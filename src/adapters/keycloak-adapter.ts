@@ -1,6 +1,7 @@
 import { env } from './environmentConfig';
 import axios, { AxiosResponse } from 'axios';
-import { loginForm } from '../models/userInterface';
+
+import { loginForm, Response } from '../models/user-interface';
 
 
 const instance = axios.create({
@@ -11,6 +12,7 @@ const instance = axios.create({
 });
 
 export function authentication(payload: loginForm): Promise<Response> {
+  console.log(`url: ${env.keycloak.url}`)
   const params = new URLSearchParams();
   params.append("username", payload.userId);
   params.append("password", payload.password);
@@ -27,6 +29,7 @@ export function authentication(payload: loginForm): Promise<Response> {
       throw new Error(response.status.toString());
     })
     .catch((error: any) => {
+      console.log(error);
       console.log(`error: ${error.response.status}`);
       console.log(`error: ${error.response.data.error_description}`)
       throw new Error(error.response.data.error_description);

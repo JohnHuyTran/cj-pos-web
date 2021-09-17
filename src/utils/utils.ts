@@ -1,5 +1,5 @@
 import jwtDecode from "jwt-decode";
-import { KeyCloakTokenInfo } from "../types/keyColakTokenInfo";
+import { KeyCloakTokenInfo } from "../models/keycolak-token-info";
 
 export const getDecodedAccessToken = (accessToken: string) => {
     return jwtDecode<KeyCloakTokenInfo>(accessToken)
@@ -10,7 +10,7 @@ export function getActionLists(): string[] {
     return tokenInfo.acl["service.newposback"];
 }
 
-export function isAllowPermission(action: string):boolean {
+export function isAllowPermission(action: string): boolean {
     return getActionLists().indexOf(action) > -1
 }
 

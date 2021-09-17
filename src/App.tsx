@@ -1,5 +1,6 @@
 import './App.css';
 import React from 'react';
+import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { makeStyles, withStyles } from '@mui/styles';
 import { useTheme, alpha } from '@mui/material/styles';
@@ -42,8 +43,11 @@ import ProductList from './pages/products';
 import Sale from './pages/sale';
 import User from './pages/user';
 import { NoEncryptionTwoTone } from '@mui/icons-material';
+import LoginForm from './components/login/login-form';
+import { useAppSelector, useAppDispatch } from './store/store';
 
 function App() {
+  const auth = useAppSelector((state) => state.auth)
   const drawerWidth = 240;
 
   const theme = useTheme();
@@ -214,6 +218,10 @@ function App() {
   const handleListItemClick = (menuId: number) => {
     setSelectedIndex(menuId);
   };
+
+  if (!auth || !auth.isLogin) {
+    return <LoginForm />;
+  }
 
   return (
     <div className={classes.root}>

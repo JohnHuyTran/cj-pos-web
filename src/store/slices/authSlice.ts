@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { authentication } from '../../adapters/keycloak-adapter';
-import { loginForm } from '../../models/userInterface';
+import { loginForm } from '../../models/user-interface';
 
 type AuthState = {
   token: string | null,
@@ -23,9 +23,12 @@ export const loginKeyCloakAsync = createAsyncThunk(
   "login",
   async (payload: loginForm, store) => {
     try {
+
       const response = await authentication(payload);
+      console.log(response);
       return response;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
@@ -36,12 +39,18 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      initialState;
+      state.isLogin = false;
+      state.token = '';
+      state.refreshToken = '';
+      state.error = '';
     }
   },
   extraReducers: (builder) => {
     builder.addCase(loginKeyCloakAsync.pending, (state) => {
-      initialState
+      state.isLogin = false;
+      state.token = '';
+      state.refreshToken = '';
+      state.error = '';
     }),
       builder.addCase(loginKeyCloakAsync.fulfilled, (state, action: PayloadAction<any>) => {
         state.token = action.payload.access_token;
@@ -50,9 +59,8 @@ const authSlice = createSlice({
         state.isLogin = true
       }),
       builder.addCase(loginKeyCloakAsync.rejected, (state, action) => {
-        console.log(action);
-        state.isLogin = false,
-          state.token = '';
+        state.isLogin = false;
+        state.token = '';
         state.refreshToken = '';
         state.sessionState = '';
         state.error = action.error.message || ''
