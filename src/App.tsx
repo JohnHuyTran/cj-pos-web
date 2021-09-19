@@ -1,6 +1,5 @@
 import './App.css';
 import React from 'react';
-import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { makeStyles, withStyles } from '@mui/styles';
 import { useTheme, alpha } from '@mui/material/styles';
@@ -42,13 +41,14 @@ import Purchase from './pages/purchase';
 import ProductList from './pages/products';
 import Sale from './pages/sale';
 import User from './pages/user';
-import { NoEncryptionTwoTone } from '@mui/icons-material';
 import LoginForm from './components/login/login-form';
-import { useAppSelector, useAppDispatch } from './store/store';
+import { useAppSelector } from './store/store';
+import CheckOrder from './pages/check-order';
 
 function App() {
-  const auth = useAppSelector((state) => state.auth)
+  const auth = useAppSelector((state) => state.auth);
   const drawerWidth = 240;
+  const pageSize = window.screen.width - drawerWidth;
 
   const theme = useTheme();
 
@@ -58,13 +58,15 @@ function App() {
     },
     appBar: {
       backgroundColor: 'white',
+      width: 500,
       transition: theme.transitions.create(['margin', 'width'], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
     },
     appBarShift: {
-      width: `calc(100% - ${drawerWidth}px)`,
+      backgroundColor: 'white',
+      width: 500,
       marginLeft: drawerWidth,
       transition: theme.transitions.create(['margin', 'width'], {
         easing: theme.transitions.easing.easeOut,
@@ -112,6 +114,7 @@ function App() {
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'space-between',
+      backgroundColor: 'white',
     },
     search: {
       position: 'relative',
@@ -202,9 +205,14 @@ function App() {
   const [open, setOpen] = React.useState(true);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [openSaleMenu, setOpenSaleMenu] = React.useState(false);
+  const [openProductMenu, setOpenProductMenu] = React.useState(false);
 
   const handleClick = () => {
     setOpenSaleMenu(!openSaleMenu);
+  };
+
+  const handleClickProduct = () => {
+    setOpenProductMenu(!openProductMenu);
   };
 
   const handleDrawerOpen = () => {
@@ -227,7 +235,7 @@ function App() {
     <div className={classes.root}>
       <CssBaseline />
       <AppBar
-        position='fixed'
+        position="fixed"
         className={clsx(classes.appBar, {
           [classes.appBarShift]: open,
         })}
@@ -240,10 +248,10 @@ function App() {
             }}
           >
             <IconButton
-              color='inherit'
-              aria-label='open drawer'
+              color="inherit"
+              aria-label="open drawer"
               onClick={handleDrawerOpen}
-              edge='start'
+              edge="start"
               className={clsx(classes.menuButton, open && classes.hide)}
             >
               <MenuIcon />
@@ -253,7 +261,7 @@ function App() {
                 <SearchIcon />
               </div>
               <InputBase
-                placeholder='Enter key word...'
+                placeholder="Enter key word..."
                 classes={{
                   root: classes.inputRoot,
                   input: classes.inputInput,
@@ -270,33 +278,33 @@ function App() {
             }}
           >
             <div className={classes.branchLabel}>
-              <Typography variant='subtitle2'>
+              <Typography variant="subtitle2">
                 สาขา : (0223) สาขาที่00236 สนามจันทร์ (ชุมชนจัทรคามพิทักษ์)
               </Typography>
             </div>
             <IconButton
-              aria-label='account of current user'
-              aria-controls='menu-appbar'
-              aria-haspopup='true'
-              color='primary'
-              edge='end'
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              color="primary"
+              edge="end"
             >
-              <img src={imgUser} alt='' />
+              <img src={imgUser} alt="" />
             </IconButton>
           </div>
         </Toolbar>
       </AppBar>
       <Drawer
         className={classes.drawer}
-        variant='persistent'
-        anchor='left'
+        variant="persistent"
+        anchor="left"
         open={open}
         classes={{
           paper: classes.drawerPaper,
         }}
       >
         <div className={classes.drawerHeader}>
-          <img src={imgLogo} alt='' />
+          <img src={imgLogo} alt="" />
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? (
               <ChevronLeftIcon />
@@ -307,88 +315,110 @@ function App() {
         </div>
         <Divider />
         <List>
-          <Link to='/' style={{ textDecoration: 'none' }}>
+          <Link to="/" style={{ textDecoration: 'none' }}>
             <ListItemButton
-              key='HOME'
+              key="HOME"
               selected={selectedIndex === 0}
               onClick={() => handleListItemClick(0)}
             >
               <ListItemIcon>
                 <HomeOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary='หน้าหลัก' />
+              <ListItemText primary="หน้าหลัก" />
             </ListItemButton>
           </Link>
-          <Link to='/notification' style={{ textDecoration: 'none' }}>
+          <Link to="/notification" style={{ textDecoration: 'none' }}>
             <ListItemButton
-              key='NOTIFICATION'
+              key="NOTIFICATION"
               selected={selectedIndex === 1}
               onClick={() => handleListItemClick(1)}
             >
               <ListItemIcon>
                 <NotificationsNoneOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary='แจ้งเตือน' />
+              <ListItemText primary="แจ้งเตือน" />
             </ListItemButton>
           </Link>
-          <Link to='/purchase' style={{ textDecoration: 'none' }}>
+          <Link to="/purchase" style={{ textDecoration: 'none' }}>
             <ListItemButton
-              key='PURCHASE'
+              key="PURCHASE"
               selected={selectedIndex === 2}
               onClick={() => handleListItemClick(2)}
             >
               <ListItemIcon>
                 <ShoppingCartOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary='ซื้อ' />
+              <ListItemText primary="ซื้อ" />
             </ListItemButton>
           </Link>
-
           <ListItemButton onClick={handleClick}>
             <ListItemIcon>
               <LoyaltyOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary='ขาย' />
+            <ListItemText primary="ขาย" />
             {openSaleMenu ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
-          <Collapse in={openSaleMenu} timeout='auto' unmountOnExit>
-            <List component='div' disablePadding>
-              <Link to='/sale' style={{ textDecoration: 'none' }}>
+          <Collapse in={openSaleMenu} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <Link to="/sale" style={{ textDecoration: 'none' }}>
                 <ListItemButton
-                  key='SALE'
+                  key="SALE"
                   selected={selectedIndex === 3}
                   onClick={() => handleListItemClick(3)}
                 >
                   <ListItemIcon>
                     <StarBorder />
                   </ListItemIcon>
-                  <ListItemText primary='ส่วนลดสินค้า' />
+                  <ListItemText primary="ส่วนลดสินค้า" />
                 </ListItemButton>
               </Link>
             </List>
           </Collapse>
-          <Link to='/products' style={{ textDecoration: 'none' }}>
+          <ListItemButton onClick={handleClickProduct}>
+            <ListItemIcon>
+              <LoyaltyOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText primary="สินค้า" />
+            {openProductMenu ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          <Collapse in={openProductMenu} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <Link to="/products" style={{ textDecoration: 'none' }}>
+                <ListItemButton
+                  key="PRODUCTS"
+                  selected={selectedIndex === 4}
+                  onClick={() => handleListItemClick(4)}
+                >
+                  <ListItemIcon>
+                    <StorefrontOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="ข้อมูลสินค้า" />
+                </ListItemButton>
+              </Link>
+              <Link to="/check-order" style={{ textDecoration: 'none' }}>
+                <ListItemButton
+                  key="SALE"
+                  selected={selectedIndex === 5}
+                  onClick={() => handleListItemClick(5)}
+                >
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary="ตรวจสอบการรับ-โอนสินค้า" />
+                </ListItemButton>
+              </Link>
+            </List>
+          </Collapse>
+          <Link to="/user" style={{ textDecoration: 'none' }}>
             <ListItemButton
-              key='PRODUCTS'
-              selected={selectedIndex === 4}
-              onClick={() => handleListItemClick(4)}
-            >
-              <ListItemIcon>
-                <StorefrontOutlinedIcon />
-              </ListItemIcon>
-              <ListItemText primary='สินค้า' />
-            </ListItemButton>
-          </Link>
-          <Link to='/user' style={{ textDecoration: 'none' }}>
-            <ListItemButton
-              key='USER'
-              selected={selectedIndex === 5}
-              onClick={() => handleListItemClick(5)}
+              key="USER"
+              selected={selectedIndex === 6}
+              onClick={() => handleListItemClick(6)}
             >
               <ListItemIcon>
                 <GroupAddOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary='จัดการผู้ใช้งาน' />
+              <ListItemText primary="จัดการผู้ใช้งาน" />
             </ListItemButton>
           </Link>
         </List>
@@ -401,12 +431,13 @@ function App() {
         <div className={classes.drawerHeader} />
 
         <Switch>
-          <Route exact path='/' component={Home} />
-          <Route path='/notification' component={Notification} />
-          <Route path='/purchase' component={Purchase} />
-          <Route path='/products' component={ProductList} />
-          <Route path='/sale' component={Sale} />
-          <Route path='/user' component={User} />
+          <Route exact path="/" component={Home} />
+          <Route path="/notification" component={Notification} />
+          <Route path="/purchase" component={Purchase} />
+          <Route path="/products" component={ProductList} />
+          <Route path="/check-order" component={CheckOrder} />
+          <Route path="/sale" component={Sale} />
+          <Route path="/user" component={User} />
         </Switch>
       </main>
     </div>

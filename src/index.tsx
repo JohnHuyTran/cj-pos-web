@@ -8,13 +8,13 @@ import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
 import reportWebVitals from './reportWebVitals';
-import store from './store/store'
+import store from './store/store';
+import App2 from './App2';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-
         <BrowserRouter>
           <CssBaseline />
           <App />
