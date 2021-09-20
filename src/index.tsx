@@ -9,7 +9,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
 import reportWebVitals from './reportWebVitals';
 import store from './store/store';
-import App2 from './App2';
 
 ReactDOM.render(
   <React.StrictMode>
