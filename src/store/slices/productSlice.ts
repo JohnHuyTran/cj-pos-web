@@ -23,7 +23,6 @@ export const fetchGetProductList = createAsyncThunk(
       const response: ItemProduct = await get(environment.products.url).then(
         (result) => result.data
       );
-      console.log("fetchProduct== ", response);
       return response;
     } catch (error) {
       console.log("error = ", error);
@@ -44,7 +43,6 @@ const productSlice = createSlice({
     builder.addCase(
       fetchGetProductList.fulfilled,
       (state, action: PayloadAction<ItemProduct>) => {
-        console.log("action payload===", action.payload);
         state.item = action.payload;
         state.loading = false;
         state.error = "";

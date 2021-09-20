@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
-import { fetchGetProductList } from "../../store/slices/productSlice";
 import { useAppSelector, useAppDispatch } from "../../store/store";
+import { fetchGetProductList } from "../../store/slices/productSlice";
 
 function ProductListComponent() {
   const dispatch = useAppDispatch();
@@ -10,7 +10,7 @@ function ProductListComponent() {
   }, []);
 
   const items = useAppSelector((state) => state.product);
-  console.log("items == ", items);
+  console.log("items == ", items.item);
 
   return <div>productList test</div>;
 }
