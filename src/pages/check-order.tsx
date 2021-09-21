@@ -4,7 +4,7 @@ import CheckOrderSearch from '../components/orders/check-order'
 
 const CheckOrder = () => {
   return (
-    <Container maxWidth="xs">
+    <Container maxWidth="xl">
       <CheckOrderSearch />
     </Container>
   );

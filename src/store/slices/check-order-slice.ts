@@ -1,16 +1,16 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { getOrderList } from '../../mockdata/orders';
-import { CheckOrderType } from '../../models/order';
+import { CheckOrderType, Order } from '../../models/order';
 
 type State = {
-    orderList: Array<string> | null,
+    orderList: Order | null,
     error: string | null,
 }
 
 
 
 const initialState: State = {
-    orderList: [],
+    orderList: null,
     error: '',
 };
 
@@ -18,7 +18,8 @@ export const featchOrderListAsync = createAsyncThunk(
     "orderList",
     async (payload: CheckOrderType, store) => {
         try {
-            const response = await getOrderList(payload);
+            const response: Order = await getOrderList(payload).then();
+            console.log(`res: ${response}`);
             return response;
         } catch (error) {
             throw error;
@@ -34,7 +35,7 @@ const checkOrderSlice = createSlice({
         builer.addCase(featchOrderListAsync.pending, (state) => {
             initialState;
         }),
-            builer.addCase(featchOrderListAsync.fulfilled, (state, action: PayloadAction<any>) => {
+            builer.addCase(featchOrderListAsync.fulfilled, (state, action: PayloadAction<Order>) => {
                 state.orderList = action.payload;
             }),
             builer.addCase(featchOrderListAsync.rejected, (state) => {

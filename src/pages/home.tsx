@@ -25,7 +25,7 @@ export default function Home() {
   const classes = useStyles();
 
   return (
-    <Container maxWidth='lg' className={classes.root}>
+    <Container className={classes.root}>
       <Typography variant='h6'> หน้าหลัก </Typography>
       <div className={classes.greeting}>
         <Greeting userName='Patumwan' />

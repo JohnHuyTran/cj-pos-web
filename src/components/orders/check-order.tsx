@@ -15,13 +15,18 @@ import { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
 import { CheckOrderType } from '../../models/order'
 
+import OrderList from './order-list'
+import { useStyles } from './order-css'
+
 interface State {
     orderNo: string;
     orderStatus: string;
     orderType: string;
 }
 function CheckOrderSearch() {
+    const classes = useStyles();
     const dispatch = useAppDispatch();
+    const items = useAppSelector((state) => state.checkOrderList);
     const [values, setValues] = React.useState<State>({
         orderNo: '',
         orderStatus: '',
@@ -97,12 +102,21 @@ function CheckOrderSearch() {
                                 <MenuItem value={'PAPER'}>Paper</MenuItem>
                                 <MenuItem value={'PASTIC'}>Pastic</MenuItem>
                                 <MenuItem value={'DRINK'}>Drinks</MenuItem>
+                                <MenuItem value={'WASHING-POWER'}>WASHING-POWER</MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Button onClick={onClickSearchBtn}>Search</Button>
+
+                    <Button
+                        id='searchBtb'
+                        variant='contained'
+                        color='primary'
+                        onClick={onClickSearchBtn}
+                        className={classes.searchBtn}
+                    >search</Button>
                 </Grid>
             </Box>
+            {items.orderList && <OrderList />}
         </div >
     )
 }
