@@ -13,12 +13,14 @@ function OrderList() {
             headerName: "รหัสสินค้า",
             minWidth: 150,
         },
-        { field: "col3", headerName: "บาร์โค้ด", minWidth: 200 },
-        { field: "col4", headerName: "รายละเอียดสินค้า", minWidth: 350 },
-        { field: "col5", headerName: "หน่วย", minWidth: 150 },
-        { field: "col6", headerName: "จำนวนอ้างอิง", minWidth: 200 },
-        { field: "col7", headerName: "จำนวนรับจริง", minWidth: 200 },
-        { field: "col8", headerName: "ส่วนต่างการรับ", minWidth: 200 },
+        { field: "col3", headerName: "SHIPMENT", minWidth: 200 },
+        { field: "col4", headerName: "เลขที่เอกสาร", minWidth: 350 },
+        { field: "col5", headerName: "TYPE", minWidth: 150 },
+        { field: "col6", headerName: "จำนวนลัง", minWidth: 200 },
+        { field: "col7", headerName: "จำนวนTOTE", minWidth: 200 },
+        { field: "col8", headerName: "วันที่", minWidth: 200 },
+        { field: "col9", headerName: "สถานะ", minWidth: 200 },
+        { field: "col10", headerName: "รายละเอียด", minWidth: 200 },
     ];
 
     const rows: any = items.orderList?.products.map((data, index) => {
