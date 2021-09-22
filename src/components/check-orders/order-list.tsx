@@ -9,7 +9,7 @@ import { CheckOrderResponse, Order } from '../../models/order';
 
 function OrderList() {
     const items = useAppSelector((state) => state.checkOrderList);
-    const res: any = items.orderList;
+    const res: Order[] = items.orderList;
     const [open, setOpen] = React.useState(false);
     const [shipment, setShipment] = React.useState('');
 
@@ -18,8 +18,6 @@ function OrderList() {
         {
             field: "orderShipment", headerName: "SHIPMENT"
         },
-
-
         { field: "orderNo", headerName: "เลขที่เอกสาร", minWidth: 150 },
         { field: "orderType", headerName: "TYPE", minWidth: 150 },
         { field: "orderTotal", headerName: "จำนวนลัง", minWidth: 200 },
@@ -29,7 +27,7 @@ function OrderList() {
         { field: "col10", headerName: "รายละเอียด", minWidth: 200 },
     ];
 
-    const rows: any = res.map((data: any, index: any) => {
+    const rows = res.map((data: Order, index: number) => {
         return {
             id: data.orderShipment,
             index: index + 1,
@@ -52,6 +50,7 @@ function OrderList() {
                         onRowClick={(params, Event, details) => {
                             setOpen(true);
                             // setShipment(params.id);
+                            console.log(params.id);
                             setShipment("LD234587");
                         }}
 

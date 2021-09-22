@@ -8,7 +8,7 @@ export interface CheckOrderRequest {
 export interface CheckOrderResponse {
     ref: number;
     total: number;
-    orders: Order[]
+    orders?: Order[]
 }
 
 export interface Order {
@@ -19,7 +19,7 @@ export interface Order {
     orderTotal: number;
     orderTote: number;
     orderCreateDate: string;
-    products: Product[]
+    products?: Product[]
 }
 
 export interface Product {

@@ -81,7 +81,7 @@ export const orders = [
 
 
 export function getOrderList(payload: CheckOrderRequest) {
-
+    console.log(payload.orderNo);
     return new Promise((resolve, reject) => {
         const foundOrders = orders.filter(
             (order) => order.orderNo.indexOf(payload.orderNo) > -1

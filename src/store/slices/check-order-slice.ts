@@ -3,14 +3,14 @@ import { getOrderList } from '../../mockdata/orders';
 import { CheckOrderRequest, Order, CheckOrderResponse } from '../../models/order';
 
 type State = {
-    orderList: Order | null;
+    orderList: Order[];
     error: string;
 }
 
 
 
 const initialState: State = {
-    orderList: null,
+    orderList: [],
     error: "",
 };
 
@@ -19,7 +19,6 @@ export const featchOrderListAsync = createAsyncThunk(
     async (payload: CheckOrderRequest, store) => {
         try {
             const response: Order = await getOrderList(payload).then();
-            console.log(`res: ${response}`);
             return response;
         } catch (error) {
             throw error;
@@ -35,7 +34,7 @@ const checkOrderSlice = createSlice({
         builer.addCase(featchOrderListAsync.pending, (state) => {
             initialState;
         }),
-            builer.addCase(featchOrderListAsync.fulfilled, (state, action: PayloadAction<Order>) => {
+            builer.addCase(featchOrderListAsync.fulfilled, (state, action: PayloadAction<any>) => {
                 state.orderList = action.payload;
             }),
             builer.addCase(featchOrderListAsync.rejected, (state) => {
