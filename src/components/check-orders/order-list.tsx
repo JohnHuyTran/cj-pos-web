@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAppSelector } from '../../store/store';
-import { DataGrid, GridColDef, GridRowsProp, GridRowData } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowsProp, GridRowData, GridRowParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import OrderProductList from './order-product-list';
 import { CheckOrderResponse, Order } from '../../models/order';
@@ -11,6 +11,7 @@ function OrderList() {
     const items = useAppSelector((state) => state.checkOrderList);
     const res: any = items.orderList;
     const [open, setOpen] = React.useState(false);
+    const [shipment, setShipment] = React.useState('');
 
     const columns: GridColDef[] = [
         { field: "index", headerName: "ลำดับ", minWidth: 120 },
@@ -48,14 +49,16 @@ function OrderList() {
             <Box mt={2} bgcolor='background.paper'>
                 <div>
                     <DataGrid rows={rows} columns={columns}
-                        // onRowClick={(params, Event) => {
-                        //     { setOpen(true) }
-                        // }}
+                        onRowClick={(params, Event, details) => {
+                            setOpen(true);
+                            // setShipment(params.id);
+                            setShipment("LD234587");
+                        }}
 
                         autoHeight />
                 </div>
             </Box>
-            {/* {open && <OrderProductList />} */}
+            {open && <OrderProductList shipment={shipment} defaultOpen={open} />}
         </div>
 
     )
