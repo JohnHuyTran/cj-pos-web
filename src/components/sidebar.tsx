@@ -25,6 +25,8 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { useAppSelector, useAppDispatch } from '../store/store';
 import { changeState } from '../store/slices/navSlice';
 
+import imgLogo from '../assets/images/CJlogo.png';
+
 const drawerWidth = 240;
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -33,7 +35,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
+  justifyContent: 'space-between',
 }));
 
 const ListItemButton = withStyles({
@@ -113,6 +115,7 @@ export default function Sidebar({}: Props): ReactElement {
       open={open}
     >
       <DrawerHeader>
+        <img src={imgLogo} alt='' />
         <IconButton onClick={handleDrawerClose}>
           {theme.direction === 'ltr' ? (
             <ChevronLeftIcon />
