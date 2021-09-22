@@ -185,6 +185,7 @@ export default function Sidebar({}: Props): ReactElement {
                 key='SALE'
                 selected={selectedIndex === 3}
                 onClick={() => handleListItemClick(3)}
+                sx={{ pl: 4 }}
               >
                 <ListItemIcon>
                   <StarBorder />
@@ -211,6 +212,7 @@ export default function Sidebar({}: Props): ReactElement {
                 key='PRODUCTS'
                 selected={selectedIndex === 4}
                 onClick={() => handleListItemClick(4)}
+                sx={{ pl: 4 }}
               >
                 <ListItemIcon>
                   <StorefrontOutlinedIcon />
@@ -226,6 +228,7 @@ export default function Sidebar({}: Props): ReactElement {
                 key='SALE'
                 selected={selectedIndex === 5}
                 onClick={() => handleListItemClick(5)}
+                sx={{ pl: 4 }}
               >
                 <ListItemIcon>
                   <StarBorder />
