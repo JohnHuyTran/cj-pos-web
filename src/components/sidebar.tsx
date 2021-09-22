@@ -123,7 +123,7 @@ export default function Sidebar({}: Props): ReactElement {
       </DrawerHeader>
       <Divider />
       <List>
-        <Link to='/' style={{ textDecoration: 'none' }}>
+        <Link to='/' style={{ textDecoration: 'none', color: '#676767' }}>
           <ListItemButton
             key='HOME'
             selected={selectedIndex === 0}
@@ -135,7 +135,10 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemText primary='หน้าหลัก' />
           </ListItemButton>
         </Link>
-        <Link to='/notification' style={{ textDecoration: 'none' }}>
+        <Link
+          to='/notification'
+          style={{ textDecoration: 'none', color: '#676767' }}
+        >
           <ListItemButton
             key='NOTIFICATION'
             selected={selectedIndex === 1}
@@ -147,7 +150,10 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemText primary='แจ้งเตือน' />
           </ListItemButton>
         </Link>
-        <Link to='/purchase' style={{ textDecoration: 'none' }}>
+        <Link
+          to='/purchase'
+          style={{ textDecoration: 'none', color: '#676767' }}
+        >
           <ListItemButton
             key='PURCHASE'
             selected={selectedIndex === 2}
@@ -163,12 +169,15 @@ export default function Sidebar({}: Props): ReactElement {
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText primary='ขาย' />
+          <ListItemText primary='ขาย' style={{ color: '#676767' }} />
           {openSaleMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openSaleMenu} timeout='auto' unmountOnExit>
           <List component='div' disablePadding>
-            <Link to='/sale' style={{ textDecoration: 'none' }}>
+            <Link
+              to='/sale'
+              style={{ textDecoration: 'none', color: '#676767' }}
+            >
               <ListItemButton
                 key='SALE'
                 selected={selectedIndex === 3}
@@ -186,12 +195,15 @@ export default function Sidebar({}: Props): ReactElement {
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText primary='สินค้า' />
+          <ListItemText primary='สินค้า' style={{ color: '#676767' }} />
           {openProductMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openProductMenu} timeout='auto' unmountOnExit>
           <List component='div' disablePadding>
-            <Link to='/products' style={{ textDecoration: 'none' }}>
+            <Link
+              to='/products'
+              style={{ textDecoration: 'none', color: '#676767' }}
+            >
               <ListItemButton
                 key='PRODUCTS'
                 selected={selectedIndex === 4}
@@ -203,7 +215,10 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='ข้อมูลสินค้า' />
               </ListItemButton>
             </Link>
-            <Link to='/check-order' style={{ textDecoration: 'none' }}>
+            <Link
+              to='/check-order'
+              style={{ textDecoration: 'none', color: '#676767' }}
+            >
               <ListItemButton
                 key='SALE'
                 selected={selectedIndex === 5}
@@ -217,7 +232,7 @@ export default function Sidebar({}: Props): ReactElement {
             </Link>
           </List>
         </Collapse>
-        <Link to='/user' style={{ textDecoration: 'none' }}>
+        <Link to='/user' style={{ textDecoration: 'none', color: '#676767' }}>
           <ListItemButton
             key='USER'
             selected={selectedIndex === 6}
