@@ -1,20 +1,24 @@
-export interface CheckOrderType {
-    orderNo: string | null,
-    orderStatus: string | null,
-    orderType: string | null,
+export interface CheckOrderRequest {
+    orderNo: string;
+    orderStatus: string;
+    orderType: string
 }
 
 export interface CheckOrderResponse {
     ref: number;
     total: number;
-    orders: Order[];
+    orders: Order[]
 }
 
 export interface Order {
     orderNo: string;
     orderStatus: string;
     orderType: string;
-    products: Product[];
+    orderShipment: string;
+    orderTotal: number;
+    orderTote: number;
+    orderCreateDate: string;
+    products: Product[]
 }
 
 export interface Product {

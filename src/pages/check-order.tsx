@@ -1,6 +1,6 @@
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import CheckOrderSearch from '../components/orders/check-order'
+import CheckOrderSearch from '../components/check-orders/check-order'
 
 const CheckOrder = () => {
   return (

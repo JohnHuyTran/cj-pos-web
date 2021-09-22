@@ -1,9 +1,13 @@
-import { CheckOrderType } from "../models/order"
+import { CheckOrderRequest } from "../models/order"
 export const orders = [
     {
+        orderShipment: "LD234587",
         orderNo: "SD2021-001",
-        orderStatus: "PENDING",
+        orderTotal: 210,
+        orderTote: 78,
         orderType: "PAPER",
+        orderStatus: "PENDING",
+        orderCreateDate: '16/09/2012',
         products: [
             {
                 productId: "0001",
@@ -35,9 +39,13 @@ export const orders = [
         ]
     },
     {
+        orderShipment: "LD234999",
         orderNo: "SD2021-002",
+        orderTotal: 210,
+        orderTote: 78,
         orderStatus: "COMPLETE",
         orderType: "WASHING-POWER",
+        orderCreateDate: '16/09/2012',
         products: [
             {
                 productId: "0021",
@@ -72,13 +80,11 @@ export const orders = [
 
 
 
-export function getOrderList(payload: CheckOrderType) {
-    console.log(`payload: ${payload}`);
+export function getOrderList(payload: CheckOrderRequest) {
+
     return new Promise((resolve, reject) => {
-        const foundOrders = orders.find(
-            (orders) => orders.orderNo === payload.orderNo ||
-                orders.orderStatus === payload.orderStatus ||
-                orders.orderType === payload.orderType
+        const foundOrders = orders.filter(
+            (order) => order.orderNo.indexOf(payload.orderNo) > -1
         )
 
         setTimeout(() => {
@@ -87,6 +93,6 @@ export function getOrderList(payload: CheckOrderType) {
             } else {
                 reject('Email or password is invalid')
             }
-        }, 3000)
+        }, 100)
     })
 }

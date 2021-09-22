@@ -13,7 +13,7 @@ import { Button } from '@mui/material';
 
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
-import { CheckOrderType } from '../../models/order'
+import { CheckOrderRequest } from '../../models/order'
 
 import OrderList from './order-list'
 import { useStyles } from './order-css'
@@ -40,11 +40,11 @@ function CheckOrderSearch() {
     }
 
     const onClickSearchBtn = () => {
-        const payload: CheckOrderType = {
+        const payload: CheckOrderRequest = {
             orderNo: values.orderNo,
             orderStatus: values.orderStatus,
             orderType: values.orderType
-        };
+        }
         dispatch(featchOrderListAsync(payload));
     }
 
