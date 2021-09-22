@@ -34,6 +34,7 @@ export interface Product {
 
 export interface OrderProductListProps {
     // shipment: GridRowId | undefined;
-    shipment: string | undefined;
+    shipment: any | undefined;
     defaultOpen: boolean;
+    onClickClose: any;
 }

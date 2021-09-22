@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAppSelector } from '../../store/store';
-import { DataGrid, GridColDef, GridRowsProp, GridRowData, GridRowParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridCellParams, GridApi, GridRowParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import OrderProductList from './order-product-list';
 import { CheckOrderResponse, Order } from '../../models/order';
@@ -10,7 +10,7 @@ import { CheckOrderResponse, Order } from '../../models/order';
 function OrderList() {
     const items = useAppSelector((state) => state.checkOrderList);
     const res: Order[] = items.orderList;
-    const [open, setOpen] = React.useState(false);
+    const [opens, setOpens] = React.useState(false);
     const [shipment, setShipment] = React.useState('');
 
     const columns: GridColDef[] = [
@@ -42,22 +42,28 @@ function OrderList() {
         };
     });
 
+    function currentlySelected(params: GridCellParams) {
+        setShipment(params.id.toString());
+        setOpens(true);
+        console.log("opens", opens);
+    }
+
+    function isClosModal() {
+        setOpens(false);
+    }
+
+    console.log(typeof isClosModal)
+
     return (
         <div>
             <Box mt={2} bgcolor='background.paper'>
                 <div>
                     <DataGrid rows={rows} columns={columns}
-                        onRowClick={(params, Event, details) => {
-                            setOpen(true);
-                            // setShipment(params.id);
-                            console.log(params.id);
-                            setShipment("LD234587");
-                        }}
-
+                        onCellClick={currentlySelected}
                         autoHeight />
                 </div>
             </Box>
-            {open && <OrderProductList shipment={shipment} defaultOpen={open} />}
+            {opens && <OrderProductList shipment={shipment} defaultOpen={opens} onClickClose={isClosModal} />}
         </div>
 
     )
