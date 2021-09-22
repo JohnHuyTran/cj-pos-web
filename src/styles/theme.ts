@@ -20,6 +20,9 @@ const theme = createTheme({
   typography: {
     fontFamily: 'Kanit',
   },
+  shape: {
+    borderRadius: 2,
+  },
 });
 
 export default theme;
