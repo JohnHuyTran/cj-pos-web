@@ -29,7 +29,11 @@ export const featchOrderListAsync = createAsyncThunk(
 const checkOrderSlice = createSlice({
     name: "checkOrder",
     initialState,
-    reducers: {},
+    reducers: {
+        clearDataFilter: (state) => {
+            state.orderList = []
+        }
+    },
     extraReducers: (builer) => {
         builer.addCase(featchOrderListAsync.pending, (state) => {
             initialState;
@@ -44,4 +48,5 @@ const checkOrderSlice = createSlice({
     }
 });
 
+export const { clearDataFilter } = checkOrderSlice.actions;
 export default checkOrderSlice.reducer;

@@ -3,7 +3,7 @@ import { useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridCellParams, GridApi, GridRowParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import OrderProductList from './order-product-list';
-import { CheckOrderResponse, Order } from '../../models/order';
+import { Order } from '../../models/order';
 
 
 

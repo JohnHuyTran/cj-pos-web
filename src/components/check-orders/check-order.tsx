@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -12,7 +12,7 @@ import { Event } from '@mui/icons-material';
 import { Button } from '@mui/material';
 
 import { useAppSelector, useAppDispatch } from '../../store/store';
-import { featchOrderListAsync } from '../../store/slices/check-order-slice';
+import { featchOrderListAsync, clearDataFilter } from '../../store/slices/check-order-slice';
 import { CheckOrderRequest } from '../../models/order'
 
 import OrderList from './order-list'
@@ -48,7 +48,10 @@ function CheckOrderSearch() {
         dispatch(featchOrderListAsync(payload));
     }
 
-
+    useEffect(() => {
+        dispatch(clearDataFilter());
+    }, [])
+    // dispatch(clearDataFilter());
 
 
     return (

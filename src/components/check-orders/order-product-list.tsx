@@ -14,13 +14,10 @@ import { OrderProductListProps, Order, Product } from '../../models/order';
 const OrderProductList: React.FC<OrderProductListProps> = props => {
 
   const { shipment, defaultOpen } = props;
-  console.log("defaultOpen: ", defaultOpen);
   const items = useAppSelector((state) => state.checkOrderList);
   const res: Order[] = items.orderList;
   const [open, setOpen] = React.useState(defaultOpen);
-  console.log("open: ", open);
   useEffect(() => {
-    console.log("use effect");
     setOpen(defaultOpen);
   }, [open])
 
