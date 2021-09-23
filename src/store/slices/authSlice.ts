@@ -23,7 +23,6 @@ export const loginKeyCloakAsync = createAsyncThunk(
   async (payload: loginForm, store) => {
     try {
       const response = await authentication(payload);
-      console.log(response);
       return response;
     } catch (error) {
       console.log(error);
