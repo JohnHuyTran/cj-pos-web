@@ -1,3 +1,5 @@
+import moment from "moment";
+import MomentUtils from "@date-io/moment";
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -9,7 +11,11 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Event } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { Button, Paper } from '@mui/material';
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import "moment/locale/fr";
+import "moment/locale/ru";
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListAsync, clearDataFilter } from '../../store/slices/check-order-slice';
@@ -17,7 +23,7 @@ import { CheckOrderRequest } from '../../models/order'
 
 import OrderList from './order-list'
 import { useStyles } from './order-css'
-
+moment.locale("en");
 interface State {
     orderNo: string;
     orderStatus: string;
@@ -32,7 +38,9 @@ function CheckOrderSearch() {
         orderStatus: '',
         orderType: ''
     });
-
+    const [locale, setLocale] = React.useState("en");
+    const [startDate, setStartDate] = React.useState<MaterialUiPickersDate>();
+    const [endDate, setEndDate] = React.useState<MaterialUiPickersDate>();
 
     const handleChange = (event: any) => {
         const value = event.target.value;
@@ -53,7 +61,6 @@ function CheckOrderSearch() {
     }, [])
     // dispatch(clearDataFilter());
 
-
     return (
         <div>
             <Box sx={{ flexGrow: 1 }}>
@@ -66,11 +73,35 @@ function CheckOrderSearch() {
                     </Grid>
                     <Grid item xs={6}>
                         <Typography variant="subtitle1" gutterBottom component="div">ตั้งแต่วันที่:</Typography>
+                        <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={locale}>
+                            <KeyboardDatePicker
+                                autoOk
+                                variant="inline"
+                                inputVariant="outlined"
+                                value={startDate}
+                                format="MM/DD/yyyy"
+                                InputAdornmentProps={{ position: "start" }}
+                                onChange={date => setStartDate(date)}
+                                disableToolbar={true}
+                            />
+                        </MuiPickersUtilsProvider>
 
-                        <TextField id="outlined-basic" label="" variant="outlined" />
+
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography variant="subtitle1" gutterBottom component="div">ถึงวันที่: </Typography><TextField id="outlined-basic" label="" variant="outlined" />
+                        <Typography variant="subtitle1" gutterBottom component="div">ถึงวันที่: </Typography>
+                        <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={locale}>
+                            <KeyboardDatePicker
+                                autoOk
+                                variant="inline"
+                                inputVariant="outlined"
+                                value={endDate}
+                                format="MM/DD/yyyy"
+                                InputAdornmentProps={{ position: "start" }}
+                                onChange={date => setEndDate(date)}
+                                disableToolbar={true}
+                            />
+                        </MuiPickersUtilsProvider>
                     </Grid>
                     <Grid item xs={6}  >
                         <Typography variant="subtitle1" gutterBottom component="div">สถานะ:</Typography>
