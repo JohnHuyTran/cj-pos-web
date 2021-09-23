@@ -84,9 +84,10 @@ function CheckOrderSearch() {
                                 displayEmpty
                                 inputProps={{ 'aria-label': 'Without label' }}
                             >
-                                <MenuItem value={'ALL'}>All</MenuItem>
+                                <MenuItem value={'APPROVE'}>Approve</MenuItem>
                                 <MenuItem value={'PENDING'}>Pending</MenuItem>
-                                <MenuItem value={'COMPLETE'}>Complete</MenuItem>
+                                <MenuItem value={'REJECT'}>Reject</MenuItem>
+
                             </Select>
                         </FormControl>
                     </Grid>

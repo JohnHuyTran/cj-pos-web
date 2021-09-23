@@ -43,7 +43,7 @@ export const orders = [
         orderNo: "SD2021-002",
         orderTotal: 210,
         orderTote: 78,
-        orderStatus: "COMPLETE",
+        orderStatus: "APPROVE",
         orderType: "WASHING-POWER",
         orderCreateDate: '16/09/2012',
         products: [
