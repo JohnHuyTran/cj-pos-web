@@ -8,6 +8,10 @@ const useStyles = makeStyles({
         height: "40px",
         borderRadius: "5px",
     },
+    textField: {
+        width: "250px",
+        height: "40px",
+    },
 })
 
 export { useStyles };

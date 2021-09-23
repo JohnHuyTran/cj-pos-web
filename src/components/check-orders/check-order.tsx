@@ -23,6 +23,8 @@ import { CheckOrderRequest } from '../../models/order'
 
 import OrderList from './order-list'
 import { useStyles } from './order-css'
+import clsx from "clsx";
+
 moment.locale("en");
 interface State {
     orderNo: string;
@@ -65,14 +67,15 @@ function CheckOrderSearch() {
         <div>
             <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={2}>
-                    <Grid item xs={6}  >
-                        <Typography variant="subtitle1" gutterBottom component="div">เลขที่เอกสาร:</Typography>
+                    <Grid item xs={2}  >
+                        <Typography variant="subtitle1" gutterBottom component="div">เลขที่เอกสาร: </Typography>
                     </Grid>
-                    <Grid item xs={6}  >
-                        <TextField id="outlined-basic" label="" variant="outlined" name='orderNo' onChange={handleChange} />
+                    <Grid item xs={2}  >
+                        <TextField size="small" id="outlined-basic" label="" variant="outlined" name='orderNo' onChange={handleChange} className={classes.textField} />
                     </Grid>
+                    <Grid item xs={8}  ></Grid>
                     <Grid item xs={6}>
-                        <Typography variant="subtitle1" gutterBottom component="div">ตั้งแต่วันที่:</Typography>
+                        <Typography variant="subtitle1" gutterBottom component="div">ตั้งแต่วันที่: </Typography>
                         <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={locale}>
                             <KeyboardDatePicker
                                 autoOk
@@ -103,11 +106,11 @@ function CheckOrderSearch() {
                             />
                         </MuiPickersUtilsProvider>
                     </Grid>
-                    <Grid item xs={6}  >
-                        <Typography variant="subtitle1" gutterBottom component="div">สถานะ:</Typography>
+                    <Grid item xs={2}  >
+                        <Typography variant="subtitle1" gutterBottom component="div">สถานะ: </Typography>
                     </Grid>
-                    <Grid item xs={6}  >
-                        <FormControl fullWidth>
+                    <Grid item xs={2}  >
+                        <FormControl fullWidth size='small'>
                             <Select
                                 name='orderStatus'
                                 value={values.orderStatus}
@@ -122,11 +125,12 @@ function CheckOrderSearch() {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={6}  >
-                        <Typography variant="subtitle1" gutterBottom component="div">ประเภท:</Typography>
+                    <Grid item xs={2} />
+                    <Grid item xs={2}  >
+                        <Typography variant="subtitle1" gutterBottom component="div">ประเภท: </Typography>
                     </Grid>
-                    <Grid item xs={6}  >
-                        <FormControl fullWidth>
+                    <Grid item xs={2}  >
+                        <FormControl fullWidth size='small'>
                             <Select
                                 name="orderType"
                                 value={values.orderType}
@@ -141,14 +145,15 @@ function CheckOrderSearch() {
                             </Select>
                         </FormControl>
                     </Grid>
-
-                    <Button
-                        id='searchBtb'
-                        variant='contained'
-                        color='primary'
-                        onClick={onClickSearchBtn}
-                        className={classes.searchBtn}
-                    >search</Button>
+                    <Grid item xs={12}  >
+                        <Button
+                            id='searchBtb'
+                            variant='contained'
+                            color='primary'
+                            onClick={onClickSearchBtn}
+                            className={classes.searchBtn}
+                        >search</Button>
+                    </Grid>
                 </Grid>
             </Box>
             {items.orderList && <OrderList />}

@@ -82,17 +82,23 @@ export const orders = [
 
 export function getOrderList(payload: CheckOrderRequest) {
     return new Promise((resolve, reject) => {
+
+        if (!payload.orderNo && !payload.orderStatus && !payload.orderType) {
+            reject('data not found')
+        }
+
         const foundOrders = orders.filter(
-            (order) => (payload.orderNo && order.orderNo.search(payload.orderNo) > -1) ||
-                (payload.orderStatus && payload.orderStatus === order.orderStatus) ||
-                (payload.orderType && payload.orderType === order.orderType)
+            (order) => (!payload.orderNo ? true : payload.orderNo && order.orderNo.search(payload.orderNo) > -1) &&
+                (!payload.orderStatus ? true : payload.orderStatus && payload.orderStatus === order.orderStatus) &&
+                (!payload.orderType ? true : payload.orderType && payload.orderType === order.orderType)
         )
+
 
         setTimeout(() => {
             if (foundOrders) {
                 resolve(foundOrders)
             } else {
-                reject('Email or password is invalid')
+                reject('data not found')
             }
         }, 100)
     })
