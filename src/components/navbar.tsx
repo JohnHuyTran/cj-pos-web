@@ -1,11 +1,13 @@
 import React, { ReactElement, useEffect } from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled, useTheme, alpha } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import InputBase from '@mui/material/InputBase';
 import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
 import { useAppSelector, useAppDispatch } from '../store/store';
 import { changeState } from '../store/slices/navSlice';
 
@@ -73,9 +75,58 @@ export default function Navbar({}: Props): ReactElement {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant='h6' noWrap component='div'>
-            Persistent drawer
-          </Typography>
+          <Box
+            sx={{
+              position: 'relative',
+              borderRadius: theme.shape.borderRadius,
+              border: '1px',
+              borderStyle: 'solid',
+              borderColor: '#CBD4DB',
+              backgroundColor: alpha(theme.palette.common.white, 0.15),
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.common.white, 0.25),
+              },
+              marginLeft: 0,
+              width: '500px',
+              [theme.breakpoints.up('sm')]: {
+                marginLeft: theme.spacing(1),
+                width: 'auto',
+              },
+            }}
+          >
+            <Box
+              sx={{
+                padding: theme.spacing(0, 2),
+                height: '100%',
+                position: 'absolute',
+                pointerEvents: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#CBD4DB',
+              }}
+            >
+              <SearchIcon />
+            </Box>
+            <InputBase
+              placeholder='Enter key word...'
+              sx={{
+                color: '#CBD4DB',
+                width: '100%',
+                padding: theme.spacing(1, 1, 1, 0),
+                // vertical padding + font size from searchIcon
+                paddingLeft: '48px',
+                transition: theme.transitions.create('width'),
+                [theme.breakpoints.up('sm')]: {
+                  width: '12ch',
+                  '&:focus': {
+                    width: '20ch',
+                  },
+                },
+              }}
+              inputProps={{ 'aria-label': 'search' }}
+            />
+          </Box>
         </Box>
         <Box
           sx={{ display: 'inline-flex', alignItems: 'center', width: '300px' }}
