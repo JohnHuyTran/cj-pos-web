@@ -6,7 +6,7 @@ import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 
 interface Props {
   title: string;
-  icon: string;
+  icon?: string;
 }
 
 const IconStyled = styled(Icon)({

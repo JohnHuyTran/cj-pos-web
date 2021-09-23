@@ -44,6 +44,7 @@ import User from "./pages/user";
 import LoginForm from "./components/login/login-form";
 import { useAppSelector } from "./store/store";
 import CheckOrder from "./pages/check-order";
+import ProductCreate from "./pages/products/product-create";
 
 function App() {
   const auth = useAppSelector((state) => state.auth);
@@ -438,6 +439,7 @@ function App() {
           <Route path="/check-order" component={CheckOrder} />
           <Route path="/sale" component={Sale} />
           <Route path="/user" component={User} />
+          <Route path="/product/product-create" component={ProductCreate} />
         </Switch>
       </main>
     </div>
