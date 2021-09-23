@@ -1,0 +1,7 @@
+include:
+  - project: "cbd-wanda/pipeline"
+    ref: master
+    file: reactwithsonar-k8s-pipeline.yml
+
+variables:
+  PROJECT_NAME: cj-pos-back-web
