@@ -15,7 +15,6 @@ import CheckOrder from "./pages/check-order";
 import LoginForm from "./components/login/login-form";
 
 import { useAppSelector } from "./store/store";
-
 const drawerWidth = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{

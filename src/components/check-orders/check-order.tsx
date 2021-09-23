@@ -1,3 +1,5 @@
+import moment from "moment";
+import MomentUtils from "@date-io/moment";
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -9,7 +11,11 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Event } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { Button, Paper } from '@mui/material';
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import "moment/locale/fr";
+import "moment/locale/ru";
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListAsync, clearDataFilter } from '../../store/slices/check-order-slice';
@@ -17,7 +23,9 @@ import { CheckOrderRequest } from '../../models/order'
 
 import OrderList from './order-list'
 import { useStyles } from './order-css'
+import clsx from "clsx";
 
+moment.locale("en");
 interface State {
     orderNo: string;
     orderStatus: string;
@@ -32,7 +40,9 @@ function CheckOrderSearch() {
         orderStatus: '',
         orderType: ''
     });
-
+    const [locale, setLocale] = React.useState("en");
+    const [startDate, setStartDate] = React.useState<MaterialUiPickersDate>();
+    const [endDate, setEndDate] = React.useState<MaterialUiPickersDate>();
 
     const handleChange = (event: any) => {
         const value = event.target.value;
@@ -53,30 +63,54 @@ function CheckOrderSearch() {
     }, [])
     // dispatch(clearDataFilter());
 
-
     return (
         <div>
             <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={2}>
-                    <Grid item xs={6}  >
-                        <Typography variant="subtitle1" gutterBottom component="div">เลขที่เอกสาร:</Typography>
+                    <Grid item xs={2}  >
+                        <Typography variant="subtitle1" gutterBottom component="div">เลขที่เอกสาร: </Typography>
                     </Grid>
-                    <Grid item xs={6}  >
-                        <TextField id="outlined-basic" label="" variant="outlined" name='orderNo' onChange={handleChange} />
+                    <Grid item xs={2}  >
+                        <TextField size="small" id="outlined-basic" label="" variant="outlined" name='orderNo' onChange={handleChange} className={classes.textField} />
                     </Grid>
+                    <Grid item xs={8}  ></Grid>
                     <Grid item xs={6}>
-                        <Typography variant="subtitle1" gutterBottom component="div">ตั้งแต่วันที่:</Typography>
+                        <Typography variant="subtitle1" gutterBottom component="div">ตั้งแต่วันที่: </Typography>
+                        <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={locale}>
+                            <KeyboardDatePicker
+                                autoOk
+                                variant="inline"
+                                inputVariant="outlined"
+                                value={startDate}
+                                format="MM/DD/yyyy"
+                                InputAdornmentProps={{ position: "start" }}
+                                onChange={date => setStartDate(date)}
+                                disableToolbar={true}
+                            />
+                        </MuiPickersUtilsProvider>
 
-                        <TextField id="outlined-basic" label="" variant="outlined" />
+
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography variant="subtitle1" gutterBottom component="div">ถึงวันที่: </Typography><TextField id="outlined-basic" label="" variant="outlined" />
+                        <Typography variant="subtitle1" gutterBottom component="div">ถึงวันที่: </Typography>
+                        <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={locale}>
+                            <KeyboardDatePicker
+                                autoOk
+                                variant="inline"
+                                inputVariant="outlined"
+                                value={endDate}
+                                format="MM/DD/yyyy"
+                                InputAdornmentProps={{ position: "start" }}
+                                onChange={date => setEndDate(date)}
+                                disableToolbar={true}
+                            />
+                        </MuiPickersUtilsProvider>
                     </Grid>
-                    <Grid item xs={6}  >
-                        <Typography variant="subtitle1" gutterBottom component="div">สถานะ:</Typography>
+                    <Grid item xs={2}  >
+                        <Typography variant="subtitle1" gutterBottom component="div">สถานะ: </Typography>
                     </Grid>
-                    <Grid item xs={6}  >
-                        <FormControl fullWidth>
+                    <Grid item xs={2}  >
+                        <FormControl fullWidth size='small'>
                             <Select
                                 name='orderStatus'
                                 value={values.orderStatus}
@@ -91,11 +125,12 @@ function CheckOrderSearch() {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={6}  >
-                        <Typography variant="subtitle1" gutterBottom component="div">ประเภท:</Typography>
+                    <Grid item xs={2} />
+                    <Grid item xs={2}  >
+                        <Typography variant="subtitle1" gutterBottom component="div">ประเภท: </Typography>
                     </Grid>
-                    <Grid item xs={6}  >
-                        <FormControl fullWidth>
+                    <Grid item xs={2}  >
+                        <FormControl fullWidth size='small'>
                             <Select
                                 name="orderType"
                                 value={values.orderType}
@@ -110,14 +145,15 @@ function CheckOrderSearch() {
                             </Select>
                         </FormControl>
                     </Grid>
-
-                    <Button
-                        id='searchBtb'
-                        variant='contained'
-                        color='primary'
-                        onClick={onClickSearchBtn}
-                        className={classes.searchBtn}
-                    >search</Button>
+                    <Grid item xs={12}  >
+                        <Button
+                            id='searchBtb'
+                            variant='contained'
+                            color='primary'
+                            onClick={onClickSearchBtn}
+                            className={classes.searchBtn}
+                        >search</Button>
+                    </Grid>
                 </Grid>
             </Box>
             {items.orderList && <OrderList />}
