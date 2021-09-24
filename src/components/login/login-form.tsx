@@ -66,7 +66,7 @@ function LoginForm() {
   return (
     <div className={classes.root}>
       <Typography variant='h5' className={classes.welcomeLabel}>
-        ยินดีต้อนรับ
+        ยินดีต้อนรับนะค่ะ
       </Typography>
       <Box className={classes.mainBox}>
         <div id='logo' className={classes.logo}>
