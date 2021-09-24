@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { Box, Button, Snackbar, IconButton, Typography } from "@mui/material";
+import { Box, Snackbar, IconButton } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { BootstrapButton } from "../product/product-list-css";
@@ -11,12 +11,9 @@ import { useAppSelector, useAppDispatch } from "../../store/store";
 import {
   fetchGetProductList,
   fetchDeleteItemById,
-  deleteItemAction,
 } from "../../store/slices/productSlice";
 import { ItemProduct } from "../../models/product-model";
-import { deleteData } from "../../adapters/posback-adapter";
-import { environment } from "../../environment-base";
-import DialogConfirm from "../../components/dialog-confirm";
+import DialogConfirm from "../modal-confirm";
 
 interface Data {}
 
@@ -27,7 +24,6 @@ function ProductListComponent() {
   }, []);
 
   const items: ItemProduct[] = useAppSelector((state) => state.product.item);
-  const [openSnackBar, setOpenSnackBar] = React.useState(false);
 
   const columns: GridColDef[] = [
     { field: "col1", headerName: "ลำดับ", width: 150 },
@@ -73,6 +69,8 @@ function ProductListComponent() {
 
   const [openDialogConfirm, setOpenDialogConfirm] = React.useState(false);
   const [rowId, setRowId] = React.useState(0);
+  const [openSnackBarSuccess, setOpenSnackBarSuccess] = React.useState(false);
+  const [openSnackBarError, setOpenSnackBarError] = React.useState(false);
 
   const deleteItem = (events: any, cellValues: any) => {
     events.stopPropagation();
@@ -91,11 +89,11 @@ function ProductListComponent() {
     if (value === "OK") {
       const res = dispatch(fetchDeleteItemById(rowId));
       if (res !== null) {
-        setOpenSnackBar(true);
+        setOpenSnackBarSuccess(true);
         dispatch(fetchGetProductList());
       }
     } else {
-      setOpenSnackBar(false);
+      setOpenSnackBarSuccess(false);
     }
   };
 
@@ -106,7 +104,8 @@ function ProductListComponent() {
     if (reason === "clickaway") {
       return;
     }
-    setOpenSnackBar(false);
+    setOpenSnackBarSuccess(false);
+    setOpenSnackBarError(false);
   };
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -143,12 +142,18 @@ function ProductListComponent() {
         </div>
       </Box>
 
+      <DialogConfirm
+        open={openDialogConfirm}
+        onClose={closeDialogConfirm}
+        actionconfirm="delete"
+      />
+
       <Snackbar
         anchorOrigin={{
           vertical: "top",
           horizontal: "right",
         }}
-        open={openSnackBar}
+        open={openSnackBarSuccess}
         autoHideDuration={6000}
         onClose={handleCloseSnackBar}
         action={actionSnackBar}
@@ -161,8 +166,6 @@ function ProductListComponent() {
           Delete Success
         </Alert>
       </Snackbar>
-
-      <DialogConfirm open={openDialogConfirm} onClose={closeDialogConfirm} />
     </div>
   );
 }
