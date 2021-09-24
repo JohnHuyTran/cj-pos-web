@@ -6,13 +6,14 @@ import Grid from '@mui/material/Grid';
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import Typography from '@mui/material/Typography';
-
+import { Button } from '@mui/material';
 import { OrderProductListProps, Order, Product } from '../../models/order';
-
-
+import { useStyles } from './order-css';
+import PrintIcon from '@mui/icons-material/Print';
+import ImportExport from '@mui/icons-material/ImportExport';
 
 const OrderProductList: React.FC<OrderProductListProps> = props => {
-
+  const classes = useStyles();
   const { shipment, defaultOpen } = props;
   const items = useAppSelector((state) => state.checkOrderList);
   const res: Order[] = items.orderList;
@@ -73,7 +74,7 @@ const OrderProductList: React.FC<OrderProductListProps> = props => {
               <Grid item xs={1}  >
                 <Typography variant="body2" gutterBottom>SHIPMENT:</Typography>
               </Grid>
-              <Grid item xs={1}  >
+              <Grid item xs={2}  >
                 <Typography variant="body2" gutterBottom>{productsFilter[0].orderShipment}</Typography>
               </Grid>
             </Grid>
@@ -90,7 +91,7 @@ const OrderProductList: React.FC<OrderProductListProps> = props => {
               <Grid item xs={1}  >
                 <Typography variant="body2" gutterBottom>Type:</Typography>
               </Grid>
-              <Grid item xs={1}  >
+              <Grid item xs={2}  >
                 <Typography variant="body2" gutterBottom>{productsFilter[0].orderType}</Typography>
               </Grid>
             </Grid>
@@ -111,7 +112,51 @@ const OrderProductList: React.FC<OrderProductListProps> = props => {
               </Grid>
             </Grid>
           </Box>
+          <Grid container
+            spacing={2}
+            direction="row"
+            alignItems="center"
+            justifyContent="center">
+            <Grid item>
+              <Button
+                id='printBtb'
+                variant='contained'
+                color='primary'
+                className={classes.searchBtn}
+              >APPROVE</Button></Grid>
 
+            <Grid item>
+              <Button
+                id='printBtb'
+                variant='contained'
+                color='primary'
+                className={classes.searchBtn}
+              >BACK</Button>
+            </Grid>
+          </Grid>
+
+          <Grid container
+            spacing={2}
+            direction="row"
+            alignItems="right"
+            justifyContent="right">
+            <Grid item>            <Button
+              id='printBtb'
+              variant='contained'
+              color='primary'
+              endIcon={<PrintIcon />}
+              className={classes.searchBtn}
+            >PRINT</Button></Grid>
+
+            <Grid item>            <Button
+              id='printBtb'
+              variant='contained'
+              color='primary'
+              endIcon={<ImportExport />}
+              className={classes.searchBtn}
+            >EXPORT</Button></Grid>
+
+          </Grid>
           <Box mt={2} bgcolor='background.paper'>
             <div>
               <DataGrid rows={rows ? rows : []} columns={columns}
