@@ -66,7 +66,7 @@ function CheckOrderSearch() {
     return (
         <div>
             <Box sx={{ flexGrow: 1 }}>
-                <Grid container spacing={2}>
+                <Grid container spacing={2} >
                     <Grid item xs={2}  >
                         <Typography variant="subtitle1" gutterBottom component="div">เลขที่เอกสาร: </Typography>
                     </Grid>
@@ -125,7 +125,7 @@ function CheckOrderSearch() {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={2} />
+                    <Grid item xs={8}  ></Grid>
                     <Grid item xs={2}  >
                         <Typography variant="subtitle1" gutterBottom component="div">ประเภท: </Typography>
                     </Grid>
@@ -145,6 +145,7 @@ function CheckOrderSearch() {
                             </Select>
                         </FormControl>
                     </Grid>
+                    <Grid item xs={8}  ></Grid>
                     <Grid item xs={12}  >
                         <Button
                             id='searchBtb'
@@ -152,7 +153,8 @@ function CheckOrderSearch() {
                             color='primary'
                             onClick={onClickSearchBtn}
                             className={classes.searchBtn}
-                        >search</Button>
+                        >SEARCH
+                        </Button>
                     </Grid>
                 </Grid>
             </Box>

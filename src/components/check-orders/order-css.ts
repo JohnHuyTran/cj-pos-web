@@ -13,6 +13,9 @@ const useStyles = makeStyles({
         width: "250px",
         height: "40px",
     },
+    labelBtnStyle: {
+        color: "white",
+    },
 })
 
 export { useStyles };
