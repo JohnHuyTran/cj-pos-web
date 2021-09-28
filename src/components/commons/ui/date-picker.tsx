@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 import moment from "moment";
 import TextField from '@mui/material/TextField';
@@ -17,7 +16,11 @@ const materialTheme = createTheme({
     }
 });
 
-export default function DatePickerComponent(props) {
+interface StateProps {
+    onClickDate: any;
+}
+
+const DatePickerComponent: React.FC<StateProps> = props => {
     const [defaultDate, setDefaultDate] = React.useState<Date | null>(new Date());
     const [newDate, setNewDate] = React.useState<Date | null>(new Date());
     // var date_format = moment(value).format("MM/DD/YYYY HH:mm:ss");
@@ -25,7 +28,7 @@ export default function DatePickerComponent(props) {
 
 
 
-    const handleDateChange = (newValue: Date) => {
+    const handleDateChange = (newValue: any) => {
         setDefaultDate(newValue);
         setNewDate(newValue)
         props.onClickDate(newValue);
@@ -46,3 +49,5 @@ export default function DatePickerComponent(props) {
         </LocalizationProvider>
     )
 }
+
+export default DatePickerComponent;

@@ -26,6 +26,7 @@ import DatePicker from '@mui/lab/DatePicker'
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 import DateAdapter from '@mui/lab/AdapterMoment';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import DatePickerComponent from "../commons/ui/date-picker";
 
 moment.locale("en");
 interface State {
@@ -66,7 +67,18 @@ function CheckOrderSearch() {
     useEffect(() => {
         dispatch(clearDataFilter());
     }, [])
-    // dispatch(clearDataFilter());
+
+    const handleStartDatePicker = (value: Date) => {
+        setStartDate(value);
+        var date_format = moment(value).format("MM/DD/YYYY HH:mm:ss");
+        console.log("start date: ", date_format);
+    }
+
+    const handleEndDatePicker = (value: Date) => {
+        setEndDate(value);
+        var date_format = moment(value).format("MM/DD/YYYY HH:mm:ss");
+        console.log("end date: ", date_format);
+    }
 
     return (
         <div>
@@ -81,30 +93,11 @@ function CheckOrderSearch() {
                     <Grid item xs={8}  ></Grid>
                     <Grid item xs={6}>
                         <Typography variant="subtitle1" gutterBottom component="div">ตั้งแต่วันที่: </Typography>
-                        <LocalizationProvider dateAdapter={DateAdapter}>
-                            <DatePicker
-                                value={startDate}
-                                onChange={(newValue) => {
-                                    setStartDate(newValue);
-                                }}
-                                renderInput={(params) => <TextField {...params} />}
-                                inputFormat="DD/MM/YYYY"
-                            />
-                        </LocalizationProvider>
-
-
+                        <DatePickerComponent onClickDate={handleStartDatePicker} />
                     </Grid>
                     <Grid item xs={6}>
                         <Typography variant="subtitle1" gutterBottom component="div">ถึงวันที่: </Typography>
-                        <LocalizationProvider dateAdapter={DateAdapter}>
-                            <DesktopDatePicker
-                                value={value}
-                                onChange={(newValue) => {
-                                    setValue(newValue);
-                                }}
-                                renderInput={(params) => <TextField {...params} />}
-                            />
-                        </LocalizationProvider>
+                        <DatePickerComponent onClickDate={handleEndDatePicker} />
 
                     </Grid>
                     <Grid item xs={2}  >
