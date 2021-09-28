@@ -3,7 +3,7 @@ import MomentUtils from "@date-io/moment";
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import InputLabel from '@mui/material/InputLabel';
@@ -12,10 +12,7 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Event } from '@mui/icons-material';
 import { Button, Paper } from '@mui/material';
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import "moment/locale/fr";
-import "moment/locale/ru";
-import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
+
 
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListAsync, clearDataFilter } from '../../store/slices/check-order-slice';
@@ -25,12 +22,19 @@ import OrderList from './order-list'
 import { useStyles } from './order-css'
 import clsx from "clsx";
 
+import DatePicker from '@mui/lab/DatePicker'
+import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
+import DateAdapter from '@mui/lab/AdapterMoment';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+
 moment.locale("en");
 interface State {
     orderNo: string;
     orderStatus: string;
     orderType: string;
 }
+
+
 function CheckOrderSearch() {
     const classes = useStyles();
     const dispatch = useAppDispatch();
@@ -41,8 +45,9 @@ function CheckOrderSearch() {
         orderType: ''
     });
     const [locale, setLocale] = React.useState("en");
-    const [startDate, setStartDate] = React.useState<MaterialUiPickersDate>();
-    const [endDate, setEndDate] = React.useState<MaterialUiPickersDate>();
+    const [startDate, setStartDate] = React.useState<Date | null>(new Date());
+    const [endDate, setEndDate] = React.useState<Date | null>(new Date());
+    const [value, setValue] = React.useState<Date | null>(new Date());
 
     const handleChange = (event: any) => {
         const value = event.target.value;
@@ -76,35 +81,31 @@ function CheckOrderSearch() {
                     <Grid item xs={8}  ></Grid>
                     <Grid item xs={6}>
                         <Typography variant="subtitle1" gutterBottom component="div">ตั้งแต่วันที่: </Typography>
-                        <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={locale}>
-                            <KeyboardDatePicker
-                                autoOk
-                                variant="inline"
-                                inputVariant="outlined"
+                        <LocalizationProvider dateAdapter={DateAdapter}>
+                            <DatePicker
                                 value={startDate}
-                                format="MM/DD/yyyy"
-                                InputAdornmentProps={{ position: "start" }}
-                                onChange={date => setStartDate(date)}
-                                disableToolbar={true}
+                                onChange={(newValue) => {
+                                    setStartDate(newValue);
+                                }}
+                                renderInput={(params) => <TextField {...params} />}
+                                inputFormat="DD/MM/YYYY"
                             />
-                        </MuiPickersUtilsProvider>
+                        </LocalizationProvider>
 
 
                     </Grid>
                     <Grid item xs={6}>
                         <Typography variant="subtitle1" gutterBottom component="div">ถึงวันที่: </Typography>
-                        <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={locale}>
-                            <KeyboardDatePicker
-                                autoOk
-                                variant="inline"
-                                inputVariant="outlined"
-                                value={endDate}
-                                format="MM/DD/yyyy"
-                                InputAdornmentProps={{ position: "start" }}
-                                onChange={date => setEndDate(date)}
-                                disableToolbar={true}
+                        <LocalizationProvider dateAdapter={DateAdapter}>
+                            <DesktopDatePicker
+                                value={value}
+                                onChange={(newValue) => {
+                                    setValue(newValue);
+                                }}
+                                renderInput={(params) => <TextField {...params} />}
                             />
-                        </MuiPickersUtilsProvider>
+                        </LocalizationProvider>
+
                     </Grid>
                     <Grid item xs={2}  >
                         <Typography variant="subtitle1" gutterBottom component="div">สถานะ: </Typography>
