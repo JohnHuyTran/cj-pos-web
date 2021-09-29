@@ -1,5 +1,4 @@
 import React from 'react'
-import moment from "moment";
 import TextField from '@mui/material/TextField';
 import DatePicker from '@mui/lab/DesktopDatePicker';
 import DateAdapter from '@mui/lab/AdapterMoment';
@@ -7,13 +6,25 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../../../styles/theme';
-
+import moment from 'moment';
+import 'moment/locale/th';
+moment.locale('th');
 const materialTheme = createTheme({
     palette: {
         primary: {
             main: theme.palette.primary.main,
         },
-    }
+    },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    color: '#446EF2',
+                    fontSize: '10rem',
+                }
+            }
+        }
+    },
 });
 
 interface StateProps {
@@ -43,7 +54,7 @@ const DatePickerComponent: React.FC<StateProps> = props => {
                     value={defaultDate}
                     onChange={handleDateChange}
                     renderInput={(params) => <TextField {...params} />}
-                    inputFormat="DD/MM/YYYY"
+                    inputFormat="Do MMM YYYY"
                 />
             </ThemeProvider>
         </LocalizationProvider>
