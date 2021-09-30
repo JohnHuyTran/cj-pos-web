@@ -7,8 +7,8 @@ import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../../../styles/theme';
 import moment from 'moment';
-import 'moment/locale/th';
-moment.locale('th');
+// import 'moment/locale/th';
+// moment.locale('th');
 const materialTheme = createTheme({
     palette: {
         primary: {
@@ -54,7 +54,7 @@ const DatePickerComponent: React.FC<StateProps> = props => {
                     value={defaultDate}
                     onChange={handleDateChange}
                     renderInput={(params) => <TextField {...params} />}
-                    inputFormat="Do MMM YYYY"
+                    inputFormat="DD/MM/YYYY"
                 />
             </ThemeProvider>
         </LocalizationProvider>
