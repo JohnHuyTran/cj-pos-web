@@ -9,20 +9,20 @@ import { approveOrderShipments, closeOrderShipments } from '../../services/order
 
 interface ConfirmOrderShipment {
     open: boolean,
+    onClose: () => void,
     shipmentNo: string,
     action: string,
     items: Item[],
     percentDiffType: string,
     percentDiffValue: string,
     imageContent: BinaryData,
-
 }
 
 export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
-    const { open, shipmentNo, action, items, percentDiffType, percentDiffValue, imageContent } = props;
+    const { open, onClose, shipmentNo, action, items, percentDiffType, percentDiffValue, imageContent } = props;
 
-    const contentTest = (action: string) => {
-
+    const contentText = () => {
+        console.log(`action: ${action}`)
         if (action === 'approve' && items.length > 0) {
             return `ยืนยันการตรวจสอบ <br/> เลขที่เอกสาร ${shipmentNo} show table`
         }
@@ -45,23 +45,25 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     }
 
     const confirmApproveBtn = () => {
-        const payload: OrderApproveCloseJobRequest = {
-            shipmentNo: shipmentNo
+        console.log('action', action)
+        if (action === 'approve') {
+            const payload: OrderApproveCloseJobRequest = {
+                shipmentNo: shipmentNo
+            }
+            approveOrderShipments(payload);
+        } else if (action === 'closeJob') {
+            const payload: OrderApproveCloseJobRequest = {
+                shipmentNo: shipmentNo,
+                imageContent: imageContent,
+            }
+            closeOrderShipments(payload);
         }
-        approveOrderShipments(payload);
-
     }
 
-    const confirmCloseJobBtn = () => {
-        const payload: OrderApproveCloseJobRequest = {
-            shipmentNo: shipmentNo,
-            imageContent: imageContent,
-        }
-        closeOrderShipments(payload);
-    }
+
 
     const handleClose = () => {
-
+        onClose();
     }
 
     return (
@@ -73,15 +75,15 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         >
             <DialogContent>
                 <DialogContentText id='alert-dialog-description'>
-                    {contentTest}
+                    {contentText}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button
                     variant='contained'
                     size='small'
-                    color='inherit'
-                    onClick={() => handleClose}
+                    color='primary'
+                    onClick={handleClose}
                 >
                     รับทราบ
                 </Button>
@@ -89,7 +91,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                     variant='contained'
                     size='small'
                     color='primary'
-                    onClick={() => confirmApproveBtn}
+                    onClick={confirmApproveBtn}
                 >
                     ยืนยัน
                 </Button>

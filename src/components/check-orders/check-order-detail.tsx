@@ -90,6 +90,9 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [fileName, setFileName] = React.useState('');
     const { apiRef, columns } = useApiRef();
 
+    const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+    const [action, setAction] = React.useState('');
+
 
     useEffect(() => {
         setOpen(defaultOpen);
@@ -101,8 +104,8 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     };
 
 
-    function isClosModal() {
-        setOpens(false);
+    function handleCloseModelConfirm() {
+        setOpenModelConfirm(false);
     }
 
     // data grid
@@ -153,11 +156,13 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     };
 
     const handleApproveBtn = () => {
-
+        setOpenModelConfirm(true)
+        setAction('approve')
     }
 
     const handleCloseJobBtn = () => {
-
+        setOpenModelConfirm(true)
+        setAction('closeJob')
     }
 
 
@@ -179,7 +184,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
     return (
         <div>
-            <Dialog open={open} onClose={handleClose} maxWidth='xl' fullWidth={true} >
+            <Dialog open={open} maxWidth='xl' fullWidth={true} >
                 <DialogContent>
                     <Box sx={{ flexGrow: 1 }}>
                         <Grid container spacing={2}>
@@ -246,7 +251,6 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 {plainFiles.map(file => (
                                     file.name
                                 ))}
-                                {console.log(JSON.stringify(filesContent))}
                             </Grid>
                         </Grid>
                         <Grid container spacing={2} justifyContent="center" style={{ marginTop: 0.1 }}>
@@ -278,6 +282,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     variant='contained'
                                     color='primary'
                                     className={classes.browserBtn}
+                                    onClick={handleApproveBtn}
                                 >อนุมัติ</Button>
 
                                 <Button
@@ -286,6 +291,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     color='primary'
                                     className={classes.browserBtn}
                                     style={{ marginLeft: 10 }}
+                                    onClick={handleCloseJobBtn}
                                 >ปิดงาน</Button>
                             </Grid>
 
@@ -310,13 +316,15 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
             </Dialog>
             <ConfirmOrderShipment
-                open={true}
+                open={openModelConfirm}
+                onClose={handleCloseModelConfirm}
                 shipmentNo={shipment}
-                action='approve'
+                action={action}
                 items={[]}
                 percentDiffType={false}
                 percentDiffValue='0'
-                imageContent=''
+                imageContent={!!filesContent.length && filesContent[0].content}
+
             />
         </div>
     )
