@@ -36,3 +36,27 @@ export interface CheckOrderDetailProps {
     defaultOpen: boolean;
     onClickClose: any;
 }
+
+
+export interface OrderSubmitRequest {
+    shipmentNo: string;
+    items: Item[];
+}
+
+export interface Item {
+    barcode: string;
+    ActualQty: number;
+    comment?: string;
+}
+
+export interface OrderSubmitResponse {
+    ref: string;
+    code: number;
+    message: string;
+    sdNo: string;
+}
+
+export interface OrderApproveCloseJobRequest {
+    shipmentNo: string;
+    imageContent?: BinaryData;
+}

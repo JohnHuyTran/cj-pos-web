@@ -52,8 +52,6 @@ function OrderList() {
         setOpens(false);
     }
 
-    console.log(typeof isClosModal)
-
     return (
         <div>
             <Box mt={2} bgcolor='background.paper'>

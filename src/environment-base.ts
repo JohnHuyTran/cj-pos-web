@@ -7,8 +7,14 @@ export const environment = {
   },
   orders: {
     shipment: {
-      save: {
-        url: "/api/order-shipment"
+      submit: {
+        url: "/api/order/submit/"
+      },
+      approve: {
+        url: "api/order/approve"
+      },
+      closejob: {
+        url: "api/order/close"
       }
     }
   }
