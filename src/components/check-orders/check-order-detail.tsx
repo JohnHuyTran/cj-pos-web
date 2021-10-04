@@ -1,14 +1,17 @@
 
 // @ts-nocheck
 import React, { useEffect, useMemo, useRef } from 'react'
-import { useAppSelector } from "../../store/store";
+import { useAppSelector } from '../../store/store';
 
 import { Box, Button, Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material'
 import { CheckOrderDetailProps, Order, Product } from '../../models/order-model';
 import { useStyles } from './check-order-detail-css'
-import { DataGrid, GridColDef, GridRenderCellParams, renderEditInputCell, GridEditRowsModel, GridCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams, renderEditInputCell, GridEditRowsModel, useGridApiRef } from '@mui/x-data-grid';
 
 import { useFilePicker } from 'use-file-picker';
+import { Item, OrderSubmitRequest } from '../../models/order-model';
+import { saveOrderShipments } from '../../services/order-shipment'
+import ConfirmOrderShipment from './check-order-confirm-model'
 
 
 const columns: GridColDef[] = [
@@ -50,13 +53,18 @@ const columns: GridColDef[] = [
     },
 ];
 
+const updateRows = (value, id, field) => {
+    const item = rows.find((item) => item.id === id);
+    item[field] = value;
+};
+
 var calProductDiff = function (params) {
     return params.data.productQuantityRef - params.data.productQuantityActual;
 };
 
 
 function useApiRef() {
-    const apiRef = useRef(null);
+    const apiRef = useGridApiRef();
     const _columns = useMemo(
         () =>
             columns.concat({
@@ -92,6 +100,11 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         props.onClickClose();
     };
 
+
+    function isClosModal() {
+        setOpens(false);
+    }
+
     // data grid
 
     const productsFilter: Order[] = res.filter(
@@ -107,7 +120,8 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             productUnit: product.productUnit,
             productQuantityRef: product.productQuantityRef,
             productQuantityActual: product.productQuantityActual,
-            productDifference: product.productDifference
+            productDifference: product.productDifference,
+            productComment: ''
         }
     })
 
@@ -119,8 +133,32 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
     const handleSaveButton = () => {
         console.log(apiRef.current.getRowModels());
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        const items = [];
+        rows.forEach((id: GridRowId, data: GridRowData) => {
+            const item: Item = {
+                barcode: id.productBarCode,
+                ActualQty: id.productQuantityActual,
+                comment: id.productComment
+            }
+            items.push(item);
+        })
 
+        const payload: OrderSubmitRequest = {
+            shipmentNo: shipment,
+            items: items,
+        }
+
+        saveOrderShipments(payload)
     };
+
+    const handleApproveBtn = () => {
+
+    }
+
+    const handleCloseJobBtn = () => {
+
+    }
 
 
     // browser file
@@ -271,7 +309,15 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 </DialogContent>
 
             </Dialog>
-
+            <ConfirmOrderShipment
+                open={true}
+                shipmentNo={shipment}
+                action='approve'
+                items={[]}
+                percentDiffType={false}
+                percentDiffValue='0'
+                imageContent=''
+            />
         </div>
     )
 }
