@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { getOrderList } from '../../mockdata/orders';
-import { CheckOrderRequest, Order, CheckOrderResponse } from '../../models/order';
+import { CheckOrderRequest, Order, CheckOrderResponse } from '../../models/order-model';
 
 type State = {
     orderList: Order[];

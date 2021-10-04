@@ -2,8 +2,8 @@ import React from 'react'
 import { useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridCellParams, GridApi, GridRowParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import OrderProductList from './order-product-list';
-import { Order } from '../../models/order';
+import CheckOrderDetail from './check-order-detail';
+import { Order } from '../../models/order-model';
 
 
 
@@ -63,7 +63,7 @@ function OrderList() {
                         autoHeight />
                 </div>
             </Box>
-            {opens && <OrderProductList shipment={shipment} defaultOpen={opens} onClickClose={isClosModal} />}
+            {opens && <CheckOrderDetail shipment={shipment} defaultOpen={opens} onClickClose={isClosModal} />}
         </div>
 
     )

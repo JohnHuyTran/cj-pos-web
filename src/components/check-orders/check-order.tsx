@@ -16,7 +16,7 @@ import { Button, Paper } from '@mui/material';
 
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListAsync, clearDataFilter } from '../../store/slices/check-order-slice';
-import { CheckOrderRequest } from '../../models/order'
+import { CheckOrderRequest } from '../../models/order-model'
 
 import OrderList from './order-list'
 import { useStyles } from './order-css'
@@ -43,7 +43,7 @@ function CheckOrderSearch() {
     const [values, setValues] = React.useState<State>({
         orderNo: '',
         orderStatus: '',
-        orderType: ''
+        orderType: 'DRINK'
     });
     const [locale, setLocale] = React.useState("en");
     const [startDate, setStartDate] = React.useState<Date | null>(new Date());
@@ -123,8 +123,8 @@ function CheckOrderSearch() {
                     <Grid item xs={2}  >
                         <Typography variant="subtitle1" gutterBottom component="div">ประเภท: </Typography>
                     </Grid>
-                    <Grid item xs={2}  >
-                        <FormControl fullWidth size='small'>
+                    <Grid item lg={4}  >
+                        <FormControl fullWidth >
                             <Select
                                 name="orderType"
                                 value={values.orderType}
@@ -135,7 +135,7 @@ function CheckOrderSearch() {
                                 <MenuItem value={'PAPER'}>Paper</MenuItem>
                                 <MenuItem value={'PASTIC'}>Pastic</MenuItem>
                                 <MenuItem value={'DRINK'}>Drinks</MenuItem>
-                                <MenuItem value={'WASHING-POWER'}>WASHING-POWER</MenuItem>
+                                <MenuItem value={'WASHING-POWER'}>WASHING-POWERssssssss</MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>

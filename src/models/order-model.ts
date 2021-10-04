@@ -1,4 +1,3 @@
-import { GridRowId } from '@mui/x-data-grid';
 export interface CheckOrderRequest {
     orderNo: string;
     orderStatus: string;
@@ -32,8 +31,7 @@ export interface Product {
     productDifference: number;
 }
 
-export interface OrderProductListProps {
-    // shipment: GridRowId | undefined;
+export interface CheckOrderDetailProps {
     shipment: any | undefined;
     defaultOpen: boolean;
     onClickClose: any;

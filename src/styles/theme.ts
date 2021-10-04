@@ -23,6 +23,41 @@ const theme = createTheme({
   shape: {
     borderRadius: 2,
   },
+
+  components: {
+
+    MuiButton: {
+
+      styleOverrides: {
+
+        root: {
+
+          backgroundColor: '#36C690',
+
+          color: '#FFFFFF',
+
+        },
+
+      },
+
+    },
+
+    MuiOutlinedInput: {
+
+      styleOverrides: {
+
+        input: {
+
+          padding: '8.5px 12px 8.5px 12px',
+
+        },
+
+      },
+
+    },
+
+  },
+
 });
 
 export default theme;

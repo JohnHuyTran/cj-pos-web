@@ -5,4 +5,11 @@ export const environment = {
       "Content-Type": "application/json",
     },
   },
+  orders: {
+    shipment: {
+      save: {
+        url: "/api/order-shipment"
+      }
+    }
+  }
 };

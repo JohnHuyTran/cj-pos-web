@@ -7,12 +7,12 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import Typography from '@mui/material/Typography';
 import { Button } from '@mui/material';
-import { OrderProductListProps, Order, Product } from '../../models/order';
+import { CheckOrderDetailProps, Order, Product } from '../../models/order-model';
 import { useStyles } from './order-css';
 import PrintIcon from '@mui/icons-material/Print';
 import ImportExport from '@mui/icons-material/ImportExport';
 
-const OrderProductList: React.FC<OrderProductListProps> = props => {
+const OrderProductList: React.FC<CheckOrderDetailProps> = props => {
   const classes = useStyles();
   const { shipment, defaultOpen } = props;
   const items = useAppSelector((state) => state.checkOrderList);

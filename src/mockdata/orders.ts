@@ -1,4 +1,4 @@
-import { CheckOrderRequest } from "../models/order"
+import { CheckOrderRequest } from "../models/order-model"
 export const orders = [
     {
         orderShipment: "LD234587",
