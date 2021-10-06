@@ -43,7 +43,7 @@ function CheckOrderSearch() {
     const [values, setValues] = React.useState<State>({
         orderNo: '',
         orderStatus: '',
-        orderType: 'DRINK'
+        orderType: 'WASHING-POWER'
     });
     const [locale, setLocale] = React.useState("en");
     const [startDate, setStartDate] = React.useState<Date | null>(new Date());

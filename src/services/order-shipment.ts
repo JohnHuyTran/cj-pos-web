@@ -1,4 +1,4 @@
-import { post, postTest } from '../adapters/posback-adapter';
+import { get, post, postTest } from '../adapters/posback-adapter';
 import axios from "axios";
 import { environment } from '../environment-base';
 import { OrderSubmitRequest, FeatchDataPDFRequest } from '../models/order-model'
@@ -20,7 +20,7 @@ export async function approveOrderShipments(payload: any) {
             .then((result: any) => result);
         return response;
     } catch (error) {
-        console.log("error = ", error);
+        console.log("cache error = ", error);
         throw error;
     }
 }
@@ -31,14 +31,15 @@ export async function closeOrderShipments(payload: any) {
             .then((result: any) => result);
         return response;
     } catch (error) {
-        console.log("error = ", error);
+        console.log("cache error = ", error);
         throw error;
     }
 }
 
-export async function fetchShipmentDataPDF(payload: FeatchDataPDFRequest) {
+export async function fetchShipmentDeliverlyPDF(shipmentNo: string) {
     try {
-        const response = await postTest('', payload)
+        const path = `/api/stock-diff/${shipmentNo}/export`;
+        const response = await get(path)
             .then((result: any) => result);
         return response
 

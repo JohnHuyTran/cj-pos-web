@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { env } from "./environmentConfig";
 import store from "../store/store";
 
@@ -24,11 +24,18 @@ export function get(path: string) {
 export function post(path: string, payload: any) {
   return instance
     .post(path, payload)
-    .then((result: any) => {
-      return result.data;
+    .then((response: AxiosResponse) => {
+      if (response.status == 200) {
+        return response.data;
+      }
     })
     .catch((error: any) => {
-      return error;
+      console.log(error);
+      console.log(`status: ${error.response?.status}`);
+      console.log(`code: ${error.response?.data.code}`);
+      console.log(`message: ${error.response?.data.message}`);
+      throw error;
+      // throw new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message)
     });
 }
 

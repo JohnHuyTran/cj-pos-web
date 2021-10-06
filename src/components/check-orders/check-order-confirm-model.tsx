@@ -12,6 +12,7 @@ import { CheckOrderEnum } from '../../utils/enum/check-order-enum';
 interface ConfirmOrderShipment {
     open: boolean,
     onClose: () => void,
+    onUpdateShipmentStatus: (value: boolean) => void,
     shipmentNo: string,
     action: string,
     items: Item[],
@@ -21,20 +22,46 @@ interface ConfirmOrderShipment {
 }
 
 export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
-    const { open, onClose, shipmentNo, action, items, percentDiffType, percentDiffValue, imageContent } = props;
+    const { open, onClose, onUpdateShipmentStatus, shipmentNo, action, items, percentDiffType, percentDiffValue, imageContent } = props;
 
     const confirmApproveBtn = () => {
         if (action === CheckOrderEnum.STATUS_APPROVE_VALUE) {
             const payload: OrderApproveCloseJobRequest = {
                 shipmentNo: shipmentNo
             }
-            approveOrderShipments(payload);
+
+            approveOrderShipments(payload)
+                .then(
+                    function (value) {
+                        console.log("value, ", value);
+                        onUpdateShipmentStatus(true);
+                        onClose();
+                    },
+                    function (error) {
+                        console.log("err, ", error);
+                        onUpdateShipmentStatus(true);
+                        onClose();
+                    }
+                );
+
+
         } else if (action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE) {
             const payload: OrderApproveCloseJobRequest = {
                 shipmentNo: shipmentNo,
                 imageContent: imageContent,
             }
-            closeOrderShipments(payload);
+            closeOrderShipments(payload)
+                .then(
+                    function (value) {
+                        console.log("value, ", value);
+                    },
+                    function (error) {
+                        console.log("err, ", error);
+                    }
+                )
+                .catch(err => {
+                    console.log(err)
+                })
         }
     }
 
@@ -43,6 +70,8 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     const handleClose = () => {
         onClose();
     }
+
+
 
     return (
         <Dialog

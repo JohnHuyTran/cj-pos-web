@@ -7,12 +7,14 @@ import { useAppSelector } from '../../store/store';
 import { Box, Button, Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams, renderEditInputCell, GridEditRowsModel, useGridApiRef } from '@mui/x-data-grid';
 import Link from '@mui/material/Link';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
 import { CheckOrderDetailProps, Order, Product } from '../../models/order-model';
 import { useStyles } from './check-order-detail-css'
 import { useFilePicker } from 'use-file-picker';
 import { Item, OrderSubmitRequest } from '../../models/order-model';
-import { saveOrderShipments, fetchShipmentDataPDF } from '../../services/order-shipment';
+import { saveOrderShipments, fetchShipmentDeliverlyPDF } from '../../services/order-shipment';
 import ConfirmOrderShipment from './check-order-confirm-model';
 import { CheckOrderEnum } from '../../utils/enum/check-order-enum';
 
@@ -101,6 +103,8 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
     const [action, setAction] = React.useState('');
 
+    const [showSnackbarSuccess, setShowSnackbarSuccess] = React.useState(false);
+    const [showSnackbarFail, setShowSnackbarFail] = React.useState(false);
 
     useEffect(() => {
         if (productsFilter[0].orderStatus === CheckOrderEnum.STATUS_DRAFT_CODE) {
@@ -149,6 +153,17 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         }
 
         saveOrderShipments(payload)
+            .then(
+                function (value) {
+                    setShowSnackbarSuccess(true);
+                }
+            )
+            .catch(
+                function (error) {
+                    setShowSnackbarFail(true);
+                }
+
+            )
     };
 
     const handleApproveBtn = () => {
@@ -162,14 +177,12 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     }
 
     const handlePrintBtn = () => {
-        const payload: FeatchDataPDFRequest = {
-            Symbol: 'BTP'
-        }
-        fetchShipmentDataPDF(payload);
+        fetchShipmentDeliverlyPDF(shipment);
         window.open('https://docs.marklogic.com/8.0/guide/rest-dev.pdf')
     }
 
     const handleLinkDocument = () => {
+        fetchShipmentDeliverlyPDF(shipment);
         window.open('https://docs.marklogic.com/8.0/guide/rest-dev.pdf')
     }
 
@@ -211,11 +224,41 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         }
     })
 
+    const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+        props,
+        ref,
+    ) {
+        return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    });
 
-
+    const handleCloseSnackBar = () => {
+        setShowSnackbarFail(false);
+        setShowSnackbarSuccess(false);
+    }
     // const handleEditRowsModelChange = React.useCallback((model: GridEditRowsModel) => {
     //     console.log(model);
     // }, []);
+
+    const handleStatusShipmentToJobClose = (issuccess: boolean) => {
+        if (issuccess) {
+            setDisableSaveBtn(true);
+            setDisableApproveBtn(true);
+            setDisableCloseJobBtn(false)
+            setShowSnackbarSuccess(true);
+        } else {
+            setShowSnackbarFail(true);
+        }
+
+    }
+    const handleShowSnackBar = (issuccess: boolen) => {
+        if (issuccess) {
+
+        } else {
+            setShowSnackbarFail(true);
+        }
+
+
+    }
 
     return (
         <div>
@@ -232,34 +275,34 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                         </Grid>
                         <Grid container spacing={2}>
 
-                            <Grid item lg={2}  >
+                            <Grid item lg={3}  >
                                 <Typography variant="body2" gutterBottom>เลขที่เอกสาร SD:</Typography>
                             </Grid>
-                            <Grid item lg={10}  >
+                            <Grid item lg={9}  >
                                 <Typography variant="body2" gutterBottom>{productsFilter[0].orderNo}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
-                            <Grid item lg={1}  >
+                            <Grid item lg={3}  >
                                 <Typography variant="body2" gutterBottom>วันที่:</Typography>
                             </Grid>
-                            <Grid item lg={1}  >
+                            <Grid item lg={9}  >
                                 <Typography variant="body2" gutterBottom>{productsFilter[0].orderCreateDate}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
-                            <Grid item lg={1}  >
+                            <Grid item lg={3}  >
                                 <Typography variant="body2" gutterBottom>สถานะ:</Typography>
                             </Grid>
-                            <Grid item lg={1}  >
+                            <Grid item lg={9}  >
                                 <Typography variant="body2" gutterBottom>{productsFilter[0].orderStatus}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
-                            <Grid item lg={1}  >
+                            <Grid item lg={3}  >
                                 <Typography variant="body2" gutterBottom>ประเภท:</Typography>
                             </Grid>
-                            <Grid item lg={10} >
+                            <Grid item lg={9} >
                                 <Typography variant="body2" gutterBottom>{productsFilter[0].orderType}</Typography>
                             </Grid>
                         </Grid>
@@ -277,7 +320,8 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                         className={classes.browserBtn}
                                         onClick={() => openFileSelector()}
                                         value={fileName}
-                                    >BROWSER</Button></div>
+                                        style={{ marginLeft: 10 }}
+                                    >BROWSE</Button></div>
                                 }
                                 {productsFilter[0].orderStatus === CheckOrderEnum.STATUS_CLOSEJOB_CODE && <div>
 
@@ -374,6 +418,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             <ConfirmOrderShipment
                 open={openModelConfirm}
                 onClose={handleCloseModelConfirm}
+                onUpdateShipmentStatus={handleStatusShipmentToJobClose}
                 shipmentNo={shipment}
                 action={action}
                 items={[]}
@@ -382,6 +427,24 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 imageContent={!!filesContent.length && filesContent[0].content}
 
             />
-        </div>
+
+            <Snackbar open={showSnackbarSuccess} onClose={handleCloseSnackBar} autoHideDuration={6000} anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}>
+                <Alert severity="success" sx={{ width: '100%' }} onClose={handleCloseSnackBar}>
+                    This transaction is success
+                </Alert>
+            </Snackbar>
+
+            <Snackbar open={showSnackbarFail} onClose={handleCloseSnackBar} autoHideDuration={6000} anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}>
+                <Alert severity="error" sx={{ width: '100%' }} onClose={handleCloseSnackBar} >
+                    This transaction is error
+                </Alert>
+            </Snackbar>
+        </div >
     )
 }

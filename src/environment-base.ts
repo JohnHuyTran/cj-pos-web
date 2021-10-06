@@ -16,8 +16,8 @@ export const environment = {
       closejob: {
         url: "api/order/close"
       },
-      loadPdf: {
-        url: ""
+      printFormShipmentDeliverly: {
+        url: "/api/stock-diff/{{sdNo}}/export"
       }
     }
   }
