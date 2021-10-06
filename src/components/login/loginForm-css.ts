@@ -11,6 +11,7 @@ const loginFormStyle = makeStyles({
         backgroundPosition: "center",
         "background-size": "cover",
         height: "100vh",
+        paddingTop: "5%",
     },
     textField: {
         width: "25ch",
@@ -20,13 +21,11 @@ const loginFormStyle = makeStyles({
         minWidth: 400,
         minHeight: 50,
     },
-    gridBox: {
-        position: "absolute",
-        top: "15%",
-    },
     mainBox: {
         padding: "20px",
+        margin: "auto",
         minWidth: 400,
+        maxWidth: 400,
         height: 450,
         background: theme.palette.background.default,
         boxShadow:
