@@ -15,6 +15,9 @@ export const environment = {
       },
       closejob: {
         url: "api/order/close"
+      },
+      loadPdf: {
+        url: ""
       }
     }
   }

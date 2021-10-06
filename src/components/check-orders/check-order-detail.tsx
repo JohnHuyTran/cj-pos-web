@@ -1,17 +1,20 @@
 
 // @ts-nocheck
 import React, { useEffect, useMemo, useRef } from 'react'
+import axios from "axios";
 import { useAppSelector } from '../../store/store';
 
 import { Box, Button, Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material'
+import { DataGrid, GridColDef, GridRenderCellParams, renderEditInputCell, GridEditRowsModel, useGridApiRef } from '@mui/x-data-grid';
+import Link from '@mui/material/Link';
+
 import { CheckOrderDetailProps, Order, Product } from '../../models/order-model';
 import { useStyles } from './check-order-detail-css'
-import { DataGrid, GridColDef, GridRenderCellParams, renderEditInputCell, GridEditRowsModel, useGridApiRef } from '@mui/x-data-grid';
-
 import { useFilePicker } from 'use-file-picker';
 import { Item, OrderSubmitRequest } from '../../models/order-model';
-import { saveOrderShipments } from '../../services/order-shipment'
-import ConfirmOrderShipment from './check-order-confirm-model'
+import { saveOrderShipments, fetchShipmentDataPDF } from '../../services/order-shipment';
+import ConfirmOrderShipment from './check-order-confirm-model';
+import { CheckOrderEnum } from '../../utils/enum/check-order-enum';
 
 
 const columns: GridColDef[] = [
@@ -53,10 +56,6 @@ const columns: GridColDef[] = [
     },
 ];
 
-const updateRows = (value, id, field) => {
-    const item = rows.find((item) => item.id === id);
-    item[field] = value;
-};
 
 var calProductDiff = function (params) {
     return params.data.productQuantityRef - params.data.productQuantityActual;
@@ -90,11 +89,31 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [fileName, setFileName] = React.useState('');
     const { apiRef, columns } = useApiRef();
 
+    const [disableSaveBtn, setDisableSaveBtn] = React.useState(false);
+    const [disableApproveBtn, setDisableApproveBtn] = React.useState(false);
+    const [disableCloseJobBtn, setDisableCloseJobBtn] = React.useState(false);
+    const [isDisplayActBtn, setIsDisplayActBtn] = React.useState('');
+
     const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
     const [action, setAction] = React.useState('');
 
 
     useEffect(() => {
+        if (productsFilter[0].orderStatus === CheckOrderEnum.STATUS_DRAFT_CODE) {
+            setDisableSaveBtn(false);
+            setDisableApproveBtn(false);
+            setDisableCloseJobBtn(true)
+        }
+        if (productsFilter[0].orderStatus === CheckOrderEnum.STATUS_APPROVE_CODE) {
+            setDisableSaveBtn(true);
+            setDisableApproveBtn(true);
+            setDisableCloseJobBtn(false)
+        }
+
+        if (productsFilter[0].orderStatus === CheckOrderEnum.STATUS_CLOSEJOB_CODE) {
+            setIsDisplayActBtn('none');
+        }
+
         setOpen(defaultOpen);
     }, [open])
 
@@ -108,34 +127,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         setOpenModelConfirm(false);
     }
 
-    // data grid
-
-    const productsFilter: Order[] = res.filter(
-        (orders: Order) => orders.orderShipment === shipment
-    )
-    const rows = productsFilter[0].products?.map((product: Product, index: number) => {
-        return {
-            id: product.productBarCode,
-            col1: index + 1,
-            productId: product.productId,
-            productBarCode: product.productBarCode,
-            productDescription: product.productDescription,
-            productUnit: product.productUnit,
-            productQuantityRef: product.productQuantityRef,
-            productQuantityActual: product.productQuantityActual,
-            productDifference: product.productDifference,
-            productComment: ''
-        }
-    })
-
-    const handleEditRowsModelChange = React.useCallback((model: GridEditRowsModel) => {
-        console.log(model);
-    }, []);
-
-
-
     const handleSaveButton = () => {
-        console.log(apiRef.current.getRowModels());
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         const items = [];
         rows.forEach((id: GridRowId, data: GridRowData) => {
@@ -157,14 +149,25 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
     const handleApproveBtn = () => {
         setOpenModelConfirm(true)
-        setAction('approve')
+        setAction(CheckOrderEnum.STATUS_APPROVE_VALUE)
     }
 
     const handleCloseJobBtn = () => {
         setOpenModelConfirm(true)
-        setAction('closeJob')
+        setAction(CheckOrderEnum.STATUS_CLOSEJOB_VALUE)
     }
 
+    const handlePrintBtn = () => {
+        const payload: FeatchDataPDFRequest = {
+            Symbol: 'BTP'
+        }
+        fetchShipmentDataPDF(payload);
+        window.open('https://docs.marklogic.com/8.0/guide/rest-dev.pdf')
+    }
+
+    const handleLinkDocument = () => {
+        window.open('https://docs.marklogic.com/8.0/guide/rest-dev.pdf')
+    }
 
     // browser file
     const [openFileSelector, { filesContent, loading, errors, plainFiles, clear }] = useFilePicker({
@@ -176,11 +179,39 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         // maxFileSize: 1,
         // readFilesContent: false, // ignores file content
     });
+
+
     if (errors.length > 0) return <p>Error!</p>;
 
     if (loading) {
         return <div>Loading...</div>;
     }
+
+
+    // data grid
+    const productsFilter: Order[] = res.filter(
+        (orders: Order) => orders.orderShipment === shipment
+    )
+    const rows = productsFilter[0].products?.map((product: Product, index: number) => {
+        return {
+            id: product.productBarCode,
+            col1: index + 1,
+            productId: product.productId,
+            productBarCode: product.productBarCode,
+            productDescription: product.productDescription,
+            productUnit: product.productUnit,
+            productQuantityRef: product.productQuantityRef,
+            productQuantityActual: product.productQuantityActual,
+            productDifference: product.productDifference,
+            productComment: ''
+        }
+    })
+
+
+
+    const handleEditRowsModelChange = React.useCallback((model: GridEditRowsModel) => {
+        console.log(model);
+    }, []);
 
     return (
         <div>
@@ -233,14 +264,28 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>แนบเอกสารใบส่วนต่างหลังเซ็นต์:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
-                                <TextField name='browserTxf' className={classes.textField} />              <Button
-                                    id='printBtb'
-                                    variant='contained'
-                                    color='primary'
-                                    className={classes.browserBtn}
-                                    onClick={() => openFileSelector()}
-                                    value={fileName}
-                                >BROWSER</Button>
+                                {productsFilter[0].orderStatus !== CheckOrderEnum.STATUS_CLOSEJOB_CODE && <div>
+                                    <TextField name='browserTxf' className={classes.textField} />
+                                    <Button
+                                        id='printBtb'
+                                        variant='contained'
+                                        color='primary'
+                                        className={classes.browserBtn}
+                                        onClick={() => openFileSelector()}
+                                        value={fileName}
+                                    >BROWSER</Button></div>
+                                }
+                                {productsFilter[0].orderStatus === CheckOrderEnum.STATUS_CLOSEJOB_CODE && <div>
+
+                                    <Link
+                                        component="button"
+                                        variant="body2"
+                                        onClick={handleLinkDocument}
+                                    >
+                                        ดูเอกสาร
+                                    </Link>
+                                </div>
+                                }
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
@@ -255,13 +300,17 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                         </Grid>
                         <Grid container spacing={2} justifyContent="center" style={{ marginTop: 0.1 }}>
                             <Grid item >
-                                <Button
-                                    id='printBtb'
-                                    variant='contained'
-                                    color='primary'
-                                    className={classes.browserBtn}
-                                    onClick={handleSaveButton}
-                                >บันทึก</Button>
+                                <Box sx={{ display: isDisplayActBtn }}>
+                                    <Button
+                                        id='printBtb'
+                                        variant='contained'
+                                        color='primary'
+                                        className={classes.browserBtn}
+                                        onClick={handleSaveButton}
+                                        disabled={disableSaveBtn}
+
+                                    >บันทึก</Button>
+                                </Box>
                             </Grid>
                             <Grid item  >
                                 <Button
@@ -274,7 +323,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                             </Grid>
                         </Grid>
                     </Box>
-                    <Box>
+                    <Box sx={{ display: isDisplayActBtn }}>
                         <Grid container spacing={2} display='flex' justifyContent='space-between'>
                             <Grid item xl={2}  >
                                 <Button
@@ -283,6 +332,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     color='primary'
                                     className={classes.browserBtn}
                                     onClick={handleApproveBtn}
+                                    disabled={disableApproveBtn}
                                 >อนุมัติ</Button>
 
                                 <Button
@@ -292,6 +342,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     className={classes.browserBtn}
                                     style={{ marginLeft: 10 }}
                                     onClick={handleCloseJobBtn}
+                                    disabled={disableCloseJobBtn}
                                 >ปิดงาน</Button>
                             </Grid>
 
@@ -300,6 +351,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     id='printBtb'
                                     variant='contained'
                                     color='primary'
+                                    onClick={handlePrintBtn}
                                 >พิมพ์ใบตรวจการรับสินค้า</Button>
                             </Grid>
                         </Grid>
@@ -323,7 +375,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 items={[]}
                 percentDiffType={false}
                 percentDiffValue='0'
-                imageContent={!!filesContent.length && filesContent[0].content}
+                imageContent={''}
 
             />
         </div>

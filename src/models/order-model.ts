@@ -60,3 +60,7 @@ export interface OrderApproveCloseJobRequest {
     shipmentNo: string;
     imageContent?: BinaryData;
 }
+
+export interface FeatchDataPDFRequest {
+    Symbol: string;
+}

@@ -32,6 +32,24 @@ export function post(path: string, payload: any) {
     });
 }
 
+export function postTest(path: string, payload: any) {
+  const instancetest = axios.create({
+    baseURL: 'https://market.sec.or.th/public/idisc/FundDownload',
+    timeout: env.backEnd.timeout,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return instancetest
+    .post(path, payload)
+    .then((result: any) => {
+      return result.data;
+    })
+    .catch((error: any) => {
+      return error;
+    });
+}
+
 export function deleteData(path: string) {
   return instance
     .delete(path)

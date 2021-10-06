@@ -1,12 +1,12 @@
 import { CheckOrderRequest } from "../models/order-model"
 export const orders = [
     {
-        orderShipment: "LD234587",
+        orderShipment: "LD1111",
         orderNo: "SD2021-001",
         orderTotal: 210,
         orderTote: 78,
         orderType: "PAPER",
-        orderStatus: "PENDING",
+        orderStatus: "1",
         orderCreateDate: '16/09/2012',
         products: [
             {
@@ -39,11 +39,11 @@ export const orders = [
         ]
     },
     {
-        orderShipment: "LD234999",
+        orderShipment: "LD2222",
         orderNo: "SD2021-002",
         orderTotal: 210,
         orderTote: 78,
-        orderStatus: "APPROVE",
+        orderStatus: "0",
         orderType: "WASHING-POWER",
         orderCreateDate: '16/09/2012',
         products: [
@@ -69,6 +69,44 @@ export const orders = [
                 productId: "0023",
                 productBarCode: "0000111122225556",
                 productDescription: "แอทแทค ผงซักฟอก 3D คลีน แอคชั่น 4500 กรัม",
+                productUnit: "Pack",
+                productQuantityRef: 10,
+                productQuantityActual: 9,
+                productDifference: 1
+            }
+        ]
+    },
+    {
+        orderShipment: "LD3333",
+        orderNo: "SD2021-002",
+        orderTotal: 210,
+        orderTote: 78,
+        orderStatus: "3",
+        orderType: "DRINK",
+        orderCreateDate: '16/09/2012',
+        products: [
+            {
+                productId: "0021",
+                productBarCode: "0000111122223334",
+                productDescription: "คาราบาว 150ml",
+                productUnit: "Pack",
+                productQuantityRef: 1,
+                productQuantityActual: 1,
+                productDifference: 0
+            },
+            {
+                productId: "0022",
+                productBarCode: "0000111122224445",
+                productDescription: "คาราบาวเอเนอร์จี้ดริงก์ 330 ml",
+                productUnit: "Pack",
+                productQuantityRef: 10,
+                productQuantityActual: 9,
+                productDifference: 1
+            },
+            {
+                productId: "0023",
+                productBarCode: "0000111122225556",
+                productDescription: "เครื่องดื่ม วู้ดดี้ ซี+ ล็อค 140ml ",
                 productUnit: "Pack",
                 productQuantityRef: 10,
                 productQuantityActual: 9,

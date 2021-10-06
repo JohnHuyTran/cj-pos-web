@@ -1,6 +1,7 @@
-import { post } from '../adapters/posback-adapter';
+import { post, postTest } from '../adapters/posback-adapter';
+import axios from "axios";
 import { environment } from '../environment-base';
-import { OrderSubmitRequest } from '../models/order-model'
+import { OrderSubmitRequest, FeatchDataPDFRequest } from '../models/order-model'
 
 export async function saveOrderShipments(payload: OrderSubmitRequest) {
     try {
@@ -34,4 +35,18 @@ export async function closeOrderShipments(payload: any) {
         throw error;
     }
 }
+
+export async function fetchShipmentDataPDF(payload: FeatchDataPDFRequest) {
+    try {
+        const response = await postTest('', payload)
+            .then((result: any) => result);
+        return response
+
+
+    } catch (error) {
+        console.log("error = ", error);
+        throw error;
+    }
+}
+
 
