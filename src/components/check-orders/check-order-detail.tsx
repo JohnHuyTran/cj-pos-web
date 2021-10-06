@@ -56,6 +56,10 @@ const columns: GridColDef[] = [
     },
 ];
 
+const updateRows = (value, id, field) => {
+    const item = rows.find((item) => item.id === id);
+    item[field] = value;
+};
 
 var calProductDiff = function (params) {
     return params.data.productQuantityRef - params.data.productQuantityActual;
@@ -209,9 +213,9 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
 
 
-    const handleEditRowsModelChange = React.useCallback((model: GridEditRowsModel) => {
-        console.log(model);
-    }, []);
+    // const handleEditRowsModelChange = React.useCallback((model: GridEditRowsModel) => {
+    //     console.log(model);
+    // }, []);
 
     return (
         <div>
@@ -361,7 +365,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                         <DataGrid rows={rows ? rows : []}
                             columns={columns}
                             editMode="row"
-                            onEditRowsModelChange={handleEditRowsModelChange}
+                            // onEditRowsModelChange={handleEditRowsModelChange}
                             autoHeight />
                     </Box>
                 </DialogContent>
@@ -375,7 +379,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 items={[]}
                 percentDiffType={false}
                 percentDiffValue='0'
-                imageContent={''}
+                imageContent={!!filesContent.length && filesContent[0].content}
 
             />
         </div>
