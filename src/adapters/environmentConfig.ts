@@ -8,5 +8,6 @@ export const env: any = {
     grantType: process.env.REACT_APP_KEYCLOAK_GRANT_TYPE,
     clientId: process.env.REACT_APP_KEYCLOAK_CLIENT_ID,
     clientSecret: process.env.REACT_APP_KEYCLOAK_CLIENT_SECRET,
+    timeout: process.env.REACT_APP_KEYCLOAK_TIME_OUT
   },
 };

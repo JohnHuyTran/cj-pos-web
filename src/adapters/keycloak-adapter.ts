@@ -6,6 +6,7 @@ import { loginForm, Response } from '../models/user-interface';
 
 const instance = axios.create({
   baseURL: env.keycloak.url,
+  timeout: env.keycloak.timeout,
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
   },
