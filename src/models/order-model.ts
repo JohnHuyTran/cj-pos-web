@@ -43,9 +43,10 @@ export interface ShipmentRequest {
     status?: string;
 }
 
+
 export interface ShipmentResponse {
     ref: string;
-    code: string;
+    code: number;
     message: string;
     data: ShipmentInfo[];
     total: number;
@@ -56,6 +57,7 @@ export interface ShipmentResponse {
     totalPage: number;
 }
 
+
 export interface ShipmentInfo {
     shipmentNo: string;
     shipmentDate: string;
@@ -63,6 +65,7 @@ export interface ShipmentInfo {
     sapDocType: string;
     sdNo: string;
     sdStatus: number;
+    sdType: number;
     toteCnt: number;
     boxCnt: number;
     entries: Entry[];
@@ -71,37 +74,43 @@ export interface ShipmentInfo {
 export interface Entry {
     deliveryOrderNo: string;
     deliveryOrderDate: string;
-    Items: Item[];
+    items: Item[];
 }
 
 export interface Item {
+    seqItem: number;
+    itemNo: string;
+    shipmentSAPRef: string;
+    sku: Sku;
     productName: string;
-    ItemRefNo: string;
     barcode: string;
-    skuCode: string;
-    outOfStockStatus: string;
-    toteCode: string;
-    expireDate: string;
-    unitFactor: number;
     unit: Unit;
     quantity: Quantity;
+    price: number;
+    isControlStock: number;
+    toteCode: string;
+    expireDate: string;
     comment: string;
 }
 
 export interface Quantity {
     qty: number;
     qtyAll: number;
-    qtyAllBefore: string;
+    qtyAllBefore: number;
     actualQty: number;
     qtyDiff: number;
+}
+
+export interface Sku {
+    code: string;
+    type: string;
 }
 
 export interface Unit {
     code: string;
     name: string;
+    unitFactor: number;
 }
-
-
 
 export interface CheckOrderDetailProps {
     shipment: any | undefined;
@@ -115,12 +124,6 @@ export interface OrderSubmitRequest {
     items: Item[];
 }
 
-// export interface Item {
-//     barcode: string;
-//     actualQty: number;
-//     comment?: string;
-
-// }
 
 export interface OrderSubmitResponse {
     ref: string;
