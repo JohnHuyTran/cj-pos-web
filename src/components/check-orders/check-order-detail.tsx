@@ -10,7 +10,7 @@ import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
-import { CheckOrderDetailProps, Order, Product } from '../../models/order-model';
+import { CheckOrderDetailProps, Entry, Order, Product } from '../../models/order-model';
 import { useStyles } from './check-order-detail-css'
 import { useFilePicker } from 'use-file-picker';
 import { Item, OrderSubmitRequest, Quantity } from '../../models/order-model';
@@ -18,6 +18,7 @@ import { saveOrderShipments, getPathReportSD } from '../../services/order-shipme
 import ConfirmOrderShipment from './check-order-confirm-model';
 import { CheckOrderEnum } from '../../utils/enum/check-order-enum';
 import ModalShowPDF from './modal-show-pdf';
+import { ShipmentInfo, ShipmentResponse } from '../../models/order-model';
 
 
 const columns: GridColDef[] = [
@@ -92,7 +93,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const classes = useStyles();
     const { shipment, defaultOpen } = props;
     const items = useAppSelector((state) => state.checkOrderList);
-    const res: Order[] = items.orderList;
+    const res: ShipmentResponse = items.orderList;
     const [open, setOpen] = React.useState(defaultOpen);
     const [fileName, setFileName] = React.useState('');
     const { apiRef, columns } = useApiRef();
@@ -111,19 +112,20 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
     const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
 
+
     useEffect(() => {
-        if (productsFilter[0].orderStatus === CheckOrderEnum.STATUS_DRAFT_CODE) {
+        if (shipmentList[0].sdStatus === CheckOrderEnum.STATUS_DRAFT_CODE) {
             setDisableSaveBtn(false);
             setDisableApproveBtn(false);
             setDisableCloseJobBtn(true)
         }
-        if (productsFilter[0].orderStatus === CheckOrderEnum.STATUS_APPROVE_CODE) {
+        if (shipmentList[0].sdStatus === CheckOrderEnum.STATUS_APPROVE_CODE) {
             setDisableSaveBtn(true);
             setDisableApproveBtn(true);
             setDisableCloseJobBtn(false)
         }
 
-        if (productsFilter[0].orderStatus === CheckOrderEnum.STATUS_CLOSEJOB_CODE) {
+        if (shipmentList[0].sdStatus === CheckOrderEnum.STATUS_CLOSEJOB_CODE) {
             setIsDisplayActBtn('none');
         }
 
@@ -148,7 +150,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const handleSaveButton = () => {
         setItemsDiffState([]);
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-        const items = [];
+        const itemsList = [];
         rows.forEach((id: GridRowId, data: GridRowData) => {
             const quantity: Quantity = {
                 actualQty: id.productQuantityActual * 1
@@ -170,13 +172,13 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 }
                 setItemsDiffState(itemsDiffState => [...itemsDiffState, itemDiff]);
             }
-            items.push(item);
+            itemsList.push(item);
 
         })
 
         const payload: OrderSubmitRequest = {
             shipmentNo: shipment,
-            items: items,
+            items: itemsList,
         }
 
         saveOrderShipments(payload)
@@ -228,22 +230,38 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
 
     // data grid
-    const productsFilter: Order[] = res.filter(
-        (orders: Order) => orders.orderShipment === shipment
+    const shipmentList: ShipmentInfo[] = res.data.filter(
+        (shipmentInfo: ShipmentInfo) => shipmentInfo.shipmentNo === shipment
     )
-    const rows = productsFilter[0].products?.map((product: Product, index: number) => {
-        return {
-            id: product.productBarCode,
-            col1: index + 1,
-            productId: product.productId,
-            productBarCode: product.productBarCode,
-            productDescription: product.productDescription,
-            productUnit: product.productUnit,
-            productQuantityRef: product.productQuantityRef,
-            productQuantityActual: product.productQuantityActual,
-            productDifference: product.productDifference,
-            productComment: ''
-        }
+
+    console.log('shipment list:', shipmentList);
+    const rows = shipmentList[0].entries.map((roList: Entry) => {
+        console.log('DO:', roList.deliveryOrderNo);
+        console.log('items size: ', roList.items.length);
+        roList.items.map((item: Item, index: number) => {
+            console.log(`${item.itemNo} ${item.barcode} ${item.productName} ${item.unit.name} ${item.quantity.qty} ${item.quantity.actualQty} ${item.quantity.qtyDiff}`);
+            return {
+                id: item.barcode,
+                col1: index + 1,
+                productId: "item.itemNo",
+                productBarCode: "item.barcode",
+                productDescription: "item.productName",
+                productUnit: "item.unit.name",
+                productQuantityRef: "item.quantity.qty",
+                productQuantityActual: "item.quantity.actualQty",
+                productDifference: "item.quantity.qtyDiff",
+                productComment: ''
+                // productId: item.itemNo,
+                // productBarCode: item.barcode,
+                // productDescription: item.productName,
+                // productUnit: item.unit.name,
+                // productQuantityRef: item.quantity.qty,
+                // productQuantityActual: item.quantity.actualQty,
+                // productDifference: item.quantity.qtyDiff,
+                // productComment: ''
+            }
+        })
+
     })
 
     const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -292,7 +310,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>เลขที่เอกสาร LD:</Typography>
                             </Grid>
                             <Grid item lg={1}  >
-                                <Typography variant="body2" gutterBottom></Typography>
+                                <Typography variant="body2" gutterBottom>{shipmentList[0].shipmentNo}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
@@ -301,7 +319,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>เลขที่เอกสาร SD:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
-                                <Typography variant="body2" gutterBottom>{productsFilter[0].orderNo}</Typography>
+                                <Typography variant="body2" gutterBottom>{shipmentList[0].sdNo}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
@@ -309,7 +327,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>วันที่:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
-                                <Typography variant="body2" gutterBottom>{productsFilter[0].orderCreateDate}</Typography>
+                                <Typography variant="body2" gutterBottom>{shipmentList[0].shipmentDate}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
@@ -317,7 +335,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>สถานะ:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
-                                <Typography variant="body2" gutterBottom>{productsFilter[0].orderStatus}</Typography>
+                                <Typography variant="body2" gutterBottom>{shipmentList[0].sdStatus}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
@@ -325,7 +343,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>ประเภท:</Typography>
                             </Grid>
                             <Grid item lg={9} >
-                                <Typography variant="body2" gutterBottom>{productsFilter[0].orderType}</Typography>
+                                <Typography variant="body2" gutterBottom>{shipmentList[0].sdType}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
@@ -333,7 +351,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>แนบเอกสารใบส่วนต่างหลังเซ็นต์:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
-                                {productsFilter[0].orderStatus !== CheckOrderEnum.STATUS_CLOSEJOB_CODE && <div>
+                                {shipmentList[0].sdStatus !== CheckOrderEnum.STATUS_CLOSEJOB_CODE && <div>
                                     <TextField name='browserTxf' className={classes.textField} />
                                     <Button
                                         id='printBtb'
@@ -345,7 +363,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                         style={{ marginLeft: 10 }}
                                     >BROWSE</Button></div>
                                 }
-                                {productsFilter[0].orderStatus === CheckOrderEnum.STATUS_CLOSEJOB_CODE && <div>
+                                {shipmentList[0].sdStatus === CheckOrderEnum.STATUS_CLOSEJOB_CODE && <div>
 
                                     <Link
                                         component="button"

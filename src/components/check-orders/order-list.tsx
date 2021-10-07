@@ -3,13 +3,13 @@ import { useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridCellParams, GridApi, GridRowParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import CheckOrderDetail from './check-order-detail';
-import { Order } from '../../models/order-model';
+import { ShipmentInfo, ShipmentResponse } from '../../models/order-model';
 
 
 
 function OrderList() {
     const items = useAppSelector((state) => state.checkOrderList);
-    const res: Order[] = items.orderList;
+    const res: ShipmentResponse = items.orderList;
     const [opens, setOpens] = React.useState(false);
     const [shipment, setShipment] = React.useState('');
 
@@ -26,18 +26,19 @@ function OrderList() {
         { field: "orderStatus", headerName: "สถานะ", minWidth: 200 },
         { field: "col10", headerName: "รายละเอียด", minWidth: 200 },
     ];
+    console.log('res:', res);
 
-    const rows = res.map((data: Order, index: number) => {
+    const rows = res.data.map((data: ShipmentInfo, index: number) => {
         return {
-            id: data.orderShipment,
+            id: data.shipmentNo,
             index: index + 1,
-            orderShipment: data.orderShipment,
-            orderNo: data.orderNo,
-            orderType: data.orderType,
-            orderTotal: data.orderTotal,
-            orderTote: data.orderTote,
-            orderCreateDate: data.orderCreateDate,
-            orderStatus: data.orderStatus,
+            orderShipment: data.shipmentNo,
+            orderNo: data.sdNo,
+            orderType: data.sdType,
+            orderTotal: data.boxCnt,
+            orderTote: data.toteCnt,
+            orderCreateDate: data.shipmentDate,
+            orderStatus: data.sdStatus,
             col10: "desc"
         };
     });
@@ -45,7 +46,7 @@ function OrderList() {
     function currentlySelected(params: GridCellParams) {
         setShipment(params.id.toString());
         setOpens(true);
-        console.log("opens", opens);
+        console.log("shipment No", params.id.toString());
     }
 
     function isClosModal() {

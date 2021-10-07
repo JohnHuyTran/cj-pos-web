@@ -1,16 +1,27 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { getOrderList } from '../../mockdata/orders';
-import { CheckOrderRequest, Order, CheckOrderResponse } from '../../models/order-model';
+import { getOrderList } from '../../mockdata/order-shipment';
+import { CheckOrderRequest, Order, CheckOrderResponse, ShipmentResponse } from '../../models/order-model';
 
 type State = {
-    orderList: Order[];
+    orderList: ShipmentResponse;
     error: string;
 }
 
-
+const inti: ShipmentResponse = {
+    ref: "",
+    code: 0,
+    message: "",
+    data: [],
+    total: 0,
+    page: 0,
+    perPage: 0,
+    prev: 0,
+    next: 0,
+    totalPage: 0
+}
 
 const initialState: State = {
-    orderList: [],
+    orderList: inti,
     error: "",
 };
 
@@ -18,7 +29,7 @@ export const featchOrderListAsync = createAsyncThunk(
     "orderList",
     async (payload: CheckOrderRequest, store) => {
         try {
-            const response: Order = await getOrderList(payload).then();
+            const response: ShipmentResponse = await getOrderList().then();
             return response;
         } catch (error) {
             throw error;
@@ -31,7 +42,7 @@ const checkOrderSlice = createSlice({
     initialState,
     reducers: {
         clearDataFilter: (state) => {
-            state.orderList = []
+            state.orderList = inti
         }
     },
     extraReducers: (builer) => {
