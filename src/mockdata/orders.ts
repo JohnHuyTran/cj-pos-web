@@ -1,105 +1,142 @@
-import { CheckOrderRequest } from "../models/order"
+import { CheckOrderRequest } from '../models/order';
 export const orders = [
-    {
-        orderShipment: "LD234587",
-        orderNo: "SD2021-001",
-        orderTotal: 210,
-        orderTote: 78,
-        orderType: "PAPER",
-        orderStatus: "PENDING",
-        orderCreateDate: '16/09/2012',
-        products: [
-            {
-                productId: "0001",
-                productBarCode: "0000111122223333",
-                productDescription: "กระดาษถ่ายเอกสาร Double A A4 80 แกรม",
-                productUnit: "Pack",
-                productQuantityRef: 1,
-                productQuantityActual: 1,
-                productDifference: 0
+  {
+    shipmentNo: 'LD21093000710345',
+    shipmentDate: '05/10/2021',
+    status: '1',
+    sapDocType: 'DO',
+    sdNo: 'SD2313066956-001',
+    sdStatus: 0,
+    sdType: 0,
+    toteCnt: 10,
+    boxCnt: 5,
+    entries: [
+      {
+        deliveryOrderNo: 'DO20210001',
+        deliveryOrderDate: '05/10/2021',
+        Items: [
+          {
+            productName: 'Shelf talker แลกแต้มแทนเงินสด(10/PAC)',
+            ItemRefNo: '900001',
+            barcode: '8859333712911',
+            skuCode: '000000000060002600',
+            outOfStockStatus: '1',
+            toteCode: 'TLGG014881',
+            expireDate: '',
+            unitFactor: 12,
+            unit: {
+              code: 'PAK',
+              name: 'แพค',
             },
-            {
-                productId: "0002",
-                productBarCode: "0000111122224444",
-                productDescription: "กระดาษถ่ายเอกสาร ไอเดีย เวิร์ค A4 80แกรม",
-                productUnit: "Pack",
-                productQuantityRef: 10,
-                productQuantityActual: 9,
-                productDifference: 1
+            quantity: {
+              qty: 1,
+              qtyAll: 12,
+              qtyAllBefore: '900001',
+              actualQty: 12,
+              qtyDiff: 0,
             },
-            {
-                productId: "0003",
-                productBarCode: "0000111122225555",
-                productDescription: "กระดาษถ่ายเอกสาร ONE Green A4 70 แกรม 450",
-                productUnit: "Pack",
-                productQuantityRef: 10,
-                productQuantityActual: 9,
-                productDifference: 1
-            }
-        ]
-    },
-    {
-        orderShipment: "LD234999",
-        orderNo: "SD2021-002",
-        orderTotal: 210,
-        orderTote: 78,
-        orderStatus: "APPROVE",
-        orderType: "WASHING-POWER",
-        orderCreateDate: '16/09/2012',
-        products: [
-            {
-                productId: "0021",
-                productBarCode: "0000111122223334",
-                productDescription: "เปา วินวอช ผงซักฟอก ขนาด 1,700 กรัม",
-                productUnit: "Pack",
-                productQuantityRef: 1,
-                productQuantityActual: 1,
-                productDifference: 0
+            comment: 'แก้ไข',
+          },
+          {
+            productName: 'Shelf Strip 2 Bay Moiz & Face(11/PAC)',
+            ItemRefNo: '900002',
+            barcode: '9999990180586',
+            skuCode: '000000000060002618',
+            outOfStockStatus: '900002',
+            toteCode: 'TDOA66923',
+            expireDate: '',
+            unitFactor: 12,
+            unit: {
+              code: 'PAK',
+              name: 'แพค',
             },
-            {
-                productId: "0022",
-                productBarCode: "0000111122224445",
-                productDescription: "บรีส เอกเซล ผงซักฟอก สูตรเข้มข้น 4500 กรัม",
-                productUnit: "Pack",
-                productQuantityRef: 10,
-                productQuantityActual: 9,
-                productDifference: 1
+            quantity: {
+              qty: 1,
+              qtyAll: 12,
+              qtyAllBefore: '',
+              actualQty: 12,
+              qtyDiff: 0,
             },
-            {
-                productId: "0023",
-                productBarCode: "0000111122225556",
-                productDescription: "แอทแทค ผงซักฟอก 3D คลีน แอคชั่น 4500 กรัม",
-                productUnit: "Pack",
-                productQuantityRef: 10,
-                productQuantityActual: 9,
-                productDifference: 1
-            }
-        ]
-    }
-]
-
-
+            comment: 'แก้ไข',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    shipmentNo: 'LD21093000710344',
+    shipmentDate: '06/10/2021',
+    status: '1',
+    sapDocType: 'DO',
+    sdNo: 'SD21093000710344',
+    sdStatus: 0,
+    sdType: 1,
+    toteCnt: 10,
+    boxCnt: 5,
+    entries: [
+      {
+        deliveryOrderNo: 'DO20210002',
+        deliveryOrderDate: '06/10/2021',
+        Items: [
+          {
+            productName: 'Shelf Strip 2 Bay Moiz & Face(11/PAC)',
+            ItemRefNo: '900002',
+            barcode: '9999990180586',
+            skuCode: '000000000060002618',
+            outOfStockStatus: '900002',
+            toteCode: 'TDOA66923',
+            expireDate: '',
+            unitFactor: 12,
+            unit: {
+              code: 'PAK',
+              name: 'แพค',
+            },
+            quantity: {
+              qty: 1,
+              qtyAll: 12,
+              qtyAllBefore: '',
+              actualQty: 12,
+              qtyDiff: 0,
+            },
+            comment: 'แก้ไข',
+          },
+        ],
+      },
+    ],
+  },
+];
 
 export function getOrderList(payload: CheckOrderRequest) {
-    return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
+    console.log(` getOrderList: ${payload.shipmentNo}`);
+    if (
+      !payload.shipmentNo &&
+      !payload.sdNo &&
+      !payload.sdStatus &&
+      !payload.sdType
+    ) {
+      reject('data not found');
+    }
 
-        if (!payload.orderNo && !payload.orderStatus && !payload.orderType) {
-            reject('data not found')
-        }
+    const foundOrders = orders.filter(
+      (order) =>
+        (!payload.shipmentNo
+          ? true
+          : payload.shipmentNo && order.shipmentNo.search(payload.shipmentNo) > -1) &&
+        (!payload.sdStatus
+          ? true
+          : payload.sdStatus && payload.sdStatus === order.sdStatus) &&
+        (!payload.sdType
+          ? true
+          : payload.sdType && payload.sdType === order.sdType)
+    );
 
-        const foundOrders = orders.filter(
-            (order) => (!payload.orderNo ? true : payload.orderNo && order.orderNo.search(payload.orderNo) > -1) &&
-                (!payload.orderStatus ? true : payload.orderStatus && payload.orderStatus === order.orderStatus) &&
-                (!payload.orderType ? true : payload.orderType && payload.orderType === order.orderType)
-        )
-
-
-        setTimeout(() => {
-            if (foundOrders) {
-                resolve(foundOrders)
-            } else {
-                reject('data not found')
-            }
-        }, 100)
-    })
+    setTimeout(() => {
+      if (foundOrders) {
+        resolve(foundOrders);
+      } else {
+        reject('data not found');
+      }
+    }, 100);
+  });
 }
