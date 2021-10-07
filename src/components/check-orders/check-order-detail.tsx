@@ -14,7 +14,7 @@ import { CheckOrderDetailProps, Order, Product } from '../../models/order-model'
 import { useStyles } from './check-order-detail-css'
 import { useFilePicker } from 'use-file-picker';
 import { Item, OrderSubmitRequest, Quantity } from '../../models/order-model';
-import { saveOrderShipments, fetchShipmentDeliverlyPDF } from '../../services/order-shipment';
+import { saveOrderShipments, getPathReportSD } from '../../services/order-shipment';
 import ConfirmOrderShipment from './check-order-confirm-model';
 import { CheckOrderEnum } from '../../utils/enum/check-order-enum';
 import ModalShowPDF from './modal-show-pdf';
@@ -453,8 +453,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             <ModalShowPDF
                 open={openModelPreviewDocument}
                 onClose={handleModelPreviewDocument}
-                // url={`http://54.255.171.154:30010/api/stock-diff/${shipment}/export`}
-                url='https://docs.marklogic.com/8.0/guide/rest-dev.pdf'
+                url={getPathReportSD(shipment)}
 
             />
 

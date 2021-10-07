@@ -4,7 +4,7 @@ import store from "../store/store";
 import { ApiError } from '../models/api-error-model'
 
 const instance = axios.create({
-  baseURL: 'http://54.255.171.154:30010',//env.backEnd.url,
+  baseURL: env.backEnd.url,
   timeout: env.backEnd.timeout,
   headers: {
     "Content-Type": "application/json",

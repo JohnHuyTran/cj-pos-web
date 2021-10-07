@@ -2,6 +2,8 @@ import { get, post, postTest } from '../adapters/posback-adapter';
 import axios from "axios";
 import { environment } from '../environment-base';
 import { OrderSubmitRequest, FeatchDataPDFRequest } from '../models/order-model'
+import { getPathUrl } from './base-service';
+import { env } from '../adapters/environmentConfig'
 
 export async function saveOrderShipments(payload: OrderSubmitRequest) {
     try {
@@ -48,6 +50,10 @@ export async function fetchShipmentDeliverlyPDF(shipmentNo: string) {
         console.log("error = ", error);
         throw error;
     }
+}
+
+export const getPathReportSD = (shipmentNo: string) => {
+    return getPathUrl(`${env.backEnd.url}${environment.orders.shipment.printFormShipmentDeliverly.url}`, { 'shipmentNo': shipmentNo })
 }
 
 

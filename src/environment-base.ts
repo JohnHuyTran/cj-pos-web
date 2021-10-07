@@ -17,7 +17,7 @@ export const environment = {
         url: "api/order/close"
       },
       printFormShipmentDeliverly: {
-        url: '/api/stock-diff/${xxx}/export'
+        url: '/api/stock-diff/{shipmentNo}/export'
       }
     }
   }
