@@ -1,9 +1,10 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { env } from "./environmentConfig";
 import store from "../store/store";
+import { ApiError } from '../models/api-error-model'
 
 const instance = axios.create({
-  baseURL: env.backEnd.url,
+  baseURL: 'http://54.255.171.154:30010',//env.backEnd.url,
   timeout: env.backEnd.timeout,
   headers: {
     "Content-Type": "application/json",
@@ -17,7 +18,12 @@ export function get(path: string) {
       return result.data;
     })
     .catch((error: any) => {
-      return error;
+      const err: ApiError = {
+        httpStatus: error.response?.status,
+        code: error.response?.data.code,
+        message: error.response?.data.message,
+      }
+      throw err;
     });
 }
 
@@ -34,8 +40,12 @@ export function post(path: string, payload: any) {
       console.log(`status: ${error.response?.status}`);
       console.log(`code: ${error.response?.data.code}`);
       console.log(`message: ${error.response?.data.message}`);
-      throw error;
-      // throw new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message)
+      const err: ApiError = {
+        httpStatus: error.response?.status,
+        code: error.response?.data.code,
+        message: error.response?.data.message,
+      }
+      throw err;
     });
 }
 
@@ -64,7 +74,12 @@ export function deleteData(path: string) {
       return result;
     })
     .catch((error: any) => {
-      return error;
+      const err: ApiError = {
+        httpStatus: error.response?.status,
+        code: error.response?.data.code,
+        message: error.response?.data.message,
+      }
+      throw err;
     });
 }
 

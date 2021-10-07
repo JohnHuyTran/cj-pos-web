@@ -4,10 +4,14 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import { Item, OrderApproveCloseJobRequest } from '../../models/order-model'
 import { approveOrderShipments, closeOrderShipments } from '../../services/order-shipment'
 import { CheckOrderEnum } from '../../utils/enum/check-order-enum';
+import DataDiffInfo from './table-diff-info';
 
 interface ConfirmOrderShipment {
     open: boolean,
@@ -21,9 +25,42 @@ interface ConfirmOrderShipment {
     imageContent: BinaryData,
 }
 
+
+
+export interface DialogTitleProps {
+    id: string;
+    children?: React.ReactNode;
+    onClose?: () => void;
+}
+
+const BootstrapDialogTitle = (props: DialogTitleProps) => {
+    const { children, onClose, ...other } = props;
+
+    return (
+        <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+            {children}
+            {onClose ? (
+                <IconButton
+                    aria-label="close"
+                    onClick={onClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
+            ) : null}
+        </DialogTitle>
+    );
+};
+
 export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     const { open, onClose, onUpdateShipmentStatus, shipmentNo, action, items, percentDiffType, percentDiffValue, imageContent } = props;
-
+    console.log('items: ', items.length);
+    console.log('action:', action);
     const confirmApproveBtn = () => {
         if (action === CheckOrderEnum.STATUS_APPROVE_VALUE) {
             const payload: OrderApproveCloseJobRequest = {
@@ -39,7 +76,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                     },
                     function (error) {
                         console.log("err, ", error);
-                        onUpdateShipmentStatus(true);
+                        onUpdateShipmentStatus(false);
                         onClose();
                     }
                 );
@@ -76,21 +113,28 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     return (
         <Dialog
             open={open}
+            aria-labelledby="alert-dialog-title"
             aria-describedby='alert-dialog-description'
             fullWidth={true}
-            maxWidth='xs'
+            maxWidth='sm'
         >
-            {action === CheckOrderEnum.STATUS_APPROVE_VALUE && items.length > 0 && <DialogContent>
+            {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && items.length > 0 && <DialogContent>
                 <DialogContentText id='alert-dialog-description'>
                     <Typography variant="body2" gutterBottom>ยืนยันการตรวจสอบ <br /> เลขที่เอกสาร {shipmentNo} show table</Typography>
                 </DialogContentText>
             </DialogContent>
-            }
-            {action === CheckOrderEnum.STATUS_APPROVE_VALUE && items.length <= 0 && <DialogContent>
-                <DialogContentText id='alert-dialog-description'>
-                    <Typography variant="body2" gutterBottom>ยืนยันการตรวจสอบ <br /> เลขที่เอกสาร {shipmentNo}</Typography>
-                </DialogContentText>
-            </DialogContent>
+            } */}
+
+            {action === CheckOrderEnum.STATUS_APPROVE_VALUE && <div><BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+                <Typography variant="body1" gutterBottom>ยืนยันการตรวจสอบ</Typography>
+            </BootstrapDialogTitle><DialogContent dividers>
+                    <DialogContentText id='alert-dialog-description'>
+                        <Typography variant="body2" gutterBottom align='center'>ยืนยันการตรวจสอบ </Typography>
+                        <Typography variant="body2" gutterBottom align='center'>เลขที่เอกสาร {shipmentNo}</Typography>
+                        {items.length > 0 && <DataDiffInfo items={items} />}
+                    </DialogContentText>
+                </DialogContent>
+            </div>
             }
 
             {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && percentDiffType && <DialogContent>
@@ -101,32 +145,41 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
 
             } */}
 
-            {action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE && !imageContent && <DialogContent>
-                <DialogContentText id='alert-dialog-description'>
-                    <Typography variant="body2" gutterBottom>กรุณาแนบเอกสาร ใบตรวจสการรับสินค้า <br />พร้อมลายเซ็นต์</Typography>
-                </DialogContentText>
-            </DialogContent>
-
+            {
+                action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE && !imageContent && <div><DialogTitle id="alert-dialog-title">
+                    <Typography variant="body1" gutterBottom>แจ้งเตือนแนบเอกสาร ใบตรวจสการรับสินค้า</Typography>
+                </DialogTitle>  <DialogContent dividers>
+                        <DialogContentText id='alert-dialog-description'>
+                            <Typography variant="body2" gutterBottom align='center' >กรุณาแนบเอกสาร ใบตรวจสการรับสินค้า </Typography>
+                            <Typography variant="body2" gutterBottom align='center'>พร้อมลายเซ็นต์</Typography>
+                        </DialogContentText>
+                    </DialogContent>
+                </div>
             }
 
-            {action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE && imageContent && <DialogContent>
-                <DialogContentText id='alert-dialog-description'>
-                    <Typography variant="body2" gutterBottom>ปิดงาน <br /> เลขที่เอกสาร {shipmentNo}</Typography>
-                </DialogContentText>
-            </DialogContent>
-
+            {
+                action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE && imageContent && <div><DialogTitle id="alert-dialog-title">
+                    <Typography variant="body1" gutterBottom>ปิดงาน</Typography>
+                </DialogTitle>  <DialogContent dividers>
+                        <DialogContentText id='alert-dialog-description'>
+                            <Typography variant="body2" gutterBottom align='center'>ปิดงาน </Typography>
+                            <Typography variant="body2" gutterBottom align='center'>เลขที่เอกสาร {shipmentNo}</Typography>
+                        </DialogContentText>
+                    </DialogContent>
+                </div>
             }
 
-            {((action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE && !imageContent)) && <DialogActions>
-                <Button
-                    variant='contained'
-                    size='small'
-                    color='primary'
-                    onClick={handleClose}
-                >
-                    รับทราบ
-                </Button>
-            </DialogActions>
+            {
+                ((action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE && !imageContent)) && <DialogActions>
+                    <Button
+                        variant='contained'
+                        size='small'
+                        color='primary'
+                        onClick={handleClose}
+                    >
+                        รับทราบ
+                    </Button>
+                </DialogActions>
             }
 
             {
@@ -148,6 +201,6 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                     </Button></DialogActions>
             }
 
-        </Dialog>
+        </Dialog >
     )
 }

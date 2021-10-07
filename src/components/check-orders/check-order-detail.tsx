@@ -13,30 +13,32 @@ import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { CheckOrderDetailProps, Order, Product } from '../../models/order-model';
 import { useStyles } from './check-order-detail-css'
 import { useFilePicker } from 'use-file-picker';
-import { Item, OrderSubmitRequest } from '../../models/order-model';
+import { Item, OrderSubmitRequest, Quantity } from '../../models/order-model';
 import { saveOrderShipments, fetchShipmentDeliverlyPDF } from '../../services/order-shipment';
 import ConfirmOrderShipment from './check-order-confirm-model';
 import { CheckOrderEnum } from '../../utils/enum/check-order-enum';
+import ModalShowPDF from './modal-show-pdf';
 
 
 const columns: GridColDef[] = [
-    { field: "col1", headerName: "ลำดับ", minWidth: 120 },
+    { field: "col1", headerName: "ลำดับ", width: 100, disableColumnMenu: 'true' },
     {
         field: "productId",
         headerName: "รหัสสินค้า",
-        minWidth: 150,
+        width: 150,
+        disableColumnMenu: 'true'
     },
-    { field: "productBarCode", headerName: "บาร์โค้ด", minWidth: 200 },
-    { field: "productDescription", headerName: "รายละเอียดสินค้า", minWidth: 350 },
-    { field: "productUnit", headerName: "หน่วย", minWidth: 150 },
+    { field: "productBarCode", headerName: "บาร์โค้ด", minWidth: 200, disableColumnMenu: 'true' },
+    { field: "productDescription", headerName: "รายละเอียดสินค้า", minWidth: 350, disableColumnMenu: 'true' },
+    { field: "productUnit", headerName: "หน่วย", minWidth: 100, disableColumnMenu: 'true' },
     {
-        field: "productQuantityRef", headerName: "จำนวนอ้างอิง", minWidth: 200, type: 'number'
+        field: "productQuantityRef", headerName: "จำนวนอ้างอิง", width: 100, type: 'number', disableColumnMenu: 'true', editable: true
 
     },
     {
-        field: "productQuantityActual", headerName: "จำนวนรับจริง", minWidth: 200,
+        field: "productQuantityActual", headerName: "จำนวนรับจริง", width: 100, disableColumnMenu: 'true',
         renderCell: (params: GridRenderCellParams) => (
-            <TextField variant="outlined" name='txnQuantityActual' value={params.value} onChange={(e) => {
+            <TextField variant="outlined" name='txnQuantityActual' type='number' value={params.value} onChange={(e) => {
                 params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }])
             }
             }
@@ -45,11 +47,11 @@ const columns: GridColDef[] = [
 
     },
     {
-        field: "productDifference", headerName: "ส่วนต่างการรับ", minWidth: 200, type: 'number',
+        field: "productDifference", headerName: "ส่วนต่างการรับ", width: 100, type: 'number', disableColumnMenu: 'true',
         valueGetter: calProductDiff
     },
     {
-        field: "productComment", headerName: "หมายเหตุ", minWidth: 200,
+        field: "productComment", headerName: "หมายเหตุ", minWidth: 200, disableColumnMenu: 'true',
         renderCell: (params: GridRenderCellParams) => (
             <TextField variant="outlined" name='txnComment' value={params.value} onChange={(e) =>
                 params.api.updateRows([{ ...params.row, productComment: e.target.value }])
@@ -105,6 +107,9 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
     const [showSnackbarSuccess, setShowSnackbarSuccess] = React.useState(false);
     const [showSnackbarFail, setShowSnackbarFail] = React.useState(false);
+    const [itemsDiffState, setItemsDiffState] = React.useState([]);
+
+    const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
 
     useEffect(() => {
         if (productsFilter[0].orderStatus === CheckOrderEnum.STATUS_DRAFT_CODE) {
@@ -135,16 +140,38 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         setOpenModelConfirm(false);
     }
 
+    function handleModelPreviewDocument() {
+        setOpenModelPreviewDocument(false);
+    }
+
+
     const handleSaveButton = () => {
+        setItemsDiffState([]);
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         const items = [];
         rows.forEach((id: GridRowId, data: GridRowData) => {
+            const quantity: Quantity = {
+                actualQty: id.productQuantityActual * 1
+            }
             const item: Item = {
                 barcode: id.productBarCode,
-                ActualQty: id.productQuantityActual,
+                quantity: quantity,
                 comment: id.productComment
             }
+            const diffCount: number = id.productQuantityRef - id.productQuantityActual;
+            if (diffCount !== 0) {
+                const quantityDiff: Quantity = {
+                    qtyDiff: diffCount
+                }
+                const itemDiff: Item = {
+                    barcode: id.productBarCode,
+                    productName: id.productDescription,
+                    quantity: quantityDiff
+                }
+                setItemsDiffState(itemsDiffState => [...itemsDiffState, itemDiff]);
+            }
             items.push(item);
+
         })
 
         const payload: OrderSubmitRequest = {
@@ -153,17 +180,14 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         }
 
         saveOrderShipments(payload)
-            .then(
-                function (value) {
-                    setShowSnackbarSuccess(true);
-                }
-            )
-            .catch(
-                function (error) {
-                    setShowSnackbarFail(true);
-                }
-
-            )
+            .then((value) => {
+                setShowSnackbarSuccess(true);
+                // setItemsDiffState[itemsDiff];
+            })
+            .catch((error) => {
+                setShowSnackbarFail(true);
+                // setItemsDiffState[itemsDiff];
+            })
     };
 
     const handleApproveBtn = () => {
@@ -177,13 +201,11 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     }
 
     const handlePrintBtn = () => {
-        fetchShipmentDeliverlyPDF(shipment);
-        window.open('https://docs.marklogic.com/8.0/guide/rest-dev.pdf')
+        setOpenModelPreviewDocument(true);
     }
 
     const handleLinkDocument = () => {
-        fetchShipmentDeliverlyPDF(shipment);
-        window.open('https://docs.marklogic.com/8.0/guide/rest-dev.pdf')
+        setOpenModelPreviewDocument(true);
     }
 
     // browser file
@@ -421,10 +443,18 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 onUpdateShipmentStatus={handleStatusShipmentToJobClose}
                 shipmentNo={shipment}
                 action={action}
-                items={[]}
+                items={itemsDiffState}
                 percentDiffType={false}
                 percentDiffValue='0'
                 imageContent={!!filesContent.length && filesContent[0].content}
+
+            />
+
+            <ModalShowPDF
+                open={openModelPreviewDocument}
+                onClose={handleModelPreviewDocument}
+                // url={`http://54.255.171.154:30010/api/stock-diff/${shipment}/export`}
+                url='https://docs.marklogic.com/8.0/guide/rest-dev.pdf'
 
             />
 

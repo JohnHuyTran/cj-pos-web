@@ -31,8 +31,19 @@ export interface Product {
     productDifference: number;
 }
 
+export interface ShipmentRequest {
+    limit: string;
+    page: string;
+    sortBy?: string;
+    sortDirection?: string;
+    shipmentNo?: string;
+    sdNo?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    status?: string;
+}
 
-export interface Shipment {
+export interface ShipmentResponse {
     ref: string;
     code: string;
     message: string;
