@@ -1,8 +1,10 @@
-export enum CheckOrderEnum {
+export enum CheckOrderStatusValue {
     STATUS_APPROVE_VALUE = 'APPROVED',
-    STATUS_APPROVE_CODE = '1',
     STATUS_DRAFT_VALUE = 'DRAFT',
-    STATUS_DRAFT_CODE = '0',
     STATUS_CLOSEJOB_VALUE = 'CLOSEJOB',
-    STATUS_CLOSEJOB_CODE = '3'
+}
+export enum CheckOrderCodeValue {
+    STATUS_APPROVE_CODE = 1,
+    STATUS_DRAFT_CODE = 0,
+    STATUS_CLOSEJOB_CODE = 3,
 }

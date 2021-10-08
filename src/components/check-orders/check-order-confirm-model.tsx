@@ -10,7 +10,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import { Item, OrderApproveCloseJobRequest } from '../../models/order-model'
 import { approveOrderShipments, closeOrderShipments } from '../../services/order-shipment'
-import { CheckOrderEnum } from '../../utils/enum/check-order-enum';
+import { CheckOrderCodeValue } from '../../utils/enum/check-order-enum';
 import DataDiffInfo from './table-diff-info';
 
 interface ConfirmOrderShipment {
@@ -62,7 +62,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     console.log('items: ', items.length);
     console.log('action:', action);
     const confirmApproveBtn = () => {
-        if (action === CheckOrderEnum.STATUS_APPROVE_VALUE) {
+        if (action === 'true') {
             const payload: OrderApproveCloseJobRequest = {
                 shipmentNo: shipmentNo
             }
@@ -82,7 +82,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                 );
 
 
-        } else if (action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE) {
+        } else if (action === 'CheckOrderEnum.STATUS_CLOSEJOB_VALUE') {
             const payload: OrderApproveCloseJobRequest = {
                 shipmentNo: shipmentNo,
                 imageContent: imageContent,
@@ -125,7 +125,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             </DialogContent>
             } */}
 
-            {action === CheckOrderEnum.STATUS_APPROVE_VALUE && <div><BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+            {action === 'CheckOrderEnum.STATUS_APPROVE_VALUE' && <div><BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
                 <Typography variant="body1" gutterBottom>ยืนยันการตรวจสอบ</Typography>
             </BootstrapDialogTitle><DialogContent dividers>
                     <DialogContentText id='alert-dialog-description'>
@@ -146,7 +146,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             } */}
 
             {
-                action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE && !imageContent && <div><DialogTitle id="alert-dialog-title">
+                action === 'CheckOrderEnum.STATUS_CLOSEJOB_VALUE' && !imageContent && <div><DialogTitle id="alert-dialog-title">
                     <Typography variant="body1" gutterBottom>แจ้งเตือนแนบเอกสาร ใบตรวจสการรับสินค้า</Typography>
                 </DialogTitle>  <DialogContent dividers>
                         <DialogContentText id='alert-dialog-description'>
@@ -158,7 +158,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             }
 
             {
-                action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE && imageContent && <div><DialogTitle id="alert-dialog-title">
+                action === 'CheckOrderEnum.STATUS_CLOSEJOB_VALUE' && imageContent && <div><DialogTitle id="alert-dialog-title">
                     <Typography variant="body1" gutterBottom>ปิดงาน</Typography>
                 </DialogTitle>  <DialogContent dividers>
                         <DialogContentText id='alert-dialog-description'>
@@ -170,7 +170,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             }
 
             {
-                ((action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE && !imageContent)) && <DialogActions>
+                ((action === 'CheckOrderEnum.STATUS_CLOSEJOB_VALUE' && !imageContent)) && <DialogActions>
                     <Button
                         variant='contained'
                         size='small'
@@ -183,7 +183,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             }
 
             {
-                ((action === CheckOrderEnum.STATUS_APPROVE_VALUE) || (action === CheckOrderEnum.STATUS_CLOSEJOB_VALUE && imageContent)) && <DialogActions><Button
+                ((action === 'CheckOrderEnum.STATUS_APPROVE_VALUE') || (action === 'CheckOrderEnum.STATUS_CLOSEJOB_VALUE' && imageContent)) && <DialogActions><Button
                     variant='contained'
                     size='small'
                     color='primary'

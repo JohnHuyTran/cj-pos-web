@@ -1,7 +1,6 @@
 
 // @ts-nocheck
 import React, { useEffect, useMemo, useRef } from 'react'
-import axios from "axios";
 import { useAppSelector } from '../../store/store';
 
 import { Box, Button, Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material'
@@ -10,15 +9,14 @@ import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
-import { CheckOrderDetailProps, Entry, Order, Product } from '../../models/order-model';
 import { useStyles } from './check-order-detail-css'
 import { useFilePicker } from 'use-file-picker';
-import { Item, OrderSubmitRequest, Quantity } from '../../models/order-model';
+
 import { saveOrderShipments, getPathReportSD } from '../../services/order-shipment';
 import ConfirmOrderShipment from './check-order-confirm-model';
-import { CheckOrderEnum } from '../../utils/enum/check-order-enum';
+import { CheckOrderCodeValue } from '../../utils/enum/check-order-enum';
 import ModalShowPDF from './modal-show-pdf';
-import { ShipmentInfo, ShipmentResponse } from '../../models/order-model';
+import { ShipmentInfo, ShipmentResponse, Item, OrderSubmitRequest, Quantity, CheckOrderDetailProps, Entry, } from '../../models/order-model';
 
 
 const columns: GridColDef[] = [
@@ -26,7 +24,7 @@ const columns: GridColDef[] = [
     {
         field: "productId",
         headerName: "รหัสสินค้า",
-        width: 150,
+        width: 200,
         disableColumnMenu: 'true'
     },
     { field: "productBarCode", headerName: "บาร์โค้ด", minWidth: 200, disableColumnMenu: 'true' },
@@ -61,10 +59,10 @@ const columns: GridColDef[] = [
     },
 ];
 
-const updateRows = (value, id, field) => {
-    const item = rows.find((item) => item.id === id);
-    item[field] = value;
-};
+// const updateRows = (value, id, field) => {
+//     const item = rows.find((item) => item.id === id);
+//     item[field] = value;
+// };
 
 var calProductDiff = function (params) {
     return params.data.productQuantityRef - params.data.productQuantityActual;
@@ -114,18 +112,18 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
 
     useEffect(() => {
-        if (shipmentList[0].sdStatus === CheckOrderEnum.STATUS_DRAFT_CODE) {
+        if (shipmentList[0].sdStatus === CheckOrderCodeValue.STATUS_DRAFT_CODE) {
             setDisableSaveBtn(false);
             setDisableApproveBtn(false);
             setDisableCloseJobBtn(true)
         }
-        if (shipmentList[0].sdStatus === CheckOrderEnum.STATUS_APPROVE_CODE) {
+        if (shipmentList[0].sdStatus === CheckOrderCodeValue.STATUS_APPROVE_CODE) {
             setDisableSaveBtn(true);
             setDisableApproveBtn(true);
             setDisableCloseJobBtn(false)
         }
 
-        if (shipmentList[0].sdStatus === CheckOrderEnum.STATUS_CLOSEJOB_CODE) {
+        if (shipmentList[0].sdStatus === CheckOrderCodeValue.STATUS_CLOSEJOB_CODE) {
             setIsDisplayActBtn('none');
         }
 
@@ -194,12 +192,12 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
     const handleApproveBtn = () => {
         setOpenModelConfirm(true)
-        setAction(CheckOrderEnum.STATUS_APPROVE_VALUE)
+        setAction(CheckOrderCodeValue.STATUS_APPROVE_VALUE)
     }
 
     const handleCloseJobBtn = () => {
         setOpenModelConfirm(true)
-        setAction(CheckOrderEnum.STATUS_CLOSEJOB_VALUE)
+        setAction(CheckOrderCodeValue.STATUS_CLOSEJOB_VALUE)
     }
 
     const handlePrintBtn = () => {
@@ -233,36 +231,27 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const shipmentList: ShipmentInfo[] = res.data.filter(
         (shipmentInfo: ShipmentInfo) => shipmentInfo.shipmentNo === shipment
     )
-
-    console.log('shipment list:', shipmentList);
-    const rows = shipmentList[0].entries.map((roList: Entry) => {
-        console.log('DO:', roList.deliveryOrderNo);
-        console.log('items size: ', roList.items.length);
-        roList.items.map((item: Item, index: number) => {
-            console.log(`${item.itemNo} ${item.barcode} ${item.productName} ${item.unit.name} ${item.quantity.qty} ${item.quantity.actualQty} ${item.quantity.qtyDiff}`);
-            return {
-                id: item.barcode,
-                col1: index + 1,
-                productId: "item.itemNo",
-                productBarCode: "item.barcode",
-                productDescription: "item.productName",
-                productUnit: "item.unit.name",
-                productQuantityRef: "item.quantity.qty",
-                productQuantityActual: "item.quantity.actualQty",
-                productDifference: "item.quantity.qtyDiff",
+    const rows = [];
+    let index: number = 1;
+    for (let i = 0; i < shipmentList[0].entries.length; i++) {
+        const items = shipmentList[0].entries[i].items;
+        for (let j = 0; j < items.length; j++) {
+            rows.push({
+                id: items[j].barcode,
+                col1: index,
+                productId: items[j].sku.code,
+                productBarCode: items[j].barcode,
+                productDescription: items[j].productName,
+                productUnit: items[j].unit.name,
+                productQuantityRef: items[j].quantity.qty,
+                productQuantityActual: items[j].quantity.actualQty,
+                productDifference: items[j].quantity.qtyDiff,
                 productComment: ''
-                // productId: item.itemNo,
-                // productBarCode: item.barcode,
-                // productDescription: item.productName,
-                // productUnit: item.unit.name,
-                // productQuantityRef: item.quantity.qty,
-                // productQuantityActual: item.quantity.actualQty,
-                // productDifference: item.quantity.qtyDiff,
-                // productComment: ''
-            }
-        })
+            })
+            index++;
+        }
 
-    })
+    }
 
     const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
         props,
@@ -351,7 +340,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>แนบเอกสารใบส่วนต่างหลังเซ็นต์:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
-                                {shipmentList[0].sdStatus !== CheckOrderEnum.STATUS_CLOSEJOB_CODE && <div>
+                                {shipmentList[0].sdStatus !== CheckOrderCodeValue.STATUS_CLOSEJOB_CODE && <div>
                                     <TextField name='browserTxf' className={classes.textField} />
                                     <Button
                                         id='printBtb'
@@ -363,7 +352,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                         style={{ marginLeft: 10 }}
                                     >BROWSE</Button></div>
                                 }
-                                {shipmentList[0].sdStatus === CheckOrderEnum.STATUS_CLOSEJOB_CODE && <div>
+                                {shipmentList[0].sdStatus === CheckOrderCodeValue.STATUS_CLOSEJOB_CODE && <div>
 
                                     <Link
                                         component="button"
@@ -446,7 +435,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                     </Box>
 
                     <Box mt={2} bgcolor='background.paper'>
-                        <DataGrid rows={rows ? rows : []}
+                        <DataGrid rows={rows}
                             columns={columns}
                             editMode="row"
                             // onEditRowsModelChange={handleEditRowsModelChange}
