@@ -3,11 +3,11 @@ import { useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridCellParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import OrderProductList from './order-product-list';
-import { Shipment } from '../../models/order';
+import { ShipmentResponse, ShipmentInfo } from '../../models/order-model';
 
 function OrderList() {
   const items = useAppSelector((state) => state.checkOrderList);
-  const res: Shipment[] = items.orderList;
+  const res: ShipmentResponse = items.orderList;
   const [opens, setOpens] = React.useState(false);
   const [shipment, setShipment] = React.useState('');
 
@@ -26,8 +26,8 @@ function OrderList() {
     { field: 'shipmentDate', headerName: 'วันที่รับสินค้า', minWidth: 200 },
     { field: 'detail', headerName: 'รายละเอียด', minWidth: 200 },
   ];
-
-  const rows = res.map((data: Shipment, index: number) => {
+  console.log('Data Size: ', JSON.stringify(res));
+  const rows = res.data.map((data: ShipmentInfo, index: number) => {
     return {
       id: data.shipmentNo,
       index: index + 1,

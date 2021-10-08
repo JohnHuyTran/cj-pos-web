@@ -13,7 +13,7 @@ import {
   featchOrderListAsync,
   clearDataFilter,
 } from '../../store/slices/check-order-slice';
-import { CheckOrderRequest } from '../../models/order';
+import { ShipmentRequest } from '../../models/order-model';
 import OrderList from './order-list';
 import { useStyles } from './order-css';
 import DatePickerComponent from '../commons/ui/date-picker';
@@ -46,7 +46,9 @@ function CheckOrderSearch() {
   };
 
   const onClickSearchBtn = () => {
-    const payload: CheckOrderRequest = {
+    const payload: ShipmentRequest = {
+      limit: '10',
+      page: '1',
       shipmentNo: values.orderShipment,
       sdNo: values.orderNo,
       sdStatus: parseInt(values.orderStatus),

@@ -7,16 +7,23 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import Typography from '@mui/material/Typography';
 import { Button } from '@mui/material';
-import { OrderProductListProps, Item, Shipment } from '../../models/order';
+import { Item, ShipmentInfo, ShipmentResponse } from '../../models/order-model';
 import { useStyles } from './order-css';
 import PrintIcon from '@mui/icons-material/Print';
 import ImportExport from '@mui/icons-material/ImportExport';
+
+interface OrderProductListProps {
+  // shipment: GridRowId | undefined;
+  shipment: any | undefined;
+  defaultOpen: boolean;
+  onClickClose: any;
+}
 
 const OrderProductList: React.FC<OrderProductListProps> = (props) => {
   const classes = useStyles();
   const { shipment, defaultOpen } = props;
   const items = useAppSelector((state) => state.checkOrderList);
-  const res: Shipment[] = items.orderList;
+  const res: ShipmentResponse = items.orderList;
   const [open, setOpen] = React.useState(defaultOpen);
   useEffect(() => {
     setOpen(defaultOpen);
@@ -54,8 +61,8 @@ const OrderProductList: React.FC<OrderProductListProps> = (props) => {
     { field: 'productDifference', headerName: 'ส่วนต่างการรับ', minWidth: 200 },
   ];
 
-  const productsFilter: Shipment[] = res.filter(
-    (orders: Shipment) => orders.shipmentNo === shipment
+  const productsFilter: ShipmentInfo[] = res.data.filter(
+    (orders: ShipmentInfo) => orders.shipmentNo === shipment
   );
   const rows = productsFilter[0].entries[0].items?.map(
     (product: Item, index: number) => {
