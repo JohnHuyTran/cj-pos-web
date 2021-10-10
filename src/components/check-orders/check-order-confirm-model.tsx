@@ -10,7 +10,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import { Item, OrderApproveCloseJobRequest } from '../../models/order-model'
 import { approveOrderShipments, closeOrderShipments } from '../../services/order-shipment'
-import { CheckOrderCodeValue } from '../../utils/enum/check-order-enum';
+import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import DataDiffInfo from './table-diff-info';
 
 interface ConfirmOrderShipment {
@@ -18,7 +18,7 @@ interface ConfirmOrderShipment {
     onClose: () => void,
     onUpdateShipmentStatus: (value: boolean) => void,
     shipmentNo: string,
-    action: string,
+    action: number,
     items: Item[],
     percentDiffType: string,
     percentDiffValue: string,
@@ -62,7 +62,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     console.log('items: ', items.length);
     console.log('action:', action);
     const confirmApproveBtn = () => {
-        if (action === 'true') {
+        if (action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
             const payload: OrderApproveCloseJobRequest = {
                 shipmentNo: shipmentNo
             }
@@ -82,7 +82,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                 );
 
 
-        } else if (action === 'CheckOrderEnum.STATUS_CLOSEJOB_VALUE') {
+        } else if (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
             const payload: OrderApproveCloseJobRequest = {
                 shipmentNo: shipmentNo,
                 imageContent: imageContent,
@@ -125,7 +125,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             </DialogContent>
             } */}
 
-            {action === 'CheckOrderEnum.STATUS_APPROVE_VALUE' && <div><BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+            {action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && <div><BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
                 <Typography variant="body1" gutterBottom>ยืนยันการตรวจสอบ</Typography>
             </BootstrapDialogTitle><DialogContent dividers>
                     <DialogContentText id='alert-dialog-description'>
@@ -146,7 +146,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             } */}
 
             {
-                action === 'CheckOrderEnum.STATUS_CLOSEJOB_VALUE' && !imageContent && <div><DialogTitle id="alert-dialog-title">
+                action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && !imageContent && <div><DialogTitle id="alert-dialog-title">
                     <Typography variant="body1" gutterBottom>แจ้งเตือนแนบเอกสาร ใบตรวจสการรับสินค้า</Typography>
                 </DialogTitle>  <DialogContent dividers>
                         <DialogContentText id='alert-dialog-description'>
@@ -158,7 +158,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             }
 
             {
-                action === 'CheckOrderEnum.STATUS_CLOSEJOB_VALUE' && imageContent && <div><DialogTitle id="alert-dialog-title">
+                action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent && <div><DialogTitle id="alert-dialog-title">
                     <Typography variant="body1" gutterBottom>ปิดงาน</Typography>
                 </DialogTitle>  <DialogContent dividers>
                         <DialogContentText id='alert-dialog-description'>
@@ -170,7 +170,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             }
 
             {
-                ((action === 'CheckOrderEnum.STATUS_CLOSEJOB_VALUE' && !imageContent)) && <DialogActions>
+                ((action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && !imageContent)) && <DialogActions>
                     <Button
                         variant='contained'
                         size='small'
@@ -183,7 +183,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             }
 
             {
-                ((action === 'CheckOrderEnum.STATUS_APPROVE_VALUE') || (action === 'CheckOrderEnum.STATUS_CLOSEJOB_VALUE' && imageContent)) && <DialogActions><Button
+                ((action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) || (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent)) && <DialogActions><Button
                     variant='contained'
                     size='small'
                     color='primary'

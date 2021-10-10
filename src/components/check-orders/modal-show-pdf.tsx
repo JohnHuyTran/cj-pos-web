@@ -30,7 +30,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
                     sx={{
                         position: 'absolute',
                         right: 8,
-                        top: 8,
+                        top: 0,
                         color: (theme) => theme.palette.grey[500],
                     }}
                 >
@@ -53,20 +53,17 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
     }
 
     return (
-        <Dialog open={open} maxWidth='xl' fullWidth={true} >
+        <Dialog open={open} fullWidth={true} >
             <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} />
-            <DialogContent>
-                <div>
-                    <Document
-                        file={url}
-                        onLoadSuccess={onDocumentLoadSuccess}
-                        externalLinkTarget="_blank"
-                    >
-                        <Page pageNumber={pageNumber} />
-                    </Document>
-                    <p>Page {pageNumber} of {numPages}</p>
-                </div>
-            </DialogContent>
+            <div>
+                <Document
+                    file={url}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    externalLinkTarget="_blank"
+                >
+                    <Page pageNumber={pageNumber} />
+                </Document>
+            </div>
         </Dialog>
     );
 }

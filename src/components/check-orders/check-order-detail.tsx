@@ -14,7 +14,7 @@ import { useFilePicker } from 'use-file-picker';
 
 import { saveOrderShipments, getPathReportSD } from '../../services/order-shipment';
 import ConfirmOrderShipment from './check-order-confirm-model';
-import { CheckOrderCodeValue } from '../../utils/enum/check-order-enum';
+import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import ModalShowPDF from './modal-show-pdf';
 import { ShipmentInfo, ShipmentResponse, Item, OrderSubmitRequest, Quantity, CheckOrderDetailProps, Entry, } from '../../models/order-model';
 
@@ -102,7 +102,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [isDisplayActBtn, setIsDisplayActBtn] = React.useState('');
 
     const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
-    const [action, setAction] = React.useState('');
+    const [action, setAction] = React.useState();
 
     const [showSnackbarSuccess, setShowSnackbarSuccess] = React.useState(false);
     const [showSnackbarFail, setShowSnackbarFail] = React.useState(false);
@@ -112,18 +112,18 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
 
     useEffect(() => {
-        if (shipmentList[0].sdStatus === CheckOrderCodeValue.STATUS_DRAFT_CODE) {
+        if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
             setDisableSaveBtn(false);
             setDisableApproveBtn(false);
             setDisableCloseJobBtn(true)
         }
-        if (shipmentList[0].sdStatus === CheckOrderCodeValue.STATUS_APPROVE_CODE) {
+        if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
             setDisableSaveBtn(true);
             setDisableApproveBtn(true);
             setDisableCloseJobBtn(false)
         }
 
-        if (shipmentList[0].sdStatus === CheckOrderCodeValue.STATUS_CLOSEJOB_CODE) {
+        if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
             setIsDisplayActBtn('none');
         }
 
@@ -340,7 +340,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>แนบเอกสารใบส่วนต่างหลังเซ็นต์:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
-                                {shipmentList[0].sdStatus !== CheckOrderCodeValue.STATUS_CLOSEJOB_CODE && <div>
+                                {shipmentList[0].sdStatus !== ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && <div>
                                     <TextField name='browserTxf' className={classes.textField} />
                                     <Button
                                         id='printBtb'
@@ -352,7 +352,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                         style={{ marginLeft: 10 }}
                                     >BROWSE</Button></div>
                                 }
-                                {shipmentList[0].sdStatus === CheckOrderCodeValue.STATUS_CLOSEJOB_CODE && <div>
+                                {shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && <div>
 
                                     <Link
                                         component="button"

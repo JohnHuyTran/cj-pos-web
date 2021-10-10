@@ -40,7 +40,7 @@ export async function closeOrderShipments(payload: any) {
 
 export async function fetchShipmentDeliverlyPDF(shipmentNo: string) {
     try {
-        const path = `/api/stock-diff/${shipmentNo}/export`;
+        const path = getPathUrl(environment.orders.shipment.printFormShipmentDeliverly.url, { 'shipmentNo': shipmentNo })
         const response = await get(path)
             .then((result: any) => result);
         return response
