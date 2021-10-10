@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { getOrderList } from '../../mockdata/order-shipment';
+import { getOrderListUpdate } from "../../mockdata/order-shipment-update";
 import { CheckOrderRequest, Order, CheckOrderResponse, ShipmentResponse } from '../../models/order-model';
 
 type State = {
@@ -29,8 +30,14 @@ export const featchOrderListAsync = createAsyncThunk(
     "orderList",
     async (payload: CheckOrderRequest, store) => {
         try {
-            const response: ShipmentResponse = await getOrderList().then();
-            return response;
+            if (payload.orderNo === 'update') {
+                const response: ShipmentResponse = await getOrderListUpdate().then();
+                return response;
+            } else {
+                const response: ShipmentResponse = await getOrderList().then();
+                return response;
+            }
+
         } catch (error) {
             throw error;
         }

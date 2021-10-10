@@ -1,7 +1,8 @@
 
 // @ts-nocheck
 import React, { useEffect, useMemo, useRef } from 'react'
-import { useAppSelector } from '../../store/store';
+import { useAppSelector, useAppDispatch } from '../../store/store';
+import { featchOrderListAsync, clearDataFilter } from '../../store/slices/check-order-slice';
 
 import { Box, Button, Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams, renderEditInputCell, GridEditRowsModel, useGridApiRef } from '@mui/x-data-grid';
@@ -91,6 +92,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const classes = useStyles();
     const { shipment, defaultOpen } = props;
     const items = useAppSelector((state) => state.checkOrderList);
+    const dispatch = useAppDispatch();
     const res: ShipmentResponse = items.orderList;
     const [open, setOpen] = React.useState(defaultOpen);
     const [fileName, setFileName] = React.useState('');
@@ -144,6 +146,14 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         setOpenModelPreviewDocument(false);
     }
 
+    const updateShipmentOrder = () => {
+        const payload: CheckOrderRequest = {
+            orderNo: 'update',
+            orderStatus: 'success',
+            orderType: 'success'
+        }
+        dispatch(featchOrderListAsync(payload));
+    }
 
     const handleSaveButton = () => {
         setItemsDiffState([]);
@@ -182,11 +192,12 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         saveOrderShipments(payload)
             .then((value) => {
                 setShowSnackbarSuccess(true);
-                // setItemsDiffState[itemsDiff];
+                updateShipmentOrder()
             })
             .catch((error) => {
                 setShowSnackbarFail(true);
                 // setItemsDiffState[itemsDiff];
+                updateShipmentOrder()
             })
     };
 
