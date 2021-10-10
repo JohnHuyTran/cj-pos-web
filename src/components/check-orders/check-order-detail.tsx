@@ -20,6 +20,7 @@ import ModalShowPDF from './modal-show-pdf';
 import { ShipmentInfo, ShipmentResponse, Item, OrderSubmitRequest, Quantity, CheckOrderDetailProps, Entry, } from '../../models/order-model';
 
 
+
 const columns: GridColDef[] = [
     { field: "col1", headerName: "ลำดับ", width: 100, disableColumnMenu: 'true' },
     {
@@ -114,6 +115,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
 
     useEffect(() => {
+        console.log('useEffect')
         if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
             setDisableSaveBtn(false);
             setDisableApproveBtn(false);
@@ -156,7 +158,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     }
 
     const handleSaveButton = () => {
-        setItemsDiffState([]);
+
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         const itemsList = [];
         rows.forEach((id: GridRowId, data: GridRowData) => {
@@ -167,18 +169,6 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 barcode: id.productBarCode,
                 quantity: quantity,
                 comment: id.productComment
-            }
-            const diffCount: number = id.productQuantityRef - id.productQuantityActual;
-            if (diffCount !== 0) {
-                const quantityDiff: Quantity = {
-                    qtyDiff: diffCount
-                }
-                const itemDiff: Item = {
-                    barcode: id.productBarCode,
-                    productName: id.productDescription,
-                    quantity: quantityDiff
-                }
-                setItemsDiffState(itemsDiffState => [...itemsDiffState, itemDiff]);
             }
             itemsList.push(item);
 
@@ -202,13 +192,29 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     };
 
     const handleApproveBtn = () => {
+        setItemsDiffState([]);
         setOpenModelConfirm(true)
-        setAction(CheckOrderCodeValue.STATUS_APPROVE_VALUE)
+        setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE)
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        rows.forEach((id: GridRowId, data: GridRowData) => {
+            const diffCount: number = id.productQuantityRef - id.productQuantityActual;
+            if (diffCount !== 0) {
+                const quantityDiff: Quantity = {
+                    qtyDiff: diffCount
+                }
+                const itemDiff: Item = {
+                    barcode: id.productBarCode,
+                    productName: id.productDescription,
+                    quantity: quantityDiff
+                }
+                setItemsDiffState(itemsDiffState => [...itemsDiffState, itemDiff]);
+            }
+        })
     }
 
     const handleCloseJobBtn = () => {
         setOpenModelConfirm(true)
-        setAction(CheckOrderCodeValue.STATUS_CLOSEJOB_VALUE)
+        setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB)
     }
 
     const handlePrintBtn = () => {
