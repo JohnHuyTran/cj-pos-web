@@ -9,6 +9,8 @@ import { DataGrid, GridColDef, GridRenderCellParams, renderEditInputCell, GridEd
 import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import SaveIcon from '@mui/icons-material/Save'
+import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
 
 import { useStyles } from './check-order-detail-css'
 import { useFilePicker } from 'use-file-picker';
@@ -366,12 +368,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                             </Grid>
                             <Grid item lg={9}  >
                                 {shipmentList[0].sdStatus !== ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && <div>
-                                    {/* <TextField name='browserTxf' className={classes.textField} value={fileName} /> */}
-                                    <Typography>
-                                        {plainFiles.map(file => (
-                                            file.name
-                                        ))
-                                        }</Typography>
+                                    <TextField name='browserTxf' className={classes.textField} value={!!filesContent.length && filesContent[0].content ? filesContent[0].name : ''} />
                                     <Button
                                         id='printBtb'
                                         variant='contained'
@@ -379,8 +376,8 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                         className={classes.browserBtn}
                                         onClick={() => openFileSelector()}
 
-                                        style={{ marginLeft: 10 }}
-                                    >BROWSE</Button></div>
+                                        style={{ marginLeft: 10, textTransform: 'none' }}
+                                    >Browse...</Button></div>
                                 }
                                 {shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && <div>
 
@@ -405,7 +402,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                         className={classes.browserBtn}
                                         onClick={handleSaveButton}
                                         disabled={disableSaveBtn}
-
+                                        endIcon={<SaveIcon />}
                                     >บันทึก</Button>
                                 </Box>
                             </Grid>
@@ -449,6 +446,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     variant='contained'
                                     color='primary'
                                     onClick={handlePrintBtn}
+                                    endIcon={<LocalPrintshopOutlinedIcon />}
                                 >พิมพ์ใบตรวจการรับสินค้า</Button>
                             </Grid>
                         </Grid>

@@ -70,13 +70,13 @@ function CheckOrderSearch() {
 
     const handleStartDatePicker = (value: Date) => {
         setStartDate(value);
-        var date_format = moment(value).format("MM/DD/YYYY HH:mm:ss");
+        var date_format = moment(value).format("YYYY/DD/MM HH:mm:ss");
         console.log("start date: ", date_format);
     }
 
     const handleEndDatePicker = (value: Date) => {
         setEndDate(value);
-        var date_format = moment(value).format("MM/DD/YYYY HH:mm:ss");
+        var date_format = moment(value).utc().format("YYYY/DD/MM HH:mm:ss");
         console.log("end date: ", date_format);
     }
 
