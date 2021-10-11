@@ -132,7 +132,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         }
 
         setOpen(defaultOpen);
-    }, [open])
+    }, [open, openModelConfirm])
 
     const handleClose = () => {
         setOpen(false);
@@ -312,10 +312,10 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 <DialogContent>
                     <Box sx={{ flexGrow: 1 }}>
                         <Grid container spacing={2}>
-                            <Grid item lg={2}  >
+                            <Grid item lg={3}  >
                                 <Typography variant="body2" gutterBottom>เลขที่เอกสาร LD:</Typography>
                             </Grid>
-                            <Grid item lg={1}  >
+                            <Grid item lg={9}  >
                                 <Typography variant="body2" gutterBottom>{shipmentList[0].shipmentNo}</Typography>
                             </Grid>
                         </Grid>

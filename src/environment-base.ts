@@ -8,7 +8,7 @@ export const environment = {
   orders: {
     shipment: {
       submit: {
-        url: "/api/order/submit/"
+        url: "/api/order/submit"
       },
       approve: {
         url: "api/order/approve"

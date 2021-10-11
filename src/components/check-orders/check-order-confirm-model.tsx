@@ -59,8 +59,6 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
 export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     const { open, onClose, onUpdateShipmentStatus, shipmentNo, action, items, percentDiffType, percentDiffValue, imageContent } = props;
-    console.log('items: ', items.length);
-    console.log('action:', action);
     const confirmApproveBtn = () => {
         if (action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
             const payload: OrderApproveCloseJobRequest = {
