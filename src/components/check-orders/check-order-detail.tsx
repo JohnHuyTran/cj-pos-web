@@ -15,7 +15,7 @@ import { useFilePicker } from 'use-file-picker';
 
 import { saveOrderShipments, getPathReportSD } from '../../services/order-shipment';
 import ConfirmOrderShipment from './check-order-confirm-model';
-import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
+import { ShipmentDeliveryStatusCodeEnum, getShipmentTypeText, getShipmentStatusText } from '../../utils/enum/check-order-enum';
 import ModalShowPDF from './modal-show-pdf';
 import { ShipmentInfo, ShipmentResponse, Item, OrderSubmitRequest, Quantity, CheckOrderDetailProps, Entry, } from '../../models/order-model';
 
@@ -49,7 +49,7 @@ const columns: GridColDef[] = [
     },
     {
         field: "productDifference", headerName: "ส่วนต่างการรับ", width: 100, type: 'number', disableColumnMenu: 'true',
-        valueGetter: calProductDiff
+        valueGetter: (params) => calProductDiff(params),
     },
     {
         field: "productComment", headerName: "หมายเหตุ", minWidth: 200, disableColumnMenu: 'true',
@@ -66,8 +66,8 @@ const columns: GridColDef[] = [
 //     item[field] = value;
 // };
 
-var calProductDiff = function (params) {
-    return params.data.productQuantityRef - params.data.productQuantityActual;
+var calProductDiff = function (params: GridValueGetterParams) {
+    return params.getValue(params.id, 'productQuantityRef') - params.getValue(params.id, 'productQuantityActual');
 };
 
 
@@ -112,10 +112,10 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [itemsDiffState, setItemsDiffState] = React.useState([]);
 
     const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
-
+    const [shipmentStatusText, setShipmentStatusText] = React.useState('');
+    const [shipmentTypeText, setShipmentTypeText] = React.useState('');
 
     useEffect(() => {
-        console.log('useEffect')
         if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
             setDisableSaveBtn(false);
             setDisableApproveBtn(false);
@@ -132,6 +132,8 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         }
 
         setOpen(defaultOpen);
+        setShipmentStatusText(getShipmentStatusText(shipmentList[0].sdStatus));
+        setShipmentTypeText(getShipmentTypeText(shipmentList[0].sdType))
     }, [open, openModelConfirm])
 
     const handleClose = () => {
@@ -341,7 +343,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>สถานะ:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
-                                <Typography variant="body2" gutterBottom>{shipmentList[0].sdStatus}</Typography>
+                                <Typography variant="body2" gutterBottom>{shipmentStatusText}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
@@ -349,7 +351,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>ประเภท:</Typography>
                             </Grid>
                             <Grid item lg={9} >
-                                <Typography variant="body2" gutterBottom>{shipmentList[0].sdType}</Typography>
+                                <Typography variant="body2" gutterBottom>{shipmentTypeText}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
