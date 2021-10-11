@@ -18,6 +18,7 @@ interface ConfirmOrderShipment {
     onClose: () => void,
     onUpdateShipmentStatus: (value: boolean) => void,
     shipmentNo: string,
+    sdNo: string,
     action: number,
     items: Item[],
     percentDiffType: string,
@@ -58,14 +59,10 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 };
 
 export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
-    const { open, onClose, onUpdateShipmentStatus, shipmentNo, action, items, percentDiffType, percentDiffValue, imageContent } = props;
+    const { open, onClose, onUpdateShipmentStatus, shipmentNo, sdNo, action, items, percentDiffType, percentDiffValue, imageContent } = props;
     const confirmApproveBtn = () => {
         if (action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
-            const payload: OrderApproveCloseJobRequest = {
-                shipmentNo: shipmentNo
-            }
-
-            approveOrderShipments(payload)
+            approveOrderShipments(sdNo)
                 .then(
                     function (value) {
                         console.log("value, ", value);

@@ -7,11 +7,12 @@ export const environment = {
   },
   orders: {
     shipment: {
-      submit: {
-        url: "/api/order/submit"
+      saveDraft: {
+        // url: "/api/order/submit"
+        url: '/api/stock-diff/{sdNo}/draft'
       },
       approve: {
-        url: "api/order/approve"
+        url: "/api/stock-diff/{sdNo}/approve"
       },
       closejob: {
         url: "api/order/close"

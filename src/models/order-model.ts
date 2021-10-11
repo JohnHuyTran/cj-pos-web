@@ -119,11 +119,17 @@ export interface CheckOrderDetailProps {
 }
 
 
-export interface OrderSubmitRequest {
+export interface SaveDraftSDRequest {
     shipmentNo: string;
-    items: Item[];
+    items: itemsReq[];
 }
 
+export interface itemsReq {
+    barcode: string;
+    deliveryOrderNo: string;
+    quantity: Quantity;
+    comment: string;
+}
 
 export interface OrderSubmitResponse {
     ref: string;

@@ -17,7 +17,7 @@ import { saveOrderShipments, getPathReportSD } from '../../services/order-shipme
 import ConfirmOrderShipment from './check-order-confirm-model';
 import { ShipmentDeliveryStatusCodeEnum, getShipmentTypeText, getShipmentStatusText } from '../../utils/enum/check-order-enum';
 import ModalShowPDF from './modal-show-pdf';
-import { ShipmentInfo, ShipmentResponse, Item, OrderSubmitRequest, Quantity, CheckOrderDetailProps, Entry, } from '../../models/order-model';
+import { ShipmentInfo, ShipmentResponse, Item, SaveDraftSDRequest, Quantity, CheckOrderDetailProps, Entry, } from '../../models/order-model';
 
 
 
@@ -114,6 +114,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
     const [shipmentStatusText, setShipmentStatusText] = React.useState('');
     const [shipmentTypeText, setShipmentTypeText] = React.useState('');
+    const [sdNo, setSdNo] = React.useState('');
 
     useEffect(() => {
         if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
@@ -134,6 +135,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         setOpen(defaultOpen);
         setShipmentStatusText(getShipmentStatusText(shipmentList[0].sdStatus));
         setShipmentTypeText(getShipmentTypeText(shipmentList[0].sdType))
+        setSdNo(shipmentList[0].sdNo);
     }, [open, openModelConfirm])
 
     const handleClose = () => {
@@ -169,6 +171,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             }
             const item: Item = {
                 barcode: id.productBarCode,
+                deliveryOrderNo: id.doNo,
                 quantity: quantity,
                 comment: id.productComment
             }
@@ -176,12 +179,13 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
         })
 
-        const payload: OrderSubmitRequest = {
+
+        const payload: SaveDraftSDRequest = {
             shipmentNo: shipment,
-            items: itemsList,
+            items: itemsList
         }
 
-        saveOrderShipments(payload)
+        saveOrderShipments(payload, sdNo)
             .then((value) => {
                 setShowSnackbarSuccess(true);
                 updateShipmentOrder()
@@ -250,6 +254,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const shipmentList: ShipmentInfo[] = res.data.filter(
         (shipmentInfo: ShipmentInfo) => shipmentInfo.shipmentNo === shipment
     )
+
     const rows = [];
     let index: number = 1;
     for (let i = 0; i < shipmentList[0].entries.length; i++) {
@@ -257,6 +262,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         for (let j = 0; j < items.length; j++) {
             rows.push({
                 id: items[j].barcode,
+                doNo: shipmentList[0].entries[i].deliveryOrderNo,
                 col1: index,
                 productId: items[j].sku.code,
                 productBarCode: items[j].barcode,
@@ -360,14 +366,19 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                             </Grid>
                             <Grid item lg={9}  >
                                 {shipmentList[0].sdStatus !== ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && <div>
-                                    <TextField name='browserTxf' className={classes.textField} />
+                                    {/* <TextField name='browserTxf' className={classes.textField} value={fileName} /> */}
+                                    <Typography>
+                                        {plainFiles.map(file => (
+                                            file.name
+                                        ))
+                                        }</Typography>
                                     <Button
                                         id='printBtb'
                                         variant='contained'
                                         color='primary'
                                         className={classes.browserBtn}
                                         onClick={() => openFileSelector()}
-                                        value={fileName}
+
                                         style={{ marginLeft: 10 }}
                                     >BROWSE</Button></div>
                                 }
@@ -382,16 +393,6 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     </Link>
                                 </div>
                                 }
-                            </Grid>
-                        </Grid>
-                        <Grid container spacing={2}>
-                            <Grid item lg={12}  >
-                                Files name:
-                                {/* If readAs is set to DataURL, You can display an image */}
-                                {/* {!!filesContent.length && <img src={filesContent[0].content} />} */}
-                                {plainFiles.map(file => (
-                                    file.name
-                                ))}
                             </Grid>
                         </Grid>
                         <Grid container spacing={2} justifyContent="center" style={{ marginTop: 0.1 }}>
@@ -468,6 +469,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 onClose={handleCloseModelConfirm}
                 onUpdateShipmentStatus={handleStatusShipmentToJobClose}
                 shipmentNo={shipment}
+                sdNo={sdNo}
                 action={action}
                 items={itemsDiffState}
                 percentDiffType={false}

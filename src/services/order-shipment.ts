@@ -1,13 +1,13 @@
-import { get, post, postTest } from '../adapters/posback-adapter';
+import { get, post, postTest, put } from '../adapters/posback-adapter';
 import axios from "axios";
 import { environment } from '../environment-base';
-import { OrderSubmitRequest, FeatchDataPDFRequest } from '../models/order-model'
+import { SaveDraftSDRequest, FeatchDataPDFRequest } from '../models/order-model'
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfig'
 
-export async function saveOrderShipments(payload: OrderSubmitRequest) {
+export async function saveOrderShipments(payload: SaveDraftSDRequest, sdNo: string) {
     try {
-        const response = await post(environment.orders.shipment.submit.url, payload)
+        const response = await put(getPathSaveDraft(sdNo), payload)
             .then((result: any) => result);
         return response;
     } catch (error) {
@@ -16,9 +16,9 @@ export async function saveOrderShipments(payload: OrderSubmitRequest) {
     }
 }
 
-export async function approveOrderShipments(payload: any) {
+export async function approveOrderShipments(sdNo: string) {
     try {
-        const response = await post(environment.orders.shipment.approve.url, payload)
+        const response = await put(getPathApprove(sdNo), '')
             .then((result: any) => result);
         return response;
     } catch (error) {
@@ -54,6 +54,14 @@ export async function fetchShipmentDeliverlyPDF(shipmentNo: string) {
 
 export const getPathReportSD = (shipmentNo: string) => {
     return getPathUrl(`${env.backEnd.url}${environment.orders.shipment.printFormShipmentDeliverly.url}`, { 'shipmentNo': shipmentNo })
+}
+
+export const getPathSaveDraft = (sdNo: string) => {
+    return getPathUrl(`${environment.orders.shipment.saveDraft.url}`, { 'sdNo': sdNo })
+}
+
+export const getPathApprove = (sdNo: string) => {
+    return getPathUrl(`${environment.orders.shipment.approve.url}`, { 'sdNo': sdNo })
 }
 
 

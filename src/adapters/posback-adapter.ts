@@ -36,10 +36,24 @@ export function post(path: string, payload: any) {
       }
     })
     .catch((error: any) => {
-      console.log(error);
-      console.log(`status: ${error.response?.status}`);
-      console.log(`code: ${error.response?.data.code}`);
-      console.log(`message: ${error.response?.data.message}`);
+      const err: ApiError = {
+        httpStatus: error.response?.status,
+        code: error.response?.data.code,
+        message: error.response?.data.message,
+      }
+      throw err;
+    });
+}
+
+export function put(path: string, payload: any) {
+  return instance
+    .put(path, payload)
+    .then((response: AxiosResponse) => {
+      if (response.status == 200) {
+        return response.data;
+      }
+    })
+    .catch((error: any) => {
       const err: ApiError = {
         httpStatus: error.response?.status,
         code: error.response?.data.code,
