@@ -3,7 +3,7 @@ import { useSelector, useDispatch, TypedUseSelectorHook } from "react-redux";
 
 import authSlice from "./slices/authSlice";
 import checkOrderSlice from "./slices/check-order-slice";
-import navSlice from "./slices/navSlice";
+import navSlice from "./slices/nav-slice";
 import productSlice from "./slices/productSlice";
 
 const store = configureStore({

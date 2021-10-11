@@ -4,6 +4,7 @@ import { DataGrid, GridColDef, GridCellParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import OrderProductList from './order-product-list';
 import { ShipmentResponse, ShipmentInfo } from '../../models/order-model';
+import { getSdType, getSdStatus } from '../../utils/utils';
 
 function OrderList() {
   const items = useAppSelector((state) => state.checkOrderList);
@@ -33,11 +34,11 @@ function OrderList() {
       index: index + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
-      sdType: data.sdType,
+      sdType: getSdType(data.sdType),
       boxCnt: data.boxCnt,
       toteCnt: data.toteCnt,
       shipmentDate: data.shipmentDate,
-      sdStatus: data.sdStatus,
+      sdStatus: getSdStatus(data.sdStatus),
       col10: 'desc',
     };
   });

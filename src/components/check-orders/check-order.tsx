@@ -15,26 +15,29 @@ import {
 } from '../../store/slices/check-order-slice';
 import { ShipmentRequest } from '../../models/order-model';
 import OrderList from './order-list';
-import { useStyles } from './order-css';
 import DatePickerComponent from '../commons/ui/date-picker';
 
 moment.locale('en');
+
 interface State {
   orderShipment: string;
   orderNo: string;
   orderStatus: string;
   orderType: string;
+  dateFrom: string;
+  dateTo: string;
 }
 
 function CheckOrderSearch() {
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.checkOrderList);
   const [values, setValues] = React.useState<State>({
     orderShipment: '',
     orderNo: '',
-    orderStatus: '',
-    orderType: '',
+    orderStatus: 'ALL',
+    orderType: 'ALL',
+    dateFrom: '10/10/2021',
+    dateTo: '11/10/2021',
   });
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
@@ -51,10 +54,13 @@ function CheckOrderSearch() {
       page: '1',
       shipmentNo: values.orderShipment,
       sdNo: values.orderNo,
+      dateFrom: moment(startDate).format('DD/MM/YYYY'),
+      dateTo: moment(endDate).format('DD/MM/YYYY'),
       sdStatus: parseInt(values.orderStatus),
       sdType: parseInt(values.orderType),
     };
     dispatch(featchOrderListAsync(payload));
+    console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
 
   useEffect(() => {
@@ -63,18 +69,14 @@ function CheckOrderSearch() {
 
   const handleStartDatePicker = (value: Date) => {
     setStartDate(value);
-    var date_format = moment(value).format('MM/DD/YYYY HH:mm:ss');
-    console.log('start date: ', date_format);
   };
 
   const handleEndDatePicker = (value: Date) => {
     setEndDate(value);
-    var date_format = moment(value).format('MM/DD/YYYY HH:mm:ss');
-    console.log('end date: ', date_format);
   };
 
   return (
-    <div>
+    <>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -85,19 +87,13 @@ function CheckOrderSearch() {
               size='small'
               name='orderShipment'
               onChange={handleChange}
-              className={classes.textField}
             />
           </Grid>
           <Grid item xs={6}>
             <Typography variant='subtitle1' gutterBottom component='div'>
               เลขที่เอกสาร SD
             </Typography>
-            <TextField
-              size='small'
-              name='orderNo'
-              onChange={handleChange}
-              className={classes.textField}
-            />
+            <TextField size='small' name='orderNo' onChange={handleChange} />
           </Grid>
           <Grid item xs={6}>
             <Typography variant='subtitle1' gutterBottom component='div'>
@@ -121,14 +117,13 @@ function CheckOrderSearch() {
                 value={values.orderStatus}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}
-                defaultValue='ALL'
                 autoWidth={true}
               >
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={'DRAFT'}>บันทึก</MenuItem>
-                <MenuItem value={'APPROVE'}>อนุมัติ</MenuItem>
+                <MenuItem value={'0'}>บันทึก</MenuItem>
+                <MenuItem value={'1'}>อนุมัติ</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -142,33 +137,46 @@ function CheckOrderSearch() {
                 value={values.orderType}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}
-                defaultValue='ALL'
                 autoWidth={true}
               >
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={'PAPER'}>ลังกระดาษ</MenuItem>
-                <MenuItem value={'PASTIC'}>ลังพลาสติก</MenuItem>
-                <MenuItem value={'TOTE'}>สินค้าภายใน Tote</MenuItem>
+                <MenuItem value={'0'}>ลังกระดาษ/ลังพลาสติก</MenuItem>
+                <MenuItem value={'1'}>สินค้าภายในTote</MenuItem>
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <Button
-              id='searchBtb'
-              variant='contained'
-              color='primary'
-              onClick={onClickSearchBtn}
-              className={classes.searchBtn}
+            <Box
+              sx={{
+                width: '150px',
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
             >
-              ค้นหา
-            </Button>
+              <Button
+                id='searchBtb'
+                variant='contained'
+                color='primary'
+                onClick={onClickSearchBtn}
+              >
+                ค้นหา
+              </Button>
+              <Button
+                id='clearBtb'
+                variant='contained'
+                onClick={onClickSearchBtn}
+                sx={{ backgroundColor: '#AEAEAE' }}
+              >
+                เคลียร์
+              </Button>
+            </Box>
           </Grid>
         </Grid>
       </Box>
       {items.orderList && <OrderList />}
-    </div>
+    </>
   );
 }
 

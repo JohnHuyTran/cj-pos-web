@@ -9,7 +9,7 @@ import InputBase from '@mui/material/InputBase';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import { useAppSelector, useAppDispatch } from '../store/store';
-import { changeState } from '../store/slices/navSlice';
+import { changeState } from '../store/slices/nav-slice';
 
 import imgUser from '../assets/images/PP-NoPic.svg';
 

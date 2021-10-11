@@ -1,5 +1,4 @@
 import { makeStyles } from '@mui/styles';
-import theme from '../../styles/theme';
 
 const useStyles = makeStyles({
     searchBtn: {

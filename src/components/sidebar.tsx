@@ -23,7 +23,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
 import { useAppSelector, useAppDispatch } from '../store/store';
-import { changeState } from '../store/slices/navSlice';
+import { changeState } from '../store/slices/nav-slice';
 
 import imgLogo from '../assets/images/CJlogo.png';
 

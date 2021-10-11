@@ -1,25 +1,58 @@
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import {
+  FormControl,
+  Input,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from '@mui/material';
+import { Box } from '@mui/system';
 
 export default function User() {
-  const [state, setState] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get(`http://54.255.171.154:30010/api/order/shipment/LD21093000710344`)
-      .then((res) => {
-        const persons: any = res.data;
-        setState(persons);
-      });
-  }, []);
-
   return (
-    <Container maxWidth='sm'>
-      <Typography variant='h1'> User </Typography>
-      {state && <div>A</div>}
-      {console.log(state)}
-    </Container>
+    <>
+      <Box
+        sx={{
+          display: 'inline-flex',
+          justifyContent: 'space-between',
+          width: '500px',
+          marginBottom: '4px',
+        }}
+      >
+        <Box>
+          <InputLabel htmlFor='shipmentNo'>เลขที่เอกสาร LD</InputLabel>
+          <TextField id='shipmentNo' />
+        </Box>
+        <Box>
+          <InputLabel htmlFor='sdNo'>เลขที่เอกสาร SD</InputLabel>
+          <TextField id='sdNo' />
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          display: 'inline-flex',
+          justifyContent: 'space-between',
+          width: '500px',
+          marginBottom: '4px',
+        }}
+      >
+        <Box>
+          <InputLabel htmlFor='sdType'>ประเภท</InputLabel>
+          <Select id='sdType'>
+            <MenuItem value={0}>ลังกระดาษ/ลังพลาสติก</MenuItem>
+            <MenuItem value={1}>สินค้าภายในTote</MenuItem>
+          </Select>
+        </Box>
+        <Box>
+          <InputLabel htmlFor='sdStatus'>สถานะ</InputLabel>
+          <Select id='sdStatus'>
+            <MenuItem value={0}>Draft</MenuItem>
+            <MenuItem value={1}>Approved</MenuItem>
+          </Select>
+        </Box>
+      </Box>
+    </>
   );
 }
