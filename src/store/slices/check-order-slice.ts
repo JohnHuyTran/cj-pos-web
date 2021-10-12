@@ -10,7 +10,7 @@ type State = {
 const initialState: State = {
   orderList: {
     ref: '',
-    code: '',
+    code: 0,
     message: '',
     data: [],
     total: 0,
