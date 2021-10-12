@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 //import OrderProductList from './order-product-list';
 import { ShipmentResponse, ShipmentInfo } from '../../models/order-model';
 import { getSdType, getSdStatus } from '../../utils/utils';
+import CheckOrderDetail from './check-order-detail';
 
 function OrderList() {
   const items = useAppSelector((state) => state.checkOrderList);
@@ -67,13 +68,7 @@ function OrderList() {
           />
         </div>
       </Box>
-      {/* {opens && (
-        <OrderProductList
-          shipment={shipment}
-          defaultOpen={opens}
-          onClickClose={isClosModal}
-        />
-      )} */}
+      {opens && <CheckOrderDetail shipment={shipment} defaultOpen={opens} onClickClose={isClosModal} />}
     </div>
   );
 }
