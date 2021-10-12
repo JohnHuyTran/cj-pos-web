@@ -9,16 +9,16 @@ export const environment = {
     shipment: {
       saveDraft: {
         // url: "/api/order/submit"
-        url: '/api/stock-diff/{sdNo}/draft'
+        url: '/api/order/stock-diff/draft'
       },
       approve: {
-        url: "/api/stock-diff/{sdNo}/approve"
+        url: "/api/order/stock-diff/{sdNo}/approve"
       },
       closejob: {
         url: "api/order/close"
       },
       printFormShipmentDeliverly: {
-        url: '/api/stock-diff/{shipmentNo}/export'
+        url: '/api/order/stock-diff/{shipmentNo}/export'
       }
     }
   }

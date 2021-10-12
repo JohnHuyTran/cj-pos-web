@@ -7,7 +7,7 @@ import { env } from '../adapters/environmentConfig'
 
 export async function saveOrderShipments(payload: SaveDraftSDRequest, sdNo: string) {
     try {
-        const response = await put(getPathSaveDraft(sdNo), payload)
+        const response = await put(environment.orders.shipment.saveDraft.url, payload)
             .then((result: any) => result);
         return response;
     } catch (error) {
