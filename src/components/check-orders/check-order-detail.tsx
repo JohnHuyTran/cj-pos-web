@@ -11,6 +11,10 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import SaveIcon from '@mui/icons-material/Save'
 import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import DoneIcon from '@mui/icons-material/Done';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 
 import { useStyles } from './check-order-detail-css'
 import { useFilePicker } from 'use-file-picker';
@@ -377,7 +381,8 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                         onClick={() => openFileSelector()}
 
                                         style={{ marginLeft: 10, textTransform: 'none' }}
-                                    >Browse...</Button></div>
+                                        endIcon={<UploadFileIcon />}
+                                    >Browse</Button></div>
                                 }
                                 {shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && <div>
 
@@ -393,10 +398,20 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                             </Grid>
                         </Grid>
                         <Grid container spacing={2} justifyContent="center" style={{ marginTop: 0.1 }}>
-                            <Grid item >
+                            <Grid item  >
+                                <Button
+                                    id='backBtb'
+                                    variant='contained'
+                                    color='primary'
+                                    className={classes.browserBtn}
+                                    onClick={handleClose}
+                                    startIcon={<ArrowBackIosIcon />}
+                                >ย้อนกลับ</Button>
+                            </Grid>
+                            <Grid item  >
                                 <Box sx={{ display: isDisplayActBtn }}>
                                     <Button
-                                        id='printBtb'
+                                        id='saveBtb'
                                         variant='contained'
                                         color='primary'
                                         className={classes.browserBtn}
@@ -406,37 +421,30 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     >บันทึก</Button>
                                 </Box>
                             </Grid>
-                            <Grid item  >
-                                <Button
-                                    id='printBtb'
-                                    variant='contained'
-                                    color='primary'
-                                    className={classes.browserBtn}
-                                    onClick={handleClose}
-                                >ย้อนกลับ</Button>
-                            </Grid>
                         </Grid>
                     </Box>
                     <Box sx={{ display: isDisplayActBtn }}>
                         <Grid container spacing={2} display='flex' justifyContent='space-between'>
                             <Grid item xl={2}  >
                                 <Button
-                                    id='printBtb'
+                                    id='approveBtb'
                                     variant='contained'
                                     color='primary'
                                     className={classes.browserBtn}
                                     onClick={handleApproveBtn}
                                     disabled={disableApproveBtn}
+                                    endIcon={<AssignmentTurnedInIcon />}
                                 >อนุมัติ</Button>
 
                                 <Button
-                                    id='printBtb'
+                                    id='closeBtb'
                                     variant='contained'
                                     color='primary'
                                     className={classes.browserBtn}
                                     style={{ marginLeft: 10 }}
                                     onClick={handleCloseJobBtn}
                                     disabled={disableCloseJobBtn}
+                                    endIcon={<DoneIcon />}
                                 >ปิดงาน</Button>
                             </Grid>
 
@@ -453,11 +461,18 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                     </Box>
 
                     <Box mt={2} bgcolor='background.paper'>
-                        <DataGrid rows={rows}
-                            columns={columns}
-                            editMode="row"
+                        <div style={{ height: 400, width: '100%' }}>
+                            <DataGrid rows={rows}
+                                columns={columns}
+                                autoPageSize={true}
+                                pagination={true}
+                                pageSize={5}
+                                editMode="row"
                             // onEditRowsModelChange={handleEditRowsModelChange}
-                            autoHeight />
+                            // autoHeight
+
+                            />
+                        </div>
                     </Box>
                 </DialogContent>
 

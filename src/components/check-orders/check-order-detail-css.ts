@@ -6,7 +6,7 @@ const useStyles = makeStyles({
         position: "absolute",
         // width: "textField",
         height: "40px",
-        width: "100px",
+        width: "110px",
         borderRadius: "5px",
     },
     textField: {
