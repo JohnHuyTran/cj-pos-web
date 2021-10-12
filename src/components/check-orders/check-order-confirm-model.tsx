@@ -111,7 +111,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             aria-labelledby="alert-dialog-title"
             aria-describedby='alert-dialog-description'
             fullWidth={true}
-            maxWidth='sm'
+            maxWidth='md'
         >
             {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && items.length > 0 && <DialogContent>
                 <DialogContentText id='alert-dialog-description'>
@@ -165,7 +165,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             }
 
             {
-                ((action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && !imageContent)) && <DialogActions>
+                ((action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && !imageContent)) && <DialogActions sx={{ justifyContent: "center" }} >
                     <Button
                         variant='contained'
                         size='small'
@@ -178,7 +178,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             }
 
             {
-                ((action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) || (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent)) && <DialogActions><Button
+                ((action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) || (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent)) && <DialogActions sx={{ justifyContent: "center" }}><Button
                     variant='contained'
                     size='small'
                     color='primary'
