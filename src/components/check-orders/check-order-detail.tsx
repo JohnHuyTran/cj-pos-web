@@ -207,7 +207,6 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         setItemsDiffState([]);
         setOpenModelConfirm(true)
         setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE)
-        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         rows.forEach((id: GridRowId, data: GridRowData) => {
             const diffCount: number = id.productQuantityRef - id.productQuantityActual;
             if (diffCount !== 0) {
@@ -494,7 +493,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             <ModalShowPDF
                 open={openModelPreviewDocument}
                 onClose={handleModelPreviewDocument}
-                url={getPathReportSD(shipment)}
+                url={getPathReportSD(sdNo)}
 
             />
 
