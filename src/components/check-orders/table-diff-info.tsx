@@ -17,7 +17,7 @@ export default function DataDiffInfo(props: DataDiffInfyProps) {
 
     return (
         <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} size="medium" aria-label="a dense table">
+            <Table sx={{ minWidth: 500 }} size="small" aria-label="a dense table">
                 <TableHead>
                     <TableRow>
                         <TableCell>ลำดับ</TableCell>
@@ -33,7 +33,7 @@ export default function DataDiffInfo(props: DataDiffInfyProps) {
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
                             <TableCell component="th" scope="row">
-                                {row.barcode}
+                                {index + 1}
                             </TableCell>
                             <TableCell align="right">{row.barcode}</TableCell>
                             <TableCell align="right">{row.productName}</TableCell>
