@@ -1,175 +1,160 @@
-import moment from 'moment';
-import React, { useEffect } from 'react';
+import moment from "moment";
+import MomentUtils from "@date-io/moment";
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+
+import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { Button } from '@mui/material';
-import { useAppSelector, useAppDispatch } from '../../store/store';
-import {
-  featchOrderListAsync,
-  clearDataFilter,
-} from '../../store/slices/check-order-slice';
-import { ShipmentRequest } from '../../models/order-model';
-import OrderList from './order-list';
-import { useStyles } from './order-css';
-import DatePickerComponent from '../commons/ui/date-picker';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { Event } from '@mui/icons-material';
+import { Button, Paper } from '@mui/material';
 
-moment.locale('en');
+
+import { useAppSelector, useAppDispatch } from '../../store/store';
+import { featchOrderListAsync, clearDataFilter } from '../../store/slices/check-order-slice';
+import { CheckOrderRequest } from '../../models/order-model'
+
+import OrderList from './order-list'
+import { useStyles } from './order-css'
+import clsx from "clsx";
+
+import DatePicker from '@mui/lab/DatePicker'
+import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
+import DateAdapter from '@mui/lab/AdapterMoment';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import DatePickerComponent from "../commons/ui/date-picker";
+
+moment.locale("en");
 interface State {
-  orderShipment: string;
   orderNo: string;
   orderStatus: string;
   orderType: string;
 }
+
 
 function CheckOrderSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.checkOrderList);
   const [values, setValues] = React.useState<State>({
-    orderShipment: '',
     orderNo: '',
     orderStatus: '',
-    orderType: '',
+    orderType: 'WASHING-POWER'
   });
+  const [locale, setLocale] = React.useState("en");
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
+  const [value, setValue] = React.useState<Date | null>(new Date());
 
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
-    console.log(values);
-  };
+  }
 
   const onClickSearchBtn = () => {
-    const payload: ShipmentRequest = {
-      limit: '10',
-      page: '1',
-      shipmentNo: values.orderShipment,
-      sdNo: values.orderNo,
-      sdStatus: parseInt(values.orderStatus),
-      sdType: parseInt(values.orderType),
-    };
+    const payload: CheckOrderRequest = {
+      orderNo: values.orderNo,
+      orderStatus: values.orderStatus,
+      orderType: values.orderType
+    }
     dispatch(featchOrderListAsync(payload));
-  };
+  }
 
   useEffect(() => {
     dispatch(clearDataFilter());
-  }, []);
+  }, [])
 
   const handleStartDatePicker = (value: Date) => {
     setStartDate(value);
-    var date_format = moment(value).format('MM/DD/YYYY HH:mm:ss');
-    console.log('start date: ', date_format);
-  };
+    var date_format = moment(value).format("YYYY/DD/MM HH:mm:ss");
+    console.log("start date: ", date_format);
+  }
 
   const handleEndDatePicker = (value: Date) => {
     setEndDate(value);
-    var date_format = moment(value).format('MM/DD/YYYY HH:mm:ss');
-    console.log('end date: ', date_format);
-  };
+    var date_format = moment(value).utc().format("YYYY/DD/MM HH:mm:ss");
+    console.log("end date: ", date_format);
+  }
 
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
-              เลขที่เอกสาร LD
-            </Typography>
-            <TextField
-              size='small'
-              name='orderShipment'
-              onChange={handleChange}
-              className={classes.textField}
-            />
+        <Grid container spacing={2} >
+          <Grid item xs={2}  >
+            <Typography variant="subtitle1" gutterBottom component="div">เลขที่เอกสาร: </Typography>
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
-              เลขที่เอกสาร SD
-            </Typography>
-            <TextField
-              size='small'
-              name='orderNo'
-              onChange={handleChange}
-              className={classes.textField}
-            />
+          <Grid item xs={2}  >
+            <TextField size="small" id="outlined-basic" label="" variant="outlined" name='orderNo' onChange={handleChange} className={classes.textField} />
           </Grid>
+          <Grid item xs={8}  ></Grid>
           <Grid item xs={6}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
-              วันที่รับสินค้า ตั้งแต่
-            </Typography>
+            <Typography variant="subtitle1" gutterBottom component="div">ตั้งแต่วันที่: </Typography>
             <DatePickerComponent onClickDate={handleStartDatePicker} />
           </Grid>
           <Grid item xs={6}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
-              ถึง
-            </Typography>
+            <Typography variant="subtitle1" gutterBottom component="div">ถึงวันที่: </Typography>
             <DatePickerComponent onClickDate={handleEndDatePicker} />
+
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
-              สถานะ
-            </Typography>
-            <FormControl sx={{ width: 240 }}>
+          <Grid item xs={2}  >
+            <Typography variant="subtitle1" gutterBottom component="div">สถานะ: </Typography>
+          </Grid>
+          <Grid item xs={2}  >
+            <FormControl fullWidth size='small'>
               <Select
                 name='orderStatus'
                 value={values.orderStatus}
                 onChange={handleChange}
+                displayEmpty
                 inputProps={{ 'aria-label': 'Without label' }}
-                defaultValue='ALL'
-                autoWidth={true}
               >
-                <MenuItem value={'ALL'} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem value={'DRAFT'}>บันทึก</MenuItem>
-                <MenuItem value={'APPROVE'}>อนุมัติ</MenuItem>
+                <MenuItem value={'APPROVE'}>Approve</MenuItem>
+                <MenuItem value={'PENDING'}>Pending</MenuItem>
+                <MenuItem value={'REJECT'}>Reject</MenuItem>
+
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
-              ประเภท
-            </Typography>
-            <FormControl sx={{ width: 240 }}>
+          <Grid item xs={8}  ></Grid>
+          <Grid item xs={2}  >
+            <Typography variant="subtitle1" gutterBottom component="div">ประเภท: </Typography>
+          </Grid>
+          <Grid item lg={4}  >
+            <FormControl fullWidth >
               <Select
-                name='orderType'
+                name="orderType"
                 value={values.orderType}
                 onChange={handleChange}
+                displayEmpty
                 inputProps={{ 'aria-label': 'Without label' }}
-                defaultValue='ALL'
-                autoWidth={true}
               >
-                <MenuItem value={'ALL'} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem value={'PAPER'}>ลังกระดาษ</MenuItem>
-                <MenuItem value={'PASTIC'}>ลังพลาสติก</MenuItem>
-                <MenuItem value={'TOTE'}>สินค้าภายใน Tote</MenuItem>
+                <MenuItem value={'PAPER'}>Paper</MenuItem>
+                <MenuItem value={'PASTIC'}>Pastic</MenuItem>
+                <MenuItem value={'DRINK'}>Drinks</MenuItem>
+                <MenuItem value={'WASHING-POWER'}>WASHING-POWERssssssss</MenuItem>
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={8}  ></Grid>
+          <Grid item xs={12}  >
             <Button
               id='searchBtb'
               variant='contained'
               color='primary'
               onClick={onClickSearchBtn}
               className={classes.searchBtn}
-            >
-              ค้นหา
+            >SEARCH
             </Button>
           </Grid>
         </Grid>
       </Box>
       {items.orderList && <OrderList />}
-    </div>
-  );
+    </div >
+  )
 }
 
-export default CheckOrderSearch;
+export default CheckOrderSearch

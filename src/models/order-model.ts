@@ -1,13 +1,13 @@
 export interface CheckOrderRequest {
   orderNo: string;
   orderStatus: string;
-  orderType: string;
+  orderType: string
 }
 
 export interface CheckOrderResponse {
   ref: number;
   total: number;
-  orders?: Order[];
+  orders?: Order[]
 }
 
 export interface Order {
@@ -18,7 +18,7 @@ export interface Order {
   orderTotal: number;
   orderTote: number;
   orderCreateDate: string;
-  products?: Product[];
+  products?: Product[]
 }
 
 export interface Product {
@@ -40,13 +40,13 @@ export interface ShipmentRequest {
   sdNo?: string;
   dateFrom?: string;
   dateTo?: string;
-  sdStatus?: number;
-  sdType?: number;
+  status?: string;
 }
+
 
 export interface ShipmentResponse {
   ref: string;
-  code: string;
+  code: number;
   message: string;
   data: ShipmentInfo[];
   total: number;
@@ -56,6 +56,7 @@ export interface ShipmentResponse {
   next: number;
   totalPage: number;
 }
+
 
 export interface ShipmentInfo {
   shipmentNo: string;
@@ -67,7 +68,6 @@ export interface ShipmentInfo {
   sdType: number;
   toteCnt: number;
   boxCnt: number;
-  comment: string;
   entries: Entry[];
 }
 
@@ -78,30 +78,38 @@ export interface Entry {
 }
 
 export interface Item {
+  seqItem: number;
+  itemNo: string;
+  shipmentSAPRef: string;
+  sku: Sku;
   productName: string;
-  ItemRefNo: string;
   barcode: string;
-  skuCode: string;
-  outOfStockStatus: string;
-  toteCode: string;
-  expireDate: string;
-  unitFactor: number;
   unit: Unit;
   quantity: Quantity;
+  price: number;
+  isControlStock: number;
+  toteCode: string;
+  expireDate: string;
   comment: string;
 }
 
 export interface Quantity {
   qty: number;
   qtyAll: number;
-  qtyAllBefore: string;
+  qtyAllBefore: number;
   actualQty: number;
   qtyDiff: number;
+}
+
+export interface Sku {
+  code: string;
+  type: string;
 }
 
 export interface Unit {
   code: string;
   name: string;
+  unitFactor: number;
 }
 
 export interface CheckOrderDetailProps {
@@ -110,9 +118,17 @@ export interface CheckOrderDetailProps {
   onClickClose: any;
 }
 
-export interface OrderSubmitRequest {
+
+export interface SaveDraftSDRequest {
   shipmentNo: string;
-  items: Item[];
+  items: itemsReq[];
+}
+
+export interface itemsReq {
+  barcode: string;
+  deliveryOrderNo: string;
+  quantity: Quantity;
+  comment: string;
 }
 
 export interface OrderSubmitResponse {

@@ -5,7 +5,7 @@ import { loginForm, Response } from '../models/user-interface';
 
 const instance = axios.create({
   baseURL: env.keycloak.url,
-  timeout: 5,
+  timeout: env.keycloak.timeout,
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
   },
@@ -29,9 +29,6 @@ export function authentication(payload: loginForm): Promise<Response> {
       throw new Error(response.status.toString());
     })
     .catch((error: any) => {
-      console.log(error);
-      console.log(`error: ${error.response.status}`);
-      console.log(`error: ${error.response.data.error_description}`);
       throw new Error(error.response.data.error_description);
       // throw new KeyCloakError(error.response.status,error.response.data.error_description);
     });

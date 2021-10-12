@@ -1,6 +1,7 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { env } from "./environmentConfig";
 import store from "../store/store";
+import { ApiError } from '../models/api-error-model'
 
 const instance = axios.create({
   baseURL: env.backEnd.url,
@@ -17,12 +18,60 @@ export function get(path: string) {
       return result.data;
     })
     .catch((error: any) => {
-      return error;
+      const err: ApiError = {
+        httpStatus: error.response?.status,
+        code: error.response?.data.code,
+        message: error.response?.data.message,
+      }
+      throw err;
     });
 }
 
 export function post(path: string, payload: any) {
   return instance
+    .post(path, payload)
+    .then((response: AxiosResponse) => {
+      if (response.status == 200) {
+        return response.data;
+      }
+    })
+    .catch((error: any) => {
+      const err: ApiError = {
+        httpStatus: error.response?.status,
+        code: error.response?.data.code,
+        message: error.response?.data.message,
+      }
+      throw err;
+    });
+}
+
+export function put(path: string, payload: any) {
+  return instance
+    .put(path, payload)
+    .then((response: AxiosResponse) => {
+      if (response.status == 200) {
+        return response.data;
+      }
+    })
+    .catch((error: any) => {
+      const err: ApiError = {
+        httpStatus: error.response?.status,
+        code: error.response?.data.code,
+        message: error.response?.data.message,
+      }
+      throw err;
+    });
+}
+
+export function postTest(path: string, payload: any) {
+  const instancetest = axios.create({
+    baseURL: 'https://market.sec.or.th/public/idisc/FundDownload',
+    timeout: env.backEnd.timeout,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return instancetest
     .post(path, payload)
     .then((result: any) => {
       return result.data;
@@ -39,7 +88,12 @@ export function deleteData(path: string) {
       return result;
     })
     .catch((error: any) => {
-      return error;
+      const err: ApiError = {
+        httpStatus: error.response?.status,
+        code: error.response?.data.code,
+        message: error.response?.data.message,
+      }
+      throw err;
     });
 }
 
