@@ -44,10 +44,10 @@ const theme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          padding: '2px 12px 2px 12px',
+          padding: '2px 2px 2px 2px',
         },
         input: {
-          padding: '2px 12px 2px 12px',
+          padding: '2px 2px 2px 2px',
         },
       },
     },
