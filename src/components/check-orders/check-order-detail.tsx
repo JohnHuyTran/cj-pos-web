@@ -6,6 +6,7 @@ import { featchOrderListAsync, clearDataFilter } from '../../store/slices/check-
 
 import { Box, Button, Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams, renderEditInputCell, GridEditRowsModel, useGridApiRef } from '@mui/x-data-grid';
+import DialogTitle from '@mui/material/DialogTitle';
 import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
@@ -15,6 +16,8 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import DoneIcon from '@mui/icons-material/Done';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 import { useStyles } from './check-order-detail-css'
 import { useFilePicker } from 'use-file-picker';
@@ -24,26 +27,26 @@ import ConfirmOrderShipment from './check-order-confirm-model';
 import { ShipmentDeliveryStatusCodeEnum, getShipmentTypeText, getShipmentStatusText } from '../../utils/enum/check-order-enum';
 import ModalShowPDF from './modal-show-pdf';
 import { ShipmentInfo, ShipmentResponse, Item, SaveDraftSDRequest, Quantity, CheckOrderDetailProps, Entry, } from '../../models/order-model';
-
+import { convertUtcToBkkDate } from '../../utils/date-utill'
 
 
 const columns: GridColDef[] = [
-    { field: "col1", headerName: "ลำดับ", width: 100, disableColumnMenu: 'true' },
+    { field: "col1", headerName: "ลำดับ", width: 90, disableColumnMenu: 'true' },
     {
         field: "productId",
         headerName: "รหัสสินค้า",
-        width: 200,
+        width: 170,
         disableColumnMenu: 'true'
     },
-    { field: "productBarCode", headerName: "บาร์โค้ด", minWidth: 200, disableColumnMenu: 'true' },
-    { field: "productDescription", headerName: "รายละเอียดสินค้า", minWidth: 350, disableColumnMenu: 'true' },
+    { field: "productBarCode", headerName: "บาร์โค้ด", minWidth: 170, disableColumnMenu: 'true' },
+    { field: "productDescription", headerName: "รายละเอียดสินค้า", minWidth: 300, disableColumnMenu: 'true' },
     { field: "productUnit", headerName: "หน่วย", minWidth: 100, disableColumnMenu: 'true' },
     {
-        field: "productQuantityRef", headerName: "จำนวนอ้างอิง", width: 100, type: 'number', disableColumnMenu: 'true', editable: true
+        field: "productQuantityRef", headerName: "จำนวนอ้างอิง", width: 135, type: 'number', disableColumnMenu: 'true', editable: true
 
     },
     {
-        field: "productQuantityActual", headerName: "จำนวนรับจริง", width: 100, disableColumnMenu: 'true',
+        field: "productQuantityActual", headerName: "จำนวนรับจริง", width: 135, disableColumnMenu: 'true',
         renderCell: (params: GridRenderCellParams) => (
             <TextField variant="outlined" name='txnQuantityActual' type='number' value={params.value} onChange={(e) => {
                 params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }])
@@ -54,7 +57,7 @@ const columns: GridColDef[] = [
 
     },
     {
-        field: "productDifference", headerName: "ส่วนต่างการรับ", width: 100, type: 'number', disableColumnMenu: 'true',
+        field: "productDifference", headerName: "ส่วนต่างการรับ", width: 145, type: 'number', disableColumnMenu: 'true',
         valueGetter: (params) => calProductDiff(params),
     },
     {
@@ -95,6 +98,36 @@ function useApiRef() {
     return { apiRef, columns: _columns };
 }
 
+export interface DialogTitleProps {
+    id: string;
+    children?: React.ReactNode;
+    onClose?: () => void;
+}
+
+const BootstrapDialogTitle = (props: DialogTitleProps) => {
+    const { children, onClose, ...other } = props;
+
+    return (
+        <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+            {children}
+            {onClose ? (
+                <IconButton
+                    aria-label="close"
+                    onClick={onClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
+            ) : null}
+        </DialogTitle>
+    );
+};
+
 export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const classes = useStyles();
     const { shipment, defaultOpen } = props;
@@ -121,6 +154,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [shipmentStatusText, setShipmentStatusText] = React.useState('');
     const [shipmentTypeText, setShipmentTypeText] = React.useState('');
     const [sdNo, setSdNo] = React.useState('');
+    const [shipmentDateFormat, setShipmentDateFormat] = React.useState('');
 
     useEffect(() => {
         if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
@@ -142,6 +176,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         setShipmentStatusText(getShipmentStatusText(shipmentList[0].sdStatus));
         setShipmentTypeText(getShipmentTypeText(shipmentList[0].sdType))
         setSdNo(shipmentList[0].sdNo);
+        setShipmentDateFormat((convertUtcToBkkDate(shipmentList[0].shipmentDate)));
     }, [open, openModelConfirm])
 
     const handleClose = () => {
@@ -322,6 +357,9 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     return (
         <div>
             <Dialog open={open} maxWidth='xl' fullWidth={true} >
+                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+                    <Typography variant="body1" gutterBottom>รายละเอียดใบตรวจสอบการรับ-โอนสินค้า</Typography>
+                </BootstrapDialogTitle>
                 <DialogContent>
                     <Box sx={{ flexGrow: 1 }}>
                         <Grid container spacing={2}>
@@ -346,7 +384,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Typography variant="body2" gutterBottom>วันที่:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
-                                <Typography variant="body2" gutterBottom>{shipmentList[0].shipmentDate}</Typography>
+                                <Typography variant="body2" gutterBottom>{shipmentDateFormat}</Typography>
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
