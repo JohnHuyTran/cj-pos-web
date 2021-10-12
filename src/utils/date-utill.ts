@@ -1,24 +1,19 @@
-// import * as moment from "moment";
-// import { environment } from '../../../environments/environment';
-import React from "react";
-import Moment from "react-moment";
 import moment from "moment";
+import { DateFormat } from '../utils/enum/common-enum';
 
-// export const formatDate = (date, dateFormat) =>
-//   !date ? null : moment(date).format(dateFormat);
-
-/**
- * @description return format ISO 8601 YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]
- */
 export const dateToStringCriteria = (date: Date, isStartDate = true) => {
   if (date === null) {
     return null;
   }
 
   if (isStartDate) {
-    return moment(date).startOf("day").toISOString();
+    return moment(date)
+      .startOf('day')
+      .toISOString();
   } else {
-    return moment(date).endOf("day").toISOString();
+    return moment(date)
+      .endOf('day')
+      .toISOString();
   }
 };
 
@@ -29,9 +24,15 @@ export const dateToStringMonthCriteria = (date: Date, isStartDate = true) => {
   }
 
   if (isStartDate) {
-    return moment(date).startOf("month").add(timeZone, "hours").toISOString();
+    return moment(date)
+      .startOf('month')
+      .add(timeZone, 'hours')
+      .toISOString();
   } else {
-    return moment(date).endOf("month").add(timeZone, "hours").toISOString();
+    return moment(date)
+      .endOf('month')
+      .add(timeZone, 'hours')
+      .toISOString();
   }
 };
 
@@ -40,7 +41,7 @@ export const dateTimeToDateOnlyString = (date: Date) => {
     return null;
   }
 
-  return moment(date).format("YYYY-MM-DD");
+  return moment(date).format('YYYY-MM-DD');
 };
 
 export const dateStringToTagCriteria = (date: string) => {
@@ -48,68 +49,81 @@ export const dateStringToTagCriteria = (date: string) => {
     return null;
   }
 
-  //   const d = moment(date, [environment.dateFormat, moment.ISO_8601]);
-  //   return d.isValid() ? d.format(environment.dateFormat) : null;
+  const d = moment(date, [DateFormat.DATE_FORMAT, moment.ISO_8601]);
+  return d.isValid() ? d.format(DateFormat.DATE_FORMAT) : null;
 };
 
 export const dateStringToMonthTagCriteria = (date: string) => {
   if (!date) {
     return null;
   }
-  //   const d = moment(date, [environment.monthFormat, moment.ISO_8601]).utc();
-  //   return d.isValid() ? d.format(environment.monthFormat) : null;
+  const d = moment(date, [DateFormat.MONTH_FORMAT, moment.ISO_8601]).utc();
+  return d.isValid() ? d.format(DateFormat.MONTH_FORMAT) : null;
 };
 
-export const formatDateStartOfDay = (
-  date: string,
-  dateFormat = "YYYY-MM-DDTHH:mm:ss"
-) => moment(date).startOf("day").format(dateFormat);
+export const formatDateStartOfDay = (date: Date, dateFormat = 'YYYY-MM-DDTHH:mm:ss') =>
+  moment(date)
+    .startOf('day')
+    .format(dateFormat);
 
-export const formatDateEndOfDay = (
-  date: string,
-  dateFormat = "YYYY-MM-DDTHH:mm:ss"
-) => moment(date).endOf("day").format(dateFormat);
+export const formatDateEndOfDay = (date: Date, dateFormat = 'YYYY-MM-DDTHH:mm:ss') =>
+  moment(date)
+    .endOf('day')
+    .format(dateFormat);
 
-export const getDateFromString = (dateStr: string, formatFrom = "YYYY-MM-DD") =>
-  moment(dateStr, formatFrom).toDate();
+export const getDateFromString = (dateStr: string, formatFrom = 'YYYY-MM-DD') => moment(dateStr, formatFrom).toDate();
 
 export const convertBkkToUtc = (bkkDate: string) => {
   const timeZone = 7;
   let utcDate = null;
 
-  if (bkkDate && bkkDate !== "") {
+  if (bkkDate && bkkDate !== '') {
     const datetime = moment(bkkDate);
-    // utcDate = datetime.add(-timeZone, 'hours').format(environment.dateTimeNanoSec);
+    utcDate = datetime.add(-timeZone, 'hours').format(DateFormat.DATE_TIME_NONO_SEC);
   }
-  //   if (!utcDate.endsWith("Z")) {
-  //     utcDate = `${utcDate}Z`;
-  //   }
+  if (utcDate && !utcDate.endsWith('Z')) {
+    utcDate = `${utcDate}Z`;
+  }
   return utcDate;
 };
 
-// export const convertUtcToBkk = (utcDate: string, format = environment.dateTimeFormat) => {
-//   let bkkDate = null;
+export const convertUtcToBkk = (utcDate: string, format = DateFormat.DATE_TIME_FORMAT) => {
+  let bkkDate = null;
 
-//   if (utcDate && utcDate !== '') {
-//     if (!utcDate.endsWith('Z')) {
-//       utcDate = `${utcDate}Z`;
-//     }
-//     const datetime = moment(utcDate);
-//     bkkDate = datetime.utcOffset(7).format(format);
-//   }
+  if (utcDate && utcDate !== '') {
+    if (!utcDate.endsWith('Z')) {
+      utcDate = `${utcDate}Z`;
+    }
+    const datetime = moment(utcDate);
+    bkkDate = datetime.utcOffset(7).format(format);
+  }
 
-//   return bkkDate;
-// };
+  return bkkDate;
+};
+
+export const convertUtcToBkkDate = (utcDate: string, format = DateFormat.DATE_FORMAT) => {
+  let bkkDate = null;
+
+  if (utcDate && utcDate !== '') {
+    if (!utcDate.endsWith('Z')) {
+      utcDate = `${utcDate}Z`;
+    }
+    const datetime = moment(utcDate);
+    bkkDate = datetime.utcOffset(7).format(format);
+  }
+
+  return bkkDate;
+};
 
 export const convertUtcToBkkWithZ = (utcDate: string) => {
   let bkkDate = null;
 
-  if (utcDate && utcDate !== "") {
-    if (!utcDate.endsWith("Z")) {
+  if (utcDate && utcDate !== '') {
+    if (!utcDate.endsWith('Z')) {
       utcDate = `${utcDate}Z`;
     }
     const datetime = moment(utcDate);
-    bkkDate = datetime.add(7, "hours").toISOString();
+    bkkDate = datetime.add(7, 'hours').toISOString();
   }
 
   return bkkDate;

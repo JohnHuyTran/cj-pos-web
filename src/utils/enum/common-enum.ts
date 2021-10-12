@@ -1,0 +1,8 @@
+export enum DateFormat {
+    DATE_FORMAT = 'DD/MM/YYYY',
+    MONTH_FORMAT = 'MM/YYYY',
+    DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss',
+    DATE_TIME_NONO_SEC = 'YYYY-MM-DDTHH:mm:ss.SSS',
+    DATE_TIME_DISPLAY_FORMAT = 'DD/MM/YYYY HH:mm',
+    DATE_ISO8601 = 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]',
+}
