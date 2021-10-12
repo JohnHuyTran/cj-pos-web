@@ -1,4 +1,5 @@
-import { ShipmentRequest } from '../models/order-model';
+import axios from 'axios';
+import { ShipmentRequest, ShipmentResponse } from '../models/order-model';
 export const orders = {
   ref: '1',
   code: '20000',
@@ -128,27 +129,30 @@ export function getOrderList(payload: ShipmentRequest) {
     ) {
       reject('data not found');
     }
-    const foundOrders = orders;
-    // const foundOrders = orders.data.filter(
-    //   (order) =>
-    //     (!payload.shipmentNo
-    //       ? true
-    //       : payload.shipmentNo &&
-    //         order.shipmentNo.search(payload.shipmentNo) > -1) &&
-    //     (!payload.sdStatus
-    //       ? true
-    //       : payload.sdStatus && payload.sdStatus === order.sdStatus) &&
-    //     (!payload.sdType
-    //       ? true
-    //       : payload.sdType && payload.sdType === order.sdType)
-    // );
 
-    setTimeout(() => {
-      if (foundOrders) {
-        resolve(foundOrders);
-      } else {
-        reject('data not found');
-      }
-    }, 100);
+    //const foundOrders = orders;
+
+    axios
+      .get<ShipmentResponse>(
+        'http://54.255.171.154:30010/api/order/shipment-deliverly',
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          params: { limit: '10', page: '1' },
+        }
+      )
+      .then((response) => {
+        console.log(response.data);
+        resolve(response.data);
+      });
+
+    // setTimeout(() => {
+    //   if (foundOrders) {
+    //     resolve(foundOrders);
+    //   } else {
+    //     reject('data not found');
+    //   }
+    // }, 100);
   });
 }
