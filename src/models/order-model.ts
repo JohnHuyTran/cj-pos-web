@@ -46,7 +46,7 @@ export interface ShipmentRequest {
 
 export interface ShipmentResponse {
   ref: string;
-  code: string;
+  code: number;
   message: string;
   data: ShipmentInfo[];
   total: number;
