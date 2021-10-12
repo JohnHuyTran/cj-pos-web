@@ -2,10 +2,16 @@ import React from 'react'
 import { useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridCellParams, GridApi, GridRowParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+<<<<<<< HEAD
 import CheckOrderDetail from './check-order-detail';
 import { ShipmentInfo, ShipmentResponse } from '../../models/order-model';
 
 
+=======
+import OrderProductList from './order-product-list';
+import { ShipmentResponse, ShipmentInfo } from '../../models/order-model';
+import { getSdType, getSdStatus } from '../../utils/utils';
+>>>>>>> feature/sp1/card-no-9
 
 function OrderList() {
   const items = useAppSelector((state) => state.checkOrderList);
@@ -32,6 +38,7 @@ function OrderList() {
     return {
       id: data.shipmentNo,
       index: index + 1,
+<<<<<<< HEAD
       orderShipment: data.shipmentNo,
       orderNo: data.sdNo,
       orderType: data.sdType,
@@ -40,6 +47,16 @@ function OrderList() {
       orderCreateDate: data.shipmentDate,
       orderStatus: data.sdStatus,
       col10: "desc"
+=======
+      shipmentNo: data.shipmentNo,
+      sdNo: data.sdNo,
+      sdType: getSdType(data.sdType),
+      boxCnt: data.boxCnt,
+      toteCnt: data.toteCnt,
+      shipmentDate: data.shipmentDate,
+      sdStatus: getSdStatus(data.sdStatus),
+      col10: 'desc',
+>>>>>>> feature/sp1/card-no-9
     };
   });
 
