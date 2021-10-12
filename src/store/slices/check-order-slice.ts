@@ -1,43 +1,34 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { getOrderList } from '../../mockdata/order-shipment';
-import { getOrderListUpdate } from "../../mockdata/order-shipment-update";
-import { CheckOrderRequest, Order, CheckOrderResponse, ShipmentResponse } from '../../models/order-model';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { getOrderList } from '../../mockdata/orders';
+import { ShipmentRequest, ShipmentResponse } from '../../models/order-model';
 
 type State = {
   orderList: ShipmentResponse;
   error: string;
-}
-
-const inti: ShipmentResponse = {
-  ref: "",
-  code: 0,
-  message: "",
-  data: [],
-  total: 0,
-  page: 0,
-  perPage: 0,
-  prev: 0,
-  next: 0,
-  totalPage: 0
-}
+};
 
 const initialState: State = {
-  orderList: inti,
-  error: "",
+  orderList: {
+    ref: '',
+    code: '',
+    message: '',
+    data: [],
+    total: 0,
+    page: 0,
+    perPage: 0,
+    prev: 0,
+    next: 0,
+    totalPage: 0,
+  },
+  error: '',
 };
 
 export const featchOrderListAsync = createAsyncThunk(
-  "orderList",
-  async (payload: CheckOrderRequest, store) => {
+  'orderList',
+  async (payload: ShipmentRequest) => {
     try {
-      if (payload.orderNo === 'update') {
-        const response: ShipmentResponse = await getOrderListUpdate().then();
-        return response;
-      } else {
-        const response: ShipmentResponse = await getOrderList().then();
-        return response;
-      }
-
+      const response: ShipmentResponse = await getOrderList(payload).then();
+      return response;
     } catch (error) {
       throw error;
     }
@@ -45,25 +36,27 @@ export const featchOrderListAsync = createAsyncThunk(
 );
 
 const checkOrderSlice = createSlice({
-  name: "checkOrder",
+  name: 'checkOrder',
   initialState,
   reducers: {
     clearDataFilter: (state) => {
-      state.orderList = inti
-    }
+      state.orderList;
+    },
   },
   extraReducers: (builer) => {
-    builer.addCase(featchOrderListAsync.pending, (state) => {
+    builer.addCase(featchOrderListAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchOrderListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.orderList = action.payload;
-      }),
-      builer.addCase(featchOrderListAsync.rejected, (state) => {
+      builer.addCase(
+        featchOrderListAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.orderList = action.payload;
+        }
+      ),
+      builer.addCase(featchOrderListAsync.rejected, () => {
         initialState;
-      })
-
-  }
+      });
+  },
 });
 
 export const { clearDataFilter } = checkOrderSlice.actions;

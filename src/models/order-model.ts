@@ -1,13 +1,13 @@
 export interface CheckOrderRequest {
   orderNo: string;
   orderStatus: string;
-  orderType: string
+  orderType: string;
 }
 
 export interface CheckOrderResponse {
   ref: number;
   total: number;
-  orders?: Order[]
+  orders?: Order[];
 }
 
 export interface Order {
@@ -18,7 +18,7 @@ export interface Order {
   orderTotal: number;
   orderTote: number;
   orderCreateDate: string;
-  products?: Product[]
+  products?: Product[];
 }
 
 export interface Product {
@@ -40,13 +40,13 @@ export interface ShipmentRequest {
   sdNo?: string;
   dateFrom?: string;
   dateTo?: string;
-  status?: string;
+  sdStatus?: number;
+  sdType?: number;
 }
-
 
 export interface ShipmentResponse {
   ref: string;
-  code: number;
+  code: string;
   message: string;
   data: ShipmentInfo[];
   total: number;
@@ -56,7 +56,6 @@ export interface ShipmentResponse {
   next: number;
   totalPage: number;
 }
-
 
 export interface ShipmentInfo {
   shipmentNo: string;
@@ -68,6 +67,7 @@ export interface ShipmentInfo {
   sdType: number;
   toteCnt: number;
   boxCnt: number;
+  comment: string;
   entries: Entry[];
 }
 
@@ -117,7 +117,6 @@ export interface CheckOrderDetailProps {
   defaultOpen: boolean;
   onClickClose: any;
 }
-
 
 export interface SaveDraftSDRequest {
   shipmentNo: string;
