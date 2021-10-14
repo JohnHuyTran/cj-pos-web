@@ -1,25 +1,28 @@
 export const environment = {
   products: {
-    url: "/api/product",
+    url: '/api/product',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   },
   orders: {
     shipment: {
+      fetchOrder: {
+        url: '/api/order/shipment-deliverly',
+      },
       saveDraft: {
         // url: "/api/order/submit"
-        url: '/api/order/stock-diff/draft'
+        url: '/api/order/stock-diff/draft',
       },
       approve: {
-        url: "/api/order/stock-diff/{sdNo}/approve"
+        url: '/api/order/stock-diff/{sdNo}/approve',
       },
       closejob: {
-        url: "api/order/close"
+        url: 'api/order/close',
       },
       printFormShipmentDeliverly: {
-        url: '/api/order/stock-diff/{shipmentNo}/export'
-      }
-    }
-  }
+        url: '/api/order/stock-diff/{shipmentNo}/export',
+      },
+    },
+  },
 };

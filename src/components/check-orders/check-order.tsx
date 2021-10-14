@@ -63,9 +63,13 @@ function CheckOrderSearch() {
     console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
 
-  useEffect(() => {
+  const onClickClearBtn = () => {
     dispatch(clearDataFilter());
-  }, []);
+  }
+
+  // useEffect(() => {
+  //   dispatch(clearDataFilter());
+  // }, []);
 
   const handleStartDatePicker = (value: Date) => {
     setStartDate(value);
@@ -166,7 +170,7 @@ function CheckOrderSearch() {
               <Button
                 id='clearBtb'
                 variant='contained'
-                onClick={onClickSearchBtn}
+                onClick={onClickClearBtn}
                 sx={{ backgroundColor: '#AEAEAE' }}
               >
                 เคลียร์
