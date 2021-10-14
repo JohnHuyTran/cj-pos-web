@@ -1,10 +1,12 @@
-import { Dialog, DialogContent } from '@mui/material';
-import React, { ReactElement } from 'react'
+//@ts-nocheck
+import { Dialog, DialogContent, styled } from '@mui/material';
+import React, { ReactElement, useEffect, useRef } from 'react'
 import { useState } from 'react';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import throttle from 'lodash.throttle';
 
 interface ModalShowPDFProp {
     open: boolean,
@@ -44,26 +46,43 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): ReactElement {
     const [numPages, setNumPages] = useState(0);
     const [pageNumber, setPageNumber] = useState(1);
+    const [initialWidth, setInitialWidth] = useState(null);
+    const pdfWrapper = useRef(null)
+
+    const setPdfSize = () => {
+        if (pdfWrapper && pdfWrapper.current) {
+            setInitialWidth(pdfWrapper.current.getBoundingClientRect().width);
+        }
+    };
 
     function onDocumentLoadSuccess(numPages: number) {
         setNumPages(numPages);
+        window.addEventListener('resize', throttle(setPdfSize, 300));
+        setPdfSize();
+        return () => {
+            window.removeEventListener('resize', throttle(setPdfSize, 300));
+        };
     }
     const handleClose = () => {
         onClose();
     }
 
+
+
     return (
-        <Dialog open={open} fullWidth={true} >
+
+        <Dialog open={open} maxWidth={initialWidth}>
             <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} />
-            <div>
+
+            <div id="placeholderWrapper" style={{ height: '100vh' }} />
+            <div id="pdfWrapper" style={{ width: '45vw' }} ref={pdfWrapper}>
                 <Document
                     file={url}
                     onLoadSuccess={onDocumentLoadSuccess}
-                    externalLinkTarget="_blank"
                 >
-                    <Page pageNumber={pageNumber} />
+                    <Page pageNumber={pageNumber} width={initialWidth} />
                 </Document>
             </div>
-        </Dialog>
+        </Dialog >
     );
 }
