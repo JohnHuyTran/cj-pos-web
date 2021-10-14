@@ -194,11 +194,23 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     }
 
     const updateShipmentOrder = () => {
-        const payload: CheckOrderRequest = {
-            orderNo: 'update',
-            orderStatus: 'success',
-            orderType: 'success'
-        }
+        // const payload: CheckOrderRequest = {
+        //     orderNo: 'update',
+        //     orderStatus: 'success',
+        //     orderType: 'success'
+        // }
+        // dispatch(featchOrderListAsync(payload));
+
+        const payload: ShipmentRequest = {
+            limit: '10',
+            page: '1',
+            shipmentNo: shipment,
+            sdNo: sdNo,
+            dateFrom: '',
+            dateTo: '',
+            sdStatus: 1,
+            sdType: 1,
+        };
         dispatch(featchOrderListAsync(payload));
     }
 
@@ -301,7 +313,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         const items = shipmentList[0].entries[i].items;
         for (let j = 0; j < items.length; j++) {
             rows.push({
-                id: items[j].barcode,
+                id: `${shipmentList[0].entries[i].deliveryOrderNo} ${items[j].barcode}`,
                 doNo: shipmentList[0].entries[i].deliveryOrderNo,
                 col1: index,
                 productId: items[j].sku.code,
