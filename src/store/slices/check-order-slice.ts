@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { getOrderList } from '../../mockdata/orders';
 import { ShipmentRequest, ShipmentResponse } from '../../models/order-model';
 import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
