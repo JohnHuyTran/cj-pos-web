@@ -18,6 +18,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import PreviewIcon from '@mui/icons-material/Preview';
 
 import { useStyles } from './check-order-detail-css'
 import { useFilePicker } from 'use-file-picker';
@@ -503,8 +504,9 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     variant='contained'
                                     color='primary'
                                     onClick={handlePrintBtn}
-                                    endIcon={<LocalPrintshopOutlinedIcon />}
-                                >พิมพ์ใบตรวจการรับสินค้า</Button>
+                                    endIcon={<PreviewIcon />}
+                                    style={{ textTransform: 'none' }}
+                                >Preview ใบตรวจการรับสินค้า</Button>
                             </Grid>
                         </Grid>
                     </Box>

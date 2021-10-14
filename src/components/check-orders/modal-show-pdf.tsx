@@ -1,11 +1,13 @@
 //@ts-nocheck
-import { Dialog, DialogContent, styled } from '@mui/material';
-import React, { ReactElement, useEffect, useRef } from 'react'
+import { Dialog, Button } from '@mui/material';
+import React, { ReactElement, useRef } from 'react'
 import { useState } from 'react';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import PrintIcon from '@mui/icons-material/Print'
+import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
 import throttle from 'lodash.throttle';
 import { useReactToPrint } from 'react-to-print';
 
@@ -18,12 +20,13 @@ export interface DialogTitleProps {
     id: string;
     children?: React.ReactNode;
     onClose?: () => void;
+    onPrint?: () => void;
 }
 
 
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
-    const { children, onClose, ...other } = props;
+    const { children, onClose, onPrint, ...other } = props;
 
     return (
         <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
@@ -41,6 +44,27 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
                 >
                     <CloseIcon />
                 </IconButton>
+            ) : null}
+            {onPrint ? (
+                // <IconButton
+                //     aria-label="print"
+                //     onClick={onPrint}
+                //     sx={{
+                //         position: 'absolute',
+                //         right: 16,
+                //         top: 0,
+                //         color: (theme) => theme.palette.grey[500],
+                //     }}
+                // >
+                //     <PrintIcon />
+                // </IconButton>
+                <Button
+                    id='printBtb'
+                    variant='contained'
+                    color='primary'
+                    onClick={onPrint}
+                    endIcon={<LocalPrintshopOutlinedIcon />}
+                >พิมพ์ใบตรวจการรับสินค้า</Button>
             ) : null}
         </DialogTitle>
     );
@@ -78,8 +102,7 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
     return (
 
         <Dialog open={open} maxWidth={initialWidth}>
-            <button onClick={handlePrint}>Print this out!</button>
-            <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} />
+            <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} onPrint={handlePrint} />
 
             <div id="placeholderWrapper" style={{ height: '3000vh' }} />
             <div id="pdfWrapper" style={{ width: '45vw' }} ref={pdfWrapper}>
