@@ -543,7 +543,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             <ModalShowPDF
                 open={openModelPreviewDocument}
                 onClose={handleModelPreviewDocument}
-                url={getPathReportSD(sdNo)}
+                url={getPathReportSD(shipment)}
 
             />
 

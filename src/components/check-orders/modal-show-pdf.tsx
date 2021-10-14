@@ -7,6 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import throttle from 'lodash.throttle';
+import { useReactToPrint } from 'react-to-print';
 
 interface ModalShowPDFProp {
     open: boolean,
@@ -18,6 +19,8 @@ export interface DialogTitleProps {
     children?: React.ReactNode;
     onClose?: () => void;
 }
+
+
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
     const { children, onClose, ...other } = props;
@@ -55,8 +58,8 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
         }
     };
 
-    function onDocumentLoadSuccess(numPages: number) {
-        setNumPages(numPages);
+    function onDocumentLoadSuccess(pdf: any) {
+        setNumPages(pdf.numPages);
         window.addEventListener('resize', throttle(setPdfSize, 300));
         setPdfSize();
         return () => {
@@ -67,20 +70,36 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
         onClose();
     }
 
-
+    // const componentRef = useRef();
+    const handlePrint = useReactToPrint({
+        content: () => pdfWrapper.current,
+    });
 
     return (
 
         <Dialog open={open} maxWidth={initialWidth}>
+            <button onClick={handlePrint}>Print this out!</button>
             <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} />
 
-            <div id="placeholderWrapper" style={{ height: '100vh' }} />
+            <div id="placeholderWrapper" style={{ height: '3000vh' }} />
             <div id="pdfWrapper" style={{ width: '45vw' }} ref={pdfWrapper}>
                 <Document
                     file={url}
                     onLoadSuccess={onDocumentLoadSuccess}
                 >
-                    <Page pageNumber={pageNumber} width={initialWidth} />
+                    {
+                        Array.from(
+                            new Array(numPages),
+                            (el, index) => (
+                                <Page
+                                    key={`page_${index + 1}`}
+                                    pageNumber={index + 1}
+                                    width={initialWidth}
+                                // height={1000}
+                                />
+                            ),
+                        )
+                    }
                 </Document>
             </div>
         </Dialog >
