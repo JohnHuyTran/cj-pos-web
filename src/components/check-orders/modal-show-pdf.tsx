@@ -91,6 +91,10 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
             window.removeEventListener('resize', throttle(setPdfSize, 300));
         };
     }
+
+    const onDocumentLoadFail = (error: any) => {
+        alert('Error while loading document! ' + error.message)
+    }
     const handleClose = () => {
         onClose();
     }
@@ -110,6 +114,7 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
                     <Document
                         file={url}
                         onLoadSuccess={onDocumentLoadSuccess}
+                        onLoadError={onDocumentLoadFail}
                     >
                         {
                             Array.from(

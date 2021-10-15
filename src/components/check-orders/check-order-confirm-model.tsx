@@ -12,11 +12,12 @@ import { Item, OrderApproveCloseJobRequest } from '../../models/order-model'
 import { approveOrderShipments, closeOrderShipments } from '../../services/order-shipment'
 import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import DataDiffInfo from './table-diff-info';
+import { ApiError } from '../../models/api-error-model';
 
 interface ConfirmOrderShipment {
     open: boolean,
     onClose: () => void,
-    onUpdateShipmentStatus: (value: boolean) => void,
+    onUpdateShipmentStatus: (value: boolean, errorMsg: any) => void,
     shipmentNo: string,
     sdNo: string,
     action: number,
@@ -66,13 +67,11 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             approveOrderShipments(sdNo)
                 .then(
                     function (value) {
-                        console.log("value, ", value);
-                        onUpdateShipmentStatus(true);
+                        onUpdateShipmentStatus(true, '');
                         onClose();
                     },
-                    function (error) {
-                        console.log("err, ", error);
-                        onUpdateShipmentStatus(false);
+                    function (error: ApiError) {
+                        onUpdateShipmentStatus(false, error.message);
                         onClose();
                     }
                 );
@@ -86,14 +85,17 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             closeOrderShipments(payload)
                 .then(
                     function (value) {
-                        console.log("value, ", value);
+                        onUpdateShipmentStatus(true, '');
+                        onClose();
                     },
-                    function (error) {
-                        console.log("err, ", error);
+                    function (error: ApiError) {
+                        onUpdateShipmentStatus(false, error.message);
+                        onClose();
                     }
                 )
                 .catch(err => {
-                    console.log(err)
+                    onUpdateShipmentStatus(false, "This is an error alert — check it out!");
+                    onClose();
                 })
         }
     }

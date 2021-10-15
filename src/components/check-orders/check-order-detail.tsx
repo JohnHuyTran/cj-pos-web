@@ -29,6 +29,7 @@ import { ShipmentDeliveryStatusCodeEnum, getShipmentTypeText, getShipmentStatusT
 import ModalShowPDF from './modal-show-pdf';
 import { ShipmentInfo, ShipmentResponse, Item, SaveDraftSDRequest, Quantity, CheckOrderDetailProps, Entry, } from '../../models/order-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill'
+import { ApiError } from '../../models/api-error-model';
 
 
 const columns: GridColDef[] = [
@@ -156,6 +157,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [shipmentTypeText, setShipmentTypeText] = React.useState('');
     const [sdNo, setSdNo] = React.useState('');
     const [shipmentDateFormat, setShipmentDateFormat] = React.useState('');
+    const [snackBarFailMsg, setSnackBarFailMsg] = React.useState('');
 
     useEffect(() => {
         if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
@@ -244,9 +246,9 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 setShowSnackbarSuccess(true);
                 updateShipmentOrder()
             })
-            .catch((error) => {
+            .catch((error: ApiError) => {
                 setShowSnackbarFail(true);
-                // setItemsDiffState[itemsDiff];
+                setSnackBarFailMsg(error.message);
                 updateShipmentOrder()
             })
     };
@@ -346,7 +348,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     //     console.log(model);
     // }, []);
 
-    const handleStatusShipmentToJobClose = (issuccess: boolean) => {
+    const handleShowSnackBar = (issuccess: boolean, errorMsg: any) => {
         if (issuccess) {
             setDisableSaveBtn(true);
             setDisableApproveBtn(true);
@@ -354,18 +356,10 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             setShowSnackbarSuccess(true);
         } else {
             setShowSnackbarFail(true);
+            setSnackBarFailMsg(errorMsg);
         }
-
     }
-    const handleShowSnackBar = (issuccess: boolen) => {
-        if (issuccess) {
 
-        } else {
-            setShowSnackbarFail(true);
-        }
-
-
-    }
 
     return (
         <div>
@@ -418,7 +412,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                         </Grid>
                         <Grid container spacing={2}>
                             <Grid item lg={3}  >
-                                <Typography variant="body2" gutterBottom>แนบเอกสารใบส่วนต่างหลังเซ็นต์:</Typography>
+                                <Typography variant="body2" gutterBottom>แนบเอกสารใบตรวจสอบการรับ-โอนสินค้าหลังเซ็นต์:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
                                 {shipmentList[0].sdStatus !== ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && <div>
@@ -531,7 +525,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             <ConfirmOrderShipment
                 open={openModelConfirm}
                 onClose={handleCloseModelConfirm}
-                onUpdateShipmentStatus={handleStatusShipmentToJobClose}
+                onUpdateShipmentStatus={handleShowSnackBar}
                 shipmentNo={shipment}
                 sdNo={sdNo}
                 action={action}
@@ -563,7 +557,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 horizontal: 'right',
             }}>
                 <Alert severity="error" sx={{ width: '100%' }} onClose={handleCloseSnackBar} >
-                    This transaction is error
+                    {snackBarFailMsg}
                 </Alert>
             </Snackbar>
         </div >
