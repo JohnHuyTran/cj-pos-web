@@ -119,7 +119,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
                         position: 'absolute',
                         right: 8,
                         top: 8,
-                        color: (theme) => theme.palette.grey[500],
+                        color: (theme) => theme.palette.grey[100],
                     }}
                 >
                     <CloseIcon />
@@ -452,7 +452,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Button
                                     id='backBtn'
                                     variant='contained'
-                                    color='primary'
+                                    color='secondary'
                                     className={classes.browserBtn}
                                     onClick={handleClose}
                                     startIcon={<ArrowBackIosIcon />}
@@ -502,7 +502,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 <Button
                                     id='printBtn'
                                     variant='contained'
-                                    color='primary'
+                                    color='secondary'
                                     onClick={handlePrintBtn}
                                     endIcon={<PreviewIcon />}
                                     style={{ textTransform: 'none' }}

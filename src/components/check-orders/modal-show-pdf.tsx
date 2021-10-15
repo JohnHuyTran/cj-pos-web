@@ -40,7 +40,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
                         position: 'absolute',
                         right: 8,
                         top: 0,
-                        color: (theme) => theme.palette.grey[500],
+                        color: (theme) => theme.palette.grey[100],
                     }}
                 >
                     <CloseIcon />
@@ -62,7 +62,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
                 <Button
                     id='printBtn'
                     variant='contained'
-                    color='primary'
+                    color='secondary'
                     onClick={onPrint}
                     endIcon={<LocalPrintshopOutlinedIcon />}
                 >พิมพ์ใบตรวจการรับสินค้า</Button>
@@ -101,31 +101,32 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
     });
 
     return (
+        <div>
+            <Dialog open={open} maxWidth={initialWidth}>
+                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} onPrint={handlePrint} />
 
-        <Dialog open={open} maxWidth={initialWidth}>
-            <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} onPrint={handlePrint} />
-
-            <div id="placeholderWrapper" style={{ height: '3000vh' }} />
-            <div id="pdfWrapper" style={{ width: '45vw' }} ref={pdfWrapper}>
-                <Document
-                    file={url}
-                    onLoadSuccess={onDocumentLoadSuccess}
-                >
-                    {
-                        Array.from(
-                            new Array(numPages),
-                            (el, index) => (
-                                <Page
-                                    key={`page_${index + 1}`}
-                                    pageNumber={index + 1}
-                                    width={initialWidth}
-                                // height={1000}
-                                />
-                            ),
-                        )
-                    }
-                </Document>
-            </div>
-        </Dialog >
+                <div id="placeholderWrapper" style={{ height: '3000vh' }} />
+                <div id="pdfWrapper" style={{ width: '45vw' }} ref={pdfWrapper}>
+                    <Document
+                        file={url}
+                        onLoadSuccess={onDocumentLoadSuccess}
+                    >
+                        {
+                            Array.from(
+                                new Array(numPages),
+                                (el, index) => (
+                                    <Page
+                                        key={`page_${index + 1}`}
+                                        pageNumber={index + 1}
+                                        width={initialWidth}
+                                    // height={1000}
+                                    />
+                                ),
+                            )
+                        }
+                    </Document>
+                </div>
+            </Dialog >
+        </div>
     );
 }

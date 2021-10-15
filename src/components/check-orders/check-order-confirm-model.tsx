@@ -49,7 +49,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
                         position: 'absolute',
                         right: 8,
                         top: 8,
-                        color: (theme) => theme.palette.grey[500],
+                        color: (theme) => theme.palette.grey[100],
                     }}
                 >
                     <CloseIcon />
@@ -196,7 +196,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                         color='primary'
                         onClick={handleClose}
                     >
-                        ยกเลิก
+                        ปิด
                     </Button></DialogActions>
             }
 
