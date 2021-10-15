@@ -59,7 +59,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
                 //     <PrintIcon />
                 // </IconButton>
                 <Button
-                    id='printBtb'
+                    id='printBtn'
                     variant='contained'
                     color='primary'
                     onClick={onPrint}

@@ -424,7 +424,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 {shipmentList[0].sdStatus !== ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && <div>
                                     <TextField name='browserTxf' className={classes.textField} value={!!filesContent.length && filesContent[0].content ? filesContent[0].name : ''} />
                                     <Button
-                                        id='printBtb'
+                                        id='printBtn'
                                         variant='contained'
                                         color='primary'
                                         className={classes.browserBtn}
@@ -450,7 +450,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                         <Grid container spacing={2} justifyContent="center" style={{ marginTop: 0.1 }}>
                             <Grid item  >
                                 <Button
-                                    id='backBtb'
+                                    id='backBtn'
                                     variant='contained'
                                     color='primary'
                                     className={classes.browserBtn}
@@ -461,7 +461,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                             <Grid item  >
                                 <Box sx={{ display: isDisplayActBtn }}>
                                     <Button
-                                        id='saveBtb'
+                                        id='saveBtn'
                                         variant='contained'
                                         color='primary'
                                         className={classes.browserBtn}
@@ -477,7 +477,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                         <Grid container spacing={2} display='flex' justifyContent='space-between'>
                             <Grid item xl={2}  >
                                 <Button
-                                    id='approveBtb'
+                                    id='approveBtn'
                                     variant='contained'
                                     color='primary'
                                     className={classes.browserBtn}
@@ -487,7 +487,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                 >อนุมัติ</Button>
 
                                 <Button
-                                    id='closeBtb'
+                                    id='closeBtn'
                                     variant='contained'
                                     color='primary'
                                     className={classes.browserBtn}
@@ -500,7 +500,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
                             <Grid item xl={2} >
                                 <Button
-                                    id='printBtb'
+                                    id='printBtn'
                                     variant='contained'
                                     color='primary'
                                     onClick={handlePrintBtn}
