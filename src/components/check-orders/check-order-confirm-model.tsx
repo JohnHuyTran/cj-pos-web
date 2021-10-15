@@ -42,6 +42,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             {children}
             {onClose ? (
                 <IconButton
+                    id='closeBtn'
                     aria-label="close"
                     onClick={onClose}
                     sx={{
@@ -167,6 +168,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             {
                 ((action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && !imageContent)) && <DialogActions sx={{ justifyContent: "center" }} >
                     <Button
+                        id='acceptBtn'
                         variant='contained'
                         size='small'
                         color='primary'
@@ -179,6 +181,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
 
             {
                 ((action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) || (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent)) && <DialogActions sx={{ justifyContent: "center" }}><Button
+                    id='confirmBtn'
                     variant='contained'
                     size='small'
                     color='primary'
@@ -187,6 +190,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                     ยืนยัน
                 </Button>
                     <Button
+                        id='cancelBtn'
                         variant='contained'
                         size='small'
                         color='primary'
