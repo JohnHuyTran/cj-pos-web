@@ -205,12 +205,12 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         const payload: ShipmentRequest = {
             limit: '10',
             page: '1',
-            shipmentNo: shipment,
-            sdNo: sdNo,
-            dateFrom: '',
-            dateTo: '',
-            sdStatus: 1,
-            sdType: 1,
+            shipmentNo: null,
+            sdNo: null,
+            dateFrom: null,
+            dateTo: null,
+            sdStatus: null,
+            sdType: null,
         };
         dispatch(featchOrderListAsync(payload));
     }
@@ -314,7 +314,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         const items = shipmentList[0].entries[i].items;
         for (let j = 0; j < items.length; j++) {
             rows.push({
-                id: `${shipmentList[0].entries[i].deliveryOrderNo} ${items[j].barcode}`,
+                id: `${shipmentList[0].entries[i].deliveryOrderNo}${items[j].barcode}_${index}`,
                 doNo: shipmentList[0].entries[i].deliveryOrderNo,
                 col1: index,
                 productId: items[j].sku.code,
@@ -324,7 +324,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 productQuantityRef: items[j].quantity.qty,
                 productQuantityActual: items[j].quantity.actualQty,
                 productDifference: items[j].quantity.qtyDiff,
-                productComment: ''
+                productComment: items[j].comment
             })
             index++;
         }
