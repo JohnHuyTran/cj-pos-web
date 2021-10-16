@@ -49,7 +49,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             ) : null}
             {onPrint ? (
                 <Button
-                    id='printBtn'
+                    id='btnPrint'
                     variant='contained'
                     color='secondary'
                     onClick={onPrint}
