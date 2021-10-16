@@ -48,18 +48,6 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
                 </IconButton>
             ) : null}
             {onPrint ? (
-                // <IconButton
-                //     aria-label="print"
-                //     onClick={onPrint}
-                //     sx={{
-                //         position: 'absolute',
-                //         right: 16,
-                //         top: 0,
-                //         color: (theme) => theme.palette.grey[500],
-                //     }}
-                // >
-                //     <PrintIcon />
-                // </IconButton>
                 <Button
                     id='printBtn'
                     variant='contained'
@@ -95,7 +83,6 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
     }
 
     const onDocumentLoadFail = (error: any) => {
-        console.log(error)
         setOpenAlert(true);
     }
 
@@ -110,17 +97,26 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
     }
 
     // const componentRef = useRef();
-    const handlePrint = useReactToPrint({
+    const showPrint = useReactToPrint({
         content: () => pdfWrapper.current,
+        onAfterPrint: () => handleClose()
     });
+
+    const handlePrint = () => {
+        showPrint;
+        // setTimeout(() => {
+        //     onClose()
+        // }, 1000);
+
+    }
 
     return (
         <div>
             <Dialog open={open} maxWidth={initialWidth}>
-                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} onPrint={handlePrint} />
+                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} onPrint={showPrint} />
 
                 <div id="placeholderWrapper" style={{ height: '3000vh' }} />
-                <div id="pdfWrapper" style={{ width: '45vw' }} ref={pdfWrapper}>
+                <div id="pdfWrapper" style={{ width: '45vw' }} ref={pdfWrapper} >
                     <Document
                         file={url}
                         onLoadSuccess={onDocumentLoadSuccess}
