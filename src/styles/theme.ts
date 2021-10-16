@@ -1,5 +1,5 @@
 import { createTheme } from '@mui/material/styles';
-import { red } from '@mui/material/colors';
+import { grey, red } from '@mui/material/colors';
 
 // Create a theme instance.
 const theme = createTheme({
@@ -16,6 +16,9 @@ const theme = createTheme({
     background: {
       default: '#fff',
     },
+    cancelColor: {
+      main: grey[500]
+    }
   },
   typography: {
     fontFamily: 'Kanit',

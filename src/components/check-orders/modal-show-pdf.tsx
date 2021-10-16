@@ -10,6 +10,7 @@ import PrintIcon from '@mui/icons-material/Print'
 import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
 import throttle from 'lodash.throttle';
 import { useReactToPrint } from 'react-to-print';
+import AlertError from '../commons/ui/alert-error';
 
 interface ModalShowPDFProp {
     open: boolean,
@@ -75,6 +76,7 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
     const [numPages, setNumPages] = useState(0);
     const [pageNumber, setPageNumber] = useState(1);
     const [initialWidth, setInitialWidth] = useState(null);
+    const [openAlert, setOpenAlert] = React.useState(false);
     const pdfWrapper = useRef(null)
 
     const setPdfSize = () => {
@@ -93,8 +95,16 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
     }
 
     const onDocumentLoadFail = (error: any) => {
-        alert('Error while loading document! ' + error.message)
+        console.log(error)
+        setOpenAlert(true);
     }
+
+
+    const handleCloseAlert = () => {
+        setOpenAlert(false);
+        onClose();
+    }
+
     const handleClose = () => {
         onClose();
     }
@@ -132,6 +142,13 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
                     </Document>
                 </div>
             </Dialog >
+
+            <AlertError
+                open={openAlert}
+                onClose={handleCloseAlert}
+                titleError='Failed'
+                textError='Failed to load PDF'
+            />
         </div>
     );
 }
