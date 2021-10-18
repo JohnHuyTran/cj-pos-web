@@ -44,7 +44,7 @@ const columns: GridColDef[] = [
     { field: "productDescription", headerName: "รายละเอียดสินค้า", minWidth: 300, disableColumnMenu: 'true' },
     { field: "productUnit", headerName: "หน่วย", minWidth: 100, disableColumnMenu: 'true' },
     {
-        field: "productQuantityRef", headerName: "จำนวนอ้างอิง", width: 135, type: 'number', disableColumnMenu: 'true', editable: true
+        field: "productQuantityRef", headerName: "จำนวนอ้างอิง", width: 135, type: 'number', disableColumnMenu: 'true'
 
     },
     {
@@ -163,7 +163,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
             setDisableSaveBtn(false);
             setDisableApproveBtn(false);
-            setDisableCloseJobBtn(true)
+            setDisableCloseJobBtn(true);
         }
         if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
             setDisableSaveBtn(true);
@@ -506,13 +506,16 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                     </Box>
 
                     <Box mt={2} bgcolor='background.paper'>
-                        <div style={{ height: 400, width: '100%' }}>
+                        <div style={{ height: 400, width: '100%' }} className={classes.rowDataGrid}>
                             <DataGrid rows={rows}
                                 columns={columns}
                                 autoPageSize={true}
                                 pagination={true}
                                 pageSize={5}
                                 editMode="row"
+                                getRowClassName={(params) =>
+                                    `row-style--${(params.getValue(params.id, 'productQuantityRef') - params.getValue(params.id, 'productQuantityActual')) != 0 ? 'diff' : ''}`
+                                }
                             // onEditRowsModelChange={handleEditRowsModelChange}
                             // autoHeight
 

@@ -1,3 +1,5 @@
+import red from '@mui/material/colors/red';
+import { lighten } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import theme from '../../styles/theme';
 
@@ -17,6 +19,11 @@ const useStyles = makeStyles({
     labelBtnStyle: {
         color: "white",
     },
+    rowDataGrid: {
+        '& .row-style--diff': {
+            color: red["700"],
+        }
+    }
 })
 
 export { useStyles };
