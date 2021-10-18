@@ -134,6 +134,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const classes = useStyles();
     const { shipment, defaultOpen } = props;
     const items = useAppSelector((state) => state.checkOrderList);
+    const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder);
     const dispatch = useAppDispatch();
     const res: ShipmentResponse = items.orderList;
     const [open, setOpen] = React.useState(defaultOpen);
@@ -214,7 +215,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             sdStatus: null,
             sdType: null,
         };
-        dispatch(featchOrderListAsync(payload));
+        dispatch(featchOrderListAsync(payloadSearchOrder));
     }
 
     const handleSaveButton = () => {
