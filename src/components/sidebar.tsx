@@ -66,9 +66,9 @@ const ListItemButton = withStyles({
   selected: {},
 })(MuiListItemButton);
 
-interface Props {}
+interface Props { }
 
-export default function Sidebar({}: Props): ReactElement {
+export default function Sidebar({ }: Props): ReactElement {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -131,6 +131,7 @@ export default function Sidebar({}: Props): ReactElement {
             key='HOME'
             selected={selectedIndex === 0}
             onClick={() => handleListItemClick(0)}
+            id='mainMenuHome'
           >
             <ListItemIcon>
               <HomeOutlinedIcon />
@@ -146,6 +147,7 @@ export default function Sidebar({}: Props): ReactElement {
             key='NOTIFICATION'
             selected={selectedIndex === 1}
             onClick={() => handleListItemClick(1)}
+            id='mainMenuNotification'
           >
             <ListItemIcon>
               <NotificationsNoneOutlinedIcon />
@@ -168,7 +170,7 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemText primary='ซื้อ' />
           </ListItemButton>
         </Link>
-        <ListItemButton onClick={handleClick}>
+        <ListItemButton onClick={handleClick} id='mainMenuSale'>
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
@@ -180,6 +182,7 @@ export default function Sidebar({}: Props): ReactElement {
             <Link
               to='/sale'
               style={{ textDecoration: 'none', color: '#676767' }}
+              id='subMenuSale'
             >
               <ListItemButton
                 key='SALE'
@@ -195,7 +198,7 @@ export default function Sidebar({}: Props): ReactElement {
             </Link>
           </List>
         </Collapse>
-        <ListItemButton onClick={handleClickProduct}>
+        <ListItemButton onClick={handleClickProduct} id='mainMenuProducts'>
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
@@ -207,6 +210,7 @@ export default function Sidebar({}: Props): ReactElement {
             <Link
               to='/products'
               style={{ textDecoration: 'none', color: '#676767' }}
+              id='subMenuProducts'
             >
               <ListItemButton
                 key='PRODUCTS'
@@ -223,6 +227,7 @@ export default function Sidebar({}: Props): ReactElement {
             <Link
               to='/check-order'
               style={{ textDecoration: 'none', color: '#676767' }}
+              id='subMenuCheckOrder'
             >
               <ListItemButton
                 key='SALE'
