@@ -248,6 +248,7 @@ export default function Sidebar({ }: Props): ReactElement {
             key='USER'
             selected={selectedIndex === 6}
             onClick={() => handleListItemClick(6)}
+            id='mainMenuUser'
           >
             <ListItemIcon>
               <GroupAddOutlinedIcon />
