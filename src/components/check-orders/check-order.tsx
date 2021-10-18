@@ -13,6 +13,10 @@ import {
   featchOrderListAsync,
   clearDataFilter,
 } from '../../store/slices/check-order-slice';
+import {
+  saveSearchCriteria,
+  clearSearchCriteria,
+} from '../../store/slices/save-search-order';
 import { ShipmentRequest } from '../../models/order-model';
 import OrderList from './order-list';
 import DatePickerComponent from '../commons/ui/date-picker';
@@ -60,12 +64,14 @@ function CheckOrderSearch() {
       sdType: parseInt(values.orderType),
     };
     dispatch(featchOrderListAsync(payload));
+    dispatch(saveSearchCriteria(payload));
     console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
 
   const onClickClearBtn = () => {
     dispatch(clearDataFilter());
-  }
+    dispatch(clearSearchCriteria());
+  };
 
   // useEffect(() => {
   //   dispatch(clearDataFilter());
@@ -88,6 +94,7 @@ function CheckOrderSearch() {
               เลขที่เอกสาร LD
             </Typography>
             <TextField
+              id='txtOrderShipment'
               size='small'
               name='orderShipment'
               onChange={handleChange}
@@ -97,7 +104,12 @@ function CheckOrderSearch() {
             <Typography variant='subtitle1' gutterBottom component='div'>
               เลขที่เอกสาร SD
             </Typography>
-            <TextField size='small' name='orderNo' onChange={handleChange} />
+            <TextField
+              id='txtOrderNo'
+              size='small'
+              name='orderNo'
+              onChange={handleChange}
+            />
           </Grid>
           <Grid item xs={6}>
             <Typography variant='subtitle1' gutterBottom component='div'>
@@ -117,6 +129,7 @@ function CheckOrderSearch() {
             </Typography>
             <FormControl sx={{ width: 240 }}>
               <Select
+                id='selOrderStatus'
                 name='orderStatus'
                 value={values.orderStatus}
                 onChange={handleChange}
@@ -137,6 +150,7 @@ function CheckOrderSearch() {
             </Typography>
             <FormControl sx={{ width: 240 }}>
               <Select
+                id='selOrderType'
                 name='orderType'
                 value={values.orderType}
                 onChange={handleChange}
@@ -160,7 +174,7 @@ function CheckOrderSearch() {
               }}
             >
               <Button
-                id='searchBtb'
+                id='btnSearch'
                 variant='contained'
                 color='primary'
                 onClick={onClickSearchBtn}
@@ -168,7 +182,7 @@ function CheckOrderSearch() {
                 ค้นหา
               </Button>
               <Button
-                id='clearBtb'
+                id='btnClear'
                 variant='contained'
                 onClick={onClickClearBtn}
                 sx={{ backgroundColor: '#AEAEAE' }}
