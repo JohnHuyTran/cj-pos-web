@@ -1,4 +1,5 @@
 import React from 'react';
+import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import DatePicker from '@mui/lab/DesktopDatePicker';
 import DateAdapter from '@mui/lab/AdapterMoment';
@@ -66,14 +67,16 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
   return (
     <LocalizationProvider dateAdapter={DateAdapter}>
       <ThemeProvider theme={materialTheme}>
-        <DatePicker
-          disableHighlightToday={true}
-          showDaysOutsideCurrentMonth={true}
-          value={defaultDate}
-          onChange={handleDateChange}
-          renderInput={(params) => <TextField {...params} />}
-          inputFormat='DD/MM/YYYY'
-        />
+        <FormControl sx={{ width: 193 }}>
+          <DatePicker
+            disableHighlightToday={true}
+            showDaysOutsideCurrentMonth={true}
+            value={defaultDate}
+            onChange={handleDateChange}
+            renderInput={(params) => <TextField {...params} />}
+            inputFormat='DD/MM/YYYY'
+          />
+        </FormControl>
       </ThemeProvider>
     </LocalizationProvider>
   );
