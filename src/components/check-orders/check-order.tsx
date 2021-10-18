@@ -127,7 +127,7 @@ function CheckOrderSearch() {
             <Typography variant='subtitle1' gutterBottom component='div'>
               สถานะ
             </Typography>
-            <FormControl sx={{ width: 240 }}>
+            <FormControl sx={{ width: 193 }}>
               <Select
                 id='selOrderStatus'
                 name='orderStatus'
@@ -148,7 +148,7 @@ function CheckOrderSearch() {
             <Typography variant='subtitle1' gutterBottom component='div'>
               ประเภท
             </Typography>
-            <FormControl sx={{ width: 240 }}>
+            <FormControl sx={{ width: 193 }}>
               <Select
                 id='selOrderType'
                 name='orderType'
