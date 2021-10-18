@@ -83,7 +83,7 @@ function LoginForm() {
               รหัสผู้ใช้งาน
             </FormHelperText>
             <OutlinedInput
-              id='outlined-adornment-user-id'
+              id='txtUserid'
               value={values.userId}
               onChange={handleChange("userId")}
               aria-describedby='outlined-user-id-text'
@@ -98,14 +98,14 @@ function LoginForm() {
             className={clsx(classes.textField)}
             variant='outlined'
           >
-            <FormHelperText id='outlined-password-text'  sx={{ ml: 0 }}>
+            <FormHelperText id='outlined-password-text' sx={{ ml: 0 }}>
               รหัสผ่าน
             </FormHelperText>
             {/* <InputLabel htmlFor="outlined-adornment-password">
                   กรุณป้อนรหัสผ่าน
                 </InputLabel> */}
             <OutlinedInput
-              id='outlined-adornment-password'
+              id='txtPassword'
               type={values.showPassword ? "text" : "password"}
               value={values.password}
               onChange={handleChange("password")}
