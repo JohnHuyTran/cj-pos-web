@@ -16,7 +16,7 @@ export default function DataDiffInfo(props: DataDiffInfyProps) {
     const { items } = props;
 
     return (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} id='tblItemDifferance'>
             <Table sx={{ minWidth: 500 }} size="small" aria-label="a dense table">
                 <TableHead>
                     <TableRow>
