@@ -54,6 +54,12 @@ const columns: GridColDef[] = [
                 params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }])
             }
             }
+
+                onBlur={(e) =>
+                    params.api.updateRows([{ ...params.row, productQuantityActual: getActualQty(e.target.value) }])
+                }
+
+
             />
         )
 
@@ -67,7 +73,8 @@ const columns: GridColDef[] = [
         renderCell: (params: GridRenderCellParams) => (
             <TextField variant="outlined" name='txnComment' value={params.value} onChange={(e) =>
                 params.api.updateRows([{ ...params.row, productComment: e.target.value }])
-            } />
+            }
+            />
         )
     },
 ];
@@ -81,6 +88,9 @@ var calProductDiff = function (params: GridValueGetterParams) {
     return params.getValue(params.id, 'productQuantityRef') - params.getValue(params.id, 'productQuantityActual');
 };
 
+var getActualQty = function (params: string) {
+    return !params ? '0' : params;
+}
 
 function useApiRef() {
     const apiRef = useGridApiRef();
