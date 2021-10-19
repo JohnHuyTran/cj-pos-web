@@ -52,6 +52,14 @@ export function put(path: string, payload: any) {
       if (response.status == 200) {
         return response.data;
       }
+
+      const err: ApiError = {
+        httpStatus: response.status,
+        code: response.status,
+        message: response.statusText,
+      }
+      throw err;
+
     })
     .catch((error: any) => {
       const err: ApiError = {
@@ -60,24 +68,6 @@ export function put(path: string, payload: any) {
         message: error.response?.data.message,
       }
       throw err;
-    });
-}
-
-export function postTest(path: string, payload: any) {
-  const instancetest = axios.create({
-    baseURL: 'https://market.sec.or.th/public/idisc/FundDownload',
-    timeout: env.backEnd.timeout,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return instancetest
-    .post(path, payload)
-    .then((result: any) => {
-      return result.data;
-    })
-    .catch((error: any) => {
-      return error;
     });
 }
 
@@ -108,7 +98,7 @@ instance.interceptors.request.use(function (config: AxiosRequestConfig) {
 });
 
 // Add a response interceptor
-axios.interceptors.response.use(
+instance.interceptors.response.use(
   function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data

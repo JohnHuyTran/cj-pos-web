@@ -32,6 +32,7 @@ import { convertUtcToBkkDate } from '../../utils/date-utill'
 import { ApiError } from '../../models/api-error-model';
 
 
+
 const columns: GridColDef[] = [
     { field: "col1", headerName: "ลำดับ", width: 90, disableColumnMenu: 'true' },
     {
@@ -69,7 +70,7 @@ const columns: GridColDef[] = [
     {
         field: "productComment", headerName: "หมายเหตุ", minWidth: 200, disableColumnMenu: 'true',
         renderCell: (params: GridRenderCellParams) => (
-            <TextField variant="outlined" name='txnComment' value={params.value} onChange={(e) =>
+            < TextField variant="outlined" name='txnComment' value={params.value} onChange={(e) =>
                 params.api.updateRows([{ ...params.row, productComment: e.target.value }])
             }
                 autoComplete='off'
@@ -77,11 +78,6 @@ const columns: GridColDef[] = [
         )
     },
 ];
-
-// const updateRows = (value, id, field) => {
-//     const item = rows.find((item) => item.id === id);
-//     item[field] = value;
-// };
 
 var calProductDiff = function (params: GridValueGetterParams) {
     return params.getValue(params.id, 'productQuantityRef') - params.getValue(params.id, 'productQuantityActual');
@@ -168,6 +164,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [sdNo, setSdNo] = React.useState('');
     const [shipmentDateFormat, setShipmentDateFormat] = React.useState('');
     const [snackBarFailMsg, setSnackBarFailMsg] = React.useState('');
+
 
     useEffect(() => {
         if (shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
@@ -364,9 +361,11 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             setDisableApproveBtn(true);
             setDisableCloseJobBtn(false)
             setShowSnackbarSuccess(true);
+            updateShipmentOrder()
         } else {
             setShowSnackbarFail(true);
             setSnackBarFailMsg(errorMsg);
+            updateShipmentOrder()
         }
     }
 
