@@ -89,7 +89,7 @@ function CheckOrderSearch() {
     <>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={3}>
             <Typography variant='subtitle1' gutterBottom component='div'>
               เลขที่เอกสาร LD
             </Typography>
@@ -100,7 +100,7 @@ function CheckOrderSearch() {
               onChange={handleChange}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={9}>
             <Typography variant='subtitle1' gutterBottom component='div'>
               เลขที่เอกสาร SD
             </Typography>
@@ -111,19 +111,19 @@ function CheckOrderSearch() {
               onChange={handleChange}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={3}>
             <Typography variant='subtitle1' gutterBottom component='div'>
               วันที่รับสินค้า ตั้งแต่
             </Typography>
             <DatePickerComponent onClickDate={handleStartDatePicker} />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={9}>
             <Typography variant='subtitle1' gutterBottom component='div'>
               ถึง
             </Typography>
             <DatePickerComponent onClickDate={handleEndDatePicker} />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={3}>
             <Typography variant='subtitle1' gutterBottom component='div'>
               สถานะ
             </Typography>
@@ -144,7 +144,7 @@ function CheckOrderSearch() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={9}>
             <Typography variant='subtitle1' gutterBottom component='div'>
               ประเภท
             </Typography>
