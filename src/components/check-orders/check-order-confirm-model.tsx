@@ -8,7 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
-import { Item, OrderApproveCloseJobRequest } from '../../models/order-model'
+import { Entry, OrderApproveCloseJobRequest } from '../../models/order-model'
 import { approveOrderShipments, closeOrderShipments } from '../../services/order-shipment'
 import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import DataDiffInfo from './table-diff-info';
@@ -21,7 +21,7 @@ interface ConfirmOrderShipment {
     shipmentNo: string,
     sdNo: string,
     action: number,
-    items: Item[],
+    items: Entry[],
     percentDiffType: string,
     percentDiffValue: string,
     imageContent: BinaryData,

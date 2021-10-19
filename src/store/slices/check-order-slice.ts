@@ -17,8 +17,6 @@ const initialState: State = {
     total: 0,
     page: 0,
     perPage: 0,
-    prev: 0,
-    next: 0,
     totalPage: 0,
   },
   error: '',

@@ -27,7 +27,7 @@ import { saveOrderShipments, getPathReportSD } from '../../services/order-shipme
 import ConfirmOrderShipment from './check-order-confirm-model';
 import { ShipmentDeliveryStatusCodeEnum, getShipmentTypeText, getShipmentStatusText } from '../../utils/enum/check-order-enum';
 import ModalShowPDF from './modal-show-pdf';
-import { ShipmentInfo, ShipmentResponse, Item, SaveDraftSDRequest, Quantity, CheckOrderDetailProps, Entry, } from '../../models/order-model';
+import { ShipmentInfo, ShipmentResponse, SaveDraftSDRequest, Quantity, CheckOrderDetailProps, Entry } from '../../models/order-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill'
 import { ApiError } from '../../models/api-error-model';
 
@@ -204,23 +204,6 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     }
 
     const updateShipmentOrder = () => {
-        // const payload: CheckOrderRequest = {
-        //     orderNo: 'update',
-        //     orderStatus: 'success',
-        //     orderType: 'success'
-        // }
-        // dispatch(featchOrderListAsync(payload));
-
-        const payload: ShipmentRequest = {
-            limit: '10',
-            page: '1',
-            shipmentNo: null,
-            sdNo: null,
-            dateFrom: null,
-            dateTo: null,
-            sdStatus: null,
-            sdType: null,
-        };
         dispatch(featchOrderListAsync(payloadSearchOrder));
     }
 
@@ -229,13 +212,10 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         const itemsList = [];
         rows.forEach((id: GridRowId, data: GridRowData) => {
-            const quantity: Quantity = {
-                actualQty: id.productQuantityActual * 1
-            }
-            const item: Item = {
+            const item: Entry = {
                 barcode: id.productBarCode,
                 deliveryOrderNo: id.doNo,
-                quantity: quantity,
+                actualQty: id.productQuantityActual * 1,
                 comment: id.productComment
             }
             itemsList.push(item);
@@ -267,13 +247,10 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         rows.forEach((id: GridRowId, data: GridRowData) => {
             const diffCount: number = id.productQuantityRef - id.productQuantityActual;
             if (diffCount !== 0) {
-                const quantityDiff: Quantity = {
-                    qtyDiff: diffCount
-                }
-                const itemDiff: Item = {
+                const itemDiff: Entry = {
                     barcode: id.productBarCode,
                     productName: id.productDescription,
-                    quantity: quantityDiff
+                    actualQty: diffCount
                 }
                 setItemsDiffState(itemsDiffState => [...itemsDiffState, itemDiff]);
             }
@@ -318,26 +295,21 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     )
 
     const rows = [];
-    let index: number = 1;
-    for (let i = 0; i < shipmentList[0].entries.length; i++) {
-        const items = shipmentList[0].entries[i].items;
-        for (let j = 0; j < items.length; j++) {
-            rows.push({
-                id: `${shipmentList[0].entries[i].deliveryOrderNo}${items[j].barcode}_${index}`,
-                doNo: shipmentList[0].entries[i].deliveryOrderNo,
-                col1: index,
-                productId: items[j].sku.code,
-                productBarCode: items[j].barcode,
-                productDescription: items[j].productName,
-                productUnit: items[j].unit.name,
-                productQuantityRef: items[j].quantity.qty,
-                productQuantityActual: items[j].quantity.actualQty,
-                productDifference: items[j].quantity.qtyDiff,
-                productComment: items[j].comment
-            })
-            index++;
-        }
-
+    for (let i = 0; i < shipmentList[0].entries?.length; i++) {
+        const item = shipmentList[0].entries[i];
+        rows.push({
+            id: `${item.deliveryOrderNo}${item.barcode}_${i}`,
+            doNo: item.deliveryOrderNo,
+            col1: i + 1,
+            productId: item.skuCode,
+            productBarCode: item.barcode,
+            productDescription: item.productName,
+            productUnit: item.unitName,
+            productQuantityRef: item.qty,
+            productQuantityActual: item.actualQty,
+            productDifference: item.qtyDiff,
+            productComment: item.comment,
+        })
     }
 
     const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(

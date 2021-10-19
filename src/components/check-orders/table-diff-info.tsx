@@ -6,11 +6,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Item } from '../../models/order-model'
+import { Entry } from '../../models/order-model'
 import Typography from '@mui/material/Typography';
 
 interface DataDiffInfyProps {
-    items: Item[],
+    items: Entry[],
 }
 
 export default function DataDiffInfo(props: DataDiffInfyProps) {
@@ -36,7 +36,7 @@ export default function DataDiffInfo(props: DataDiffInfyProps) {
                             <TableCell > {index + 1}</TableCell>
                             <TableCell align="right">{row.barcode}</TableCell>
                             <TableCell align="right">{row.productName}</TableCell>
-                            <TableCell align="right">{row.quantity.qtyDiff}</TableCell>
+                            <TableCell align="right">{row.actualQty}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
