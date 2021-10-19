@@ -25,7 +25,7 @@ const saveSearchOrder = createSlice({
   initialState,
   reducers: {
     saveSearchCriteria: (state, action: PayloadAction<any>) => {
-      state = action.payload;
+      state.searchCriteria = action.payload;
     },
     clearSearchCriteria: () => {
       initialState;
