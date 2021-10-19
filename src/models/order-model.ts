@@ -73,43 +73,26 @@ export interface ShipmentInfo {
 
 export interface Entry {
   deliveryOrderNo: string;
-  deliveryOrderDate: string;
-  items: Item[];
-}
-
-export interface Item {
   seqItem: number;
   itemNo: string;
   shipmentSAPRef: string;
-  sku: Sku;
+  skuCode: string;
+  skuType: string;
   productName: string;
   barcode: string;
-  unit: Unit;
-  quantity: Quantity;
-  price: number;
-  isControlStock: number;
-  toteCode: string;
-  expireDate: string;
-  comment: string;
-}
-
-export interface Quantity {
+  unitCode: string;
+  unitName: string;
+  unitFactor: number;
   qty: number;
   qtyAll: number;
   qtyAllBefore: number;
   actualQty: number;
   qtyDiff: number;
-}
-
-export interface Sku {
-  code: string;
-  type: string;
-}
-
-export interface Unit {
-  code: string;
-  name: string;
-  unitFactor: number;
+  price: number;
+  isControlStock: number;
+  toteCode: string;
+  expireDate: string;
+  comment: string;
 }
 
 export interface CheckOrderDetailProps {
@@ -126,7 +109,7 @@ export interface SaveDraftSDRequest {
 export interface itemsReq {
   barcode: string;
   deliveryOrderNo: string;
-  quantity: Quantity;
+  actualQty: number;
   comment: string;
 }
 
