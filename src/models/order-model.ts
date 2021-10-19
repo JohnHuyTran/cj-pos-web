@@ -52,13 +52,10 @@ export interface ShipmentResponse {
   total: number;
   page: number;
   perPage: number;
-  prev: number;
-  next: number;
   totalPage: number;
 }
 
 export interface ShipmentInfo {
-  shipmentNo: string;
   shipmentDate: string;
   status: string;
   sapDocType: string;
@@ -67,12 +64,10 @@ export interface ShipmentInfo {
   sdType: number;
   toteCnt: number;
   boxCnt: number;
-  comment: string;
-  entries: Entry[];
+  entries: Entry[] | null;
 }
 
 export interface Entry {
-  deliveryOrderNo: string;
   seqItem: number;
   itemNo: string;
   shipmentSAPRef: string;
@@ -92,6 +87,7 @@ export interface Entry {
   isControlStock: number;
   toteCode: string;
   expireDate: string;
+  isTote: boolean;
   comment: string;
 }
 
@@ -103,7 +99,7 @@ export interface CheckOrderDetailProps {
 
 export interface SaveDraftSDRequest {
   shipmentNo: string;
-  items: itemsReq[];
+  items: Entry[];
 }
 
 export interface itemsReq {
