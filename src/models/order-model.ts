@@ -56,6 +56,7 @@ export interface ShipmentResponse {
 }
 
 export interface ShipmentInfo {
+  shipmentNo: string;
   shipmentDate: string;
   status: string;
   sapDocType: string;
