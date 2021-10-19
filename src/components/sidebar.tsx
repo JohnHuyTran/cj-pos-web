@@ -241,6 +241,23 @@ export default function Sidebar({ }: Props): ReactElement {
                 <ListItemText primary='ตรวจสอบการรับ-โอนสินค้า' />
               </ListItemButton>
             </Link>
+            <Link
+              to='/dc-check-order'
+              style={{ textDecoration: 'none', color: '#676767' }}
+              id='subMenuDCCheckOrder'
+            >
+              <ListItemButton
+                key='dcConfirmOrder'
+                selected={selectedIndex === 7}
+                onClick={() => handleListItemClick(7)}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon>
+                  <StarBorder />
+                </ListItemIcon>
+                <ListItemText primary='ตรวจสอบผลต่างการรับสินค้า' />
+              </ListItemButton>
+            </Link>
           </List>
         </Collapse>
         <Link to='/user' style={{ textDecoration: 'none', color: '#676767' }}>
