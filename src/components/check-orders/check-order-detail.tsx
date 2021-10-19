@@ -54,12 +54,10 @@ const columns: GridColDef[] = [
                 params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }])
             }
             }
-
                 onBlur={(e) =>
                     params.api.updateRows([{ ...params.row, productQuantityActual: getActualQty(e.target.value) }])
                 }
-
-
+                autoComplete='off'
             />
         )
 
@@ -74,6 +72,7 @@ const columns: GridColDef[] = [
             <TextField variant="outlined" name='txnComment' value={params.value} onChange={(e) =>
                 params.api.updateRows([{ ...params.row, productComment: e.target.value }])
             }
+                autoComplete='off'
             />
         )
     },
