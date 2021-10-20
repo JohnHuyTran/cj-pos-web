@@ -329,15 +329,15 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
     const handleShowSnackBar = (issuccess: boolean, errorMsg: any) => {
         if (issuccess) {
-            setDisableSaveBtn(true);
-            setDisableApproveBtn(true);
-            setDisableCloseJobBtn(false)
+            // setDisableSaveBtn(true);
+            // setDisableApproveBtn(true);
+            // setDisableCloseJobBtn(false)
             setShowSnackbarSuccess(true);
-            updateShipmentOrder()
+            // updateShipmentOrder()
         } else {
             setShowSnackbarFail(true);
             setSnackBarFailMsg(errorMsg);
-            updateShipmentOrder()
+            // updateShipmentOrder()
         }
     }
 

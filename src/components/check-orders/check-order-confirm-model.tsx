@@ -8,11 +8,14 @@ import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
-import { Entry, OrderApproveCloseJobRequest } from '../../models/order-model'
+import { Entry, OrderApproveCloseJobRequest, ShipmentRequest } from '../../models/order-model'
 import { approveOrderShipments, closeOrderShipments } from '../../services/order-shipment'
 import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import DataDiffInfo from './table-diff-info';
 import { ApiError } from '../../models/api-error-model';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { featchOrderListAsync } from '../../store/slices/check-order-slice';
+
 
 interface ConfirmOrderShipment {
     open: boolean,
@@ -62,13 +65,20 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
 export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     const { open, onClose, onUpdateShipmentStatus, shipmentNo, sdNo, action, items, percentDiffType, percentDiffValue, imageContent } = props;
+    const searchState = useAppSelector((state) => state.saveSearchOrder);
+    const payloadSearchOrder: ShipmentRequest = searchState.searchCriteria;
+    const dispatch = useAppDispatch();
+
     const confirmApproveBtn = () => {
         if (action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
             approveOrderShipments(sdNo)
                 .then(
                     function (value) {
-                        onUpdateShipmentStatus(true, '');
-                        onClose();
+                        updateShipmentOrder()
+                        setTimeout(() => {
+                            onUpdateShipmentStatus(true, '');
+                            onClose();
+                        }, 3000);
                     },
                     function (error: ApiError) {
                         onUpdateShipmentStatus(false, error.message);
@@ -85,8 +95,11 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             closeOrderShipments(payload)
                 .then(
                     function (value) {
-                        onUpdateShipmentStatus(true, '');
-                        onClose();
+                        updateShipmentOrder()
+                        setTimeout(() => {
+                            onUpdateShipmentStatus(true, '');
+                            onClose();
+                        }, 3000)
                     },
                     function (error: ApiError) {
                         onUpdateShipmentStatus(false, error.message);
@@ -106,7 +119,10 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         onClose();
     }
 
-
+    const updateShipmentOrder = () => {
+        console.log("updateShipmentOrder");
+        dispatch(featchOrderListAsync(payloadSearchOrder));
+    }
 
     return (
         <Dialog
