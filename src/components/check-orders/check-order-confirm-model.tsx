@@ -116,7 +116,6 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     const handleClose = () => {
         onClose();
     }
-
     const updateShipmentOrder = () => {
         dispatch(featchOrderListAsync(payloadSearchOrder));
     }
