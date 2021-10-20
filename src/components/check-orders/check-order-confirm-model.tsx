@@ -120,7 +120,6 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     }
 
     const updateShipmentOrder = () => {
-        console.log("updateShipmentOrder");
         dispatch(featchOrderListAsync(payloadSearchOrder));
     }
 
