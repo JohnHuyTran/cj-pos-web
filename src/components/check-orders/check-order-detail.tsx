@@ -31,8 +31,6 @@ import { ShipmentInfo, ShipmentResponse, SaveDraftSDRequest, Quantity, CheckOrde
 import { convertUtcToBkkDate } from '../../utils/date-utill'
 import { ApiError } from '../../models/api-error-model';
 
-
-
 const columns: GridColDef[] = [
     { field: "col1", headerName: "ลำดับ", width: 90, disableColumnMenu: 'true' },
     {
@@ -164,6 +162,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [sdNo, setSdNo] = React.useState('');
     const [shipmentDateFormat, setShipmentDateFormat] = React.useState('');
     const [snackBarFailMsg, setSnackBarFailMsg] = React.useState('');
+    const [openAlert, setOpenAlert] = React.useState(false);
 
 
     useEffect(() => {
@@ -300,6 +299,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         rows.push({
             id: `${item.deliveryOrderNo}${item.barcode}_${i}`,
             doNo: item.deliveryOrderNo,
+            isTote: item.isTote,
             col1: i + 1,
             productId: item.skuCode,
             productBarCode: item.barcode,
@@ -339,6 +339,10 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             setSnackBarFailMsg(errorMsg);
             // updateShipmentOrder()
         }
+    }
+
+    const handleCloseAlert = () => {
+        setOpenAlert(false);
     }
 
 

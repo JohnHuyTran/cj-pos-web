@@ -8,20 +8,20 @@ export const environment = {
   orders: {
     shipment: {
       fetchOrder: {
-        url: '/order/shipment-deliverly',
+        url: '/shipment-deliverly',
       },
       saveDraft: {
         // url: "/api/order/submit"
-        url: '/order/stock-diff/draft',
+        url: '/stock-diff/draft',
       },
       approve: {
-        url: '/order/stock-diff/{sdNo}/approve',
+        url: '/stock-diff/{sdNo}/approve',
       },
       closejob: {
-        url: '/order/close',
+        url: '/close',
       },
       printFormShipmentDeliverly: {
-        url: '/order/stock-diff/{shipmentNo}/export',
+        url: '/stock-diff/{shipmentNo}/export',
       },
     },
   },
