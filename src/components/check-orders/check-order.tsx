@@ -69,6 +69,16 @@ function CheckOrderSearch() {
   };
 
   const onClickClearBtn = () => {
+    setValues({
+      orderShipment: '',
+      orderNo: '',
+      orderStatus: 'ALL',
+      orderType: 'ALL',
+      dateFrom: '10/10/2021',
+      dateTo: '11/10/2021',
+    });
+    setStartDate(new Date());
+    setEndDate(new Date());
     dispatch(clearDataFilter());
     dispatch(clearSearchCriteria());
   };
@@ -90,47 +100,49 @@ function CheckOrderSearch() {
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
           <Grid item xs={3}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
+            <Typography variant="subtitle1" gutterBottom component="div">
               เลขที่เอกสาร LD
             </Typography>
             <TextField
-              id='txtOrderShipment'
-              size='small'
-              name='orderShipment'
+              id="txtOrderShipment"
+              size="small"
+              name="orderShipment"
+              value={values.orderShipment}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={9}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
+            <Typography variant="subtitle1" gutterBottom component="div">
               เลขที่เอกสาร SD
             </Typography>
             <TextField
-              id='txtOrderNo'
-              size='small'
-              name='orderNo'
+              id="txtOrderNo"
+              size="small"
+              name="orderNo"
+              value={values.orderNo}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={3}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
+            <Typography variant="subtitle1" gutterBottom component="div">
               วันที่รับสินค้า ตั้งแต่
             </Typography>
             <DatePickerComponent onClickDate={handleStartDatePicker} />
           </Grid>
           <Grid item xs={9}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
+            <Typography variant="subtitle1" gutterBottom component="div">
               ถึง
             </Typography>
             <DatePickerComponent onClickDate={handleEndDatePicker} />
           </Grid>
           <Grid item xs={3}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
+            <Typography variant="subtitle1" gutterBottom component="div">
               สถานะ
             </Typography>
             <FormControl sx={{ width: 193 }}>
               <Select
-                id='selOrderStatus'
-                name='orderStatus'
+                id="selOrderStatus"
+                name="orderStatus"
                 value={values.orderStatus}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}
@@ -145,13 +157,13 @@ function CheckOrderSearch() {
             </FormControl>
           </Grid>
           <Grid item xs={9}>
-            <Typography variant='subtitle1' gutterBottom component='div'>
+            <Typography variant="subtitle1" gutterBottom component="div">
               ประเภท
             </Typography>
             <FormControl sx={{ width: 193 }}>
               <Select
-                id='selOrderType'
-                name='orderType'
+                id="selOrderType"
+                name="orderType"
                 value={values.orderType}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}
@@ -174,16 +186,16 @@ function CheckOrderSearch() {
               }}
             >
               <Button
-                id='btnSearch'
-                variant='contained'
-                color='primary'
+                id="btnSearch"
+                variant="contained"
+                color="primary"
                 onClick={onClickSearchBtn}
               >
                 ค้นหา
               </Button>
               <Button
-                id='btnClear'
-                variant='contained'
+                id="btnClear"
+                variant="contained"
                 onClick={onClickClearBtn}
                 sx={{ backgroundColor: '#AEAEAE' }}
               >
