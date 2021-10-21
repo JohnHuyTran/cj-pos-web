@@ -59,8 +59,8 @@ const checkOrderSlice = createSlice({
   name: 'checkOrder',
   initialState,
   reducers: {
-    clearDataFilter: (state) => {
-      state = initialState;
+    clearDataFilter: () => {
+      initialState;
     },
   },
   extraReducers: (builer) => {

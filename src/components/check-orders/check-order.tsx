@@ -127,13 +127,13 @@ function CheckOrderSearch() {
             <Typography variant="subtitle1" gutterBottom component="div">
               วันที่รับสินค้า ตั้งแต่
             </Typography>
-            <DatePickerComponent onClickDate={handleStartDatePicker} />
+            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={9}>
             <Typography variant="subtitle1" gutterBottom component="div">
               ถึง
             </Typography>
-            <DatePickerComponent onClickDate={handleEndDatePicker} />
+            <DatePickerComponent onClickDate={handleEndDatePicker}  value={endDate}/>
           </Grid>
           <Grid item xs={3}>
             <Typography variant="subtitle1" gutterBottom component="div">

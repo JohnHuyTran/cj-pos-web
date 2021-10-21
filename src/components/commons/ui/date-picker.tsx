@@ -50,6 +50,7 @@ const materialTheme = createTheme({
 
 interface StateProps {
   onClickDate: any;
+  value: any | Date | number | string;
 }
 
 const DatePickerComponent: React.FC<StateProps> = (props) => {
@@ -71,10 +72,10 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
           <DatePicker
             disableHighlightToday={true}
             showDaysOutsideCurrentMonth={true}
-            value={defaultDate}
+            value={props.value}
             onChange={handleDateChange}
             renderInput={(params) => <TextField {...params} />}
-            inputFormat='DD/MM/YYYY'
+            inputFormat="DD/MM/YYYY"
           />
         </FormControl>
       </ThemeProvider>
