@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { Dialog, Button } from '@mui/material';
 import React, { ReactElement, useRef } from 'react'
 import { useState } from 'react';
@@ -6,7 +5,6 @@ import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import PrintIcon from '@mui/icons-material/Print'
 import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
 import throttle from 'lodash.throttle';
 import { useReactToPrint } from 'react-to-print';
@@ -63,12 +61,13 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): ReactElement {
     const [numPages, setNumPages] = useState(0);
     const [pageNumber, setPageNumber] = useState(1);
-    const [initialWidth, setInitialWidth] = useState(null);
-    const [openAlert, setOpenAlert] = React.useState(false);
-    const pdfWrapper = useRef(null)
+    const [initialWidth, setInitialWidth] = useState(0);
+    const [openAlert, setOpenAlert] = useState(false);
+    const pdfWrapper = React.useRef<HTMLDivElement>(null);
 
     const setPdfSize = () => {
         if (pdfWrapper && pdfWrapper.current) {
+            // pdfWrapper.current.getBoundingClientRect().width;
             setInitialWidth(pdfWrapper.current.getBoundingClientRect().width);
         }
     };
@@ -112,11 +111,11 @@ export default function ModalShowPDF({ open, url, onClose }: ModalShowPDFProp): 
 
     return (
         <div>
-            <Dialog open={open} maxWidth={initialWidth}>
+            <Dialog open={open} maxWidth={false}>
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} onPrint={showPrint} />
 
                 <div id="placeholderWrapper" style={{ height: '3000vh' }} />
-                <div id="pdfWrapper" style={{ width: '45vw' }} ref={pdfWrapper} >
+                <div id="pdfWrapper" style={{ width: '50vw' }} ref={pdfWrapper} >
                     <Document
                         file={url}
                         onLoadSuccess={onDocumentLoadSuccess}
