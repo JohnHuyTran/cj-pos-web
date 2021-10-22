@@ -30,6 +30,7 @@ import ModalShowPDF from './modal-show-pdf';
 import { ShipmentInfo, ShipmentResponse, SaveDraftSDRequest, Quantity, CheckOrderDetailProps, Entry } from '../../models/order-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill'
 import { ApiError } from '../../models/api-error-model';
+import AlertError from '../commons/ui/alert-error';
 
 const columns: GridColDef[] = [
     { field: "col1", headerName: "ลำดับ", width: 90, disableColumnMenu: 'true' },
@@ -207,7 +208,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     }
 
     const handleSaveButton = () => {
-
+        let qtyIsValid: boolean = true;
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         const itemsList = [];
         rows.forEach((id: GridRowId, data: GridRowData) => {
@@ -217,26 +218,33 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 actualQty: id.productQuantityActual * 1,
                 comment: id.productComment
             }
+
+            if (id.isTote === true && (!(id.productQuantityActual * 1 >= 0 && id.productQuantityActual * 1 <= 1))) {
+                qtyIsValid = false
+            }
             itemsList.push(item);
 
         })
 
+        setOpenAlert(!qtyIsValid)
+        if (qtyIsValid) {
+            const payload: SaveDraftSDRequest = {
+                shipmentNo: shipment,
+                items: itemsList
+            }
 
-        const payload: SaveDraftSDRequest = {
-            shipmentNo: shipment,
-            items: itemsList
+            saveOrderShipments(payload, sdNo)
+                .then((value) => {
+                    setShowSnackbarSuccess(true);
+                    updateShipmentOrder()
+                })
+                .catch((error: ApiError) => {
+                    setShowSnackbarFail(true);
+                    setSnackBarFailMsg(error.message);
+                    updateShipmentOrder()
+                })
         }
 
-        saveOrderShipments(payload, sdNo)
-            .then((value) => {
-                setShowSnackbarSuccess(true);
-                updateShipmentOrder()
-            })
-            .catch((error: ApiError) => {
-                setShowSnackbarFail(true);
-                setSnackBarFailMsg(error.message);
-                updateShipmentOrder()
-            })
     };
 
     const handleApproveBtn = () => {
@@ -530,6 +538,13 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 url={getPathReportSD(shipment)}
 
             />
+            <AlertError
+                open={openAlert}
+                onClose={handleCloseAlert}
+                titleError='Failed'
+                textError='จำนวนรับจริง ของ tote  ต้องเป็น 0 หรือ 1เท่านั้น'
+            />
+
 
             <Snackbar open={showSnackbarSuccess} onClose={handleCloseSnackBar} autoHideDuration={6000} anchorOrigin={{
                 vertical: 'top',
