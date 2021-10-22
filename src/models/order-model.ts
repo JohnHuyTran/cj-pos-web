@@ -42,6 +42,7 @@ export interface ShipmentRequest {
   dateTo?: string;
   sdStatus?: number;
   sdType?: number;
+  clearSearch?: boolean;
 }
 
 export interface ShipmentResponse {

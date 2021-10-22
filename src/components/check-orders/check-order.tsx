@@ -62,6 +62,7 @@ function CheckOrderSearch() {
       dateTo: moment(endDate).format('DD/MM/YYYY'),
       sdStatus: parseInt(values.orderStatus),
       sdType: parseInt(values.orderType),
+      clearSearch: false,
     };
     dispatch(featchOrderListAsync(payload));
     dispatch(saveSearchCriteria(payload));
@@ -79,13 +80,20 @@ function CheckOrderSearch() {
     });
     setStartDate(new Date());
     setEndDate(new Date());
-    dispatch(clearDataFilter());
+    const payload: ShipmentRequest = {
+      limit: '10',
+      page: '1',
+      shipmentNo: values.orderShipment,
+      sdNo: values.orderNo,
+      dateFrom: moment(startDate).format('DD/MM/YYYY'),
+      dateTo: moment(endDate).format('DD/MM/YYYY'),
+      sdStatus: parseInt(values.orderStatus),
+      sdType: parseInt(values.orderType),
+      clearSearch: true,
+    };
+    dispatch(featchOrderListAsync(payload));
     dispatch(clearSearchCriteria());
   };
-
-  // useEffect(() => {
-  //   dispatch(clearDataFilter());
-  // }, []);
 
   const handleStartDatePicker = (value: Date) => {
     setStartDate(value);
@@ -127,13 +135,19 @@ function CheckOrderSearch() {
             <Typography variant="subtitle1" gutterBottom component="div">
               วันที่รับสินค้า ตั้งแต่
             </Typography>
-            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+            <DatePickerComponent
+              onClickDate={handleStartDatePicker}
+              value={startDate}
+            />
           </Grid>
           <Grid item xs={9}>
             <Typography variant="subtitle1" gutterBottom component="div">
               ถึง
             </Typography>
-            <DatePickerComponent onClickDate={handleEndDatePicker}  value={endDate}/>
+            <DatePickerComponent
+              onClickDate={handleEndDatePicker}
+              value={endDate}
+            />
           </Grid>
           <Grid item xs={3}>
             <Typography variant="subtitle1" gutterBottom component="div">

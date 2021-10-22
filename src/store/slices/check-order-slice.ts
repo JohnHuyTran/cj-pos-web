@@ -47,7 +47,19 @@ export const featchOrderListAsync = createAsyncThunk(
         path = path + `&dateTo=${payload.dateTo}`;
       }
       console.log('path : ', path);
-      const response: ShipmentResponse = await get(path).then();
+      let response: ShipmentResponse = {
+        ref: '',
+        code: 0,
+        message: '',
+        data: [],
+        total: 0,
+        page: 0,
+        perPage: 0,
+        totalPage: 0,
+      };
+      if (!payload.clearSearch) {
+        response = await get(path).then();
+      }
       return response;
     } catch (error) {
       throw error;
