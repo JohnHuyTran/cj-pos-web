@@ -57,6 +57,7 @@ const columns: GridColDef[] = [
                 onBlur={(e) =>
                     params.api.updateRows([{ ...params.row, productQuantityActual: getActualQty(e.target.value) }])
                 }
+                disabled={isDisable(params) ? true : false}
                 autoComplete='off'
             />
         )
@@ -72,6 +73,7 @@ const columns: GridColDef[] = [
             < TextField variant="outlined" name='txnComment' value={params.value} onChange={(e) =>
                 params.api.updateRows([{ ...params.row, productComment: e.target.value }])
             }
+                disabled={isDisable(params) ? true : false}
                 autoComplete='off'
             />
         )
@@ -102,6 +104,9 @@ function useApiRef() {
     );
 
     return { apiRef, columns: _columns };
+}
+const isDisable = (params: GridRenderCellParams) => {
+    return params.row.isDraftStatus;
 }
 
 export interface DialogTitleProps {
@@ -308,6 +313,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             id: `${item.deliveryOrderNo}${item.barcode}_${i}`,
             doNo: item.deliveryOrderNo,
             isTote: item.isTote,
+            isDraftStatus: shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
             col1: i + 1,
             productId: item.skuCode,
             productBarCode: item.barcode,
