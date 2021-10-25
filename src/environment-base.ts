@@ -21,7 +21,7 @@ export const environment = {
         url: '/close',
       },
       printFormShipmentDeliverly: {
-        url: '/stock-diff/{shipmentNo}/export',
+        url: '/stock-diff/{sdNo}/export',
       },
     },
   },

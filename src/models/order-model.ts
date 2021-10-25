@@ -75,6 +75,7 @@ export interface Entry {
   shipmentSAPRef: string;
   skuCode: string;
   skuType: string;
+  deliveryOrderNo: string;
   productName: string;
   barcode: string;
   unitCode: string;
@@ -120,7 +121,7 @@ export interface OrderSubmitResponse {
 
 export interface OrderApproveCloseJobRequest {
   shipmentNo: string;
-  imageContent?: BinaryData;
+  imageContent?: string;
 }
 
 export interface FeatchDataPDFRequest {

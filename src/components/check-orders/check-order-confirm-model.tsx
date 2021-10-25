@@ -25,9 +25,9 @@ interface ConfirmOrderShipment {
     sdNo: string,
     action: number,
     items: Entry[],
-    percentDiffType: string,
+    percentDiffType: boolean,
     percentDiffValue: string,
-    imageContent: BinaryData,
+    imageContent: string,
 }
 
 

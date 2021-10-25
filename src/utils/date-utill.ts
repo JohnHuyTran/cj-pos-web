@@ -102,7 +102,7 @@ export const convertUtcToBkk = (utcDate: string, format = DateFormat.DATE_TIME_F
 };
 
 export const convertUtcToBkkDate = (utcDate: string, format = DateFormat.DATE_FORMAT) => {
-  let bkkDate = null;
+  let bkkDate = utcDate;
 
   if (utcDate && utcDate !== '') {
     if (!utcDate.endsWith('Z')) {

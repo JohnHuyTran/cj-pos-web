@@ -38,9 +38,9 @@ export async function closeOrderShipments(payload: any) {
     }
 }
 
-export async function fetchShipmentDeliverlyPDF(shipmentNo: string) {
+export async function fetchShipmentDeliverlyPDF(sdNo: string) {
     try {
-        const path = getPathUrl(environment.orders.shipment.printFormShipmentDeliverly.url, { 'shipmentNo': shipmentNo })
+        const path = getPathUrl(environment.orders.shipment.printFormShipmentDeliverly.url, { 'sdNo': sdNo })
         const response = await get(path)
             .then((result: any) => result);
         return response
@@ -52,8 +52,8 @@ export async function fetchShipmentDeliverlyPDF(shipmentNo: string) {
     }
 }
 
-export const getPathReportSD = (shipmentNo: string) => {
-    return getPathUrl(`${env.backEnd.url}${environment.orders.shipment.printFormShipmentDeliverly.url}`, { 'shipmentNo': shipmentNo })
+export const getPathReportSD = (sdNo: string) => {
+    return getPathUrl(`${env.backEnd.url}${environment.orders.shipment.printFormShipmentDeliverly.url}`, { 'sdNo': sdNo })
 }
 
 export const getPathSaveDraft = (sdNo: string) => {

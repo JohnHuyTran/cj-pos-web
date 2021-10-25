@@ -1,17 +1,14 @@
-
-// @ts-nocheck
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListAsync, clearDataFilter } from '../../store/slices/check-order-slice';
 
 import { Box, Button, Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material'
-import { DataGrid, GridColDef, GridRenderCellParams, renderEditInputCell, GridEditRowsModel, useGridApiRef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams, renderEditInputCell, GridEditRowsModel, useGridApiRef, GridValueGetterParams, GridRowId, GridRowData } from '@mui/x-data-grid';
 import DialogTitle from '@mui/material/DialogTitle';
 import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import SaveIcon from '@mui/icons-material/Save'
-import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import DoneIcon from '@mui/icons-material/Done';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -27,28 +24,28 @@ import { saveOrderShipments, getPathReportSD } from '../../services/order-shipme
 import ConfirmOrderShipment from './check-order-confirm-model';
 import { ShipmentDeliveryStatusCodeEnum, getShipmentTypeText, getShipmentStatusText } from '../../utils/enum/check-order-enum';
 import ModalShowPDF from './modal-show-pdf';
-import { ShipmentInfo, ShipmentResponse, SaveDraftSDRequest, Quantity, CheckOrderDetailProps, Entry } from '../../models/order-model';
+import { ShipmentInfo, ShipmentResponse, SaveDraftSDRequest, CheckOrderDetailProps, Entry, ShipmentRequest } from '../../models/order-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill'
 import { ApiError } from '../../models/api-error-model';
 import AlertError from '../commons/ui/alert-error';
+import { IndeterminateCheckBoxTwoTone } from '@mui/icons-material';
 
 const columns: GridColDef[] = [
-    { field: "col1", headerName: "ลำดับ", width: 90, disableColumnMenu: 'true' },
+    { field: "col1", headerName: "ลำดับ", width: 90, disableColumnMenu: true },
     {
         field: "productId",
         headerName: "รหัสสินค้า",
         width: 170,
-        disableColumnMenu: 'true'
+        disableColumnMenu: true
     },
-    { field: "productBarCode", headerName: "บาร์โค้ด", minWidth: 170, disableColumnMenu: 'true' },
-    { field: "productDescription", headerName: "รายละเอียดสินค้า", minWidth: 300, disableColumnMenu: 'true' },
-    { field: "productUnit", headerName: "หน่วย", minWidth: 100, disableColumnMenu: 'true' },
+    { field: "productBarCode", headerName: "บาร์โค้ด", minWidth: 170, disableColumnMenu: true },
+    { field: "productDescription", headerName: "รายละเอียดสินค้า", minWidth: 300, },
+    { field: "productUnit", headerName: "หน่วย", minWidth: 100, },
     {
-        field: "productQuantityRef", headerName: "จำนวนอ้างอิง", width: 135, type: 'number', disableColumnMenu: 'true'
-
+        field: "productQuantityRef", headerName: "จำนวนอ้างอิง", width: 135, type: 'number'
     },
     {
-        field: "productQuantityActual", headerName: "จำนวนรับจริง", width: 135, disableColumnMenu: 'true',
+        field: "productQuantityActual", headerName: "จำนวนรับจริง", width: 135,
         renderCell: (params: GridRenderCellParams) => (
             <TextField variant="outlined" name='txnQuantityActual' type='number' value={params.value} onChange={(e) => {
                 params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }])
@@ -64,11 +61,11 @@ const columns: GridColDef[] = [
 
     },
     {
-        field: "productDifference", headerName: "ส่วนต่างการรับ", width: 145, type: 'number', disableColumnMenu: 'true',
+        field: "productDifference", headerName: "ส่วนต่างการรับ", width: 145, type: 'number',
         valueGetter: (params) => calProductDiff(params),
     },
     {
-        field: "productComment", headerName: "หมายเหตุ", minWidth: 200, disableColumnMenu: 'true',
+        field: "productComment", headerName: "หมายเหตุ", minWidth: 200,
         renderCell: (params: GridRenderCellParams) => (
             < TextField variant="outlined" name='txnComment' value={params.value} onChange={(e) =>
                 params.api.updateRows([{ ...params.row, productComment: e.target.value }])
@@ -81,7 +78,7 @@ const columns: GridColDef[] = [
 ];
 
 var calProductDiff = function (params: GridValueGetterParams) {
-    return params.getValue(params.id, 'productQuantityRef') - params.getValue(params.id, 'productQuantityActual');
+    return Number(params.getValue(params.id, 'productQuantityRef')) - Number(params.getValue(params.id, 'productQuantityActual'));
 };
 
 var getActualQty = function (params: string) {
@@ -142,10 +139,9 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const classes = useStyles();
     const { shipment, defaultOpen } = props;
-    const items = useAppSelector((state) => state.checkOrderList);
-    const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder);
+    const res = useAppSelector((state) => state.checkOrderList.orderList);
+    const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
     const dispatch = useAppDispatch();
-    const res: ShipmentResponse = items.orderList;
     const [open, setOpen] = React.useState(defaultOpen);
     const [fileName, setFileName] = React.useState('');
     const { apiRef, columns } = useApiRef();
@@ -156,17 +152,17 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const [isDisplayActBtn, setIsDisplayActBtn] = React.useState('');
 
     const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
-    const [action, setAction] = React.useState();
+    const [action, setAction] = useState<number>(0);
 
     const [showSnackbarSuccess, setShowSnackbarSuccess] = React.useState(false);
     const [showSnackbarFail, setShowSnackbarFail] = React.useState(false);
-    const [itemsDiffState, setItemsDiffState] = React.useState([]);
+    const [itemsDiffState, setItemsDiffState] = useState<Entry[]>([]);
 
     const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
-    const [shipmentStatusText, setShipmentStatusText] = React.useState('');
-    const [shipmentTypeText, setShipmentTypeText] = React.useState('');
+    const [shipmentStatusText, setShipmentStatusText] = useState<string | undefined>('');
+    const [shipmentTypeText, setShipmentTypeText] = useState<string | undefined>('');
     const [sdNo, setSdNo] = React.useState('');
-    const [shipmentDateFormat, setShipmentDateFormat] = React.useState('');
+    const [shipmentDateFormat, setShipmentDateFormat] = useState<string | undefined>('');
     const [snackBarFailMsg, setSnackBarFailMsg] = React.useState('');
     const [openAlert, setOpenAlert] = React.useState(false);
 
@@ -215,16 +211,34 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     const handleSaveButton = () => {
         let qtyIsValid: boolean = true;
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-        const itemsList = [];
-        rows.forEach((id: GridRowId, data: GridRowData) => {
+        const itemsList: any = [];
+        rows.forEach((data: GridRowData) => {
             const item: Entry = {
-                barcode: id.productBarCode,
-                deliveryOrderNo: id.doNo,
-                actualQty: id.productQuantityActual * 1,
-                comment: id.productComment
+                barcode: data.productBarCode,
+                deliveryOrderNo: data.doNo,
+                actualQty: data.productQuantityActual * 1,
+                comment: data.productComment,
+                seqItem: 0,
+                itemNo: '',
+                shipmentSAPRef: '',
+                skuCode: '',
+                skuType: '',
+                productName: '',
+                unitCode: '',
+                unitName: '',
+                unitFactor: 0,
+                qty: 0,
+                qtyAll: 0,
+                qtyAllBefore: 0,
+                qtyDiff: 0,
+                price: 0,
+                isControlStock: 0,
+                toteCode: '',
+                expireDate: '',
+                isTote: false
             }
 
-            if (id.isTote === true && (!(id.productQuantityActual * 1 >= 0 && id.productQuantityActual * 1 <= 1))) {
+            if (data.isTote === true && (!(data.productQuantityActual * 1 >= 0 && data.productQuantityActual * 1 <= 1))) {
                 qtyIsValid = false
             }
             itemsList.push(item);
@@ -239,7 +253,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             }
 
             saveOrderShipments(payload, sdNo)
-                .then((value) => {
+                .then((_value) => {
                     setShowSnackbarSuccess(true);
                     updateShipmentOrder()
                 })
@@ -256,13 +270,32 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         setItemsDiffState([]);
         setOpenModelConfirm(true)
         setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE)
-        rows.forEach((id: GridRowId, data: GridRowData) => {
-            const diffCount: number = id.productQuantityRef - id.productQuantityActual;
+        rows.forEach((data: GridRowData) => {
+            const diffCount: number = data.productQuantityRef - data.productQuantityActual;
             if (diffCount !== 0) {
                 const itemDiff: Entry = {
-                    barcode: id.productBarCode,
-                    productName: id.productDescription,
-                    actualQty: diffCount
+                    barcode: data.productBarCode,
+                    productName: data.productDescription,
+                    actualQty: diffCount,
+                    seqItem: 0,
+                    itemNo: '',
+                    shipmentSAPRef: '',
+                    skuCode: '',
+                    skuType: '',
+                    deliveryOrderNo: '',
+                    unitCode: '',
+                    unitName: '',
+                    unitFactor: 0,
+                    qty: 0,
+                    qtyAll: 0,
+                    qtyAllBefore: 0,
+                    qtyDiff: 0,
+                    price: 0,
+                    isControlStock: 0,
+                    toteCode: '',
+                    expireDate: '',
+                    isTote: false,
+                    comment: ''
                 }
                 setItemsDiffState(itemsDiffState => [...itemsDiffState, itemDiff]);
             }
@@ -306,15 +339,15 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         (shipmentInfo: ShipmentInfo) => shipmentInfo.shipmentNo === shipment
     )
 
-    const rows = [];
-    for (let i = 0; i < shipmentList[0].entries?.length; i++) {
-        const item = shipmentList[0].entries[i];
-        rows.push({
-            id: `${item.deliveryOrderNo}${item.barcode}_${i}`,
+
+    const entries: Entry[] = shipmentList[0].entries ? shipmentList[0].entries : [];
+    const rows = entries.map((item: Entry, index: number) => {
+        return {
+            id: `${item.deliveryOrderNo}${item.barcode}_${IndeterminateCheckBoxTwoTone}`,
             doNo: item.deliveryOrderNo,
             isTote: item.isTote,
             isDraftStatus: shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
-            col1: i + 1,
+            col1: index + 1,
             productId: item.skuCode,
             productBarCode: item.barcode,
             productDescription: item.productName,
@@ -323,8 +356,9 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
             productQuantityActual: item.actualQty,
             productDifference: item.qtyDiff,
             productComment: item.comment,
-        })
-    }
+        };
+    })
+
 
     const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
         props,
@@ -508,12 +542,13 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                         <div style={{ height: 400, width: '100%' }} className={classes.rowDataGrid}>
                             <DataGrid rows={rows}
                                 columns={columns}
+                                disableColumnMenu
                                 autoPageSize={true}
                                 pagination={true}
                                 pageSize={5}
                                 editMode="row"
                                 getRowClassName={(params) =>
-                                    `row-style--${(params.getValue(params.id, 'productQuantityRef') - params.getValue(params.id, 'productQuantityActual')) != 0 ? 'diff' : ''}`
+                                    `row-style--${(Number(params.getValue(params.id, 'productQuantityRef')) - Number(params.getValue(params.id, 'productQuantityActual'))) != 0 ? 'diff' : ''}`
                                 }
                             // onEditRowsModelChange={handleEditRowsModelChange}
                             // autoHeight
@@ -534,14 +569,14 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 items={itemsDiffState}
                 percentDiffType={false}
                 percentDiffValue='0'
-                imageContent={!!filesContent.length && filesContent[0].content}
+                imageContent={filesContent.length > 0 ? filesContent[0].content : ''}
 
             />
 
             <ModalShowPDF
                 open={openModelPreviewDocument}
                 onClose={handleModelPreviewDocument}
-                url={getPathReportSD(shipment)}
+                url={getPathReportSD(sdNo)}
 
             />
             <AlertError
