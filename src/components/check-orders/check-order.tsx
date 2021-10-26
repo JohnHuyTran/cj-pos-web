@@ -167,6 +167,7 @@ function CheckOrderSearch() {
                 </MenuItem>
                 <MenuItem value={'0'}>บันทึก</MenuItem>
                 <MenuItem value={'1'}>อนุมัติ</MenuItem>
+                <MenuItem value={'2'}>ปิดงาน</MenuItem>
               </Select>
             </FormControl>
           </Grid>
