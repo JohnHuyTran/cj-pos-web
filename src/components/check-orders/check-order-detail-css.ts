@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import theme from '../../styles/theme';
 
 const useStyles = makeStyles({
-    browserBtn: {
+    browseBtn: {
         position: "absolute",
         // width: "textField",
         height: "40px",

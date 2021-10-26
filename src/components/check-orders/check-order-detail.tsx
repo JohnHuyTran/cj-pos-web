@@ -449,12 +449,12 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                             </Grid>
                             <Grid item lg={9}  >
                                 {shipmentList[0].sdStatus !== ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && <div>
-                                    <TextField name='browserTxf' className={classes.textField} value={!!filesContent.length && filesContent[0].content ? filesContent[0].name : ''} />
+                                    <TextField id='txtBrowse' className={classes.textField} value={!!filesContent.length && filesContent[0].content ? filesContent[0].name : ''} />
                                     <Button
                                         id='btnPrint'
                                         variant='contained'
                                         color='primary'
-                                        className={classes.browserBtn}
+                                        className={classes.browseBtn}
                                         onClick={() => openFileSelector()}
 
                                         style={{ marginLeft: 10, textTransform: 'none' }}
@@ -480,7 +480,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     id='btnBack'
                                     variant='contained'
                                     color='secondary'
-                                    className={classes.browserBtn}
+                                    className={classes.browseBtn}
                                     onClick={handleClose}
                                     startIcon={<ArrowBackIosIcon />}
                                 >ย้อนกลับ</Button>
@@ -491,7 +491,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                         id='btnSave'
                                         variant='contained'
                                         color='primary'
-                                        className={classes.browserBtn}
+                                        className={classes.browseBtn}
                                         onClick={handleSaveButton}
                                         disabled={disableSaveBtn}
                                         endIcon={<SaveIcon />}
@@ -507,7 +507,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     id='btnApprove'
                                     variant='contained'
                                     color='primary'
-                                    className={classes.browserBtn}
+                                    className={classes.browseBtn}
                                     onClick={handleApproveBtn}
                                     disabled={disableApproveBtn}
                                     endIcon={<AssignmentTurnedInIcon />}
@@ -517,7 +517,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                                     id='btnClose'
                                     variant='contained'
                                     color='primary'
-                                    className={classes.browserBtn}
+                                    className={classes.browseBtn}
                                     style={{ marginLeft: 10 }}
                                     onClick={handleCloseJobBtn}
                                     disabled={disableCloseJobBtn}
