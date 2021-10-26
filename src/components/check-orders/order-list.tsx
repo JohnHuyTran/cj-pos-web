@@ -6,7 +6,8 @@ import Box from '@mui/material/Box';
 import { ShipmentResponse, ShipmentInfo } from '../../models/order-model';
 import { getSdType, getSdStatus } from '../../utils/utils';
 import CheckOrderDetail from './check-order-detail';
-import { convertUtcToBkkDate } from '../../utils/date-utill'
+import { convertUtcToBkkDate } from '../../utils/date-utill';
+import { getShipmentStatusText, getShipmentTypeText } from '../../utils/enum/check-order-enum';
 
 function OrderList() {
   const items = useAppSelector((state) => state.checkOrderList);
@@ -37,11 +38,11 @@ function OrderList() {
       index: index + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
-      sdType: getSdType(data.sdType),
+      sdType: getShipmentTypeText(data.sdType),
       boxCnt: data.boxCnt,
       toteCnt: data.toteCnt,
       shipmentDate: convertUtcToBkkDate(data.shipmentDate),
-      sdStatus: getSdStatus(data.sdStatus),
+      sdStatus: getShipmentStatusText(data.sdStatus),
       col10: 'desc',
     };
   });
@@ -60,7 +61,7 @@ function OrderList() {
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <div>
           <DataGrid
             rows={rows}

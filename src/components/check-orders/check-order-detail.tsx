@@ -394,6 +394,11 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   };
 
   const handleCloseJobBtn = () => {
+    setFileName(
+      !!filesContent.length && filesContent[0].content
+        ? filesContent[0].name
+        : ''
+    );
     setOpenModelConfirm(true);
     setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
   };
