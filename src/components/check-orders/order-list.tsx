@@ -14,6 +14,7 @@ function OrderList() {
   const res: ShipmentResponse = items.orderList;
   const [opens, setOpens] = React.useState(false);
   const [shipment, setShipment] = React.useState('');
+  const [sdNo, setSdNo] = React.useState('');
 
   const columns: GridColDef[] = [
     { field: 'index', headerName: 'ลำดับที่', minWidth: 120 },
@@ -33,7 +34,7 @@ function OrderList() {
   console.log('Data Size: ', JSON.stringify(res));
   const rows = res.data.map((data: ShipmentInfo, index: number) => {
     return {
-      id: `${data.shipmentNo}`,
+      id: `${data.shipmentNo}_${data.sdNo}`,
       index: index + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
@@ -47,9 +48,9 @@ function OrderList() {
   });
 
   function currentlySelected(params: GridCellParams) {
-    setShipment(params.id.toString());
+    setSdNo(params.row.sdNo);
+    setShipment(params.row.shipmentNo);
     setOpens(true);
-    console.log('opens', opens);
   }
 
   function isClosModal() {
@@ -70,13 +71,7 @@ function OrderList() {
           />
         </div>
       </Box>
-      {opens && (
-        <CheckOrderDetail
-          shipment={shipment}
-          defaultOpen={opens}
-          onClickClose={isClosModal}
-        />
-      )}
+      {opens && <CheckOrderDetail sdNo={sdNo} shipmentNo={shipment} defaultOpen={opens} onClickClose={isClosModal} />}
     </div>
   );
 }

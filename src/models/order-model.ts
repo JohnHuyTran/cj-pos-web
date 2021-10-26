@@ -95,7 +95,8 @@ export interface Entry {
 }
 
 export interface CheckOrderDetailProps {
-  shipment: any | undefined;
+  sdNo: string;
+  shipmentNo: string;
   defaultOpen: boolean;
   onClickClose: any;
 }
