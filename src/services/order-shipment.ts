@@ -29,7 +29,7 @@ export async function approveOrderShipments(sdNo: string) {
 
 export async function closeOrderShipments(sdNo: string, payload: any) {
     try {
-        const response = await post(getPathClose(sdNo), payload)
+        const response = await put(getPathClose(sdNo), payload)
             .then((result: any) => result);
         return response;
     } catch (error) {
