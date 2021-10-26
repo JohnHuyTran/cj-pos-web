@@ -127,3 +127,7 @@ export interface OrderApproveCloseJobRequest {
 export interface FeatchDataPDFRequest {
   Symbol: string;
 }
+
+export interface GenerateBORequest {
+  comment: string;
+}

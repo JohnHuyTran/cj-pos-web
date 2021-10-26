@@ -1,6 +1,6 @@
 import { get, post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
-import { SaveDraftSDRequest, FeatchDataPDFRequest } from '../models/order-model'
+import { SaveDraftSDRequest, GenerateBORequest } from '../models/order-model'
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfig'
 import { ApiError } from '../models/api-error-model';
@@ -52,6 +52,19 @@ export async function fetchShipmentDeliverlyPDF(sdNo: string) {
     }
 }
 
+export async function generateBO(sdNo: string, payload: GenerateBORequest) {
+
+    const response = await put(getPathGenerateBO(sdNo), payload)
+        .then((result: any) => result)
+        .catch((error: ApiError) => {
+            throw error
+        })
+    return response;
+
+}
+
+
+
 export const getPathReportSD = (sdNo: string) => {
     return getPathUrl(`${env.backEnd.url}${environment.orders.shipment.printFormShipmentDeliverly.url}`, { 'sdNo': sdNo })
 }
@@ -62,6 +75,10 @@ export const getPathSaveDraft = (sdNo: string) => {
 
 export const getPathApprove = (sdNo: string) => {
     return getPathUrl(`${environment.orders.shipment.approve.url}`, { 'sdNo': sdNo })
+}
+
+export const getPathGenerateBO = (sdNo: string) => {
+    return getPathUrl(`${environment.orders.dcCheckOrder.generateBO.url}`, { 'sdNo': sdNo })
 }
 
 

@@ -14,6 +14,7 @@ import { getPathReportSD } from '../../services/order-shipment'
 import { TextField } from '@mui/material'
 import DCOrderEntries from './dc-check-order-entries'
 import ModelConfirm from './modal-confirm'
+import SnackbarStatus from '../commons/ui/snackbar-status'
 
 interface Props {
     isOpen: boolean,
@@ -21,6 +22,14 @@ interface Props {
 
 interface State {
     commentDC: string;
+}
+
+interface SnackbarProps {
+    open: boolean,
+    onClose: () => void,
+    isSuccess: boolean,
+    contentMsg: string
+
 }
 
 function DCOrderDetail({ isOpen }: Props): ReactElement {
@@ -33,7 +42,9 @@ function DCOrderDetail({ isOpen }: Props): ReactElement {
     const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
     const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
 
-
+    const [showSnackBar, setShowSnackBar] = React.useState(false);
+    const [contentMsg, setContentMsg] = React.useState('');
+    const [generateBOStatus, setGenerateBOStatus] = React.useState(false);
 
     const handleChange = (event: any) => {
         const value = event.target.value;
@@ -59,6 +70,19 @@ function DCOrderDetail({ isOpen }: Props): ReactElement {
 
     const handleModelConfirm = () => {
         setOpenModelConfirm(false);
+    }
+
+
+    const handleGenerateBOStatus = (issuccess: boolean, errorMsg: string) => {
+        const msg = issuccess ? 'This transaction is success' : errorMsg;
+        setShowSnackBar(true);
+        setContentMsg(msg)
+        setGenerateBOStatus(issuccess);
+        // setSnackbarValue({ ...snackbarValue, open: true, onClose: handleCloseSnackBar, isSuccess: issuccess, contentMsg: msg });
+    }
+
+    const handleCloseSnackBar = () => {
+        setShowSnackBar(false);
     }
 
     return (
@@ -116,6 +140,21 @@ function DCOrderDetail({ isOpen }: Props): ReactElement {
                         </Grid>
                         <Grid container spacing={2}>
                             <Grid item lg={3}  >
+                                <Typography variant="body2" gutterBottom>แนบภาพสินค้า/วีดีโอ:</Typography>
+                            </Grid>
+                            <Grid item lg={9}  >
+                                <Link
+                                    component="button"
+                                    variant="body2"
+                                    onClick={handleLinkDocument}
+                                >
+                                    ดูเอกสาร
+                                </Link>
+
+                            </Grid>
+                        </Grid>
+                        <Grid container spacing={2}>
+                            <Grid item lg={3}  >
                                 <Typography variant="body2" gutterBottom>แนบเอกสารใบส่วนต่างหลังเซ็นต์:</Typography>
                             </Grid>
                             <Grid item lg={9}  >
@@ -149,17 +188,19 @@ function DCOrderDetail({ isOpen }: Props): ReactElement {
             <ModelConfirm
                 open={openModelConfirm}
                 onClose={handleModelConfirm}
+                onUpdateAction={handleGenerateBOStatus}
+                sdNo='123'
                 shipmentNo='LD20211020001644'
                 comment='comment'
             />
-
-
             <ModalShowPDF
                 open={openModelPreviewDocument}
                 onClose={handleModelPreviewDocument}
                 url={getPathReportSD("sdNo")}
 
             />
+
+            <SnackbarStatus open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={generateBOStatus} contentMsg={contentMsg} />
         </div>
     )
 }

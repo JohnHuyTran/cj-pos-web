@@ -24,5 +24,10 @@ export const environment = {
         url: '/stock-diff/{sdNo}/export',
       },
     },
-  },
+    dcCheckOrder: {
+      generateBO: {
+        url: '/stock-diff/{sdNo}/approve',
+      }
+    }
+  }
 };

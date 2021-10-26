@@ -6,16 +6,36 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Typography from '@mui/material/Typography'
 import React, { ReactElement } from 'react'
+import { ApiError } from '../../models/api-error-model'
+import { GenerateBORequest } from '../../models/order-model'
+import { generateBO } from '../../services/order-shipment'
 
 interface Props {
     open: boolean,
     onClose: () => void,
+    onUpdateAction: (value: boolean, errorMsg: any) => void,
     shipmentNo: string,
+    sdNo: string,
     comment: string,
 }
 
-export default function ModelConfirm({ open, onClose, shipmentNo, comment }: Props): ReactElement {
+export default function ModelConfirm({ open, onClose, onUpdateAction, shipmentNo, comment }: Props): ReactElement {
     const handleConfirm = () => {
+        const payload: GenerateBORequest = {
+            comment: comment,
+        }
+        generateBO(shipmentNo, payload)
+            .then(
+                function (value) {
+                    setTimeout(() => {
+                        onUpdateAction(true, '');
+
+                    }, 3000);
+                },
+                function (error: ApiError) {
+                    onUpdateAction(false, error.message);
+                }
+            );
         onClose();
     }
     return (
