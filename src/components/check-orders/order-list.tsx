@@ -32,7 +32,7 @@ function OrderList() {
   console.log('Data Size: ', JSON.stringify(res));
   const rows = res.data.map((data: ShipmentInfo, index: number) => {
     return {
-      id: data.shipmentNo,
+      id: `${data.shipmentNo}${data.sdNo}`,
       index: index + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
