@@ -395,6 +395,11 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
   };
 
   const handleCloseJobBtn = () => {
+    setFileName(
+      !!filesContent.length && filesContent[0].content
+        ? filesContent[0].name
+        : ''
+    );
     setOpenModelConfirm(true);
     setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
   };
