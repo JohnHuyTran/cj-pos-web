@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import { ShipmentResponse, ShipmentInfo } from '../../models/order-model';
 import { getSdType, getSdStatus } from '../../utils/utils';
 import CheckOrderDetail from './check-order-detail';
+import { convertUtcToBkkDate } from '../../utils/date-utill'
 
 function OrderList() {
   const items = useAppSelector((state) => state.checkOrderList);
@@ -38,7 +39,7 @@ function OrderList() {
       sdType: getSdType(data.sdType),
       boxCnt: data.boxCnt,
       toteCnt: data.toteCnt,
-      shipmentDate: data.shipmentDate,
+      shipmentDate: convertUtcToBkkDate(data.shipmentDate),
       sdStatus: getSdStatus(data.sdStatus),
       col10: 'desc',
     };
