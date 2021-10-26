@@ -209,9 +209,9 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-export default function CheckOrderDetail(props: CheckOrderDetailProps) {
+export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClickClose }: CheckOrderDetailProps) {
   const classes = useStyles();
-  const { shipment, defaultOpen } = props;
+  // const { sdNo, defaultOpen } = props;
   const res = useAppSelector((state) => state.checkOrderList.orderList);
   const payloadSearchOrder = useAppSelector(
     (state) => state.saveSearchOrder.searchCriteria
@@ -241,7 +241,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
   const [shipmentTypeText, setShipmentTypeText] = useState<string | undefined>(
     ''
   );
-  const [sdNo, setSdNo] = React.useState('');
+  // const [sdNo, setSdNo] = React.useState('');
   const [shipmentDateFormat, setShipmentDateFormat] = useState<
     string | undefined
   >('');
@@ -274,13 +274,12 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     setOpen(defaultOpen);
     setShipmentStatusText(getShipmentStatusText(shipmentList[0].sdStatus));
     setShipmentTypeText(getShipmentTypeText(shipmentList[0].sdType));
-    setSdNo(shipmentList[0].sdNo);
     setShipmentDateFormat(convertUtcToBkkDate(shipmentList[0].shipmentDate));
   }, [open, openModelConfirm]);
 
   const handleClose = () => {
     setOpen(false);
-    props.onClickClose();
+    onClickClose();
   };
 
   function handleCloseModelConfirm() {
@@ -340,7 +339,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
     setOpenAlert(!qtyIsValid);
     if (qtyIsValid) {
       const payload: SaveDraftSDRequest = {
-        shipmentNo: shipment,
+        shipmentNo: shipmentNo,
         items: itemsList,
       };
 
@@ -429,15 +428,13 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
 
   // data grid
   const shipmentList: ShipmentInfo[] = res.data.filter(
-    (shipmentInfo: ShipmentInfo) => shipmentInfo.shipmentNo === shipment
+    (shipmentInfo: ShipmentInfo) => shipmentInfo.sdNo === sdNo
   );
 
-  const entries: Entry[] = shipmentList[0].entries
-    ? shipmentList[0].entries
-    : [];
+  const entries: Entry[] = shipmentList[0].entries ? shipmentList[0].entries : [];
   const rows = entries.map((item: Entry, index: number) => {
     return {
-      id: `${item.deliveryOrderNo}${item.barcode}_${IndeterminateCheckBoxTwoTone}`,
+      id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
       doNo: item.deliveryOrderNo,
       isTote: item.isTote,
       isDraftStatus:
@@ -571,41 +568,41 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
               <Grid item lg={9}>
                 {shipmentList[0].sdStatus !==
                   ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                  <div>
-                    <TextField
-                      name="browserTxf"
-                      className={classes.textField}
-                      value={
-                        !!filesContent.length && filesContent[0].content
-                          ? filesContent[0].name
-                          : ''
-                      }
-                    />
-                    <Button
-                      id="btnPrint"
-                      variant="contained"
-                      color="primary"
-                      className={classes.browserBtn}
-                      onClick={() => openFileSelector()}
-                      style={{ marginLeft: 10, textTransform: 'none' }}
-                      endIcon={<UploadFileIcon />}
-                    >
-                      Browse
-                    </Button>
-                  </div>
-                )}
+                    <div>
+                      <TextField
+                        name="browserTxf"
+                        className={classes.textField}
+                        value={
+                          !!filesContent.length && filesContent[0].content
+                            ? filesContent[0].name
+                            : ''
+                        }
+                      />
+                      <Button
+                        id="btnPrint"
+                        variant="contained"
+                        color="primary"
+                        className={classes.browserBtn}
+                        onClick={() => openFileSelector()}
+                        style={{ marginLeft: 10, textTransform: 'none' }}
+                        endIcon={<UploadFileIcon />}
+                      >
+                        Browse
+                      </Button>
+                    </div>
+                  )}
                 {shipmentList[0].sdStatus ===
                   ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                  <div>
-                    <Link
-                      component="button"
-                      variant="body2"
-                      onClick={handleLinkDocument}
-                    >
-                      ดูเอกสาร
-                    </Link>
-                  </div>
-                )}
+                    <div>
+                      <Link
+                        component="button"
+                        variant="body2"
+                        onClick={handleLinkDocument}
+                      >
+                        ดูเอกสาร
+                      </Link>
+                    </div>
+                  )}
               </Grid>
             </Grid>
             <Grid
@@ -706,18 +703,17 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
                 pageSize={5}
                 editMode="row"
                 getRowClassName={(params) =>
-                  `row-style--${
-                    Number(params.getValue(params.id, 'productQuantityRef')) -
-                      Number(
-                        params.getValue(params.id, 'productQuantityActual')
-                      ) !=
+                  `row-style--${Number(params.getValue(params.id, 'productQuantityRef')) -
+                    Number(
+                      params.getValue(params.id, 'productQuantityActual')
+                    ) !=
                     0
-                      ? 'diff'
-                      : ''
+                    ? 'diff'
+                    : ''
                   }`
                 }
-                // onEditRowsModelChange={handleEditRowsModelChange}
-                // autoHeight
+              // onEditRowsModelChange={handleEditRowsModelChange}
+              // autoHeight
               />
             </div>
           </Box>
@@ -727,7 +723,7 @@ export default function CheckOrderDetail(props: CheckOrderDetailProps) {
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
         onUpdateShipmentStatus={handleShowSnackBar}
-        shipmentNo={shipment}
+        shipmentNo={shipmentNo}
         sdNo={sdNo}
         action={action}
         items={itemsDiffState}
