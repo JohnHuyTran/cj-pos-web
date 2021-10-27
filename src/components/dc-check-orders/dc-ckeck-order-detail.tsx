@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useEffect } from 'react'
 
 import DialogContent from '@mui/material/DialogContent'
 import Dialog from '@mui/material/Dialog'
@@ -18,6 +18,9 @@ import SnackbarStatus from '../commons/ui/snackbar-status'
 
 interface Props {
     isOpen: boolean,
+    sdNo: string,
+    shipmentNo: string,
+    onClickClose: () => void
 }
 
 interface State {
@@ -32,7 +35,7 @@ interface SnackbarProps {
 
 }
 
-function DCOrderDetail({ isOpen }: Props): ReactElement {
+function DCOrderDetail({ isOpen, sdNo, shipmentNo, onClickClose }: Props): ReactElement {
     const [values, setValues] = React.useState<State>({
         commentDC: '',
     });
@@ -45,6 +48,13 @@ function DCOrderDetail({ isOpen }: Props): ReactElement {
     const [showSnackBar, setShowSnackBar] = React.useState(false);
     const [contentMsg, setContentMsg] = React.useState('');
     const [generateBOStatus, setGenerateBOStatus] = React.useState(false);
+
+    useEffect(() => {
+        console.log('dc open', open)
+        setOpen(isOpen);
+    }, [open]);
+
+
 
     const handleChange = (event: any) => {
         const value = event.target.value;
@@ -88,7 +98,7 @@ function DCOrderDetail({ isOpen }: Props): ReactElement {
     return (
         <div>
             <Dialog open={open} maxWidth='xl' fullWidth={true} >
-                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} >
+                <BootstrapDialogTitle id="customized-dialog-title" onClose={onClickClose} >
                     <Typography variant="body1" gutterBottom>ตรวจสอบผลต่าง(DC)</Typography>
                 </BootstrapDialogTitle>
                 <DialogContent>
@@ -181,7 +191,7 @@ function DCOrderDetail({ isOpen }: Props): ReactElement {
                             </Grid>
                         </Grid>
                     </Box>
-                    <DCOrderEntries shipmentNo='LD20211020001644' />
+                    <DCOrderEntries sdNo={sdNo} />
                 </DialogContent>
             </Dialog>
 
@@ -189,14 +199,14 @@ function DCOrderDetail({ isOpen }: Props): ReactElement {
                 open={openModelConfirm}
                 onClose={handleModelConfirm}
                 onUpdateAction={handleGenerateBOStatus}
-                sdNo='123'
-                shipmentNo='LD20211020001644'
+                sdNo={sdNo}
+                shipmentNo={shipmentNo}
                 comment='comment'
             />
             <ModalShowPDF
                 open={openModelPreviewDocument}
                 onClose={handleModelPreviewDocument}
-                url={getPathReportSD("sdNo")}
+                url={getPathReportSD(sdNo)}
 
             />
 

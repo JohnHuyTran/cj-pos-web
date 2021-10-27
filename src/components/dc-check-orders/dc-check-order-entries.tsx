@@ -6,7 +6,7 @@ import { useAppSelector } from '../../store/store';
 
 
 interface Props {
-    shipmentNo: string;
+    sdNo: string;
 }
 
 const columns: GridColDef[] = [
@@ -34,10 +34,10 @@ const columns: GridColDef[] = [
     },
 ];
 
-export default function DCOrderEntries({ shipmentNo }: Props): ReactElement {
+export default function DCOrderEntries({ sdNo }: Props): ReactElement {
     const res = useAppSelector((state) => state.checkOrderList.orderList);
     const shipmentList: ShipmentInfo[] = res.data.filter(
-        (shipmentInfo: ShipmentInfo) => shipmentInfo.shipmentNo === shipmentNo
+        (shipmentInfo: ShipmentInfo) => shipmentInfo.sdNo === sdNo
     )
 
 

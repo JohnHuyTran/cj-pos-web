@@ -9,7 +9,7 @@ const DCCheckOrder = () => {
     <Container maxWidth="xl">
       <TitleHeader title="ตรวจสอบผลต่างการรับสินค้า" icon="staroutlineoutline" />
       <Box mt={3}>
-        <DCOrderDetail isOpen={true} />
+        <DCCheckOrderSearch />
       </Box>
     </Container>
   );
