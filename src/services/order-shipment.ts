@@ -27,9 +27,9 @@ export async function approveOrderShipments(sdNo: string) {
 
 }
 
-export async function closeOrderShipments(payload: any) {
+export async function closeOrderShipments(sdNo: string, payload: any) {
     try {
-        const response = await post(environment.orders.shipment.closejob.url, payload)
+        const response = await put(getPathClose(sdNo), payload)
             .then((result: any) => result);
         return response;
     } catch (error) {
@@ -77,8 +77,6 @@ export const getPathApprove = (sdNo: string) => {
     return getPathUrl(`${environment.orders.shipment.approve.url}`, { 'sdNo': sdNo })
 }
 
-export const getPathGenerateBO = (sdNo: string) => {
-    return getPathUrl(`${environment.orders.dcCheckOrder.generateBO.url}`, { 'sdNo': sdNo })
+export const getPathClose = (sdNo: string) => {
+    return getPathUrl(`${environment.orders.shipment.closejob.url}`, { 'sdNo': sdNo })
 }
-
-

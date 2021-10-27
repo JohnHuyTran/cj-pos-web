@@ -18,7 +18,7 @@ export const environment = {
         url: '/stock-diff/{sdNo}/approve',
       },
       closejob: {
-        url: '/close',
+        url: '/stock-diff/{sdNo}/close',
       },
       printFormShipmentDeliverly: {
         url: '/stock-diff/{sdNo}/export',

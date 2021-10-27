@@ -95,7 +95,8 @@ export interface Entry {
 }
 
 export interface CheckOrderDetailProps {
-  shipment: any | undefined;
+  sdNo: string;
+  shipmentNo: string;
   defaultOpen: boolean;
   onClickClose: any;
 }
@@ -120,8 +121,8 @@ export interface OrderSubmitResponse {
 }
 
 export interface OrderApproveCloseJobRequest {
-  shipmentNo: string;
-  imageContent?: string;
+  imageFileName?: string;
+  imageFile?: string;
 }
 
 export interface FeatchDataPDFRequest {

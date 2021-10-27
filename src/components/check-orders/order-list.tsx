@@ -6,12 +6,15 @@ import Box from '@mui/material/Box';
 import { ShipmentResponse, ShipmentInfo } from '../../models/order-model';
 import { getSdType, getSdStatus } from '../../utils/utils';
 import CheckOrderDetail from './check-order-detail';
+import { convertUtcToBkkDate } from '../../utils/date-utill';
+import { getShipmentStatusText, getShipmentTypeText } from '../../utils/enum/check-order-enum';
 
 function OrderList() {
   const items = useAppSelector((state) => state.checkOrderList);
   const res: ShipmentResponse = items.orderList;
   const [opens, setOpens] = React.useState(false);
   const [shipment, setShipment] = React.useState('');
+  const [sdNo, setSdNo] = React.useState('');
 
   const columns: GridColDef[] = [
     { field: 'index', headerName: 'ลำดับที่', minWidth: 120 },
@@ -31,23 +34,23 @@ function OrderList() {
   console.log('Data Size: ', JSON.stringify(res));
   const rows = res.data.map((data: ShipmentInfo, index: number) => {
     return {
-      id: data.shipmentNo,
+      id: `${data.shipmentNo}_${data.sdNo}`,
       index: index + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
-      sdType: getSdType(data.sdType),
+      sdType: getShipmentTypeText(data.sdType),
       boxCnt: data.boxCnt,
       toteCnt: data.toteCnt,
-      shipmentDate: data.shipmentDate,
-      sdStatus: getSdStatus(data.sdStatus),
+      shipmentDate: convertUtcToBkkDate(data.shipmentDate),
+      sdStatus: getShipmentStatusText(data.sdStatus),
       col10: 'desc',
     };
   });
 
   function currentlySelected(params: GridCellParams) {
-    setShipment(params.id.toString());
+    setSdNo(params.row.sdNo);
+    setShipment(params.row.shipmentNo);
     setOpens(true);
-    console.log('opens', opens);
   }
 
   function isClosModal() {
@@ -58,7 +61,7 @@ function OrderList() {
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <div>
           <DataGrid
             rows={rows}
@@ -68,7 +71,7 @@ function OrderList() {
           />
         </div>
       </Box>
-      {opens && <CheckOrderDetail shipment={shipment} defaultOpen={opens} onClickClose={isClosModal} />}
+      {opens && <CheckOrderDetail sdNo={sdNo} shipmentNo={shipment} defaultOpen={opens} onClickClose={isClosModal} />}
     </div>
   );
 }
