@@ -22,6 +22,7 @@ import DataDiffInfo from './table-diff-info';
 import { ApiError } from '../../models/api-error-model';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
+import { base64encode, base64decode } from 'nodejs-base64'
 
 interface ConfirmOrderShipment {
   open: boolean;
@@ -104,7 +105,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     } else if (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
       const payload: OrderApproveCloseJobRequest = {
         imageFileName: fileName,
-        imageFile: imageContent,
+        imageFile: base64encode(imageContent).toString(),
       };
       closeOrderShipments(sdNo, payload)
         .then(
