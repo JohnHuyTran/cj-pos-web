@@ -29,7 +29,7 @@ export default function AlertError({ open, onClose, titleError, textError }: Pro
             </DialogContent>
             <DialogActions>
                 <Button
-                    id='closeBtn'
+                    id='btnClose'
                     variant='contained'
                     color='cancelColor'
                     onClick={onClose}

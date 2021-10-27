@@ -4,6 +4,7 @@ import { DataGrid, GridColDef, GridCellParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import { ShipmentResponse, ShipmentInfo } from '../../models/order-model';
 import { getSdType, getSdStatus } from '../../utils/utils';
+import DCOrderDetail from './dc-ckeck-order-detail';
 //import CheckOrderDetail from './check-order-detail';
 
 function DCOrderList() {
@@ -11,6 +12,7 @@ function DCOrderList() {
   const res: ShipmentResponse = items.orderList;
   const [opens, setOpens] = React.useState(false);
   const [shipment, setShipment] = React.useState('');
+  const [sdNo, setSdNo] = React.useState('');
 
   const columns: GridColDef[] = [
     { field: 'index', headerName: 'ลำดับที่', minWidth: 120 },
@@ -46,7 +48,8 @@ function DCOrderList() {
   });
 
   function currentlySelected(params: GridCellParams) {
-    setShipment(params.id.toString());
+    setSdNo(params.row.sdNo);
+    setShipment(params.row.shipmentNo);
     setOpens(true);
     console.log('opens', opens);
   }
@@ -69,7 +72,7 @@ function DCOrderList() {
           />
         </div>
       </Box>
-      {/* {opens && <CheckOrderDetail shipment={shipment} defaultOpen={opens} onClickClose={isClosModal} />} */}
+      {opens && <DCOrderDetail shipmentNo={shipment} sdNo={sdNo} isOpen={opens} onClickClose={isClosModal} />}
     </div>
   );
 }
