@@ -20,6 +20,7 @@ import {
 import { ShipmentRequest } from '../../models/order-model';
 import OrderList from './order-list';
 import DatePickerComponent from '../commons/ui/date-picker';
+import LoadingModal from '../commons/ui/loading-modal';
 
 moment.locale('en');
 
@@ -31,6 +32,10 @@ interface State {
   dateFrom: string;
   dateTo: string;
 }
+interface loadingModalState {
+  open: boolean;
+}
+
 
 function CheckOrderSearch() {
   const dispatch = useAppDispatch();
@@ -45,14 +50,21 @@ function CheckOrderSearch() {
   });
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false
+  });
 
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
     console.log(values);
   };
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event })
+  }
 
-  const onClickSearchBtn = () => {
+
+  const onClickSearchBtn = async () => {
     const payload: ShipmentRequest = {
       limit: '10',
       page: '1',
@@ -64,8 +76,10 @@ function CheckOrderSearch() {
       sdType: parseInt(values.orderType),
       clearSearch: false,
     };
-    dispatch(featchOrderListAsync(payload));
-    dispatch(saveSearchCriteria(payload));
+    handleOpenLoading("open", true)
+    await dispatch(featchOrderListAsync(payload));
+    // await dispatch(saveSearchCriteria(payload));
+    handleOpenLoading("open", false)
     console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
 
@@ -221,6 +235,10 @@ function CheckOrderSearch() {
         </Grid>
       </Box>
       {items.orderList && <OrderList />}
+      <LoadingModal
+        open={openLoadingModal.open}
+      />
+
     </>
   );
 }
