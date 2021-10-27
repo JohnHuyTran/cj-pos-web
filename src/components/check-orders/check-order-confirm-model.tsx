@@ -168,7 +168,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                 ยืนยันการตรวจสอบ{' '}
               </Typography>
               <Typography variant="body2" gutterBottom align="center">
-                เลขที่เอกสาร {shipmentNo}
+                เลขที่เอกสาร {sdNo}
               </Typography>
               {items.length > 0 && <DataDiffInfo items={items} />}
             </DialogContentText>
@@ -219,7 +219,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                   ปิดงาน{' '}
                 </Typography>
                 <Typography variant="body2" gutterBottom align="center">
-                  เลขที่เอกสาร {shipmentNo}
+                  เลขที่เอกสาร {sdNo}
                 </Typography>
               </DialogContentText>
             </DialogContent>
@@ -244,27 +244,27 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
       {(action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE ||
         (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
           imageContent)) && (
-        <DialogActions sx={{ justifyContent: 'center' }}>
-          <Button
-            id="btnConfirm"
-            variant="contained"
-            size="small"
-            color="primary"
-            onClick={confirmApproveBtn}
-          >
-            ยืนยัน
-          </Button>
-          <Button
-            id="btnCancel"
-            variant="contained"
-            size="small"
-            color="primary"
-            onClick={handleClose}
-          >
-            ปิด
-          </Button>
-        </DialogActions>
-      )}
+          <DialogActions sx={{ justifyContent: 'center' }}>
+            <Button
+              id="btnConfirm"
+              variant="contained"
+              size="small"
+              color="primary"
+              onClick={confirmApproveBtn}
+            >
+              ยืนยัน
+            </Button>
+            <Button
+              id="btnCancel"
+              variant="contained"
+              size="small"
+              color="primary"
+              onClick={handleClose}
+            >
+              ปิด
+            </Button>
+          </DialogActions>
+        )}
     </Dialog>
   );
 }
