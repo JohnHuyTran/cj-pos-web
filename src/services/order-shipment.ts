@@ -80,3 +80,7 @@ export const getPathApprove = (sdNo: string) => {
 export const getPathClose = (sdNo: string) => {
     return getPathUrl(`${environment.orders.shipment.closejob.url}`, { 'sdNo': sdNo })
 }
+
+export const getPathGenerateBO = (sdNo: string) => {
+    return getPathUrl(`${environment.orders.shipment.approve.url}`, { 'sdNo': sdNo })
+}

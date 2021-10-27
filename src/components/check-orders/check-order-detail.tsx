@@ -587,7 +587,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                         id="btnPrint"
                         variant="contained"
                         color="primary"
-                        className={classes.browserBtn}
+                        className={classes.browseBtn}
                         onClick={() => openFileSelector()}
                         style={{ marginLeft: 10, textTransform: 'none' }}
                         endIcon={<UploadFileIcon />}
@@ -621,7 +621,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                   id="btnBack"
                   variant="contained"
                   color="secondary"
-                  className={classes.browserBtn}
+                  className={classes.browseBtn}
                   onClick={handleClose}
                   startIcon={<ArrowBackIosIcon />}
                 >
@@ -634,7 +634,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     id="btnSave"
                     variant="contained"
                     color="primary"
-                    className={classes.browserBtn}
+                    className={classes.browseBtn}
                     onClick={handleSaveButton}
                     disabled={disableSaveBtn}
                     endIcon={<SaveIcon />}
@@ -657,7 +657,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                   id="btnApprove"
                   variant="contained"
                   color="primary"
-                  className={classes.browserBtn}
+                  className={classes.browseBtn}
                   onClick={handleApproveBtn}
                   disabled={disableApproveBtn}
                   endIcon={<AssignmentTurnedInIcon />}
@@ -669,7 +669,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                   id="btnClose"
                   variant="contained"
                   color="primary"
-                  className={classes.browserBtn}
+                  className={classes.browseBtn}
                   style={{ marginLeft: 10 }}
                   onClick={handleCloseJobBtn}
                   disabled={disableCloseJobBtn}
