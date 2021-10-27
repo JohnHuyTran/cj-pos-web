@@ -11,8 +11,7 @@ export const environment = {
         url: '/shipment-deliverly',
       },
       saveDraft: {
-        // url: "/api/order/submit"
-        url: '/stock-diff/draft',
+        url: '/stock-diff/{sdNo}/draft',
       },
       approve: {
         url: '/stock-diff/{sdNo}/approve',

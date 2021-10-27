@@ -7,7 +7,7 @@ import { ApiError } from '../models/api-error-model';
 
 export async function saveOrderShipments(payload: SaveDraftSDRequest, sdNo: string) {
     try {
-        const response = await put(environment.orders.shipment.saveDraft.url, payload)
+        const response = await put(getPathSaveDraft(sdNo), payload)
             .then((result: any) => result);
         return response;
     } catch (error) {
@@ -33,7 +33,6 @@ export async function closeOrderShipments(sdNo: string, payload: any) {
             .then((result: any) => result);
         return response;
     } catch (error) {
-        console.log("cache error = ", error);
         throw error;
     }
 }

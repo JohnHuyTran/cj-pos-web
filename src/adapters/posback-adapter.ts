@@ -18,11 +18,7 @@ export function get(path: string) {
       return result.data;
     })
     .catch((error: any) => {
-      const err: ApiError = {
-        httpStatus: error.response?.status,
-        code: error.response?.data.code,
-        message: error.response?.data.message,
-      }
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message)
       throw err;
     });
 }
@@ -36,11 +32,7 @@ export function post(path: string, payload: any) {
       }
     })
     .catch((error: any) => {
-      const err: ApiError = {
-        httpStatus: error.response?.status,
-        code: error.response?.data.code,
-        message: error.response?.data.message,
-      }
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message)
       throw err;
     });
 }
@@ -52,21 +44,11 @@ export function put(path: string, payload: any) {
       if (response.status == 200) {
         return response.data;
       }
-
-      const err: ApiError = {
-        httpStatus: response.status,
-        code: response.status,
-        message: response.statusText,
-      }
+      const err = new ApiError(response.status, response.status, response.statusText)
       throw err;
-
     })
     .catch((error: any) => {
-      const err: ApiError = {
-        httpStatus: error.response?.status,
-        code: error.response?.data.code,
-        message: error.response?.data.message,
-      }
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message)
       throw err;
     });
 }
@@ -78,11 +60,7 @@ export function deleteData(path: string) {
       return result;
     })
     .catch((error: any) => {
-      const err: ApiError = {
-        httpStatus: error.response?.status,
-        code: error.response?.data.code,
-        message: error.response?.data.message,
-      }
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message)
       throw err;
     });
 }
