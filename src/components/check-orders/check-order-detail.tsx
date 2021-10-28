@@ -101,13 +101,16 @@ const columns: GridColDef[] = [
         type="number"
         value={params.value}
         onChange={(e) => {
-          console.log(typeof e.target.value);
-          var value = parseInt((e.target.value) ? e.target.value : '0', 10);
+          var value = (e.target.value) ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
 
           params.api.updateRows([
             { ...params.row, productQuantityActual: value },
           ]);
+        }}
+
+        onBlur={(e) => {
+          isAllowActualQty(params, parseInt(e.target.value, 10))
         }}
         disabled={isDisable(params) ? true : false}
         autoComplete="off"
@@ -173,6 +176,12 @@ function useApiRef() {
 }
 const isDisable = (params: GridRenderCellParams) => {
   return params.row.isDraftStatus;
+};
+
+const isAllowActualQty = (params: GridRenderCellParams, value: number) => {
+  if (params.row.isTote === true && !(value * 1 >= 0 && value * 1 <= 1)) {
+    return (alert('errror'))
+  }
 };
 
 export interface DialogTitleProps {
