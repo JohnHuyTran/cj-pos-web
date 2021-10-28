@@ -63,7 +63,6 @@ import {
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { ApiError } from '../../models/api-error-model';
 import AlertError from '../commons/ui/alert-error';
-import { IndeterminateCheckBoxTwoTone } from '@mui/icons-material';
 
 const columns: GridColDef[] = [
   { field: 'col1', headerName: 'ลำดับ', width: 90, disableColumnMenu: true },
@@ -102,18 +101,14 @@ const columns: GridColDef[] = [
         type="number"
         value={params.value}
         onChange={(e) => {
+          console.log(typeof e.target.value);
+          var value = parseInt((e.target.value) ? e.target.value : '0', 10);
+          if (value < 0) value = 0;
+
           params.api.updateRows([
-            { ...params.row, productQuantityActual: e.target.value },
+            { ...params.row, productQuantityActual: value },
           ]);
         }}
-        onBlur={(e) =>
-          params.api.updateRows([
-            {
-              ...params.row,
-              productQuantityActual: getActualQty(e.target.value),
-            },
-          ])
-        }
         disabled={isDisable(params) ? true : false}
         autoComplete="off"
       />
@@ -157,6 +152,7 @@ var calProductDiff = function (params: GridValueGetterParams) {
 var getActualQty = function (params: string) {
   return !params ? '0' : params;
 };
+
 
 function useApiRef() {
   const apiRef = useGridApiRef();
@@ -324,13 +320,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         isTote: false,
       };
 
-      if (
-        data.isTote === true &&
-        !(
-          data.productQuantityActual * 1 >= 0 &&
-          data.productQuantityActual * 1 <= 1
-        )
-      ) {
+      if (data.isTote === true && !(data.productQuantityActual * 1 >= 0 && data.productQuantityActual * 1 <= 1)) {
         qtyIsValid = false;
       }
       itemsList.push(item);
@@ -355,6 +345,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         });
     }
   };
+
+
 
   const handleApproveBtn = () => {
     setItemsDiffState([]);
@@ -788,3 +780,5 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     </div>
   );
 }
+
+
