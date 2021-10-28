@@ -78,7 +78,7 @@ function CheckOrderSearch() {
     };
     handleOpenLoading("open", true)
     await dispatch(featchOrderListAsync(payload));
-    // await dispatch(saveSearchCriteria(payload));
+    await dispatch(saveSearchCriteria(payload));
     handleOpenLoading("open", false)
     console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
