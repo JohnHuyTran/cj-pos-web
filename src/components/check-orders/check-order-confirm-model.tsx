@@ -1,3 +1,4 @@
+
 import React, { ReactElement } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -23,6 +24,8 @@ import { ApiError } from '../../models/api-error-model';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
 import { base64encode, base64decode } from 'nodejs-base64'
+import LoadingModal from '../commons/ui/loading-modal';
+import { NetworkCheck } from '@mui/icons-material';
 
 interface ConfirmOrderShipment {
   open: boolean;
@@ -36,6 +39,10 @@ interface ConfirmOrderShipment {
   percentDiffValue: string;
   fileName: string;
   imageContent: string;
+}
+
+interface loadingModalState {
+  open: boolean;
 }
 
 export interface DialogTitleProps {
@@ -86,16 +93,24 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
   const searchState = useAppSelector((state) => state.saveSearchOrder);
   const payloadSearchOrder: ShipmentRequest = searchState.searchCriteria;
   const dispatch = useAppDispatch();
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false
+  });
 
-  const confirmApproveBtn = () => {
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event })
+  }
+
+  const confirmApproveBtn = async () => {
+    handleOpenLoading("open", true)
     if (action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
-      approveOrderShipments(sdNo).then(
-        function (value) {
-          updateShipmentOrder();
-          setTimeout(() => {
-            onUpdateShipmentStatus(true, '');
-            onClose();
-          }, 3000);
+      await approveOrderShipments(sdNo).then(
+        async function (value) {
+          await updateShipmentOrder();
+          // setTimeout(() => {
+          onUpdateShipmentStatus(true, '');
+          onClose();
+          // }, 3000);
         },
         function (error: ApiError) {
           onUpdateShipmentStatus(false, error.message);
@@ -107,14 +122,13 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         imageFileName: fileName,
         imageFile: base64encode(imageContent).toString(),
       };
-      closeOrderShipments(sdNo, payload)
+      await closeOrderShipments(sdNo, payload)
         .then(
-          function (value) {
-            updateShipmentOrder();
-            setTimeout(() => {
-              onUpdateShipmentStatus(true, '');
-              onClose();
-            }, 3000);
+          async function (value) {
+            await updateShipmentOrder();
+
+            onUpdateShipmentStatus(true, '');
+            onClose();
           },
           function (error: ApiError) {
             onUpdateShipmentStatus(false, error.message);
@@ -129,55 +143,57 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
           onClose();
         });
     }
+    handleOpenLoading("open", false)
   };
 
   const handleClose = () => {
     onClose();
   };
-  const updateShipmentOrder = () => {
-    dispatch(featchOrderListAsync(payloadSearchOrder));
+  const updateShipmentOrder = async () => {
+    await dispatch(featchOrderListAsync(payloadSearchOrder));
   };
 
   return (
-    <Dialog
-      open={open}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-      fullWidth={true}
-      maxWidth="md"
-    >
-      {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && items.length > 0 && <DialogContent>
+    <div>
+      <Dialog
+        open={open}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        fullWidth={true}
+        maxWidth="md"
+      >
+        {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && items.length > 0 && <DialogContent>
                 <DialogContentText id='alert-dialog-description'>
                     <Typography variant="body2" gutterBottom>ยืนยันการตรวจสอบ <br /> เลขที่เอกสาร {shipmentNo} show table</Typography>
                 </DialogContentText>
             </DialogContent>
             } */}
 
-      {action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
-        <div>
-          <BootstrapDialogTitle
-            id="customized-dialog-title"
-            onClose={handleClose}
-          >
-            <Typography variant="body1" gutterBottom>
-              ยืนยันการตรวจสอบ
-            </Typography>
-          </BootstrapDialogTitle>
-          <DialogContent dividers>
-            <DialogContentText id="alert-dialog-description">
-              <Typography variant="body2" gutterBottom align="center">
-                ยืนยันการตรวจสอบ{' '}
+        {action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
+          <div>
+            <BootstrapDialogTitle
+              id="customized-dialog-title"
+              onClose={handleClose}
+            >
+              <Typography variant="body1" gutterBottom>
+                ยืนยันการตรวจสอบ
               </Typography>
-              <Typography variant="body2" gutterBottom align="center">
-                เลขที่เอกสาร {sdNo}
-              </Typography>
-              {items.length > 0 && <DataDiffInfo items={items} />}
-            </DialogContentText>
-          </DialogContent>
-        </div>
-      )}
+            </BootstrapDialogTitle>
+            <DialogContent dividers>
+              <DialogContentText id="alert-dialog-description">
+                <Typography variant="body2" gutterBottom align="center">
+                  ยืนยันการตรวจสอบ{' '}
+                </Typography>
+                <Typography variant="body2" gutterBottom align="center">
+                  เลขที่เอกสาร {sdNo}
+                </Typography>
+                {items.length > 0 && <DataDiffInfo items={items} />}
+              </DialogContentText>
+            </DialogContent>
+          </div>
+        )}
 
-      {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && percentDiffType && <DialogContent>
+        {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && percentDiffType && <DialogContent>
                 <DialogContentText id='alert-dialog-description'>
                     <Typography variant="body2" gutterBottom>ไม่สามารถอนุมัติ เลขที่เอกสาร {shipmentNo} เนื่องจาก จำนวนสินค้าที่รับ  {percentDiffValue}  กรุณาตรวจสอบอีกครั้งหรือติดต่อ IT  เบอร์โทร 02-111-2222</Typography>
                 </DialogContentText>
@@ -185,87 +201,91 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
 
             } */}
 
-      {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
-        !imageContent && (
-          <div>
-            <DialogTitle id="alert-dialog-title">
-              <Typography variant="body1" gutterBottom>
-                แจ้งเตือนแนบเอกสาร ใบตรวจสการรับสินค้า
-              </Typography>
-            </DialogTitle>{' '}
-            <DialogContent dividers>
-              <DialogContentText id="alert-dialog-description">
-                <Typography variant="body2" gutterBottom align="center">
-                  กรุณาแนบเอกสาร ใบตรวจสการรับสินค้า{' '}
+        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
+          !imageContent && (
+            <div>
+              <DialogTitle id="alert-dialog-title">
+                <Typography variant="body1" gutterBottom>
+                  แจ้งเตือนแนบเอกสาร ใบตรวจสการรับสินค้า
                 </Typography>
-                <Typography variant="body2" gutterBottom align="center">
-                  พร้อมลายเซ็นต์
-                </Typography>
-              </DialogContentText>
-            </DialogContent>
-          </div>
-        )}
+              </DialogTitle>{' '}
+              <DialogContent dividers>
+                <DialogContentText id="alert-dialog-description">
+                  <Typography variant="body2" gutterBottom align="center">
+                    กรุณาแนบเอกสาร ใบตรวจสการรับสินค้า{' '}
+                  </Typography>
+                  <Typography variant="body2" gutterBottom align="center">
+                    พร้อมลายเซ็นต์
+                  </Typography>
+                </DialogContentText>
+              </DialogContent>
+            </div>
+          )}
 
-      {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
-        imageContent && (
-          <div>
-            <DialogTitle id="alert-dialog-title">
-              <Typography variant="body1" gutterBottom>
-                ปิดงาน
-              </Typography>
-            </DialogTitle>{' '}
-            <DialogContent dividers>
-              <DialogContentText id="alert-dialog-description">
-                <Typography variant="body2" gutterBottom align="center">
-                  ปิดงาน{' '}
+        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
+          imageContent && (
+            <div>
+              <DialogTitle id="alert-dialog-title">
+                <Typography variant="body1" gutterBottom>
+                  ปิดงาน
                 </Typography>
-                <Typography variant="body2" gutterBottom align="center">
-                  เลขที่เอกสาร {sdNo}
-                </Typography>
-              </DialogContentText>
-            </DialogContent>
-          </div>
-        )}
+              </DialogTitle>{' '}
+              <DialogContent dividers>
+                <DialogContentText id="alert-dialog-description">
+                  <Typography variant="body2" gutterBottom align="center">
+                    ปิดงาน{' '}
+                  </Typography>
+                  <Typography variant="body2" gutterBottom align="center">
+                    เลขที่เอกสาร {sdNo}
+                  </Typography>
+                </DialogContentText>
+              </DialogContent>
+            </div>
+          )}
 
-      {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
-        !imageContent && (
-          <DialogActions sx={{ justifyContent: 'center' }}>
-            <Button
-              id="btnAccept"
-              variant="contained"
-              size="small"
-              color="primary"
-              onClick={handleClose}
-            >
-              รับทราบ
-            </Button>
-          </DialogActions>
-        )}
+        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
+          !imageContent && (
+            <DialogActions sx={{ justifyContent: 'center' }}>
+              <Button
+                id="btnAccept"
+                variant="contained"
+                size="small"
+                color="primary"
+                onClick={handleClose}
+              >
+                รับทราบ
+              </Button>
+            </DialogActions>
+          )}
 
-      {(action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE ||
-        (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
-          imageContent)) && (
-          <DialogActions sx={{ justifyContent: 'center' }}>
-            <Button
-              id="btnConfirm"
-              variant="contained"
-              size="small"
-              color="primary"
-              onClick={confirmApproveBtn}
-            >
-              ยืนยัน
-            </Button>
-            <Button
-              id="btnCancel"
-              variant="contained"
-              size="small"
-              color="primary"
-              onClick={handleClose}
-            >
-              ปิด
-            </Button>
-          </DialogActions>
-        )}
-    </Dialog>
+        {(action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE ||
+          (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
+            imageContent)) && (
+            <DialogActions sx={{ justifyContent: 'center' }}>
+              <Button
+                id="btnConfirm"
+                variant="contained"
+                size="small"
+                color="primary"
+                onClick={confirmApproveBtn}
+              >
+                ยืนยัน
+              </Button>
+              <Button
+                id="btnCancel"
+                variant="contained"
+                size="small"
+                color="primary"
+                onClick={handleClose}
+              >
+                ปิด
+              </Button>
+            </DialogActions>
+          )}
+      </Dialog>
+      <LoadingModal
+        open={openLoadingModal.open}
+      />
+    </div>
   );
 }

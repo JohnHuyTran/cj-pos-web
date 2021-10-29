@@ -9,7 +9,7 @@ export default function LoadingModal(props: loadingModalProps) {
 
     return (
         <div>
-            <Backdrop sx={{ color: '#FFF', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={open}>
+            <Backdrop sx={{ color: '#FFF', zIndex: (theme) => theme.zIndex.modal + 1 }} open={open}>
                 <div style={{ marginRight: "15px" }}>กรุณารอสักครู่</div>
                 <CircularProgress color="inherit" />
             </Backdrop>
