@@ -40,7 +40,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import PreviewIcon from '@mui/icons-material/Preview';
 
 import { useStyles } from './check-order-detail-css';
-import { useFilePicker } from 'use-file-picker';
 
 import {
   saveOrderShipments,
@@ -419,27 +418,6 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     setOpenModelPreviewDocument(true);
   };
 
-  // browser file
-  const [
-    openFileSelector,
-    { filesContent, loading, errors, plainFiles, clear },
-  ] = useFilePicker({
-    multiple: true,
-    readAs: 'BinaryString', // availible formats: "Text" | "BinaryString" | "ArrayBuffer" | "DataURL"
-    accept: ['.pdf', '.txt'],
-    limitFilesConfig: { min: 0.01, max: 3 },
-    // minFileSize: 1, // in megabytes
-    // maxFileSize: 1,
-    // readFilesContent: false, // ignores file content
-  });
-
-  if (errors.length > 0) return <p>Error!</p>;
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-
 
   const getBase64 = (file: Blob) => {
     return new Promise(resolve => {
@@ -631,24 +609,6 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                         className={classes.textField}
                         value={fileInfo.fileName}
                       />
-
-
-                      {/* <input id="btnBrowse" type="file" onChange={handleFileInputChange} />
-
-                      <label htmlFor={'btnBrowse'}>
-                        <Button
-                          id="btnPrint"
-                          variant="contained"
-                          color="primary"
-                          className={classes.browseBtn}
-                          style={{ marginLeft: 10, textTransform: 'none' }}
-                          endIcon={<UploadFileIcon />}
-                        >
-                          Browse
-                        </Button>
-                      </label> */}
-
-
                       <input id="btnBrowse" type="file" accept='.pdf, .jpg, .jpeg' onChange={handleFileInputChange} style={{ display: 'none' }} />
 
                       <label htmlFor={'btnBrowse'}>

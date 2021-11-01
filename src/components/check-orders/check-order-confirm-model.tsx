@@ -23,7 +23,6 @@ import DataDiffInfo from './table-diff-info';
 import { ApiError } from '../../models/api-error-model';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
-import { base64encode, base64decode } from 'nodejs-base64'
 import LoadingModal from '../commons/ui/loading-modal';
 import { NetworkCheck } from '@mui/icons-material';
 
