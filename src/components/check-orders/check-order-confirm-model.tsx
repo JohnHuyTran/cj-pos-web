@@ -120,7 +120,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     } else if (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
       const payload: OrderApproveCloseJobRequest = {
         imageFileName: fileName,
-        imageFile: base64encode(imageContent).toString(),
+        imageFile: imageContent,
       };
       await closeOrderShipments(sdNo, payload)
         .then(

@@ -10,6 +10,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  formControlClasses,
   Grid,
   TextField,
   Typography,
@@ -214,6 +215,12 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
+interface fileInfoProps {
+  file?: any;
+  fileName: string;
+  base64URL: any;
+}
+
 export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClickClose }: CheckOrderDetailProps) {
   const classes = useStyles();
   // const { sdNo, defaultOpen } = props;
@@ -252,6 +259,11 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   >('');
   const [snackBarFailMsg, setSnackBarFailMsg] = React.useState('');
   const [openAlert, setOpenAlert] = React.useState(false);
+  const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
+    file: null,
+    fileName: '',
+    base64URL: '',
+  });
 
   useEffect(() => {
     if (
@@ -395,11 +407,6 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   };
 
   const handleCloseJobBtn = () => {
-    setFileName(
-      !!filesContent.length && filesContent[0].content
-        ? filesContent[0].name
-        : ''
-    );
     setOpenModelConfirm(true);
     setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
   };
@@ -431,6 +438,44 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   if (loading) {
     return <div>Loading...</div>;
   }
+
+
+
+  const getBase64 = (file: Blob) => {
+    return new Promise(resolve => {
+      let fileInfo;
+      let baseURL: any = "";
+      // Make new FileReader
+      let reader = new FileReader();
+
+      // Convert the file to base64 text
+      reader.readAsDataURL(file);
+
+      // on reader load somthing...
+      reader.onload = () => {
+        // Make a fileInfo Object
+        baseURL = reader.result;
+        resolve(baseURL);
+      };
+    });
+  };
+
+  const handleFileInputChange = (e: any) => {
+
+    let file: File = e.target.files[0];
+    const fileSize = e.target.files[0].size;
+    const fileName = e.target.files[0].name;
+
+    getBase64(file)
+      .then((result: any) => {
+        file = result;
+        setFileInfo({ ...fileInfo, base64URL: result, fileName: fileName });
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  };
+
 
   // data grid
   const shipmentList: ShipmentInfo[] = res.data.filter(
@@ -490,6 +535,12 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
 
   const handleCloseAlert = () => {
     setOpenAlert(false);
+  };
+
+
+  const getfileName = (fileName: string) => {
+    console.log(`fileName>>: ${fileName}`)
+    return fileName
   };
 
   return (
@@ -578,23 +629,41 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                       <TextField
                         name="browserTxf"
                         className={classes.textField}
-                        value={
-                          !!filesContent.length && filesContent[0].content
-                            ? filesContent[0].name
-                            : ''
-                        }
+                        value={fileInfo.fileName}
                       />
-                      <Button
-                        id="btnPrint"
-                        variant="contained"
-                        color="primary"
-                        className={classes.browseBtn}
-                        onClick={() => openFileSelector()}
-                        style={{ marginLeft: 10, textTransform: 'none' }}
-                        endIcon={<UploadFileIcon />}
-                      >
-                        Browse
-                      </Button>
+
+
+                      {/* <input id="btnBrowse" type="file" onChange={handleFileInputChange} />
+
+                      <label htmlFor={'btnBrowse'}>
+                        <Button
+                          id="btnPrint"
+                          variant="contained"
+                          color="primary"
+                          className={classes.browseBtn}
+                          style={{ marginLeft: 10, textTransform: 'none' }}
+                          endIcon={<UploadFileIcon />}
+                        >
+                          Browse
+                        </Button>
+                      </label> */}
+
+
+                      <input id="btnBrowse" type="file" accept='.pdf, .jpg, .jpeg' onChange={handleFileInputChange} style={{ display: 'none' }} />
+
+                      <label htmlFor={'btnBrowse'}>
+                        <Button
+                          id="btnPrint"
+                          color="secondary"
+                          variant="contained"
+                          component="span"
+                          className={classes.browseBtn}
+                          style={{ marginLeft: 10, textTransform: 'none' }}
+                          endIcon={<UploadFileIcon />}
+                        >
+                          Browse
+                        </Button>
+                      </label>
                     </div>
                   )}
                 {shipmentList[0].sdStatus ===
@@ -735,8 +804,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         items={itemsDiffState}
         percentDiffType={false}
         percentDiffValue="0"
-        fileName={fileName}
-        imageContent={filesContent.length > 0 ? filesContent[0].content : ''}
+        fileName={fileInfo.fileName}
+        imageContent={fileInfo.base64URL}
       />
 
       <ModalShowPDF
