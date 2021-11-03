@@ -1,37 +1,40 @@
-import React from 'react';
-import { useAppSelector } from '../../store/store';
-import { DataGrid, GridColDef, GridCellParams } from '@mui/x-data-grid';
-import Box from '@mui/material/Box';
+import React from "react";
+import { useAppSelector } from "../../store/store";
+import { DataGrid, GridColDef, GridCellParams } from "@mui/x-data-grid";
+import Box from "@mui/material/Box";
 //import OrderProductList from './order-product-list';
-import { ShipmentResponse, ShipmentInfo } from '../../models/order-model';
-import { getSdType, getSdStatus } from '../../utils/utils';
-import CheckOrderDetail from './check-order-detail';
-import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { getShipmentStatusText, getShipmentTypeText } from '../../utils/enum/check-order-enum';
+import { ShipmentResponse, ShipmentInfo } from "../../models/order-model";
+import { getSdType, getSdStatus } from "../../utils/utils";
+import CheckOrderDetail from "./check-order-detail";
+import { convertUtcToBkkDate } from "../../utils/date-utill";
+import {
+  getShipmentStatusText,
+  getShipmentTypeText,
+} from "../../utils/enum/check-order-enum";
 
 function OrderList() {
   const items = useAppSelector((state) => state.checkOrderList);
   const res: ShipmentResponse = items.orderList;
   const [opens, setOpens] = React.useState(false);
-  const [shipment, setShipment] = React.useState('');
-  const [sdNo, setSdNo] = React.useState('');
+  const [shipment, setShipment] = React.useState("");
+  const [sdNo, setSdNo] = React.useState("");
 
   const columns: GridColDef[] = [
-    { field: 'index', headerName: 'ลำดับที่', minWidth: 120 },
+    { field: "index", headerName: "ลำดับที่", minWidth: 120 },
     {
-      field: 'shipmentNo',
-      headerName: 'เลขที่เอกสาร LD',
+      field: "shipmentNo",
+      headerName: "เลขที่เอกสาร LD",
       minWidth: 200,
     },
-    { field: 'sdNo', headerName: 'เลขที่เอกสาร SD', minWidth: 200 },
-    { field: 'sdType', headerName: 'ประเภท', minWidth: 200 },
-    { field: 'sdStatus', headerName: 'สถานะ', minWidth: 200 },
-    { field: 'boxCnt', headerName: 'จำนวนลัง', minWidth: 150 },
-    { field: 'toteCnt', headerName: 'จำนวน Tote', minWidth: 150 },
-    { field: 'shipmentDate', headerName: 'วันที่รับสินค้า', minWidth: 200 },
-    { field: 'detail', headerName: 'รายละเอียด', minWidth: 200 },
+    { field: "sdNo", headerName: "เลขที่เอกสาร SD", minWidth: 200 },
+    { field: "sdType", headerName: "ประเภท", minWidth: 200 },
+    { field: "sdStatus", headerName: "สถานะ", minWidth: 200 },
+    { field: "boxCnt", headerName: "จำนวนลัง", minWidth: 150 },
+    { field: "toteCnt", headerName: "จำนวน Tote", minWidth: 150 },
+    { field: "shipmentDate", headerName: "วันที่รับสินค้า", minWidth: 200 },
+    { field: "detail", headerName: "รายละเอียด", minWidth: 200 },
   ];
-  console.log('Data Size: ', JSON.stringify(res));
+  // console.log("Data Size: ", JSON.stringify(res));
   const rows = res.data.map((data: ShipmentInfo, index: number) => {
     return {
       id: `${data.shipmentNo}_${data.sdNo}`,
@@ -43,7 +46,7 @@ function OrderList() {
       toteCnt: data.toteCnt,
       shipmentDate: convertUtcToBkkDate(data.shipmentDate),
       sdStatus: getShipmentStatusText(data.sdStatus),
-      col10: 'desc',
+      col10: "desc",
     };
   });
 
@@ -71,7 +74,14 @@ function OrderList() {
           />
         </div>
       </Box>
-      {opens && <CheckOrderDetail sdNo={sdNo} shipmentNo={shipment} defaultOpen={opens} onClickClose={isClosModal} />}
+      {opens && (
+        <CheckOrderDetail
+          sdNo={sdNo}
+          shipmentNo={shipment}
+          defaultOpen={opens}
+          onClickClose={isClosModal}
+        />
+      )}
     </div>
   );
 }

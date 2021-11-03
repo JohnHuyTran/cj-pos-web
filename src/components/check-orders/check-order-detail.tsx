@@ -716,40 +716,47 @@ export default function CheckOrderDetail({
               </Grid>
 
               <Grid item>
-                <Button
-                  id="btnSave"
-                  variant="contained"
-                  color="warning"
-                  className={classes.MbtnSave}
-                  onClick={handleSaveButton}
-                  disabled={disableSaveBtn}
-                  startIcon={<SaveIcon />}
-                >
-                  บันทึก
-                </Button>
-                <Button
-                  id="btnApprove"
-                  variant="contained"
-                  color="primary"
-                  className={classes.MbtnApprove}
-                  onClick={handleApproveBtn}
-                  disabled={disableApproveBtn}
-                  startIcon={<CheckCircleOutline />}
-                >
-                  อนุมัติ
-                </Button>
+                {!disableSaveBtn && (
+                  <Button
+                    id="btnSave"
+                    variant="contained"
+                    color="warning"
+                    className={classes.MbtnSave}
+                    onClick={handleSaveButton}
+                    // disabled={disableSaveBtn}
+                    startIcon={<SaveIcon />}
+                  >
+                    บันทึก
+                  </Button>
+                )}
 
-                <Button
-                  id="btnClose"
-                  variant="contained"
-                  color="primary"
-                  className={classes.MbtnClose}
-                  onClick={handleCloseJobBtn}
-                  disabled={disableCloseJobBtn}
-                  startIcon={<BookmarkAdded />}
-                >
-                  ปิดงาน
-                </Button>
+                {!disableApproveBtn && (
+                  <Button
+                    id="btnApprove"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnApprove}
+                    onClick={handleApproveBtn}
+                    // disabled={disableApproveBtn}
+                    startIcon={<CheckCircleOutline />}
+                  >
+                    อนุมัติ
+                  </Button>
+                )}
+
+                {!disableCloseJobBtn && (
+                  <Button
+                    id="btnClose"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnClose}
+                    onClick={handleCloseJobBtn}
+                    // disabled={disableCloseJobBtn}
+                    startIcon={<BookmarkAdded />}
+                  >
+                    ปิดงาน
+                  </Button>
+                )}
               </Grid>
             </Grid>
           </Box>
@@ -763,9 +770,10 @@ export default function CheckOrderDetail({
                 rows={rows}
                 columns={columns}
                 disableColumnMenu
-                autoPageSize={true}
+                // autoPageSize={true}
                 pagination={true}
                 pageSize={5}
+                // rowsPerPageOptions={[5, 10, 50, 100]}
                 editMode="row"
                 getRowClassName={(params) =>
                   `row-style--${
@@ -825,7 +833,8 @@ export default function CheckOrderDetail({
           sx={{ width: "100%" }}
           onClose={handleCloseSnackBar}
         >
-          This transaction is success
+          {/* This transaction is success */}
+          ทำรายการสำเร็จ
         </Alert>
       </Snackbar>
 

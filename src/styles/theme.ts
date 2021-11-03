@@ -17,7 +17,7 @@ const theme = createTheme({
       default: "#fff",
     },
     cancelColor: {
-      main: grey[500],
+      main: "#AEAEAE",
     },
   },
   typography: {
