@@ -1,29 +1,57 @@
-import red from '@mui/material/colors/red';
-import { lighten } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
-import theme from '../../styles/theme';
+import red from "@mui/material/colors/red";
+import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles({
-    browseBtn: {
-        position: "absolute",
-        // width: "textField",
-        height: "40px",
-        width: "110px",
-        borderRadius: "5px",
+  MbtnBrowse: {
+    position: "absolute",
+    borderRadius: "8px !important",
+  },
+  MbtnPrint: {
+    borderRadius: "4px !important",
+  },
+  MbtnSave: {
+    backgroundColor: "#FBA600 !important",
+    borderRadius: "4px !important",
+    marginRight: "10px !important",
+  },
+  MbtnApprove: {
+    borderRadius: "4px !important",
+    marginRight: "10px !important",
+  },
+  MbtnClose: {
+    borderRadius: "4px !important",
+  },
+  MtextFieldBrowse: {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "5px !important",
+      border: "2px dashed #36C690 !important",
     },
-    textField: {
-        width: "250px",
-        height: "40px",
-        border: "10px"
+  },
+  MdataGrid: {
+    "& .MuiDataGrid-root": {
+      fontFamily: "Kanit",
+      borderRadius: "10px !important",
     },
-    labelBtnStyle: {
-        color: "white",
+    "& .MuiDataGrid-columnHeaderTitle": {
+      color: "#36C690",
+      fontWeight: "600 !important",
     },
-    rowDataGrid: {
-        '& .row-style--diff': {
-            color: red["700"],
-        }
-    }
-})
+    "& .row-style--diff": {
+      color: red["700"],
+    },
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "5px",
+    },
+    "& .css-ieen6m-MuiInputBase-input-MuiOutlinedInput-input": {
+      textAlign: "right",
+    },
+  },
+
+  Mselect: {
+    "& .css-y4ygc1-MuiInputBase-root-MuiOutlinedInput-root": {
+      borderRadius: "10px !important",
+    },
+  },
+});
 
 export { useStyles };

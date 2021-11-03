@@ -1,20 +1,23 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useAppSelector, useAppDispatch } from '../../store/store';
+import React, { useEffect, useMemo, useState } from "react";
+import { useAppSelector, useAppDispatch } from "../../store/store";
 import {
   featchOrderListAsync,
   clearDataFilter,
-} from '../../store/slices/check-order-slice';
+} from "../../store/slices/check-order-slice";
 
 import {
   Box,
   Button,
   Dialog,
   DialogContent,
+  FormControl,
   formControlClasses,
   Grid,
+  MenuItem,
+  Select,
   TextField,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 import {
   DataGrid,
   GridColDef,
@@ -25,33 +28,33 @@ import {
   GridValueGetterParams,
   GridRowId,
   GridRowData,
-} from '@mui/x-data-grid';
-import DialogTitle from '@mui/material/DialogTitle';
-import Link from '@mui/material/Link';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import SaveIcon from '@mui/icons-material/Save';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import DoneIcon from '@mui/icons-material/Done';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import PreviewIcon from '@mui/icons-material/Preview';
+} from "@mui/x-data-grid";
+import DialogTitle from "@mui/material/DialogTitle";
+import Link from "@mui/material/Link";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
+import SaveIcon from "@mui/icons-material/Save";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import DoneIcon from "@mui/icons-material/Done";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import PreviewIcon from "@mui/icons-material/Preview";
 
-import { useStyles } from './check-order-detail-css';
+import { useStyles } from "./check-order-detail-css";
 
 import {
   saveOrderShipments,
   getPathReportSD,
-} from '../../services/order-shipment';
-import ConfirmOrderShipment from './check-order-confirm-model';
+} from "../../services/order-shipment";
+import ConfirmOrderShipment from "./check-order-confirm-model";
 import {
   ShipmentDeliveryStatusCodeEnum,
   getShipmentTypeText,
   getShipmentStatusText,
-} from '../../utils/enum/check-order-enum';
-import ModalShowPDF from './modal-show-pdf';
+} from "../../utils/enum/check-order-enum";
+import ModalShowPDF from "./modal-show-pdf";
 import {
   ShipmentInfo,
   ShipmentResponse,
@@ -59,41 +62,64 @@ import {
   CheckOrderDetailProps,
   Entry,
   ShipmentRequest,
-} from '../../models/order-model';
-import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { ApiError } from '../../models/api-error-model';
-import AlertError from '../commons/ui/alert-error';
+} from "../../models/order-model";
+import { convertUtcToBkkDate } from "../../utils/date-utill";
+import { ApiError } from "../../models/api-error-model";
+import AlertError from "../commons/ui/alert-error";
+import {
+  BookmarkAdd,
+  BookmarkAdded,
+  CheckCircleOutline,
+  HighlightOff,
+  Print,
+} from "@mui/icons-material";
 
 const columns: GridColDef[] = [
-  { field: 'col1', headerName: 'ลำดับ', width: 90, disableColumnMenu: true },
   {
-    field: 'productId',
-    headerName: 'รหัสสินค้า',
+    field: "col1",
+    headerName: "ลำดับ",
+    width: 90,
+    headerAlign: "center",
+    disableColumnMenu: true,
+  },
+  {
+    field: "productId",
+    headerName: "รหัสสินค้า",
     width: 170,
+    headerAlign: "center",
     disableColumnMenu: true,
   },
   {
-    field: 'productBarCode',
-    headerName: 'บาร์โค้ด',
+    field: "productBarCode",
+    headerName: "บาร์โค้ด",
     minWidth: 170,
+    headerAlign: "center",
     disableColumnMenu: true,
   },
   {
-    field: 'productDescription',
-    headerName: 'รายละเอียดสินค้า',
+    field: "productDescription",
+    headerName: "รายละเอียดสินค้า",
+    headerAlign: "center",
     minWidth: 300,
   },
-  { field: 'productUnit', headerName: 'หน่วย', minWidth: 100 },
   {
-    field: 'productQuantityRef',
-    headerName: 'จำนวนอ้างอิง',
-    width: 135,
-    type: 'number',
+    field: "productUnit",
+    headerName: "หน่วย",
+    minWidth: 100,
+    headerAlign: "center",
   },
   {
-    field: 'productQuantityActual',
-    headerName: 'จำนวนรับจริง',
+    field: "productQuantityRef",
+    headerName: "จำนวนอ้างอิง",
     width: 135,
+    headerAlign: "center",
+    align: "right",
+  },
+  {
+    field: "productQuantityActual",
+    headerName: "จำนวนรับจริง",
+    width: 135,
+    headerAlign: "center",
     renderCell: (params: GridRenderCellParams) => (
       <TextField
         variant="outlined"
@@ -101,16 +127,15 @@ const columns: GridColDef[] = [
         type="number"
         value={params.value}
         onChange={(e) => {
-          var value = (e.target.value) ? parseInt(e.target.value, 10) : '';
+          var value = e.target.value ? parseInt(e.target.value, 10) : "";
           if (value < 0) value = 0;
 
           params.api.updateRows([
             { ...params.row, productQuantityActual: value },
           ]);
         }}
-
         onBlur={(e) => {
-          isAllowActualQty(params, parseInt(e.target.value, 10))
+          isAllowActualQty(params, parseInt(e.target.value, 10));
         }}
         disabled={isDisable(params) ? true : false}
         autoComplete="off"
@@ -118,15 +143,16 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'productDifference',
-    headerName: 'ส่วนต่างการรับ',
+    field: "productDifference",
+    headerName: "ส่วนต่างการรับ",
     width: 145,
-    type: 'number',
+    headerAlign: "center",
+    align: "right",
     valueGetter: (params) => calProductDiff(params),
   },
   {
-    field: 'productComment',
-    headerName: 'หมายเหตุ',
+    field: "productComment",
+    headerName: "หมายเหตุ",
     minWidth: 200,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
@@ -147,22 +173,21 @@ const columns: GridColDef[] = [
 
 var calProductDiff = function (params: GridValueGetterParams) {
   return (
-    Number(params.getValue(params.id, 'productQuantityRef')) -
-    Number(params.getValue(params.id, 'productQuantityActual'))
+    Number(params.getValue(params.id, "productQuantityRef")) -
+    Number(params.getValue(params.id, "productQuantityActual"))
   );
 };
 
 var getActualQty = function (params: string) {
-  return !params ? '0' : params;
+  return !params ? "0" : params;
 };
-
 
 function useApiRef() {
   const apiRef = useGridApiRef();
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: '__HIDDEN__',
+        field: "__HIDDEN__",
         width: 0,
         renderCell: (params) => {
           apiRef.current = params.api;
@@ -180,7 +205,7 @@ const isDisable = (params: GridRenderCellParams) => {
 
 const isAllowActualQty = (params: GridRenderCellParams, value: number) => {
   if (params.row.isTote === true && !(value * 1 >= 0 && value * 1 <= 1)) {
-    return (alert('errror'))
+    return alert("errror");
   }
 };
 
@@ -194,20 +219,20 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   const { children, onClose, ...other } = props;
 
   return (
-    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+    <DialogTitle sx={{ m: 0, p: 3 }} {...other}>
       {children}
       {onClose ? (
         <IconButton
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: 'absolute',
+            position: "absolute",
             right: 8,
             top: 8,
-            color: (theme: any) => theme.palette.grey[100],
+            color: (theme: any) => theme.palette.grey[400],
           }}
         >
-          <CloseIcon />
+          <HighlightOff fontSize="large" />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -220,22 +245,28 @@ interface fileInfoProps {
   base64URL: any;
 }
 
-export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClickClose }: CheckOrderDetailProps) {
-  const classes = useStyles();
+export default function CheckOrderDetail({
+  sdNo,
+  shipmentNo,
+  defaultOpen,
+  onClickClose,
+}: CheckOrderDetailProps) {
   // const { sdNo, defaultOpen } = props;
+  const classes = useStyles();
+
   const res = useAppSelector((state) => state.checkOrderList.orderList);
   const payloadSearchOrder = useAppSelector(
     (state) => state.saveSearchOrder.searchCriteria
   );
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(defaultOpen);
-  const [fileName, setFileName] = React.useState('');
+  const [fileName, setFileName] = React.useState("");
   const { apiRef, columns } = useApiRef();
 
   const [disableSaveBtn, setDisableSaveBtn] = React.useState(false);
   const [disableApproveBtn, setDisableApproveBtn] = React.useState(false);
   const [disableCloseJobBtn, setDisableCloseJobBtn] = React.useState(false);
-  const [isDisplayActBtn, setIsDisplayActBtn] = React.useState('');
+  const [isDisplayActBtn, setIsDisplayActBtn] = React.useState("");
 
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [action, setAction] = useState<number>(0);
@@ -248,20 +279,20 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     React.useState(false);
   const [shipmentStatusText, setShipmentStatusText] = useState<
     string | undefined
-  >('');
+  >("");
   const [shipmentTypeText, setShipmentTypeText] = useState<string | undefined>(
-    ''
+    ""
   );
   // const [sdNo, setSdNo] = React.useState('');
   const [shipmentDateFormat, setShipmentDateFormat] = useState<
     string | undefined
-  >('');
-  const [snackBarFailMsg, setSnackBarFailMsg] = React.useState('');
+  >("");
+  const [snackBarFailMsg, setSnackBarFailMsg] = React.useState("");
   const [openAlert, setOpenAlert] = React.useState(false);
   const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
     file: null,
-    fileName: '',
-    base64URL: '',
+    fileName: "",
+    base64URL: "",
   });
 
   useEffect(() => {
@@ -284,7 +315,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
       shipmentList[0].sdStatus ===
       ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB
     ) {
-      setIsDisplayActBtn('none');
+      setIsDisplayActBtn("none");
     }
 
     setOpen(defaultOpen);
@@ -321,13 +352,13 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         actualQty: data.productQuantityActual * 1,
         comment: data.productComment,
         seqItem: 0,
-        itemNo: '',
-        shipmentSAPRef: '',
-        skuCode: '',
-        skuType: '',
-        productName: '',
-        unitCode: '',
-        unitName: '',
+        itemNo: "",
+        shipmentSAPRef: "",
+        skuCode: "",
+        skuType: "",
+        productName: "",
+        unitCode: "",
+        unitName: "",
         unitFactor: 0,
         qty: 0,
         qtyAll: 0,
@@ -335,12 +366,18 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         qtyDiff: 0,
         price: 0,
         isControlStock: 0,
-        toteCode: '',
-        expireDate: '',
+        toteCode: "",
+        expireDate: "",
         isTote: false,
       };
 
-      if (data.isTote === true && !(data.productQuantityActual * 1 >= 0 && data.productQuantityActual * 1 <= 1)) {
+      if (
+        data.isTote === true &&
+        !(
+          data.productQuantityActual * 1 >= 0 &&
+          data.productQuantityActual * 1 <= 1
+        )
+      ) {
         qtyIsValid = false;
       }
       itemsList.push(item);
@@ -366,8 +403,6 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     }
   };
 
-
-
   const handleApproveBtn = () => {
     setItemsDiffState([]);
     setOpenModelConfirm(true);
@@ -381,13 +416,13 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           productName: data.productDescription,
           actualQty: diffCount,
           seqItem: 0,
-          itemNo: '',
-          shipmentSAPRef: '',
-          skuCode: '',
-          skuType: '',
-          deliveryOrderNo: '',
-          unitCode: '',
-          unitName: '',
+          itemNo: "",
+          shipmentSAPRef: "",
+          skuCode: "",
+          skuType: "",
+          deliveryOrderNo: "",
+          unitCode: "",
+          unitName: "",
           unitFactor: 0,
           qty: 0,
           qtyAll: 0,
@@ -395,10 +430,10 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           qtyDiff: 0,
           price: 0,
           isControlStock: 0,
-          toteCode: '',
-          expireDate: '',
+          toteCode: "",
+          expireDate: "",
           isTote: false,
-          comment: '',
+          comment: "",
         };
         setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
       }
@@ -418,9 +453,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     setOpenModelPreviewDocument(true);
   };
 
-
   const getBase64 = (file: Blob) => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       let fileInfo;
       let baseURL: any = "";
       // Make new FileReader
@@ -439,7 +473,6 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   };
 
   const handleFileInputChange = (e: any) => {
-
     let file: File = e.target.files[0];
     const fileSize = e.target.files[0].size;
     const fileName = e.target.files[0].name;
@@ -454,13 +487,14 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
       });
   };
 
-
   // data grid
   const shipmentList: ShipmentInfo[] = res.data.filter(
     (shipmentInfo: ShipmentInfo) => shipmentInfo.sdNo === sdNo
   );
 
-  const entries: Entry[] = shipmentList[0].entries ? shipmentList[0].entries : [];
+  const entries: Entry[] = shipmentList[0].entries
+    ? shipmentList[0].entries
+    : [];
   const rows = entries.map((item: Entry, index: number) => {
     return {
       id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
@@ -515,10 +549,9 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     setOpenAlert(false);
   };
 
-
   const getfileName = (fileName: string) => {
-    console.log(`fileName>>: ${fileName}`)
-    return fileName
+    console.log(`fileName>>: ${fileName}`);
+    return fileName;
   };
 
   return (
@@ -528,116 +561,117 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          <Typography variant="body1" gutterBottom>
+          <Typography variant="h5" gutterBottom>
             รายละเอียดใบตรวจสอบการรับ-โอนสินค้า
           </Typography>
         </BootstrapDialogTitle>
+
         <DialogContent>
           <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
+            <Grid container spacing={2} mb={1}>
+              <Grid item lg={2}>
                 <Typography variant="body2" gutterBottom>
                   เลขที่เอกสาร LD:
                 </Typography>
               </Grid>
-              <Grid item lg={9}>
+              <Grid item lg={4}>
                 <Typography variant="body2" gutterBottom>
                   {shipmentList[0].shipmentNo}
                 </Typography>
               </Grid>
-            </Grid>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  เลขที่เอกสาร SD:
-                </Typography>
-              </Grid>
-              <Grid item lg={9}>
-                <Typography variant="body2" gutterBottom>
-                  {shipmentList[0].sdNo}
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  วันที่:
-                </Typography>
-              </Grid>
-              <Grid item lg={9}>
-                <Typography variant="body2" gutterBottom>
-                  {shipmentDateFormat}
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
+              <Grid item lg={2}>
                 <Typography variant="body2" gutterBottom>
                   สถานะ:
                 </Typography>
               </Grid>
-              <Grid item lg={9}>
+              <Grid item lg={4}>
                 <Typography variant="body2" gutterBottom>
                   {shipmentStatusText}
                 </Typography>
               </Grid>
             </Grid>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
+            <Grid container spacing={2} mb={1}>
+              <Grid item lg={2}>
+                <Typography variant="body2" gutterBottom>
+                  เลขที่เอกสาร SD:
+                </Typography>
+              </Grid>
+              <Grid item lg={4}>
+                <Typography variant="body2" gutterBottom>
+                  {shipmentList[0].sdNo}
+                </Typography>
+              </Grid>
+              <Grid item lg={2}>
                 <Typography variant="body2" gutterBottom>
                   ประเภท:
                 </Typography>
               </Grid>
-              <Grid item lg={9}>
+              <Grid item lg={4}>
                 <Typography variant="body2" gutterBottom>
                   {shipmentTypeText}
                 </Typography>
               </Grid>
             </Grid>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
+            <Grid container spacing={2} mb={1}>
+              <Grid item lg={2}>
                 <Typography variant="body2" gutterBottom>
-                  แนบเอกสารใบตรวจสอบการรับ-โอนสินค้าหลังเซ็นต์:
+                  วันที่:
                 </Typography>
               </Grid>
-              <Grid item lg={9}>
+              <Grid item lg={4}>
+                <Typography variant="body2" gutterBottom>
+                  {shipmentDateFormat}
+                </Typography>
+              </Grid>
+              <Grid item lg={2}>
+                <Typography variant="body2" gutterBottom>
+                  ใบผลต่างหลังเซ็นต์:
+                </Typography>
+              </Grid>
+              <Grid item lg={4}>
                 {shipmentList[0].sdStatus !==
                   ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <div>
-                      <TextField
-                        name="browserTxf"
-                        className={classes.textField}
-                        value={fileInfo.fileName}
-                      />
-                      <input id="btnBrowse" type="file" accept='.pdf, .jpg, .jpeg' onChange={handleFileInputChange} style={{ display: 'none' }} />
+                  <div>
+                    <TextField
+                      name="browserTxf"
+                      className={classes.MtextFieldBrowse}
+                      value={fileInfo.fileName}
+                      placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5MB"
+                    />
+                    <input
+                      id="btnBrowse"
+                      type="file"
+                      accept=".pdf, .jpg, .jpeg"
+                      onChange={handleFileInputChange}
+                      style={{ display: "none" }}
+                    />
 
-                      <label htmlFor={'btnBrowse'}>
-                        <Button
-                          id="btnPrint"
-                          color="secondary"
-                          variant="contained"
-                          component="span"
-                          className={classes.browseBtn}
-                          style={{ marginLeft: 10, textTransform: 'none' }}
-                          endIcon={<UploadFileIcon />}
-                        >
-                          Browse
-                        </Button>
-                      </label>
-                    </div>
-                  )}
+                    <label htmlFor={"btnBrowse"}>
+                      <Button
+                        id="btnPrint"
+                        color="primary"
+                        variant="contained"
+                        component="span"
+                        className={classes.MbtnBrowse}
+                        style={{ marginLeft: 10, textTransform: "none" }}
+                      >
+                        Browse
+                      </Button>
+                    </label>
+                  </div>
+                )}
                 {shipmentList[0].sdStatus ===
                   ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <div>
-                      <Link
-                        component="button"
-                        variant="body2"
-                        onClick={handleLinkDocument}
-                      >
-                        ดูเอกสาร
-                      </Link>
-                    </div>
-                  )}
+                  <div>
+                    <Link
+                      component="button"
+                      variant="body2"
+                      onClick={handleLinkDocument}
+                    >
+                      ดูเอกสาร
+                    </Link>
+                  </div>
+                )}
               </Grid>
             </Grid>
             <Grid
@@ -646,7 +680,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
               justifyContent="center"
               style={{ marginTop: 0.1 }}
             >
-              <Grid item>
+              {/* <Grid item>
                 <Button
                   id="btnBack"
                   variant="contained"
@@ -657,25 +691,10 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                 >
                   ย้อนกลับ
                 </Button>
-              </Grid>
-              <Grid item>
-                <Box sx={{ display: isDisplayActBtn }}>
-                  <Button
-                    id="btnSave"
-                    variant="contained"
-                    color="primary"
-                    className={classes.browseBtn}
-                    onClick={handleSaveButton}
-                    disabled={disableSaveBtn}
-                    endIcon={<SaveIcon />}
-                  >
-                    บันทึก
-                  </Button>
-                </Box>
-              </Grid>
+              </Grid> */}
             </Grid>
           </Box>
-          <Box sx={{ display: isDisplayActBtn }}>
+          <Box sx={{ display: isDisplayActBtn, marginTop: 4 }}>
             <Grid
               container
               spacing={2}
@@ -684,13 +703,38 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
             >
               <Grid item xl={2}>
                 <Button
+                  id="btnPrint"
+                  variant="contained"
+                  color="secondary"
+                  onClick={handlePrintBtn}
+                  startIcon={<Print />}
+                  className={classes.MbtnPrint}
+                  style={{ textTransform: "none" }}
+                >
+                  พิมพ์ใบผลต่าง
+                </Button>
+              </Grid>
+
+              <Grid item>
+                <Button
+                  id="btnSave"
+                  variant="contained"
+                  color="warning"
+                  className={classes.MbtnSave}
+                  onClick={handleSaveButton}
+                  disabled={disableSaveBtn}
+                  startIcon={<SaveIcon />}
+                >
+                  บันทึก
+                </Button>
+                <Button
                   id="btnApprove"
                   variant="contained"
                   color="primary"
-                  className={classes.browseBtn}
+                  className={classes.MbtnApprove}
                   onClick={handleApproveBtn}
                   disabled={disableApproveBtn}
-                  endIcon={<AssignmentTurnedInIcon />}
+                  startIcon={<CheckCircleOutline />}
                 >
                   อนุมัติ
                 </Button>
@@ -699,26 +743,12 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                   id="btnClose"
                   variant="contained"
                   color="primary"
-                  className={classes.browseBtn}
-                  style={{ marginLeft: 10 }}
+                  className={classes.MbtnClose}
                   onClick={handleCloseJobBtn}
                   disabled={disableCloseJobBtn}
-                  endIcon={<DoneIcon />}
+                  startIcon={<BookmarkAdded />}
                 >
                   ปิดงาน
-                </Button>
-              </Grid>
-
-              <Grid item xl={2}>
-                <Button
-                  id="btnPrint"
-                  variant="contained"
-                  color="secondary"
-                  onClick={handlePrintBtn}
-                  endIcon={<PreviewIcon />}
-                  style={{ textTransform: 'none' }}
-                >
-                  Preview ใบตรวจการรับสินค้า
                 </Button>
               </Grid>
             </Grid>
@@ -726,8 +756,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
 
           <Box mt={2} bgcolor="background.paper">
             <div
-              style={{ height: 400, width: '100%' }}
-              className={classes.rowDataGrid}
+              style={{ height: 400, width: "100%" }}
+              className={classes.MdataGrid}
             >
               <DataGrid
                 rows={rows}
@@ -738,17 +768,18 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                 pageSize={5}
                 editMode="row"
                 getRowClassName={(params) =>
-                  `row-style--${Number(params.getValue(params.id, 'productQuantityRef')) -
-                    Number(
-                      params.getValue(params.id, 'productQuantityActual')
-                    ) !=
+                  `row-style--${
+                    Number(params.getValue(params.id, "productQuantityRef")) -
+                      Number(
+                        params.getValue(params.id, "productQuantityActual")
+                      ) !=
                     0
-                    ? 'diff'
-                    : ''
+                      ? "diff"
+                      : "div"
                   }`
                 }
-              // onEditRowsModelChange={handleEditRowsModelChange}
-              // autoHeight
+                // onEditRowsModelChange={handleEditRowsModelChange}
+                // autoHeight
               />
             </div>
           </Box>
@@ -785,13 +816,13 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         onClose={handleCloseSnackBar}
         autoHideDuration={6000}
         anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
+          vertical: "top",
+          horizontal: "right",
         }}
       >
         <Alert
           severity="success"
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
           onClose={handleCloseSnackBar}
         >
           This transaction is success
@@ -803,13 +834,13 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         onClose={handleCloseSnackBar}
         autoHideDuration={6000}
         anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
+          vertical: "top",
+          horizontal: "right",
         }}
       >
         <Alert
           severity="error"
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
           onClose={handleCloseSnackBar}
         >
           {snackBarFailMsg}
@@ -818,5 +849,3 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     </div>
   );
 }
-
-

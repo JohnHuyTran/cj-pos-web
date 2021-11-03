@@ -1,28 +1,29 @@
-import moment from 'moment';
-import React, { useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { Button } from '@mui/material';
-import { useAppSelector, useAppDispatch } from '../../store/store';
+import moment from "moment";
+import React, { useEffect } from "react";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import { Button } from "@mui/material";
+import { useAppSelector, useAppDispatch } from "../../store/store";
 import {
   featchOrderListAsync,
   clearDataFilter,
-} from '../../store/slices/check-order-slice';
+} from "../../store/slices/check-order-slice";
 import {
   saveSearchCriteria,
   clearSearchCriteria,
-} from '../../store/slices/save-search-order';
-import { ShipmentRequest } from '../../models/order-model';
-import OrderList from './order-list';
-import DatePickerComponent from '../commons/ui/date-picker';
-import LoadingModal from '../commons/ui/loading-modal';
+} from "../../store/slices/save-search-order";
+import { ShipmentRequest } from "../../models/order-model";
+import OrderList from "./order-list";
+import DatePickerComponent from "../commons/ui/date-picker";
+import LoadingModal from "../commons/ui/loading-modal";
+import { useStyles } from "../../styles/maekTheme";
 
-moment.locale('en');
+moment.locale("en");
 
 interface State {
   orderShipment: string;
@@ -36,23 +37,23 @@ interface loadingModalState {
   open: boolean;
 }
 
-
 function CheckOrderSearch() {
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.checkOrderList);
   const [values, setValues] = React.useState<State>({
-    orderShipment: '',
-    orderNo: '',
-    orderStatus: 'ALL',
-    orderType: 'ALL',
-    dateFrom: '10/10/2021',
-    dateTo: '11/10/2021',
+    orderShipment: "",
+    orderNo: "",
+    orderStatus: "ALL",
+    orderType: "ALL",
+    dateFrom: "10/10/2021",
+    dateTo: "11/10/2021",
   });
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false
-  });
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
 
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -60,47 +61,46 @@ function CheckOrderSearch() {
     console.log(values);
   };
   const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event })
-  }
-
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
 
   const onClickSearchBtn = async () => {
     const payload: ShipmentRequest = {
-      limit: '10',
-      page: '1',
+      limit: "10",
+      page: "1",
       shipmentNo: values.orderShipment,
       sdNo: values.orderNo,
-      dateFrom: moment(startDate).format('DD/MM/YYYY'),
-      dateTo: moment(endDate).format('DD/MM/YYYY'),
+      dateFrom: moment(startDate).format("DD/MM/YYYY"),
+      dateTo: moment(endDate).format("DD/MM/YYYY"),
       sdStatus: parseInt(values.orderStatus),
       sdType: parseInt(values.orderType),
       clearSearch: false,
     };
-    handleOpenLoading("open", true)
+    handleOpenLoading("open", true);
     await dispatch(featchOrderListAsync(payload));
     await dispatch(saveSearchCriteria(payload));
-    handleOpenLoading("open", false)
+    handleOpenLoading("open", false);
     console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
 
   const onClickClearBtn = () => {
     setValues({
-      orderShipment: '',
-      orderNo: '',
-      orderStatus: 'ALL',
-      orderType: 'ALL',
-      dateFrom: '10/10/2021',
-      dateTo: '11/10/2021',
+      orderShipment: "",
+      orderNo: "",
+      orderStatus: "ALL",
+      orderType: "ALL",
+      dateFrom: "10/10/2021",
+      dateTo: "11/10/2021",
     });
     setStartDate(new Date());
     setEndDate(new Date());
     const payload: ShipmentRequest = {
-      limit: '10',
-      page: '1',
+      limit: "10",
+      page: "1",
       shipmentNo: values.orderShipment,
       sdNo: values.orderNo,
-      dateFrom: moment(startDate).format('DD/MM/YYYY'),
-      dateTo: moment(endDate).format('DD/MM/YYYY'),
+      dateFrom: moment(startDate).format("DD/MM/YYYY"),
+      dateTo: moment(endDate).format("DD/MM/YYYY"),
       sdStatus: parseInt(values.orderStatus),
       sdType: parseInt(values.orderType),
       clearSearch: true,
@@ -116,6 +116,8 @@ function CheckOrderSearch() {
   const handleEndDatePicker = (value: Date) => {
     setEndDate(value);
   };
+
+  const classes = useStyles();
 
   return (
     <>
@@ -167,21 +169,21 @@ function CheckOrderSearch() {
             <Typography variant="subtitle1" gutterBottom component="div">
               สถานะ
             </Typography>
-            <FormControl sx={{ width: 193 }}>
+            <FormControl className={classes.Mselect} sx={{ width: 193 }}>
               <Select
                 id="selOrderStatus"
                 name="orderStatus"
                 value={values.orderStatus}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
+                inputProps={{ "aria-label": "Without label" }}
                 autoWidth={true}
               >
-                <MenuItem value={'ALL'} selected={true}>
+                <MenuItem value={"ALL"} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={'0'}>บันทึก</MenuItem>
-                <MenuItem value={'1'}>อนุมัติ</MenuItem>
-                <MenuItem value={'2'}>ปิดงาน</MenuItem>
+                <MenuItem value={"0"}>บันทึก</MenuItem>
+                <MenuItem value={"1"}>อนุมัติ</MenuItem>
+                <MenuItem value={"2"}>ปิดงาน</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -189,29 +191,29 @@ function CheckOrderSearch() {
             <Typography variant="subtitle1" gutterBottom component="div">
               ประเภท
             </Typography>
-            <FormControl sx={{ width: 193 }}>
+            <FormControl className={classes.Mselect} sx={{ width: 193 }}>
               <Select
                 id="selOrderType"
                 name="orderType"
                 value={values.orderType}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
+                inputProps={{ "aria-label": "Without label" }}
                 autoWidth={true}
               >
-                <MenuItem value={'ALL'} selected={true}>
+                <MenuItem value={"ALL"} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={'0'}>ลังกระดาษ/ลังพลาสติก</MenuItem>
-                <MenuItem value={'1'}>สินค้าภายในTote</MenuItem>
+                <MenuItem value={"0"}>ลังกระดาษ/ลังพลาสติก</MenuItem>
+                <MenuItem value={"1"}>สินค้าภายในTote</MenuItem>
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12}>
             <Box
               sx={{
-                width: '150px',
-                display: 'flex',
-                justifyContent: 'space-between',
+                width: "150px",
+                display: "flex",
+                justifyContent: "space-between",
               }}
             >
               <Button
@@ -226,7 +228,7 @@ function CheckOrderSearch() {
                 id="btnClear"
                 variant="contained"
                 onClick={onClickClearBtn}
-                sx={{ backgroundColor: '#AEAEAE' }}
+                sx={{ backgroundColor: "#AEAEAE" }}
               >
                 เคลียร์
               </Button>
@@ -235,10 +237,7 @@ function CheckOrderSearch() {
         </Grid>
       </Box>
       {items.orderList && <OrderList />}
-      <LoadingModal
-        open={openLoadingModal.open}
-      />
-
+      <LoadingModal open={openLoadingModal.open} />
     </>
   );
 }
