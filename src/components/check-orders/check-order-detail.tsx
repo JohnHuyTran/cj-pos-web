@@ -67,6 +67,7 @@ import { convertUtcToBkkDate } from "../../utils/date-utill";
 import { ApiError } from "../../models/api-error-model";
 import AlertError from "../commons/ui/alert-error";
 import {
+  ArrowDownward,
   BookmarkAdd,
   BookmarkAdded,
   CheckCircleOutline,
@@ -148,7 +149,8 @@ const columns: GridColDef[] = [
     width: 145,
     headerAlign: "center",
     align: "right",
-    valueGetter: (params) => calProductDiff(params),
+    // valueGetter: (params) => calProductDiff(params),
+    renderCell: (params) => calProductDiff(params),
   },
   {
     field: "productComment",
@@ -172,10 +174,19 @@ const columns: GridColDef[] = [
 ];
 
 var calProductDiff = function (params: GridValueGetterParams) {
-  return (
+  let diff =
     Number(params.getValue(params.id, "productQuantityRef")) -
-    Number(params.getValue(params.id, "productQuantityActual"))
-  );
+    Number(params.getValue(params.id, "productQuantityActual"));
+
+  if (diff > 0)
+    return (
+      <label style={{ color: "#446EF2", fontWeight: 700 }}> +{diff} </label>
+    );
+  if (diff < 0)
+    return (
+      <label style={{ color: "#F54949", fontWeight: 700 }}> {diff} </label>
+    );
+  return diff;
 };
 
 var getActualQty = function (params: string) {
@@ -668,7 +679,7 @@ export default function CheckOrderDetail({
                       variant="body2"
                       onClick={handleLinkDocument}
                     >
-                      ดูเอกสาร
+                      ดูเอกสาร <ArrowDownward />
                     </Link>
                   </div>
                 )}
@@ -775,17 +786,17 @@ export default function CheckOrderDetail({
                 pageSize={5}
                 // rowsPerPageOptions={[5, 10, 50, 100]}
                 editMode="row"
-                getRowClassName={(params) =>
-                  `row-style--${
-                    Number(params.getValue(params.id, "productQuantityRef")) -
-                      Number(
-                        params.getValue(params.id, "productQuantityActual")
-                      ) !=
-                    0
-                      ? "diff"
-                      : "div"
-                  }`
-                }
+                // getRowClassName={(params) =>
+                //   `row-style--${
+                //     Number(params.getValue(params.id, "productQuantityRef")) -
+                //       Number(
+                //         params.getValue(params.id, "productQuantityActual")
+                //       ) !=
+                //     0
+                //       ? "diff"
+                //       : "div"
+                //   }`
+                // }
                 // onEditRowsModelChange={handleEditRowsModelChange}
                 // autoHeight
               />
