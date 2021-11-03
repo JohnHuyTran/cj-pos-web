@@ -21,7 +21,7 @@ import { ShipmentRequest } from "../../models/order-model";
 import OrderList from "./order-list";
 import DatePickerComponent from "../commons/ui/date-picker";
 import LoadingModal from "../commons/ui/loading-modal";
-import { useStyles } from "../../styles/maekTheme";
+import { useStyles } from "../../styles/makeTheme";
 
 moment.locale("en");
 
