@@ -34,21 +34,14 @@ import Link from "@mui/material/Link";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import SaveIcon from "@mui/icons-material/Save";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import DoneIcon from "@mui/icons-material/Done";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import PreviewIcon from "@mui/icons-material/Preview";
-
 import { useStyles } from "./check-order-detail-css";
-
 import {
   saveOrderShipments,
   getPathReportSD,
 } from "../../services/order-shipment";
 import ConfirmOrderShipment from "./check-order-confirm-model";
+import ConfirmExitModel from "./confirm-model";
 import {
   ShipmentDeliveryStatusCodeEnum,
   getShipmentTypeText,
@@ -137,6 +130,10 @@ const columns: GridColDef[] = [
         }}
         onBlur={(e) => {
           isAllowActualQty(params, parseInt(e.target.value, 10));
+
+          params.api.updateRows([
+            { ...params.row, productQuantityActual: e.target.value },
+          ]);
         }}
         disabled={isDisable(params) ? true : false}
         autoComplete="off"
@@ -216,7 +213,7 @@ const isDisable = (params: GridRenderCellParams) => {
 
 const isAllowActualQty = (params: GridRenderCellParams, value: number) => {
   if (params.row.isTote === true && !(value * 1 >= 0 && value * 1 <= 1)) {
-    return alert("errror");
+    return alert("errror isAllowActualQty");
   }
 };
 
@@ -286,6 +283,8 @@ export default function CheckOrderDetail({
   const [showSnackbarFail, setShowSnackbarFail] = React.useState(false);
   const [itemsDiffState, setItemsDiffState] = useState<Entry[]>([]);
 
+  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+
   const [openModelPreviewDocument, setOpenModelPreviewDocument] =
     React.useState(false);
   const [shipmentStatusText, setShipmentStatusText] = useState<
@@ -336,9 +335,37 @@ export default function CheckOrderDetail({
   }, [open, openModelConfirm]);
 
   const handleClose = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    let i = 0;
+    let exit = false;
+    rowsEdit.forEach((data: GridRowData) => {
+      if (data.productQuantityActual !== rows[i].productQuantityActual) {
+        exit = true;
+      } else if (data.productComment !== rows[i].productComment) {
+        exit = true;
+      }
+      i++;
+
+      if (exit) {
+        setConfirmModelExit(true);
+        return;
+      }
+    });
+
+    if (!exit) {
+      setOpen(false);
+      onClickClose();
+    }
+  };
+
+  function handleNotExitModelConfirm() {
+    setConfirmModelExit(false);
+  }
+  function handleExitModelConfirm() {
+    setConfirmModelExit(false);
     setOpen(false);
     onClickClose();
-  };
+  }
 
   function handleCloseModelConfirm() {
     setOpenModelConfirm(false);
@@ -355,6 +382,7 @@ export default function CheckOrderDetail({
   const handleSaveButton = () => {
     let qtyIsValid: boolean = true;
     const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+
     const itemsList: any = [];
     rows.forEach((data: GridRowData) => {
       const item: Entry = {
@@ -506,7 +534,8 @@ export default function CheckOrderDetail({
   const entries: Entry[] = shipmentList[0].entries
     ? shipmentList[0].entries
     : [];
-  const rows = entries.map((item: Entry, index: number) => {
+
+  let rows = entries.map((item: Entry, index: number) => {
     return {
       id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
       doNo: item.deliveryOrderNo,
@@ -685,26 +714,9 @@ export default function CheckOrderDetail({
                 )}
               </Grid>
             </Grid>
-            <Grid
-              container
-              spacing={2}
-              justifyContent="center"
-              style={{ marginTop: 0.1 }}
-            >
-              {/* <Grid item>
-                <Button
-                  id="btnBack"
-                  variant="contained"
-                  color="secondary"
-                  className={classes.browseBtn}
-                  onClick={handleClose}
-                  startIcon={<ArrowBackIosIcon />}
-                >
-                  ย้อนกลับ
-                </Button>
-              </Grid> */}
-            </Grid>
           </Box>
+
+          {/* DisplayBtn */}
           <Box sx={{ display: isDisplayActBtn, marginTop: 4 }}>
             <Grid
               container
@@ -734,7 +746,6 @@ export default function CheckOrderDetail({
                     color="warning"
                     className={classes.MbtnSave}
                     onClick={handleSaveButton}
-                    // disabled={disableSaveBtn}
                     startIcon={<SaveIcon />}
                   >
                     บันทึก
@@ -748,7 +759,6 @@ export default function CheckOrderDetail({
                     color="primary"
                     className={classes.MbtnApprove}
                     onClick={handleApproveBtn}
-                    // disabled={disableApproveBtn}
                     startIcon={<CheckCircleOutline />}
                   >
                     อนุมัติ
@@ -762,7 +772,6 @@ export default function CheckOrderDetail({
                     color="primary"
                     className={classes.MbtnClose}
                     onClick={handleCloseJobBtn}
-                    // disabled={disableCloseJobBtn}
                     startIcon={<BookmarkAdded />}
                   >
                     ปิดงาน
@@ -784,26 +793,19 @@ export default function CheckOrderDetail({
                 // autoPageSize={true}
                 pagination={true}
                 pageSize={5}
-                // rowsPerPageOptions={[5, 10, 50, 100]}
                 editMode="row"
-                // getRowClassName={(params) =>
-                //   `row-style--${
-                //     Number(params.getValue(params.id, "productQuantityRef")) -
-                //       Number(
-                //         params.getValue(params.id, "productQuantityActual")
-                //       ) !=
-                //     0
-                //       ? "diff"
-                //       : "div"
-                //   }`
-                // }
+                autoHeight
+                // onCellEditStart={handleCellClick2}
+                // onEditRowsModelChange={handleCellClick2}
+                // onCellClick={handleCellClick2}
+
                 // onEditRowsModelChange={handleEditRowsModelChange}
-                // autoHeight
               />
             </div>
           </Box>
         </DialogContent>
       </Dialog>
+
       <ConfirmOrderShipment
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
@@ -818,11 +820,18 @@ export default function CheckOrderDetail({
         imageContent={fileInfo.base64URL}
       />
 
+      <ConfirmExitModel
+        open={confirmModelExit}
+        onClose={handleNotExitModelConfirm}
+        onConfirm={handleExitModelConfirm}
+      />
+
       <ModalShowPDF
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
         url={getPathReportSD(sdNo)}
       />
+
       <AlertError
         open={openAlert}
         onClose={handleCloseAlert}
