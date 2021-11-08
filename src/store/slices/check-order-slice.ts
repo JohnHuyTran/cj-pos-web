@@ -50,7 +50,7 @@ export const featchOrderListAsync = createAsyncThunk(
       if (payload.dateTo) {
         path = path + `&dateTo=${payload.dateTo}`;
       }
-      console.log("path : ", path);
+      // console.log("path : ", path);
       let response: ShipmentResponse = {
         ref: "",
         code: 0,

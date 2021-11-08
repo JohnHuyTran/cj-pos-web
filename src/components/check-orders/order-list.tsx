@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../store/store";
 import {
   DataGrid,
@@ -8,7 +8,11 @@ import {
 } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 //import OrderProductList from './order-product-list';
-import { ShipmentResponse, ShipmentInfo } from "../../models/order-model";
+import {
+  ShipmentResponse,
+  ShipmentInfo,
+  ShipmentRequest,
+} from "../../models/order-model";
 import { getSdType, getSdStatus } from "../../utils/utils";
 import CheckOrderDetail from "./check-order-detail";
 import { convertUtcToBkkDate } from "../../utils/date-utill";
@@ -18,7 +22,6 @@ import {
 } from "../../utils/enum/check-order-enum";
 import { useStyles } from "../../styles/makeTheme";
 import { featchOrderListAsync } from "../../store/slices/check-order-slice";
-import PaginationComponent from "../../components/commons/ui/pagination";
 
 function OrderList() {
   const classes = useStyles();
@@ -31,6 +34,8 @@ function OrderList() {
   const [opens, setOpens] = React.useState(false);
   const [shipment, setShipment] = React.useState("");
   const [sdNo, setSdNo] = React.useState("");
+  const [index, setIndex] = React.useState(1);
+  const [currentpage, setCurrentpage] = React.useState(0);
 
   const columns: GridColDef[] = [
     {
@@ -94,10 +99,11 @@ function OrderList() {
     },
   ];
   // console.log('Data Size: ', JSON.stringify(res));
-  const rows = res.data.map((data: ShipmentInfo, index: number) => {
+  let i: number = index;
+  const rows = res.data.map((data: ShipmentInfo, indexs: number) => {
     return {
       id: `${data.shipmentNo}_${data.sdNo}`,
-      index: index + 1,
+      index: i + indexs,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
       sdType: getShipmentTypeText(data.sdType),
@@ -119,6 +125,40 @@ function OrderList() {
     setOpens(false);
   }
 
+  //pagination
+
+  const [loading, setLoading] = React.useState<boolean>(false);
+
+  const handlePageChange = async (newPage: number) => {
+    setLoading(true);
+    setCurrentpage(newPage);
+
+    let page: string = "1";
+
+    if (newPage > currentpage) {
+      setIndex(index + 5);
+      page = (newPage + 1).toString();
+    } else if (newPage < currentpage) {
+      setIndex(index - 5);
+      page = (newPage - 1).toString();
+    }
+
+    const payloadNewpage: ShipmentRequest = {
+      limit: payload.limit,
+      page: page,
+      shipmentNo: payload.shipmentNo,
+      sdNo: payload.sdNo,
+      dateFrom: payload.dateFrom,
+      dateTo: payload.dateTo,
+      sdStatus: payload.sdStatus,
+      sdType: payload.sdType,
+      clearSearch: false,
+    };
+
+    await dispatch(featchOrderListAsync(payloadNewpage));
+    setLoading(false);
+  };
+
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
@@ -130,7 +170,12 @@ function OrderList() {
             onCellClick={currentlySelected}
             autoHeight
             pagination
-            pageSize={10}
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            rowCount={res.total}
+            paginationMode="server"
+            onPageChange={handlePageChange}
+            loading={loading}
           />
         </div>
       </Box>

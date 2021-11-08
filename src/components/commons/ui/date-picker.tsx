@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from "@material-ui/core/styles";
 
 interface StateProps {
   onClickDate: any;
+  value: any | Date | number | string;
 }
 
 const defaultMaterialTheme = createTheme({
@@ -27,17 +28,12 @@ const defaultMaterialTheme = createTheme({
 
 // export default function DatePickerComponent() {
 const DatePickerComponent: React.FC<StateProps> = (props) => {
-  // const [selectedDate, setSelectedDate] = React.useState<Date | null>(
-  //   new Date('2014-08-18T21:11:54'),
-  // );
   const classes = useStyles();
-  const [selectedDate, setSelectedDate] = React.useState(
-    moment().add(0, "years")
-  );
+  // const [selectedDate, setSelectedDate] = React.useState(
+  //   moment().add(0, "years")
+  // );
 
   const handleDateChange = (date: Date | null) => {
-    console.log("newdate: ", date);
-    setSelectedDate(date);
     props.onClickDate(date);
   };
 
@@ -49,7 +45,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
             disableToolbar
             variant="inline"
             format="DD/MM/YYYY"
-            value={selectedDate}
+            value={props.value}
             onChange={handleDateChange}
             autoOk
             inputVariant="outlined"

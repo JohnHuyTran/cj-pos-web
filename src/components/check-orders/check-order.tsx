@@ -47,11 +47,10 @@ function CheckOrderSearch() {
     orderNo: "",
     orderStatus: "ALL",
     orderType: "ALL",
-    dateFrom: "10/10/2021",
-    dateTo: "11/10/2021",
+    dateFrom: "",
+    dateTo: "",
   });
-  // const newDates = moment(new Date()).add(543, "year");
-  // const d = moment(newDates, "DD/MM/YYYY").toDate();
+
   const [startDate, setStartDate] = React.useState<Date>(new Date());
   const [endDate, setEndDate] = React.useState<Date>(new Date());
   const [openLoadingModal, setOpenLoadingModal] =
@@ -70,7 +69,7 @@ function CheckOrderSearch() {
 
   const onClickSearchBtn = async () => {
     const payload: ShipmentRequest = {
-      limit: "20",
+      limit: "5",
       page: "1",
       shipmentNo: values.orderShipment,
       sdNo: values.orderNo,
@@ -85,12 +84,14 @@ function CheckOrderSearch() {
     await dispatch(featchOrderListAsync(payload));
     await dispatch(saveSearchCriteria(payload));
     handleOpenLoading("open", false);
-    console.log("startDate: ", dateToStringCriteria(startDate));
-    console.log("endDate: ", dateToStringCriteria(endDate, false));
-    console.log(`Search Criteria: ${JSON.stringify(payload)}`);
+    // console.log("startDate: ", dateToStringCriteria(startDate));
+    // console.log("endDate: ", dateToStringCriteria(endDate, false));
+    // console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
 
   const onClickClearBtn = () => {
+    setStartDate(new Date());
+    setEndDate(new Date());
     setValues({
       orderShipment: "",
       orderNo: "",
@@ -99,10 +100,9 @@ function CheckOrderSearch() {
       dateFrom: "",
       dateTo: "",
     });
-    setStartDate(new Date());
-    setEndDate(new Date());
+
     const payload: ShipmentRequest = {
-      limit: "20",
+      limit: "5",
       page: "1",
       shipmentNo: values.orderShipment,
       sdNo: values.orderNo,
@@ -195,14 +195,20 @@ function CheckOrderSearch() {
             <Typography gutterBottom variant="subtitle1" component="div">
               ตั้งแต่
             </Typography>
-            <DatePickerComponent onClickDate={handleStartDatePicker} />
+            <DatePickerComponent
+              onClickDate={handleStartDatePicker}
+              value={startDate}
+            />
           </Grid>
           <Grid item xs={4} container alignItems="flex-end">
             <Box sx={{ width: "100%" }}>
               <Typography gutterBottom variant="subtitle1" component="div">
                 ถึง
               </Typography>
-              <DatePickerComponent onClickDate={handleEndDatePicker} />
+              <DatePickerComponent
+                onClickDate={handleEndDatePicker}
+                value={endDate}
+              />
             </Box>
           </Grid>
           <Grid
