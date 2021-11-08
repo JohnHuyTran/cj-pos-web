@@ -13,11 +13,6 @@ const useStyles = makeStyles({
       padding: "4px 4px 4px 8px",
     },
   },
-  Mdatepicker: {
-    "& .MuiOutlinedInput-input": {
-      padding: "8px 14px !important",
-    },
-  },
   MdataGrid: {
     "& .MuiDataGrid-columnHeaderTitle": {
       color: "#36C690",

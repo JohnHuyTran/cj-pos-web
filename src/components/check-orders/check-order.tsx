@@ -143,6 +143,7 @@ function CheckOrderSearch() {
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
+              placeholder="เลขที่เอกสาร LD/เลขที่เอกสาร SD"
             />
           </Grid>
           <Grid item xs={4}>
