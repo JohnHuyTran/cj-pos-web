@@ -113,20 +113,6 @@ function OrderList() {
     setOpens(false);
   }
 
-  //pagination
-  const pagesNextCursor = React.useRef<{ [page: number]: GridRowId }>({});
-  const [page, setPage] = React.useState(0);
-  const [loading, setLoading] = React.useState<boolean>(false);
-
-  const handlePageChange = (newPage: number) => {
-    // We have the cursor, we can allow the page transition.
-    if (newPage === 0 || pagesNextCursor.current[newPage - 1]) {
-      setPage(newPage);
-    }
-
-    console.log("page==", page);
-  };
-
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
@@ -140,10 +126,6 @@ function OrderList() {
             className={classes.MdataGrid}
             pagination
             pageSize={10}
-            paginationMode="server"
-            onPageChange={handlePageChange}
-            page={page}
-            loading={loading}
           />
         </div>
       </Box>
