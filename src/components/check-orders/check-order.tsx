@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { Button } from "@mui/material";
+import { Button, InputLabel } from "@mui/material";
 import { useAppSelector, useAppDispatch } from "../../store/store";
 import {
   featchOrderListAsync,
@@ -22,8 +22,10 @@ import OrderList from "./order-list";
 import DatePickerComponent from "../commons/ui/date-picker";
 import LoadingModal from "../commons/ui/loading-modal";
 import { useStyles } from "../../styles/makeTheme";
+import { dateToStringCriteria } from "../../utils/date-utill";
 
-moment.locale("en");
+// moment.locale("en");
+moment.locale("th");
 
 interface State {
   orderShipment: string;
@@ -48,8 +50,10 @@ function CheckOrderSearch() {
     dateFrom: "10/10/2021",
     dateTo: "11/10/2021",
   });
-  const [startDate, setStartDate] = React.useState<Date | null>(new Date());
-  const [endDate, setEndDate] = React.useState<Date | null>(new Date());
+  // const newDates = moment(new Date()).add(543, "year");
+  // const d = moment(newDates, "DD/MM/YYYY").toDate();
+  const [startDate, setStartDate] = React.useState<Date>(new Date());
+  const [endDate, setEndDate] = React.useState<Date>(new Date());
   const [openLoadingModal, setOpenLoadingModal] =
     React.useState<loadingModalState>({
       open: false,
@@ -66,20 +70,23 @@ function CheckOrderSearch() {
 
   const onClickSearchBtn = async () => {
     const payload: ShipmentRequest = {
-      limit: "10",
+      limit: "20",
       page: "1",
       shipmentNo: values.orderShipment,
       sdNo: values.orderNo,
-      dateFrom: moment(startDate).format("DD/MM/YYYY"),
-      dateTo: moment(endDate).format("DD/MM/YYYY"),
+      dateFrom: moment(startDate).startOf("day").toISOString(),
+      dateTo: moment(endDate).endOf("day").toISOString(),
       sdStatus: parseInt(values.orderStatus),
       sdType: parseInt(values.orderType),
       clearSearch: false,
     };
+
     handleOpenLoading("open", true);
     await dispatch(featchOrderListAsync(payload));
     await dispatch(saveSearchCriteria(payload));
     handleOpenLoading("open", false);
+    console.log("startDate: ", dateToStringCriteria(startDate));
+    console.log("endDate: ", dateToStringCriteria(endDate, false));
     console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
 
@@ -89,13 +96,13 @@ function CheckOrderSearch() {
       orderNo: "",
       orderStatus: "ALL",
       orderType: "ALL",
-      dateFrom: "10/10/2021",
-      dateTo: "11/10/2021",
+      dateFrom: "",
+      dateTo: "",
     });
     setStartDate(new Date());
     setEndDate(new Date());
     const payload: ShipmentRequest = {
-      limit: "10",
+      limit: "20",
       page: "1",
       shipmentNo: values.orderShipment,
       sdNo: values.orderNo,
@@ -121,62 +128,55 @@ function CheckOrderSearch() {
 
   return (
     <>
-      <Box sx={{ flexGrow: 1 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={3}>
-            <Typography variant="subtitle1" gutterBottom component="div">
-              เลขที่เอกสาร LD
+      {/* <Box sx={{ flexGrow: 1 }}> */}
+      <Box>
+        <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              ค้นหาเอกสาร
             </Typography>
             <TextField
               id="txtOrderShipment"
-              size="small"
               name="orderShipment"
+              size="small"
               value={values.orderShipment}
               onChange={handleChange}
+              className={classes.MtextField}
+              fullWidth
+              placeholder="เลขที่เอกสาร LD/เลขที่เอกสาร SD"
             />
           </Grid>
-          <Grid item xs={9}>
-            <Typography variant="subtitle1" gutterBottom component="div">
-              เลขที่เอกสาร SD
+          <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              ประเภท
             </Typography>
-            <TextField
-              id="txtOrderNo"
-              size="small"
-              name="orderNo"
-              value={values.orderNo}
-              onChange={handleChange}
-            />
+            <FormControl fullWidth className={classes.Mselect}>
+              <Select
+                id="selOrderType"
+                name="orderType"
+                value={values.orderType}
+                onChange={handleChange}
+                inputProps={{ "aria-label": "Without label" }}
+              >
+                <MenuItem value={"ALL"} selected={true}>
+                  ทั้งหมด
+                </MenuItem>
+                <MenuItem value={"0"}>ลังกระดาษ/ลังพลาสติก</MenuItem>
+                <MenuItem value={"1"}>สินค้าภายในTote</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
-          <Grid item xs={3}>
-            <Typography variant="subtitle1" gutterBottom component="div">
-              วันที่รับสินค้า ตั้งแต่
-            </Typography>
-            <DatePickerComponent
-              onClickDate={handleStartDatePicker}
-              value={startDate}
-            />
-          </Grid>
-          <Grid item xs={9}>
-            <Typography variant="subtitle1" gutterBottom component="div">
-              ถึง
-            </Typography>
-            <DatePickerComponent
-              onClickDate={handleEndDatePicker}
-              value={endDate}
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="subtitle1" gutterBottom component="div">
+          <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สถานะ
             </Typography>
-            <FormControl className={classes.Mselect} sx={{ width: 193 }}>
+            <FormControl fullWidth className={classes.Mselect}>
               <Select
                 id="selOrderStatus"
                 name="orderStatus"
                 value={values.orderStatus}
                 onChange={handleChange}
                 inputProps={{ "aria-label": "Without label" }}
-                autoWidth={true}
               >
                 <MenuItem value={"ALL"} selected={true}>
                   ทั้งหมด
@@ -187,55 +187,55 @@ function CheckOrderSearch() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={9}>
-            <Typography variant="subtitle1" gutterBottom component="div">
-              ประเภท
+
+          <Grid item xs={4} sx={{ pt: 30 }}>
+            <Typography gutterBottom variant="subtitle1" component="div">
+              วันที่รับสินค้า
             </Typography>
-            <FormControl className={classes.Mselect} sx={{ width: 193 }}>
-              <Select
-                id="selOrderType"
-                name="orderType"
-                value={values.orderType}
-                onChange={handleChange}
-                inputProps={{ "aria-label": "Without label" }}
-                autoWidth={true}
-              >
-                <MenuItem value={"ALL"} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem value={"0"}>ลังกระดาษ/ลังพลาสติก</MenuItem>
-                <MenuItem value={"1"}>สินค้าภายในTote</MenuItem>
-              </Select>
-            </FormControl>
+            <Typography gutterBottom variant="subtitle1" component="div">
+              ตั้งแต่
+            </Typography>
+            <DatePickerComponent onClickDate={handleStartDatePicker} />
           </Grid>
-          <Grid item xs={12}>
-            <Box
-              sx={{
-                width: "150px",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Button
-                id="btnSearch"
-                variant="contained"
-                color="primary"
-                onClick={onClickSearchBtn}
-              >
-                ค้นหา
-              </Button>
-              <Button
-                id="btnClear"
-                variant="contained"
-                onClick={onClickClearBtn}
-                sx={{ backgroundColor: "#AEAEAE" }}
-              >
-                เคลียร์
-              </Button>
+          <Grid item xs={4} container alignItems="flex-end">
+            <Box sx={{ width: "100%" }}>
+              <Typography gutterBottom variant="subtitle1" component="div">
+                ถึง
+              </Typography>
+              <DatePickerComponent onClickDate={handleEndDatePicker} />
             </Box>
+          </Grid>
+          <Grid
+            item
+            container
+            xs={4}
+            justifyContent="flex-end"
+            direction="row"
+            alignItems="flex-end"
+          >
+            <Button
+              id="btnSearch"
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={onClickSearchBtn}
+              sx={{ width: "40%" }}
+            >
+              ค้นหา
+            </Button>
+            <Button
+              id="btnClear"
+              variant="contained"
+              size="large"
+              onClick={onClickClearBtn}
+              sx={{ backgroundColor: "#AEAEAE", ml: 2, width: "40%" }}
+            >
+              เคลียร์
+            </Button>
           </Grid>
         </Grid>
       </Box>
+      <Box mt={6}></Box>
       {items.orderList && <OrderList />}
       <LoadingModal open={openLoadingModal.open} />
     </>

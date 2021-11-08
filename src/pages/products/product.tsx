@@ -24,7 +24,7 @@ export default function ProductList({}: Props): ReactElement {
   return (
     <div>
       <Container maxWidth="lg">
-        <TitleHeader title="สินค้า" icon="storefront" />
+        <TitleHeader title="สินค้า" />
         <Box mt={3}>
           <BootstrapButton
             variant="contained"

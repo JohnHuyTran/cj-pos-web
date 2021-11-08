@@ -1,6 +1,11 @@
 import React from "react";
 import { useAppSelector } from "../../store/store";
-import { DataGrid, GridColDef, GridCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridCellParams,
+  GridRowId,
+} from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 //import OrderProductList from './order-product-list';
 import { ShipmentResponse, ShipmentInfo } from "../../models/order-model";
@@ -11,8 +16,11 @@ import {
   getShipmentStatusText,
   getShipmentTypeText,
 } from "../../utils/enum/check-order-enum";
+import { useStyles } from "../../styles/makeTheme";
+// import { Pagination } from "@mui/material";
 
 function OrderList() {
+  const classes = useStyles();
   const items = useAppSelector((state) => state.checkOrderList);
   const res: ShipmentResponse = items.orderList;
   const [opens, setOpens] = React.useState(false);
@@ -20,21 +28,66 @@ function OrderList() {
   const [sdNo, setSdNo] = React.useState("");
 
   const columns: GridColDef[] = [
-    { field: "index", headerName: "ลำดับที่", minWidth: 120 },
+    {
+      field: "index",
+      headerName: "ลำดับที่",
+      minWidth: 120,
+      headerAlign: "center",
+    },
     {
       field: "shipmentNo",
       headerName: "เลขที่เอกสาร LD",
       minWidth: 200,
+      headerAlign: "center",
     },
-    { field: "sdNo", headerName: "เลขที่เอกสาร SD", minWidth: 200 },
-    { field: "sdType", headerName: "ประเภท", minWidth: 200 },
-    { field: "sdStatus", headerName: "สถานะ", minWidth: 200 },
-    { field: "boxCnt", headerName: "จำนวนลัง", minWidth: 150 },
-    { field: "toteCnt", headerName: "จำนวน Tote", minWidth: 150 },
-    { field: "shipmentDate", headerName: "วันที่รับสินค้า", minWidth: 200 },
-    { field: "detail", headerName: "รายละเอียด", minWidth: 200 },
+    {
+      field: "sdNo",
+      headerName: "เลขที่เอกสาร SD",
+      minWidth: 200,
+      headerAlign: "center",
+    },
+    {
+      field: "sdType",
+      headerName: "ประเภท",
+      minWidth: 200,
+      headerAlign: "center",
+    },
+    {
+      field: "sdStatus",
+      headerName: "สถานะ",
+      minWidth: 200,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "boxCnt",
+      headerName: "จำนวนลัง",
+      minWidth: 150,
+      headerAlign: "center",
+      align: "right",
+    },
+    {
+      field: "toteCnt",
+      headerName: "จำนวน Tote",
+      minWidth: 150,
+      headerAlign: "center",
+      align: "right",
+    },
+    {
+      field: "shipmentDate",
+      headerName: "วันที่รับสินค้า",
+      minWidth: 200,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "detail",
+      headerName: "รายละเอียด",
+      minWidth: 200,
+      headerAlign: "center",
+    },
   ];
-  // console.log("Data Size: ", JSON.stringify(res));
+  // console.log('Data Size: ', JSON.stringify(res));
   const rows = res.data.map((data: ShipmentInfo, index: number) => {
     return {
       id: `${data.shipmentNo}_${data.sdNo}`,
@@ -60,8 +113,6 @@ function OrderList() {
     setOpens(false);
   }
 
-  console.log(typeof isClosModal);
-
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
@@ -69,8 +120,12 @@ function OrderList() {
           <DataGrid
             rows={rows}
             columns={columns}
+            disableColumnMenu
             onCellClick={currentlySelected}
             autoHeight
+            className={classes.MdataGrid}
+            pagination
+            pageSize={10}
           />
         </div>
       </Box>
