@@ -66,6 +66,7 @@ export interface ShipmentInfo {
   sdType: number;
   toteCnt: number;
   boxCnt: number;
+  hasDoc: boolean;
   entries: Entry[] | null;
 }
 

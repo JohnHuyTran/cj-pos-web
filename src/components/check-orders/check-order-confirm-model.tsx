@@ -189,23 +189,41 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                 >
                   ยืนยันอนุมัติใบตรวจสอบการรับ-โอนสินค้า
                 </Typography>
-                <Typography variant="body1" align="center">
-                  เลขที่เอกสาร LD |{" "}
+                <Typography
+                  variant="body1"
+                  align="left"
+                  sx={{ paddingLeft: "7em" }}
+                >
+                  เลขที่เอกสาร LD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
                   <label style={{ color: "#36C690" }}>
                     <b>{shipmentNo}</b>
                   </label>
                 </Typography>
                 <Typography
                   variant="body1"
-                  align="center"
-                  sx={{ marginBottom: 2 }}
+                  align="left"
+                  sx={{ marginBottom: 2, paddingLeft: "7em" }}
                 >
-                  เลขที่เอกสาร SD |{" "}
+                  เลขที่เอกสาร SD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
                   <label style={{ color: "#36C690" }}>
                     <b>{sdNo}</b>
                   </label>
                 </Typography>
-                {items.length > 0 && <DataDiffInfo items={items} />}
+                {items.length > 0 && (
+                  <div>
+                    <div
+                      style={{
+                        textAlign: "center",
+                        fontWeight: 400,
+                        fontSize: 18,
+                        marginBottom: 10,
+                      }}
+                    >
+                      รายการสินค้าขาด / เกิน
+                    </div>
+                    <DataDiffInfo items={items} />
+                  </div>
+                )}
               </DialogContentText>
             </DialogContent>
           </div>

@@ -18,7 +18,11 @@ export default function DataDiffInfo(props: DataDiffInfyProps) {
   const { items } = props;
 
   return (
-    <TableContainer component={Paper} id="tblItemDifferance">
+    <TableContainer
+      component={Paper}
+      id="tblItemDifferance"
+      style={{ border: "1px solid #676767" }}
+    >
       <Table
         sx={{ minWidth: 500, textAlign: "center" }}
         size="small"
@@ -49,7 +53,20 @@ export default function DataDiffInfo(props: DataDiffInfyProps) {
               <TableCell> {index + 1}</TableCell>
               <TableCell>{row.barcode}</TableCell>
               <TableCell>{row.productName}</TableCell>
-              <TableCell align="right">{row.actualQty}</TableCell>
+              <TableCell align="right">
+                {row.actualQty > 0 && (
+                  <label style={{ color: "#446EF2", fontWeight: 700 }}>
+                    {" "}
+                    +{row.actualQty}{" "}
+                  </label>
+                )}
+                {row.actualQty < 0 && (
+                  <label style={{ color: "#F54949", fontWeight: 700 }}>
+                    {" "}
+                    {row.actualQty}{" "}
+                  </label>
+                )}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
