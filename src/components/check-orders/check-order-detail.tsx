@@ -29,6 +29,7 @@ import {
   GridRowId,
   GridRowData,
   GridCellParams,
+  GridRowsProp,
 } from "@mui/x-data-grid";
 import DialogTitle from "@mui/material/DialogTitle";
 import Link from "@mui/material/Link";
@@ -219,7 +220,7 @@ const isDisable = (params: GridRenderCellParams) => {
 
 const isAllowActualQty = (params: GridRenderCellParams, value: number) => {
   if (params.row.isTote === true && !(value * 1 >= 0 && value * 1 <= 1)) {
-    return alert("errror");
+    return alert("สินค้าภายใน Tote กรอกได้เฉพาะ 0 กับ 1 เท่านั้น");
   }
 };
 
@@ -345,34 +346,11 @@ export default function CheckOrderDetail({
     setShipmentDateFormat(convertUtcToBkkDate(shipmentList[0].shipmentDate));
   }, [open, openModelConfirm]);
 
-  const handleClose = () => {
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    let i = 0;
-    let exit = false;
-    rowsEdit.forEach((data: GridRowData) => {
-      if (data.productQuantityActual !== rows[i].productQuantityActual) {
-        exit = true;
-      } else if (data.productComment !== rows[i].productComment) {
-        exit = true;
-      }
-      i++;
-
-      if (exit) {
-        setConfirmModelExit(true);
-        return;
-      }
-    });
-
-    if (!exit) {
-      setOpen(false);
-      onClickClose();
-    }
-  };
-
   function handleNotExitModelConfirm() {
     setConfirmModelExit(false);
   }
   function handleExitModelConfirm() {
+    localStorage.removeItem("localStorageRowsEdit");
     setConfirmModelExit(false);
     setOpen(false);
     onClickClose();
@@ -451,51 +429,22 @@ export default function CheckOrderDetail({
           updateShipmentOrder();
         });
     }
+
+    localStorage.removeItem("localStorageRowsEdit");
   };
 
   const handleApproveBtn = async () => {
     setItemsDiffState([]);
     setOpenModelConfirm(true);
     setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
-
-    // rows.forEach((data: GridRowData) => {
-    //   let diffCount: number =
-    //     // data.productQuantityRef - data.productQuantityActual;
-    //     data.productQuantityActual - data.productQuantityRef;
-
-    //   if (diffCount !== 0) {
-    //     const itemDiff: Entry = {
-    //       barcode: data.productBarCode,
-    //       productName: data.productDescription,
-    //       actualQty: diffCount,
-    //       seqItem: 0,
-    //       itemNo: "",
-    //       shipmentSAPRef: "",
-    //       skuCode: "",
-    //       skuType: "",
-    //       deliveryOrderNo: "",
-    //       unitCode: "",
-    //       unitName: "",
-    //       unitFactor: 0,
-    //       qty: 0,
-    //       qtyAll: 0,
-    //       qtyAllBefore: 0,
-    //       qtyDiff: 0,
-    //       price: 0,
-    //       isControlStock: 0,
-    //       toteCode: "",
-    //       expireDate: "",
-    //       isTote: false,
-    //       comment: "",
-    //     };
-    //     setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
-    //   }
-    // });
-
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+
+    const itemsList: any = [];
     rowsEdit.forEach((data: GridRowData) => {
       let diffCount: number =
         data.productQuantityActual - data.productQuantityRef;
+
+      // console.log("data: " + JSON.stringify(data));
 
       const itemDiff: Entry = {
         barcode: data.productBarCode,
@@ -507,7 +456,7 @@ export default function CheckOrderDetail({
         shipmentSAPRef: "",
         skuCode: "",
         skuType: "",
-        productName: "",
+        productName: data.productDescription,
         unitCode: "",
         unitName: "",
         unitFactor: 0,
@@ -522,7 +471,11 @@ export default function CheckOrderDetail({
         isTote: false,
       };
       setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
+
+      itemsList.push(data);
     });
+
+    localStorage.setItem("localStorageRowsEdit", JSON.stringify(itemsList));
   };
 
   const handleCloseJobBtn = () => {
@@ -577,11 +530,8 @@ export default function CheckOrderDetail({
     (shipmentInfo: ShipmentInfo) => shipmentInfo.sdNo === sdNo
   );
 
-  const entries: Entry[] = shipmentList[0].entries
-    ? shipmentList[0].entries
-    : [];
-
-  let rows = entries.map((item: Entry, index: number) => {
+  let entries: Entry[] = shipmentList[0].entries ? shipmentList[0].entries : [];
+  let rowsEntries = entries.map((item: Entry, index: number) => {
     return {
       id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
       doNo: item.deliveryOrderNo,
@@ -601,6 +551,13 @@ export default function CheckOrderDetail({
       productComment: item.comment,
     };
   });
+
+  if (localStorage.getItem("localStorageRowsEdit")) {
+    let localStorageEdit = JSON.parse(
+      localStorage.getItem("localStorageRowsEdit") || ""
+    );
+    rowsEntries = localStorageEdit;
+  }
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     props,
@@ -640,14 +597,42 @@ export default function CheckOrderDetail({
     return fileName;
   };
 
-  const [opensSD, setOpensSD] = React.useState(false);
-  function isClosSDModal() {
-    setOpensSD(false);
-  }
+  // const [opensSD, setOpensSD] = React.useState(false);
+  // function isClosSDModal() {
+  //   setOpensSD(false);
+  // }
 
-  function clickSelectedSD() {
-    setOpensSD(true);
-  }
+  // function clickSelectedSD() {
+  //   setOpensSD(true);
+  // }
+
+  const handleClose = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    let i = 0;
+    let exit = false;
+
+    const itemsList: any = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      if (data.productQuantityActual !== rowsEntries[i].productQuantityActual) {
+        exit = true;
+      } else if (data.productComment !== rowsEntries[i].productComment) {
+        exit = true;
+      }
+      i++;
+
+      itemsList.push(data);
+    });
+
+    if (!exit) {
+      setOpen(false);
+      onClickClose();
+    }
+
+    if (exit) {
+      localStorage.setItem("localStorageRowsEdit", JSON.stringify(itemsList));
+      setConfirmModelExit(true);
+    }
+  };
 
   return (
     <div>
@@ -911,7 +896,7 @@ export default function CheckOrderDetail({
               className={classes.MdataGrid}
             >
               <DataGrid
-                rows={rows}
+                rows={rowsEntries}
                 columns={columns}
                 disableColumnMenu
                 // autoPageSize={true}

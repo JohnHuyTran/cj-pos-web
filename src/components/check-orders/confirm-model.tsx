@@ -4,25 +4,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
-import {
-  Entry,
-  OrderApproveCloseJobRequest,
-  ShipmentRequest,
-} from "../../models/order-model";
-import {
-  approveOrderShipments,
-  closeOrderShipments,
-} from "../../services/order-shipment";
-import { ShipmentDeliveryStatusCodeEnum } from "../../utils/enum/check-order-enum";
-import DataDiffInfo from "./table-diff-info";
-import { ApiError } from "../../models/api-error-model";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { featchOrderListAsync } from "../../store/slices/check-order-slice";
-import LoadingModal from "../commons/ui/loading-modal";
 
 interface Confirm {
   open: boolean;

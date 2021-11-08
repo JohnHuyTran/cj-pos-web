@@ -162,6 +162,8 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         });
     }
     handleOpenLoading("open", false);
+
+    localStorage.removeItem("localStorageRowsEdit");
   };
 
   const handleClose = () => {
@@ -184,7 +186,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         shipmentSAPRef: "",
         skuCode: "",
         skuType: "",
-        productName: "",
+        productName: data.productName,
         unitCode: "",
         unitName: "",
         unitFactor: 0,
@@ -242,13 +244,13 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                 >
                   ยืนยันอนุมัติใบตรวจสอบการรับ-โอนสินค้า
                 </Typography>
-                <Typography variant="body2" align="center">
+                <Typography variant="body1" align="center">
                   เลขที่เอกสาร LD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
                   <label style={{ color: "#36C690" }}>
                     <b>{shipmentNo}</b>
                   </label>
                 </Typography>
-                <Typography variant="body2" align="center">
+                <Typography variant="body1" align="center">
                   เลขที่เอกสาร SD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
                   <label style={{ color: "#36C690" }}>
                     <b>{sdNo}</b>
@@ -260,7 +262,9 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                       variant="body1"
                       align="center"
                       sx={{
-                        margin: 2,
+                        marginTop: 2,
+                        marginBottom: 1,
+                        fontWeight: 600,
                       }}
                     >
                       รายการสินค้าขาด / เกิน
