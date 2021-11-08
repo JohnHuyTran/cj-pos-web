@@ -16,8 +16,12 @@ const useStyles = makeStyles({
   MdataGrid: {
     "& .MuiDataGrid-columnHeaderTitle": {
       color: "#36C690",
-
       fontWeight: "600 !important",
+    },
+    "& .MuiDataGrid-root": {
+      fontFamily: "Kanit",
+
+      borderRadius: "10px !important",
     },
   },
 });

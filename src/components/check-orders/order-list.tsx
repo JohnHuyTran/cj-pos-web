@@ -1,5 +1,5 @@
 import React from "react";
-import { useAppSelector } from "../../store/store";
+import { useAppSelector, useAppDispatch } from "../../store/store";
 import {
   DataGrid,
   GridColDef,
@@ -23,6 +23,10 @@ function OrderList() {
   const classes = useStyles();
   const items = useAppSelector((state) => state.checkOrderList);
   const res: ShipmentResponse = items.orderList;
+  const payload = useAppSelector(
+    (state) => state.saveSearchOrder.searchCriteria
+  );
+  const dispatch = useAppDispatch();
   const [opens, setOpens] = React.useState(false);
   const [shipment, setShipment] = React.useState("");
   const [sdNo, setSdNo] = React.useState("");
@@ -32,32 +36,32 @@ function OrderList() {
       field: "index",
       headerName: "ลำดับที่",
       minWidth: 120,
-      headerAlign: "center",
+      headerAlign: "left",
     },
     {
       field: "shipmentNo",
       headerName: "เลขที่เอกสาร LD",
       minWidth: 200,
-      headerAlign: "center",
+      headerAlign: "left",
     },
     {
       field: "sdNo",
       headerName: "เลขที่เอกสาร SD",
       minWidth: 200,
-      headerAlign: "center",
+      headerAlign: "left",
     },
     {
       field: "sdType",
       headerName: "ประเภท",
       minWidth: 200,
-      headerAlign: "center",
+      headerAlign: "left",
     },
     {
       field: "sdStatus",
       headerName: "สถานะ",
       minWidth: 200,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: "left",
+      align: "left",
     },
     {
       field: "boxCnt",
@@ -85,6 +89,7 @@ function OrderList() {
       headerName: "รายละเอียด",
       minWidth: 200,
       headerAlign: "center",
+      align: "left",
     },
   ];
   // console.log('Data Size: ', JSON.stringify(res));
@@ -116,14 +121,13 @@ function OrderList() {
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
-        <div>
+        <div className={classes.MdataGrid}>
           <DataGrid
             rows={rows}
             columns={columns}
             disableColumnMenu
             onCellClick={currentlySelected}
             autoHeight
-            className={classes.MdataGrid}
             pagination
             pageSize={10}
           />
