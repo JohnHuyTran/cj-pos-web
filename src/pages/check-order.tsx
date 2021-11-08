@@ -6,7 +6,7 @@ import TitleHeader from "../components/title-header";
 const CheckOrder = () => {
   return (
     <Container maxWidth="xl">
-      <TitleHeader title="ตรวจสอบการรับ-โอนสินค้า" icon="staroutlineoutline" />
+      <TitleHeader title="ตรวจสอบการรับ-โอนสินค้า" />
       <Box mt={3}>
         <CheckOrderSearch />
       </Box>

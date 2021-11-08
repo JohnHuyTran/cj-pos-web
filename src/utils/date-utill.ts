@@ -1,5 +1,5 @@
 import moment from "moment";
-import { DateFormat } from '../utils/enum/common-enum';
+import { DateFormat } from "../utils/enum/common-enum";
 
 export const dateToStringCriteria = (date: Date, isStartDate = true) => {
   if (date === null) {
@@ -7,13 +7,9 @@ export const dateToStringCriteria = (date: Date, isStartDate = true) => {
   }
 
   if (isStartDate) {
-    return moment(date)
-      .startOf('day')
-      .toISOString();
+    return moment(date).startOf("day").toISOString();
   } else {
-    return moment(date)
-      .endOf('day')
-      .toISOString();
+    return moment(date).endOf("day").toISOString();
   }
 };
 
@@ -24,15 +20,9 @@ export const dateToStringMonthCriteria = (date: Date, isStartDate = true) => {
   }
 
   if (isStartDate) {
-    return moment(date)
-      .startOf('month')
-      .add(timeZone, 'hours')
-      .toISOString();
+    return moment(date).startOf("month").add(timeZone, "hours").toISOString();
   } else {
-    return moment(date)
-      .endOf('month')
-      .add(timeZone, 'hours')
-      .toISOString();
+    return moment(date).endOf("month").add(timeZone, "hours").toISOString();
   }
 };
 
@@ -41,7 +31,7 @@ export const dateTimeToDateOnlyString = (date: Date) => {
     return null;
   }
 
-  return moment(date).format('YYYY-MM-DD');
+  return moment(date).format("YYYY-MM-DD");
 };
 
 export const dateStringToTagCriteria = (date: string) => {
@@ -61,37 +51,43 @@ export const dateStringToMonthTagCriteria = (date: string) => {
   return d.isValid() ? d.format(DateFormat.MONTH_FORMAT) : null;
 };
 
-export const formatDateStartOfDay = (date: Date, dateFormat = 'YYYY-MM-DDTHH:mm:ss') =>
-  moment(date)
-    .startOf('day')
-    .format(dateFormat);
+export const formatDateStartOfDay = (
+  date: Date,
+  dateFormat = "YYYY-MM-DDTHH:mm:ss"
+) => moment(date).startOf("day").format(dateFormat);
 
-export const formatDateEndOfDay = (date: Date, dateFormat = 'YYYY-MM-DDTHH:mm:ss') =>
-  moment(date)
-    .endOf('day')
-    .format(dateFormat);
+export const formatDateEndOfDay = (
+  date: Date,
+  dateFormat = "YYYY-MM-DDTHH:mm:ss"
+) => moment(date).endOf("day").format(dateFormat);
 
-export const getDateFromString = (dateStr: string, formatFrom = 'YYYY-MM-DD') => moment(dateStr, formatFrom).toDate();
+export const getDateFromString = (dateStr: string, formatFrom = "YYYY-MM-DD") =>
+  moment(dateStr, formatFrom).toDate();
 
 export const convertBkkToUtc = (bkkDate: string) => {
   const timeZone = 7;
   let utcDate = null;
 
-  if (bkkDate && bkkDate !== '') {
+  if (bkkDate && bkkDate !== "") {
     const datetime = moment(bkkDate);
-    utcDate = datetime.add(-timeZone, 'hours').format(DateFormat.DATE_TIME_NONO_SEC);
+    utcDate = datetime
+      .add(-timeZone, "hours")
+      .format(DateFormat.DATE_TIME_NONO_SEC);
   }
-  if (utcDate && !utcDate.endsWith('Z')) {
+  if (utcDate && !utcDate.endsWith("Z")) {
     utcDate = `${utcDate}Z`;
   }
   return utcDate;
 };
 
-export const convertUtcToBkk = (utcDate: string, format = DateFormat.DATE_TIME_FORMAT) => {
+export const convertUtcToBkk = (
+  utcDate: string,
+  format = DateFormat.DATE_TIME_FORMAT
+) => {
   let bkkDate = null;
 
-  if (utcDate && utcDate !== '') {
-    if (!utcDate.endsWith('Z')) {
+  if (utcDate && utcDate !== "") {
+    if (!utcDate.endsWith("Z")) {
       utcDate = `${utcDate}Z`;
     }
     const datetime = moment(utcDate);
@@ -101,14 +97,17 @@ export const convertUtcToBkk = (utcDate: string, format = DateFormat.DATE_TIME_F
   return bkkDate;
 };
 
-export const convertUtcToBkkDate = (utcDate: string, format = DateFormat.DATE_FORMAT) => {
+export const convertUtcToBkkDate = (
+  utcDate: string,
+  format = DateFormat.DATE_FORMAT
+) => {
   let bkkDate = utcDate;
 
-  if (utcDate && utcDate !== '') {
-    if (!utcDate.endsWith('Z')) {
+  if (utcDate && utcDate !== "") {
+    if (!utcDate.endsWith("Z")) {
       utcDate = `${utcDate}Z`;
     }
-    const datetime = moment(utcDate);
+    const datetime = moment(utcDate).add(543, "year");
     bkkDate = datetime.utcOffset(7).format(format);
   }
 
@@ -118,12 +117,12 @@ export const convertUtcToBkkDate = (utcDate: string, format = DateFormat.DATE_FO
 export const convertUtcToBkkWithZ = (utcDate: string) => {
   let bkkDate = null;
 
-  if (utcDate && utcDate !== '') {
-    if (!utcDate.endsWith('Z')) {
+  if (utcDate && utcDate !== "") {
+    if (!utcDate.endsWith("Z")) {
       utcDate = `${utcDate}Z`;
     }
     const datetime = moment(utcDate);
-    bkkDate = datetime.add(7, 'hours').toISOString();
+    bkkDate = datetime.add(7, "hours").toISOString();
   }
 
   return bkkDate;

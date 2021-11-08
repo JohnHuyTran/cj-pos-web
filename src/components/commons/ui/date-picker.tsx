@@ -1,85 +1,58 @@
-import React from 'react';
-import FormControl from '@mui/material/FormControl';
-import TextField from '@mui/material/TextField';
-import DatePicker from '@mui/lab/DesktopDatePicker';
-import DateAdapter from '@mui/lab/AdapterMoment';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import { createTheme } from '@mui/material/styles';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from '../../../styles/theme';
-import moment from 'moment';
-// import 'moment/locale/th';
-// moment.locale('th');
-const materialTheme = createTheme({
-  palette: {
-    primary: {
-      main: theme.palette.primary.main,
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          color: '#446EF2',
-          fontSize: '10rem',
-        },
-      },
-    },
-    MuiInputBase: {
-      styleOverrides: {
-        root: {
-          padding: '2px 12px 2px 12px',
-        },
-        input: {
-          padding: '2px 12px 2px 12px',
-        },
-      },
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        root: {
-          padding: '2px 12px 2px 12px',
-        },
-        input: {
-          padding: '2px 12px 2px 12px',
-        },
-      },
-    },
-  },
-});
+//@ts-nocheck
+import React, { useState } from "react";
+
+import moment from "moment";
+// npm i @date-io/moment@1.x moment
+import OverwriteMomentBE from "./OverwriteMoment"; // choose your lib
+import { useStyles } from "../../../styles/makeTheme";
+
+import {
+  DatePicker,
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
 
 interface StateProps {
   onClickDate: any;
-  value: any | Date | number | string;
 }
 
+// export default function DatePickerComponent() {
 const DatePickerComponent: React.FC<StateProps> = (props) => {
-  const [defaultDate, setDefaultDate] = React.useState<Date | null>(new Date());
-  const [newDate, setNewDate] = React.useState<Date | null>(new Date());
-  // var date_format = moment(value).format("MM/DD/YYYY HH:mm:ss");
-  // const [inputValue, setInputValue] = React.useState(moment().format("DD/MM/YYYY"));
+  // const [selectedDate, setSelectedDate] = React.useState<Date | null>(
+  //   new Date('2014-08-18T21:11:54'),
+  // );
+  const classes = useStyles();
+  const [selectedDate, setSelectedDate] = React.useState(
+    moment().add(0, "years")
+  );
 
-  const handleDateChange = (newValue: any) => {
-    setDefaultDate(newValue);
-    setNewDate(newValue);
-    props.onClickDate(newValue);
+  const handleDateChange = (date: Date | null) => {
+    console.log("newdate: ", date);
+    setSelectedDate(date);
+    props.onClickDate(date);
   };
 
   return (
-    <LocalizationProvider dateAdapter={DateAdapter}>
-      <ThemeProvider theme={materialTheme}>
-        <FormControl sx={{ width: 193 }}>
-          <DatePicker
-            disableHighlightToday={true}
-            showDaysOutsideCurrentMonth={true}
-            value={props.value}
-            onChange={handleDateChange}
-            renderInput={(params) => <TextField {...params} />}
-            inputFormat="DD/MM/YYYY"
-          />
-        </FormControl>
-      </ThemeProvider>
-    </LocalizationProvider>
+    <div>
+      <MuiPickersUtilsProvider utils={OverwriteMomentBE} locale="th">
+        <KeyboardDatePicker
+          disableToolbar
+          variant="inline"
+          format="DD/MM/YYYY"
+          value={selectedDate}
+          onChange={handleDateChange}
+          autoOk
+          inputVariant="outlined"
+          className={classes.Mdatepicker}
+          fullWidth
+        />
+      </MuiPickersUtilsProvider>
+      {/* <p>1. output form datepicker :: {selectedDate.format("DD/MM/YYYY")}</p>
+      <p>
+        2. output form datepicker (add 543) ::{" "}
+        {moment(selectedDate).add(543, "year").format("DD/MM/YYYY")}
+      </p> */}
+    </div>
   );
 };
 
