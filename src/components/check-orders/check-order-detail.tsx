@@ -458,38 +458,70 @@ export default function CheckOrderDetail({
     setOpenModelConfirm(true);
     setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
 
-    rows.forEach((data: GridRowData) => {
+    // rows.forEach((data: GridRowData) => {
+    //   let diffCount: number =
+    //     // data.productQuantityRef - data.productQuantityActual;
+    //     data.productQuantityActual - data.productQuantityRef;
+
+    //   if (diffCount !== 0) {
+    //     const itemDiff: Entry = {
+    //       barcode: data.productBarCode,
+    //       productName: data.productDescription,
+    //       actualQty: diffCount,
+    //       seqItem: 0,
+    //       itemNo: "",
+    //       shipmentSAPRef: "",
+    //       skuCode: "",
+    //       skuType: "",
+    //       deliveryOrderNo: "",
+    //       unitCode: "",
+    //       unitName: "",
+    //       unitFactor: 0,
+    //       qty: 0,
+    //       qtyAll: 0,
+    //       qtyAllBefore: 0,
+    //       qtyDiff: 0,
+    //       price: 0,
+    //       isControlStock: 0,
+    //       toteCode: "",
+    //       expireDate: "",
+    //       isTote: false,
+    //       comment: "",
+    //     };
+    //     setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
+    //   }
+    // });
+
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    rowsEdit.forEach((data: GridRowData) => {
       let diffCount: number =
-        // data.productQuantityRef - data.productQuantityActual;
         data.productQuantityActual - data.productQuantityRef;
 
-      if (diffCount !== 0) {
-        const itemDiff: Entry = {
-          barcode: data.productBarCode,
-          productName: data.productDescription,
-          actualQty: diffCount,
-          seqItem: 0,
-          itemNo: "",
-          shipmentSAPRef: "",
-          skuCode: "",
-          skuType: "",
-          deliveryOrderNo: "",
-          unitCode: "",
-          unitName: "",
-          unitFactor: 0,
-          qty: 0,
-          qtyAll: 0,
-          qtyAllBefore: 0,
-          qtyDiff: 0,
-          price: 0,
-          isControlStock: 0,
-          toteCode: "",
-          expireDate: "",
-          isTote: false,
-          comment: "",
-        };
-        setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
-      }
+      const itemDiff: Entry = {
+        barcode: data.productBarCode,
+        deliveryOrderNo: data.doNo,
+        actualQty: data.productQuantityActual,
+        comment: data.productComment,
+        seqItem: 0,
+        itemNo: "",
+        shipmentSAPRef: "",
+        skuCode: "",
+        skuType: "",
+        productName: "",
+        unitCode: "",
+        unitName: "",
+        unitFactor: 0,
+        qty: 0,
+        qtyAll: 0,
+        qtyAllBefore: 0,
+        qtyDiff: diffCount,
+        price: 0,
+        isControlStock: 0,
+        toteCode: "",
+        expireDate: "",
+        isTote: false,
+      };
+      setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
     });
   };
 
@@ -970,14 +1002,14 @@ export default function CheckOrderDetail({
 
       <LoadingModal open={openLoadingModal.open} />
 
-      {opensSD && (
+      {/* {opensSD && (
         <CheckOrderDetail
           sdNo={sdNo}
           shipmentNo={shipmentNo}
           defaultOpen={opensSD}
           onClickClose={isClosSDModal}
         />
-      )}
+      )} */}
     </div>
   );
 }

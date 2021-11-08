@@ -10,7 +10,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import {
   Entry,
+  ItemsApprove,
   OrderApproveCloseJobRequest,
+  OrderApproveRequest,
   ShipmentRequest,
 } from "../../models/order-model";
 import {
@@ -23,6 +25,7 @@ import { ApiError } from "../../models/api-error-model";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { featchOrderListAsync } from "../../store/slices/check-order-slice";
 import LoadingModal from "../commons/ui/loading-modal";
+import { GridRowData } from "@mui/x-data-grid";
 
 interface ConfirmOrderShipment {
   open: boolean;
@@ -101,8 +104,25 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
 
   const confirmApproveBtn = async () => {
     handleOpenLoading("open", true);
+
     if (action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
-      await approveOrderShipments(sdNo).then(
+      const itemsApprove: any = [];
+      items.forEach((data) => {
+        const item: ItemsApprove = {
+          barcode: data.barcode,
+          deliveryOrderNo: data.deliveryOrderNo,
+          actualQty: data.actualQty * 1,
+          comment: data.comment,
+        };
+
+        itemsApprove.push(item);
+      });
+
+      const payload: OrderApproveRequest = {
+        items: itemsApprove,
+      };
+
+      await approveOrderShipments(sdNo, payload).then(
         async function (value) {
           await updateShipmentOrder();
           // setTimeout(() => {
@@ -151,6 +171,38 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     await dispatch(featchOrderListAsync(payloadSearchOrder));
   };
 
+  const itemsDiff: any = [];
+  items.forEach((data) => {
+    if (data.qtyDiff !== 0) {
+      const item: Entry = {
+        barcode: data.barcode,
+        deliveryOrderNo: data.deliveryOrderNo,
+        actualQty: data.actualQty * 1,
+        comment: data.comment,
+        seqItem: 0,
+        itemNo: "",
+        shipmentSAPRef: "",
+        skuCode: "",
+        skuType: "",
+        productName: "",
+        unitCode: "",
+        unitName: "",
+        unitFactor: 0,
+        qty: 0,
+        qtyAll: 0,
+        qtyAllBefore: 0,
+        qtyDiff: data.qtyDiff,
+        price: 0,
+        isControlStock: 0,
+        toteCode: "",
+        expireDate: "",
+        isTote: false,
+      };
+
+      itemsDiff.push(item);
+    }
+  });
+
   return (
     <div>
       <Dialog
@@ -158,6 +210,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         maxWidth="md"
+        sx={{ minWidth: 500 }}
       >
         {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && items.length > 0 && <DialogContent>
                 <DialogContentText id='alert-dialog-description'>
@@ -189,39 +242,30 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                 >
                   ยืนยันอนุมัติใบตรวจสอบการรับ-โอนสินค้า
                 </Typography>
-                <Typography
-                  variant="body1"
-                  align="left"
-                  sx={{ paddingLeft: "7em" }}
-                >
+                <Typography variant="body2" align="center">
                   เลขที่เอกสาร LD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
                   <label style={{ color: "#36C690" }}>
                     <b>{shipmentNo}</b>
                   </label>
                 </Typography>
-                <Typography
-                  variant="body1"
-                  align="left"
-                  sx={{ marginBottom: 2, paddingLeft: "7em" }}
-                >
+                <Typography variant="body2" align="center">
                   เลขที่เอกสาร SD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
                   <label style={{ color: "#36C690" }}>
                     <b>{sdNo}</b>
                   </label>
                 </Typography>
-                {items.length > 0 && (
+                {itemsDiff.length > 0 && (
                   <div>
-                    <div
-                      style={{
-                        textAlign: "center",
-                        fontWeight: 400,
-                        fontSize: 18,
-                        marginBottom: 10,
+                    <Typography
+                      variant="body1"
+                      align="center"
+                      sx={{
+                        margin: 2,
                       }}
                     >
                       รายการสินค้าขาด / เกิน
-                    </div>
-                    <DataDiffInfo items={items} />
+                    </Typography>
+                    <DataDiffInfo items={itemsDiff} />
                   </div>
                 )}
               </DialogContentText>

@@ -121,6 +121,16 @@ export interface OrderSubmitResponse {
   sdNo: string;
 }
 
+export interface OrderApproveRequest {
+  items: ItemsApprove;
+}
+export interface ItemsApprove {
+  deliveryOrderNo: string;
+  barcode: string;
+  actualQty: number;
+  comment: string;
+}
+
 export interface OrderApproveCloseJobRequest {
   imageFileName?: string;
   imageFile?: string;

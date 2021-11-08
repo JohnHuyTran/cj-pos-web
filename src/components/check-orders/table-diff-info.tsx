@@ -8,7 +8,6 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Entry } from "../../models/order-model";
 import Typography from "@mui/material/Typography";
-import { border } from "@mui/lab/node_modules/@mui/system";
 
 interface DataDiffInfyProps {
   items: Entry[];
@@ -30,17 +29,37 @@ export default function DataDiffInfo(props: DataDiffInfyProps) {
       >
         <TableHead>
           <TableRow>
-            <TableCell sx={{ color: "#36C690" }}>
-              <Typography variant="body2">ลำดับ</Typography>
+            <TableCell>
+              <Typography
+                variant="body2"
+                sx={{ color: "#36C690", fontWeight: 600 }}
+              >
+                ลำดับ
+              </Typography>
             </TableCell>
-            <TableCell sx={{ color: "#36C690" }}>
-              <Typography variant="body2">บาร์โค้ด</Typography>
+            <TableCell>
+              <Typography
+                variant="body2"
+                sx={{ color: "#36C690", fontWeight: 600 }}
+              >
+                บาร์โค้ด
+              </Typography>
             </TableCell>
-            <TableCell sx={{ color: "#36C690" }}>
-              <Typography variant="body2">รายละเอียดสินค้า</Typography>
+            <TableCell>
+              <Typography
+                variant="body2"
+                sx={{ color: "#36C690", fontWeight: 600 }}
+              >
+                รายละเอียดสินค้า
+              </Typography>
             </TableCell>
-            <TableCell sx={{ color: "#36C690" }}>
-              <Typography variant="body2">จำนวนส่วนต่าง</Typography>
+            <TableCell>
+              <Typography
+                variant="body2"
+                sx={{ color: "#36C690", fontWeight: 600 }}
+              >
+                จำนวนส่วนต่าง
+              </Typography>
             </TableCell>
           </TableRow>
         </TableHead>
@@ -54,16 +73,16 @@ export default function DataDiffInfo(props: DataDiffInfyProps) {
               <TableCell>{row.barcode}</TableCell>
               <TableCell>{row.productName}</TableCell>
               <TableCell align="right">
-                {row.actualQty > 0 && (
+                {row.qtyDiff > 0 && (
                   <label style={{ color: "#446EF2", fontWeight: 700 }}>
                     {" "}
-                    +{row.actualQty}{" "}
+                    +{row.qtyDiff}{" "}
                   </label>
                 )}
-                {row.actualQty < 0 && (
+                {row.qtyDiff < 0 && (
                   <label style={{ color: "#F54949", fontWeight: 700 }}>
                     {" "}
-                    {row.actualQty}{" "}
+                    {row.qtyDiff}{" "}
                   </label>
                 )}
               </TableCell>
