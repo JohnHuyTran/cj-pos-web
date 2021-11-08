@@ -106,7 +106,7 @@ const columns: GridColDef[] = [
   {
     field: "productUnit",
     headerName: "หน่วย",
-    minWidth: 100,
+    width: 100,
     headerAlign: "center",
   },
   {
@@ -126,6 +126,7 @@ const columns: GridColDef[] = [
         variant="outlined"
         name="txnQuantityActual"
         type="number"
+        inputProps={{ style: { textAlign: "right" } }}
         value={params.value}
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value, 10) : "";
@@ -153,12 +154,12 @@ const columns: GridColDef[] = [
     width: 145,
     headerAlign: "center",
     align: "right",
-    // valueGetter: (params) => calProductDiff(params),
     renderCell: (params) => calProductDiff(params),
   },
   {
     field: "productComment",
     headerName: "หมายเหตุ",
+    headerAlign: "center",
     minWidth: 200,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
@@ -444,8 +445,6 @@ export default function CheckOrderDetail({
       let diffCount: number =
         data.productQuantityActual - data.productQuantityRef;
 
-      // console.log("data: " + JSON.stringify(data));
-
       const itemDiff: Entry = {
         barcode: data.productBarCode,
         deliveryOrderNo: data.doNo,
@@ -624,6 +623,7 @@ export default function CheckOrderDetail({
     });
 
     if (!exit) {
+      localStorage.removeItem("localStorageRowsEdit");
       setOpen(false);
       onClickClose();
     }
@@ -899,16 +899,10 @@ export default function CheckOrderDetail({
                 rows={rowsEntries}
                 columns={columns}
                 disableColumnMenu
-                // autoPageSize={true}
                 pagination={true}
                 pageSize={5}
                 editMode="row"
                 autoHeight
-                // onCellEditStart={handleCellClick2}
-                // onEditRowsModelChange={handleCellClick2}
-                // onCellClick={handleCellClick2}
-
-                // onEditRowsModelChange={handleEditRowsModelChange}
               />
             </div>
           </Box>

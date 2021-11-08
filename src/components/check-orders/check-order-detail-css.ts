@@ -50,9 +50,10 @@ const useStyles = makeStyles({
       borderRadius: "5px",
     },
     //TextField
-    "& .css-ieen6m-MuiInputBase-input-MuiOutlinedInput-input": {
-      textAlign: "right",
-    },
+    // "& .css-ieen6m-MuiInputBase-input-MuiOutlinedInput-input":
+    //   {
+    //     textAlign: "right",
+    //   },
     "& .css-ieen6m-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {
       "-webkit-text-fill-color": "#676767",
       backgroundColor: "#EAEBEB  !important",
