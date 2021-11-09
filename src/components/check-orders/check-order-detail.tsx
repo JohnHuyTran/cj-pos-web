@@ -221,7 +221,8 @@ const isDisable = (params: GridRenderCellParams) => {
 
 const isAllowActualQty = (params: GridRenderCellParams, value: number) => {
   if (params.row.isTote === true && !(value * 1 >= 0 && value * 1 <= 1)) {
-    return alert("สินค้าภายใน Tote กรอกได้เฉพาะ 0 กับ 1 เท่านั้น");
+    // return alert("สินค้าภายใน Tote กรอกได้เฉพาะ 0 กับ 1 เท่านั้น");
+    return console.log("สินค้าภายใน Tote กรอกได้เฉพาะ 0 กับ 1 เท่านั้น");
   }
 };
 
