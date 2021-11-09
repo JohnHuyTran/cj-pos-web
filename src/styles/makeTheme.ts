@@ -20,9 +20,15 @@ const useStyles = makeStyles({
     },
     "& .MuiDataGrid-root": {
       fontFamily: "Kanit",
-
       borderRadius: "10px !important",
     },
+  },
+  MbtnClear: {
+    backgroundColor: "#AEAEAE !important",
+    borderRadius: "5px !important",
+  },
+  MbtnSearch: {
+    borderRadius: "5px !important",
   },
 });
 
