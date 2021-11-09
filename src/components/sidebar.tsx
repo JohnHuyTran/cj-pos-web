@@ -130,7 +130,7 @@ export default function Sidebar({}: Props): ReactElement {
         </div>
       </DrawerHeader>
 
-      <List sx={{ marginTop: 8 }}>
+      <List sx={{ marginTop: 2 }}>
         <Link to="/" style={{ textDecoration: "none", color: "#676767" }}>
           <ListItemButton
             key="HOME"
@@ -278,7 +278,10 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemIcon>
               <GroupAddOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary="จัดการผู้ใช้งาน" />
+            <ListItemText
+              primary="จัดการผู้ใช้งาน"
+              style={{ color: "#676767", marginLeft: -15 }}
+            />
           </ListItemButton>
         </Link>
       </List>
