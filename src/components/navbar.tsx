@@ -131,12 +131,12 @@ export default function Navbar({}: Props): ReactElement {
           </Box>
         </Box>
         <Box
-          sx={{ display: "inline-flex", alignItems: "center", width: "300px" }}
+          sx={{ display: "inline-flex", alignItems: "center", width: "320px" }}
         >
           <Box
             sx={{
-              width: "300px",
-              height: "40px",
+              width: "320px",
+              height: "48px",
               border: "2px",
               borderStyle: "solid",
               borderColor: "#EAEBEB",
@@ -145,7 +145,7 @@ export default function Navbar({}: Props): ReactElement {
               paddingLeft: "20px",
             }}
           >
-            <Typography sx={{ fontSize: "12px" }}>
+            <Typography sx={{ fontSize: "14px" }}>
               สาขา : (0223) สาขาที่00236 <br /> สนามจันทร์ (ชุมชนจัทรคามพิทักษ์)
             </Typography>
           </Box>
