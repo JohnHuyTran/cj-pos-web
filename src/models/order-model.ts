@@ -66,6 +66,7 @@ export interface ShipmentInfo {
   sdType: number;
   toteCnt: number;
   boxCnt: number;
+  hasDoc: boolean;
   entries: Entry[] | null;
 }
 
@@ -118,6 +119,16 @@ export interface OrderSubmitResponse {
   code: number;
   message: string;
   sdNo: string;
+}
+
+export interface OrderApproveRequest {
+  items: ItemsApprove;
+}
+export interface ItemsApprove {
+  deliveryOrderNo: string;
+  barcode: string;
+  actualQty: number;
+  comment: string;
 }
 
 export interface OrderApproveCloseJobRequest {

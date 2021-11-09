@@ -12,19 +12,26 @@ const useStyles = makeStyles({
   MbtnSave: {
     backgroundColor: "#FBA600 !important",
     borderRadius: "4px !important",
-    marginRight: "10px !important",
+    marginLeft: "10px !important",
   },
   MbtnApprove: {
     borderRadius: "4px !important",
-    marginRight: "10px !important",
+    marginLeft: "10px !important",
   },
   MbtnClose: {
     borderRadius: "4px !important",
   },
   MtextFieldBrowse: {
     "& .MuiOutlinedInput-root": {
+      //input
       borderRadius: "5px !important",
-      border: "2px dashed #36C690 !important",
+      border: "1px dashed #36C690 !important",
+      padding: "4px !important",
+      minWidth: "235px",
+    },
+    "& .MuiOutlinedInput-root input::placeholder": {
+      color: "#676767 !important",
+      fontSize: "12px",
     },
   },
   MdataGrid: {
@@ -42,8 +49,19 @@ const useStyles = makeStyles({
     "& .MuiOutlinedInput-root": {
       borderRadius: "5px",
     },
-    "& .css-ieen6m-MuiInputBase-input-MuiOutlinedInput-input": {
-      textAlign: "right",
+    //TextField
+    // "& .css-ieen6m-MuiInputBase-input-MuiOutlinedInput-input":
+    //   {
+    //     textAlign: "right",
+    //   },
+    "& .css-ieen6m-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {
+      "-webkit-text-fill-color": "#676767",
+      backgroundColor: "#EAEBEB  !important",
+      fontSize: "0.875rem !important",
+      padding: "4px !important",
+    },
+    "& .MuiTypography-body2": {
+      fontFamily: "Kanit",
     },
   },
 
