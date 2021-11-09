@@ -111,7 +111,8 @@ function OrderList() {
       toteCnt: data.toteCnt,
       shipmentDate: convertUtcToBkkDate(data.shipmentDate),
       sdStatus: getShipmentStatusText(data.sdStatus),
-      col10: "desc",
+      // col10: "desc",
+      detail: data.comment,
     };
   });
 
