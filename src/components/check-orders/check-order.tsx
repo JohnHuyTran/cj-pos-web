@@ -222,23 +222,25 @@ function CheckOrderSearch() {
             alignItems="flex-end"
           >
             <Button
+              id="btnClear"
+              variant="contained"
+              size="large"
+              onClick={onClickClearBtn}
+              sx={{ width: "40%" }}
+              className={classes.MbtnClear}
+            >
+              เคลียร์
+            </Button>
+            <Button
               id="btnSearch"
               variant="contained"
               color="primary"
               size="large"
               onClick={onClickSearchBtn}
-              sx={{ width: "40%" }}
+              sx={{ width: "40%", ml: 2 }}
+              className={classes.MbtnSearch}
             >
               ค้นหา
-            </Button>
-            <Button
-              id="btnClear"
-              variant="contained"
-              size="large"
-              onClick={onClickClearBtn}
-              sx={{ backgroundColor: "#AEAEAE", ml: 2, width: "40%" }}
-            >
-              เคลียร์
             </Button>
           </Grid>
         </Grid>
