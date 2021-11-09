@@ -21,14 +21,14 @@ import StarBorder from "@mui/icons-material/StarBorder";
 import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-
 import { useAppSelector, useAppDispatch } from "../store/store";
 import { changeState } from "../store/slices/nav-slice";
-
 import imgLogo from "../assets/images/Logo-CJ-More.png";
+import Menu from "@mui/icons-material/Menu";
+
+// const [version, setVersion] = React.useState<any>(process.env.REACT_APP_REF);
 
 const drawerWidth = 240;
-
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -116,16 +116,21 @@ export default function Sidebar({}: Props): ReactElement {
     >
       <DrawerHeader>
         <img src={imgLogo} alt="" width="50" />
-        <IconButton onClick={handleDrawerClose}>
+        {/* <IconButton onClick={handleDrawerClose}>
           {theme.direction === "ltr" ? (
-            <ChevronLeftIcon />
+            <ChevronLeftIcon color="primary" />
           ) : (
-            <ChevronRightIcon />
+            <ChevronRightIcon color="primary" />
           )}
-        </IconButton>
+        </IconButton> */}
+
+        <div onClick={handleDrawerClose}>
+          <ChevronLeftIcon color="primary" sx={{ marginRight: "-5px" }} />
+          <Menu color="primary" />
+        </div>
       </DrawerHeader>
-      <Divider />
-      <List>
+
+      <List sx={{ marginTop: 8 }}>
         <Link to="/" style={{ textDecoration: "none", color: "#676767" }}>
           <ListItemButton
             key="HOME"
@@ -136,7 +141,10 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemIcon>
               <HomeOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary="หน้าหลัก" />
+            <ListItemText
+              primary="หน้าหลัก"
+              style={{ color: "#676767", marginLeft: -15 }}
+            />
           </ListItemButton>
         </Link>
         <Link
@@ -152,7 +160,10 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemIcon>
               <NotificationsNoneOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary="แจ้งเตือน" />
+            <ListItemText
+              primary="แจ้งเตือน"
+              style={{ color: "#676767", marginLeft: -15 }}
+            />
           </ListItemButton>
         </Link>
         <Link
@@ -167,14 +178,20 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemIcon>
               <ShoppingCartOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary="ซื้อ" />
+            <ListItemText
+              primary="ซื้อ"
+              style={{ color: "#676767", marginLeft: -15 }}
+            />
           </ListItemButton>
         </Link>
         <ListItemButton onClick={handleClick} id="mainMenuSale">
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText primary="ขาย" style={{ color: "#676767" }} />
+          <ListItemText
+            primary="ขาย"
+            style={{ color: "#676767", marginLeft: -15 }}
+          />
           {openSaleMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openSaleMenu} timeout="auto" unmountOnExit>
@@ -188,11 +205,8 @@ export default function Sidebar({}: Props): ReactElement {
                 key="SALE"
                 selected={selectedIndex === 3}
                 onClick={() => handleListItemClick(3)}
-                sx={{ pl: 4 }}
+                sx={{ pl: 7 }}
               >
-                <ListItemIcon>
-                  <StarBorder />
-                </ListItemIcon>
                 <ListItemText primary="ส่วนลดสินค้า" />
               </ListItemButton>
             </Link>
@@ -202,7 +216,10 @@ export default function Sidebar({}: Props): ReactElement {
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText primary="สินค้า" style={{ color: "#676767" }} />
+          <ListItemText
+            primary="สินค้า"
+            style={{ color: "#676767", marginLeft: -15 }}
+          />
           {openProductMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openProductMenu} timeout="auto" unmountOnExit>
@@ -216,11 +233,8 @@ export default function Sidebar({}: Props): ReactElement {
                 key="PRODUCTS"
                 selected={selectedIndex === 4}
                 onClick={() => handleListItemClick(4)}
-                sx={{ pl: 4 }}
+                sx={{ pl: 7 }}
               >
-                <ListItemIcon>
-                  <StorefrontOutlinedIcon />
-                </ListItemIcon>
                 <ListItemText primary="ข้อมูลสินค้า" />
               </ListItemButton>
             </Link>
@@ -233,11 +247,8 @@ export default function Sidebar({}: Props): ReactElement {
                 key="SALE"
                 selected={selectedIndex === 5}
                 onClick={() => handleListItemClick(5)}
-                sx={{ pl: 4 }}
+                sx={{ pl: 7 }}
               >
-                <ListItemIcon>
-                  <StarBorder />
-                </ListItemIcon>
                 <ListItemText primary="ตรวจสอบการรับ-โอนสินค้า" />
               </ListItemButton>
             </Link>
@@ -250,11 +261,8 @@ export default function Sidebar({}: Props): ReactElement {
                 key="dcConfirmOrder"
                 selected={selectedIndex === 7}
                 onClick={() => handleListItemClick(7)}
-                sx={{ pl: 4 }}
+                sx={{ pl: 7 }}
               >
-                <ListItemIcon>
-                  <StarBorder />
-                </ListItemIcon>
                 <ListItemText primary="ตรวจสอบผลต่างการรับสินค้า" />
               </ListItemButton>
             </Link>
@@ -274,6 +282,18 @@ export default function Sidebar({}: Props): ReactElement {
           </ListItemButton>
         </Link>
       </List>
+
+      <div
+        style={{
+          position: "fixed",
+          bottom: "1em",
+          width: "230px",
+          textAlign: "center",
+          color: "#AEAEAE",
+        }}
+      >
+        version 0.0.0.1
+      </div>
     </Drawer>
   );
 }
