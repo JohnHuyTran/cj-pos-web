@@ -16,6 +16,7 @@ import { useAppSelector, useAppDispatch } from '../../store/store';
 import { loginKeyCloakAsync } from '../../store/slices/authSlice';
 import { loginForm } from '../../models/user-interface';
 import { loginFormStyle } from './loginForm-css';
+import { env } from '../../adapters/environmentConfigs';
 
 interface State {
   userId: string;
@@ -34,8 +35,7 @@ function LoginForm() {
   // console.log(isAllowPermission('FEATURE.ADMIN.SEARCH.DATA'));
   const dispatch = useAppDispatch()
   const { error } = useAppSelector((state) => state.auth)
-
-
+  const [version, setVersion] = React.useState<any>(process.env.REACT_APP_REF);
   const handleChange = (prop: any) => (event: any) => {
     setValues({ ...values, [prop]: event.target.value });
   }
@@ -142,6 +142,18 @@ function LoginForm() {
             </Typography>
           </Button>
         </div>
+        <Box sx={{
+          width: '350px',
+          height: '10px',
+          display: 'flex',
+          justifyContent: 'center',
+          color: '#AEAEAE',
+
+        }}>
+          <Typography sx={{ fontSize: '10px', position: 'relative', top: '60px' }}>
+            version: {version}
+          </Typography>
+        </Box>
       </Box>
     </div>
   );
