@@ -208,6 +208,8 @@ function CheckOrderSearch() {
               <DatePickerComponent
                 onClickDate={handleEndDatePicker}
                 value={endDate}
+                type={"TO"}
+                minDateTo={startDate}
               />
             </Box>
           </Grid>

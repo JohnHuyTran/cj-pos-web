@@ -16,6 +16,8 @@ import { createTheme, ThemeProvider } from "@material-ui/core/styles";
 interface StateProps {
   onClickDate: any;
   value: any | Date | number | string;
+  type?: string;
+  minDateTo?: any | Date | number | string;
 }
 
 const defaultMaterialTheme = createTheme({
@@ -37,22 +39,42 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
     props.onClickDate(date);
   };
 
+  let datePicker;
+  if (props.type === "TO") {
+    datePicker = (
+      <KeyboardDatePicker
+        disableToolbar
+        variant="inline"
+        format="DD/MM/YYYY"
+        value={props.value}
+        onChange={handleDateChange}
+        autoOk
+        inputVariant="outlined"
+        className={classes.Mdatepicker}
+        fullWidth
+        minDate={props.minDateTo}
+      />
+    );
+  } else {
+    datePicker = (
+      <KeyboardDatePicker
+        disableToolbar
+        variant="inline"
+        format="DD/MM/YYYY"
+        value={props.value}
+        onChange={handleDateChange}
+        autoOk
+        inputVariant="outlined"
+        className={classes.Mdatepicker}
+        fullWidth
+      />
+    );
+  }
+
   return (
     <div>
       <MuiPickersUtilsProvider utils={OverwriteMomentBE} locale="th">
-        <ThemeProvider theme={defaultMaterialTheme}>
-          <KeyboardDatePicker
-            disableToolbar
-            variant="inline"
-            format="DD/MM/YYYY"
-            value={props.value}
-            onChange={handleDateChange}
-            autoOk
-            inputVariant="outlined"
-            className={classes.Mdatepicker}
-            fullWidth
-          />
-        </ThemeProvider>
+        <ThemeProvider theme={defaultMaterialTheme}>{datePicker}</ThemeProvider>
       </MuiPickersUtilsProvider>
     </div>
   );
