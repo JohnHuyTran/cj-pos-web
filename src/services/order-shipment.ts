@@ -6,7 +6,7 @@ import {
   ItemsApprove,
 } from "../models/order-model";
 import { getPathUrl } from "./base-service";
-import { env } from "../adapters/environmentConfig";
+import { env } from "../adapters/environmentConfigs";
 import { ApiError } from "../models/api-error-model";
 
 export async function saveOrderShipments(

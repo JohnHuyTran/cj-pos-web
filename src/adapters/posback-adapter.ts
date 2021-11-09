@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { env } from "./environmentConfig";
+import { env } from "./environmentConfigs";
 import store from "../store/store";
-import { ApiError } from '../models/api-error-model'
+import { ApiError } from "../models/api-error-model";
 
 const instance = axios.create({
   baseURL: env.backEnd.url,
@@ -18,7 +18,11 @@ export function get(path: string) {
       return result.data;
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message)
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.code,
+        error.response?.data.message
+      );
       throw err;
     });
 }
@@ -32,7 +36,11 @@ export function post(path: string, payload: any) {
       }
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message)
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.code,
+        error.response?.data.message
+      );
       throw err;
     });
 }
@@ -44,11 +52,19 @@ export function put(path: string, payload: any) {
       if (response.status == 200) {
         return response.data;
       }
-      const err = new ApiError(response.status, response.status, response.statusText)
+      const err = new ApiError(
+        response.status,
+        response.status,
+        response.statusText
+      );
       throw err;
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message)
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.code,
+        error.response?.data.message
+      );
       throw err;
     });
 }
@@ -60,7 +76,11 @@ export function deleteData(path: string) {
       return result;
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message)
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.code,
+        error.response?.data.message
+      );
       throw err;
     });
 }
