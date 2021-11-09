@@ -318,6 +318,10 @@ export default function CheckOrderDetail({
       open: false,
     });
 
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+
   useEffect(() => {
     if (
       shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT
@@ -369,7 +373,9 @@ export default function CheckOrderDetail({
     dispatch(featchOrderListAsync(payloadSearchOrder));
   };
 
-  const handleSaveButton = () => {
+  const handleSaveButton = async () => {
+    handleOpenLoading("open", true);
+
     let qtyIsValid: boolean = true;
     const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
 
@@ -419,7 +425,7 @@ export default function CheckOrderDetail({
         items: itemsList,
       };
 
-      saveOrderShipments(payload, sdNo)
+      await saveOrderShipments(payload, sdNo)
         .then((_value) => {
           setShowSnackbarSuccess(true);
           updateShipmentOrder();
@@ -432,6 +438,8 @@ export default function CheckOrderDetail({
     }
 
     localStorage.removeItem("localStorageRowsEdit");
+
+    handleOpenLoading("open", false);
   };
 
   const handleApproveBtn = async () => {
