@@ -124,8 +124,8 @@ function DCOrderList() {
   const rows = res.data.map((data: CheckOrderInfo, indexs: number) => {
     return {
       id: data.id,
-      // index: i + indexs,
-      index: (currentpage - 1) * 10 + (indexs + 1),
+      index: i + indexs,
+      // index: (currentpage - 1) * 10 + (indexs + 1),
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
       branchOutNo: data.branchOutNo,

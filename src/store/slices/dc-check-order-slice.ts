@@ -36,7 +36,7 @@ export const featchOrderListDcAsync = createAsyncThunk(
       if (payload.shipmentNo) {
         path = path + `&shipmentNo=${payload.shipmentNo}`;
       }
-      if (payload.branchCode) {
+      if (payload.branchCode !== 'ALL') {
         path = path + `&branchCode=${payload.branchCode}`;
       }
       if (payload.verifyDCStatus == "0" || payload.verifyDCStatus == "1") {

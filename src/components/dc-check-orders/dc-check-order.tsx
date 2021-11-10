@@ -43,6 +43,7 @@ function DCCheckOrderSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.dcCheckOrderList);
+  const branchList = useAppSelector((state) => state.searchBranchSlice);
   const [values, setValues] = React.useState<State>({
     shipmentNo: "",
     branchCode: "ALL",
@@ -59,13 +60,8 @@ function DCCheckOrderSearch() {
       open: false,
     });
 
-  const [branchDropDown, setBranchDropDown] = React.useState<BranchResponse>(
-    (useAppSelector((state) => state.searchBranchSlice.branchList))
-  );
-
   useEffect(() => {
     dispatch(featchBranchListAsync());
-
   }, []);
 
 
@@ -203,7 +199,7 @@ function DCCheckOrderSearch() {
                 <MenuItem value={"ALL"} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                {branchDropDown?.data.map((option: BranchInfo, index: number) => (
+                {branchList.branchList.data.map((option: BranchInfo, index: number) => (
                   <MenuItem key={option.code} value={option.code}>{option.name}</MenuItem>
                 ))}
               </Select>
