@@ -22,6 +22,7 @@ import { useStyles } from "../../styles/makeTheme";
 import DatePickerComponent from "../commons/ui/date-picker";
 import LoadingModal from "../commons/ui/loading-modal";
 import { SearchOff } from "@mui/icons-material";
+import { BranchInfo, BranchResponse } from "../../models/search-branch-model";
 
 moment.locale("th");
 
@@ -58,11 +59,16 @@ function DCCheckOrderSearch() {
       open: false,
     });
 
+  const [branchDropDown, setBranchDropDown] = React.useState<BranchResponse>(
+    (useAppSelector((state) => state.searchBranchSlice.branchList))
+  );
+
   useEffect(() => {
     dispatch(featchBranchListAsync());
+
   }, []);
 
-  const branchList = useAppSelector((state) => state.searchBranchSlice);
+
 
   // console.log("branchList: ", branchList.branchList.data);
 
@@ -141,6 +147,11 @@ function DCCheckOrderSearch() {
     setEndDate(value);
   };
 
+  const handleChangeBranch = (event: any) => {
+    const value = event.target.value;
+    setValues({ ...values, branchCode: value });
+  }
+
   let orderListData;
   const orderListDatas = items.orderList.data;
 
@@ -187,12 +198,13 @@ function DCCheckOrderSearch() {
                 name="branchNo"
                 value={values.branchCode}
                 inputProps={{ "aria-label": "Without label" }}
+                onChange={handleChangeBranch}
               >
                 <MenuItem value={"ALL"} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                {branchList.branchList.data.map((option) => (
-                  <MenuItem value={option.code}>{option.name}</MenuItem>
+                {branchDropDown?.data.map((option: BranchInfo, index: number) => (
+                  <MenuItem key={option.code} value={option.code}>{option.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
