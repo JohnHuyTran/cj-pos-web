@@ -103,7 +103,8 @@ function OrderList() {
   const rows = res.data.map((data: ShipmentInfo, indexs: number) => {
     return {
       id: `${data.shipmentNo}_${data.sdNo}`,
-      index: i + indexs,
+      // index: i + indexs,
+      index: currentpage * 5 + indexs + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
       sdType: getShipmentTypeText(data.sdType),
