@@ -22,6 +22,7 @@ import OrderList from "./order-list";
 import DatePickerComponent from "../commons/ui/date-picker";
 import LoadingModal from "../commons/ui/loading-modal";
 import { useStyles } from "../../styles/makeTheme";
+import { SearchOff } from "@mui/icons-material";
 import { dateToStringCriteria } from "../../utils/date-utill";
 
 // moment.locale("en");
@@ -41,6 +42,7 @@ interface loadingModalState {
 
 function CheckOrderSearch() {
   const dispatch = useAppDispatch();
+  const classes = useStyles();
   const items = useAppSelector((state) => state.checkOrderList);
   const [values, setValues] = React.useState<State>({
     orderShipment: "",
@@ -61,7 +63,7 @@ function CheckOrderSearch() {
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
-    console.log(values);
+    // console.log(values);
   };
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -124,7 +126,22 @@ function CheckOrderSearch() {
     setEndDate(value);
   };
 
-  const classes = useStyles();
+  let orderListData;
+  const orderListDatas = items.orderList.data;
+
+  if (orderListDatas.length === 0) {
+    orderListData = (
+      <Grid item container xs={12} justifyContent="center">
+        <Box color="#CBD4DB">
+          <h2>
+            ไม่มีข้อมูล <SearchOff fontSize="large" />
+          </h2>
+        </Box>
+      </Grid>
+    );
+  } else {
+    orderListData = <OrderList />;
+  }
 
   return (
     <>
@@ -246,7 +263,8 @@ function CheckOrderSearch() {
         </Grid>
       </Box>
       <Box mt={6}></Box>
-      {items.orderList && <OrderList />}
+      {/* {items.orderList && <OrderList />} */}
+      {orderListData}
       <LoadingModal open={openLoadingModal.open} />
     </>
   );
