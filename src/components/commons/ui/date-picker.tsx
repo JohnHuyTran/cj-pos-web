@@ -31,6 +31,7 @@ const defaultMaterialTheme = createTheme({
 // export default function DatePickerComponent() {
 const DatePickerComponent: React.FC<StateProps> = (props) => {
   const classes = useStyles();
+  const today = new Date();
   // const [selectedDate, setSelectedDate] = React.useState(
   //   moment().add(0, "years")
   // );
@@ -53,6 +54,8 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         className={classes.Mdatepicker}
         fullWidth
         minDate={props.minDateTo}
+        maxDate={today}
+        InputProps={{ readOnly: true }}
       />
     );
   } else {
@@ -67,6 +70,8 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         inputVariant="outlined"
         className={classes.Mdatepicker}
         fullWidth
+        maxDate={today}
+        InputProps={{ readOnly: true }}
       />
     );
   }
