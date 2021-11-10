@@ -283,7 +283,7 @@ export default function Sidebar({}: Props): ReactElement {
         </Link>
       </List>
 
-      <div
+      {/* <div
         style={{
           position: "fixed",
           bottom: "1em",
@@ -293,7 +293,7 @@ export default function Sidebar({}: Props): ReactElement {
         }}
       >
         version 0.0.0.1
-      </div>
+      </div> */}
     </Drawer>
   );
 }
