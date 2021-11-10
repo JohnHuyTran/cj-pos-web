@@ -22,6 +22,7 @@ import {
 } from "../../utils/enum/check-order-enum";
 import { useStyles } from "../../styles/makeTheme";
 import { featchOrderListAsync } from "../../store/slices/check-order-slice";
+import { saveSearchCriteria } from "../../store/slices/save-search-order";
 
 function OrderList() {
   const classes = useStyles();
@@ -157,6 +158,8 @@ function OrderList() {
     };
 
     await dispatch(featchOrderListAsync(payloadNewpage));
+    await dispatch(saveSearchCriteria(payloadNewpage));
+
     setLoading(false);
   };
 
