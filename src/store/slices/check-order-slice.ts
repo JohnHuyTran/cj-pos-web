@@ -28,8 +28,8 @@ export const featchOrderListAsync = createAsyncThunk(
     try {
       const apiRootPath = environment.orders.shipment.fetchOrder.url;
       let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}`;
-      if (payload.shipmentNo) {
-        path = path + `&shipmentNo=${payload.shipmentNo}`;
+      if (payload.paramQuery) {
+        path = path + `&paramQuery=${payload.paramQuery}`;
       }
       if (payload.sdNo) {
         path = path + `&sdNo=${payload.sdNo}`;

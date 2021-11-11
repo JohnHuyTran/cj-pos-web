@@ -73,7 +73,7 @@ function CheckOrderSearch() {
     const payload: ShipmentRequest = {
       limit: "5",
       page: "1",
-      shipmentNo: values.orderShipment,
+      paramQuery: values.orderShipment,
       sdNo: values.orderNo,
       dateFrom: moment(startDate).startOf("day").toISOString(),
       dateTo: moment(endDate).endOf("day").toISOString(),
@@ -106,7 +106,7 @@ function CheckOrderSearch() {
     const payload: ShipmentRequest = {
       limit: "5",
       page: "1",
-      shipmentNo: values.orderShipment,
+      paramQuery: values.orderShipment,
       sdNo: values.orderNo,
       dateFrom: moment(startDate).format("DD/MM/YYYY"),
       dateTo: moment(endDate).format("DD/MM/YYYY"),

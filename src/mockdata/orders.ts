@@ -120,9 +120,9 @@ export const orders = {
 
 export function getOrderList(payload: ShipmentRequest) {
   return new Promise((resolve, reject) => {
-    console.log(` getOrderList: ${payload.shipmentNo}`);
+    console.log(` getOrderList: ${payload.paramQuery}`);
     if (
-      !payload.shipmentNo &&
+      !payload.paramQuery &&
       !payload.sdNo &&
       !payload.sdStatus &&
       !payload.sdType
