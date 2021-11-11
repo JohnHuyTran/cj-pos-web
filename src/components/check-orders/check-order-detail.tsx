@@ -713,13 +713,24 @@ export default function CheckOrderDetail({
                 </Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  ใบผลต่างหลังเซ็นต์:
-                </Typography>
+                {shipmentList[0].sdStatus ===
+                  ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
+                  <Typography variant="body2" gutterBottom>
+                    ใบผลต่างหลังเซ็นต์:
+                  </Typography>
+                )}
+
+                {shipmentList[0].hasDoc === true &&
+                  shipmentList[0].sdStatus ===
+                    ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
+                    <Typography variant="body2" gutterBottom>
+                      ใบผลต่างหลังเซ็นต์:
+                    </Typography>
+                  )}
               </Grid>
               <Grid item lg={4}>
-                {shipmentList[0].sdStatus !==
-                  ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
+                {shipmentList[0].sdStatus ===
+                  ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
                   <div>
                     <TextField
                       name="browserTxf"
@@ -759,7 +770,10 @@ export default function CheckOrderDetail({
                         variant="body2"
                         onClick={handleLinkDocument}
                       >
-                        ดูเอกสาร <ArrowDownward />
+                        ดูเอกสาร{" "}
+                        <u>
+                          <ArrowDownward fontSize="small" />
+                        </u>
                       </Link>
                     </div>
                   )}
@@ -962,7 +976,12 @@ export default function CheckOrderDetail({
       >
         <Alert
           severity="success"
-          sx={{ width: "100%" }}
+          sx={{
+            width: "300px",
+            background: "#36C690",
+            borderRadius: "6px",
+            fontSize: "12px",
+          }}
           onClose={handleCloseSnackBar}
         >
           {/* This transaction is success */}
@@ -981,7 +1000,11 @@ export default function CheckOrderDetail({
       >
         <Alert
           severity="error"
-          sx={{ width: "100%" }}
+          sx={{
+            width: "300px",
+            borderRadius: "6px",
+            fontSize: "12px",
+          }}
           onClose={handleCloseSnackBar}
         >
           {snackBarFailMsg}
