@@ -36,7 +36,7 @@ export interface ShipmentRequest {
   page: string;
   sortBy?: string;
   sortDirection?: string;
-  shipmentNo?: string;
+  paramQuery?: string;
   sdNo?: string;
   dateFrom?: string;
   dateTo?: string;
@@ -67,6 +67,7 @@ export interface ShipmentInfo {
   toteCnt: number;
   boxCnt: number;
   hasDoc: boolean;
+  comment: string;
   entries: Entry[] | null;
 }
 

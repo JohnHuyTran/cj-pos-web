@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { ShipmentRequest } from '../../models/order-model';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { ShipmentRequest } from "../../models/order-model";
 
 type State = {
   searchCriteria: ShipmentRequest;
@@ -7,21 +7,21 @@ type State = {
 
 const initialState: State = {
   searchCriteria: {
-    limit: '10',
-    page: '1',
-    sortBy: '',
-    sortDirection: '',
-    shipmentNo: '',
-    sdNo: '',
-    dateFrom: '',
-    dateTo: '',
+    limit: "10",
+    page: "1",
+    sortBy: "",
+    sortDirection: "",
+    paramQuery: "",
+    sdNo: "",
+    dateFrom: "",
+    dateTo: "",
     sdStatus: -1,
     sdType: -1,
   },
 };
 
 const saveSearchOrder = createSlice({
-  name: 'searchCriteria',
+  name: "searchCriteria",
   initialState,
   reducers: {
     saveSearchCriteria: (state, action: PayloadAction<any>) => {

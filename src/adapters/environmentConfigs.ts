@@ -3,6 +3,7 @@ export const env: any = {
     url: process.env.REACT_APP_POS_BACK_BE_URL,
     timeout: process.env.REACT_APP_POS_BACK_BE_TIME_OUT,
   },
+
   keycloak: {
     url: process.env.REACT_APP_KEYCLOAK_URL,
     grantType: process.env.REACT_APP_KEYCLOAK_GRANT_TYPE,

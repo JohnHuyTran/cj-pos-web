@@ -22,6 +22,7 @@ import {
 } from "../../utils/enum/check-order-enum";
 import { useStyles } from "../../styles/makeTheme";
 import { featchOrderListAsync } from "../../store/slices/check-order-slice";
+import { saveSearchCriteria } from "../../store/slices/save-search-order";
 
 function OrderList() {
   const classes = useStyles();
@@ -112,7 +113,8 @@ function OrderList() {
       toteCnt: data.toteCnt,
       shipmentDate: convertUtcToBkkDate(data.shipmentDate),
       sdStatus: getShipmentStatusText(data.sdStatus),
-      col10: "desc",
+      // col10: "desc",
+      detail: data.comment,
     };
   });
 
@@ -147,7 +149,7 @@ function OrderList() {
     const payloadNewpage: ShipmentRequest = {
       limit: payload.limit,
       page: page,
-      shipmentNo: payload.shipmentNo,
+      paramQuery: payload.paramQuery,
       sdNo: payload.sdNo,
       dateFrom: payload.dateFrom,
       dateTo: payload.dateTo,
@@ -157,6 +159,8 @@ function OrderList() {
     };
 
     await dispatch(featchOrderListAsync(payloadNewpage));
+    await dispatch(saveSearchCriteria(payloadNewpage));
+
     setLoading(false);
   };
 
