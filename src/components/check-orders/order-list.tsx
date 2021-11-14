@@ -148,7 +148,7 @@ function OrderList() {
     const payloadNewpage: ShipmentRequest = {
       limit: payload.limit,
       page: page,
-      shipmentNo: payload.shipmentNo,
+      paramQuery: payload.paramQuery,
       sdNo: payload.sdNo,
       dateFrom: payload.dateFrom,
       dateTo: payload.dateTo,

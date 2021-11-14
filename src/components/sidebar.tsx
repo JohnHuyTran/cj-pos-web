@@ -130,7 +130,7 @@ export default function Sidebar({}: Props): ReactElement {
         </div>
       </DrawerHeader>
 
-      <List sx={{ marginTop: 8 }}>
+      <List sx={{ marginTop: 2 }}>
         <Link to="/" style={{ textDecoration: "none", color: "#676767" }}>
           <ListItemButton
             key="HOME"
@@ -141,10 +141,7 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemIcon>
               <HomeOutlinedIcon />
             </ListItemIcon>
-            <ListItemText
-              primary="หน้าหลัก"
-              style={{ color: "#676767", marginLeft: -15 }}
-            />
+            <ListItemText primary="หน้าหลัก" style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
         <Link
@@ -160,10 +157,7 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemIcon>
               <NotificationsNoneOutlinedIcon />
             </ListItemIcon>
-            <ListItemText
-              primary="แจ้งเตือน"
-              style={{ color: "#676767", marginLeft: -15 }}
-            />
+            <ListItemText primary="แจ้งเตือน" style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
         <Link
@@ -178,20 +172,14 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemIcon>
               <ShoppingCartOutlinedIcon />
             </ListItemIcon>
-            <ListItemText
-              primary="ซื้อ"
-              style={{ color: "#676767", marginLeft: -15 }}
-            />
+            <ListItemText primary="ซื้อ" style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
         <ListItemButton onClick={handleClick} id="mainMenuSale">
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText
-            primary="ขาย"
-            style={{ color: "#676767", marginLeft: -15 }}
-          />
+          <ListItemText primary="ขาย" style={{ marginLeft: -15 }} />
           {openSaleMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openSaleMenu} timeout="auto" unmountOnExit>
@@ -216,10 +204,7 @@ export default function Sidebar({}: Props): ReactElement {
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText
-            primary="สินค้า"
-            style={{ color: "#676767", marginLeft: -15 }}
-          />
+          <ListItemText primary="สินค้า" style={{ marginLeft: -15 }} />
           {openProductMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openProductMenu} timeout="auto" unmountOnExit>
@@ -278,7 +263,10 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemIcon>
               <GroupAddOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary="จัดการผู้ใช้งาน" />
+            <ListItemText
+              primary="จัดการผู้ใช้งาน"
+              style={{ marginLeft: -15 }}
+            />
           </ListItemButton>
         </Link>
       </List>

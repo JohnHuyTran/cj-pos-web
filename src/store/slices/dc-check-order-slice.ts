@@ -1,10 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { ShipmentRequest, ShipmentResponse } from "../../models/order-model";
+import {
+  CheckOrderRequest,
+  CheckOrderResponse,
+} from "../../models/dc-check-order-model";
 import { environment } from "../../environment-base";
 import { get } from "../../adapters/posback-adapter";
 
 type State = {
-  orderList: ShipmentResponse;
+  orderList: CheckOrderResponse;
   error: string;
 };
 
@@ -17,31 +20,29 @@ const initialState: State = {
     total: 0,
     page: 0,
     perPage: 0,
+    prev: 0,
+    next: 0,
     totalPage: 0,
   },
   error: "",
 };
 
-export const featchOrderListAsync = createAsyncThunk(
-  "orderList",
-  async (payload: ShipmentRequest) => {
+export const featchOrderListDcAsync = createAsyncThunk(
+  "orderListDc",
+  async (payload: CheckOrderRequest) => {
     try {
-      const apiRootPath = environment.orders.shipment.fetchOrder.url;
+      const apiRootPath = environment.orders.dcCheckOrder.fetchOrder.url;
       let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}`;
-      if (payload.paramQuery) {
-        path = path + `&paramQuery=${payload.paramQuery}`;
+      if (payload.shipmentNo) {
+        path = path + `&shipmentNo=${payload.shipmentNo}`;
       }
-      if (payload.sdNo) {
-        path = path + `&sdNo=${payload.sdNo}`;
+      if (payload.branchCode !== 'ALL') {
+        path = path + `&branchCode=${payload.branchCode}`;
       }
-      if (
-        payload.sdStatus == 0 ||
-        payload.sdStatus == 1 ||
-        payload.sdStatus == 2
-      ) {
-        path = path + `&sdStatus=${payload.sdStatus}`;
+      if (payload.verifyDCStatus == "0" || payload.verifyDCStatus == "1") {
+        path = path + `&sdStatus=${payload.verifyDCStatus}`;
       }
-      if (payload.sdType == 0 || payload.sdType == 1) {
+      if (payload.sdType == "0" || payload.sdType == "1") {
         path = path + `&sdType=${payload.sdType}`;
       }
       if (payload.dateFrom) {
@@ -50,8 +51,8 @@ export const featchOrderListAsync = createAsyncThunk(
       if (payload.dateTo) {
         path = path + `&dateTo=${payload.dateTo}`;
       }
-      // console.log("path : ", path);
-      let response: ShipmentResponse = {
+
+      let response: CheckOrderResponse = {
         ref: "",
         code: 0,
         message: "",
@@ -59,11 +60,15 @@ export const featchOrderListAsync = createAsyncThunk(
         total: 0,
         page: 0,
         perPage: 0,
+        prev: 0,
+        next: 0,
         totalPage: 0,
       };
+
       if (!payload.clearSearch) {
         response = await get(path).then();
       }
+
       return response;
     } catch (error) {
       throw error;
@@ -71,29 +76,27 @@ export const featchOrderListAsync = createAsyncThunk(
   }
 );
 
-const checkOrderSlice = createSlice({
-  name: "checkOrder",
+const dcCheckOrderSlice = createSlice({
+  name: "dcCheckOrder",
   initialState,
   reducers: {
-    clearDataFilter: () => {
-      initialState;
-    },
+    clearDataFilter: (state) => initialState,
   },
   extraReducers: (builer) => {
-    builer.addCase(featchOrderListAsync.pending, () => {
+    builer.addCase(featchOrderListDcAsync.pending, () => {
       initialState;
     }),
       builer.addCase(
-        featchOrderListAsync.fulfilled,
+        featchOrderListDcAsync.fulfilled,
         (state, action: PayloadAction<any>) => {
           state.orderList = action.payload;
         }
       ),
-      builer.addCase(featchOrderListAsync.rejected, () => {
+      builer.addCase(featchOrderListDcAsync.rejected, () => {
         initialState;
       });
   },
 });
 
-export const { clearDataFilter } = checkOrderSlice.actions;
-export default checkOrderSlice.reducer;
+export const { clearDataFilter } = dcCheckOrderSlice.actions;
+export default dcCheckOrderSlice.reducer;

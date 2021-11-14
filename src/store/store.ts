@@ -1,19 +1,25 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { useSelector, useDispatch, TypedUseSelectorHook } from 'react-redux';
+import { configureStore } from "@reduxjs/toolkit";
+import { useSelector, useDispatch, TypedUseSelectorHook } from "react-redux";
 
-import authSlice from './slices/authSlice';
-import checkOrderSlice from './slices/check-order-slice';
-import navSlice from './slices/nav-slice';
-import productSlice from './slices/productSlice';
-import saveSearchOrder from './slices/save-search-order';
+import authSlice from "./slices/authSlice";
+import checkOrderSlice from "./slices/check-order-slice";
+import dcCheckOrderSlice from "./slices/dc-check-order-slice";
+import navSlice from "./slices/nav-slice";
+import productSlice from "./slices/productSlice";
+import saveSearchOrder from "./slices/save-search-order";
+import saveSearchOrderDc from "./slices/save-search-order-dc-slice";
+import searchBranchSlice from "./slices/search-branches-slice";
 
 const store = configureStore({
   reducer: {
     auth: authSlice,
     checkOrderList: checkOrderSlice,
+    dcCheckOrderList: dcCheckOrderSlice,
     navigator: navSlice,
     product: productSlice,
     saveSearchOrder: saveSearchOrder,
+    saveSearchOrderDc: saveSearchOrderDc,
+    searchBranchSlice: searchBranchSlice,
   },
 });
 

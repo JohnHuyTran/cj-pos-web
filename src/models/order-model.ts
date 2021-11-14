@@ -36,7 +36,7 @@ export interface ShipmentRequest {
   page: string;
   sortBy?: string;
   sortDirection?: string;
-  shipmentNo?: string;
+  paramQuery?: string;
   sdNo?: string;
   dateFrom?: string;
   dateTo?: string;
