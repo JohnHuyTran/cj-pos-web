@@ -142,7 +142,6 @@ export default function ModalShowPDF({
       <AlertError
         open={openAlert}
         onClose={handleCloseAlert}
-        titleError="Failed"
         textError="Failed to load PDF"
       />
     </div>

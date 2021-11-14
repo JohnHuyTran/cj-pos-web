@@ -70,6 +70,7 @@ import {
   Print,
 } from "@mui/icons-material";
 import LoadingModal from "../commons/ui/loading-modal";
+import CheckOrderSDDetail from "./check-order-detail-sd";
 
 interface loadingModalState {
   open: boolean;
@@ -86,14 +87,14 @@ const columns: GridColDef[] = [
   {
     field: "productId",
     headerName: "รหัสสินค้า",
-    width: 170,
+    width: 200,
     headerAlign: "center",
     disableColumnMenu: true,
   },
   {
     field: "productBarCode",
     headerName: "บาร์โค้ด",
-    minWidth: 170,
+    minWidth: 150,
     headerAlign: "center",
     disableColumnMenu: true,
   },
@@ -106,7 +107,7 @@ const columns: GridColDef[] = [
   {
     field: "productUnit",
     headerName: "หน่วย",
-    width: 100,
+    width: 90,
     headerAlign: "center",
   },
   {
@@ -160,7 +161,7 @@ const columns: GridColDef[] = [
     field: "productComment",
     headerName: "หมายเหตุ",
     headerAlign: "center",
-    minWidth: 200,
+    minWidth: 150,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
         variant="outlined"
@@ -280,10 +281,15 @@ export default function CheckOrderDetail({
   const [fileName, setFileName] = React.useState("");
   const { apiRef, columns } = useApiRef();
 
-  const [disableSaveBtn, setDisableSaveBtn] = React.useState(false);
-  const [disableApproveBtn, setDisableApproveBtn] = React.useState(false);
-  const [disableCloseJobBtn, setDisableCloseJobBtn] = React.useState(false);
+  const [showSaveBtn, setShowSaveBtn] = React.useState(false);
+  const [showApproveBtn, setShowApproveBtn] = React.useState(false);
+  const [showCloseJobBtn, setShowCloseJobBtn] = React.useState(false);
+  // const [disableCloseJobBtn, setDisableCloseJobBtn] = React.useState(true);
+  const [validationFile, setValidationFile] = React.useState(false);
   const [isDisplayActBtn, setIsDisplayActBtn] = React.useState("");
+
+  const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
+  const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState("");
 
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [action, setAction] = useState<number>(0);
@@ -307,7 +313,9 @@ export default function CheckOrderDetail({
     string | undefined
   >("");
   const [snackBarFailMsg, setSnackBarFailMsg] = React.useState("");
-  const [openAlert, setOpenAlert] = React.useState(false);
+  const [openFailAlert, setOpenFailAlert] = React.useState(false);
+  const [textFail, setTextFail] = React.useState("");
+
   const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
     file: null,
     fileName: "",
@@ -327,16 +335,16 @@ export default function CheckOrderDetail({
     if (
       shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT
     ) {
-      setDisableSaveBtn(false);
-      setDisableApproveBtn(false);
-      setDisableCloseJobBtn(true);
+      setShowSaveBtn(false);
+      setShowApproveBtn(false);
+      setShowCloseJobBtn(true);
     }
     if (
       shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE
     ) {
-      setDisableSaveBtn(true);
-      setDisableApproveBtn(true);
-      setDisableCloseJobBtn(false);
+      setShowSaveBtn(true);
+      setShowApproveBtn(true);
+      setShowCloseJobBtn(false);
     }
 
     if (
@@ -419,7 +427,11 @@ export default function CheckOrderDetail({
       itemsList.push(item);
     });
 
-    setOpenAlert(!qtyIsValid);
+    if (!qtyIsValid) {
+      setOpenFailAlert(!qtyIsValid);
+      setTextFail("จำนวนรับจริงของTote ต้องเป็น 0 หรือ 1 เท่านั้น");
+    }
+
     if (qtyIsValid) {
       const payload: SaveDraftSDRequest = {
         shipmentNo: shipmentNo,
@@ -487,8 +499,16 @@ export default function CheckOrderDetail({
   };
 
   const handleCloseJobBtn = () => {
-    setOpenModelConfirm(true);
-    setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
+    if (!fileInfo.base64URL) {
+      setErrorBrowseFile(true);
+      setMsgErrorBrowseFile("กรุณาแนบไฟล์เอกสาร");
+    } else if (validationFile === true) {
+      setOpenFailAlert(true);
+      setTextFail("กรุณาตรวจสอบ ไฟล์เอกสาร");
+    } else {
+      setOpenModelConfirm(true);
+      setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
+    }
   };
 
   const handlePrintBtn = () => {
@@ -519,8 +539,12 @@ export default function CheckOrderDetail({
   };
 
   const handleFileInputChange = (e: any) => {
+    setValidationFile(false);
+    setErrorBrowseFile(false);
+    setMsgErrorBrowseFile("");
+    checkSizeFile(e);
+
     let file: File = e.target.files[0];
-    const fileSize = e.target.files[0].size;
     const fileName = e.target.files[0].name;
 
     getBase64(file)
@@ -531,6 +555,39 @@ export default function CheckOrderDetail({
       .catch((err: any) => {
         console.log(err);
       });
+  };
+
+  const checkSizeFile = (e: any) => {
+    const fileSize = e.target.files[0].size;
+    const fileName = e.target.files[0].name;
+    let parts = fileName.split(".");
+
+    // pdf, .jpg, .jpeg
+    if (
+      parts[1].toLowerCase() !== "pdf" &&
+      parts[1].toLowerCase() !== "jpg" &&
+      parts[1].toLowerCase() !== "jpeg"
+    ) {
+      setValidationFile(true);
+      setErrorBrowseFile(true);
+      setMsgErrorBrowseFile("กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น");
+      return;
+    }
+
+    // 1024 = bytes
+    // 1024*1024*1024 = mb
+    let mb = 1024 * 1024 * 1024;
+    // fileSize = mb unit
+    if (fileSize < mb) {
+      //size > 5MB
+      let size = fileSize / 1024 / 1024;
+      if (size > 5) {
+        setValidationFile(true);
+        setErrorBrowseFile(true);
+        setMsgErrorBrowseFile("ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่");
+        return;
+      }
+    }
   };
 
   // data grid
@@ -584,20 +641,16 @@ export default function CheckOrderDetail({
 
   const handleShowSnackBar = (issuccess: boolean, errorMsg: any) => {
     if (issuccess) {
-      // setDisableSaveBtn(true);
-      // setDisableApproveBtn(true);
-      // setDisableCloseJobBtn(false)
       setShowSnackbarSuccess(true);
-      // updateShipmentOrder()
     } else {
       setShowSnackbarFail(true);
       setSnackBarFailMsg(errorMsg);
-      // updateShipmentOrder()
     }
   };
 
-  const handleCloseAlert = () => {
-    setOpenAlert(false);
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail("");
   };
 
   const getfileName = (fileName: string) => {
@@ -605,14 +658,16 @@ export default function CheckOrderDetail({
     return fileName;
   };
 
-  // const [opensSD, setOpensSD] = React.useState(false);
-  // function isClosSDModal() {
-  //   setOpensSD(false);
-  // }
+  const [opensSD, setOpensSD] = React.useState(false);
+  function isClosSDModal() {
+    setOpenModelConfirm(false);
+    setOpensSD(false);
+  }
 
-  // function clickSelectedSD() {
-  //   setOpensSD(true);
-  // }
+  function clickSelectedSD() {
+    setOpenModelConfirm(true);
+    setOpensSD(true);
+  }
 
   const handleClose = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -732,12 +787,26 @@ export default function CheckOrderDetail({
                 {shipmentList[0].sdStatus ===
                   ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
                   <div>
-                    <TextField
-                      name="browserTxf"
-                      className={classes.MtextFieldBrowse}
-                      value={fileInfo.fileName}
-                      placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
-                    />
+                    {errorBrowseFile === true && (
+                      <TextField
+                        error
+                        name="browserTxf"
+                        className={classes.MtextFieldBrowse}
+                        value={fileInfo.fileName}
+                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
+                        helperText={msgErrorBrowseFile}
+                      />
+                    )}
+
+                    {errorBrowseFile === false && (
+                      <TextField
+                        name="browserTxf"
+                        className={classes.MtextFieldBrowse}
+                        value={fileInfo.fileName}
+                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
+                      />
+                    )}
+
                     <input
                       id="btnBrowse"
                       type="file"
@@ -780,7 +849,7 @@ export default function CheckOrderDetail({
               </Grid>
             </Grid>
 
-            {/* <Grid container spacing={2} mb={1}>
+            <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
                 <Typography variant="body2" gutterBottom>
                   อ้างอิง SD โอนลอย :
@@ -789,17 +858,17 @@ export default function CheckOrderDetail({
               <Grid item lg={4}>
                 <Typography variant="body2" gutterBottom>
                   <u onClick={clickSelectedSD} style={{ cursor: "pointer" }}>
-                    SD20020101-000001
+                    {shipmentList[0].comment}
                   </u>
                 </Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
+                {/* <Typography variant="body2" gutterBottom>
                   แนบภาพสินค้า / วีดีโอ:
-                </Typography>
+                </Typography> */}
               </Grid>
               <Grid item lg={4}>
-                {shipmentList[0].sdStatus !==
+                {/* {shipmentList[0].sdStatus !==
                   ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
                   <div>
                     <TextField
@@ -842,10 +911,9 @@ export default function CheckOrderDetail({
                         ดูเอกสาร <ArrowDownward />
                       </Link>
                     </div>
-                  )}
+                  )} */}
               </Grid>
             </Grid>
-            hasDoc : {shipmentList[0].hasDoc} */}
           </Box>
 
           {/* DisplayBtn */}
@@ -871,7 +939,7 @@ export default function CheckOrderDetail({
               </Grid>
 
               <Grid item>
-                {!disableSaveBtn && (
+                {!showSaveBtn && (
                   <Button
                     id="btnSave"
                     variant="contained"
@@ -884,7 +952,7 @@ export default function CheckOrderDetail({
                   </Button>
                 )}
 
-                {!disableApproveBtn && (
+                {!showApproveBtn && (
                   <Button
                     id="btnApprove"
                     variant="contained"
@@ -897,7 +965,7 @@ export default function CheckOrderDetail({
                   </Button>
                 )}
 
-                {!disableCloseJobBtn && (
+                {!showCloseJobBtn && (
                   <Button
                     id="btnClose"
                     variant="contained"
@@ -959,10 +1027,9 @@ export default function CheckOrderDetail({
       />
 
       <AlertError
-        open={openAlert}
-        onClose={handleCloseAlert}
-        titleError="Failed"
-        textError="จำนวนรับจริง ของ tote  ต้องเป็น 0 หรือ 1เท่านั้น"
+        open={openFailAlert}
+        onClose={handleCloseFailAlert}
+        textError={textFail}
       />
 
       <Snackbar
@@ -1013,14 +1080,14 @@ export default function CheckOrderDetail({
 
       <LoadingModal open={openLoadingModal.open} />
 
-      {/* {opensSD && (
-        <CheckOrderDetail
+      {opensSD && (
+        <CheckOrderSDDetail
           sdNo={sdNo}
           shipmentNo={shipmentNo}
           defaultOpen={opensSD}
           onClickClose={isClosSDModal}
         />
-      )} */}
+      )}
     </div>
   );
 }

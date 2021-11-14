@@ -285,7 +285,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
 
             } */}
 
-        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
+        {/* {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
           !imageContent && (
             <div>
               <DialogTitle id="alert-dialog-title">
@@ -304,7 +304,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                 </DialogContentText>
               </DialogContent>
             </div>
-          )}
+          )} */}
 
         {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
           imageContent && (

@@ -5,21 +5,19 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
 } from "@mui/material";
 import theme from "../../../styles/theme";
+import { ErrorOutline } from "@mui/icons-material";
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  titleError: string;
   textError: string;
 }
 
 export default function AlertError({
   open,
   onClose,
-  titleError,
   textError,
 }: Props): ReactElement {
   return (
@@ -28,16 +26,21 @@ export default function AlertError({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       fullWidth={true}
+      maxWidth="xs"
     >
-      <DialogTitle>{titleError}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>{textError}</DialogContentText>
+      <DialogContent sx={{ padding: "1em" }}>
+        <DialogContentText sx={{ textAlign: "center" }}>
+          <ErrorOutline sx={{ color: "#F54949", fontSize: "4em" }} />
+          <br />
+          {textError}{" "}
+        </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button
           id="btnClose"
           variant="contained"
           color="cancelColor"
+          sx={{ borderRadius: "5px" }}
           onClick={onClose}
         >
           ปิด
