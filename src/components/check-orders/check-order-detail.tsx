@@ -546,12 +546,12 @@ export default function CheckOrderDetail({
     const fileSize = e.target.files[0].size;
     const fileName = e.target.files[0].name;
     let parts = fileName.split(".");
-
+    let length = parts.length - 1;
     // pdf, .jpg, .jpeg
     if (
-      parts[1].toLowerCase() !== "pdf" &&
-      parts[1].toLowerCase() !== "jpg" &&
-      parts[1].toLowerCase() !== "jpeg"
+      parts[length].toLowerCase() !== "pdf" &&
+      parts[length].toLowerCase() !== "jpg" &&
+      parts[length].toLowerCase() !== "jpeg"
     ) {
       setValidationFile(true);
       setErrorBrowseFile(true);
