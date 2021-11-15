@@ -1,20 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../store/store";
-import {
-  featchOrderListAsync,
-  clearDataFilter,
-} from "../../store/slices/check-order-slice";
-
+import { featchOrderListAsync } from "../../store/slices/check-order-slice";
 import {
   Box,
   Button,
   Dialog,
   DialogContent,
-  FormControl,
-  formControlClasses,
   Grid,
-  MenuItem,
-  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,14 +14,10 @@ import {
   DataGrid,
   GridColDef,
   GridRenderCellParams,
-  renderEditInputCell,
-  GridEditRowsModel,
   useGridApiRef,
   GridValueGetterParams,
   GridRowId,
   GridRowData,
-  GridCellParams,
-  GridRowsProp,
 } from "@mui/x-data-grid";
 import DialogTitle from "@mui/material/DialogTitle";
 import Link from "@mui/material/Link";
@@ -52,18 +40,15 @@ import {
 import ModalShowPDF from "./modal-show-pdf";
 import {
   ShipmentInfo,
-  ShipmentResponse,
   SaveDraftSDRequest,
   CheckOrderDetailProps,
   Entry,
-  ShipmentRequest,
 } from "../../models/order-model";
 import { convertUtcToBkkDate } from "../../utils/date-utill";
 import { ApiError } from "../../models/api-error-model";
 import AlertError from "../commons/ui/alert-error";
 import {
   ArrowDownward,
-  BookmarkAdd,
   BookmarkAdded,
   CheckCircleOutline,
   HighlightOff,
@@ -78,7 +63,7 @@ interface loadingModalState {
 
 const columns: GridColDef[] = [
   {
-    field: "col1",
+    field: "rowOrder",
     headerName: "ลำดับ",
     width: 90,
     headerAlign: "center",
@@ -107,20 +92,20 @@ const columns: GridColDef[] = [
   {
     field: "productUnit",
     headerName: "หน่วย",
-    width: 90,
+    width: 100,
     headerAlign: "center",
   },
   {
     field: "productQuantityRef",
     headerName: "จำนวนอ้างอิง",
-    width: 135,
+    width: 150,
     headerAlign: "center",
     align: "right",
   },
   {
     field: "productQuantityActual",
     headerName: "จำนวนรับจริง",
-    width: 135,
+    width: 150,
     headerAlign: "center",
     renderCell: (params: GridRenderCellParams) => (
       <TextField
@@ -161,7 +146,7 @@ const columns: GridColDef[] = [
     field: "productComment",
     headerName: "หมายเหตุ",
     headerAlign: "center",
-    minWidth: 150,
+    minWidth: 200,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
         variant="outlined"
@@ -598,6 +583,7 @@ export default function CheckOrderDetail({
   let entries: Entry[] = shipmentList[0].entries ? shipmentList[0].entries : [];
   let rowsEntries = entries.map((item: Entry, index: number) => {
     return {
+      rowOrder: index + 1,
       id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
       doNo: item.deliveryOrderNo,
       isTote: item.isTote,
@@ -605,7 +591,6 @@ export default function CheckOrderDetail({
         shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT
           ? false
           : true,
-      col1: index + 1,
       productId: item.skuCode,
       productBarCode: item.barcode,
       productDescription: item.productName,
@@ -635,9 +620,6 @@ export default function CheckOrderDetail({
     setShowSnackbarFail(false);
     setShowSnackbarSuccess(false);
   };
-  // const handleEditRowsModelChange = React.useCallback((model: GridEditRowsModel) => {
-  //     console.log(model);
-  // }, []);
 
   const handleShowSnackBar = (issuccess: boolean, errorMsg: any) => {
     if (issuccess) {
@@ -651,11 +633,6 @@ export default function CheckOrderDetail({
   const handleCloseFailAlert = () => {
     setOpenFailAlert(false);
     setTextFail("");
-  };
-
-  const getfileName = (fileName: string) => {
-    console.log(`fileName>>: ${fileName}`);
-    return fileName;
   };
 
   const [opensSD, setOpensSD] = React.useState(false);
@@ -705,7 +682,7 @@ export default function CheckOrderDetail({
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h5">
             รายละเอียดใบตรวจสอบการรับ-โอนสินค้า
           </Typography>
         </BootstrapDialogTitle>
@@ -714,73 +691,51 @@ export default function CheckOrderDetail({
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  เลขที่เอกสาร LD:
-                </Typography>
+                <Typography variant="body2">เลขที่เอกสาร LD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
+                <Typography variant="body2">
                   {shipmentList[0].shipmentNo}
                 </Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  สถานะ:
-                </Typography>
+                <Typography variant="body2">สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
-                  {shipmentStatusText}
-                </Typography>
+                <Typography variant="body2">{shipmentStatusText}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  เลขที่เอกสาร SD:
-                </Typography>
+                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
-                  {shipmentList[0].sdNo}
-                </Typography>
+                <Typography variant="body2">{shipmentList[0].sdNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  ประเภท:
-                </Typography>
+                <Typography variant="body2">ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
-                  {shipmentTypeText}
-                </Typography>
+                <Typography variant="body2">{shipmentTypeText}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  วันที่:
-                </Typography>
+                <Typography variant="body2">วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
-                  {shipmentDateFormat}
-                </Typography>
+                <Typography variant="body2">{shipmentDateFormat}</Typography>
               </Grid>
               <Grid item lg={2}>
                 {shipmentList[0].sdStatus ===
                   ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
-                  <Typography variant="body2" gutterBottom>
-                    ใบผลต่างหลังเซ็นต์:
-                  </Typography>
+                  <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
                 )}
 
                 {shipmentList[0].hasDoc === true &&
                   shipmentList[0].sdStatus ===
                     ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <Typography variant="body2" gutterBottom>
-                      ใบผลต่างหลังเซ็นต์:
-                    </Typography>
+                    <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
                   )}
               </Grid>
               <Grid item lg={4}>
@@ -851,68 +806,16 @@ export default function CheckOrderDetail({
 
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  อ้างอิง SD โอนลอย :
-                </Typography>
+                {/* <Typography variant="body2">อ้างอิง SD โอนลอย :</Typography> */}
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
+                {/* <Typography variant="body2">
                   <u onClick={clickSelectedSD} style={{ cursor: "pointer" }}>
                     {shipmentList[0].comment}
                   </u>
-                </Typography>
-              </Grid>
-              <Grid item lg={2}>
-                {/* <Typography variant="body2" gutterBottom>
-                  แนบภาพสินค้า / วีดีโอ:
                 </Typography> */}
               </Grid>
-              <Grid item lg={4}>
-                {/* {shipmentList[0].sdStatus !==
-                  ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                  <div>
-                    <TextField
-                      name="browserTxf"
-                      className={classes.MtextFieldBrowse}
-                      value={fileInfo.fileName}
-                      placeholder="แนบไฟล์รวมไม่เกิน 30 MB"
-                    />
-                    <input
-                      id="btnBrowse"
-                      type="file"
-                      accept=".pdf, .jpg, .jpeg"
-                      onChange={handleFileInputChange}
-                      style={{ display: "none" }}
-                    />
-
-                    <label htmlFor={"btnBrowse"}>
-                      <Button
-                        id="btnPrint"
-                        color="primary"
-                        variant="contained"
-                        component="span"
-                        className={classes.MbtnBrowse}
-                        style={{ marginLeft: 10, textTransform: "none" }}
-                      >
-                        Browse
-                      </Button>
-                    </label>
-                  </div>
-                )}
-                {shipmentList[0].hasDoc === true &&
-                  shipmentList[0].sdStatus ===
-                    ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <div>
-                      <Link
-                        component="button"
-                        variant="body2"
-                        onClick={handleLinkDocument}
-                      >
-                        ดูเอกสาร <ArrowDownward />
-                      </Link>
-                    </div>
-                  )} */}
-              </Grid>
+              <Grid item lg={6}></Grid>
             </Grid>
           </Box>
 
@@ -1051,7 +954,6 @@ export default function CheckOrderDetail({
           }}
           onClose={handleCloseSnackBar}
         >
-          {/* This transaction is success */}
           ทำรายการสำเร็จ
         </Alert>
       </Snackbar>
