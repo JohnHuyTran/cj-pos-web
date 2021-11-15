@@ -647,31 +647,48 @@ export default function CheckOrderDetail({
   }
 
   const handleClose = () => {
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    let i = 0;
-    let exit = false;
+    if (
+      shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT
+    ) {
+      const rowsEdit: Map<GridRowId, GridRowData> =
+        apiRef.current.getRowModels();
+      let i = 0;
+      let exit = false;
 
-    const itemsList: any = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      if (data.productQuantityActual !== rowsEntries[i].productQuantityActual) {
-        exit = true;
-      } else if (data.productComment !== rowsEntries[i].productComment) {
-        exit = true;
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        if (
+          data.productQuantityActual !== rowsEntries[i].productQuantityActual
+        ) {
+          exit = true;
+        } else if (data.productComment !== rowsEntries[i].productComment) {
+          exit = true;
+        }
+        i++;
+
+        itemsList.push(data);
+      });
+
+      if (!exit) {
+        localStorage.removeItem("localStorageRowsEdit");
+        setOpen(false);
+        onClickClose();
+      } else if (exit) {
+        localStorage.setItem("localStorageRowsEdit", JSON.stringify(itemsList));
+        setConfirmModelExit(true);
       }
-      i++;
-
-      itemsList.push(data);
-    });
-
-    if (!exit) {
-      localStorage.removeItem("localStorageRowsEdit");
+    } else if (
+      shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE
+    ) {
+      if (fileInfo.base64URL) {
+        setConfirmModelExit(true);
+      } else {
+        setOpen(false);
+        onClickClose();
+      }
+    } else {
       setOpen(false);
       onClickClose();
-    }
-
-    if (exit) {
-      localStorage.setItem("localStorageRowsEdit", JSON.stringify(itemsList));
-      setConfirmModelExit(true);
     }
   };
 
