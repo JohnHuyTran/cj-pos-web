@@ -9,11 +9,13 @@ import productSlice from "./slices/productSlice";
 import saveSearchOrder from "./slices/save-search-order";
 import saveSearchOrderDc from "./slices/save-search-order-dc-slice";
 import searchBranchSlice from "./slices/search-branches-slice";
+import checkOrderSDSlice from "./slices/check-order-sd-slice";
 
 const store = configureStore({
   reducer: {
     auth: authSlice,
     checkOrderList: checkOrderSlice,
+    checkOrderSDList: checkOrderSDSlice,
     dcCheckOrderList: dcCheckOrderSlice,
     navigator: navSlice,
     product: productSlice,

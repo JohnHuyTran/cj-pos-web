@@ -144,3 +144,33 @@ export interface FeatchDataPDFRequest {
 export interface GenerateBORequest {
   comment: string;
 }
+
+export interface SDResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: SDInfo[] | null;
+}
+
+export interface SDInfo {
+  shipmentNo: string;
+  shipmentDate: string;
+  status: string;
+  sapDocType: string;
+  sdNo: string;
+  sdStatus: number;
+  sdType: number;
+  toteCnt: number;
+  boxCnt: number;
+  hasDoc: boolean;
+  itemRefNo: number;
+  entries: Entry[];
+}
+
+export interface CheckOrderSDDetailProps {
+  sdNo: string;
+  sdRefNo: string;
+  shipmentNo: string;
+  defaultOpen: boolean;
+  onClickClose: any;
+}

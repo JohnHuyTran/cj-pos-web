@@ -55,7 +55,8 @@ import {
   Print,
 } from "@mui/icons-material";
 import LoadingModal from "../commons/ui/loading-modal";
-import CheckOrderSDDetail from "./check-order-detail-sd";
+import CheckOrderSDRefDetail from "./check-order-detail-sd";
+import { featchOrderSDListAsync } from "../../store/slices/check-order-sd-slice";
 
 interface loadingModalState {
   open: boolean;
@@ -258,6 +259,7 @@ export default function CheckOrderDetail({
   const classes = useStyles();
 
   const res = useAppSelector((state) => state.checkOrderList.orderList);
+  const sdRef = useAppSelector((state) => state.checkOrderSDList.orderList);
   const payloadSearchOrder = useAppSelector(
     (state) => state.saveSearchOrder.searchCriteria
   );
@@ -343,6 +345,8 @@ export default function CheckOrderDetail({
     setShipmentStatusText(getShipmentStatusText(shipmentList[0].sdStatus));
     setShipmentTypeText(getShipmentTypeText(shipmentList[0].sdType));
     setShipmentDateFormat(convertUtcToBkkDate(shipmentList[0].shipmentDate));
+
+    dispatch(featchOrderSDListAsync(shipmentList[0].comment));
   }, [open, openModelConfirm]);
 
   function handleNotExitModelConfirm() {
@@ -641,10 +645,20 @@ export default function CheckOrderDetail({
     setOpensSD(false);
   }
 
-  function clickSelectedSD() {
-    setOpenModelConfirm(true);
-    setOpensSD(true);
-  }
+  const clickSelectedSDRef = () => {
+    handleOpenLoading("open", true);
+    setTimeout(() => {
+      handleOpenLoading("open", false);
+      if (sdRef.data !== null && sdRef.data !== []) {
+        setOpensSD(true);
+      } else {
+        setOpenFailAlert(true);
+        setTextFail(
+          `ไม่พบข้อมูล อ้างอิง SD โอนลอย: ${shipmentList[0].comment}`
+        );
+      }
+    }, 200);
+  };
 
   const handleClose = () => {
     if (
@@ -823,14 +837,21 @@ export default function CheckOrderDetail({
 
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                {/* <Typography variant="body2">อ้างอิง SD โอนลอย :</Typography> */}
+                {shipmentList[0].comment !== "" && (
+                  <Typography variant="body2">อ้างอิง SD โอนลอย :</Typography>
+                )}
               </Grid>
               <Grid item lg={4}>
-                {/* <Typography variant="body2">
-                  <u onClick={clickSelectedSD} style={{ cursor: "pointer" }}>
-                    {shipmentList[0].comment}
-                  </u>
-                </Typography> */}
+                <Typography variant="body2">
+                  {shipmentList[0].comment !== "" && (
+                    <u
+                      onClick={clickSelectedSDRef}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {shipmentList[0].comment}
+                    </u>
+                  )}
+                </Typography>
               </Grid>
               <Grid item lg={6}></Grid>
             </Grid>
@@ -1000,8 +1021,9 @@ export default function CheckOrderDetail({
       <LoadingModal open={openLoadingModal.open} />
 
       {opensSD && (
-        <CheckOrderSDDetail
+        <CheckOrderSDRefDetail
           sdNo={sdNo}
+          sdRefNo={shipmentList[0].comment}
           shipmentNo={shipmentNo}
           defaultOpen={opensSD}
           onClickClose={isClosSDModal}
