@@ -12,6 +12,9 @@ import {
   KeyboardDatePicker,
 } from "@material-ui/pickers";
 import { createTheme, ThemeProvider } from "@material-ui/core/styles";
+import CloseIcon from "@mui/icons-material/Close";
+import CalendarToday from "@mui/icons-material/CalendarToday";
+import IconButton from "@mui/material/IconButton";
 
 interface StateProps {
   onClickDate: any;
@@ -36,7 +39,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
   //   moment().add(0, "years")
   // );
 
-  const handleDateChange = (date: Date | null) => {
+  const handleDateChange = (date: any) => {
     props.onClickDate(date);
   };
 
@@ -45,34 +48,97 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
+        clearable
+        autoOk
+        fullWidth
         variant="inline"
+        inputVariant="outlined"
         format="DD/MM/YYYY"
+        className={classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
-        autoOk
-        inputVariant="outlined"
-        className={classes.Mdatepicker}
-        fullWidth
-        minDate={props.minDateTo}
+        InputProps={{
+          endAdornment: (
+            <IconButton onClick={() => handleDateChange(null)}>
+              <CloseIcon />
+            </IconButton>
+          ),
+          readOnly: true,
+        }}
+        InputAdornmentProps={{
+          position: "start",
+        }}
         maxDate={today}
-        InputProps={{ readOnly: true }}
+        minDate={props.minDateTo}
+        placeholder="กรุณาเลือกวันที่"
       />
+      // <KeyboardDatePicker
+      //   disableToolbar
+      //   variant="inline"
+      //   format="DD/MM/YYYY"
+      //   value={props.value}
+      //   onChange={handleDateChange}
+      //   autoOk
+      //   inputVariant="outlined"
+      //   className={classes.Mdatepicker}
+      //   fullWidth
+      //   minDate={props.minDateTo}
+      //   maxDate={today}
+      //   InputProps={{ readOnly: true }}
+      //   placeholder="กรุณาเลือกวันที่"
+      //   keyboardIcon={props.value ? <CloseIcon /> : <CalendarToday />}
+      // />
     );
   } else {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
+        clearable
+        autoOk
+        fullWidth
         variant="inline"
+        inputVariant="outlined"
         format="DD/MM/YYYY"
+        className={classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
-        autoOk
-        inputVariant="outlined"
-        className={classes.Mdatepicker}
-        fullWidth
+        InputProps={{
+          endAdornment: (
+            <IconButton onClick={() => handleDateChange(null)}>
+              <CloseIcon />
+            </IconButton>
+          ),
+          readOnly: true,
+        }}
+        InputAdornmentProps={{
+          position: "start",
+        }}
         maxDate={today}
-        InputProps={{ readOnly: true }}
+        placeholder="กรุณาเลือกวันที่"
       />
+      // <KeyboardDatePicker
+
+      //   disableToolbar
+      //   variant="inline"
+      //   format="DD/MM/YYYY"
+      //   value={props.value}
+      //   onChange={handleDateChange}
+      //   autoOk
+      //   inputVariant="outlined"
+      //   className={classes.Mdatepicker}
+      //   fullWidth
+      //   maxDate={today}
+      //   InputProps={{ readOnly: true }}
+      //   placeholder="กรุณาเลือกวันที่"
+      //   keyboardIcon={props.value ? <CloseIcon /> : <CalendarToday />}
+      //   KeyboardButtonProps={{
+      //     onClick: (
+      //       <IconButton onClick={() => handleDateChange(null)}>
+      //         <CloseIcon />
+      //       </IconButton>
+      //     ),
+      //   }}
+      // />
     );
   }
 

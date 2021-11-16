@@ -17,6 +17,7 @@ import {
   saveSearchCriteria,
   clearSearchCriteria,
 } from "../../store/slices/save-search-order";
+import { getShipmentTypeText } from "../../utils/enum/check-order-enum";
 import { ShipmentRequest } from "../../models/order-model";
 import OrderList from "./order-list";
 import DatePickerComponent from "../commons/ui/date-picker";
@@ -24,13 +25,23 @@ import LoadingModal from "../commons/ui/loading-modal";
 import { useStyles } from "../../styles/makeTheme";
 import { SearchOff } from "@mui/icons-material";
 import { dateToStringCriteria } from "../../utils/date-utill";
+import AlertError from "../commons/ui/alert-error";
+import {
+  DatePicker,
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
+import { createTheme, ThemeProvider } from "@material-ui/core/styles";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 // moment.locale("en");
 moment.locale("th");
 
 interface State {
   orderShipment: string;
-  orderNo: string;
+  // orderNo: string;
   orderStatus: string;
   orderType: string;
   dateFrom: string;
@@ -46,19 +57,22 @@ function CheckOrderSearch() {
   const items = useAppSelector((state) => state.checkOrderList);
   const [values, setValues] = React.useState<State>({
     orderShipment: "",
-    orderNo: "",
+    // orderNo: "",
     orderStatus: "ALL",
     orderType: "ALL",
     dateFrom: "",
     dateTo: "",
   });
 
-  const [startDate, setStartDate] = React.useState<Date>(new Date());
-  const [endDate, setEndDate] = React.useState<Date>(new Date());
+  const [startDate, setStartDate] = React.useState<Date | null>(new Date());
+  // const [startDate, setStartDate] = React.useState(null);
+  const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const [openLoadingModal, setOpenLoadingModal] =
     React.useState<loadingModalState>({
       open: false,
     });
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState("");
 
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -69,12 +83,34 @@ function CheckOrderSearch() {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
+  const validateForm = () => {
+    if (
+      values.orderShipment === "" &&
+      values.orderStatus === "ALL" &&
+      values.orderType === "ALL" &&
+      startDate === null &&
+      endDate === null
+    ) {
+      setOpenAlert(true);
+      setTextError("กรุณากรอกข้อมูลค้นหา");
+    } else if (
+      values.orderShipment === "" &&
+      values.orderStatus === "ALL" &&
+      values.orderType === "ALL"
+    ) {
+      if (startDate === null || endDate === null) {
+        setOpenAlert(true);
+        setTextError("กรุณากรอกวันที่รับสินค้าให้ครบ");
+      }
+    }
+  };
+
   const onClickSearchBtn = async () => {
     const payload: ShipmentRequest = {
       limit: "5",
       page: "1",
       paramQuery: values.orderShipment,
-      sdNo: values.orderNo,
+      // sdNo: values.orderNo,
       dateFrom: moment(startDate).startOf("day").toISOString(),
       dateTo: moment(endDate).endOf("day").toISOString(),
       sdStatus: parseInt(values.orderStatus),
@@ -83,6 +119,7 @@ function CheckOrderSearch() {
     };
 
     handleOpenLoading("open", true);
+    await validateForm();
     await dispatch(featchOrderListAsync(payload));
     await dispatch(saveSearchCriteria(payload));
     handleOpenLoading("open", false);
@@ -92,11 +129,11 @@ function CheckOrderSearch() {
   };
 
   const onClickClearBtn = () => {
-    setStartDate(new Date());
-    setEndDate(new Date());
+    setStartDate(null);
+    setEndDate(null);
     setValues({
       orderShipment: "",
-      orderNo: "",
+      // orderNo: "",
       orderStatus: "ALL",
       orderType: "ALL",
       dateFrom: "",
@@ -107,7 +144,7 @@ function CheckOrderSearch() {
       limit: "5",
       page: "1",
       paramQuery: values.orderShipment,
-      sdNo: values.orderNo,
+      // sdNo: values.orderNo,
       dateFrom: moment(startDate).format("DD/MM/YYYY"),
       dateTo: moment(endDate).format("DD/MM/YYYY"),
       sdStatus: parseInt(values.orderStatus),
@@ -118,7 +155,7 @@ function CheckOrderSearch() {
     dispatch(clearSearchCriteria());
   };
 
-  const handleStartDatePicker = (value: Date) => {
+  const handleStartDatePicker = (value: any) => {
     setStartDate(value);
   };
 
@@ -142,6 +179,18 @@ function CheckOrderSearch() {
   } else {
     orderListData = <OrderList />;
   }
+
+  //check dateFrom-dateTo
+  if (endDate != null && startDate != null) {
+    if (endDate < startDate) {
+      setEndDate(null);
+    }
+  }
+
+  //alert Errormodel
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
 
   return (
     <>
@@ -178,8 +227,8 @@ function CheckOrderSearch() {
                 <MenuItem value={"ALL"} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={"0"}>ลังกระดาษ/ลังพลาสติก</MenuItem>
-                <MenuItem value={"1"}>สินค้าภายในTote</MenuItem>
+                <MenuItem value={"0"}>{getShipmentTypeText(0)}</MenuItem>
+                <MenuItem value={"1"}>{getShipmentTypeText(1)}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -266,6 +315,13 @@ function CheckOrderSearch() {
       {/* {items.orderList && <OrderList />} */}
       {orderListData}
       <LoadingModal open={openLoadingModal.open} />
+
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        titleError="Failed"
+        textError={textError}
+      />
     </>
   );
 }

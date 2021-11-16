@@ -64,8 +64,6 @@ function DCCheckOrderSearch() {
     dispatch(featchBranchListAsync());
   }, []);
 
-
-
   // console.log("branchList: ", branchList.branchList.data);
 
   const handleChange = (event: any) => {
@@ -97,7 +95,7 @@ function DCCheckOrderSearch() {
     await dispatch(saveSearchCriteriaDc(payload));
     handleOpenLoading("open", false);
 
-    // console.log(`Search Criteria: ${JSON.stringify(payload)}`);
+    console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
 
   const onClickClearBtn = async () => {
@@ -146,7 +144,7 @@ function DCCheckOrderSearch() {
   const handleChangeBranch = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, branchCode: value });
-  }
+  };
 
   let orderListData;
   const orderListDatas = items.orderList.data;
@@ -199,9 +197,13 @@ function DCCheckOrderSearch() {
                 <MenuItem value={"ALL"} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                {branchList.branchList.data.map((option: BranchInfo, index: number) => (
-                  <MenuItem key={option.code} value={option.code}>{option.name}</MenuItem>
-                ))}
+                {branchList.branchList.data.map(
+                  (option: BranchInfo, index: number) => (
+                    <MenuItem key={option.code} value={option.code}>
+                      {option.name}
+                    </MenuItem>
+                  )
+                )}
               </Select>
             </FormControl>
 

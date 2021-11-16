@@ -1,5 +1,6 @@
 //@ts-nocheck
 import moment from "moment";
+import React, { useEffect } from "react";
 
 import DateUtils from "@date-io/moment"; // choose your lib
 import "moment/locale/th";
@@ -11,8 +12,13 @@ export default class OverwriteMomentBE extends DateUtils {
 
   date = (value = null) => {
     if (value === null) {
-      return null;
+      // return null;
+      const moment = this.moment(new Date());
+      moment.locale(this.locale);
+
+      return moment;
     }
+
     const moment = this.moment(value);
     moment.locale(this.locale);
     return moment;
