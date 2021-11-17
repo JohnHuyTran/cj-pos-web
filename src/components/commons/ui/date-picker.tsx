@@ -72,22 +72,6 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         minDate={props.minDateTo}
         placeholder="กรุณาเลือกวันที่"
       />
-      // <KeyboardDatePicker
-      //   disableToolbar
-      //   variant="inline"
-      //   format="DD/MM/YYYY"
-      //   value={props.value}
-      //   onChange={handleDateChange}
-      //   autoOk
-      //   inputVariant="outlined"
-      //   className={classes.Mdatepicker}
-      //   fullWidth
-      //   minDate={props.minDateTo}
-      //   maxDate={today}
-      //   InputProps={{ readOnly: true }}
-      //   placeholder="กรุณาเลือกวันที่"
-      //   keyboardIcon={props.value ? <CloseIcon /> : <CalendarToday />}
-      // />
     );
   } else {
     datePicker = (
@@ -116,29 +100,6 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         maxDate={today}
         placeholder="กรุณาเลือกวันที่"
       />
-      // <KeyboardDatePicker
-
-      //   disableToolbar
-      //   variant="inline"
-      //   format="DD/MM/YYYY"
-      //   value={props.value}
-      //   onChange={handleDateChange}
-      //   autoOk
-      //   inputVariant="outlined"
-      //   className={classes.Mdatepicker}
-      //   fullWidth
-      //   maxDate={today}
-      //   InputProps={{ readOnly: true }}
-      //   placeholder="กรุณาเลือกวันที่"
-      //   keyboardIcon={props.value ? <CloseIcon /> : <CalendarToday />}
-      //   KeyboardButtonProps={{
-      //     onClick: (
-      //       <IconButton onClick={() => handleDateChange(null)}>
-      //         <CloseIcon />
-      //       </IconButton>
-      //     ),
-      //   }}
-      // />
     );
   }
 

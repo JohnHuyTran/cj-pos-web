@@ -7,6 +7,7 @@ const useStyles = makeStyles({
     },
     "& .MuiIconButton-root": {
       color: "#CBD4DB !important",
+      padding: "5px !important",
     },
     "& .MuiOutlinedInput-adornedEnd": {
       paddingRight: "0px !important",

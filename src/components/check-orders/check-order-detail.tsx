@@ -1,20 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../store/store";
-import {
-  featchOrderListAsync,
-  clearDataFilter,
-} from "../../store/slices/check-order-slice";
-
+import { featchOrderListAsync } from "../../store/slices/check-order-slice";
 import {
   Box,
   Button,
   Dialog,
   DialogContent,
-  FormControl,
-  formControlClasses,
   Grid,
-  MenuItem,
-  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,14 +14,10 @@ import {
   DataGrid,
   GridColDef,
   GridRenderCellParams,
-  renderEditInputCell,
-  GridEditRowsModel,
   useGridApiRef,
   GridValueGetterParams,
   GridRowId,
   GridRowData,
-  GridCellParams,
-  GridRowsProp,
 } from "@mui/x-data-grid";
 import DialogTitle from "@mui/material/DialogTitle";
 import Link from "@mui/material/Link";
@@ -52,24 +40,22 @@ import {
 import ModalShowPDF from "./modal-show-pdf";
 import {
   ShipmentInfo,
-  ShipmentResponse,
   SaveDraftSDRequest,
   CheckOrderDetailProps,
   Entry,
-  ShipmentRequest,
 } from "../../models/order-model";
 import { convertUtcToBkkDate } from "../../utils/date-utill";
 import { ApiError } from "../../models/api-error-model";
 import AlertError from "../commons/ui/alert-error";
 import {
   ArrowDownward,
-  BookmarkAdd,
   BookmarkAdded,
   CheckCircleOutline,
   HighlightOff,
   Print,
 } from "@mui/icons-material";
 import LoadingModal from "../commons/ui/loading-modal";
+import CheckOrderSDDetail from "./check-order-detail-sd";
 
 interface loadingModalState {
   open: boolean;
@@ -77,7 +63,7 @@ interface loadingModalState {
 
 const columns: GridColDef[] = [
   {
-    field: "col1",
+    field: "rowOrder",
     headerName: "ลำดับ",
     width: 90,
     headerAlign: "center",
@@ -86,14 +72,14 @@ const columns: GridColDef[] = [
   {
     field: "productId",
     headerName: "รหัสสินค้า",
-    width: 170,
+    width: 200,
     headerAlign: "center",
     disableColumnMenu: true,
   },
   {
     field: "productBarCode",
     headerName: "บาร์โค้ด",
-    minWidth: 170,
+    minWidth: 150,
     headerAlign: "center",
     disableColumnMenu: true,
   },
@@ -112,14 +98,14 @@ const columns: GridColDef[] = [
   {
     field: "productQuantityRef",
     headerName: "จำนวนอ้างอิง",
-    width: 135,
+    width: 150,
     headerAlign: "center",
     align: "right",
   },
   {
     field: "productQuantityActual",
     headerName: "จำนวนรับจริง",
-    width: 135,
+    width: 150,
     headerAlign: "center",
     renderCell: (params: GridRenderCellParams) => (
       <TextField
@@ -280,10 +266,15 @@ export default function CheckOrderDetail({
   const [fileName, setFileName] = React.useState("");
   const { apiRef, columns } = useApiRef();
 
-  const [disableSaveBtn, setDisableSaveBtn] = React.useState(false);
-  const [disableApproveBtn, setDisableApproveBtn] = React.useState(false);
-  const [disableCloseJobBtn, setDisableCloseJobBtn] = React.useState(false);
+  const [showSaveBtn, setShowSaveBtn] = React.useState(false);
+  const [showApproveBtn, setShowApproveBtn] = React.useState(false);
+  const [showCloseJobBtn, setShowCloseJobBtn] = React.useState(false);
+  // const [disableCloseJobBtn, setDisableCloseJobBtn] = React.useState(true);
+  const [validationFile, setValidationFile] = React.useState(false);
   const [isDisplayActBtn, setIsDisplayActBtn] = React.useState("");
+
+  const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
+  const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState("");
 
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [action, setAction] = useState<number>(0);
@@ -307,7 +298,9 @@ export default function CheckOrderDetail({
     string | undefined
   >("");
   const [snackBarFailMsg, setSnackBarFailMsg] = React.useState("");
-  const [openAlert, setOpenAlert] = React.useState(false);
+  const [openFailAlert, setOpenFailAlert] = React.useState(false);
+  const [textFail, setTextFail] = React.useState("");
+
   const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
     file: null,
     fileName: "",
@@ -327,16 +320,16 @@ export default function CheckOrderDetail({
     if (
       shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT
     ) {
-      setDisableSaveBtn(false);
-      setDisableApproveBtn(false);
-      setDisableCloseJobBtn(true);
+      setShowSaveBtn(false);
+      setShowApproveBtn(false);
+      setShowCloseJobBtn(true);
     }
     if (
       shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE
     ) {
-      setDisableSaveBtn(true);
-      setDisableApproveBtn(true);
-      setDisableCloseJobBtn(false);
+      setShowSaveBtn(true);
+      setShowApproveBtn(true);
+      setShowCloseJobBtn(false);
     }
 
     if (
@@ -419,7 +412,11 @@ export default function CheckOrderDetail({
       itemsList.push(item);
     });
 
-    setOpenAlert(!qtyIsValid);
+    if (!qtyIsValid) {
+      setOpenFailAlert(!qtyIsValid);
+      setTextFail("จำนวนรับจริงของTote ต้องเป็น 0 หรือ 1 เท่านั้น");
+    }
+
     if (qtyIsValid) {
       const payload: SaveDraftSDRequest = {
         shipmentNo: shipmentNo,
@@ -487,8 +484,16 @@ export default function CheckOrderDetail({
   };
 
   const handleCloseJobBtn = () => {
-    setOpenModelConfirm(true);
-    setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
+    if (!fileInfo.base64URL) {
+      setErrorBrowseFile(true);
+      setMsgErrorBrowseFile("กรุณาแนบไฟล์เอกสาร");
+    } else if (validationFile === true) {
+      setOpenFailAlert(true);
+      setTextFail("กรุณาตรวจสอบ ไฟล์เอกสาร");
+    } else {
+      setOpenModelConfirm(true);
+      setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
+    }
   };
 
   const handlePrintBtn = () => {
@@ -519,8 +524,12 @@ export default function CheckOrderDetail({
   };
 
   const handleFileInputChange = (e: any) => {
+    setValidationFile(false);
+    setErrorBrowseFile(false);
+    setMsgErrorBrowseFile("");
+    checkSizeFile(e);
+
     let file: File = e.target.files[0];
-    const fileSize = e.target.files[0].size;
     const fileName = e.target.files[0].name;
 
     getBase64(file)
@@ -533,6 +542,39 @@ export default function CheckOrderDetail({
       });
   };
 
+  const checkSizeFile = (e: any) => {
+    const fileSize = e.target.files[0].size;
+    const fileName = e.target.files[0].name;
+    let parts = fileName.split(".");
+    let length = parts.length - 1;
+    // pdf, .jpg, .jpeg
+    if (
+      parts[length].toLowerCase() !== "pdf" &&
+      parts[length].toLowerCase() !== "jpg" &&
+      parts[length].toLowerCase() !== "jpeg"
+    ) {
+      setValidationFile(true);
+      setErrorBrowseFile(true);
+      setMsgErrorBrowseFile("กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น");
+      return;
+    }
+
+    // 1024 = bytes
+    // 1024*1024*1024 = mb
+    let mb = 1024 * 1024 * 1024;
+    // fileSize = mb unit
+    if (fileSize < mb) {
+      //size > 5MB
+      let size = fileSize / 1024 / 1024;
+      if (size > 5) {
+        setValidationFile(true);
+        setErrorBrowseFile(true);
+        setMsgErrorBrowseFile("ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่");
+        return;
+      }
+    }
+  };
+
   // data grid
   const shipmentList: ShipmentInfo[] = res.data.filter(
     (shipmentInfo: ShipmentInfo) => shipmentInfo.sdNo === sdNo
@@ -541,6 +583,7 @@ export default function CheckOrderDetail({
   let entries: Entry[] = shipmentList[0].entries ? shipmentList[0].entries : [];
   let rowsEntries = entries.map((item: Entry, index: number) => {
     return {
+      rowOrder: index + 1,
       id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
       doNo: item.deliveryOrderNo,
       isTote: item.isTote,
@@ -548,7 +591,6 @@ export default function CheckOrderDetail({
         shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT
           ? false
           : true,
-      col1: index + 1,
       productId: item.skuCode,
       productBarCode: item.barcode,
       productDescription: item.productName,
@@ -578,68 +620,75 @@ export default function CheckOrderDetail({
     setShowSnackbarFail(false);
     setShowSnackbarSuccess(false);
   };
-  // const handleEditRowsModelChange = React.useCallback((model: GridEditRowsModel) => {
-  //     console.log(model);
-  // }, []);
 
   const handleShowSnackBar = (issuccess: boolean, errorMsg: any) => {
     if (issuccess) {
-      // setDisableSaveBtn(true);
-      // setDisableApproveBtn(true);
-      // setDisableCloseJobBtn(false)
       setShowSnackbarSuccess(true);
-      // updateShipmentOrder()
     } else {
       setShowSnackbarFail(true);
       setSnackBarFailMsg(errorMsg);
-      // updateShipmentOrder()
     }
   };
 
-  const handleCloseAlert = () => {
-    setOpenAlert(false);
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail("");
   };
 
-  const getfileName = (fileName: string) => {
-    console.log(`fileName>>: ${fileName}`);
-    return fileName;
-  };
+  const [opensSD, setOpensSD] = React.useState(false);
+  function isClosSDModal() {
+    setOpenModelConfirm(false);
+    setOpensSD(false);
+  }
 
-  // const [opensSD, setOpensSD] = React.useState(false);
-  // function isClosSDModal() {
-  //   setOpensSD(false);
-  // }
-
-  // function clickSelectedSD() {
-  //   setOpensSD(true);
-  // }
+  function clickSelectedSD() {
+    setOpenModelConfirm(true);
+    setOpensSD(true);
+  }
 
   const handleClose = () => {
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    let i = 0;
-    let exit = false;
+    if (
+      shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT
+    ) {
+      const rowsEdit: Map<GridRowId, GridRowData> =
+        apiRef.current.getRowModels();
+      let i = 0;
+      let exit = false;
 
-    const itemsList: any = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      if (data.productQuantityActual !== rowsEntries[i].productQuantityActual) {
-        exit = true;
-      } else if (data.productComment !== rowsEntries[i].productComment) {
-        exit = true;
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        if (
+          data.productQuantityActual !== rowsEntries[i].productQuantityActual
+        ) {
+          exit = true;
+        } else if (data.productComment !== rowsEntries[i].productComment) {
+          exit = true;
+        }
+        i++;
+
+        itemsList.push(data);
+      });
+
+      if (!exit) {
+        localStorage.removeItem("localStorageRowsEdit");
+        setOpen(false);
+        onClickClose();
+      } else if (exit) {
+        localStorage.setItem("localStorageRowsEdit", JSON.stringify(itemsList));
+        setConfirmModelExit(true);
       }
-      i++;
-
-      itemsList.push(data);
-    });
-
-    if (!exit) {
-      localStorage.removeItem("localStorageRowsEdit");
+    } else if (
+      shipmentList[0].sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE
+    ) {
+      if (fileInfo.base64URL) {
+        setConfirmModelExit(true);
+      } else {
+        setOpen(false);
+        onClickClose();
+      }
+    } else {
       setOpen(false);
       onClickClose();
-    }
-
-    if (exit) {
-      localStorage.setItem("localStorageRowsEdit", JSON.stringify(itemsList));
-      setConfirmModelExit(true);
     }
   };
 
@@ -650,7 +699,7 @@ export default function CheckOrderDetail({
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h5">
             รายละเอียดใบตรวจสอบการรับ-โอนสินค้า
           </Typography>
         </BootstrapDialogTitle>
@@ -659,85 +708,77 @@ export default function CheckOrderDetail({
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  เลขที่เอกสาร LD:
-                </Typography>
+                <Typography variant="body2">เลขที่เอกสาร LD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
+                <Typography variant="body2">
                   {shipmentList[0].shipmentNo}
                 </Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  สถานะ:
-                </Typography>
+                <Typography variant="body2">สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
-                  {shipmentStatusText}
-                </Typography>
+                <Typography variant="body2">{shipmentStatusText}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  เลขที่เอกสาร SD:
-                </Typography>
+                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
-                  {shipmentList[0].sdNo}
-                </Typography>
+                <Typography variant="body2">{shipmentList[0].sdNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  ประเภท:
-                </Typography>
+                <Typography variant="body2">ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
-                  {shipmentTypeText}
-                </Typography>
+                <Typography variant="body2">{shipmentTypeText}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  วันที่:
-                </Typography>
+                <Typography variant="body2">วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
-                  {shipmentDateFormat}
-                </Typography>
+                <Typography variant="body2">{shipmentDateFormat}</Typography>
               </Grid>
               <Grid item lg={2}>
                 {shipmentList[0].sdStatus ===
                   ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
-                  <Typography variant="body2" gutterBottom>
-                    ใบผลต่างหลังเซ็นต์:
-                  </Typography>
+                  <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
                 )}
 
                 {shipmentList[0].hasDoc === true &&
                   shipmentList[0].sdStatus ===
                     ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <Typography variant="body2" gutterBottom>
-                      ใบผลต่างหลังเซ็นต์:
-                    </Typography>
+                    <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
                   )}
               </Grid>
               <Grid item lg={4}>
                 {shipmentList[0].sdStatus ===
                   ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
                   <div>
-                    <TextField
-                      name="browserTxf"
-                      className={classes.MtextFieldBrowse}
-                      value={fileInfo.fileName}
-                      placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
-                    />
+                    {errorBrowseFile === true && (
+                      <TextField
+                        error
+                        name="browserTxf"
+                        className={classes.MtextFieldBrowse}
+                        value={fileInfo.fileName}
+                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
+                        helperText={msgErrorBrowseFile}
+                      />
+                    )}
+
+                    {errorBrowseFile === false && (
+                      <TextField
+                        name="browserTxf"
+                        className={classes.MtextFieldBrowse}
+                        value={fileInfo.fileName}
+                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
+                      />
+                    )}
+
                     <input
                       id="btnBrowse"
                       type="file"
@@ -780,72 +821,19 @@ export default function CheckOrderDetail({
               </Grid>
             </Grid>
 
-            {/* <Grid container spacing={2} mb={1}>
+            <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  อ้างอิง SD โอนลอย :
-                </Typography>
+                {/* <Typography variant="body2">อ้างอิง SD โอนลอย :</Typography> */}
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2" gutterBottom>
+                {/* <Typography variant="body2">
                   <u onClick={clickSelectedSD} style={{ cursor: "pointer" }}>
-                    SD20020101-000001
+                    {shipmentList[0].comment}
                   </u>
-                </Typography>
+                </Typography> */}
               </Grid>
-              <Grid item lg={2}>
-                <Typography variant="body2" gutterBottom>
-                  แนบภาพสินค้า / วีดีโอ:
-                </Typography>
-              </Grid>
-              <Grid item lg={4}>
-                {shipmentList[0].sdStatus !==
-                  ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                  <div>
-                    <TextField
-                      name="browserTxf"
-                      className={classes.MtextFieldBrowse}
-                      value={fileInfo.fileName}
-                      placeholder="แนบไฟล์รวมไม่เกิน 30 MB"
-                    />
-                    <input
-                      id="btnBrowse"
-                      type="file"
-                      accept=".pdf, .jpg, .jpeg"
-                      onChange={handleFileInputChange}
-                      style={{ display: "none" }}
-                    />
-
-                    <label htmlFor={"btnBrowse"}>
-                      <Button
-                        id="btnPrint"
-                        color="primary"
-                        variant="contained"
-                        component="span"
-                        className={classes.MbtnBrowse}
-                        style={{ marginLeft: 10, textTransform: "none" }}
-                      >
-                        Browse
-                      </Button>
-                    </label>
-                  </div>
-                )}
-                {shipmentList[0].hasDoc === true &&
-                  shipmentList[0].sdStatus ===
-                    ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <div>
-                      <Link
-                        component="button"
-                        variant="body2"
-                        onClick={handleLinkDocument}
-                      >
-                        ดูเอกสาร <ArrowDownward />
-                      </Link>
-                    </div>
-                  )}
-              </Grid>
+              <Grid item lg={6}></Grid>
             </Grid>
-            hasDoc : {shipmentList[0].hasDoc} */}
           </Box>
 
           {/* DisplayBtn */}
@@ -871,7 +859,7 @@ export default function CheckOrderDetail({
               </Grid>
 
               <Grid item>
-                {!disableSaveBtn && (
+                {!showSaveBtn && (
                   <Button
                     id="btnSave"
                     variant="contained"
@@ -884,7 +872,7 @@ export default function CheckOrderDetail({
                   </Button>
                 )}
 
-                {!disableApproveBtn && (
+                {!showApproveBtn && (
                   <Button
                     id="btnApprove"
                     variant="contained"
@@ -897,7 +885,7 @@ export default function CheckOrderDetail({
                   </Button>
                 )}
 
-                {!disableCloseJobBtn && (
+                {!showCloseJobBtn && (
                   <Button
                     id="btnClose"
                     variant="contained"
@@ -959,10 +947,9 @@ export default function CheckOrderDetail({
       />
 
       <AlertError
-        open={openAlert}
-        onClose={handleCloseAlert}
-        titleError="Failed"
-        textError="จำนวนรับจริง ของ tote  ต้องเป็น 0 หรือ 1เท่านั้น"
+        open={openFailAlert}
+        onClose={handleCloseFailAlert}
+        textError={textFail}
       />
 
       <Snackbar
@@ -984,7 +971,6 @@ export default function CheckOrderDetail({
           }}
           onClose={handleCloseSnackBar}
         >
-          {/* This transaction is success */}
           ทำรายการสำเร็จ
         </Alert>
       </Snackbar>
@@ -1013,14 +999,14 @@ export default function CheckOrderDetail({
 
       <LoadingModal open={openLoadingModal.open} />
 
-      {/* {opensSD && (
-        <CheckOrderDetail
+      {opensSD && (
+        <CheckOrderSDDetail
           sdNo={sdNo}
           shipmentNo={shipmentNo}
           defaultOpen={opensSD}
           onClickClose={isClosSDModal}
         />
-      )} */}
+      )}
     </div>
   );
 }

@@ -41,24 +41,25 @@ function DCOrderList() {
     {
       field: "index",
       headerName: "ลำดับที่",
-      minWidth: 120,
-      headerAlign: "left",
+      minWidth: 70,
+      headerAlign: "center",
     },
     {
       field: "shipmentNo",
       headerName: "เลขที่เอกสาร LD",
-      minWidth: 200,
+      minWidth: 160,
+      headerAlign: "center",
     },
     {
       field: "sdNo",
       headerName: "เลขที่เอกสาร SD",
-      minWidth: 200,
+      minWidth: 160,
       headerAlign: "center",
     },
     {
       field: "branchOutNo",
       headerName: "เลขที่เอกสาร BO",
-      minWidth: 200,
+      minWidth: 160,
       headerAlign: "center",
     },
     {
@@ -84,12 +85,12 @@ function DCOrderList() {
     {
       field: "hasBelow",
       headerName: "สินค้าขาด",
-      minWidth: 150,
+      minWidth: 115,
       headerAlign: "center",
       align: "center",
       renderCell: (params) => {
         if (params.value === true) {
-          return <Done fontSize="large" sx={{ color: "#F54949" }} />;
+          return <Done fontSize="small" sx={{ color: "#F54949" }} />;
         } else if (params.value === false) {
           return "-";
         }
@@ -98,12 +99,12 @@ function DCOrderList() {
     {
       field: "hasOver",
       headerName: "สินค้าเกิน",
-      minWidth: 150,
+      minWidth: 115,
       headerAlign: "center",
       align: "center",
       renderCell: (params) => {
         if (params.value === true) {
-          return <Done fontSize="large" sx={{ color: "#F54949" }} />;
+          return <Done fontSize="small" sx={{ color: "#F54949" }} />;
         } else if (params.value === false) {
           return "-";
         }
@@ -112,7 +113,7 @@ function DCOrderList() {
     {
       field: "receivedDate",
       headerName: "วันที่รับสินค้า",
-      minWidth: 200,
+      minWidth: 130,
       headerAlign: "center",
       align: "center",
     },

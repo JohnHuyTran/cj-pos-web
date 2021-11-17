@@ -9,10 +9,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { Button, InputLabel } from "@mui/material";
 import { useAppSelector, useAppDispatch } from "../../store/store";
-import {
-  featchOrderListAsync,
-  clearDataFilter,
-} from "../../store/slices/check-order-slice";
+import { featchOrderListAsync } from "../../store/slices/check-order-slice";
 import {
   saveSearchCriteria,
   clearSearchCriteria,
@@ -24,17 +21,7 @@ import DatePickerComponent from "../commons/ui/date-picker";
 import LoadingModal from "../commons/ui/loading-modal";
 import { useStyles } from "../../styles/makeTheme";
 import { SearchOff } from "@mui/icons-material";
-import { dateToStringCriteria } from "../../utils/date-utill";
 import AlertError from "../commons/ui/alert-error";
-import {
-  DatePicker,
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
-import { createTheme, ThemeProvider } from "@material-ui/core/styles";
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 // moment.locale("en");
 moment.locale("th");
@@ -55,6 +42,7 @@ function CheckOrderSearch() {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const items = useAppSelector((state) => state.checkOrderList);
+  // const codeError: number = useAppSelector((state) => state.checkOrderList.error);
   const [values, setValues] = React.useState<State>({
     orderShipment: "",
     // orderNo: "",
@@ -83,7 +71,7 @@ function CheckOrderSearch() {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  const validateForm = () => {
+  const onClickValidateForm = () => {
     if (
       values.orderShipment === "" &&
       values.orderStatus === "ALL" &&
@@ -101,7 +89,11 @@ function CheckOrderSearch() {
       if (startDate === null || endDate === null) {
         setOpenAlert(true);
         setTextError("กรุณากรอกวันที่รับสินค้าให้ครบ");
+      } else {
+        onClickSearchBtn();
       }
+    } else {
+      onClickSearchBtn();
     }
   };
 
@@ -119,7 +111,6 @@ function CheckOrderSearch() {
     };
 
     handleOpenLoading("open", true);
-    await validateForm();
     await dispatch(featchOrderListAsync(payload));
     await dispatch(saveSearchCriteria(payload));
     handleOpenLoading("open", false);
@@ -302,7 +293,7 @@ function CheckOrderSearch() {
               variant="contained"
               color="primary"
               size="large"
-              onClick={onClickSearchBtn}
+              onClick={onClickValidateForm}
               sx={{ width: "40%", ml: 2 }}
               className={classes.MbtnSearch}
             >
@@ -319,7 +310,6 @@ function CheckOrderSearch() {
       <AlertError
         open={openAlert}
         onClose={handleCloseAlert}
-        titleError="Failed"
         textError={textError}
       />
     </>
