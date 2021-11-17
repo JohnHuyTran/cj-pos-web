@@ -36,20 +36,20 @@ export const featchOrderListDcAsync = createAsyncThunk(
       if (payload.shipmentNo) {
         path = path + `&shipmentNo=${payload.shipmentNo}`;
       }
-      if (payload.branchCode !== 'ALL') {
+      if (payload.branchCode) {
         path = path + `&branchCode=${payload.branchCode}`;
       }
       if (payload.verifyDCStatus == "0" || payload.verifyDCStatus == "1") {
-        path = path + `&sdStatus=${payload.verifyDCStatus}`;
-      }
-      if (payload.sdType == "0" || payload.sdType == "1") {
-        path = path + `&sdType=${payload.sdType}`;
+        path = path + `&verifyDCStatus=${payload.verifyDCStatus}`;
       }
       if (payload.dateFrom) {
         path = path + `&dateFrom=${payload.dateFrom}`;
       }
       if (payload.dateTo) {
         path = path + `&dateTo=${payload.dateTo}`;
+      }
+      if (payload.sdType == "0" || payload.sdType == "1") {
+        path = path + `&sdType=${payload.sdType}`;
       }
 
       let response: CheckOrderResponse = {

@@ -23,6 +23,14 @@ const useStyles = makeStyles({
       borderRadius: "10px !important",
     },
   },
+  Mautocomplete: {
+    "& .MuiOutlinedInput-root.MuiInputBase-sizeSmall": {
+      padding: "4px !important",
+    },
+    "& .MuiAutocomplete-input": {
+      padding: "2px 4px 2px 6px !important",
+    },
+  },
   MbtnClear: {
     backgroundColor: "#AEAEAE !important",
     borderRadius: "5px !important",

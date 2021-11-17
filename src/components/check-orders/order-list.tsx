@@ -42,19 +42,19 @@ function OrderList() {
     {
       field: "index",
       headerName: "ลำดับที่",
-      minWidth: 50,
+      minWidth: 80,
       headerAlign: "center",
     },
     {
       field: "shipmentNo",
       headerName: "เลขที่เอกสาร LD",
-      minWidth: 180,
+      minWidth: 200,
       headerAlign: "center",
     },
     {
       field: "sdNo",
       headerName: "เลขที่เอกสาร SD",
-      minWidth: 180,
+      minWidth: 200,
       headerAlign: "center",
     },
     {
@@ -66,28 +66,28 @@ function OrderList() {
     {
       field: "sdStatus",
       headerName: "สถานะ",
-      minWidth: 120,
+      minWidth: 70,
       headerAlign: "center",
       align: "left",
     },
     {
       field: "boxCnt",
       headerName: "จำนวนลัง",
-      minWidth: 120,
+      minWidth: 115,
       headerAlign: "center",
       align: "right",
     },
     {
       field: "toteCnt",
-      headerName: "จำนวน Tote",
-      minWidth: 130,
+      headerName: "จำนวนTote",
+      minWidth: 125,
       headerAlign: "center",
       align: "right",
     },
     {
       field: "shipmentDate",
       headerName: "วันที่รับสินค้า",
-      minWidth: 150,
+      minWidth: 140,
       headerAlign: "center",
       align: "center",
     },
@@ -104,7 +104,8 @@ function OrderList() {
   const rows = res.data.map((data: ShipmentInfo, indexs: number) => {
     return {
       id: `${data.shipmentNo}_${data.sdNo}`,
-      index: i + indexs,
+      // index: i + indexs,
+      index: currentpage * 5 + indexs + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
       sdType: getShipmentTypeText(data.sdType),

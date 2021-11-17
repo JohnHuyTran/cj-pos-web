@@ -23,6 +23,8 @@ import DatePickerComponent from "../commons/ui/date-picker";
 import LoadingModal from "../commons/ui/loading-modal";
 import { SearchOff } from "@mui/icons-material";
 import { BranchInfo, BranchResponse } from "../../models/search-branch-model";
+import { Autocomplete } from "@mui/material";
+import AlertError from "../commons/ui/alert-error";
 
 moment.locale("th");
 
@@ -39,6 +41,11 @@ interface loadingModalState {
   open: boolean;
 }
 
+interface branchListOptionType {
+  name: string;
+  code: string;
+}
+
 function DCCheckOrderSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -46,27 +53,30 @@ function DCCheckOrderSearch() {
   const branchList = useAppSelector((state) => state.searchBranchSlice);
   const [values, setValues] = React.useState<State>({
     shipmentNo: "",
-    branchCode: "ALL",
+    // branchCode: "ALL",
+    branchCode: "",
     verifyDCStatus: "ALL",
     dateFrom: "",
     dateTo: "",
     sdType: "ALL",
     sortBy: "",
   });
+  const [codeBranch, setCodeBranch] = React.useState("");
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const [openLoadingModal, setOpenLoadingModal] =
     React.useState<loadingModalState>({
       open: false,
     });
+  const [valueBranchList, setValueBranchList] =
+    React.useState<branchListOptionType | null>(null);
+
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState("");
 
   useEffect(() => {
     dispatch(featchBranchListAsync());
   }, []);
-
-
-
-  // console.log("branchList: ", branchList.branchList.data);
 
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -100,12 +110,41 @@ function DCCheckOrderSearch() {
     // console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
 
+  const onClickValidateForm = () => {
+    if (
+      values.shipmentNo === "" &&
+      valueBranchList === null &&
+      values.verifyDCStatus === "ALL" &&
+      startDate === null &&
+      endDate === null &&
+      values.sdType === "ALL"
+    ) {
+      setOpenAlert(true);
+      setTextError("กรุณากรอกวันที่รับสินค้า");
+    } else if (
+      values.shipmentNo === "" &&
+      valueBranchList === null &&
+      values.verifyDCStatus === "ALL" &&
+      values.sdType === "ALL"
+    ) {
+      if (startDate === null || endDate === null) {
+        setOpenAlert(true);
+        setTextError("กรุณากรอกวันที่รับสินค้า");
+      } else {
+        onClickSearchBtn();
+      }
+    } else {
+      onClickSearchBtn();
+    }
+  };
+
   const onClickClearBtn = async () => {
-    setStartDate(new Date());
-    setEndDate(new Date());
+    setStartDate(null);
+    setEndDate(null);
+    setValueBranchList(null);
     setValues({
       shipmentNo: "",
-      branchCode: "ALL",
+      branchCode: "",
       verifyDCStatus: "ALL",
       dateFrom: "",
       dateTo: "",
@@ -143,15 +182,32 @@ function DCCheckOrderSearch() {
     setEndDate(value);
   };
 
-  const handleChangeBranch = (event: any) => {
-    const value = event.target.value;
-    setValues({ ...values, branchCode: value });
-  }
+  //for branchList
+  const defaultPropsBranchList = {
+    options: branchList.branchList.data,
+    getOptionLabel: (option: branchListOptionType) => option.name,
+  };
+
+  const handleChangeBranch = (
+    event: any,
+
+    newValue: branchListOptionType | null
+  ) => {
+    setValueBranchList(newValue);
+
+    if (newValue !== null) {
+      let codes = JSON.stringify(newValue?.code);
+      setValues({ ...values, branchCode: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branchCode: "" });
+    }
+  };
 
   let orderListData;
   const orderListDatas = items.orderList.data;
+  const codeError = items.orderList.code;
 
-  if (orderListDatas.length === 0) {
+  if (codeError === 40100 || orderListDatas.length === 0) {
     orderListData = (
       <Grid item container xs={12} justifyContent="center">
         <Box color="#CBD4DB">
@@ -164,6 +220,18 @@ function DCCheckOrderSearch() {
   } else {
     orderListData = <DCOrderList />;
   }
+
+  //check dateFrom-dateTo
+  if (endDate != null && startDate != null) {
+    if (endDate < startDate) {
+      setEndDate(null);
+    }
+  }
+
+  //alert Errormodel
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
 
   return (
     <>
@@ -188,7 +256,30 @@ function DCCheckOrderSearch() {
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาขาปลายทาง
             </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
+            <Autocomplete
+              {...defaultPropsBranchList}
+              className={classes.Mautocomplete}
+              id="selBranchNo"
+              value={valueBranchList}
+              onChange={handleChangeBranch}
+              renderOption={(props, option) => {
+                return (
+                  <li {...props} key={option.code}>
+                    {option.name}
+                  </li>
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="ทั้งหมด"
+                  size="small"
+                  className={classes.MtextField}
+                />
+              )}
+            />
+
+            {/* <FormControl fullWidth className={classes.Mselect}>
               <Select
                 id="selBranchNo"
                 name="branchNo"
@@ -199,36 +290,15 @@ function DCCheckOrderSearch() {
                 <MenuItem value={"ALL"} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                {branchList.branchList.data.map((option: BranchInfo, index: number) => (
-                  <MenuItem key={option.code} value={option.code}>{option.name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            {/* <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id="selBranchNo"
-                name="branchNo"
-                value={values.orderStatus}
-                inputProps={{ "aria-label": "Without label" }}
-              >
-                <MenuItem value={"ALL"} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem value={"0"}>วัดโคก</MenuItem>
-                <MenuItem value={"1"}>ซอยใจเอื้อ</MenuItem>
+                {branchList.branchList.data.map(
+                  (option: BranchInfo, index: number) => (
+                    <MenuItem key={option.code} value={option.code}>
+                      {option.name}
+                    </MenuItem>
+                  )
+                )}
               </Select>
             </FormControl> */}
-            {/* <TextField
-              id="txtBranchCode"
-              name="branchCode"
-              size="small"
-              value={values.branchCode}
-              onChange={handleChange}
-              className={classes.MtextField}
-              fullWidth
-              placeholder="branchCode"
-            /> */}
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
@@ -320,7 +390,7 @@ function DCCheckOrderSearch() {
               variant="contained"
               color="primary"
               size="large"
-              onClick={onClickSearchBtn}
+              onClick={onClickValidateForm}
               sx={{ width: "15%", ml: 2 }}
               className={classes.MbtnSearch}
             >
@@ -334,6 +404,12 @@ function DCCheckOrderSearch() {
       {/* {items.orderList && <DCOrderList />} */}
       {orderListData}
       <LoadingModal open={openLoadingModal.open} />
+
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        textError={textError}
+      />
     </>
   );
 }
