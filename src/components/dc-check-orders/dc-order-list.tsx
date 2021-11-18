@@ -92,7 +92,7 @@ function DCOrderList() {
       align: "center",
       renderCell: (params) => {
         if (params.value === true) {
-          return <Done fontSize="large" sx={{ color: "#F54949" }} />;
+          return <Done fontSize="small" sx={{ color: "#F54949" }} />;
         } else if (params.value === false) {
           return "-";
         }
@@ -106,7 +106,7 @@ function DCOrderList() {
       align: "center",
       renderCell: (params) => {
         if (params.value === true) {
-          return <Done fontSize="large" sx={{ color: "#F54949" }} />;
+          return <Done fontSize="small" sx={{ color: "#F54949" }} />;
         } else if (params.value === false) {
           return "-";
         }
