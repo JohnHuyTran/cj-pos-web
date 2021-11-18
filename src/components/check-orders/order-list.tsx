@@ -27,6 +27,9 @@ import { saveSearchCriteria } from "../../store/slices/save-search-order";
 function OrderList() {
   const classes = useStyles();
   const items = useAppSelector((state) => state.checkOrderList);
+  const cuurentPages = useAppSelector(
+    (state) => state.checkOrderList.orderList.page
+  );
   const res: ShipmentResponse = items.orderList;
   const payload = useAppSelector(
     (state) => state.saveSearchOrder.searchCriteria
@@ -35,8 +38,6 @@ function OrderList() {
   const [opens, setOpens] = React.useState(false);
   const [shipment, setShipment] = React.useState("");
   const [sdNo, setSdNo] = React.useState("");
-  const [index, setIndex] = React.useState(1);
-  const [currentpage, setCurrentpage] = React.useState(0);
 
   const columns: GridColDef[] = [
     {
@@ -100,12 +101,11 @@ function OrderList() {
     },
   ];
   // console.log('Data Size: ', JSON.stringify(res));
-  let i: number = index;
+
   const rows = res.data.map((data: ShipmentInfo, indexs: number) => {
     return {
       id: `${data.shipmentNo}_${data.sdNo}`,
-      // index: i + indexs,
-      index: currentpage * 5 + indexs + 1,
+      index: (cuurentPages - 1) * 5 + indexs + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
       sdType: getShipmentTypeText(data.sdType),
@@ -134,17 +134,8 @@ function OrderList() {
 
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
-    setCurrentpage(newPage);
 
-    let page: string = "1";
-
-    if (newPage > currentpage) {
-      setIndex(index + 5);
-      page = (newPage + 1).toString();
-    } else if (newPage < currentpage) {
-      setIndex(index - 5);
-      page = (newPage - 1).toString();
-    }
+    let page: string = (newPage + 1).toString();
 
     const payloadNewpage: ShipmentRequest = {
       limit: payload.limit,
@@ -175,6 +166,7 @@ function OrderList() {
             onCellClick={currentlySelected}
             autoHeight
             pagination
+            page={cuurentPages - 1}
             pageSize={5}
             rowsPerPageOptions={[5]}
             rowCount={res.total}

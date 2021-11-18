@@ -27,6 +27,9 @@ function DCOrderList() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.dcCheckOrderList);
+  const cuurentPage = useAppSelector(
+    (state) => state.dcCheckOrderList.orderList.page
+  );
   const res: CheckOrderResponse = items.orderList;
   const payload = useAppSelector(
     (state) => state.saveSearchOrderDc.searchCriteriaDc
@@ -34,32 +37,30 @@ function DCOrderList() {
   // const [opens, setOpens] = React.useState(false);
   // const [shipment, setShipment] = React.useState("");
   // const [sdNo, setSdNo] = React.useState("");
-  const [index, setIndex] = React.useState(1);
-  const [currentpage, setCurrentpage] = React.useState(0);
 
   const columns: GridColDef[] = [
     {
       field: "index",
       headerName: "ลำดับที่",
-      minWidth: 70,
+      minWidth: 120,
       headerAlign: "center",
     },
     {
       field: "shipmentNo",
       headerName: "เลขที่เอกสาร LD",
-      minWidth: 160,
+      minWidth: 200,
       headerAlign: "center",
     },
     {
       field: "sdNo",
       headerName: "เลขที่เอกสาร SD",
-      minWidth: 160,
+      minWidth: 200,
       headerAlign: "center",
     },
     {
       field: "branchOutNo",
       headerName: "เลขที่เอกสาร BO",
-      minWidth: 160,
+      minWidth: 200,
       headerAlign: "center",
     },
     {
@@ -85,12 +86,12 @@ function DCOrderList() {
     {
       field: "hasBelow",
       headerName: "สินค้าขาด",
-      minWidth: 115,
+      minWidth: 150,
       headerAlign: "center",
       align: "center",
       renderCell: (params) => {
         if (params.value === true) {
-          return <Done fontSize="small" sx={{ color: "#F54949" }} />;
+          return <Done fontSize="large" sx={{ color: "#F54949" }} />;
         } else if (params.value === false) {
           return "-";
         }
@@ -99,12 +100,12 @@ function DCOrderList() {
     {
       field: "hasOver",
       headerName: "สินค้าเกิน",
-      minWidth: 115,
+      minWidth: 150,
       headerAlign: "center",
       align: "center",
       renderCell: (params) => {
         if (params.value === true) {
-          return <Done fontSize="small" sx={{ color: "#F54949" }} />;
+          return <Done fontSize="large" sx={{ color: "#F54949" }} />;
         } else if (params.value === false) {
           return "-";
         }
@@ -113,7 +114,7 @@ function DCOrderList() {
     {
       field: "receivedDate",
       headerName: "วันที่รับสินค้า",
-      minWidth: 130,
+      minWidth: 200,
       headerAlign: "center",
       align: "center",
     },
@@ -121,12 +122,10 @@ function DCOrderList() {
   ];
   // console.log("Data Size: ", JSON.stringify(res));
 
-  let i: number = index;
   const rows = res.data.map((data: CheckOrderInfo, indexs: number) => {
     return {
       id: data.id,
-      // index: i + indexs,
-      index: currentpage * 10 + indexs + 1,
+      index: (cuurentPage - 1) * 10 + indexs + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
       branchOutNo: data.branchOutNo,
@@ -161,17 +160,8 @@ function DCOrderList() {
 
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
-    setCurrentpage(newPage);
 
-    let page: string = "1";
-
-    if (newPage > currentpage) {
-      setIndex(index + 10);
-      page = (newPage + 1).toString();
-    } else if (newPage < currentpage) {
-      setIndex(index - 10);
-      page = (newPage - 1).toString();
-    }
+    let page: string = (newPage + 1).toString();
 
     const payloadNewpage: CheckOrderRequest = {
       limit: payload.limit,
@@ -179,8 +169,8 @@ function DCOrderList() {
       shipmentNo: payload.shipmentNo,
       branchCode: payload.branchCode,
       verifyDCStatus: payload.verifyDCStatus,
-      dateFrom: payload.dateTo,
-      dateTo: payload.dateFrom,
+      dateFrom: payload.dateFrom,
+      dateTo: payload.dateTo,
       sdType: payload.sdType,
       sortBy: payload.sortBy,
     };
@@ -200,6 +190,7 @@ function DCOrderList() {
             // onCellClick={currentlySelected}
             autoHeight
             pagination
+            page={cuurentPage - 1}
             pageSize={10}
             rowsPerPageOptions={[10]}
             rowCount={res.total}
