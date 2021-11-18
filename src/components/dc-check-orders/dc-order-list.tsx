@@ -21,6 +21,7 @@ import { useStyles } from "../../styles/makeTheme";
 import Done from "@mui/icons-material/Done";
 
 import { PanoramaSharp } from "@mui/icons-material";
+import { saveSearchCriteriaDc } from "../../store/slices/save-search-order-dc-slice";
 //import CheckOrderDetail from './check-order-detail';
 
 function DCOrderList() {
@@ -166,7 +167,7 @@ function DCOrderList() {
     const payloadNewpage: CheckOrderRequest = {
       limit: payload.limit,
       page: page,
-      shipmentNo: payload.shipmentNo,
+      docNo: payload.docNo,
       branchCode: payload.branchCode,
       verifyDCStatus: payload.verifyDCStatus,
       dateFrom: payload.dateFrom,
@@ -176,6 +177,7 @@ function DCOrderList() {
     };
 
     await dispatch(featchOrderListDcAsync(payloadNewpage));
+    await dispatch(saveSearchCriteriaDc(payloadNewpage));
     setLoading(false);
   };
 

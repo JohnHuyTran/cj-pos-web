@@ -99,7 +99,7 @@ function CheckOrderSearch() {
 
   const onClickSearchBtn = async () => {
     const payload: ShipmentRequest = {
-      limit: "5",
+      limit: "10",
       page: "1",
       paramQuery: values.orderShipment,
       // sdNo: values.orderNo,
@@ -132,7 +132,7 @@ function CheckOrderSearch() {
     });
 
     const payload: ShipmentRequest = {
-      limit: "5",
+      limit: "10",
       page: "1",
       paramQuery: values.orderShipment,
       // sdNo: values.orderNo,

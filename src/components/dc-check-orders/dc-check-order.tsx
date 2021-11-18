@@ -29,7 +29,7 @@ import AlertError from "../commons/ui/alert-error";
 moment.locale("th");
 
 interface State {
-  shipmentNo: string;
+  docNo: string;
   branchCode: string;
   verifyDCStatus: string;
   dateFrom: string;
@@ -52,8 +52,7 @@ function DCCheckOrderSearch() {
   const items = useAppSelector((state) => state.dcCheckOrderList);
   const branchList = useAppSelector((state) => state.searchBranchSlice);
   const [values, setValues] = React.useState<State>({
-    shipmentNo: "",
-    // branchCode: "ALL",
+    docNo: "",
     branchCode: "",
     verifyDCStatus: "ALL",
     dateFrom: "",
@@ -92,7 +91,7 @@ function DCCheckOrderSearch() {
     const payload: CheckOrderRequest = {
       limit: "10",
       page: "1",
-      shipmentNo: values.shipmentNo,
+      docNo: values.docNo,
       branchCode: values.branchCode,
       verifyDCStatus: values.verifyDCStatus,
       dateFrom: moment(startDate).startOf("day").toISOString(),
@@ -112,7 +111,7 @@ function DCCheckOrderSearch() {
 
   const onClickValidateForm = () => {
     if (
-      values.shipmentNo === "" &&
+      values.docNo === "" &&
       valueBranchList === null &&
       values.verifyDCStatus === "ALL" &&
       startDate === null &&
@@ -122,7 +121,7 @@ function DCCheckOrderSearch() {
       setOpenAlert(true);
       setTextError("กรุณากรอกวันที่รับสินค้า");
     } else if (
-      values.shipmentNo === "" &&
+      values.docNo === "" &&
       valueBranchList === null &&
       values.verifyDCStatus === "ALL" &&
       values.sdType === "ALL"
@@ -143,7 +142,7 @@ function DCCheckOrderSearch() {
     setEndDate(null);
     setValueBranchList(null);
     setValues({
-      shipmentNo: "",
+      docNo: "",
       branchCode: "",
       verifyDCStatus: "ALL",
       dateFrom: "",
@@ -157,7 +156,7 @@ function DCCheckOrderSearch() {
     const payload: CheckOrderRequest = {
       limit: "10",
       page: "1",
-      shipmentNo: values.shipmentNo,
+      docNo: values.docNo,
       branchCode: values.branchCode,
       verifyDCStatus: values.verifyDCStatus,
       dateFrom: moment(startDate).startOf("day").toISOString(),
@@ -242,10 +241,10 @@ function DCCheckOrderSearch() {
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id="txtShipmentNo"
-              name="shipmentNo"
+              id="txtDocNo"
+              name="docNo"
               size="small"
-              value={values.shipmentNo}
+              value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth

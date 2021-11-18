@@ -105,7 +105,7 @@ function OrderList() {
   const rows = res.data.map((data: ShipmentInfo, indexs: number) => {
     return {
       id: `${data.shipmentNo}_${data.sdNo}`,
-      index: (cuurentPages - 1) * 5 + indexs + 1,
+      index: (cuurentPages - 1) * 10 + indexs + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
       sdType: getShipmentTypeText(data.sdType),
@@ -167,8 +167,8 @@ function OrderList() {
             autoHeight
             pagination
             page={cuurentPages - 1}
-            pageSize={5}
-            rowsPerPageOptions={[5]}
+            pageSize={10}
+            rowsPerPageOptions={[10]}
             rowCount={res.total}
             paginationMode="server"
             onPageChange={handlePageChange}
