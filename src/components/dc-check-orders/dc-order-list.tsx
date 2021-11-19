@@ -181,14 +181,6 @@ function DCOrderList() {
     };
   });
 
-  const featchOrderDCList = async (id: string) => {
-    try {
-      await dispatch(featchorderDetailDCAsync(id));
-    } catch (error) {
-      console.log("error : " + error);
-    }
-  };
-
   const [openLoadingModal, setOpenLoadingModal] =
     React.useState<loadingModalState>({
       open: false,

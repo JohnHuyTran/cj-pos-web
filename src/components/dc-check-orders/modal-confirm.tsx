@@ -13,6 +13,8 @@ import {
 } from "../../services/order-shipment";
 import { DCOrderApproveRequest } from "../../models/dc-check-order-model";
 import LoadingModal from "../commons/ui/loading-modal";
+import { featchorderDetailDCAsync } from "../../store/slices/dc-check-order-detail-slice";
+import { useAppDispatch } from "../../store/store";
 
 interface Props {
   open: boolean;
@@ -41,8 +43,14 @@ export default function ModelConfirm({
       open: false,
     });
 
+  const dispatch = useAppDispatch();
+
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+
+  const updateDCOrder = async () => {
+    await dispatch(featchorderDetailDCAsync(idDC));
   };
 
   const handleConfirm = async () => {
@@ -50,42 +58,24 @@ export default function ModelConfirm({
     const payload: GenerateBORequest = {
       comment: comment,
     };
-    await approveDCOrderShipments(idDC, payload)
-      .then
-      // function (value) {
-      //   setTimeout(() => {
-      //     onUpdateAction(true, "");
-      //   }, 3000);
-      // },
-      // function (error: ApiError) {
-      //   onUpdateAction(false, error.message);
-      // }
-      ();
+    await approveDCOrderShipments(idDC, payload).then(
+      function (value) {
+        setTimeout(() => {
+          updateDCOrder();
+          onUpdateAction(true, "");
+        }, 3000);
+      },
+      function (error: ApiError) {
+        console.log("error : " + JSON.stringify(error));
+        onUpdateAction(false, error.message);
+      }
+    );
+
+    // onUpdateAction(true, "");
+
     handleOpenLoading("open", false);
     onClose();
   };
-
-  // const handleConfirm = async () => {
-  //   handleOpenLoading("open", true);
-  //   const payload: DCOrderApproveRequest = {
-  //     dcComment: comment,
-  //   };
-
-  //   await approveDCOrderShipments(sdNo, payload).then(
-  //     async function (value) {
-  //       // await updateShipmentOrder();
-  //       // setTimeout(() => {
-  //       // onUpdateShipmentStatus(true, "");
-  //       onClose();
-  //       // }, 3000);
-  //     },
-  //     function (error: ApiError) {
-  //       // onUpdateShipmentStatus(false, error.message);
-  //       onClose();
-  //     }
-  //   );
-  //   handleOpenLoading("open", false);
-  // };
 
   return (
     <div>

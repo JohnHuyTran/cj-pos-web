@@ -1,70 +1,56 @@
 import React, { ReactElement, useEffect } from "react";
-
 import DialogContent from "@mui/material/DialogContent";
 import Dialog from "@mui/material/Dialog";
 import Typography from "@mui/material/Typography";
-
 import { BootstrapDialogTitle } from "../commons/ui/dialog-title";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
-import ModalShowPDF from "../check-orders/modal-show-pdf";
-import { getPathReportSD } from "../../services/order-shipment";
-import { TextareaAutosize, TextField } from "@mui/material";
 import ModelConfirm from "./modal-confirm";
 import SnackbarStatus from "../commons/ui/snackbar-status";
 import { ContentPaste } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { featchorderDetailDCAsync } from "../../store/slices/dc-check-order-detail-slice";
 import { getDCStatus, getSdType } from "../../utils/utils";
-
 import DCOrderDetailList from "./dc-check-order-detail-list";
 import { convertUtcToBkkDate } from "../../utils/date-utill";
 import ModalShowFile from "./modal-show-file";
-import ModalShowImage from "./modal-show-image";
+// import ModalShowImage from "./modal-show-image";
+import LoadingModal from "../commons/ui/loading-modal";
+import { useStyles } from "../../styles/makeTheme";
+import { TextField } from "@mui/material";
+import { featchOrderListDcAsync } from "../../store/slices/dc-check-order-slice";
 
 interface Props {
   isOpen: boolean;
-  // sdNo: string;
-  // shipmentNo: string;
   idDC: string;
   onClickClose: () => void;
 }
 
-interface State {
-  commentDC: string;
-}
-
-interface SnackbarProps {
+interface loadingModalState {
   open: boolean;
-  onClose: () => void;
-  isSuccess: boolean;
-  contentMsg: string;
 }
 
-function DCOrderDetail({
-  isOpen,
-  // sdNo,
-  // shipmentNo,
-  idDC,
-  onClickClose,
-}: Props): ReactElement {
+function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
+  const dispatch = useAppDispatch();
+  const classes = useStyles();
   const orderDetailList = useAppSelector(
     (state) => state.dcCheckOrderDetail.orderDetail
   );
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
+  const [valueCommentDC, setValueCommentDC] = React.useState("");
 
-  const [values, setValues] = React.useState<State>({
-    commentDC: "",
-  });
+  // const [disabledCommentDC, setDisabledCommentDC] = React.useState(false);
+  // const [sdNo, setSdNo] = React.useState("");
+  // const [shipmentNo, setShipmentNo] = React.useState("");
+  // const [verifyDCStatus, setverifyDCStatus] = React.useState("");
+  // const [dcSdType, setDCSdType] = React.useState("");
+  // const [imageFile, setImageFile] = React.useState("");
+  // const [isDisplayActBtn, setIsDisplayActBtn] = React.useState("");
 
-  const [sdNo, setSdNo] = React.useState("");
-  const [shipmentNo, setShipmentNo] = React.useState("");
-  const [verifyDCStatus, setverifyDCStatus] = React.useState("");
-  const [dcSdType, setDCSdType] = React.useState("");
-  const [imageFile, setImageFile] = React.useState("");
-
-  const [isDisplayActBtn, setIsDisplayActBtn] = React.useState("");
   const [open, setOpen] = React.useState(isOpen);
   const [openModelPreviewDocument, setOpenModelPreviewDocument] =
     React.useState(false);
@@ -72,46 +58,44 @@ function DCOrderDetail({
 
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState("");
-  const [generateBOStatus, setGenerateBOStatus] = React.useState(false);
+
+  const [approveDCStatus, setApproveDCStatus] = React.useState(false);
 
   const [characterCount, setCharacterCount] = React.useState(0);
 
   useEffect(() => {
     console.log("dc open", open);
     setOpen(isOpen);
-
-    // setverifyDCStatus(getDCStatus(detailDC.verifyDCStatus));
-    // setDCSdType(getSdType(detailDC.sdType));
+    setValueCommentDC(detailDC.dcComment);
   }, [open]);
 
   const detailDC: any = orderDetailList.data ? orderDetailList.data : null;
   const detailDCItems = detailDC.items ? detailDC.items : [];
 
-  console.log("shipmentNo : " + JSON.stringify(detailDC.shipmentNo));
-  console.log("sdNo : " + JSON.stringify(detailDC.sdNo));
-  console.log("sdImageFile : " + JSON.stringify(detailDC.sdImageFile));
+  // console.log(
+  //   "detailDC.verifyDCStatus : " + JSON.stringify(detailDC.verifyDCStatus)
+  // );
+  // console.log("disabledCommentDC : ", +disabledCommentDC);
+  // console.log("shipmentNo : " + JSON.stringify(detailDC.shipmentNo));
+  // console.log("sdNo : " + JSON.stringify(detailDC.sdNo));
+  // console.log("dcComment : " + JSON.stringify(detailDC.dcComment));
+  // console.log("sdImageFile : " + JSON.stringify(detailDC.sdImageFile));
 
-  console.log("detailDCItems : " + JSON.stringify(detailDCItems));
-  // if (detailDC !== null) {
-  // setShipmentNo(detailDC.shipmentNo);
-  // setSdNo(detailDC.sdNo);
-  // }
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
 
   const handleChangeCommentDC = (event: any) => {
     const value = event.target.value;
     const length = event.target.value.length;
     if (length <= 100) {
       setCharacterCount(event.target.value.length);
-      setValues({ ...values, [event.target.name]: value });
+      setValueCommentDC(value);
     }
   };
 
   const handlCheckedButton = () => {
     setOpenModelConfirm(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
   };
 
   const handleLinkDocument = () => {
@@ -126,16 +110,38 @@ function DCOrderDetail({
     setOpenModelConfirm(false);
   };
 
-  const handleGenerateBOStatus = (issuccess: boolean, errorMsg: string) => {
-    const msg = issuccess ? "This transaction is success aaa" : errorMsg;
+  const payloadSearchDC = useAppSelector(
+    (state) => state.saveSearchOrderDc.searchCriteriaDc
+  );
+
+  const handleGenerateBOStatus = async (
+    issuccess: boolean,
+    errorMsg: string
+  ) => {
+    handleOpenLoading("open", true);
+    const msg = issuccess ? "ตรวจสอบผลต่าง(DC) สำเร็จ" : errorMsg;
     setShowSnackBar(true);
     setContentMsg(msg);
-    setGenerateBOStatus(issuccess);
-    // setSnackbarValue({ ...snackbarValue, open: true, onClose: handleCloseSnackBar, isSuccess: issuccess, contentMsg: msg });
+    setApproveDCStatus(issuccess);
+
+    console.log("issuccess : " + issuccess);
+    if (issuccess) {
+      await dispatch(featchOrderListDcAsync(payloadSearchDC));
+      setTimeout(() => {
+        handleClose();
+      }, 500);
+    } else {
+      handleOpenLoading("open", false);
+    }
   };
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    onClickClose();
   };
 
   return (
@@ -143,7 +149,7 @@ function DCOrderDetail({
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
         <BootstrapDialogTitle
           id="customized-dialog-title"
-          onClose={onClickClose}
+          onClose={handleClose}
         >
           <Typography variant="h5">ตรวจสอบผลต่าง (DC)</Typography>
         </BootstrapDialogTitle>
@@ -191,53 +197,7 @@ function DCOrderDetail({
                 </Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">แนบภาพสินค้า/วีดีโอ:</Typography>
-              </Grid>
-              <Grid item lg={4}>
-                <Link
-                  component="button"
-                  variant="body2"
-                  onClick={handleLinkDocument}
-                >
-                  ดูเอกสาร
-                </Link>
-              </Grid>
-            </Grid>
-            <Grid container spacing={2} mb={1}>
-              <Grid item lg={2}>
-                <Typography variant="body2">หมายเหตุ DC:</Typography>
-              </Grid>
-              <Grid item lg={4} mt={0.5}>
-                <TextareaAutosize
-                  // aria-label="empty textarea"
-                  id="txarCommentDC"
-                  name="commentDC"
-                  minRows={3}
-                  placeholder="กรุณากรอก หมายเหตุ"
-                  onChange={handleChangeCommentDC}
-                  value={values.commentDC}
-                  style={{
-                    width: "100%",
-                    maxWidth: 300,
-                    borderRadius: "5px",
-                    border: "1px solid #AEAEAE",
-                    fontFamily: "Kanit",
-                    padding: "5px",
-                  }}
-                />
-                <div
-                  style={{
-                    fontSize: "11px",
-                    color: "#AEAEAE",
-                    width: "100%",
-                    maxWidth: 300,
-                    textAlign: "right",
-                  }}
-                >
-                  {characterCount}/100
-                </div>
-              </Grid>
-              <Grid item lg={2}>
+                {/* <Typography variant="body2">แนบภาพสินค้า/วีดีโอ:</Typography> */}
                 <Typography variant="body2">
                   แนบเอกสารใบส่วนต่าง
                   <br />
@@ -254,10 +214,74 @@ function DCOrderDetail({
                 </Link>
               </Grid>
             </Grid>
+            <Grid container spacing={2} mb={1}>
+              <Grid item lg={2}>
+                <Typography variant="body2">หมายเหตุ DC:</Typography>
+              </Grid>
+              <Grid item lg={4}>
+                {detailDC.verifyDCStatus !== 0 && (
+                  <TextField
+                    disabled
+                    multiline
+                    fullWidth
+                    rows={3}
+                    defaultValue={valueCommentDC}
+                    placeholder="หมายเหตุ"
+                    className={classes.MtextField}
+                    style={{ maxWidth: 300 }}
+                  />
+                )}
+
+                {detailDC.verifyDCStatus === 0 && (
+                  <div>
+                    <TextField
+                      // error
+                      multiline
+                      fullWidth
+                      rows={4}
+                      onChange={handleChangeCommentDC}
+                      defaultValue={valueCommentDC}
+                      placeholder="กรุณากรอก หมายเหตุ"
+                      className={classes.MtextField}
+                      style={{ maxWidth: 300 }}
+                      inputProps={{ maxLength: 100 }}
+                      // helperText="กรุณากรอก หมายเหตุ"
+                    />
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        color: "#AEAEAE",
+                        width: "100%",
+                        maxWidth: 300,
+                        textAlign: "right",
+                      }}
+                    >
+                      {characterCount}/100
+                    </div>
+                  </div>
+                )}
+              </Grid>
+              {/* <Grid item lg={2}>
+                <Typography variant="body2">
+                  แนบเอกสารใบส่วนต่าง
+                  <br />
+                  หลังเซ็นต์:
+                </Typography>
+              </Grid>
+              <Grid item lg={4}>
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={handleLinkDocument}
+                >
+                  ดูเอกสาร
+                </Link>
+              </Grid> */}
+            </Grid>
 
             <Grid container spacing={2} justifyContent="right" sx={{ mt: 1 }}>
               <Grid item>
-                <Box sx={{ display: isDisplayActBtn }}>
+                {detailDC.verifyDCStatus === 0 && (
                   <Button
                     id="btnChecked"
                     variant="contained"
@@ -272,7 +296,7 @@ function DCOrderDetail({
                   >
                     ตรวจสอบแล้ว
                   </Button>
-                </Box>
+                )}
               </Grid>
             </Grid>
           </Box>
@@ -287,7 +311,7 @@ function DCOrderDetail({
         idDC={idDC}
         sdNo={detailDC.sdNo}
         shipmentNo={detailDC.shipmentNo}
-        comment={values.commentDC}
+        comment={valueCommentDC}
       />
 
       {/* <ModalShowPDF
@@ -299,21 +323,23 @@ function DCOrderDetail({
       <SnackbarStatus
         open={showSnackBar}
         onClose={handleCloseSnackBar}
-        isSuccess={generateBOStatus}
+        isSuccess={approveDCStatus}
         contentMsg={contentMsg}
       />
 
-      {/* <ModalShowFile
+      <ModalShowFile
+        open={openModelPreviewDocument}
+        onClose={handleModelPreviewDocument}
+        file={detailDC.sdImageFile}
+      />
+
+      {/* <ModalShowImage
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
         file={detailDC.sdImageFile}
       /> */}
 
-      <ModalShowImage
-        open={openModelPreviewDocument}
-        onClose={handleModelPreviewDocument}
-        file={detailDC.sdImageFile}
-      />
+      <LoadingModal open={openLoadingModal.open} />
     </div>
   );
 }
