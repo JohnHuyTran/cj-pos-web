@@ -41,6 +41,9 @@ interface loadingModalState {
 function CheckOrderSearch() {
   const dispatch = useAppDispatch();
   const classes = useStyles();
+
+  const limit = "10";
+  const page = "1";
   const items = useAppSelector((state) => state.checkOrderList);
   // const codeError: number = useAppSelector((state) => state.checkOrderList.error);
   const [values, setValues] = React.useState<State>({
@@ -53,7 +56,6 @@ function CheckOrderSearch() {
   });
 
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
-  // const [startDate, setStartDate] = React.useState(null);
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const [openLoadingModal, setOpenLoadingModal] =
     React.useState<loadingModalState>({
@@ -99,8 +101,8 @@ function CheckOrderSearch() {
 
   const onClickSearchBtn = async () => {
     const payload: ShipmentRequest = {
-      limit: "10",
-      page: "1",
+      limit: limit,
+      page: page,
       paramQuery: values.orderShipment,
       // sdNo: values.orderNo,
       dateFrom: moment(startDate).startOf("day").toISOString(),
@@ -132,8 +134,9 @@ function CheckOrderSearch() {
     });
 
     const payload: ShipmentRequest = {
-      limit: "10",
-      page: "1",
+      limit: limit,
+      page: page,
+
       paramQuery: values.orderShipment,
       // sdNo: values.orderNo,
       dateFrom: moment(startDate).format("DD/MM/YYYY"),
@@ -185,8 +188,7 @@ function CheckOrderSearch() {
 
   return (
     <>
-      {/* <Box sx={{ flexGrow: 1 }}> */}
-      <Box>
+      <Box sx={{ flexGrow: 1 }}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>

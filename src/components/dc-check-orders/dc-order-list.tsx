@@ -22,6 +22,8 @@ import Done from "@mui/icons-material/Done";
 
 import { PanoramaSharp } from "@mui/icons-material";
 import { saveSearchCriteriaDc } from "../../store/slices/save-search-order-dc-slice";
+import { Typography } from "@mui/material";
+import { ShipmentRequest } from "../../models/order-model";
 //import CheckOrderDetail from './check-order-detail';
 
 function DCOrderList() {
@@ -31,10 +33,14 @@ function DCOrderList() {
   const cuurentPage = useAppSelector(
     (state) => state.dcCheckOrderList.orderList.page
   );
+  const limit = useAppSelector(
+    (state) => state.dcCheckOrderList.orderList.perPage
+  );
   const res: CheckOrderResponse = items.orderList;
   const payload = useAppSelector(
     (state) => state.saveSearchOrderDc.searchCriteriaDc
   );
+  const [pageSize, setPageSize] = React.useState(limit.toString());
   // const [opens, setOpens] = React.useState(false);
   // const [shipment, setShipment] = React.useState("");
   // const [sdNo, setSdNo] = React.useState("");
@@ -43,52 +49,74 @@ function DCOrderList() {
     {
       field: "index",
       headerName: "ลำดับที่",
-      minWidth: 120,
+      minWidth: 75,
+      // flex: 0.7,
       headerAlign: "center",
+      sortable: false,
     },
     {
       field: "shipmentNo",
       headerName: "เลขที่เอกสาร LD",
-      minWidth: 200,
+      minWidth: 170,
+      flex: 1.3,
       headerAlign: "center",
+      sortable: false,
+      // renderCell: (params) => (
+      //   <div>
+      //     <Typography color="textSecondary">{params.value}</Typography>
+      //     <Typography>{params.getValue(params.id, "sdNo") || ""}</Typography>
+      //   </div>
+      // ),
     },
     {
       field: "sdNo",
       headerName: "เลขที่เอกสาร SD",
-      minWidth: 200,
+      minWidth: 170,
+      // flex: 1.2,
       headerAlign: "center",
+      sortable: false,
     },
     {
       field: "branchOutNo",
       headerName: "เลขที่เอกสาร BO",
-      minWidth: 200,
+      minWidth: 170,
+      // flex: 1.2,
       headerAlign: "center",
+      sortable: false,
     },
     {
       field: "branchDesc",
       headerName: "สาขาปลายทาง",
-      minWidth: 200,
+      minWidth: 190,
+      // flex: 1,
       headerAlign: "center",
+      sortable: false,
     },
     {
       field: "sdType",
       headerName: "ประเภท",
-      minWidth: 170,
+      minWidth: 160,
+      // flex: 1,
       headerAlign: "center",
       align: "left",
+      sortable: false,
     },
     {
       field: "verifyDCStatus",
       headerName: "สถานะการตรวจสอบผลต่าง",
-      minWidth: 220,
+      minWidth: 195,
+      // flex: 1,
       headerAlign: "center",
       align: "center",
+      sortable: false,
     },
     {
       field: "hasBelow",
       headerName: "สินค้าขาด",
-      minWidth: 150,
+      minWidth: 120,
+      // flex: 0.8,
       headerAlign: "center",
+      sortable: false,
       align: "center",
       renderCell: (params) => {
         if (params.value === true) {
@@ -101,7 +129,9 @@ function DCOrderList() {
     {
       field: "hasOver",
       headerName: "สินค้าเกิน",
-      minWidth: 150,
+      minWidth: 120,
+      // flex: 0.7,
+      sortable: false,
       headerAlign: "center",
       align: "center",
       renderCell: (params) => {
@@ -115,9 +145,11 @@ function DCOrderList() {
     {
       field: "receivedDate",
       headerName: "วันที่รับสินค้า",
-      minWidth: 200,
+      minWidth: 180,
+      // flex: 1,
       headerAlign: "center",
       align: "center",
+      sortable: false,
     },
     // { field: "detail", headerName: "รายละเอียด", minWidth: 200 },
   ];
@@ -126,7 +158,7 @@ function DCOrderList() {
   const rows = res.data.map((data: CheckOrderInfo, indexs: number) => {
     return {
       id: data.id,
-      index: (cuurentPage - 1) * 10 + indexs + 1,
+      index: (cuurentPage - 1) * parseInt(pageSize) + indexs + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
       branchOutNo: data.branchOutNo,
@@ -165,7 +197,7 @@ function DCOrderList() {
     let page: string = (newPage + 1).toString();
 
     const payloadNewpage: CheckOrderRequest = {
-      limit: payload.limit,
+      limit: pageSize,
       page: page,
       docNo: payload.docNo,
       branchCode: payload.branchCode,
@@ -181,6 +213,31 @@ function DCOrderList() {
     setLoading(false);
   };
 
+  const handlePageSizeChange = async (pageSize: number) => {
+    console.log("pageSize: ", pageSize);
+    setPageSize(pageSize.toString());
+
+    setLoading(true);
+
+    const payloadNewpage: CheckOrderRequest = {
+      limit: pageSize.toString(),
+      // page: cuurentPages.toString(),
+      page: "1",
+      docNo: payload.docNo,
+      branchCode: payload.branchCode,
+      verifyDCStatus: payload.verifyDCStatus,
+      dateFrom: payload.dateFrom,
+      dateTo: payload.dateTo,
+      sdType: payload.sdType,
+      sortBy: payload.sortBy,
+    };
+
+    await dispatch(featchOrderListDcAsync(payloadNewpage));
+    await dispatch(saveSearchCriteriaDc(payloadNewpage));
+
+    setLoading(false);
+  };
+
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
@@ -193,12 +250,14 @@ function DCOrderList() {
             autoHeight
             pagination
             page={cuurentPage - 1}
-            pageSize={10}
-            rowsPerPageOptions={[10]}
+            pageSize={parseInt(pageSize)}
+            rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
             paginationMode="server"
             onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
             loading={loading}
+            // rowHeight={80}
           />
         </div>
       </Box>

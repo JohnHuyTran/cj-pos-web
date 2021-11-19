@@ -47,6 +47,9 @@ interface branchListOptionType {
 }
 
 function DCCheckOrderSearch() {
+  const limit = "10";
+  const page = "1";
+
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.dcCheckOrderList);
@@ -89,8 +92,8 @@ function DCCheckOrderSearch() {
 
   const onClickSearchBtn = async () => {
     const payload: CheckOrderRequest = {
-      limit: "10",
-      page: "1",
+      limit: limit,
+      page: page,
       docNo: values.docNo,
       branchCode: values.branchCode,
       verifyDCStatus: values.verifyDCStatus,
@@ -154,8 +157,8 @@ function DCCheckOrderSearch() {
     // items.orderList = '';
 
     const payload: CheckOrderRequest = {
-      limit: "10",
-      page: "1",
+      limit: limit,
+      page: page,
       docNo: values.docNo,
       branchCode: values.branchCode,
       verifyDCStatus: values.verifyDCStatus,
