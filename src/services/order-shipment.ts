@@ -106,3 +106,18 @@ export const getPathGenerateBO = (sdNo: string) => {
     sdNo: sdNo,
   });
 };
+
+export async function approveDCOrderShipments(sdNo: string, payload: any) {
+  const response = await put(getPathDCApprove(sdNo), payload)
+    .then((result: any) => result)
+    .catch((error: ApiError) => {
+      throw error;
+    });
+  return response;
+}
+
+export const getPathDCApprove = (sdNo: string) => {
+  return getPathUrl(`${environment.orders.dcCheckOrder.approve.url}`, {
+    sdNo: sdNo,
+  });
+};

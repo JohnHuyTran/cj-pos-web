@@ -1,14 +1,17 @@
+import React, { ReactElement } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import Typography from "@mui/material/Typography";
-import React, { ReactElement } from "react";
 import { ApiError } from "../../models/api-error-model";
 import { GenerateBORequest } from "../../models/order-model";
-import { generateBO } from "../../services/order-shipment";
+import {
+  approveDCOrderShipments,
+  generateBO,
+} from "../../services/order-shipment";
+import { DCOrderApproveRequest } from "../../models/dc-check-order-model";
 
 interface Props {
   open: boolean;
@@ -18,49 +21,94 @@ interface Props {
   sdNo: string;
   comment: string;
 }
+interface loadingModalState {
+  open: boolean;
+}
 
 export default function ModelConfirm({
   open,
   onClose,
   onUpdateAction,
   shipmentNo,
+  sdNo,
   comment,
 }: Props): ReactElement {
-  const handleConfirm = () => {
-    const payload: GenerateBORequest = {
-      comment: comment,
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
+
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+
+  // const handleConfirm = () => {
+  //   const payload: GenerateBORequest = {
+  //     comment: comment,
+  //   };
+  //   generateBO(shipmentNo, payload).then(
+  //     function (value) {
+  //       setTimeout(() => {
+  //         onUpdateAction(true, "");
+  //       }, 3000);
+  //     },
+  //     function (error: ApiError) {
+  //       onUpdateAction(false, error.message);
+  //     }
+  //   );
+  //   onClose();
+  // };
+
+  const handleConfirm = async () => {
+    handleOpenLoading("open", true);
+    const payload: DCOrderApproveRequest = {
+      dcComment: comment,
     };
-    generateBO(shipmentNo, payload).then(
-      function (value) {
-        setTimeout(() => {
-          onUpdateAction(true, "");
-        }, 3000);
+
+    await approveDCOrderShipments(sdNo, payload).then(
+      async function (value) {
+        // await updateShipmentOrder();
+        // setTimeout(() => {
+        // onUpdateShipmentStatus(true, "");
+        onClose();
+        // }, 3000);
       },
       function (error: ApiError) {
-        onUpdateAction(false, error.message);
+        // onUpdateShipmentStatus(false, error.message);
+        onClose();
       }
     );
-    onClose();
+    handleOpenLoading("open", false);
   };
+
   return (
     <Dialog
       open={open}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
-      fullWidth={true}
+      maxWidth="md"
+      sx={{ minWidth: 500 }}
     >
-      <DialogTitle>
-        <Typography variant="body1" gutterBottom>
-          ยืนยันการตรวจสอบ{" "}
-        </Typography>
-      </DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          <Typography variant="body2" gutterBottom align="center">
-            ยืนยันการตรวจสอบ{" "}
+        <DialogContentText
+          id="alert-dialog-description"
+          sx={{ color: "#263238" }}
+        >
+          <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+            ยืนยันการตรวจสอบผลต่าง (DC)
           </Typography>
-          <Typography variant="body2" gutterBottom align="center">
-            เลขที่เอกสาร {shipmentNo}
+          <Typography variant="body1" align="center">
+            เลขที่เอกสาร LD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
+            <label style={{ color: "#36C690" }}>
+              <b>{shipmentNo}</b>
+            </label>
+          </Typography>
+
+          <Typography variant="body1" align="center">
+            เลขที่เอกสาร SD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
+            <label style={{ color: "#36C690" }}>
+              <b>{sdNo}</b>
+            </label>
           </Typography>
         </DialogContentText>
       </DialogContent>
@@ -78,7 +126,7 @@ export default function ModelConfirm({
         <Button
           id="btnConfirm"
           variant="contained"
-          color="secondary"
+          color="primary"
           sx={{ borderRadius: 2, width: 80 }}
           onClick={handleConfirm}
         >

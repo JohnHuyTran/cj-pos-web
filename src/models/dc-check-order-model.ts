@@ -38,3 +38,41 @@ export interface CheckOrderInfo {
   hasBelow: boolean;
   receivedDate: string;
 }
+
+export interface CheckOrderDetailResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: CheckOrderDetailInfo | null;
+}
+
+export interface CheckOrderDetailInfo {
+  id: string;
+  shipmentNo: string;
+  sdNo: string;
+  sdType: string;
+  dcComment: string;
+  items: CheckOrderDetailItims[] | [];
+  verifyDCStatus: number;
+  receivedDate: string;
+  sdImageFilename: string;
+  sdImageFile: string;
+}
+
+export interface CheckOrderDetailItims {
+  skuCode: string;
+  skuType: string;
+  barcode: string;
+  productName: string;
+  unitCode: string;
+  unitName: string;
+  unitFactor: number;
+  qty: number;
+  actualQty: number;
+  qtyDiff: number;
+  comment: string;
+}
+
+export interface DCOrderApproveRequest {
+  dcComment: string;
+}

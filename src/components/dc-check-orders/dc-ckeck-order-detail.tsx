@@ -11,15 +11,22 @@ import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
 import ModalShowPDF from "../check-orders/modal-show-pdf";
 import { getPathReportSD } from "../../services/order-shipment";
-import { TextField } from "@mui/material";
-import DCOrderEntries from "./dc-check-order-entries";
+import { TextareaAutosize, TextField } from "@mui/material";
 import ModelConfirm from "./modal-confirm";
 import SnackbarStatus from "../commons/ui/snackbar-status";
+import { ContentPaste } from "@mui/icons-material";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { featchorderDetailDCAsync } from "../../store/slices/dc-check-order-detail-slice";
+import { getDCStatus, getSdType } from "../../utils/utils";
+
+import DCOrderDetailList from "./dc-check-order-detail-list";
+import { convertUtcToBkkDate } from "../../utils/date-utill";
 
 interface Props {
   isOpen: boolean;
-  sdNo: string;
-  shipmentNo: string;
+  // sdNo: string;
+  // shipmentNo: string;
+  idDC: string;
   onClickClose: () => void;
 }
 
@@ -36,13 +43,24 @@ interface SnackbarProps {
 
 function DCOrderDetail({
   isOpen,
-  sdNo,
-  shipmentNo,
+  // sdNo,
+  // shipmentNo,
+  idDC,
   onClickClose,
 }: Props): ReactElement {
+  const orderDetailList = useAppSelector(
+    (state) => state.dcCheckOrderDetail.orderDetail
+  );
+
   const [values, setValues] = React.useState<State>({
     commentDC: "",
   });
+
+  const [sdNo, setSdNo] = React.useState("");
+  const [shipmentNo, setShipmentNo] = React.useState("");
+  const [verifyDCStatus, setverifyDCStatus] = React.useState("");
+  const [dcSdType, setDCSdType] = React.useState("");
+  const [imageFile, setImageFile] = React.useState("");
 
   const [isDisplayActBtn, setIsDisplayActBtn] = React.useState("");
   const [open, setOpen] = React.useState(isOpen);
@@ -54,20 +72,45 @@ function DCOrderDetail({
   const [contentMsg, setContentMsg] = React.useState("");
   const [generateBOStatus, setGenerateBOStatus] = React.useState(false);
 
+  const [characterCount, setCharacterCount] = React.useState(0);
+
   useEffect(() => {
     console.log("dc open", open);
     setOpen(isOpen);
+
+    // setImageFile(base64toBlob(detailDC.sdImageFile));
+    base64toBlob(detailDC.sdImageFile);
+
+    // setverifyDCStatus(getDCStatus(detailDC.verifyDCStatus));
+    // setDCSdType(getSdType(detailDC.sdType));
   }, [open]);
 
-  const handleChange = (event: any) => {
+  const detailDC: any = orderDetailList.data ? orderDetailList.data : null;
+  const detailDCItems = detailDC.items ? detailDC.items : [];
+
+  console.log("shipmentNo : " + JSON.stringify(detailDC.shipmentNo));
+  console.log("sdNo : " + JSON.stringify(detailDC.sdNo));
+  console.log("sdImageFile : " + JSON.stringify(detailDC.sdImageFile));
+
+  console.log("detailDCItems : " + JSON.stringify(detailDCItems));
+  // if (detailDC !== null) {
+  // setShipmentNo(detailDC.shipmentNo);
+  // setSdNo(detailDC.sdNo);
+  // }
+
+  const handleChangeCommentDC = (event: any) => {
     const value = event.target.value;
-    setValues({ ...values, [event.target.name]: value });
-    console.log(values);
+    const length = event.target.value.length;
+    if (length <= 100) {
+      setCharacterCount(event.target.value.length);
+      setValues({ ...values, [event.target.name]: value });
+    }
   };
 
   const handlCheckedButton = () => {
     setOpenModelConfirm(true);
   };
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -96,6 +139,32 @@ function DCOrderDetail({
     setShowSnackBar(false);
   };
 
+  const base64toBlob = (data: string) => {
+    // Cut the prefix `data:application/pdf;base64` from the raw base 64
+    if (data !== "") {
+      const base64WithoutPrefix = data.substr(
+        "data:application/pdf;base64,".length
+      );
+
+      // const bytes = atob(base64WithoutPrefix);
+      // let length = bytes.length;
+      // let out = new Uint8Array(length);
+
+      // while (length--) {
+      //   out[length] = bytes.charCodeAt(length);
+      // }
+
+      console.log("base64WithoutPrefix : " + base64WithoutPrefix);
+      // console.log("bytes : " + bytes);
+      // console.log("length : " + length);
+      // console.log("out : " + out);
+      // console.log("pdf : " + new Blob([out], { type: "application/pdf" }));
+
+      // return new Blob([out], { type: "application/pdf" });
+    }
+    return data;
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -103,91 +172,106 @@ function DCOrderDetail({
           id="customized-dialog-title"
           onClose={onClickClose}
         >
-          <Typography variant="body1" gutterBottom>
-            ตรวจสอบผลต่าง(DC)
-          </Typography>
+          <Typography variant="h5">ตรวจสอบผลต่าง (DC)</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  เลขที่เอกสาร LD:
-                </Typography>
+            <Grid container spacing={2} mb={1}>
+              <Grid item lg={2}>
+                <Typography variant="body2">เลขที่เอกสาร LD:</Typography>
               </Grid>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  LD20211020001644
-                </Typography>
+              <Grid item lg={4}>
+                <Typography variant="body2">{detailDC.shipmentNo}</Typography>
               </Grid>
-
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  เลขที่เอกสาร SD:
-                </Typography>
+              <Grid item lg={2}>
+                <Typography variant="body2">สถานะการตรวจสอบผลต่าง:</Typography>
               </Grid>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  SD2021D002-21
+              <Grid item lg={4}>
+                <Typography variant="body2">
+                  {getDCStatus(detailDC.verifyDCStatus)}
                 </Typography>
               </Grid>
             </Grid>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  วันที่:
-                </Typography>
+            <Grid container spacing={2} mb={1}>
+              <Grid item lg={2}>
+                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
               </Grid>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  11/11/2021
-                </Typography>
+              <Grid item lg={4}>
+                <Typography variant="body2">{detailDC.sdNo}</Typography>
               </Grid>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  สถานะการตรวจสอบผลต่าง:
-                </Typography>
+              <Grid item lg={2}>
+                <Typography variant="body2">ประเภท:</Typography>
               </Grid>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  รอการตรวจสอบ
+              <Grid item lg={4}>
+                <Typography variant="body2">
+                  {getSdType(detailDC.sdType)}
                 </Typography>
               </Grid>
             </Grid>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  ประเภท:
+            <Grid container spacing={2} mb={1}>
+              <Grid item lg={2}>
+                <Typography variant="body2">วันที่:</Typography>
+              </Grid>
+              <Grid item lg={4}>
+                <Typography variant="body2">
+                  {convertUtcToBkkDate(detailDC.receivedDate)}
                 </Typography>
               </Grid>
-              <Grid item lg={9}>
-                <Typography variant="body2" gutterBottom>
-                  ลังกระดาษ/ลังพลาสติก
-                </Typography>
+              <Grid item lg={2}>
+                <Typography variant="body2">แนบภาพสินค้า/วีดีโอ:</Typography>
+              </Grid>
+              <Grid item lg={4}>
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={handleLinkDocument}
+                >
+                  ดูเอกสาร
+                </Link>
               </Grid>
             </Grid>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  หมายเหตุ DC:
-                </Typography>
+            <Grid container spacing={2} mb={1}>
+              <Grid item lg={2}>
+                <Typography variant="body2">หมายเหตุ DC:</Typography>
               </Grid>
-              <Grid item lg={9}>
-                <TextField
-                  id="txbCommentDC"
-                  size="small"
-                  onChange={handleChange}
+              <Grid item lg={4} mt={0.5}>
+                <TextareaAutosize
+                  // aria-label="empty textarea"
+                  id="txarCommentDC"
+                  name="commentDC"
+                  minRows={3}
+                  placeholder="กรุณากรอก หมายเหตุ"
+                  onChange={handleChangeCommentDC}
                   value={values.commentDC}
+                  style={{
+                    width: "100%",
+                    maxWidth: 300,
+                    borderRadius: "5px",
+                    border: "1px solid #AEAEAE",
+                    fontFamily: "Kanit",
+                    padding: "5px",
+                  }}
                 />
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "#AEAEAE",
+                    width: "100%",
+                    maxWidth: 300,
+                    textAlign: "right",
+                  }}
+                >
+                  {characterCount}/100
+                </div>
               </Grid>
-            </Grid>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  แนบภาพสินค้า/วีดีโอ:
+              <Grid item lg={2}>
+                <Typography variant="body2">
+                  แนบเอกสารใบส่วนต่าง
+                  <br />
+                  หลังเซ็นต์:
                 </Typography>
               </Grid>
-              <Grid item lg={9}>
+              <Grid item lg={4}>
                 <Link
                   component="button"
                   variant="body2"
@@ -197,35 +281,21 @@ function DCOrderDetail({
                 </Link>
               </Grid>
             </Grid>
-            <Grid container spacing={2}>
-              <Grid item lg={3}>
-                <Typography variant="body2" gutterBottom>
-                  แนบเอกสารใบส่วนต่างหลังเซ็นต์:
-                </Typography>
-              </Grid>
-              <Grid item lg={9}>
-                <Link
-                  component="button"
-                  variant="body2"
-                  onClick={handleLinkDocument}
-                >
-                  ดูเอกสาร
-                </Link>
-              </Grid>
-            </Grid>
-            <Grid
-              container
-              spacing={2}
-              justifyContent="center"
-              style={{ marginTop: 0.1 }}
-            >
+
+            <Grid container spacing={2} justifyContent="right" sx={{ mt: 1 }}>
               <Grid item>
                 <Box sx={{ display: isDisplayActBtn }}>
                   <Button
                     id="btnChecked"
                     variant="contained"
-                    color="secondary"
+                    color="primary"
+                    startIcon={<ContentPaste />}
                     onClick={handlCheckedButton}
+                    sx={{
+                      borderRadius: "5px",
+                      width: "200px",
+                      padding: "8px",
+                    }}
                   >
                     ตรวจสอบแล้ว
                   </Button>
@@ -233,7 +303,8 @@ function DCOrderDetail({
               </Grid>
             </Grid>
           </Box>
-          <DCOrderEntries sdNo={sdNo} />
+
+          {detailDCItems !== [] && <DCOrderDetailList items={detailDCItems} />}
         </DialogContent>
       </Dialog>
 
@@ -241,14 +312,14 @@ function DCOrderDetail({
         open={openModelConfirm}
         onClose={handleModelConfirm}
         onUpdateAction={handleGenerateBOStatus}
-        sdNo={sdNo}
-        shipmentNo={shipmentNo}
-        comment="comment"
+        sdNo={detailDC.sdNo}
+        shipmentNo={detailDC.shipmentNo}
+        comment={values.commentDC}
       />
       <ModalShowPDF
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
-        url={getPathReportSD(sdNo)}
+        url={getPathReportSD("")}
       />
 
       <SnackbarStatus
