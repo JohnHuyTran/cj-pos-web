@@ -23,6 +23,22 @@ const useStyles = makeStyles({
       borderRadius: "10px !important",
     },
   },
+
+  MdataGridPaginationTop: {
+    "& .MuiDataGrid-columnHeaderTitle": {
+      color: "#36C690",
+      fontWeight: "600 !important",
+    },
+    "& .MuiDataGrid-root": {
+      fontFamily: "Kanit",
+      borderRadius: "10px !important",
+      display: "flex !important",
+      flexDirection: "column-reverse",
+    },
+    "& .MuiDataGrid-footerContainer": {
+      borderBottom: "1px solid #cbd4db !important",
+    },
+  },
   Mautocomplete: {
     "& .MuiOutlinedInput-root.MuiInputBase-sizeSmall": {
       padding: "4px !important",

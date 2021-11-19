@@ -244,11 +244,25 @@ export default function Sidebar({}: Props): ReactElement {
             >
               <ListItemButton
                 key="dcConfirmOrder"
+                selected={selectedIndex === 6}
+                onClick={() => handleListItemClick(6)}
+                sx={{ pl: 7 }}
+              >
+                <ListItemText primary="ตรวจสอบผลต่างการรับสินค้า" />
+              </ListItemButton>
+            </Link>
+            <Link
+              to="/supplier-check-order"
+              style={{ textDecoration: "none", color: "#676767" }}
+              id="subMenuSupplierCheckOrder"
+            >
+              <ListItemButton
+                key="supplierCheckOrder"
                 selected={selectedIndex === 7}
                 onClick={() => handleListItemClick(7)}
                 sx={{ pl: 7 }}
               >
-                <ListItemText primary="ตรวจสอบผลต่างการรับสินค้า" />
+                <ListItemText primary="ใบรับสินค้าจากผู้จำหน่าย" />
               </ListItemButton>
             </Link>
           </List>
@@ -256,8 +270,8 @@ export default function Sidebar({}: Props): ReactElement {
         <Link to="/user" style={{ textDecoration: "none", color: "#676767" }}>
           <ListItemButton
             key="USER"
-            selected={selectedIndex === 6}
-            onClick={() => handleListItemClick(6)}
+            selected={selectedIndex === 8}
+            onClick={() => handleListItemClick(8)}
             id="mainMenuUser"
           >
             <ListItemIcon>

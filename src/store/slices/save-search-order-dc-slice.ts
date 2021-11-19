@@ -9,7 +9,7 @@ const initialState: State = {
   searchCriteriaDc: {
     limit: "10",
     page: "1",
-    shipmentNo: "",
+    docNo: "",
     branchCode: "",
     verifyDCStatus: "",
     dateFrom: "",

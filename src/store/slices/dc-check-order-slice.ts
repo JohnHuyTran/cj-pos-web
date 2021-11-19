@@ -33,8 +33,8 @@ export const featchOrderListDcAsync = createAsyncThunk(
     try {
       const apiRootPath = environment.orders.dcCheckOrder.fetchOrder.url;
       let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}`;
-      if (payload.shipmentNo) {
-        path = path + `&shipmentNo=${payload.shipmentNo}`;
+      if (payload.docNo) {
+        path = path + `&docNo=${payload.docNo}`;
       }
       if (payload.branchCode) {
         path = path + `&branchCode=${payload.branchCode}`;

@@ -1,7 +1,7 @@
 export interface CheckOrderRequest {
   limit: string;
   page: string;
-  shipmentNo?: string;
+  docNo?: string;
   branchCode?: string;
   verifyDCStatus?: string;
   orderType?: string;

@@ -27,6 +27,12 @@ import { saveSearchCriteria } from "../../store/slices/save-search-order";
 function OrderList() {
   const classes = useStyles();
   const items = useAppSelector((state) => state.checkOrderList);
+  const cuurentPages = useAppSelector(
+    (state) => state.checkOrderList.orderList.page
+  );
+  const limit = useAppSelector(
+    (state) => state.checkOrderList.orderList.perPage
+  );
   const res: ShipmentResponse = items.orderList;
   const payload = useAppSelector(
     (state) => state.saveSearchOrder.searchCriteria
@@ -35,77 +41,93 @@ function OrderList() {
   const [opens, setOpens] = React.useState(false);
   const [shipment, setShipment] = React.useState("");
   const [sdNo, setSdNo] = React.useState("");
-  const [index, setIndex] = React.useState(1);
-  const [currentpage, setCurrentpage] = React.useState(0);
+  const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const columns: GridColDef[] = [
     {
       field: "index",
       headerName: "ลำดับที่",
-      minWidth: 80,
+      // minWidth: 75,
+      flex: 0.7,
       headerAlign: "center",
+      sortable: false,
     },
     {
       field: "shipmentNo",
       headerName: "เลขที่เอกสาร LD",
-      minWidth: 200,
+      // minWidth: 161,
+      flex: 1.2,
       headerAlign: "center",
+      sortable: false,
     },
     {
       field: "sdNo",
       headerName: "เลขที่เอกสาร SD",
-      minWidth: 200,
+      // minWidth: 160,
+      flex: 1.1,
       headerAlign: "center",
+      sortable: false,
     },
     {
       field: "sdType",
       headerName: "ประเภท",
-      minWidth: 180,
+      // minWidth: 160,
+      flex: 1.4,
       headerAlign: "center",
+      sortable: false,
     },
     {
       field: "sdStatus",
       headerName: "สถานะ",
-      minWidth: 70,
+      // minWidth: 80,
+      flex: 0.7,
       headerAlign: "center",
       align: "left",
+      sortable: false,
     },
     {
       field: "boxCnt",
       headerName: "จำนวนลัง",
-      minWidth: 115,
+      // minWidth: 90,
+      flex: 0.8,
       headerAlign: "center",
       align: "right",
+      sortable: false,
     },
     {
       field: "toteCnt",
       headerName: "จำนวนTote",
-      minWidth: 125,
+      // minWidth: 100,
+      flex: 0.9,
       headerAlign: "center",
       align: "right",
+      sortable: false,
     },
     {
       field: "shipmentDate",
       headerName: "วันที่รับสินค้า",
-      minWidth: 140,
+      // minWidth: 120,
+      flex: 1,
       headerAlign: "center",
       align: "center",
+      sortable: false,
     },
     {
       field: "comment",
       headerName: "อ้างอิง SD โอนลอย",
-      minWidth: 180,
+      // minWidth: 160,
+      flex: 1.2,
       headerAlign: "center",
       align: "left",
+      sortable: false,
     },
   ];
   // console.log('Data Size: ', JSON.stringify(res));
-  let i: number = index;
+
   const rows = res.data.map((data: ShipmentInfo, indexs: number) => {
     return {
       id: `${data.shipmentNo}_${data.sdNo}`,
-      // index: i + indexs,
-      index: currentpage * 5 + indexs + 1,
+      index: (cuurentPages - 1) * parseInt(pageSize) + indexs + 1,
       shipmentNo: data.shipmentNo,
       sdNo: data.sdNo,
       sdType: getShipmentTypeText(data.sdType),
@@ -134,21 +156,39 @@ function OrderList() {
 
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
-    setCurrentpage(newPage);
 
-    let page: string = "1";
-
-    if (newPage > currentpage) {
-      setIndex(index + 5);
-      page = (newPage + 1).toString();
-    } else if (newPage < currentpage) {
-      setIndex(index - 5);
-      page = (newPage - 1).toString();
-    }
+    let page: string = (newPage + 1).toString();
 
     const payloadNewpage: ShipmentRequest = {
-      limit: payload.limit,
+      // limit: payload.limit,
+      limit: pageSize,
       page: page,
+      paramQuery: payload.paramQuery,
+      sdNo: payload.sdNo,
+      dateFrom: payload.dateFrom,
+      dateTo: payload.dateTo,
+      sdStatus: payload.sdStatus,
+      sdType: payload.sdType,
+      clearSearch: false,
+    };
+
+    await dispatch(featchOrderListAsync(payloadNewpage));
+    await dispatch(saveSearchCriteria(payloadNewpage));
+
+    setLoading(false);
+  };
+
+  const handlePageSizeChange = async (pageSize: number) => {
+    // console.log("pageSize: ", pageSize);
+    setPageSize(pageSize.toString());
+
+    setLoading(true);
+
+    const payloadNewpage: ShipmentRequest = {
+      // limit: payload.limit,
+      limit: pageSize.toString(),
+      // page: cuurentPages.toString(),
+      page: "1",
       paramQuery: payload.paramQuery,
       sdNo: payload.sdNo,
       dateFrom: payload.dateFrom,
@@ -174,13 +214,15 @@ function OrderList() {
             disableColumnMenu
             onCellClick={currentlySelected}
             autoHeight
-            pagination
-            pageSize={5}
-            rowsPerPageOptions={[5]}
+            page={cuurentPages - 1}
+            pageSize={parseInt(pageSize)}
+            rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
             paginationMode="server"
             onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
             loading={loading}
+            pagination
           />
         </div>
       </Box>
