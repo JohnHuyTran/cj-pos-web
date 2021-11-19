@@ -107,8 +107,9 @@ export const getPathGenerateBO = (sdNo: string) => {
   });
 };
 
-export async function approveDCOrderShipments(sdNo: string, payload: any) {
-  const response = await put(getPathDCApprove(sdNo), payload)
+export async function approveDCOrderShipments(idDC: string, payload: any) {
+  console.log("approveDCOrderShipments : " + idDC);
+  const response = await put(getPathDCApprove(idDC), payload)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;
@@ -116,8 +117,8 @@ export async function approveDCOrderShipments(sdNo: string, payload: any) {
   return response;
 }
 
-export const getPathDCApprove = (sdNo: string) => {
+export const getPathDCApprove = (idDC: string) => {
   return getPathUrl(`${environment.orders.dcCheckOrder.approve.url}`, {
-    sdNo: sdNo,
+    idDC: idDC,
   });
 };

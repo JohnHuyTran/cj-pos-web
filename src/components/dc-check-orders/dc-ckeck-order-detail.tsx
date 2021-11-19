@@ -21,6 +21,8 @@ import { getDCStatus, getSdType } from "../../utils/utils";
 
 import DCOrderDetailList from "./dc-check-order-detail-list";
 import { convertUtcToBkkDate } from "../../utils/date-utill";
+import ModalShowFile from "./modal-show-file";
+import ModalShowImage from "./modal-show-image";
 
 interface Props {
   isOpen: boolean;
@@ -78,9 +80,6 @@ function DCOrderDetail({
     console.log("dc open", open);
     setOpen(isOpen);
 
-    // setImageFile(base64toBlob(detailDC.sdImageFile));
-    base64toBlob(detailDC.sdImageFile);
-
     // setverifyDCStatus(getDCStatus(detailDC.verifyDCStatus));
     // setDCSdType(getSdType(detailDC.sdType));
   }, [open]);
@@ -137,32 +136,6 @@ function DCOrderDetail({
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
-  };
-
-  const base64toBlob = (data: string) => {
-    // Cut the prefix `data:application/pdf;base64` from the raw base 64
-    if (data !== "") {
-      const base64WithoutPrefix = data.substr(
-        "data:application/pdf;base64,".length
-      );
-
-      // const bytes = atob(base64WithoutPrefix);
-      // let length = bytes.length;
-      // let out = new Uint8Array(length);
-
-      // while (length--) {
-      //   out[length] = bytes.charCodeAt(length);
-      // }
-
-      console.log("base64WithoutPrefix : " + base64WithoutPrefix);
-      // console.log("bytes : " + bytes);
-      // console.log("length : " + length);
-      // console.log("out : " + out);
-      // console.log("pdf : " + new Blob([out], { type: "application/pdf" }));
-
-      // return new Blob([out], { type: "application/pdf" });
-    }
-    return data;
   };
 
   return (
@@ -303,7 +276,6 @@ function DCOrderDetail({
               </Grid>
             </Grid>
           </Box>
-
           {detailDCItems !== [] && <DCOrderDetailList items={detailDCItems} />}
         </DialogContent>
       </Dialog>
@@ -312,21 +284,35 @@ function DCOrderDetail({
         open={openModelConfirm}
         onClose={handleModelConfirm}
         onUpdateAction={handleGenerateBOStatus}
+        idDC={idDC}
         sdNo={detailDC.sdNo}
         shipmentNo={detailDC.shipmentNo}
         comment={values.commentDC}
       />
-      <ModalShowPDF
+
+      {/* <ModalShowPDF
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
         url={getPathReportSD("")}
-      />
+      /> */}
 
       <SnackbarStatus
         open={showSnackBar}
         onClose={handleCloseSnackBar}
         isSuccess={generateBOStatus}
         contentMsg={contentMsg}
+      />
+
+      {/* <ModalShowFile
+        open={openModelPreviewDocument}
+        onClose={handleModelPreviewDocument}
+        file={detailDC.sdImageFile}
+      /> */}
+
+      <ModalShowImage
+        open={openModelPreviewDocument}
+        onClose={handleModelPreviewDocument}
+        file={detailDC.sdImageFile}
       />
     </div>
   );

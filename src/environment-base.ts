@@ -40,7 +40,7 @@ export const environment = {
         url: "/stock-diff/verify/view",
       },
       approve: {
-        url: "/stock-diff/verify/{sdNo}",
+        url: "/stock-diff/verify/{idDC}",
       },
     },
   },
