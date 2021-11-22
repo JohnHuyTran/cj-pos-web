@@ -7,7 +7,7 @@ type State = {
 
 const initialState: State = {
   searchCriteria: {
-    limit: "10",
+    limit: "0",
     page: "1",
     paramQuery: "",
     piStatus: "",
