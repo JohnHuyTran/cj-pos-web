@@ -1002,7 +1002,7 @@ export default function CheckOrderDetail({
             width: "300px",
             background: "#36C690",
             borderRadius: "6px",
-            fontSize: "12px",
+            fontSize: "14px",
           }}
           onClose={handleCloseSnackBar}
         >
