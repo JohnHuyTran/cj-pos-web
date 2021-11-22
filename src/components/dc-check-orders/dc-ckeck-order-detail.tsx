@@ -227,8 +227,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     rows={3}
                     defaultValue={valueCommentDC}
                     placeholder="หมายเหตุ"
-                    className={classes.MtextField}
-                    style={{ maxWidth: 300 }}
+                    className={classes.MtextFieldRemark}
                   />
                 )}
 
@@ -242,11 +241,9 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                       onChange={handleChangeCommentDC}
                       defaultValue={valueCommentDC}
                       placeholder="กรุณากรอก หมายเหตุ"
-                      className={classes.MtextField}
-                      style={{ maxWidth: 300 }}
+                      className={classes.MtextFieldRemark}
                       inputProps={{ maxLength: 100 }}
                       // helperText="กรุณากรอก หมายเหตุ"
-                      sx={{ fontSize: "14px" }}
                     />
                     <div
                       style={{
