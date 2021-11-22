@@ -49,7 +49,7 @@ export function put(path: string, payload: any) {
   return instance
     .put(path, payload)
     .then((response: AxiosResponse) => {
-      if (response.status == 200) {
+      if (response.status == 200 || response.status == 201) {
         return response.data;
       }
       const err = new ApiError(
