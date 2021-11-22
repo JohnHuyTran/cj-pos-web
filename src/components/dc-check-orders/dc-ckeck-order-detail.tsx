@@ -246,6 +246,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                       style={{ maxWidth: 300 }}
                       inputProps={{ maxLength: 100 }}
                       // helperText="กรุณากรอก หมายเหตุ"
+                      sx={{ fontSize: "14px" }}
                     />
                     <div
                       style={{

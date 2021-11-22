@@ -55,23 +55,19 @@ export default function ModelConfirm({
 
   const handleConfirm = async () => {
     handleOpenLoading("open", true);
-    const payload: GenerateBORequest = {
-      comment: comment,
+    const payload: DCOrderApproveRequest = {
+      dcComment: comment,
     };
     await approveDCOrderShipments(idDC, payload).then(
       function (value) {
-        setTimeout(() => {
-          updateDCOrder();
-          onUpdateAction(true, "");
-        }, 3000);
+        updateDCOrder();
+        onUpdateAction(true, "");
       },
       function (error: ApiError) {
         console.log("error : " + JSON.stringify(error));
         onUpdateAction(false, error.message);
       }
     );
-
-    // onUpdateAction(true, "");
 
     handleOpenLoading("open", false);
     onClose();

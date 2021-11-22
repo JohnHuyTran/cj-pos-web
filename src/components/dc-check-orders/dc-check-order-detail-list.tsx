@@ -24,7 +24,7 @@ const columns: GridColDef[] = [
   {
     field: "index",
     headerName: "ลำดับ",
-    width: 80,
+    width: 90,
     sortable: false,
   },
   {
@@ -44,7 +44,7 @@ const columns: GridColDef[] = [
   {
     field: "productDescription",
     headerName: "รายละเอียดสินค้า",
-    flex: 0.5,
+    minWidth: 260,
     sortable: false,
     headerAlign: "center",
   },
@@ -58,7 +58,7 @@ const columns: GridColDef[] = [
   {
     field: "productQuantityRef",
     headerName: "จำนวนอ้างอิง",
-    width: 110,
+    width: 135,
     sortable: false,
     align: "right",
     headerAlign: "center",
@@ -66,7 +66,7 @@ const columns: GridColDef[] = [
   {
     field: "productQuantityActual",
     headerName: "จำนวนรับจริง",
-    width: 115,
+    width: 135,
     sortable: false,
     align: "right",
     headerAlign: "center",
@@ -74,7 +74,7 @@ const columns: GridColDef[] = [
   {
     field: "productDifference",
     headerName: "จำนวนส่วนต่าง",
-    width: 120,
+    width: 140,
     sortable: false,
     align: "right",
     headerAlign: "center",
@@ -122,6 +122,8 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
     };
   });
 
+  const [pageSize, setPageSize] = React.useState<number>(5);
+
   return (
     <Box mt={2} bgcolor="background.paper">
       <div
@@ -129,13 +131,12 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
         style={{ width: "100%", marginBottom: "1em" }}
       >
         <DataGrid
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[5, 10, 20]}
+          pagination
           rows={rows}
           columns={columns}
-          disableColumnMenu
-          autoPageSize={true}
-          pagination={true}
-          pageSize={5}
-          editMode="row"
           autoHeight
         />
       </div>
