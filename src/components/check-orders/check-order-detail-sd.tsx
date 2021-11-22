@@ -18,63 +18,73 @@ const columns: GridColDef[] = [
   {
     field: "col1",
     headerName: "ลำดับ",
-    width: 90,
+    width: 80,
     headerAlign: "center",
     disableColumnMenu: true,
+    sortable: false,
   },
   {
     field: "productId",
     headerName: "รหัสสินค้า",
-    width: 190,
+    width: 180,
     headerAlign: "center",
     disableColumnMenu: true,
+    sortable: false,
   },
   {
     field: "productBarCode",
     headerName: "บาร์โค้ด",
-    minWidth: 140,
+    minWidth: 135,
     headerAlign: "center",
     disableColumnMenu: true,
+    sortable: false,
   },
   {
     field: "productDescription",
     headerName: "รายละเอียดสินค้า",
     headerAlign: "center",
-    minWidth: 250,
+    // minWidth: 250,
+    flex: 1,
+    sortable: false,
   },
   {
     field: "productUnit",
     headerName: "หน่วย",
     width: 90,
     headerAlign: "center",
+    sortable: false,
   },
   {
     field: "productQuantityRef",
     headerName: "จำนวนอ้างอิง",
-    width: 140,
+    width: 130,
     headerAlign: "center",
     align: "right",
+    sortable: false,
   },
   {
     field: "productQuantityActual",
     headerName: "จำนวนรับจริง",
-    width: 140,
+    width: 135,
     headerAlign: "center",
     align: "right",
+    sortable: false,
   },
   {
     field: "productDifference",
     headerName: "ส่วนต่างการรับ",
-    width: 145,
+    width: 140,
     headerAlign: "center",
     align: "right",
+    sortable: false,
     renderCell: (params) => calProductDiff(params),
   },
   {
     field: "productComment",
     headerName: "หมายเหตุ",
     headerAlign: "center",
-    minWidth: 150,
+    minWidth: 120,
+    sortable: false,
   },
 ];
 
@@ -145,6 +155,8 @@ export default function CheckOrderDetail({
   const [shipmentDateFormat, setShipmentDateFormat] = useState<
     string | undefined
   >("");
+
+  const [pageSize, setPageSize] = React.useState<number>(5);
 
   useEffect(() => {
     setOpen(defaultOpen);
@@ -246,10 +258,10 @@ export default function CheckOrderDetail({
               <DataGrid
                 rows={rowsEntries}
                 columns={columns}
-                disableColumnMenu
-                pagination={true}
-                pageSize={5}
-                editMode="row"
+                pageSize={pageSize}
+                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                rowsPerPageOptions={[5, 10, 20]}
+                pagination
                 autoHeight
               />
             </div>

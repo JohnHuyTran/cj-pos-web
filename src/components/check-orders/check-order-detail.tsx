@@ -66,48 +66,56 @@ const columns: GridColDef[] = [
   {
     field: "rowOrder",
     headerName: "ลำดับ",
-    width: 90,
+    width: 80,
     headerAlign: "center",
     disableColumnMenu: true,
+    sortable: false,
   },
   {
     field: "productId",
     headerName: "รหัสสินค้า",
-    width: 200,
+    width: 180,
     headerAlign: "center",
     disableColumnMenu: true,
+    sortable: false,
   },
   {
     field: "productBarCode",
     headerName: "บาร์โค้ด",
-    minWidth: 150,
+    minWidth: 135,
     headerAlign: "center",
     disableColumnMenu: true,
+    sortable: false,
   },
   {
     field: "productDescription",
     headerName: "รายละเอียดสินค้า",
     headerAlign: "center",
-    minWidth: 300,
+    // minWidth: 300,
+    flex: 1,
+    sortable: false,
   },
   {
     field: "productUnit",
     headerName: "หน่วย",
-    width: 100,
+    width: 90,
     headerAlign: "center",
+    sortable: false,
   },
   {
     field: "productQuantityRef",
     headerName: "จำนวนอ้างอิง",
-    width: 150,
+    width: 130,
     headerAlign: "center",
     align: "right",
+    sortable: false,
   },
   {
     field: "productQuantityActual",
     headerName: "จำนวนรับจริง",
-    width: 150,
+    width: 135,
     headerAlign: "center",
+    sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
         variant="outlined"
@@ -138,16 +146,19 @@ const columns: GridColDef[] = [
   {
     field: "productDifference",
     headerName: "ส่วนต่างการรับ",
-    width: 145,
+    width: 140,
     headerAlign: "center",
     align: "right",
+    sortable: false,
     renderCell: (params) => calProductDiff(params),
   },
   {
     field: "productComment",
     headerName: "หมายเหตุ",
     headerAlign: "center",
-    minWidth: 200,
+    minWidth: 120,
+    // flex: 0.5,
+    sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
         variant="outlined"
@@ -257,7 +268,6 @@ export default function CheckOrderDetail({
 }: CheckOrderDetailProps) {
   // const { sdNo, defaultOpen } = props;
   const classes = useStyles();
-
   const res = useAppSelector((state) => state.checkOrderList.orderList);
   const sdRef = useAppSelector((state) => state.checkOrderSDList.orderList);
   const payloadSearchOrder = useAppSelector(
@@ -313,6 +323,8 @@ export default function CheckOrderDetail({
     React.useState<loadingModalState>({
       open: false,
     });
+
+  const [pageSize, setPageSize] = React.useState<number>(5);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -796,6 +808,8 @@ export default function CheckOrderDetail({
                     <input
                       id="btnBrowse"
                       type="file"
+                      // multiple
+                      // onDrop
                       accept=".pdf, .jpg, .jpeg"
                       onChange={handleFileInputChange}
                       style={{ display: "none" }}
@@ -930,10 +944,10 @@ export default function CheckOrderDetail({
               <DataGrid
                 rows={rowsEntries}
                 columns={columns}
-                disableColumnMenu
-                pagination={true}
-                pageSize={5}
-                editMode="row"
+                pageSize={pageSize}
+                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                rowsPerPageOptions={[5, 10, 20]}
+                pagination
                 autoHeight
               />
             </div>
