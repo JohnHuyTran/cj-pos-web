@@ -214,7 +214,7 @@ function DCOrderList() {
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
-    console.log("pageSize: ", pageSize);
+    // console.log("pageSize: ", pageSize);
     setPageSize(pageSize.toString());
 
     setLoading(true);

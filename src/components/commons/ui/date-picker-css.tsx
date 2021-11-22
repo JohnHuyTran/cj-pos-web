@@ -3,11 +3,12 @@ import { makeStyles } from "@mui/styles";
 const useStyles = makeStyles({
   Mdatepicker: {
     "& .MuiOutlinedInput-input": {
-      padding: "8px 0px !important",
+      // padding: "6px 0px !important",
+      padding: "0px !important",
     },
     "& .MuiIconButton-root": {
       color: "#CBD4DB !important",
-      padding: "5px !important",
+      // padding: "5px !important",
     },
     "& .MuiOutlinedInput-adornedEnd": {
       paddingRight: "0px !important",
