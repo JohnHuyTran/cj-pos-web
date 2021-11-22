@@ -1,5 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 import { grey, red } from "@mui/material/colors";
+import { NoEncryption } from "@mui/icons-material";
 
 // Create a theme instance.
 const theme = createTheme({
@@ -31,6 +32,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           color: "#fff",
+          boxShadow: "none !important",
         },
       },
     },

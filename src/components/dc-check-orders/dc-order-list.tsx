@@ -1,12 +1,6 @@
-import moment from "moment";
 import React from "react";
 import { useAppSelector, useAppDispatch } from "../../store/store";
-import {
-  DataGrid,
-  GridColDef,
-  GridCellParams,
-  GridRenderCellParams,
-} from "@mui/x-data-grid";
+import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import {
   CheckOrderResponse,
@@ -19,12 +13,17 @@ import { getSdType, getDCStatus } from "../../utils/utils";
 import DCOrderDetail from "./dc-ckeck-order-detail";
 import { useStyles } from "../../styles/makeTheme";
 import Done from "@mui/icons-material/Done";
-
+import { featchorderDetailDCAsync } from "../../store/slices/dc-check-order-detail-slice";
+import LoadingModal from "../commons/ui/loading-modal";
 import { PanoramaSharp } from "@mui/icons-material";
 import { saveSearchCriteriaDc } from "../../store/slices/save-search-order-dc-slice";
 import { Typography } from "@mui/material";
 import { ShipmentRequest } from "../../models/order-model";
 //import CheckOrderDetail from './check-order-detail';
+
+interface loadingModalState {
+  open: boolean;
+}
 
 function DCOrderList() {
   const classes = useStyles();
@@ -40,6 +39,14 @@ function DCOrderList() {
   const payload = useAppSelector(
     (state) => state.saveSearchOrderDc.searchCriteriaDc
   );
+  const [opensDCOrderDetail, setOpensDCOrderDetail] = React.useState(false);
+  const [shipment, setShipment] = React.useState("");
+  const [sdNo, setSdNo] = React.useState("");
+
+  const [idDC, setidDC] = React.useState("");
+  const [index, setIndex] = React.useState(1);
+  const [currentpage, setCurrentpage] = React.useState(0);
+
   const [pageSize, setPageSize] = React.useState(limit.toString());
   // const [opens, setOpens] = React.useState(false);
   // const [shipment, setShipment] = React.useState("");
@@ -174,23 +181,34 @@ function DCOrderList() {
     };
   });
 
-  // function currentlySelected(params: GridCellParams) {
-  //   setSdNo(params.row.sdNo);
-  //   setShipment(params.row.shipmentNo);
-  //   setOpens(true);
-  //   console.log("opens", opens);
-  // }
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
 
-  // function isClosModal() {
-  //   setOpens(false);
-  // }
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
 
-  // console.log(typeof isClosModal);
+  const currentlySelected = async (params: GridCellParams) => {
+    handleOpenLoading("open", true);
+    setidDC(params.row.id);
 
-  //pagination
+    try {
+      await dispatch(featchorderDetailDCAsync(params.row.id));
+      setOpensDCOrderDetail(true);
+    } catch (error) {
+      console.log(error);
+    }
+
+    handleOpenLoading("open", false);
+  };
+
+  function isClosModal() {
+    setOpensDCOrderDetail(false);
+  }
 
   const [loading, setLoading] = React.useState<boolean>(false);
-
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
 
@@ -246,7 +264,7 @@ function DCOrderList() {
             rows={rows}
             columns={columns}
             disableColumnMenu
-            // onCellClick={currentlySelected}
+            onCellClick={currentlySelected}
             autoHeight
             pagination
             page={cuurentPage - 1}
@@ -261,14 +279,15 @@ function DCOrderList() {
           />
         </div>
       </Box>
-      {/* {opens && (
+      {opensDCOrderDetail && (
         <DCOrderDetail
-          shipmentNo={shipment}
-          sdNo={sdNo}
-          isOpen={opens}
+          idDC={idDC}
+          isOpen={opensDCOrderDetail}
           onClickClose={isClosModal}
         />
-      )} */}
+      )}
+
+      <LoadingModal open={openLoadingModal.open} />
     </div>
   );
 }

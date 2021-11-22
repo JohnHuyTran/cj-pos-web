@@ -36,6 +36,12 @@ export const environment = {
       searchBranch: {
         url: "/master/branches",
       },
+      detailDC: {
+        url: "/stock-diff/verify/view",
+      },
+      approve: {
+        url: "/stock-diff/verify/{idDC}",
+      },
     },
   },
 };
