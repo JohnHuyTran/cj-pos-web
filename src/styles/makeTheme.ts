@@ -67,6 +67,27 @@ const useStyles = makeStyles({
   MbtnSearch: {
     borderRadius: "5px !important",
   },
+  MbtnSave: {
+    backgroundColor: "#FBA600 !important",
+    borderRadius: "4px !important",
+    marginLeft: "10px !important",
+  },
+  MbtnApprove: {
+    borderRadius: "4px !important",
+    marginLeft: "10px !important",
+  },
+  MtextFieldRemark: {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "5px !important",
+      fontSize: "14px",
+      color: "#263238 !important",
+    },
+    "& .css-2vifws-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {
+      // opacity: 0,
+      color: "#263238 !important",
+      "-webkit-text-fill-color": "rgb(0 0 0 / 100%)",
+    },
+  },
 });
 
 export { useStyles };

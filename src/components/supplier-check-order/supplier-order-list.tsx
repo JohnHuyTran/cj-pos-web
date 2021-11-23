@@ -1,7 +1,7 @@
 import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 import { Box, Button, Chip, Typography } from "@mui/material";
 import { styled } from "@mui/styles";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import {
   PurchaseInfo,
@@ -13,6 +13,7 @@ import { featchOrderListSupAsync } from "../../store/slices/supplier-check-order
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { useStyles } from "../../styles/makeTheme";
 import { convertUtcToBkkDate } from "../../utils/date-utill";
+import SupplierOrderDetail from "./supplier-order-detail";
 
 export default function SupplierOrderList() {
   const classes = useStyles();
@@ -31,6 +32,9 @@ export default function SupplierOrderList() {
     (state) => state.saveSearchOrderSup.searchCriteria
   );
   const [pageSize, setPageSize] = React.useState(limit.toString());
+
+  const [openDetail, setOpenDetail] = React.useState(false);
+  const [supplierId, setSupplierId] = React.useState("");
 
   const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -202,6 +206,15 @@ export default function SupplierOrderList() {
     setLoading(false);
   };
 
+  function currentlySelected(params: GridCellParams) {
+    setSupplierId(params.row.id);
+    setOpenDetail(true);
+  }
+
+  function isClosModal() {
+    setOpenDetail(false);
+  }
+
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
@@ -210,7 +223,7 @@ export default function SupplierOrderList() {
             rows={rows}
             columns={columns}
             disableColumnMenu
-            // onCellClick={currentlySelected}
+            onCellClick={currentlySelected}
             autoHeight
             pagination
             page={cuurentPage - 1}
@@ -225,6 +238,14 @@ export default function SupplierOrderList() {
           />
         </div>
       </Box>
+
+      {openDetail && (
+        <SupplierOrderDetail
+          supplierId={supplierId}
+          isOpen={openDetail}
+          onClickClose={isClosModal}
+        />
+      )}
     </div>
   );
 }
