@@ -15,7 +15,6 @@ import { getDCStatus, getSdType } from "../../utils/utils";
 import DCOrderDetailList from "./dc-check-order-detail-list";
 import { convertUtcToBkkDate } from "../../utils/date-utill";
 import ModalShowFile from "./modal-show-file";
-// import ModalShowImage from "./modal-show-image";
 import LoadingModal from "../commons/ui/loading-modal";
 import { useStyles } from "../../styles/makeTheme";
 import { TextField } from "@mui/material";
@@ -42,14 +41,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       open: false,
     });
   const [valueCommentDC, setValueCommentDC] = React.useState("");
-
-  // const [disabledCommentDC, setDisabledCommentDC] = React.useState(false);
-  // const [sdNo, setSdNo] = React.useState("");
-  // const [shipmentNo, setShipmentNo] = React.useState("");
-  // const [verifyDCStatus, setverifyDCStatus] = React.useState("");
-  // const [dcSdType, setDCSdType] = React.useState("");
-  // const [imageFile, setImageFile] = React.useState("");
-  // const [isDisplayActBtn, setIsDisplayActBtn] = React.useState("");
+  const [errorCommentDC, setErrorCommentDC] = React.useState(false);
 
   const [open, setOpen] = React.useState(isOpen);
   const [openModelPreviewDocument, setOpenModelPreviewDocument] =
@@ -72,15 +64,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const detailDC: any = orderDetailList.data ? orderDetailList.data : null;
   const detailDCItems = detailDC.items ? detailDC.items : [];
 
-  // console.log(
-  //   "detailDC.verifyDCStatus : " + JSON.stringify(detailDC.verifyDCStatus)
-  // );
-  // console.log("disabledCommentDC : ", +disabledCommentDC);
-  // console.log("shipmentNo : " + JSON.stringify(detailDC.shipmentNo));
-  // console.log("sdNo : " + JSON.stringify(detailDC.sdNo));
-  // console.log("dcComment : " + JSON.stringify(detailDC.dcComment));
-  // console.log("sdImageFile : " + JSON.stringify(detailDC.sdImageFile));
-
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
@@ -95,7 +78,12 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   };
 
   const handlCheckedButton = () => {
-    setOpenModelConfirm(true);
+    if (valueCommentDC !== "") {
+      setErrorCommentDC(false);
+      setOpenModelConfirm(true);
+    } else {
+      setErrorCommentDC(true);
+    }
   };
 
   const handleLinkDocument = () => {
@@ -197,7 +185,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                 </Typography>
               </Grid>
               <Grid item lg={2}>
-                {/* <Typography variant="body2">แนบภาพสินค้า/วีดีโอ:</Typography> */}
                 <Typography variant="body2">
                   แนบเอกสารใบส่วนต่าง
                   <br />
@@ -219,32 +206,25 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">หมายเหตุ DC:</Typography>
               </Grid>
               <Grid item lg={4}>
-                {detailDC.verifyDCStatus !== 0 && (
+                {/* {detailDC.verifyDCStatus === 0 && ( */}
+                <div>
                   <TextField
-                    disabled
                     multiline
                     fullWidth
-                    rows={3}
+                    rows={4}
+                    onChange={handleChangeCommentDC}
                     defaultValue={valueCommentDC}
-                    placeholder="หมายเหตุ"
+                    placeholder="กรุณากรอก หมายเหตุ"
                     className={classes.MtextFieldRemark}
+                    inputProps={{ maxLength: 100 }}
+                    error={errorCommentDC === true}
+                    helperText={
+                      errorCommentDC === true ? "กรุณากรอก หมายเหตุ" : " "
+                    }
+                    disabled={detailDC.verifyDCStatus !== 0}
                   />
-                )}
 
-                {detailDC.verifyDCStatus === 0 && (
-                  <div>
-                    <TextField
-                      // error
-                      multiline
-                      fullWidth
-                      rows={4}
-                      onChange={handleChangeCommentDC}
-                      defaultValue={valueCommentDC}
-                      placeholder="กรุณากรอก หมายเหตุ"
-                      className={classes.MtextFieldRemark}
-                      inputProps={{ maxLength: 100 }}
-                      // helperText="กรุณากรอก หมายเหตุ"
-                    />
+                  {detailDC.verifyDCStatus === 0 && (
                     <div
                       style={{
                         fontSize: "11px",
@@ -252,29 +232,14 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                         width: "100%",
                         maxWidth: 300,
                         textAlign: "right",
+                        marginTop: "-1.5em",
                       }}
                     >
                       {characterCount}/100
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </Grid>
-              {/* <Grid item lg={2}>
-                <Typography variant="body2">
-                  แนบเอกสารใบส่วนต่าง
-                  <br />
-                  หลังเซ็นต์:
-                </Typography>
-              </Grid>
-              <Grid item lg={4}>
-                <Link
-                  component="button"
-                  variant="body2"
-                  onClick={handleLinkDocument}
-                >
-                  ดูเอกสาร
-                </Link>
-              </Grid> */}
             </Grid>
 
             <Grid container spacing={2} justifyContent="right" sx={{ mt: 1 }}>
@@ -312,12 +277,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         comment={valueCommentDC}
       />
 
-      {/* <ModalShowPDF
-        open={openModelPreviewDocument}
-        onClose={handleModelPreviewDocument}
-        url={getPathReportSD("")}
-      /> */}
-
       <SnackbarStatus
         open={showSnackBar}
         onClose={handleCloseSnackBar}
@@ -330,12 +289,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         onClose={handleModelPreviewDocument}
         file={detailDC.sdImageFile}
       />
-
-      {/* <ModalShowImage
-        open={openModelPreviewDocument}
-        onClose={handleModelPreviewDocument}
-        file={detailDC.sdImageFile}
-      /> */}
 
       <LoadingModal open={openLoadingModal.open} />
     </div>

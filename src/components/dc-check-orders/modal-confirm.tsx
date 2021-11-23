@@ -6,11 +6,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import Typography from "@mui/material/Typography";
 import { ApiError } from "../../models/api-error-model";
-import { GenerateBORequest } from "../../models/order-model";
-import {
-  approveDCOrderShipments,
-  generateBO,
-} from "../../services/order-shipment";
+import { approveDCOrderShipments } from "../../services/order-shipment";
 import { DCOrderApproveRequest } from "../../models/dc-check-order-model";
 import LoadingModal from "../commons/ui/loading-modal";
 import { featchorderDetailDCAsync } from "../../store/slices/dc-check-order-detail-slice";
