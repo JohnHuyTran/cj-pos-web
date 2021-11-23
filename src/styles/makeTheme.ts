@@ -4,13 +4,13 @@ const useStyles = makeStyles({
   MtextField: {
     "& .MuiOutlinedInput-root": {
       borderRadius: "5px !important",
-      padding: "4px 4px 4px 8px",
+      // padding: "2x 2px 2px 6px",
     },
   },
   Mselect: {
     "& .css-y4ygc1-MuiInputBase-root-MuiOutlinedInput-root": {
       borderRadius: "5px !important",
-      padding: "4px 4px 4px 8px",
+      // padding: "4px 4px 4px 8px",
     },
   },
   MdataGrid: {
@@ -39,12 +39,25 @@ const useStyles = makeStyles({
       borderBottom: "1px solid #cbd4db !important",
     },
   },
+  MdataGridNew: {
+    "& .MuiDataGrid-renderingZone": {
+      maxHeight: "none !important",
+    },
+    "& .MuiDataGrid-cell": {
+      lineHeight: "unset !important",
+      maxHeight: "none !important",
+      whiteSpace: "normal",
+    },
+    "& .MuiDataGrid-row": {
+      maxHeight: "none !important",
+    },
+  },
   Mautocomplete: {
     "& .MuiOutlinedInput-root.MuiInputBase-sizeSmall": {
-      padding: "4px !important",
+      padding: "1.5px !important",
     },
     "& .MuiAutocomplete-input": {
-      padding: "2px 4px 2px 6px !important",
+      // padding: "2px 4px 2px 6px !important",
     },
   },
   MbtnClear: {

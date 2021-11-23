@@ -47,12 +47,15 @@ interface branchListOptionType {
 }
 
 function DCCheckOrderSearch() {
-  const limit = "10";
+  // const limit = "10";
   const page = "1";
 
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.dcCheckOrderList);
+  const limit = useAppSelector(
+    (state) => state.dcCheckOrderList.orderList.perPage
+  );
   const branchList = useAppSelector((state) => state.searchBranchSlice);
   const [values, setValues] = React.useState<State>({
     docNo: "",
@@ -91,8 +94,15 @@ function DCCheckOrderSearch() {
   };
 
   const onClickSearchBtn = async () => {
+    let limits;
+    if (limit === 0) {
+      limits = "10";
+    } else {
+      limits = limit.toString();
+    }
+
     const payload: CheckOrderRequest = {
-      limit: limit,
+      limit: limits,
       page: page,
       docNo: values.docNo,
       branchCode: values.branchCode,
@@ -157,7 +167,7 @@ function DCCheckOrderSearch() {
     // items.orderList = '';
 
     const payload: CheckOrderRequest = {
-      limit: limit,
+      limit: limit.toString(),
       page: page,
       docNo: values.docNo,
       branchCode: values.branchCode,
@@ -277,6 +287,7 @@ function DCCheckOrderSearch() {
                   placeholder="ทั้งหมด"
                   size="small"
                   className={classes.MtextField}
+                  fullWidth
                 />
               )}
             />
@@ -380,9 +391,8 @@ function DCCheckOrderSearch() {
             <Button
               id="btnClear"
               variant="contained"
-              size="large"
               onClick={onClickClearBtn}
-              sx={{ width: "15%" }}
+              sx={{ width: "13%" }}
               className={classes.MbtnClear}
             >
               เคลียร์
@@ -391,9 +401,8 @@ function DCCheckOrderSearch() {
               id="btnSearch"
               variant="contained"
               color="primary"
-              size="large"
               onClick={onClickValidateForm}
-              sx={{ width: "15%", ml: 2 }}
+              sx={{ width: "13%", ml: 2 }}
               className={classes.MbtnSearch}
             >
               ค้นหา

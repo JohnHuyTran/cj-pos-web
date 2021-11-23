@@ -59,8 +59,8 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton onClick={() => handleDateChange(null)}>
-              <CloseIcon />
+            <IconButton size="small" onClick={() => handleDateChange(null)}>
+              <CloseIcon fontSize="small" />
             </IconButton>
           ),
           readOnly: true,
@@ -88,8 +88,8 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton onClick={() => handleDateChange(null)}>
-              <CloseIcon />
+            <IconButton size="small" onClick={() => handleDateChange(null)}>
+              <CloseIcon fontSize="small" />
             </IconButton>
           ),
           readOnly: true,

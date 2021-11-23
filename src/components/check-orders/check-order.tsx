@@ -42,13 +42,15 @@ function CheckOrderSearch() {
   const dispatch = useAppDispatch();
   const classes = useStyles();
 
-  const limit = "10";
+  // const limit = "10";
   const page = "1";
   const items = useAppSelector((state) => state.checkOrderList);
-  // const codeError: number = useAppSelector((state) => state.checkOrderList.error);
+  const limit = useAppSelector(
+    (state) => state.checkOrderList.orderList.perPage
+  );
+  // console.log("limit in check page: ", limit);
   const [values, setValues] = React.useState<State>({
     orderShipment: "",
-    // orderNo: "",
     orderStatus: "ALL",
     orderType: "ALL",
     dateFrom: "",
@@ -100,11 +102,17 @@ function CheckOrderSearch() {
   };
 
   const onClickSearchBtn = async () => {
+    let limits;
+    if (limit === 0) {
+      limits = "10";
+    } else {
+      limits = limit.toString();
+    }
+
     const payload: ShipmentRequest = {
-      limit: limit,
+      limit: limits,
       page: page,
       paramQuery: values.orderShipment,
-      // sdNo: values.orderNo,
       dateFrom: moment(startDate).startOf("day").toISOString(),
       dateTo: moment(endDate).endOf("day").toISOString(),
       sdStatus: parseInt(values.orderStatus),
@@ -134,7 +142,7 @@ function CheckOrderSearch() {
     });
 
     const payload: ShipmentRequest = {
-      limit: limit,
+      limit: limit.toString(),
       page: page,
 
       paramQuery: values.orderShipment,
@@ -283,7 +291,6 @@ function CheckOrderSearch() {
             <Button
               id="btnClear"
               variant="contained"
-              size="large"
               onClick={onClickClearBtn}
               sx={{ width: "40%" }}
               className={classes.MbtnClear}
@@ -294,7 +301,6 @@ function CheckOrderSearch() {
               id="btnSearch"
               variant="contained"
               color="primary"
-              size="large"
               onClick={onClickValidateForm}
               sx={{ width: "40%", ml: 2 }}
               className={classes.MbtnSearch}

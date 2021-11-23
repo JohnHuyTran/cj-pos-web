@@ -11,6 +11,8 @@ import saveSearchOrderDc from "./slices/save-search-order-dc-slice";
 import searchBranchSlice from "./slices/search-branches-slice";
 import checkOrderSDSlice from "./slices/check-order-sd-slice";
 import dcCheckOrderDetailSlice from "./slices/dc-check-order-detail-slice";
+import supplierCheckOrderSlice from "./slices/supplier-check-order-slice";
+import saveSearchOrderSup from "./slices/save-search-order-supplier-slice";
 
 const store = configureStore({
   reducer: {
@@ -24,6 +26,8 @@ const store = configureStore({
     saveSearchOrder: saveSearchOrder,
     saveSearchOrderDc: saveSearchOrderDc,
     searchBranchSlice: searchBranchSlice,
+    supplierCheckOrderSlice: supplierCheckOrderSlice,
+    saveSearchOrderSup: saveSearchOrderSup,
   },
 });
 

@@ -33,6 +33,7 @@ function OrderList() {
   const limit = useAppSelector(
     (state) => state.checkOrderList.orderList.perPage
   );
+
   const res: ShipmentResponse = items.orderList;
   const payload = useAppSelector(
     (state) => state.saveSearchOrder.searchCriteria
@@ -135,7 +136,6 @@ function OrderList() {
       toteCnt: data.toteCnt,
       shipmentDate: convertUtcToBkkDate(data.shipmentDate),
       sdStatus: getShipmentStatusText(data.sdStatus),
-      // col10: "desc",
       comment: data.comment,
     };
   });
@@ -179,7 +179,6 @@ function OrderList() {
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
-    // console.log("pageSize: ", pageSize);
     setPageSize(pageSize.toString());
 
     setLoading(true);
@@ -206,26 +205,26 @@ function OrderList() {
 
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
-        <div className={classes.MdataGrid}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            disableColumnMenu
-            onCellClick={currentlySelected}
-            autoHeight
-            page={cuurentPages - 1}
-            pageSize={parseInt(pageSize)}
-            rowsPerPageOptions={[10, 20, 50, 100]}
-            rowCount={res.total}
-            paginationMode="server"
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-            loading={loading}
-            pagination
-          />
-        </div>
-      </Box>
+      {/* <Box mt={2} bgcolor="background.paper"> */}
+      <div className={classes.MdataGrid} style={{ height: 650, width: "100%" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          disableColumnMenu
+          onCellClick={currentlySelected}
+          autoHeight
+          page={cuurentPages - 1}
+          pageSize={parseInt(pageSize)}
+          rowsPerPageOptions={[10, 20, 50, 100]}
+          rowCount={res.total}
+          paginationMode="server"
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          loading={loading}
+          pagination
+        />
+      </div>
+      {/* </Box> */}
       {opens && (
         <CheckOrderDetail
           sdNo={sdNo}

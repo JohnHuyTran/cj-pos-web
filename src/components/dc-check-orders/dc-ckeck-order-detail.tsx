@@ -242,7 +242,15 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
               </Grid>
             </Grid>
 
-            <Grid container spacing={2} justifyContent="right" sx={{ mt: 1 }}>
+            <Grid
+              container
+              spacing={2}
+              justifyContent="flex-end"
+              direction="row"
+              alignItems="flex-end"
+              sx={{ mt: 1 }}
+              xs={12}
+            >
               <Grid item>
                 {detailDC.verifyDCStatus === 0 && (
                   <Button
