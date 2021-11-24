@@ -14,6 +14,10 @@ const useStyles = makeStyles({
       fontSize: "14px",
       textAlignLast: "end !important",
     },
+    "& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {
+      color: "#263238 !important",
+      "-webkit-text-fill-color": "rgb(0 0 0 / 100%)",
+    },
   },
   Mselect: {
     "& .css-y4ygc1-MuiInputBase-root-MuiOutlinedInput-root": {
@@ -78,7 +82,6 @@ const useStyles = makeStyles({
       backgroundColor: "#676767",
     },
   },
-
   MbtnSearch: {
     borderRadius: "5px !important",
   },

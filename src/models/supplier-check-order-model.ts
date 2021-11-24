@@ -68,6 +68,18 @@ export interface PurchaseDetailInfo {
   piNo: string;
   billNo?: string;
   comment: string;
+  // totalAmount: number;
+  // discount: number;
+  // charge: number;
+  // discountCharge: number;
+  // afterDiscountCharge: number;
+  // netExcludeVat: number;
+  // netIncludeVatSpecial: number;
+  // netIncludeVat: number;
+  // vat: number;
+  // vatAble: number;
+  // ratRate: number;
+  // roundAmount: number;
   entries: PurchaseDetailEntries | [];
 }
 

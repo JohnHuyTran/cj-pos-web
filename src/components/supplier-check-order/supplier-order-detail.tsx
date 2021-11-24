@@ -214,10 +214,33 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [piNo, setPiNo] = React.useState("");
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState("");
-  const [totalAmount, setTotalAmount] = React.useState(0);
-  const [vat, setVat] = React.useState(0);
-  const [discount, setDiscount] = React.useState(0);
-  const [afterDiscountCharge, setAfterDiscountCharge] = React.useState(100.01);
+  const [totalAmount, setTotalAmount] = React.useState("");
+  const [vat, setVat] = React.useState("");
+  const [discount, setDiscount] = React.useState("");
+  const [afterDiscountCharge, setAfterDiscountCharge] = React.useState("");
+  const [summary, setSummary] = React.useState(false);
+
+  if (purchaseDetailItems !== [] && summary === false) {
+    let sumPrice = 0;
+    let vat = 0;
+    let discount = 0;
+    let afterDiscountCharge = 0;
+    purchaseDetailItems.forEach((data: PurchaseDetailEntries) => {
+      sumPrice = sumPrice + data.sumPrice;
+      // vat = vat + data.salePrice;
+      discount = discount + data.salePrice;
+    });
+
+    setTotalAmount((Math.round(sumPrice * 100) / 100).toFixed(2));
+    setVat("0");
+    setDiscount((Math.round(discount * 100) / 100).toFixed(2));
+    afterDiscountCharge = sumPrice + vat - discount;
+    setAfterDiscountCharge(
+      (Math.round(afterDiscountCharge * 100) / 100).toFixed(2)
+    );
+
+    setSummary(true);
+  }
 
   const rows = purchaseDetailItems.map(
     (item: PurchaseDetailEntries, index: number) => {
@@ -247,7 +270,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const classes = useStyles();
   const [pageSize, setPageSize] = React.useState<number>(10);
-
   const [characterCount, setCharacterCount] = React.useState(0);
   // const [errorCommentDC, setErrorCommentDC] = React.useState(false);
   const maxCommentLength = 255;
@@ -286,12 +308,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const handleConfirmStatus = async (issuccess: boolean, errorMsg: string) => {
     setOpenLoadingModal(true);
-    const msg = issuccess ? "ตรวจสอบผลต่าง(DC) สำเร็จ" : errorMsg;
+    const msg = issuccess ? "คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว" : errorMsg;
     setShowSnackBar(true);
     setContentMsg(msg);
     setSnackbarIsStatus(issuccess);
 
-    console.log("issuccess : " + issuccess);
     if (issuccess) {
       dispatch(featchOrderListSupAsync(payloadSearch));
       setTimeout(() => {
@@ -445,6 +466,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 className={classes.MbtnSave}
                 onClick={handleSaveButton}
                 startIcon={<SaveIcon />}
+                sx={{ width: 200 }}
               >
                 บันทึก
               </Button>
@@ -458,6 +480,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 className={classes.MbtnApprove}
                 onClick={handlConfirmButton}
                 startIcon={<CheckCircleOutline />}
+                sx={{ width: 200 }}
               >
                 อนุมัติ
               </Button>
@@ -530,6 +553,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       value={totalAmount}
                       className={classes.MtextFieldNumber}
                       fullWidth
+                      disabled
                       sx={{ background: "#EAEBEB" }}
                     />
                   </Grid>
@@ -549,6 +573,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       value={vat}
                       className={classes.MtextFieldNumber}
                       fullWidth
+                      disabled
                       sx={{ background: "#EAEBEB" }}
                     />
                   </Grid>
@@ -569,6 +594,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       value={discount}
                       className={classes.MtextFieldNumber}
                       fullWidth
+                      disabled
                       sx={{ background: "#EAEBEB" }}
                     />
                   </Grid>
@@ -589,6 +615,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       value={afterDiscountCharge}
                       className={classes.MtextFieldNumber}
                       fullWidth
+                      disabled
                       sx={{ background: "#E7FFE9" }}
                     />
                   </Grid>
