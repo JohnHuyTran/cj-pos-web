@@ -19,7 +19,10 @@ export async function saveSupplierOrder(
   }
 }
 
-export async function approveOrderShipments(piNo: string, payload: any) {
+export async function approveSupplierOrder(
+  payload: SavePurchaseRequest,
+  piNo: string
+) {
   const response = await put(getPathApprove(piNo), payload)
     .then((result: any) => result)
     .catch((error: ApiError) => {

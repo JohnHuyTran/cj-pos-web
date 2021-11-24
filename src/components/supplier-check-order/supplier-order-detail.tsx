@@ -33,10 +33,10 @@ import { saveSupplierOrder } from "../../services/purchase";
 import { featchSupplierOrderDetailAsync } from "../../store/slices/supplier-order-detail-slice";
 import { featchOrderListSupAsync } from "../../store/slices/supplier-check-order-slice";
 import SnackbarStatus from "../commons/ui/snackbar-status";
+import ModelConfirm from "./modal-confirm";
 
 interface Props {
   isOpen: boolean;
-  supplierId: string;
   onClickClose: () => void;
 }
 
@@ -184,11 +184,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function SupplierOrderDetail({
-  isOpen,
-  supplierId,
-  onClickClose,
-}: Props): ReactElement {
+function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const handleClose = () => {
     setOpen(false);
@@ -196,7 +192,6 @@ function SupplierOrderDetail({
   };
   useEffect(() => {
     setOpen(isOpen);
-
     setBillNo(purchaseDetail.billNo);
     setPiNo(purchaseDetail.piNo);
     setPiStatus(purchaseDetail.piStatus);
@@ -254,7 +249,7 @@ function SupplierOrderDetail({
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   const [characterCount, setCharacterCount] = React.useState(0);
-  const [errorCommentDC, setErrorCommentDC] = React.useState(false);
+  // const [errorCommentDC, setErrorCommentDC] = React.useState(false);
   const maxCommentLength = 255;
   const handleChangeComment = (event: any) => {
     const value = event.target.value;
@@ -274,13 +269,40 @@ function SupplierOrderDetail({
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState("");
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  const [items, setItems] = React.useState<any>([]);
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
   };
 
-  const handleSaveButton = async () => {
+  const handleModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+
+  const handlConfirmButton = () => {
+    setOpenModelConfirm(true);
+  };
+
+  const handleConfirmStatus = async (issuccess: boolean, errorMsg: string) => {
     setOpenLoadingModal(true);
+    const msg = issuccess ? "ตรวจสอบผลต่าง(DC) สำเร็จ" : errorMsg;
+    setShowSnackBar(true);
+    setContentMsg(msg);
+    setSnackbarIsStatus(issuccess);
+
+    console.log("issuccess : " + issuccess);
+    if (issuccess) {
+      dispatch(featchOrderListSupAsync(payloadSearch));
+      setTimeout(() => {
+        handleClose();
+      }, 500);
+    } else {
+      setOpenLoadingModal(false);
+    }
+  };
+
+  const handleGetItemsEdit = async () => {
     const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const itemsList: any = [];
     rows.forEach((data: GridRowData) => {
@@ -292,11 +314,17 @@ function SupplierOrderDetail({
       itemsList.push(item);
     });
 
-    console.log("itemsList : ", JSON.stringify(itemsList));
+    setItems(itemsList);
+  };
+
+  const handleSaveButton = async () => {
+    setOpenLoadingModal(true);
+    handleGetItemsEdit();
+
     const payloadSave: SavePurchaseRequest = {
       billNo: billNo,
       comment: comment,
-      items: itemsList,
+      items: items,
     };
 
     await saveSupplierOrder(payloadSave, piNo)
@@ -409,26 +437,31 @@ function SupplierOrderDetail({
             direction="row"
             alignItems="flex-end"
           >
-            <Button
-              id="btnSave"
-              variant="contained"
-              color="warning"
-              className={classes.MbtnSave}
-              onClick={handleSaveButton}
-              startIcon={<SaveIcon />}
-            >
-              บันทึก
-            </Button>
-            <Button
-              id="btnApprove"
-              variant="contained"
-              color="primary"
-              className={classes.MbtnApprove}
-              // onClick={handleApproveBtn}
-              startIcon={<CheckCircleOutline />}
-            >
-              อนุมัติ
-            </Button>
+            {piStatus !== 1 && (
+              <Button
+                id="btnSave"
+                variant="contained"
+                color="warning"
+                className={classes.MbtnSave}
+                onClick={handleSaveButton}
+                startIcon={<SaveIcon />}
+              >
+                บันทึก
+              </Button>
+            )}
+
+            {piStatus !== 1 && (
+              <Button
+                id="btnApprove"
+                variant="contained"
+                color="primary"
+                className={classes.MbtnApprove}
+                onClick={handlConfirmButton}
+                startIcon={<CheckCircleOutline />}
+              >
+                อนุมัติ
+              </Button>
+            )}
           </Grid>
           <Box mt={2} bgcolor="background.paper">
             <div style={{ width: "100%" }} className={classes.MdataGrid}>
@@ -463,7 +496,7 @@ function SupplierOrderDetail({
                   //   errorCommentDC === true ? "กรุณากรอก หมายเหตุ" : " "
                   // }
                   sx={{ maxWidth: 350 }}
-                  // disabled={detailDC.verifyDCStatus !== 0}
+                  disabled={piStatus !== 0}
                 />
 
                 <div
@@ -572,6 +605,17 @@ function SupplierOrderDetail({
         isSuccess={snackbarIsStatus}
         contentMsg={contentMsg}
       />
+      <ModelConfirm
+        open={openModelConfirm}
+        onClose={handleModelConfirm}
+        onUpdateAction={handleConfirmStatus}
+        piNo={piNo}
+        docNo={purchaseDetail.docNo}
+        billNo={billNo}
+        comment={comment}
+        items={items}
+      />
+
       <LoadingModal open={openLoadingModal} />
     </div>
   );

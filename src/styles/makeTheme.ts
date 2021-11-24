@@ -112,6 +112,11 @@ const useStyles = makeStyles({
       "-webkit-text-fill-color": "rgb(0 0 0 / 100%)",
     },
   },
+  MStepper: {
+    "& .css-4q7q78-MuiSvgIcon-root-MuiStepIcon-root.Mui-active": {
+      color: "#DDDDDD",
+    },
+  },
 });
 
 export { useStyles };

@@ -269,11 +269,7 @@ export default function SupplierOrderList() {
       </Box>
 
       {openDetail && (
-        <SupplierOrderDetail
-          supplierId={supplierId}
-          isOpen={openDetail}
-          onClickClose={isClosModal}
-        />
+        <SupplierOrderDetail isOpen={openDetail} onClickClose={isClosModal} />
       )}
 
       <LoadingModal open={openLoadingModal.open} />
