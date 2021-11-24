@@ -41,3 +41,52 @@ export interface PurchaseInfo {
   piNo: string;
   comment: string;
 }
+
+export interface PurchaseDetailResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: PurchaseDetailInfo[];
+}
+
+export interface PurchaseDetailInfo {
+  id: string;
+  docNo: string;
+  docDate: string;
+  branchCode: string;
+  vatType: number;
+  supplierCode: string;
+  supplierName: string;
+  supplierAddress: string;
+  supplierTaxNo: string;
+  creditTerm: number;
+  dueDate: string;
+  shipmentDate: string;
+  createdDate: string;
+  piStatus: number;
+  piType: number;
+  piNo: string;
+  billNo?: string;
+  comment: string;
+  entries: PurchaseDetailEntries | [];
+}
+
+export interface PurchaseDetailEntries {
+  seqItem: number;
+  produtStatus: number;
+  isControlStock: number;
+  isAllowDiscount: number;
+  skuCode: string;
+  barcode: string;
+  productName: string;
+  unitCode: string;
+  unitName: string;
+  qty: number;
+  qtyAll: number;
+  controlPrice: number;
+  salePrice: number;
+  setPrice: number;
+  sumPrice: number;
+  actualQty: number;
+  actualQtyAll: number;
+}
