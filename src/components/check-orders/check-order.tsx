@@ -285,6 +285,7 @@ function CheckOrderSearch() {
               onClick={onClickClearBtn}
               sx={{ width: "40%" }}
               className={classes.MbtnClear}
+              color="cancelColor"
             >
               เคลียร์
             </Button>
