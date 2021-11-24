@@ -394,6 +394,7 @@ function DCCheckOrderSearch() {
               onClick={onClickClearBtn}
               sx={{ width: "13%" }}
               className={classes.MbtnClear}
+              color="cancelColor"
             >
               เคลียร์
             </Button>

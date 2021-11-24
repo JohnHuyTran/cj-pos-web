@@ -61,8 +61,11 @@ const useStyles = makeStyles({
     },
   },
   MbtnClear: {
-    backgroundColor: "#AEAEAE !important",
     borderRadius: "5px !important",
+    color: "#fff",
+    "&:hover": {
+      backgroundColor: "#676767",
+    },
   },
   MbtnSearch: {
     borderRadius: "5px !important",
