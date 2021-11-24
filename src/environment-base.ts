@@ -43,6 +43,9 @@ export const environment = {
       search: {
         url: "/purchase/purchase-invoice",
       },
+      detail: {
+        url: "/purchase/pi",
+      },
     },
   },
 };

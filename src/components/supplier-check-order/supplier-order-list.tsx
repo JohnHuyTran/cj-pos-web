@@ -14,6 +14,12 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { useStyles } from "../../styles/makeTheme";
 import { convertUtcToBkkDate } from "../../utils/date-utill";
 import SupplierOrderDetail from "./supplier-order-detail";
+import { featchSupplierOrderDetailAsync } from "../../store/slices/supplier-order-detail-slice";
+import LoadingModal from "../commons/ui/loading-modal";
+
+interface loadingModalState {
+  open: boolean;
+}
 
 export default function SupplierOrderList() {
   const classes = useStyles();
@@ -163,6 +169,15 @@ export default function SupplierOrderList() {
 
   const [loading, setLoading] = React.useState<boolean>(false);
 
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
+
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
 
@@ -206,10 +221,29 @@ export default function SupplierOrderList() {
     setLoading(false);
   };
 
-  function currentlySelected(params: GridCellParams) {
-    setSupplierId(params.row.id);
-    setOpenDetail(true);
-  }
+  const purchaseDetailList = useAppSelector(
+    (state) => state.supplierOrderDetail.purchaseDetail
+  );
+  const currentlySelected = async (params: GridCellParams) => {
+    console.log("currentlySelected :", params.row.piNo);
+
+    handleOpenLoading("open", true);
+    // setSupplierId(params.row.id);
+    try {
+      await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
+
+      if (purchaseDetailList.data === []) {
+        console.log("Purchase Detail No data");
+      } else {
+        setOpenDetail(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    console.log("purchaseDetailList : ", JSON.stringify(purchaseDetailList));
+    handleOpenLoading("open", false);
+  };
 
   function isClosModal() {
     setOpenDetail(false);
@@ -246,6 +280,8 @@ export default function SupplierOrderList() {
           onClickClose={isClosModal}
         />
       )}
+
+      <LoadingModal open={openLoadingModal.open} />
     </div>
   );
 }

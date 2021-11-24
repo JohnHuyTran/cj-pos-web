@@ -15,6 +15,8 @@ import Steppers from "../commons/ui/steppers";
 import SaveIcon from "@mui/icons-material/Save";
 import { useStyles } from "../../styles/makeTheme";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { useAppSelector } from "../../store/store";
+import { PurchaseDetailEntries } from "../../models/supplier-check-order-model";
 
 interface Props {
   isOpen: boolean;
@@ -78,7 +80,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => (
       <div>
         <Typography variant="body2">{params.value}</Typography>
-        <Typography color="textSecondary" variant="body2">
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
           {params.getValue(params.id, "skuCode") || ""}
         </Typography>
       </div>
@@ -115,20 +117,10 @@ const columns: GridColDef[] = [
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value, 10) : "";
           if (value < 0) value = 0;
-
-          params.api.updateRows([
-            { ...params.row, productQuantityActual: value },
-          ]);
+          params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
-        // onBlur={(e) => {
-        //   isAllowActualQty(params, parseInt(e.target.value, 10));
-
-        //   params.api.updateRows([
-        //     { ...params.row, productQuantityActual: e.target.value },
-        //   ]);
-        // }}
         // disabled={isDisable(params) ? true : false}
-        // autoComplete="off"
+        autoComplete="off"
       />
     ),
   },
@@ -169,52 +161,74 @@ function SupplierOrderDetail({
     onClickClose();
   };
   useEffect(() => {
-    console.log("dc open", open);
     setOpen(isOpen);
-    // setValueCommentDC(detailDC.dcComment);
+
+    setBillNo(purchaseDetail.billNo);
+    setPiNo(purchaseDetail.piNo);
+    setPiStatus(purchaseDetail.piStatus);
+    setComment(purchaseDetail.comment);
+    setCharacterCount(purchaseDetail.comment.length);
   }, [open]);
 
-  const classes = useStyles();
+  const purchaseDetailList = useAppSelector(
+    (state) => state.supplierOrderDetail.purchaseDetail
+  );
 
+  const purchaseDetail: any = purchaseDetailList.data
+    ? purchaseDetailList.data
+    : null;
+  const purchaseDetailItems = purchaseDetail.entries
+    ? purchaseDetail.entries
+    : [];
+
+  const [billNo, setBillNo] = React.useState("");
+  const [piNo, setPiNo] = React.useState("");
+  const [piStatus, setPiStatus] = React.useState(0);
+  const [comment, setComment] = React.useState("");
+  const [totalAmount, setTotalAmount] = React.useState(0);
+  const [vat, setVat] = React.useState(0);
+  const [discount, setDiscount] = React.useState(0);
+  const [afterDiscountCharge, setAfterDiscountCharge] = React.useState(100.01);
+
+  const rows = purchaseDetailItems.map(
+    (item: PurchaseDetailEntries, index: number) => {
+      return {
+        id: `${item.barcode}-${index + 1}`,
+        index: index + 1,
+        seqItem: item.seqItem,
+        produtStatus: item.produtStatus,
+        isControlStock: item.isControlStock,
+        isAllowDiscount: item.isAllowDiscount,
+        skuCode: item.skuCode,
+        barCode: item.barcode,
+        productName: item.productName,
+        unitCode: item.unitCode,
+        unitName: item.unitName,
+        qty: item.qty,
+        qtyAll: item.qtyAll,
+        controlPrice: item.controlPrice,
+        salePrice: item.salePrice,
+        setPrice: item.setPrice,
+        sumPrice: item.sumPrice,
+        actualQty: item.actualQty,
+        actualQtyAll: item.actualQtyAll,
+      };
+    }
+  );
+
+  const classes = useStyles();
   const [pageSize, setPageSize] = React.useState<number>(10);
 
-  const rows = [
-    {
-      // rowOrder: index + 1,
-      // id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
-      rowId: 1,
-      id: ``,
-      seqItem: 1,
-      produtStatus: 1,
-      isControlStock: 1,
-      isAllowDiscount: 1,
-      skuCode: "000000000020004592",
-      barCode: "8852966000097",
-      productName: "00010/อัลเฟรโดพิซซ่าซีฟู้ด100g",
-      unitCode: "ST",
-      unitName: "ชิ้น",
-      qty: 12,
-      qtyAll: 0,
-      controlPrice: 0,
-      salePrice: 27.34,
-      setPrice: 27.34,
-      sumPrice: 328.08,
-      actualQty: 0,
-      actualQtyAll: 0,
-    },
-  ];
-
-  const [valueCommentDC, setValueCommentDC] = React.useState("");
+  // const [valueCommentDC, setValueCommentDC] = React.useState("");
   const [characterCount, setCharacterCount] = React.useState(0);
   const [errorCommentDC, setErrorCommentDC] = React.useState(false);
-
   const maxCommentLength = 255;
   const handleChangeCommentDC = (event: any) => {
     const value = event.target.value;
     const length = event.target.value.length;
     if (length <= maxCommentLength) {
       setCharacterCount(event.target.value.length);
-      setValueCommentDC(value);
+      setComment(value);
     }
   };
 
@@ -225,39 +239,54 @@ function SupplierOrderDetail({
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          <Typography variant="h5">รายละเอียด อ้างอิง SD โอนลอย</Typography>
+          <Typography variant="h5">ใบสั่งซื้อ Supplier</Typography>
+          <Steppers status={piStatus}></Steppers>
         </BootstrapDialogTitle>
 
         <DialogContent>
-          <Steppers></Steppers>
           <Box mt={4} sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่ใบสั่งซื้อ PO:</Typography>
+                <Typography variant="body2">เลขที่ใบสั่งซื้อ PO :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">xxxx</Typography>
+                <Typography variant="body2">{purchaseDetail.docNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่บิลผู้จำหน่าย:</Typography>
+                <Typography variant="body2">เลขที่บิลผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">xxx</Typography>
+                <TextField
+                  id="txtParamQuery"
+                  name="paramQuery"
+                  size="small"
+                  value={billNo}
+                  className={classes.MtextField}
+                />
               </Grid>
             </Grid>
-
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร PI:</Typography>
+                <Typography variant="body2">เลขทเอกสาร PI :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">xxxx</Typography>
+                <Typography variant="body2">{piNo}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">แนบเอกสารจากผู้ขาย:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">xxx</Typography>
+                <Button
+                  id="btnPrint"
+                  color="primary"
+                  variant="contained"
+                  component="span"
+                  className={classes.MbtnBrowse}
+                  // style={{ marginLeft: 10, textTransform: "none" }}
+                  disabled
+                >
+                  แนบไฟล์
+                </Button>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -265,12 +294,29 @@ function SupplierOrderDetail({
                 <Typography variant="body2">รหัสผู้จัดจำหน่าย:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">xxxx</Typography>
+                <div
+                  style={{
+                    border: "1px solid #CBD4DB",
+                    borderRadius: "5px",
+                    maxWidth: "270px",
+                    background: "#EAEBEB",
+                    padding: "2px",
+                  }}
+                >
+                  <Typography variant="body2" sx={{ color: "#263238" }}>
+                    {purchaseDetail.supplierName}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "#AEAEAE", fontSize: 12 }}
+                  >
+                    {purchaseDetail.supplierTaxNo}
+                  </Typography>
+                </div>
               </Grid>
               <Grid item lg={6}></Grid>
             </Grid>
           </Box>
-
           <Grid
             item
             container
@@ -301,7 +347,6 @@ function SupplierOrderDetail({
               อนุมัติ
             </Button>
           </Grid>
-
           <Box mt={2} bgcolor="background.paper">
             <div style={{ width: "100%" }} className={classes.MdataGrid}>
               <DataGrid
@@ -316,7 +361,6 @@ function SupplierOrderDetail({
               />
             </div>
           </Box>
-
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
@@ -325,16 +369,16 @@ function SupplierOrderDetail({
                 <TextField
                   multiline
                   fullWidth
-                  rows={6}
+                  rows={5}
                   onChange={handleChangeCommentDC}
-                  defaultValue={valueCommentDC}
-                  placeholder="กรุณากรอก หมายเหตุ"
+                  defaultValue={comment}
+                  placeholder="ความยาวไม่เกิน 255 ตัวอักษร"
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
-                  error={errorCommentDC === true}
-                  helperText={
-                    errorCommentDC === true ? "กรุณากรอก หมายเหตุ" : " "
-                  }
+                  // error={errorCommentDC === true}
+                  // helperText={
+                  //   errorCommentDC === true ? "กรุณากรอก หมายเหตุ" : " "
+                  // }
                   sx={{ maxWidth: 350 }}
                   // disabled={detailDC.verifyDCStatus !== 0}
                 />
@@ -346,7 +390,7 @@ function SupplierOrderDetail({
                     width: "100%",
                     maxWidth: 350,
                     textAlign: "right",
-                    marginTop: "-1.5em",
+                    // marginTop: "-1.5em",
                   }}
                 >
                   {characterCount}/{maxCommentLength}
@@ -367,9 +411,10 @@ function SupplierOrderDetail({
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      value="0"
-                      className={classes.MtextField}
+                      value={totalAmount}
+                      className={classes.MtextFieldNumber}
                       fullWidth
+                      sx={{ background: "#EAEBEB" }}
                     />
                   </Grid>
                 </Grid>
@@ -385,9 +430,10 @@ function SupplierOrderDetail({
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      value="0"
-                      className={classes.MtextField}
+                      value={vat}
+                      className={classes.MtextFieldNumber}
                       fullWidth
+                      sx={{ background: "#EAEBEB" }}
                     />
                   </Grid>
                 </Grid>
@@ -404,9 +450,10 @@ function SupplierOrderDetail({
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      value="0"
-                      className={classes.MtextField}
+                      value={discount}
+                      className={classes.MtextFieldNumber}
                       fullWidth
+                      sx={{ background: "#EAEBEB" }}
                     />
                   </Grid>
                 </Grid>
@@ -423,9 +470,10 @@ function SupplierOrderDetail({
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      value="0"
-                      className={classes.MtextField}
+                      value={afterDiscountCharge}
+                      className={classes.MtextFieldNumber}
                       fullWidth
+                      sx={{ background: "#E7FFE9" }}
                     />
                   </Grid>
                 </Grid>
