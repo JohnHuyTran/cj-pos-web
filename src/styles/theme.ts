@@ -13,6 +13,9 @@ const theme = createTheme({
     error: {
       main: red.A400,
     },
+    warning: {
+      main: "#FBA600",
+    },
     background: {
       default: "#fff",
     },

@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect } from "react";
+import React, { ReactElement, useEffect, useMemo } from "react";
 import DialogContent from "@mui/material/DialogContent";
 import Dialog from "@mui/material/Dialog";
 import Typography from "@mui/material/Typography";
@@ -14,9 +14,25 @@ import { Box } from "@mui/system";
 import Steppers from "../commons/ui/steppers";
 import SaveIcon from "@mui/icons-material/Save";
 import { useStyles } from "../../styles/makeTheme";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { useAppSelector } from "../../store/store";
-import { PurchaseDetailEntries } from "../../models/supplier-check-order-model";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  useGridApiRef,
+  GridRowId,
+  GridRowData,
+} from "@mui/x-data-grid";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import {
+  PurchaseDetailEntries,
+  SavePurchaseRequest,
+} from "../../models/supplier-check-order-model";
+import LoadingModal from "../commons/ui/loading-modal";
+import { ApiError } from "../../models/api-error-model";
+import { saveSupplierOrder } from "../../services/purchase";
+import { featchSupplierOrderDetailAsync } from "../../store/slices/supplier-order-detail-slice";
+import { featchOrderListSupAsync } from "../../store/slices/supplier-check-order-slice";
+import SnackbarStatus from "../commons/ui/snackbar-status";
 
 interface Props {
   isOpen: boolean;
@@ -150,6 +166,24 @@ const columns: GridColDef[] = [
   },
 ];
 
+function useApiRef() {
+  const apiRef = useGridApiRef();
+  const _columns = useMemo(
+    () =>
+      columns.concat({
+        field: "__HIDDEN__",
+        width: 0,
+        renderCell: (params) => {
+          apiRef.current = params.api;
+          return null;
+        },
+      }),
+    [columns]
+  );
+
+  return { apiRef, columns: _columns };
+}
+
 function SupplierOrderDetail({
   isOpen,
   supplierId,
@@ -219,17 +253,65 @@ function SupplierOrderDetail({
   const classes = useStyles();
   const [pageSize, setPageSize] = React.useState<number>(10);
 
-  // const [valueCommentDC, setValueCommentDC] = React.useState("");
   const [characterCount, setCharacterCount] = React.useState(0);
   const [errorCommentDC, setErrorCommentDC] = React.useState(false);
   const maxCommentLength = 255;
-  const handleChangeCommentDC = (event: any) => {
+  const handleChangeComment = (event: any) => {
     const value = event.target.value;
     const length = event.target.value.length;
     if (length <= maxCommentLength) {
       setCharacterCount(event.target.value.length);
       setComment(value);
     }
+  };
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  const { apiRef, columns } = useApiRef();
+  const dispatch = useAppDispatch();
+  const payloadSearch = useAppSelector(
+    (state) => state.saveSearchOrderSup.searchCriteria
+  );
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState("");
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const handleSaveButton = async () => {
+    setOpenLoadingModal(true);
+    const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const itemsList: any = [];
+    rows.forEach((data: GridRowData) => {
+      const item: any = {
+        barcode: data.barCode,
+        actualQty: data.actualQty,
+      };
+
+      itemsList.push(item);
+    });
+
+    console.log("itemsList : ", JSON.stringify(itemsList));
+    const payloadSave: SavePurchaseRequest = {
+      billNo: billNo,
+      comment: comment,
+      items: itemsList,
+    };
+
+    await saveSupplierOrder(payloadSave, piNo)
+      .then((_value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg("คุณได้บันทึกข้อมูลเรียบร้อยแล้ว");
+        dispatch(featchSupplierOrderDetailAsync(piNo));
+        dispatch(featchOrderListSupAsync(payloadSearch));
+      })
+      .catch((error: ApiError) => {
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+      });
+    setOpenLoadingModal(false);
   };
 
   return (
@@ -261,6 +343,7 @@ function SupplierOrderDetail({
                   name="paramQuery"
                   size="small"
                   value={billNo}
+                  onChange={(event) => setBillNo(event.target.value)}
                   className={classes.MtextField}
                 />
               </Grid>
@@ -331,7 +414,7 @@ function SupplierOrderDetail({
               variant="contained"
               color="warning"
               className={classes.MbtnSave}
-              // onClick={handleSaveButton}
+              onClick={handleSaveButton}
               startIcon={<SaveIcon />}
             >
               บันทึก
@@ -370,7 +453,7 @@ function SupplierOrderDetail({
                   multiline
                   fullWidth
                   rows={5}
-                  onChange={handleChangeCommentDC}
+                  onChange={handleChangeComment}
                   defaultValue={comment}
                   placeholder="ความยาวไม่เกิน 255 ตัวอักษร"
                   className={classes.MtextFieldRemark}
@@ -482,6 +565,14 @@ function SupplierOrderDetail({
           </Box>
         </DialogContent>
       </Dialog>
+
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={contentMsg}
+      />
+      <LoadingModal open={openLoadingModal} />
     </div>
   );
 }

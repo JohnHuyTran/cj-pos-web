@@ -225,10 +225,7 @@ export default function SupplierOrderList() {
     (state) => state.supplierOrderDetail.purchaseDetail
   );
   const currentlySelected = async (params: GridCellParams) => {
-    console.log("currentlySelected :", params.row.piNo);
-
     handleOpenLoading("open", true);
-    // setSupplierId(params.row.id);
     try {
       await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
 
@@ -240,8 +237,6 @@ export default function SupplierOrderList() {
     } catch (error) {
       console.log(error);
     }
-
-    console.log("purchaseDetailList : ", JSON.stringify(purchaseDetailList));
     handleOpenLoading("open", false);
   };
 
