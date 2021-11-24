@@ -8,39 +8,39 @@ export const environment = {
   orders: {
     shipment: {
       fetchOrder: {
-        url: "/shipment-deliverly",
+        url: "/order/shipment-deliverly",
       },
       fetchOrderSD: {
-        url: "/sd",
+        url: "/order/sd",
       },
       saveDraft: {
-        url: "/stock-diff/{sdNo}/draft",
+        url: "/order/stock-diff/{sdNo}/draft",
       },
       approve: {
-        url: "/stock-diff/{sdNo}/approve",
+        url: "/order/stock-diff/{sdNo}/approve",
       },
       closejob: {
-        url: "/stock-diff/{sdNo}/close",
+        url: "/order/stock-diff/{sdNo}/close",
       },
       printFormShipmentDeliverly: {
-        url: "/stock-diff/{sdNo}/export",
+        url: "/order/stock-diff/{sdNo}/export",
       },
     },
     dcCheckOrder: {
       fetchOrder: {
-        url: "/stock-diff/verifies",
+        url: "/order/stock-diff/verifies",
       },
       generateBO: {
-        url: "/stock-diff/{sdNo}/approve",
+        url: "/order/stock-diff/{sdNo}/approve",
       },
       searchBranch: {
-        url: "/master/branches",
+        url: "/order/master/branches",
       },
       detailDC: {
-        url: "/stock-diff/verify/view",
+        url: "/order/stock-diff/verify/view",
       },
       approve: {
-        url: "/stock-diff/verify/{idDC}",
+        url: "/order/stock-diff/verify/{idDC}",
       },
     },
   },
