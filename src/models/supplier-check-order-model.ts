@@ -90,3 +90,14 @@ export interface PurchaseDetailEntries {
   actualQty: number;
   actualQtyAll: number;
 }
+
+export interface SavePurchaseRequest {
+  billNo: string;
+  comment: string;
+  items: PurchaseItems[];
+}
+
+export interface PurchaseItems {
+  barcode: string;
+  actualQty: number;
+}
