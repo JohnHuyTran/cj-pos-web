@@ -156,7 +156,7 @@ export default function CheckOrderDetail({
     string | undefined
   >("");
 
-  const [pageSize, setPageSize] = React.useState<number>(5);
+  const [pageSize, setPageSize] = React.useState<number>(10);
 
   useEffect(() => {
     setOpen(defaultOpen);
@@ -260,7 +260,7 @@ export default function CheckOrderDetail({
                 columns={columns}
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                rowsPerPageOptions={[5, 10, 20]}
+                rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
                 autoHeight
               />
