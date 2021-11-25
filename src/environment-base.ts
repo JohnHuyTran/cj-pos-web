@@ -49,11 +49,14 @@ export const environment = {
       search: {
         url: "/purchase/purchase-invoice",
       },
-      detailDC: {
-        url: "/stock-diff/verify/view",
+      detail: {
+        url: "/purchase/pi",
+      },
+      saveDraft: {
+        url: "/purchase/purchase/{piNo}/draft",
       },
       approve: {
-        url: "/stock-diff/verify/{idDC}",
+        url: "/purchase/purchase/{piNo}/approve",
       },
     },
   },

@@ -1,7 +1,7 @@
 import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 import { Box, Button, Chip, Typography } from "@mui/material";
 import { styled } from "@mui/styles";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import {
   PurchaseInfo,
@@ -13,6 +13,13 @@ import { featchOrderListSupAsync } from "../../store/slices/supplier-check-order
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { useStyles } from "../../styles/makeTheme";
 import { convertUtcToBkkDate } from "../../utils/date-utill";
+import SupplierOrderDetail from "./supplier-order-detail";
+import { featchSupplierOrderDetailAsync } from "../../store/slices/supplier-order-detail-slice";
+import LoadingModal from "../commons/ui/loading-modal";
+
+interface loadingModalState {
+  open: boolean;
+}
 
 export default function SupplierOrderList() {
   const classes = useStyles();
@@ -31,6 +38,9 @@ export default function SupplierOrderList() {
     (state) => state.saveSearchOrderSup.searchCriteria
   );
   const [pageSize, setPageSize] = React.useState(limit.toString());
+
+  const [openDetail, setOpenDetail] = React.useState(false);
+  const [supplierId, setSupplierId] = React.useState("");
 
   const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -159,6 +169,15 @@ export default function SupplierOrderList() {
 
   const [loading, setLoading] = React.useState<boolean>(false);
 
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
+
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
 
@@ -202,6 +221,29 @@ export default function SupplierOrderList() {
     setLoading(false);
   };
 
+  const purchaseDetailList = useAppSelector(
+    (state) => state.supplierOrderDetail.purchaseDetail
+  );
+  const currentlySelected = async (params: GridCellParams) => {
+    handleOpenLoading("open", true);
+    try {
+      await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
+
+      if (purchaseDetailList.data === []) {
+        console.log("Purchase Detail No data");
+      } else {
+        setOpenDetail(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    handleOpenLoading("open", false);
+  };
+
+  function isClosModal() {
+    setOpenDetail(false);
+  }
+
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
@@ -210,7 +252,7 @@ export default function SupplierOrderList() {
             rows={rows}
             columns={columns}
             disableColumnMenu
-            // onCellClick={currentlySelected}
+            onCellClick={currentlySelected}
             autoHeight
             pagination
             page={cuurentPage - 1}
@@ -225,6 +267,12 @@ export default function SupplierOrderList() {
           />
         </div>
       </Box>
+
+      {openDetail && (
+        <SupplierOrderDetail isOpen={openDetail} onClickClose={isClosModal} />
+      )}
+
+      <LoadingModal open={openLoadingModal.open} />
     </div>
   );
 }

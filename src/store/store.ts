@@ -13,6 +13,7 @@ import checkOrderSDSlice from "./slices/check-order-sd-slice";
 import dcCheckOrderDetailSlice from "./slices/dc-check-order-detail-slice";
 import supplierCheckOrderSlice from "./slices/supplier-check-order-slice";
 import saveSearchOrderSup from "./slices/save-search-order-supplier-slice";
+import supplierOrderDetail from "./slices/supplier-order-detail-slice";
 
 const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ const store = configureStore({
     searchBranchSlice: searchBranchSlice,
     supplierCheckOrderSlice: supplierCheckOrderSlice,
     saveSearchOrderSup: saveSearchOrderSup,
+    supplierOrderDetail: supplierOrderDetail,
   },
 });
 

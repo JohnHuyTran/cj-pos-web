@@ -5,6 +5,18 @@ const useStyles = makeStyles({
     "& .MuiOutlinedInput-root": {
       borderRadius: "5px !important",
       // padding: "2x 2px 2px 6px",
+      fontSize: "14px",
+    },
+  },
+  MtextFieldNumber: {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "5px !important",
+      fontSize: "14px",
+      textAlignLast: "end !important",
+    },
+    "& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {
+      color: "#263238 !important",
+      "-webkit-text-fill-color": "rgb(0 0 0 / 100%)",
     },
   },
   Mselect: {
@@ -21,6 +33,9 @@ const useStyles = makeStyles({
     "& .MuiDataGrid-root": {
       fontFamily: "Kanit",
       borderRadius: "10px !important",
+    },
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "5px",
     },
   },
 
@@ -70,10 +85,27 @@ const useStyles = makeStyles({
   MbtnSearch: {
     borderRadius: "5px !important",
   },
+  MbtnSave: {
+    width: "125px",
+    // backgroundColor: "#FBA600 !important",
+    borderRadius: "4px !important",
+    marginLeft: "10px !important",
+    boxShadow: "none !important",
+  },
+  MbtnApprove: {
+    width: "125px",
+    borderRadius: "4px !important",
+    marginLeft: "10px !important",
+    boxShadow: "none !important",
+  },
+  MbtnBrowse: {
+    width: "125px",
+    borderRadius: "8px !important",
+    boxShadow: "none !important",
+  },
   MtextFieldRemark: {
     "& .MuiOutlinedInput-root": {
       borderRadius: "5px !important",
-      maxWidth: 300,
       fontSize: "14px",
       color: "#263238 !important",
     },
@@ -81,6 +113,11 @@ const useStyles = makeStyles({
       // opacity: 0,
       color: "#263238 !important",
       "-webkit-text-fill-color": "rgb(0 0 0 / 100%)",
+    },
+  },
+  MStepper: {
+    "& .css-4q7q78-MuiSvgIcon-root-MuiStepIcon-root.Mui-active": {
+      color: "#DDDDDD",
     },
   },
 });
