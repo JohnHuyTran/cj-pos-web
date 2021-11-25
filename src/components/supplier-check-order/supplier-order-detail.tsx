@@ -364,37 +364,35 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     if (issuccess) {
       dispatch(featchOrderListSupAsync(payloadSearch));
       setTimeout(() => {
-        handleClose();
+        localStorage.removeItem("SupplierRowsEdit");
+        setOpen(false);
+        onClickClose();
       }, 500);
     } else {
       setOpenLoadingModal(false);
     }
   };
 
-  const handleGetItemsEdit = async () => {
+  const handleSaveButton = async () => {
+    setOpenLoadingModal(true);
+
     const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const itemsList: any = [];
-    rows.forEach((data: GridRowData) => {
+    await rows.forEach((data: GridRowData) => {
       const item: any = {
         barcode: data.barCode,
         actualQty: data.actualQty,
       };
-
       itemsList.push(item);
     });
-
-    setItems(itemsList);
-  };
-
-  const handleSaveButton = async () => {
-    setOpenLoadingModal(true);
-    handleGetItemsEdit();
 
     const payloadSave: SavePurchaseRequest = {
       billNo: billNo,
       comment: comment,
-      items: items,
+      items: itemsList,
     };
+
+    console.log("payloadSave : ", JSON.stringify(payloadSave));
 
     await saveSupplierOrder(payloadSave, piNo)
       .then((_value) => {
@@ -403,6 +401,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         setContentMsg("คุณได้บันทึกข้อมูลเรียบร้อยแล้ว");
         dispatch(featchSupplierOrderDetailAsync(piNo));
         dispatch(featchOrderListSupAsync(payloadSearch));
+
+        localStorage.removeItem("SupplierRowsEdit");
       })
       .catch((error: ApiError) => {
         setShowSnackBar(true);
