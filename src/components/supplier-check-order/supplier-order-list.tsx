@@ -205,7 +205,7 @@ export default function SupplierOrderList() {
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
-        <div className={classes.MdataGrid}>
+        <div className={classes.MdataGridPaginationTop}>
           <DataGrid
             rows={rows}
             columns={columns}
