@@ -16,9 +16,7 @@ import { Button } from "@mui/material";
 import AlertError from "../commons/ui/alert-error";
 import { featchOrderListSupAsync } from "../../store/slices/supplier-check-order-slice";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { featchOrderListDcAsync } from "../../store/slices/dc-check-order-slice";
-import { CheckOrderRequest } from "../../models/dc-check-order-model";
-import { saveSearchCriteriaDc } from "../../store/slices/save-search-order-dc-slice";
+
 import SupplierOrderList from "./supplier-order-list";
 import LoadingModal from "../commons/ui/loading-modal";
 import { SearchOff } from "@mui/icons-material";

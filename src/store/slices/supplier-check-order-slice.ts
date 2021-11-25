@@ -29,7 +29,7 @@ const initialState: State = {
 };
 
 export const featchOrderListSupAsync = createAsyncThunk(
-  "orderListSub",
+  "orderListSup",
   async (payload: PurchaseInvoiceSearchCriteriaRequest) => {
     try {
       const apiRootPath = environment.purchase.supplierOrder.search.url;
