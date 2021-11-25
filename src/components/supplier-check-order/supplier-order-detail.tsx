@@ -33,6 +33,7 @@ import { saveSupplierOrder } from "../../services/purchase";
 import { featchSupplierOrderDetailAsync } from "../../store/slices/supplier-order-detail-slice";
 import { featchOrderListSupAsync } from "../../store/slices/supplier-check-order-slice";
 import SnackbarStatus from "../commons/ui/snackbar-status";
+import ConfirmModelExit from "../commons/ui/confirm-exit-model";
 import ModelConfirm from "./modal-confirm";
 
 interface Props {
@@ -186,10 +187,51 @@ function useApiRef() {
 
 function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
+  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+
   const handleClose = () => {
+    let exit = false;
+    if (
+      comment !== purchaseDetail.comment ||
+      billNo !== purchaseDetail.billNo
+    ) {
+      exit = true;
+    }
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    let i = 0;
+    const itemsList: any = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      if (data.actualQty !== rows[i].actualQty) {
+        exit = true;
+      }
+      i++;
+
+      itemsList.push(data);
+    });
+
+    if (!exit) {
+      localStorage.removeItem("SupplierRowsEdit");
+      setOpen(false);
+      onClickClose();
+    } else if (exit) {
+      if (itemsList !== []) {
+        localStorage.setItem("SupplierRowsEdit", JSON.stringify(itemsList));
+      }
+      setConfirmModelExit(true);
+    }
+  };
+
+  function handleNotExitModelConfirm() {
+    setConfirmModelExit(false);
+  }
+
+  function handleExitModelConfirm() {
+    localStorage.removeItem("SupplierRowsEdit");
+    setConfirmModelExit(false);
     setOpen(false);
     onClickClose();
-  };
+  }
+
   useEffect(() => {
     setOpen(isOpen);
     setBillNo(purchaseDetail.billNo);
@@ -214,35 +256,35 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [piNo, setPiNo] = React.useState("");
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState("");
-  const [totalAmount, setTotalAmount] = React.useState("");
-  const [vat, setVat] = React.useState("");
-  const [discount, setDiscount] = React.useState("");
-  const [afterDiscountCharge, setAfterDiscountCharge] = React.useState("");
-  const [summary, setSummary] = React.useState(false);
+  // const [totalAmount, setTotalAmount] = React.useState("");
+  // const [vat, setVat] = React.useState("");
+  // const [discount, setDiscount] = React.useState("");
+  // const [afterDiscountCharge, setAfterDiscountCharge] = React.useState("");
+  // const [summary, setSummary] = React.useState(false);
 
-  if (purchaseDetailItems !== [] && summary === false) {
-    let sumPrice = 0;
-    let vat = 0;
-    let discount = 0;
-    let afterDiscountCharge = 0;
-    purchaseDetailItems.forEach((data: PurchaseDetailEntries) => {
-      sumPrice = sumPrice + data.sumPrice;
-      // vat = vat + data.salePrice;
-      discount = discount + data.salePrice;
-    });
+  // if (purchaseDetailItems !== [] && summary === false) {
+  //   let sumPrice = 0;
+  //   let vat = 0;
+  //   let discount = 0;
+  //   let afterDiscountCharge = 0;
+  //   purchaseDetailItems.forEach((data: PurchaseDetailEntries) => {
+  //     sumPrice = sumPrice + data.sumPrice;
+  //     // vat = vat + data.salePrice;
+  //     discount = discount + data.salePrice;
+  //   });
 
-    setTotalAmount((Math.round(sumPrice * 100) / 100).toFixed(2));
-    setVat("0");
-    setDiscount((Math.round(discount * 100) / 100).toFixed(2));
-    afterDiscountCharge = sumPrice + vat - discount;
-    setAfterDiscountCharge(
-      (Math.round(afterDiscountCharge * 100) / 100).toFixed(2)
-    );
+  //   setTotalAmount((Math.round(sumPrice * 100) / 100).toFixed(2));
+  //   setVat("0");
+  //   setDiscount((Math.round(discount * 100) / 100).toFixed(2));
+  //   afterDiscountCharge = sumPrice + vat - discount;
+  //   setAfterDiscountCharge(
+  //     (Math.round(afterDiscountCharge * 100) / 100).toFixed(2)
+  //   );
 
-    setSummary(true);
-  }
+  //   setSummary(true);
+  // }
 
-  const rows = purchaseDetailItems.map(
+  let rows = purchaseDetailItems.map(
     (item: PurchaseDetailEntries, index: number) => {
       return {
         id: `${item.barcode}-${index + 1}`,
@@ -267,6 +309,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       };
     }
   );
+  if (localStorage.getItem("SupplierRowsEdit")) {
+    let localStorageEdit = JSON.parse(
+      localStorage.getItem("SupplierRowsEdit") || ""
+    );
+    rows = localStorageEdit;
+  }
 
   const classes = useStyles();
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -429,10 +477,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <div
                   style={{
                     border: "1px solid #CBD4DB",
-                    borderRadius: "5px",
-                    maxWidth: "270px",
+                    borderRadius: 5,
+                    maxWidth: 250,
                     background: "#EAEBEB",
-                    padding: "2px",
+                    padding: 2,
                   }}
                 >
                   <Typography variant="body2" sx={{ color: "#263238" }}>
@@ -550,7 +598,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      value={totalAmount}
+                      // value={totalAmount}
+                      value="0"
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
@@ -570,7 +619,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      value={vat}
+                      // value={vat}
+                      value="0"
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
@@ -591,7 +641,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      value={discount}
+                      // value={discount}
+                      value="0"
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
@@ -612,7 +663,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      value={afterDiscountCharge}
+                      // value={afterDiscountCharge}
+                      value="0"
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
@@ -641,6 +693,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         billNo={billNo}
         comment={comment}
         items={items}
+      />
+
+      <ConfirmModelExit
+        open={confirmModelExit}
+        onClose={handleNotExitModelConfirm}
+        onConfirm={handleExitModelConfirm}
       />
 
       <LoadingModal open={openLoadingModal} />
