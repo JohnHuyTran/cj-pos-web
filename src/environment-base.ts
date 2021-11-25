@@ -44,4 +44,20 @@ export const environment = {
       },
     },
   },
+  purchase: {
+    supplierOrder: {
+      search: {
+        url: "/purchase/purchase-invoice",
+      },
+      detail: {
+        url: "/purchase/pi",
+      },
+      saveDraft: {
+        url: "/purchase/purchase/{piNo}/draft",
+      },
+      approve: {
+        url: "/purchase/purchase/{piNo}/approve",
+      },
+    },
+  },
 };

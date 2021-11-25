@@ -7,8 +7,8 @@ type State = {
 
 const initialState: State = {
   searchCriteria: {
-    limit: "10",
-    page: "1",
+    limit: "",
+    page: "",
     sortBy: "",
     sortDirection: "",
     paramQuery: "",

@@ -232,7 +232,7 @@ function DCOrderList() {
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
-    console.log("pageSize: ", pageSize);
+    // console.log("pageSize: ", pageSize);
     setPageSize(pageSize.toString());
 
     setLoading(true);
@@ -259,7 +259,7 @@ function DCOrderList() {
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
-        <div className={classes.MdataGrid}>
+        <div className={classes.MdataGridPaginationTop}>
           <DataGrid
             rows={rows}
             columns={columns}

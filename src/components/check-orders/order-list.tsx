@@ -33,6 +33,7 @@ function OrderList() {
   const limit = useAppSelector(
     (state) => state.checkOrderList.orderList.perPage
   );
+
   const res: ShipmentResponse = items.orderList;
   const payload = useAppSelector(
     (state) => state.saveSearchOrder.searchCriteria
@@ -56,7 +57,7 @@ function OrderList() {
       field: "shipmentNo",
       headerName: "เลขที่เอกสาร LD",
       // minWidth: 161,
-      flex: 1.2,
+      flex: 1.3,
       headerAlign: "center",
       sortable: false,
     },
@@ -64,7 +65,7 @@ function OrderList() {
       field: "sdNo",
       headerName: "เลขที่เอกสาร SD",
       // minWidth: 160,
-      flex: 1.1,
+      flex: 1.3,
       headerAlign: "center",
       sortable: false,
     },
@@ -80,7 +81,7 @@ function OrderList() {
       field: "sdStatus",
       headerName: "สถานะ",
       // minWidth: 80,
-      flex: 0.7,
+      flex: 0.65,
       headerAlign: "center",
       align: "left",
       sortable: false,
@@ -116,7 +117,7 @@ function OrderList() {
       field: "comment",
       headerName: "อ้างอิง SD โอนลอย",
       // minWidth: 160,
-      flex: 1.2,
+      flex: 1.4,
       headerAlign: "center",
       align: "left",
       sortable: false,
@@ -135,7 +136,6 @@ function OrderList() {
       toteCnt: data.toteCnt,
       shipmentDate: convertUtcToBkkDate(data.shipmentDate),
       sdStatus: getShipmentStatusText(data.sdStatus),
-      // col10: "desc",
       comment: data.comment,
     };
   });
@@ -179,7 +179,6 @@ function OrderList() {
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
-    // console.log("pageSize: ", pageSize);
     setPageSize(pageSize.toString());
 
     setLoading(true);
@@ -206,26 +205,29 @@ function OrderList() {
 
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
-        <div className={classes.MdataGrid}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            disableColumnMenu
-            onCellClick={currentlySelected}
-            autoHeight
-            page={cuurentPages - 1}
-            pageSize={parseInt(pageSize)}
-            rowsPerPageOptions={[10, 20, 50, 100]}
-            rowCount={res.total}
-            paginationMode="server"
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-            loading={loading}
-            pagination
-          />
-        </div>
-      </Box>
+      {/* <Box mt={2} bgcolor="background.paper"> */}
+      <div
+        className={classes.MdataGridPaginationTop}
+        style={{ height: 650, width: "100%" }}
+      >
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          disableColumnMenu
+          onCellClick={currentlySelected}
+          autoHeight
+          page={cuurentPages - 1}
+          pageSize={parseInt(pageSize)}
+          rowsPerPageOptions={[10, 20, 50, 100]}
+          rowCount={res.total}
+          paginationMode="server"
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          loading={loading}
+          pagination
+        />
+      </div>
+      {/* </Box> */}
       {opens && (
         <CheckOrderDetail
           sdNo={sdNo}
