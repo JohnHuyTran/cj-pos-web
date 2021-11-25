@@ -65,7 +65,7 @@ function OrderList() {
       field: "sdNo",
       headerName: "เลขที่เอกสาร SD",
       // minWidth: 160,
-      flex: 1.2,
+      flex: 1.3,
       headerAlign: "center",
       sortable: false,
     },
