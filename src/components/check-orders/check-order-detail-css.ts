@@ -7,18 +7,22 @@ const useStyles = makeStyles({
     borderRadius: "8px !important",
   },
   MbtnPrint: {
+    width: "200px",
     borderRadius: "4px !important",
   },
   MbtnSave: {
-    backgroundColor: "#FBA600 !important",
+    // backgroundColor: "#FBA600 !important",
+    width: "200px",
     borderRadius: "4px !important",
     marginLeft: "10px !important",
   },
   MbtnApprove: {
+    width: "200px",
     borderRadius: "4px !important",
     marginLeft: "10px !important",
   },
   MbtnClose: {
+    width: "200px",
     borderRadius: "4px !important",
   },
   MtextFieldBrowse: {

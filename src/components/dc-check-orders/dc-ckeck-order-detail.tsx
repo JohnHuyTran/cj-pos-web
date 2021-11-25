@@ -222,6 +222,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                       errorCommentDC === true ? "กรุณากรอก หมายเหตุ" : " "
                     }
                     disabled={detailDC.verifyDCStatus !== 0}
+                    sx={{ maxWidth: 300 }}
                   />
 
                   {detailDC.verifyDCStatus === 0 && (
