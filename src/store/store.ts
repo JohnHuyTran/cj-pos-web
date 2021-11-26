@@ -3,6 +3,7 @@ import { useSelector, useDispatch, TypedUseSelectorHook } from "react-redux";
 
 import authSlice from "./slices/authSlice";
 import checkOrderSlice from "./slices/check-order-slice";
+import checkOrderDetailSlice from "./slices/check-order-detail-slice";
 import dcCheckOrderSlice from "./slices/dc-check-order-slice";
 import navSlice from "./slices/nav-slice";
 import productSlice from "./slices/productSlice";
@@ -19,6 +20,7 @@ const store = configureStore({
   reducer: {
     auth: authSlice,
     checkOrderList: checkOrderSlice,
+    checkOrderDetail: checkOrderDetailSlice,
     checkOrderSDList: checkOrderSDSlice,
     dcCheckOrderList: dcCheckOrderSlice,
     dcCheckOrderDetail: dcCheckOrderDetailSlice,

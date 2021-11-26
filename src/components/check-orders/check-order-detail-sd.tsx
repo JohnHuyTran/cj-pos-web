@@ -4,7 +4,7 @@ import { Box, Dialog, DialogContent, Grid, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
-import { useStyles } from "./check-order-detail-css";
+import { useStyles } from "../../styles/makeTheme";
 import {
   ShipmentDeliveryStatusCodeEnum,
   getShipmentTypeText,
@@ -200,7 +200,9 @@ export default function CheckOrderDetail({
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          <Typography variant="h5">รายละเอียด อ้างอิง SD โอนลอย</Typography>
+          <Typography sx={{ fontSize: "1em" }}>
+            รายละเอียด อ้างอิง SD โอนลอย
+          </Typography>
         </BootstrapDialogTitle>
 
         <DialogContent>

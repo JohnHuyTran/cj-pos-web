@@ -5,7 +5,6 @@ const useStyles = makeStyles({
     "& .MuiOutlinedInput-root": {
       borderRadius: "5px !important",
       // padding: "2x 2px 2px 6px",
-      fontSize: "14px",
     },
   },
   MtextFieldNumber: {
@@ -52,6 +51,9 @@ const useStyles = makeStyles({
     },
     "& .MuiDataGrid-footerContainer": {
       borderBottom: "1px solid #cbd4db !important",
+    },
+    "& .MuiTablePagination-toolbar": {
+      color: "#AEAEAE",
     },
   },
   MdataGridNew: {
@@ -119,6 +121,27 @@ const useStyles = makeStyles({
     "& .css-4q7q78-MuiSvgIcon-root-MuiStepIcon-root.Mui-active": {
       color: "#DDDDDD",
     },
+  },
+  MtextFieldBrowse: {
+    "& .MuiOutlinedInput-root": {
+      //input
+      borderRadius: "5px !important",
+      border: "1px dashed #36C690 !important",
+      padding: "4px !important",
+      minWidth: "235px",
+    },
+    "& .MuiOutlinedInput-root input::placeholder": {
+      color: "#676767 !important",
+      fontSize: "12px",
+    },
+  },
+  MbtnPrint: {
+    width: "200px",
+    borderRadius: "4px !important",
+  },
+  MbtnClose: {
+    width: "200px",
+    borderRadius: "4px !important",
   },
 });
 

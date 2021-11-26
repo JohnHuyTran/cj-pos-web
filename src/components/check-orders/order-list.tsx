@@ -23,6 +23,11 @@ import {
 import { useStyles } from "../../styles/makeTheme";
 import { featchOrderListAsync } from "../../store/slices/check-order-slice";
 import { saveSearchCriteria } from "../../store/slices/save-search-order";
+import checkOrderDetailSlice, {
+  featchOrderDetailAsync,
+} from "../../store/slices/check-order-detail-slice";
+import LoadingModal from "../commons/ui/loading-modal";
+import { ApiError } from "../../models/api-error-model";
 
 function OrderList() {
   const classes = useStyles();
@@ -30,8 +35,10 @@ function OrderList() {
   const cuurentPages = useAppSelector(
     (state) => state.checkOrderList.orderList.page
   );
-  const limit = useAppSelector(
-    (state) => state.checkOrderList.orderList.perPage
+  const limit = useAppSelector((state) =>
+    state.checkOrderList.orderList.perPage
+      ? state.checkOrderList.orderList.perPage
+      : 0
   );
 
   const res: ShipmentResponse = items.orderList;
@@ -123,8 +130,8 @@ function OrderList() {
       sortable: false,
     },
   ];
-  // console.log('Data Size: ', JSON.stringify(res));
 
+  // console.log("res: ", JSON.stringify(res));
   const rows = res.data.map((data: ShipmentInfo, indexs: number) => {
     return {
       id: `${data.shipmentNo}_${data.sdNo}`,
@@ -140,11 +147,43 @@ function OrderList() {
     };
   });
 
-  function currentlySelected(params: GridCellParams) {
+  const currentlySelected = async (params: GridCellParams) => {
+    setOpenLoadingModal(true);
     setSdNo(params.row.sdNo);
     setShipment(params.row.shipmentNo);
-    setOpens(true);
-  }
+
+    await dispatch(featchOrderDetailAsync(params.row.sdNo))
+      .then(
+        async function (value) {
+          setOpens(true);
+        },
+        function (error: ApiError) {
+          console.log("err message : ", error.message);
+        }
+      )
+      .catch((err) => {
+        console.log("err : ", err);
+      });
+    // setOpens(true);
+    setOpenLoadingModal(false);
+  };
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+
+  // const currentlySelected = async (params: GridCellParams) => {
+  //   setOpenLoadingModal(true);
+  //   setSdNo(params.row.sdNo);
+  //   setShipment(params.row.shipmentNo);
+
+  //   try {
+  //     await dispatch(featchOrderDetailAsync(params.row.sdNo));
+  //     setOpens(true);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+
+  //   setOpenLoadingModal(false);
+  // };
 
   function isClosModal() {
     setOpens(false);
@@ -236,6 +275,8 @@ function OrderList() {
           onClickClose={isClosModal}
         />
       )}
+
+      <LoadingModal open={openLoadingModal} />
     </div>
   );
 }

@@ -45,7 +45,7 @@ export const featchOrderSDListAsync = createAsyncThunk(
 );
 
 const checkOrderSDSlice = createSlice({
-  name: "checkOrderSD",
+  name: "orderSDList",
   initialState,
   reducers: {
     clearDataFilter: () => {
