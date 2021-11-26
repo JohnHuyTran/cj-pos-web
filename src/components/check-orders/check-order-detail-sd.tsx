@@ -200,7 +200,9 @@ export default function CheckOrderDetail({
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          <Typography variant="h5">รายละเอียด อ้างอิง SD โอนลอย</Typography>
+          <Typography sx={{ fontSize: "1em" }}>
+            รายละเอียด อ้างอิง SD โอนลอย
+          </Typography>
         </BootstrapDialogTitle>
 
         <DialogContent>

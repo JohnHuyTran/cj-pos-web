@@ -10,6 +10,9 @@ export const environment = {
       fetchOrder: {
         url: "/order/shipment-deliverly",
       },
+      detail: {
+        url: "/order/shipment-deliverly",
+      },
       fetchOrderSD: {
         url: "/order/sd",
       },

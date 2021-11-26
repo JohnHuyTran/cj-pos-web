@@ -96,6 +96,43 @@ export interface Entry {
   comment: string;
 }
 
+export interface ShipmentDetailResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: ShipmentDetailInfo | null;
+}
+export interface ShipmentDetailInfo {
+  id: string;
+  shipmentNo: string;
+  sdNo: string;
+  sdType: number;
+  dcComment: string;
+  verifyDCStatus: number;
+  receivedDate: string;
+  sdImageFilename: string;
+  sdImageFile: string;
+  sdStatus: number;
+  Comment: string;
+  items: itemsDetail[] | [];
+}
+export interface itemsDetail {
+  skuCode: string;
+  skuType: string;
+  barcode: string;
+  productName: string;
+  unitCode: string;
+  unitName: string;
+  unitFactor: number;
+  qty: number;
+  actualQty: number;
+  qtyDiff: number;
+  comment: string;
+  isTote: boolean;
+  toteCode: string;
+  deliveryOrderNo: string;
+}
+
 export interface CheckOrderDetailProps {
   sdNo: string;
   shipmentNo: string;
