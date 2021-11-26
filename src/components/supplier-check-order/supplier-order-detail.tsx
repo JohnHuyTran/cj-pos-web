@@ -136,7 +136,7 @@ const columns: GridColDef[] = [
           if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
-        // disabled={isDisable(params) ? true : false}
+        disabled={isDisable(params) ? true : false}
         autoComplete="off"
       />
     ),
@@ -166,6 +166,10 @@ const columns: GridColDef[] = [
     sortable: false,
   },
 ];
+
+const isDisable = (params: GridRenderCellParams) => {
+  return params.row.isDraftStatus;
+};
 
 function useApiRef() {
   const apiRef = useGridApiRef();
@@ -291,6 +295,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         index: index + 1,
         seqItem: item.seqItem,
         produtStatus: item.produtStatus,
+        isDraftStatus: piStatus === 0 ? false : true,
         isControlStock: item.isControlStock,
         isAllowDiscount: item.isAllowDiscount,
         skuCode: item.skuCode,
@@ -391,8 +396,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       comment: comment,
       items: itemsList,
     };
-
-    console.log("payloadSave : ", JSON.stringify(payloadSave));
 
     await saveSupplierOrder(payloadSave, piNo)
       .then((_value) => {
@@ -553,7 +556,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
                 <Typography variant="body2">หมายเหตุ:</Typography>
-
                 <TextField
                   multiline
                   fullWidth
