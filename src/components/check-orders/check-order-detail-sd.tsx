@@ -4,7 +4,7 @@ import { Box, Dialog, DialogContent, Grid, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
-import { useStyles } from "./check-order-detail-css";
+import { useStyles } from "../../styles/makeTheme";
 import {
   ShipmentDeliveryStatusCodeEnum,
   getShipmentTypeText,

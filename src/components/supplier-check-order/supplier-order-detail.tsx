@@ -418,7 +418,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          <Typography variant="h5">ใบสั่งซื้อ Supplier</Typography>
+          <Typography sx={{ fontSize: "1em" }}>ใบสั่งซื้อ Supplier</Typography>
           <Steppers status={piStatus}></Steppers>
         </BootstrapDialogTitle>
 
@@ -442,6 +442,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   value={billNo}
                   onChange={(event) => setBillNo(event.target.value)}
                   className={classes.MtextField}
+                  disabled={piStatus !== 0}
                 />
               </Grid>
             </Grid>

@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { getDCStatus, getSdType } from "../../utils/utils";
 import DCOrderDetailList from "./dc-check-order-detail-list";
 import { convertUtcToBkkDate } from "../../utils/date-utill";
-import ModalShowFile from "./modal-show-file";
+import ModalShowFile from "../commons/ui/modal-show-file";
 import LoadingModal from "../commons/ui/loading-modal";
 import { useStyles } from "../../styles/makeTheme";
 import { TextField } from "@mui/material";
@@ -46,6 +46,8 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const [openModelPreviewDocument, setOpenModelPreviewDocument] =
     React.useState(false);
+
+  const [statusFile, setStatusFile] = React.useState(0);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
 
   const [showSnackBar, setShowSnackBar] = React.useState(false);
@@ -56,7 +58,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const [characterCount, setCharacterCount] = React.useState(0);
 
   useEffect(() => {
-    console.log("dc open", open);
     setOpen(isOpen);
     setValueCommentDC(detailDC.dcComment);
   }, [open]);
@@ -87,6 +88,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   };
 
   const handleLinkDocument = () => {
+    setStatusFile(0);
     setOpenModelPreviewDocument(true);
   };
 
@@ -111,8 +113,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     setShowSnackBar(true);
     setContentMsg(msg);
     setApproveDCStatus(issuccess);
-
-    console.log("issuccess : " + issuccess);
     if (issuccess) {
       await dispatch(featchOrderListDcAsync(payloadSearchDC));
       setTimeout(() => {
@@ -139,7 +139,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          <Typography variant="h5">ตรวจสอบผลต่าง (DC)</Typography>
+          <Typography sx={{ fontSize: "1em" }}>ตรวจสอบผลต่าง (DC)</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box sx={{ flexGrow: 1 }}>
@@ -214,7 +214,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     rows={4}
                     onChange={handleChangeCommentDC}
                     defaultValue={valueCommentDC}
-                    placeholder="กรุณากรอก หมายเหตุ"
+                    placeholder="ความยาวไม่เกิน 100 ตัวอักษร"
                     className={classes.MtextFieldRemark}
                     inputProps={{ maxLength: 100 }}
                     error={errorCommentDC === true}
@@ -285,10 +285,18 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         contentMsg={contentMsg}
       />
 
-      <ModalShowFile
+      {/* <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
         file={detailDC.sdImageFile}
+      /> */}
+
+      <ModalShowFile
+        open={openModelPreviewDocument}
+        onClose={handleModelPreviewDocument}
+        url=""
+        statusFile={statusFile}
+        sdImageFile={detailDC.sdImageFile}
       />
 
       <LoadingModal open={openLoadingModal.open} />

@@ -21,11 +21,11 @@ import {
 } from "@mui/x-data-grid";
 import DialogTitle from "@mui/material/DialogTitle";
 import Link from "@mui/material/Link";
-import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import SaveIcon from "@mui/icons-material/Save";
 import IconButton from "@mui/material/IconButton";
-import { useStyles } from "./check-order-detail-css";
+import { useStyles } from "../../styles/makeTheme";
+
 import {
   saveOrderShipments,
   getPathReportSD,
@@ -39,7 +39,6 @@ import {
 } from "../../utils/enum/check-order-enum";
 import ModalShowFile from "../commons/ui/modal-show-file";
 import {
-  ShipmentInfo,
   SaveDraftSDRequest,
   CheckOrderDetailProps,
   Entry,
@@ -49,7 +48,6 @@ import { convertUtcToBkkDate } from "../../utils/date-utill";
 import { ApiError } from "../../models/api-error-model";
 import AlertError from "../commons/ui/alert-error";
 import {
-  ArrowDownward,
   BookmarkAdded,
   CheckCircleOutline,
   HighlightOff,
@@ -59,7 +57,7 @@ import LoadingModal from "../commons/ui/loading-modal";
 import CheckOrderSDRefDetail from "./check-order-detail-sd";
 import { featchOrderSDListAsync } from "../../store/slices/check-order-sd-slice";
 import { featchOrderDetailAsync } from "../../store/slices/check-order-detail-slice";
-
+import Snackbar from "../commons/ui/snackbar-status";
 interface loadingModalState {
   open: boolean;
 }
@@ -135,7 +133,6 @@ const columns: GridColDef[] = [
         }}
         onBlur={(e) => {
           // isAllowActualQty(params, parseInt(e.target.value, 10));
-
           params.api.updateRows([
             { ...params.row, productQuantityActual: e.target.value },
           ]);
@@ -215,13 +212,6 @@ const isDisable = (params: GridRenderCellParams) => {
   return params.row.isDraftStatus;
 };
 
-// const isAllowActualQty = (params: GridRenderCellParams, value: number) => {
-//   if (params.row.isTote === true && !(value * 1 >= 0 && value * 1 <= 1)) {
-//     // return alert("สินค้าภายใน Tote กรอกได้เฉพาะ 0 กับ 1 เท่านั้น");
-//     return console.log("สินค้าภายใน Tote กรอกได้เฉพาะ 0 กับ 1 เท่านั้น");
-//   }
-// };
-
 export interface DialogTitleProps {
   id: string;
   children?: React.ReactNode;
@@ -270,15 +260,12 @@ export default function CheckOrderDetail({
     (state) => state.saveSearchOrder.searchCriteria
   );
   const dispatch = useAppDispatch();
-
   const orderDetails = useAppSelector(
     (state) => state.checkOrderDetail.orderDetail
   );
   const orderDetail: any = orderDetails.data ? orderDetails.data : null;
-
   const [open, setOpen] = React.useState(defaultOpen);
   const { apiRef, columns } = useApiRef();
-
   const [showSaveBtn, setShowSaveBtn] = React.useState(false);
   const [showApproveBtn, setShowApproveBtn] = React.useState(false);
   const [showCloseJobBtn, setShowCloseJobBtn] = React.useState(false);
@@ -288,8 +275,6 @@ export default function CheckOrderDetail({
   const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState("");
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [action, setAction] = useState<number>(0);
-  const [showSnackbarSuccess, setShowSnackbarSuccess] = React.useState(false);
-  const [showSnackbarFail, setShowSnackbarFail] = React.useState(false);
   const [itemsDiffState, setItemsDiffState] = useState<Entry[]>([]);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const [openModelPreviewDocument, setOpenModelPreviewDocument] =
@@ -313,10 +298,12 @@ export default function CheckOrderDetail({
 
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [statusFile, setStatusFile] = React.useState(0);
-
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState("");
+  const [snackbarStatus, setSnackbarStatus] = React.useState(false);
 
   useEffect(() => {
     if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
@@ -331,17 +318,14 @@ export default function CheckOrderDetail({
       setShowApproveBtn(true);
       setShowCloseJobBtn(false);
     }
-
     if (
       orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB
     ) {
       setIsDisplayActBtn("none");
     }
-
     setOpen(defaultOpen);
     setShipmentStatusText(getShipmentStatusText(orderDetail.sdStatus));
     setShipmentTypeText(getShipmentTypeText(orderDetail.sdType));
-
     setShipmentDateFormat(convertUtcToBkkDate(orderDetail.receivedDate));
     if (orderDetail.Comment !== "") {
       dispatch(featchOrderSDListAsync(orderDetail.Comment));
@@ -458,12 +442,15 @@ export default function CheckOrderDetail({
 
       await saveOrderShipments(payload, sdNo)
         .then((_value) => {
-          setShowSnackbarSuccess(true);
+          setShowSnackBar(true);
+          setContentMsg("คุณได้บันทึกข้อมูลเรียบร้อยแล้ว");
+          setSnackbarStatus(true);
           updateShipmentOrder();
         })
         .catch((error: ApiError) => {
-          setShowSnackbarFail(true);
-          setSnackBarFailMsg(error.message);
+          setShowSnackBar(true);
+          setContentMsg(error.message);
+          setSnackbarStatus(false);
           updateShipmentOrder();
         });
     }
@@ -623,16 +610,25 @@ export default function CheckOrderDetail({
   });
 
   const handleCloseSnackBar = () => {
-    setShowSnackbarFail(false);
-    setShowSnackbarSuccess(false);
+    setShowSnackBar(false);
+    setContentMsg("");
+    setSnackbarStatus(false);
   };
 
-  const handleShowSnackBar = (issuccess: boolean, errorMsg: any) => {
+  const handleShowSnackBar = async (issuccess: boolean, errorMsg: string) => {
+    handleOpenLoading("open", true);
+    const msg = issuccess ? "คุณได้อนุมัติใบสั่งซื้อเรียบร้อยแล้ว" : errorMsg;
+    setShowSnackBar(true);
+    setContentMsg(msg);
+    setSnackbarStatus(issuccess);
+
     if (issuccess) {
-      setShowSnackbarSuccess(true);
+      updateShipmentOrder();
+      setTimeout(() => {
+        handleClose();
+      }, 500);
     } else {
-      setShowSnackbarFail(true);
-      setSnackBarFailMsg(errorMsg);
+      handleOpenLoading("open", false);
     }
   };
 
@@ -938,6 +934,16 @@ export default function CheckOrderDetail({
         </DialogContent>
       </Dialog>
 
+      {opensSD && (
+        <CheckOrderSDRefDetail
+          sdNo={sdNo}
+          sdRefNo={orderDetail.Comment}
+          shipmentNo={shipmentNo}
+          defaultOpen={opensSD}
+          onClickClose={isClosSDModal}
+        />
+      )}
+
       <ConfirmOrderShipment
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
@@ -973,61 +979,13 @@ export default function CheckOrderDetail({
       />
 
       <Snackbar
-        open={showSnackbarSuccess}
+        open={showSnackBar}
         onClose={handleCloseSnackBar}
-        autoHideDuration={6000}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <Alert
-          severity="success"
-          sx={{
-            width: "300px",
-            background: "#36C690",
-            borderRadius: "6px",
-            fontSize: "14px",
-          }}
-          onClose={handleCloseSnackBar}
-        >
-          ทำรายการสำเร็จ
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={showSnackbarFail}
-        onClose={handleCloseSnackBar}
-        autoHideDuration={6000}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <Alert
-          severity="error"
-          sx={{
-            width: "300px",
-            borderRadius: "6px",
-            fontSize: "12px",
-          }}
-          onClose={handleCloseSnackBar}
-        >
-          {snackBarFailMsg}
-        </Alert>
-      </Snackbar>
+        isSuccess={snackbarStatus}
+        contentMsg={contentMsg}
+      />
 
       <LoadingModal open={openLoadingModal.open} />
-
-      {opensSD && (
-        <CheckOrderSDRefDetail
-          sdNo={sdNo}
-          sdRefNo={orderDetail.Comment}
-          shipmentNo={shipmentNo}
-          defaultOpen={opensSD}
-          onClickClose={isClosSDModal}
-        />
-      )}
     </div>
   );
 }

@@ -9,6 +9,7 @@ import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlin
 import throttle from "lodash.throttle";
 import { useReactToPrint } from "react-to-print";
 import AlertError from "./alert-error";
+import { HighlightOff } from "@mui/icons-material";
 
 interface ModalShowPDFProp {
   open: boolean;
@@ -29,34 +30,38 @@ export interface DialogTitleProps {
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
   const { children, status, onClose, onPrint, ...other } = props;
   return (
-    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+    <DialogTitle sx={{ m: 1, p: 2 }} {...other}>
       {children}
       {onClose ? (
         <IconButton
-          id="closeBtn"
           aria-label="close"
           onClick={onClose}
           sx={{
             position: "absolute",
             right: 8,
-            top: 0,
-            color: (theme) => theme.palette.grey[100],
+            top: 8,
+            color: (theme: any) => theme.palette.grey[400],
           }}
         >
-          <CloseIcon sx={{ color: "#676767" }} />
+          <HighlightOff fontSize="large" />
         </IconButton>
       ) : null}
       {onPrint ? (
-        <Button
-          id="btnPrint"
-          variant="contained"
-          color="secondary"
-          onClick={onPrint}
-          endIcon={<LocalPrintshopOutlinedIcon />}
-        >
-          {status === 0 && "พิมพ์เอกสาร"}
-          {status === 1 && "พิมพ์ใบผลต่าง"}
-        </Button>
+        <div>
+          {status === 1 && (
+            <Button
+              id="btnPrint"
+              variant="contained"
+              color="secondary"
+              onClick={onPrint}
+              endIcon={<LocalPrintshopOutlinedIcon />}
+            >
+              {/* {status === 0 && "พิมพ์เอกสาร"} */}
+              {/* {status === 1 && "พิมพ์ใบผลต่าง"} */}
+              พิมพ์ใบผลต่าง
+            </Button>
+          )}
+        </div>
       ) : null}
     </DialogTitle>
   );
@@ -117,6 +122,9 @@ export default function ModalShowPDF({
     onAfterPrint: () => handleClose(),
   });
 
+  const pdfFile = sdImageFile.substr(5, 15);
+  const imgFile = sdImageFile.substr(5, 5);
+
   return (
     <div>
       <Dialog open={open} maxWidth={false}>
@@ -126,7 +134,13 @@ export default function ModalShowPDF({
           onPrint={showPrint}
           status={statusFile}
         />
-        <DialogContent>
+        <DialogContent
+          sx={{
+            minWidth: 600,
+            minHeight: 600,
+            textAlign: "center",
+          }}
+        >
           {/* <div id="placeholderWrapper" style={{ height: "3000vh" }} /> */}
           {statusFile === 1 && (
             <div id="pdfWrapper" style={{ width: "50vw" }} ref={pdfWrapper}>
@@ -152,21 +166,29 @@ export default function ModalShowPDF({
             </div>
           )}
           {statusFile === 0 && (
-            <div id="pdfWrapper" style={{ width: "50vw" }} ref={pdfWrapper}>
-              <Document
-                file={sdImageFile}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadFail}
-              >
-                {Array.from(new Array(numPages), (el, index) => (
-                  <Page
-                    key={`page_${index + 1}`}
-                    pageNumber={index + 1}
-                    width={initialWidth}
-                    // height={1000}
-                  />
-                ))}
-              </Document>
+            <div>
+              {imgFile !== "image" && (
+                <div id="pdfWrapper" style={{ width: "50vw" }} ref={pdfWrapper}>
+                  <Document
+                    file={sdImageFile}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    onLoadError={onDocumentLoadFail}
+                  >
+                    {Array.from(new Array(numPages), (el, index) => (
+                      <Page
+                        key={`page_${index + 1}`}
+                        pageNumber={index + 1}
+                        width={initialWidth}
+                        // height={1000}
+                      />
+                    ))}
+                  </Document>
+                </div>
+              )}
+
+              {imgFile === "image" && (
+                <img src={sdImageFile} style={{ minWidth: "200px" }} />
+              )}
             </div>
           )}
         </DialogContent>
