@@ -23,6 +23,7 @@ import {
 import { useStyles } from "../../styles/makeTheme";
 import { featchOrderListAsync } from "../../store/slices/check-order-slice";
 import { saveSearchCriteria } from "../../store/slices/save-search-order";
+import { Typography } from "@mui/material";
 
 function OrderList() {
   const classes = useStyles();
@@ -65,7 +66,8 @@ function OrderList() {
       field: "sdNo",
       headerName: "เลขที่เอกสาร SD",
       // minWidth: 160,
-      flex: 1.3,
+      // flex: 1.3,
+      flex: 1,
       headerAlign: "center",
       sortable: false,
     },
