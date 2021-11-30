@@ -42,6 +42,8 @@ const useStyles = makeStyles({
     "& .MuiDataGrid-columnHeaderTitle": {
       color: "#36C690",
       fontWeight: "600 !important",
+      whiteSpace: "unset !important",
+      // overflow: "unset !important",
     },
     "& .MuiDataGrid-root": {
       fontFamily: "Kanit",
@@ -55,18 +57,31 @@ const useStyles = makeStyles({
     "& .MuiTablePagination-toolbar": {
       color: "#AEAEAE",
     },
+    // "& .MuiDataGrid-renderingZone": {
+    //   maxHeight: "none !important",
+    // },
+    // "& .MuiDataGrid-cell": {
+    //   lineHeight: "unset !important",
+    //   maxHeight: "none !important",
+    //   whiteSpace: "unset !important",
+    //   overflow: "unset !important",
+    // },
+    // "& .MuiDataGrid-row": {
+    //   maxHeight: "none !important",
+    // },
+    //column wrap text
+    // "& .MuiDataGrid-columnHeaderTitleContainer": {
+    //   lineHeight: "normal !important",
+    //   whiteSpace: "unset !important",
+    //   overflow: "unset !important",
+    // },
   },
   MdataGridNew: {
-    "& .MuiDataGrid-renderingZone": {
-      maxHeight: "none !important",
-    },
-    "& .MuiDataGrid-cell": {
-      lineHeight: "unset !important",
-      maxHeight: "none !important",
-      whiteSpace: "normal",
-    },
-    "& .MuiDataGrid-row": {
-      maxHeight: "none !important",
+    //column wrap text
+    "& .MuiDataGrid-columnHeaderTitleContainer": {
+      lineHeight: "normal !important",
+      whiteSpace: "unset !important",
+      overflow: "unset !important",
     },
   },
   Mautocomplete: {

@@ -230,6 +230,7 @@ function CheckOrderSearch() {
                 </MenuItem>
                 <MenuItem value={"0"}>{getShipmentTypeText(0)}</MenuItem>
                 <MenuItem value={"1"}>{getShipmentTypeText(1)}</MenuItem>
+                <MenuItem value={"2"}>{getShipmentTypeText(2)}</MenuItem>
               </Select>
             </FormControl>
           </Grid>

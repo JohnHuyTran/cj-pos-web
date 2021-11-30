@@ -279,15 +279,12 @@ export default function CheckOrderDetail({
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const [openModelPreviewDocument, setOpenModelPreviewDocument] =
     React.useState(false);
-  const [shipmentStatusText, setShipmentStatusText] = useState<
-    string | undefined
-  >("");
-  const [shipmentTypeText, setShipmentTypeText] = useState<string | undefined>(
-    ""
-  );
-  const [shipmentDateFormat, setShipmentDateFormat] = useState<
-    string | undefined
-  >("");
+  const [shipmentStatusText, setShipmentStatusText] =
+    useState<string | undefined>("");
+  const [shipmentTypeText, setShipmentTypeText] =
+    useState<string | undefined>("");
+  const [shipmentDateFormat, setShipmentDateFormat] =
+    useState<string | undefined>("");
   const [snackBarFailMsg, setSnackBarFailMsg] = React.useState("");
   const [openFailAlert, setOpenFailAlert] = React.useState(false);
   const [textFail, setTextFail] = React.useState("");
@@ -895,7 +892,7 @@ export default function CheckOrderDetail({
                     onClick={handleApproveBtn}
                     startIcon={<CheckCircleOutline />}
                   >
-                    อนุมัติ
+                    ยืนยัน
                   </Button>
                 )}
 
