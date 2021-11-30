@@ -41,7 +41,7 @@ export const featchOrderListAsync = createAsyncThunk(
       ) {
         path = path + `&sdStatus=${payload.sdStatus}`;
       }
-      if (payload.sdType == 0 || payload.sdType == 1) {
+      if (payload.sdType == 0 || payload.sdType == 1 || payload.sdType == 2) {
         path = path + `&sdType=${payload.sdType}`;
       }
       if (payload.dateFrom) {

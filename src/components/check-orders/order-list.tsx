@@ -28,6 +28,7 @@ import checkOrderDetailSlice, {
 } from "../../store/slices/check-order-detail-slice";
 import LoadingModal from "../commons/ui/loading-modal";
 import { ApiError } from "../../models/api-error-model";
+import { Typography } from "@mui/material";
 
 function OrderList() {
   const classes = useStyles();
@@ -72,7 +73,8 @@ function OrderList() {
       field: "sdNo",
       headerName: "เลขที่เอกสาร SD",
       // minWidth: 160,
-      flex: 1.3,
+      // flex: 1.3,
+      flex: 1,
       headerAlign: "center",
       sortable: false,
     },
