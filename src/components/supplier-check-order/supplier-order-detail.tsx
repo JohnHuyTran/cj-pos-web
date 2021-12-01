@@ -326,7 +326,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handlConfirmButton = () => {
-    setOpenModelConfirm(true);
+    if (!billNo) {
+      setErrorBillNo(true);
+    } else {
+      setErrorBillNo(false);
+      setOpenModelConfirm(true);
+    }
   };
 
   const handleConfirmStatus = async (issuccess: boolean, errorMsg: string) => {
@@ -349,7 +354,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleSaveButton = async () => {
-    if (billNo === '') {
+    if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);

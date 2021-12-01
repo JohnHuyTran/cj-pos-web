@@ -796,7 +796,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     onClick={handleApproveBtn}
                     startIcon={<CheckCircleOutline />}
                   >
-                    อนุมัติ
+                    ยืนยัน
                   </Button>
                 )}
 
