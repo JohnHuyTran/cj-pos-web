@@ -22,6 +22,9 @@ import LoadingModal from "../commons/ui/loading-modal";
 import { SearchOff } from "@mui/icons-material";
 import { saveSearchCriteriaSup } from "../../store/slices/save-search-order-supplier-slice";
 
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import ModalSupplierSelection from "./modal-supplier-selection";
+
 interface State {
   paramQuery: string;
   piStatus: string;
@@ -39,6 +42,10 @@ export default function SupplierCheckOrderSearch() {
   const page = "1";
   const classes = useStyles();
   const dispatch = useAppDispatch();
+
+  const [openModal, setOpenModal] = React.useState(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   const items = useAppSelector((state) => state.supplierCheckOrderSlice);
   const limit = useAppSelector(
@@ -280,10 +287,21 @@ export default function SupplierCheckOrderSearch() {
             alignItems="flex-end"
           >
             <Button
+              id="btnSupplierSelection"
+              variant="contained"
+              onClick={handleOpenModal}
+              sx={{ width: "15%" }}
+              className={classes.MbtnClear}
+              startIcon={<AddCircleOutlineOutlinedIcon />}
+              color="secondary"
+            >
+              สร้างใบรับสินค้า
+            </Button>
+            <Button
               id="btnClear"
               variant="contained"
               onClick={onClickClearBtn}
-              sx={{ width: "13%" }}
+              sx={{ width: "13%", ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
             >
@@ -312,6 +330,11 @@ export default function SupplierCheckOrderSearch() {
         open={openAlert}
         onClose={handleCloseAlert}
         textError={textError}
+      />
+
+      <ModalSupplierSelection
+        openModal={openModal}
+        handleCloseModal={handleCloseModal}
       />
     </>
   );
