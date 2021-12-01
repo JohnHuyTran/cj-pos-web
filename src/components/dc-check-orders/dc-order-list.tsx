@@ -7,7 +7,8 @@ import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice'
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { getSdType, getDCStatus } from '../../utils/utils';
 import DCOrderDetail from './dc-ckeck-order-detail';
-import { useStyles } from '../../styles/makeTheme';
+import { makeStyles } from '@mui/styles';
+// import { useStyles } from '../../styles/makeTheme';
 import Done from '@mui/icons-material/Done';
 import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
@@ -21,8 +22,36 @@ interface loadingModalState {
   open: boolean;
 }
 
+const useStyles2 = makeStyles({
+  MdataGridPaginationTop: {
+    '& .MuiDataGrid-root': {
+      fontFamily: 'Kanit',
+      borderRadius: '10px !important',
+      display: 'flex !important',
+      flexDirection: 'column-reverse',
+      '& .MuiDataGrid-row': {
+        maxHeight: 'none !important',
+        '& .MuiDataGrid-cell': {
+          cursor: 'pointer',
+          maxHeight: 'none !important',
+          display: 'flex',
+          alignItems: 'center',
+        },
+      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus': {
+        outline: 'none',
+      },
+
+      // '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus': {
+      //   outline: 'none',
+      // },
+    },
+  },
+});
+
 function DCOrderList() {
-  const classes = useStyles();
+  // const classes = useStyles();
+  const classes = useStyles2();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.dcCheckOrderList);
   const cuurentPage = useAppSelector((state) => state.dcCheckOrderList.orderList.page);
@@ -95,7 +124,17 @@ function DCOrderList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Typography sx={{ whiteSpace: 'normal', fontSize: '0.875rem', display: 'flex', alignItems: 'center' }}>
+        <Typography
+          sx={{
+            whiteSpace: 'normal',
+            lineHeight: '100%',
+            fontSize: '0.875rem',
+            display: 'flex',
+            alignItems: 'center',
+            pt: '5px',
+            pb: '5px',
+          }}
+        >
           {params.value}
         </Typography>
       ),
