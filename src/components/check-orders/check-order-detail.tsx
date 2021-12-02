@@ -782,6 +782,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     className={classes.MbtnSave}
                     onClick={handleSaveButton}
                     startIcon={<SaveIcon />}
+                    style={{ width: 200 }}
                   >
                     บันทึก
                   </Button>
@@ -795,6 +796,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     className={classes.MbtnApprove}
                     onClick={handleApproveBtn}
                     startIcon={<CheckCircleOutline />}
+                    style={{ width: 200 }}
                   >
                     ยืนยัน
                   </Button>
@@ -817,7 +819,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           </Box>
 
           <Box mt={2} bgcolor="background.paper">
-            <div style={{ height: 400, width: '100%' }} className={classes.MdataGrid}>
+            <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rowsEntries}
                 columns={columns}
@@ -826,6 +828,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
                 autoHeight
+                disableColumnMenu
               />
             </div>
           </Box>

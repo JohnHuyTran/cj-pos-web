@@ -151,7 +151,7 @@ function DCOrderList() {
     {
       field: 'sdType',
       headerName: 'ประเภท',
-      // minWidth: 100,
+      minWidth: 80,
       flex: 0.8,
       headerAlign: 'center',
       align: 'left',
@@ -175,7 +175,7 @@ function DCOrderList() {
     {
       field: 'verifyDCStatus',
       headerName: 'สถานะ',
-      // minWidth: 100,
+      minWidth: 80,
       flex: 0.8,
       headerAlign: 'center',
       align: 'center',
@@ -339,13 +339,13 @@ function DCOrderList() {
   return (
     <div>
       <Box mt={2} bgcolor='background.paper'>
-        <div className={classes.MdataGridPaginationTop}>
+        <div className={classes.MdataGridPaginationTop} style={{ height: '80vh' }}>
           <DataGrid
             rows={rows}
             columns={columns}
             disableColumnMenu
             onCellClick={currentlySelected}
-            autoHeight
+            // autoHeight
             pagination
             page={cuurentPage - 1}
             pageSize={parseInt(pageSize)}

@@ -1,26 +1,26 @@
-import moment from "moment";
-import { Grid } from "@mui/material";
-import { TextField } from "@mui/material";
-import { FormControl } from "@mui/material";
-import { MenuItem } from "@mui/material";
-import { Select } from "@mui/material";
-import { Typography } from "@mui/material";
-import { Box } from "@mui/material";
-import React from "react";
+import moment from 'moment';
+import { Grid } from '@mui/material';
+import { TextField } from '@mui/material';
+import { FormControl } from '@mui/material';
+import { MenuItem } from '@mui/material';
+import { Select } from '@mui/material';
+import { Typography } from '@mui/material';
+import { Box } from '@mui/material';
+import React from 'react';
 
-import { PurchaseInvoiceSearchCriteriaRequest } from "../../models/supplier-check-order-model";
+import { PurchaseInvoiceSearchCriteriaRequest } from '../../models/supplier-check-order-model';
 
-import DatePickerComponent from "../commons/ui/date-picker";
-import { useStyles } from "../../styles/makeTheme";
-import { Button } from "@mui/material";
-import AlertError from "../commons/ui/alert-error";
-import { featchOrderListSupAsync } from "../../store/slices/supplier-check-order-slice";
-import { useAppDispatch, useAppSelector } from "../../store/store";
+import DatePickerComponent from '../commons/ui/date-picker';
+import { useStyles } from '../../styles/makeTheme';
+import { Button } from '@mui/material';
+import AlertError from '../commons/ui/alert-error';
+import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 
-import SupplierOrderList from "./supplier-order-list";
-import LoadingModal from "../commons/ui/loading-modal";
-import { SearchOff } from "@mui/icons-material";
-import { saveSearchCriteriaSup } from "../../store/slices/save-search-order-supplier-slice";
+import SupplierOrderList from './supplier-order-list';
+import LoadingModal from '../commons/ui/loading-modal';
+import { SearchOff } from '@mui/icons-material';
+import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
 
 interface State {
   paramQuery: string;
@@ -36,26 +36,24 @@ interface loadingModalState {
 
 export default function SupplierCheckOrderSearch() {
   // const limit = "10";
-  const page = "1";
+  const page = '1';
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
   const items = useAppSelector((state) => state.supplierCheckOrderSlice);
-  const limit = useAppSelector(
-    (state) => state.supplierCheckOrderSlice.orderList.perPage
-  );
+  const limit = useAppSelector((state) => state.supplierCheckOrderSlice.orderList.perPage);
 
   const [values, setValues] = React.useState<State>({
-    paramQuery: "",
-    piStatus: "0",
-    piType: "ALL",
-    dateFrom: "",
-    dateTo: "",
+    paramQuery: '',
+    piStatus: '0',
+    piType: 'ALL',
+    dateFrom: '',
+    dateTo: '',
   });
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState("");
+  const [textError, setTextError] = React.useState('');
 
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -63,10 +61,9 @@ export default function SupplierCheckOrderSearch() {
     // console.log(values);
   };
 
-  const [openLoadingModal, setOpenLoadingModal] =
-    React.useState<loadingModalState>({
-      open: false,
-    });
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
+  });
 
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
@@ -94,34 +91,35 @@ export default function SupplierCheckOrderSearch() {
 
   const onClickValidateForm = () => {
     if (
-      values.paramQuery === "" &&
-      values.piStatus === "ALL" &&
-      values.piType === "ALL" &&
+      values.paramQuery === '' &&
+      values.piStatus === 'ALL' &&
+      values.piType === 'ALL' &&
       startDate === null &&
       endDate === null
     ) {
       setOpenAlert(true);
-      setTextError("กรุณากรอกวันที่รับสินค้า");
-    } else if (
-      values.paramQuery === "" &&
-      values.piStatus === "ALL" &&
-      values.piType === "ALL"
-    ) {
+      setTextError('กรุณากรอกวันที่รับสินค้า');
+    } else if (values.paramQuery === '' && values.piStatus === 'ALL' && values.piType === 'ALL') {
       if (startDate === null || endDate === null) {
         setOpenAlert(true);
-        setTextError("กรุณากรอกวันที่รับสินค้า");
+        setTextError('กรุณากรอกวันที่รับสินค้า');
       } else {
         onClickSearchBtn();
       }
     } else {
-      onClickSearchBtn();
+      if (startDate === null || endDate === null) {
+        setOpenAlert(true);
+        setTextError('กรุณากรอกวันที่รับสินค้า');
+      } else {
+        onClickSearchBtn();
+      }
     }
   };
 
   const onClickSearchBtn = async () => {
     let limits;
     if (limit === 0) {
-      limits = "10";
+      limits = '10';
     } else {
       limits = limit.toString();
     }
@@ -132,15 +130,15 @@ export default function SupplierCheckOrderSearch() {
       paramQuery: values.paramQuery,
       piStatus: values.piStatus,
       piType: values.piType,
-      dateFrom: moment(startDate).startOf("day").toISOString(),
-      dateTo: moment(endDate).endOf("day").toISOString(),
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
       clearSearch: false,
     };
 
-    handleOpenLoading("open", true);
+    handleOpenLoading('open', true);
     await dispatch(featchOrderListSupAsync(payload));
     await dispatch(saveSearchCriteriaSup(payload));
-    handleOpenLoading("open", false);
+    handleOpenLoading('open', false);
 
     // console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
@@ -149,11 +147,11 @@ export default function SupplierCheckOrderSearch() {
     setStartDate(null);
     setEndDate(null);
     setValues({
-      paramQuery: "",
-      piStatus: "ALL",
-      piType: "ALL",
-      dateFrom: "",
-      dateTo: "",
+      paramQuery: '',
+      piStatus: 'ALL',
+      piType: 'ALL',
+      dateFrom: '',
+      dateTo: '',
     });
 
     const payload: PurchaseInvoiceSearchCriteriaRequest = {
@@ -162,8 +160,8 @@ export default function SupplierCheckOrderSearch() {
       paramQuery: values.paramQuery,
       piStatus: values.piStatus,
       piType: values.piType,
-      dateFrom: moment(startDate).startOf("day").toISOString(),
-      dateTo: moment(endDate).endOf("day").toISOString(),
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
 
       clearSearch: true,
     };
@@ -217,11 +215,11 @@ export default function SupplierCheckOrderSearch() {
                 name="piStatus"
                 value={values.piStatus}
                 onChange={handleChange}
-                inputProps={{ "aria-label": "Without label" }}
+                inputProps={{ 'aria-label': 'Without label' }}
               >
-                <MenuItem value={"ALL"}>ทั้งหมด</MenuItem>
-                <MenuItem value={"0"}>บันทึก</MenuItem>
-                <MenuItem value={"1"}>อนุมัติ</MenuItem>
+                <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
+                <MenuItem value={'0'}>บันทึก</MenuItem>
+                <MenuItem value={'1'}>อนุมัติ</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -235,11 +233,11 @@ export default function SupplierCheckOrderSearch() {
                 name="piType"
                 value={values.piType}
                 onChange={handleChange}
-                inputProps={{ "aria-label": "Without label" }}
+                inputProps={{ 'aria-label': 'Without label' }}
               >
-                <MenuItem value={"ALL"}>ทั้งหมด</MenuItem>
-                <MenuItem value={"0"}>มี PO</MenuItem>
-                <MenuItem value={"1"}>ไม่มี PO</MenuItem>
+                <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
+                <MenuItem value={'0'}>มี PO</MenuItem>
+                <MenuItem value={'1'}>ไม่มี PO</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -251,39 +249,28 @@ export default function SupplierCheckOrderSearch() {
             <Typography gutterBottom variant="subtitle1" component="div">
               ตั้งแต่
             </Typography>
-            <DatePickerComponent
-              onClickDate={handleStartDatePicker}
-              value={startDate}
-            />
+            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4} container alignItems="flex-end">
-            <Box sx={{ width: "100%" }}>
+            <Box sx={{ width: '100%' }}>
               <Typography gutterBottom variant="subtitle1" component="div">
                 ถึง
               </Typography>
               <DatePickerComponent
                 onClickDate={handleEndDatePicker}
                 value={endDate}
-                type={"TO"}
+                type={'TO'}
                 minDateTo={startDate}
               />
             </Box>
           </Grid>
 
-          <Grid
-            item
-            container
-            xs={12}
-            sx={{ mt: 3 }}
-            justifyContent="flex-end"
-            direction="row"
-            alignItems="flex-end"
-          >
+          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
             <Button
               id="btnClear"
               variant="contained"
               onClick={onClickClearBtn}
-              sx={{ width: "13%" }}
+              sx={{ width: '13%' }}
               className={classes.MbtnClear}
               color="cancelColor"
             >
@@ -294,7 +281,7 @@ export default function SupplierCheckOrderSearch() {
               variant="contained"
               color="primary"
               onClick={onClickValidateForm}
-              sx={{ width: "13%", ml: 2 }}
+              sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}
             >
               ค้นหา
@@ -308,11 +295,7 @@ export default function SupplierCheckOrderSearch() {
       {orderListData}
       <LoadingModal open={openLoadingModal.open} />
 
-      <AlertError
-        open={openAlert}
-        onClose={handleCloseAlert}
-        textError={textError}
-      />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </>
   );
 }
