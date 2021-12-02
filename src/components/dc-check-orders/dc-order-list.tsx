@@ -7,8 +7,8 @@ import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice'
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { getSdType, getDCStatus } from '../../utils/utils';
 import DCOrderDetail from './dc-ckeck-order-detail';
-import { makeStyles } from '@mui/styles';
-// import { useStyles } from '../../styles/makeTheme';
+// import { makeStyles } from '@mui/styles';
+import { useStyles } from '../../styles/makeTheme';
 import Done from '@mui/icons-material/Done';
 import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
@@ -22,36 +22,46 @@ interface loadingModalState {
   open: boolean;
 }
 
-const useStyles2 = makeStyles({
-  MdataGridPaginationTop: {
-    '& .MuiDataGrid-root': {
-      fontFamily: 'Kanit',
-      borderRadius: '10px !important',
-      display: 'flex !important',
-      flexDirection: 'column-reverse',
-      '& .MuiDataGrid-row': {
-        maxHeight: 'none !important',
-        '& .MuiDataGrid-cell': {
-          cursor: 'pointer',
-          maxHeight: 'none !important',
-          display: 'flex',
-          alignItems: 'center',
-        },
-      },
-      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus': {
-        outline: 'none',
-      },
-
-      // '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus': {
-      //   outline: 'none',
-      // },
-    },
-  },
-});
+// const useStyles2 = makeStyles({
+//   MdataGridPaginationTop: {
+//     '& .MuiDataGrid-columnHeaderTitle': {
+//       color: '#36C690',
+//       fontWeight: '600 !important',
+//       whiteSpace: 'unset !important',
+//       '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus': {
+//         outline: 'none',
+//       },
+//     },
+//     '& .MuiDataGrid-root': {
+//       fontFamily: 'Kanit',
+//       borderRadius: '10px !important',
+//       display: 'flex !important',
+//       flexDirection: 'column-reverse',
+//       '& .MuiDataGrid-row': {
+//         maxHeight: 'none !important',
+//         '& .MuiDataGrid-cell': {
+//           cursor: 'pointer',
+//           maxHeight: 'none !important',
+//           display: 'flex',
+//           alignItems: 'center',
+//         },
+//       },
+//       '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus': {
+//         outline: 'none',
+//       },
+//     },
+//     '& .MuiDataGrid-footerContainer': {
+//       borderBottom: '1px solid #cbd4db !important',
+//     },
+//     '& .MuiTablePagination-toolbar': {
+//       color: '#AEAEAE',
+//     },
+//   },
+// });
 
 function DCOrderList() {
-  // const classes = useStyles();
-  const classes = useStyles2();
+  const classes = useStyles();
+  // const classes = useStyles2();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.dcCheckOrderList);
   const cuurentPage = useAppSelector((state) => state.dcCheckOrderList.orderList.page);
@@ -74,14 +84,13 @@ function DCOrderList() {
   const columns: GridColDef[] = [
     {
       field: 'index',
-      headerName: 'ลำดับที่',
-      // minWidth: 50,
-      width: 80,
+      headerName: 'ลำดับ',
+      width: 70,
       // flex: 0.7,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '25px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -119,7 +128,7 @@ function DCOrderList() {
     {
       field: 'branchDesc',
       headerName: 'สาขาปลายทาง',
-      // minWidth: 190,
+      minWidth: 150,
       flex: 1,
       headerAlign: 'center',
       sortable: false,
@@ -142,25 +151,55 @@ function DCOrderList() {
     {
       field: 'sdType',
       headerName: 'ประเภท',
-      minWidth: 125,
-      // flex: 1,
+      // minWidth: 100,
+      flex: 0.8,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
+      renderCell: (params) => (
+        <Typography
+          sx={{
+            whiteSpace: 'normal',
+            lineHeight: '100%',
+            fontSize: '0.875rem',
+            display: 'flex',
+            alignItems: 'center',
+            pt: '5px',
+            pb: '5px',
+          }}
+        >
+          {params.value}
+        </Typography>
+      ),
     },
     {
       field: 'verifyDCStatus',
       headerName: 'สถานะ',
-      minWidth: 120,
-      // flex: 1,
+      // minWidth: 100,
+      flex: 0.8,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <Typography
+          sx={{
+            whiteSpace: 'normal',
+            lineHeight: '100%',
+            fontSize: '0.875rem',
+            display: 'flex',
+            alignItems: 'center',
+            pt: '5px',
+            pb: '5px',
+          }}
+        >
+          {params.value}
+        </Typography>
+      ),
     },
     {
       field: 'hasBelow',
       headerName: 'ขาด',
-      width: 70,
+      width: 65,
       // minWidth: 120,
       // flex: 0.8,
       headerAlign: 'center',
@@ -177,7 +216,7 @@ function DCOrderList() {
     {
       field: 'hasOver',
       headerName: 'เกิน',
-      width: 70,
+      width: 65,
       // minWidth: 120,
       // flex: 0.7,
       sortable: false,
@@ -194,8 +233,7 @@ function DCOrderList() {
     {
       field: 'receivedDate',
       headerName: 'วันที่รับสินค้า',
-      width: 120,
-      // minWidth: 180,
+      minWidth: 110,
       // flex: 1,
       headerAlign: 'center',
       align: 'center',
@@ -317,7 +355,7 @@ function DCOrderList() {
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
-            // rowHeight={80}
+            rowHeight={65}
           />
         </div>
       </Box>

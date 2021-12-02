@@ -56,12 +56,19 @@ const useStyles = makeStyles({
       borderRadius: '10px !important',
       display: 'flex !important',
       flexDirection: 'column-reverse',
-      '& .MuiDataGrid-cell': {
-        cursor: 'pointer',
+      '& .MuiDataGrid-row': {
+        maxHeight: 'none !important',
+        '& .MuiDataGrid-cell': {
+          cursor: 'pointer',
+          maxHeight: 'none !important',
+          display: 'flex',
+          alignItems: 'center',
+        },
       },
-      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus': {
-        outline: 'none',
-      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
+        {
+          outline: 'none',
+        },
     },
     '& .MuiDataGrid-footerContainer': {
       borderBottom: '1px solid #cbd4db !important',
@@ -69,9 +76,9 @@ const useStyles = makeStyles({
     '& .MuiTablePagination-toolbar': {
       color: '#AEAEAE',
     },
-    // "& .MuiDataGrid-renderingZone": {
-    //   maxHeight: "none !important",
-    // },
+    '& .MuiDataGrid-renderingZone': {
+      maxHeight: 'none !important',
+    },
     // "& .MuiDataGrid-cell": {
     //   lineHeight: "unset !important",
     //   maxHeight: "none !important",
