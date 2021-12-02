@@ -5,19 +5,17 @@ export enum ShipmentDeliveryStatusCodeEnum {
 }
 
 const shipmentStatus = [
-  { key: 0, text: "บันทึก" },
-  { key: 1, text: "อนุมัติ" },
-  { key: 2, text: "ปิดงาน" },
+  { key: 0, text: 'บันทึก' },
+  { key: 1, text: 'อนุมัติ' },
+  { key: 2, text: 'ปิดงาน' },
 ];
 
 const shipmentType = [
-  { key: 0, text: "ลังกระดาษ/ลังพลาสติก" },
-  { key: 1, text: "สินค้าภายในTote" },
-  { key: 2, text: "โอนลอย" },
+  { key: 0, text: 'ลังกระดาษ/Tote' }, // ลังกระดาษ/ลังพลาสติก
+  { key: 1, text: 'สินค้าภายในTote' },
+  { key: 2, text: 'โอนลอย' },
 ];
 
-export const getShipmentStatusText = (key: number) =>
-  shipmentStatus.find((item) => item.key === key)?.text;
+export const getShipmentStatusText = (key: number) => shipmentStatus.find((item) => item.key === key)?.text;
 
-export const getShipmentTypeText = (key: number) =>
-  shipmentType.find((item) => item.key === key)?.text;
+export const getShipmentTypeText = (key: number) => shipmentType.find((item) => item.key === key)?.text;
