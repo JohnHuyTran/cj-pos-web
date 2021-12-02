@@ -25,6 +25,7 @@ import {
   ShipmentDeliveryStatusCodeEnum,
   getShipmentTypeText,
   getShipmentStatusText,
+  formatFileNam,
 } from '../../utils/enum/check-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { SaveDraftSDRequest, CheckOrderDetailProps, Entry, itemsDetail } from '../../models/order-model';
@@ -489,7 +490,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     checkSizeFile(e);
 
     let file: File = e.target.files[0];
-    const fileName = e.target.files[0].name;
+    let fileType = file.type.split('/');
+    const fileName = `${sdNo}.${fileType[1]}`;
 
     getBase64(file)
       .then((result: any) => {
@@ -871,6 +873,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         url={getPathReportSD(sdNo)}
         statusFile={statusFile}
         sdImageFile={orderDetail.sdImageFile}
+        fileName={orderDetail.sdImageFilename ? orderDetail.sdImageFilename : formatFileNam(sdNo, orderDetail.sdStatus)}
       />
 
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
