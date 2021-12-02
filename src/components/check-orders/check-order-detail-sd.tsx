@@ -230,8 +230,8 @@ export default function CheckOrderDetail({
             </Grid>
           </Box>
 
-          <Box mt={6} mb={6} bgcolor="background.paper">
-            <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
+          <Box mt={6} bgcolor="background.paper">
+            <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rowsEntries}
                 columns={columns}
@@ -240,6 +240,7 @@ export default function CheckOrderDetail({
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
                 autoHeight
+                disableColumnMenu
               />
             </div>
           </Box>

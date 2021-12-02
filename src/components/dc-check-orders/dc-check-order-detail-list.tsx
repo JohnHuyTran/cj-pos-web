@@ -112,7 +112,7 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
 
   return (
     <Box mt={2} bgcolor="background.paper">
-      <div className={classes.MdataGridPaginationTop} style={{ width: '100%', marginBottom: '1em' }}>
+      <div className={classes.MdataGridDetail} style={{ width: '100%', marginBottom: '1em' }}>
         <DataGrid
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
@@ -121,6 +121,7 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
           rows={rows}
           columns={columns}
           autoHeight
+          disableColumnMenu
         />
       </div>
     </Box>

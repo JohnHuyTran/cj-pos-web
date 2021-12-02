@@ -25,6 +25,7 @@ import {
   ShipmentDeliveryStatusCodeEnum,
   getShipmentTypeText,
   getShipmentStatusText,
+  formatFileNam,
 } from '../../utils/enum/check-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { SaveDraftSDRequest, CheckOrderDetailProps, Entry, itemsDetail } from '../../models/order-model';
@@ -489,7 +490,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     checkSizeFile(e);
 
     let file: File = e.target.files[0];
-    const fileName = e.target.files[0].name;
+    let fileType = file.type.split('/');
+    const fileName = `${sdNo}.${fileType[1]}`;
 
     getBase64(file)
       .then((result: any) => {
@@ -782,6 +784,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     className={classes.MbtnSave}
                     onClick={handleSaveButton}
                     startIcon={<SaveIcon />}
+                    style={{ width: 200 }}
                   >
                     บันทึก
                   </Button>
@@ -795,6 +798,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     className={classes.MbtnApprove}
                     onClick={handleApproveBtn}
                     startIcon={<CheckCircleOutline />}
+                    style={{ width: 200 }}
                   >
                     ยืนยัน
                   </Button>
@@ -817,7 +821,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           </Box>
 
           <Box mt={2} bgcolor="background.paper">
-            <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
+            <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rowsEntries}
                 columns={columns}
@@ -826,6 +830,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
                 autoHeight
+                disableColumnMenu
               />
             </div>
           </Box>
@@ -868,6 +873,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         url={getPathReportSD(sdNo)}
         statusFile={statusFile}
         sdImageFile={orderDetail.sdImageFile}
+        fileName={orderDetail.sdImageFilename ? orderDetail.sdImageFilename : formatFileNam(sdNo, orderDetail.sdStatus)}
       />
 
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
