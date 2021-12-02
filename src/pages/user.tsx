@@ -1,13 +1,6 @@
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import {
-  FormControl,
-  Input,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from '@mui/material';
+import { FormControl, Input, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 
 export default function User() {
@@ -41,7 +34,7 @@ export default function User() {
         <Box>
           <InputLabel htmlFor='sdType'>ประเภท</InputLabel>
           <Select id='sdType'>
-            <MenuItem value={0}>ลังกระดาษ/ลังพลาสติก</MenuItem>
+            <MenuItem value={0}>ลังกระดาษ/Tote</MenuItem>
             <MenuItem value={1}>สินค้าภายในTote</MenuItem>
           </Select>
         </Box>

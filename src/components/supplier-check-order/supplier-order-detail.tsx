@@ -508,7 +508,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             )}
           </Grid>
           <Box mt={2} bgcolor="background.paper">
-            <div style={{ width: '100%' }} className={classes.MdataGrid}>
+            <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
               <DataGrid
                 rows={rows}
                 columns={columns}

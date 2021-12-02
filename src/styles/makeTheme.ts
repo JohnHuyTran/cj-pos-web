@@ -35,6 +35,12 @@ const useStyles = makeStyles({
     '& .MuiDataGrid-root': {
       fontFamily: 'Kanit',
       borderRadius: '10px !important',
+      '& .MuiDataGrid-cell': {
+        cursor: 'pointer',
+      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus': {
+        outline: 'none',
+      },
     },
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px',
@@ -54,15 +60,29 @@ const useStyles = makeStyles({
       borderRadius: '10px !important',
       display: 'flex !important',
       flexDirection: 'column-reverse',
+      '& .MuiDataGrid-row': {
+        maxHeight: 'none !important',
+        '& .MuiDataGrid-cell': {
+          cursor: 'pointer',
+          maxHeight: 'none !important',
+          display: 'flex',
+          alignItems: 'center',
+        },
+      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
+        {
+          outline: 'none',
+        },
     },
     '& .MuiDataGrid-footerContainer': {
       borderBottom: '1px solid #E5E5E5 !important',
+      // height: '50px',
     },
     '& .MuiTablePagination-toolbar': {
       color: '#AEAEAE',
     },
-    // "& .MuiDataGrid-renderingZone": {
-    //   maxHeight: "none !important",
+    // '& .MuiDataGrid-renderingZone': {
+    //   maxHeight: 'none !important',
     // },
     // "& .MuiDataGrid-cell": {
     //   lineHeight: "unset !important",

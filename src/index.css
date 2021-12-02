@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
-
+:root {
+  --primary: #36c690;
+}
 body {
   margin: 0;
 
@@ -12,4 +14,18 @@ body {
 
 code {
   font-family: 'Kanit', sans-serif;
+}
+.MuiDrawer-docked .MuiList-root .MuiList-root .MuiTypography-body1 {
+  font-size: 14px;
+}
+.MuiDrawer-docked .MuiList-root .Mui-selected:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 5px;
+  right: 0;
+  bottom: 5px;
+  width: 4px;
+  background: var(--primary);
+  border-radius: 2px;
 }
