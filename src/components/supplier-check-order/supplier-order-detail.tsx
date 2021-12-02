@@ -508,16 +508,16 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             )}
           </Grid>
           <Box mt={2} bgcolor="background.paper">
-            <div style={{ width: '100%' }} className={classes.MdataGrid}>
+            <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rows}
                 columns={columns}
-                disableColumnMenu
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
                 autoHeight
+                disableColumnMenu
               />
             </div>
           </Box>
