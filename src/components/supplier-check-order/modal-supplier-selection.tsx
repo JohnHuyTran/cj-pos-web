@@ -1,3 +1,4 @@
+import React from "react";
 import { styled } from "@mui/material/styles";
 import { makeStyles } from "@material-ui/core";
 import Dialog from "@mui/material/Dialog";
@@ -13,6 +14,21 @@ import FormControlLabel, {
   FormControlLabelProps,
 } from "@mui/material/FormControlLabel";
 import Button from "@mui/material/Button";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { changeState } from "../../store/slices/supplier-selection-slice";
+
+const mockDataset = [
+  {
+    company: "บริษัท เบทาโกรการเกษตรอุตสาหกรรม จำกัด",
+    code: "401212254",
+    po: ["401212254", "401224456", "P121100101-000163"],
+  },
+  {
+    company: "บริษัท เบทาไมค์อิเล็กทริคจำกัด",
+    code: "401212254",
+    po: ["401212254", "401224456", "P121100101-000163"],
+  },
+];
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -106,6 +122,12 @@ export default function ModalSupplierSelection({
   handleCloseModal,
 }: Props) {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
+
+  function onSelectionData() {
+    handleCloseModal();
+    dispatch(changeState(mockDataset[0]));
+  }
 
   return (
     <div>
@@ -174,9 +196,9 @@ export default function ModalSupplierSelection({
               id="btnAddSupplier"
               variant="contained"
               color="secondary"
-              onClick={handleCloseModal}
+              onClick={onSelectionData}
               className={classes.MBtnAddSupplier}
-              disabled
+              disabled={false}
             >
               เพิ่มผู้จำหน่าย
             </Button>
