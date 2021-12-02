@@ -290,7 +290,7 @@ export default function SupplierCheckOrderSearch() {
               id="btnSupplierSelection"
               variant="contained"
               onClick={handleOpenModal}
-              sx={{ width: "15%" }}
+              sx={{ minWidth: "15%" }}
               className={classes.MbtnClear}
               startIcon={<AddCircleOutlineOutlinedIcon />}
               color="secondary"

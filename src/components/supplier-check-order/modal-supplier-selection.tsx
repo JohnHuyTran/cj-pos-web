@@ -14,19 +14,26 @@ import FormControlLabel, {
   FormControlLabelProps,
 } from "@mui/material/FormControlLabel";
 import Button from "@mui/material/Button";
-import { useAppDispatch, useAppSelector } from "../../store/store";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import Divider from "@mui/material/Divider";
+import ListItemText from "@mui/material/ListItemText";
+import Typography from "@mui/material/Typography";
+
+import { useAppDispatch } from "../../store/store";
 import { changeState } from "../../store/slices/supplier-selection-slice";
+import { typography } from "@mui/system";
 
 const mockDataset = [
   {
-    company: "บริษัท เบทาโกรการเกษตรอุตสาหกรรม จำกัด",
+    label: "บริษัท เบทาโกรการเกษตรอุตสาหกรรม จำกัด",
     code: "401212254",
     po: ["401212254", "401224456", "P121100101-000163"],
   },
   {
-    company: "บริษัท เบทาไมค์อิเล็กทริคจำกัด",
-    code: "401212254",
-    po: ["401212254", "401224456", "P121100101-000163"],
+    label: "บริษัท เบทาไมค์อิเล็กทริคจำกัด",
+    code: "401224456",
   },
 ];
 
@@ -40,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   MTextField: {
     "& .MuiOutlinedInput-root": {
       borderRadius: "5px !important",
-      padding: theme.spacing(1),
+      padding: theme.spacing(1.8),
     },
   },
   MBtnAddSupplier: {
@@ -124,10 +131,28 @@ export default function ModalSupplierSelection({
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
-  function onSelectionData() {
+  const autocompleteRenderListItem = (props: any, option: any) => {
+    return (
+      <List {...props} sx={{ width: "100%" }} key={option.code}>
+        <ListItem alignItems="flex-start" disablePadding>
+          <ListItemText primary={option.label} secondary={option.code} />
+        </ListItem>
+      </List>
+    );
+  };
+
+  const onChangeSelection = (_: any, value: any) => {
+    console.log(value);
+  };
+
+  const onSubmitData = () => {
     handleCloseModal();
     dispatch(changeState(mockDataset[0]));
-  }
+  };
+
+  const filterOptions = createFilterOptions({
+    stringify: (option: any) => option.label + option.code,
+  });
 
   return (
     <div>
@@ -136,6 +161,8 @@ export default function ModalSupplierSelection({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         open={openModal}
+        fullWidth
+        maxWidth="sm"
       >
         <BootstrapDialogTitle
           id="customized-dialog-title"
@@ -148,21 +175,30 @@ export default function ModalSupplierSelection({
           <Box sx={{ display: "flex" }}>
             <Box sx={{ flex: 3 }}>
               <label className={classes.textLabelInput}>ผู้จำหน่าย</label>
-              <TextField
-                id="outlined-basic"
-                variant="outlined"
-                className={classes.MTextField}
-                sx={{ width: "100%" }}
-                placeholder="รหัสผู้จำหน่าย/ชื่อผู้จำหน่าย"
+              <Autocomplete
+                id="selBranchNo"
+                fullWidth
+                freeSolo
+                sx={{ mt: 1 }}
+                options={mockDataset}
+                filterOptions={filterOptions}
+                renderOption={autocompleteRenderListItem}
+                onChange={onChangeSelection}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="รหัสผู้จำหน่าย/ชื่อผู้จำหน่าย"
+                    className={classes.MTextField}
+                    variant="outlined"
+                    fullWidth
+                  />
+                )}
               />
             </Box>
+
             <Box sx={{ flex: 2, ml: 2 }}>
               <label className={classes.textLabelInput}>ประเภทผู้จำหน่าย</label>
-              <TextField
-                id="outlined-basic"
-                variant="outlined"
-                className={classes.MTextField}
-              />
+              <TextField sx={{ mt: 1 }} className={classes.MTextField} />
             </Box>
           </Box>
 
@@ -196,7 +232,7 @@ export default function ModalSupplierSelection({
               id="btnAddSupplier"
               variant="contained"
               color="secondary"
-              onClick={onSelectionData}
+              onClick={onSubmitData}
               className={classes.MBtnAddSupplier}
               disabled={false}
             >
