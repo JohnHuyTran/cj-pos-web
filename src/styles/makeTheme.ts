@@ -56,7 +56,7 @@ const useStyles = makeStyles({
       flexDirection: 'column-reverse',
     },
     '& .MuiDataGrid-footerContainer': {
-      borderBottom: '1px solid #cbd4db !important',
+      borderBottom: '1px solid #E5E5E5 !important',
     },
     '& .MuiTablePagination-toolbar': {
       color: '#AEAEAE',

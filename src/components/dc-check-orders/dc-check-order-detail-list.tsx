@@ -1,19 +1,11 @@
-import React, { ReactElement } from "react";
-import Box from "@mui/material/Box";
-import {
-  DataGrid,
-  GridColDef,
-  GridRowData,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { Entry, ShipmentInfo } from "../../models/order-model";
-import { useAppSelector } from "../../store/store";
-import {
-  CheckOrderDetailInfo,
-  CheckOrderDetailItims,
-} from "../../models/dc-check-order-model";
+import React, { ReactElement } from 'react';
+import Box from '@mui/material/Box';
+import { DataGrid, GridColDef, GridRowData, GridValueGetterParams } from '@mui/x-data-grid';
+import { Entry, ShipmentInfo } from '../../models/order-model';
+import { useAppSelector } from '../../store/store';
+import { CheckOrderDetailInfo, CheckOrderDetailItims } from '../../models/dc-check-order-model';
 
-import { useStyles } from "../../styles/makeTheme";
+import { useStyles } from '../../styles/makeTheme';
 
 interface Props {
   //   sdNo: string;
@@ -22,86 +14,80 @@ interface Props {
 
 const columns: GridColDef[] = [
   {
-    field: "index",
-    headerName: "ลำดับ",
+    field: 'index',
+    headerName: 'ลำดับ',
     width: 90,
     sortable: false,
   },
   {
-    field: "productId",
-    headerName: "รหัสสินค้า",
+    field: 'productId',
+    headerName: 'รหัสสินค้า',
     flex: 0.5,
     sortable: false,
-    headerAlign: "center",
+    headerAlign: 'center',
   },
   {
-    field: "productBarCode",
-    headerName: "บาร์โค้ด",
+    field: 'productBarCode',
+    headerName: 'บาร์โค้ด',
     flex: 0.5,
     sortable: false,
-    headerAlign: "center",
+    headerAlign: 'center',
   },
   {
-    field: "productDescription",
-    headerName: "รายละเอียดสินค้า",
+    field: 'productDescription',
+    headerName: 'รายละเอียดสินค้า',
     minWidth: 260,
     sortable: false,
-    headerAlign: "center",
+    headerAlign: 'center',
   },
   {
-    field: "productUnit",
-    headerName: "หน่วย",
+    field: 'productUnit',
+    headerName: 'หน่วย',
     minWidth: 80,
     sortable: false,
-    headerAlign: "center",
+    headerAlign: 'center',
   },
   {
-    field: "productQuantityRef",
-    headerName: "จำนวนอ้างอิง",
+    field: 'productQuantityRef',
+    headerName: 'จำนวนอ้างอิง',
     width: 135,
     sortable: false,
-    align: "right",
-    headerAlign: "center",
+    align: 'right',
+    headerAlign: 'center',
   },
   {
-    field: "productQuantityActual",
-    headerName: "จำนวนรับจริง",
+    field: 'productQuantityActual',
+    headerName: 'จำนวนรับจริง',
     width: 135,
     sortable: false,
-    align: "right",
-    headerAlign: "center",
+    align: 'right',
+    headerAlign: 'center',
   },
   {
-    field: "productDifference",
-    headerName: "จำนวนส่วนต่าง",
+    field: 'productDifference',
+    headerName: 'จำนวนส่วนต่าง',
     width: 140,
     sortable: false,
-    align: "right",
-    headerAlign: "center",
+    align: 'right',
+    headerAlign: 'center',
     renderCell: (params) => calProductDiff(params),
   },
   {
-    field: "productComment",
-    headerName: "หมายเหตุ",
+    field: 'productComment',
+    headerName: 'หมายเหตุ',
     flex: 0.5,
     sortable: false,
-    headerAlign: "center",
+    headerAlign: 'center',
   },
 ];
 
 var calProductDiff = function (params: GridValueGetterParams) {
   let diff =
-    Number(params.getValue(params.id, "productQuantityActual")) -
-    Number(params.getValue(params.id, "productQuantityRef"));
+    Number(params.getValue(params.id, 'productQuantityActual')) -
+    Number(params.getValue(params.id, 'productQuantityRef'));
 
-  if (diff > 0)
-    return (
-      <label style={{ color: "#446EF2", fontWeight: 700 }}> +{diff} </label>
-    );
-  if (diff < 0)
-    return (
-      <label style={{ color: "#F54949", fontWeight: 700 }}> {diff} </label>
-    );
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
   return diff;
 };
 
@@ -126,10 +112,7 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
 
   return (
     <Box mt={2} bgcolor="background.paper">
-      <div
-        className={classes.MdataGrid}
-        style={{ width: "100%", marginBottom: "1em" }}
-      >
+      <div className={classes.MdataGridPaginationTop} style={{ width: '100%', marginBottom: '1em' }}>
         <DataGrid
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

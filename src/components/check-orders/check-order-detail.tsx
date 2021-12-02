@@ -817,7 +817,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           </Box>
 
           <Box mt={2} bgcolor="background.paper">
-            <div style={{ height: 400, width: '100%' }} className={classes.MdataGrid}>
+            <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
               <DataGrid
                 rows={rowsEntries}
                 columns={columns}
