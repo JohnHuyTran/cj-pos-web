@@ -863,7 +863,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         onClose={handleModelPreviewDocument}
         url={getPathReportSD(sdNo)}
         statusFile={statusFile}
-        sdImageFile={orderDetail.sdImageFile ? orderDetail.sdImageFile : formatFileNam(sdNo, orderDetail.sdStatus)}
+        sdImageFile={orderDetail.sdImageFile}
+        fileName={orderDetail.sdImageFilename ? orderDetail.sdImageFilename : formatFileNam(sdNo, orderDetail.sdStatus)}
       />
 
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />

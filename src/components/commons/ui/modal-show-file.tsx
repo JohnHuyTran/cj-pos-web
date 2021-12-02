@@ -16,6 +16,7 @@ interface ModalShowPDFProp {
   url: string;
   sdImageFile: string;
   statusFile: number;
+  fileName: string;
   onClose: () => void;
   onPrint?: () => void;
 }
@@ -65,7 +66,14 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-export default function ModalShowPDF({ open, url, sdImageFile, statusFile, onClose }: ModalShowPDFProp): ReactElement {
+export default function ModalShowPDF({
+  open,
+  url,
+  sdImageFile,
+  statusFile,
+  fileName,
+  onClose,
+}: ModalShowPDFProp): ReactElement {
   const [numPages, setNumPages] = useState(0);
   // const [pageNumber, setPageNumber] = useState(1);
   const [initialWidth, setInitialWidth] = useState(0);
@@ -110,7 +118,7 @@ export default function ModalShowPDF({ open, url, sdImageFile, statusFile, onClo
 
   // const componentRef = useRef();
   const showPrint = useReactToPrint({
-    documentTitle: sdImageFile,
+    documentTitle: fileName,
     content: () => pdfWrapper.current,
     onAfterPrint: () => handleClose(),
   });
