@@ -11,7 +11,7 @@ const shipmentStatus = [
 ];
 
 const shipmentType = [
-  { key: 0, text: 'ลังกระดาษ/Tote' },
+  { key: 0, text: 'ลังกระดาษ /Tote' },
   { key: 1, text: 'สินค้าภายในTote' },
   { key: 2, text: 'โอนลอย' },
 ];

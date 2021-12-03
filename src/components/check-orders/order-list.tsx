@@ -57,7 +57,7 @@ function OrderList() {
     {
       field: 'sdNo',
       headerName: 'เลขที่เอกสาร SD',
-      minWidth: 150,
+      minWidth: 160,
       // flex: 1.3,
       flex: 1.3,
       headerAlign: 'center',
@@ -71,21 +71,6 @@ function OrderList() {
       // flex: 1.4,
       headerAlign: 'center',
       sortable: false,
-      renderCell: (params) => (
-        <Typography
-          sx={{
-            whiteSpace: 'normal',
-            lineHeight: '100%',
-            fontSize: '0.875rem',
-            display: 'flex',
-            alignItems: 'center',
-            pt: '5px',
-            pb: '5px',
-          }}
-        >
-          {params.value}
-        </Typography>
-      ),
     },
     {
       field: 'sdStatus',
