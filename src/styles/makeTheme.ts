@@ -184,7 +184,7 @@ const useStyles = makeStyles({
       //input
       borderRadius: '5px !important',
       border: '1px dashed #36C690 !important',
-      padding: '4px !important',
+      padding: '0px 4px !important',
       minWidth: '235px',
     },
     '& .MuiOutlinedInput-root input::placeholder': {

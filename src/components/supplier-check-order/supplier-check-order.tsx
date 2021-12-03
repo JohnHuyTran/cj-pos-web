@@ -138,6 +138,7 @@ export default function SupplierCheckOrderSearch() {
   };
 
   const onClickClearBtn = async () => {
+    handleOpenLoading('open', true);
     setFlagSearch(false);
     setStartDate(null);
     setEndDate(null);
@@ -162,6 +163,9 @@ export default function SupplierCheckOrderSearch() {
     };
 
     dispatch(featchOrderListSupAsync(payload));
+    setTimeout(() => {
+      handleOpenLoading('open', false);
+    }, 300);
   };
 
   let orderListData;

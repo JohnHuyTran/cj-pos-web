@@ -139,6 +139,7 @@ function DCCheckOrderSearch() {
   };
 
   const onClickClearBtn = async () => {
+    handleOpenLoading('open', true);
     setFlagSearch(false);
     setStartDate(null);
     setEndDate(null);
@@ -152,8 +153,6 @@ function DCCheckOrderSearch() {
       sdType: 'ALL',
       sortBy: '',
     });
-
-    // items.orderList = '';
 
     const payload: CheckOrderRequest = {
       limit: limit.toString(),
@@ -169,6 +168,9 @@ function DCCheckOrderSearch() {
     };
 
     dispatch(featchOrderListDcAsync(payload));
+    setTimeout(() => {
+      handleOpenLoading('open', false);
+    }, 300);
   };
 
   // useEffect(() => {

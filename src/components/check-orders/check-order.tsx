@@ -148,7 +148,7 @@ function CheckOrderSearch() {
 
     setTimeout(() => {
       handleOpenLoading('open', false);
-    }, 500);
+    }, 300);
   };
 
   const handleStartDatePicker = (value: any) => {
