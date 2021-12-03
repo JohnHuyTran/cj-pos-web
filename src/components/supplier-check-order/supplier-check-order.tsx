@@ -7,16 +7,13 @@ import { Select } from '@mui/material';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/material';
 import React from 'react';
-
 import { PurchaseInvoiceSearchCriteriaRequest } from '../../models/supplier-check-order-model';
-
 import DatePickerComponent from '../commons/ui/date-picker';
 import { useStyles } from '../../styles/makeTheme';
 import { Button } from '@mui/material';
 import AlertError from '../commons/ui/alert-error';
 import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-
 import SupplierOrderList from './supplier-order-list';
 import LoadingModal from '../commons/ui/loading-modal';
 import { SearchOff } from '@mui/icons-material';
@@ -39,7 +36,6 @@ export default function SupplierCheckOrderSearch() {
   const page = '1';
   const classes = useStyles();
   const dispatch = useAppDispatch();
-
   const items = useAppSelector((state) => state.supplierCheckOrderSlice);
   const limit = useAppSelector((state) => state.supplierCheckOrderSlice.orderList.perPage);
 
@@ -58,7 +54,6 @@ export default function SupplierCheckOrderSearch() {
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
-    // console.log(values);
   };
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
@@ -138,12 +133,12 @@ export default function SupplierCheckOrderSearch() {
     handleOpenLoading('open', true);
     await dispatch(featchOrderListSupAsync(payload));
     await dispatch(saveSearchCriteriaSup(payload));
+    setFlagSearch(true);
     handleOpenLoading('open', false);
-
-    // console.log(`Search Criteria: ${JSON.stringify(payload)}`);
   };
 
   const onClickClearBtn = async () => {
+    setFlagSearch(false);
     setStartDate(null);
     setEndDate(null);
     setValues({
@@ -170,20 +165,22 @@ export default function SupplierCheckOrderSearch() {
   };
 
   let orderListData;
-  const orderListDatas = items.orderList.data;
-
-  if (orderListDatas.length === 0) {
-    orderListData = (
-      <Grid item container xs={12} justifyContent="center">
-        <Box color="#CBD4DB">
-          <h2>
-            ไม่มีข้อมูล <SearchOff fontSize="large" />
-          </h2>
-        </Box>
-      </Grid>
-    );
-  } else {
-    orderListData = <SupplierOrderList />;
+  const orderListDatas = items.orderList.data ? items.orderList.data : [];
+  const [flagSearch, setFlagSearch] = React.useState(false);
+  if (flagSearch) {
+    if (orderListDatas.length > 0) {
+      orderListData = <SupplierOrderList />;
+    } else {
+      orderListData = (
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
+            <h2>
+              ไม่มีข้อมูล <SearchOff fontSize="large" />
+            </h2>
+          </Box>
+        </Grid>
+      );
+    }
   }
 
   return (
