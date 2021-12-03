@@ -159,8 +159,16 @@ export default function ModalSupplierSelection({
   };
 
   const onSubmitData = () => {
+    setHasPO(false);
+    setHasPOValue("");
     handleCloseModal();
     dispatch(changeState(mockDataset[0]));
+  };
+
+  const onCloseModal = () => {
+    setHasPO(false);
+    setHasPOValue("");
+    handleCloseModal();
   };
 
   const filterOptions = createFilterOptions({
@@ -170,7 +178,7 @@ export default function ModalSupplierSelection({
   return (
     <div>
       <BootstrapDialog
-        // onClose={handleCloseModal}
+        // onClose={onCloseModal}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         open={openModal}
@@ -179,7 +187,7 @@ export default function ModalSupplierSelection({
       >
         <BootstrapDialogTitle
           id="customized-dialog-title"
-          onClose={handleCloseModal}
+          onClose={onCloseModal}
         >
           เพิ่มผู้จำหน่าย
         </BootstrapDialogTitle>
