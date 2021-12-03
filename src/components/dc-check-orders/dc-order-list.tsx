@@ -22,43 +22,6 @@ interface loadingModalState {
   open: boolean;
 }
 
-// const useStyles2 = makeStyles({
-//   MdataGridPaginationTop: {
-//     '& .MuiDataGrid-columnHeaderTitle': {
-//       color: '#36C690',
-//       fontWeight: '600 !important',
-//       whiteSpace: 'unset !important',
-//       '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus': {
-//         outline: 'none',
-//       },
-//     },
-//     '& .MuiDataGrid-root': {
-//       fontFamily: 'Kanit',
-//       borderRadius: '10px !important',
-//       display: 'flex !important',
-//       flexDirection: 'column-reverse',
-//       '& .MuiDataGrid-row': {
-//         maxHeight: 'none !important',
-//         '& .MuiDataGrid-cell': {
-//           cursor: 'pointer',
-//           maxHeight: 'none !important',
-//           display: 'flex',
-//           alignItems: 'center',
-//         },
-//       },
-//       '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus': {
-//         outline: 'none',
-//       },
-//     },
-//     '& .MuiDataGrid-footerContainer': {
-//       borderBottom: '1px solid #cbd4db !important',
-//     },
-//     '& .MuiTablePagination-toolbar': {
-//       color: '#AEAEAE',
-//     },
-//   },
-// });
-
 function DCOrderList() {
   const classes = useStyles();
   // const classes = useStyles2();
@@ -129,72 +92,27 @@ function DCOrderList() {
       field: 'branchDesc',
       headerName: 'สาขาปลายทาง',
       minWidth: 150,
-      flex: 1,
+      flex: 0.9,
       headerAlign: 'center',
       sortable: false,
-      renderCell: (params) => (
-        <Typography
-          sx={{
-            whiteSpace: 'normal',
-            lineHeight: '100%',
-            fontSize: '0.875rem',
-            display: 'flex',
-            alignItems: 'center',
-            pt: '5px',
-            pb: '5px',
-          }}
-        >
-          {params.value}
-        </Typography>
-      ),
     },
     {
       field: 'sdType',
       headerName: 'ประเภท',
       minWidth: 80,
-      flex: 0.8,
+      flex: 0.75,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
-      renderCell: (params) => (
-        <Typography
-          sx={{
-            whiteSpace: 'normal',
-            lineHeight: '100%',
-            fontSize: '0.875rem',
-            display: 'flex',
-            alignItems: 'center',
-            pt: '5px',
-            pb: '5px',
-          }}
-        >
-          {params.value}
-        </Typography>
-      ),
     },
     {
       field: 'verifyDCStatus',
       headerName: 'สถานะ',
       minWidth: 80,
-      flex: 0.8,
+      flex: 0.7,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
-      renderCell: (params) => (
-        <Typography
-          sx={{
-            whiteSpace: 'normal',
-            lineHeight: '100%',
-            fontSize: '0.875rem',
-            display: 'flex',
-            alignItems: 'center',
-            pt: '5px',
-            pb: '5px',
-          }}
-        >
-          {params.value}
-        </Typography>
-      ),
     },
     {
       field: 'hasBelow',
@@ -339,13 +257,14 @@ function DCOrderList() {
   return (
     <div>
       <Box mt={2} bgcolor='background.paper'>
-        <div className={classes.MdataGridPaginationTop} style={{ height: '80vh' }}>
+        <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
             columns={columns}
             disableColumnMenu
             onCellClick={currentlySelected}
-            // autoHeight
+            autoHeight={rows.length >= 10 ? false : true}
+            scrollbarSize={10}
             pagination
             page={cuurentPage - 1}
             pageSize={parseInt(pageSize)}

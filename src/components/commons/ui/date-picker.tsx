@@ -1,20 +1,16 @@
 //@ts-nocheck
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import moment from "moment";
+import moment from 'moment';
 // npm i @date-io/moment@1.x moment
-import OverwriteMomentBE from "./OverwriteMoment"; // choose your lib
-import { useStyles } from "./date-picker-css";
+import OverwriteMomentBE from './OverwriteMoment'; // choose your lib
+import { useStyles } from './date-picker-css';
 
-import {
-  DatePicker,
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
-import { createTheme, ThemeProvider } from "@material-ui/core/styles";
-import CloseIcon from "@mui/icons-material/Close";
-import CalendarToday from "@mui/icons-material/CalendarToday";
-import IconButton from "@mui/material/IconButton";
+import { DatePicker, MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import CloseIcon from '@mui/icons-material/Close';
+import CalendarToday from '@mui/icons-material/CalendarToday';
+import IconButton from '@mui/material/IconButton';
 
 interface StateProps {
   onClickDate: any;
@@ -26,8 +22,11 @@ interface StateProps {
 const defaultMaterialTheme = createTheme({
   palette: {
     primary: {
-      main: "#36C690",
+      main: '#36C690',
     },
+  },
+  typography: {
+    fontFamily: 'Kanit',
   },
 });
 
@@ -44,7 +43,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
   };
 
   let datePicker;
-  if (props.type === "TO") {
+  if (props.type === 'TO') {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
@@ -66,7 +65,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
           readOnly: true,
         }}
         InputAdornmentProps={{
-          position: "start",
+          position: 'start',
         }}
         maxDate={today}
         minDate={props.minDateTo}
@@ -95,7 +94,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
           readOnly: true,
         }}
         InputAdornmentProps={{
-          position: "start",
+          position: 'start',
         }}
         maxDate={today}
         placeholder="กรุณาเลือกวันที่"
