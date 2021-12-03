@@ -98,9 +98,9 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnQuantityActual"
-        type="number"
+        variant='outlined'
+        name='txnQuantityActual'
+        type='number'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
@@ -114,7 +114,7 @@ const columns: GridColDef[] = [
           params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }]);
         }}
         disabled={isDisable(params) ? true : false}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
@@ -136,12 +136,12 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnComment"
+        variant='outlined'
+        name='txnComment'
         value={params.value}
         onChange={(e) => params.api.updateRows([{ ...params.row, productComment: e.target.value }])}
         disabled={isDisable(params) ? true : false}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
@@ -192,16 +192,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
-          <HighlightOff fontSize="large" />
+          }}>
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -491,7 +490,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
 
     let file: File = e.target.files[0];
     let fileType = file.type.split('/');
-    const fileName = `${sdNo}.${fileType[1]}`;
+    const fileName = `${sdNo}-01.${fileType[1]}`;
 
     getBase64(file)
       .then((result: any) => {
@@ -537,7 +536,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   };
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
 
   const handleCloseSnackBar = () => {
@@ -629,8 +628,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
 
   return (
     <div>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+      <Dialog open={open} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>รายละเอียดใบตรวจสอบการรับ-โอนสินค้า</Typography>
         </BootstrapDialogTitle>
 
@@ -638,48 +637,48 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร LD:</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร LD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetail.shipmentNo}</Typography>
+                <Typography variant='body2'>{orderDetail.shipmentNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">สถานะ:</Typography>
+                <Typography variant='body2'>สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentStatusText}</Typography>
+                <Typography variant='body2'>{shipmentStatusText}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetail.sdNo}</Typography>
+                <Typography variant='body2'>{orderDetail.sdNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">ประเภท:</Typography>
+                <Typography variant='body2'>ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentTypeText}</Typography>
+                <Typography variant='body2'>{shipmentTypeText}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">วันที่:</Typography>
+                <Typography variant='body2'>วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentDateFormat}</Typography>
+                <Typography variant='body2'>{shipmentDateFormat}</Typography>
               </Grid>
               <Grid item lg={2}>
                 {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
-                  <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
+                  <Typography variant='body2'>ใบผลต่างหลังเซ็นต์:</Typography>
                 )}
 
                 {orderDetail.sdImageFile !== '' &&
                   orderDetail.sdImageFile !== 'temp' &&
                   orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
+                    <Typography variant='body2'>ใบผลต่างหลังเซ็นต์:</Typography>
                   )}
               </Grid>
               <Grid item lg={4}>
@@ -688,42 +687,41 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     {errorBrowseFile === true && (
                       <TextField
                         error
-                        name="browserTxf"
+                        name='browserTxf'
                         className={classes.MtextFieldBrowse}
                         value={fileInfo.fileName}
-                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
+                        placeholder='แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB'
                         helperText={msgErrorBrowseFile}
                       />
                     )}
 
                     {errorBrowseFile === false && (
                       <TextField
-                        name="browserTxf"
+                        name='browserTxf'
                         className={classes.MtextFieldBrowse}
                         value={fileInfo.fileName}
-                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
+                        placeholder='แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB'
                       />
                     )}
 
                     <input
-                      id="btnBrowse"
-                      type="file"
+                      id='btnBrowse'
+                      type='file'
                       // multiple
                       // onDrop
-                      accept=".pdf, .jpg, .jpeg"
+                      accept='.pdf, .jpg, .jpeg'
                       onChange={handleFileInputChange}
                       style={{ display: 'none' }}
                     />
 
                     <label htmlFor={'btnBrowse'}>
                       <Button
-                        id="btnPrint"
-                        color="primary"
-                        variant="contained"
-                        component="span"
+                        id='btnPrint'
+                        color='primary'
+                        variant='contained'
+                        component='span'
                         className={classes.MbtnBrowse}
-                        style={{ marginLeft: 10, textTransform: 'none' }}
-                      >
+                        style={{ marginLeft: 10, textTransform: 'none' }}>
                         Browse
                       </Button>
                     </label>
@@ -734,7 +732,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                   orderDetail.sdImageFile !== 'temp' &&
                   orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
                     <div>
-                      <Link component="button" variant="body2" onClick={handleLinkDocument}>
+                      <Link component='button' variant='body2' onClick={handleLinkDocument}>
                         ดูเอกสาร
                       </Link>
                     </div>
@@ -744,10 +742,10 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
             {orderDetail.Comment !== '' && (
               <Grid container spacing={2} mb={1}>
                 <Grid item lg={2}>
-                  <Typography variant="body2">อ้างอิง SD โอนลอย :</Typography>
+                  <Typography variant='body2'>อ้างอิง SD โอนลอย :</Typography>
                 </Grid>
                 <Grid item lg={4}>
-                  <Typography variant="body2">
+                  <Typography variant='body2'>
                     <u onClick={clickSelectedSDRef} style={{ cursor: 'pointer' }}>
                       {orderDetail.Comment}
                     </u>
@@ -760,17 +758,16 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
 
           {/* DisplayBtn */}
           <Box sx={{ display: isDisplayActBtn, marginTop: 4 }}>
-            <Grid container spacing={2} display="flex" justifyContent="space-between">
+            <Grid container spacing={2} display='flex' justifyContent='space-between'>
               <Grid item xl={2}>
                 <Button
-                  id="btnPrint"
-                  variant="contained"
-                  color="secondary"
+                  id='btnPrint'
+                  variant='contained'
+                  color='secondary'
                   onClick={handlePrintBtn}
                   startIcon={<Print />}
                   className={classes.MbtnPrint}
-                  style={{ textTransform: 'none' }}
-                >
+                  style={{ textTransform: 'none' }}>
                   พิมพ์ใบผลต่าง
                 </Button>
               </Grid>
@@ -778,41 +775,38 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
               <Grid item>
                 {!showSaveBtn && (
                   <Button
-                    id="btnSave"
-                    variant="contained"
-                    color="warning"
+                    id='btnSave'
+                    variant='contained'
+                    color='warning'
                     className={classes.MbtnSave}
                     onClick={handleSaveButton}
                     startIcon={<SaveIcon />}
-                    style={{ width: 200 }}
-                  >
+                    style={{ width: 200 }}>
                     บันทึก
                   </Button>
                 )}
 
                 {!showApproveBtn && (
                   <Button
-                    id="btnApprove"
-                    variant="contained"
-                    color="primary"
+                    id='btnApprove'
+                    variant='contained'
+                    color='primary'
                     className={classes.MbtnApprove}
                     onClick={handleApproveBtn}
                     startIcon={<CheckCircleOutline />}
-                    style={{ width: 200 }}
-                  >
+                    style={{ width: 200 }}>
                     ยืนยัน
                   </Button>
                 )}
 
                 {!showCloseJobBtn && (
                   <Button
-                    id="btnClose"
-                    variant="contained"
-                    color="primary"
+                    id='btnClose'
+                    variant='contained'
+                    color='primary'
                     className={classes.MbtnClose}
                     onClick={handleCloseJobBtn}
-                    startIcon={<BookmarkAdded />}
-                  >
+                    startIcon={<BookmarkAdded />}>
                     ปิดงาน
                   </Button>
                 )}
@@ -820,7 +814,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
             </Grid>
           </Box>
 
-          <Box mt={2} bgcolor="background.paper">
+          <Box mt={2} bgcolor='background.paper'>
             <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rowsEntries}
@@ -856,7 +850,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         action={action}
         items={itemsDiffState}
         percentDiffType={false}
-        percentDiffValue="0"
+        percentDiffValue='0'
         fileName={fileInfo.fileName}
         imageContent={fileInfo.base64URL}
       />
