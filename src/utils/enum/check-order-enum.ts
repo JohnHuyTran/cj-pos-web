@@ -12,12 +12,12 @@ const shipmentStatus = [
 
 const shipmentEnStatus = [
   { key: 0, text: 'Draft' },
-  { key: 1, text: 'Approve' },
+  { key: 1, text: 'Approved' },
   { key: 2, text: 'Close' },
 ];
 
 const shipmentType = [
-  { key: 0, text: 'ลังกระดาษ/ลังพลาสติก' },
+  { key: 0, text: 'ลังกระดาษ /Tote' },
   { key: 1, text: 'สินค้าภายในTote' },
   { key: 2, text: 'โอนลอย' },
 ];
