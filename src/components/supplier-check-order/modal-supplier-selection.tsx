@@ -98,7 +98,6 @@ interface Props {
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
   const { children, onClose, ...other } = props;
-  const classes = useStyles();
 
   return (
     <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
@@ -177,7 +176,7 @@ export default function ModalSupplierSelection({
             <Box sx={{ flex: 3 }}>
               <label className={classes.textLabelInput}>ผู้จำหน่าย</label>
               <Autocomplete
-                id="selBranchNo"
+                id="searchSupplierModal"
                 fullWidth
                 freeSolo
                 sx={{ mt: 1 }}
@@ -199,7 +198,12 @@ export default function ModalSupplierSelection({
 
             <Box sx={{ flex: 2, ml: 2 }}>
               <label className={classes.textLabelInput}>ประเภทผู้จำหน่าย</label>
-              <TextField sx={{ mt: 1 }} className={classes.MTextField} />
+              <TextField
+                id="supplierModalType"
+                sx={{ mt: 1 }}
+                className={classes.MTextField}
+                value="มีเอกสาร PO"
+              />
             </Box>
           </Box>
 
@@ -208,7 +212,11 @@ export default function ModalSupplierSelection({
               รายการเอกสารใบสั่งซื5อ
             </label>
 
-            <RadioGroup name="use-radio-group" defaultValue="first">
+            <RadioGroup
+              name="use-radio-group"
+              defaultValue="first"
+              id="listSupplierDocPO"
+            >
               <MyFormControlLabel
                 value="401212254"
                 label="401212254"

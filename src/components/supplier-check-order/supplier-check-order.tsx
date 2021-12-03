@@ -287,7 +287,7 @@ export default function SupplierCheckOrderSearch() {
             alignItems="flex-end"
           >
             <Button
-              id="btnSupplierSelection"
+              id="btnCreateSupplierModal"
               variant="contained"
               onClick={handleOpenModal}
               sx={{ minWidth: "15%" }}
