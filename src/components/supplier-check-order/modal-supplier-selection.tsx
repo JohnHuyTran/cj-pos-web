@@ -53,13 +53,13 @@ const useStyles = makeStyles((theme) => ({
   MBtnAddSupplier: {
     borderRadius: "5px !important",
   },
-  textLabelInput: { fontSize: 14, fontWeight: 700 },
+  textLabelInput: { fontSize: 14, fontWeight: 400 },
   textListSupplier: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 700,
   },
   textItemList: {
-    fontSize: 15,
+    fontSize: 14,
   },
 }));
 
@@ -98,10 +98,11 @@ interface Props {
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
   const { children, onClose, ...other } = props;
+  const classes = useStyles();
 
   return (
     <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
-      {children}
+      <Typography sx={{ fontSize: 24 }}>{children}</Typography>
       {onClose ? (
         <IconButton
           aria-label="close"
@@ -204,7 +205,7 @@ export default function ModalSupplierSelection({
 
           <Box sx={{ mt: 4, visibility: "visible" }}>
             <label className={classes.textListSupplier}>
-              รายการเอกสารใบสั่งซื้อ
+              รายการเอกสารใบสั่งซื5อ
             </label>
 
             <RadioGroup name="use-radio-group" defaultValue="first">
