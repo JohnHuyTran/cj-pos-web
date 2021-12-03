@@ -13,7 +13,8 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
-import SupplierOrderDetail from './supplier-order-detail';
+// import SupplierOrderDetail from './supplier-order-detail';
+import SupplierOrderDetail from './supplier-pi-detail';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 
@@ -60,7 +61,7 @@ export default function SupplierOrderList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -82,8 +83,8 @@ export default function SupplierOrderList() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant='body2'>{params.value}</Typography>
-          <Typography color='textSecondary' variant='body2'>
+          <Typography variant="body2">{params.value}</Typography>
+          <Typography color="textSecondary" variant="body2">
             {params.getValue(params.id, 'supplierCode') || ''}
           </Typography>
         </div>
@@ -115,9 +116,9 @@ export default function SupplierOrderList() {
       sortable: false,
       renderCell: (params) => {
         if (params.value === 0) {
-          return <Chip label='บันทึก' size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
+          return <Chip label="บันทึก" size="small" sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
         } else if (params.value === 1) {
-          return <Chip label='อนุมัติ' size='small' sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
+          return <Chip label="อนุมัติ" size="small" sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
         }
       },
     },
@@ -131,7 +132,7 @@ export default function SupplierOrderList() {
       renderCell: (params) => {
         return (
           <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
-            <Typography variant='body2' noWrap>
+            <Typography variant="body2" noWrap>
               {params.value}
             </Typography>
           </HtmlTooltip>
@@ -230,7 +231,7 @@ export default function SupplierOrderList() {
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -244,7 +245,7 @@ export default function SupplierOrderList() {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}

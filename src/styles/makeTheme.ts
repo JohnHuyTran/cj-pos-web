@@ -10,6 +10,16 @@ const useStyles = makeStyles({
       fontSize: '14px',
     },
   },
+  MtextFieldDetail: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      minHeight: '20px !important',
+      padding: '0px 0px 0px 5px',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      fontSize: '14px',
+    },
+  },
   MtextFieldNumber: {
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',

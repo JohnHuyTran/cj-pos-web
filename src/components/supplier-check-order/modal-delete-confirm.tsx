@@ -31,20 +31,6 @@ export default function ModelConfirm({
   items,
 }: Props): ReactElement {
   const handleConfirm = async () => {
-    // const payload: GenerateBORequest = {
-    //   comment: comment,
-    // };
-    // generateBO(shipmentNo, payload).then(
-    //   function (value) {
-    //     setTimeout(() => {
-    //       onUpdateAction(true, "");
-    //     }, 3000);
-    //   },
-    //   function (error: ApiError) {
-    //     onUpdateAction(false, error.message);
-    //   }
-    // );
-
     const payloadSave: SavePurchaseRequest = {
       billNo: billNo,
       comment: comment,
@@ -74,12 +60,20 @@ export default function ModelConfirm({
       <DialogContent>
         <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
           <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
-            ยืนยันการตรวจสอบผลต่าง (DC)
+            ต้องการลบสินค้า
           </Typography>
           <Typography variant="body1" align="center">
-            เลขที่ใบสั่งซื้อ PO <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+            สินค้า <label style={{ color: '#AEAEAE' }}>|</label>{' '}
             <label style={{ color: '#36C690' }}>
-              <b>{docNo}</b>
+              <b>น้ำดื่มขนาด 300มล.</b>
+              <br />
+              <label style={{ color: '#AEAEAE', fontSize: 12 }}>0000000000000123</label>
+            </label>
+          </Typography>
+          <Typography variant="body1" align="center">
+            บาร์โค้ด <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+            <label style={{ color: '#36C690' }}>
+              <b>1234567890000000</b>
             </label>
           </Typography>
         </DialogContentText>
@@ -98,11 +92,11 @@ export default function ModelConfirm({
         <Button
           id="btnConfirm"
           variant="contained"
-          color="primary"
+          color="error"
           sx={{ borderRadius: 2, width: 80 }}
           onClick={handleConfirm}
         >
-          ยืนยัน
+          ลบสินค้า
         </Button>
       </DialogActions>
     </Dialog>

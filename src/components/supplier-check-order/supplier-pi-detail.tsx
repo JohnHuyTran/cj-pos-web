@@ -3,7 +3,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import { Button, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
-import { CheckCircleOutline, ControlPoint, HighlightOff, PlusOne } from '@mui/icons-material';
+import { CheckCircleOutline, ControlPoint, DeleteForever, HighlightOff, PlusOne } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import Steppers from '../commons/ui/steppers';
 import SaveIcon from '@mui/icons-material/Save';
@@ -19,6 +19,7 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
+import ModelDeleteConfirm from './modal-delete-confirm';
 
 interface Props {
   isOpen: boolean;
@@ -58,7 +59,7 @@ const columns: GridColDef[] = [
   {
     field: 'index',
     headerName: 'ลำดับ',
-    width: 80,
+    width: 65,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -76,7 +77,7 @@ const columns: GridColDef[] = [
     headerName: 'สินค้า',
     headerAlign: 'center',
     // minWidth: 250,
-    flex: 1,
+    flex: 2,
     sortable: false,
     renderCell: (params) => (
       <div>
@@ -148,6 +149,19 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+  },
+  {
+    field: 'action',
+    headerName: ' ',
+    width: 60,
+    headerAlign: 'center',
+    align: 'center',
+    sortable: false,
+    renderCell: (params) => (
+      //params.id
+      <DeleteForever fontSize="small" sx={{ color: '#F54949' }} />
+      //onClick={handlDeleteConfirmButton}
+    ),
   },
 ];
 
@@ -288,6 +302,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [contentMsg, setContentMsg] = React.useState('');
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
   const [items, setItems] = React.useState<any>([]);
 
   const handleCloseSnackBar = () => {
@@ -297,7 +312,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const handleModelConfirm = () => {
     setOpenModelConfirm(false);
   };
-
   const handlConfirmButton = () => {
     if (!billNo) {
       setErrorBillNo(true);
@@ -305,6 +319,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setErrorBillNo(false);
       setOpenModelConfirm(true);
     }
+  };
+
+  const handleModelDeleteConfirm = () => {
+    setOpenModelDeleteConfirm(false);
+  };
+  const handlDeleteConfirmButton = () => {
+    setOpenModelDeleteConfirm(true);
   };
 
   const handleConfirmStatus = async (issuccess: boolean, errorMsg: string) => {
@@ -377,7 +398,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
         <DialogContent>
           <Box mt={4}>
-            <Grid container spacing={2} mb={1}>
+            <Grid container spacing={2} mb={0}>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่ใบสั่งซื้อ PO :</Typography>
               </Grid>
@@ -395,14 +416,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   value={billNo}
                   placeholder="กรุณากรอก เลขที่บิลผู้จำหน่าย"
                   onChange={(event) => setBillNo(event.target.value)}
-                  className={classes.MtextField}
+                  className={classes.MtextFieldDetail}
                   disabled={piStatus !== 0}
                   error={errorBillNo === true}
                   helperText={errorBillNo === true ? 'กรุณากรอก เลขที่บิลผู้จำหน่าย' : ' '}
                 />
               </Grid>
             </Grid>
-            <Grid container spacing={2} mb={1}>
+            <Grid container spacing={2} mb={0}>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
               </Grid>
@@ -426,7 +447,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 </Button>
               </Grid>
             </Grid>
-            <Grid container spacing={2} mb={1}>
+            <Grid container spacing={2}>
               <Grid item lg={2}>
                 <Typography variant="body2">รหัสผู้จัดจำหน่าย:</Typography>
               </Grid>
@@ -501,7 +522,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           </Box>
 
           <Box mt={2} bgcolor="background.paper">
-            <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
+            <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rows}
                 columns={columns}
@@ -653,6 +674,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       <ModelConfirm
         open={openModelConfirm}
         onClose={handleModelConfirm}
+        onUpdateAction={handleConfirmStatus}
+        piNo={piNo}
+        docNo={purchaseDetail.docNo}
+        billNo={billNo}
+        comment={comment}
+        items={items}
+      />
+
+      <ModelDeleteConfirm
+        open={openModelDeleteConfirm}
+        onClose={handleModelDeleteConfirm}
         onUpdateAction={handleConfirmStatus}
         piNo={piNo}
         docNo={purchaseDetail.docNo}
