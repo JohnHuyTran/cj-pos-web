@@ -18,7 +18,7 @@ export function isAllowPermission(action: string): boolean {
 
 export function getSdType(codeType: number): string {
   if (codeType === 0) {
-    return 'ลังกระดาษ/Tote';
+    return 'ลังกระดาษ /Tote';
   } else if (codeType === 1) {
     return 'สินค้าภายใน Tote';
   }

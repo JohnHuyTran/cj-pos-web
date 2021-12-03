@@ -57,7 +57,7 @@ function OrderList() {
     {
       field: 'sdNo',
       headerName: 'เลขที่เอกสาร SD',
-      // minWidth: 160,
+      minWidth: 150,
       // flex: 1.3,
       flex: 1.3,
       headerAlign: 'center',
@@ -66,15 +66,31 @@ function OrderList() {
     {
       field: 'sdType',
       headerName: 'ประเภท',
-      // minWidth: 160,
-      flex: 1.4,
+      minWidth: 80,
+      flex: 0.9,
+      // flex: 1.4,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <Typography
+          sx={{
+            whiteSpace: 'normal',
+            lineHeight: '100%',
+            fontSize: '0.875rem',
+            display: 'flex',
+            alignItems: 'center',
+            pt: '5px',
+            pb: '5px',
+          }}
+        >
+          {params.value}
+        </Typography>
+      ),
     },
     {
       field: 'sdStatus',
       headerName: 'สถานะ',
-      // minWidth: 80,
+      minWidth: 80,
       flex: 0.65,
       headerAlign: 'center',
       align: 'left',
@@ -83,7 +99,7 @@ function OrderList() {
     {
       field: 'boxCnt',
       headerName: 'จำนวนลัง',
-      // minWidth: 90,
+      minWidth: 90,
       flex: 0.8,
       headerAlign: 'center',
       align: 'right',
@@ -92,7 +108,7 @@ function OrderList() {
     {
       field: 'toteCnt',
       headerName: 'จำนวนTote',
-      // minWidth: 100,
+      minWidth: 100,
       flex: 0.9,
       headerAlign: 'center',
       align: 'right',
@@ -101,7 +117,7 @@ function OrderList() {
     {
       field: 'shipmentDate',
       headerName: 'วันที่รับสินค้า',
-      // minWidth: 120,
+      minWidth: 110,
       flex: 1,
       headerAlign: 'center',
       align: 'center',
@@ -110,7 +126,7 @@ function OrderList() {
     {
       field: 'comment',
       headerName: 'อ้างอิง SD โอนลอย',
-      // minWidth: 160,
+      minWidth: 150,
       flex: 1.4,
       headerAlign: 'center',
       align: 'left',
@@ -232,13 +248,17 @@ function OrderList() {
   return (
     <div>
       {/* <Box mt={2} bgcolor="background.paper"> */}
-      <div className={classes.MdataGridPaginationTop} style={{ height: 650, width: '100%' }}>
+      <div
+        className={classes.MdataGridPaginationTop}
+        style={{ height: rows.length >= 10 ? '80vh' : 'auto', width: '100%' }}
+      >
         <DataGrid
           rows={rows}
           columns={columns}
           disableColumnMenu
           onCellClick={currentlySelected}
-          autoHeight
+          autoHeight={rows.length >= 10 ? false : true}
+          scrollbarSize={10}
           page={cuurentPages - 1}
           pageSize={parseInt(pageSize)}
           rowsPerPageOptions={[10, 20, 50, 100]}

@@ -231,13 +231,14 @@ export default function SupplierOrderList() {
   return (
     <div>
       <Box mt={2} bgcolor='background.paper'>
-        <div className={classes.MdataGridPaginationTop}>
+        <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
             columns={columns}
             disableColumnMenu
             onCellClick={currentlySelected}
-            autoHeight
+            autoHeight={rows.length >= 10 ? false : true}
+            scrollbarSize={10}
             pagination
             page={cuurentPage - 1}
             pageSize={parseInt(pageSize)}

@@ -112,7 +112,7 @@ function DCOrderList() {
     {
       field: 'sdNo',
       headerName: 'เลขที่เอกสาร SD',
-      minWidth: 160,
+      minWidth: 150,
       // flex: 1.2,
       headerAlign: 'center',
       sortable: false,
@@ -129,7 +129,7 @@ function DCOrderList() {
       field: 'branchDesc',
       headerName: 'สาขาปลายทาง',
       minWidth: 150,
-      flex: 1,
+      flex: 0.9,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -151,8 +151,8 @@ function DCOrderList() {
     {
       field: 'sdType',
       headerName: 'ประเภท',
-      // minWidth: 100,
-      flex: 0.8,
+      minWidth: 80,
+      flex: 0.75,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
@@ -175,8 +175,8 @@ function DCOrderList() {
     {
       field: 'verifyDCStatus',
       headerName: 'สถานะ',
-      // minWidth: 100,
-      flex: 0.8,
+      minWidth: 80,
+      flex: 0.7,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
@@ -339,13 +339,14 @@ function DCOrderList() {
   return (
     <div>
       <Box mt={2} bgcolor='background.paper'>
-        <div className={classes.MdataGridPaginationTop}>
+        <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
             columns={columns}
             disableColumnMenu
             onCellClick={currentlySelected}
-            autoHeight
+            autoHeight={rows.length >= 10 ? false : true}
+            scrollbarSize={10}
             pagination
             page={cuurentPage - 1}
             pageSize={parseInt(pageSize)}
