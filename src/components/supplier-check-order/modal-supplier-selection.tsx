@@ -130,6 +130,8 @@ export default function ModalSupplierSelection({
 }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const [hasPO, setHasPO] = React.useState<boolean>(false);
+  const [hasPOValue, setHasPOValue] = React.useState<string>("");
 
   const autocompleteRenderListItem = (props: any, option: any) => {
     return (
@@ -142,7 +144,18 @@ export default function ModalSupplierSelection({
   };
 
   const onChangeSelection = (_: any, value: any) => {
-    console.log(value);
+    if (value) {
+      if (value.po && value.po.length > 0) {
+        setHasPO(true);
+        setHasPOValue("มีเอกสาร PO");
+      } else {
+        setHasPO(false);
+        setHasPOValue("ไม่มีมีเอกสาร PO");
+      }
+    } else {
+      setHasPO(false);
+      setHasPOValue("");
+    }
   };
 
   const onSubmitData = () => {
@@ -168,7 +181,7 @@ export default function ModalSupplierSelection({
           id="customized-dialog-title"
           onClose={handleCloseModal}
         >
-          เพิ่มผู้จัดจำหน่าย
+          เพิ่มผู้จำหน่าย
         </BootstrapDialogTitle>
 
         <DialogContent>
@@ -202,14 +215,14 @@ export default function ModalSupplierSelection({
                 id="supplierModalType"
                 sx={{ mt: 1 }}
                 className={classes.MTextField}
-                value="มีเอกสาร PO"
+                value={hasPOValue}
               />
             </Box>
           </Box>
 
-          <Box sx={{ mt: 4, visibility: "visible" }}>
+          <Box sx={{ mt: 4, visibility: hasPO ? "visible" : "hidden" }}>
             <label className={classes.textListSupplier}>
-              รายการเอกสารใบสั่งซื5อ
+              รายการเอกสารใบสั่งซื้อ PO
             </label>
 
             <RadioGroup
