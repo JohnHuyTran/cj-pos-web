@@ -12,7 +12,7 @@ const shipmentStatus = [
 
 const shipmentEnStatus = [
   { key: 0, text: 'Draft' },
-  { key: 1, text: 'Approve' },
+  { key: 1, text: 'Approved' },
   { key: 2, text: 'Close' },
 ];
 
