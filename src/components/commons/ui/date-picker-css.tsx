@@ -1,20 +1,21 @@
-import { makeStyles } from "@mui/styles";
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({
   Mdatepicker: {
-    "& .MuiOutlinedInput-input": {
+    '& .MuiOutlinedInput-input': {
       // padding: "6px 0px !important",
-      padding: "0px !important",
+      padding: '0px !important',
+      fontFamily: 'Kanit',
     },
-    "& .MuiIconButton-root": {
-      color: "#CBD4DB !important",
+    '& .MuiIconButton-root': {
+      color: '#CBD4DB !important',
       // padding: "5px !important",
     },
-    "& .MuiOutlinedInput-adornedEnd": {
-      paddingRight: "0px !important",
+    '& .MuiOutlinedInput-adornedEnd': {
+      paddingRight: '0px !important',
     },
-    "& .MuiOutlinedInput-adornedStart": {
-      paddingLeft: "0px !important",
+    '& .MuiOutlinedInput-adornedStart': {
+      paddingLeft: '0px !important',
     },
   },
 

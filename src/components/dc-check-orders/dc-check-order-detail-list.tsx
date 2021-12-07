@@ -121,7 +121,7 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
   return (
     <Box mt={2} bgcolor='background.paper'>
       <div
-        className={classes.MdataGrid}
+        className={classes.MdataGridDetail}
         style={{ width: '100%', marginBottom: '1em', height: rows.length >= 8 ? '70vh' : 'auto' }}
       >
         <DataGrid
