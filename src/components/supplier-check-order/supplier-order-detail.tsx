@@ -56,7 +56,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
 const columns: GridColDef[] = [
   {
-    field: 'rowId',
+    field: 'index',
     headerName: 'ลำดับ',
     width: 80,
     headerAlign: 'center',
@@ -66,7 +66,7 @@ const columns: GridColDef[] = [
   {
     field: 'barCode',
     headerName: 'บาร์โค้ด',
-    minWidth: 150,
+    minWidth: 200,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -135,7 +135,7 @@ const columns: GridColDef[] = [
   },
   {
     field: 'salePrice',
-    headerName: 'ลด/ชาร์ท',
+    headerName: 'ลด/ชาร์จ',
     width: 135,
     headerAlign: 'center',
     align: 'right',
@@ -232,6 +232,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
 
   const [billNo, setBillNo] = React.useState('');
+  const [errorBillNo, setErrorBillNo] = React.useState(false);
   const [piNo, setPiNo] = React.useState('');
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
@@ -325,7 +326,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handlConfirmButton = () => {
-    setOpenModelConfirm(true);
+    if (!billNo) {
+      setErrorBillNo(true);
+    } else {
+      setErrorBillNo(false);
+      setOpenModelConfirm(true);
+    }
   };
 
   const handleConfirmStatus = async (issuccess: boolean, errorMsg: string) => {
@@ -348,39 +354,44 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleSaveButton = async () => {
-    setOpenLoadingModal(true);
+    if (!billNo) {
+      setErrorBillNo(true);
+    } else {
+      setErrorBillNo(false);
+      setOpenLoadingModal(true);
 
-    const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const itemsList: any = [];
-    await rows.forEach((data: GridRowData) => {
-      const item: any = {
-        barcode: data.barCode,
-        actualQty: data.actualQty,
-      };
-      itemsList.push(item);
-    });
-
-    const payloadSave: SavePurchaseRequest = {
-      billNo: billNo,
-      comment: comment,
-      items: itemsList,
-    };
-
-    await saveSupplierOrder(payloadSave, piNo)
-      .then((_value) => {
-        setShowSnackBar(true);
-        setSnackbarIsStatus(true);
-        setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-        dispatch(featchSupplierOrderDetailAsync(piNo));
-        dispatch(featchOrderListSupAsync(payloadSearch));
-
-        localStorage.removeItem('SupplierRowsEdit');
-      })
-      .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setContentMsg(error.message);
+      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
+      await rows.forEach((data: GridRowData) => {
+        const item: any = {
+          barcode: data.barCode,
+          actualQty: data.actualQty,
+        };
+        itemsList.push(item);
       });
-    setOpenLoadingModal(false);
+
+      const payloadSave: SavePurchaseRequest = {
+        billNo: billNo,
+        comment: comment,
+        items: itemsList,
+      };
+
+      await saveSupplierOrder(payloadSave, piNo)
+        .then((_value) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          dispatch(featchSupplierOrderDetailAsync(piNo));
+          dispatch(featchOrderListSupAsync(payloadSearch));
+
+          localStorage.removeItem('SupplierRowsEdit');
+        })
+        .catch((error: ApiError) => {
+          setShowSnackBar(true);
+          setContentMsg(error.message);
+        });
+      setOpenLoadingModal(false);
+    }
   };
 
   return (
@@ -409,9 +420,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   name='paramQuery'
                   size='small'
                   value={billNo}
+                  placeholder='กรุณากรอก เลขที่บิลผู้จำหน่าย'
                   onChange={(event) => setBillNo(event.target.value)}
                   className={classes.MtextField}
                   disabled={piStatus !== 0}
+                  error={errorBillNo === true}
+                  helperText={errorBillNo === true ? 'กรุณากรอก เลขที่บิลผู้จำหน่าย' : ' '}
                 />
               </Grid>
             </Grid>
@@ -498,11 +512,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               <DataGrid
                 rows={rows}
                 columns={columns}
-                disableColumnMenu
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
+                disableColumnMenu
                 autoHeight={rows.length >= 8 ? false : true}
                 scrollbarSize={10}
               />
@@ -592,7 +606,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   <Grid item lg={5}></Grid>
                   <Grid item lg={3} alignItems='flex-end'>
                     <Typography variant='body2' pt={1}>
-                      ลด/ชาร์ท
+                      ลด/ชาร์จ
                     </Typography>
                   </Grid>
                   <Grid item lg={4}>

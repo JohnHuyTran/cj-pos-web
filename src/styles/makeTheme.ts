@@ -6,6 +6,9 @@ const useStyles = makeStyles({
       borderRadius: '5px !important',
       // padding: "2x 2px 2px 6px",
     },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      fontSize: '14px',
+    },
   },
   MtextFieldNumber: {
     '& .MuiOutlinedInput-root': {
@@ -24,14 +27,20 @@ const useStyles = makeStyles({
       // padding: "4px 4px 4px 8px",
     },
   },
-  MdataGrid: {
+  MdataGridDetail: {
     '& .MuiDataGrid-columnHeaderTitle': {
       color: '#36C690',
       fontWeight: '600 !important',
     },
     '& .MuiDataGrid-root': {
+      color: '#263238',
       fontFamily: 'Kanit',
-      borderRadius: '10px !important',
+      borderRadius: '20px !important',
+      display: 'flex !important',
+      flexDirection: 'column-reverse',
+      '& .MuiDataGrid-main': {
+        top: -16,
+      },
       '& .MuiDataGrid-cell': {
         cursor: 'pointer',
         display: 'flex',
@@ -48,6 +57,19 @@ const useStyles = makeStyles({
     },
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px',
+      fontSize: '14px',
+    },
+    '& .MuiTablePagination-toolbar': {
+      color: '#AEAEAE',
+      '& .MuiTypography-body2': {
+        fontFamily: 'Kanit',
+      },
+    },
+    '& .MuiDataGrid-footerContainer': {
+      color: '#AEAEAE',
+      '& MuiDataGrid-selectedRowCount': {
+        fontFamily: 'Kanit !important',
+      },
     },
   },
 
@@ -86,9 +108,10 @@ const useStyles = makeStyles({
     '& .MuiTablePagination-toolbar': {
       color: '#AEAEAE',
     },
-    '& .MuiDataGrid-renderingZone': {
-      maxHeight: 'none !important',
-    },
+
+    // '& .MuiDataGrid-renderingZone': {
+    //   maxHeight: 'none !important',
+    // },
     // "& .MuiDataGrid-cell": {
     //   lineHeight: "unset !important",
     //   maxHeight: "none !important",

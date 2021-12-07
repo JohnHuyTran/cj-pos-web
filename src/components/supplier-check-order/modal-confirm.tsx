@@ -1,16 +1,16 @@
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Typography from "@mui/material/Typography";
-import React, { ReactElement } from "react";
-import { ApiError } from "../../models/api-error-model";
-import { GenerateBORequest } from "../../models/order-model";
-import { SavePurchaseRequest } from "../../models/supplier-check-order-model";
-import { generateBO } from "../../services/order-shipment";
-import { approveSupplierOrder } from "../../services/purchase";
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
+import React, { ReactElement } from 'react';
+import { ApiError } from '../../models/api-error-model';
+import { GenerateBORequest } from '../../models/order-model';
+import { SavePurchaseRequest } from '../../models/supplier-check-order-model';
+import { generateBO } from '../../services/order-shipment';
+import { approveSupplierOrder } from '../../services/purchase';
 
 interface Props {
   open: boolean;
@@ -57,7 +57,7 @@ export default function ModelConfirm({
     await approveSupplierOrder(payloadSave, piNo).then(
       function (value) {
         setTimeout(() => {
-          onUpdateAction(true, "");
+          onUpdateAction(true, '');
         }, 3000);
       },
       function (error: ApiError) {
@@ -75,30 +75,20 @@ export default function ModelConfirm({
       sx={{ minWidth: 500 }}
     >
       <DialogContent>
-        <DialogContentText
-          id="alert-dialog-description"
-          sx={{ color: "#263238" }}
-        >
+        <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
           <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
             ยืนยันการตรวจสอบผลต่าง (DC)
           </Typography>
           <Typography variant="body1" align="center">
-            เลขที่ใบสั่งซื้อ PO <label style={{ color: "#AEAEAE" }}>|</label>{" "}
-            <label style={{ color: "#36C690" }}>
+            เลขที่ใบสั่งซื้อ PO <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+            <label style={{ color: '#36C690' }}>
               <b>{docNo}</b>
-            </label>
-          </Typography>
-
-          <Typography variant="body1" align="center">
-            เลขที่บิลผู้จำหน่าย <label style={{ color: "#AEAEAE" }}>|</label>{" "}
-            <label style={{ color: "#36C690" }}>
-              <b>{billNo}</b>
             </label>
           </Typography>
         </DialogContentText>
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
+      <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
         <Button
           id="btnCancle"
           variant="contained"

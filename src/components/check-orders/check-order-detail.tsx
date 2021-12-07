@@ -25,6 +25,7 @@ import {
   ShipmentDeliveryStatusCodeEnum,
   getShipmentTypeText,
   getShipmentStatusText,
+  formatFileNam,
 } from '../../utils/enum/check-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { SaveDraftSDRequest, CheckOrderDetailProps, Entry, itemsDetail } from '../../models/order-model';
@@ -489,7 +490,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     checkSizeFile(e);
 
     let file: File = e.target.files[0];
-    const fileName = e.target.files[0].name;
+    let fileType = file.type.split('/');
+    const fileName = `${sdNo}-01.${fileType[1]}`;
 
     getBase64(file)
       .then((result: any) => {
@@ -546,7 +548,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
 
   const handleShowSnackBar = async (issuccess: boolean, errorMsg: string) => {
     handleOpenLoading('open', true);
-    const msg = issuccess ? 'คุณได้อนุมัติใบสั่งซื้อเรียบร้อยแล้ว' : errorMsg;
+    const msg = issuccess ? 'คุณได้ทำรายการเรียบร้อยแล้ว' : errorMsg;
     setShowSnackBar(true);
     setContentMsg(msg);
     setSnackbarStatus(issuccess);
@@ -554,11 +556,11 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     if (issuccess) {
       updateShipmentOrder();
       setTimeout(() => {
-        handleClose();
-      }, 500);
-    } else {
-      handleOpenLoading('open', false);
+        setOpen(false);
+        onClickClose();
+      }, 1000);
     }
+    handleOpenLoading('open', false);
   };
 
   const handleCloseFailAlert = () => {
@@ -782,6 +784,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     className={classes.MbtnSave}
                     onClick={handleSaveButton}
                     startIcon={<SaveIcon />}
+                    style={{ width: 200 }}
                   >
                     บันทึก
                   </Button>
@@ -795,6 +798,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     className={classes.MbtnApprove}
                     onClick={handleApproveBtn}
                     startIcon={<CheckCircleOutline />}
+                    style={{ width: 200 }}
                   >
                     ยืนยัน
                   </Button>
@@ -873,6 +877,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         url={getPathReportSD(sdNo)}
         statusFile={statusFile}
         sdImageFile={orderDetail.sdImageFile}
+        fileName={orderDetail.sdImageFilename ? orderDetail.sdImageFilename : formatFileNam(sdNo, orderDetail.sdStatus)}
       />
 
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />

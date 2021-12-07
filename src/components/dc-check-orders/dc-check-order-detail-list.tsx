@@ -86,21 +86,6 @@ const columns: GridColDef[] = [
     flex: 0.5,
     sortable: false,
     headerAlign: 'center',
-    // renderCell: (params) => (
-    //   <Box
-    //     sx={{
-    //       whiteSpace: 'normal',
-    //       lineHeight: '100%',
-    //       fontSize: '0.875rem',
-    //       display: 'flex',
-    //       alignItems: 'center',
-    //       pt: '5px',
-    //       pb: '5px',
-    //     }}
-    //   >
-    //     {params.value}
-    //   </Box>
-    // ),
   },
 ];
 

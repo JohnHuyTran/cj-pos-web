@@ -1,65 +1,68 @@
 export const environment = {
   products: {
-    url: "/api/product",
+    url: '/api/product',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   },
   orders: {
     shipment: {
       fetchOrder: {
-        url: "/order/shipment-deliverly",
+        url: '/order/shipment-deliverly',
       },
       detail: {
-        url: "/order/shipment-deliverly",
+        url: '/order/shipment-deliverly',
       },
       fetchOrderSD: {
-        url: "/order/sd",
+        url: '/order/sd',
       },
       saveDraft: {
-        url: "/order/stock-diff/{sdNo}/draft",
+        url: '/order/stock-diff/{sdNo}/draft',
       },
       approve: {
-        url: "/order/stock-diff/{sdNo}/approve",
+        url: '/order/stock-diff/{sdNo}/approve',
       },
       closejob: {
-        url: "/order/stock-diff/{sdNo}/close",
+        url: '/order/stock-diff/{sdNo}/close',
       },
       printFormShipmentDeliverly: {
-        url: "/order/stock-diff/{sdNo}/export",
+        url: '/order/stock-diff/{sdNo}/export',
       },
     },
     dcCheckOrder: {
       fetchOrder: {
-        url: "/order/stock-diff/verifies",
+        url: '/order/stock-diff/verifies',
       },
       generateBO: {
-        url: "/order/stock-diff/{sdNo}/approve",
+        url: '/order/stock-diff/{sdNo}/approve',
       },
       searchBranch: {
-        url: "/order/master/branches",
+        url: '/order/master/branches',
       },
       detailDC: {
-        url: "/order/stock-diff/verify/view",
+        url: '/order/stock-diff/verify/view',
       },
       approve: {
-        url: "/order/stock-diff/verify/{idDC}",
+        url: '/order/stock-diff/verify/{idDC}',
       },
     },
   },
   purchase: {
     supplierOrder: {
       search: {
-        url: "/purchase/purchase-invoice",
+        url: '/purchase/purchase-invoice',
       },
       detail: {
-        url: "/purchase/pi",
+        url: '/purchase/purchase-invoice',
+        // url: '/purchase/pi',
       },
       saveDraft: {
-        url: "/purchase/purchase/{piNo}/draft",
+        url: '/purchase/purchase-invoice/{piNo}/draft',
+        // url: '/purchase/purchase/{piNo}/draft',
       },
       approve: {
-        url: "/purchase/purchase/{piNo}/approve",
+        url: '/purchase/purchase-invoice/{piNo}/approve',
+        // url: '/purchase/purchase/{piNo}/approve',
       },
     },
   },
