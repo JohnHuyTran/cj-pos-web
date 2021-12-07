@@ -16,41 +16,49 @@ const columns: GridColDef[] = [
   {
     field: 'index',
     headerName: 'ลำดับ',
-    width: 90,
+    width: 70,
     sortable: false,
+    renderCell: (params) => (
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
+        {params.value}
+      </Box>
+    ),
   },
   {
     field: 'productId',
     headerName: 'รหัสสินค้า',
-    flex: 0.5,
+    minWidth: 185,
+    // flex: 0.5,
     sortable: false,
     headerAlign: 'center',
   },
   {
     field: 'productBarCode',
     headerName: 'บาร์โค้ด',
-    flex: 0.5,
+    minWidth: 130,
+    // flex: 0.5,
     sortable: false,
     headerAlign: 'center',
   },
   {
     field: 'productDescription',
     headerName: 'รายละเอียดสินค้า',
-    minWidth: 260,
+    minWidth: 160,
+    flex: 1,
     sortable: false,
     headerAlign: 'center',
   },
   {
     field: 'productUnit',
     headerName: 'หน่วย',
-    minWidth: 80,
+    minWidth: 50,
     sortable: false,
     headerAlign: 'center',
   },
   {
     field: 'productQuantityRef',
     headerName: 'จำนวนอ้างอิง',
-    width: 135,
+    width: 115,
     sortable: false,
     align: 'right',
     headerAlign: 'center',
@@ -58,7 +66,7 @@ const columns: GridColDef[] = [
   {
     field: 'productQuantityActual',
     headerName: 'จำนวนรับจริง',
-    width: 135,
+    width: 115,
     sortable: false,
     align: 'right',
     headerAlign: 'center',
@@ -66,7 +74,7 @@ const columns: GridColDef[] = [
   {
     field: 'productDifference',
     headerName: 'จำนวนส่วนต่าง',
-    width: 140,
+    width: 120,
     sortable: false,
     align: 'right',
     headerAlign: 'center',
@@ -111,8 +119,11 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   return (
-    <Box mt={2} bgcolor="background.paper">
-      <div className={classes.MdataGridDetail} style={{ width: '100%', marginBottom: '1em' }}>
+    <Box mt={2} bgcolor='background.paper'>
+      <div
+        className={classes.MdataGridDetail}
+        style={{ width: '100%', marginBottom: '1em', height: rows.length >= 8 ? '70vh' : 'auto' }}
+      >
         <DataGrid
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
@@ -120,8 +131,9 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
           pagination
           rows={rows}
           columns={columns}
-          autoHeight
           disableColumnMenu
+          autoHeight={rows.length >= 8 ? false : true}
+          scrollbarSize={10}
         />
       </div>
     </Box>

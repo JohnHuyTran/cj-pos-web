@@ -53,10 +53,17 @@ const useStyles = makeStyles({
       },
       '& .MuiDataGrid-cell': {
         cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        lineHeight: '120% !important',
+        maxHeight: 'none !important',
+        whiteSpace: 'unset !important',
+        overflow: 'unset !important',
       },
-      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus': {
-        outline: 'none',
-      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
+        {
+          outline: 'none',
+        },
     },
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px',
@@ -92,9 +99,12 @@ const useStyles = makeStyles({
         maxHeight: 'none !important',
         '& .MuiDataGrid-cell': {
           cursor: 'pointer',
-          maxHeight: 'none !important',
           display: 'flex',
           alignItems: 'center',
+          lineHeight: '120% !important',
+          maxHeight: 'none !important',
+          whiteSpace: 'unset !important',
+          overflow: 'unset !important',
         },
       },
       '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
