@@ -516,7 +516,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     startIcon={<CheckCircleOutline />}
                     sx={{ width: 200 }}
                   >
-                    อนุมัติ
+                    ยืนยัน
                   </Button>
                 </Grid>
               </Grid>

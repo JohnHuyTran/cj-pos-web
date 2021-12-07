@@ -16,7 +16,7 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import SupplierOrderList from './supplier-order-list';
 import LoadingModal from '../commons/ui/loading-modal';
-import { SearchOff } from '@mui/icons-material';
+import { AddCircleOutlined, SearchOff } from '@mui/icons-material';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
 import { featchSupplierOrderPIDetailAsync } from '../../store/slices/supplier-order-pi-detail-slice';
 import SupplierOrderDetail from './supplier-pi-detail';
@@ -299,12 +299,13 @@ export default function SupplierCheckOrderSearch() {
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
             <Button
-              id="btnClear"
+              id="btnCreateSupplierModal"
               variant="contained"
               onClick={createPI}
-              sx={{ width: '13%', marginRight: 2 }}
+              sx={{ minWidth: '15%' }}
               className={classes.MbtnClear}
-              color="info"
+              startIcon={<AddCircleOutlined />}
+              color="secondary"
             >
               สร้างใบรับสินค้า
             </Button>
@@ -313,7 +314,7 @@ export default function SupplierCheckOrderSearch() {
               id="btnClear"
               variant="contained"
               onClick={onClickClearBtn}
-              sx={{ width: '13%' }}
+              sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
             >
