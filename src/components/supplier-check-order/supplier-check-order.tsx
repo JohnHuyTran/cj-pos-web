@@ -18,6 +18,8 @@ import SupplierOrderList from './supplier-order-list';
 import LoadingModal from '../commons/ui/loading-modal';
 import { SearchOff } from '@mui/icons-material';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
+import { featchSupplierOrderPIDetailAsync } from '../../store/slices/supplier-order-pi-detail-slice';
+import SupplierOrderDetail from './supplier-pi-detail';
 
 interface State {
   paramQuery: string;
@@ -168,6 +170,35 @@ export default function SupplierCheckOrderSearch() {
     }, 300);
   };
 
+  const piDetail: any = [];
+  const [openPIDetail, setOpenPIDetail] = React.useState(false);
+  const purchasePIDetailList = useAppSelector((state) => state.supplierOrderPIDetail.purchasePIDetail);
+  const createPI = async () => {
+    handleOpenLoading('open', true);
+    piDetail.push({
+      supplierCode: '0000101539',
+      docNo: '4000709005',
+    });
+    try {
+      await dispatch(featchSupplierOrderPIDetailAsync(piDetail));
+      if (purchasePIDetailList.data === []) {
+        console.log('Purchase PI Detail No data');
+        setOpenAlert(true);
+        setTextError('ไม่พบข้อมูลใบรับสินค้า');
+      } else {
+        setOpenPIDetail(true);
+      }
+    } catch (error) {
+      console.log(error);
+      setOpenAlert(true);
+      setTextError('ไม่พบข้อมูลใบรับสินค้า');
+    }
+    handleOpenLoading('open', false);
+  };
+  function isClosModal() {
+    setOpenPIDetail(false);
+  }
+
   let orderListData;
   const orderListDatas = items.orderList.data ? items.orderList.data : [];
   const [flagSearch, setFlagSearch] = React.useState(false);
@@ -270,6 +301,17 @@ export default function SupplierCheckOrderSearch() {
             <Button
               id="btnClear"
               variant="contained"
+              onClick={createPI}
+              sx={{ width: '13%', marginRight: 2 }}
+              className={classes.MbtnClear}
+              color="info"
+            >
+              สร้างใบรับสินค้า
+            </Button>
+
+            <Button
+              id="btnClear"
+              variant="contained"
               onClick={onClickClearBtn}
               sx={{ width: '13%' }}
               className={classes.MbtnClear}
@@ -297,6 +339,8 @@ export default function SupplierCheckOrderSearch() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+      {openPIDetail && <SupplierOrderDetail isOpen={openPIDetail} onClickClose={isClosModal} />}
     </>
   );
 }

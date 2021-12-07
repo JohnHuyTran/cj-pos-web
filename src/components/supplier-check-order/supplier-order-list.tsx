@@ -13,8 +13,7 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
-// import SupplierOrderDetail from './supplier-order-detail';
-import SupplierOrderDetail from './supplier-pi-detail';
+import SupplierOrderDetail from './supplier-order-detail';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 

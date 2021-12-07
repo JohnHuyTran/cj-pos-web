@@ -56,6 +56,9 @@ export const environment = {
         url: '/purchase/purchase-invoice',
         // url: '/purchase/pi',
       },
+      detailPI: {
+        url: '/purchase/purchase-order',
+      },
       saveDraft: {
         url: '/purchase/purchase-invoice/{piNo}/draft',
         // url: '/purchase/purchase/{piNo}/draft',

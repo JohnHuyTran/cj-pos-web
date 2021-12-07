@@ -199,6 +199,9 @@ const useStyles = makeStyles({
     '& .css-4q7q78-MuiSvgIcon-root-MuiStepIcon-root.Mui-active': {
       color: '#DDDDDD',
     },
+    '& .css-c9cih3-MuiSvgIcon-root-MuiStepIcon-root.Mui-active': {
+      color: '#DDDDDD',
+    },
   },
   MtextFieldBrowse: {
     '& .MuiOutlinedInput-root': {

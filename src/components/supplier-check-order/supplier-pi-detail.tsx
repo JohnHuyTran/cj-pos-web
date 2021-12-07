@@ -150,19 +150,19 @@ const columns: GridColDef[] = [
     align: 'right',
     sortable: false,
   },
-  {
-    field: 'action',
-    headerName: ' ',
-    width: 60,
-    headerAlign: 'center',
-    align: 'center',
-    sortable: false,
-    renderCell: (params) => (
-      //params.id
-      <DeleteForever fontSize="small" sx={{ color: '#F54949' }} />
-      //onClick={handlDeleteConfirmButton}
-    ),
-  },
+  // {
+  //   field: 'action',
+  //   headerName: ' ',
+  //   width: 60,
+  //   headerAlign: 'center',
+  //   align: 'center',
+  //   sortable: false,
+  //   renderCell: (params) => (
+  //     // params.piStatus !== 1
+  //     <DeleteForever fontSize="small" sx={{ color: '#F54949' }} />
+  //     //onClick={handlDeleteConfirmButton}
+  //   ),
+  // },
 ];
 
 const isDisable = (params: GridRenderCellParams) => {
@@ -235,19 +235,20 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpen(isOpen);
     setBillNo(purchaseDetail.billNo);
     setPiNo(purchaseDetail.piNo);
+    setPiType(purchaseDetail.piType);
     setPiStatus(purchaseDetail.piStatus);
     setComment(purchaseDetail.comment);
     setCharacterCount(purchaseDetail.comment.length);
   }, [open]);
 
-  const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
-
-  const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
+  const purchasePIDetailList = useAppSelector((state) => state.supplierOrderPIDetail.purchasePIDetail);
+  const purchaseDetail: any = purchasePIDetailList.data ? purchasePIDetailList.data : null;
   const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
 
   const [billNo, setBillNo] = React.useState('');
   const [errorBillNo, setErrorBillNo] = React.useState(false);
   const [piNo, setPiNo] = React.useState('');
+  const [piType, setPiType] = React.useState(0);
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
 
@@ -273,6 +274,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       sumPrice: item.sumPrice,
       actualQty: item.actualQty,
       actualQtyAll: item.actualQtyAll,
+      piStatus: piStatus,
     };
   });
   if (localStorage.getItem('SupplierRowsEdit')) {
@@ -473,25 +475,27 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
           </Box>
 
-          <Box mt={4} mb={2}>
-            <Grid container spacing={2} display="flex" justifyContent="space-between">
-              {/* <Grid container spacing={2}> */}
-              <Grid item xl={2}>
-                <Button
-                  id="btnSave"
-                  variant="contained"
-                  color="info"
-                  className={classes.MbtnPrint}
-                  // onClick={handleSaveButton}
-                  startIcon={<ControlPoint />}
-                  sx={{ width: 200 }}
-                >
-                  เพิ่มสินค้า
-                </Button>
-              </Grid>
+          {piStatus !== 1 && (
+            <Box mt={4} mb={2}>
+              <Grid container spacing={2} display="flex" justifyContent="space-between">
+                {/* <Grid container spacing={2}> */}
+                <Grid item xl={2}>
+                  {piType === 1 && (
+                    <Button
+                      id="btnSave"
+                      variant="contained"
+                      color="info"
+                      className={classes.MbtnPrint}
+                      // onClick={handleSaveButton}
+                      startIcon={<ControlPoint />}
+                      sx={{ width: 200 }}
+                    >
+                      เพิ่มสินค้า
+                    </Button>
+                  )}
+                </Grid>
 
-              <Grid item xl={10}>
-                {piStatus !== 1 && (
+                <Grid item xl={10}>
                   <Button
                     id="btnSave"
                     variant="contained"
@@ -503,8 +507,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   >
                     บันทึก
                   </Button>
-                )}
-                {piStatus !== 1 && (
                   <Button
                     id="btnApprove"
                     variant="contained"
@@ -516,10 +518,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   >
                     อนุมัติ
                   </Button>
-                )}
+                </Grid>
               </Grid>
-            </Grid>
-          </Box>
+            </Box>
+          )}
 
           <Box mt={2} bgcolor="background.paper">
             <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
