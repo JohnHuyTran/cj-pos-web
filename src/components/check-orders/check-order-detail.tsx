@@ -1,15 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useAppSelector, useAppDispatch } from "../../store/store";
-import { featchOrderListAsync } from "../../store/slices/check-order-slice";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogContent,
-  Grid,
-  TextField,
-  Typography,
-} from "@mui/material";
+import React, { useEffect, useMemo, useState } from 'react';
+import { useAppSelector, useAppDispatch } from '../../store/store';
+import { featchOrderListAsync } from '../../store/slices/check-order-slice';
+import { Box, Button, Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material';
 import {
   DataGrid,
   GridColDef,
@@ -18,158 +10,138 @@ import {
   GridValueGetterParams,
   GridRowId,
   GridRowData,
-} from "@mui/x-data-grid";
-import DialogTitle from "@mui/material/DialogTitle";
-import Link from "@mui/material/Link";
-import MuiAlert, { AlertProps } from "@mui/material/Alert";
-import SaveIcon from "@mui/icons-material/Save";
-import IconButton from "@mui/material/IconButton";
-import { useStyles } from "../../styles/makeTheme";
+} from '@mui/x-data-grid';
+import DialogTitle from '@mui/material/DialogTitle';
+import Link from '@mui/material/Link';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import SaveIcon from '@mui/icons-material/Save';
+import IconButton from '@mui/material/IconButton';
+import { useStyles } from '../../styles/makeTheme';
 
-import {
-  saveOrderShipments,
-  getPathReportSD,
-} from "../../services/order-shipment";
-import ConfirmOrderShipment from "./check-order-confirm-model";
-import ConfirmExitModel from "./confirm-model";
+import { saveOrderShipments, getPathReportSD } from '../../services/order-shipment';
+import ConfirmOrderShipment from './check-order-confirm-model';
+import ConfirmExitModel from './confirm-model';
 import {
   ShipmentDeliveryStatusCodeEnum,
   getShipmentTypeText,
   getShipmentStatusText,
-} from "../../utils/enum/check-order-enum";
-import ModalShowFile from "../commons/ui/modal-show-file";
-import {
-  SaveDraftSDRequest,
-  CheckOrderDetailProps,
-  Entry,
-  itemsDetail,
-} from "../../models/order-model";
-import { convertUtcToBkkDate } from "../../utils/date-utill";
-import { ApiError } from "../../models/api-error-model";
-import AlertError from "../commons/ui/alert-error";
-import {
-  BookmarkAdded,
-  CheckCircleOutline,
-  HighlightOff,
-  Print,
-} from "@mui/icons-material";
-import LoadingModal from "../commons/ui/loading-modal";
-import CheckOrderSDRefDetail from "./check-order-detail-sd";
-import { featchOrderSDListAsync } from "../../store/slices/check-order-sd-slice";
-import { featchOrderDetailAsync } from "../../store/slices/check-order-detail-slice";
-import Snackbar from "../commons/ui/snackbar-status";
+  formatFileNam,
+} from '../../utils/enum/check-order-enum';
+import ModalShowFile from '../commons/ui/modal-show-file';
+import { SaveDraftSDRequest, CheckOrderDetailProps, Entry, itemsDetail } from '../../models/order-model';
+import { convertUtcToBkkDate } from '../../utils/date-utill';
+import { ApiError } from '../../models/api-error-model';
+import AlertError from '../commons/ui/alert-error';
+import { BookmarkAdded, CheckCircleOutline, HighlightOff, Print } from '@mui/icons-material';
+import LoadingModal from '../commons/ui/loading-modal';
+import CheckOrderSDRefDetail from './check-order-detail-sd';
+import { featchOrderSDListAsync } from '../../store/slices/check-order-sd-slice';
+import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+import Snackbar from '../commons/ui/snackbar-status';
 interface loadingModalState {
   open: boolean;
 }
 
 const columns: GridColDef[] = [
   {
-    field: "rowOrder",
-    headerName: "ลำดับ",
+    field: 'rowOrder',
+    headerName: 'ลำดับ',
     width: 80,
-    headerAlign: "center",
+    headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
   },
   {
-    field: "productId",
-    headerName: "รหัสสินค้า",
+    field: 'productId',
+    headerName: 'รหัสสินค้า',
     width: 180,
-    headerAlign: "center",
+    headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
   },
   {
-    field: "productBarCode",
-    headerName: "บาร์โค้ด",
+    field: 'productBarCode',
+    headerName: 'บาร์โค้ด',
     minWidth: 135,
-    headerAlign: "center",
+    headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
   },
   {
-    field: "productDescription",
-    headerName: "รายละเอียดสินค้า",
-    headerAlign: "center",
-    // minWidth: 300,
+    field: 'productDescription',
+    headerName: 'รายละเอียดสินค้า',
+    headerAlign: 'center',
+    minWidth: 160,
     flex: 1,
     sortable: false,
   },
   {
-    field: "productUnit",
-    headerName: "หน่วย",
+    field: 'productUnit',
+    headerName: 'หน่วย',
     width: 90,
-    headerAlign: "center",
+    headerAlign: 'center',
     sortable: false,
   },
   {
-    field: "productQuantityRef",
-    headerName: "จำนวนอ้างอิง",
+    field: 'productQuantityRef',
+    headerName: 'จำนวนอ้างอิง',
     width: 130,
-    headerAlign: "center",
-    align: "right",
+    headerAlign: 'center',
+    align: 'right',
     sortable: false,
   },
   {
-    field: "productQuantityActual",
-    headerName: "จำนวนรับจริง",
+    field: 'productQuantityActual',
+    headerName: 'จำนวนรับจริง',
     width: 135,
-    headerAlign: "center",
+    headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnQuantityActual"
-        type="number"
-        inputProps={{ style: { textAlign: "right" } }}
+        variant='outlined'
+        name='txnQuantityActual'
+        type='number'
+        inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
-          var value = e.target.value ? parseInt(e.target.value, 10) : "";
+          var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
 
-          params.api.updateRows([
-            { ...params.row, productQuantityActual: value },
-          ]);
+          params.api.updateRows([{ ...params.row, productQuantityActual: value }]);
         }}
         onBlur={(e) => {
           // isAllowActualQty(params, parseInt(e.target.value, 10));
-          params.api.updateRows([
-            { ...params.row, productQuantityActual: e.target.value },
-          ]);
+          params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }]);
         }}
         disabled={isDisable(params) ? true : false}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
   {
-    field: "productDifference",
-    headerName: "ส่วนต่างการรับ",
+    field: 'productDifference',
+    headerName: 'ส่วนต่างการรับ',
     width: 140,
-    headerAlign: "center",
-    align: "right",
+    headerAlign: 'center',
+    align: 'right',
     sortable: false,
     renderCell: (params) => calProductDiff(params),
   },
   {
-    field: "productComment",
-    headerName: "หมายเหตุ",
-    headerAlign: "center",
+    field: 'productComment',
+    headerName: 'หมายเหตุ',
+    headerAlign: 'center',
     minWidth: 120,
     // flex: 0.5,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnComment"
+        variant='outlined'
+        name='txnComment'
         value={params.value}
-        onChange={(e) =>
-          params.api.updateRows([
-            { ...params.row, productComment: e.target.value },
-          ])
-        }
+        onChange={(e) => params.api.updateRows([{ ...params.row, productComment: e.target.value }])}
         disabled={isDisable(params) ? true : false}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
@@ -177,17 +149,11 @@ const columns: GridColDef[] = [
 
 var calProductDiff = function (params: GridValueGetterParams) {
   let diff =
-    Number(params.getValue(params.id, "productQuantityActual")) -
-    Number(params.getValue(params.id, "productQuantityRef"));
+    Number(params.getValue(params.id, 'productQuantityActual')) -
+    Number(params.getValue(params.id, 'productQuantityRef'));
 
-  if (diff > 0)
-    return (
-      <label style={{ color: "#446EF2", fontWeight: 700 }}> +{diff} </label>
-    );
-  if (diff < 0)
-    return (
-      <label style={{ color: "#F54949", fontWeight: 700 }}> {diff} </label>
-    );
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
   return diff;
 };
 
@@ -196,7 +162,7 @@ function useApiRef() {
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: "__HIDDEN__",
+        field: '__HIDDEN__',
         width: 0,
         renderCell: (params) => {
           apiRef.current = params.api;
@@ -226,16 +192,16 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
           }}
         >
-          <HighlightOff fontSize="large" />
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -248,21 +214,12 @@ interface fileInfoProps {
   base64URL: any;
 }
 
-export default function CheckOrderDetail({
-  sdNo,
-  shipmentNo,
-  defaultOpen,
-  onClickClose,
-}: CheckOrderDetailProps) {
+export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClickClose }: CheckOrderDetailProps) {
   const classes = useStyles();
   const sdRef = useAppSelector((state) => state.checkOrderSDList.orderList);
-  const payloadSearchOrder = useAppSelector(
-    (state) => state.saveSearchOrder.searchCriteria
-  );
+  const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
   const dispatch = useAppDispatch();
-  const orderDetails = useAppSelector(
-    (state) => state.checkOrderDetail.orderDetail
-  );
+  const orderDetails = useAppSelector((state) => state.checkOrderDetail.orderDetail);
   const orderDetail: any = orderDetails.data ? orderDetails.data : null;
   const [open, setOpen] = React.useState(defaultOpen);
   const { apiRef, columns } = useApiRef();
@@ -270,28 +227,23 @@ export default function CheckOrderDetail({
   const [showApproveBtn, setShowApproveBtn] = React.useState(false);
   const [showCloseJobBtn, setShowCloseJobBtn] = React.useState(false);
   const [validationFile, setValidationFile] = React.useState(false);
-  const [isDisplayActBtn, setIsDisplayActBtn] = React.useState("");
+  const [isDisplayActBtn, setIsDisplayActBtn] = React.useState('');
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
-  const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState("");
+  const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [action, setAction] = useState<number>(0);
   const [itemsDiffState, setItemsDiffState] = useState<Entry[]>([]);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
-  const [openModelPreviewDocument, setOpenModelPreviewDocument] =
-    React.useState(false);
-  const [shipmentStatusText, setShipmentStatusText] =
-    useState<string | undefined>("");
-  const [shipmentTypeText, setShipmentTypeText] =
-    useState<string | undefined>("");
-  const [shipmentDateFormat, setShipmentDateFormat] =
-    useState<string | undefined>("");
-  const [snackBarFailMsg, setSnackBarFailMsg] = React.useState("");
+  const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
+  const [shipmentStatusText, setShipmentStatusText] = useState<string | undefined>('');
+  const [shipmentTypeText, setShipmentTypeText] = useState<string | undefined>('');
+  const [shipmentDateFormat, setShipmentDateFormat] = useState<string | undefined>('');
+  const [snackBarFailMsg, setSnackBarFailMsg] = React.useState('');
   const [openFailAlert, setOpenFailAlert] = React.useState(false);
-  const [textFail, setTextFail] = React.useState("");
-  const [openLoadingModal, setOpenLoadingModal] =
-    React.useState<loadingModalState>({
-      open: false,
-    });
+  const [textFail, setTextFail] = React.useState('');
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
+  });
 
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [statusFile, setStatusFile] = React.useState(0);
@@ -299,7 +251,7 @@ export default function CheckOrderDetail({
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
   const [showSnackBar, setShowSnackBar] = React.useState(false);
-  const [contentMsg, setContentMsg] = React.useState("");
+  const [contentMsg, setContentMsg] = React.useState('');
   const [snackbarStatus, setSnackbarStatus] = React.useState(false);
 
   useEffect(() => {
@@ -308,23 +260,19 @@ export default function CheckOrderDetail({
       setShowApproveBtn(false);
       setShowCloseJobBtn(true);
     }
-    if (
-      orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE
-    ) {
+    if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
       setShowSaveBtn(true);
       setShowApproveBtn(true);
       setShowCloseJobBtn(false);
     }
-    if (
-      orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB
-    ) {
-      setIsDisplayActBtn("none");
+    if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
+      setIsDisplayActBtn('none');
     }
     setOpen(defaultOpen);
     setShipmentStatusText(getShipmentStatusText(orderDetail.sdStatus));
     setShipmentTypeText(getShipmentTypeText(orderDetail.sdType));
     setShipmentDateFormat(convertUtcToBkkDate(orderDetail.receivedDate));
-    if (orderDetail.Comment !== "") {
+    if (orderDetail.Comment !== '') {
       dispatch(featchOrderSDListAsync(orderDetail.Comment));
     }
   }, [open, openModelConfirm]);
@@ -336,10 +284,7 @@ export default function CheckOrderDetail({
       id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
       doNo: item.deliveryOrderNo,
       isTote: item.isTote,
-      isDraftStatus:
-        orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT
-          ? false
-          : true,
+      isDraftStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
       productId: item.skuCode,
       productBarCode: item.barcode,
       productDescription: item.productName,
@@ -351,10 +296,8 @@ export default function CheckOrderDetail({
     };
   });
 
-  if (localStorage.getItem("checkOrderRowsEdit")) {
-    let localStorageEdit = JSON.parse(
-      localStorage.getItem("checkOrderRowsEdit") || ""
-    );
+  if (localStorage.getItem('checkOrderRowsEdit')) {
+    let localStorageEdit = JSON.parse(localStorage.getItem('checkOrderRowsEdit') || '');
     rowsEntries = localStorageEdit;
   }
 
@@ -362,7 +305,7 @@ export default function CheckOrderDetail({
     setConfirmModelExit(false);
   }
   function handleExitModelConfirm() {
-    localStorage.removeItem("checkOrderRowsEdit");
+    localStorage.removeItem('checkOrderRowsEdit');
     setConfirmModelExit(false);
     setOpen(false);
     onClickClose();
@@ -382,7 +325,7 @@ export default function CheckOrderDetail({
   };
 
   const handleSaveButton = async () => {
-    handleOpenLoading("open", true);
+    handleOpenLoading('open', true);
 
     let qtyIsValid: boolean = true;
     const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -395,13 +338,13 @@ export default function CheckOrderDetail({
         actualQty: data.productQuantityActual * 1,
         comment: data.productComment,
         seqItem: 0,
-        itemNo: "",
-        shipmentSAPRef: "",
-        skuCode: "",
-        skuType: "",
-        productName: "",
-        unitCode: "",
-        unitName: "",
+        itemNo: '',
+        shipmentSAPRef: '',
+        skuCode: '',
+        skuType: '',
+        productName: '',
+        unitCode: '',
+        unitName: '',
         unitFactor: 0,
         qty: 0,
         qtyAll: 0,
@@ -409,18 +352,12 @@ export default function CheckOrderDetail({
         qtyDiff: 0,
         price: 0,
         isControlStock: 0,
-        toteCode: "",
-        expireDate: "",
+        toteCode: '',
+        expireDate: '',
         isTote: false,
       };
 
-      if (
-        data.isTote === true &&
-        !(
-          data.productQuantityActual * 1 >= 0 &&
-          data.productQuantityActual * 1 <= 1
-        )
-      ) {
+      if (data.isTote === true && !(data.productQuantityActual * 1 >= 0 && data.productQuantityActual * 1 <= 1)) {
         qtyIsValid = false;
       }
       itemsList.push(item);
@@ -428,7 +365,7 @@ export default function CheckOrderDetail({
 
     if (!qtyIsValid) {
       setOpenFailAlert(!qtyIsValid);
-      setTextFail("จำนวนรับจริงของTote ต้องเป็น 0 หรือ 1 เท่านั้น");
+      setTextFail('จำนวนรับจริงของTote ต้องเป็น 0 หรือ 1 เท่านั้น');
     }
 
     if (qtyIsValid) {
@@ -440,7 +377,7 @@ export default function CheckOrderDetail({
       await saveOrderShipments(payload, sdNo)
         .then((_value) => {
           setShowSnackBar(true);
-          setContentMsg("คุณได้บันทึกข้อมูลเรียบร้อยแล้ว");
+          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           setSnackbarStatus(true);
           updateShipmentOrder();
         })
@@ -452,9 +389,9 @@ export default function CheckOrderDetail({
         });
     }
 
-    localStorage.removeItem("checkOrderRowsEdit");
+    localStorage.removeItem('checkOrderRowsEdit');
 
-    handleOpenLoading("open", false);
+    handleOpenLoading('open', false);
   };
 
   const handleApproveBtn = async () => {
@@ -464,21 +401,20 @@ export default function CheckOrderDetail({
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const itemsList: any = [];
     rowsEdit.forEach((data: GridRowData) => {
-      let diffCount: number =
-        data.productQuantityActual - data.productQuantityRef;
+      let diffCount: number = data.productQuantityActual - data.productQuantityRef;
       const itemDiff: Entry = {
         barcode: data.productBarCode,
         deliveryOrderNo: data.doNo,
         actualQty: data.productQuantityActual,
         comment: data.productComment,
         seqItem: 0,
-        itemNo: "",
-        shipmentSAPRef: "",
-        skuCode: "",
-        skuType: "",
+        itemNo: '',
+        shipmentSAPRef: '',
+        skuCode: '',
+        skuType: '',
         productName: data.productDescription,
-        unitCode: "",
-        unitName: "",
+        unitCode: '',
+        unitName: '',
         unitFactor: 0,
         qty: 0,
         qtyAll: 0,
@@ -486,30 +422,30 @@ export default function CheckOrderDetail({
         qtyDiff: diffCount,
         price: 0,
         isControlStock: 0,
-        toteCode: "",
-        expireDate: "",
+        toteCode: '',
+        expireDate: '',
         isTote: false,
       };
       setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
       itemsList.push(data);
     });
 
-    localStorage.setItem("checkOrderRowsEdit", JSON.stringify(itemsList));
+    localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
   };
 
   const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
     file: null,
-    fileName: "",
-    base64URL: "",
+    fileName: '',
+    base64URL: '',
   });
 
   const handleCloseJobBtn = () => {
     if (!fileInfo.base64URL) {
       setErrorBrowseFile(true);
-      setMsgErrorBrowseFile("กรุณาแนบไฟล์เอกสาร");
+      setMsgErrorBrowseFile('กรุณาแนบไฟล์เอกสาร');
     } else if (validationFile === true) {
       setOpenFailAlert(true);
-      setTextFail("กรุณาตรวจสอบ ไฟล์เอกสาร");
+      setTextFail('กรุณาตรวจสอบ ไฟล์เอกสาร');
     } else {
       setOpenModelConfirm(true);
       setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
@@ -517,23 +453,23 @@ export default function CheckOrderDetail({
   };
 
   const handlePrintBtn = async () => {
-    handleOpenLoading("open", true);
+    handleOpenLoading('open', true);
     setStatusFile(1);
     setOpenModelPreviewDocument(true);
-    handleOpenLoading("open", false);
+    handleOpenLoading('open', false);
   };
 
   const handleLinkDocument = async () => {
-    handleOpenLoading("open", true);
+    handleOpenLoading('open', true);
     setStatusFile(0);
     setOpenModelPreviewDocument(true);
-    handleOpenLoading("open", false);
+    handleOpenLoading('open', false);
   };
 
   const getBase64 = (file: Blob) => {
     return new Promise((resolve) => {
       let fileInfo;
-      let baseURL: any = "";
+      let baseURL: any = '';
       // Make new FileReader
       let reader = new FileReader();
       // Convert the file to base64 text
@@ -550,11 +486,12 @@ export default function CheckOrderDetail({
   const handleFileInputChange = (e: any) => {
     setValidationFile(false);
     setErrorBrowseFile(false);
-    setMsgErrorBrowseFile("");
+    setMsgErrorBrowseFile('');
     checkSizeFile(e);
 
     let file: File = e.target.files[0];
-    const fileName = e.target.files[0].name;
+    let fileType = file.type.split('/');
+    const fileName = `${sdNo}-01.${fileType[1]}`;
 
     getBase64(file)
       .then((result: any) => {
@@ -569,17 +506,17 @@ export default function CheckOrderDetail({
   const checkSizeFile = (e: any) => {
     const fileSize = e.target.files[0].size;
     const fileName = e.target.files[0].name;
-    let parts = fileName.split(".");
+    let parts = fileName.split('.');
     let length = parts.length - 1;
     // pdf, .jpg, .jpeg
     if (
-      parts[length].toLowerCase() !== "pdf" &&
-      parts[length].toLowerCase() !== "jpg" &&
-      parts[length].toLowerCase() !== "jpeg"
+      parts[length].toLowerCase() !== 'pdf' &&
+      parts[length].toLowerCase() !== 'jpg' &&
+      parts[length].toLowerCase() !== 'jpeg'
     ) {
       setValidationFile(true);
       setErrorBrowseFile(true);
-      setMsgErrorBrowseFile("กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น");
+      setMsgErrorBrowseFile('กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น');
       return;
     }
 
@@ -593,28 +530,25 @@ export default function CheckOrderDetail({
       if (size > 5) {
         setValidationFile(true);
         setErrorBrowseFile(true);
-        setMsgErrorBrowseFile("ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่");
+        setMsgErrorBrowseFile('ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่');
         return;
       }
     }
   };
 
-  const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
-    props,
-    ref
-  ) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
-    setContentMsg("");
+    setContentMsg('');
     setSnackbarStatus(false);
   };
 
   const handleShowSnackBar = async (issuccess: boolean, errorMsg: string) => {
-    handleOpenLoading("open", true);
-    const msg = issuccess ? "คุณได้อนุมัติใบสั่งซื้อเรียบร้อยแล้ว" : errorMsg;
+    handleOpenLoading('open', true);
+    const msg = issuccess ? 'คุณได้ทำรายการเรียบร้อยแล้ว' : errorMsg;
     setShowSnackBar(true);
     setContentMsg(msg);
     setSnackbarStatus(issuccess);
@@ -622,16 +556,16 @@ export default function CheckOrderDetail({
     if (issuccess) {
       updateShipmentOrder();
       setTimeout(() => {
-        handleClose();
-      }, 500);
-    } else {
-      handleOpenLoading("open", false);
+        setOpen(false);
+        onClickClose();
+      }, 1000);
     }
+    handleOpenLoading('open', false);
   };
 
   const handleCloseFailAlert = () => {
     setOpenFailAlert(false);
-    setTextFail("");
+    setTextFail('');
   };
 
   const [opensSD, setOpensSD] = React.useState(false);
@@ -641,10 +575,10 @@ export default function CheckOrderDetail({
   }
 
   const clickSelectedSDRef = async () => {
-    handleOpenLoading("open", true);
+    handleOpenLoading('open', true);
     setTimeout(() => {
-      handleOpenLoading("open", false);
-      console.log("sdRef.data : ", sdRef.data);
+      handleOpenLoading('open', false);
+      console.log('sdRef.data : ', sdRef.data);
       if (sdRef.data !== null && sdRef.data !== []) {
         setOpensSD(true);
       } else {
@@ -656,16 +590,13 @@ export default function CheckOrderDetail({
 
   const handleClose = () => {
     if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
-      const rowsEdit: Map<GridRowId, GridRowData> =
-        apiRef.current.getRowModels();
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       let i = 0;
       let exit = false;
 
       const itemsList: any = [];
       rowsEdit.forEach((data: GridRowData) => {
-        if (
-          data.productQuantityActual !== rowsEntries[i].productQuantityActual
-        ) {
+        if (data.productQuantityActual !== rowsEntries[i].productQuantityActual) {
           exit = true;
         } else if (data.productComment !== rowsEntries[i].productComment) {
           exit = true;
@@ -676,16 +607,14 @@ export default function CheckOrderDetail({
       });
 
       if (!exit) {
-        localStorage.removeItem("checkOrderRowsEdit");
+        localStorage.removeItem('checkOrderRowsEdit');
         setOpen(false);
         onClickClose();
       } else if (exit) {
-        localStorage.setItem("checkOrderRowsEdit", JSON.stringify(itemsList));
+        localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
         setConfirmModelExit(true);
       }
-    } else if (
-      orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE
-    ) {
+    } else if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
       if (fileInfo.base64URL) {
         setConfirmModelExit(true);
       } else {
@@ -700,110 +629,100 @@ export default function CheckOrderDetail({
 
   return (
     <div>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle
-          id="customized-dialog-title"
-          onClose={handleClose}
-        >
-          <Typography sx={{ fontSize: "1em" }}>
-            รายละเอียดใบตรวจสอบการรับ-โอนสินค้า
-          </Typography>
+      <Dialog open={open} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
+          <Typography sx={{ fontSize: '1em' }}>รายละเอียดใบตรวจสอบการรับ-โอนสินค้า</Typography>
         </BootstrapDialogTitle>
 
         <DialogContent>
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร LD:</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร LD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">
-                  {orderDetail.shipmentNo}
-                </Typography>
+                <Typography variant='body2'>{orderDetail.shipmentNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">สถานะ:</Typography>
+                <Typography variant='body2'>สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentStatusText}</Typography>
+                <Typography variant='body2'>{shipmentStatusText}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetail.sdNo}</Typography>
+                <Typography variant='body2'>{orderDetail.sdNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">ประเภท:</Typography>
+                <Typography variant='body2'>ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentTypeText}</Typography>
+                <Typography variant='body2'>{shipmentTypeText}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">วันที่:</Typography>
+                <Typography variant='body2'>วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentDateFormat}</Typography>
+                <Typography variant='body2'>{shipmentDateFormat}</Typography>
               </Grid>
               <Grid item lg={2}>
-                {orderDetail.sdStatus ===
-                  ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
-                  <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
+                {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
+                  <Typography variant='body2'>ใบผลต่างหลังเซ็นต์:</Typography>
                 )}
 
-                {orderDetail.sdImageFile !== "" &&
-                  orderDetail.sdImageFile !== "temp" &&
-                  orderDetail.sdStatus ===
-                    ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
+                {orderDetail.sdImageFile !== '' &&
+                  orderDetail.sdImageFile !== 'temp' &&
+                  orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
+                    <Typography variant='body2'>ใบผลต่างหลังเซ็นต์:</Typography>
                   )}
               </Grid>
               <Grid item lg={4}>
-                {orderDetail.sdStatus ===
-                  ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
+                {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
                   <div>
                     {errorBrowseFile === true && (
                       <TextField
                         error
-                        name="browserTxf"
+                        name='browserTxf'
                         className={classes.MtextFieldBrowse}
                         value={fileInfo.fileName}
-                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
+                        placeholder='แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB'
                         helperText={msgErrorBrowseFile}
                       />
                     )}
 
                     {errorBrowseFile === false && (
                       <TextField
-                        name="browserTxf"
+                        name='browserTxf'
                         className={classes.MtextFieldBrowse}
                         value={fileInfo.fileName}
-                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
+                        placeholder='แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB'
                       />
                     )}
 
                     <input
-                      id="btnBrowse"
-                      type="file"
+                      id='btnBrowse'
+                      type='file'
                       // multiple
                       // onDrop
-                      accept=".pdf, .jpg, .jpeg"
+                      accept='.pdf, .jpg, .jpeg'
                       onChange={handleFileInputChange}
-                      style={{ display: "none" }}
+                      style={{ display: 'none' }}
                     />
 
-                    <label htmlFor={"btnBrowse"}>
+                    <label htmlFor={'btnBrowse'}>
                       <Button
-                        id="btnPrint"
-                        color="primary"
-                        variant="contained"
-                        component="span"
+                        id='btnPrint'
+                        color='primary'
+                        variant='contained'
+                        component='span'
                         className={classes.MbtnBrowse}
-                        style={{ marginLeft: 10, textTransform: "none" }}
+                        style={{ marginLeft: 10, textTransform: 'none' }}
                       >
                         Browse
                       </Button>
@@ -811,33 +730,25 @@ export default function CheckOrderDetail({
                   </div>
                 )}
 
-                {orderDetail.sdImageFile !== "" &&
-                  orderDetail.sdImageFile !== "temp" &&
-                  orderDetail.sdStatus ===
-                    ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
+                {orderDetail.sdImageFile !== '' &&
+                  orderDetail.sdImageFile !== 'temp' &&
+                  orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
                     <div>
-                      <Link
-                        component="button"
-                        variant="body2"
-                        onClick={handleLinkDocument}
-                      >
+                      <Link component='button' variant='body2' onClick={handleLinkDocument}>
                         ดูเอกสาร
                       </Link>
                     </div>
                   )}
               </Grid>
             </Grid>
-            {orderDetail.Comment !== "" && (
+            {orderDetail.Comment !== '' && (
               <Grid container spacing={2} mb={1}>
                 <Grid item lg={2}>
-                  <Typography variant="body2">อ้างอิง SD โอนลอย :</Typography>
+                  <Typography variant='body2'>อ้างอิง SD โอนลอย :</Typography>
                 </Grid>
                 <Grid item lg={4}>
-                  <Typography variant="body2">
-                    <u
-                      onClick={clickSelectedSDRef}
-                      style={{ cursor: "pointer" }}
-                    >
+                  <Typography variant='body2'>
+                    <u onClick={clickSelectedSDRef} style={{ cursor: 'pointer' }}>
                       {orderDetail.Comment}
                     </u>
                   </Typography>
@@ -849,21 +760,16 @@ export default function CheckOrderDetail({
 
           {/* DisplayBtn */}
           <Box sx={{ display: isDisplayActBtn, marginTop: 4 }}>
-            <Grid
-              container
-              spacing={2}
-              display="flex"
-              justifyContent="space-between"
-            >
+            <Grid container spacing={2} display='flex' justifyContent='space-between'>
               <Grid item xl={2}>
                 <Button
-                  id="btnPrint"
-                  variant="contained"
-                  color="secondary"
+                  id='btnPrint'
+                  variant='contained'
+                  color='secondary'
                   onClick={handlePrintBtn}
                   startIcon={<Print />}
                   className={classes.MbtnPrint}
-                  style={{ textTransform: "none" }}
+                  style={{ textTransform: 'none' }}
                 >
                   พิมพ์ใบผลต่าง
                 </Button>
@@ -872,12 +778,13 @@ export default function CheckOrderDetail({
               <Grid item>
                 {!showSaveBtn && (
                   <Button
-                    id="btnSave"
-                    variant="contained"
-                    color="warning"
+                    id='btnSave'
+                    variant='contained'
+                    color='warning'
                     className={classes.MbtnSave}
                     onClick={handleSaveButton}
                     startIcon={<SaveIcon />}
+                    style={{ width: 200 }}
                   >
                     บันทึก
                   </Button>
@@ -885,12 +792,13 @@ export default function CheckOrderDetail({
 
                 {!showApproveBtn && (
                   <Button
-                    id="btnApprove"
-                    variant="contained"
-                    color="primary"
+                    id='btnApprove'
+                    variant='contained'
+                    color='primary'
                     className={classes.MbtnApprove}
                     onClick={handleApproveBtn}
                     startIcon={<CheckCircleOutline />}
+                    style={{ width: 200 }}
                   >
                     ยืนยัน
                   </Button>
@@ -898,9 +806,9 @@ export default function CheckOrderDetail({
 
                 {!showCloseJobBtn && (
                   <Button
-                    id="btnClose"
-                    variant="contained"
-                    color="primary"
+                    id='btnClose'
+                    variant='contained'
+                    color='primary'
                     className={classes.MbtnClose}
                     onClick={handleCloseJobBtn}
                     startIcon={<BookmarkAdded />}
@@ -912,10 +820,10 @@ export default function CheckOrderDetail({
             </Grid>
           </Box>
 
-          <Box mt={2} bgcolor="background.paper">
+          <Box mt={2} bgcolor='background.paper'>
             <div
-              style={{ height: 400, width: "100%" }}
-              className={classes.MdataGrid}
+              style={{ width: '100%', height: rowsEntries.length >= 8 ? '70vh' : 'auto' }}
+              className={classes.MdataGridDetail}
             >
               <DataGrid
                 rows={rowsEntries}
@@ -924,7 +832,9 @@ export default function CheckOrderDetail({
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
-                autoHeight
+                disableColumnMenu
+                autoHeight={rowsEntries.length >= 8 ? false : true}
+                scrollbarSize={10}
               />
             </div>
           </Box>
@@ -950,7 +860,7 @@ export default function CheckOrderDetail({
         action={action}
         items={itemsDiffState}
         percentDiffType={false}
-        percentDiffValue="0"
+        percentDiffValue='0'
         fileName={fileInfo.fileName}
         imageContent={fileInfo.base64URL}
       />
@@ -967,20 +877,12 @@ export default function CheckOrderDetail({
         url={getPathReportSD(sdNo)}
         statusFile={statusFile}
         sdImageFile={orderDetail.sdImageFile}
+        fileName={orderDetail.sdImageFilename ? orderDetail.sdImageFilename : formatFileNam(sdNo, orderDetail.sdStatus)}
       />
 
-      <AlertError
-        open={openFailAlert}
-        onClose={handleCloseFailAlert}
-        textError={textFail}
-      />
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
 
-      <Snackbar
-        open={showSnackBar}
-        onClose={handleCloseSnackBar}
-        isSuccess={snackbarStatus}
-        contentMsg={contentMsg}
-      />
+      <Snackbar open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={snackbarStatus} contentMsg={contentMsg} />
 
       <LoadingModal open={openLoadingModal.open} />
     </div>

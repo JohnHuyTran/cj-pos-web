@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
-
+:root {
+  --primary: #36c690;
+}
 body {
   margin: 0;
 
@@ -12,4 +14,39 @@ body {
 
 code {
   font-family: 'Kanit', sans-serif;
+}
+.MuiDrawer-docked .MuiList-root .MuiList-root .MuiTypography-body1 {
+  font-size: 14px;
+}
+.MuiDrawer-docked .MuiList-root .Mui-selected:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 8px;
+  right: 0;
+  bottom: 8px;
+  width: 4px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+.MuiDataGrid-root .MuiDataGrid-window::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.MuiDataGrid-root .MuiDataGrid-window::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+}
+
+/*fix search*/
+[class*='MtextField'] .MuiOutlinedInput-input {
+  min-height: 30px;
+}
+[class*='Mselect'] .MuiOutlinedInput-input.MuiInputBase-input {
+  height: 30px;
+  line-height: 30px;
+  padding-left: 5px;
+}
+[class*='Mdatepicker'] .MuiInputBase-root.MuiOutlinedInput-root {
+  height: 38px;
 }

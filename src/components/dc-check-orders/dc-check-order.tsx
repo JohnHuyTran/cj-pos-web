@@ -1,32 +1,27 @@
-import moment from "moment";
-import React, { useEffect } from "react";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import { Button } from "@mui/material";
-import { useAppSelector, useAppDispatch } from "../../store/store";
-import {
-  featchOrderListDcAsync,
-  clearDataFilter,
-} from "../../store/slices/dc-check-order-slice";
-import { featchBranchListAsync } from "../../store/slices/search-branches-slice";
-import { clearSearchCriteriaDc } from "../../store/slices/save-search-order-dc-slice";
-import { saveSearchCriteriaDc } from "../../store/slices/save-search-order-dc-slice";
-import { CheckOrderRequest } from "../../models/dc-check-order-model";
-import DCOrderList from "./dc-order-list";
-import { useStyles } from "../../styles/makeTheme";
-import DatePickerComponent from "../commons/ui/date-picker";
-import LoadingModal from "../commons/ui/loading-modal";
-import { SearchOff } from "@mui/icons-material";
-import { BranchInfo, BranchResponse } from "../../models/search-branch-model";
-import { Autocomplete } from "@mui/material";
-import AlertError from "../commons/ui/alert-error";
+import moment from 'moment';
+import React, { useEffect } from 'react';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import { Button } from '@mui/material';
+import { useAppSelector, useAppDispatch } from '../../store/store';
+import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
+import { featchBranchListAsync } from '../../store/slices/search-branches-slice';
+import { saveSearchCriteriaDc } from '../../store/slices/save-search-order-dc-slice';
+import { CheckOrderRequest } from '../../models/dc-check-order-model';
+import DCOrderList from './dc-order-list';
+import { useStyles } from '../../styles/makeTheme';
+import DatePickerComponent from '../commons/ui/date-picker';
+import LoadingModal from '../commons/ui/loading-modal';
+import { SearchOff } from '@mui/icons-material';
+import { Autocomplete } from '@mui/material';
+import AlertError from '../commons/ui/alert-error';
 
-moment.locale("th");
+moment.locale('th');
 
 interface State {
   docNo: string;
@@ -48,36 +43,31 @@ interface branchListOptionType {
 
 function DCCheckOrderSearch() {
   // const limit = "10";
-  const page = "1";
-
+  const page = '1';
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.dcCheckOrderList);
-  const limit = useAppSelector(
-    (state) => state.dcCheckOrderList.orderList.perPage
-  );
+  const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
   const branchList = useAppSelector((state) => state.searchBranchSlice);
   const [values, setValues] = React.useState<State>({
-    docNo: "",
-    branchCode: "",
-    verifyDCStatus: "ALL",
-    dateFrom: "",
-    dateTo: "",
-    sdType: "ALL",
-    sortBy: "",
+    docNo: '',
+    branchCode: '',
+    verifyDCStatus: 'ALL',
+    dateFrom: '',
+    dateTo: '',
+    sdType: 'ALL',
+    sortBy: '',
   });
-  const [codeBranch, setCodeBranch] = React.useState("");
+  // const [codeBranch, setCodeBranch] = React.useState('');
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
-  const [openLoadingModal, setOpenLoadingModal] =
-    React.useState<loadingModalState>({
-      open: false,
-    });
-  const [valueBranchList, setValueBranchList] =
-    React.useState<branchListOptionType | null>(null);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
+  });
+  const [valueBranchList, setValueBranchList] = React.useState<branchListOptionType | null>(null);
 
   const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState("");
+  const [textError, setTextError] = React.useState('');
 
   useEffect(() => {
     dispatch(featchBranchListAsync());
@@ -86,7 +76,6 @@ function DCCheckOrderSearch() {
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
-    // console.log("value in handle change: ", values);
   };
 
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -96,7 +85,7 @@ function DCCheckOrderSearch() {
   const onClickSearchBtn = async () => {
     let limits;
     if (limit === 0) {
-      limits = "10";
+      limits = '10';
     } else {
       limits = limit.toString();
     }
@@ -107,41 +96,40 @@ function DCCheckOrderSearch() {
       docNo: values.docNo,
       branchCode: values.branchCode,
       verifyDCStatus: values.verifyDCStatus,
-      dateFrom: moment(startDate).startOf("day").toISOString(),
-      dateTo: moment(endDate).endOf("day").toISOString(),
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
       sdType: values.sdType,
       sortBy: values.sortBy,
       clearSearch: false,
     };
 
-    handleOpenLoading("open", true);
+    handleOpenLoading('open', true);
     await dispatch(featchOrderListDcAsync(payload));
     await dispatch(saveSearchCriteriaDc(payload));
-    handleOpenLoading("open", false);
-
-    // console.log(`Search Criteria: ${JSON.stringify(payload)}`);
+    setFlagSearch(true);
+    handleOpenLoading('open', false);
   };
 
   const onClickValidateForm = () => {
     if (
-      values.docNo === "" &&
+      values.docNo === '' &&
       valueBranchList === null &&
-      values.verifyDCStatus === "ALL" &&
+      values.verifyDCStatus === 'ALL' &&
       startDate === null &&
       endDate === null &&
-      values.sdType === "ALL"
+      values.sdType === 'ALL'
     ) {
       setOpenAlert(true);
-      setTextError("กรุณากรอกวันที่รับสินค้า");
+      setTextError('กรุณากรอกวันที่รับสินค้า');
     } else if (
-      values.docNo === "" &&
+      values.docNo === '' &&
       valueBranchList === null &&
-      values.verifyDCStatus === "ALL" &&
-      values.sdType === "ALL"
+      values.verifyDCStatus === 'ALL' &&
+      values.sdType === 'ALL'
     ) {
       if (startDate === null || endDate === null) {
         setOpenAlert(true);
-        setTextError("กรุณากรอกวันที่รับสินค้า");
+        setTextError('กรุณากรอกวันที่รับสินค้า');
       } else {
         onClickSearchBtn();
       }
@@ -151,20 +139,20 @@ function DCCheckOrderSearch() {
   };
 
   const onClickClearBtn = async () => {
+    handleOpenLoading('open', true);
+    setFlagSearch(false);
     setStartDate(null);
     setEndDate(null);
     setValueBranchList(null);
     setValues({
-      docNo: "",
-      branchCode: "",
-      verifyDCStatus: "ALL",
-      dateFrom: "",
-      dateTo: "",
-      sdType: "ALL",
-      sortBy: "",
+      docNo: '',
+      branchCode: '',
+      verifyDCStatus: 'ALL',
+      dateFrom: '',
+      dateTo: '',
+      sdType: 'ALL',
+      sortBy: '',
     });
-
-    // items.orderList = '';
 
     const payload: CheckOrderRequest = {
       limit: limit.toString(),
@@ -172,14 +160,17 @@ function DCCheckOrderSearch() {
       docNo: values.docNo,
       branchCode: values.branchCode,
       verifyDCStatus: values.verifyDCStatus,
-      dateFrom: moment(startDate).startOf("day").toISOString(),
-      dateTo: moment(endDate).endOf("day").toISOString(),
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
       sdType: values.sdType,
       sortBy: values.sortBy,
       clearSearch: true,
     };
 
     dispatch(featchOrderListDcAsync(payload));
+    setTimeout(() => {
+      handleOpenLoading('open', false);
+    }, 300);
   };
 
   // useEffect(() => {
@@ -200,37 +191,34 @@ function DCCheckOrderSearch() {
     getOptionLabel: (option: branchListOptionType) => option.name,
   };
 
-  const handleChangeBranch = (
-    event: any,
-
-    newValue: branchListOptionType | null
-  ) => {
+  const handleChangeBranch = (event: any, newValue: branchListOptionType | null) => {
     setValueBranchList(newValue);
 
     if (newValue !== null) {
       let codes = JSON.stringify(newValue?.code);
       setValues({ ...values, branchCode: JSON.parse(codes) });
     } else {
-      setValues({ ...values, branchCode: "" });
+      setValues({ ...values, branchCode: '' });
     }
   };
 
   let orderListData;
-  const orderListDatas = items.orderList.data;
-  const codeError = items.orderList.code;
-
-  if (codeError === 40100 || orderListDatas.length === 0) {
-    orderListData = (
-      <Grid item container xs={12} justifyContent="center">
-        <Box color="#CBD4DB">
-          <h2>
-            ไม่มีข้อมูล <SearchOff fontSize="large" />
-          </h2>
-        </Box>
-      </Grid>
-    );
-  } else {
-    orderListData = <DCOrderList />;
+  const orderListDatas = items.orderList.data ? items.orderList.data : [];
+  const [flagSearch, setFlagSearch] = React.useState(false);
+  if (flagSearch) {
+    if (orderListDatas.length > 0) {
+      orderListData = <DCOrderList />;
+    } else {
+      orderListData = (
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
+            <h2>
+              ไม่มีข้อมูล <SearchOff fontSize="large" />
+            </h2>
+          </Box>
+        </Grid>
+      );
+    }
   }
 
   //check dateFrom-dateTo
@@ -282,13 +270,7 @@ function DCCheckOrderSearch() {
                 );
               }}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="ทั้งหมด"
-                  size="small"
-                  className={classes.MtextField}
-                  fullWidth
-                />
+                <TextField {...params} placeholder="ทั้งหมด" size="small" className={classes.MtextField} fullWidth />
               )}
             />
 
@@ -323,13 +305,13 @@ function DCCheckOrderSearch() {
                 name="verifyDCStatus"
                 value={values.verifyDCStatus}
                 onChange={handleChange}
-                inputProps={{ "aria-label": "Without label" }}
+                inputProps={{ 'aria-label': 'Without label' }}
               >
-                <MenuItem value={"ALL"} selected={true}>
+                <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={"0"}>รอการตรวจสอบ</MenuItem>
-                <MenuItem value={"1"}>ตรวจสอบแล้ว</MenuItem>
+                <MenuItem value={'0'}>รอการตรวจสอบ</MenuItem>
+                <MenuItem value={'1'}>ตรวจสอบแล้ว</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -341,20 +323,17 @@ function DCCheckOrderSearch() {
             <Typography gutterBottom variant="subtitle1" component="div">
               ตั้งแต่
             </Typography>
-            <DatePickerComponent
-              onClickDate={handleStartDatePicker}
-              value={startDate}
-            />
+            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4} container alignItems="flex-end">
-            <Box sx={{ width: "100%" }}>
+            <Box sx={{ width: '100%' }}>
               <Typography gutterBottom variant="subtitle1" component="div">
                 ถึง
               </Typography>
               <DatePickerComponent
                 onClickDate={handleEndDatePicker}
                 value={endDate}
-                type={"TO"}
+                type={'TO'}
                 minDateTo={startDate}
               />
             </Box>
@@ -369,30 +348,23 @@ function DCCheckOrderSearch() {
                 name="sdType"
                 value={values.sdType}
                 onChange={handleChange}
-                inputProps={{ "aria-label": "Without label" }}
+                inputProps={{ 'aria-label': 'Without label' }}
               >
-                <MenuItem value={"ALL"} selected={true}>
+                <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={"0"}>ลังกระดาษ/ลังพลาสติก</MenuItem>
-                <MenuItem value={"1"}>สินค้าภายในTote</MenuItem>
+                <MenuItem value={'0'}>ลังกระดาษ/Tote</MenuItem>
+                <MenuItem value={'1'}>สินค้าภายในTote</MenuItem>
               </Select>
             </FormControl>
           </Grid>
 
-          <Grid
-            item
-            container
-            xs={12}
-            justifyContent="flex-end"
-            direction="row"
-            alignItems="flex-end"
-          >
+          <Grid item container xs={12} justifyContent="flex-end" direction="row" alignItems="flex-end">
             <Button
               id="btnClear"
               variant="contained"
               onClick={onClickClearBtn}
-              sx={{ width: "13%" }}
+              sx={{ width: '13%' }}
               className={classes.MbtnClear}
               color="cancelColor"
             >
@@ -403,7 +375,7 @@ function DCCheckOrderSearch() {
               variant="contained"
               color="primary"
               onClick={onClickValidateForm}
-              sx={{ width: "13%", ml: 2 }}
+              sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}
             >
               ค้นหา
@@ -417,11 +389,7 @@ function DCCheckOrderSearch() {
       {orderListData}
       <LoadingModal open={openLoadingModal.open} />
 
-      <AlertError
-        open={openAlert}
-        onClose={handleCloseAlert}
-        textError={textError}
-      />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </>
   );
 }

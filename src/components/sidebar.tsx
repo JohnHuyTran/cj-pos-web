@@ -1,65 +1,65 @@
-import React, { ReactElement, useEffect } from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import { withStyles } from "@mui/styles";
-import { Link } from "react-router-dom";
-import Drawer from "@mui/material/Drawer";
-import Divider from "@mui/material/Divider";
-import Collapse from "@mui/material/Collapse";
-import List from "@mui/material/List";
-import MuiListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import IconButton from "@mui/material/IconButton";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import LoyaltyOutlinedIcon from "@mui/icons-material/LoyaltyOutlined";
-import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
-import StarBorder from "@mui/icons-material/StarBorder";
-import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import { useAppSelector, useAppDispatch } from "../store/store";
-import { changeState } from "../store/slices/nav-slice";
-import imgLogo from "../assets/images/Logo-CJ-More.png";
-import Menu from "@mui/icons-material/Menu";
+import React, { ReactElement, useEffect } from 'react';
+import { styled, useTheme } from '@mui/material/styles';
+import { withStyles } from '@mui/styles';
+import { Link } from 'react-router-dom';
+import Drawer from '@mui/material/Drawer';
+import Divider from '@mui/material/Divider';
+import Collapse from '@mui/material/Collapse';
+import List from '@mui/material/List';
+import MuiListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import IconButton from '@mui/material/IconButton';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import LoyaltyOutlinedIcon from '@mui/icons-material/LoyaltyOutlined';
+import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
+import StarBorder from '@mui/icons-material/StarBorder';
+import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { useAppSelector, useAppDispatch } from '../store/store';
+import { changeState } from '../store/slices/nav-slice';
+import imgLogo from '../assets/images/Logo-CJ-More.png';
+import Menu from '@mui/icons-material/Menu';
 
 // const [version, setVersion] = React.useState<any>(process.env.REACT_APP_REF);
 
 const drawerWidth = 240;
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: "space-between",
+  justifyContent: 'space-between',
 }));
 
 const ListItemButton = withStyles({
   root: {
-    "&$selected": {
-      backgroundColor: "#E7FFE9",
-      color: "#36C690",
-      "& .MuiListItemIcon-root": {
-        color: "#36C690",
+    '&$selected': {
+      backgroundColor: '#E7FFE9!important',
+      color: '#36C690',
+      '& .MuiListItemIcon-root': {
+        color: '#36C690',
       },
     },
-    "&$selected:hover": {
-      backgroundColor: "#FFFFFF",
-      color: "#676767",
-      "& .MuiListItemIcon-root": {
-        color: "#676767",
+    '&$selected:hover': {
+      backgroundColor: '#FFFFFF',
+      color: '#676767',
+      '& .MuiListItemIcon-root': {
+        color: '#676767',
       },
     },
-    "&:hover": {
-      cursor: "pointer",
-      backgroundColor: "#E7FFE9",
-      color: "#36C690",
-      "& .MuiListItemIcon-root": {
-        color: "#36C690",
+    '&:hover': {
+      cursor: 'pointer',
+      backgroundColor: '#E7FFE9',
+      color: '#36C690',
+      '& .MuiListItemIcon-root': {
+        color: '#36C690',
       },
     },
   },
@@ -105,17 +105,18 @@ export default function Sidebar({}: Props): ReactElement {
       sx={{
         width: drawerWidth,
         flexShrink: 0,
-        "& .MuiDrawer-paper": {
+        '& .MuiDrawer-paper': {
           width: drawerWidth,
-          boxSizing: "border-box",
+          boxSizing: 'border-box',
+          boxShadow: '10px 10px 20px rgba(0, 0, 0, 0.1)',
         },
       }}
-      variant="persistent"
-      anchor="left"
+      variant='persistent'
+      anchor='left'
       open={open}
     >
       <DrawerHeader>
-        <img src={imgLogo} alt="" width="50" />
+        <img src={imgLogo} alt='' width='50' />
         {/* <IconButton onClick={handleDrawerClose}>
           {theme.direction === "ltr" ? (
             <ChevronLeftIcon color="primary" />
@@ -125,162 +126,133 @@ export default function Sidebar({}: Props): ReactElement {
         </IconButton> */}
 
         <div onClick={handleDrawerClose}>
-          <ChevronLeftIcon color="primary" sx={{ marginRight: "-5px" }} />
-          <Menu color="primary" />
+          <ChevronLeftIcon color='primary' sx={{ marginRight: '-5px' }} />
+          <Menu color='primary' />
         </div>
       </DrawerHeader>
 
       <List sx={{ marginTop: 2 }}>
-        <Link to="/" style={{ textDecoration: "none", color: "#676767" }}>
+        <Link to='/' style={{ textDecoration: 'none', color: '#676767' }}>
           <ListItemButton
-            key="HOME"
+            key='HOME'
             selected={selectedIndex === 0}
             onClick={() => handleListItemClick(0)}
-            id="mainMenuHome"
+            id='mainMenuHome'
           >
             <ListItemIcon>
               <HomeOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary="หน้าหลัก" style={{ marginLeft: -15 }} />
+            <ListItemText primary='หน้าหลัก' style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
-        <Link
-          to="/notification"
-          style={{ textDecoration: "none", color: "#676767" }}
-        >
+        <Link to='/notification' style={{ textDecoration: 'none', color: '#676767' }}>
           <ListItemButton
-            key="NOTIFICATION"
+            key='NOTIFICATION'
             selected={selectedIndex === 1}
             onClick={() => handleListItemClick(1)}
-            id="mainMenuNotification"
+            id='mainMenuNotification'
           >
             <ListItemIcon>
               <NotificationsNoneOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary="แจ้งเตือน" style={{ marginLeft: -15 }} />
+            <ListItemText primary='แจ้งเตือน' style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
-        <Link
-          to="/purchase"
-          style={{ textDecoration: "none", color: "#676767" }}
-        >
-          <ListItemButton
-            key="PURCHASE"
-            selected={selectedIndex === 2}
-            onClick={() => handleListItemClick(2)}
-          >
+        <Link to='/purchase' style={{ textDecoration: 'none', color: '#676767' }}>
+          <ListItemButton key='PURCHASE' selected={selectedIndex === 2} onClick={() => handleListItemClick(2)}>
             <ListItemIcon>
               <ShoppingCartOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary="ซื้อ" style={{ marginLeft: -15 }} />
+            <ListItemText primary='ซื้อ' style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
-        <ListItemButton onClick={handleClick} id="mainMenuSale">
+        <ListItemButton onClick={handleClick} id='mainMenuSale'>
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText primary="ขาย" style={{ marginLeft: -15 }} />
+          <ListItemText primary='ขาย' style={{ marginLeft: -15 }} />
           {openSaleMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openSaleMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <Link
-              to="/sale"
-              style={{ textDecoration: "none", color: "#676767" }}
-              id="subMenuSale"
-            >
+        <Collapse in={openSaleMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
+            <Link to='/sale' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuSale'>
               <ListItemButton
-                key="SALE"
+                key='SALE'
                 selected={selectedIndex === 3}
                 onClick={() => handleListItemClick(3)}
                 sx={{ pl: 7 }}
               >
-                <ListItemText primary="ส่วนลดสินค้า" />
+                <ListItemText primary='ส่วนลดสินค้า' />
               </ListItemButton>
             </Link>
           </List>
         </Collapse>
-        <ListItemButton onClick={handleClickProduct} id="mainMenuProducts">
+        <ListItemButton onClick={handleClickProduct} id='mainMenuProducts'>
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText primary="สินค้า" style={{ marginLeft: -15 }} />
+          <ListItemText primary='สินค้า' style={{ marginLeft: -15 }} />
           {openProductMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openProductMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <Link
-              to="/products"
-              style={{ textDecoration: "none", color: "#676767" }}
-              id="subMenuProducts"
-            >
+        <Collapse in={openProductMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
+            <Link to='/products' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuProducts'>
               <ListItemButton
-                key="PRODUCTS"
+                key='PRODUCTS'
                 selected={selectedIndex === 4}
                 onClick={() => handleListItemClick(4)}
                 sx={{ pl: 7 }}
               >
-                <ListItemText primary="ข้อมูลสินค้า" />
+                <ListItemText primary='ข้อมูลสินค้า' />
               </ListItemButton>
             </Link>
-            <Link
-              to="/check-order"
-              style={{ textDecoration: "none", color: "#676767" }}
-              id="subMenuCheckOrder"
-            >
+            <Link to='/check-order' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuCheckOrder'>
               <ListItemButton
-                key="SALE"
+                key='SALE'
                 selected={selectedIndex === 5}
                 onClick={() => handleListItemClick(5)}
                 sx={{ pl: 7 }}
               >
-                <ListItemText primary="ตรวจสอบการรับ-โอนสินค้า" />
+                <ListItemText primary='ตรวจสอบการรับ-โอนสินค้า' />
               </ListItemButton>
             </Link>
-            <Link
-              to="/dc-check-order"
-              style={{ textDecoration: "none", color: "#676767" }}
-              id="subMenuDCCheckOrder"
-            >
+            <Link to='/dc-check-order' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuDCCheckOrder'>
               <ListItemButton
-                key="dcConfirmOrder"
+                key='dcConfirmOrder'
                 selected={selectedIndex === 6}
                 onClick={() => handleListItemClick(6)}
                 sx={{ pl: 7 }}
               >
-                <ListItemText primary="ตรวจสอบผลต่างการรับสินค้า" />
+                <ListItemText primary='ตรวจสอบผลต่างการรับสินค้า' />
               </ListItemButton>
             </Link>
             <Link
-              to="/supplier-check-order"
-              style={{ textDecoration: "none", color: "#676767" }}
-              id="subMenuSupplierCheckOrder"
+              to='/supplier-check-order'
+              style={{ textDecoration: 'none', color: '#676767' }}
+              id='subMenuSupplierCheckOrder'
             >
               <ListItemButton
-                key="supplierCheckOrder"
+                key='supplierCheckOrder'
                 selected={selectedIndex === 7}
                 onClick={() => handleListItemClick(7)}
                 sx={{ pl: 7 }}
               >
-                <ListItemText primary="ใบรับสินค้าจากผู้จำหน่าย" />
+                <ListItemText primary='ใบรับสินค้าจากผู้จำหน่าย' />
               </ListItemButton>
             </Link>
           </List>
         </Collapse>
-        <Link to="/user" style={{ textDecoration: "none", color: "#676767" }}>
+        <Link to='/user' style={{ textDecoration: 'none', color: '#676767' }}>
           <ListItemButton
-            key="USER"
+            key='USER'
             selected={selectedIndex === 8}
             onClick={() => handleListItemClick(8)}
-            id="mainMenuUser"
+            id='mainMenuUser'
           >
             <ListItemIcon>
               <GroupAddOutlinedIcon />
             </ListItemIcon>
-            <ListItemText
-              primary="จัดการผู้ใช้งาน"
-              style={{ marginLeft: -15 }}
-            />
+            <ListItemText primary='จัดการผู้ใช้งาน' style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
       </List>

@@ -53,13 +53,16 @@ export const environment = {
         url: '/purchase/purchase-invoice',
       },
       detail: {
-        url: '/purchase/pi',
+        url: '/purchase/purchase-invoice',
+        // url: '/purchase/pi',
       },
       saveDraft: {
-        url: '/purchase/purchase/{piNo}/draft',
+        url: '/purchase/purchase-invoice/{piNo}/draft',
+        // url: '/purchase/purchase/{piNo}/draft',
       },
       approve: {
-        url: '/purchase/purchase/{piNo}/approve',
+        url: '/purchase/purchase-invoice/{piNo}/approve',
+        // url: '/purchase/purchase/{piNo}/approve',
       },
       searchSupplier: {
         url: '/supplier',

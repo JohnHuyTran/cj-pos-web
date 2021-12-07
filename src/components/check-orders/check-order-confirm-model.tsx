@@ -1,31 +1,28 @@
-import React, { ReactElement } from "react";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import Typography from "@mui/material/Typography";
+import React, { ReactElement } from 'react';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
 import {
   Entry,
   ItemsApprove,
   OrderApproveCloseJobRequest,
   OrderApproveRequest,
   ShipmentRequest,
-} from "../../models/order-model";
-import {
-  approveOrderShipments,
-  closeOrderShipments,
-} from "../../services/order-shipment";
-import { ShipmentDeliveryStatusCodeEnum } from "../../utils/enum/check-order-enum";
-import DataDiffInfo from "./table-diff-info";
-import { ApiError } from "../../models/api-error-model";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { featchOrderListAsync } from "../../store/slices/check-order-slice";
-import LoadingModal from "../commons/ui/loading-modal";
-import { GridRowData } from "@mui/x-data-grid";
+} from '../../models/order-model';
+import { approveOrderShipments, closeOrderShipments } from '../../services/order-shipment';
+import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
+import DataDiffInfo from './table-diff-info';
+import { ApiError } from '../../models/api-error-model';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { featchOrderListAsync } from '../../store/slices/check-order-slice';
+import LoadingModal from '../commons/ui/loading-modal';
+import { GridRowData } from '@mui/x-data-grid';
 
 interface ConfirmOrderShipment {
   open: boolean;
@@ -63,7 +60,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[100],
@@ -93,17 +90,16 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
   const searchState = useAppSelector((state) => state.saveSearchOrder);
   const payloadSearchOrder: ShipmentRequest = searchState.searchCriteria;
   const dispatch = useAppDispatch();
-  const [openLoadingModal, setOpenLoadingModal] =
-    React.useState<loadingModalState>({
-      open: false,
-    });
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
+  });
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
   const confirmApproveBtn = async () => {
-    handleOpenLoading("open", true);
+    handleOpenLoading('open', true);
 
     if (action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
       const itemsApprove: any = [];
@@ -126,7 +122,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         async function (value) {
           await updateShipmentOrder();
           // setTimeout(() => {
-          onUpdateShipmentStatus(true, "");
+          onUpdateShipmentStatus(true, '');
           onClose();
           // }, 3000);
         },
@@ -140,12 +136,13 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         imageFileName: fileName,
         imageFile: imageContent,
       };
+
       await closeOrderShipments(sdNo, payload)
         .then(
           async function (value) {
             await updateShipmentOrder();
 
-            onUpdateShipmentStatus(true, "");
+            onUpdateShipmentStatus(true, '');
             onClose();
           },
           function (error: ApiError) {
@@ -154,16 +151,13 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
           }
         )
         .catch((err) => {
-          onUpdateShipmentStatus(
-            false,
-            "This is an error alert — check it out!"
-          );
+          onUpdateShipmentStatus(false, 'This is an error alert — check it out!');
           onClose();
         });
     }
-    handleOpenLoading("open", false);
+    handleOpenLoading('open', false);
 
-    localStorage.removeItem("localStorageRowsEdit");
+    localStorage.removeItem('localStorageRowsEdit');
   };
 
   const handleClose = () => {
@@ -182,13 +176,13 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         actualQty: data.actualQty * 1,
         comment: data.comment,
         seqItem: 0,
-        itemNo: "",
-        shipmentSAPRef: "",
-        skuCode: "",
-        skuType: "",
+        itemNo: '',
+        shipmentSAPRef: '',
+        skuCode: '',
+        skuType: '',
         productName: data.productName,
-        unitCode: "",
-        unitName: "",
+        unitCode: '',
+        unitName: '',
         unitFactor: 0,
         qty: 0,
         qtyAll: 0,
@@ -196,8 +190,8 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         qtyDiff: data.qtyDiff,
         price: 0,
         isControlStock: 0,
-        toteCode: "",
-        expireDate: "",
+        toteCode: '',
+        expireDate: '',
         isTote: false,
       };
 
@@ -223,36 +217,20 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
 
         {action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
           <div>
-            {/* <BootstrapDialogTitle
-              id="customized-dialog-title"
-              onClose={handleClose}
-            >
-              <Typography variant="body1" gutterBottom>
-                ยืนยันการตรวจสอบ
-              </Typography>
-            </BootstrapDialogTitle> */}
-
             <DialogContent>
-              <DialogContentText
-                id="alert-dialog-description"
-                sx={{ color: "#263238" }}
-              >
-                <Typography
-                  variant="h6"
-                  align="center"
-                  sx={{ marginBottom: 2 }}
-                >
+              <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
+                <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
                   ยืนยันอนุมัติใบตรวจสอบการรับ-โอนสินค้า
                 </Typography>
                 <Typography variant="body1" align="center">
-                  เลขที่เอกสาร LD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
-                  <label style={{ color: "#36C690" }}>
+                  เลขที่เอกสาร LD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  <label style={{ color: '#36C690' }}>
                     <b>{shipmentNo}</b>
                   </label>
                 </Typography>
                 <Typography variant="body1" align="center">
-                  เลขที่เอกสาร SD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
-                  <label style={{ color: "#36C690" }}>
+                  เลขที่เอกสาร SD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  <label style={{ color: '#36C690' }}>
                     <b>{sdNo}</b>
                   </label>
                 </Typography>
@@ -277,75 +255,41 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
           </div>
         )}
 
-        {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && percentDiffType && <DialogContent>
-                <DialogContentText id='alert-dialog-description'>
-                    <Typography variant="body2" gutterBottom>ไม่สามารถอนุมัติ เลขที่เอกสาร {shipmentNo} เนื่องจาก จำนวนสินค้าที่รับ  {percentDiffValue}  กรุณาตรวจสอบอีกครั้งหรือติดต่อ IT  เบอร์โทร 02-111-2222</Typography>
-                </DialogContentText>
+        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent && (
+          <div>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
+                <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+                  ปิดงานใบตรวจสอบการรับ-โอนสินค้า
+                </Typography>
+                <Typography variant="body1" align="center">
+                  เลขที่เอกสาร LD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  <label style={{ color: '#36C690' }}>
+                    <b>{shipmentNo}</b>
+                  </label>
+                </Typography>
+                <Typography variant="body1" align="center">
+                  เลขที่เอกสาร SD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  <label style={{ color: '#36C690' }}>
+                    <b>{sdNo}</b>
+                  </label>
+                </Typography>
+              </DialogContentText>
             </DialogContent>
+          </div>
+        )}
 
-            } */}
-
-        {/* {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
-          !imageContent && (
-            <div>
-              <DialogTitle id="alert-dialog-title">
-                <Typography variant="body1" gutterBottom>
-                  แจ้งเตือนแนบเอกสาร ใบตรวจสการรับสินค้า
-                </Typography>
-              </DialogTitle>{" "}
-              <DialogContent dividers>
-                <DialogContentText id="alert-dialog-description">
-                  <Typography variant="body2" gutterBottom align="center">
-                    กรุณาแนบเอกสาร ใบตรวจสการรับสินค้า{" "}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom align="center">
-                    พร้อมลายเซ็นต์
-                  </Typography>
-                </DialogContentText>
-              </DialogContent>
-            </div>
-          )} */}
-
-        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
-          imageContent && (
-            <div>
-              <DialogTitle id="alert-dialog-title">
-                <Typography variant="body1" gutterBottom>
-                  ปิดงาน
-                </Typography>
-              </DialogTitle>{" "}
-              <DialogContent dividers>
-                <DialogContentText id="alert-dialog-description">
-                  <Typography variant="body2" gutterBottom align="center">
-                    ปิดงาน{" "}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom align="center">
-                    เลขที่เอกสาร {sdNo}
-                  </Typography>
-                </DialogContentText>
-              </DialogContent>
-            </div>
-          )}
-
-        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
-          !imageContent && (
-            <DialogActions sx={{ justifyContent: "center" }}>
-              <Button
-                id="btnAccept"
-                variant="contained"
-                size="small"
-                color="primary"
-                onClick={handleClose}
-              >
-                รับทราบ
-              </Button>
-            </DialogActions>
-          )}
+        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && !imageContent && (
+          <DialogActions sx={{ justifyContent: 'center' }}>
+            <Button id="btnAccept" variant="contained" size="small" color="primary" onClick={handleClose}>
+              รับทราบ
+            </Button>
+          </DialogActions>
+        )}
 
         {(action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE ||
-          (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
-            imageContent)) && (
-          <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
+          (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent)) && (
+          <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
             <Button
               id="btnCancel"
               variant="contained"
