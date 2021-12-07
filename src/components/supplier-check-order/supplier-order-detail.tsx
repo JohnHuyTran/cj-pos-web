@@ -508,7 +508,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             )}
           </Grid>
           <Box mt={2} bgcolor='background.paper'>
-            <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGrid}>
+            <div
+              style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
+              className={classes.MdataGridDetail}
+            >
               <DataGrid
                 rows={rows}
                 columns={columns}

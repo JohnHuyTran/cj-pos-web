@@ -823,7 +823,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           <Box mt={2} bgcolor='background.paper'>
             <div
               style={{ width: '100%', height: rowsEntries.length >= 8 ? '70vh' : 'auto' }}
-              className={classes.MdataGrid}
+              className={classes.MdataGridDetail}
             >
               <DataGrid
                 rows={rowsEntries}
