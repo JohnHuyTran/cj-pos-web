@@ -177,7 +177,7 @@ export default function SupplierCheckOrderSearch() {
     handleOpenLoading('open', true);
     piDetail.push({
       supplierCode: '0000101539',
-      docNo: '4000709005',
+      docNo: '2021120302',
     });
     try {
       await dispatch(featchSupplierOrderPIDetailAsync(piDetail));

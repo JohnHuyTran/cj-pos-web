@@ -125,63 +125,63 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
   return (
     <div>
-      <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
+      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>ตรวจสอบผลต่าง (DC)</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร LD:</Typography>
+                <Typography variant="body2">เลขที่เอกสาร LD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{detailDC.shipmentNo}</Typography>
+                <Typography variant="body2">{detailDC.shipmentNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>สถานะการตรวจสอบผลต่าง:</Typography>
+                <Typography variant="body2">สถานะการตรวจสอบผลต่าง:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{getDCStatus(detailDC.verifyDCStatus)}</Typography>
+                <Typography variant="body2">{getDCStatus(detailDC.verifyDCStatus)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร SD:</Typography>
+                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{detailDC.sdNo}</Typography>
+                <Typography variant="body2">{detailDC.sdNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>ประเภท:</Typography>
+                <Typography variant="body2">ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{getSdType(detailDC.sdType)}</Typography>
+                <Typography variant="body2">{getSdType(detailDC.sdType)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่:</Typography>
+                <Typography variant="body2">วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
+                <Typography variant="body2">{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>
+                <Typography variant="body2">
                   แนบเอกสารใบส่วนต่าง
                   <br />
                   หลังเซ็นต์:
                 </Typography>
               </Grid>
               <Grid item lg={4}>
-                <Link component='button' variant='body2' onClick={handleLinkDocument}>
+                <Link component="button" variant="body2" onClick={handleLinkDocument}>
                   ดูเอกสาร
                 </Link>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>หมายเหตุ DC:</Typography>
+                <Typography variant="body2">หมายเหตุ DC:</Typography>
               </Grid>
               <Grid item lg={4}>
                 {/* {detailDC.verifyDCStatus === 0 && ( */}
@@ -192,7 +192,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     rows={4}
                     onChange={handleChangeCommentDC}
                     defaultValue={valueCommentDC}
-                    placeholder='ความยาวไม่เกิน 100 ตัวอักษร'
+                    placeholder="ความยาวไม่เกิน 100 ตัวอักษร"
                     className={classes.MtextFieldRemark}
                     inputProps={{ maxLength: 100 }}
                     error={errorCommentDC === true}
@@ -210,7 +210,8 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                         maxWidth: 300,
                         textAlign: 'right',
                         marginTop: '-1.5em',
-                      }}>
+                      }}
+                    >
                       {characterCount}/100
                     </div>
                   )}
@@ -218,20 +219,21 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
               </Grid>
             </Grid>
 
-            <Grid container spacing={2} justifyContent='right' sx={{ mt: 1 }}>
+            <Grid container spacing={2} justifyContent="right" sx={{ mt: 1 }}>
               <Grid item>
                 {detailDC.verifyDCStatus === 0 && (
                   <Button
-                    id='btnChecked'
-                    variant='contained'
-                    color='primary'
+                    id="btnChecked"
+                    variant="contained"
+                    color="primary"
                     startIcon={<ContentPaste />}
                     onClick={handlCheckedButton}
                     sx={{
                       borderRadius: '5px',
                       width: '200px',
                       padding: '8px',
-                    }}>
+                    }}
+                  >
                     ตรวจสอบแล้ว
                   </Button>
                 )}
@@ -268,10 +270,10 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
-        url=''
+        url=""
         statusFile={statusFile}
         sdImageFile={detailDC.sdImageFile}
-        fileName=''
+        fileName=""
       />
 
       <LoadingModal open={openLoadingModal.open} />

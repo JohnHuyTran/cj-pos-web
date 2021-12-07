@@ -10,10 +10,14 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useStyles } from '../../styles/makeTheme';
 import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef, GridRowId, GridRowData } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { PurchaseDetailEntries, SavePurchaseRequest } from '../../models/supplier-check-order-model';
+import {
+  PurchaseDetailEntries,
+  SavePurchasePIRequest,
+  SavePurchaseRequest,
+} from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
-import { saveSupplierOrder } from '../../services/purchase';
+import { saveSupplierOrder, saveSupplierPI } from '../../services/purchase';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
@@ -239,6 +243,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setPiStatus(purchaseDetail.piStatus);
     setComment(purchaseDetail.comment);
     setCharacterCount(purchaseDetail.comment.length);
+    setDocNo(purchaseDetail.docNo);
   }, [open]);
 
   const purchasePIDetailList = useAppSelector((state) => state.supplierOrderPIDetail.purchasePIDetail);
@@ -251,6 +256,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [piType, setPiType] = React.useState(0);
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
+  const [docNo, setDocNo] = React.useState('');
 
   let rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
     return {
@@ -314,11 +320,21 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const handleModelConfirm = () => {
     setOpenModelConfirm(false);
   };
-  const handlConfirmButton = () => {
+  const handlConfirmButton = async () => {
     if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
+      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
+      await rows.forEach((data: GridRowData) => {
+        const item: any = {
+          barcode: data.barCode,
+          actualQty: data.actualQty,
+        };
+        itemsList.push(item);
+      });
+      await setItems(itemsList);
       setOpenModelConfirm(true);
     }
   };
@@ -366,13 +382,16 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         itemsList.push(item);
       });
 
-      const payloadSave: SavePurchaseRequest = {
+      const payloadSave: SavePurchasePIRequest = {
+        piNo: piNo,
         billNo: billNo,
+        docNo: docNo,
+        flagPO: piType,
         comment: comment,
         items: itemsList,
       };
 
-      await saveSupplierOrder(payloadSave, piNo)
+      await saveSupplierPI(payloadSave)
         .then((_value) => {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
@@ -405,7 +424,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">เลขที่ใบสั่งซื้อ PO :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{purchaseDetail.docNo}</Typography>
+                <Typography variant="body2">{docNo}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่บิลผู้จำหน่าย :</Typography>
@@ -678,10 +697,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         onClose={handleModelConfirm}
         onUpdateAction={handleConfirmStatus}
         piNo={piNo}
-        docNo={purchaseDetail.docNo}
+        docNo={docNo}
         billNo={billNo}
         comment={comment}
+        piStatus={piStatus}
         items={items}
+        piDetail={true}
       />
 
       <ModelDeleteConfirm
@@ -689,7 +710,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         onClose={handleModelDeleteConfirm}
         onUpdateAction={handleConfirmStatus}
         piNo={piNo}
-        docNo={purchaseDetail.docNo}
+        docNo={docNo}
         billNo={billNo}
         comment={comment}
         items={items}

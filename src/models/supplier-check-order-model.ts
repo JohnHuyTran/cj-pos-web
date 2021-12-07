@@ -109,6 +109,15 @@ export interface SavePurchaseRequest {
   items: PurchaseItems[];
 }
 
+export interface SavePurchasePIRequest {
+  billNo: string;
+  comment: string;
+  piNo: string;
+  docNo: string;
+  flagPO: number;
+  items: PurchaseItems[];
+}
+
 export interface PurchaseItems {
   barcode: string;
   actualQty: number;

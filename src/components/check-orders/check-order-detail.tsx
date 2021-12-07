@@ -71,7 +71,7 @@ const columns: GridColDef[] = [
     field: 'productDescription',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
-    // minWidth: 300,
+    minWidth: 160,
     flex: 1,
     sortable: false,
   },
@@ -199,7 +199,8 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}>
+          }}
+        >
           <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
@@ -721,7 +722,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                         variant='contained'
                         component='span'
                         className={classes.MbtnBrowse}
-                        style={{ marginLeft: 10, textTransform: 'none' }}>
+                        style={{ marginLeft: 10, textTransform: 'none' }}
+                      >
                         Browse
                       </Button>
                     </label>
@@ -767,7 +769,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                   onClick={handlePrintBtn}
                   startIcon={<Print />}
                   className={classes.MbtnPrint}
-                  style={{ textTransform: 'none' }}>
+                  style={{ textTransform: 'none' }}
+                >
                   พิมพ์ใบผลต่าง
                 </Button>
               </Grid>
@@ -781,7 +784,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     className={classes.MbtnSave}
                     onClick={handleSaveButton}
                     startIcon={<SaveIcon />}
-                    style={{ width: 200 }}>
+                    style={{ width: 200 }}
+                  >
                     บันทึก
                   </Button>
                 )}
@@ -794,7 +798,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     className={classes.MbtnApprove}
                     onClick={handleApproveBtn}
                     startIcon={<CheckCircleOutline />}
-                    style={{ width: 200 }}>
+                    style={{ width: 200 }}
+                  >
                     ยืนยัน
                   </Button>
                 )}
@@ -806,7 +811,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     color='primary'
                     className={classes.MbtnClose}
                     onClick={handleCloseJobBtn}
-                    startIcon={<BookmarkAdded />}>
+                    startIcon={<BookmarkAdded />}
+                  >
                     ปิดงาน
                   </Button>
                 )}
@@ -815,7 +821,10 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           </Box>
 
           <Box mt={2} bgcolor='background.paper'>
-            <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
+            <div
+              style={{ width: '100%', height: rowsEntries.length >= 8 ? '70vh' : 'auto' }}
+              className={classes.MdataGridDetail}
+            >
               <DataGrid
                 rows={rowsEntries}
                 columns={columns}
@@ -823,8 +832,9 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
-                autoHeight
                 disableColumnMenu
+                autoHeight={rowsEntries.length >= 8 ? false : true}
+                scrollbarSize={10}
               />
             </div>
           </Box>

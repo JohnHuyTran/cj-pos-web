@@ -325,11 +325,21 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelConfirm(false);
   };
 
-  const handlConfirmButton = () => {
+  const handlConfirmButton = async () => {
     if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
+      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
+      await rows.forEach((data: GridRowData) => {
+        const item: any = {
+          barcode: data.barCode,
+          actualQty: data.actualQty,
+        };
+        itemsList.push(item);
+      });
+      await setItems(itemsList);
       setOpenModelConfirm(true);
     }
   };
@@ -508,7 +518,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             )}
           </Grid>
           <Box mt={2} bgcolor="background.paper">
-            <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
+            <div
+              style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
+              className={classes.MdataGridDetail}
+            >
               <DataGrid
                 rows={rows}
                 columns={columns}
@@ -516,8 +529,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
-                autoHeight
                 disableColumnMenu
+                autoHeight={rows.length >= 8 ? false : true}
+                scrollbarSize={10}
               />
             </div>
           </Box>
@@ -664,7 +678,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         docNo={purchaseDetail.docNo}
         billNo={billNo}
         comment={comment}
+        piStatus={piStatus}
         items={items}
+        piDetail={false}
       />
 
       <ConfirmModelExit
