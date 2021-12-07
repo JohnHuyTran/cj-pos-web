@@ -15,31 +15,11 @@ import Button from '@mui/material/Button';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import Divider from '@mui/material/Divider';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
-
-import { useAppDispatch } from '../../store/store';
-import { changeState } from '../../store/slices/supplier-selection-slice';
-
-interface Supplier {
-  label: string;
-  code: string;
-  po?: string[];
-}
-
-const mockDataset = [
-  {
-    label: 'บริษัท เบทาโกรการเกษตรอุตสาหกรรม จำกัด',
-    code: '401212254',
-    po: ['401212254', '401224456', 'P121100101-000163'],
-  },
-  {
-    label: 'บริษัท เบทาไมค์อิเล็กทริคจำกัด',
-    code: '401224456',
-  },
-];
+import { environment } from '../../environment-base';
+import { get } from '../../adapters/posback-adapter';
+import { PurchaseDetailResponse } from '../../models/supplier-check-order-model';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -117,96 +97,74 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             color: (theme) => theme.palette.cancelColor.main,
           }}
         >
-          <CancelOutlinedIcon fontSize="large" stroke={'white'} stroke-width={1} />
+          <CancelOutlinedIcon fontSize="large" stroke={'white'} strokeWidth={1} />
         </IconButton>
       ) : null}
     </DialogTitle>
   );
 };
 
-function sleep(delay = 0) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delay);
-  });
-}
-
 export default function ModalSupplierSelection({ openModal, handleCloseModal }: Props) {
   const classes = useStyles();
-  const dispatch = useAppDispatch();
-  const [hasPO, setHasPO] = React.useState<boolean>(false);
   const [hasPOValue, setHasPOValue] = React.useState<string>('');
+  const [options, setOptions] = React.useState<any>([]);
 
-  const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState<Supplier[]>([]);
-  const loading = open && options.length === 0;
+  const getData = async (keyword: string) => {
+    const apiRootPath = `${environment.purchase.supplierOrder.searchSupplier.url}?query=${keyword}`;
+    let resp: PurchaseDetailResponse = { ref: '', code: 0, message: '', data: [] };
 
-  React.useEffect(() => {
-    let active = true;
+    resp = await get(apiRootPath);
 
-    if (!loading) {
-      return undefined;
+    if (resp && resp.data && resp.data.length > 0) {
+      setOptions(resp.data.slice(0, 10));
     }
+  };
 
-    (async () => {
-      await sleep(1e3); // For demo purposes.
-
-      if (active) {
-        setOptions([...mockDataset]);
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [loading]);
-
-  React.useEffect(() => {
-    if (!open) {
-      setOptions([]);
+  const onChangeTextSearch = async (event: any, value: string, reason: string) => {
+    const keyword = value.trim();
+    if (keyword.length >= 3) {
+      getData(keyword);
+    } else {
+      clearData();
     }
-  }, [open]);
+  };
+
+  const onChangeSelection = (event: any, option: any, reason: string) => {
+    if (option) {
+      option.isRefPO ? setHasPOValue('มีเอกสาร PO') : setHasPOValue('ไม่มีมีเอกสาร PO');
+    } else {
+      clearData();
+    }
+  };
+
+  const onSubmitData = () => {
+    clearData();
+    handleCloseModal();
+  };
+
+  const onCloseModal = () => {
+    clearData();
+    handleCloseModal();
+  };
+
+  const clearData = () => {
+    setHasPOValue('');
+    setOptions([]);
+  };
+
+  const filterOptions = createFilterOptions({
+    stringify: (option: any) => option.name + option.code,
+  });
 
   const autocompleteRenderListItem = (props: any, option: any) => {
     return (
       <List {...props} sx={{ width: '100%' }} key={option.code}>
         <ListItem alignItems="flex-start" disablePadding>
-          <ListItemText primary={option.label} secondary={option.code} />
+          <ListItemText primary={option.name} secondary={option.code} />
         </ListItem>
       </List>
     );
   };
-
-  const onChangeSelection = (_: any, option: any) => {
-    if (option) {
-      if (option.po && option.po.length > 0) {
-        setHasPO(true);
-        setHasPOValue('มีเอกสาร PO');
-      } else {
-        setHasPO(false);
-        setHasPOValue('ไม่มีมีเอกสาร PO');
-      }
-    } else {
-      setHasPO(false);
-      setHasPOValue('');
-    }
-  };
-
-  const onSubmitData = () => {
-    setHasPO(false);
-    setHasPOValue('');
-    handleCloseModal();
-    dispatch(changeState(mockDataset[0]));
-  };
-
-  const onCloseModal = () => {
-    setHasPO(false);
-    setHasPOValue('');
-    handleCloseModal();
-  };
-
-  const filterOptions = createFilterOptions({
-    stringify: (option: Supplier) => option.label + option.code,
-  });
 
   return (
     <div>
@@ -226,25 +184,20 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
           <Box sx={{ display: 'flex' }}>
             <Box sx={{ flex: 3 }}>
               <label className={classes.textLabelInput}>ผู้จำหน่าย</label>
+
               <Autocomplete
                 id="searchSupplierModal"
                 fullWidth
                 freeSolo
-                loading={true}
                 loadingText="กำลังโหลด..."
-                sx={{ mt: 1 }}
-                open={open}
-                onOpen={() => {
-                  setOpen(true);
-                }}
-                onClose={() => {
-                  setOpen(false);
-                }}
+                sx={{ mt: 1, width: '100%' }}
                 options={options}
                 filterOptions={filterOptions}
                 renderOption={autocompleteRenderListItem}
                 onChange={onChangeSelection}
-                isOptionEqualToValue={(option, value) => option.label === value.label}
+                onInputChange={onChangeTextSearch}
+                getOptionLabel={(option) => option.name.trim()}
+                isOptionEqualToValue={(option, value) => option.name === value.name}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -252,15 +205,6 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
                     className={classes.MTextField}
                     variant="outlined"
                     fullWidth
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      ),
-                    }}
                   />
                 )}
               />
@@ -268,11 +212,19 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
 
             <Box sx={{ flex: 2, ml: 2 }}>
               <label className={classes.textLabelInput}>ประเภทผู้จำหน่าย</label>
-              <TextField id="supplierModalType" sx={{ mt: 1 }} className={classes.MTextField} value={hasPOValue} />
+              <TextField
+                id="supplierModalType"
+                sx={{ mt: 1 }}
+                className={classes.MTextField}
+                value={hasPOValue}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
             </Box>
           </Box>
 
-          <Box sx={{ mt: 4, visibility: hasPO ? 'visible' : 'hidden' }}>
+          <Box sx={{ mt: 4, visibility: true ? 'visible' : 'hidden' }}>
             <label className={classes.textListSupplier}>รายการเอกสารใบสั่งซื้อ PO</label>
 
             <RadioGroup name="use-radio-group" defaultValue="first" id="listSupplierDocPO">
