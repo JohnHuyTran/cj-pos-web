@@ -75,7 +75,7 @@ function DCOrderList() {
     {
       field: 'sdNo',
       headerName: 'เลขที่เอกสาร SD',
-      minWidth: 150,
+      minWidth: 160,
       // flex: 1.2,
       headerAlign: 'center',
       sortable: false,
