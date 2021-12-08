@@ -275,7 +275,7 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
-            {/* <Button
+            <Button
               id="btnCreateSupplierModal"
               variant="contained"
               onClick={handleOpenModal}
@@ -285,7 +285,7 @@ export default function SupplierCheckOrderSearch() {
               color="secondary"
             >
               สร้างใบรับสินค้า
-            </Button> */}
+            </Button>
             <Button
               id="btnClear"
               variant="contained"
