@@ -169,13 +169,8 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
 
   const onSubmitData = async () => {
     const payload = { supplier, poSelection };
-
     await dispatch(updateState(payload));
-
-    handleOpenDetailPI(payload.poSelection.supplierCode, payload.poSelection.docNo);
-
-    // clearData();
-    // handleCloseModal();
+    if (payload.poSelection !== null) handleOpenDetailPI(payload.poSelection.supplierCode, payload.poSelection.docNo);
   };
 
   const onCloseModal = () => {
