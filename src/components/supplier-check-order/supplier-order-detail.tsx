@@ -8,7 +8,15 @@ import { Box } from '@mui/system';
 import Steppers from '../commons/ui/steppers';
 import SaveIcon from '@mui/icons-material/Save';
 import { useStyles } from '../../styles/makeTheme';
-import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef, GridRowId, GridRowData } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  useGridApiRef,
+  GridRowId,
+  GridRowData,
+  GridValueGetterParams,
+} from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { PurchaseDetailEntries, SavePurchaseRequest } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
@@ -38,7 +46,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label='close'
+          aria-label="close"
           onClick={onClose}
           sx={{
             position: 'absolute',
@@ -47,7 +55,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             color: (theme: any) => theme.palette.grey[400],
           }}
         >
-          <HighlightOff fontSize='large' />
+          <HighlightOff fontSize="large" />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -81,8 +89,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant='body2'>{params.value}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+        <Typography variant="body2">{params.value}</Typography>
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
@@ -111,9 +119,9 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant='outlined'
-        name='txnQuantityActual'
-        type='number'
+        variant="outlined"
+        name="txnQuantityActual"
+        type="number"
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
@@ -122,21 +130,22 @@ const columns: GridColDef[] = [
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         disabled={isDisable(params) ? true : false}
-        autoComplete='off'
+        autoComplete="off"
       />
     ),
   },
   {
-    field: 'setPrice',
-    headerName: 'ราคาต่อหน่วย',
-    width: 135,
+    field: 'productDifference',
+    headerName: 'ส่วนต่างการรับ',
+    width: 140,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params) => calProductDiff(params),
   },
   {
-    field: 'salePrice',
-    headerName: 'ลด/ชาร์จ',
+    field: 'setPrice',
+    headerName: 'ราคาต่อหน่วย',
     width: 135,
     headerAlign: 'center',
     align: 'right',
@@ -152,6 +161,13 @@ const columns: GridColDef[] = [
   },
 ];
 
+var calProductDiff = function (params: GridValueGetterParams) {
+  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qty'));
+
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  return diff;
+};
 const isDisable = (params: GridRenderCellParams) => {
   return params.row.isDraftStatus;
 };
@@ -397,9 +413,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   return (
     <div>
-      <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
-          <Typography sx={{ fontSize: '1em' }}>ใบสั่งซื้อ Supplier</Typography>
+      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+          <Typography sx={{ fontSize: '1em' }}>ใบรับสินค้าจากผู้จำหน่าย</Typography>
           <Steppers status={piStatus}></Steppers>
         </BootstrapDialogTitle>
 
@@ -407,21 +423,21 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           <Box mt={4} sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่ใบสั่งซื้อ PO :</Typography>
+                <Typography variant="body2">เลขที่ใบสั่งซื้อ PO :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{purchaseDetail.docNo}</Typography>
+                <Typography variant="body2">{purchaseDetail.docNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่บิลผู้จำหน่าย :</Typography>
+                <Typography variant="body2">เลขที่บิลผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
                 <TextField
-                  id='txtParamQuery'
-                  name='paramQuery'
-                  size='small'
+                  id="txtParamQuery"
+                  name="paramQuery"
+                  size="small"
                   value={billNo}
-                  placeholder='กรุณากรอก เลขที่บิลผู้จำหน่าย'
+                  placeholder="กรุณากรอก เลขที่บิลผู้จำหน่าย"
                   onChange={(event) => setBillNo(event.target.value)}
                   className={classes.MtextField}
                   disabled={piStatus !== 0}
@@ -432,20 +448,20 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขทเอกสาร PI :</Typography>
+                <Typography variant="body2">เลขทเอกสาร PI :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{piNo}</Typography>
+                <Typography variant="body2">{piNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>แนบเอกสารจากผู้ขาย:</Typography>
+                <Typography variant="body2">แนบเอกสาร:</Typography>
               </Grid>
               <Grid item lg={4}>
                 <Button
-                  id='btnPrint'
-                  color='primary'
-                  variant='contained'
-                  component='span'
+                  id="btnPrint"
+                  color="primary"
+                  variant="contained"
+                  component="span"
                   className={classes.MbtnBrowse}
                   // style={{ marginLeft: 10, textTransform: "none" }}
                   disabled
@@ -456,7 +472,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>รหัสผู้จัดจำหน่าย:</Typography>
+                <Typography variant="body2">รหัสผู้จัดจำหน่าย:</Typography>
               </Grid>
               <Grid item lg={4}>
                 <div
@@ -468,10 +484,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     padding: 2,
                   }}
                 >
-                  <Typography variant='body2' sx={{ color: '#263238' }}>
+                  <Typography variant="body2" sx={{ color: '#263238' }}>
                     {purchaseDetail.supplierName}
                   </Typography>
-                  <Typography variant='body2' sx={{ color: '#AEAEAE', fontSize: 12 }}>
+                  <Typography variant="body2" sx={{ color: '#AEAEAE', fontSize: 12 }}>
                     {purchaseDetail.supplierTaxNo}
                   </Typography>
                 </div>
@@ -479,12 +495,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               <Grid item lg={6}></Grid>
             </Grid>
           </Box>
-          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
+          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
             {piStatus !== 1 && (
               <Button
-                id='btnSave'
-                variant='contained'
-                color='warning'
+                id="btnSave"
+                variant="contained"
+                color="warning"
                 className={classes.MbtnSave}
                 onClick={handleSaveButton}
                 startIcon={<SaveIcon />}
@@ -496,9 +512,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
             {piStatus !== 1 && (
               <Button
-                id='btnApprove'
-                variant='contained'
-                color='primary'
+                id="btnApprove"
+                variant="contained"
+                color="primary"
                 className={classes.MbtnApprove}
                 onClick={handlConfirmButton}
                 startIcon={<CheckCircleOutline />}
@@ -508,7 +524,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Button>
             )}
           </Grid>
-          <Box mt={2} bgcolor='background.paper'>
+          <Box mt={2} bgcolor="background.paper">
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
               className={classes.MdataGridDetail}
@@ -530,14 +546,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
-                <Typography variant='body2'>หมายเหตุ:</Typography>
+                <Typography variant="body2">หมายเหตุ:</Typography>
                 <TextField
                   multiline
                   fullWidth
                   rows={5}
                   onChange={handleChangeComment}
                   defaultValue={comment}
-                  placeholder='ความยาวไม่เกิน 255 ตัวอักษร'
+                  placeholder="ความยาวไม่เกิน 255 ตัวอักษร"
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
                   // error={errorCommentDC === true}
@@ -564,20 +580,20 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
               <Grid item lg={4}></Grid>
               <Grid item lg={4}>
-                <Grid container spacing={2} justifyContent='flex-end' mb={1}>
+                <Grid container spacing={2} justifyContent="flex-end" mb={1}>
                   <Grid item lg={5}></Grid>
-                  <Grid item lg={3} alignItems='flex-end'>
-                    <Typography variant='body2' pt={1}>
+                  <Grid item lg={3} alignItems="flex-end">
+                    <Typography variant="body2" pt={1}>
                       ยอดรวม
                     </Typography>
                   </Grid>
                   <Grid item md={4}>
                     <TextField
-                      id='txtParamQuery'
-                      name='paramQuery'
-                      size='small'
+                      id="txtParamQuery"
+                      name="paramQuery"
+                      size="small"
                       // value={totalAmount}
-                      value='0'
+                      value="0"
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
@@ -585,20 +601,20 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     />
                   </Grid>
                 </Grid>
-                <Grid container spacing={2} justifyContent='flex-end' mb={1}>
+                <Grid container spacing={2} justifyContent="flex-end" mb={1}>
                   <Grid item lg={5}></Grid>
-                  <Grid item lg={3} alignItems='flex-end'>
-                    <Typography variant='body2' pt={1}>
+                  <Grid item lg={3} alignItems="flex-end">
+                    <Typography variant="body2" pt={1}>
                       ภาษี(7%)
                     </Typography>
                   </Grid>
                   <Grid item lg={4}>
                     <TextField
-                      id='txtParamQuery'
-                      name='paramQuery'
-                      size='small'
+                      id="txtParamQuery"
+                      name="paramQuery"
+                      size="small"
                       // value={vat}
-                      value='0'
+                      value="0"
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
@@ -607,7 +623,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} justifyContent='flex-end' mb={1}>
+                {/* <Grid container spacing={2} justifyContent='flex-end' mb={1}>
                   <Grid item lg={5}></Grid>
                   <Grid item lg={3} alignItems='flex-end'>
                     <Typography variant='body2' pt={1}>
@@ -627,22 +643,22 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       sx={{ background: '#EAEBEB' }}
                     />
                   </Grid>
-                </Grid>
+                </Grid> */}
 
-                <Grid container spacing={2} justifyContent='flex-end' mb={1}>
+                <Grid container spacing={2} justifyContent="flex-end" mb={1}>
                   <Grid item lg={5}></Grid>
-                  <Grid item lg={3} alignItems='flex-end'>
-                    <Typography variant='body2' pt={1}>
+                  <Grid item lg={3} alignItems="flex-end">
+                    <Typography variant="body2" pt={1}>
                       <b>ยอดรวมทั้งสิ้น</b>
                     </Typography>
                   </Grid>
                   <Grid item lg={4}>
                     <TextField
-                      id='txtParamQuery'
-                      name='paramQuery'
-                      size='small'
+                      id="txtParamQuery"
+                      name="paramQuery"
+                      size="small"
                       // value={afterDiscountCharge}
-                      value='0'
+                      value="0"
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
