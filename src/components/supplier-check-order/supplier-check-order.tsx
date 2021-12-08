@@ -16,11 +16,10 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import SupplierOrderList from './supplier-order-list';
 import LoadingModal from '../commons/ui/loading-modal';
-import { SearchOff } from '@mui/icons-material';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
-
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import ModalSupplierSelection from './modal-supplier-selection';
+import { SearchOff } from '@mui/icons-material';
 
 interface State {
   paramQuery: string;
@@ -275,7 +274,7 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
-            {/* <Button
+            <Button
               id="btnCreateSupplierModal"
               variant="contained"
               onClick={handleOpenModal}
@@ -285,7 +284,7 @@ export default function SupplierCheckOrderSearch() {
               color="secondary"
             >
               สร้างใบรับสินค้า
-            </Button> */}
+            </Button>
             <Button
               id="btnClear"
               variant="contained"
@@ -316,7 +315,6 @@ export default function SupplierCheckOrderSearch() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
-
       <ModalSupplierSelection openModal={openModal} handleCloseModal={handleCloseModal} />
     </>
   );

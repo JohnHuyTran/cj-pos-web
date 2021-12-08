@@ -64,6 +64,15 @@ export const environment = {
         url: '/purchase/purchase-invoice/{piNo}/approve',
         // url: '/purchase/purchase/{piNo}/approve',
       },
+      detailPI: {
+        url: '/purchase/purchase-order',
+      },
+      saveDraftPI: {
+        url: '/purchase/purchase-invoice/draft',
+      },
+      approvePI: {
+        url: '/purchase/purchase-invoice/approve',
+      },
       searchSupplier: {
         url: '/supplier',
       },

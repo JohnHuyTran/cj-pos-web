@@ -6,9 +6,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
 import { ApiError } from '../../models/api-error-model';
-import { SavePurchasePIRequest, SavePurchaseRequest } from '../../models/supplier-check-order-model';
-import { approveSupplierOrder, approveSupplierPI } from '../../services/purchase';
-import LoadingModal from '../commons/ui/loading-modal';
+import { SavePurchaseRequest } from '../../models/supplier-check-order-model';
+import { approveSupplierOrder } from '../../services/purchase';
 
 interface Props {
   open: boolean;
@@ -17,11 +16,8 @@ interface Props {
   piNo: string;
   docNo: string;
   billNo: string;
-  supplierId: string;
   comment: string;
-  piStatus: number;
   items: any;
-  piDetail: boolean;
 }
 
 export default function ModelConfirm({
@@ -31,58 +27,26 @@ export default function ModelConfirm({
   piNo,
   docNo,
   billNo,
-  supplierId,
   comment,
-  piStatus,
   items,
-  piDetail,
 }: Props): ReactElement {
-  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const handleConfirm = async () => {
-    setOpenLoadingModal(true);
-    if (piDetail) {
-      const payloadSave: SavePurchasePIRequest = {
-        billNo: billNo,
-        supplierId: supplierId,
-        comment: comment,
-        piNo: piNo,
-        docNo: docNo,
-        flagPO: piStatus,
-        items: items,
-      };
+    const payloadSave: SavePurchaseRequest = {
+      billNo: billNo,
+      comment: comment,
+      items: items,
+    };
 
-      await approveSupplierPI(payloadSave).then(
-        function (value) {
-          setTimeout(() => {
-            onUpdateAction(true, '');
-          }, 500);
-        },
-        function (error: ApiError) {
-          onUpdateAction(false, error.message);
-        }
-      );
-
-      setOpenLoadingModal(false);
-    } else {
-      const payloadSave: SavePurchaseRequest = {
-        billNo: billNo,
-        comment: comment,
-        items: items,
-      };
-
-      await approveSupplierOrder(payloadSave, piNo).then(
-        function (value) {
-          setTimeout(() => {
-            onUpdateAction(true, '');
-          }, 500);
-        },
-        function (error: ApiError) {
-          onUpdateAction(false, error.message);
-        }
-      );
-
-      setOpenLoadingModal(false);
-    }
+    await approveSupplierOrder(payloadSave, piNo).then(
+      function (value) {
+        setTimeout(() => {
+          onUpdateAction(true, '');
+        }, 3000);
+      },
+      function (error: ApiError) {
+        onUpdateAction(false, error.message);
+      }
+    );
     onClose();
   };
   return (
@@ -96,18 +60,20 @@ export default function ModelConfirm({
       <DialogContent>
         <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
           <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
-            ยืนยันอนุมัติใบสั่งซื้อ Supplier
+            ต้องการลบสินค้า
           </Typography>
           <Typography variant="body1" align="center">
-            เลขที่ใบสั่งซื้อ PO <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+            สินค้า <label style={{ color: '#AEAEAE' }}>|</label>{' '}
             <label style={{ color: '#36C690' }}>
-              <b>{docNo}</b>
+              <b>น้ำดื่มขนาด 300มล.</b>
+              <br />
+              <label style={{ color: '#AEAEAE', fontSize: 12 }}>0000000000000123</label>
             </label>
           </Typography>
           <Typography variant="body1" align="center">
-            เลขที่ใบเอกสาร PI <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+            บาร์โค้ด <label style={{ color: '#AEAEAE' }}>|</label>{' '}
             <label style={{ color: '#36C690' }}>
-              <b>{piNo}</b>
+              <b>1234567890000000</b>
             </label>
           </Typography>
         </DialogContentText>
@@ -126,14 +92,12 @@ export default function ModelConfirm({
         <Button
           id="btnConfirm"
           variant="contained"
-          color="primary"
+          color="error"
           sx={{ borderRadius: 2, width: 80 }}
           onClick={handleConfirm}
         >
-          ยืนยัน
+          ลบสินค้า
         </Button>
-
-        <LoadingModal open={openLoadingModal} />
       </DialogActions>
     </Dialog>
   );
