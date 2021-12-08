@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@material-ui/core';
 import Dialog from '@mui/material/Dialog';
@@ -17,9 +17,14 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
-import { PurchaseDetailResponse } from '../../models/supplier-check-order-model';
+
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { searchSupplierAsync, clearDataFilter } from '../../store/slices/search-supplier-selection-slice';
+import {
+  searchSupplierPOAsync,
+  clearDataFilter as clearDataFilterPO,
+} from '../../store/slices/search-supplier-selection-po-slice';
+import { updateState } from '../../store/slices/supplier-selection-slice';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -59,7 +64,7 @@ const StyledFormControlLabel = styled((props: StyledFormControlLabelProps) => <F
   })
 );
 
-function MyFormControlLabel(props: FormControlLabelProps) {
+function ColorFormControlLabel(props: FormControlLabelProps) {
   const radioGroup = useRadioGroup();
   let checked = false;
   if (radioGroup) {
@@ -85,9 +90,12 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
   return (
     <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
-      <Typography sx={{ fontSize: 24 }}>{children}</Typography>
+      <Typography sx={{ fontSize: 24 }} id="titleSupplierModal">
+        {children}
+      </Typography>
       {onClose ? (
         <IconButton
+          id="iconButtonCloseModal"
           aria-label="close"
           onClick={onClose}
           sx={{
@@ -97,7 +105,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             color: (theme) => theme.palette.cancelColor.main,
           }}
         >
-          <CancelOutlinedIcon fontSize="large" stroke={'white'} strokeWidth={1} />
+          <CancelOutlinedIcon id="iconCloseModal" fontSize="large" stroke={'white'} strokeWidth={1} />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -106,38 +114,47 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
 export default function ModalSupplierSelection({ openModal, handleCloseModal }: Props) {
   const classes = useStyles();
-  const [hasPOValue, setHasPOValue] = React.useState<string>('');
-  const [options, setOptions] = React.useState<any>([]);
+  const dispatch = useAppDispatch();
+  const [havePOValue, setHavePOValue] = useState<string>('');
+  const [selection, setSelection] = useState<any>(null);
 
-  const getData = async (keyword: string) => {
-    const apiRootPath = `${environment.purchase.supplierOrder.searchSupplier.url}?query=${keyword}`;
-    let resp: PurchaseDetailResponse = { ref: '', code: 0, message: '', data: [] };
+  const resp = useAppSelector((state) => state.searchSupplierSelectionSlice.supplierResp);
+  const options = resp.data && resp.data.length > 0 ? resp.data : [];
 
-    resp = await get(apiRootPath);
+  const poResp = useAppSelector((state) => state.searchSupplierSelectionPOSlice.supplierPOResp);
+  const poData = poResp.data && poResp.data.length > 0 ? poResp.data : [];
 
-    if (resp && resp.data && resp.data.length > 0) {
-      setOptions(resp.data.slice(0, 10));
-    }
-  };
-
-  const onChangeTextSearch = async (event: any, value: string, reason: string) => {
+  const onInputChange = async (event: any, value: string, reason: string) => {
     const keyword = value.trim();
     if (keyword.length >= 3) {
-      getData(keyword);
+      await dispatch(searchSupplierAsync(keyword));
     } else {
       clearData();
     }
   };
 
-  const onChangeSelection = (event: any, option: any, reason: string) => {
-    if (option) {
-      option.isRefPO ? setHasPOValue('มีเอกสาร PO') : setHasPOValue('ไม่มีมีเอกสาร PO');
+  const onChange = async (event: any, option: any, reason: string) => {
+    if (option && reason === 'selectOption') {
+      if (option.isRefPO) {
+        setHavePOValue('มีเอกสาร PO');
+        await dispatch(searchSupplierPOAsync(option.code));
+      } else {
+        setHavePOValue('ไม่มีมีเอกสาร PO');
+      }
     } else {
       clearData();
     }
   };
 
-  const onSubmitData = () => {
+  const onRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const code = event.target.value;
+    const filter = poData.filter((row) => row.docNo === code);
+    if (filter.length > 0) setSelection(filter[0]);
+  };
+
+  const onSubmitData = async () => {
+    console.log(selection);
+    await dispatch(updateState(selection));
     clearData();
     handleCloseModal();
   };
@@ -147,9 +164,10 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
     handleCloseModal();
   };
 
-  const clearData = () => {
-    setHasPOValue('');
-    setOptions([]);
+  const clearData = async () => {
+    setHavePOValue('');
+    await dispatch(clearDataFilter());
+    await dispatch(clearDataFilterPO());
   };
 
   const filterOptions = createFilterOptions({
@@ -175,15 +193,18 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
         open={openModal}
         fullWidth
         maxWidth="sm"
+        id="addSupplierModal"
       >
         <BootstrapDialogTitle id="customized-dialog-title" onClose={onCloseModal}>
           เพิ่มผู้จำหน่าย
         </BootstrapDialogTitle>
 
-        <DialogContent>
+        <DialogContent id="addSupplierContentModal">
           <Box sx={{ display: 'flex' }}>
             <Box sx={{ flex: 3 }}>
-              <label className={classes.textLabelInput}>ผู้จำหน่าย</label>
+              <label className={classes.textLabelInput} id="titleSupplierLabel">
+                ผู้จำหน่าย
+              </label>
 
               <Autocomplete
                 id="searchSupplierModal"
@@ -194,8 +215,8 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
                 options={options}
                 filterOptions={filterOptions}
                 renderOption={autocompleteRenderListItem}
-                onChange={onChangeSelection}
-                onInputChange={onChangeTextSearch}
+                onChange={onChange}
+                onInputChange={onInputChange}
                 getOptionLabel={(option) => option.name.trim()}
                 isOptionEqualToValue={(option, value) => option.name === value.name}
                 renderInput={(params) => (
@@ -211,12 +232,14 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
             </Box>
 
             <Box sx={{ flex: 2, ml: 2 }}>
-              <label className={classes.textLabelInput}>ประเภทผู้จำหน่าย</label>
+              <label className={classes.textLabelInput} id="titlePOTypeLabel">
+                ประเภทผู้จำหน่าย
+              </label>
               <TextField
-                id="supplierModalType"
+                id="supplierPOTypeModal"
                 sx={{ mt: 1 }}
                 className={classes.MTextField}
-                value={hasPOValue}
+                value={havePOValue}
                 InputProps={{
                   readOnly: true,
                 }}
@@ -224,14 +247,26 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
             </Box>
           </Box>
 
-          <Box sx={{ mt: 4, visibility: true ? 'visible' : 'hidden' }}>
-            <label className={classes.textListSupplier}>รายการเอกสารใบสั่งซื้อ PO</label>
+          {poData.length === 0 && <Box sx={{ mt: 4, height: 100 }} />}
 
-            <RadioGroup name="use-radio-group" defaultValue="first" id="listSupplierDocPO">
-              <MyFormControlLabel value="401212254" label="401212254" control={<Radio />} />
-              <MyFormControlLabel value="401224456" label="401224456" control={<Radio />} />
-            </RadioGroup>
-          </Box>
+          {poData.length > 0 && (
+            <Box sx={{ mt: 4, height: 100 }}>
+              <label className={classes.textListSupplier} id="listPOModal">
+                รายการเอกสารใบสั่งซื้อ PO
+              </label>
+              <RadioGroup name="use-radio-group" defaultValue="first" id="listSupplierDocPO" onChange={onRadioChange}>
+                {poData.map((row, index) => (
+                  <ColorFormControlLabel
+                    id={`item-po-${index}`}
+                    value={row.docNo}
+                    label={row.docNo}
+                    control={<Radio />}
+                    key={row.docNo}
+                  />
+                ))}
+              </RadioGroup>
+            </Box>
+          )}
 
           <Box
             sx={{
