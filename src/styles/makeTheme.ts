@@ -60,6 +60,12 @@ const useStyles = makeStyles({
         whiteSpace: 'unset !important',
         overflow: 'unset !important',
       },
+      '& .MuiDataGrid-cell--textRight': {
+        justifyContent: 'flex-end',
+      },
+      '& .MuiDataGrid-cell--textLeft': {
+        justifyContent: 'flex-start',
+      },
       '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
         {
           outline: 'none',
@@ -105,6 +111,12 @@ const useStyles = makeStyles({
           maxHeight: 'none !important',
           whiteSpace: 'unset !important',
           overflow: 'unset !important',
+        },
+        '& .MuiDataGrid-cell--textRight': {
+          justifyContent: 'flex-end',
+        },
+        '& .MuiDataGrid-cell--textLeft': {
+          justifyContent: 'flex-start',
         },
       },
       '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':

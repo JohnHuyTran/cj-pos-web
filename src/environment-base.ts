@@ -73,6 +73,12 @@ export const environment = {
       approvePI: {
         url: '/purchase/purchase-invoice/approve',
       },
+      searchSupplier: {
+        url: '/supplier',
+      },
+      searchSupplierPO: {
+        url: '/purchase/receivable-purchase-order',
+      },
     },
   },
 };

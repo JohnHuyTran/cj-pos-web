@@ -8,7 +8,15 @@ import { Box } from '@mui/system';
 import Steppers from '../commons/ui/steppers';
 import SaveIcon from '@mui/icons-material/Save';
 import { useStyles } from '../../styles/makeTheme';
-import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef, GridRowId, GridRowData } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  useGridApiRef,
+  GridRowId,
+  GridRowData,
+  GridValueGetterParams,
+} from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { PurchaseDetailEntries, SavePurchaseRequest } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
@@ -67,6 +75,7 @@ const columns: GridColDef[] = [
     field: 'barCode',
     headerName: 'บาร์โค้ด',
     minWidth: 200,
+    flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -75,7 +84,7 @@ const columns: GridColDef[] = [
     field: 'productName',
     headerName: 'สินค้า',
     headerAlign: 'center',
-    // minWidth: 250,
+    minWidth: 220,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
@@ -126,16 +135,17 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'setPrice',
-    headerName: 'ราคาต่อหน่วย',
-    width: 135,
+    field: 'productDifference',
+    headerName: 'ส่วนต่างการรับ',
+    width: 140,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params) => calProductDiff(params),
   },
   {
-    field: 'salePrice',
-    headerName: 'ลด/ชาร์จ',
+    field: 'setPrice',
+    headerName: 'ราคาต่อหน่วย',
     width: 135,
     headerAlign: 'center',
     align: 'right',
@@ -151,6 +161,13 @@ const columns: GridColDef[] = [
   },
 ];
 
+var calProductDiff = function (params: GridValueGetterParams) {
+  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qty'));
+
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  return diff;
+};
 const isDisable = (params: GridRenderCellParams) => {
   return params.row.isDraftStatus;
 };
@@ -160,8 +177,9 @@ function useApiRef() {
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: '__HIDDEN__',
+        field: '',
         width: 0,
+        sortable: false,
         renderCell: (params) => {
           apiRef.current = params.api;
           return null;
@@ -408,7 +426,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          <Typography sx={{ fontSize: '1em' }}>ใบสั่งซื้อ Supplier</Typography>
+          <Typography sx={{ fontSize: '1em' }}>ใบรับสินค้าจากผู้จำหน่าย</Typography>
           <Steppers status={piStatus}></Steppers>
         </BootstrapDialogTitle>
 
@@ -441,13 +459,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขทเอกสาร PI :</Typography>
+                <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">{piNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">แนบเอกสารจากผู้ขาย:</Typography>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย:</Typography>
               </Grid>
               <Grid item lg={4}>
                 <Button
@@ -465,7 +483,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">รหัสผู้จัดจำหน่าย:</Typography>
+                <Typography variant="body2">ผู้จัดจำหน่าย:</Typography>
               </Grid>
               <Grid item lg={4}>
                 <div
@@ -513,7 +531,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 startIcon={<CheckCircleOutline />}
                 sx={{ width: 200 }}
               >
-                อนุมัติ
+                ยืนยัน
               </Button>
             )}
           </Grid>
@@ -532,6 +550,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 disableColumnMenu
                 autoHeight={rows.length >= 8 ? false : true}
                 scrollbarSize={10}
+                rowHeight={65}
               />
             </div>
           </Box>
@@ -615,7 +634,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} justifyContent="flex-end" mb={1}>
+                {/* <Grid container spacing={2} justifyContent='flex-end' mb={1}>
                   <Grid item lg={5}></Grid>
                   <Grid item lg={3} alignItems="flex-end">
                     <Typography variant="body2" pt={1}>
@@ -635,7 +654,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       sx={{ background: '#EAEBEB' }}
                     />
                   </Grid>
-                </Grid>
+                </Grid> */}
 
                 <Grid container spacing={2} justifyContent="flex-end" mb={1}>
                   <Grid item lg={5}></Grid>

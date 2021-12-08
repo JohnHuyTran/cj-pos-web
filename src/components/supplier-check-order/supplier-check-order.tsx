@@ -21,6 +21,9 @@ import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supp
 import { featchSupplierOrderPIDetailAsync } from '../../store/slices/supplier-order-pi-detail-slice';
 import SupplierOrderDetail from './supplier-pi-detail';
 
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import ModalSupplierSelection from './modal-supplier-selection';
+
 interface State {
   paramQuery: string;
   piStatus: string;
@@ -38,6 +41,11 @@ export default function SupplierCheckOrderSearch() {
   const page = '1';
   const classes = useStyles();
   const dispatch = useAppDispatch();
+
+  const [openModal, setOpenModal] = React.useState(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+
   const items = useAppSelector((state) => state.supplierCheckOrderSlice);
   const limit = useAppSelector((state) => state.supplierCheckOrderSlice.orderList.perPage);
 
@@ -301,15 +309,14 @@ export default function SupplierCheckOrderSearch() {
             <Button
               id="btnCreateSupplierModal"
               variant="contained"
-              onClick={createPI}
+              onClick={handleOpenModal}
               sx={{ minWidth: '15%' }}
               className={classes.MbtnClear}
-              startIcon={<AddCircleOutlined />}
+              startIcon={<AddCircleOutlineOutlinedIcon />}
               color="secondary"
             >
               สร้างใบรับสินค้า
             </Button>
-
             <Button
               id="btnClear"
               variant="contained"
@@ -342,6 +349,7 @@ export default function SupplierCheckOrderSearch() {
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
 
       {openPIDetail && <SupplierOrderDetail isOpen={openPIDetail} onClickClose={isClosModal} />}
+      <ModalSupplierSelection openModal={openModal} handleCloseModal={handleCloseModal} />
     </>
   );
 }
