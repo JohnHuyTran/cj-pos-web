@@ -153,7 +153,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
   };
 
   const onSubmitData = async () => {
-    console.log(selection);
+    // console.log(selection);
     await dispatch(updateState(selection));
     clearData();
     handleCloseModal();
