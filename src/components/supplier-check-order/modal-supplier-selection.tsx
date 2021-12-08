@@ -217,7 +217,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
                 renderOption={autocompleteRenderListItem}
                 onChange={onChange}
                 onInputChange={onInputChange}
-                getOptionLabel={(option) => option.name.trim()}
+                getOptionLabel={(option) => option.name}
                 isOptionEqualToValue={(option, value) => option.name === value.name}
                 renderInput={(params) => (
                   <TextField
