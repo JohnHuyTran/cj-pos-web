@@ -67,6 +67,7 @@ const columns: GridColDef[] = [
     field: 'barCode',
     headerName: 'บาร์โค้ด',
     minWidth: 200,
+    flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -75,7 +76,7 @@ const columns: GridColDef[] = [
     field: 'productName',
     headerName: 'สินค้า',
     headerAlign: 'center',
-    // minWidth: 250,
+    minWidth: 220,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
@@ -522,6 +523,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 disableColumnMenu
                 autoHeight={rows.length >= 8 ? false : true}
                 scrollbarSize={10}
+                rowHeight={65}
               />
             </div>
           </Box>
