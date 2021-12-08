@@ -448,13 +448,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขทเอกสาร PI :</Typography>
+                <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">{piNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">แนบเอกสาร:</Typography>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย:</Typography>
               </Grid>
               <Grid item lg={4}>
                 <Button
