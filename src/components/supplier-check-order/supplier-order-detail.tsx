@@ -450,7 +450,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   value={billNo}
                   placeholder="กรุณากรอก เลขที่บิลผู้จำหน่าย"
                   onChange={(event) => setBillNo(event.target.value)}
-                  className={classes.MtextField}
+                  className={classes.MtextFieldDetail}
                   disabled={piStatus !== 0}
                   error={errorBillNo === true}
                   helperText={errorBillNo === true ? 'กรุณากรอก เลขที่บิลผู้จำหน่าย' : ' '}
@@ -465,7 +465,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">{piNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย:</Typography>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
                 <Button
@@ -696,6 +696,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         piNo={piNo}
         docNo={purchaseDetail.docNo}
         billNo={billNo}
+        supplierId={purchaseDetail.supplierCode}
         comment={comment}
         piStatus={piStatus}
         items={items}

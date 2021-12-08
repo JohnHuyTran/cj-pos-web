@@ -17,6 +17,7 @@ interface Props {
   piNo: string;
   docNo: string;
   billNo: string;
+  supplierId: string;
   comment: string;
   piStatus: number;
   items: any;
@@ -30,6 +31,7 @@ export default function ModelConfirm({
   piNo,
   docNo,
   billNo,
+  supplierId,
   comment,
   piStatus,
   items,
@@ -41,6 +43,7 @@ export default function ModelConfirm({
     if (piDetail) {
       const payloadSave: SavePurchasePIRequest = {
         billNo: billNo,
+        supplierId: supplierId,
         comment: comment,
         piNo: piNo,
         docNo: docNo,

@@ -111,6 +111,7 @@ export interface SavePurchaseRequest {
 
 export interface SavePurchasePIRequest {
   billNo: string;
+  supplierId: string;
   comment: string;
   piNo: string;
   docNo: string;

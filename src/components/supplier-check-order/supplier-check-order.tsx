@@ -16,13 +16,10 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import SupplierOrderList from './supplier-order-list';
 import LoadingModal from '../commons/ui/loading-modal';
-import { AddCircleOutlined, SearchOff } from '@mui/icons-material';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
-import { featchSupplierOrderPIDetailAsync } from '../../store/slices/supplier-order-pi-detail-slice';
-import SupplierOrderDetail from './supplier-pi-detail';
-
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import ModalSupplierSelection from './modal-supplier-selection';
+import { SearchOff } from '@mui/icons-material';
 
 interface State {
   paramQuery: string;
@@ -178,35 +175,6 @@ export default function SupplierCheckOrderSearch() {
     }, 300);
   };
 
-  const piDetail: any = [];
-  const [openPIDetail, setOpenPIDetail] = React.useState(false);
-  const purchasePIDetailList = useAppSelector((state) => state.supplierOrderPIDetail.purchasePIDetail);
-  const createPI = async () => {
-    handleOpenLoading('open', true);
-    piDetail.push({
-      supplierCode: '0000101539',
-      docNo: '2021120302',
-    });
-    try {
-      await dispatch(featchSupplierOrderPIDetailAsync(piDetail));
-      if (purchasePIDetailList.data === []) {
-        console.log('Purchase PI Detail No data');
-        setOpenAlert(true);
-        setTextError('ไม่พบข้อมูลใบรับสินค้า');
-      } else {
-        setOpenPIDetail(true);
-      }
-    } catch (error) {
-      console.log(error);
-      setOpenAlert(true);
-      setTextError('ไม่พบข้อมูลใบรับสินค้า');
-    }
-    handleOpenLoading('open', false);
-  };
-  function isClosModal() {
-    setOpenPIDetail(false);
-  }
-
   let orderListData;
   const orderListDatas = items.orderList.data ? items.orderList.data : [];
   const [flagSearch, setFlagSearch] = React.useState(false);
@@ -347,8 +315,6 @@ export default function SupplierCheckOrderSearch() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
-
-      {openPIDetail && <SupplierOrderDetail isOpen={openPIDetail} onClickClose={isClosModal} />}
       <ModalSupplierSelection openModal={openModal} handleCloseModal={handleCloseModal} />
     </>
   );

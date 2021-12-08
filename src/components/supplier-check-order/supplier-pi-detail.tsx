@@ -8,7 +8,15 @@ import { Box } from '@mui/system';
 import Steppers from '../commons/ui/steppers';
 import SaveIcon from '@mui/icons-material/Save';
 import { useStyles } from '../../styles/makeTheme';
-import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef, GridRowId, GridRowData } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  useGridApiRef,
+  GridRowId,
+  GridRowData,
+  GridValueGetterParams,
+} from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
   PurchaseDetailEntries,
@@ -24,6 +32,7 @@ import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
 import ModelDeleteConfirm from './modal-delete-confirm';
+import { featchSupplierOrderPIDetailAsync } from '../../store/slices/supplier-order-pi-detail-slice';
 
 interface Props {
   isOpen: boolean;
@@ -131,6 +140,15 @@ const columns: GridColDef[] = [
     ),
   },
   {
+    field: 'productDifference',
+    headerName: 'ส่วนต่างการรับ',
+    width: 140,
+    headerAlign: 'center',
+    align: 'right',
+    sortable: false,
+    renderCell: (params) => calProductDiff(params),
+  },
+  {
     field: 'setPrice',
     headerName: 'ราคาต่อหน่วย',
     width: 135,
@@ -138,14 +156,6 @@ const columns: GridColDef[] = [
     align: 'right',
     sortable: false,
   },
-  // {
-  //   field: 'salePrice',
-  //   headerName: 'ลด/ชาร์จ',
-  //   width: 135,
-  //   headerAlign: 'center',
-  //   align: 'right',
-  //   sortable: false,
-  // },
   {
     field: 'sumPrice',
     headerName: 'รวม',
@@ -169,6 +179,14 @@ const columns: GridColDef[] = [
   // },
 ];
 
+var calProductDiff = function (params: GridValueGetterParams) {
+  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qty'));
+
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  return diff;
+};
+
 const isDisable = (params: GridRenderCellParams) => {
   return params.row.isDraftStatus;
 };
@@ -178,8 +196,9 @@ function useApiRef() {
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: '__HIDDEN__',
+        field: '',
         width: 0,
+        sortable: false,
         renderCell: (params) => {
           apiRef.current = params.api;
           return null;
@@ -239,6 +258,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpen(isOpen);
     setBillNo(purchaseDetail.billNo);
     setPiNo(purchaseDetail.piNo);
+    setSupplierCode(purchaseDetail.supplierCode);
     setPiType(purchaseDetail.piType);
     setPiStatus(purchaseDetail.piStatus);
     setComment(purchaseDetail.comment);
@@ -253,6 +273,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [billNo, setBillNo] = React.useState('');
   const [errorBillNo, setErrorBillNo] = React.useState(false);
   const [piNo, setPiNo] = React.useState('');
+  const [supplierCode, setSupplierCode] = React.useState('');
   const [piType, setPiType] = React.useState(0);
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
@@ -384,6 +405,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
       const payloadSave: SavePurchasePIRequest = {
         piNo: piNo,
+        supplierId: supplierCode,
         billNo: billNo,
         docNo: docNo,
         flagPO: piType,
@@ -396,8 +418,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          dispatch(featchSupplierOrderDetailAsync(piNo));
           dispatch(featchOrderListSupAsync(payloadSearch));
+
+          const piDetail: any = [];
+          piDetail.push({
+            supplierCode: supplierCode,
+            docNo: docNo,
+          });
+          dispatch(featchSupplierOrderPIDetailAsync(piDetail));
 
           localStorage.removeItem('SupplierRowsEdit');
         })
@@ -413,7 +441,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          <Typography sx={{ fontSize: '1em' }}>ใบสั่งซื้อ Supplier</Typography>
+          <Typography sx={{ fontSize: '1em' }}>ใบรับสินค้าจากผู้จำหน่าย</Typography>
           <Steppers status={piStatus}></Steppers>
         </BootstrapDialogTitle>
 
@@ -452,7 +480,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">{piNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">แนบเอกสารจากผู้ขาย:</Typography>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
                 <Button
@@ -470,7 +498,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid container spacing={2}>
               <Grid item lg={2}>
-                <Typography variant="body2">รหัสผู้จัดจำหน่าย:</Typography>
+                <Typography variant="body2">ผู้จัดจำหน่าย:</Typography>
               </Grid>
               <Grid item lg={4}>
                 <div
@@ -543,20 +571,25 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           )}
 
           <Box mt={2} bgcolor="background.paper">
-            <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
+            <div
+              style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
+              className={classes.MdataGridDetail}
+            >
               <DataGrid
                 rows={rows}
                 columns={columns}
-                disableColumnMenu
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
-                autoHeight
-                paginationMode="server"
+                disableColumnMenu
+                autoHeight={rows.length >= 8 ? false : true}
+                scrollbarSize={10}
+                rowHeight={65}
               />
             </div>
           </Box>
+
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
@@ -699,6 +732,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         piNo={piNo}
         docNo={docNo}
         billNo={billNo}
+        supplierId={supplierCode}
         comment={comment}
         piStatus={piStatus}
         items={items}
