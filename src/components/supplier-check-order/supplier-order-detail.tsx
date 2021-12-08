@@ -473,7 +473,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">รหัสผู้จัดจำหน่าย:</Typography>
+                <Typography variant="body2">ผู้จัดจำหน่าย:</Typography>
               </Grid>
               <Grid item lg={4}>
                 <div
@@ -521,7 +521,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 startIcon={<CheckCircleOutline />}
                 sx={{ width: 200 }}
               >
-                อนุมัติ
+                ยืนยัน
               </Button>
             )}
           </Grid>
