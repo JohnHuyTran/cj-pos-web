@@ -116,7 +116,10 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [havePOValue, setHavePOValue] = useState<string>('');
-  const [selection, setSelection] = useState<any>(null);
+
+  const [supplier, setSupplier] = useState<any>(null);
+  const [poSelection, setPoSelection] = useState<any>(null);
+  const [submitDisable, setSubmitDisable] = useState<boolean>(true);
 
   const resp = useAppSelector((state) => state.searchSupplierSelectionSlice.supplierResp);
   const options = resp.data && resp.data.length > 0 ? resp.data : [];
@@ -134,11 +137,18 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
   };
 
   const onChange = async (event: any, option: any, reason: string) => {
+    setSupplier(null);
+    setPoSelection(null);
+
     if (option && reason === 'selectOption') {
+      setSupplier(option);
+
       if (option.isRefPO) {
+        setSubmitDisable(true);
         setHavePOValue('มีเอกสาร PO');
         await dispatch(searchSupplierPOAsync(option.code));
       } else {
+        setSubmitDisable(false);
         setHavePOValue('ไม่มีมีเอกสาร PO');
       }
     } else {
@@ -147,14 +157,15 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
   };
 
   const onRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSubmitDisable(false);
     const code = event.target.value;
     const filter = poData.filter((row) => row.docNo === code);
-    if (filter.length > 0) setSelection(filter[0]);
+    filter.length > 0 ? setPoSelection(filter[0]) : setPoSelection(null);
   };
 
   const onSubmitData = async () => {
-    // console.log(selection);
-    await dispatch(updateState(selection));
+    const payload = { supplier, poSelection };
+    await dispatch(updateState(payload));
     clearData();
     handleCloseModal();
   };
@@ -165,6 +176,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
   };
 
   const clearData = async () => {
+    setSubmitDisable(true);
     setHavePOValue('');
     await dispatch(clearDataFilter());
     await dispatch(clearDataFilterPO());
@@ -281,7 +293,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
               color="secondary"
               onClick={onSubmitData}
               className={classes.MBtnAddSupplier}
-              disabled={false}
+              disabled={submitDisable}
             >
               เพิ่มผู้จำหน่าย
             </Button>
