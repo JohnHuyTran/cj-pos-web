@@ -176,8 +176,9 @@ function useApiRef() {
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: '__HIDDEN__',
+        field: '',
         width: 0,
+        sortable: false,
         renderCell: (params) => {
           apiRef.current = params.api;
           return null;
