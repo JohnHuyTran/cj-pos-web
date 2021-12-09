@@ -414,18 +414,19 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       };
 
       await saveSupplierPI(payloadSave)
-        .then((_value) => {
+        .then((value) => {
+          setPiNo(value.piNo);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchOrderListSupAsync(payloadSearch));
 
-          const piDetail: any = [];
-          piDetail.push({
-            supplierCode: supplierCode,
-            docNo: docNo,
-          });
-          dispatch(featchSupplierOrderPIDetailAsync(piDetail));
+          // const piDetail: any = [];
+          // piDetail.push({
+          //   supplierCode: supplierCode,
+          //   docNo: docNo,
+          // });
+          // dispatch(featchSupplierOrderPIDetailAsync(piDetail));
 
           localStorage.removeItem('SupplierRowsEdit');
         })
@@ -669,28 +670,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     />
                   </Grid>
                 </Grid>
-
-                {/* <Grid container spacing={2} justifyContent="flex-end" mb={1}>
-                  <Grid item lg={5}></Grid>
-                  <Grid item lg={3} alignItems="flex-end">
-                    <Typography variant="body2" pt={1}>
-                      ลด/ชาร์จ
-                    </Typography>
-                  </Grid>
-                  <Grid item lg={4}>
-                    <TextField
-                      id="txtParamQuery"
-                      name="paramQuery"
-                      size="small"
-                      // value={discount}
-                      value="0"
-                      className={classes.MtextFieldNumber}
-                      fullWidth
-                      disabled
-                      sx={{ background: '#EAEBEB' }}
-                    />
-                  </Grid>
-                </Grid> */}
 
                 <Grid container spacing={2} justifyContent="flex-end" mb={1}>
                   <Grid item lg={5}></Grid>
