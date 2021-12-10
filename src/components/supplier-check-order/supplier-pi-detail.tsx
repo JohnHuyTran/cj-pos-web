@@ -543,7 +543,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   )}
                 </Grid>
 
-                <Grid item xl={10}>
+                <Grid item xl={10} sx={{ textAlign: 'end' }}>
                   <Button
                     id="btnSave"
                     variant="contained"
