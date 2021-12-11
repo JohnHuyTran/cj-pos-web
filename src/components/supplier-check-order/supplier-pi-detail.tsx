@@ -216,9 +216,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const handleClose = () => {
     let exit = false;
-    if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) {
-      exit = true;
-    }
+    // if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) {
+    //   exit = true;
+    // }
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let i = 0;
     const itemsList: any = [];
@@ -256,36 +256,29 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   useEffect(() => {
     setOpen(isOpen);
-    setBillNo(purchaseDetail.billNo);
-    setPiNo(purchaseDetail.piNo);
-    setSupplierCode(purchaseDetail.supplierCode);
-    setPiType(purchaseDetail.piType);
-    setPiStatus(purchaseDetail.piStatus);
-    setComment(purchaseDetail.comment);
-    setCharacterCount(purchaseDetail.comment.length);
-    setDocNo(purchaseDetail.docNo);
+    // setBillNo(purchaseDetail.billNo);
+    // setPiNo(purchaseDetail.piNo);
+    setSupplierCode(payloadSupplier.poSelection.supplierCode);
+    setSupplierName(payloadSupplier.poSelection.supplierName);
+    setSupplierTaxNo(payloadSupplier.poSelection.supplierTaxNo);
+    setPiType(payloadSupplier.poSelection.docType);
+    // setPiStatus(payloadSupplier.poSelection.status);
+    setDocNo(payloadSupplier.poSelection.docNo);
+    // setComment(purchaseDetail.comment);
+    // setCharacterCount(purchaseDetail.comment.length);
   }, [open]);
 
-  const purchasePIDetailList = useAppSelector((state) => state.supplierOrderPIDetail.purchasePIDetail);
-  const purchaseDetail: any = purchasePIDetailList.data ? purchasePIDetailList.data : null;
-  const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
+  const payloadSupplier = useAppSelector((state) => state.supplierSelectionSlice.state);
+  const supplierItems = payloadSupplier.poSelection.items;
 
-  const [billNo, setBillNo] = React.useState('');
-  const [errorBillNo, setErrorBillNo] = React.useState(false);
-  const [piNo, setPiNo] = React.useState('');
-  const [supplierCode, setSupplierCode] = React.useState('');
-  const [piType, setPiType] = React.useState(0);
-  const [piStatus, setPiStatus] = React.useState(0);
-  const [comment, setComment] = React.useState('');
-  const [docNo, setDocNo] = React.useState('');
-
-  let rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
+  let rows = supplierItems.map((item: PurchaseDetailEntries, index: number) => {
     return {
       id: `${item.barcode}-${index + 1}`,
       index: index + 1,
       seqItem: item.seqItem,
       produtStatus: item.produtStatus,
-      isDraftStatus: piStatus === 0 ? false : true,
+      isDraftStatus: false,
+      // isDraftStatus: piStatus === 0 ? false : true,
       isControlStock: item.isControlStock,
       isAllowDiscount: item.isAllowDiscount,
       skuCode: item.skuCode,
@@ -299,11 +292,56 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       salePrice: item.salePrice,
       setPrice: item.setPrice,
       sumPrice: item.sumPrice,
-      actualQty: item.actualQty,
+      actualQty: item.actualQty ? item.actualQty : 0,
       actualQtyAll: item.actualQtyAll,
-      piStatus: piStatus,
+      piStatus: 0,
+      // piStatus: piStatus,
     };
   });
+
+  // console.log('code :' + JSON.stringify(payloadSupplier.supplier.code));;
+  // console.log('items :' + JSON.stringify(payloadSupplier.poSelection.items));
+
+  // const purchasePIDetailList = useAppSelector((state) => state.supplierOrderPIDetail.purchasePIDetail);
+  // const purchaseDetail: any = purchasePIDetailList.data ? purchasePIDetailList.data : null;
+  // const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
+
+  const [billNo, setBillNo] = React.useState('');
+  const [errorBillNo, setErrorBillNo] = React.useState(false);
+  const [piNo, setPiNo] = React.useState('');
+  const [supplierCode, setSupplierCode] = React.useState('');
+  const [supplierName, setSupplierName] = React.useState('');
+  const [supplierTaxNo, setSupplierTaxNo] = React.useState('');
+  const [piType, setPiType] = React.useState(0);
+  const [piStatus, setPiStatus] = React.useState(0);
+  const [comment, setComment] = React.useState('');
+  const [docNo, setDocNo] = React.useState('');
+
+  // let rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
+  //   return {
+  //     id: `${item.barcode}-${index + 1}`,
+  //     index: index + 1,
+  //     seqItem: item.seqItem,
+  //     produtStatus: item.produtStatus,
+  //     isDraftStatus: piStatus === 0 ? false : true,
+  //     isControlStock: item.isControlStock,
+  //     isAllowDiscount: item.isAllowDiscount,
+  //     skuCode: item.skuCode,
+  //     barCode: item.barcode,
+  //     productName: item.productName,
+  //     unitCode: item.unitCode,
+  //     unitName: item.unitName,
+  //     qty: item.qty,
+  //     qtyAll: item.qtyAll,
+  //     controlPrice: item.controlPrice,
+  //     salePrice: item.salePrice,
+  //     setPrice: item.setPrice,
+  //     sumPrice: item.sumPrice,
+  //     actualQty: item.actualQty,
+  //     actualQtyAll: item.actualQtyAll,
+  //     piStatus: piStatus,
+  //   };
+  // });
   if (localStorage.getItem('SupplierRowsEdit')) {
     let localStorageEdit = JSON.parse(localStorage.getItem('SupplierRowsEdit') || '');
     rows = localStorageEdit;
@@ -512,10 +550,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   }}
                 >
                   <Typography variant="body2" sx={{ color: '#263238' }}>
-                    {purchaseDetail.supplierName}
+                    {supplierName}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#AEAEAE', fontSize: 12 }}>
-                    {purchaseDetail.supplierTaxNo}
+                    {supplierTaxNo}
                   </Typography>
                 </div>
               </Grid>
