@@ -18,6 +18,7 @@ import SupplierOrderList from './supplier-order-list';
 import LoadingModal from '../commons/ui/loading-modal';
 import { SearchOff } from '@mui/icons-material';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
+import ModalAddItem from '../../components/supplier-check-order/modal-add-item';
 
 interface State {
   paramQuery: string;
@@ -187,6 +188,15 @@ export default function SupplierCheckOrderSearch() {
     }
   }
 
+  //test modal add item
+  const [openModal, setOpenModal] = React.useState(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+
+  const onClickTestAddItem = () => {
+    setOpenModal(true);
+  };
+
   return (
     <>
       <Box>
@@ -270,6 +280,16 @@ export default function SupplierCheckOrderSearch() {
             <Button
               id="btnClear"
               variant="contained"
+              onClick={onClickTestAddItem}
+              sx={{ width: '13%' }}
+              className={classes.MbtnClear}
+              color="cancelColor"
+            >
+              test
+            </Button>
+            <Button
+              id="btnClear"
+              variant="contained"
               onClick={onClickClearBtn}
               sx={{ width: '13%' }}
               className={classes.MbtnClear}
@@ -297,6 +317,8 @@ export default function SupplierCheckOrderSearch() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+      <ModalAddItem openModal={openModal} handleCloseModal={handleCloseModal} supNo="1234567"></ModalAddItem>
     </>
   );
 }
