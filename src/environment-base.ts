@@ -1,5 +1,5 @@
 export const environment = {
-  products: {
+  product: {
     url: '/api/product',
     headers: {
       'Content-Type': 'application/json',
@@ -63,6 +63,16 @@ export const environment = {
       approve: {
         url: '/purchase/purchase-invoice/{piNo}/approve',
         // url: '/purchase/purchase/{piNo}/approve',
+      },
+    },
+  },
+  products: {
+    addItem: {
+      itemList: {
+        url: '/products/',
+      },
+      itemByBarcode: {
+        url: '/products/barcode/',
       },
     },
   },
