@@ -29,8 +29,8 @@ export const searchSupplierPOAsync = createAsyncThunk('supplierPO', async (code:
       data: [],
     };
 
-    // response = await get(apiRootPath).then();
-    response = SupplierPO;
+    response = await get(apiRootPath).then();
+    // response = SupplierPO;
     return response;
   } catch (error) {
     throw error;

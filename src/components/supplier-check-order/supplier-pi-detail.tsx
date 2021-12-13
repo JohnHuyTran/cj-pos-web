@@ -175,17 +175,6 @@ const columns: GridColDef[] = [
       </div>
     ),
   },
-  // {
-  //   field: 'delete',
-  //   headerName: 'ลบ',
-  //   width: 50,
-  //   align: 'right',
-  //   sortable: false,
-  //   // hide: true,
-  //   renderCell: () => {
-  //     return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
-  //   },
-  // },
 ];
 
 var calProductDiff = function (params: GridValueGetterParams) {
@@ -268,7 +257,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   useEffect(() => {
     setOpen(isOpen);
     if (supplier) {
-      setPiType(supplier.docType);
+      // setPiType(supplier.docType);
       setDocNo(supplier.docNo);
     }
 
@@ -281,6 +270,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const supplier = payloadSupplier.supplier;
   const po = payloadSupplier.poSelection;
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
+
+  console.log('supplier : ', JSON.stringify(supplier));
 
   let rows: any = [];
   const handleAddRow = (items: any) => {
@@ -453,11 +444,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         piNo: piNo,
         supplierId: supplierCode,
         billNo: billNo,
-        docNo: docNo,
-        flagPO: piType,
+        docNo: docNo ? docNo : '',
+        flagPO: 1,
         comment: comment,
         items: itemsList,
       };
+
+      console.log(piType, ' : payloadSave : ', JSON.stringify(payloadSave));
 
       await saveSupplierPI(payloadSave)
         .then((value) => {

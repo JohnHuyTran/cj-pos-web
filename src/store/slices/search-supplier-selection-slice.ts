@@ -29,9 +29,8 @@ export const searchSupplierAsync = createAsyncThunk('supplierSearch', async (key
       data: [],
     };
 
-    // response = await get(apiRootPath).then();
-
-    response = Supplier;
+    response = await get(apiRootPath).then();
+    // response = Supplier;
     return response;
   } catch (error) {
     throw error;
