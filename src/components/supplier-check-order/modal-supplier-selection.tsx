@@ -132,6 +132,11 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
   const poData = poResp.data && poResp.data.length > 0 ? poResp.data : [];
 
   const onInputChange = async (event: any, value: string, reason: string) => {
+    if (event && event.keyCode && event.keyCode === 13) {
+      console.log({ reason, value });
+      return false;
+    }
+
     const keyword = value.trim();
     if (keyword.length >= 3) {
       await dispatch(searchSupplierAsync(keyword));
@@ -153,7 +158,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
         await dispatch(searchSupplierPOAsync(option.code));
       } else {
         setSubmitDisable(false);
-        setHavePOValue('ไม่มีมีเอกสาร PO');
+        setHavePOValue('ไม่มีเอกสาร PO');
       }
     } else {
       clearData();
@@ -270,7 +275,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
                 renderOption={autocompleteRenderListItem}
                 onChange={onChange}
                 onInputChange={onInputChange}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option) => (option.name ? option.name : '')}
                 isOptionEqualToValue={(option, value) => option.name === value.name}
                 renderInput={(params) => (
                   <TextField
