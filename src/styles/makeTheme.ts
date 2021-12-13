@@ -10,6 +10,16 @@ const useStyles = makeStyles({
       fontSize: '14px',
     },
   },
+  MtextFieldDetail: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      minHeight: '20px !important',
+      padding: '0px 0px 0px 5px',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      fontSize: '14px',
+    },
+  },
   MtextFieldNumber: {
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
@@ -49,6 +59,12 @@ const useStyles = makeStyles({
         maxHeight: 'none !important',
         whiteSpace: 'unset !important',
         overflow: 'unset !important',
+      },
+      '& .MuiDataGrid-cell--textRight': {
+        justifyContent: 'flex-end',
+      },
+      '& .MuiDataGrid-cell--textLeft': {
+        justifyContent: 'flex-start',
       },
       '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
         {
@@ -96,6 +112,12 @@ const useStyles = makeStyles({
           whiteSpace: 'unset !important',
           overflow: 'unset !important',
         },
+        '& .MuiDataGrid-cell--textRight': {
+          justifyContent: 'flex-end',
+        },
+        '& .MuiDataGrid-cell--textLeft': {
+          justifyContent: 'flex-start',
+        },
       },
       '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
         {
@@ -103,7 +125,8 @@ const useStyles = makeStyles({
         },
     },
     '& .MuiDataGrid-footerContainer': {
-      borderBottom: '1px solid #cbd4db !important',
+      borderBottom: '1px solid #E5E5E5 !important',
+      // height: '50px',
     },
     '& .MuiTablePagination-toolbar': {
       color: '#AEAEAE',
@@ -186,6 +209,9 @@ const useStyles = makeStyles({
   },
   MStepper: {
     '& .css-4q7q78-MuiSvgIcon-root-MuiStepIcon-root.Mui-active': {
+      color: '#DDDDDD',
+    },
+    '& .css-c9cih3-MuiSvgIcon-root-MuiStepIcon-root.Mui-active': {
       color: '#DDDDDD',
     },
   },

@@ -16,9 +16,10 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import SupplierOrderList from './supplier-order-list';
 import LoadingModal from '../commons/ui/loading-modal';
-import { SearchOff } from '@mui/icons-material';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
-import ModalAddItem from '../../components/supplier-check-order/modal-add-item';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import ModalSupplierSelection from './modal-supplier-selection';
+import { SearchOff } from '@mui/icons-material';
 
 interface State {
   paramQuery: string;
@@ -37,6 +38,11 @@ export default function SupplierCheckOrderSearch() {
   const page = '1';
   const classes = useStyles();
   const dispatch = useAppDispatch();
+
+  const [openModal, setOpenModal] = React.useState(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+
   const items = useAppSelector((state) => state.supplierCheckOrderSlice);
   const limit = useAppSelector((state) => state.supplierCheckOrderSlice.orderList.perPage);
 
@@ -188,15 +194,6 @@ export default function SupplierCheckOrderSearch() {
     }
   }
 
-  //test modal add item
-  const [openModal, setOpenModal] = React.useState(false);
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
-
-  const onClickTestAddItem = () => {
-    setOpenModal(true);
-  };
-
   return (
     <>
       <Box>
@@ -278,20 +275,21 @@ export default function SupplierCheckOrderSearch() {
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
             <Button
-              id="btnClear"
+              id="btnCreateSupplierModal"
               variant="contained"
-              onClick={onClickTestAddItem}
-              sx={{ width: '13%' }}
+              onClick={handleOpenModal}
+              sx={{ minWidth: '15%' }}
               className={classes.MbtnClear}
-              color="cancelColor"
+              startIcon={<AddCircleOutlineOutlinedIcon />}
+              color="secondary"
             >
-              test
+              สร้างใบรับสินค้า
             </Button>
             <Button
               id="btnClear"
               variant="contained"
               onClick={onClickClearBtn}
-              sx={{ width: '13%' }}
+              sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
             >
@@ -318,7 +316,7 @@ export default function SupplierCheckOrderSearch() {
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
 
-      <ModalAddItem openModal={openModal} handleCloseModal={handleCloseModal} supNo="1234567"></ModalAddItem>
+      <ModalSupplierSelection openModal={openModal} handleCloseModal={handleCloseModal} />
     </>
   );
 }

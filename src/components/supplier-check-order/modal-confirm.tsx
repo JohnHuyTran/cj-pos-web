@@ -1,16 +1,14 @@
+import React, { ReactElement } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import React, { ReactElement } from 'react';
 import { ApiError } from '../../models/api-error-model';
-import { GenerateBORequest } from '../../models/order-model';
-import { SavePurchaseRequest } from '../../models/supplier-check-order-model';
-import { generateBO } from '../../services/order-shipment';
-import { approveSupplierOrder } from '../../services/purchase';
+import { SavePurchasePIRequest, SavePurchaseRequest } from '../../models/supplier-check-order-model';
+import { approveSupplierOrder, approveSupplierPI } from '../../services/purchase';
+import LoadingModal from '../commons/ui/loading-modal';
 
 interface Props {
   open: boolean;
@@ -19,8 +17,11 @@ interface Props {
   piNo: string;
   docNo: string;
   billNo: string;
+  supplierId: string;
   comment: string;
+  piStatus: number;
   items: any;
+  piDetail: boolean;
 }
 
 export default function ModelConfirm({
@@ -30,40 +31,58 @@ export default function ModelConfirm({
   piNo,
   docNo,
   billNo,
+  supplierId,
   comment,
+  piStatus,
   items,
+  piDetail,
 }: Props): ReactElement {
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const handleConfirm = async () => {
-    // const payload: GenerateBORequest = {
-    //   comment: comment,
-    // };
-    // generateBO(shipmentNo, payload).then(
-    //   function (value) {
-    //     setTimeout(() => {
-    //       onUpdateAction(true, "");
-    //     }, 3000);
-    //   },
-    //   function (error: ApiError) {
-    //     onUpdateAction(false, error.message);
-    //   }
-    // );
+    setOpenLoadingModal(true);
+    if (piDetail) {
+      const payloadSave: SavePurchasePIRequest = {
+        billNo: billNo,
+        supplierId: supplierId,
+        comment: comment,
+        piNo: piNo,
+        docNo: docNo,
+        flagPO: piStatus,
+        items: items,
+      };
 
-    const payloadSave: SavePurchaseRequest = {
-      billNo: billNo,
-      comment: comment,
-      items: items,
-    };
+      await approveSupplierPI(payloadSave).then(
+        function (value) {
+          setTimeout(() => {
+            onUpdateAction(true, '');
+          }, 500);
+        },
+        function (error: ApiError) {
+          onUpdateAction(false, error.message);
+        }
+      );
 
-    await approveSupplierOrder(payloadSave, piNo).then(
-      function (value) {
-        setTimeout(() => {
-          onUpdateAction(true, '');
-        }, 3000);
-      },
-      function (error: ApiError) {
-        onUpdateAction(false, error.message);
-      }
-    );
+      setOpenLoadingModal(false);
+    } else {
+      const payloadSave: SavePurchaseRequest = {
+        billNo: billNo,
+        comment: comment,
+        items: items,
+      };
+
+      await approveSupplierOrder(payloadSave, piNo).then(
+        function (value) {
+          setTimeout(() => {
+            onUpdateAction(true, '');
+          }, 500);
+        },
+        function (error: ApiError) {
+          onUpdateAction(false, error.message);
+        }
+      );
+
+      setOpenLoadingModal(false);
+    }
     onClose();
   };
   return (
@@ -77,12 +96,18 @@ export default function ModelConfirm({
       <DialogContent>
         <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
           <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
-            ยืนยันการตรวจสอบผลต่าง (DC)
+            ยืนยันอนุมัติใบสั่งซื้อ Supplier
           </Typography>
           <Typography variant="body1" align="center">
             เลขที่ใบสั่งซื้อ PO <label style={{ color: '#AEAEAE' }}>|</label>{' '}
             <label style={{ color: '#36C690' }}>
               <b>{docNo}</b>
+            </label>
+          </Typography>
+          <Typography variant="body1" align="center">
+            เลขที่ใบเอกสาร PI <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+            <label style={{ color: '#36C690' }}>
+              <b>{piNo}</b>
             </label>
           </Typography>
         </DialogContentText>
@@ -107,6 +132,8 @@ export default function ModelConfirm({
         >
           ยืนยัน
         </Button>
+
+        <LoadingModal open={openLoadingModal} />
       </DialogActions>
     </Dialog>
   );
