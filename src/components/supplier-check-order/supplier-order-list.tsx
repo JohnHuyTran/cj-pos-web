@@ -55,8 +55,8 @@ export default function SupplierOrderList() {
     {
       field: 'index',
       headerName: 'ลำดับ',
-      //   minWidth: 75,
-      flex: 0.5,
+      width: 70,
+      // flex: 0.5,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -68,8 +68,8 @@ export default function SupplierOrderList() {
     {
       field: 'createdDate',
       headerName: 'วันที่รับสินค้า',
-      //   minWidth: 170,
-      flex: 0.8,
+      minWidth: 110,
+      // flex: 0.8,
       headerAlign: 'center',
       sortable: false,
     },
@@ -82,8 +82,10 @@ export default function SupplierOrderList() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2">{params.value}</Typography>
-          <Typography color="textSecondary" variant="body2">
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.value}
+          </Typography>
+          <Typography color="textSecondary" variant="body2" sx={{ lineHeight: '120%' }}>
             {params.getValue(params.id, 'supplierCode') || ''}
           </Typography>
         </div>
@@ -92,24 +94,53 @@ export default function SupplierOrderList() {
     {
       field: 'piNo',
       headerName: 'เลขที่เอกสาร PI',
-      //   minWidth: 170,
-      flex: 1,
+      minWidth: 155,
+      // flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
     {
       field: 'docNo',
       headerName: 'เลขที่ใบสั่งซื้อ PO',
-      //   minWidth: 190,
-      flex: 1,
+      minWidth: 130,
+      // flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
     {
+      field: 'pnNo',
+      headerName: 'เลขที่คืนสินค้า PN',
+      minWidth: 140,
+      // flex: 1,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      renderCell: (params) => {
+        if (params.value === 0) {
+          return (
+            <Typography color="textSecondary" variant="body2">
+              {params.getValue(params.id, 'supplierCode') || ''}
+            </Typography>
+          );
+        } else if (params.value === 1) {
+          return (
+            <Button
+              variant="contained"
+              color="success"
+              size="small"
+              sx={{ color: '#20AE79', backgroundColor: '#E7FFE9', borderRadius: '5px' }}
+            >
+              คืนสินค้า
+            </Button>
+          );
+        }
+      },
+    },
+    {
       field: 'piStatus',
       headerName: 'สถานะ',
-      //   minWidth: 160,
-      flex: 0.8,
+      minWidth: 70,
+      // flex: 0.8,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
@@ -149,6 +180,7 @@ export default function SupplierOrderList() {
       supplierCode: data.supplierCode,
       piNo: data.piNo,
       docNo: data.docNo,
+      pnNo: data.piType,
       piStatus: data.piStatus,
       comment: data.comment,
     };
@@ -209,6 +241,11 @@ export default function SupplierOrderList() {
 
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
   const currentlySelected = async (params: GridCellParams) => {
+    const value = params.colDef.field;
+    if (value === 'pnNo') {
+      return;
+    }
+
     handleOpenLoading('open', true);
     try {
       await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
@@ -248,7 +285,7 @@ export default function SupplierOrderList() {
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
-            // rowHeight={80}
+            // rowHeight={65}
           />
         </div>
       </Box>
