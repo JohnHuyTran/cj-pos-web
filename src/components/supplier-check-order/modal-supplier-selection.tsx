@@ -158,7 +158,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
         await dispatch(searchSupplierPOAsync(option.code));
       } else {
         setSubmitDisable(false);
-        setHavePOValue('ไม่มีมีเอกสาร PO');
+        setHavePOValue('ไม่มีเอกสาร PO');
       }
     } else {
       clearData();
