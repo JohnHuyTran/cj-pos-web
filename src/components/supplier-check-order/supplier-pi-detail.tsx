@@ -270,6 +270,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const supplier = payloadSupplier.supplier;
   const po = payloadSupplier.poSelection;
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
+  // console.log('payloadSupplier: ', payloadSupplier);
+  // console.log('payloadAddItem: ', payloadAddItem);
 
   console.log('supplier : ', JSON.stringify(supplier));
 
@@ -284,14 +286,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         isAllowDiscount: item.isAllowDiscount,
         skuCode: item.skuCode,
         barCode: item.barcode,
-        productName: item.productName,
+        productName: item.barcodeName,
         unitCode: item.unitCode,
         unitName: item.unitName,
         qty: item.qty,
         qtyAll: item.qtyAll,
         controlPrice: item.controlPrice,
         salePrice: item.salePrice,
-        setPrice: item.setPrice,
+        setPrice: item.pricePerUnit,
         sumPrice: item.sumPrice,
         actualQty: item.actualQty ? item.actualQty : 0,
         isRefPO: supplier.isRefPO,
@@ -302,8 +304,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   if (po) {
     const supplierItems = po.items;
     handleAddRow(supplierItems);
-  } else if (payloadAddItem.items) {
-    handleAddRow(payloadAddItem.items);
+  } else if (payloadAddItem) {
+    handleAddRow(payloadAddItem);
   }
 
   // const change = () => {
@@ -755,8 +757,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         barCode={barCodeDel}
       />
 
-      <ModelAddItems open={openModelAddItems} onClose={handleModelAddItems} />
-
+      <ModelAddItems open={openModelAddItems} onClose={handleModelAddItems} SupplierCode="0000400537"></ModelAddItems>
       <ConfirmModelExit
         open={confirmModelExit}
         onClose={handleNotExitModelConfirm}

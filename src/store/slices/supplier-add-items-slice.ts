@@ -5,7 +5,7 @@ type SupplierItemsState = {
 };
 
 const initialState: SupplierItemsState = {
-  state: {},
+  state: null,
 };
 
 export const SupplierItemsSlice = createSlice({
