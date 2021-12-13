@@ -21,7 +21,7 @@ export interface ItemByBarcodeResponse {
   ref: string;
   code: number;
   message: string;
-  data: ItemByBarcodeInfo[];
+  data: ItemByBarcodeInfo[] | [];
 }
 
 export interface ItemByBarcodeInfo {

@@ -46,8 +46,8 @@ export default function ModelAddItems({ open, onClose }: Props): ReactElement {
             เพิ่มสินค้า (Mockup Data)
           </Typography>
 
-          <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-            {SupplierItem.items.map((value) => (
+          {/* <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+            {SupplierItem.map((value) => (
               <ListItem
                 key={value.barcode}
                 disableGutters
@@ -57,11 +57,11 @@ export default function ModelAddItems({ open, onClose }: Props): ReactElement {
                   </IconButton>
                 }
               >
-                {/* <ListItemText primary={value.productName} /> */}
+                <ListItemText primary={value.productName} />
                 {value.barcodeName} | {value.unitName} | {value.barcodeName}
               </ListItem>
             ))}
-          </List>
+          </List> */}
         </DialogContentText>
       </DialogContent>
 

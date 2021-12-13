@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { ItemBySupplierCodeResponse } from '../../models/modal-add-item-model';
 import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
+import { SupplierItem } from '../../mockdata/supplier-items';
 
 type State = {
   itemList: ItemBySupplierCodeResponse;
@@ -23,9 +24,10 @@ export const featchItemBySupplierListAsync = createAsyncThunk('ItemList', async 
   try {
     const path = environment.products.addItem.itemList.url + supNo;
 
-    let response = await get(path).then();
+    // let response = await get(path).then();
 
-    return response;
+    // return response;
+    return SupplierItem;
   } catch (error) {
     throw error;
   }

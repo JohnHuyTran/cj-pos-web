@@ -178,6 +178,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
 
   const onCloseModal = async () => {
     await dispatch(updateSearchItemsState({}));
+    localStorage.removeItem('SupplierAddItems');
     onClose();
   };
 
@@ -222,17 +223,65 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   const [barCodeDel, setBarCodeDel] = React.useState('');
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
 
+  //   const onClickAddItem = async () => {
+  //     let barcodeItem = valueItemList.barcode;
+  //     await dispatch(featchItemByBarcodeAsync(barcodeItem));
+  //     console.log('itemsListByBarcode.data: ', itemsListByBarcode.data);
+  //     await dispatch(updateSearchItemsState(itemsListByBarcode.data));
+  //     console.log('payloadSearchAddItems in onclick: ', payloadSearchAddItems);
+  //     await itemListArray.push(itemsListByBarcode.data);
+  //     console.log('itemListArray: ', itemListArray);
+  //   };
+
   const onClickAddItem = async () => {
     let barcodeItem = valueItemList.barcode;
-    await dispatch(featchItemByBarcodeAsync(barcodeItem));
-    console.log('itemsListByBarcode.data: ', itemsListByBarcode.data);
-    await dispatch(updateSearchItemsState(itemsListByBarcode.data));
-    console.log('payloadSearchAddItems in onclick: ', payloadSearchAddItems);
+    await dispatch(featchItemByBarcodeAsync(barcodeItem)).then((res) => {
+      //   console.log('itemsListByBarcode: ', JSON.stringify(itemsListByBarcode));
+      //   console.log('itemsListByBarcode.data: ', itemsListByBarcode.data);
+      //   console.log('res: ', JSON.stringify(res.payload));
+      let addItemListArray: any = [];
+
+      //   localStorage.getItem('SupplierAddItems');
+      console.log('localStorage get: ', JSON.stringify(localStorage.getItem('SupplierAddItems')));
+      if (localStorage.getItem('SupplierAddItems')) {
+        let localStorageAddItem = JSON.parse(localStorage.getItem('SupplierAddItems') || '');
+        // rows = localStorageAddItem;
+
+        if (localStorageAddItem != '') addItemListArray = [...localStorageAddItem];
+      }
+
+      console.log('addItemListArray1: ', addItemListArray);
+      addItemListArray.push(res.payload);
+      console.log('addItemListArray2: ', JSON.stringify(addItemListArray));
+      localStorage.setItem('SupplierAddItems', JSON.stringify(addItemListArray));
+    });
+    // setTimeout(() => {
+    //   console.log('itemsListByBarcode: ', JSON.stringify(itemsListByBarcode));
+    //   console.log('itemsListByBarcode.data: ', itemsListByBarcode.data);
+    // }, 500);
+
+    // const items: any = [];
+    // if (payloadSearchAddItems.items) {
+    // }
+    // items.push(payloadSearchAddItems);
+
+    // console.log('i [1]: ', JSON.stringify(items));
+
+    // items.push(itemsListByBarcode.data);
+    // const item: any = { items };
+    // console.log('i [2]: ', JSON.stringify(item));
+    // await dispatch(updateSearchItemsState(item));
+    // console.log('payloadSearchAddItems in onclick: ', JSON.stringify(payloadSearchAddItems));
+
     // await itemListArray.push(itemsListByBarcode.data);
+
     // console.log('itemListArray: ', itemListArray);
+
+    localStorage.removeItem('checkLoadRow');
   };
 
   const currentlyDelete = (params: GridCellParams) => {
+    localStorage.removeItem('checkLoadRow');
     const value = params.colDef.field;
     //deleteItem
     if (value === 'delete') {
@@ -249,9 +298,28 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   console.log('payloadSearchAddItems: ', payloadSearchAddItems);
 
   let rows: any = [];
+
+  if (localStorage.getItem('SupplierAddItems')) {
+    let localStorageAddItem = JSON.parse(localStorage.getItem('SupplierAddItems') || '');
+    console.log('add on: ', JSON.stringify(localStorageAddItem));
+    console.log('checxloadxxxxx: ', localStorage.getItem('checkLoadRow'));
+    if (localStorage.getItem('checkLoadRow') === null) {
+      rows = localStorageAddItem.map((item: any, index: number) => {
+        return {
+          id: index,
+          barcode: item.barcode,
+          unitName: item.unitName,
+          barcodeName: item.barcodeName,
+          qty: 1,
+          skuCode: item.skuCode,
+        };
+      });
+      localStorage.setItem('checkLoadRow', '1');
+    }
+  }
   //   if (payloadSearchAddItems) {
   //     rows = payloadSearchAddItems.map((item: any, index: number) => {
-  //       rows = SupplierItem.items.map((item: any, index: number) => {
+  //     rows = SupplierItem.items.map((item: any, index: number) => {
   //       return {
   //         id: index,
   //         barcode: item.barcode,
@@ -346,7 +414,16 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
                   <ListItemText primary={value.barcode} />
                   <ListItemText primary={value.unitName} />
                   <ListItemText primary={value.barcodeName} />
-                  {value.barcodeName} | {value.unitName} | {value.barcodeName}
+                  
+                  <TextField
+                    variant="outlined"
+                    name="txnQuantityActual"
+                    type="number"
+                    inputProps={{ style: { textAlign: 'right' } }}
+                    
+                    autoComplete="off"
+                  />
+                  ),
                 </ListItem>
               ))}
             </List>
