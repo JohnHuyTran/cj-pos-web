@@ -268,7 +268,6 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
                 id="searchSupplierModal"
                 fullWidth
                 freeSolo
-                disablePortal
                 loadingText="กำลังโหลด..."
                 sx={{ mt: 1, width: '100%' }}
                 options={options}
