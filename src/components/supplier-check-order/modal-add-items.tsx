@@ -36,6 +36,7 @@ const mockRows = [
     barcodeName: 'แก้วพลาสติก 22oz Piece',
     pricePerUnit: 0,
     qty: 1,
+    actualQty: 1,
     isCalVat: true,
     isControlStock: true,
   },
@@ -48,6 +49,7 @@ const mockRows = [
     barcodeName: 'ถ้วยร้อนDW8oz พิมพ์ลายBaoCafe Carton',
     pricePerUnit: 0,
     qty: 1,
+    actualQty: 1,
     isCalVat: true,
     isControlStock: true,
   },
@@ -115,7 +117,6 @@ export default function ModelAddItems({ open, onClose, SupplierCode }: Props): R
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
-  const [valueItemList, setValueItemList] = React.useState<any | null>(null);
 
   // let rows: any = [];
   const rows = mockRows.map((item: any, index: number) => {
@@ -127,11 +128,6 @@ export default function ModelAddItems({ open, onClose, SupplierCode }: Props): R
       qty: 1,
       skuCode: item.skuCode,
     };
-  });
-
-  const [valueItemSelect, setValueItemSelect] = React.useState<StateItem>({
-    barcodeName: '',
-    barcode: '',
   });
 
   const handleAddItem = async () => {
@@ -165,7 +161,7 @@ export default function ModelAddItems({ open, onClose, SupplierCode }: Props): R
   };
 
   const onCloseModal = async () => {
-    localStorage.removeItem('SupplierAddItems');
+    localStorage.clear();
     onClose();
   };
 

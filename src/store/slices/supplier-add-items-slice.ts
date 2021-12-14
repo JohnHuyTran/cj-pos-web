@@ -5,7 +5,7 @@ type SupplierItemsState = {
 };
 
 const initialState: SupplierItemsState = {
-  state: null,
+  state: {},
 };
 
 export const SupplierItemsSlice = createSlice({
@@ -15,9 +15,12 @@ export const SupplierItemsSlice = createSlice({
     updateItemsState: (state, action: PayloadAction<any>) => {
       state.state = action.payload;
     },
+    clearItemsState: () => {
+      initialState;
+    },
   },
 });
 
-export const { updateItemsState } = SupplierItemsSlice.actions;
+export const { updateItemsState, clearItemsState } = SupplierItemsSlice.actions;
 
 export default SupplierItemsSlice.reducer;
