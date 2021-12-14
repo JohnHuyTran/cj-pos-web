@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
 import { SupplierSearchResponse } from '../../models/supplier-search-model';
+import { Supplier } from '../../mockdata/supplier';
 
 type State = {
   supplierResp: SupplierSearchResponse;
@@ -29,6 +30,7 @@ export const searchSupplierAsync = createAsyncThunk('supplierSearch', async (key
     };
 
     response = await get(apiRootPath).then();
+    // response = Supplier;
     return response;
   } catch (error) {
     throw error;

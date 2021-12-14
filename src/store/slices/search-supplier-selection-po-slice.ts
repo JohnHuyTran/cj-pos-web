@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
 import { SupplierPOResponse } from '../../models/supplier-po-model';
+import { SupplierPO } from '../../mockdata/supplier-po';
 
 type State = {
   supplierPOResp: SupplierPOResponse;
@@ -29,6 +30,7 @@ export const searchSupplierPOAsync = createAsyncThunk('supplierPO', async (code:
     };
 
     response = await get(apiRootPath).then();
+    // response = SupplierPO;
     return response;
   } catch (error) {
     throw error;
