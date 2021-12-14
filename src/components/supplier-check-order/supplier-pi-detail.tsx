@@ -28,7 +28,9 @@ import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
 import ModelDeleteConfirm from './modal-delete-confirm';
 import ModelAddItems from './modal-add-items';
+import ModalAddItem from './modal-add-item';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
+import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
 
 interface Props {
   isOpen: boolean;
@@ -257,9 +259,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   useEffect(() => {
     setOpen(isOpen);
+
     if (po) {
       setDocNo(po.docNo);
       setPiType(0);
+    } else {
+      dispatch(featchItemBySupplierListAsync(payloadSupplier.supplier.code));
     }
 
     setSupplierCode(payloadSupplier.supplier.code);
@@ -283,12 +288,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           productName: item.productName ? item.productName : item.barcodeName,
           unitCode: item.unitCode,
           unitName: item.unitName,
-          qty: item.qty,
+          qty: item.qty ? item.qty : 0,
           qtyAll: item.qtyAll,
           controlPrice: item.controlPrice,
           salePrice: item.salePrice,
-          setPrice: item.pricePerUnit,
-          sumPrice: item.sumPrice,
+          setPrice: item.pricePerUnit ? item.pricePerUnit : 0,
+          sumPrice: item.sumPrice ? item.sumPrice : 0,
           actualQty: item.actualQty ? item.actualQty : 0,
           isRefPO: supplier.isRefPO,
         };
@@ -741,7 +746,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         barCode={barCodeDel}
       />
 
-      <ModelAddItems open={openModelAddItems} onClose={handleModelAddItems} SupplierCode="0000400537"></ModelAddItems>
+      <ModalAddItem open={openModelAddItems} onClose={handleModelAddItems} supNo={supplierCode}></ModalAddItem>
       <ConfirmModelExit
         open={confirmModelExit}
         onClose={handleNotExitModelConfirm}
