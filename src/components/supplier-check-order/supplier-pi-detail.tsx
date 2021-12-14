@@ -766,7 +766,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       />
 
       {/* <ModelAddItems open={openModelAddItems} onClose={handleModelAddItems} /> */}
-      <ModalAddItem open={openModelAddItems} onClose={handleModelAddItems} supNo="0000400537"></ModalAddItem>
+      <ModalAddItem open={openModelAddItems} onClose={handleModelAddItems} supNo={supplierCode}></ModalAddItem>
 
       <ConfirmModelExit
         open={confirmModelExit}

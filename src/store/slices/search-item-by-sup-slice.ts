@@ -21,13 +21,14 @@ const initialState: State = {
 };
 
 export const featchItemBySupplierListAsync = createAsyncThunk('ItemList', async (supNo: string) => {
+  console.log('supNo: ', supNo);
   try {
     const path = environment.products.addItem.itemList.url + supNo;
 
-    // let response = await get(path).then();
+    let response = await get(path).then();
 
-    // return response;
-    return SupplierItem;
+    return response;
+    // return SupplierItem;
   } catch (error) {
     throw error;
   }

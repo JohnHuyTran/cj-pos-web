@@ -2,8 +2,11 @@ import {
   Box,
   Button,
   Dialog,
+  DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
+  Grid,
   IconButton,
   List,
   ListItem,
@@ -26,34 +29,16 @@ import ModelDeleteConfirm from './modal-delete-confirm';
 import { useStyles } from '../../styles/makeTheme';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { DeleteForever } from '@mui/icons-material';
-import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, useGridApiRef } from '@mui/x-data-grid';
-
-const mockDataItem = [
-  {
-    barcodeName: 'น้ำดื่มขนาด 100 มล',
-    barcode: '33333333',
-  },
-  {
-    barcodeName: 'โกลด์เบรดขนาปังหมูหยอง',
-    barcode: '44',
-  },
-];
-
-const mockDataItemResponse = [
-  {
-    barcode: '8851123237017',
-    skuCode: '000000000020000565',
-    unitCode: 'PAK',
-    unitName: 'แพค',
-    unitFactor: 10,
-    barcodeName: 'ซีวิตเลมอน140ml Pack',
-    pricePerUnit: 0,
-    qty: 1,
-    isCalVat: true,
-    isControlStock: true,
-    isAllowDiscount: true,
-  },
-];
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRenderCellParams,
+  GridRowData,
+  GridRowId,
+  useGridApiRef,
+} from '@mui/x-data-grid';
+import LoadingModal from '../commons/ui/loading-modal';
 
 interface StateItem {
   barcodeName: string;
@@ -84,7 +69,8 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    flex: 1,
+    // flex: 1.8,
+    minWidth: 125,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -92,7 +78,7 @@ const columns: GridColDef[] = [
   {
     field: 'unitName',
     headerName: 'หน่วย',
-    flex: 0.7,
+    flex: 1,
     headerAlign: 'center',
     sortable: false,
   },
@@ -100,7 +86,8 @@ const columns: GridColDef[] = [
     field: 'barcodeName',
     headerName: 'รายละเอียด',
     headerAlign: 'center',
-    flex: 2,
+    // flex: 2,
+    minWidth: 180,
     disableColumnMenu: true,
     sortable: false,
   },
@@ -120,7 +107,7 @@ const columns: GridColDef[] = [
         value={params.value}
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value) : '';
-          if (value < 0) value = 1;
+          //   if (value < 0) value = 1;
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
         autoComplete="off"
@@ -159,12 +146,12 @@ function useApiRef() {
 }
 
 function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
+  const { apiRef, columns } = useApiRef();
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [valueItemList, setValueItemList] = React.useState<any | null>(null);
-
   const [valueItemSelect, setValueItemSelect] = React.useState<StateItem>({
     barcodeName: '',
     barcode: '',
@@ -176,15 +163,8 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     dispatch(featchItemBySupplierListAsync(supNo));
   }, []);
 
-  const onCloseModal = async () => {
-    await dispatch(updateSearchItemsState({}));
-    localStorage.removeItem('SupplierAddItems');
-    onClose();
-  };
-
   //search item
   const defaultSearchItemList = {
-    // options: mockDataItem,
     options: itemsList.data,
     getOptionLabel: (option: ItemInfo) => option.barcodeName,
   };
@@ -204,17 +184,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     }
   };
 
-  const handleAddItem = async () => {
-    setOpenLoadingModal(true);
-    const payload = SupplierItem;
-    await dispatch(updateItemsState(payload));
-
-    setTimeout(() => {
-      setOpenLoadingModal(false);
-      onClose();
-    }, 300);
-  };
-
   const itemsListByBarcode = useAppSelector((state) => state.searchItemByBarcode.itemList);
   const payloadSearchAddItems = useAppSelector((state) => state.supplierSearchAddItems.state);
   const [itemListArray, setItemListArray] = React.useState<any[]>([]);
@@ -223,65 +192,31 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   const [barCodeDel, setBarCodeDel] = React.useState('');
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
 
-  //   const onClickAddItem = async () => {
-  //     let barcodeItem = valueItemList.barcode;
-  //     await dispatch(featchItemByBarcodeAsync(barcodeItem));
-  //     console.log('itemsListByBarcode.data: ', itemsListByBarcode.data);
-  //     await dispatch(updateSearchItemsState(itemsListByBarcode.data));
-  //     console.log('payloadSearchAddItems in onclick: ', payloadSearchAddItems);
-  //     await itemListArray.push(itemsListByBarcode.data);
-  //     console.log('itemListArray: ', itemListArray);
-  //   };
+  const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemByBarcodeInfo[]>([]);
 
   const onClickAddItem = async () => {
     let barcodeItem = valueItemList.barcode;
     await dispatch(featchItemByBarcodeAsync(barcodeItem)).then((res) => {
-      //   console.log('itemsListByBarcode: ', JSON.stringify(itemsListByBarcode));
-      //   console.log('itemsListByBarcode.data: ', itemsListByBarcode.data);
-      //   console.log('res: ', JSON.stringify(res.payload));
-      let addItemListArray: any = [];
-
-      //   localStorage.getItem('SupplierAddItems');
-      console.log('localStorage get: ', JSON.stringify(localStorage.getItem('SupplierAddItems')));
-      if (localStorage.getItem('SupplierAddItems')) {
-        let localStorageAddItem = JSON.parse(localStorage.getItem('SupplierAddItems') || '');
-        // rows = localStorageAddItem;
-
-        if (localStorageAddItem != '') addItemListArray = [...localStorageAddItem];
-      }
-
-      console.log('addItemListArray1: ', addItemListArray);
-      addItemListArray.push(res.payload);
-      console.log('addItemListArray2: ', JSON.stringify(addItemListArray));
-      localStorage.setItem('SupplierAddItems', JSON.stringify(addItemListArray));
+      const result: ItemByBarcodeInfo = res.payload;
+      setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, result]);
     });
-    // setTimeout(() => {
-    //   console.log('itemsListByBarcode: ', JSON.stringify(itemsListByBarcode));
-    //   console.log('itemsListByBarcode.data: ', itemsListByBarcode.data);
-    // }, 500);
+  };
 
-    // const items: any = [];
-    // if (payloadSearchAddItems.items) {
-    // }
-    // items.push(payloadSearchAddItems);
+  const handleAddItem = async () => {
+    setOpenLoadingModal(true);
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
 
-    // console.log('i [1]: ', JSON.stringify(items));
+    await dispatch(updateItemsState(rowsEdit));
+    setNewAddItemListArray([]);
+    setValueItemList(null);
 
-    // items.push(itemsListByBarcode.data);
-    // const item: any = { items };
-    // console.log('i [2]: ', JSON.stringify(item));
-    // await dispatch(updateSearchItemsState(item));
-    // console.log('payloadSearchAddItems in onclick: ', JSON.stringify(payloadSearchAddItems));
-
-    // await itemListArray.push(itemsListByBarcode.data);
-
-    // console.log('itemListArray: ', itemListArray);
-
-    localStorage.removeItem('checkLoadRow');
+    setTimeout(() => {
+      setOpenLoadingModal(false);
+      onClose();
+    }, 500);
   };
 
   const currentlyDelete = (params: GridCellParams) => {
-    localStorage.removeItem('checkLoadRow');
     const value = params.colDef.field;
     //deleteItem
     if (value === 'delete') {
@@ -289,47 +224,61 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
       setBarCodeDel(String(params.getValue(params.id, 'barcode')));
       setOpenModelDeleteConfirm(true);
+      //   setNewAddItemListArray(
+      //     newAddItemListArray.filter((r: any) => r.barcode !== params.getValue(params.id, 'barcode'))
+      //   );
     }
   };
+
+  const handleDeleteItem = () => {
+    setNewAddItemListArray(newAddItemListArray.filter((r: any) => r.barcode !== barCodeDel));
+    setOpenModelDeleteConfirm(false);
+  };
+
   const handleModelDeleteConfirm = () => {
     setOpenModelDeleteConfirm(false);
   };
 
-  console.log('payloadSearchAddItems: ', payloadSearchAddItems);
-
   let rows: any = [];
+  rows = newAddItemListArray.map((item: any, index: number) => {
+    return {
+      id: index,
+      barcode: item.barcode,
+      unitName: item.unitName,
+      barcodeName: item.barcodeName,
+      qty: item.qty,
+      skuCode: item.skuCode,
+    };
+  });
 
-  if (localStorage.getItem('SupplierAddItems')) {
-    let localStorageAddItem = JSON.parse(localStorage.getItem('SupplierAddItems') || '');
-    console.log('add on: ', JSON.stringify(localStorageAddItem));
-    console.log('checxloadxxxxx: ', localStorage.getItem('checkLoadRow'));
-    if (localStorage.getItem('checkLoadRow') === null) {
-      rows = localStorageAddItem.map((item: any, index: number) => {
-        return {
-          id: index,
-          barcode: item.barcode,
-          unitName: item.unitName,
-          barcodeName: item.barcodeName,
-          qty: 1,
-          skuCode: item.skuCode,
-        };
-      });
-      localStorage.setItem('checkLoadRow', '1');
-    }
+  let checkHaveItems;
+  if (itemsList.code === 204001) {
+    checkHaveItems = (
+      <Grid item container xs={12} justifyContent="center">
+        <Box color="#CBD4DB">
+          <h6>ไม่พบสินค้า</h6>
+        </Box>
+      </Grid>
+    );
+  } else if (newAddItemListArray.length > 0) {
+    checkHaveItems = (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+        <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            disableColumnMenu
+            hideFooter
+            autoHeight
+            onCellClick={currentlyDelete}
+            // rowHeight={65}
+          />
+        </div>
+      </Box>
+    );
+  } else {
+    checkHaveItems = <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}></Box>;
   }
-  //   if (payloadSearchAddItems) {
-  //     rows = payloadSearchAddItems.map((item: any, index: number) => {
-  //     rows = SupplierItem.items.map((item: any, index: number) => {
-  //       return {
-  //         id: index,
-  //         barcode: item.barcode,
-  //         unitName: item.unitName,
-  //         barcodeName: item.barcodeName,
-  //         qty: 1,
-  //         skuCode: item.skuCode,
-  //       };
-  //     });
-  //   }
 
   return (
     <div>
@@ -382,10 +331,10 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
             </Box>
 
             <Box sx={{ flex: 1, ml: 2 }}>
-              {onCloseModal ? (
+              {onClose ? (
                 <IconButton
                   aria-label="close"
-                  onClick={onCloseModal}
+                  onClick={onClose}
                   sx={{
                     position: 'absolute',
                     right: 8,
@@ -399,49 +348,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
             </Box>
           </Box>
 
-          {/* <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
-            <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-              {itemListArray.map((value) => (
-                <ListItem
-                  key={value.barcode}
-                  disableGutters
-                  secondaryAction={
-                    <IconButton>
-                      <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
-                    </IconButton>
-                  }
-                >
-                  <ListItemText primary={value.barcode} />
-                  <ListItemText primary={value.unitName} />
-                  <ListItemText primary={value.barcodeName} />
-                  
-                  <TextField
-                    variant="outlined"
-                    name="txnQuantityActual"
-                    type="number"
-                    inputProps={{ style: { textAlign: 'right' } }}
-                    
-                    autoComplete="off"
-                  />
-                  ),
-                </ListItem>
-              ))}
-            </List>
-          </Box> */}
-
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
-            <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                disableColumnMenu
-                hideFooter
-                autoHeight
-                onCellClick={currentlyDelete}
-                // rowHeight={65}
-              />
-            </div>
-          </Box>
+          {checkHaveItems}
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
@@ -459,13 +366,60 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
         </DialogContent>
       </Dialog>
 
-      <ModelDeleteConfirm
+      {/* ModalDeleteConfirm */}
+
+      <Dialog
         open={openModelDeleteConfirm}
-        onClose={handleModelDeleteConfirm}
-        productName={barcodeNameDel}
-        skuCode={skuCodeDel}
-        barCode={barCodeDel}
-      />
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="md"
+        sx={{ minWidth: 800 }}
+      >
+        <DialogContent sx={{ pl: 6, pr: 8 }}>
+          <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
+            <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+              ต้องการลบสินค้า
+            </Typography>
+            <Typography variant="body1" align="left">
+              สินค้า <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
+              <label style={{ color: '#36C690' }}>
+                <b>{barcodeNameDel}</b>
+                <br />
+                <label style={{ color: '#AEAEAE', fontSize: 14, marginLeft: '3.8em' }}>{skuCodeDel}</label>
+              </label>
+            </Typography>
+            <Typography variant="body1" align="left">
+              บาร์โค้ด <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
+              <label style={{ color: '#36C690' }}>
+                <b>{barCodeDel}</b>
+              </label>
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
+          <Button
+            id="btnCancle"
+            variant="contained"
+            color="cancelColor"
+            sx={{ borderRadius: 2, width: 90, mr: 2 }}
+            onClick={handleModelDeleteConfirm}
+          >
+            ยกเลิก
+          </Button>
+          <Button
+            id="btnConfirm"
+            variant="contained"
+            color="error"
+            sx={{ borderRadius: 2, width: 90 }}
+            onClick={handleDeleteItem}
+          >
+            ลบสินค้า
+          </Button>
+        </DialogActions>
+
+        <LoadingModal open={openLoadingModal} />
+      </Dialog>
     </div>
   );
 }
