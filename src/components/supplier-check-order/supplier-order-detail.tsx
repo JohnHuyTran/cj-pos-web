@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect, useMemo } from 'react';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
-import { Button, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
+import { Button, DialogTitle, Grid, IconButton, Link, TextField } from '@mui/material';
 import { CheckCircleOutline, HighlightOff } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import Steppers from '../commons/ui/steppers';
@@ -27,6 +27,9 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
+
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import theme from '../../styles/theme';
 
 interface Props {
   isOpen: boolean;
@@ -432,7 +435,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
         <DialogContent>
           <Box mt={4} sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2} mb={1}>
+            <Grid container mb={1}>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่ใบสั่งซื้อ PO :</Typography>
               </Grid>
@@ -457,7 +460,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 />
               </Grid>
             </Grid>
-            <Grid container spacing={2} mb={1}>
+
+            <Grid container mb={1}>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
               </Grid>
@@ -468,20 +472,28 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Button
-                  id="btnPrint"
-                  color="primary"
-                  variant="contained"
-                  component="span"
-                  className={classes.MbtnBrowse}
-                  // style={{ marginLeft: 10, textTransform: "none" }}
-                  disabled
-                >
-                  แนบไฟล์
-                </Button>
+                <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
+                  <Button
+                    id="btnPrint"
+                    color="primary"
+                    variant="contained"
+                    component="span"
+                    className={classes.MbtnBrowse}
+                    disabled
+                  >
+                    แนบไฟล์
+                  </Button>
+
+                  <Typography
+                    variant="overline"
+                    sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
+                  >
+                    แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
+                  </Typography>
+                </Box>
               </Grid>
             </Grid>
-            <Grid container spacing={2} mb={1}>
+            <Grid container mb={1}>
               <Grid item lg={2}>
                 <Typography variant="body2">ผู้จัดจำหน่าย:</Typography>
               </Grid>
@@ -503,7 +515,40 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
-              <Grid item lg={6}></Grid>
+              <Grid item lg={2}></Grid>
+              <Grid item lg={4}>
+                <Box
+                  sx={{
+                    mt: 1,
+                    border: `1px dashed ${theme.palette.primary.main}`,
+                    padding: 2,
+                    borderRadius: 8,
+                  }}
+                >
+                  <Box
+                    sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}
+                    onClick={() => console.log('box')}
+                  >
+                    <Typography sx={{ fontSize: 18, color: '#676767' }}>เอกสารแนบ จำนวน 5/5</Typography>
+                    <KeyboardArrowUpIcon sx={{ color: '#676767' }} />
+                  </Box>
+
+                  <Box sx={{ mt: 1, display: 'visible' }}>
+                    <Box
+                      component="a"
+                      href="javascript:;"
+                      sx={{ color: theme.palette.secondary.main }}
+                      onClick={() => console.log('Pressed')}
+                    >
+                      PI21110101-INV123456-9999-1.pdf
+                    </Box>
+                    <Typography color="secondary">PI21110101-INV123456-9999-1.pdf</Typography>
+                    <Typography color="secondary">PI21110101-INV123456-9999-1.pdf</Typography>
+                    <Typography color="secondary">PI21110101-INV123456-9999-1.pdf</Typography>
+                    <Typography color="secondary">PI21110101-INV123456-9999-1.pdf</Typography>
+                  </Box>
+                </Box>
+              </Grid>
             </Grid>
           </Box>
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
