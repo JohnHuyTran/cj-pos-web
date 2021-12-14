@@ -118,31 +118,35 @@ export default function SupplierOrderList() {
       align: 'center',
       sortable: false,
       renderCell: (params) => {
-        if (params.value === 0) {
-          return (
-            <Typography color="textSecondary" variant="body2">
-              {params.getValue(params.id, 'supplierCode') || ''}
-            </Typography>
-          );
-        } else if (params.value === 1) {
-          return (
-            <Button
-              variant="contained"
-              color="success"
-              size="small"
-              sx={{
-                color: theme.palette.error.main,
-                backgroundColor: theme.palette.background.default,
-                border: `1px solid ${theme.palette.error.main}`,
-                borderRadius: '5px',
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.error.main, 0.25),
-                },
-              }}
-            >
-              คืนสินค้า
-            </Button>
-          );
+        if (params.getValue(params.id, 'piStatus') !== 0) {
+          if (params.value === 0) {
+            return (
+              <Typography color="textSecondary" variant="body2">
+                {params.getValue(params.id, 'docNo') || ''}
+              </Typography>
+            );
+          } else if (params.value === 1) {
+            return (
+              <Button
+                variant="contained"
+                color="success"
+                size="small"
+                sx={{
+                  color: theme.palette.error.main,
+                  backgroundColor: theme.palette.background.default,
+                  border: `1px solid ${theme.palette.error.main}`,
+                  borderRadius: '5px',
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.error.main, 0.25),
+                  },
+                }}
+              >
+                คืนสินค้า
+              </Button>
+            );
+          }
+        } else {
+          return <Box></Box>;
         }
       },
     },
