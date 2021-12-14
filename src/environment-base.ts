@@ -79,6 +79,9 @@ export const environment = {
       searchSupplierPO: {
         url: '/purchase/receivable-purchase-order',
       },
+      supplierFile: {
+        url: '/purchase//getUrl',
+      },
     },
   },
 };

@@ -30,6 +30,8 @@ import ModelConfirm from './modal-confirm';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import theme from '../../styles/theme';
+import ModalShowPDF from '../commons/ui/modal-show-file';
+import { getFileUrlHuawei } from '../../services/purchase';
 
 interface Props {
   isOpen: boolean;
@@ -337,7 +339,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [items, setItems] = React.useState<any>([]);
-  const [displayFiles, setDisplayFiles] = React.useState<boolean>(false);
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -424,6 +425,26 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         });
       setOpenLoadingModal(false);
     }
+  };
+
+  // file
+  const [accordionFile, setAccordionFile] = React.useState<boolean>(false);
+  const [displayFile, setDisplayFile] = React.useState<boolean>(false);
+  const [fileUrl, setFileUrl] = React.useState<string>('');
+
+  const getHuaweiFileUrl = async () => {
+    await getFileUrlHuawei('SD21120002-000014-Draft.pdf')
+      .then((resp) => {
+        if (resp && resp.data) {
+          setFileUrl(resp.data);
+          setTimeout(() => {
+            setDisplayFile(true);
+          }, 500);
+        }
+      })
+      .catch((error: ApiError) => {
+        console.log('error', error);
+      });
   };
 
   return (
@@ -529,22 +550,28 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 >
                   <Box
                     sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' }}
-                    onClick={() => setDisplayFiles(!displayFiles)}
+                    onClick={() => setAccordionFile(!accordionFile)}
                   >
                     <Typography sx={{ fontSize: 18, color: '#676767' }}>เอกสารแนบ จำนวน 5/5</Typography>
-                    {displayFiles ? <KeyboardArrowUpIcon color="primary" /> : <KeyboardArrowDownIcon color="primary" />}
+                    {accordionFile ? (
+                      <KeyboardArrowUpIcon color="primary" />
+                    ) : (
+                      <KeyboardArrowDownIcon color="primary" />
+                    )}
                   </Box>
 
-                  <Box sx={{ mt: 1, display: displayFiles ? 'visible' : 'none' }}>
+                  <Box sx={{ mt: 1, display: accordionFile ? 'visible' : 'none' }}>
                     {[1, 2, 3, 4, 5].map((item, index) => (
                       <Box
                         key={`item-${index + 1}`}
                         component="a"
-                        href="javascript:;"
-                        sx={{ color: theme.palette.secondary.main }}
-                        onClick={() => console.log('Pressed ', item)}
+                        href={void 0}
+                        sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
+                        onClick={getHuaweiFileUrl}
                       >
-                        <Typography color="secondary">PI21110101-INV123456-9999-1.pdf</Typography>
+                        <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
+                          PI21110101-INV123456-9999-1.pdf
+                        </Typography>
                       </Box>
                     ))}
                   </Box>
@@ -756,6 +783,15 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       />
 
       <LoadingModal open={openLoadingModal} />
+
+      <ModalShowPDF
+        open={displayFile}
+        onClose={() => setDisplayFile(false)}
+        fileName={'test-rename.pdf'}
+        url={fileUrl}
+        sdImageFile={''}
+        statusFile={1}
+      />
     </div>
   );
 }

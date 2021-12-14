@@ -1,4 +1,4 @@
-import { put } from '../adapters/posback-adapter';
+import { put, get } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { getPathUrl } from './base-service';
 import { ApiError } from '../models/api-error-model';
@@ -49,6 +49,15 @@ export async function saveSupplierPI(payload: SavePurchasePIRequest) {
 
 export async function approveSupplierPI(payload: SavePurchasePIRequest) {
   const response = await put(environment.purchase.supplierOrder.approvePI.url, payload)
+    .then((result: any) => result)
+    .catch((error: ApiError) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function getFileUrlHuawei(filekey: string) {
+  const response = await get(environment.purchase.supplierOrder.supplierFile.url + `/${filekey}`)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;
