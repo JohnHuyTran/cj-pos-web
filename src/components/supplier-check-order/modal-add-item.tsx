@@ -93,7 +93,7 @@ const columns: GridColDef[] = [
   },
 
   {
-    field: 'qty',
+    field: 'actualQty',
     headerName: 'จำนวน',
     flex: 1,
     headerAlign: 'center',
@@ -108,7 +108,7 @@ const columns: GridColDef[] = [
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value) : '';
           //   if (value < 0) value = 1;
-          params.api.updateRows([{ ...params.row, qty: value }]);
+          params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         autoComplete="off"
       />
@@ -159,9 +159,9 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
 
   const itemsList = useAppSelector((state) => state.searchItemListBySup.itemList);
 
-  useEffect(() => {
-    dispatch(featchItemBySupplierListAsync(supNo));
-  }, []);
+  //   useEffect(() => {
+  //     dispatch(featchItemBySupplierListAsync(supNo));
+  //   }, []);
 
   //search item
   const defaultSearchItemList = {
@@ -205,8 +205,14 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   const handleAddItem = async () => {
     setOpenLoadingModal(true);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const itemsList: any = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      itemsList.push(data);
+    });
 
-    await dispatch(updateItemsState(rowsEdit));
+    console.log('rowsEdit: ', JSON.stringify(itemsList));
+
+    await dispatch(updateItemsState(itemsList));
     setNewAddItemListArray([]);
     setValueItemList(null);
 
@@ -246,7 +252,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       barcode: item.barcode,
       unitName: item.unitName,
       barcodeName: item.barcodeName,
-      qty: item.qty,
+      actualQty: item.qty,
       skuCode: item.skuCode,
     };
   });
@@ -364,6 +370,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
             </Button>
           </Box>
         </DialogContent>
+        <LoadingModal open={openLoadingModal} />
       </Dialog>
 
       {/* ModalDeleteConfirm */}
@@ -417,8 +424,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
             ลบสินค้า
           </Button>
         </DialogActions>
-
-        <LoadingModal open={openLoadingModal} />
       </Dialog>
     </div>
   );

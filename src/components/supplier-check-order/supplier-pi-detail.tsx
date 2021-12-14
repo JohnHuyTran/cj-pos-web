@@ -30,6 +30,7 @@ import ModelDeleteConfirm from './modal-delete-confirm';
 import ModelAddItems from './modal-add-items';
 import ModalAddItem from './modal-add-item';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
+import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
 
 interface Props {
   isOpen: boolean;
@@ -176,17 +177,6 @@ const columns: GridColDef[] = [
       </div>
     ),
   },
-  // {
-  //   field: 'delete',
-  //   headerName: 'ลบ',
-  //   width: 50,
-  //   align: 'right',
-  //   sortable: false,
-  //   // hide: true,
-  //   renderCell: () => {
-  //     return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
-  //   },
-  // },
 ];
 
 var calProductDiff = function (params: GridValueGetterParams) {
@@ -219,6 +209,10 @@ function useApiRef() {
 function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const payloadSupplier = useAppSelector((state) => state.supplierSelectionSlice.state);
+  const supplier = payloadSupplier.supplier;
+  const po = payloadSupplier.poSelection;
+  const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
 
   const handleClose = async () => {
     let exit = false;
@@ -240,13 +234,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       });
 
       if (itemsList !== []) {
-        localStorage.setItem('SupplierPIRowsEdit', JSON.stringify(itemsList));
+        await dispatch(updateItemsState(itemsList));
       }
     }
 
     if (!exit) {
-      localStorage.removeItem('SupplierPIRowsEdit');
-
       await dispatch(updateItemsState({}));
       setOpen(false);
       onClickClose();
@@ -260,7 +252,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   }
 
   function handleExitModelConfirm() {
-    localStorage.removeItem('SupplierPIRowsEdit');
     setConfirmModelExit(false);
     setOpen(false);
     onClickClose();
@@ -268,9 +259,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   useEffect(() => {
     setOpen(isOpen);
-    if (supplier) {
-      setPiType(supplier.docType);
-      setDocNo(supplier.docNo);
+
+    if (po) {
+      setDocNo(po.docNo);
+      setPiType(0);
+    } else {
+      dispatch(featchItemBySupplierListAsync(payloadSupplier.supplier.code));
     }
 
     setSupplierCode(payloadSupplier.supplier.code);
@@ -278,50 +272,42 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setSupplierTaxNo(payloadSupplier.supplier.taxNo);
   }, [open]);
 
-  const payloadSupplier = useAppSelector((state) => state.supplierSelectionSlice.state);
-  const supplier = payloadSupplier.supplier;
-  const po = payloadSupplier.poSelection;
-  const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
-  console.log('payloadSupplier: ', payloadSupplier);
-  console.log('payloadAddItem: ', payloadAddItem);
-
   let rows: any = [];
   const handleAddRow = (items: any) => {
-    rows = items.map((item: any, index: number) => {
-      return {
-        id: `${item.barcode}-${index + 1}`,
-        index: index + 1,
-        seqItem: item.seqItem,
-        isControlStock: item.isControlStock,
-        isAllowDiscount: item.isAllowDiscount,
-        skuCode: item.skuCode,
-        barCode: item.barcode,
-        productName: item.productName,
-        unitCode: item.unitCode,
-        unitName: item.unitName,
-        qty: item.qty,
-        qtyAll: item.qtyAll,
-        controlPrice: item.controlPrice,
-        salePrice: item.salePrice,
-        setPrice: item.setPrice,
-        sumPrice: item.sumPrice,
-        actualQty: item.actualQty ? item.actualQty : 0,
-        isRefPO: supplier.isRefPO,
-      };
-    });
+    if (Object.keys(items).length !== 0) {
+      rows = items.map((item: any, index: number) => {
+        let barcode = item.barCode ? item.barCode : item.barcode;
+        return {
+          id: `${barcode}-${index + 1}`,
+          index: index + 1,
+          seqItem: item.seqItem,
+          isControlStock: item.isControlStock,
+          isAllowDiscount: item.isAllowDiscount,
+          skuCode: item.skuCode,
+          barCode: barcode,
+          productName: item.productName ? item.productName : item.barcodeName,
+          unitCode: item.unitCode,
+          unitName: item.unitName,
+          qty: item.qty,
+          qtyAll: item.qtyAll,
+          controlPrice: item.controlPrice,
+          salePrice: item.salePrice,
+          setPrice: item.pricePerUnit,
+          sumPrice: item.sumPrice,
+          actualQty: item.actualQty ? item.actualQty : 0,
+          isRefPO: supplier.isRefPO,
+        };
+      });
+    }
   };
 
   if (po) {
     const supplierItems = po.items;
     handleAddRow(supplierItems);
-  } else if (payloadAddItem.items) {
-    handleAddRow(payloadAddItem.items);
   }
-
-  // const change = () => {
-  //   columns[9].hide = !columns[9].hide;
-  //   // setColumns([...columns]);
-  // };
+  if (!po && payloadAddItem) {
+    handleAddRow(payloadAddItem);
+  }
 
   const [billNo, setBillNo] = React.useState('');
   const [errorBillNo, setErrorBillNo] = React.useState(false);
@@ -329,15 +315,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [supplierCode, setSupplierCode] = React.useState('');
   const [supplierName, setSupplierName] = React.useState('');
   const [supplierTaxNo, setSupplierTaxNo] = React.useState('');
-  const [piType, setPiType] = React.useState(0);
+  const [piType, setPiType] = React.useState(1);
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
   const [docNo, setDocNo] = React.useState('');
-  if (localStorage.getItem('SupplierPIRowsEdit')) {
-    let localStorageEdit = JSON.parse(localStorage.getItem('SupplierPIRowsEdit') || '');
-    rows = localStorageEdit;
-  }
-
   const classes = useStyles();
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [characterCount, setCharacterCount] = React.useState(0);
@@ -353,7 +334,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const { apiRef, columns } = useApiRef();
   const dispatch = useAppDispatch();
-  // const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
@@ -375,6 +355,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
+
       const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       const itemsList: any = [];
       await rows.forEach((data: GridRowData) => {
@@ -424,9 +405,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setSnackbarIsStatus(issuccess);
 
     if (issuccess) {
-      // dispatch(featchOrderListSupAsync(payloadSearch));
+      await dispatch(updateItemsState({}));
       setTimeout(() => {
-        localStorage.removeItem('SupplierPIRowsEdit');
         setOpen(false);
         onClickClose();
       }, 500);
@@ -441,22 +421,25 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     } else {
       setErrorBillNo(false);
       setOpenLoadingModal(true);
-
       const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemEditList: any = [];
       const itemsList: any = [];
       await rows.forEach((data: GridRowData) => {
         const item: any = {
           barcode: data.barCode,
           actualQty: data.actualQty,
         };
+
         itemsList.push(item);
+        itemEditList.push(data);
       });
+      await dispatch(updateItemsState(itemEditList));
 
       const payloadSave: SavePurchasePIRequest = {
         piNo: piNo,
-        supplierId: supplierCode,
+        SupplierCode: supplierCode,
         billNo: billNo,
-        docNo: docNo,
+        docNo: docNo ? docNo : '',
         flagPO: piType,
         comment: comment,
         items: itemsList,
@@ -468,8 +451,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          // dispatch(featchOrderListSupAsync(payloadSearch));
-          localStorage.removeItem('SupplierPIRowsEdit');
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
@@ -752,7 +733,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         billNo={billNo}
         supplierId={supplierCode}
         comment={comment}
-        piStatus={piStatus}
+        piType={piType}
         items={items}
         piDetail={true}
       />
@@ -765,9 +746,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         barCode={barCodeDel}
       />
 
-      {/* <ModelAddItems open={openModelAddItems} onClose={handleModelAddItems} /> */}
       <ModalAddItem open={openModelAddItems} onClose={handleModelAddItems} supNo={supplierCode}></ModalAddItem>
-
       <ConfirmModelExit
         open={confirmModelExit}
         onClose={handleNotExitModelConfirm}

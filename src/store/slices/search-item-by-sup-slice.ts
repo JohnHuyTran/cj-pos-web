@@ -21,7 +21,6 @@ const initialState: State = {
 };
 
 export const featchItemBySupplierListAsync = createAsyncThunk('ItemList', async (supNo: string) => {
-  console.log('supNo: ', supNo);
   try {
     const path = environment.products.addItem.itemList.url + supNo;
 

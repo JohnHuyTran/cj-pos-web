@@ -24,21 +24,9 @@ export default function ModelConfirm({ open, onClose, productName, skuCode, barC
 
   const handleDeleteItem = async () => {
     setOpenLoadingModal(true);
-
-    if (localStorage.getItem('SupplierAddItems')) {
-      let localStorageAddItem = JSON.parse(localStorage.getItem('SupplierAddItems') || '');
-      let payload = { items: localStorageAddItem.filter((r: any) => r.barcode !== barCode) };
-
-      localStorage.removeItem('checkLoadRow');
-      localStorage.removeItem('SupplierAddItems');
-      localStorage.setItem('SupplierAddItems', JSON.stringify(payload));
-
-      console.log('payloade delet: ', payload);
-    } else {
-      let items = payloadItem.items;
-      let payload = { items: items.filter((r: any) => r.barcode !== barCode) };
-      await dispatch(updateItemsState(payload));
-    }
+    let items = payloadItem;
+    let payload = items.filter((r: any) => r.barCode !== barCode);
+    await dispatch(updateItemsState(payload));
 
     setTimeout(() => {
       setOpenLoadingModal(false);
