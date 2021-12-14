@@ -522,20 +522,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   sx={{
                     mt: 1,
                     border: `1px dashed ${theme.palette.primary.main}`,
-                    padding: 2,
+                    px: 2,
+                    py: 1,
                     borderRadius: 8,
                   }}
                 >
                   <Box
-                    sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}
+                    sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' }}
                     onClick={() => setDisplayFiles(!displayFiles)}
                   >
                     <Typography sx={{ fontSize: 18, color: '#676767' }}>เอกสารแนบ จำนวน 5/5</Typography>
-                    {displayFiles ? (
-                      <KeyboardArrowUpIcon sx={{ color: '#676767' }} />
-                    ) : (
-                      <KeyboardArrowDownIcon sx={{ color: '#676767' }} />
-                    )}
+                    {displayFiles ? <KeyboardArrowUpIcon color="primary" /> : <KeyboardArrowDownIcon color="primary" />}
                   </Box>
 
                   <Box sx={{ mt: 1, display: displayFiles ? 'visible' : 'none' }}>
