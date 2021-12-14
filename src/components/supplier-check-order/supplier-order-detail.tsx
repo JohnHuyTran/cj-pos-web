@@ -27,8 +27,8 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
-
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import theme from '../../styles/theme';
 
 interface Props {
@@ -337,6 +337,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [items, setItems] = React.useState<any>([]);
+  const [displayFiles, setDisplayFiles] = React.useState<boolean>(false);
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -527,25 +528,28 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 >
                   <Box
                     sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}
-                    onClick={() => console.log('box')}
+                    onClick={() => setDisplayFiles(!displayFiles)}
                   >
                     <Typography sx={{ fontSize: 18, color: '#676767' }}>เอกสารแนบ จำนวน 5/5</Typography>
-                    <KeyboardArrowUpIcon sx={{ color: '#676767' }} />
+                    {displayFiles ? (
+                      <KeyboardArrowUpIcon sx={{ color: '#676767' }} />
+                    ) : (
+                      <KeyboardArrowDownIcon sx={{ color: '#676767' }} />
+                    )}
                   </Box>
 
-                  <Box sx={{ mt: 1, display: 'visible' }}>
-                    <Box
-                      component="a"
-                      href="javascript:;"
-                      sx={{ color: theme.palette.secondary.main }}
-                      onClick={() => console.log('Pressed')}
-                    >
-                      PI21110101-INV123456-9999-1.pdf
-                    </Box>
-                    <Typography color="secondary">PI21110101-INV123456-9999-1.pdf</Typography>
-                    <Typography color="secondary">PI21110101-INV123456-9999-1.pdf</Typography>
-                    <Typography color="secondary">PI21110101-INV123456-9999-1.pdf</Typography>
-                    <Typography color="secondary">PI21110101-INV123456-9999-1.pdf</Typography>
+                  <Box sx={{ mt: 1, display: displayFiles ? 'visible' : 'none' }}>
+                    {[1, 2, 3, 4, 5].map((item, index) => (
+                      <Box
+                        key={`item-${index + 1}`}
+                        component="a"
+                        href="javascript:;"
+                        sx={{ color: theme.palette.secondary.main }}
+                        onClick={() => console.log('Pressed ', item)}
+                      >
+                        <Typography color="secondary">PI21110101-INV123456-9999-1.pdf</Typography>
+                      </Box>
+                    ))}
                   </Box>
                 </Box>
               </Grid>
