@@ -256,9 +256,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   useEffect(() => {
     setOpen(isOpen);
-    if (supplier) {
-      // setPiType(supplier.docType);
-      setDocNo(supplier.docNo);
+    if (po) {
+      setDocNo(po.docNo);
+      setPiStatus(0);
     }
 
     setSupplierCode(payloadSupplier.supplier.code);
@@ -270,10 +270,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const supplier = payloadSupplier.supplier;
   const po = payloadSupplier.poSelection;
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
-  // console.log('payloadSupplier: ', payloadSupplier);
-  // console.log('payloadAddItem: ', payloadAddItem);
-
-  console.log('supplier : ', JSON.stringify(supplier));
+  // console.log('payloadSupplier: ', JSON.stringify(payloadSupplier));
+  // console.log('payloadAddItem: ', po.docNo);
+  // console.log('supplier : ', JSON.stringify(supplier));
 
   let rows: any = [];
   const handleAddRow = (items: any) => {
@@ -320,9 +319,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [supplierName, setSupplierName] = React.useState('');
   const [supplierTaxNo, setSupplierTaxNo] = React.useState('');
   const [piType, setPiType] = React.useState(0);
-  const [piStatus, setPiStatus] = React.useState(0);
+  const [piStatus, setPiStatus] = React.useState(1);
   const [comment, setComment] = React.useState('');
   const [docNo, setDocNo] = React.useState('');
+
   if (localStorage.getItem('SupplierPIRowsEdit')) {
     let localStorageEdit = JSON.parse(localStorage.getItem('SupplierPIRowsEdit') || '');
     rows = localStorageEdit;
@@ -365,6 +365,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
+
       const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       const itemsList: any = [];
       await rows.forEach((data: GridRowData) => {
@@ -442,17 +443,21 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         itemsList.push(item);
       });
 
+      // if (itemsList !== []) {
+      //   localStorage.setItem('SupplierPIRowsEdit', JSON.stringify(itemsList));
+      // }
+
       const payloadSave: SavePurchasePIRequest = {
         piNo: piNo,
         supplierId: supplierCode,
         billNo: billNo,
         docNo: docNo ? docNo : '',
-        flagPO: 1,
+        flagPO: piStatus,
         comment: comment,
         items: itemsList,
       };
 
-      console.log(piType, ' : payloadSave : ', JSON.stringify(payloadSave));
+      // console.log(piType, ' : payloadSave : ', JSON.stringify(payloadSave));
 
       await saveSupplierPI(payloadSave)
         .then((value) => {
