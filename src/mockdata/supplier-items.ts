@@ -373,7 +373,7 @@ export const Barcode1 = {
   code: 20000,
   message: 'success',
   data: {
-    barcode: '8851123237017',
+    barcode: '0811028020023',
     skuCode: '000000000020000565',
     unitCode: 'PAK',
     unitName: 'แพค',

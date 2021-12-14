@@ -1,5 +1,5 @@
 export const environment = {
-  products: {
+  product: {
     url: '/api/product',
     headers: {
       'Content-Type': 'application/json',
@@ -78,6 +78,16 @@ export const environment = {
       },
       searchSupplierPO: {
         url: '/purchase/receivable-purchase-order',
+      },
+    },
+  },
+  products: {
+    addItem: {
+      itemList: {
+        url: '/products/',
+      },
+      itemByBarcode: {
+        url: '/products/barcode/',
       },
     },
   },
