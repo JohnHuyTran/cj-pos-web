@@ -26,8 +26,6 @@ import {
 } from '../../store/slices/search-supplier-selection-po-slice';
 import { updateState } from '../../store/slices/supplier-selection-slice';
 import SupplierOrderDetail from './supplier-pi-detail';
-import AlertError from '../commons/ui/alert-error';
-import { featchSupplierOrderPIDetailAsync } from '../../store/slices/supplier-order-pi-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -173,9 +171,15 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
   };
 
   const onSubmitData = async () => {
+    setOpenLoadingModal(true);
     const payload = { supplier, poSelection };
+
+    console.log('payload :', JSON.stringify(payload));
     await dispatch(updateState(payload));
-    if (payload.poSelection !== null) handleOpenDetailPI(payload.poSelection.supplierCode, payload.poSelection.docNo);
+    setOpenPIDetail(true);
+    clearData();
+    handleCloseModal();
+    setOpenLoadingModal(false);
   };
 
   const onCloseModal = () => {
@@ -205,41 +209,9 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
   };
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
-  const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState('');
   const [openPIDetail, setOpenPIDetail] = React.useState(false);
-  const purchasePIDetailList = useAppSelector((state) => state.supplierOrderPIDetail.purchasePIDetail);
-  const handleOpenDetailPI = async (supplierCode: string, docNo: string) => {
-    setOpenLoadingModal(true);
-    const piDetail: any = [];
-    piDetail.push({
-      supplierCode: supplierCode,
-      docNo: docNo,
-    });
-
-    try {
-      await dispatch(featchSupplierOrderPIDetailAsync(piDetail));
-      if (purchasePIDetailList.data === [] || purchasePIDetailList.data === null) {
-        setOpenAlert(true);
-        setTextError('ไม่พบข้อมูลใบรับสินค้าจากผู้จำหน่าย');
-      } else {
-        setOpenPIDetail(true);
-      }
-    } catch (error) {
-      setOpenAlert(true);
-      setTextError('ไม่พบข้อมูลใบรับสินค้าจากผู้จำหน่าย');
-    }
-    setOpenLoadingModal(false);
-    clearData();
-    handleCloseModal();
-  };
-
-  const isClosModal = () => {
+  const isClosModalPIDetail = () => {
     setOpenPIDetail(false);
-  };
-
-  const handleCloseAlert = () => {
-    setOpenAlert(false);
   };
 
   return (
@@ -345,8 +317,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
       </BootstrapDialog>
 
       <LoadingModal open={openLoadingModal} />
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
-      {openPIDetail && <SupplierOrderDetail isOpen={openPIDetail} onClickClose={isClosModal} />}
+      {openPIDetail && <SupplierOrderDetail isOpen={openPIDetail} onClickClose={isClosModalPIDetail} />}
     </div>
   );
 }
