@@ -33,7 +33,7 @@ export default function ModelConfirm({ open, onClose, productName, skuCode, barC
       localStorage.setItem('SupplierAddItems', JSON.stringify(payload));
     } else {
       let items = payloadItem;
-      let payload = items.filter((r: any) => r.barcode !== barCode);
+      let payload = items.filter((r: any) => r.barCode !== barCode);
       await dispatch(updateItemsState(payload));
     }
 
