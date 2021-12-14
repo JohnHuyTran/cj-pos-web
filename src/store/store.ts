@@ -19,6 +19,7 @@ import supplierOrderPIDetail from './slices/supplier-order-pi-detail-slice';
 import supplierSelectionSlice from './slices/supplier-selection-slice';
 import searchSupplierSelectionSlice from './slices/search-supplier-selection-slice';
 import searchSupplierSelectionPOSlice from './slices/search-supplier-selection-po-slice';
+import supplierAddItems from './slices/supplier-add-items-slice';
 
 const store = configureStore({
   reducer: {
@@ -40,6 +41,7 @@ const store = configureStore({
     supplierSelectionSlice: supplierSelectionSlice,
     searchSupplierSelectionSlice: searchSupplierSelectionSlice,
     searchSupplierSelectionPOSlice: searchSupplierSelectionPOSlice,
+    supplierAddItems: supplierAddItems,
   },
 });
 
