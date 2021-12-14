@@ -1,6 +1,7 @@
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { Box, Button, Chip, Typography } from '@mui/material';
 import { styled } from '@mui/styles';
+import { alpha } from '@mui/material/styles';
 import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid';
 import React from 'react';
 import {
@@ -12,6 +13,7 @@ import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supp
 import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
+import theme from '../../styles/theme';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import SupplierOrderDetail from './supplier-order-detail';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
@@ -128,7 +130,15 @@ export default function SupplierOrderList() {
               variant="contained"
               color="success"
               size="small"
-              sx={{ color: '#20AE79', backgroundColor: '#E7FFE9', borderRadius: '5px' }}
+              sx={{
+                color: theme.palette.error.main,
+                backgroundColor: theme.palette.background.default,
+                border: `1px solid ${theme.palette.error.main}`,
+                borderRadius: '5px',
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.error.main, 0.25),
+                },
+              }}
             >
               คืนสินค้า
             </Button>
