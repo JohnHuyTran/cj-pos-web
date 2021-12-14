@@ -254,6 +254,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       barcodeName: item.barcodeName,
       actualQty: item.qty,
       skuCode: item.skuCode,
+      setPrice: item.pricePerUnit,
     };
   });
 
