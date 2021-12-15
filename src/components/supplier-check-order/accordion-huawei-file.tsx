@@ -38,10 +38,10 @@ const AccordionHuaweiFile = ({ files }: Props) => {
     <>
       <Box
         sx={{
-          border: `1px dashed ${theme.palette.primary.main}`,
           px: 2,
           py: 1,
-          borderRadius: 5,
+          borderRadius: '5px',
+          border: `1px dashed ${theme.palette.primary.main}`,
         }}
       >
         <Box
@@ -54,17 +54,17 @@ const AccordionHuaweiFile = ({ files }: Props) => {
           {accordionFile ? <KeyboardArrowUp color="primary" /> : <KeyboardArrowDown color="primary" />}
         </Box>
 
-        <Box sx={{ mt: 1, display: accordionFile ? 'visible' : 'none' }}>
+        <Box sx={{ display: accordionFile ? 'visible' : 'none' }}>
           {files.length > 0 &&
             files.map((item, index) => (
               <Box
-                key={`item-${item.filekey}`}
+                key={`item-${index + 1}-${item.filekey}`}
                 component="a"
                 href={void 0}
                 sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
                 onClick={() => getHuaweiFileUrl(item)}
               >
-                <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: '12px' }}>
+                <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: '13px' }}>
                   {item.filename}
                 </Typography>
               </Box>
