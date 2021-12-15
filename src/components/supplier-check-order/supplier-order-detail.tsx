@@ -32,7 +32,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import theme from '../../styles/theme';
 import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
 import { getFileUrlHuawei } from '../../services/purchase';
-import { truncate } from 'fs';
 
 interface Props {
   isOpen: boolean;
