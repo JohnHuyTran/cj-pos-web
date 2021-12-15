@@ -30,7 +30,7 @@ import ModelConfirm from './modal-confirm';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import theme from '../../styles/theme';
-import ModalShowPDF from '../commons/ui/modal-show-file';
+import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
 import { getFileUrlHuawei } from '../../services/purchase';
 import { truncate } from 'fs';
 
@@ -428,16 +428,19 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
-  // file
+  // huawei file
   const [accordionFile, setAccordionFile] = React.useState<boolean>(false);
   const [displayFile, setDisplayFile] = React.useState<boolean>(false);
   const [fileUrl, setFileUrl] = React.useState<string>('');
+  const [newFilename, setNewFilename] = React.useState<string>('test-rename');
+  const [isImage, setIsImage] = React.useState(false);
 
-  const getHuaweiFileUrl = async (filekey: string) => {
+  const getHuaweiFileUrl = async (filekey: string, image: boolean) => {
     await getFileUrlHuawei(filekey)
       .then((resp) => {
         if (resp && resp.data) {
           setFileUrl(resp.data);
+          setIsImage(image);
           setDisplayFile(true);
         }
       })
@@ -578,7 +581,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       component="a"
                       href={void 0}
                       sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
-                      onClick={() => getHuaweiFileUrl('key.jpg')}
+                      onClick={() => getHuaweiFileUrl('key.jpg', true)}
                     >
                       <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
                         key.jpg
@@ -589,7 +592,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       component="a"
                       href={void 0}
                       sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
-                      onClick={() => getHuaweiFileUrl('SD21120002-000014-Draft.pdf')}
+                      onClick={() => getHuaweiFileUrl('SD21120002-000014-Draft.pdf', false)}
                     >
                       <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
                         SD21120002-000014-Draft.pdf
@@ -805,14 +808,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
       <LoadingModal open={openLoadingModal} />
 
-      <ModalShowPDF
+      <ModalShowHuaweiFile
         open={displayFile}
         onClose={() => setDisplayFile(false)}
-        fileName={'test-rename'}
+        fileName={newFilename}
         url={fileUrl}
-        sdImageFile={''}
-        statusFile={0}
-        // isHuawei={true}
+        isImage={isImage}
       />
     </div>
   );

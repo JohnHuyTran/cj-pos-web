@@ -1,39 +1,37 @@
 import { Dialog, Button, DialogContent } from '@mui/material';
-import React, { ReactElement, useRef } from 'react';
+import React, { ReactElement } from 'react';
 import { useState } from 'react';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
 import throttle from 'lodash.throttle';
 import { useReactToPrint } from 'react-to-print';
 import AlertError from './alert-error';
 import { HighlightOff } from '@mui/icons-material';
 
-interface ModalShowPDFProp {
+interface ModalShowHuaweiFilerop {
   open: boolean;
   url: string;
-  sdImageFile: string;
-  statusFile: number;
+  isImage: boolean;
   fileName: string;
   onClose: () => void;
   onPrint?: () => void;
-  isHuawei?: boolean;
 }
+
 export interface DialogTitleProps {
   id: string;
-  status: number;
   children?: React.ReactNode;
   onClose?: () => void;
   onPrint?: () => void;
 }
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
-  const { children, status, onClose, onPrint, ...other } = props;
+  const { children, onClose, onPrint, ...other } = props;
   return (
     <DialogTitle sx={{ m: 1, p: 2 }} {...other}>
       {children}
+
       {onClose ? (
         <IconButton
           aria-label="close"
@@ -48,45 +46,36 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
           <HighlightOff fontSize="large" />
         </IconButton>
       ) : null}
+
       {onPrint ? (
-        <div>
-          {status === 1 && (
-            <Button
-              id="btnPrint"
-              variant="contained"
-              color="secondary"
-              onClick={onPrint}
-              endIcon={<LocalPrintshopOutlinedIcon />}
-            >
-              {/* {status === 0 && "พิมพ์เอกสาร"} */}
-              {/* {status === 1 && "พิมพ์ใบผลต่าง"} */}
-              พิมพ์ใบผลต่าง
-            </Button>
-          )}
-        </div>
+        <Button
+          id="btnPrint"
+          variant="contained"
+          color="secondary"
+          onClick={onPrint}
+          endIcon={<LocalPrintshopOutlinedIcon />}
+        >
+          พิมพ์ใบผลต่าง
+        </Button>
       ) : null}
     </DialogTitle>
   );
 };
 
-export default function ModalShowPDF({
+export default function ModalShowHuaweiFile({
   open,
   url,
-  sdImageFile,
-  statusFile,
+  isImage,
   fileName,
   onClose,
-  isHuawei = false,
-}: ModalShowPDFProp): ReactElement {
+}: ModalShowHuaweiFilerop): ReactElement {
   const [numPages, setNumPages] = useState(0);
-  // const [pageNumber, setPageNumber] = useState(1);
   const [initialWidth, setInitialWidth] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
   const pdfWrapper = React.useRef<HTMLDivElement>(null);
 
   const setPdfSize = () => {
     if (pdfWrapper && pdfWrapper.current) {
-      // pdfWrapper.current.getBoundingClientRect().width;
       setInitialWidth(pdfWrapper.current.getBoundingClientRect().width);
     }
   };
@@ -113,32 +102,16 @@ export default function ModalShowPDF({
     onClose();
   };
 
-  const handlePrint = () => {
-    showPrint;
-    // setTimeout(() => {
-    //     onClose()
-    // }, 1000);
-  };
-
-  // const componentRef = useRef();
   const showPrint = useReactToPrint({
     documentTitle: fileName,
     content: () => pdfWrapper.current,
     onAfterPrint: () => handleClose(),
   });
 
-  const pdfFile = sdImageFile.substr(5, 15);
-  const imgFile = sdImageFile.substr(5, 5);
-
   return (
     <div>
       <Dialog open={open} maxWidth={false}>
-        <BootstrapDialogTitle
-          id="customized-dialog-title"
-          onClose={handleClose}
-          onPrint={showPrint}
-          status={statusFile}
-        />
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} onPrint={showPrint} />
         <DialogContent
           sx={{
             minWidth: 600,
@@ -146,64 +119,19 @@ export default function ModalShowPDF({
             textAlign: 'center',
           }}
         >
-          {isHuawei && (
-            <>
-              {imgFile === 'image' && <img src={sdImageFile} style={{ minWidth: '200px' }} />}
-
-              {imgFile !== 'image' && (
-                <div id="pdfWrapper" style={{ width: '50vw' }} ref={pdfWrapper}>
-                  <Document file={{ url: url }} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
-                    {Array.from(new Array(numPages), (el, index) => (
-                      <Page key={`page_${index + 1}`} pageNumber={index + 1} width={initialWidth} />
-                    ))}
-                  </Document>
-                </div>
-              )}
-            </>
-          )}
-
-          {statusFile === 1 && !isHuawei && (
+          {!isImage && (
             <div id="pdfWrapper" style={{ width: '50vw' }} ref={pdfWrapper}>
-              <Document
-                file={{
-                  url: url,
-                  httpHeaders: {
-                    Authorization: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwbmZJNmF1MXZ5LWhRQ0s3ODJ1V2E3cWIzQVFYY1FfNnZYOWZwdE5FaHR3In0.eyJleHAiOjE2MzE3NzY3OTUsImlhdCI6MTYzMTc3NjQ5NSwianRpIjoiYjA5ZGM0ZmQtMTRlMS00M2UwLThkNTItMzU0YTBlMjU2NzM0IiwiaXNzIjoiaHR0cHM6Ly9hZG1pbi5hdXRoLWRldi5jamV4cHJlc3MuaW8vYXV0aC9yZWFsbXMvY2pleHByZXNzIiwic3ViIjoiOWY2ZDEyODEtOTJhOS00N2EzLTk0NWQtNWJkMTg0MjkzMjBjIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYXBwLm5ld3Bvc2JhY2siLCJzZXNzaW9uX3N0YXRlIjoiMGM2ODkwMjMtZWI3ZC00MTQyLTgwOWMtYzRjNWFmODdiOTRmIiwiYWNyIjoiMSIsInNjb3BlIjoic2NvcGUubmV3cG9zYmFjayBlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoicG9zMiBwb3MyIiwicHJlZmVycmVkX3VzZXJuYW1lIjoicG9zMiIsImFjbCI6eyJzZXJ2aWNlLm5ld3Bvc2JhY2siOlsiQ0FTSERSQVdFUi5ERVBPU0lUIiwiU0FMRS5JVEVNLkNBTkNFTCIsIkZFQVRVUkUuQURNSU4uU0VBUkNILkRBVEEiLCJDQVNIRFJBV0VSLldJVEhEUkFXIl19LCJnaXZlbl9uYW1lIjoicG9zMiIsImJyYW5jaCI6IjAwMDIiLCJmYW1pbHlfbmFtZSI6InBvczIiLCJlbWFpbCI6InBvczJAdGVzdC5jb20ifQ.myRuJJxraId5ZptOahCJl2lt3YQczXDbatKGrEoquzuyRz4ID1QYOi2IZT6ND4Gpa8CCvtIjWKNuUrYQbRrjG8o1dJMzSAi5pt40HXbEiBvN2QDCuCF2NMPcBYZPMlPfMyNGTAafolpJYGHhjZy_4oGGZiUSbTzgQ91iVoY_WUHgdNTk9H8c-nvKxNRXIWos92AMox6-tlLkjksQsMusu9JZWEQ2v7Fmex_oIBghxPr-r9JGstm0_f16bbvMTyPskaDoOUehKNbw6V3I1IsfJgUnbUFbOlMXuCDsGmOtKbpouycPXJvj2BJJQ11PY28W4g7w3ddffLyVm4i8_OJRBg`,
-                  },
-                }}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadFail}
-              >
+              <Document file={{ url }} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
                 {Array.from(new Array(numPages), (el, index) => (
-                  <Page
-                    key={`page_${index + 1}`}
-                    pageNumber={index + 1}
-                    width={initialWidth}
-                    // height={1000}
-                  />
+                  <Page key={`page_${index + 1}`} pageNumber={index + 1} width={initialWidth} />
                 ))}
               </Document>
             </div>
           )}
 
-          {statusFile === 0 && !isHuawei && (
-            <div>
-              {imgFile !== 'image' && (
-                <div id="pdfWrapper" style={{ width: '50vw' }} ref={pdfWrapper}>
-                  <Document file={sdImageFile} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
-                    {Array.from(new Array(numPages), (el, index) => (
-                      <Page
-                        key={`page_${index + 1}`}
-                        pageNumber={index + 1}
-                        width={initialWidth}
-                        // height={1000}
-                      />
-                    ))}
-                  </Document>
-                </div>
-              )}
-
-              {imgFile === 'image' && <img src={sdImageFile} style={{ minWidth: '200px' }} />}
+          {isImage && (
+            <div id="pdfWrapper" style={{ minWidth: '200px' }} ref={pdfWrapper}>
+              <img src={url} style={{ minWidth: '200px' }} />
             </div>
           )}
         </DialogContent>
