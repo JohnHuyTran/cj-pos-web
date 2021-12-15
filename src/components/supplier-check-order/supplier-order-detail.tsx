@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect, useMemo } from 'react';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
-import { Button, DialogTitle, Grid, IconButton, Link, TextField } from '@mui/material';
+import { Button, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
 import { CheckCircleOutline, HighlightOff } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import Steppers from '../commons/ui/steppers';
@@ -27,11 +27,8 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import theme from '../../styles/theme';
-import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
-import { getFileUrlHuawei } from '../../services/purchase';
+import AccordionHuaweiFile from './accordion-huawei-file';
 
 interface Props {
   isOpen: boolean;
@@ -427,27 +424,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
-  // huawei file
-  const [accordionFile, setAccordionFile] = React.useState<boolean>(false);
-  const [displayFile, setDisplayFile] = React.useState<boolean>(false);
-  const [fileUrl, setFileUrl] = React.useState<string>('');
-  const [newFilename, setNewFilename] = React.useState<string>('test-rename');
-  const [isImage, setIsImage] = React.useState(false);
-
-  const getHuaweiFileUrl = async (filekey: string, image: boolean) => {
-    await getFileUrlHuawei(filekey)
-      .then((resp) => {
-        if (resp && resp.data) {
-          setFileUrl(resp.data);
-          setIsImage(image);
-          setDisplayFile(true);
-        }
-      })
-      .catch((error: ApiError) => {
-        console.log('error', error);
-      });
-  };
-
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -540,65 +516,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
               <Grid item lg={2}></Grid>
               <Grid item lg={4}>
-                <Box
-                  sx={{
-                    mt: 1,
-                    border: `1px dashed ${theme.palette.primary.main}`,
-                    px: 2,
-                    py: 1,
-                    borderRadius: 8,
-                  }}
-                >
-                  <Box
-                    sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' }}
-                    onClick={() => setAccordionFile(!accordionFile)}
-                  >
-                    <Typography sx={{ fontSize: 18, color: '#676767' }}>เอกสารแนบ จำนวน 5/5</Typography>
-                    {accordionFile ? (
-                      <KeyboardArrowUpIcon color="primary" />
-                    ) : (
-                      <KeyboardArrowDownIcon color="primary" />
-                    )}
-                  </Box>
-
-                  <Box sx={{ mt: 1, display: accordionFile ? 'visible' : 'none' }}>
-                    {/* {[1, 2, 3, 4, 5].map((item, index) => (
-                      <Box
-                        key={`item-${index + 1}`}
-                        component="a"
-                        href={void 0}
-                        sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
-                        onClick={getHuaweiFileUrl}
-                      >
-                        <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
-                          PI21110101-INV123456-9999-1.pdf
-                        </Typography>
-                      </Box>
-                    ))} */}
-
-                    <Box
-                      component="a"
-                      href={void 0}
-                      sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
-                      onClick={() => getHuaweiFileUrl('key.jpg', true)}
-                    >
-                      <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
-                        key.jpg
-                      </Typography>
-                    </Box>
-
-                    <Box
-                      component="a"
-                      href={void 0}
-                      sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
-                      onClick={() => getHuaweiFileUrl('SD21120002-000014-Draft.pdf', false)}
-                    >
-                      <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
-                        SD21120002-000014-Draft.pdf
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
+                <AccordionHuaweiFile />
               </Grid>
             </Grid>
           </Box>
@@ -806,14 +724,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       />
 
       <LoadingModal open={openLoadingModal} />
-
-      <ModalShowHuaweiFile
-        open={displayFile}
-        onClose={() => setDisplayFile(false)}
-        fileName={newFilename}
-        url={fileUrl}
-        isImage={isImage}
-      />
     </div>
   );
 }
