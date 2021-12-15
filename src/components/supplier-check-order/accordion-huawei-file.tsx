@@ -38,7 +38,6 @@ const AccordionHuaweiFile = ({ files }: Props) => {
     <>
       <Box
         sx={{
-          mt: 1,
           border: `1px dashed ${theme.palette.primary.main}`,
           px: 2,
           py: 1,
