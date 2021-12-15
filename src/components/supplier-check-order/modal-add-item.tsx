@@ -204,37 +204,29 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       itemsList.push(data);
     });
 
-    // console.log('payloadAddItem: ', payloadAddItem);
-    // console.log('itemsList: ', itemsList);
+    let result: any = [];
+    if (payloadAddItem.length > 0) {
+      const sumAddItemList = [...itemsList, ...payloadAddItem];
 
-    // itemsList.map(function (x: any) {
-    //   var result = payloadAddItem.filter((a1: any) => a1.barcode == x.barcode);
-    //   if (result.length > 0) {
-    //     console.log('match');
-    //     x.actualQty += result[0].actualQty;
-    //   }
-    //   return x;
-    // });
-    // let result: any = [];
-    // if (payloadAddItem) {
-    //   const sumAddItemList = [...itemsList, ...payloadAddItem];
-    //   console.log('array3: ', sumAddItemList);
-    //   //   result = sumAddItemList;
+      var o: any = {};
+      sumAddItemList.forEach((i: any) => {
+        var id = i.barcode;
+        if (!o[id]) {
+          return (o[id] = i);
+        }
+        return (o[id].actualQty = o[id].actualQty + i.actualQty);
+      });
 
-    //   sumAddItemList.forEach(function (x) {
-    //     result = payloadAddItem.filter((a1: any) => a1.barcode == x.barcode);
-    //     if (result.length > 0) {
-    //       x.actualQty += result[0].actualQty;
-    //     }
-    //     return x;
-    //   });
-    // } else {
-    //   result = itemsList;
-    // }
+      var itemResult: any = [];
+      Object.keys(o).forEach((key) => {
+        itemResult.push(o[key]);
+      });
+      result = itemResult;
+    } else {
+      result = itemsList;
+    }
 
-    // console.log('itemsList after compare: ', result);
-
-    await dispatch(updateItemsState(itemsList));
+    await dispatch(updateItemsState(result));
     setNewAddItemListArray([]);
     setValueItemList(null);
 
@@ -388,6 +380,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
               onClick={handleAddItem}
               className={classes.MbtnSearch}
               size="large"
+              disabled={newAddItemListArray.length === 0}
               startIcon={<AddCircleOutlineIcon />}
             >
               เพิ่มสินค้า
