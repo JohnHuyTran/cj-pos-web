@@ -80,7 +80,15 @@ export interface PurchaseDetailInfo {
   // vatAble: number;
   // ratRate: number;
   // roundAmount: number;
+  files: PurchaseDetailFiles | [];
   entries: PurchaseDetailEntries | [];
+}
+
+// TODO: huawei file list
+export interface PurchaseDetailFiles {
+  filekey: string;
+  filename: string;
+  mimeType: string;
 }
 
 export interface PurchaseDetailEntries {

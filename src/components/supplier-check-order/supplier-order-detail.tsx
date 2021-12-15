@@ -18,7 +18,11 @@ import {
   GridValueGetterParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { PurchaseDetailEntries, SavePurchaseRequest } from '../../models/supplier-check-order-model';
+import {
+  PurchaseDetailEntries,
+  SavePurchaseRequest,
+  PurchaseDetailFiles,
+} from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
 import { saveSupplierOrder } from '../../services/purchase';
@@ -256,6 +260,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [piNo, setPiNo] = React.useState('');
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
+
+  const [files, setFiles] = React.useState<PurchaseDetailFiles[] | []>([
+    { filekey: 'key.jpg', filename: 'new-image.jpg', mimeType: 'image/jpeg' },
+    { filekey: 'SD21120002-000014-Draft.pdf', filename: 'new-document.pdf', mimeType: 'application/pdf' },
+  ]);
+
   // const [totalAmount, setTotalAmount] = React.useState("");
   // const [vat, setVat] = React.useState("");
   // const [discount, setDiscount] = React.useState("");
@@ -516,7 +526,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
               <Grid item lg={2}></Grid>
               <Grid item lg={4}>
-                <AccordionHuaweiFile />
+                <AccordionHuaweiFile files={files} />
               </Grid>
             </Grid>
           </Box>
