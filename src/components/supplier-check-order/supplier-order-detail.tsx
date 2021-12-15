@@ -228,6 +228,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const saveStateRows = () => {
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        itemsList.push(data);
+      });
+
+      if (itemsList.length > 0) localStorage.setItem('SupplierRowsEdit', JSON.stringify(itemsList));
+    }
+  };
+
   function handleNotExitModelConfirm() {
     setConfirmModelExit(false);
   }
@@ -357,6 +369,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setErrorBillNo(false);
 
       if (rows.length > 0) {
+        saveStateRows();
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         const itemsList: any = [];
         await rows.forEach((data: GridRowData) => {
@@ -400,6 +413,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
       const itemsList: any = [];
       if (rows.length > 0) {
+        saveStateRows();
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         await rows.forEach((data: GridRowData) => {
           const item: any = {
@@ -528,6 +542,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 onClick={handleSaveButton}
                 startIcon={<SaveIcon />}
                 sx={{ width: 200 }}
+                disabled={rows.length == 0}
               >
                 บันทึก
               </Button>
@@ -542,6 +557,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 onClick={handlConfirmButton}
                 startIcon={<CheckCircleOutline />}
                 sx={{ width: 200 }}
+                disabled={rows.length == 0}
               >
                 ยืนยัน
               </Button>
