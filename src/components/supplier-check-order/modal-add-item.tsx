@@ -5,12 +5,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
   Grid,
   IconButton,
-  List,
-  ListItem,
-  ListItemText,
   TextField,
   Typography,
 } from '@mui/material';
@@ -19,16 +15,12 @@ import React, { ReactElement, useEffect, useMemo } from 'react';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { ItemBySupplierCodeResponse, ItemInfo, ItemByBarcodeInfo } from '../../models/modal-add-item-model';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
-import { featchItemByBarcodeAsync } from '../../store/slices/search-item-by-barcode-slice';
-import { SupplierItem } from '../../mockdata/supplier-items';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { updateSearchItemsState } from '../../store/slices/supplier-search-add-items-slice';
-import ModelDeleteConfirm from './modal-delete-confirm';
 
 import { useStyles } from '../../styles/makeTheme';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { DeleteForever } from '@mui/icons-material';
+import { ConstructionOutlined, DeleteForever, PersonAddAlt1TwoTone } from '@mui/icons-material';
 import {
   DataGrid,
   GridCellParams,
@@ -39,6 +31,7 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid';
 import LoadingModal from '../commons/ui/loading-modal';
+import { isConstructorDeclaration } from 'typescript';
 
 interface StateItem {
   barcodeName: string;
@@ -107,7 +100,7 @@ const columns: GridColDef[] = [
         value={params.value}
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value) : '';
-          //   if (value < 0) value = 1;
+          if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         autoComplete="off"
@@ -159,10 +152,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
 
   const itemsList = useAppSelector((state) => state.searchItemListBySup.itemList);
 
-  //   useEffect(() => {
-  //     dispatch(featchItemBySupplierListAsync(supNo));
-  //   }, []);
-
   //search item
   const defaultSearchItemList = {
     options: itemsList.data,
@@ -184,7 +173,12 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     }
   };
 
-  const itemsListByBarcode = useAppSelector((state) => state.searchItemByBarcode.itemList);
+  const handldCloseAddItemModal = () => {
+    onClose();
+    setNewAddItemListArray([]);
+    setValueItemList(null);
+  };
+
   const payloadSearchAddItems = useAppSelector((state) => state.supplierSearchAddItems.state);
   const [itemListArray, setItemListArray] = React.useState<any[]>([]);
   const [barcodeNameDel, setBarcodeNameDel] = React.useState('');
@@ -192,15 +186,15 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   const [barCodeDel, setBarCodeDel] = React.useState('');
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
 
-  const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemByBarcodeInfo[]>([]);
+  const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
 
   const onClickAddItem = async () => {
     let barcodeItem = valueItemList.barcode;
-    await dispatch(featchItemByBarcodeAsync(barcodeItem)).then((res) => {
-      const result: ItemByBarcodeInfo = res.payload;
-      setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, result]);
-    });
+    const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
+    setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, itemSelect]);
   };
+
+  const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
 
   const handleAddItem = async () => {
     setOpenLoadingModal(true);
@@ -210,7 +204,35 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       itemsList.push(data);
     });
 
-    console.log('rowsEdit: ', JSON.stringify(itemsList));
+    // console.log('payloadAddItem: ', payloadAddItem);
+    // console.log('itemsList: ', itemsList);
+
+    // itemsList.map(function (x: any) {
+    //   var result = payloadAddItem.filter((a1: any) => a1.barcode == x.barcode);
+    //   if (result.length > 0) {
+    //     console.log('match');
+    //     x.actualQty += result[0].actualQty;
+    //   }
+    //   return x;
+    // });
+    // let result: any = [];
+    // if (payloadAddItem) {
+    //   const sumAddItemList = [...itemsList, ...payloadAddItem];
+    //   console.log('array3: ', sumAddItemList);
+    //   //   result = sumAddItemList;
+
+    //   sumAddItemList.forEach(function (x) {
+    //     result = payloadAddItem.filter((a1: any) => a1.barcode == x.barcode);
+    //     if (result.length > 0) {
+    //       x.actualQty += result[0].actualQty;
+    //     }
+    //     return x;
+    //   });
+    // } else {
+    //   result = itemsList;
+    // }
+
+    // console.log('itemsList after compare: ', result);
 
     await dispatch(updateItemsState(itemsList));
     setNewAddItemListArray([]);
@@ -299,6 +321,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
                 value={valueItemList}
                 onChange={handleChangeItem}
                 filterOptions={filterOptions}
+                disabled={itemsList.code === 204001}
                 renderOption={(props, option) => {
                   return (
                     <li {...props} key={option.barcode}>
@@ -337,10 +360,10 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
             </Box>
 
             <Box sx={{ flex: 1, ml: 2 }}>
-              {onClose ? (
+              {handldCloseAddItemModal ? (
                 <IconButton
                   aria-label="close"
-                  onClick={onClose}
+                  onClick={handldCloseAddItemModal}
                   sx={{
                     position: 'absolute',
                     right: 8,
