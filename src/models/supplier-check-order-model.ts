@@ -101,6 +101,9 @@ export interface PurchaseDetailEntries {
   sumPrice: number;
   actualQty: number;
   actualQtyAll: number;
+  isDraftStatus?: boolean;
+  itemReturn?: number;
+  deleteStatus?: boolean;
 }
 
 export interface SavePurchaseRequest {
