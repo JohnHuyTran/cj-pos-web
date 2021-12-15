@@ -315,6 +315,7 @@ export default function SupplierCheckOrderSearch() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
       <ModalSupplierSelection openModal={openModal} handleCloseModal={handleCloseModal} />
     </>
   );

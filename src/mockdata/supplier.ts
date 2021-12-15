@@ -1,0 +1,32 @@
+export const Supplier = {
+  timestamp: '2021-12-10T10:03:54.659+0000',
+  ref: '61b3260abd4c0b15f57b9d6d',
+  code: 20000,
+  message: 'success',
+  data: [
+    {
+      code: '0000100472',
+      name: 'บริษัท อัลเฟรโด เอ็นเตอร์ไพรส์ จำกัด  ',
+      taxNo: '0105539096702',
+      address: '57  หมู่5  ตำบลอุทัย อำเภออุทัย จ.พระนครศรีอยุธยา 13210',
+      vatType: '2',
+      creditTerm: 60,
+      isFrontPay: false,
+      isPayBilling: false,
+      isRefPO: true,
+      vatRate: 7,
+    },
+    {
+      code: '0000100444',
+      name: 'บริษัท ทดสอบ เอ็นเตอร์ไพรส์ จำกัด  ',
+      taxNo: '0105539096702',
+      address: '57  หมู่5  ตำบลอุทัย อำเภออุทัย จ.พระนครศรีอยุธยา 13210',
+      vatType: '2',
+      creditTerm: 60,
+      isFrontPay: false,
+      isPayBilling: false,
+      isRefPO: false,
+      vatRate: 7,
+    },
+  ],
+};

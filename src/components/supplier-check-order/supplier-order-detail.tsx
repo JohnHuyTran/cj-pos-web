@@ -245,6 +245,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpen(isOpen);
     setBillNo(purchaseDetail.billNo);
     setPiNo(purchaseDetail.piNo);
+    setPiType(purchaseDetail.piType);
     setPiStatus(purchaseDetail.piStatus);
     setComment(purchaseDetail.comment);
     setCharacterCount(purchaseDetail.comment.length);
@@ -258,6 +259,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [billNo, setBillNo] = React.useState('');
   const [errorBillNo, setErrorBillNo] = React.useState(false);
   const [piNo, setPiNo] = React.useState('');
+  const [piType, setPiType] = React.useState(0);
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
 
@@ -722,7 +724,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         billNo={billNo}
         supplierId={purchaseDetail.supplierCode}
         comment={comment}
-        piStatus={piStatus}
+        piType={piType}
         items={items}
         piDetail={false}
       />

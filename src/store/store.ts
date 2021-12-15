@@ -15,10 +15,13 @@ import dcCheckOrderDetailSlice from './slices/dc-check-order-detail-slice';
 import supplierCheckOrderSlice from './slices/supplier-check-order-slice';
 import saveSearchOrderSup from './slices/save-search-order-supplier-slice';
 import supplierOrderDetail from './slices/supplier-order-detail-slice';
+import searchItemBySupSlice from './slices/search-item-by-sup-slice';
 import supplierOrderPIDetail from './slices/supplier-order-pi-detail-slice';
 import supplierSelectionSlice from './slices/supplier-selection-slice';
 import searchSupplierSelectionSlice from './slices/search-supplier-selection-slice';
 import searchSupplierSelectionPOSlice from './slices/search-supplier-selection-po-slice';
+import supplierAddItems from './slices/supplier-add-items-slice';
+import SupplierSearchAddItemsSlice from './slices/supplier-search-add-items-slice';
 
 const store = configureStore({
   reducer: {
@@ -36,10 +39,13 @@ const store = configureStore({
     supplierCheckOrderSlice: supplierCheckOrderSlice,
     saveSearchOrderSup: saveSearchOrderSup,
     supplierOrderDetail: supplierOrderDetail,
+    searchItemListBySup: searchItemBySupSlice,
     supplierOrderPIDetail: supplierOrderPIDetail,
     supplierSelectionSlice: supplierSelectionSlice,
     searchSupplierSelectionSlice: searchSupplierSelectionSlice,
     searchSupplierSelectionPOSlice: searchSupplierSelectionPOSlice,
+    supplierAddItems: supplierAddItems,
+    supplierSearchAddItems: SupplierSearchAddItemsSlice,
   },
 });
 

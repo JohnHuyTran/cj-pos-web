@@ -5,86 +5,71 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
-import { ApiError } from '../../models/api-error-model';
-import { SavePurchaseRequest } from '../../models/supplier-check-order-model';
-import { approveSupplierOrder } from '../../services/purchase';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
+import LoadingModal from '../commons/ui/loading-modal';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  onUpdateAction: (value: boolean, errorMsg: any) => void;
-  piNo: string;
-  docNo: string;
-  billNo: string;
-  comment: string;
-  items: any;
+  productName: string;
+  skuCode: string;
+  barCode: string;
 }
 
-export default function ModelConfirm({
-  open,
-  onClose,
-  onUpdateAction,
-  piNo,
-  docNo,
-  billNo,
-  comment,
-  items,
-}: Props): ReactElement {
-  const handleConfirm = async () => {
-    const payloadSave: SavePurchaseRequest = {
-      billNo: billNo,
-      comment: comment,
-      items: items,
-    };
+export default function ModelConfirm({ open, onClose, productName, skuCode, barCode }: Props): ReactElement {
+  const dispatch = useAppDispatch();
+  const payloadItem = useAppSelector((state) => state.supplierAddItems.state);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
 
-    await approveSupplierOrder(payloadSave, piNo).then(
-      function (value) {
-        setTimeout(() => {
-          onUpdateAction(true, '');
-        }, 3000);
-      },
-      function (error: ApiError) {
-        onUpdateAction(false, error.message);
-      }
-    );
-    onClose();
+  const handleDeleteItem = async () => {
+    setOpenLoadingModal(true);
+    let items = payloadItem;
+    let payload = items.filter((r: any) => r.barCode !== barCode);
+    await dispatch(updateItemsState(payload));
+
+    setTimeout(() => {
+      setOpenLoadingModal(false);
+      onClose();
+    }, 200);
   };
+
   return (
     <Dialog
       open={open}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       maxWidth="md"
-      sx={{ minWidth: 500 }}
+      sx={{ minWidth: 800 }}
     >
-      <DialogContent>
+      <DialogContent sx={{ pl: 6, pr: 8 }}>
         <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
           <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
             ต้องการลบสินค้า
           </Typography>
-          <Typography variant="body1" align="center">
-            สินค้า <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+          <Typography variant="body1" align="left">
+            สินค้า <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
             <label style={{ color: '#36C690' }}>
-              <b>น้ำดื่มขนาด 300มล.</b>
+              <b>{productName}</b>
               <br />
-              <label style={{ color: '#AEAEAE', fontSize: 12 }}>0000000000000123</label>
+              <label style={{ color: '#AEAEAE', fontSize: 14, marginLeft: '3.8em' }}>{skuCode}</label>
             </label>
           </Typography>
-          <Typography variant="body1" align="center">
-            บาร์โค้ด <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+          <Typography variant="body1" align="left">
+            บาร์โค้ด <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
             <label style={{ color: '#36C690' }}>
-              <b>1234567890000000</b>
+              <b>{barCode}</b>
             </label>
           </Typography>
         </DialogContentText>
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
+      <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
         <Button
           id="btnCancle"
           variant="contained"
           color="cancelColor"
-          sx={{ borderRadius: 2, width: 80, mr: 2 }}
+          sx={{ borderRadius: 2, width: 90, mr: 2 }}
           onClick={onClose}
         >
           ยกเลิก
@@ -93,12 +78,14 @@ export default function ModelConfirm({
           id="btnConfirm"
           variant="contained"
           color="error"
-          sx={{ borderRadius: 2, width: 80 }}
-          onClick={handleConfirm}
+          sx={{ borderRadius: 2, width: 90 }}
+          onClick={handleDeleteItem}
         >
           ลบสินค้า
         </Button>
       </DialogActions>
+
+      <LoadingModal open={openLoadingModal} />
     </Dialog>
   );
 }

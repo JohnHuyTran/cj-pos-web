@@ -19,7 +19,7 @@ interface Props {
   billNo: string;
   supplierId: string;
   comment: string;
-  piStatus: number;
+  piType: number;
   items: any;
   piDetail: boolean;
 }
@@ -33,7 +33,7 @@ export default function ModelConfirm({
   billNo,
   supplierId,
   comment,
-  piStatus,
+  piType,
   items,
   piDetail,
 }: Props): ReactElement {
@@ -43,11 +43,11 @@ export default function ModelConfirm({
     if (piDetail) {
       const payloadSave: SavePurchasePIRequest = {
         billNo: billNo,
-        supplierId: supplierId,
+        SupplierCode: supplierId,
         comment: comment,
         piNo: piNo,
         docNo: docNo,
-        flagPO: piStatus,
+        flagPO: piType,
         items: items,
       };
 
