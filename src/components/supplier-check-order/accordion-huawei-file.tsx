@@ -65,7 +65,7 @@ const AccordionHuaweiFile = ({ files }: Props) => {
                 sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
                 onClick={() => getHuaweiFileUrl(item)}
               >
-                <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
+                <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: 14 }}>
                   {item.filename}
                 </Typography>
               </Box>
