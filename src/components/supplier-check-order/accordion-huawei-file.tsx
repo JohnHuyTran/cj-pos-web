@@ -42,7 +42,7 @@ const AccordionHuaweiFile = ({ files }: Props) => {
           border: `1px dashed ${theme.palette.primary.main}`,
           px: 2,
           py: 1,
-          borderRadius: 8,
+          borderRadius: 5,
         }}
       >
         <Box

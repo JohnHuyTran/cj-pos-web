@@ -528,7 +528,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
               <Grid item lg={2}></Grid>
               <Grid item lg={4}>
-                <AccordionHuaweiFile files={files} />
+                {piStatus === 1 && <AccordionHuaweiFile files={files} />}
               </Grid>
             </Grid>
           </Box>
