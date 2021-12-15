@@ -51,7 +51,7 @@ const AccordionHuaweiFile = ({ files }: Props) => {
             if (files.length > 0) setAccordionFile(!accordionFile);
           }}
         >
-          <Typography sx={{ fontSize: 18, color: '#676767' }}>เอกสารแนบ จำนวน {files.length}/5</Typography>
+          <Typography sx={{ fontSize: '14px', color: '#676767' }}>เอกสารแนบ จำนวน {files.length}/5</Typography>
           {accordionFile ? <KeyboardArrowUp color="primary" /> : <KeyboardArrowDown color="primary" />}
         </Box>
 
@@ -65,7 +65,7 @@ const AccordionHuaweiFile = ({ files }: Props) => {
                 sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
                 onClick={() => getHuaweiFileUrl(item)}
               >
-                <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: 14 }}>
+                <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: '12px' }}>
                   {item.filename}
                 </Typography>
               </Box>
