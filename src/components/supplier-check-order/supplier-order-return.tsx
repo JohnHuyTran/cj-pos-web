@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Button, Checkbox, DialogContent, Grid, TextField } from '@mui/material';
+import { Button, Checkbox, DialogActions, DialogContent, DialogContentText, Grid, TextField } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/system/Box';
@@ -14,6 +14,7 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridRowData, GridRowId, use
 import { useAppSelector } from '../../store/store';
 import { PurchaseDetailEntries, PurchaseDetailInfo } from '../../models/supplier-check-order-model';
 import AlertError from '../commons/ui/alert-error';
+import { ErrorOutline } from '@mui/icons-material';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -94,7 +95,7 @@ const columns: GridColDef[] = [
                 ? params.getValue(params.id, 'qty')
                 : 0;
             var value = e.target.value ? parseInt(e.target.value, 10) : '0';
-            if (value > qty) value = qty;
+            // if (value > qty) value = qty;
             params.api.updateRows([{ ...params.row, itemReturn: value }]);
           }}
           disabled={false}
@@ -195,9 +196,56 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setOpenAlert(false);
   };
 
-  const handleSaveBtn = () => {};
+  const storeItem = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    let itemNotValid: boolean = false;
+    rowsEdit.forEach((data: GridRowData) => {
+      if (data.itemReturn > data.qty || data.itemReturn <= 0) {
+        itemNotValid = true;
+        return;
+      }
+    });
+    if (itemNotValid) {
+      setOpenAlert(true);
+      setTextError('จำนวนที่คืนต้องมากกว่า 0 หรือ น้อยกว่า จำนวนที่รับ');
+      const items: PurchaseDetailEntries[] = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        const newData: PurchaseDetailEntries = {
+          seqItem: data.seqItem,
+          produtStatus: data.produtStatus,
+          isDraftStatus: piStatus === 0 ? false : true,
+          isControlStock: data.isControlStock,
+          isAllowDiscount: data.isAllowDiscount,
+          skuCode: data.skuCode,
+          barcode: data.barcode,
+          productName: data.productName,
+          unitCode: data.unitCode,
+          unitName: data.unitName,
+          qty: data.qty,
+          qtyAll: data.qtyAll,
+          controlPrice: data.controlPrice,
+          salePrice: data.salePrice,
+          setPrice: data.setPrice,
+          sumPrice: data.sumPrice,
+          actualQty: data.actualQty,
+          itemReturn: data.itemReturn,
+          actualQtyAll: data.actualQtyAll,
+          deleteStatus: false,
+        };
+        items.push(newData);
+      });
+      setPurchaseDetailItems(items);
+    }
+  };
 
-  const handleConfirmBtn = () => {};
+  const handleSaveBtn = async () => {
+    storeItem();
+    // call api
+  };
+
+  const handleConfirmBtn = () => {
+    storeItem();
+  };
 
   const handleDeleteBtn = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
