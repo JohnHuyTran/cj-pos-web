@@ -32,6 +32,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import theme from '../../styles/theme';
 import ModalShowPDF from '../commons/ui/modal-show-file';
 import { getFileUrlHuawei } from '../../services/purchase';
+import { truncate } from 'fs';
 
 interface Props {
   isOpen: boolean;
@@ -432,14 +433,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [displayFile, setDisplayFile] = React.useState<boolean>(false);
   const [fileUrl, setFileUrl] = React.useState<string>('');
 
-  const getHuaweiFileUrl = async () => {
-    await getFileUrlHuawei('SD21120002-000014-Draft.pdf')
+  const getHuaweiFileUrl = async (filekey: string) => {
+    await getFileUrlHuawei(filekey)
       .then((resp) => {
         if (resp && resp.data) {
           setFileUrl(resp.data);
-          setTimeout(() => {
-            setDisplayFile(true);
-          }, 500);
+          setDisplayFile(true);
         }
       })
       .catch((error: ApiError) => {
@@ -561,7 +560,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Box>
 
                   <Box sx={{ mt: 1, display: accordionFile ? 'visible' : 'none' }}>
-                    {[1, 2, 3, 4, 5].map((item, index) => (
+                    {/* {[1, 2, 3, 4, 5].map((item, index) => (
                       <Box
                         key={`item-${index + 1}`}
                         component="a"
@@ -573,7 +572,29 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                           PI21110101-INV123456-9999-1.pdf
                         </Typography>
                       </Box>
-                    ))}
+                    ))} */}
+
+                    <Box
+                      component="a"
+                      href={void 0}
+                      sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
+                      onClick={() => getHuaweiFileUrl('key.jpg')}
+                    >
+                      <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
+                        key.jpg
+                      </Typography>
+                    </Box>
+
+                    <Box
+                      component="a"
+                      href={void 0}
+                      sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
+                      onClick={() => getHuaweiFileUrl('SD21120002-000014-Draft.pdf')}
+                    >
+                      <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
+                        SD21120002-000014-Draft.pdf
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
               </Grid>
@@ -791,6 +812,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         url={fileUrl}
         sdImageFile={''}
         statusFile={1}
+        isHuawei={true}
       />
     </div>
   );
