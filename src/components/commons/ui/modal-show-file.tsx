@@ -19,7 +19,6 @@ interface ModalShowPDFProp {
   fileName: string;
   onClose: () => void;
   onPrint?: () => void;
-  isHuawei?: boolean;
 }
 export interface DialogTitleProps {
   id: string;
@@ -76,7 +75,6 @@ export default function ModalShowPDF({
   statusFile,
   fileName,
   onClose,
-  isHuawei = false,
 }: ModalShowPDFProp): ReactElement {
   const [numPages, setNumPages] = useState(0);
   // const [pageNumber, setPageNumber] = useState(1);
@@ -146,23 +144,8 @@ export default function ModalShowPDF({
             textAlign: 'center',
           }}
         >
-          {isHuawei && (
-            <>
-              {imgFile === 'image' && <img src={sdImageFile} style={{ minWidth: '200px' }} />}
-
-              {imgFile !== 'image' && (
-                <div id="pdfWrapper" style={{ width: '50vw' }} ref={pdfWrapper}>
-                  <Document file={{ url: url }} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
-                    {Array.from(new Array(numPages), (el, index) => (
-                      <Page key={`page_${index + 1}`} pageNumber={index + 1} width={initialWidth} />
-                    ))}
-                  </Document>
-                </div>
-              )}
-            </>
-          )}
-
-          {statusFile === 1 && !isHuawei && (
+          {/* <div id="placeholderWrapper" style={{ height: "3000vh" }} /> */}
+          {statusFile === 1 && (
             <div id="pdfWrapper" style={{ width: '50vw' }} ref={pdfWrapper}>
               <Document
                 file={{
@@ -185,8 +168,7 @@ export default function ModalShowPDF({
               </Document>
             </div>
           )}
-
-          {statusFile === 0 && !isHuawei && (
+          {statusFile === 0 && (
             <div>
               {imgFile !== 'image' && (
                 <div id="pdfWrapper" style={{ width: '50vw' }} ref={pdfWrapper}>
