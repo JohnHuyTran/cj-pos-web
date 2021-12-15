@@ -808,11 +808,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       <ModalShowPDF
         open={displayFile}
         onClose={() => setDisplayFile(false)}
-        fileName={'test-rename.pdf'}
+        fileName={'test-rename'}
         url={fileUrl}
         sdImageFile={''}
-        statusFile={1}
-        isHuawei={true}
+        statusFile={0}
+        // isHuawei={true}
       />
     </div>
   );
