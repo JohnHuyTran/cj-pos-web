@@ -200,26 +200,30 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) {
       exit = true;
     }
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    let i = 0;
-    const itemsList: any = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      if (data.actualQty !== rows[i].actualQty) {
-        exit = true;
-      }
-      i++;
 
-      itemsList.push(data);
-    });
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      let i = 0;
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        if (data.actualQty !== rows[i].actualQty) {
+          exit = true;
+        }
+        i++;
+
+        itemsList.push(data);
+      });
+
+      if (itemsList !== []) {
+        localStorage.setItem('SupplierRowsEdit', JSON.stringify(itemsList));
+      }
+    }
 
     if (!exit) {
       localStorage.removeItem('SupplierRowsEdit');
       setOpen(false);
       onClickClose();
     } else if (exit) {
-      if (itemsList !== []) {
-        localStorage.setItem('SupplierRowsEdit', JSON.stringify(itemsList));
-      }
       setConfirmModelExit(true);
     }
   };
@@ -308,6 +312,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       actualQtyAll: item.actualQtyAll,
     };
   });
+
   if (localStorage.getItem('SupplierRowsEdit')) {
     let localStorageEdit = JSON.parse(localStorage.getItem('SupplierRowsEdit') || '');
     rows = localStorageEdit;
@@ -350,16 +355,19 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      const itemsList: any = [];
-      await rows.forEach((data: GridRowData) => {
-        const item: any = {
-          barcode: data.barCode,
-          actualQty: data.actualQty,
-        };
-        itemsList.push(item);
-      });
-      await setItems(itemsList);
+
+      if (rows.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        const itemsList: any = [];
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barCode,
+            actualQty: data.actualQty,
+          };
+          itemsList.push(item);
+        });
+        await setItems(itemsList);
+      }
       setOpenModelConfirm(true);
     }
   };
@@ -390,15 +398,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setErrorBillNo(false);
       setOpenLoadingModal(true);
 
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       const itemsList: any = [];
-      await rows.forEach((data: GridRowData) => {
-        const item: any = {
-          barcode: data.barCode,
-          actualQty: data.actualQty,
-        };
-        itemsList.push(item);
-      });
+      if (rows.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barCode,
+            actualQty: data.actualQty,
+          };
+          itemsList.push(item);
+        });
+      }
 
       const payloadSave: SavePurchaseRequest = {
         billNo: billNo,

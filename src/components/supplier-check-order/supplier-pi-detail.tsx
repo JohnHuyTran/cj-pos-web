@@ -216,26 +216,22 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const handleClose = async () => {
     let exit = false;
-    if (comment !== '' || billNo !== '') {
+
+    if (comment !== commentOrigin || billNo !== billNoOrigin) {
       exit = true;
     }
 
-    if (po) {
+    if (rows.length > 0) {
       const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       let i = 0;
       const itemsList: any = [];
       rowsEdit.forEach((data: GridRowData) => {
-        if (data.actualQty !== rows[i].actualQty) {
-          exit = true;
-        }
+        if (data.actualQty !== rows[i].actualQty) exit = true;
         i++;
-
         itemsList.push(data);
       });
 
-      if (itemsList !== []) {
-        await dispatch(updateItemsState(itemsList));
-      }
+      if (rows.length > 0) await dispatch(updateItemsState(itemsList));
     }
 
     if (!exit) {
@@ -310,6 +306,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   }
 
   const [billNo, setBillNo] = React.useState('');
+  const [billNoOrigin, setBillNoOrigin] = React.useState('');
   const [errorBillNo, setErrorBillNo] = React.useState(false);
   const [piNo, setPiNo] = React.useState('');
   const [supplierCode, setSupplierCode] = React.useState('');
@@ -318,6 +315,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [piType, setPiType] = React.useState(1);
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
+  const [commentOrigin, setCommentOrigin] = React.useState('');
   const [docNo, setDocNo] = React.useState('');
   const classes = useStyles();
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -355,18 +353,45 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
+      setOpenLoadingModal(true);
 
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       const itemsList: any = [];
-      await rows.forEach((data: GridRowData) => {
-        const item: any = {
-          barcode: data.barCode,
-          actualQty: data.actualQty,
-        };
-        itemsList.push(item);
-      });
-      await setItems(itemsList);
-      setOpenModelConfirm(true);
+      if (rows.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barCode,
+            actualQty: data.actualQty,
+          };
+          itemsList.push(item);
+        });
+        await setItems(itemsList);
+      }
+
+      const payloadSave: SavePurchasePIRequest = {
+        piNo: piNo,
+        SupplierCode: supplierCode,
+        billNo: billNo,
+        docNo: docNo ? docNo : '',
+        flagPO: piType,
+        comment: comment,
+        items: itemsList,
+      };
+
+      await saveSupplierPI(payloadSave)
+        .then((value) => {
+          setPiNo(value.piNo);
+          setBillNoOrigin(billNo);
+          setCommentOrigin(comment);
+
+          setOpenModelConfirm(true);
+        })
+        .catch((error: ApiError) => {
+          setShowSnackBar(true);
+          setContentMsg(error.message);
+        });
+
+      setOpenLoadingModal(false);
     }
   };
 
@@ -416,14 +441,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleSaveButton = async () => {
-    if (!billNo) {
-      setErrorBillNo(true);
-    } else {
-      setErrorBillNo(false);
-      setOpenLoadingModal(true);
+    const itemEditList: any = [];
+    const itemsList: any = [];
+    if (rows.length > 0) {
       const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      const itemEditList: any = [];
-      const itemsList: any = [];
       await rows.forEach((data: GridRowData) => {
         const item: any = {
           barcode: data.barCode,
@@ -434,6 +455,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         itemEditList.push(data);
       });
       await dispatch(updateItemsState(itemEditList));
+    }
+
+    if (!billNo) {
+      setErrorBillNo(true);
+    } else {
+      setErrorBillNo(false);
+      setOpenLoadingModal(true);
 
       const payloadSave: SavePurchasePIRequest = {
         piNo: piNo,
@@ -448,6 +476,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       await saveSupplierPI(payloadSave)
         .then((value) => {
           setPiNo(value.piNo);
+          setBillNoOrigin(billNo);
+          setCommentOrigin(comment);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -572,6 +602,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   onClick={handleSaveButton}
                   startIcon={<SaveIcon />}
                   sx={{ width: 200 }}
+                  disabled={rows.length == 0}
                 >
                   บันทึก
                 </Button>
@@ -583,6 +614,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   onClick={handlConfirmButton}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 200 }}
+                  disabled={rows.length == 0}
                 >
                   ยืนยัน
                 </Button>
@@ -624,10 +656,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   placeholder="ความยาวไม่เกิน 255 ตัวอักษร"
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
-                  // error={errorCommentDC === true}
-                  // helperText={
-                  //   errorCommentDC === true ? "กรุณากรอก หมายเหตุ" : " "
-                  // }
                   sx={{ maxWidth: 350 }}
                   // disabled={piStatus !== 0}
                 />

@@ -9,7 +9,7 @@ const initialState: SupplierItemsState = {
 };
 
 export const SupplierItemsSlice = createSlice({
-  name: 'supplierSelection',
+  name: 'supplierItem',
   initialState,
   reducers: {
     updateItemsState: (state, action: PayloadAction<any>) => {
