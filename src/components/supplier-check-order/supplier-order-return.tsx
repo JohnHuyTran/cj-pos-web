@@ -35,7 +35,7 @@ const columns: GridColDef[] = [
     flex: 0.5,
     headerAlign: 'center',
     sortable: false,
-    hide: false,
+    hide: true,
     renderHeader: (params) => <div>index</div>,
     renderCell: (params) => (
       <Box component='div' sx={{ paddingLeft: '20px' }}>
@@ -163,6 +163,16 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       setComment(value);
     }
   };
+  const [cols, setCols] = React.useState(columns);
+
+  React.useEffect(() => {
+    setPiStatus(0);
+    if (piStatus != 0) {
+      let newColumns = [...cols];
+      newColumns[0]['hide'] = false;
+      setCols(newColumns);
+    }
+  }, [open]);
 
   let rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
     return {
@@ -427,7 +437,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
               className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rows}
-                columns={columns}
+                columns={cols}
                 checkboxSelection={piStatus === 0 ? true : false}
                 disableSelectionOnClick
                 pageSize={pageSize}
