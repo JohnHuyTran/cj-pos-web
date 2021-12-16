@@ -19,13 +19,18 @@ import {
   GridRowId,
   useGridApiRef,
 } from '@mui/x-data-grid';
-import { useAppSelector } from '../../store/store';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 import { PurchaseDetailEntries, PurchaseDetailInfo } from '../../models/supplier-check-order-model';
 import AlertError from '../commons/ui/alert-error';
 import { ErrorOutline } from '@mui/icons-material';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
+import { draftPurchaseCreditNote } from '../../services/purchase';
+import { ItemsType, PurchaseCreditNoteType } from '../../models/purchase-credit-note';
+import { ApiError } from '../../models/api-error-model';
+import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
+import ModalConfirmOrderReturn from './modal-confirm-order-return';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -39,7 +44,6 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     // hide: true,
-    renderHeader: (params) => <div>index</div>,
     renderCell: (params) => (
       <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
@@ -139,7 +143,7 @@ function useApiRef() {
 
 function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const classes = useStyles();
-
+  const dispatch = useAppDispatch();
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
 
   const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
@@ -162,7 +166,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [open, setOpen] = React.useState(isOpen);
-  const [piStatus, setPiStatus] = React.useState(0);
+  const [pnStatus, setPnStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
   const [characterCount, setCharacterCount] = React.useState(0);
   const maxCommentLength = 255;
@@ -177,41 +181,44 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const [cols, setCols] = React.useState(columns);
 
   React.useEffect(() => {
-    setPiStatus(0);
+    setComment(purchaseDetail.pnComment);
+    setPnStatus(purchaseDetail.pnState !== 2 ? 0 : 1);
     let newColumns = [...cols];
-    if (piStatus == 0) {
-      newColumns[0]['hide'] = true;
-    } else {
+    if (purchaseDetail.pnState == 2) {
       newColumns[0]['hide'] = false;
+    } else {
+      newColumns[0]['hide'] = true;
     }
     setCols(newColumns);
   }, [open]);
 
-  let rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
-    return {
-      id: `${item.barcode}-${index + 1}`,
-      index: index + 1,
-      seqItem: item.seqItem,
-      produtStatus: item.produtStatus,
-      isDraftStatus: piStatus === 0 ? false : true,
-      isControlStock: item.isControlStock,
-      isAllowDiscount: item.isAllowDiscount,
-      skuCode: item.skuCode,
-      barcode: item.barcode,
-      productName: item.productName,
-      unitCode: item.unitCode,
-      unitName: item.unitName,
-      qty: item.qty,
-      qtyAll: item.qtyAll,
-      controlPrice: item.controlPrice,
-      salePrice: item.salePrice,
-      setPrice: item.setPrice,
-      sumPrice: item.sumPrice,
-      actualQty: item.actualQty,
-      returnQty: item.returnQty ? item.returnQty : 0,
-      actualQtyAll: item.actualQtyAll,
-    };
-  });
+  let rows = purchaseDetailItems
+    // .filter((item: PurchaseDetailEntries) => item.pnDisplay === 1)
+    .map((item: PurchaseDetailEntries, index: number) => {
+      return {
+        id: `${item.barcode}-${index + 1}`,
+        index: index + 1,
+        seqItem: item.seqItem,
+        produtStatus: item.produtStatus,
+        isDraftStatus: pnStatus === 0 ? false : true,
+        isControlStock: item.isControlStock,
+        isAllowDiscount: item.isAllowDiscount,
+        skuCode: item.skuCode,
+        barcode: item.barcode,
+        productName: item.productName,
+        unitCode: item.unitCode,
+        unitName: item.unitName,
+        qty: item.qty,
+        qtyAll: item.qtyAll,
+        controlPrice: item.controlPrice,
+        salePrice: item.salePrice,
+        setPrice: item.setPrice,
+        sumPrice: item.sumPrice,
+        actualQty: item.actualQty,
+        returnQty: item.returnQty ? item.returnQty : 0,
+        actualQtyAll: item.actualQtyAll,
+      };
+    });
 
   const handleClose = () => {
     onClickClose();
@@ -238,7 +245,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         const newData: PurchaseDetailEntries = {
           seqItem: data.seqItem,
           produtStatus: data.produtStatus,
-          isDraftStatus: piStatus === 0 ? false : true,
+          isDraftStatus: pnStatus === 0 ? false : true,
           isControlStock: data.isControlStock,
           isAllowDiscount: data.isAllowDiscount,
           skuCode: data.skuCode,
@@ -259,16 +266,46 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         items.push(newData);
       });
       setPurchaseDetailItems(items);
+      return false;
+    } else {
+      return true;
     }
   };
 
   const handleSaveBtn = async () => {
-    storeItem();
+    const rs = storeItem();
     // call api
-  };
+    if (rs) {
+      setOpenLoadingModal(true);
+      let items: ItemsType[] = [];
+      purchaseDetailItems.forEach((data: PurchaseDetailEntries) => {
+        const item: ItemsType = {
+          barcode: data.barcode,
+          returnQry: data.returnQty ? data.returnQty : 0,
+        };
+        items.push(item);
+      });
 
-  const handleConfirmBtn = () => {
-    storeItem();
+      const payload: PurchaseCreditNoteType = {
+        pnNo: purchaseDetail.pnNo,
+        items: items,
+      };
+      await draftPurchaseCreditNote(payload)
+        .then((_value) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          dispatch(featchSupplierOrderDetailAsync(purchaseDetail.pnNo));
+          // dispatch(featchOrderListSupAsync(payloadSearch));
+
+          // localStorage.removeItem('SupplierRowsEdit');
+        })
+        .catch((error: ApiError) => {
+          setShowSnackBar(true);
+          setContentMsg(error.message);
+        });
+      setOpenLoadingModal(false);
+    }
   };
 
   const handleDeleteBtn = () => {
@@ -288,7 +325,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       const newData: PurchaseDetailEntries = {
         seqItem: data.seqItem,
         produtStatus: data.produtStatus,
-        isDraftStatus: piStatus === 0 ? false : true,
+        isDraftStatus: pnStatus === 0 ? false : true,
         isControlStock: data.isControlStock,
         isAllowDiscount: data.isAllowDiscount,
         skuCode: data.skuCode,
@@ -324,10 +361,6 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setShowSnackBar(false);
   };
 
-  const handleModelConfirm = () => {
-    setOpenModelConfirm(false);
-  };
-
   function handleNotExitModelConfirm() {
     setConfirmModelExit(false);
   }
@@ -337,6 +370,50 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setOpen(false);
     onClickClose();
   }
+  const handleOnCloseModalConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+
+  const handleConfirmBtn = () => {
+    console.log('handleConfirmBtn');
+    const rs = storeItem();
+    console.log(rs);
+    if (rs) {
+      setOpenModelConfirm(true);
+    }
+  };
+
+  const approvePN = async () => {
+    setOpenLoadingModal(true);
+    let items: ItemsType[] = [];
+    purchaseDetailItems.forEach((data: PurchaseDetailEntries) => {
+      const item: ItemsType = {
+        barcode: data.barcode,
+        returnQry: data.returnQty ? data.returnQty : 0,
+      };
+      items.push(item);
+    });
+
+    const payload: PurchaseCreditNoteType = {
+      pnNo: purchaseDetail.pnNo,
+      items: items,
+    };
+    await draftPurchaseCreditNote(payload)
+      .then((_value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
+        dispatch(featchSupplierOrderDetailAsync(purchaseDetail.pnNo));
+        // dispatch(featchOrderListSupAsync(payloadSearch));
+
+        // localStorage.removeItem('SupplierRowsEdit');
+      })
+      .catch((error: ApiError) => {
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+      });
+    setOpenLoadingModal(false);
+  };
 
   return (
     <div>
@@ -344,7 +421,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>ใบคืนสินค้า</Typography>
-          <Steppers status={piStatus}></Steppers>
+          <Steppers status={pnStatus}></Steppers>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box mt={4} sx={{ flexGrow: 1 }}>
@@ -359,7 +436,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                     id='txtDocPN'
                     name='paramQuery'
                     size='small'
-                    value='xxxx'
+                    value={purchaseDetail.pnNo}
                     className={classes.MtextFieldNumber}
                     disabled
                     sx={{ background: '#EAEBEB' }}
@@ -411,50 +488,52 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
               </Grid>
             </Grid>
           </Box>
-          <Grid
-            item
-            container
-            xs={12}
-            sx={{ mt: 3 }}
-            justifyContent='space-between'
-            direction='row'
-            alignItems='flex-end'>
-            <Grid item xl={2}>
-              <Button
-                id='btnSave'
-                variant='contained'
-                color='secondary'
-                className={classes.MbtnSave}
-                onClick={handleDeleteBtn}
-                startIcon={<DeleteIcon />}
-                sx={{ width: 200 }}>
-                ลบรายการ
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                id='btnSave'
-                variant='contained'
-                color='warning'
-                className={classes.MbtnSave}
-                onClick={handleSaveBtn}
-                startIcon={<SaveIcon />}
-                sx={{ width: 200 }}>
-                บันทึก
-              </Button>
+          {pnStatus === 0 && (
+            <Grid
+              item
+              container
+              xs={12}
+              sx={{ mt: 3 }}
+              justifyContent='space-between'
+              direction='row'
+              alignItems='flex-end'>
+              <Grid item xl={2}>
+                <Button
+                  id='btnSave'
+                  variant='contained'
+                  color='secondary'
+                  className={classes.MbtnSave}
+                  onClick={handleDeleteBtn}
+                  startIcon={<DeleteIcon />}
+                  sx={{ width: 200 }}>
+                  ลบรายการ
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  id='btnSave'
+                  variant='contained'
+                  color='warning'
+                  className={classes.MbtnSave}
+                  onClick={handleSaveBtn}
+                  startIcon={<SaveIcon />}
+                  sx={{ width: 200 }}>
+                  บันทึก
+                </Button>
 
-              <Button
-                id='btnApprove'
-                variant='contained'
-                color='primary'
-                className={classes.MbtnApprove}
-                onClick={handleConfirmBtn}
-                startIcon={<CheckCircleOutline />}
-                sx={{ width: 200 }}>
-                ยืนยัน
-              </Button>
+                <Button
+                  id='btnApprove'
+                  variant='contained'
+                  color='primary'
+                  className={classes.MbtnApprove}
+                  onClick={handleConfirmBtn}
+                  startIcon={<CheckCircleOutline />}
+                  sx={{ width: 200 }}>
+                  ยืนยัน
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
+          )}
           <Box mt={2} bgcolor='background.paper'>
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
@@ -462,7 +541,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
               <DataGrid
                 rows={rows}
                 columns={cols}
-                checkboxSelection={piStatus === 0 ? true : false}
+                checkboxSelection={pnStatus === 0 ? true : false}
                 disableSelectionOnClick
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
@@ -489,7 +568,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
                   sx={{ maxWidth: 350 }}
-                  disabled={piStatus !== 0}
+                  disabled={pnStatus !== 0}
                 />
 
                 <div
@@ -519,6 +598,14 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         open={confirmModelExit}
         onClose={handleNotExitModelConfirm}
         onConfirm={handleExitModelConfirm}
+      />
+      <ModalConfirmOrderReturn
+        open={openModelConfirm}
+        onClose={handleOnCloseModalConfirm}
+        handleConfirm={approvePN}
+        header='ยืนยันอนุมัติใบรับสินค้า'
+        title='เลขที่เอกสาร PN'
+        value={purchaseDetail.pnNo}
       />
       <LoadingModal open={openLoadingModal} />
     </div>
