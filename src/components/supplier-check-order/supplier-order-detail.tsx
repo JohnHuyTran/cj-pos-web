@@ -70,12 +70,17 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
+    renderCell: (params) => (
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
+        {params.value}
+      </Box>
+    ),
   },
   {
     field: 'barCode',
     headerName: 'บาร์โค้ด',
     minWidth: 200,
-    flex: 0.7,
+    // flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,

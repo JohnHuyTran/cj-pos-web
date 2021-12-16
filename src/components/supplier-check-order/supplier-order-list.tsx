@@ -118,7 +118,7 @@ export default function SupplierOrderList() {
       align: 'center',
       sortable: false,
       renderCell: (params) => {
-        if (params.getValue(params.id, 'piStatus') !== 0) {
+        if (params.getValue(params.id, 'piStatus') === 1) {
           if (params.value === 0) {
             //demo check PN Status 'บันทึก,อนุมัติ'
             return (
