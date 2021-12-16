@@ -205,27 +205,43 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) {
       exit = true;
     }
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    let i = 0;
-    const itemsList: any = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      if (data.actualQty !== rows[i].actualQty) {
-        exit = true;
-      }
-      i++;
 
-      itemsList.push(data);
-    });
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      let i = 0;
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        if (data.actualQty !== rows[i].actualQty) {
+          exit = true;
+        }
+        i++;
+
+        itemsList.push(data);
+      });
+
+      if (itemsList !== []) {
+        localStorage.setItem('SupplierRowsEdit', JSON.stringify(itemsList));
+      }
+    }
 
     if (!exit) {
       localStorage.removeItem('SupplierRowsEdit');
       setOpen(false);
       onClickClose();
     } else if (exit) {
-      if (itemsList !== []) {
-        localStorage.setItem('SupplierRowsEdit', JSON.stringify(itemsList));
-      }
       setConfirmModelExit(true);
+    }
+  };
+
+  const saveStateRows = () => {
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        itemsList.push(data);
+      });
+
+      if (itemsList.length > 0) localStorage.setItem('SupplierRowsEdit', JSON.stringify(itemsList));
     }
   };
 
@@ -313,6 +329,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       actualQtyAll: item.actualQtyAll,
     };
   });
+
   if (localStorage.getItem('SupplierRowsEdit')) {
     let localStorageEdit = JSON.parse(localStorage.getItem('SupplierRowsEdit') || '');
     rows = localStorageEdit;
@@ -324,12 +341,20 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   // const [errorCommentDC, setErrorCommentDC] = React.useState(false);
   const maxCommentLength = 255;
   const handleChangeComment = (event: any) => {
+    saveStateRows();
     const value = event.target.value;
     const length = event.target.value.length;
     if (length <= maxCommentLength) {
       setCharacterCount(event.target.value.length);
       setComment(value);
     }
+  };
+
+  const handleChangeBillNo = (event: any) => {
+    saveStateRows();
+    const value = event.target.value;
+    setBillNo(value);
+    setErrorBillNo(false);
   };
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
@@ -355,16 +380,20 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      const itemsList: any = [];
-      await rows.forEach((data: GridRowData) => {
-        const item: any = {
-          barcode: data.barCode,
-          actualQty: data.actualQty,
-        };
-        itemsList.push(item);
-      });
-      await setItems(itemsList);
+
+      if (rows.length > 0) {
+        saveStateRows();
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        const itemsList: any = [];
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barCode,
+            actualQty: data.actualQty,
+          };
+          itemsList.push(item);
+        });
+        await setItems(itemsList);
+      }
       setOpenModelConfirm(true);
     }
   };
@@ -395,15 +424,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setErrorBillNo(false);
       setOpenLoadingModal(true);
 
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       const itemsList: any = [];
-      await rows.forEach((data: GridRowData) => {
-        const item: any = {
-          barcode: data.barCode,
-          actualQty: data.actualQty,
-        };
-        itemsList.push(item);
-      });
+      if (rows.length > 0) {
+        saveStateRows();
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barCode,
+            actualQty: data.actualQty,
+          };
+          itemsList.push(item);
+        });
+      }
 
       const payloadSave: SavePurchaseRequest = {
         billNo: billNo,
@@ -456,7 +488,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   size="small"
                   value={billNo}
                   placeholder="กรุณากรอก เลขที่บิลผู้จำหน่าย"
-                  onChange={(event) => setBillNo(event.target.value)}
+                  // onChange={(event) => setBillNo(event.target.value)}
+                  onChange={handleChangeBillNo}
                   className={classes.MtextFieldDetail}
                   disabled={piStatus !== 0}
                   error={errorBillNo === true}
@@ -523,6 +556,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 onClick={handleSaveButton}
                 startIcon={<SaveIcon />}
                 sx={{ width: 200 }}
+                disabled={rows.length == 0}
               >
                 บันทึก
               </Button>
@@ -537,6 +571,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 onClick={handlConfirmButton}
                 startIcon={<CheckCircleOutline />}
                 sx={{ width: 200 }}
+                disabled={rows.length == 0}
               >
                 ยืนยัน
               </Button>

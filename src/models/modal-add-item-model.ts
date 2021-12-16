@@ -12,7 +12,7 @@ export interface ItemInfo {
   unitCode?: string;
   unitName?: string;
   barcodeName: string;
-  pricePerUnit?: number;
+  unitPrice?: number;
   qty?: number;
 }
 
