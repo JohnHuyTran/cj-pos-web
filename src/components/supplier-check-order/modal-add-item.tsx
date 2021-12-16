@@ -69,13 +69,6 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'unitName',
-    headerName: 'หน่วย',
-    flex: 1,
-    headerAlign: 'center',
-    sortable: false,
-  },
-  {
     field: 'barcodeName',
     headerName: 'รายละเอียด',
     headerAlign: 'center',
@@ -84,7 +77,13 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
   },
-
+  {
+    field: 'unitName',
+    headerName: 'หน่วย',
+    flex: 1,
+    headerAlign: 'center',
+    sortable: false,
+  },
   {
     field: 'actualQty',
     headerName: 'จำนวน',
@@ -189,9 +188,36 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
 
   const onClickAddItem = async () => {
+    setValueItemList(null);
     let barcodeItem = valueItemList.barcode;
     const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
-    setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, itemSelect]);
+    const checkDupItem: any = newAddItemListArray.find((a: any) => a.barcode === barcodeItem);
+
+    console.log('newAddItemListArray: ', newAddItemListArray);
+    if (checkDupItem) {
+      let arrayItemDup: any = [];
+      newAddItemListArray.forEach((data: any) => {
+        if (data.barcode === barcodeItem) {
+          const itemsDup: any = {
+            barcode: data.barcode,
+            barcodeName: data.barcodeName,
+            qty: data.qty + 1,
+            skuCode: data.skuCode,
+            unitCode: data.unitCode,
+            unitName: data.unitName,
+            unitPrice: data.unitPrice,
+          };
+
+          arrayItemDup.push(itemsDup);
+        } else {
+          arrayItemDup.push(data);
+        }
+      });
+
+      setNewAddItemListArray(arrayItemDup);
+    } else {
+      setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, itemSelect]);
+    }
   };
 
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
@@ -268,7 +294,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       barcodeName: item.barcodeName,
       actualQty: item.qty,
       skuCode: item.skuCode,
-      setPrice: item.pricePerUnit,
+      unitPrice: item.unitPrice,
     };
   });
 
