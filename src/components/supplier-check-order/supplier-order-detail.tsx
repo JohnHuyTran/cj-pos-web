@@ -165,9 +165,9 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <div>
-        {params.getValue(params.id, 'isRefPO') && <label>{params.value}</label>}
-
-        {!params.getValue(params.id, 'isRefPO') && (
+        {params.getValue(params.id, 'piType') === 0 ||
+          (!params.getValue(params.id, 'isDraftStatus') && <label>{params.value}</label>)}
+        {params.getValue(params.id, 'piType') === 1 && params.getValue(params.id, 'isDraftStatus') && (
           <div>
             <label style={{ position: 'relative', right: '-1.5em' }}>{params.value}</label>
             <DeleteForever
@@ -341,6 +341,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         sumPrice: item.sumPrice,
         actualQty: item.actualQty,
         actualQtyAll: item.actualQtyAll,
+        piType: piType,
       };
     });
   }
@@ -371,6 +372,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         setPrice: item.unitPrice ? item.unitPrice : 0,
         sumPrice: item.sumPrice ? item.sumPrice : 0,
         actualQty: item.actualQty ? item.actualQty : 0,
+        piType: piType,
       };
     });
   }
@@ -526,8 +528,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     const value = params.colDef.field;
     const isRefPO = params.getValue(params.id, 'isRefPO');
     //deleteItem
-
-    // await dispatch(updateItemsState(rows));
     handleUpdateRowState();
 
     if (!isRefPO && value === 'sumPrice') {
@@ -629,7 +629,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           <Box mt={4} mb={2}>
             <Grid container spacing={2} display="flex" justifyContent="space-between">
               <Grid item xl={2}>
-                {piType == 1 && (
+                {piType == 1 && piStatus !== 1 && (
                   <Button
                     id="btnAddItem"
                     variant="contained"
