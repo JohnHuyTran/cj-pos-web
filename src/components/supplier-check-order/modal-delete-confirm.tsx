@@ -25,11 +25,12 @@ export default function ModelConfirm({ open, onClose, productName, skuCode, barC
   const handleDeleteItem = async () => {
     setOpenLoadingModal(true);
     let items = payloadItem;
-    console.log('items :', JSON.stringify(items));
-    if (Object.keys(items).length !== 0) {
-      let payload = items.filter((r: any) => r.barcode !== barCode);
-      await dispatch(updateItemsState(payload));
-    }
+    // if (Object.keys(items).length !== 0) {
+    let payload = items.filter((r: any) => r.barcode !== barCode);
+
+    console.log('payload :', JSON.stringify(payload));
+    await dispatch(updateItemsState(payload));
+    // }
 
     setTimeout(() => {
       setOpenLoadingModal(false);
