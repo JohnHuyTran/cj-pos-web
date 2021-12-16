@@ -3,6 +3,7 @@ import { environment } from '../environment-base';
 import { getPathUrl } from './base-service';
 import { ApiError } from '../models/api-error-model';
 import { SavePurchasePIRequest, SavePurchaseRequest } from '../models/supplier-check-order-model';
+import { PurchaseCreditNoteType } from '../models/purchase-credit-note';
 
 export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string) {
   try {
@@ -48,6 +49,24 @@ export async function saveSupplierPI(payload: SavePurchasePIRequest) {
 }
 
 export async function approveSupplierPI(payload: SavePurchasePIRequest) {
+  const response = await put(environment.purchase.supplierOrder.approvePI.url, payload)
+    .then((result: any) => result)
+    .catch((error: ApiError) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function draftPurchaseCreditNote(payload: PurchaseCreditNoteType) {
+  const response = await put(environment.purchase.supplierOrder.approvePI.url, payload)
+    .then((result: any) => result)
+    .catch((error: ApiError) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType) {
   const response = await put(environment.purchase.supplierOrder.approvePI.url, payload)
     .then((result: any) => result)
     .catch((error: ApiError) => {
