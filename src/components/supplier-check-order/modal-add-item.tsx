@@ -69,13 +69,6 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'unitName',
-    headerName: 'หน่วย',
-    flex: 1,
-    headerAlign: 'center',
-    sortable: false,
-  },
-  {
     field: 'barcodeName',
     headerName: 'รายละเอียด',
     headerAlign: 'center',
@@ -84,7 +77,13 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
   },
-
+  {
+    field: 'unitName',
+    headerName: 'หน่วย',
+    flex: 1,
+    headerAlign: 'center',
+    sortable: false,
+  },
   {
     field: 'actualQty',
     headerName: 'จำนวน',
