@@ -68,6 +68,10 @@ export interface PurchaseDetailInfo {
   piNo: string;
   billNo?: string;
   comment: string;
+  pnNo?: string;
+  pnState?: number;
+  files?: FileType[];
+  pnFiles?: FileType[];
   // totalAmount: number;
   // discount: number;
   // charge: number;
@@ -102,10 +106,16 @@ export interface PurchaseDetailEntries {
   actualQty: number;
   actualQtyAll: number;
   isDraftStatus?: boolean;
-  itemReturn?: number;
-  deleteStatus?: boolean;
+  returnQty?: number;
+  returnAllQty?: number;
+  pnDisplay?: number;
 }
 
+export interface FileType {
+  fileKey: string;
+  fileName: string;
+  mimeType: string;
+}
 export interface SavePurchaseRequest {
   billNo: string;
   comment: string;

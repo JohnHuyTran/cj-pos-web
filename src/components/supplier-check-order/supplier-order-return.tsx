@@ -23,6 +23,9 @@ import { useAppSelector } from '../../store/store';
 import { PurchaseDetailEntries, PurchaseDetailInfo } from '../../models/supplier-check-order-model';
 import AlertError from '../commons/ui/alert-error';
 import { ErrorOutline } from '@mui/icons-material';
+import SnackbarStatus from '../commons/ui/snackbar-status';
+import ConfirmModalExit from '../commons/ui/confirm-exit-model';
+import LoadingModal from '../commons/ui/loading-modal';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -35,7 +38,7 @@ const columns: GridColDef[] = [
     flex: 0.5,
     headerAlign: 'center',
     sortable: false,
-    hide: true,
+    // hide: true,
     renderHeader: (params) => <div>index</div>,
     renderCell: (params) => (
       <Box component='div' sx={{ paddingLeft: '20px' }}>
@@ -77,7 +80,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'itemReturn',
+    field: 'returnQty',
     headerName: 'จำนวนที่คืน',
     width: 110,
     headerAlign: 'center',
@@ -99,7 +102,7 @@ const columns: GridColDef[] = [
                 : 0;
             var value = e.target.value ? parseInt(e.target.value, 10) : '0';
             // if (value > qty) value = qty;
-            params.api.updateRows([{ ...params.row, itemReturn: value }]);
+            params.api.updateRows([{ ...params.row, returnQty: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
           autoComplete='off'
@@ -148,6 +151,14 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+
+  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
 
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [open, setOpen] = React.useState(isOpen);
@@ -167,11 +178,13 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   React.useEffect(() => {
     setPiStatus(0);
-    if (piStatus != 0) {
-      let newColumns = [...cols];
+    let newColumns = [...cols];
+    if (piStatus == 0) {
+      newColumns[0]['hide'] = true;
+    } else {
       newColumns[0]['hide'] = false;
-      setCols(newColumns);
     }
+    setCols(newColumns);
   }, [open]);
 
   let rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
@@ -195,7 +208,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       setPrice: item.setPrice,
       sumPrice: item.sumPrice,
       actualQty: item.actualQty,
-      itemReturn: item.itemReturn ? item.itemReturn : 0,
+      returnQty: item.returnQty ? item.returnQty : 0,
       actualQtyAll: item.actualQtyAll,
     };
   });
@@ -212,7 +225,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.itemReturn > data.qty || data.itemReturn <= 0) {
+      if (data.returnQty > data.qty || data.returnQty <= 0) {
         itemNotValid = true;
         return;
       }
@@ -240,7 +253,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setPrice: data.setPrice,
           sumPrice: data.sumPrice,
           actualQty: data.actualQty,
-          itemReturn: data.itemReturn,
+          returnQty: data.returnQty,
           actualQtyAll: data.actualQtyAll,
         };
         items.push(newData);
@@ -266,15 +279,10 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       setTextError('ไม่สามารถลบรายการทั้งหมดได้');
       return;
     }
-
-    console.log('befor: ', rowsEdit);
     rowSelect.forEach((data: GridRowData, key) => {
       rowsEdit.delete(key);
     });
-    console.log('after: ', rowsEdit);
-    //
 
-    //
     const items: PurchaseDetailEntries[] = [];
     rowsEdit.forEach((data: GridRowData) => {
       const newData: PurchaseDetailEntries = {
@@ -295,9 +303,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         setPrice: data.setPrice,
         sumPrice: data.sumPrice,
         actualQty: data.actualQty,
-        itemReturn: data.itemReturn,
+        returnQty: data.returnQty,
         actualQtyAll: data.actualQtyAll,
-        deleteStatus: false,
       };
       items.push(newData);
     });
@@ -313,6 +320,23 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     //   setPurchaseDetailItems(itemsNoDelete);
     // }
   };
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const handleModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+
+  function handleNotExitModelConfirm() {
+    setConfirmModelExit(false);
+  }
+
+  function handleExitModelConfirm() {
+    setConfirmModelExit(false);
+    setOpen(false);
+    onClickClose();
+  }
 
   return (
     <div>
@@ -485,6 +509,18 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         </DialogContent>
       </Dialog>
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={contentMsg}
+      />
+      <ConfirmModalExit
+        open={confirmModelExit}
+        onClose={handleNotExitModelConfirm}
+        onConfirm={handleExitModelConfirm}
+      />
+      <LoadingModal open={openLoadingModal} />
     </div>
   );
 }
