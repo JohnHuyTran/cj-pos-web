@@ -166,8 +166,8 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => (
       <div>
         {params.getValue(params.id, 'piType') === 0 ||
-          (!params.getValue(params.id, 'isDraftStatus') && <label>{params.value}</label>)}
-        {params.getValue(params.id, 'piType') === 1 && params.getValue(params.id, 'isDraftStatus') && (
+          (params.getValue(params.id, 'isDraftStatus') && <label>{params.value}</label>)}
+        {params.getValue(params.id, 'piType') === 1 && !params.getValue(params.id, 'isDraftStatus') && (
           <div>
             <label style={{ position: 'relative', right: '-1.5em' }}>{params.value}</label>
             <DeleteForever
