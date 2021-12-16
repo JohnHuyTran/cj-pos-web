@@ -162,6 +162,7 @@ const useStyles = makeStyles({
   Mautocomplete: {
     '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
       padding: '1.5px !important',
+      paddingRight: '65px !important',
     },
     '& .MuiAutocomplete-input': {
       // padding: "2px 4px 2px 6px !important",
