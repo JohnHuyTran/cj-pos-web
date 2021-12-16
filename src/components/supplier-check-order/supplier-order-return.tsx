@@ -22,25 +22,6 @@ interface Props {
 
 const columns: GridColDef[] = [
   {
-    field: 'deleteStatus',
-    headerName: ' ',
-    width: 80,
-    headerAlign: 'center',
-    disableColumnMenu: true,
-    sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <Checkbox
-        name='chkDeleteStatus'
-        checked={params.getValue(params.id, 'deleteStatus') ? true : false}
-        inputProps={{ 'aria-label': 'controlled' }}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          const value = event.target.checked;
-          params.api.updateRows([{ ...params.row, deleteStatus: value }]);
-        }}
-      />
-    ),
-  },
-  {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
     width: 200,
@@ -184,7 +165,6 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       actualQty: item.actualQty,
       itemReturn: item.itemReturn ? item.itemReturn : 0,
       actualQtyAll: item.actualQtyAll,
-      deleteStatus: item.deleteStatus ? item.deleteStatus : false,
     };
   });
 
@@ -230,7 +210,6 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           actualQty: data.actualQty,
           itemReturn: data.itemReturn,
           actualQtyAll: data.actualQtyAll,
-          deleteStatus: false,
         };
         items.push(newData);
       });
@@ -249,72 +228,58 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const handleDeleteBtn = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    // setPurchaseDetailItems([]);
-    let countIsDelete: number = 0;
-    const itemsNoDelete: PurchaseDetailEntries[] = [];
-    const itemsDelete: PurchaseDetailEntries[] = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      if (!data.deleteStatus) {
-        const newData: PurchaseDetailEntries = {
-          seqItem: data.seqItem,
-          produtStatus: data.produtStatus,
-          isDraftStatus: piStatus === 0 ? false : true,
-          isControlStock: data.isControlStock,
-          isAllowDiscount: data.isAllowDiscount,
-          skuCode: data.skuCode,
-          barcode: data.barcode,
-          productName: data.productName,
-          unitCode: data.unitCode,
-          unitName: data.unitName,
-          qty: data.qty,
-          qtyAll: data.qtyAll,
-          controlPrice: data.controlPrice,
-          salePrice: data.salePrice,
-          setPrice: data.setPrice,
-          sumPrice: data.sumPrice,
-          actualQty: data.actualQty,
-          itemReturn: data.itemReturn,
-          actualQtyAll: data.actualQtyAll,
-          deleteStatus: false,
-        };
-        itemsNoDelete.push(newData);
-        // setPurchaseDetailItems([newData]);
-      } else {
-        const newData: PurchaseDetailEntries = {
-          seqItem: data.seqItem,
-          produtStatus: data.produtStatus,
-          isDraftStatus: piStatus === 0 ? false : true,
-          isControlStock: data.isControlStock,
-          isAllowDiscount: data.isAllowDiscount,
-          skuCode: data.skuCode,
-          barcode: data.barcode,
-          productName: data.productName,
-          unitCode: data.unitCode,
-          unitName: data.unitName,
-          qty: data.qty,
-          qtyAll: data.qtyAll,
-          controlPrice: data.controlPrice,
-          salePrice: data.salePrice,
-          setPrice: data.setPrice,
-          sumPrice: data.sumPrice,
-          actualQty: data.actualQty,
-          itemReturn: data.itemReturn,
-          actualQtyAll: data.actualQtyAll,
-          deleteStatus: true,
-        };
-        itemsDelete.push(newData);
-        countIsDelete++;
-      }
-    });
-    if (countIsDelete === rowsEdit.size) {
+    const rowSelect = apiRef.current.getSelectedRows();
+    if (rowSelect.size === rowsEdit.size) {
       setOpenAlert(true);
       setTextError('ไม่สามารถลบรายการทั้งหมดได้');
-      setPurchaseDetailItems([]);
-      setPurchaseDetailItems(itemsDelete);
-    } else {
-      setPurchaseDetailItems([]);
-      setPurchaseDetailItems(itemsNoDelete);
+      return;
     }
+
+    console.log('befor: ', rowsEdit);
+    rowSelect.forEach((data: GridRowData, key) => {
+      rowsEdit.delete(key);
+    });
+    console.log('after: ', rowsEdit);
+    //
+
+    //
+    const items: PurchaseDetailEntries[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const newData: PurchaseDetailEntries = {
+        seqItem: data.seqItem,
+        produtStatus: data.produtStatus,
+        isDraftStatus: piStatus === 0 ? false : true,
+        isControlStock: data.isControlStock,
+        isAllowDiscount: data.isAllowDiscount,
+        skuCode: data.skuCode,
+        barcode: data.barcode,
+        productName: data.productName,
+        unitCode: data.unitCode,
+        unitName: data.unitName,
+        qty: data.qty,
+        qtyAll: data.qtyAll,
+        controlPrice: data.controlPrice,
+        salePrice: data.salePrice,
+        setPrice: data.setPrice,
+        sumPrice: data.sumPrice,
+        actualQty: data.actualQty,
+        itemReturn: data.itemReturn,
+        actualQtyAll: data.actualQtyAll,
+        deleteStatus: false,
+      };
+      items.push(newData);
+    });
+    setPurchaseDetailItems([]);
+    setPurchaseDetailItems(items);
+    // if (countIsDelete === rowsEdit.size) {
+    //   setOpenAlert(true);
+    //   setTextError('ไม่สามารถลบรายการทั้งหมดได้');
+    //   setPurchaseDetailItems([]);
+    //   setPurchaseDetailItems(itemsDelete);
+    // } else {
+    //   setPurchaseDetailItems([]);
+    //   setPurchaseDetailItems(itemsNoDelete);
+    // }
   };
 
   return (
@@ -441,6 +406,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
               <DataGrid
                 rows={rows}
                 columns={columns}
+                checkboxSelection
+                disableSelectionOnClick
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 rowsPerPageOptions={[10, 20, 50, 100]}
