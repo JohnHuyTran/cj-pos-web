@@ -237,35 +237,36 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         return;
       }
     });
+
+    const items: PurchaseDetailEntries[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const newData: PurchaseDetailEntries = {
+        seqItem: data.seqItem,
+        produtStatus: data.produtStatus,
+        isDraftStatus: pnStatus === 0 ? false : true,
+        isControlStock: data.isControlStock,
+        isAllowDiscount: data.isAllowDiscount,
+        skuCode: data.skuCode,
+        barcode: data.barcode,
+        productName: data.productName,
+        unitCode: data.unitCode,
+        unitName: data.unitName,
+        qty: data.qty,
+        qtyAll: data.qtyAll,
+        controlPrice: data.controlPrice,
+        salePrice: data.salePrice,
+        setPrice: data.setPrice,
+        sumPrice: data.sumPrice,
+        actualQty: data.actualQty,
+        returnQty: data.returnQty,
+        actualQtyAll: data.actualQtyAll,
+      };
+      items.push(newData);
+    });
+    setPurchaseDetailItems(items);
     if (itemNotValid) {
       setOpenAlert(true);
       setTextError('จำนวนที่คืนต้องมากกว่า 0 หรือ น้อยกว่า จำนวนที่รับ');
-      const items: PurchaseDetailEntries[] = [];
-      rowsEdit.forEach((data: GridRowData) => {
-        const newData: PurchaseDetailEntries = {
-          seqItem: data.seqItem,
-          produtStatus: data.produtStatus,
-          isDraftStatus: pnStatus === 0 ? false : true,
-          isControlStock: data.isControlStock,
-          isAllowDiscount: data.isAllowDiscount,
-          skuCode: data.skuCode,
-          barcode: data.barcode,
-          productName: data.productName,
-          unitCode: data.unitCode,
-          unitName: data.unitName,
-          qty: data.qty,
-          qtyAll: data.qtyAll,
-          controlPrice: data.controlPrice,
-          salePrice: data.salePrice,
-          setPrice: data.setPrice,
-          sumPrice: data.sumPrice,
-          actualQty: data.actualQty,
-          returnQty: data.returnQty,
-          actualQtyAll: data.actualQtyAll,
-        };
-        items.push(newData);
-      });
-      setPurchaseDetailItems(items);
       return false;
     } else {
       return true;
@@ -278,7 +279,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     if (rs) {
       setOpenLoadingModal(true);
       let items: ItemsType[] = [];
-      purchaseDetailItems.forEach((data: PurchaseDetailEntries) => {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      rowsEdit.forEach((data: GridRowData) => {
         const item: ItemsType = {
           barcode: data.barcode,
           returnQry: data.returnQty ? data.returnQty : 0,
@@ -375,9 +377,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   };
 
   const handleConfirmBtn = () => {
-    console.log('handleConfirmBtn');
     const rs = storeItem();
-    console.log(rs);
     if (rs) {
       setOpenModelConfirm(true);
     }
