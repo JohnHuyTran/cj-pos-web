@@ -120,26 +120,30 @@ export default function SupplierOrderList() {
       renderCell: (params) => {
         if (params.getValue(params.id, 'piStatus') !== 0) {
           if (params.value === 0) {
+            //demo check PN Status 'บันทึก,อนุมัติ'
             return (
-              <Typography color="textSecondary" variant="body2">
-                {params.getValue(params.id, 'docNo') || ''}
+              <Typography color="secondary" variant="body2" sx={{ textDecoration: 'underline' }}>
+                PN{params.getValue(params.id, 'docNo') || ''}
               </Typography>
             );
           } else if (params.value === 1) {
+            //demo check PN Status to create PN
             return (
               <Button
                 variant="contained"
-                color="success"
+                color="warning"
                 size="small"
-                sx={{
-                  color: theme.palette.error.main,
-                  backgroundColor: theme.palette.background.default,
-                  border: `1px solid ${theme.palette.error.main}`,
-                  borderRadius: '5px',
-                  '&:hover': {
-                    backgroundColor: alpha(theme.palette.error.main, 0.25),
-                  },
-                }}
+                className={classes.MbtnSearch}
+                sx={{ minWidth: 90 }}
+                // sx={{
+                //   color: theme.palette.error.main,
+                //   backgroundColor: theme.palette.background.default,
+                //   border: `1px solid ${theme.palette.error.main}`,
+                //   borderRadius: '5px',
+                //   '&:hover': {
+                //     backgroundColor: alpha(theme.palette.error.main, 0.25),
+                //   },
+                // }}
               >
                 คืนสินค้า
               </Button>
