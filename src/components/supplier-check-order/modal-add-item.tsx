@@ -62,19 +62,19 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    // flex: 1.8,
-    minWidth: 125,
+    flex: 1,
+    // minWidth: 125,
     headerAlign: 'center',
-    disableColumnMenu: true,
+    // disableColumnMenu: true,
     sortable: false,
   },
   {
     field: 'barcodeName',
     headerName: 'รายละเอียด',
     headerAlign: 'center',
-    // flex: 2,
-    minWidth: 180,
-    disableColumnMenu: true,
+    flex: 1,
+    // minWidth: 180,
+    // disableColumnMenu: true,
     sortable: false,
   },
   {
@@ -109,7 +109,8 @@ const columns: GridColDef[] = [
   {
     field: 'delete',
     headerName: 'ลบ',
-    width: 50,
+    flex: 1,
+    // width: 50,
     align: 'center',
     sortable: false,
     renderCell: () => {
@@ -294,16 +295,16 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       barcodeName: item.barcodeName,
       actualQty: item.qty,
       skuCode: item.skuCode,
-      setPrice: item.pricePerUnit,
+      unitPrice: item.unitPrice,
     };
   });
 
   let checkHaveItems;
-  if (itemsList.code === 204001) {
+  if (itemsList.code === 204) {
     checkHaveItems = (
       <Grid item container xs={12} justifyContent="center">
         <Box color="#CBD4DB">
-          <h6>ไม่พบสินค้า</h6>
+          <h4>ไม่พบสินค้า</h4>
         </Box>
       </Grid>
     );
@@ -340,7 +341,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
                 value={valueItemList}
                 onChange={handleChangeItem}
                 filterOptions={filterOptions}
-                disabled={itemsList.code === 204001}
+                disabled={itemsList.code === 204}
                 renderOption={(props, option) => {
                   return (
                     <li {...props} key={option.barcode}>

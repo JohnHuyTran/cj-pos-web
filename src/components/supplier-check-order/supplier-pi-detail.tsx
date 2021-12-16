@@ -287,7 +287,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           qtyAll: item.qtyAll,
           controlPrice: item.controlPrice,
           salePrice: item.salePrice,
-          setPrice: item.pricePerUnit ? item.pricePerUnit : 0,
+          setPrice: item.unitPrice ? item.unitPrice : 0,
           sumPrice: item.sumPrice ? item.sumPrice : 0,
           actualQty: item.actualQty ? item.actualQty : 0,
           isRefPO: supplier.isRefPO,
