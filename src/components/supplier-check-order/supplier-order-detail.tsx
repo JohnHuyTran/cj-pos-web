@@ -336,12 +336,20 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   // const [errorCommentDC, setErrorCommentDC] = React.useState(false);
   const maxCommentLength = 255;
   const handleChangeComment = (event: any) => {
+    saveStateRows();
     const value = event.target.value;
     const length = event.target.value.length;
     if (length <= maxCommentLength) {
       setCharacterCount(event.target.value.length);
       setComment(value);
     }
+  };
+
+  const handleChangeBillNo = (event: any) => {
+    saveStateRows();
+    const value = event.target.value;
+    setBillNo(value);
+    setErrorBillNo(false);
   };
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
@@ -475,7 +483,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   size="small"
                   value={billNo}
                   placeholder="กรุณากรอก เลขที่บิลผู้จำหน่าย"
-                  onChange={(event) => setBillNo(event.target.value)}
+                  // onChange={(event) => setBillNo(event.target.value)}
+                  onChange={handleChangeBillNo}
                   className={classes.MtextFieldDetail}
                   disabled={piStatus !== 0}
                   error={errorBillNo === true}
