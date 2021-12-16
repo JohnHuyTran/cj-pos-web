@@ -10,7 +10,15 @@ import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
 import Steppers from '../commons/ui/steppers';
 
 import { useStyles } from '../../styles/makeTheme';
-import { DataGrid, GridColDef, GridRenderCellParams, GridRowData, GridRowId, useGridApiRef } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridColDef,
+  GridColumnHeaderParams,
+  GridRenderCellParams,
+  GridRowData,
+  GridRowId,
+  useGridApiRef,
+} from '@mui/x-data-grid';
 import { useAppSelector } from '../../store/store';
 import { PurchaseDetailEntries, PurchaseDetailInfo } from '../../models/supplier-check-order-model';
 import AlertError from '../commons/ui/alert-error';
@@ -21,6 +29,20 @@ interface Props {
 }
 
 const columns: GridColDef[] = [
+  {
+    field: 'index',
+    headerName: 'ลำดับ',
+    flex: 0.5,
+    headerAlign: 'center',
+    sortable: false,
+    hide: false,
+    renderHeader: (params) => <div>index</div>,
+    renderCell: (params) => (
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
+        {params.value}
+      </Box>
+    ),
+  },
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
@@ -79,7 +101,7 @@ const columns: GridColDef[] = [
             // if (value > qty) value = qty;
             params.api.updateRows([{ ...params.row, itemReturn: value }]);
           }}
-          disabled={false}
+          disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
           autoComplete='off'
         />
       </div>
@@ -406,7 +428,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
               <DataGrid
                 rows={rows}
                 columns={columns}
-                checkboxSelection
+                checkboxSelection={piStatus === 0 ? true : false}
                 disableSelectionOnClick
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
@@ -432,10 +454,6 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                   placeholder='ความยาวไม่เกิน 255 ตัวอักษร'
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
-                  // error={errorCommentDC === true}
-                  // helperText={
-                  //   errorCommentDC === true ? "กรุณากรอก หมายเหตุ" : " "
-                  // }
                   sx={{ maxWidth: 350 }}
                   disabled={piStatus !== 0}
                 />
