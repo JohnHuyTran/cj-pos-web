@@ -70,6 +70,7 @@ export interface PurchaseDetailInfo {
   comment: string;
   pnNo?: string;
   pnState?: number;
+  pnComment?: string;
   files?: FileType[];
   pnFiles?: FileType[];
   // totalAmount: number;
