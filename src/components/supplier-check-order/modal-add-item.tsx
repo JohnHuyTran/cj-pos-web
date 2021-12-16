@@ -347,6 +347,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
                 onClick={onClickAddItem}
                 sx={{ width: '100%', ml: 2 }}
                 className={classes.MbtnSearch}
+                disabled={!valueItemList}
               >
                 เพิ่ม
               </Button>
