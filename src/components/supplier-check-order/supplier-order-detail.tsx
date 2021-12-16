@@ -3,7 +3,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import { Button, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
-import { CheckCircleOutline, HighlightOff } from '@mui/icons-material';
+import { CheckCircleOutline, ControlPoint, DeleteForever, HighlightOff } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import Steppers from '../commons/ui/steppers';
 import SaveIcon from '@mui/icons-material/Save';
@@ -16,6 +16,7 @@ import {
   GridRowId,
   GridRowData,
   GridValueGetterParams,
+  GridCellParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { PurchaseDetailEntries, SavePurchaseRequest } from '../../models/supplier-check-order-model';
@@ -27,6 +28,9 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
+import ModalAddItem from './modal-add-item';
+import ModelDeleteConfirm from './modal-delete-confirm';
+import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 
 interface Props {
   isOpen: boolean;
@@ -151,6 +155,14 @@ const columns: GridColDef[] = [
     align: 'right',
     sortable: false,
   },
+  // {
+  //   field: 'sumPrice',
+  //   headerName: 'รวม',
+  //   width: 120,
+  //   headerAlign: 'center',
+  //   align: 'right',
+  //   sortable: false,
+  // },
   {
     field: 'sumPrice',
     headerName: 'รวม',
@@ -158,6 +170,21 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <div>
+        {params.getValue(params.id, 'isRefPO') && <label>{params.value}</label>}
+
+        {!params.getValue(params.id, 'isRefPO') && (
+          <div>
+            <label style={{ position: 'relative', right: '-1.5em' }}>{params.value}</label>
+            <DeleteForever
+              fontSize="small"
+              sx={{ color: '#F54949', position: 'relative', right: '-2em', top: '5px' }}
+            />
+          </div>
+        )}
+      </div>
+    ),
   },
 ];
 
@@ -192,6 +219,7 @@ function useApiRef() {
 }
 
 function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
+  const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(isOpen);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
 
@@ -262,10 +290,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   }, [open]);
 
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
-
   const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
   const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
-
+  const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
   const [billNo, setBillNo] = React.useState('');
   const [errorBillNo, setErrorBillNo] = React.useState(false);
   const [piNo, setPiNo] = React.useState('');
@@ -300,6 +327,16 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   //   setSummary(true);
   // }
 
+  const handleUpdateRowState = async (items: any) => {
+    console.log('handleUpdateRowState :', JSON.stringify(items));
+    const itemsList: any = [];
+    items.forEach((data: GridRowData) => {
+      itemsList.push(data);
+    });
+    // await dispatch(updateItemsState(itemsList));
+    console.log('itemsList :', JSON.stringify(itemsList));
+  };
+
   let rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
     return {
       id: `${item.barcode}-${index + 1}`,
@@ -324,11 +361,44 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       actualQtyAll: item.actualQtyAll,
     };
   });
+  // handleUpdateRowState(purchaseDetailItems);
 
   if (localStorage.getItem('SupplierRowsEdit')) {
     let localStorageEdit = JSON.parse(localStorage.getItem('SupplierRowsEdit') || '');
     rows = localStorageEdit;
+
+    // handleUpdateRowState(rows);
   }
+
+  if (piType === 1 && Object.keys(payloadAddItem).length !== 0) {
+    rows = payloadAddItem.map((item: any, index: number) => {
+      let barcode = item.barCode ? item.barCode : item.barcode;
+      return {
+        id: `${barcode}-${index + 1}`,
+        index: index + 1,
+        seqItem: item.seqItem,
+        isControlStock: item.isControlStock,
+        isAllowDiscount: item.isAllowDiscount,
+        skuCode: item.skuCode,
+        barCode: barcode,
+        productName: item.productName ? item.productName : item.barcodeName,
+        unitCode: item.unitCode,
+        unitName: item.unitName,
+        qty: item.qty ? item.qty : 0,
+        qtyAll: item.qtyAll,
+        controlPrice: item.controlPrice,
+        salePrice: item.salePrice,
+        setPrice: item.pricePerUnit ? item.pricePerUnit : 0,
+        sumPrice: item.sumPrice ? item.sumPrice : 0,
+        actualQty: item.actualQty ? item.actualQty : 0,
+      };
+    });
+
+    // handleUpdateRowState(rows);
+  }
+
+  console.log('rows :', JSON.stringify(rows));
+  handleUpdateRowState(rows);
 
   const classes = useStyles();
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -354,7 +424,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const { apiRef, columns } = useApiRef();
-  const dispatch = useAppDispatch();
   const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
@@ -456,6 +525,35 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const handleAddItems = () => {
+    setOpenModelAddItems(true);
+  };
+
+  const handleModelAddItems = () => {
+    setOpenModelAddItems(false);
+  };
+
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+  const [productNameDel, setProductNameDel] = React.useState('');
+  const [skuCodeDel, setSkuCodeDel] = React.useState('');
+  const [barCodeDel, setBarCodeDel] = React.useState('');
+  const currentlySelected = (params: GridCellParams) => {
+    const value = params.colDef.field;
+    const isRefPO = params.getValue(params.id, 'isRefPO');
+    //deleteItem
+    if (!isRefPO && value === 'sumPrice') {
+      setProductNameDel(String(params.getValue(params.id, 'productName')));
+      setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
+      setBarCodeDel(String(params.getValue(params.id, 'barCode')));
+      setOpenModelDeleteConfirm(true);
+    }
+  };
+
+  const handleModelDeleteConfirm = () => {
+    setOpenModelDeleteConfirm(false);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -509,7 +607,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   variant="contained"
                   component="span"
                   className={classes.MbtnBrowse}
-                  // style={{ marginLeft: 10, textTransform: "none" }}
                   disabled
                 >
                   แนบไฟล์
@@ -541,37 +638,58 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               <Grid item lg={6}></Grid>
             </Grid>
           </Box>
-          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
-            {piStatus !== 1 && (
-              <Button
-                id="btnSave"
-                variant="contained"
-                color="warning"
-                className={classes.MbtnSave}
-                onClick={handleSaveButton}
-                startIcon={<SaveIcon />}
-                sx={{ width: 200 }}
-                disabled={rows.length == 0}
-              >
-                บันทึก
-              </Button>
-            )}
 
-            {piStatus !== 1 && (
-              <Button
-                id="btnApprove"
-                variant="contained"
-                color="primary"
-                className={classes.MbtnApprove}
-                onClick={handlConfirmButton}
-                startIcon={<CheckCircleOutline />}
-                sx={{ width: 200 }}
-                disabled={rows.length == 0}
-              >
-                ยืนยัน
-              </Button>
-            )}
-          </Grid>
+          <Box mt={4} mb={2}>
+            <Grid container spacing={2} display="flex" justifyContent="space-between">
+              <Grid item xl={2}>
+                {piType == 1 && (
+                  <Button
+                    id="btnAddItem"
+                    variant="contained"
+                    color="info"
+                    className={classes.MbtnPrint}
+                    onClick={handleAddItems}
+                    startIcon={<ControlPoint />}
+                    sx={{ width: 200 }}
+                  >
+                    เพิ่มสินค้า
+                  </Button>
+                )}
+              </Grid>
+
+              <Grid item xl={10} sx={{ textAlign: 'end' }}>
+                {piStatus !== 1 && (
+                  <Button
+                    id="btnSave"
+                    variant="contained"
+                    color="warning"
+                    className={classes.MbtnSave}
+                    onClick={handleSaveButton}
+                    startIcon={<SaveIcon />}
+                    sx={{ width: 200 }}
+                    disabled={rows.length == 0}
+                  >
+                    บันทึก
+                  </Button>
+                )}
+                {piStatus !== 1 && (
+                  <Button
+                    id="btnApprove"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnApprove}
+                    onClick={handlConfirmButton}
+                    startIcon={<CheckCircleOutline />}
+                    sx={{ width: 200 }}
+                    disabled={rows.length == 0}
+                  >
+                    ยืนยัน
+                  </Button>
+                )}
+              </Grid>
+            </Grid>
+          </Box>
+
           <Box mt={2} bgcolor="background.paper">
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
@@ -588,6 +706,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 autoHeight={rows.length >= 8 ? false : true}
                 scrollbarSize={10}
                 rowHeight={65}
+                onCellClick={currentlySelected}
               />
             </div>
           </Box>
@@ -604,10 +723,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   placeholder="ความยาวไม่เกิน 255 ตัวอักษร"
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
-                  // error={errorCommentDC === true}
-                  // helperText={
-                  //   errorCommentDC === true ? "กรุณากรอก หมายเหตุ" : " "
-                  // }
                   sx={{ maxWidth: 350 }}
                   disabled={piStatus !== 0}
                 />
@@ -619,7 +734,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     width: '100%',
                     maxWidth: 350,
                     textAlign: 'right',
-                    // marginTop: "-1.5em",
                   }}
                 >
                   {characterCount}/{maxCommentLength}
@@ -670,28 +784,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     />
                   </Grid>
                 </Grid>
-
-                {/* <Grid container spacing={2} justifyContent='flex-end' mb={1}>
-                  <Grid item lg={5}></Grid>
-                  <Grid item lg={3} alignItems="flex-end">
-                    <Typography variant="body2" pt={1}>
-                      ลด/ชาร์จ
-                    </Typography>
-                  </Grid>
-                  <Grid item lg={4}>
-                    <TextField
-                      id="txtParamQuery"
-                      name="paramQuery"
-                      size="small"
-                      // value={discount}
-                      value="0"
-                      className={classes.MtextFieldNumber}
-                      fullWidth
-                      disabled
-                      sx={{ background: '#EAEBEB' }}
-                    />
-                  </Grid>
-                </Grid> */}
 
                 <Grid container spacing={2} justifyContent="flex-end" mb={1}>
                   <Grid item lg={5}></Grid>
@@ -744,6 +836,20 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         open={confirmModelExit}
         onClose={handleNotExitModelConfirm}
         onConfirm={handleExitModelConfirm}
+      />
+
+      <ModalAddItem
+        open={openModelAddItems}
+        onClose={handleModelAddItems}
+        supNo={purchaseDetail.supplierCode}
+      ></ModalAddItem>
+
+      <ModelDeleteConfirm
+        open={openModelDeleteConfirm}
+        onClose={handleModelDeleteConfirm}
+        productName={productNameDel}
+        skuCode={skuCodeDel}
+        barCode={barCodeDel}
       />
 
       <LoadingModal open={openLoadingModal} />

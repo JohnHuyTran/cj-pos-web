@@ -13,6 +13,7 @@ export const SupplierItemsSlice = createSlice({
   initialState,
   reducers: {
     updateItemsState: (state, action: PayloadAction<any>) => {
+      console.log('state:', JSON.stringify(state), ' | action:', JSON.stringify(action));
       state.state = action.payload;
     },
     clearItemsState: () => {
