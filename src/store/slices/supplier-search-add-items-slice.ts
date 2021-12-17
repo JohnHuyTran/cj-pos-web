@@ -14,7 +14,7 @@ export const SupplierSearchAddItemsSlice = createSlice({
   initialState,
   reducers: {
     updateSearchItemsState: (state, action: PayloadAction<any>) => {
-      console.log('payload: ', JSON.stringify(action.payload));
+      // console.log('payload: ', JSON.stringify(action.payload));
       state.state = action.payload;
     },
     // deleteSearchItemsState: (state, action) => {

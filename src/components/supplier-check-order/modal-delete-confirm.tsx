@@ -26,6 +26,9 @@ export default function ModelConfirm({ open, onClose, productName, skuCode, barC
     setOpenLoadingModal(true);
     let items = payloadItem;
     // if (Object.keys(items).length !== 0) {
+    // let payload = items.filter((r: any) => r.barcode !== barCode);
+    // if (!payload) payload = items.filter((r: any) => r.barCode !== barCode);
+
     let payload = items.filter((r: any) => r.barcode !== barCode);
 
     console.log('payload :', JSON.stringify(payload));
