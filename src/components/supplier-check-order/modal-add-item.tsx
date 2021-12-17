@@ -5,12 +5,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
   Grid,
   IconButton,
-  List,
-  ListItem,
-  ListItemText,
   TextField,
   Typography,
 } from '@mui/material';
@@ -19,16 +15,12 @@ import React, { ReactElement, useEffect, useMemo } from 'react';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { ItemBySupplierCodeResponse, ItemInfo, ItemByBarcodeInfo } from '../../models/modal-add-item-model';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
-import { featchItemByBarcodeAsync } from '../../store/slices/search-item-by-barcode-slice';
-import { SupplierItem } from '../../mockdata/supplier-items';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { updateSearchItemsState } from '../../store/slices/supplier-search-add-items-slice';
-import ModelDeleteConfirm from './modal-delete-confirm';
 
 import { useStyles } from '../../styles/makeTheme';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { DeleteForever } from '@mui/icons-material';
+import { ConstructionOutlined, DeleteForever, PersonAddAlt1TwoTone } from '@mui/icons-material';
 import {
   DataGrid,
   GridCellParams,
@@ -39,6 +31,7 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid';
 import LoadingModal from '../commons/ui/loading-modal';
+import { isConstructorDeclaration } from 'typescript';
 
 interface StateItem {
   barcodeName: string;
@@ -69,33 +62,32 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    // flex: 1.8,
-    minWidth: 125,
+    flex: 1.2,
+    // minWidth: 125,
     headerAlign: 'center',
-    disableColumnMenu: true,
-    sortable: false,
-  },
-  {
-    field: 'unitName',
-    headerName: 'หน่วย',
-    flex: 1,
-    headerAlign: 'center',
+    // disableColumnMenu: true,
     sortable: false,
   },
   {
     field: 'barcodeName',
     headerName: 'รายละเอียด',
     headerAlign: 'center',
-    // flex: 2,
-    minWidth: 180,
-    disableColumnMenu: true,
+    flex: 1.7,
+    // minWidth: 180,
+    // disableColumnMenu: true,
     sortable: false,
   },
-
+  {
+    field: 'unitName',
+    headerName: 'หน่วย',
+    flex: 0.7,
+    headerAlign: 'center',
+    sortable: false,
+  },
   {
     field: 'actualQty',
     headerName: 'จำนวน',
-    flex: 1,
+    flex: 0.7,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -107,7 +99,7 @@ const columns: GridColDef[] = [
         value={params.value}
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value) : '';
-          //   if (value < 0) value = 1;
+          if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         autoComplete="off"
@@ -117,7 +109,8 @@ const columns: GridColDef[] = [
   {
     field: 'delete',
     headerName: 'ลบ',
-    width: 50,
+    flex: 0.5,
+    // width: 50,
     align: 'center',
     sortable: false,
     renderCell: () => {
@@ -159,10 +152,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
 
   const itemsList = useAppSelector((state) => state.searchItemListBySup.itemList);
 
-  //   useEffect(() => {
-  //     dispatch(featchItemBySupplierListAsync(supNo));
-  //   }, []);
-
   //search item
   const defaultSearchItemList = {
     options: itemsList.data,
@@ -184,23 +173,52 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     }
   };
 
-  const itemsListByBarcode = useAppSelector((state) => state.searchItemByBarcode.itemList);
-  const payloadSearchAddItems = useAppSelector((state) => state.supplierSearchAddItems.state);
-  const [itemListArray, setItemListArray] = React.useState<any[]>([]);
+  const handldCloseAddItemModal = () => {
+    onClose();
+    setNewAddItemListArray([]);
+    setValueItemList(null);
+  };
+
   const [barcodeNameDel, setBarcodeNameDel] = React.useState('');
   const [skuCodeDel, setSkuCodeDel] = React.useState('');
   const [barCodeDel, setBarCodeDel] = React.useState('');
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
 
-  const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemByBarcodeInfo[]>([]);
+  const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
 
   const onClickAddItem = async () => {
+    setValueItemList(null);
     let barcodeItem = valueItemList.barcode;
-    await dispatch(featchItemByBarcodeAsync(barcodeItem)).then((res) => {
-      const result: ItemByBarcodeInfo = res.payload;
-      setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, result]);
-    });
+    const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
+    const checkDupItem: any = newAddItemListArray.find((a: any) => a.barcode === barcodeItem);
+
+    if (checkDupItem) {
+      let arrayItemDup: any = [];
+      newAddItemListArray.forEach((data: any) => {
+        if (data.barcode === barcodeItem) {
+          const itemsDup: any = {
+            barcode: data.barcode,
+            barcodeName: data.barcodeName,
+            qty: data.qty + 1,
+            skuCode: data.skuCode,
+            unitCode: data.unitCode,
+            unitName: data.unitName,
+            unitPrice: data.unitPrice,
+          };
+
+          arrayItemDup.push(itemsDup);
+        } else {
+          arrayItemDup.push(data);
+        }
+      });
+
+      setNewAddItemListArray(arrayItemDup);
+    } else {
+      setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, itemSelect]);
+    }
   };
+
+  const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
 
   const handleAddItem = async () => {
     setOpenLoadingModal(true);
@@ -210,9 +228,29 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       itemsList.push(data);
     });
 
-    console.log('rowsEdit: ', JSON.stringify(itemsList));
+    let result: any = [];
+    if (payloadAddItem.length > 0) {
+      const sumAddItemList = [...itemsList, ...payloadAddItem];
 
-    await dispatch(updateItemsState(itemsList));
+      var o: any = {};
+      sumAddItemList.forEach((i: any) => {
+        var id = i.barcode;
+        if (!o[id]) {
+          return (o[id] = i);
+        }
+        return (o[id].actualQty = o[id].actualQty + i.actualQty);
+      });
+
+      var itemResult: any = [];
+      Object.keys(o).forEach((key) => {
+        itemResult.push(o[key]);
+      });
+      result = itemResult;
+    } else {
+      result = itemsList;
+    }
+
+    await dispatch(updateItemsState(result));
     setNewAddItemListArray([]);
     setValueItemList(null);
 
@@ -254,15 +292,16 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       barcodeName: item.barcodeName,
       actualQty: item.qty,
       skuCode: item.skuCode,
+      unitPrice: item.unitPrice,
     };
   });
 
   let checkHaveItems;
-  if (itemsList.code === 204001) {
+  if (itemsList.code === 204) {
     checkHaveItems = (
       <Grid item container xs={12} justifyContent="center">
         <Box color="#CBD4DB">
-          <h6>ไม่พบสินค้า</h6>
+          <h4>ไม่พบสินค้า</h4>
         </Box>
       </Grid>
     );
@@ -299,6 +338,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
                 value={valueItemList}
                 onChange={handleChangeItem}
                 filterOptions={filterOptions}
+                disabled={itemsList.code === 204}
                 renderOption={(props, option) => {
                   return (
                     <li {...props} key={option.barcode}>
@@ -331,16 +371,17 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
                 onClick={onClickAddItem}
                 sx={{ width: '100%', ml: 2 }}
                 className={classes.MbtnSearch}
+                disabled={!valueItemList}
               >
                 เพิ่ม
               </Button>
             </Box>
 
             <Box sx={{ flex: 1, ml: 2 }}>
-              {onClose ? (
+              {handldCloseAddItemModal ? (
                 <IconButton
                   aria-label="close"
-                  onClick={onClose}
+                  onClick={handldCloseAddItemModal}
                   sx={{
                     position: 'absolute',
                     right: 8,
@@ -364,6 +405,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
               onClick={handleAddItem}
               className={classes.MbtnSearch}
               size="large"
+              disabled={newAddItemListArray.length === 0}
               startIcon={<AddCircleOutlineIcon />}
             >
               เพิ่มสินค้า

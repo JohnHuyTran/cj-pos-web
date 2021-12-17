@@ -3,7 +3,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import { Button, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
-import { CheckCircleOutline, HighlightOff } from '@mui/icons-material';
+import { CheckCircleOutline, ControlPoint, DeleteForever, HighlightOff } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import Steppers from '../commons/ui/steppers';
 import SaveIcon from '@mui/icons-material/Save';
@@ -16,6 +16,7 @@ import {
   GridRowId,
   GridRowData,
   GridValueGetterParams,
+  GridCellParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { PurchaseDetailEntries, SavePurchaseRequest } from '../../models/supplier-check-order-model';
@@ -27,6 +28,10 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
+import ModalAddItem from './modal-add-item';
+import ModelDeleteConfirm from './modal-delete-confirm';
+import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
+import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
 
 interface Props {
   isOpen: boolean;
@@ -74,7 +79,7 @@ const columns: GridColDef[] = [
   {
     field: 'barCode',
     headerName: 'บาร์โค้ด',
-    minWidth: 200,
+    minWidth: 180,
     flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
@@ -106,7 +111,7 @@ const columns: GridColDef[] = [
   {
     field: 'qty',
     headerName: 'จำนวนที่สั่ง',
-    width: 110,
+    width: 100,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -154,10 +159,25 @@ const columns: GridColDef[] = [
   {
     field: 'sumPrice',
     headerName: 'รวม',
-    width: 120,
+    width: 110,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <div>
+        {params.getValue(params.id, 'piType') === 0 ||
+          (params.getValue(params.id, 'isDraftStatus') && <label>{params.value}</label>)}
+        {params.getValue(params.id, 'piType') === 1 && !params.getValue(params.id, 'isDraftStatus') && (
+          <div>
+            <label style={{ position: 'relative', right: '-1.5em' }}>{params.value}</label>
+            <DeleteForever
+              fontSize="small"
+              sx={{ color: '#F54949', position: 'relative', right: '-2em', top: '5px' }}
+            />
+          </div>
+        )}
+      </div>
+    ),
   },
 ];
 
@@ -192,6 +212,7 @@ function useApiRef() {
 }
 
 function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
+  const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(isOpen);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
 
@@ -200,27 +221,63 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) {
       exit = true;
     }
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    let i = 0;
-    const itemsList: any = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      if (data.actualQty !== rows[i].actualQty) {
-        exit = true;
-      }
-      i++;
 
-      itemsList.push(data);
-    });
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      let i = 0;
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        if (data.actualQty !== rows[i].actualQty) {
+          exit = true;
+        }
+        i++;
+
+        itemsList.push(data);
+      });
+
+      if (itemsList !== []) localStorage.setItem('SupplierRowsEdit', JSON.stringify(itemsList));
+    }
 
     if (!exit) {
       localStorage.removeItem('SupplierRowsEdit');
       setOpen(false);
       onClickClose();
     } else if (exit) {
-      if (itemsList !== []) {
-        localStorage.setItem('SupplierRowsEdit', JSON.stringify(itemsList));
-      }
       setConfirmModelExit(true);
+    }
+  };
+
+  const saveStateRows = () => {
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        itemsList.push(data);
+      });
+
+      if (itemsList.length > 0) localStorage.setItem('SupplierRowsEdit', JSON.stringify(itemsList));
+    }
+  };
+  const [chkSetState, setChkSetState] = React.useState(false);
+  const handleUpdateRowState = async () => {
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        const item: any = {
+          id: data.index,
+          barcode: data.barCode,
+          unitName: data.unitName,
+          productName: data.productName,
+          actualQty: data.actualQty,
+          skuCode: data.skuCode,
+          unitPrice: data.setPrice,
+        };
+
+        itemsList.push(item);
+      });
+      setChkSetState(true);
+      await dispatch(updateItemsState(itemsList));
     }
   };
 
@@ -237,80 +294,87 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   useEffect(() => {
     setOpen(isOpen);
+    setsSupplierCode(purchaseDetail.supplierCode);
     setBillNo(purchaseDetail.billNo);
     setPiNo(purchaseDetail.piNo);
     setPiType(purchaseDetail.piType);
     setPiStatus(purchaseDetail.piStatus);
     setComment(purchaseDetail.comment);
     setCharacterCount(purchaseDetail.comment.length);
+
+    if (purchaseDetail.piType === 1) dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
   }, [open]);
 
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
-
   const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
   const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
-
+  const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
+  const [supplierCode, setsSupplierCode] = React.useState('');
   const [billNo, setBillNo] = React.useState('');
   const [errorBillNo, setErrorBillNo] = React.useState(false);
   const [piNo, setPiNo] = React.useState('');
   const [piType, setPiType] = React.useState(0);
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
-  // const [totalAmount, setTotalAmount] = React.useState("");
-  // const [vat, setVat] = React.useState("");
-  // const [discount, setDiscount] = React.useState("");
-  // const [afterDiscountCharge, setAfterDiscountCharge] = React.useState("");
-  // const [summary, setSummary] = React.useState(false);
 
-  // if (purchaseDetailItems !== [] && summary === false) {
-  //   let sumPrice = 0;
-  //   let vat = 0;
-  //   let discount = 0;
-  //   let afterDiscountCharge = 0;
-  //   purchaseDetailItems.forEach((data: PurchaseDetailEntries) => {
-  //     sumPrice = sumPrice + data.sumPrice;
-  //     // vat = vat + data.salePrice;
-  //     discount = discount + data.salePrice;
-  //   });
+  let rows: any = [];
+  if (!chkSetState) {
+    rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
+      return {
+        id: `${item.barcode}-${index + 1}`,
+        index: index + 1,
+        seqItem: item.seqItem,
+        produtStatus: item.produtStatus,
+        isDraftStatus: piStatus === 0 ? false : true,
+        isControlStock: item.isControlStock,
+        isAllowDiscount: item.isAllowDiscount,
+        skuCode: item.skuCode,
+        barCode: item.barcode,
+        productName: item.productName,
+        unitCode: item.unitCode,
+        unitName: item.unitName,
+        qty: item.qty,
+        qtyAll: item.qtyAll,
+        controlPrice: item.controlPrice,
+        salePrice: item.salePrice,
+        setPrice: item.setPrice,
+        sumPrice: item.sumPrice,
+        actualQty: item.actualQty,
+        actualQtyAll: item.actualQtyAll,
+        piType: piType,
+      };
+    });
+  }
 
-  //   setTotalAmount((Math.round(sumPrice * 100) / 100).toFixed(2));
-  //   setVat("0");
-  //   setDiscount((Math.round(discount * 100) / 100).toFixed(2));
-  //   afterDiscountCharge = sumPrice + vat - discount;
-  //   setAfterDiscountCharge(
-  //     (Math.round(afterDiscountCharge * 100) / 100).toFixed(2)
-  //   );
-
-  //   setSummary(true);
-  // }
-
-  let rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
-    return {
-      id: `${item.barcode}-${index + 1}`,
-      index: index + 1,
-      seqItem: item.seqItem,
-      produtStatus: item.produtStatus,
-      isDraftStatus: piStatus === 0 ? false : true,
-      isControlStock: item.isControlStock,
-      isAllowDiscount: item.isAllowDiscount,
-      skuCode: item.skuCode,
-      barCode: item.barcode,
-      productName: item.productName,
-      unitCode: item.unitCode,
-      unitName: item.unitName,
-      qty: item.qty,
-      qtyAll: item.qtyAll,
-      controlPrice: item.controlPrice,
-      salePrice: item.salePrice,
-      setPrice: item.setPrice,
-      sumPrice: item.sumPrice,
-      actualQty: item.actualQty,
-      actualQtyAll: item.actualQtyAll,
-    };
-  });
   if (localStorage.getItem('SupplierRowsEdit')) {
     let localStorageEdit = JSON.parse(localStorage.getItem('SupplierRowsEdit') || '');
     rows = localStorageEdit;
+  }
+
+  if (piType === 1 && Object.keys(payloadAddItem).length !== 0) {
+    rows = payloadAddItem.map((item: any, index: number) => {
+      let barcode = item.barCode ? item.barCode : item.barcode;
+      return {
+        id: `${barcode}-${index + 1}`,
+        index: index + 1,
+        seqItem: item.seqItem,
+        isControlStock: item.isControlStock,
+        isAllowDiscount: item.isAllowDiscount,
+        skuCode: item.skuCode,
+        barCode: barcode,
+        productName: item.productName ? item.productName : item.barcodeName,
+        unitCode: item.unitCode,
+        unitName: item.unitName,
+        qty: item.qty ? item.qty : 0,
+        qtyAll: item.qtyAll,
+        controlPrice: item.controlPrice,
+        salePrice: item.salePrice,
+        setPrice: item.unitPrice ? item.unitPrice : 0,
+        sumPrice: item.sumPrice ? item.sumPrice : 0,
+        actualQty: item.actualQty ? item.actualQty : 0,
+        piType: piType,
+      };
+    });
   }
 
   const classes = useStyles();
@@ -319,6 +383,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   // const [errorCommentDC, setErrorCommentDC] = React.useState(false);
   const maxCommentLength = 255;
   const handleChangeComment = (event: any) => {
+    saveStateRows();
     const value = event.target.value;
     const length = event.target.value.length;
     if (length <= maxCommentLength) {
@@ -327,9 +392,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const handleChangeBillNo = (event: any) => {
+    if (piType === 1) handleUpdateRowState();
+    else saveStateRows();
+
+    const value = event.target.value;
+    setBillNo(value);
+    setErrorBillNo(false);
+  };
+
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const { apiRef, columns } = useApiRef();
-  const dispatch = useAppDispatch();
   const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
@@ -346,20 +419,26 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handlConfirmButton = async () => {
+    if (piType === 1) handleUpdateRowState();
+    else saveStateRows();
+
     if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      const itemsList: any = [];
-      await rows.forEach((data: GridRowData) => {
-        const item: any = {
-          barcode: data.barCode,
-          actualQty: data.actualQty,
-        };
-        itemsList.push(item);
-      });
-      await setItems(itemsList);
+
+      if (rows.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        const itemsList: any = [];
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barCode,
+            actualQty: data.actualQty,
+          };
+          itemsList.push(item);
+        });
+        await setItems(itemsList);
+      }
       setOpenModelConfirm(true);
     }
   };
@@ -384,21 +463,29 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleSaveButton = async () => {
+    if (piType === 1) handleUpdateRowState();
+    else saveStateRows();
     if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
       setOpenLoadingModal(true);
 
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       const itemsList: any = [];
-      await rows.forEach((data: GridRowData) => {
-        const item: any = {
-          barcode: data.barCode,
-          actualQty: data.actualQty,
-        };
-        itemsList.push(item);
-      });
+      const itemsState: any = [];
+      if (rows.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barCode,
+            actualQty: data.actualQty,
+          };
+          itemsList.push(item);
+          itemsState.push(data);
+        });
+
+        // if (piType === 1) handleUpdateRowState(itemsState);
+      }
 
       const payloadSave: SavePurchaseRequest = {
         billNo: billNo,
@@ -424,6 +511,37 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const handleAddItems = () => {
+    setOpenModelAddItems(true);
+  };
+
+  const handleModelAddItems = () => {
+    setOpenModelAddItems(false);
+  };
+
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+  const [productNameDel, setProductNameDel] = React.useState('');
+  const [skuCodeDel, setSkuCodeDel] = React.useState('');
+  const [barCodeDel, setBarCodeDel] = React.useState('');
+  const currentlySelected = async (params: GridCellParams) => {
+    const value = params.colDef.field;
+    const isRefPO = params.getValue(params.id, 'isRefPO');
+    //deleteItem
+    handleUpdateRowState();
+
+    if (!isRefPO && value === 'sumPrice') {
+      setProductNameDel(String(params.getValue(params.id, 'productName')));
+      setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
+      setBarCodeDel(String(params.getValue(params.id, 'barCode')));
+      setOpenModelDeleteConfirm(true);
+    }
+  };
+
+  const handleModelDeleteConfirm = () => {
+    setOpenModelDeleteConfirm(false);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -439,7 +557,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">เลขที่ใบสั่งซื้อ PO :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{purchaseDetail.docNo}</Typography>
+                {piType !== 1 && <Typography variant="body2">{purchaseDetail.docNo}</Typography>}
+                {piType === 1 && <Typography variant="body2">-</Typography>}
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่บิลผู้จำหน่าย :</Typography>
@@ -451,7 +570,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   size="small"
                   value={billNo}
                   placeholder="กรุณากรอก เลขที่บิลผู้จำหน่าย"
-                  onChange={(event) => setBillNo(event.target.value)}
+                  onChange={handleChangeBillNo}
                   className={classes.MtextFieldDetail}
                   disabled={piStatus !== 0}
                   error={errorBillNo === true}
@@ -476,7 +595,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   variant="contained"
                   component="span"
                   className={classes.MbtnBrowse}
-                  // style={{ marginLeft: 10, textTransform: "none" }}
                   disabled
                 >
                   แนบไฟล์
@@ -508,35 +626,58 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               <Grid item lg={6}></Grid>
             </Grid>
           </Box>
-          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
-            {piStatus !== 1 && (
-              <Button
-                id="btnSave"
-                variant="contained"
-                color="warning"
-                className={classes.MbtnSave}
-                onClick={handleSaveButton}
-                startIcon={<SaveIcon />}
-                sx={{ width: 200 }}
-              >
-                บันทึก
-              </Button>
-            )}
 
-            {piStatus !== 1 && (
-              <Button
-                id="btnApprove"
-                variant="contained"
-                color="primary"
-                className={classes.MbtnApprove}
-                onClick={handlConfirmButton}
-                startIcon={<CheckCircleOutline />}
-                sx={{ width: 200 }}
-              >
-                ยืนยัน
-              </Button>
-            )}
-          </Grid>
+          <Box mt={4} mb={2}>
+            <Grid container spacing={2} display="flex" justifyContent="space-between">
+              <Grid item xl={2}>
+                {piType == 1 && piStatus !== 1 && (
+                  <Button
+                    id="btnAddItem"
+                    variant="contained"
+                    color="info"
+                    className={classes.MbtnPrint}
+                    onClick={handleAddItems}
+                    startIcon={<ControlPoint />}
+                    sx={{ width: 200 }}
+                  >
+                    เพิ่มสินค้า
+                  </Button>
+                )}
+              </Grid>
+
+              <Grid item xl={10} sx={{ textAlign: 'end' }}>
+                {piStatus !== 1 && (
+                  <Button
+                    id="btnSave"
+                    variant="contained"
+                    color="warning"
+                    className={classes.MbtnSave}
+                    onClick={handleSaveButton}
+                    startIcon={<SaveIcon />}
+                    sx={{ width: 200 }}
+                    disabled={rows.length == 0}
+                  >
+                    บันทึก
+                  </Button>
+                )}
+                {piStatus !== 1 && (
+                  <Button
+                    id="btnApprove"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnApprove}
+                    onClick={handlConfirmButton}
+                    startIcon={<CheckCircleOutline />}
+                    sx={{ width: 200 }}
+                    disabled={rows.length == 0}
+                  >
+                    ยืนยัน
+                  </Button>
+                )}
+              </Grid>
+            </Grid>
+          </Box>
+
           <Box mt={2} bgcolor="background.paper">
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
@@ -553,6 +694,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 autoHeight={rows.length >= 8 ? false : true}
                 scrollbarSize={10}
                 rowHeight={65}
+                onCellClick={currentlySelected}
               />
             </div>
           </Box>
@@ -569,10 +711,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   placeholder="ความยาวไม่เกิน 255 ตัวอักษร"
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
-                  // error={errorCommentDC === true}
-                  // helperText={
-                  //   errorCommentDC === true ? "กรุณากรอก หมายเหตุ" : " "
-                  // }
                   sx={{ maxWidth: 350 }}
                   disabled={piStatus !== 0}
                 />
@@ -584,7 +722,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     width: '100%',
                     maxWidth: 350,
                     textAlign: 'right',
-                    // marginTop: "-1.5em",
                   }}
                 >
                   {characterCount}/{maxCommentLength}
@@ -636,28 +773,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Grid>
                 </Grid>
 
-                {/* <Grid container spacing={2} justifyContent='flex-end' mb={1}>
-                  <Grid item lg={5}></Grid>
-                  <Grid item lg={3} alignItems="flex-end">
-                    <Typography variant="body2" pt={1}>
-                      ลด/ชาร์จ
-                    </Typography>
-                  </Grid>
-                  <Grid item lg={4}>
-                    <TextField
-                      id="txtParamQuery"
-                      name="paramQuery"
-                      size="small"
-                      // value={discount}
-                      value="0"
-                      className={classes.MtextFieldNumber}
-                      fullWidth
-                      disabled
-                      sx={{ background: '#EAEBEB' }}
-                    />
-                  </Grid>
-                </Grid> */}
-
                 <Grid container spacing={2} justifyContent="flex-end" mb={1}>
                   <Grid item lg={5}></Grid>
                   <Grid item lg={3} alignItems="flex-end">
@@ -698,7 +813,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         piNo={piNo}
         docNo={purchaseDetail.docNo}
         billNo={billNo}
-        supplierId={purchaseDetail.supplierCode}
+        supplierId={supplierCode}
         comment={comment}
         piType={piType}
         items={items}
@@ -709,6 +824,16 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         open={confirmModelExit}
         onClose={handleNotExitModelConfirm}
         onConfirm={handleExitModelConfirm}
+      />
+
+      <ModalAddItem open={openModelAddItems} onClose={handleModelAddItems} supNo={supplierCode}></ModalAddItem>
+
+      <ModelDeleteConfirm
+        open={openModelDeleteConfirm}
+        onClose={handleModelDeleteConfirm}
+        productName={productNameDel}
+        skuCode={skuCodeDel}
+        barCode={barCodeDel}
       />
 
       <LoadingModal open={openLoadingModal} />

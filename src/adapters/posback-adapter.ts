@@ -48,7 +48,11 @@ export function get(path: string, contentType = defaultForJSON) {
   return instance(contentType)
     .get(path)
     .then((result: any) => {
-      return result.data;
+      if (result.status == 200) {
+        return result.data;
+      } else if (result.status == 204) {
+        return result.status;
+      }
     })
     .catch((error: any) => {
       const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);

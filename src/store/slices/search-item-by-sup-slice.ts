@@ -26,6 +26,17 @@ export const featchItemBySupplierListAsync = createAsyncThunk('ItemList', async 
 
     let response = await get(path).then();
 
+    if (response === 204) {
+      let responseCode: any = {
+        ref: '',
+        code: response,
+        message: '',
+        data: [],
+      };
+
+      return responseCode;
+    }
+
     return response;
     // return SupplierItem;
   } catch (error) {
