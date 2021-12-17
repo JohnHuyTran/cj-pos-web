@@ -62,7 +62,7 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    flex: 1,
+    flex: 1.2,
     // minWidth: 125,
     headerAlign: 'center',
     // disableColumnMenu: true,
@@ -72,7 +72,7 @@ const columns: GridColDef[] = [
     field: 'barcodeName',
     headerName: 'รายละเอียด',
     headerAlign: 'center',
-    flex: 1,
+    flex: 1.7,
     // minWidth: 180,
     // disableColumnMenu: true,
     sortable: false,
@@ -80,14 +80,14 @@ const columns: GridColDef[] = [
   {
     field: 'unitName',
     headerName: 'หน่วย',
-    flex: 1,
+    flex: 0.7,
     headerAlign: 'center',
     sortable: false,
   },
   {
     field: 'actualQty',
     headerName: 'จำนวน',
-    flex: 1,
+    flex: 0.7,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -109,7 +109,7 @@ const columns: GridColDef[] = [
   {
     field: 'delete',
     headerName: 'ลบ',
-    flex: 1,
+    flex: 0.5,
     // width: 50,
     align: 'center',
     sortable: false,
@@ -179,8 +179,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     setValueItemList(null);
   };
 
-  const payloadSearchAddItems = useAppSelector((state) => state.supplierSearchAddItems.state);
-  const [itemListArray, setItemListArray] = React.useState<any[]>([]);
   const [barcodeNameDel, setBarcodeNameDel] = React.useState('');
   const [skuCodeDel, setSkuCodeDel] = React.useState('');
   const [barCodeDel, setBarCodeDel] = React.useState('');
@@ -194,7 +192,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
     const checkDupItem: any = newAddItemListArray.find((a: any) => a.barcode === barcodeItem);
 
-    // console.log('newAddItemListArray: ', newAddItemListArray);
     if (checkDupItem) {
       let arrayItemDup: any = [];
       newAddItemListArray.forEach((data: any) => {
