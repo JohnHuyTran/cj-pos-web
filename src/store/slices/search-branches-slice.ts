@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { BranchResponse } from "../../models/search-branch-model";
-import { environment } from "../../environment-base";
-import { get } from "../../adapters/posback-adapter";
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { BranchResponse } from '../../models/search-branch-model';
+import { environment } from '../../environment-base';
+import { get } from '../../adapters/posback-adapter';
 
 type State = {
   branchList: BranchResponse;
@@ -10,43 +10,37 @@ type State = {
 
 const initialState: State = {
   branchList: {
-    ref: "",
+    ref: '',
     code: 0,
-    message: "",
+    message: '',
     data: [],
   },
-  error: "",
+  error: '',
 };
 
-export const featchBranchListAsync = createAsyncThunk(
-  "BranchList",
-  async () => {
-    try {
-      const path = environment.orders.dcCheckOrder.searchBranch.url;
+export const featchBranchListAsync = createAsyncThunk('BranchList', async () => {
+  try {
+    const path = environment.orders.dcCheckOrder.searchBranch.url;
 
-      let response = await get(path).then();
+    let response = await get(path).then();
 
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    return response;
+  } catch (error) {
+    throw error;
   }
-);
+});
 
 const searchBranchSlice = createSlice({
-  name: "searchBranch",
+  name: 'searchBranch',
   initialState,
   reducers: {},
   extraReducers: (builer) => {
     builer.addCase(featchBranchListAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(
-        featchBranchListAsync.fulfilled,
-        (state, action: PayloadAction<any>) => {
-          state.branchList = action.payload;
-        }
-      ),
+      builer.addCase(featchBranchListAsync.fulfilled, (state, action: PayloadAction<any>) => {
+        state.branchList = action.payload;
+      }),
       builer.addCase(featchBranchListAsync.rejected, () => {
         initialState;
       });
