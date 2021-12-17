@@ -36,6 +36,7 @@ export default function SupplierOrderList() {
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const [openDetail, setOpenDetail] = React.useState(false);
+  const [openReturn, setOpenReturn] = React.useState(false);
   const [supplierId, setSupplierId] = React.useState('');
 
   const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -135,15 +136,6 @@ export default function SupplierOrderList() {
                 size="small"
                 className={classes.MbtnSearch}
                 sx={{ minWidth: 90 }}
-                // sx={{
-                //   color: theme.palette.error.main,
-                //   backgroundColor: theme.palette.background.default,
-                //   border: `1px solid ${theme.palette.error.main}`,
-                //   borderRadius: '5px',
-                //   '&:hover': {
-                //     backgroundColor: alpha(theme.palette.error.main, 0.25),
-                //   },
-                // }}
               >
                 คืนสินค้า
               </Button>
@@ -259,10 +251,7 @@ export default function SupplierOrderList() {
 
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
   const currentlySelected = async (params: GridCellParams) => {
-    const value = params.colDef.field;
-    if (value === 'pnNo') {
-      return;
-    }
+    const chkPN = params.colDef.field;
 
     handleOpenLoading('open', true);
     try {
@@ -271,7 +260,11 @@ export default function SupplierOrderList() {
       if (purchaseDetailList.data === []) {
         console.log('Purchase Detail No data');
       } else {
-        setOpenDetail(true);
+        if (chkPN === 'pnNo') {
+          setOpenReturn(true);
+        } else {
+          setOpenDetail(true);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -281,6 +274,7 @@ export default function SupplierOrderList() {
 
   function isClosModal() {
     setOpenDetail(false);
+    setOpenReturn(false);
   }
 
   return (
@@ -309,6 +303,7 @@ export default function SupplierOrderList() {
       </Box>
 
       {openDetail && <SupplierOrderDetail isOpen={openDetail} onClickClose={isClosModal} />}
+      {/* {openReturn && <SupplierReturn isOpen={openReturn} onClickClose={isClosModal} />} */}
 
       <LoadingModal open={openLoadingModal.open} />
     </div>
