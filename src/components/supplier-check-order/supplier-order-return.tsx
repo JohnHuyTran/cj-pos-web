@@ -26,7 +26,7 @@ import { ErrorOutline } from '@mui/icons-material';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
-import { draftPurchaseCreditNote } from '../../services/purchase';
+import { approvePurchaseCreditNote, draftPurchaseCreditNote } from '../../services/purchase';
 import { ItemsType, PurchaseCreditNoteType } from '../../models/purchase-credit-note';
 import { ApiError } from '../../models/api-error-model';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
@@ -479,7 +479,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       pnNo: purchaseDetail.pnNo,
       items: items,
     };
-    await draftPurchaseCreditNote(payload)
+    await approvePurchaseCreditNote(payload)
       .then((_value) => {
         handleOnCloseModalConfirm();
         setShowSnackBar(true);
@@ -641,7 +641,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
               />
             </div>
           </Box>
-          <Box>
+          <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
                 <Typography variant='body2'>หมายเหตุ:</Typography>
