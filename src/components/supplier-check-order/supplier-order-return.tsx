@@ -31,6 +31,7 @@ import { ItemsType, PurchaseCreditNoteType } from '../../models/purchase-credit-
 import { ApiError } from '../../models/api-error-model';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import ModalConfirmOrderReturn from './modal-confirm-order-return';
+import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -145,6 +146,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
+  const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
 
   const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
   const [purchaseDetailItems, setPurchaseDetailItems] = React.useState<PurchaseDetailEntries[]>(
@@ -220,15 +222,44 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       };
     });
 
-  const handleClose = () => {
-    onClickClose();
+  const handleClose = async () => {
+    await storeItem();
+    let isExit = true;
+    // onClickClose();
+    if (comment !== purchaseDetail.pnComment) {
+      isExit = false;
+    }
+    const rowSelect = apiRef.current.getSelectedRows();
+    if (rowSelect.size > 0) {
+      isExit = false;
+    }
+    const ent: PurchaseDetailEntries[] = purchaseDetail.entries;
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    if (rowsEdit.size !== ent.length) {
+      isExit = false;
+    }
+
+    let i = 0;
+    rowsEdit.forEach((data: GridRowData) => {
+      if (data.returnQty !== (ent[i].returnQty ? ent[i].returnQty : 0)) {
+        isExit = false;
+      }
+      i++;
+    });
+
+    if (!isExit) {
+      setConfirmModelExit(true);
+    } else {
+      setOpen(false);
+      onClickClose();
+    }
   };
 
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
 
-  const storeItem = () => {
+  const storeItem_ = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
@@ -273,8 +304,57 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     }
   };
 
+  const validateItem = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    let itemNotValid: boolean = false;
+    rowsEdit.forEach((data: GridRowData) => {
+      if (data.returnQty > data.qty || data.returnQty <= 0) {
+        itemNotValid = true;
+        return;
+      }
+    });
+    if (itemNotValid) {
+      setOpenAlert(true);
+      setTextError('จำนวนที่คืนต้องมากกว่า 0 หรือ น้อยกว่า จำนวนที่รับ');
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const storeItem = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const items: PurchaseDetailEntries[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const newData: PurchaseDetailEntries = {
+        seqItem: data.seqItem,
+        produtStatus: data.produtStatus,
+        isDraftStatus: pnStatus === 0 ? false : true,
+        isControlStock: data.isControlStock,
+        isAllowDiscount: data.isAllowDiscount,
+        skuCode: data.skuCode,
+        barcode: data.barcode,
+        productName: data.productName,
+        unitCode: data.unitCode,
+        unitName: data.unitName,
+        qty: data.qty,
+        qtyAll: data.qtyAll,
+        controlPrice: data.controlPrice,
+        salePrice: data.salePrice,
+        setPrice: data.setPrice,
+        sumPrice: data.sumPrice,
+        actualQty: data.actualQty,
+        returnQty: data.returnQty,
+        actualQtyAll: data.actualQtyAll,
+      };
+      items.push(newData);
+    });
+    setPurchaseDetailItems(items);
+  };
+
   const handleSaveBtn = async () => {
-    const rs = storeItem();
+    await storeItem();
+    const rs = validateItem();
     // call api
     if (rs) {
       setOpenLoadingModal(true);
@@ -298,7 +378,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchSupplierOrderDetailAsync(purchaseDetail.pnNo));
-          // dispatch(featchOrderListSupAsync(payloadSearch));
+          dispatch(featchOrderListSupAsync(payloadSearch));
 
           // localStorage.removeItem('SupplierRowsEdit');
         })
@@ -376,8 +456,9 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setOpenModelConfirm(false);
   };
 
-  const handleConfirmBtn = () => {
-    const rs = storeItem();
+  const handleConfirmBtn = async () => {
+    await storeItem();
+    const rs = validateItem();
     if (rs) {
       setOpenModelConfirm(true);
     }
@@ -400,18 +481,24 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     };
     await draftPurchaseCreditNote(payload)
       .then((_value) => {
+        handleOnCloseModalConfirm();
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
-        dispatch(featchSupplierOrderDetailAsync(purchaseDetail.pnNo));
-        // dispatch(featchOrderListSupAsync(payloadSearch));
-
-        // localStorage.removeItem('SupplierRowsEdit');
+        dispatch(featchOrderListSupAsync(payloadSearch));
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
       })
       .catch((error: ApiError) => {
+        handleOnCloseModalConfirm();
         setShowSnackBar(true);
         setContentMsg(error.message);
       });
+    // setOpen(false);
+    // onClickClose();
+    // handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
   };
 
