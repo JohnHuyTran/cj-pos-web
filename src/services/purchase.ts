@@ -67,9 +67,10 @@ export async function draftPurchaseCreditNote(payload: PurchaseCreditNoteType) {
   return response;
 }
 
-export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType) {
+export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType, fileList: any) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
+  bodyFormData.append('file', fileList);
   const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
     .catch((error: ApiError) => {
