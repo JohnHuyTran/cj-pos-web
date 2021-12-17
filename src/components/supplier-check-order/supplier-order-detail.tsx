@@ -302,7 +302,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setComment(purchaseDetail.comment);
     setCharacterCount(purchaseDetail.comment.length);
 
-    if (piType === 1) dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
+    if (purchaseDetail.piType === 1) dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
   }, [open]);
 
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
@@ -557,7 +557,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">เลขที่ใบสั่งซื้อ PO :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{purchaseDetail.docNo}</Typography>
+                {piType !== 1 && <Typography variant="body2">{purchaseDetail.docNo}</Typography>}
+                {piType === 1 && <Typography variant="body2">-</Typography>}
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่บิลผู้จำหน่าย :</Typography>
