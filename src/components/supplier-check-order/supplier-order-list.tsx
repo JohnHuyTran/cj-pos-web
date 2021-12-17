@@ -16,7 +16,6 @@ import { convertUtcToBkkDate } from '../../utils/date-utill';
 import SupplierOrderDetail from './supplier-order-detail';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
-import SupplierOrderReturn from './supplier-order-return';
 
 interface loadingModalState {
   open: boolean;
@@ -254,9 +253,7 @@ export default function SupplierOrderList() {
         </div>
       </Box>
 
-      {openDetail && <SupplierOrderReturn isOpen={openDetail} onClickClose={isClosModal} />}
-
-      {/* {openDetail && <SupplierOrderDetail isOpen={openDetail} onClickClose={isClosModal} />} */}
+      {openDetail && <SupplierOrderDetail isOpen={openDetail} onClickClose={isClosModal} />}
 
       <LoadingModal open={openLoadingModal.open} />
     </div>
