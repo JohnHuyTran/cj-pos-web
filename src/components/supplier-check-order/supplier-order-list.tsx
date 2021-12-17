@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import SupplierOrderDetail from './supplier-order-detail';
+import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 
@@ -212,11 +213,11 @@ export default function SupplierOrderList() {
     handleOpenLoading('open', true);
     try {
       await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
-
-      if (purchaseDetailList.data === []) {
-        console.log('Purchase Detail No data');
-      } else {
+      if (purchaseDetailList.data.length > 0 || purchaseDetailList.data) {
         setOpenDetail(true);
+      } else {
+        console.log('Purchase Detail No data');
+        await dispatch(updateItemsState({}));
       }
     } catch (error) {
       console.log(error);

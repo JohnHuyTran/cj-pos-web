@@ -132,7 +132,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
 
   const onInputChange = async (event: any, value: string, reason: string) => {
     if (event && event.keyCode && event.keyCode === 13) {
-      console.log({ reason, value });
+      // console.log({ reason, value });
       return false;
     }
 
@@ -179,7 +179,8 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
     setOpenPIDetail(true);
     clearData();
     handleCloseModal();
-    await dispatch(updateItemsState({}));
+    if (poSelection) await dispatch(updateItemsState(poSelection.items));
+    else await dispatch(updateItemsState({}));
     setOpenLoadingModal(false);
   };
 

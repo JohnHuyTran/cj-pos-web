@@ -194,7 +194,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
     const checkDupItem: any = newAddItemListArray.find((a: any) => a.barcode === barcodeItem);
 
-    console.log('newAddItemListArray: ', newAddItemListArray);
+    // console.log('newAddItemListArray: ', newAddItemListArray);
     if (checkDupItem) {
       let arrayItemDup: any = [];
       newAddItemListArray.forEach((data: any) => {
