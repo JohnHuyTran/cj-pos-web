@@ -40,6 +40,8 @@ export interface PurchaseInfo {
   piType: number;
   piNo: string;
   comment: string;
+  pnNo?: string;
+  pnState?: number;
 }
 
 export interface PurchaseDetailResponse {

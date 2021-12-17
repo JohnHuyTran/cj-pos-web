@@ -122,14 +122,7 @@ export default function SupplierOrderList() {
       renderCell: (params) => {
         if (params.getValue(params.id, 'piStatus') === 1) {
           if (params.value === 0) {
-            //demo check PN Status 'บันทึก,อนุมัติ'
-            return (
-              <Typography color="secondary" variant="body2" sx={{ textDecoration: 'underline' }}>
-                PN{params.getValue(params.id, 'docNo') || ''}
-              </Typography>
-            );
-          } else if (params.value === 1) {
-            //demo check PN Status to create PN
+            //check Create PN
             return (
               <Button
                 variant="contained"
@@ -140,6 +133,13 @@ export default function SupplierOrderList() {
               >
                 คืนสินค้า
               </Button>
+            );
+          } else {
+            //PN Number 'บันทึก pnState=1, อนุมัติpnState=2'
+            return (
+              <Typography color="secondary" variant="body2" sx={{ textDecoration: 'underline' }}>
+                {params.getValue(params.id, 'pnNo') || ''}
+              </Typography>
             );
           }
         } else {
@@ -191,7 +191,7 @@ export default function SupplierOrderList() {
       supplierCode: data.supplierCode,
       piNo: data.piNo,
       docNo: data.docNo,
-      pnNo: data.piType,
+      pnNo: data.pnState,
       piStatus: data.piStatus,
       comment: data.comment,
     };
@@ -304,7 +304,7 @@ export default function SupplierOrderList() {
       </Box>
 
       {openDetail && <SupplierOrderDetail isOpen={openDetail} onClickClose={isClosModal} />}
-      {/* {openReturn && <SupplierReturn isOpen={openReturn} onClickClose={isClosModal} />} */}
+      {openReturn && <SupplierOrderReturn isOpen={openReturn} onClickClose={isClosModal} />}
 
       <LoadingModal open={openLoadingModal.open} />
     </div>
