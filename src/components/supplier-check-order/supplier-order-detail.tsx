@@ -32,6 +32,7 @@ import ModalAddItem from './modal-add-item';
 import ModelDeleteConfirm from './modal-delete-confirm';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
+import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 
 interface Props {
   isOpen: boolean;
@@ -623,7 +624,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
-              <Grid item lg={6}></Grid>
+              <Grid item lg={2}></Grid>
+              <Grid item lg={4}>
+                <AccordionUploadFile />
+              </Grid>
             </Grid>
           </Box>
 
