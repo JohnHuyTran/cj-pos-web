@@ -17,12 +17,13 @@ import {
   GridRowData,
   GridValueGetterParams,
   GridCellParams,
+  GridEditCellValueParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { SavePurchasePIRequest } from '../../models/supplier-check-order-model';
+import { CalculatePurchasePIRequest, SavePurchasePIRequest } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
-import { saveSupplierPI } from '../../services/purchase';
+import { calculateSupplierPI, saveSupplierPI } from '../../services/purchase';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
@@ -294,8 +295,27 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const [flagCalculate, setFlagCalculate] = React.useState(false);
+  const setItemCal = async () => {
+    if (rows.length > 0) {
+      const itemsList: any = [];
+      await rows.forEach((data: GridRowData) => {
+        const item: any = {
+          barcode: data.barcode,
+          actualQty: data.actualQty,
+        };
+        itemsList.push(item);
+      });
+      if (itemsList.length > 0) calculateItems(itemsList);
+    }
+  };
+
   if (payloadAddItem) {
     handleAddRow(payloadAddItem);
+    if (!flagCalculate) {
+      setItemCal();
+      setFlagCalculate(true);
+    }
   }
 
   const [billNo, setBillNo] = React.useState('');
@@ -307,6 +327,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [supplierTaxNo, setSupplierTaxNo] = React.useState('');
   const [piType, setPiType] = React.useState(1);
   const [piStatus, setPiStatus] = React.useState(0);
+
+  const [totalAmount, setTotalAmount] = React.useState(0);
+  const [vat, setVat] = React.useState(0);
+  const [grandTotalAmount, setGrandTotalAmount] = React.useState(0);
+
   const [comment, setComment] = React.useState('');
   const [commentOrigin, setCommentOrigin] = React.useState('');
   const [docNo, setDocNo] = React.useState('');
@@ -397,7 +422,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setPiNo(value.piNo);
           setBillNoOrigin(billNo);
           setCommentOrigin(comment);
-
           setOpenModelConfirm(true);
         })
         .catch((error: ApiError) => {
@@ -426,6 +450,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleModelDeleteConfirm = () => {
+    setFlagCalculate(false);
     setOpenModelDeleteConfirm(false);
   };
 
@@ -433,8 +458,72 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelAddItems(true);
   };
 
-  const handleModelAddItems = () => {
+  const handleModelAddItems = async () => {
+    setFlagCalculate(false);
     setOpenModelAddItems(false);
+  };
+
+  const handleCalculateItems = async (params: GridEditCellValueParams) => {
+    saveStateRows();
+    if (params.field === 'actualQty') {
+      const itemsList: any = [];
+      if (rows.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barcode,
+            actualQty: data.actualQty,
+          };
+          itemsList.push(item);
+        });
+      }
+
+      calculateItems(itemsList);
+      // setOpenLoadingModal(false);
+    }
+  };
+
+  const calculateItems = async (items: any) => {
+    const payloadCalculate: CalculatePurchasePIRequest = {
+      piNo: piNo,
+      billNo: billNo,
+      SupplierCode: supplierCode,
+      items: items,
+    };
+
+    await calculateSupplierPI(payloadCalculate)
+      .then((value) => {
+        setTotalAmount(value.data.totalAmount);
+        setVat(value.data.vat);
+        setGrandTotalAmount(value.data.grandTotalAmount);
+        console.log(value.data.totalAmount, ' / ', value.data.vat, ' / ', value.data.grandTotalAmount);
+
+        let calItem = value.data.items;
+        const items: any = [];
+        rows.forEach((data: GridRowData) => {
+          const calculate = calItem.filter((r: any) => r.barcode === data.barcode);
+          // const sumPrice = (Math.round(Number(calculate[0].sumPrice) * 100) / 100).toFixed(2);
+          const sumPrice = calculate[0].sumPrice;
+          console.log('sumPrice:', JSON.stringify(sumPrice));
+
+          const item: any = {
+            id: data.index,
+            barcode: data.barcode,
+            unitName: data.unitName,
+            productName: data.productName,
+            qty: data.qty,
+            actualQty: data.actualQty,
+            skuCode: data.skuCode,
+            unitPrice: data.setPrice,
+            sumPrice: sumPrice,
+          };
+          items.push(item);
+        });
+        updateStateRows(items);
+      })
+      .catch((error: ApiError) => {
+        console.log('calculateSupplierPI error:', error);
+      });
   };
 
   const handleConfirmStatus = async (issuccess: boolean, errorMsg: string) => {
@@ -654,6 +743,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
+                // onCellBlur={handleCalculateItems}
+                onCellFocusOut={handleCalculateItems}
               />
             </div>
           </Box>
@@ -703,8 +794,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      // value={totalAmount}
-                      value="0"
+                      value={totalAmount}
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
@@ -724,8 +814,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      // value={vat}
-                      value="0"
+                      value={vat}
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
@@ -746,8 +835,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      // value={afterDiscountCharge}
-                      value="0"
+                      value={grandTotalAmount}
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled

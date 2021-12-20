@@ -19,10 +19,15 @@ import {
   GridCellParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { PurchaseDetailEntries, SavePurchaseRequest, FileType } from '../../models/supplier-check-order-model';
+import {
+  PurchaseDetailEntries,
+  SavePurchaseRequest,
+  FileType,
+  CalculatePurchasePIRequest,
+} from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
-import { saveSupplierOrder } from '../../services/purchase';
+import { calculateSupplierPI, saveSupplierOrder } from '../../services/purchase';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
@@ -34,6 +39,7 @@ import ModalAddItem from './modal-add-item';
 import ModelDeleteConfirm from './modal-delete-confirm';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
+import { GridEditCellValueParams } from '@material-ui/data-grid';
 
 interface Props {
   isOpen: boolean;
@@ -77,12 +83,17 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
+    renderCell: (params) => (
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
+        {params.value}
+      </Box>
+    ),
   },
   {
     field: 'barCode',
     headerName: 'บาร์โค้ด',
-    minWidth: 180,
-    flex: 0.7,
+    minWidth: 200,
+    // flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -312,6 +323,37 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [piType, setPiType] = React.useState(0);
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
+  const [totalAmount, setTotalAmount] = React.useState(0);
+  const [vat, setVat] = React.useState(0);
+  const [grandTotalAmount, setGrandTotalAmount] = React.useState(0);
+  const [flagCalculate, setFlagCalculate] = React.useState(false);
+  const saveStateRows = async () => {
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        itemsList.push(data);
+      });
+      if (itemsList.length > 0) updateStateRows(itemsList);
+    }
+  };
+  const updateStateRows = async (items: any) => {
+    await dispatch(updateItemsState(items));
+  };
+
+  const setItemCal = async () => {
+    if (rows.length > 0) {
+      const itemsList: any = [];
+      await rows.forEach((data: GridRowData) => {
+        const item: any = {
+          barcode: data.barCode,
+          actualQty: data.actualQty,
+        };
+        itemsList.push(item);
+      });
+      if (itemsList.length > 0) calculateItems(itemsList);
+    }
+  };
 
   const [files, setFiles] = React.useState<FileType[]>([
     // { fileKey: 'key.jpg', fileName: 'new-image.jpg', mimeType: 'image/jpeg' },
@@ -373,6 +415,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         piStatus: piStatus,
       };
     });
+  }
+
+  if (!flagCalculate && rows.length > 0) {
+    setItemCal();
+    setFlagCalculate(true);
   }
 
   const classes = useStyles();
@@ -505,6 +552,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleModelAddItems = () => {
+    setFlagCalculate(false);
     setOpenModelAddItems(false);
   };
 
@@ -527,7 +575,69 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleModelDeleteConfirm = () => {
+    setFlagCalculate(false);
     setOpenModelDeleteConfirm(false);
+  };
+
+  const handleCalculateItems = async (params: GridEditCellValueParams) => {
+    saveStateRows();
+    if (params.field === 'actualQty') {
+      const itemsList: any = [];
+      if (rows.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barCode,
+            actualQty: data.actualQty,
+          };
+          itemsList.push(item);
+        });
+      }
+
+      calculateItems(itemsList);
+      // setOpenLoadingModal(false);
+    }
+  };
+
+  const calculateItems = async (items: any) => {
+    const payloadCalculate: CalculatePurchasePIRequest = {
+      piNo: purchaseDetail.piNo,
+      billNo: purchaseDetail.billNo,
+      SupplierCode: purchaseDetail.supplierCode,
+      // piNo: purchaseDetail.piNo,
+      // billNo: '',
+      // SupplierCode: '',
+      items: items,
+    };
+
+    await calculateSupplierPI(payloadCalculate)
+      .then((value) => {
+        setTotalAmount(value.data.totalAmount);
+        setVat(value.data.vat);
+        setGrandTotalAmount(value.data.grandTotalAmount);
+        let calItem = value.data.items;
+        const items: any = [];
+        rows.forEach((data: GridRowData) => {
+          const calculate = calItem.filter((r: any) => r.barcode === data.barCode);
+          const item: any = {
+            id: data.index,
+            barCode: data.barCode,
+            unitName: data.unitName,
+            productName: data.productName,
+            qty: data.qty,
+            actualQty: data.actualQty,
+            skuCode: data.skuCode,
+            unitPrice: data.setPrice,
+            sumPrice: calculate[0].sumPrice,
+          };
+          items.push(item);
+        });
+        // dispatch(updateItemsState(items));
+        updateStateRows(items);
+      })
+      .catch((error: ApiError) => {
+        console.log('calculateSupplierPI error:', error);
+      });
   };
 
   return (
@@ -696,6 +806,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
+                onCellFocusOut={handleCalculateItems}
               />
             </div>
           </Box>
@@ -743,8 +854,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      // value={totalAmount}
-                      value="0"
+                      value={totalAmount}
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
@@ -764,8 +874,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      // value={vat}
-                      value="0"
+                      value={vat}
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled
@@ -786,8 +895,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       id="txtParamQuery"
                       name="paramQuery"
                       size="small"
-                      // value={afterDiscountCharge}
-                      value="0"
+                      value={grandTotalAmount}
                       className={classes.MtextFieldNumber}
                       fullWidth
                       disabled

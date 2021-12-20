@@ -40,6 +40,8 @@ export interface PurchaseInfo {
   piType: number;
   piNo: string;
   comment: string;
+  pnNo?: string;
+  pnState?: number;
 }
 
 export interface PurchaseDetailResponse {
@@ -136,4 +138,11 @@ export interface SavePurchasePIRequest {
 export interface PurchaseItems {
   barcode: string;
   actualQty: number;
+}
+
+export interface CalculatePurchasePIRequest {
+  billNo: string;
+  piNo: string;
+  SupplierCode: string;
+  items: PurchaseItems[];
 }
