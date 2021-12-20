@@ -1,6 +1,7 @@
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { Box, Button, Chip, Typography } from '@mui/material';
 import { styled } from '@mui/styles';
+import { alpha } from '@mui/material/styles';
 import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid';
 import React from 'react';
 import {
@@ -12,8 +13,10 @@ import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supp
 import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
+import theme from '../../styles/theme';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import SupplierOrderDetail from './supplier-order-detail';
+import SupplierOrderReturn from './supplier-order-return';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
@@ -35,6 +38,7 @@ export default function SupplierOrderList() {
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const [openDetail, setOpenDetail] = React.useState(false);
+  const [openReturn, setOpenReturn] = React.useState(false);
   const [supplierId, setSupplierId] = React.useState('');
 
   const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -56,12 +60,12 @@ export default function SupplierOrderList() {
     {
       field: 'index',
       headerName: 'ลำดับ',
-      //   minWidth: 75,
-      flex: 0.5,
+      width: 70,
+      // flex: 0.5,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -69,8 +73,8 @@ export default function SupplierOrderList() {
     {
       field: 'createdDate',
       headerName: 'วันที่รับสินค้า',
-      //   minWidth: 170,
-      flex: 0.8,
+      minWidth: 110,
+      // flex: 0.8,
       headerAlign: 'center',
       sortable: false,
     },
@@ -83,8 +87,10 @@ export default function SupplierOrderList() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant='body2'>{params.value}</Typography>
-          <Typography color='textSecondary' variant='body2'>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.value}
+          </Typography>
+          <Typography color="textSecondary" variant="body2" sx={{ lineHeight: '120%' }}>
             {params.getValue(params.id, 'supplierCode') || ''}
           </Typography>
         </div>
@@ -93,32 +99,68 @@ export default function SupplierOrderList() {
     {
       field: 'piNo',
       headerName: 'เลขที่เอกสาร PI',
-      //   minWidth: 170,
-      flex: 1,
+      minWidth: 155,
+      // flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
     {
       field: 'docNo',
       headerName: 'เลขที่ใบสั่งซื้อ PO',
-      //   minWidth: 190,
-      flex: 1,
+      minWidth: 130,
+      // flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
     {
+      field: 'pnNo',
+      headerName: 'เลขที่คืนสินค้า PN',
+      minWidth: 140,
+      // flex: 1,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      renderCell: (params) => {
+        if (params.getValue(params.id, 'piStatus') === 1) {
+          if (params.value === 0) {
+            //check Create PN
+            return (
+              <Button
+                variant="contained"
+                color="warning"
+                size="small"
+                className={classes.MbtnSearch}
+                sx={{ minWidth: 90 }}
+              >
+                คืนสินค้า
+              </Button>
+            );
+          } else {
+            //PN Number 'บันทึก pnState=1, อนุมัติpnState=2'
+            return (
+              <Typography color="secondary" variant="body2" sx={{ textDecoration: 'underline' }}>
+                {params.getValue(params.id, 'pnNo') || ''}
+              </Typography>
+            );
+          }
+        } else {
+          return <Box></Box>;
+        }
+      },
+    },
+    {
       field: 'piStatus',
       headerName: 'สถานะ',
-      //   minWidth: 160,
-      flex: 0.8,
+      minWidth: 70,
+      // flex: 0.8,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
       renderCell: (params) => {
         if (params.value === 0) {
-          return <Chip label='บันทึก' size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
+          return <Chip label="บันทึก" size="small" sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
         } else if (params.value === 1) {
-          return <Chip label='อนุมัติ' size='small' sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
+          return <Chip label="อนุมัติ" size="small" sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
         }
       },
     },
@@ -132,7 +174,7 @@ export default function SupplierOrderList() {
       renderCell: (params) => {
         return (
           <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
-            <Typography variant='body2' noWrap>
+            <Typography variant="body2" noWrap>
               {params.value}
             </Typography>
           </HtmlTooltip>
@@ -150,6 +192,7 @@ export default function SupplierOrderList() {
       supplierCode: data.supplierCode,
       piNo: data.piNo,
       docNo: data.docNo,
+      pnNo: data.pnState,
       piStatus: data.piStatus,
       comment: data.comment,
     };
@@ -210,11 +253,17 @@ export default function SupplierOrderList() {
 
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
   const currentlySelected = async (params: GridCellParams) => {
+    const chkPN = params.colDef.field;
+
     handleOpenLoading('open', true);
     try {
       await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
       if (purchaseDetailList.data.length > 0 || purchaseDetailList.data) {
-        setOpenDetail(true);
+        if (chkPN === 'pnNo') {
+          setOpenReturn(true);
+        } else {
+          setOpenDetail(true);
+        }
       } else {
         console.log('Purchase Detail No data');
         await dispatch(updateItemsState({}));
@@ -227,11 +276,12 @@ export default function SupplierOrderList() {
 
   function isClosModal() {
     setOpenDetail(false);
+    setOpenReturn(false);
   }
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -245,16 +295,17 @@ export default function SupplierOrderList() {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
-            // rowHeight={80}
+            // rowHeight={65}
           />
         </div>
       </Box>
 
       {openDetail && <SupplierOrderDetail isOpen={openDetail} onClickClose={isClosModal} />}
+      {openReturn && <SupplierOrderReturn isOpen={openReturn} onClickClose={isClosModal} />}
 
       <LoadingModal open={openLoadingModal.open} />
     </div>
