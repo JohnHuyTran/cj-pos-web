@@ -295,8 +295,27 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const [flagCalculate, setFlagCalculate] = React.useState(false);
+  const setItemCal = async () => {
+    if (rows.length > 0) {
+      const itemsList: any = [];
+      await rows.forEach((data: GridRowData) => {
+        const item: any = {
+          barcode: data.barcode,
+          actualQty: data.actualQty,
+        };
+        itemsList.push(item);
+      });
+      if (itemsList.length > 0) calculateItems(itemsList);
+    }
+  };
+
   if (payloadAddItem) {
     handleAddRow(payloadAddItem);
+    if (!flagCalculate) {
+      setItemCal();
+      setFlagCalculate(true);
+    }
   }
 
   const [billNo, setBillNo] = React.useState('');
@@ -403,7 +422,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setPiNo(value.piNo);
           setBillNoOrigin(billNo);
           setCommentOrigin(comment);
-
           setOpenModelConfirm(true);
         })
         .catch((error: ApiError) => {
@@ -432,6 +450,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleModelDeleteConfirm = () => {
+    setFlagCalculate(false);
     setOpenModelDeleteConfirm(false);
   };
 
@@ -439,7 +458,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelAddItems(true);
   };
 
-  const handleModelAddItems = () => {
+  const handleModelAddItems = async () => {
+    setFlagCalculate(false);
     setOpenModelAddItems(false);
   };
 
@@ -458,52 +478,52 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         });
       }
 
-      const payloadCalculate: CalculatePurchasePIRequest = {
-        piNo: piNo,
-        billNo: billNo,
-        SupplierCode: supplierCode,
-        items: itemsList,
-      };
-
-      await calculateSupplierPI(payloadCalculate)
-        .then((value) => {
-          let TotalAmount = Number(value.data.totalAmount).toFixed(2);
-          let Vat = Number(value.data.vat).toFixed(2);
-          let GrandTotalAmount = Number(value.data.grandTotalAmount).toFixed(2);
-          setTotalAmount(Number(TotalAmount));
-          setVat(Number(Vat));
-          setGrandTotalAmount(Number(GrandTotalAmount));
-
-          console.log(value.data.totalAmount, ' / ', value.data.vat, ' / ', value.data.grandTotalAmount);
-
-          let calItem = value.data.items;
-          const items: any = [];
-          rows.forEach((data: GridRowData) => {
-            const calculate = calItem.filter((r: any) => r.barcode === data.barcode);
-            // const sumPrice = (Math.round(Number(calculate[0].sumPrice) * 100) / 100).toFixed(2);
-            const sumPrice = Number(calculate[0].sumPrice).toFixed(2);
-            console.log('sumPrice:', JSON.stringify(sumPrice));
-
-            const item: any = {
-              id: data.index,
-              barcode: data.barcode,
-              unitName: data.unitName,
-              productName: data.productName,
-              qty: data.qty,
-              actualQty: data.actualQty,
-              skuCode: data.skuCode,
-              unitPrice: data.setPrice,
-              sumPrice: sumPrice,
-            };
-            items.push(item);
-          });
-          updateStateRows(items);
-        })
-        .catch((error: ApiError) => {
-          console.log('calculateSupplierPI error:', error);
-        });
+      calculateItems(itemsList);
       // setOpenLoadingModal(false);
     }
+  };
+
+  const calculateItems = async (items: any) => {
+    const payloadCalculate: CalculatePurchasePIRequest = {
+      piNo: piNo,
+      billNo: billNo,
+      SupplierCode: supplierCode,
+      items: items,
+    };
+
+    await calculateSupplierPI(payloadCalculate)
+      .then((value) => {
+        setTotalAmount(value.data.totalAmount);
+        setVat(value.data.vat);
+        setGrandTotalAmount(value.data.grandTotalAmount);
+        console.log(value.data.totalAmount, ' / ', value.data.vat, ' / ', value.data.grandTotalAmount);
+
+        let calItem = value.data.items;
+        const items: any = [];
+        rows.forEach((data: GridRowData) => {
+          const calculate = calItem.filter((r: any) => r.barcode === data.barcode);
+          // const sumPrice = (Math.round(Number(calculate[0].sumPrice) * 100) / 100).toFixed(2);
+          const sumPrice = calculate[0].sumPrice;
+          console.log('sumPrice:', JSON.stringify(sumPrice));
+
+          const item: any = {
+            id: data.index,
+            barcode: data.barcode,
+            unitName: data.unitName,
+            productName: data.productName,
+            qty: data.qty,
+            actualQty: data.actualQty,
+            skuCode: data.skuCode,
+            unitPrice: data.setPrice,
+            sumPrice: sumPrice,
+          };
+          items.push(item);
+        });
+        updateStateRows(items);
+      })
+      .catch((error: ApiError) => {
+        console.log('calculateSupplierPI error:', error);
+      });
   };
 
   const handleConfirmStatus = async (issuccess: boolean, errorMsg: string) => {
