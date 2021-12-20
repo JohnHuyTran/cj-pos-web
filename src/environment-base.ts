@@ -85,6 +85,9 @@ export const environment = {
       purchaseCreditApprove: {
         url: '/purchase/receivable-purchase-order',
       },
+      supplierFile: {
+        url: '/purchase//getUrl',
+      },
     },
   },
   products: {
