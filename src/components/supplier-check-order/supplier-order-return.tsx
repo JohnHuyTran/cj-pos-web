@@ -479,7 +479,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       pnNo: purchaseDetail.pnNo,
       items: items,
     };
-    await approvePurchaseCreditNote(payload)
+    await approvePurchaseCreditNote(payload, fileInfo)
       .then((_value) => {
         handleOnCloseModalConfirm();
         setShowSnackBar(true);
@@ -500,6 +500,55 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     // onClickClose();
     // handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
+  };
+
+  const [fileInfo, setFileInfo] = React.useState<any>([]);
+  const handleFileInputChange = (e: any) => {
+    // setValidationFile(false);
+    // setErrorBrowseFile(false);
+    // setMsgErrorBrowseFile('');
+    checkSizeFile(e);
+
+    let file: File = e.target.files[0];
+    console.log('filelist: ', e.target.files);
+    console.log('file: ', file);
+    let fileType = file.type.split('/');
+    const fileName = `test-01.${fileType[1]}`;
+
+    setFileInfo([...fileInfo, file]);
+  };
+
+  const checkSizeFile = (e: any) => {
+    const fileSize = e.target.files[0].size;
+    const fileName = e.target.files[0].name;
+    let parts = fileName.split('.');
+    let length = parts.length - 1;
+    // pdf, .jpg, .jpeg
+    if (
+      parts[length].toLowerCase() !== 'pdf' &&
+      parts[length].toLowerCase() !== 'jpg' &&
+      parts[length].toLowerCase() !== 'jpeg'
+    ) {
+      // setValidationFile(true);
+      // setErrorBrowseFile(true);
+      // setMsgErrorBrowseFile('กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น');
+      return;
+    }
+
+    // 1024 = bytes
+    // 1024*1024*1024 = mb
+    let mb = 1024 * 1024 * 1024;
+    // fileSize = mb unit
+    if (fileSize < mb) {
+      //size > 5MB
+      let size = fileSize / 1024 / 1024;
+      if (size > 5) {
+        // setValidationFile(true);
+        // setErrorBrowseFile(true);
+        // setMsgErrorBrowseFile('ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่');
+        return;
+      }
+    }
   };
 
   return (
@@ -562,16 +611,32 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'>แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Button
-                  id='btnAttachedFile'
-                  color='primary'
-                  variant='contained'
-                  component='span'
-                  className={classes.MbtnBrowse}
-                  // style={{ marginLeft: 10, textTransform: "none" }}
-                  disabled>
-                  แนบไฟล์
-                </Button>
+                <TextField
+                  name='browserTxf'
+                  className={classes.MtextFieldBrowse}
+                  value={fileInfo.fileName}
+                  placeholder='แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB'
+                />
+                <input
+                  id='btnBrowse'
+                  type='file'
+                  multiple
+                  // onDrop
+                  accept='.pdf, .jpg, .jpeg'
+                  onChange={handleFileInputChange}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor={'btnBrowse'}>
+                  <Button
+                    id='btnPrint'
+                    color='primary'
+                    variant='contained'
+                    component='span'
+                    className={classes.MbtnBrowse}
+                    style={{ marginLeft: 10, textTransform: 'none' }}>
+                    Browse
+                  </Button>
+                </label>
               </Grid>
             </Grid>
           </Box>

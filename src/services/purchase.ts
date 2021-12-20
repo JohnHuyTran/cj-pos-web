@@ -1,4 +1,4 @@
-import { post, put } from '../adapters/posback-adapter';
+import { put, get, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { getPathUrl } from './base-service';
 import { ApiError } from '../models/api-error-model';
@@ -71,9 +71,10 @@ export async function draftPurchaseCreditNote(payload: PurchaseCreditNoteType) {
   return response;
 }
 
-export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType) {
+export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType, fileList: any) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
+  bodyFormData.append('file', fileList);
   const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
     .catch((error: ApiError) => {
@@ -92,4 +93,12 @@ export async function calculateSupplierPI(payload: CalculatePurchasePIRequest) {
     console.log('error = ', error);
     throw error;
   }
+}
+export async function getFileUrlHuawei(filekey: string) {
+  const response = await get(environment.purchase.supplierOrder.supplierFile.url + `/${filekey}`)
+    .then((result: any) => result)
+    .catch((error: ApiError) => {
+      throw error;
+    });
+  return response;
 }

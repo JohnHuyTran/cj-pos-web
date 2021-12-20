@@ -20,9 +20,10 @@ import {
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
-  CalculatePurchasePIRequest,
   PurchaseDetailEntries,
   SavePurchaseRequest,
+  FileType,
+  CalculatePurchasePIRequest,
 } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
@@ -32,6 +33,8 @@ import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
+import theme from '../../styles/theme';
+import AccordionHuaweiFile from './accordion-huawei-file';
 import ModalAddItem from './modal-add-item';
 import ModelDeleteConfirm from './modal-delete-confirm';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
@@ -80,12 +83,17 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
+    renderCell: (params) => (
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
+        {params.value}
+      </Box>
+    ),
   },
   {
     field: 'barCode',
     headerName: 'บาร์โค้ด',
-    minWidth: 180,
-    flex: 0.7,
+    minWidth: 200,
+    // flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -299,6 +307,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setPiStatus(purchaseDetail.piStatus);
     setComment(purchaseDetail.comment);
     setCharacterCount(purchaseDetail.comment.length);
+    setFiles(purchaseDetail.files ? purchaseDetail.files : []);
 
     if (purchaseDetail.piType === 1) dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
   }, [open]);
@@ -345,6 +354,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       if (itemsList.length > 0) calculateItems(itemsList);
     }
   };
+
+  const [files, setFiles] = React.useState<FileType[]>([
+    // { fileKey: 'key.jpg', fileName: 'new-image.jpg', mimeType: 'image/jpeg' },
+    // { fileKey: 'SD21120002-000014-Draft.pdf', fileName: 'new-document.pdf', mimeType: 'application/pdf' },
+  ]);
 
   let rows: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
@@ -636,7 +650,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
         <DialogContent>
           <Box mt={4} sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2} mb={1}>
+            <Grid container mb={1}>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่ใบสั่งซื้อ PO :</Typography>
               </Grid>
@@ -662,7 +676,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 />
               </Grid>
             </Grid>
-            <Grid container spacing={2} mb={1}>
+
+            <Grid container mb={1}>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
               </Grid>
@@ -673,19 +688,28 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Button
-                  id="btnPrint"
-                  color="primary"
-                  variant="contained"
-                  component="span"
-                  className={classes.MbtnBrowse}
-                  disabled
-                >
-                  แนบไฟล์
-                </Button>
+                <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
+                  <Button
+                    id="btnPrint"
+                    color="primary"
+                    variant="contained"
+                    component="span"
+                    className={classes.MbtnBrowse}
+                    disabled
+                  >
+                    แนบไฟล์
+                  </Button>
+
+                  <Typography
+                    variant="overline"
+                    sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
+                  >
+                    แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
+                  </Typography>
+                </Box>
               </Grid>
             </Grid>
-            <Grid container spacing={2} mb={1}>
+            <Grid container mb={1}>
               <Grid item lg={2}>
                 <Typography variant="body2">ผู้จัดจำหน่าย:</Typography>
               </Grid>
@@ -707,7 +731,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
-              <Grid item lg={6}></Grid>
+              <Grid item lg={2}></Grid>
+              <Grid item lg={4}>
+                {piStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
+              </Grid>
             </Grid>
           </Box>
 
