@@ -26,11 +26,12 @@ import { ErrorOutline } from '@mui/icons-material';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
-import { draftPurchaseCreditNote } from '../../services/purchase';
+import { approvePurchaseCreditNote, draftPurchaseCreditNote } from '../../services/purchase';
 import { ItemsType, PurchaseCreditNoteType } from '../../models/purchase-credit-note';
 import { ApiError } from '../../models/api-error-model';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import ModalConfirmOrderReturn from './modal-confirm-order-return';
+import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -145,6 +146,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
+  const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
 
   const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
   const [purchaseDetailItems, setPurchaseDetailItems] = React.useState<PurchaseDetailEntries[]>(
@@ -220,15 +222,44 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       };
     });
 
-  const handleClose = () => {
-    onClickClose();
+  const handleClose = async () => {
+    await storeItem();
+    let isExit = true;
+    // onClickClose();
+    if (comment !== purchaseDetail.pnComment) {
+      isExit = false;
+    }
+    const rowSelect = apiRef.current.getSelectedRows();
+    if (rowSelect.size > 0) {
+      isExit = false;
+    }
+    const ent: PurchaseDetailEntries[] = purchaseDetail.entries;
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    if (rowsEdit.size !== ent.length) {
+      isExit = false;
+    }
+
+    let i = 0;
+    rowsEdit.forEach((data: GridRowData) => {
+      if (data.returnQty !== (ent[i].returnQty ? ent[i].returnQty : 0)) {
+        isExit = false;
+      }
+      i++;
+    });
+
+    if (!isExit) {
+      setConfirmModelExit(true);
+    } else {
+      setOpen(false);
+      onClickClose();
+    }
   };
 
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
 
-  const storeItem = () => {
+  const storeItem_ = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
@@ -273,8 +304,57 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     }
   };
 
+  const validateItem = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    let itemNotValid: boolean = false;
+    rowsEdit.forEach((data: GridRowData) => {
+      if (data.returnQty > data.qty || data.returnQty <= 0) {
+        itemNotValid = true;
+        return;
+      }
+    });
+    if (itemNotValid) {
+      setOpenAlert(true);
+      setTextError('จำนวนที่คืนต้องมากกว่า 0 หรือ น้อยกว่า จำนวนที่รับ');
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const storeItem = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const items: PurchaseDetailEntries[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const newData: PurchaseDetailEntries = {
+        seqItem: data.seqItem,
+        produtStatus: data.produtStatus,
+        isDraftStatus: pnStatus === 0 ? false : true,
+        isControlStock: data.isControlStock,
+        isAllowDiscount: data.isAllowDiscount,
+        skuCode: data.skuCode,
+        barcode: data.barcode,
+        productName: data.productName,
+        unitCode: data.unitCode,
+        unitName: data.unitName,
+        qty: data.qty,
+        qtyAll: data.qtyAll,
+        controlPrice: data.controlPrice,
+        salePrice: data.salePrice,
+        setPrice: data.setPrice,
+        sumPrice: data.sumPrice,
+        actualQty: data.actualQty,
+        returnQty: data.returnQty,
+        actualQtyAll: data.actualQtyAll,
+      };
+      items.push(newData);
+    });
+    setPurchaseDetailItems(items);
+  };
+
   const handleSaveBtn = async () => {
-    const rs = storeItem();
+    await storeItem();
+    const rs = validateItem();
     // call api
     if (rs) {
       setOpenLoadingModal(true);
@@ -298,7 +378,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchSupplierOrderDetailAsync(purchaseDetail.pnNo));
-          // dispatch(featchOrderListSupAsync(payloadSearch));
+          dispatch(featchOrderListSupAsync(payloadSearch));
 
           // localStorage.removeItem('SupplierRowsEdit');
         })
@@ -376,8 +456,9 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setOpenModelConfirm(false);
   };
 
-  const handleConfirmBtn = () => {
-    const rs = storeItem();
+  const handleConfirmBtn = async () => {
+    await storeItem();
+    const rs = validateItem();
     if (rs) {
       setOpenModelConfirm(true);
     }
@@ -398,21 +479,76 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       pnNo: purchaseDetail.pnNo,
       items: items,
     };
-    await draftPurchaseCreditNote(payload)
+    await approvePurchaseCreditNote(payload, fileInfo)
       .then((_value) => {
+        handleOnCloseModalConfirm();
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
-        dispatch(featchSupplierOrderDetailAsync(purchaseDetail.pnNo));
-        // dispatch(featchOrderListSupAsync(payloadSearch));
-
-        // localStorage.removeItem('SupplierRowsEdit');
+        dispatch(featchOrderListSupAsync(payloadSearch));
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
       })
       .catch((error: ApiError) => {
+        handleOnCloseModalConfirm();
         setShowSnackBar(true);
         setContentMsg(error.message);
       });
+    // setOpen(false);
+    // onClickClose();
+    // handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
+  };
+
+  const [fileInfo, setFileInfo] = React.useState<any>([]);
+  const handleFileInputChange = (e: any) => {
+    // setValidationFile(false);
+    // setErrorBrowseFile(false);
+    // setMsgErrorBrowseFile('');
+    checkSizeFile(e);
+
+    let file: File = e.target.files[0];
+    console.log('filelist: ', e.target.files);
+    console.log('file: ', file);
+    let fileType = file.type.split('/');
+    const fileName = `test-01.${fileType[1]}`;
+
+    setFileInfo([...fileInfo, file]);
+  };
+
+  const checkSizeFile = (e: any) => {
+    const fileSize = e.target.files[0].size;
+    const fileName = e.target.files[0].name;
+    let parts = fileName.split('.');
+    let length = parts.length - 1;
+    // pdf, .jpg, .jpeg
+    if (
+      parts[length].toLowerCase() !== 'pdf' &&
+      parts[length].toLowerCase() !== 'jpg' &&
+      parts[length].toLowerCase() !== 'jpeg'
+    ) {
+      // setValidationFile(true);
+      // setErrorBrowseFile(true);
+      // setMsgErrorBrowseFile('กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น');
+      return;
+    }
+
+    // 1024 = bytes
+    // 1024*1024*1024 = mb
+    let mb = 1024 * 1024 * 1024;
+    // fileSize = mb unit
+    if (fileSize < mb) {
+      //size > 5MB
+      let size = fileSize / 1024 / 1024;
+      if (size > 5) {
+        // setValidationFile(true);
+        // setErrorBrowseFile(true);
+        // setMsgErrorBrowseFile('ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่');
+        return;
+      }
+    }
   };
 
   return (
@@ -475,16 +611,32 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'>แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Button
-                  id='btnAttachedFile'
-                  color='primary'
-                  variant='contained'
-                  component='span'
-                  className={classes.MbtnBrowse}
-                  // style={{ marginLeft: 10, textTransform: "none" }}
-                  disabled>
-                  แนบไฟล์
-                </Button>
+                <TextField
+                  name='browserTxf'
+                  className={classes.MtextFieldBrowse}
+                  value={fileInfo.fileName}
+                  placeholder='แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB'
+                />
+                <input
+                  id='btnBrowse'
+                  type='file'
+                  multiple
+                  // onDrop
+                  accept='.pdf, .jpg, .jpeg'
+                  onChange={handleFileInputChange}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor={'btnBrowse'}>
+                  <Button
+                    id='btnPrint'
+                    color='primary'
+                    variant='contained'
+                    component='span'
+                    className={classes.MbtnBrowse}
+                    style={{ marginLeft: 10, textTransform: 'none' }}>
+                    Browse
+                  </Button>
+                </label>
               </Grid>
             </Grid>
           </Box>
@@ -554,7 +706,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
               />
             </div>
           </Box>
-          <Box>
+          <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
                 <Typography variant='body2'>หมายเหตุ:</Typography>

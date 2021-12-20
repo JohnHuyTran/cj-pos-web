@@ -62,32 +62,32 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    // flex: 1.8,
-    minWidth: 125,
+    flex: 1.2,
+    // minWidth: 125,
     headerAlign: 'center',
-    disableColumnMenu: true,
+    // disableColumnMenu: true,
     sortable: false,
   },
   {
     field: 'barcodeName',
     headerName: 'รายละเอียด',
     headerAlign: 'center',
-    // flex: 2,
-    minWidth: 180,
-    disableColumnMenu: true,
+    flex: 1.7,
+    // minWidth: 180,
+    // disableColumnMenu: true,
     sortable: false,
   },
   {
     field: 'unitName',
     headerName: 'หน่วย',
-    flex: 1,
+    flex: 0.7,
     headerAlign: 'center',
     sortable: false,
   },
   {
     field: 'actualQty',
     headerName: 'จำนวน',
-    flex: 1,
+    flex: 0.7,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -109,7 +109,8 @@ const columns: GridColDef[] = [
   {
     field: 'delete',
     headerName: 'ลบ',
-    width: 50,
+    flex: 0.5,
+    // width: 50,
     align: 'center',
     sortable: false,
     renderCell: () => {
@@ -178,8 +179,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     setValueItemList(null);
   };
 
-  const payloadSearchAddItems = useAppSelector((state) => state.supplierSearchAddItems.state);
-  const [itemListArray, setItemListArray] = React.useState<any[]>([]);
   const [barcodeNameDel, setBarcodeNameDel] = React.useState('');
   const [skuCodeDel, setSkuCodeDel] = React.useState('');
   const [barCodeDel, setBarCodeDel] = React.useState('');
@@ -193,7 +192,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
     const checkDupItem: any = newAddItemListArray.find((a: any) => a.barcode === barcodeItem);
 
-    console.log('newAddItemListArray: ', newAddItemListArray);
     if (checkDupItem) {
       let arrayItemDup: any = [];
       newAddItemListArray.forEach((data: any) => {
@@ -294,16 +292,16 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       barcodeName: item.barcodeName,
       actualQty: item.qty,
       skuCode: item.skuCode,
-      setPrice: item.pricePerUnit,
+      unitPrice: item.unitPrice,
     };
   });
 
   let checkHaveItems;
-  if (itemsList.code === 204001) {
+  if (itemsList.code === 204) {
     checkHaveItems = (
       <Grid item container xs={12} justifyContent="center">
         <Box color="#CBD4DB">
-          <h6>ไม่พบสินค้า</h6>
+          <h4>ไม่พบสินค้า</h4>
         </Box>
       </Grid>
     );
@@ -340,7 +338,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
                 value={valueItemList}
                 onChange={handleChangeItem}
                 filterOptions={filterOptions}
-                disabled={itemsList.code === 204001}
+                disabled={itemsList.code === 204}
                 renderOption={(props, option) => {
                   return (
                     <li {...props} key={option.barcode}>
