@@ -296,6 +296,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setPiStatus(purchaseDetail.piStatus);
     setComment(purchaseDetail.comment);
     setCharacterCount(purchaseDetail.comment.length);
+    setFiles(purchaseDetail.files ? purchaseDetail.files : []);
 
     if (purchaseDetail.piType === 1) dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
   }, [open]);
@@ -312,9 +313,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
 
-  const [files, setFiles] = React.useState<FileType[] | []>([
-    { fileKey: 'key.jpg', fileName: 'new-image.jpg', mimeType: 'image/jpeg' },
-    { fileKey: 'SD21120002-000014-Draft.pdf', fileName: 'new-document.pdf', mimeType: 'application/pdf' },
+  const [files, setFiles] = React.useState<FileType[]>([
+    // { fileKey: 'key.jpg', fileName: 'new-image.jpg', mimeType: 'image/jpeg' },
+    // { fileKey: 'SD21120002-000014-Draft.pdf', fileName: 'new-document.pdf', mimeType: 'application/pdf' },
   ]);
 
   let rows: any = [];
@@ -622,7 +623,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
               <Grid item lg={2}></Grid>
               <Grid item lg={4}>
-                {piStatus === 1 && <AccordionHuaweiFile files={files} />}
+                {piStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
               </Grid>
             </Grid>
           </Box>
