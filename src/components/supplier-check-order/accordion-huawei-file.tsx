@@ -6,10 +6,10 @@ import theme from '../../styles/theme';
 import { ApiError } from '../../models/api-error-model';
 import { getFileUrlHuawei } from '../../services/purchase';
 import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
-import { PurchaseDetailFiles } from '../../models/supplier-check-order-model';
+import { FileType } from '../../models/supplier-check-order-model';
 
 interface Props {
-  files: PurchaseDetailFiles[];
+  files: FileType[];
 }
 
 const AccordionHuaweiFile = ({ files }: Props) => {
@@ -19,13 +19,13 @@ const AccordionHuaweiFile = ({ files }: Props) => {
   const [newFilename, setNewFilename] = useState<string>('test-rename');
   const [isImage, setIsImage] = useState(false);
 
-  async function getHuaweiFileUrl(item: PurchaseDetailFiles) {
-    await getFileUrlHuawei(item.filekey)
+  async function getHuaweiFileUrl(item: FileType) {
+    await getFileUrlHuawei(item.fileKey)
       .then((resp) => {
         if (resp && resp.data) {
           setFileUrl(resp.data);
           setIsImage(item.mimeType === 'image/jpeg');
-          setNewFilename(item.filename);
+          setNewFilename(item.fileName);
           setDisplayFile(true);
         }
       })
@@ -58,14 +58,14 @@ const AccordionHuaweiFile = ({ files }: Props) => {
           {files.length > 0 &&
             files.map((item, index) => (
               <Box
-                key={`item-${index + 1}-${item.filekey}`}
+                key={`item-${index + 1}-${item.fileKey}`}
                 component="a"
                 href={void 0}
                 sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
                 onClick={() => getHuaweiFileUrl(item)}
               >
                 <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: '13px' }}>
-                  {item.filename}
+                  {item.fileName}
                 </Typography>
               </Box>
             ))}

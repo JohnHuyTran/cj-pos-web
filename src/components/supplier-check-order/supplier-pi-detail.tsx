@@ -27,9 +27,9 @@ import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
 import ModelDeleteConfirm from './modal-delete-confirm';
-import ModelAddItems from './modal-add-items';
 import ModalAddItem from './modal-add-item';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
+import { updateState } from '../../store/slices/supplier-selection-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
 
 interface Props {
@@ -76,7 +76,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'barCode',
+    field: 'barcode',
     headerName: 'บาร์โค้ด',
     minWidth: 200,
     headerAlign: 'center',
@@ -202,40 +202,32 @@ function useApiRef() {
       }),
     [columns]
   );
-
   return { apiRef, columns: _columns };
 }
 
 function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const { apiRef, columns } = useApiRef();
+  const dispatch = useAppDispatch();
   const payloadSupplier = useAppSelector((state) => state.supplierSelectionSlice.state);
   const supplier = payloadSupplier.supplier;
   const po = payloadSupplier.poSelection;
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
-
   const handleClose = async () => {
     let exit = false;
-    if (comment !== '' || billNo !== '') {
-      exit = true;
-    }
+    if (comment !== commentOrigin || billNo !== billNoOrigin) exit = true;
 
-    if (po) {
+    if (rows.length > 0) {
       const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       let i = 0;
       const itemsList: any = [];
       rowsEdit.forEach((data: GridRowData) => {
-        if (data.actualQty !== rows[i].actualQty) {
-          exit = true;
-        }
+        if (data.actualQty !== rows[i].actualQty) exit = true;
         i++;
-
         itemsList.push(data);
       });
-
-      if (itemsList !== []) {
-        await dispatch(updateItemsState(itemsList));
-      }
+      if (rows.length > 0) await dispatch(updateItemsState(itemsList));
     }
 
     if (!exit) {
@@ -277,6 +269,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     if (Object.keys(items).length !== 0) {
       rows = items.map((item: any, index: number) => {
         let barcode = item.barCode ? item.barCode : item.barcode;
+        let setPrice = item.setPrice ? item.setPrice : item.unitPrice;
         return {
           id: `${barcode}-${index + 1}`,
           index: index + 1,
@@ -284,7 +277,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           isControlStock: item.isControlStock,
           isAllowDiscount: item.isAllowDiscount,
           skuCode: item.skuCode,
-          barCode: barcode,
+          barcode: barcode,
           productName: item.productName ? item.productName : item.barcodeName,
           unitCode: item.unitCode,
           unitName: item.unitName,
@@ -292,7 +285,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           qtyAll: item.qtyAll,
           controlPrice: item.controlPrice,
           salePrice: item.salePrice,
-          setPrice: item.pricePerUnit ? item.pricePerUnit : 0,
+          setPrice: setPrice ? setPrice : 0,
           sumPrice: item.sumPrice ? item.sumPrice : 0,
           actualQty: item.actualQty ? item.actualQty : 0,
           isRefPO: supplier.isRefPO,
@@ -301,15 +294,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
-  if (po) {
-    const supplierItems = po.items;
-    handleAddRow(supplierItems);
-  }
-  if (!po && payloadAddItem) {
+  if (payloadAddItem) {
     handleAddRow(payloadAddItem);
   }
 
   const [billNo, setBillNo] = React.useState('');
+  const [billNoOrigin, setBillNoOrigin] = React.useState('');
   const [errorBillNo, setErrorBillNo] = React.useState(false);
   const [piNo, setPiNo] = React.useState('');
   const [supplierCode, setSupplierCode] = React.useState('');
@@ -318,12 +308,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [piType, setPiType] = React.useState(1);
   const [piStatus, setPiStatus] = React.useState(0);
   const [comment, setComment] = React.useState('');
+  const [commentOrigin, setCommentOrigin] = React.useState('');
   const [docNo, setDocNo] = React.useState('');
   const classes = useStyles();
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [characterCount, setCharacterCount] = React.useState(0);
   const maxCommentLength = 255;
   const handleChangeComment = (event: any) => {
+    saveStateRows();
     const value = event.target.value;
     const length = event.target.value.length;
     if (length <= maxCommentLength) {
@@ -332,8 +324,28 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
-  const { apiRef, columns } = useApiRef();
-  const dispatch = useAppDispatch();
+  const handleChangeBillNo = async (event: any) => {
+    saveStateRows();
+    const value = event.target.value;
+    setBillNo(value);
+    setErrorBillNo(false);
+  };
+
+  const saveStateRows = async () => {
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
+      rowsEdit.forEach((data: GridRowData) => {
+        itemsList.push(data);
+      });
+      if (itemsList.length > 0) updateStateRows(itemsList);
+    }
+  };
+
+  const updateStateRows = async (items: any) => {
+    await dispatch(updateItemsState(items));
+  };
+
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
@@ -355,18 +367,45 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
+      setOpenLoadingModal(true);
 
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       const itemsList: any = [];
-      await rows.forEach((data: GridRowData) => {
-        const item: any = {
-          barcode: data.barCode,
-          actualQty: data.actualQty,
-        };
-        itemsList.push(item);
-      });
-      await setItems(itemsList);
-      setOpenModelConfirm(true);
+      if (rows.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barcode,
+            actualQty: data.actualQty,
+          };
+          itemsList.push(item);
+        });
+        await setItems(itemsList);
+      }
+
+      const payloadSave: SavePurchasePIRequest = {
+        piNo: piNo,
+        SupplierCode: supplierCode,
+        billNo: billNo,
+        docNo: docNo ? docNo : '',
+        flagPO: piType,
+        comment: comment,
+        items: itemsList,
+      };
+
+      await saveSupplierPI(payloadSave)
+        .then((value) => {
+          setPiNo(value.piNo);
+          setBillNoOrigin(billNo);
+          setCommentOrigin(comment);
+
+          setOpenModelConfirm(true);
+        })
+        .catch((error: ApiError) => {
+          setShowSnackBar(true);
+          setContentMsg(error.message);
+        });
+
+      setOpenLoadingModal(false);
     }
   };
 
@@ -374,13 +413,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [skuCodeDel, setSkuCodeDel] = React.useState('');
   const [barCodeDel, setBarCodeDel] = React.useState('');
   const currentlySelected = (params: GridCellParams) => {
+    saveStateRows();
     const value = params.colDef.field;
     const isRefPO = params.getValue(params.id, 'isRefPO');
     //deleteItem
     if (!isRefPO && value === 'sumPrice') {
       setProductNameDel(String(params.getValue(params.id, 'productName')));
       setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
-      setBarCodeDel(String(params.getValue(params.id, 'barCode')));
+      setBarCodeDel(String(params.getValue(params.id, 'barcode')));
       setOpenModelDeleteConfirm(true);
     }
   };
@@ -405,28 +445,25 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setSnackbarIsStatus(issuccess);
 
     if (issuccess) {
-      await dispatch(updateItemsState({}));
       setTimeout(() => {
         setOpen(false);
         onClickClose();
       }, 500);
+
+      await dispatch(updateItemsState({}));
     } else {
       setOpenLoadingModal(false);
     }
   };
 
   const handleSaveButton = async () => {
-    if (!billNo) {
-      setErrorBillNo(true);
-    } else {
-      setErrorBillNo(false);
-      setOpenLoadingModal(true);
+    const itemEditList: any = [];
+    const itemsList: any = [];
+    if (rows.length > 0) {
       const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      const itemEditList: any = [];
-      const itemsList: any = [];
       await rows.forEach((data: GridRowData) => {
         const item: any = {
-          barcode: data.barCode,
+          barcode: data.barcode,
           actualQty: data.actualQty,
         };
 
@@ -434,6 +471,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         itemEditList.push(data);
       });
       await dispatch(updateItemsState(itemEditList));
+    }
+
+    if (!billNo) {
+      setErrorBillNo(true);
+    } else {
+      setErrorBillNo(false);
+      setOpenLoadingModal(true);
 
       const payloadSave: SavePurchasePIRequest = {
         piNo: piNo,
@@ -448,6 +492,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       await saveSupplierPI(payloadSave)
         .then((value) => {
           setPiNo(value.piNo);
+          setBillNoOrigin(billNo);
+          setCommentOrigin(comment);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -475,7 +521,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">เลขที่ใบสั่งซื้อ PO :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{docNo}</Typography>
+                {piType !== 1 && <Typography variant="body2">{docNo}</Typography>}
+                {piType === 1 && <Typography variant="body2">-</Typography>}
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่บิลผู้จำหน่าย :</Typography>
@@ -487,9 +534,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   size="small"
                   value={billNo}
                   placeholder="กรุณากรอก เลขที่บิลผู้จำหน่าย"
-                  onChange={(event) => setBillNo(event.target.value)}
+                  onChange={handleChangeBillNo}
                   className={classes.MtextFieldDetail}
-                  // disabled={piStatus !== 0}
                   error={errorBillNo === true}
                   helperText={errorBillNo === true ? 'กรุณากรอก เลขที่บิลผู้จำหน่าย' : ' '}
                 />
@@ -512,7 +558,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   variant="contained"
                   component="span"
                   className={classes.MbtnBrowse}
-                  // style={{ marginLeft: 10, textTransform: "none" }}
                   disabled
                 >
                   แนบไฟล์
@@ -572,6 +617,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   onClick={handleSaveButton}
                   startIcon={<SaveIcon />}
                   sx={{ width: 200 }}
+                  disabled={rows.length == 0}
                 >
                   บันทึก
                 </Button>
@@ -583,6 +629,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   onClick={handlConfirmButton}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 200 }}
+                  disabled={rows.length == 0}
                 >
                   ยืนยัน
                 </Button>
@@ -624,10 +671,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   placeholder="ความยาวไม่เกิน 255 ตัวอักษร"
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
-                  // error={errorCommentDC === true}
-                  // helperText={
-                  //   errorCommentDC === true ? "กรุณากรอก หมายเหตุ" : " "
-                  // }
                   sx={{ maxWidth: 350 }}
                   // disabled={piStatus !== 0}
                 />

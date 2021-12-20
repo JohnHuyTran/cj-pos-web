@@ -68,6 +68,11 @@ export interface PurchaseDetailInfo {
   piNo: string;
   billNo?: string;
   comment: string;
+  pnNo?: string;
+  pnState?: number;
+  pnComment?: string;
+  files?: FileType[];
+  pnFiles?: FileType[];
   // totalAmount: number;
   // discount: number;
   // charge: number;
@@ -80,15 +85,7 @@ export interface PurchaseDetailInfo {
   // vatAble: number;
   // ratRate: number;
   // roundAmount: number;
-  files: PurchaseDetailFiles | [];
   entries: PurchaseDetailEntries | [];
-}
-
-// TODO: huawei file list
-export interface PurchaseDetailFiles {
-  filekey: string;
-  filename: string;
-  mimeType: string;
 }
 
 export interface PurchaseDetailEntries {
@@ -109,8 +106,17 @@ export interface PurchaseDetailEntries {
   sumPrice: number;
   actualQty: number;
   actualQtyAll: number;
+  isDraftStatus?: boolean;
+  returnQty?: number;
+  returnAllQty?: number;
+  pnDisplay?: number;
 }
 
+export interface FileType {
+  fileKey: string;
+  fileName: string;
+  mimeType: string;
+}
 export interface SavePurchaseRequest {
   billNo: string;
   comment: string;

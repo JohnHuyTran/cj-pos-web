@@ -25,6 +25,7 @@ import {
   clearDataFilter as clearDataFilterPO,
 } from '../../store/slices/search-supplier-selection-po-slice';
 import { updateState } from '../../store/slices/supplier-selection-slice';
+import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import SupplierOrderDetail from './supplier-pi-detail';
 import LoadingModal from '../commons/ui/loading-modal';
 
@@ -131,7 +132,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
 
   const onInputChange = async (event: any, value: string, reason: string) => {
     if (event && event.keyCode && event.keyCode === 13) {
-      console.log({ reason, value });
+      // console.log({ reason, value });
       return false;
     }
 
@@ -174,11 +175,12 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
     setOpenLoadingModal(true);
     const payload = { supplier, poSelection };
 
-    console.log('payload :', JSON.stringify(payload));
     await dispatch(updateState(payload));
     setOpenPIDetail(true);
     clearData();
     handleCloseModal();
+    if (poSelection) await dispatch(updateItemsState(poSelection.items));
+    else await dispatch(updateItemsState({}));
     setOpenLoadingModal(false);
   };
 

@@ -98,12 +98,14 @@ export default function ModelConfirm({
           <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
             ยืนยันอนุมัติใบสั่งซื้อ Supplier
           </Typography>
-          <Typography variant="body1" align="center">
-            เลขที่ใบสั่งซื้อ PO <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-            <label style={{ color: '#36C690' }}>
-              <b>{docNo}</b>
-            </label>
-          </Typography>
+          {docNo && (
+            <Typography variant="body1" align="center">
+              เลขที่ใบสั่งซื้อ PO <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+              <label style={{ color: '#36C690' }}>
+                <b>{docNo}</b>
+              </label>
+            </Typography>
+          )}
           <Typography variant="body1" align="center">
             เลขที่ใบเอกสาร PI <label style={{ color: '#AEAEAE' }}>|</label>{' '}
             <label style={{ color: '#36C690' }}>
