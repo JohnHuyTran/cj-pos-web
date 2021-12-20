@@ -6,9 +6,24 @@ import { SavePurchasePIRequest, SavePurchaseRequest } from '../models/supplier-c
 import { PurchaseCreditNoteType } from '../models/purchase-credit-note';
 import { ContentType } from '../utils/enum/common-enum';
 
-export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string) {
+// export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string) {
+//   try {
+//     const response = await put(getPathSaveDraft(piNo), payload).then((result: any) => result);
+//     return response;
+//   } catch (error) {
+//     console.log('error = ', error);
+//     throw error;
+//   }
+// }
+
+export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string, fileList: any) {
+  const bodyFormData = new FormData();
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+  bodyFormData.append('file[]', fileList);
   try {
-    const response = await put(getPathSaveDraft(piNo), payload).then((result: any) => result);
+    const response = await put(getPathSaveDraft(piNo), bodyFormData, ContentType.MULTIPART).then(
+      (result: any) => result
+    );
     return response;
   } catch (error) {
     console.log('error = ', error);
@@ -77,3 +92,14 @@ export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType)
     });
   return response;
 }
+
+// export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType, fileList: any) {
+//   const bodyFormData = new FormData();
+//   bodyFormData.append('requestBody', JSON.stringify(payload));
+//   const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
+//     .then((result: any) => result)
+//     .catch((error: ApiError) => {
+//       throw error;
+//     });
+//   return response;
+// }

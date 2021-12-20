@@ -397,6 +397,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [items, setItems] = React.useState<any>([]);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+
+  console.log('fileUploadList: ', fileUploadList);
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -475,18 +478,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
-      await saveSupplierOrder(payloadSave, piNo)
-        .then((_value) => {
-          setShowSnackBar(true);
-          setSnackbarIsStatus(true);
-          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          dispatch(featchSupplierOrderDetailAsync(piNo));
-          dispatch(featchOrderListSupAsync(payloadSearch));
-        })
-        .catch((error: ApiError) => {
-          setShowSnackBar(true);
-          setContentMsg(error.message);
-        });
+      // await saveSupplierOrder(payloadSave, piNo, fileUploadLinstInfo)
+      //   .then((_value) => {
+      //     setShowSnackBar(true);
+      //     setSnackbarIsStatus(true);
+      //     setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+      //     dispatch(featchSupplierOrderDetailAsync(piNo));
+      //     dispatch(featchOrderListSupAsync(payloadSearch));
+      //   })
+      //   .catch((error: ApiError) => {
+      //     setShowSnackBar(true);
+      //     setContentMsg(error.message);
+      //   });
       setOpenLoadingModal(false);
     }
   };
@@ -505,6 +508,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [productNameDel, setProductNameDel] = React.useState('');
   const [skuCodeDel, setSkuCodeDel] = React.useState('');
   const [barCodeDel, setBarCodeDel] = React.useState('');
+  const [uploadFileInfo, setUploadFileInfo] = React.useState([]);
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
     const isRefPO = params.getValue(params.id, 'isRefPO');
@@ -522,6 +526,15 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const handleModelDeleteConfirm = () => {
     setOpenModelDeleteConfirm(false);
   };
+
+  const setUploadfile = (value: any) => {
+    console.log('setUploadfile value: ', value);
+    setUploadFileInfo(value.file);
+  };
+
+  useEffect(() => {
+    console.log('UploadFileInfo: ', uploadFileInfo);
+  }, [uploadFileInfo]);
 
   return (
     <div>
@@ -566,11 +579,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               <Grid item lg={4}>
                 <Typography variant="body2">{piNo}</Typography>
               </Grid>
-              <Grid item lg={2}>
+              {/* <Grid item lg={2}>
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
-              </Grid>
+              </Grid> */}
               <Grid item lg={4}>
-                <Button
+                {/* <Button
                   id="btnPrint"
                   color="primary"
                   variant="contained"
@@ -579,7 +592,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   disabled
                 >
                   แนบไฟล์
-                </Button>
+                </Button> */}
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -604,9 +617,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
-              <Grid item lg={2}></Grid>
+              <Grid item lg={2}>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
+              </Grid>
               <Grid item lg={4}>
-                <AccordionUploadFile />
+                {/* <AccordionUploadFile sdNo="1111" handleStoreFile={setUploadfile} /> */}
+                <AccordionUploadFile sdNo={piNo} />
               </Grid>
             </Grid>
           </Box>
