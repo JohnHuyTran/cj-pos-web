@@ -137,3 +137,10 @@ export interface PurchaseItems {
   barcode: string;
   actualQty: number;
 }
+
+export interface CalculatePurchasePIRequest {
+  billNo: string;
+  piNo: string;
+  SupplierCode: string;
+  items: PurchaseItems[];
+}

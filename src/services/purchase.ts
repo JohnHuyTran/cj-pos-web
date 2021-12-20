@@ -1,8 +1,12 @@
-import { put } from '../adapters/posback-adapter';
+import { post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { getPathUrl } from './base-service';
 import { ApiError } from '../models/api-error-model';
-import { SavePurchasePIRequest, SavePurchaseRequest } from '../models/supplier-check-order-model';
+import {
+  CalculatePurchasePIRequest,
+  SavePurchasePIRequest,
+  SavePurchaseRequest,
+} from '../models/supplier-check-order-model';
 import { PurchaseCreditNoteType } from '../models/purchase-credit-note';
 import { ContentType } from '../utils/enum/common-enum';
 
@@ -76,4 +80,16 @@ export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType)
       throw error;
     });
   return response;
+}
+
+export async function calculateSupplierPI(payload: CalculatePurchasePIRequest) {
+  try {
+    const response = await post(environment.purchase.supplierOrder.calculatePI.url, payload).then(
+      (result: any) => result
+    );
+    return response;
+  } catch (error) {
+    console.log('error = ', error);
+    throw error;
+  }
 }
