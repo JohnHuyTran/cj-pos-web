@@ -200,7 +200,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setPnStatus(purchaseDetail.pnState);
     setPnNo(purchaseDetail.pnNo);
     let newColumns = [...cols];
-    if (purchaseDetail.pnState == 2) {
+    if (purchaseDetail.pnState == 1) {
       newColumns[0]['hide'] = false;
     } else {
       newColumns[0]['hide'] = true;
