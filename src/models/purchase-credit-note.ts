@@ -31,7 +31,6 @@ export interface PurchaseNoteDetailInfo {
   comment: string;
   pnNo?: string;
   pnState?: number;
-  pnComment?: string;
   files?: FileType[];
   entries: PurchaseNoteDetailEntries | [];
 }

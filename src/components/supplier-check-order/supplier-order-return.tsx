@@ -190,8 +190,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   React.useEffect(() => {
     setFiles(purchaseDetail.files);
-    setComment(purchaseDetail.pnComment);
-    setPnStatus(purchaseDetail.pnState !== 2 ? 0 : 1);
+    setComment(purchaseDetail.comment);
+    setPnStatus(purchaseDetail.pnState);
     let newColumns = [...cols];
     if (purchaseDetail.pnState == 2) {
       newColumns[0]['hide'] = false;
@@ -227,7 +227,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     await storeItem();
     let isExit = true;
     // onClickClose();
-    if (comment !== purchaseDetail.pnComment) {
+    if (comment !== purchaseDetail.comment) {
       isExit = false;
     }
     const rowSelect = apiRef.current.getSelectedRows();
@@ -559,18 +559,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'>เลขที่เอกสาร PN</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>
-                  {' '}
-                  <TextField
-                    id='txtDocPN'
-                    name='paramQuery'
-                    size='small'
-                    value={purchaseDetail.pnNo}
-                    className={classes.MtextFieldNumber}
-                    disabled
-                    sx={{ background: '#EAEBEB' }}
-                  />
-                </Typography>
+                <Typography variant='body2'>{purchaseDetail.pnNo}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant='body2'>ผู้จำหน่าย</Typography>

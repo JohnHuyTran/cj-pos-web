@@ -90,6 +90,12 @@ export const getPathPurchaseNoteSaveDraft = (piNo: string) => {
   });
 };
 
+export const getPathPurchaseDetaio = (piNo: string) => {
+  return getPathUrl(`${environment.purchase.purchaseNote.detail.url}`, {
+    piNo: piNo,
+  });
+};
+
 export async function draftPurchaseCreditNote(payload: PurchaseCreditNoteType, piNo: string, files: File[]) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));

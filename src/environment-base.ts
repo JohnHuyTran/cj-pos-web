@@ -87,6 +87,9 @@ export const environment = {
       },
     },
     purchaseNote: {
+      detail: {
+        url: '/purchase-note/{piNo}',
+      },
       save: {
         url: '/purchase-note/{piNo}/save',
       },
