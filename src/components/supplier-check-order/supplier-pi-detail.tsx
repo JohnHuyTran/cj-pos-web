@@ -337,11 +337,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [supplierTaxNo, setSupplierTaxNo] = React.useState('');
   const [piType, setPiType] = React.useState(1);
   const [piStatus, setPiStatus] = React.useState(0);
-
   const [totalAmount, setTotalAmount] = React.useState(0);
   const [vat, setVat] = React.useState(0);
   const [grandTotalAmount, setGrandTotalAmount] = React.useState(0);
-
   const [comment, setComment] = React.useState('');
   const [commentOrigin, setCommentOrigin] = React.useState('');
   const [docNo, setDocNo] = React.useState('');
@@ -365,6 +363,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setBillNo(value);
     setErrorBillNo(false);
   };
+
+  if (rows.length === 0) {
+    if (totalAmount !== 0) setTotalAmount(0);
+    if (vat !== 0) setVat(0);
+    if (grandTotalAmount !== 0) setGrandTotalAmount(0);
+  }
 
   const saveStateRows = async () => {
     if (rows.length > 0) {

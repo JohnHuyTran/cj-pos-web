@@ -408,6 +408,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     });
   }
 
+  if (rows.length === 0) {
+    if (totalAmount !== 0) setTotalAmount(0);
+    if (vat !== 0) setVat(0);
+    if (grandTotalAmount !== 0) setGrandTotalAmount(0);
+  }
+
   if (!flagCalculate && rows.length > 0) {
     setItemCal();
     setFlagCalculate(true);
