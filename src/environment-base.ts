@@ -88,13 +88,13 @@ export const environment = {
     },
     purchaseNote: {
       detail: {
-        url: '/purchase-note/{piNo}',
+        url: '/purchase/purchase-invoice/{piNo}',
       },
       save: {
-        url: '/purchase-note/{piNo}/save',
+        url: '/purchase/purchase-note/{piNo}/save',
       },
       approve: {
-        url: '/purchase-note/{piNo}/save',
+        url: '/purchase/purchase-note/{pnNo}/approve',
       },
     },
   },

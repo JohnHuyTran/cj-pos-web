@@ -27,7 +27,12 @@ import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { approvePurchaseCreditNote, draftPurchaseCreditNote } from '../../services/purchase';
-import { ItemsType, PurchaseCreditNoteType, PurchaseNoteDetailEntries } from '../../models/purchase-credit-note';
+import {
+  ItemsType,
+  PurchaseCreditNoteType,
+  PurchaseNoteDetailEntries,
+  PurchaseNoteResponseType,
+} from '../../models/purchase-credit-note';
 import { ApiError } from '../../models/api-error-model';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import ModalConfirmOrderReturn from './modal-confirm-order-return';
@@ -81,7 +86,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'qty',
+    field: 'actualQty',
     headerName: 'จำนวนที่รับ',
     width: 110,
     headerAlign: 'center',
@@ -104,10 +109,10 @@ const columns: GridColDef[] = [
           value={params.value}
           onChange={(e) => {
             var qty: any =
-              params.getValue(params.id, 'qty') &&
-              params.getValue(params.id, 'qty') !== null &&
-              params.getValue(params.id, 'qty') != undefined
-                ? params.getValue(params.id, 'qty')
+              params.getValue(params.id, 'actualQty') &&
+              params.getValue(params.id, 'actualQty') !== null &&
+              params.getValue(params.id, 'actualQty') != undefined
+                ? params.getValue(params.id, 'actualQty')
                 : 0;
             var value = e.target.value ? parseInt(e.target.value, 10) : '0';
             // if (value > qty) value = qty;
@@ -175,6 +180,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [open, setOpen] = React.useState(isOpen);
   const [pnStatus, setPnStatus] = React.useState(0);
+  const [pnNo, setPnNo] = React.useState('');
   const [comment, setComment] = React.useState('');
   const [characterCount, setCharacterCount] = React.useState(0);
   const maxCommentLength = 255;
@@ -192,6 +198,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setFiles(purchaseDetail.files);
     setComment(purchaseDetail.comment);
     setPnStatus(purchaseDetail.pnState);
+    setPnNo(purchaseDetail.pnNo);
     let newColumns = [...cols];
     if (purchaseDetail.pnState == 2) {
       newColumns[0]['hide'] = false;
@@ -264,7 +271,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.qtyReturn > data.qty || data.qtyReturn <= 0) {
+      if (data.qtyReturn > data.actualQty || data.qtyReturn <= 0) {
         itemNotValid = true;
         return;
       }
@@ -303,7 +310,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.qtyReturn > data.qty || data.qtyReturn <= 0) {
+      if (data.qtyReturn > data.actualQty || data.qtyReturn <= 0) {
         itemNotValid = true;
         return;
       }
@@ -347,20 +354,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     // call api
     if (rs) {
       setOpenLoadingModal(true);
-      let items: ItemsType[] = [];
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      rowsEdit.forEach((data: GridRowData) => {
-        const item: ItemsType = {
-          barcode: data.barcode,
-          qtyReturn: data.qtyReturn ? data.qtyReturn : 0,
-        };
-        items.push(item);
-      });
-
-      const payload: PurchaseCreditNoteType = {
-        comment: comment,
-        items: items,
-      };
+      const payload = await mappingPayload();
       await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileInfo)
         .then((_value) => {
           setShowSnackBar(true);
@@ -375,6 +369,24 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         });
       setOpenLoadingModal(false);
     }
+  };
+
+  const mappingPayload = () => {
+    let items: ItemsType[] = [];
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    rowsEdit.forEach((data: GridRowData) => {
+      const item: ItemsType = {
+        barcode: data.barcode,
+        qtyReturn: data.qtyReturn ? data.qtyReturn : 0,
+      };
+      items.push(item);
+    });
+
+    const payload: PurchaseCreditNoteType = {
+      comment: comment,
+      items: items,
+    };
+    return payload;
   };
 
   const handleDeleteBtn = () => {
@@ -441,8 +453,24 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     await storeItem();
     const isFileValidate: boolean = validateFileInfo();
     const rs = validateItem();
+    let isCallSaveDraft: boolean = true;
+    console.log('pnNo: ', !pnNo);
     if (rs && isFileValidate) {
-      setOpenModelConfirm(true);
+      if (!pnNo) {
+        const payload = mappingPayload();
+        await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileInfo)
+          .then((value: PurchaseNoteResponseType) => {
+            setPnNo(value.pnNo);
+          })
+          .catch((error: ApiError) => {
+            setShowSnackBar(true);
+            setContentMsg(error.message);
+            isCallSaveDraft = false;
+          });
+      }
+      if (isCallSaveDraft) {
+        setOpenModelConfirm(true);
+      }
     }
   };
 
@@ -468,7 +496,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     });
 
     const payload: PurchaseCreditNoteType = {
-      pnNo: purchaseDetail.pnNo,
+      pnNo: pnNo,
       comment: comment,
       items: items,
     };
@@ -559,7 +587,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'>เลขที่เอกสาร PN</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{purchaseDetail.pnNo}</Typography>
+                <Typography variant='body2'>{pnNo}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant='body2'>ผู้จำหน่าย</Typography>
@@ -745,7 +773,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         handleConfirm={approvePN}
         header='ยืนยันอนุมัติใบรับสินค้า'
         title='เลขที่เอกสาร PN'
-        value={purchaseDetail.pnNo}
+        value={pnNo}
       />
       <LoadingModal open={openLoadingModal} />
     </div>

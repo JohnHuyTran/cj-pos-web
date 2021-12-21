@@ -11,6 +11,13 @@ export interface ItemsType {
   qtyReturn: number;
 }
 
+export interface PurchaseNoteResponseType {
+  ref: string;
+  code: number;
+  message: string;
+  pnNo: string;
+}
+
 export interface PurchaseNoteDetailResponse {
   ref: string;
   code: number;

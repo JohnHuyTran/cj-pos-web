@@ -90,12 +90,17 @@ export const getPathPurchaseNoteSaveDraft = (piNo: string) => {
   });
 };
 
-export const getPathPurchaseDetaio = (piNo: string) => {
+export const getPathPurchaseDetail = (piNo: string) => {
   return getPathUrl(`${environment.purchase.purchaseNote.detail.url}`, {
     piNo: piNo,
   });
 };
 
+export const getPathPurchaseNoteApprove = (pnNo: string) => {
+  return getPathUrl(`${environment.purchase.purchaseNote.approve.url}`, {
+    pnNo: pnNo,
+  });
+};
 export async function draftPurchaseCreditNote(payload: PurchaseCreditNoteType, piNo: string, files: File[]) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
@@ -112,16 +117,16 @@ export async function draftPurchaseCreditNote(payload: PurchaseCreditNoteType, p
 }
 export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType, files: File[]) {
   const bodyFormData = new FormData();
-  // bodyFormData.append(
-  //   'requestBody',
-  //   '{"piNo":"","SupplierCode":"0000402671","billNo":"22222","docNo":"","flagPO":1,"comment":"","items":[{"barcode":"8859333830578","actualQty":1}]}'
-  // );
   bodyFormData.append('requestBody', JSON.stringify(payload));
   files.map((file: File) => {
     return bodyFormData.append('file[]', file);
   });
-  // const response = await put(environment.purchase.purchaseNote.approve.url, bodyFormData, ContentType.MULTIPART)
-  const response = await put(environment.purchase.supplierOrder.approve.url, bodyFormData, ContentType.MULTIPART)
+  const response = await put(
+    getPathPurchaseNoteApprove(payload.pnNo ? payload.pnNo : ''),
+    bodyFormData,
+    ContentType.MULTIPART
+  )
+    // const response = await put(environment.purchase.supplierOrder.approve.url, bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;
