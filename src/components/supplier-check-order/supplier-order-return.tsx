@@ -203,19 +203,11 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         seqItem: item.seqItem,
         produtStatus: item.produtStatus,
         isDraftStatus: pnStatus === 0 ? false : true,
-        isControlStock: item.isControlStock,
-        isAllowDiscount: item.isAllowDiscount,
         skuCode: item.skuCode,
         barcode: item.barcode,
         productName: item.productName,
-        unitCode: item.unitCode,
-        unitName: item.unitName,
         qty: item.qty,
         qtyAll: item.qtyAll,
-        controlPrice: item.controlPrice,
-        salePrice: item.salePrice,
-        setPrice: item.setPrice,
-        sumPrice: item.sumPrice,
         actualQty: item.actualQty,
         returnQty: item.returnQty ? item.returnQty : 0,
         actualQtyAll: item.actualQtyAll,
@@ -275,19 +267,11 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         seqItem: data.seqItem,
         produtStatus: data.produtStatus,
         isDraftStatus: pnStatus === 0 ? false : true,
-        isControlStock: data.isControlStock,
-        isAllowDiscount: data.isAllowDiscount,
         skuCode: data.skuCode,
         barcode: data.barcode,
         productName: data.productName,
-        unitCode: data.unitCode,
-        unitName: data.unitName,
         qty: data.qty,
         qtyAll: data.qtyAll,
-        controlPrice: data.controlPrice,
-        salePrice: data.salePrice,
-        setPrice: data.setPrice,
-        sumPrice: data.sumPrice,
         actualQty: data.actualQty,
         returnQty: data.returnQty,
         actualQtyAll: data.actualQtyAll,
@@ -330,19 +314,11 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         seqItem: data.seqItem,
         produtStatus: data.produtStatus,
         isDraftStatus: pnStatus === 0 ? false : true,
-        isControlStock: data.isControlStock,
-        isAllowDiscount: data.isAllowDiscount,
         skuCode: data.skuCode,
         barcode: data.barcode,
         productName: data.productName,
-        unitCode: data.unitCode,
-        unitName: data.unitName,
         qty: data.qty,
         qtyAll: data.qtyAll,
-        controlPrice: data.controlPrice,
-        salePrice: data.salePrice,
-        setPrice: data.setPrice,
-        sumPrice: data.sumPrice,
         actualQty: data.actualQty,
         returnQty: data.returnQty,
         actualQtyAll: data.actualQtyAll,
@@ -363,24 +339,22 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       rowsEdit.forEach((data: GridRowData) => {
         const item: ItemsType = {
           barcode: data.barcode,
-          returnQry: data.returnQty ? data.returnQty : 0,
+          qtyReturn: data.returnQty ? data.returnQty : 0,
         };
         items.push(item);
       });
 
       const payload: PurchaseCreditNoteType = {
-        pnNo: purchaseDetail.pnNo,
+        comment: comment,
         items: items,
       };
-      await draftPurchaseCreditNote(payload)
+      await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileInfo)
         .then((_value) => {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          dispatch(featchSupplierOrderDetailAsync(purchaseDetail.pnNo));
+          dispatch(featchSupplierOrderDetailAsync(purchaseDetail.pnNo)); // change dispatch slice
           dispatch(featchOrderListSupAsync(payloadSearch));
-
-          // localStorage.removeItem('SupplierRowsEdit');
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
@@ -408,19 +382,11 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         seqItem: data.seqItem,
         produtStatus: data.produtStatus,
         isDraftStatus: pnStatus === 0 ? false : true,
-        isControlStock: data.isControlStock,
-        isAllowDiscount: data.isAllowDiscount,
         skuCode: data.skuCode,
         barcode: data.barcode,
         productName: data.productName,
-        unitCode: data.unitCode,
-        unitName: data.unitName,
         qty: data.qty,
         qtyAll: data.qtyAll,
-        controlPrice: data.controlPrice,
-        salePrice: data.salePrice,
-        setPrice: data.setPrice,
-        sumPrice: data.sumPrice,
         actualQty: data.actualQty,
         returnQty: data.returnQty,
         actualQtyAll: data.actualQtyAll,
@@ -470,13 +436,14 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     purchaseDetailItems.forEach((data: PurchaseDetailEntries) => {
       const item: ItemsType = {
         barcode: data.barcode,
-        returnQry: data.returnQty ? data.returnQty : 0,
+        qtyReturn: data.returnQty ? data.returnQty : 0,
       };
       items.push(item);
     });
 
     const payload: PurchaseCreditNoteType = {
       pnNo: purchaseDetail.pnNo,
+      comment: comment,
       items: items,
     };
     await approvePurchaseCreditNote(payload, fileInfo)
