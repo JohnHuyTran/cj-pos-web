@@ -262,6 +262,7 @@ export default function SupplierOrderList() {
         if (chkPN === 'pnNo') {
           setOpenReturn(true);
         } else {
+          await dispatch(updateItemsState({}));
           setOpenDetail(true);
         }
       } else {
