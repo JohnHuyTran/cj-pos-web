@@ -20,18 +20,22 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { PurchaseDetailEntries, PurchaseDetailInfo } from '../../models/supplier-check-order-model';
+// import { PurchaseDetailEntries, PurchaseDetailInfo } from '../../models/supplier-check-order-model';
 import AlertError from '../commons/ui/alert-error';
 import { ErrorOutline } from '@mui/icons-material';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { approvePurchaseCreditNote, draftPurchaseCreditNote } from '../../services/purchase';
-import { ItemsType, PurchaseCreditNoteType } from '../../models/purchase-credit-note';
+import { ItemsType, PurchaseCreditNoteType, PurchaseNoteDetailEntries } from '../../models/purchase-credit-note';
 import { ApiError } from '../../models/api-error-model';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import ModalConfirmOrderReturn from './modal-confirm-order-return';
 import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
+import { isValid } from 'date-fns';
+import AccordionHuaweiFile from './accordion-huawei-file';
+import { FileType } from '../../models/supplier-check-order-model';
+import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -85,7 +89,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'returnQty',
+    field: 'qtyReturn',
     headerName: 'จำนวนที่คืน',
     width: 110,
     headerAlign: 'center',
@@ -107,7 +111,7 @@ const columns: GridColDef[] = [
                 : 0;
             var value = e.target.value ? parseInt(e.target.value, 10) : '0';
             // if (value > qty) value = qty;
-            params.api.updateRows([{ ...params.row, returnQty: value }]);
+            params.api.updateRows([{ ...params.row, qtyReturn: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
           autoComplete='off'
@@ -145,13 +149,15 @@ function useApiRef() {
 function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
+  const purchaseDetailList = useAppSelector((state) => state.SupplierOrderReturn.purchaseDetail);
   const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
 
   const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
-  const [purchaseDetailItems, setPurchaseDetailItems] = React.useState<PurchaseDetailEntries[]>(
+  const [purchaseDetailItems, setPurchaseDetailItems] = React.useState<PurchaseNoteDetailEntries[]>(
     purchaseDetail.entries ? purchaseDetail.entries : []
   );
+
+  const [files, setFiles] = React.useState<FileType[]>([]);
 
   const { apiRef, columns } = useApiRef();
 
@@ -183,6 +189,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const [cols, setCols] = React.useState(columns);
 
   React.useEffect(() => {
+    setFiles(purchaseDetail.files);
     setComment(purchaseDetail.pnComment);
     setPnStatus(purchaseDetail.pnState !== 2 ? 0 : 1);
     let newColumns = [...cols];
@@ -196,7 +203,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   let rows = purchaseDetailItems
     // .filter((item: PurchaseDetailEntries) => item.pnDisplay === 1)
-    .map((item: PurchaseDetailEntries, index: number) => {
+    .map((item: PurchaseNoteDetailEntries, index: number) => {
       return {
         id: `${item.barcode}-${index + 1}`,
         index: index + 1,
@@ -208,8 +215,10 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         productName: item.productName,
         qty: item.qty,
         qtyAll: item.qtyAll,
+        unitName: item.unitName,
+        unitCode: item.unitCode,
         actualQty: item.actualQty,
-        returnQty: item.returnQty ? item.returnQty : 0,
+        qtyReturn: item.qtyReturn ? item.qtyReturn : 0,
         actualQtyAll: item.actualQtyAll,
       };
     });
@@ -225,7 +234,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     if (rowSelect.size > 0) {
       isExit = false;
     }
-    const ent: PurchaseDetailEntries[] = purchaseDetail.entries;
+    const ent: PurchaseNoteDetailEntries[] = purchaseDetail.entries;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     if (rowsEdit.size !== ent.length) {
       isExit = false;
@@ -233,7 +242,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
     let i = 0;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.returnQty !== (ent[i].returnQty ? ent[i].returnQty : 0)) {
+      if (data.qtyReturn !== (ent[i].qtyReturn ? ent[i].qtyReturn : 0)) {
         isExit = false;
       }
       i++;
@@ -255,15 +264,15 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.returnQty > data.qty || data.returnQty <= 0) {
+      if (data.qtyReturn > data.qty || data.qtyReturn <= 0) {
         itemNotValid = true;
         return;
       }
     });
 
-    const items: PurchaseDetailEntries[] = [];
+    const items: PurchaseNoteDetailEntries[] = [];
     rowsEdit.forEach((data: GridRowData) => {
-      const newData: PurchaseDetailEntries = {
+      const newData: PurchaseNoteDetailEntries = {
         seqItem: data.seqItem,
         produtStatus: data.produtStatus,
         isDraftStatus: pnStatus === 0 ? false : true,
@@ -272,8 +281,10 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         productName: data.productName,
         qty: data.qty,
         qtyAll: data.qtyAll,
+        unitName: data.unitName,
+        unitCode: data.unitCode,
         actualQty: data.actualQty,
-        returnQty: data.returnQty,
+        qtyReturn: data.qtyReturn,
         actualQtyAll: data.actualQtyAll,
       };
       items.push(newData);
@@ -292,7 +303,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.returnQty > data.qty || data.returnQty <= 0) {
+      if (data.qtyReturn > data.qty || data.qtyReturn <= 0) {
         itemNotValid = true;
         return;
       }
@@ -308,9 +319,9 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const storeItem = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const items: PurchaseDetailEntries[] = [];
+    const items: PurchaseNoteDetailEntries[] = [];
     rowsEdit.forEach((data: GridRowData) => {
-      const newData: PurchaseDetailEntries = {
+      const newData: PurchaseNoteDetailEntries = {
         seqItem: data.seqItem,
         produtStatus: data.produtStatus,
         isDraftStatus: pnStatus === 0 ? false : true,
@@ -320,8 +331,10 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         qty: data.qty,
         qtyAll: data.qtyAll,
         actualQty: data.actualQty,
-        returnQty: data.returnQty,
+        qtyReturn: data.qtyReturn,
         actualQtyAll: data.actualQtyAll,
+        unitName: data.unitName,
+        unitCode: data.unitCode,
       };
       items.push(newData);
     });
@@ -339,7 +352,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       rowsEdit.forEach((data: GridRowData) => {
         const item: ItemsType = {
           barcode: data.barcode,
-          qtyReturn: data.returnQty ? data.returnQty : 0,
+          qtyReturn: data.qtyReturn ? data.qtyReturn : 0,
         };
         items.push(item);
       });
@@ -353,7 +366,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          dispatch(featchSupplierOrderDetailAsync(purchaseDetail.pnNo)); // change dispatch slice
+          dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
           dispatch(featchOrderListSupAsync(payloadSearch));
         })
         .catch((error: ApiError) => {
@@ -376,9 +389,9 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       rowsEdit.delete(key);
     });
 
-    const items: PurchaseDetailEntries[] = [];
+    const items: PurchaseNoteDetailEntries[] = [];
     rowsEdit.forEach((data: GridRowData) => {
-      const newData: PurchaseDetailEntries = {
+      const newData: PurchaseNoteDetailEntries = {
         seqItem: data.seqItem,
         produtStatus: data.produtStatus,
         isDraftStatus: pnStatus === 0 ? false : true,
@@ -387,8 +400,10 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         productName: data.productName,
         qty: data.qty,
         qtyAll: data.qtyAll,
+        unitName: data.unitName,
+        unitCode: data.unitCode,
         actualQty: data.actualQty,
-        returnQty: data.returnQty,
+        qtyReturn: data.qtyReturn,
         actualQtyAll: data.actualQtyAll,
       };
       items.push(newData);
@@ -424,19 +439,30 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const handleConfirmBtn = async () => {
     await storeItem();
+    const isFileValidate: boolean = validateFileInfo();
     const rs = validateItem();
-    if (rs) {
+    if (rs && isFileValidate) {
       setOpenModelConfirm(true);
     }
+  };
+
+  const validateFileInfo = () => {
+    const isvalid = fileInfo === undefined || fileInfo === null || fileInfo.length <= 0 ? false : true;
+    if (!isvalid) {
+      setOpenAlert(true);
+      setTextError('กรุณาแนบไฟล์');
+      return false;
+    }
+    return isvalid;
   };
 
   const approvePN = async () => {
     setOpenLoadingModal(true);
     let items: ItemsType[] = [];
-    purchaseDetailItems.forEach((data: PurchaseDetailEntries) => {
+    purchaseDetailItems.forEach((data: PurchaseNoteDetailEntries) => {
       const item: ItemsType = {
         barcode: data.barcode,
-        qtyReturn: data.returnQty ? data.returnQty : 0,
+        qtyReturn: data.qtyReturn ? data.qtyReturn : 0,
       };
       items.push(item);
     });
@@ -469,7 +495,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setOpenLoadingModal(false);
   };
 
-  const [fileInfo, setFileInfo] = React.useState<any>([]);
+  const [fileInfo, setFileInfo] = React.useState<File[]>([]);
   const handleFileInputChange = (e: any) => {
     // setValidationFile(false);
     // setErrorBrowseFile(false);
@@ -578,32 +604,38 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'>แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <TextField
-                  name='browserTxf'
-                  className={classes.MtextFieldBrowse}
-                  value={fileInfo.fileName}
-                  placeholder='แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB'
-                />
-                <input
-                  id='btnBrowse'
-                  type='file'
-                  multiple
-                  // onDrop
-                  accept='.pdf, .jpg, .jpeg'
-                  onChange={handleFileInputChange}
-                  style={{ display: 'none' }}
-                />
-                <label htmlFor={'btnBrowse'}>
-                  <Button
-                    id='btnPrint'
-                    color='primary'
-                    variant='contained'
-                    component='span'
-                    className={classes.MbtnBrowse}
-                    style={{ marginLeft: 10, textTransform: 'none' }}>
-                    Browse
-                  </Button>
-                </label>
+                {pnStatus === 0 && (
+                  <>
+                    <TextField
+                      name='browserTxf'
+                      className={classes.MtextFieldBrowse}
+                      value=''
+                      placeholder='แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB'
+                    />
+                    <input
+                      id='btnBrowse'
+                      type='file'
+                      multiple
+                      // onDrop
+                      accept='.pdf, .jpg, .jpeg'
+                      onChange={handleFileInputChange}
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor={'btnBrowse'}>
+                      <Button
+                        id='btnPrint'
+                        color='primary'
+                        variant='contained'
+                        component='span'
+                        className={classes.MbtnBrowse}
+                        style={{ marginLeft: 10, textTransform: 'none' }}>
+                        Browse
+                      </Button>
+                    </label>
+                  </>
+                )}
+
+                {pnStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
               </Grid>
             </Grid>
           </Box>

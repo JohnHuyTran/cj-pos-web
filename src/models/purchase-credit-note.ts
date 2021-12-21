@@ -50,6 +50,8 @@ export interface PurchaseNoteDetailEntries {
   qtyReturn?: number;
   allQtyReturn?: number;
   pnDisplay?: number;
+  unitCode: string;
+  unitName: string;
 }
 
 export interface PurchaseNoteDetailResponse {
