@@ -11,8 +11,14 @@ import { PurchaseCreditNoteType } from '../models/purchase-credit-note';
 import { ContentType } from '../utils/enum/common-enum';
 
 export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string) {
+  const bodyFormData = new FormData();
+
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+
   try {
-    const response = await put(getPathSaveDraft(piNo), payload).then((result: any) => result);
+    const response = await put(getPathSaveDraft(piNo), bodyFormData, ContentType.MULTIPART).then(
+      (result: any) => result
+    );
     return response;
   } catch (error) {
     console.log('error = ', error);
@@ -21,7 +27,11 @@ export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: stri
 }
 
 export async function approveSupplierOrder(payload: SavePurchaseRequest, piNo: string) {
-  const response = await put(getPathApprove(piNo), payload)
+  const bodyFormData = new FormData();
+
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  const response = await put(getPathApprove(piNo), bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;
@@ -42,10 +52,18 @@ export const getPathApprove = (piNo: string) => {
 };
 
 export async function saveSupplierPI(payload: SavePurchasePIRequest) {
+  const bodyFormData = new FormData();
+
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  // bodyFormData.append('file[]', fileList[0]);
+
   try {
-    const response = await put(environment.purchase.supplierOrder.saveDraftPI.url, payload).then(
-      (result: any) => result
-    );
+    const response = await put(
+      environment.purchase.supplierOrder.saveDraftPI.url,
+      bodyFormData,
+      ContentType.MULTIPART
+    ).then((result: any) => result);
     return response;
   } catch (error) {
     console.log('error = ', error);
@@ -54,7 +72,11 @@ export async function saveSupplierPI(payload: SavePurchasePIRequest) {
 }
 
 export async function approveSupplierPI(payload: SavePurchasePIRequest) {
-  const response = await put(environment.purchase.supplierOrder.approvePI.url, payload)
+  const bodyFormData = new FormData();
+
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;
