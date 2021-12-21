@@ -399,7 +399,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [items, setItems] = React.useState<any>([]);
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
-  console.log('fileUploadList2: ', fileUploadList);
+  // console.log('fileUploadList2: ', fileUploadList);
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -532,9 +532,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setUploadFileInfo(value.file);
   };
 
-  useEffect(() => {
-    console.log('UploadFileInfo: ', uploadFileInfo);
-  }, [uploadFileInfo]);
+  // useEffect(() => {
+  //   console.log('UploadFileInfo: ', uploadFileInfo);
+  // }, [uploadFileInfo]);
 
   return (
     <div>
@@ -621,7 +621,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
-                {/* <AccordionUploadFile sdNo="1111" handleStoreFile={setUploadfile} /> */}
                 <AccordionUploadFile sdNo={piNo} />
               </Grid>
             </Grid>

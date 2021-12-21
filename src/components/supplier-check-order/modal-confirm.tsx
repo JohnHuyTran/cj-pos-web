@@ -39,7 +39,6 @@ export default function ModelConfirm({
   piDetail,
 }: Props): ReactElement {
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
-  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const handleConfirm = async () => {
     setOpenLoadingModal(true);
     if (piDetail) {
@@ -72,18 +71,16 @@ export default function ModelConfirm({
         items: items,
       };
 
-      // await approveSupplierOrder(payloadSave, piNo).then(
-      //   function (value) {
-      //     setTimeout(() => {
-      //       onUpdateAction(true, '');
-      //     }, 500);
-      //   },
-      //   function (error: ApiError) {
-      //     onUpdateAction(false, error.message);
-      //   }
-      // );
-
-      await approvePurchaseCreditNote2(payloadSave, fileUploadList);
+      await approveSupplierOrder(payloadSave, piNo).then(
+        function (value) {
+          setTimeout(() => {
+            onUpdateAction(true, '');
+          }, 500);
+        },
+        function (error: ApiError) {
+          onUpdateAction(false, error.message);
+        }
+      );
 
       setOpenLoadingModal(false);
     }
