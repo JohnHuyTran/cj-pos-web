@@ -399,7 +399,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [items, setItems] = React.useState<any>([]);
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
-  console.log('fileUploadList: ', fileUploadList);
+  console.log('fileUploadList2: ', fileUploadList);
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -478,18 +478,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
-      // await saveSupplierOrder(payloadSave, piNo, fileUploadLinstInfo)
-      //   .then((_value) => {
-      //     setShowSnackBar(true);
-      //     setSnackbarIsStatus(true);
-      //     setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-      //     dispatch(featchSupplierOrderDetailAsync(piNo));
-      //     dispatch(featchOrderListSupAsync(payloadSearch));
-      //   })
-      //   .catch((error: ApiError) => {
-      //     setShowSnackBar(true);
-      //     setContentMsg(error.message);
-      //   });
+      await saveSupplierOrder(payloadSave, piNo, fileUploadList)
+        .then((_value) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          dispatch(featchSupplierOrderDetailAsync(piNo));
+          dispatch(featchOrderListSupAsync(payloadSearch));
+        })
+        .catch((error: ApiError) => {
+          setShowSnackBar(true);
+          setContentMsg(error.message);
+        });
       setOpenLoadingModal(false);
     }
   };

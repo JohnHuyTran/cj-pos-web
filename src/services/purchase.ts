@@ -16,10 +16,14 @@ import { ContentType } from '../utils/enum/common-enum';
 //   }
 // }
 
-export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string, fileList: any) {
+export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string, fileList: File[]) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
-  bodyFormData.append('file[]', fileList);
+
+  fileList.map((data: File) => {
+    return bodyFormData.append('file[]', data);
+  });
+
   try {
     const response = await put(getPathSaveDraft(piNo), bodyFormData, ContentType.MULTIPART).then(
       (result: any) => result
@@ -82,7 +86,30 @@ export async function draftPurchaseCreditNote(payload: PurchaseCreditNoteType) {
   return response;
 }
 
-export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType) {
+export async function approvePurchaseCreditNote2(payload: any, fileList: File[]) {
+  const bodyFormData = new FormData();
+  // bodyFormData.append('requestBody', JSON.stringify(payload));
+  bodyFormData.append(
+    'requestBody',
+
+    '{"piNo":"","SupplierCode":"0000402671","billNo":"22222","docNo":"","flagPO":1,"comment":"","items":[{"barcode":"8859333830578","actualQty":1}]}'
+  );
+
+  // bodyFormData.append('file[]', fileList[0], 'filename.pdf');
+
+  fileList.map((data: File) => {
+    return bodyFormData.append('file[]', data);
+  });
+
+  const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
+    .then((result: any) => result)
+    .catch((error: ApiError) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType, fileList: any) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
   const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
@@ -92,14 +119,3 @@ export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType)
     });
   return response;
 }
-
-// export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType, fileList: any) {
-//   const bodyFormData = new FormData();
-//   bodyFormData.append('requestBody', JSON.stringify(payload));
-//   const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
-//     .then((result: any) => result)
-//     .catch((error: ApiError) => {
-//       throw error;
-//     });
-//   return response;
-// }

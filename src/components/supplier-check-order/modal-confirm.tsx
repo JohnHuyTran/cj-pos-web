@@ -7,8 +7,9 @@ import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
 import { ApiError } from '../../models/api-error-model';
 import { SavePurchasePIRequest, SavePurchaseRequest } from '../../models/supplier-check-order-model';
-import { approveSupplierOrder, approveSupplierPI } from '../../services/purchase';
+import { approveSupplierOrder, approveSupplierPI, approvePurchaseCreditNote2 } from '../../services/purchase';
 import LoadingModal from '../commons/ui/loading-modal';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 
 interface Props {
   open: boolean;
@@ -38,6 +39,7 @@ export default function ModelConfirm({
   piDetail,
 }: Props): ReactElement {
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const handleConfirm = async () => {
     setOpenLoadingModal(true);
     if (piDetail) {
@@ -70,16 +72,18 @@ export default function ModelConfirm({
         items: items,
       };
 
-      await approveSupplierOrder(payloadSave, piNo).then(
-        function (value) {
-          setTimeout(() => {
-            onUpdateAction(true, '');
-          }, 500);
-        },
-        function (error: ApiError) {
-          onUpdateAction(false, error.message);
-        }
-      );
+      // await approveSupplierOrder(payloadSave, piNo).then(
+      //   function (value) {
+      //     setTimeout(() => {
+      //       onUpdateAction(true, '');
+      //     }, 500);
+      //   },
+      //   function (error: ApiError) {
+      //     onUpdateAction(false, error.message);
+      //   }
+      // );
+
+      await approvePurchaseCreditNote2(payloadSave, fileUploadList);
 
       setOpenLoadingModal(false);
     }
