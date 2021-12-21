@@ -79,11 +79,13 @@ export const environment = {
       searchSupplierPO: {
         url: '/purchase/receivable-purchase-order',
       },
-      purchaseCreditDraft: {
-        url: '/purchase/receivable-purchase-order',
+    },
+    purchaseNote: {
+      save: {
+        url: '/purchase-note/{piNo}/save',
       },
-      purchaseCreditApprove: {
-        url: '/purchase/receivable-purchase-order',
+      approve: {
+        url: '/purchase-note/{piNo}/save',
       },
     },
   },
