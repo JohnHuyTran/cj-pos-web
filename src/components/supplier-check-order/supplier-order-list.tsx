@@ -122,7 +122,7 @@ export default function SupplierOrderList() {
       sortable: false,
       renderCell: (params) => {
         if (params.getValue(params.id, 'piStatus') === 1) {
-          if (params.value === 0) {
+          if (params.getValue(params.id, 'pnState') === 0) {
             //check Create PN
             return (
               <Button
@@ -139,7 +139,7 @@ export default function SupplierOrderList() {
             //PN Number 'บันทึก pnState=1, อนุมัติpnState=2'
             return (
               <Typography color="secondary" variant="body2" sx={{ textDecoration: 'underline' }}>
-                {params.getValue(params.id, 'pnNo') || ''}
+                {params.value}
               </Typography>
             );
           }
@@ -192,7 +192,7 @@ export default function SupplierOrderList() {
       supplierCode: data.supplierCode,
       piNo: data.piNo,
       docNo: data.docNo,
-      pnNo: data.pnState,
+      pnNo: data.pnNo,
       piStatus: data.piStatus,
       comment: data.comment,
     };
