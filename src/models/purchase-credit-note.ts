@@ -1,9 +1,10 @@
 export interface PurchaseCreditNoteType {
-  pnNo: string;
+  pnNo?: string;
+  comment: string;
   items: ItemsType[];
 }
 
 export interface ItemsType {
   barcode: string;
-  returnQry: number;
+  qtyReturn: number;
 }
