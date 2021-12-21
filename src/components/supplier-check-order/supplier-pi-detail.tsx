@@ -128,13 +128,19 @@ const columns: GridColDef[] = [
         type="number"
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
+        // onBlur={(e) => {
+        //   var value = e.target.value ? parseInt(e.target.value, 10) : '';
+        //   console.log('onBlur1:', value);
+        //   if (value === 0) value = '';
+        //   console.log('onBlur2:', value);
+        //   params.api.updateRows([{ ...params.row, actualQty: value }]);
+        // }}
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
           var qty = Number(params.getValue(params.id, 'qty'));
           var piType = Number(params.getValue(params.id, 'piType'));
           if (piType === 0 && value > qty) value = qty;
-
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         // disabled={isDisable(params) ? true : false}
@@ -497,19 +503,16 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
     await calculateSupplierPI(payloadCalculate)
       .then((value) => {
-        setTotalAmount(value.data.totalAmount);
-        setVat(value.data.vat);
-        setGrandTotalAmount(value.data.grandTotalAmount);
-        console.log(value.data.totalAmount, ' / ', value.data.vat, ' / ', value.data.grandTotalAmount);
+        setTotalAmount(value.data.amountText.totalAmount);
+        setVat(value.data.amountText.vat);
+        setGrandTotalAmount(value.data.amountText.grandTotalAmount);
 
         let calItem = value.data.items;
         const items: any = [];
         rows.forEach((data: GridRowData) => {
           const calculate = calItem.filter((r: any) => r.barcode === data.barcode);
           // const sumPrice = (Math.round(Number(calculate[0].sumPrice) * 100) / 100).toFixed(2);
-          const sumPrice = calculate[0].sumPrice;
-          console.log('sumPrice:', JSON.stringify(sumPrice));
-
+          const sumPrice = calculate[0].amountText.sumPrice;
           const item: any = {
             id: data.index,
             barcode: data.barcode,
