@@ -91,6 +91,9 @@ export const environment = {
       supplierFile: {
         url: '/purchase/getUrl',
       },
+      exportFile: {
+        url: '/purchase/purchase-invoice/{piNo}/export',
+      },
     },
   },
   products: {
