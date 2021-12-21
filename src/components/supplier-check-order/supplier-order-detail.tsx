@@ -680,7 +680,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
             </Grid>
 
-            <Grid container mb={2} sx={{ mt: -3 }}>
+            <Grid container mb={2} sx={{ mt: -4 }}>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
               </Grid>
@@ -712,10 +712,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
-              <Grid item lg={2} sx={{ mt: -4 }}>
+              <Grid item lg={2} sx={{ mt: -3 }}>
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
-              <Grid item lg={4} sx={{ mt: -4 }}>
+              <Grid item lg={4} sx={{ mt: -3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
                   <Button
                     id="btnPrint"
