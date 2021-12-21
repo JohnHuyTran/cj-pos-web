@@ -680,38 +680,16 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
             </Grid>
 
-            <Grid container mb={1}>
+            <Grid container mb={2} sx={{ mt: -4 }}>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">{piNo}</Typography>
               </Grid>
-              <Grid item lg={2}>
-                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
-              </Grid>
-              <Grid item lg={4}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                  <Button
-                    id="btnPrint"
-                    color="primary"
-                    variant="contained"
-                    component="span"
-                    className={classes.MbtnBrowse}
-                    disabled
-                  >
-                    แนบไฟล์
-                  </Button>
-
-                  <Typography
-                    variant="overline"
-                    sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
-                  >
-                    แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
-                  </Typography>
-                </Box>
-              </Grid>
+              <Grid item lg={6}></Grid>
             </Grid>
+
             <Grid container mb={1}>
               <Grid item lg={2}>
                 <Typography variant="body2">ผู้จัดจำหน่าย:</Typography>
@@ -734,8 +712,30 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
-              <Grid item lg={2}></Grid>
-              <Grid item lg={4}>
+              <Grid item lg={2} sx={{ mt: -3 }}>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
+              </Grid>
+              <Grid item lg={4} sx={{ mt: -3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
+                  <Button
+                    id="btnPrint"
+                    color="primary"
+                    variant="contained"
+                    component="span"
+                    className={classes.MbtnBrowse}
+                    disabled
+                  >
+                    แนบไฟล์
+                  </Button>
+
+                  <Typography
+                    variant="overline"
+                    sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
+                  >
+                    แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
+                  </Typography>
+                </Box>
+
                 {piStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
               </Grid>
             </Grid>

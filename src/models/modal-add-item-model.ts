@@ -13,7 +13,7 @@ export interface ItemInfo {
   unitName?: string;
   barcodeName: string;
   unitPrice?: number;
-  qty?: number;
+  actualQty?: number;
 }
 
 export interface ItemByBarcodeResponse {
