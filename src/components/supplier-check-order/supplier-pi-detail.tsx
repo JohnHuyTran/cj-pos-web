@@ -131,6 +131,10 @@ const columns: GridColDef[] = [
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
+          var qty = Number(params.getValue(params.id, 'qty'));
+          var piType = Number(params.getValue(params.id, 'piType'));
+          if (piType === 0 && value > qty) value = qty;
+
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         // disabled={isDisable(params) ? true : false}
@@ -512,7 +516,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             unitName: data.unitName,
             productName: data.productName,
             qty: data.qty,
-            actualQty: data.actualQty,
+            actualQty: calculate[0].actualQty,
             skuCode: data.skuCode,
             unitPrice: data.setPrice,
             sumPrice: sumPrice,

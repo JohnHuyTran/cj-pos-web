@@ -145,6 +145,10 @@ const columns: GridColDef[] = [
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
+          var qty = Number(params.getValue(params.id, 'qty'));
+          var piType = Number(params.getValue(params.id, 'piType'));
+          if (piType === 0 && value > qty) value = qty;
+
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         disabled={isDisable(params) ? true : false}
@@ -334,6 +338,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       rowsEdit.forEach((data: GridRowData) => {
         itemsList.push(data);
       });
+      console.log('itemsList:', JSON.stringify(itemsList));
       if (itemsList.length > 0) updateStateRows(itemsList);
     }
   };
@@ -361,6 +366,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   ]);
 
   let rows: any = [];
+  //State payloadAddItem
   if (Object.keys(payloadAddItem).length !== 0) {
     rows = payloadAddItem.map((item: any, index: number) => {
       let barcode = item.barCode ? item.barCode : item.barcode;
@@ -388,7 +394,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       };
     });
   } else {
-    handleUpdateRowState();
+    //Get PurchaseDetail
+    // handleUpdateRowState();
     rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
       return {
         id: `${item.barcode}-${index + 1}`,
@@ -604,9 +611,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       piNo: purchaseDetail.piNo,
       billNo: purchaseDetail.billNo,
       SupplierCode: purchaseDetail.supplierCode,
-      // piNo: purchaseDetail.piNo,
-      // billNo: '',
-      // SupplierCode: '',
       items: items,
     };
 
@@ -625,14 +629,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             unitName: data.unitName,
             productName: data.productName,
             qty: data.qty,
-            actualQty: data.actualQty,
+            actualQty: calculate[0].actualQty,
             skuCode: data.skuCode,
             unitPrice: data.setPrice,
             sumPrice: calculate[0].sumPrice,
           };
           items.push(item);
         });
-        // dispatch(updateItemsState(items));
         updateStateRows(items);
       })
       .catch((error: ApiError) => {
@@ -677,38 +680,16 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
             </Grid>
 
-            <Grid container mb={1}>
+            <Grid container mb={2} sx={{ mt: -3 }}>
               <Grid item lg={2}>
                 <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">{piNo}</Typography>
               </Grid>
-              <Grid item lg={2}>
-                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
-              </Grid>
-              <Grid item lg={4}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                  <Button
-                    id="btnPrint"
-                    color="primary"
-                    variant="contained"
-                    component="span"
-                    className={classes.MbtnBrowse}
-                    disabled
-                  >
-                    แนบไฟล์
-                  </Button>
-
-                  <Typography
-                    variant="overline"
-                    sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
-                  >
-                    แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
-                  </Typography>
-                </Box>
-              </Grid>
+              <Grid item lg={6}></Grid>
             </Grid>
+
             <Grid container mb={1}>
               <Grid item lg={2}>
                 <Typography variant="body2">ผู้จัดจำหน่าย:</Typography>
@@ -731,8 +712,30 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
-              <Grid item lg={2}></Grid>
-              <Grid item lg={4}>
+              <Grid item lg={2} sx={{ mt: -4 }}>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
+              </Grid>
+              <Grid item lg={4} sx={{ mt: -4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
+                  <Button
+                    id="btnPrint"
+                    color="primary"
+                    variant="contained"
+                    component="span"
+                    className={classes.MbtnBrowse}
+                    disabled
+                  >
+                    แนบไฟล์
+                  </Button>
+
+                  <Typography
+                    variant="overline"
+                    sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
+                  >
+                    แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
+                  </Typography>
+                </Box>
+
                 {piStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
               </Grid>
             </Grid>
