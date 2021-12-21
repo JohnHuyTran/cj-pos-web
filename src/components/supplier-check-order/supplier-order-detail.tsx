@@ -145,6 +145,10 @@ const columns: GridColDef[] = [
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
+          var qty = Number(params.getValue(params.id, 'qty'));
+          var piType = Number(params.getValue(params.id, 'piType'));
+          if (piType === 0 && value > qty) value = qty;
+
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         disabled={isDisable(params) ? true : false}
@@ -334,6 +338,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       rowsEdit.forEach((data: GridRowData) => {
         itemsList.push(data);
       });
+      console.log('itemsList:', JSON.stringify(itemsList));
       if (itemsList.length > 0) updateStateRows(itemsList);
     }
   };
@@ -361,6 +366,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   ]);
 
   let rows: any = [];
+  //State payloadAddItem
   if (Object.keys(payloadAddItem).length !== 0) {
     rows = payloadAddItem.map((item: any, index: number) => {
       let barcode = item.barCode ? item.barCode : item.barcode;
@@ -388,7 +394,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       };
     });
   } else {
-    handleUpdateRowState();
+    //Get PurchaseDetail
+    // handleUpdateRowState();
     rows = purchaseDetailItems.map((item: PurchaseDetailEntries, index: number) => {
       return {
         id: `${item.barcode}-${index + 1}`,
@@ -604,9 +611,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       piNo: purchaseDetail.piNo,
       billNo: purchaseDetail.billNo,
       SupplierCode: purchaseDetail.supplierCode,
-      // piNo: purchaseDetail.piNo,
-      // billNo: '',
-      // SupplierCode: '',
       items: items,
     };
 
@@ -625,14 +629,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             unitName: data.unitName,
             productName: data.productName,
             qty: data.qty,
-            actualQty: data.actualQty,
+            actualQty: calculate[0].actualQty,
             skuCode: data.skuCode,
             unitPrice: data.setPrice,
             sumPrice: calculate[0].sumPrice,
           };
           items.push(item);
         });
-        // dispatch(updateItemsState(items));
         updateStateRows(items);
       })
       .catch((error: ApiError) => {
