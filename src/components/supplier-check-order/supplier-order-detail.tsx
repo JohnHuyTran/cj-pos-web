@@ -142,13 +142,17 @@ const columns: GridColDef[] = [
         type="number"
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
+        // onBlur={(e) => {
+        //   var value = e.target.value ? parseInt(e.target.value, 10) : '';
+        //   if (value === 0) value = '';
+        //   params.api.updateRows([{ ...params.row, actualQty: value }]);
+        // }}
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
           var qty = Number(params.getValue(params.id, 'qty'));
           var piType = Number(params.getValue(params.id, 'piType'));
           if (piType === 0 && value > qty) value = qty;
-
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         disabled={isDisable(params) ? true : false}
@@ -182,9 +186,10 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <div>
-        {/* {params.getValue(params.id, 'piType')} | {params.getValue(params.id, 'piStatus')} */}
         {params.getValue(params.id, 'piType') === 0 && <label>{params.value}</label>}
-        {params.getValue(params.id, 'piStatus') === 1 && <label>{params.value}</label>}
+        {params.getValue(params.id, 'piType') === 1 && params.getValue(params.id, 'piStatus') === 1 && (
+          <label>{params.value}</label>
+        )}
         {params.getValue(params.id, 'piType') === 1 && params.getValue(params.id, 'piStatus') === 0 && (
           <div>
             <label style={{ position: 'relative', right: '-1.5em' }}>{params.value}</label>
@@ -338,7 +343,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       rowsEdit.forEach((data: GridRowData) => {
         itemsList.push(data);
       });
-      console.log('itemsList:', JSON.stringify(itemsList));
+      // console.log('itemsList:', JSON.stringify(itemsList));
       if (itemsList.length > 0) updateStateRows(itemsList);
     }
   };
@@ -616,9 +621,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
     await calculateSupplierPI(payloadCalculate)
       .then((value) => {
-        setTotalAmount(value.data.totalAmount);
-        setVat(value.data.vat);
-        setGrandTotalAmount(value.data.grandTotalAmount);
+        setTotalAmount(value.data.amountText.totalAmount);
+        setVat(value.data.amountText.vat);
+        setGrandTotalAmount(value.data.amountText.grandTotalAmount);
+
         let calItem = value.data.items;
         const items: any = [];
         rows.forEach((data: GridRowData) => {
@@ -632,7 +638,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             actualQty: calculate[0].actualQty,
             skuCode: data.skuCode,
             unitPrice: data.setPrice,
-            sumPrice: calculate[0].sumPrice,
+            sumPrice: calculate[0].amountText.sumPrice,
           };
           items.push(item);
         });
