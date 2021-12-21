@@ -1,5 +1,6 @@
 import { put, get, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
+import { env } from '../adapters/environmentConfigs';
 import { getPathUrl } from './base-service';
 import { ApiError } from '../models/api-error-model';
 import {
@@ -124,3 +125,9 @@ export async function getFileUrlHuawei(filekey: string) {
     });
   return response;
 }
+
+export const getPathReportPI = (piNo: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.purchase.supplierOrder.exportFile.url}`, {
+    piNo: piNo,
+  });
+};

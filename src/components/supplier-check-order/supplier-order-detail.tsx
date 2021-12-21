@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect, useMemo } from 'react';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
-import { Button, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
+import { Button, DialogTitle, Grid, IconButton, Link, TextField } from '@mui/material';
 import { CheckCircleOutline, ControlPoint, DeleteForever, HighlightOff } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import Steppers from '../commons/ui/steppers';
@@ -27,7 +27,7 @@ import {
 } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
-import { calculateSupplierPI, saveSupplierOrder } from '../../services/purchase';
+import { calculateSupplierPI, getPathReportPI, saveSupplierOrder } from '../../services/purchase';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
@@ -40,6 +40,8 @@ import ModelDeleteConfirm from './modal-delete-confirm';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
 import { GridEditCellValueParams } from '@material-ui/data-grid';
+import ModalShowFile from '../commons/ui/modal-show-file';
+import { formatFileNam } from '../../utils/enum/check-order-enum';
 
 interface Props {
   isOpen: boolean;
@@ -627,6 +629,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       });
   };
 
+  const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
+  const [statusFile, setStatusFile] = React.useState(0);
+  function handleModelPreviewDocument() {
+    setOpenModelPreviewDocument(false);
+  }
+  const handleLinkDocument = async () => {
+    setOpenLoadingModal(true);
+    setStatusFile(1);
+    setOpenModelPreviewDocument(true);
+    setOpenLoadingModal(false);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -721,6 +735,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 </Box>
 
                 {piStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
+                {piStatus === 1 && (
+                  <Link component="button" variant="body2" onClick={handleLinkDocument}>
+                    เรียกดูเอกสารใบรับสินค้า
+                  </Link>
+                )}
               </Grid>
             </Grid>
           </Box>
@@ -930,6 +949,15 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         productName={productNameDel}
         skuCode={skuCodeDel}
         barCode={barCodeDel}
+      />
+
+      <ModalShowFile
+        open={openModelPreviewDocument}
+        onClose={handleModelPreviewDocument}
+        url={getPathReportPI(piNo)}
+        statusFile={statusFile}
+        sdImageFile=""
+        fileName={formatFileNam(piNo, piStatus)}
       />
 
       <LoadingModal open={openLoadingModal} />
