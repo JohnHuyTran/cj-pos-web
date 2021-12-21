@@ -112,42 +112,42 @@ export default function SupplierOrderList() {
       headerAlign: 'center',
       sortable: false,
     },
-    {
-      field: 'pnNo',
-      headerName: 'เลขที่คืนสินค้า PN',
-      minWidth: 140,
-      // flex: 1,
-      headerAlign: 'center',
-      align: 'center',
-      sortable: false,
-      renderCell: (params) => {
-        if (params.getValue(params.id, 'piStatus') === 1) {
-          if (params.value === 0) {
-            //check Create PN
-            return (
-              <Button
-                variant="contained"
-                color="warning"
-                size="small"
-                className={classes.MbtnSearch}
-                sx={{ minWidth: 90 }}
-              >
-                คืนสินค้า
-              </Button>
-            );
-          } else {
-            //PN Number 'บันทึก pnState=1, อนุมัติpnState=2'
-            return (
-              <Typography color="secondary" variant="body2" sx={{ textDecoration: 'underline' }}>
-                {params.getValue(params.id, 'pnNo') || ''}
-              </Typography>
-            );
-          }
-        } else {
-          return <Box></Box>;
-        }
-      },
-    },
+    // {
+    //   field: 'pnNo',
+    //   headerName: 'เลขที่คืนสินค้า PN',
+    //   minWidth: 140,
+    //   // flex: 1,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    //   sortable: false,
+    //   renderCell: (params) => {
+    //     if (params.getValue(params.id, 'piStatus') === 1) {
+    //       if (params.value === 0) {
+    //         //check Create PN
+    //         return (
+    //           <Button
+    //             variant="contained"
+    //             color="warning"
+    //             size="small"
+    //             className={classes.MbtnSearch}
+    //             sx={{ minWidth: 90 }}
+    //           >
+    //             คืนสินค้า
+    //           </Button>
+    //         );
+    //       } else {
+    //         //PN Number 'บันทึก pnState=1, อนุมัติpnState=2'
+    //         return (
+    //           <Typography color="secondary" variant="body2" sx={{ textDecoration: 'underline' }}>
+    //             {params.getValue(params.id, 'pnNo') || ''}
+    //           </Typography>
+    //         );
+    //       }
+    //     } else {
+    //       return <Box></Box>;
+    //     }
+    //   },
+    // },
     {
       field: 'piStatus',
       headerName: 'สถานะ',
