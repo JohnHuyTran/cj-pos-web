@@ -87,6 +87,12 @@ export const environment = {
       approve: {
         url: '/purchase-note/{piNo}/save',
       },
+      calculatePI: {
+        url: '/purchase/purchase-invoice/calculate',
+      },
+      supplierFile: {
+        url: '/purchase//getUrl',
+      },
     },
   },
   products: {
