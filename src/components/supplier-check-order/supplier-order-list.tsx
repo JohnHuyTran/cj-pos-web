@@ -2,7 +2,7 @@ import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { Box, Button, Chip, Typography } from '@mui/material';
 import { styled } from '@mui/styles';
 import { alpha } from '@mui/material/styles';
-import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import React from 'react';
 import {
   PurchaseInfo,
@@ -104,6 +104,14 @@ export default function SupplierOrderList() {
       headerAlign: 'center',
       sortable: false,
     },
+    // {
+    //   field: 'docNo',
+    //   headerName: 'เลขที่ใบสั่งซื้อ PO',
+    //   minWidth: 130,
+    //   // flex: 1,
+    //   headerAlign: 'center',
+    //   sortable: false,
+    // },
     {
       field: 'docNo',
       headerName: 'เลขที่ใบสั่งซื้อ PO',
@@ -111,6 +119,12 @@ export default function SupplierOrderList() {
       // flex: 1,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <div>
+          {params.value && <label>{params.value}</label>}
+          {!params.value && <label>-</label>}
+        </div>
+      ),
     },
     // {
     //   field: 'pnNo',

@@ -139,8 +139,9 @@ const columns: GridColDef[] = [
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
           var qty = Number(params.getValue(params.id, 'qty'));
-          var piType = Number(params.getValue(params.id, 'piType'));
-          if (piType === 0 && value > qty) value = qty;
+          var isRefPO = Number(params.getValue(params.id, 'isRefPO'));
+          if (isRefPO && value > qty) value = qty;
+          console.log('isRefPO :', isRefPO, ' / value:', value, ' / qty:', qty);
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         // disabled={isDisable(params) ? true : false}
@@ -498,10 +499,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const calculateItems = async (items: any) => {
+    let docNo = '';
+    if (po) docNo = po.docNo;
     const payloadCalculate: CalculatePurchasePIRequest = {
       piNo: piNo,
-      billNo: billNo,
-      SupplierCode: supplierCode,
+      docNo: docNo,
+      SupplierCode: payloadSupplier.supplier.code,
       items: items,
     };
 
