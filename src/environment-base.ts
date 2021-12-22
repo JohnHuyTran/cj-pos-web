@@ -91,7 +91,7 @@ export const environment = {
     },
     purchaseNote: {
       detail: {
-        url: '/purchase/purchase-invoice/{piNo}',
+        url: '/purchase/purchase-note/{piNo}',
       },
       save: {
         url: '/purchase/purchase-note/{piNo}/save',
