@@ -83,7 +83,10 @@ export const environment = {
         url: '/purchase/purchase-invoice/calculate',
       },
       supplierFile: {
-        url: '/purchase//getUrl',
+        url: '/purchase/getUrl',
+      },
+      exportFile: {
+        url: '/purchase/purchase-invoice/{piNo}/export',
       },
     },
     purchaseNote: {

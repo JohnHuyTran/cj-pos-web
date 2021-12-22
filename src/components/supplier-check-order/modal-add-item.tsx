@@ -171,6 +171,17 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     } else {
       setValueItemSelect({ ...valueItemSelect, barcodeName: '' });
     }
+
+    const itemsList: any = [];
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+
+      rowsEdit.forEach((data: GridRowData) => {
+        itemsList.push(data);
+      });
+
+      setNewAddItemListArray(itemsList);
+    }
   };
 
   const handldCloseAddItemModal = () => {
@@ -192,14 +203,24 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
     const checkDupItem: any = newAddItemListArray.find((a: any) => a.barcode === barcodeItem);
 
+    const itemsListInRows: any = [];
+    if (newAddItemListArray.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+
+      rowsEdit.forEach((data: GridRowData) => {
+        itemsListInRows.push(data);
+      });
+    }
+
     if (checkDupItem) {
       let arrayItemDup: any = [];
       newAddItemListArray.forEach((data: any) => {
+        let qty = data.qty ? data.qty : data.actualQty;
         if (data.barcode === barcodeItem) {
           const itemsDup: any = {
             barcode: data.barcode,
             barcodeName: data.barcodeName,
-            qty: data.qty + 1,
+            actualQty: Number(qty) + 1,
             skuCode: data.skuCode,
             unitCode: data.unitCode,
             unitName: data.unitName,
@@ -290,7 +311,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       barcode: item.barcode,
       unitName: item.unitName,
       barcodeName: item.barcodeName,
-      actualQty: item.qty,
+      actualQty: item.actualQty ? item.actualQty : 1,
       skuCode: item.skuCode,
       unitPrice: item.unitPrice,
     };
