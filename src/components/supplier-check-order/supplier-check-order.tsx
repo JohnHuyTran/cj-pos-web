@@ -211,7 +211,7 @@ export default function SupplierCheckOrderSearch() {
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่ใบสั่งซื้อ PO/รหัสผู้จำหน่าย/ชื่อผู้จำหน่าย"
+              placeholder="เลขที่ใบสั่งซื้อ PO, PI, PN/รหัสผู้จำหน่าย/ชื่อผู้จำหน่าย"
             />
           </Grid>
           <Grid item xs={4}>

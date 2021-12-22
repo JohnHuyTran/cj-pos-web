@@ -1,8 +1,12 @@
-import { put } from '../adapters/posback-adapter';
+import { put, get, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { getPathUrl } from './base-service';
 import { ApiError } from '../models/api-error-model';
-import { SavePurchasePIRequest, SavePurchaseRequest } from '../models/supplier-check-order-model';
+import {
+  CalculatePurchasePIRequest,
+  SavePurchasePIRequest,
+  SavePurchaseRequest,
+} from '../models/supplier-check-order-model';
 import { PurchaseCreditNoteType } from '../models/purchase-credit-note';
 import { ContentType } from '../utils/enum/common-enum';
 
@@ -36,7 +40,11 @@ export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: stri
 }
 
 export async function approveSupplierOrder(payload: SavePurchaseRequest, piNo: string) {
-  const response = await put(getPathApprove(piNo), payload)
+  const bodyFormData = new FormData();
+
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  const response = await put(getPathApprove(piNo), bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;
@@ -57,10 +65,18 @@ export const getPathApprove = (piNo: string) => {
 };
 
 export async function saveSupplierPI(payload: SavePurchasePIRequest) {
+  const bodyFormData = new FormData();
+
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  // bodyFormData.append('file[]', fileList[0]);
+
   try {
-    const response = await put(environment.purchase.supplierOrder.saveDraftPI.url, payload).then(
-      (result: any) => result
-    );
+    const response = await put(
+      environment.purchase.supplierOrder.saveDraftPI.url,
+      bodyFormData,
+      ContentType.MULTIPART
+    ).then((result: any) => result);
     return response;
   } catch (error) {
     console.log('error = ', error);
@@ -69,7 +85,11 @@ export async function saveSupplierPI(payload: SavePurchasePIRequest) {
 }
 
 export async function approveSupplierPI(payload: SavePurchasePIRequest) {
-  const response = await put(environment.purchase.supplierOrder.approvePI.url, payload)
+  const bodyFormData = new FormData();
+
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;
@@ -112,7 +132,28 @@ export async function approvePurchaseCreditNote2(payload: any, fileList: File[])
 export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType, fileList: any) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
+  bodyFormData.append('file', fileList);
   const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
+    .then((result: any) => result)
+    .catch((error: ApiError) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function calculateSupplierPI(payload: CalculatePurchasePIRequest) {
+  try {
+    const response = await post(environment.purchase.supplierOrder.calculatePI.url, payload).then(
+      (result: any) => result
+    );
+    return response;
+  } catch (error) {
+    console.log('error = ', error);
+    throw error;
+  }
+}
+export async function getFileUrlHuawei(filekey: string) {
+  const response = await get(environment.purchase.supplierOrder.supplierFile.url + `/${filekey}`)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;

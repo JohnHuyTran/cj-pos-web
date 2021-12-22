@@ -36,6 +36,9 @@ const useStyles = makeStyles({
       borderRadius: '5px !important',
       // padding: "4px 4px 4px 8px",
     },
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+    },
   },
   MdataGridDetail: {
     '& .MuiDataGrid-columnHeaderTitle': {
