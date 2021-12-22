@@ -141,8 +141,8 @@ export interface PurchaseItems {
 }
 
 export interface CalculatePurchasePIRequest {
-  billNo: string;
   piNo: string;
+  docNo: string;
   SupplierCode: string;
   items: PurchaseItems[];
 }

@@ -600,7 +600,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const calculateItems = async (items: any) => {
     const payloadCalculate: CalculatePurchasePIRequest = {
       piNo: purchaseDetail.piNo,
-      billNo: purchaseDetail.billNo,
+      docNo: purchaseDetail.docNo,
       SupplierCode: purchaseDetail.supplierCode,
       items: items,
     };
