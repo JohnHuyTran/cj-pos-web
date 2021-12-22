@@ -280,7 +280,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
           </Box>
           {poData.length === 0 && <Box sx={{ mt: 4, height: 100 }} />}
           {poData.length > 0 && (
-            <Box sx={{ mt: 4, maxHeight: 250 }}>
+            <Box sx={{ mt: 4, maxHeight: 250, overflow: 'auto' }}>
               <label className={classes.textListSupplier} id="listPOModal">
                 รายการเอกสารใบสั่งซื้อ PO
               </label>
@@ -294,6 +294,12 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
                     key={row.docNo}
                   />
                 ))}
+
+                <ColorFormControlLabel id={`item-po-1`} value={'row.docNo'} label={'row.docNo'} control={<Radio />} />
+                <ColorFormControlLabel id={`item-po-1`} value={'row.docNo'} label={'row.docNo'} control={<Radio />} />
+                <ColorFormControlLabel id={`item-po-1`} value={'row.docNo'} label={'row.docNo'} control={<Radio />} />
+                <ColorFormControlLabel id={`item-po-1`} value={'row.docNo'} label={'row.docNo'} control={<Radio />} />
+                <ColorFormControlLabel id={`item-po-1`} value={'row.docNo'} label={'row.docNo'} control={<Radio />} />
               </RadioGroup>
             </Box>
           )}
