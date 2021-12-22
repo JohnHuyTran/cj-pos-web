@@ -340,6 +340,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [piStatus, setPiStatus] = React.useState(0);
   const [totalAmount, setTotalAmount] = React.useState(0);
   const [vat, setVat] = React.useState(0);
+  const [vatRate, setVatRate] = React.useState(0);
   const [grandTotalAmount, setGrandTotalAmount] = React.useState(0);
   const [comment, setComment] = React.useState('');
   const [commentOrigin, setCommentOrigin] = React.useState('');
@@ -368,6 +369,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   if (rows.length === 0) {
     if (totalAmount !== 0) setTotalAmount(0);
     if (vat !== 0) setVat(0);
+    if (vatRate != 0) setVatRate(0);
     if (grandTotalAmount !== 0) setGrandTotalAmount(0);
   }
 
@@ -512,6 +514,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       .then((value) => {
         setTotalAmount(value.data.amountText.totalAmount);
         setVat(value.data.amountText.vat);
+        setVatRate(value.data.amountText.vatRate);
         setGrandTotalAmount(value.data.amountText.grandTotalAmount);
 
         let calItem = value.data.items;
@@ -820,7 +823,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   <Grid item lg={5}></Grid>
                   <Grid item lg={3} alignItems="flex-end">
                     <Typography variant="body2" pt={1}>
-                      ภาษี(7%)
+                      ภาษี({vatRate}%)
                     </Typography>
                   </Grid>
                   <Grid item lg={4}>
