@@ -262,6 +262,7 @@ export default function SupplierOrderList() {
           await dispatch(featchPurchaseNoteAsync(params.row.piNo));
           setOpenReturn(true);
         } else {
+          await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
           await dispatch(updateItemsState({}));
           setOpenDetail(true);
         }
