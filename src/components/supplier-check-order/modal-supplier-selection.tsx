@@ -299,12 +299,6 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
                     key={row.docNo}
                   />
                 ))}
-
-                <ColorFormControlLabel id={`item-po-1`} value={'row.docNo'} label={'row.docNo'} control={<Radio />} />
-                <ColorFormControlLabel id={`item-po-1`} value={'row.docNo'} label={'row.docNo'} control={<Radio />} />
-                <ColorFormControlLabel id={`item-po-1`} value={'row.docNo'} label={'row.docNo'} control={<Radio />} />
-                <ColorFormControlLabel id={`item-po-1`} value={'row.docNo'} label={'row.docNo'} control={<Radio />} />
-                <ColorFormControlLabel id={`item-po-1`} value={'row.docNo'} label={'row.docNo'} control={<Radio />} />
               </RadioGroup>
             </Box>
           )}
