@@ -34,6 +34,7 @@ import { updateState } from '../../store/slices/supplier-selection-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
 import theme from '../../styles/theme';
 import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
+import AlertError from '../commons/ui/alert-error';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -407,7 +408,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelConfirm(false);
   };
   const handlConfirmButton = async () => {
-    if (!billNo) {
+    if (fileUploadList.length <= 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาแนบเอกสาร');
+    } else if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
@@ -612,6 +616,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         });
       setOpenLoadingModal(false);
     }
+  };
+
+  const [openFailAlert, setOpenFailAlert] = React.useState(false);
+  const [textFail, setTextFail] = React.useState('');
+
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail('');
   };
 
   return (
@@ -909,6 +921,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       />
 
       <LoadingModal open={openLoadingModal} />
+
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
     </div>
   );
 }

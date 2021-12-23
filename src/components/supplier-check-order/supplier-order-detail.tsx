@@ -43,6 +43,7 @@ import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 import { GridEditCellValueParams } from '@material-ui/data-grid';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { formatFileNam } from '../../utils/enum/check-order-enum';
+import AlertError from '../commons/ui/alert-error';
 
 interface Props {
   isOpen: boolean;
@@ -476,7 +477,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const handlConfirmButton = async () => {
     handleUpdateRowState();
-    if (!billNo) {
+    if (files.length <= 0) {
+      if (fileUploadList.length <= 0) {
+        setOpenFailAlert(true);
+        setTextFail('กรุณาแนบเอกสาร');
+      }
+    } else if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
@@ -672,6 +678,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setStatusFile(1);
     setOpenModelPreviewDocument(true);
     setOpenLoadingModal(false);
+  };
+
+  const [openFailAlert, setOpenFailAlert] = React.useState(false);
+  const [textFail, setTextFail] = React.useState('');
+
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail('');
   };
 
   return (
@@ -1001,6 +1015,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         fileName={formatFileNam(piNo, piStatus)}
         btnPrintName="พิมพ์เอกสาร"
       />
+
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
 
       <LoadingModal open={openLoadingModal} />
     </div>
