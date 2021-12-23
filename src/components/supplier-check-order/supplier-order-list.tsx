@@ -13,12 +13,12 @@ import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supp
 import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
-import theme from '../../styles/theme';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import SupplierOrderDetail from './supplier-order-detail';
 import SupplierOrderReturn from './supplier-order-return';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
+import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 
 interface loadingModalState {
@@ -126,42 +126,42 @@ export default function SupplierOrderList() {
         </div>
       ),
     },
-    // {
-    //   field: 'pnNo',
-    //   headerName: 'เลขที่คืนสินค้า PN',
-    //   minWidth: 140,
-    //   // flex: 1,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    //   sortable: false,
-    //   renderCell: (params) => {
-    //     if (params.getValue(params.id, 'piStatus') === 1) {
-    //       if (params.value === 0) {
-    //         //check Create PN
-    //         return (
-    //           <Button
-    //             variant="contained"
-    //             color="warning"
-    //             size="small"
-    //             className={classes.MbtnSearch}
-    //             sx={{ minWidth: 90 }}
-    //           >
-    //             คืนสินค้า
-    //           </Button>
-    //         );
-    //       } else {
-    //         //PN Number 'บันทึก pnState=1, อนุมัติpnState=2'
-    //         return (
-    //           <Typography color="secondary" variant="body2" sx={{ textDecoration: 'underline' }}>
-    //             {params.getValue(params.id, 'pnNo') || ''}
-    //           </Typography>
-    //         );
-    //       }
-    //     } else {
-    //       return <Box></Box>;
-    //     }
-    //   },
-    // },
+    {
+      field: 'pnNo',
+      headerName: 'เลขที่คืนสินค้า PN',
+      minWidth: 140,
+      // flex: 1,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      renderCell: (params) => {
+        if (params.getValue(params.id, 'piStatus') === 1) {
+          if (params.getValue(params.id, 'pnState') === 0) {
+            //check Create PN
+            return (
+              <Button
+                variant="contained"
+                color="warning"
+                size="small"
+                className={classes.MbtnSearch}
+                sx={{ minWidth: 90 }}
+              >
+                คืนสินค้า
+              </Button>
+            );
+          } else {
+            //PN Number 'บันทึก pnState=1, อนุมัติpnState=2'
+            return (
+              <Typography color="secondary" variant="body2" sx={{ textDecoration: 'underline' }}>
+                {params.value}
+              </Typography>
+            );
+          }
+        } else {
+          return <Box></Box>;
+        }
+      },
+    },
     {
       field: 'piStatus',
       headerName: 'สถานะ',
@@ -206,7 +206,8 @@ export default function SupplierOrderList() {
       supplierCode: data.supplierCode,
       piNo: data.piNo,
       docNo: data.docNo,
-      pnNo: data.pnState,
+      pnNo: data.pnNo,
+      pnState: data.pnState,
       piStatus: data.piStatus,
       comment: data.comment,
     };
@@ -271,11 +272,13 @@ export default function SupplierOrderList() {
 
     handleOpenLoading('open', true);
     try {
-      await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
+      // await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
       if (purchaseDetailList.data.length > 0 || purchaseDetailList.data) {
         if (chkPN === 'pnNo') {
+          await dispatch(featchPurchaseNoteAsync(params.row.piNo));
           setOpenReturn(true);
         } else {
+          await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
           await dispatch(updateItemsState({}));
           setOpenDetail(true);
         }
