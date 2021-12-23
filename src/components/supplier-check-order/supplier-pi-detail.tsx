@@ -226,6 +226,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const supplier = payloadSupplier.supplier;
   const po = payloadSupplier.poSelection;
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const handleClose = async () => {
     let exit = false;
     if (comment !== commentOrigin || billNo !== billNoOrigin) exit = true;
@@ -434,7 +435,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
-      await saveSupplierPI(payloadSave)
+      await saveSupplierPI(payloadSave, fileUploadList)
         .then((value) => {
           setPiNo(value.piNo);
           setBillNoOrigin(billNo);
@@ -595,7 +596,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
-      await saveSupplierPI(payloadSave)
+      await saveSupplierPI(payloadSave, fileUploadList)
         .then((value) => {
           setPiNo(value.piNo);
           setBillNoOrigin(billNo);
