@@ -1,5 +1,14 @@
 import React, { useMemo } from 'react';
-import { Button, Checkbox, DialogActions, DialogContent, DialogContentText, Grid, TextField } from '@mui/material';
+import {
+  Button,
+  Checkbox,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Grid,
+  Link,
+  TextField,
+} from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/system/Box';
@@ -13,6 +22,7 @@ import theme from '../../styles/theme';
 import { useStyles } from '../../styles/makeTheme';
 import {
   DataGrid,
+  GridCellParams,
   GridColDef,
   GridColumnHeaderParams,
   GridRenderCellParams,
@@ -27,7 +37,7 @@ import { ErrorOutline } from '@mui/icons-material';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
-import { approvePurchaseCreditNote, draftPurchaseCreditNote } from '../../services/purchase';
+import { approvePurchaseCreditNote, draftPurchaseCreditNote, getPathReportPI } from '../../services/purchase';
 import {
   ItemsType,
   PurchaseCreditNoteType,
@@ -43,6 +53,8 @@ import AccordionHuaweiFile from './accordion-huawei-file';
 import { FileType } from '../../models/supplier-check-order-model';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import AccordionUploadFile from './accordion-upload-file';
+import { formatFileNam } from '../../utils/enum/check-order-enum';
+import ModalShowFile from '../commons/ui/modal-show-file';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -53,6 +65,7 @@ const columns: GridColDef[] = [
     field: 'index',
     headerName: 'ลำดับ',
     flex: 0.5,
+    width: 30,
     headerAlign: 'center',
     sortable: false,
     // hide: true,
@@ -200,8 +213,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setFiles(purchaseDetail.files);
     setComment(purchaseDetail.comment);
     setPnStatus(purchaseDetail.pnState);
-    // setPnNo(purchaseDetail.pnNo);
-    setPnNo('pn123');
+    setPnNo(purchaseDetail.pnNo);
     let newColumns = [...cols];
     if (purchaseDetail.pnState == 1) {
       newColumns[0]['hide'] = false;
@@ -433,7 +445,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     const isExistingFile = files.length > 0 ? true : false;
     if (!(isvalid || isExistingFile)) {
       setOpenAlert(true);
-      setTextError('กรุณาแนบไฟล์');
+      setTextError('กรุณาแนบเอกสาร');
       return false;
     }
     return true;
@@ -474,6 +486,22 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       });
     handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
+  };
+
+  const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
+  const [statusFile, setStatusFile] = React.useState(0);
+  function handleModelPreviewDocument() {
+    setOpenModelPreviewDocument(false);
+  }
+  const handleLinkDocument = async () => {
+    setOpenLoadingModal(true);
+    setStatusFile(1);
+    setOpenModelPreviewDocument(true);
+    setOpenLoadingModal(false);
+  };
+
+  const currentlySelected = async (params: GridCellParams) => {
+    storeItem();
   };
 
   return (
@@ -545,6 +573,11 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                   </Box>
                 )}
                 {pnStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
+                {pnStatus === 1 && (
+                  <Link component='button' variant='body2' onClick={handleLinkDocument}>
+                    เรียกดูเอกสารใบคืนสินค้า
+                  </Link>
+                )}
                 {pnStatus === 0 && <AccordionUploadFile files={files} />}
               </Grid>
             </Grid>
@@ -612,6 +645,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 autoHeight={rows.length >= 8 ? false : true}
                 scrollbarSize={10}
                 rowHeight={65}
+                onCellClick={currentlySelected}
               />
             </div>
           </Box>
@@ -664,9 +698,18 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         open={openModelConfirm}
         onClose={handleOnCloseModalConfirm}
         handleConfirm={approvePN}
-        header='ยืนยันอนุมัติใบรับสินค้า'
+        header='ยืนยันอนุมัติใบคืนสินค้า'
         title='เลขที่เอกสาร PN'
         value={pnNo}
+      />
+      <ModalShowFile
+        open={openModelPreviewDocument}
+        onClose={handleModelPreviewDocument}
+        url={getPathReportPI(purchaseDetail.piNo)}
+        statusFile={statusFile}
+        sdImageFile=''
+        fileName={formatFileNam(pnNo, pnStatus)}
+        btnPrintName='พิมพ์เอกสาร'
       />
       <LoadingModal open={openLoadingModal} />
     </div>
