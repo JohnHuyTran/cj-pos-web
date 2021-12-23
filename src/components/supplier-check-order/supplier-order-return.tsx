@@ -103,7 +103,7 @@ const columns: GridColDef[] = [
   {
     field: 'actualQty',
     headerName: 'จำนวนที่รับ',
-    width: 110,
+    width: 150,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -111,7 +111,7 @@ const columns: GridColDef[] = [
   {
     field: 'qtyReturn',
     headerName: 'จำนวนที่คืน',
-    width: 110,
+    width: 150,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -142,7 +142,7 @@ const columns: GridColDef[] = [
   {
     field: 'unitName',
     headerName: 'หน่วย',
-    width: 90,
+    width: 110,
     headerAlign: 'center',
     sortable: false,
   },
