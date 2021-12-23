@@ -131,6 +131,7 @@ export default function SupplierOrderList() {
                 size="small"
                 className={classes.MbtnSearch}
                 sx={{ minWidth: 90 }}
+                onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}
               >
                 คืนสินค้า
               </Button>
@@ -144,7 +145,12 @@ export default function SupplierOrderList() {
             );
           }
         } else {
-          return <Box></Box>;
+          return (
+            <Box
+              sx={{ height: '100%', width: '100px' }}
+              onClick={() => handleOpenReturnModal(params.row.piNo, 'blank')}
+            ></Box>
+          );
         }
       },
     },
@@ -206,6 +212,7 @@ export default function SupplierOrderList() {
   });
 
   const handleOpenLoading = (prop: any, event: boolean) => {
+    console.log({ prop, event });
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
@@ -260,10 +267,7 @@ export default function SupplierOrderList() {
     try {
       // await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
       if (purchaseDetailList.data.length > 0 || purchaseDetailList.data) {
-        if (chkPN === 'pnNo') {
-          await dispatch(featchPurchaseNoteAsync(params.row.piNo));
-          setOpenReturn(true);
-        } else {
+        if (chkPN !== 'pnNo') {
           await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
           await dispatch(updateItemsState({}));
           setOpenDetail(true);
@@ -271,6 +275,25 @@ export default function SupplierOrderList() {
       } else {
         console.log('Purchase Detail No data');
         await dispatch(updateItemsState({}));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    if (chkPN !== 'pnNo') {
+      handleOpenLoading('open', false);
+    }
+  };
+
+  const handleOpenReturnModal = async (piNo: string, status: string) => {
+    try {
+      if (status === 'button') {
+        await dispatch(featchPurchaseNoteAsync(piNo));
+        setOpenReturn(true);
+      } else {
+        await dispatch(featchSupplierOrderDetailAsync(piNo));
+        await dispatch(updateItemsState({}));
+        setOpenDetail(true);
       }
     } catch (error) {
       console.log(error);
