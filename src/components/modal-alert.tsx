@@ -4,15 +4,16 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 export interface SimpleDialogProps {
   open: boolean;
-  actionconfirm: string;
+  errormsg: string;
   onClose: (value: string) => void;
 }
 
-export default function DialogConfirm(props: SimpleDialogProps) {
-  const { open, actionconfirm, onClose } = props;
+export default function ModalAlert(props: SimpleDialogProps) {
+  const { open, errormsg, onClose } = props;
 
   const handleListItemClick = (value: string) => {
     onClose(value);
@@ -21,11 +22,12 @@ export default function DialogConfirm(props: SimpleDialogProps) {
   return (
     <div>
       <Dialog open={open} aria-describedby="alert-dialog-description" fullWidth={true} maxWidth="xs">
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">Are you sure {actionconfirm} ?</DialogContentText>
+        <DialogContent sx={{ textAlign: 'center' }}>
+          <InfoOutlinedIcon color="error" sx={{ fontSize: 60 }} />
+          <DialogContentText id="alert-dialog-description">{errormsg}</DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button variant="contained" size="small" color="primary" onClick={() => handleListItemClick('OK')}>
+        <DialogActions sx={{ justifyContent: 'center' }}>
+          <Button variant="contained" color="error" onClick={() => handleListItemClick('OK')}>
             ปิด
           </Button>
         </DialogActions>

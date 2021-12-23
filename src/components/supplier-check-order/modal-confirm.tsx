@@ -9,6 +9,7 @@ import { ApiError } from '../../models/api-error-model';
 import { SavePurchasePIRequest, SavePurchaseRequest } from '../../models/supplier-check-order-model';
 import { approveSupplierOrder, approveSupplierPI } from '../../services/purchase';
 import LoadingModal from '../commons/ui/loading-modal';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 
 interface Props {
   open: boolean;
@@ -38,6 +39,7 @@ export default function ModelConfirm({
   piDetail,
 }: Props): ReactElement {
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const handleConfirm = async () => {
     setOpenLoadingModal(true);
     if (piDetail) {
@@ -51,7 +53,7 @@ export default function ModelConfirm({
         items: items,
       };
 
-      await approveSupplierPI(payloadSave).then(
+      await approveSupplierPI(payloadSave, fileUploadList).then(
         function (value) {
           setTimeout(() => {
             onUpdateAction(true, '');
@@ -70,7 +72,7 @@ export default function ModelConfirm({
         items: items,
       };
 
-      await approveSupplierOrder(payloadSave, piNo).then(
+      await approveSupplierOrder(payloadSave, piNo, fileUploadList).then(
         function (value) {
           setTimeout(() => {
             onUpdateAction(true, '');

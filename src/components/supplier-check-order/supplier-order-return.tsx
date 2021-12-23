@@ -46,7 +46,7 @@ const columns: GridColDef[] = [
     sortable: false,
     // hide: true,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -69,8 +69,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant='body2'>{params.value}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+        <Typography variant="body2">{params.value}</Typography>
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
@@ -93,9 +93,9 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => (
       <div>
         <TextField
-          variant='outlined'
-          name='txnQtyReturn'
-          type='number'
+          variant="outlined"
+          name="txnQtyReturn"
+          type="number"
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
@@ -110,7 +110,7 @@ const columns: GridColDef[] = [
             params.api.updateRows([{ ...params.row, returnQty: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
-          autoComplete='off'
+          autoComplete="off"
         />
       </div>
     ),
@@ -479,23 +479,23 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       pnNo: purchaseDetail.pnNo,
       items: items,
     };
-    await approvePurchaseCreditNote(payload, fileInfo)
-      .then((_value) => {
-        handleOnCloseModalConfirm();
-        setShowSnackBar(true);
-        setSnackbarIsStatus(true);
-        setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
-        dispatch(featchOrderListSupAsync(payloadSearch));
-        setTimeout(() => {
-          setOpen(false);
-          onClickClose();
-        }, 500);
-      })
-      .catch((error: ApiError) => {
-        handleOnCloseModalConfirm();
-        setShowSnackBar(true);
-        setContentMsg(error.message);
-      });
+    // await approvePurchaseCreditNote(payload)
+    //   .then((_value) => {
+    //     handleOnCloseModalConfirm();
+    //     setShowSnackBar(true);
+    //     setSnackbarIsStatus(true);
+    //     setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
+    //     dispatch(featchOrderListSupAsync(payloadSearch));
+    //     setTimeout(() => {
+    //       setOpen(false);
+    //       onClickClose();
+    //     }, 500);
+    //   })
+    //   .catch((error: ApiError) => {
+    //     handleOnCloseModalConfirm();
+    //     setShowSnackBar(true);
+    //     setContentMsg(error.message);
+    //   });
     // setOpen(false);
     // onClickClose();
     // handleOnCloseModalConfirm();
@@ -554,8 +554,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   return (
     <div>
       {' '}
-      <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
+      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>ใบคืนสินค้า</Typography>
           <Steppers status={pnStatus}></Steppers>
         </BootstrapDialogTitle>
@@ -563,15 +563,15 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           <Box mt={4} sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร PN</Typography>
+                <Typography variant="body2">เลขที่เอกสาร PN</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>
+                <Typography variant="body2">
                   {' '}
                   <TextField
-                    id='txtDocPN'
-                    name='paramQuery'
-                    size='small'
+                    id="txtDocPN"
+                    name="paramQuery"
+                    size="small"
                     value={purchaseDetail.pnNo}
                     className={classes.MtextFieldNumber}
                     disabled
@@ -580,7 +580,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 </Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>ผู้จำหน่าย</Typography>
+                <Typography variant="body2">ผู้จำหน่าย</Typography>
               </Grid>
               <Grid item lg={4}>
                 <div
@@ -590,11 +590,12 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                     maxWidth: 250,
                     background: '#EAEBEB',
                     padding: 2,
-                  }}>
-                  <Typography variant='body2' sx={{ color: '#263238' }}>
+                  }}
+                >
+                  <Typography variant="body2" sx={{ color: '#263238' }}>
                     {purchaseDetail.supplierName}
                   </Typography>
-                  <Typography variant='body2' sx={{ color: '#AEAEAE', fontSize: 12 }}>
+                  <Typography variant="body2" sx={{ color: '#AEAEAE', fontSize: 12 }}>
                     {purchaseDetail.supplierTaxNo}
                   </Typography>
                 </div>
@@ -602,38 +603,50 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร PI :</Typography>
+                <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{purchaseDetail.piNo}</Typography>
+                <Typography variant="body2">{purchaseDetail.piNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>แนบเอกสารจากผู้จำหน่าย :</Typography>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
+                <Button
+                  id="btnAttachedFile"
+                  color="primary"
+                  variant="contained"
+                  component="span"
+                  className={classes.MbtnBrowse}
+                  // style={{ marginLeft: 10, textTransform: "none" }}
+                  disabled
+                >
+                  แนบไฟล์
+                </Button>
                 <TextField
-                  name='browserTxf'
+                  name="browserTxf"
                   className={classes.MtextFieldBrowse}
                   value={fileInfo.fileName}
-                  placeholder='แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB'
+                  placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
                 />
                 <input
-                  id='btnBrowse'
-                  type='file'
+                  id="btnBrowse"
+                  type="file"
                   multiple
                   // onDrop
-                  accept='.pdf, .jpg, .jpeg'
+                  accept=".pdf, .jpg, .jpeg"
                   onChange={handleFileInputChange}
                   style={{ display: 'none' }}
                 />
                 <label htmlFor={'btnBrowse'}>
                   <Button
-                    id='btnPrint'
-                    color='primary'
-                    variant='contained'
-                    component='span'
+                    id="btnPrint"
+                    color="primary"
+                    variant="contained"
+                    component="span"
                     className={classes.MbtnBrowse}
-                    style={{ marginLeft: 10, textTransform: 'none' }}>
+                    style={{ marginLeft: 10, textTransform: 'none' }}
+                  >
                     Browse
                   </Button>
                 </label>
@@ -646,50 +659,55 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
               container
               xs={12}
               sx={{ mt: 3 }}
-              justifyContent='space-between'
-              direction='row'
-              alignItems='flex-end'>
+              justifyContent="space-between"
+              direction="row"
+              alignItems="flex-end"
+            >
               <Grid item xl={2}>
                 <Button
-                  id='btnSave'
-                  variant='contained'
-                  color='secondary'
+                  id="btnSave"
+                  variant="contained"
+                  color="secondary"
                   className={classes.MbtnSave}
                   onClick={handleDeleteBtn}
                   startIcon={<DeleteIcon />}
-                  sx={{ width: 200 }}>
+                  sx={{ width: 200 }}
+                >
                   ลบรายการ
                 </Button>
               </Grid>
               <Grid item>
                 <Button
-                  id='btnSave'
-                  variant='contained'
-                  color='warning'
+                  id="btnSave"
+                  variant="contained"
+                  color="warning"
                   className={classes.MbtnSave}
                   onClick={handleSaveBtn}
                   startIcon={<SaveIcon />}
-                  sx={{ width: 200 }}>
+                  sx={{ width: 200 }}
+                >
                   บันทึก
                 </Button>
 
                 <Button
-                  id='btnApprove'
-                  variant='contained'
-                  color='primary'
+                  id="btnApprove"
+                  variant="contained"
+                  color="primary"
                   className={classes.MbtnApprove}
                   onClick={handleConfirmBtn}
                   startIcon={<CheckCircleOutline />}
-                  sx={{ width: 200 }}>
+                  sx={{ width: 200 }}
+                >
                   ยืนยัน
                 </Button>
               </Grid>
             </Grid>
           )}
-          <Box mt={2} bgcolor='background.paper'>
+          <Box mt={2} bgcolor="background.paper">
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
-              className={classes.MdataGridDetail}>
+              className={classes.MdataGridDetail}
+            >
               <DataGrid
                 rows={rows}
                 columns={cols}
@@ -709,14 +727,14 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
-                <Typography variant='body2'>หมายเหตุ:</Typography>
+                <Typography variant="body2">หมายเหตุ:</Typography>
                 <TextField
                   multiline
                   fullWidth
                   rows={5}
                   onChange={handleChangeComment}
                   defaultValue={comment}
-                  placeholder='ความยาวไม่เกิน 255 ตัวอักษร'
+                  placeholder="ความยาวไม่เกิน 255 ตัวอักษร"
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
                   sx={{ maxWidth: 350 }}
@@ -731,7 +749,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                     maxWidth: 350,
                     textAlign: 'right',
                     // marginTop: "-1.5em",
-                  }}>
+                  }}
+                >
                   {characterCount}/{maxCommentLength}
                 </div>
               </Grid>
@@ -755,8 +774,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         open={openModelConfirm}
         onClose={handleOnCloseModalConfirm}
         handleConfirm={approvePN}
-        header='ยืนยันอนุมัติใบรับสินค้า'
-        title='เลขที่เอกสาร PN'
+        header="ยืนยันอนุมัติใบรับสินค้า"
+        title="เลขที่เอกสาร PN"
         value={purchaseDetail.pnNo}
       />
       <LoadingModal open={openLoadingModal} />

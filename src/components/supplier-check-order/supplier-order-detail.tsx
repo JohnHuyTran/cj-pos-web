@@ -39,6 +39,7 @@ import ModalAddItem from './modal-add-item';
 import ModelDeleteConfirm from './modal-delete-confirm';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
+import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 import { GridEditCellValueParams } from '@material-ui/data-grid';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { formatFileNam } from '../../utils/enum/check-order-enum';
@@ -461,6 +462,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [items, setItems] = React.useState<any>([]);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+
+  // console.log('fileUploadList2: ', fileUploadList);
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -539,7 +543,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
-      await saveSupplierOrder(payloadSave, piNo)
+      await saveSupplierOrder(payloadSave, piNo, fileUploadList)
         .then((_value) => {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
@@ -570,6 +574,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [productNameDel, setProductNameDel] = React.useState('');
   const [skuCodeDel, setSkuCodeDel] = React.useState('');
   const [barCodeDel, setBarCodeDel] = React.useState('');
+  const [uploadFileInfo, setUploadFileInfo] = React.useState([]);
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
     const isRefPO = params.getValue(params.id, 'isRefPO');
@@ -590,6 +595,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelDeleteConfirm(false);
   };
 
+  const setUploadfile = (value: any) => {
+    console.log('setUploadfile value: ', value);
+    setUploadFileInfo(value.file);
+  };
+
+  // useEffect(() => {
+  //   console.log('UploadFileInfo: ', uploadFileInfo);
+  // }, [uploadFileInfo]);
   const handleCalculateItems = async (params: GridEditCellValueParams) => {
     saveStateRows();
     if (params.field === 'actualQty') {
@@ -730,29 +743,36 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
+              {/* <Grid item lg={2}>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
+              </Grid> */}
+              {/* <Grid item lg={4}>
+                <AccordionUploadFile sdNo={piNo} /> */}
               <Grid item lg={2} sx={{ mt: -3 }}>
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4} sx={{ mt: -3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
-                  <Button
-                    id="btnPrint"
-                    color="primary"
-                    variant="contained"
-                    component="span"
-                    className={classes.MbtnBrowse}
-                    disabled
-                  >
-                    แนบไฟล์
-                  </Button>
+                {piStatus === 1 && (
+                  <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
+                    <Button
+                      id="btnPrint"
+                      color="primary"
+                      variant="contained"
+                      component="span"
+                      className={classes.MbtnBrowse}
+                      disabled
+                    >
+                      แนบไฟล์
+                    </Button>
 
-                  <Typography
-                    variant="overline"
-                    sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
-                  >
-                    แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
-                  </Typography>
-                </Box>
+                    <Typography
+                      variant="overline"
+                      sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
+                    >
+                      แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
+                    </Typography>
+                  </Box>
+                )}
 
                 {piStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
                 {piStatus === 1 && (
@@ -760,6 +780,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     เรียกดูเอกสารใบรับสินค้า
                   </Link>
                 )}
+                {piStatus === 0 && <AccordionUploadFile files={files} />}
               </Grid>
             </Grid>
           </Box>

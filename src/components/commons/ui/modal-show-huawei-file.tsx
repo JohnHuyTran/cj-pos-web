@@ -55,7 +55,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
           onClick={onPrint}
           endIcon={<LocalPrintshopOutlinedIcon />}
         >
-          พิมพ์ใบผลต่าง
+          พิมพ์
         </Button>
       ) : null}
     </DialogTitle>
