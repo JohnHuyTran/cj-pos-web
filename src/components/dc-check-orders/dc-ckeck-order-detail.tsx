@@ -274,6 +274,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         statusFile={statusFile}
         sdImageFile={detailDC.sdImageFile}
         fileName=""
+        btnPrintName=""
       />
 
       <LoadingModal open={openLoadingModal.open} />

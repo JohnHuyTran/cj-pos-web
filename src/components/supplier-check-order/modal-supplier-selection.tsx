@@ -119,7 +119,6 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [havePOValue, setHavePOValue] = useState<string>('');
-
   const [supplier, setSupplier] = useState<any>(null);
   const [poSelection, setPoSelection] = useState<any>(null);
   const [submitDisable, setSubmitDisable] = useState<boolean>(true);
@@ -175,13 +174,19 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
     setOpenLoadingModal(true);
     const payload = { supplier, poSelection };
 
+    if (poSelection) {
+      // console.log('poSelection OK');
+      await dispatch(updateItemsState(poSelection.items));
+    } else {
+      // console.log('poSelection Noooo');
+      await dispatch(updateItemsState({}));
+    }
+
     await dispatch(updateState(payload));
     setOpenPIDetail(true);
     clearData();
     handleCloseModal();
-    if (poSelection) await dispatch(updateItemsState(poSelection.items));
-    else await dispatch(updateItemsState({}));
-    setOpenLoadingModal(false);
+    await setOpenLoadingModal(false);
   };
 
   const onCloseModal = () => {
@@ -280,7 +285,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
           </Box>
           {poData.length === 0 && <Box sx={{ mt: 4, height: 100 }} />}
           {poData.length > 0 && (
-            <Box sx={{ mt: 4, height: 100 }}>
+            <Box sx={{ mt: 4, maxHeight: 250 }}>
               <label className={classes.textListSupplier} id="listPOModal">
                 รายการเอกสารใบสั่งซื้อ PO
               </label>
