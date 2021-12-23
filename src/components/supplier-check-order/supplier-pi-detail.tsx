@@ -32,7 +32,9 @@ import ModalAddItem from './modal-add-item';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { updateState } from '../../store/slices/supplier-selection-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
-
+import theme from '../../styles/theme';
+import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
+import AlertError from '../commons/ui/alert-error';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -139,8 +141,9 @@ const columns: GridColDef[] = [
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
           var qty = Number(params.getValue(params.id, 'qty'));
-          var piType = Number(params.getValue(params.id, 'piType'));
-          if (piType === 0 && value > qty) value = qty;
+          var isRefPO = Number(params.getValue(params.id, 'isRefPO'));
+          if (isRefPO && value > qty) value = qty;
+          console.log('isRefPO :', isRefPO, ' / value:', value, ' / qty:', qty);
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         // disabled={isDisable(params) ? true : false}
@@ -225,6 +228,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const supplier = payloadSupplier.supplier;
   const po = payloadSupplier.poSelection;
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const handleClose = async () => {
     let exit = false;
     if (comment !== commentOrigin || billNo !== billNoOrigin) exit = true;
@@ -339,6 +343,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [piStatus, setPiStatus] = React.useState(0);
   const [totalAmount, setTotalAmount] = React.useState(0);
   const [vat, setVat] = React.useState(0);
+  const [vatRate, setVatRate] = React.useState(0);
   const [grandTotalAmount, setGrandTotalAmount] = React.useState(0);
   const [comment, setComment] = React.useState('');
   const [commentOrigin, setCommentOrigin] = React.useState('');
@@ -367,6 +372,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   if (rows.length === 0) {
     if (totalAmount !== 0) setTotalAmount(0);
     if (vat !== 0) setVat(0);
+    if (vatRate != 0) setVatRate(0);
     if (grandTotalAmount !== 0) setGrandTotalAmount(0);
   }
 
@@ -402,7 +408,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelConfirm(false);
   };
   const handlConfirmButton = async () => {
-    if (!billNo) {
+    if (fileUploadList.length <= 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาแนบเอกสาร');
+    } else if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
@@ -431,7 +440,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
-      await saveSupplierPI(payloadSave)
+      await saveSupplierPI(payloadSave, fileUploadList)
         .then((value) => {
           setPiNo(value.piNo);
           setBillNoOrigin(billNo);
@@ -498,10 +507,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const calculateItems = async (items: any) => {
+    let docNo = '';
+    if (po) docNo = po.docNo;
     const payloadCalculate: CalculatePurchasePIRequest = {
       piNo: piNo,
-      billNo: billNo,
-      SupplierCode: supplierCode,
+      docNo: docNo,
+      SupplierCode: payloadSupplier.supplier.code,
       items: items,
     };
 
@@ -509,6 +520,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       .then((value) => {
         setTotalAmount(value.data.amountText.totalAmount);
         setVat(value.data.amountText.vat);
+        setVatRate(value.data.amountText.vatRate);
         setGrandTotalAmount(value.data.amountText.grandTotalAmount);
 
         let calItem = value.data.items;
@@ -589,7 +601,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
-      await saveSupplierPI(payloadSave)
+      await saveSupplierPI(payloadSave, fileUploadList)
         .then((value) => {
           setPiNo(value.piNo);
           setBillNoOrigin(billNo);
@@ -604,6 +616,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         });
       setOpenLoadingModal(false);
     }
+  };
+
+  const [openFailAlert, setOpenFailAlert] = React.useState(false);
+  const [textFail, setTextFail] = React.useState('');
+
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail('');
   };
 
   return (
@@ -648,10 +668,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               <Grid item lg={4}>
                 <Typography variant="body2">{piNo}</Typography>
               </Grid>
-              <Grid item lg={2}>
+              {/* <Grid item lg={2}>
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
-              </Grid>
-              <Grid item lg={4}>
+              </Grid> */}
+              {/* <Grid item lg={4}>
                 <Button
                   id="btnPrint"
                   color="primary"
@@ -662,7 +682,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 >
                   แนบไฟล์
                 </Button>
-              </Grid>
+              </Grid> */}
             </Grid>
             <Grid container spacing={2}>
               <Grid item lg={2}>
@@ -686,7 +706,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
-              <Grid item lg={6}></Grid>
+              <Grid item lg={2} sx={{ mt: -3 }}>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
+              </Grid>
+              <Grid item lg={4} sx={{ mt: -3 }}>
+                <AccordionUploadFile files={[]} />
+              </Grid>
             </Grid>
           </Box>
 
@@ -817,7 +842,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   <Grid item lg={5}></Grid>
                   <Grid item lg={3} alignItems="flex-end">
                     <Typography variant="body2" pt={1}>
-                      ภาษี(7%)
+                      ภาษี({vatRate}%)
                     </Typography>
                   </Grid>
                   <Grid item lg={4}>
@@ -896,6 +921,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       />
 
       <LoadingModal open={openLoadingModal} />
+
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
     </div>
   );
 }

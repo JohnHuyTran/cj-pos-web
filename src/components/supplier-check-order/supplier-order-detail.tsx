@@ -39,9 +39,11 @@ import ModalAddItem from './modal-add-item';
 import ModelDeleteConfirm from './modal-delete-confirm';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
+import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 import { GridEditCellValueParams } from '@material-ui/data-grid';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { formatFileNam } from '../../utils/enum/check-order-enum';
+import AlertError from '../commons/ui/alert-error';
 
 interface Props {
   isOpen: boolean;
@@ -320,7 +322,15 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setCharacterCount(purchaseDetail.comment.length);
     setFiles(purchaseDetail.files ? purchaseDetail.files : []);
 
-    if (purchaseDetail.piType === 1) dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
+    if (purchaseDetail.piType === 1 && purchaseDetail.piStatus === 0) {
+      dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
+    }
+    if (purchaseDetail.piStatus === 1) {
+      setTotalAmount(purchaseDetail.totalAmount);
+      setVat(purchaseDetail.vat);
+      setVatRate(purchaseDetail.vatRate);
+      setGrandTotalAmount(purchaseDetail.grandTotalAmount);
+    }
   }, [open]);
 
   const saveStateRows = async () => {
@@ -357,6 +367,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [comment, setComment] = React.useState('');
   const [totalAmount, setTotalAmount] = React.useState(0);
   const [vat, setVat] = React.useState(0);
+  const [vatRate, setVatRate] = React.useState(0);
   const [grandTotalAmount, setGrandTotalAmount] = React.useState(0);
   const [flagCalculate, setFlagCalculate] = React.useState(false);
 
@@ -411,12 +422,16 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   if (rows.length === 0) {
     if (totalAmount !== 0) setTotalAmount(0);
     if (vat !== 0) setVat(0);
+    if (vatRate != 0) setVatRate(0);
     if (grandTotalAmount !== 0) setGrandTotalAmount(0);
   }
 
-  if (!flagCalculate && rows.length > 0) {
-    setItemCal();
-    setFlagCalculate(true);
+  if (purchaseDetail.piStatus === 0) {
+    console.log('purchaseDetail.piStatus:', purchaseDetail.piStatus);
+    if (!flagCalculate && rows.length > 0) {
+      setItemCal();
+      setFlagCalculate(true);
+    }
   }
 
   const classes = useStyles();
@@ -448,6 +463,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [items, setItems] = React.useState<any>([]);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+
+  // console.log('fileUploadList2: ', fileUploadList);
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -459,7 +477,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const handlConfirmButton = async () => {
     handleUpdateRowState();
-    if (!billNo) {
+    if (files.length <= 0) {
+      if (fileUploadList.length <= 0) {
+        setOpenFailAlert(true);
+        setTextFail('กรุณาแนบเอกสาร');
+      }
+    } else if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
@@ -526,7 +549,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
-      await saveSupplierOrder(payloadSave, piNo)
+      await saveSupplierOrder(payloadSave, piNo, fileUploadList)
         .then((_value) => {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
@@ -557,6 +580,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [productNameDel, setProductNameDel] = React.useState('');
   const [skuCodeDel, setSkuCodeDel] = React.useState('');
   const [barCodeDel, setBarCodeDel] = React.useState('');
+  const [uploadFileInfo, setUploadFileInfo] = React.useState([]);
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
     const isRefPO = params.getValue(params.id, 'isRefPO');
@@ -577,6 +601,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelDeleteConfirm(false);
   };
 
+  const setUploadfile = (value: any) => {
+    console.log('setUploadfile value: ', value);
+    setUploadFileInfo(value.file);
+  };
+
+  // useEffect(() => {
+  //   console.log('UploadFileInfo: ', uploadFileInfo);
+  // }, [uploadFileInfo]);
   const handleCalculateItems = async (params: GridEditCellValueParams) => {
     saveStateRows();
     if (params.field === 'actualQty') {
@@ -600,7 +632,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const calculateItems = async (items: any) => {
     const payloadCalculate: CalculatePurchasePIRequest = {
       piNo: purchaseDetail.piNo,
-      billNo: purchaseDetail.billNo,
+      docNo: purchaseDetail.docNo,
       SupplierCode: purchaseDetail.supplierCode,
       items: items,
     };
@@ -609,6 +641,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       .then((value) => {
         setTotalAmount(value.data.amountText.totalAmount);
         setVat(value.data.amountText.vat);
+        setVatRate(value.data.amountText.vatRate);
         setGrandTotalAmount(value.data.amountText.grandTotalAmount);
 
         let calItem = value.data.items;
@@ -645,6 +678,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setStatusFile(1);
     setOpenModelPreviewDocument(true);
     setOpenLoadingModal(false);
+  };
+
+  const [openFailAlert, setOpenFailAlert] = React.useState(false);
+  const [textFail, setTextFail] = React.useState('');
+
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail('');
   };
 
   return (
@@ -716,29 +757,36 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
+              {/* <Grid item lg={2}>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
+              </Grid> */}
+              {/* <Grid item lg={4}>
+                <AccordionUploadFile sdNo={piNo} /> */}
               <Grid item lg={2} sx={{ mt: -3 }}>
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4} sx={{ mt: -3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
-                  <Button
-                    id="btnPrint"
-                    color="primary"
-                    variant="contained"
-                    component="span"
-                    className={classes.MbtnBrowse}
-                    disabled
-                  >
-                    แนบไฟล์
-                  </Button>
+                {piStatus === 1 && (
+                  <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
+                    <Button
+                      id="btnPrint"
+                      color="primary"
+                      variant="contained"
+                      component="span"
+                      className={classes.MbtnBrowse}
+                      disabled
+                    >
+                      แนบไฟล์
+                    </Button>
 
-                  <Typography
-                    variant="overline"
-                    sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
-                  >
-                    แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
-                  </Typography>
-                </Box>
+                    <Typography
+                      variant="overline"
+                      sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
+                    >
+                      แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
+                    </Typography>
+                  </Box>
+                )}
 
                 {piStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
                 {piStatus === 1 && (
@@ -746,6 +794,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     เรียกดูเอกสารใบรับสินค้า
                   </Link>
                 )}
+                {piStatus === 0 && <AccordionUploadFile files={files} />}
               </Grid>
             </Grid>
           </Box>
@@ -878,7 +927,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   <Grid item lg={5}></Grid>
                   <Grid item lg={3} alignItems="flex-end">
                     <Typography variant="body2" pt={1}>
-                      ภาษี(7%)
+                      ภาษี({vatRate}%)
                     </Typography>
                   </Grid>
                   <Grid item lg={4}>
@@ -964,7 +1013,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         statusFile={statusFile}
         sdImageFile=""
         fileName={formatFileNam(piNo, piStatus)}
+        btnPrintName="พิมพ์เอกสาร"
       />
+
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
 
       <LoadingModal open={openLoadingModal} />
     </div>

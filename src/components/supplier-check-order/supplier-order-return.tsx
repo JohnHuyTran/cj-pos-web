@@ -1,5 +1,14 @@
 import React, { useMemo } from 'react';
-import { Button, Checkbox, DialogActions, DialogContent, DialogContentText, Grid, TextField } from '@mui/material';
+import {
+  Button,
+  Checkbox,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Grid,
+  Link,
+  TextField,
+} from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/system/Box';
@@ -9,9 +18,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
 import Steppers from '../commons/ui/steppers';
 
+import theme from '../../styles/theme';
 import { useStyles } from '../../styles/makeTheme';
 import {
   DataGrid,
+  GridCellParams,
   GridColDef,
   GridColumnHeaderParams,
   GridRenderCellParams,
@@ -26,7 +37,7 @@ import { ErrorOutline } from '@mui/icons-material';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
-import { approvePurchaseCreditNote, draftPurchaseCreditNote } from '../../services/purchase';
+import { approvePurchaseCreditNote, draftPurchaseCreditNote, getPathReportPI } from '../../services/purchase';
 import {
   ItemsType,
   PurchaseCreditNoteType,
@@ -41,6 +52,9 @@ import { isValid } from 'date-fns';
 import AccordionHuaweiFile from './accordion-huawei-file';
 import { FileType } from '../../models/supplier-check-order-model';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
+import AccordionUploadFile from './accordion-upload-file';
+import { formatFileNam } from '../../utils/enum/check-order-enum';
+import ModalShowFile from '../commons/ui/modal-show-file';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -51,6 +65,7 @@ const columns: GridColDef[] = [
     field: 'index',
     headerName: 'ลำดับ',
     flex: 0.5,
+    width: 30,
     headerAlign: 'center',
     sortable: false,
     // hide: true,
@@ -88,7 +103,7 @@ const columns: GridColDef[] = [
   {
     field: 'actualQty',
     headerName: 'จำนวนที่รับ',
-    width: 110,
+    width: 150,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -96,7 +111,7 @@ const columns: GridColDef[] = [
   {
     field: 'qtyReturn',
     headerName: 'จำนวนที่คืน',
-    width: 110,
+    width: 150,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -127,7 +142,7 @@ const columns: GridColDef[] = [
   {
     field: 'unitName',
     headerName: 'หน่วย',
-    width: 90,
+    width: 110,
     headerAlign: 'center',
     sortable: false,
   },
@@ -163,7 +178,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   );
 
   const [files, setFiles] = React.useState<FileType[]>([]);
-
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const { apiRef, columns } = useApiRef();
 
   const [openAlert, setOpenAlert] = React.useState(false);
@@ -195,7 +210,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const [cols, setCols] = React.useState(columns);
 
   React.useEffect(() => {
-    setFiles(purchaseDetail.files);
+    setFiles(purchaseDetail.files ? purchaseDetail.files : []);
     setComment(purchaseDetail.comment);
     setPnStatus(purchaseDetail.pnState);
     setPnNo(purchaseDetail.pnNo);
@@ -267,45 +282,6 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setOpenAlert(false);
   };
 
-  const storeItem_ = () => {
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    let itemNotValid: boolean = false;
-    rowsEdit.forEach((data: GridRowData) => {
-      if (data.qtyReturn > data.actualQty || data.qtyReturn <= 0) {
-        itemNotValid = true;
-        return;
-      }
-    });
-
-    const items: PurchaseNoteDetailEntries[] = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      const newData: PurchaseNoteDetailEntries = {
-        seqItem: data.seqItem,
-        produtStatus: data.produtStatus,
-        isDraftStatus: pnStatus === 0 ? false : true,
-        skuCode: data.skuCode,
-        barcode: data.barcode,
-        productName: data.productName,
-        qty: data.qty,
-        qtyAll: data.qtyAll,
-        unitName: data.unitName,
-        unitCode: data.unitCode,
-        actualQty: data.actualQty,
-        qtyReturn: data.qtyReturn,
-        actualQtyAll: data.actualQtyAll,
-      };
-      items.push(newData);
-    });
-    setPurchaseDetailItems(items);
-    if (itemNotValid) {
-      setOpenAlert(true);
-      setTextError('จำนวนที่คืนต้องมากกว่า 0 หรือ น้อยกว่า จำนวนที่รับ');
-      return false;
-    } else {
-      return true;
-    }
-  };
-
   const validateItem = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
@@ -355,7 +331,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     if (rs) {
       setOpenLoadingModal(true);
       const payload = await mappingPayload();
-      await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileInfo)
+      await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileUploadList)
         .then((_value) => {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
@@ -422,15 +398,6 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     });
     setPurchaseDetailItems([]);
     setPurchaseDetailItems(items);
-    // if (countIsDelete === rowsEdit.size) {
-    //   setOpenAlert(true);
-    //   setTextError('ไม่สามารถลบรายการทั้งหมดได้');
-    //   setPurchaseDetailItems([]);
-    //   setPurchaseDetailItems(itemsDelete);
-    // } else {
-    //   setPurchaseDetailItems([]);
-    //   setPurchaseDetailItems(itemsNoDelete);
-    // }
   };
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -454,11 +421,10 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     const isFileValidate: boolean = validateFileInfo();
     const rs = validateItem();
     let isCallSaveDraft: boolean = true;
-    console.log('pnNo: ', !pnNo);
     if (rs && isFileValidate) {
       if (!pnNo) {
         const payload = mappingPayload();
-        await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileInfo)
+        await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileUploadList)
           .then((value: PurchaseNoteResponseType) => {
             setPnNo(value.pnNo);
           })
@@ -475,13 +441,14 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   };
 
   const validateFileInfo = () => {
-    const isvalid = fileInfo === undefined || fileInfo === null || fileInfo.length <= 0 ? false : true;
-    if (!isvalid) {
+    const isvalid = fileUploadList.length > 0 ? true : false;
+    const isExistingFile = files.length > 0 ? true : false;
+    if (!(isvalid || isExistingFile)) {
       setOpenAlert(true);
-      setTextError('กรุณาแนบไฟล์');
+      setTextError('กรุณาแนบเอกสาร');
       return false;
     }
-    return isvalid;
+    return true;
   };
 
   const approvePN = async () => {
@@ -500,7 +467,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       comment: comment,
       items: items,
     };
-    await approvePurchaseCreditNote(payload, fileInfo)
+    await approvePurchaseCreditNote(payload, fileUploadList)
       .then((_value) => {
         handleOnCloseModalConfirm();
         setShowSnackBar(true);
@@ -517,59 +484,24 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         setShowSnackBar(true);
         setContentMsg(error.message);
       });
-    // setOpen(false);
-    // onClickClose();
-    // handleOnCloseModalConfirm();
+    handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
   };
 
-  const [fileInfo, setFileInfo] = React.useState<File[]>([]);
-  const handleFileInputChange = (e: any) => {
-    // setValidationFile(false);
-    // setErrorBrowseFile(false);
-    // setMsgErrorBrowseFile('');
-    checkSizeFile(e);
-
-    let file: File = e.target.files[0];
-    console.log('filelist: ', e.target.files);
-    console.log('file: ', file);
-    let fileType = file.type.split('/');
-    const fileName = `test-01.${fileType[1]}`;
-
-    setFileInfo([...fileInfo, file]);
+  const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
+  const [statusFile, setStatusFile] = React.useState(0);
+  function handleModelPreviewDocument() {
+    setOpenModelPreviewDocument(false);
+  }
+  const handleLinkDocument = async () => {
+    setOpenLoadingModal(true);
+    setStatusFile(1);
+    setOpenModelPreviewDocument(true);
+    setOpenLoadingModal(false);
   };
 
-  const checkSizeFile = (e: any) => {
-    const fileSize = e.target.files[0].size;
-    const fileName = e.target.files[0].name;
-    let parts = fileName.split('.');
-    let length = parts.length - 1;
-    // pdf, .jpg, .jpeg
-    if (
-      parts[length].toLowerCase() !== 'pdf' &&
-      parts[length].toLowerCase() !== 'jpg' &&
-      parts[length].toLowerCase() !== 'jpeg'
-    ) {
-      // setValidationFile(true);
-      // setErrorBrowseFile(true);
-      // setMsgErrorBrowseFile('กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น');
-      return;
-    }
-
-    // 1024 = bytes
-    // 1024*1024*1024 = mb
-    let mb = 1024 * 1024 * 1024;
-    // fileSize = mb unit
-    if (fileSize < mb) {
-      //size > 5MB
-      let size = fileSize / 1024 / 1024;
-      if (size > 5) {
-        // setValidationFile(true);
-        // setErrorBrowseFile(true);
-        // setMsgErrorBrowseFile('ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่');
-        return;
-      }
-    }
+  const currentlySelected = async (params: GridCellParams) => {
+    storeItem();
   };
 
   return (
@@ -621,38 +553,32 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'>แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
-                {pnStatus === 0 && (
-                  <>
-                    <TextField
-                      name='browserTxf'
-                      className={classes.MtextFieldBrowse}
-                      value=''
-                      placeholder='แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB'
-                    />
-                    <input
-                      id='btnBrowse'
-                      type='file'
-                      multiple
-                      // onDrop
-                      accept='.pdf, .jpg, .jpeg'
-                      onChange={handleFileInputChange}
-                      style={{ display: 'none' }}
-                    />
-                    <label htmlFor={'btnBrowse'}>
-                      <Button
-                        id='btnPrint'
-                        color='primary'
-                        variant='contained'
-                        component='span'
-                        className={classes.MbtnBrowse}
-                        style={{ marginLeft: 10, textTransform: 'none' }}>
-                        Browse
-                      </Button>
-                    </label>
-                  </>
-                )}
+                {pnStatus === 1 && (
+                  <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
+                    <Button
+                      id='btnPrint'
+                      color='primary'
+                      variant='contained'
+                      component='span'
+                      className={classes.MbtnBrowse}
+                      disabled>
+                      แนบไฟล์
+                    </Button>
 
+                    <Typography
+                      variant='overline'
+                      sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
+                      แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
+                    </Typography>
+                  </Box>
+                )}
                 {pnStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
+                {pnStatus === 1 && (
+                  <Link component='button' variant='body2' onClick={handleLinkDocument}>
+                    เรียกดูเอกสารใบคืนสินค้า
+                  </Link>
+                )}
+                {pnStatus === 0 && <AccordionUploadFile files={files} />}
               </Grid>
             </Grid>
           </Box>
@@ -719,6 +645,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 autoHeight={rows.length >= 8 ? false : true}
                 scrollbarSize={10}
                 rowHeight={65}
+                onCellClick={currentlySelected}
               />
             </div>
           </Box>
@@ -771,9 +698,18 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         open={openModelConfirm}
         onClose={handleOnCloseModalConfirm}
         handleConfirm={approvePN}
-        header='ยืนยันอนุมัติใบรับสินค้า'
+        header='ยืนยันอนุมัติใบคืนสินค้า'
         title='เลขที่เอกสาร PN'
         value={pnNo}
+      />
+      <ModalShowFile
+        open={openModelPreviewDocument}
+        onClose={handleModelPreviewDocument}
+        url={getPathReportPI(purchaseDetail.piNo)}
+        statusFile={statusFile}
+        sdImageFile=''
+        fileName={formatFileNam(pnNo, pnStatus)}
+        btnPrintName='พิมพ์เอกสาร'
       />
       <LoadingModal open={openLoadingModal} />
     </div>
