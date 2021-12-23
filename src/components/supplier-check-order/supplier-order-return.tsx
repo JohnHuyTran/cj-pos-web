@@ -429,14 +429,14 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   };
 
   const validateFileInfo = () => {
-    const isvalid =
-      fileUploadList === undefined || fileUploadList === null || fileUploadList.length <= 0 ? false : true;
-    if (!isvalid) {
+    const isvalid = fileUploadList.length > 0 ? true : false;
+    const isExistingFile = files.length > 0 ? true : false;
+    if (!(isvalid || isExistingFile)) {
       setOpenAlert(true);
       setTextError('กรุณาแนบไฟล์');
       return false;
     }
-    return isvalid;
+    return true;
   };
 
   const approvePN = async () => {
