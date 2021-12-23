@@ -118,6 +118,7 @@ export interface FileType {
   fileKey: string;
   fileName: string;
   mimeType: string;
+  status?: string;
 }
 export interface SavePurchaseRequest {
   billNo: string;

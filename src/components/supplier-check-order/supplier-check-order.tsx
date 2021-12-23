@@ -20,6 +20,7 @@ import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supp
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import ModalSupplierSelection from './modal-supplier-selection';
 import { SearchOff } from '@mui/icons-material';
+import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 
 interface State {
   paramQuery: string;
@@ -272,6 +273,10 @@ export default function SupplierCheckOrderSearch() {
               />
             </Box>
           </Grid>
+
+          {/* <Grid item xs={4}>
+            <AccordionUploadFile sdNo="1234" />
+          </Grid> */}
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
             <Button

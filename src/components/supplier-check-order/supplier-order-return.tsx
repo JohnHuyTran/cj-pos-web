@@ -500,23 +500,23 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       comment: comment,
       items: items,
     };
-    await approvePurchaseCreditNote(payload, fileInfo)
-      .then((_value) => {
-        handleOnCloseModalConfirm();
-        setShowSnackBar(true);
-        setSnackbarIsStatus(true);
-        setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
-        dispatch(featchOrderListSupAsync(payloadSearch));
-        setTimeout(() => {
-          setOpen(false);
-          onClickClose();
-        }, 500);
-      })
-      .catch((error: ApiError) => {
-        handleOnCloseModalConfirm();
-        setShowSnackBar(true);
-        setContentMsg(error.message);
-      });
+    // await approvePurchaseCreditNote(payload)
+    //   .then((_value) => {
+    //     handleOnCloseModalConfirm();
+    //     setShowSnackBar(true);
+    //     setSnackbarIsStatus(true);
+    //     setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
+    //     dispatch(featchOrderListSupAsync(payloadSearch));
+    //     setTimeout(() => {
+    //       setOpen(false);
+    //       onClickClose();
+    //     }, 500);
+    //   })
+    //   .catch((error: ApiError) => {
+    //     handleOnCloseModalConfirm();
+    //     setShowSnackBar(true);
+    //     setContentMsg(error.message);
+    //   });
     // setOpen(false);
     // onClickClose();
     // handleOnCloseModalConfirm();

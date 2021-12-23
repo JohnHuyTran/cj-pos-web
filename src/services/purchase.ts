@@ -11,10 +11,23 @@ import {
 import { PurchaseCreditNoteType } from '../models/purchase-credit-note';
 import { ContentType } from '../utils/enum/common-enum';
 
-export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string) {
-  const bodyFormData = new FormData();
+// export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string) {
+//   try {
+//     const response = await put(getPathSaveDraft(piNo), payload).then((result: any) => result);
+//     return response;
+//   } catch (error) {
+//     console.log('error = ', error);
+//     throw error;
+//   }
+// }
 
+export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string, fileList: File[]) {
+  const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  fileList.map((data: File) => {
+    return bodyFormData.append('file[]', data);
+  });
 
   try {
     const response = await put(getPathSaveDraft(piNo), bodyFormData, ContentType.MULTIPART).then(
@@ -27,10 +40,13 @@ export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: stri
   }
 }
 
-export async function approveSupplierOrder(payload: SavePurchaseRequest, piNo: string) {
+export async function approveSupplierOrder(payload: SavePurchaseRequest, piNo: string, fileList: File[]) {
   const bodyFormData = new FormData();
-
   bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  fileList.map((data: File) => {
+    return bodyFormData.append('file[]', data);
+  });
 
   const response = await put(getPathApprove(piNo), bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
@@ -52,12 +68,13 @@ export const getPathApprove = (piNo: string) => {
   });
 };
 
-export async function saveSupplierPI(payload: SavePurchasePIRequest) {
+export async function saveSupplierPI(payload: SavePurchasePIRequest, fileList: File[]) {
   const bodyFormData = new FormData();
-
   bodyFormData.append('requestBody', JSON.stringify(payload));
 
-  // bodyFormData.append('file[]', fileList[0]);
+  fileList.map((data: File) => {
+    return bodyFormData.append('file[]', data);
+  });
 
   try {
     const response = await put(
@@ -72,10 +89,13 @@ export async function saveSupplierPI(payload: SavePurchasePIRequest) {
   }
 }
 
-export async function approveSupplierPI(payload: SavePurchasePIRequest) {
+export async function approveSupplierPI(payload: SavePurchasePIRequest, fileList: File[]) {
   const bodyFormData = new FormData();
-
   bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  fileList.map((data: File) => {
+    return bodyFormData.append('file[]', data);
+  });
 
   const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
