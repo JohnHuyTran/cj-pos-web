@@ -320,7 +320,15 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setCharacterCount(purchaseDetail.comment.length);
     setFiles(purchaseDetail.files ? purchaseDetail.files : []);
 
-    if (purchaseDetail.piType === 1) dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
+    if (purchaseDetail.piType === 1 && purchaseDetail.piStatus === 0) {
+      dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
+    }
+    if (purchaseDetail.piStatus === 1) {
+      setTotalAmount(purchaseDetail.totalAmount);
+      setVat(purchaseDetail.vat);
+      setVatRate(purchaseDetail.vatRate);
+      setGrandTotalAmount(purchaseDetail.grandTotalAmount);
+    }
   }, [open]);
 
   const saveStateRows = async () => {
@@ -416,9 +424,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     if (grandTotalAmount !== 0) setGrandTotalAmount(0);
   }
 
-  if (!flagCalculate && rows.length > 0) {
-    setItemCal();
-    setFlagCalculate(true);
+  if (purchaseDetail.piStatus === 0) {
+    console.log('purchaseDetail.piStatus:', purchaseDetail.piStatus);
+    if (!flagCalculate && rows.length > 0) {
+      setItemCal();
+      setFlagCalculate(true);
+    }
   }
 
   const classes = useStyles();
@@ -967,6 +978,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         statusFile={statusFile}
         sdImageFile=""
         fileName={formatFileNam(piNo, piStatus)}
+        btnPrintName="พิมพ์เอกสาร"
       />
 
       <LoadingModal open={openLoadingModal} />

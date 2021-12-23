@@ -879,6 +879,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         statusFile={statusFile}
         sdImageFile={orderDetail.sdImageFile}
         fileName={orderDetail.sdImageFilename ? orderDetail.sdImageFilename : formatFileNam(sdNo, orderDetail.sdStatus)}
+        btnPrintName="พิมพ์ใบผลต่าง"
       />
 
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />

@@ -17,19 +17,21 @@ interface ModalShowPDFProp {
   sdImageFile: string;
   statusFile: number;
   fileName: string;
+  btnPrintName: string;
   onClose: () => void;
   onPrint?: () => void;
 }
 export interface DialogTitleProps {
   id: string;
   status: number;
+  text: string;
   children?: React.ReactNode;
   onClose?: () => void;
   onPrint?: () => void;
 }
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
-  const { children, status, onClose, onPrint, ...other } = props;
+  const { children, status, text, onClose, onPrint, ...other } = props;
   return (
     <DialogTitle sx={{ m: 1, p: 2 }} {...other}>
       {children}
@@ -57,9 +59,9 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
               onClick={onPrint}
               endIcon={<LocalPrintshopOutlinedIcon />}
             >
-              {/* {status === 0 && "พิมพ์เอกสาร"} */}
-              {/* {status === 1 && "พิมพ์ใบผลต่าง"} */}
-              พิมพ์ใบผลต่าง
+              {/* {text && 'พิมพ์เอกสาร'}
+              {!text && 'พิมพ์ใบผลต่าง'} */}
+              {text}
             </Button>
           )}
         </div>
@@ -74,6 +76,7 @@ export default function ModalShowPDF({
   sdImageFile,
   statusFile,
   fileName,
+  btnPrintName,
   onClose,
 }: ModalShowPDFProp): ReactElement {
   const [numPages, setNumPages] = useState(0);
@@ -136,6 +139,7 @@ export default function ModalShowPDF({
           onClose={handleClose}
           onPrint={showPrint}
           status={statusFile}
+          text={btnPrintName}
         />
         <DialogContent
           sx={{
