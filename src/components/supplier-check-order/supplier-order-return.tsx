@@ -386,15 +386,6 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     });
     setPurchaseDetailItems([]);
     setPurchaseDetailItems(items);
-    // if (countIsDelete === rowsEdit.size) {
-    //   setOpenAlert(true);
-    //   setTextError('ไม่สามารถลบรายการทั้งหมดได้');
-    //   setPurchaseDetailItems([]);
-    //   setPurchaseDetailItems(itemsDelete);
-    // } else {
-    //   setPurchaseDetailItems([]);
-    //   setPurchaseDetailItems(itemsNoDelete);
-    // }
   };
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -481,8 +472,6 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         setShowSnackBar(true);
         setContentMsg(error.message);
       });
-    setOpen(false);
-    onClickClose();
     handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
   };
