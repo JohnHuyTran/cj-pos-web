@@ -153,7 +153,12 @@ export default function SupplierOrderList() {
           } else {
             //PN Number 'บันทึก pnState=1, อนุมัติpnState=2'
             return (
-              <Typography color="secondary" variant="body2" sx={{ textDecoration: 'underline' }}>
+              <Typography
+                color="secondary"
+                variant="body2"
+                sx={{ textDecoration: 'underline' }}
+                onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}
+              >
                 {params.value}
               </Typography>
             );
