@@ -53,9 +53,14 @@ export interface PurchaseNoteDetailEntries {
   actualQty: number;
   actualQtyAll: number;
   isDraftStatus?: boolean;
-  qtyReturn?: number;
+  returnQty?: number;
   allQtyReturn?: number;
   pnDisplay?: number;
   unitCode: string;
   unitName: string;
 }
+// export interface RequestPurchaseInq {
+//   piNo: string;
+//   pnNo: string;
+//   pnState: number;
+// }
