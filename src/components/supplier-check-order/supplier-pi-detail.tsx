@@ -32,7 +32,9 @@ import ModalAddItem from './modal-add-item';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { updateState } from '../../store/slices/supplier-selection-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
-
+import theme from '../../styles/theme';
+import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
+import AlertError from '../commons/ui/alert-error';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -406,7 +408,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelConfirm(false);
   };
   const handlConfirmButton = async () => {
-    if (!billNo) {
+    if (fileUploadList.length <= 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาแนบเอกสาร');
+    } else if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
@@ -613,6 +618,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const [openFailAlert, setOpenFailAlert] = React.useState(false);
+  const [textFail, setTextFail] = React.useState('');
+
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail('');
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -655,10 +668,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               <Grid item lg={4}>
                 <Typography variant="body2">{piNo}</Typography>
               </Grid>
-              <Grid item lg={2}>
+              {/* <Grid item lg={2}>
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
-              </Grid>
-              <Grid item lg={4}>
+              </Grid> */}
+              {/* <Grid item lg={4}>
                 <Button
                   id="btnPrint"
                   color="primary"
@@ -669,7 +682,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 >
                   แนบไฟล์
                 </Button>
-              </Grid>
+              </Grid> */}
             </Grid>
             <Grid container spacing={2}>
               <Grid item lg={2}>
@@ -693,7 +706,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
-              <Grid item lg={6}></Grid>
+              <Grid item lg={2} sx={{ mt: -3 }}>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
+              </Grid>
+              <Grid item lg={4} sx={{ mt: -3 }}>
+                <AccordionUploadFile files={[]} />
+              </Grid>
             </Grid>
           </Box>
 
@@ -903,6 +921,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       />
 
       <LoadingModal open={openLoadingModal} />
+
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
     </div>
   );
 }

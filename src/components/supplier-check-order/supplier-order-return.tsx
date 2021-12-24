@@ -210,7 +210,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const [cols, setCols] = React.useState(columns);
 
   React.useEffect(() => {
-    setFiles(purchaseDetail.files);
+    setFiles(purchaseDetail.files ? purchaseDetail.files : []);
     setComment(purchaseDetail.comment);
     setPnStatus(purchaseDetail.pnState);
     setPnNo(purchaseDetail.pnNo);
