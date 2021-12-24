@@ -109,7 +109,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'qtyReturn',
+    field: 'returnQty',
     headerName: 'จำนวนที่คืน',
     width: 150,
     headerAlign: 'center',
@@ -131,7 +131,7 @@ const columns: GridColDef[] = [
                 : 0;
             var value = e.target.value ? parseInt(e.target.value, 10) : '0';
             // if (value > qty) value = qty;
-            params.api.updateRows([{ ...params.row, qtyReturn: value }]);
+            params.api.updateRows([{ ...params.row, returnQty: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
           autoComplete='off'
@@ -240,7 +240,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         unitName: item.unitName,
         unitCode: item.unitCode,
         actualQty: item.actualQty,
-        qtyReturn: item.qtyReturn ? item.qtyReturn : 0,
+        returnQty: item.returnQty ? item.returnQty : 0,
         actualQtyAll: item.actualQtyAll,
       };
     });
@@ -264,7 +264,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
     let i = 0;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.qtyReturn !== (ent[i].qtyReturn ? ent[i].qtyReturn : 0)) {
+      if (data.returnQty !== (ent[i].returnQty ? ent[i].returnQty : 0)) {
         isExit = false;
       }
       i++;
@@ -286,7 +286,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.qtyReturn > data.actualQty || data.qtyReturn <= 0) {
+      if (data.returnQty > data.actualQty || data.returnQty <= 0) {
         itemNotValid = true;
         return;
       }
@@ -314,7 +314,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         qty: data.qty,
         qtyAll: data.qtyAll,
         actualQty: data.actualQty,
-        qtyReturn: data.qtyReturn,
+        returnQty: data.returnQty,
         actualQtyAll: data.actualQtyAll,
         unitName: data.unitName,
         unitCode: data.unitCode,
@@ -355,7 +355,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     rowsEdit.forEach((data: GridRowData) => {
       const item: ItemsType = {
         barcode: data.barcode,
-        qtyReturn: data.qtyReturn ? data.qtyReturn : 0,
+        qtyReturn: data.returnQty ? data.returnQty : 0,
       };
       items.push(item);
     });
@@ -393,7 +393,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         unitName: data.unitName,
         unitCode: data.unitCode,
         actualQty: data.actualQty,
-        qtyReturn: data.qtyReturn,
+        returnQty: data.returnQty,
         actualQtyAll: data.actualQtyAll,
       };
       items.push(newData);
@@ -459,7 +459,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     purchaseDetailItems.forEach((data: PurchaseNoteDetailEntries) => {
       const item: ItemsType = {
         barcode: data.barcode,
-        qtyReturn: data.qtyReturn ? data.qtyReturn : 0,
+        qtyReturn: data.returnQty ? data.returnQty : 0,
       };
       items.push(item);
     });
