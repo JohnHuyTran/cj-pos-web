@@ -117,6 +117,12 @@ export const getPathPurchaseDetail = (piNo: string) => {
   });
 };
 
+export const getPathPurchaseNoteInit = (pnNo: string) => {
+  return getPathUrl(`${environment.purchase.purchaseNote.initPn.url}`, {
+    pnNo: pnNo,
+  });
+};
+
 export const getPathPurchaseNoteApprove = (pnNo: string) => {
   return getPathUrl(`${environment.purchase.purchaseNote.approve.url}`, {
     pnNo: pnNo,

@@ -90,6 +90,9 @@ export const environment = {
       },
     },
     purchaseNote: {
+      initPn: {
+        url: '/purchase/purchase-note/init/{pnNo}',
+      },
       detail: {
         url: '/purchase/purchase-note/{piNo}',
       },

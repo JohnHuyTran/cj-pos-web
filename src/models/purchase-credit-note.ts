@@ -59,3 +59,8 @@ export interface PurchaseNoteDetailEntries {
   unitCode: string;
   unitName: string;
 }
+export interface RequestPurchaseInq {
+  piNo: string;
+  pnNo: string;
+  pnState: number;
+}
