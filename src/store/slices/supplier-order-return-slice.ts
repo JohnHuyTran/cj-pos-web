@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
-import { PurchaseNoteDetailResponse, RequestPurchaseInq } from '../../models/purchase-credit-note';
-import { getPathPurchaseDetail, getPathPurchaseNoteInit } from '../../services/purchase';
+import { PurchaseNoteDetailResponse } from '../../models/purchase-credit-note';
+import { getPathPurchaseDetail } from '../../services/purchase';
 
 type State = {
   purchaseDetail: PurchaseNoteDetailResponse;
@@ -19,13 +19,9 @@ const initialState: State = {
   error: '',
 };
 
-export const featchPurchaseNoteAsync = createAsyncThunk('purchaseNote', async (payload: RequestPurchaseInq) => {
+export const featchPurchaseNoteAsync = createAsyncThunk('purchaseNote', async (pi: string) => {
   try {
-    let apiRootPath = getPathPurchaseDetail(payload.piNo); //remark
-    if (payload.pnNo && payload.pnState != 0) {
-      apiRootPath = getPathPurchaseNoteInit(payload.pnNo);
-    }
-
+    const apiRootPath = getPathPurchaseDetail(pi); //remark
     let response: PurchaseNoteDetailResponse = {
       ref: '',
       code: 0,

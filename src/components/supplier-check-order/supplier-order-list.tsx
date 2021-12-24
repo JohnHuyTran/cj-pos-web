@@ -20,7 +20,6 @@ import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import LoadingModal from '../commons/ui/loading-modal';
-import { RequestPurchaseInq } from '../../models/purchase-credit-note';
 
 interface loadingModalState {
   open: boolean;
@@ -146,7 +145,7 @@ export default function SupplierOrderList() {
                 size='small'
                 className={classes.MbtnSearch}
                 sx={{ minWidth: 90 }}
-                onClick={() => handleOpenReturnModal(params.row.piNo, params.row.pnNo, params.row.pnState, 'button')}>
+                onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}>
                 คืนสินค้า
               </Button>
             );
@@ -157,7 +156,7 @@ export default function SupplierOrderList() {
                 color='secondary'
                 variant='body2'
                 sx={{ textDecoration: 'underline' }}
-                onClick={() => handleOpenReturnModal(params.row.piNo, params.row.pnNo, params.row.pnState, 'button')}>
+                onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}>
                 {params.value}
               </Typography>
             );
@@ -166,9 +165,7 @@ export default function SupplierOrderList() {
           return (
             <Box
               sx={{ height: '100%', width: '100px' }}
-              onClick={() =>
-                handleOpenReturnModal(params.row.piNo, params.row.pnNo, params.row.pnState, 'blank')
-              }></Box>
+              onClick={() => handleOpenReturnModal(params.row.piNo, 'blank')}></Box>
           );
         }
       },
@@ -304,15 +301,10 @@ export default function SupplierOrderList() {
     }
   };
 
-  const handleOpenReturnModal = async (piNo: string, pnNo: string, pnState: number, status: string) => {
+  const handleOpenReturnModal = async (piNo: string, status: string) => {
     try {
       if (status === 'button') {
-        const payload: RequestPurchaseInq = {
-          piNo,
-          pnNo,
-          pnState,
-        };
-        await dispatch(featchPurchaseNoteAsync(payload));
+        await dispatch(featchPurchaseNoteAsync(piNo));
         setOpenReturn(true);
       } else {
         await dispatch(featchSupplierOrderDetailAsync(piNo));

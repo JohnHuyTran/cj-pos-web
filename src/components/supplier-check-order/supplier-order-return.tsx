@@ -43,7 +43,6 @@ import {
   PurchaseCreditNoteType,
   PurchaseNoteDetailEntries,
   PurchaseNoteResponseType,
-  RequestPurchaseInq,
 } from '../../models/purchase-credit-note';
 import { ApiError } from '../../models/api-error-model';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
@@ -338,12 +337,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          const payload: RequestPurchaseInq = {
-            piNo: purchaseDetail.piNo,
-            pnNo: value.pnNo,
-            pnState: 1,
-          };
-          dispatch(featchPurchaseNoteAsync(payload));
+          dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
           dispatch(featchOrderListSupAsync(payloadSearch));
         })
         .catch((error: ApiError) => {
