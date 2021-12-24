@@ -97,7 +97,7 @@ export const environment = {
         url: '/purchase/purchase-note/{piNo}/save',
       },
       approve: {
-        url: '/purchase/purchase-note/{pnNo}/approve',
+        url: '/purchase/purchase-note/approve/{pnNo}',
       },
     },
   },

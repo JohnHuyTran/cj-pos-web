@@ -332,7 +332,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       setOpenLoadingModal(true);
       const payload = await mappingPayload();
       await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileUploadList)
-        .then((_value) => {
+        .then((value) => {
+          setPnNo(value.pnNo);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
