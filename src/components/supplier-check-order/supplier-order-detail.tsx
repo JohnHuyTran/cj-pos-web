@@ -251,6 +251,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       exit = true;
     }
 
+    if (fileUploadList.length > 0) {
+      exit = true;
+    }
+
     if (rows.length > 0) {
       const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       let i = 0;
@@ -427,7 +431,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   }
 
   if (purchaseDetail.piStatus === 0) {
-    console.log('purchaseDetail.piStatus:', purchaseDetail.piStatus);
+    // console.log('purchaseDetail.piStatus:', purchaseDetail.piStatus);
     if (!flagCalculate && rows.length > 0) {
       setItemCal();
       setFlagCalculate(true);
@@ -477,11 +481,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const handlConfirmButton = async () => {
     handleUpdateRowState();
-    if (files.length <= 0) {
-      if (fileUploadList.length <= 0) {
-        setOpenFailAlert(true);
-        setTextFail('กรุณาแนบเอกสาร');
-      }
+
+    if (files.length <= 0 && fileUploadList.length <= 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาแนบเอกสาร');
     } else if (!billNo) {
       setErrorBillNo(true);
     } else {
