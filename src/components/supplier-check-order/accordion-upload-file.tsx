@@ -68,6 +68,14 @@ function AccordionUploadFile({ files }: Props): ReactElement {
     let parts = fileName.split('.');
     let length = parts.length - 1;
     let checkError: boolean = false;
+
+    //match file name
+    // if (newFileDisplayList.length > 0 && fileName === newFileDisplayList.fileName) {
+    //   console.log('have newFileDisplayList');
+    // } else {
+    //   console.log('do not have newFileDisplayList', newFileDisplayList.length);
+    // }
+
     // pdf, .jpg, .jpeg
     if (
       parts[length].toLowerCase() !== 'pdf' &&
@@ -125,8 +133,8 @@ function AccordionUploadFile({ files }: Props): ReactElement {
     const name = item.fileName ? item.fileName : '';
 
     if (item.status === 'old') {
-      console.log('key: ', keys);
-      console.log('name: ', name);
+      // console.log('key: ', keys);
+      // console.log('name: ', name);
       getFileUrlHuawei(keys)
         .then((resp) => {
           if (resp && resp.data) {
@@ -152,7 +160,7 @@ function AccordionUploadFile({ files }: Props): ReactElement {
 
   let newFileHuawei: any = [];
   let newFileUpload: any = [];
-  console.log('file huawei: ', files);
+  // console.log('file huawei: ', files);
   newFileHuawei = files.map((data: FileType, index: number) => {
     return {
       file: null,
