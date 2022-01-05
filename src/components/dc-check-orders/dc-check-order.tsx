@@ -10,7 +10,6 @@ import Select from '@mui/material/Select';
 import { Button } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
-import { featchBranchListAsync } from '../../store/slices/search-branches-slice';
 import { saveSearchCriteriaDc } from '../../store/slices/save-search-order-dc-slice';
 import { CheckOrderRequest } from '../../models/dc-check-order-model';
 import DCOrderList from './dc-order-list';
@@ -18,8 +17,8 @@ import { useStyles } from '../../styles/makeTheme';
 import DatePickerComponent from '../commons/ui/date-picker';
 import LoadingModal from '../commons/ui/loading-modal';
 import { SearchOff } from '@mui/icons-material';
-import { Autocomplete } from '@mui/material';
 import AlertError from '../commons/ui/alert-error';
+import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 
 moment.locale('th');
 
@@ -48,7 +47,6 @@ function DCCheckOrderSearch() {
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.dcCheckOrderList);
   const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
-  const branchList = useAppSelector((state) => state.searchBranchSlice);
   const [values, setValues] = React.useState<State>({
     docNo: '',
     branchCode: '',
@@ -64,14 +62,12 @@ function DCCheckOrderSearch() {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
-  const [valueBranchList, setValueBranchList] = React.useState<branchListOptionType | null>(null);
+  // const [valueBranchList, setValueBranchList] = React.useState<branchListOptionType | null>(null);
 
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
 
-  useEffect(() => {
-    dispatch(featchBranchListAsync());
-  }, []);
+  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
 
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -84,7 +80,7 @@ function DCCheckOrderSearch() {
 
   const onClickSearchBtn = async () => {
     let limits;
-    if (limit === 0) {
+    if (limit === 0 || limit === undefined) {
       limits = '10';
     } else {
       limits = limit.toString();
@@ -113,7 +109,7 @@ function DCCheckOrderSearch() {
   const onClickValidateForm = () => {
     if (
       values.docNo === '' &&
-      valueBranchList === null &&
+      // valueBranchList === null &&
       values.verifyDCStatus === 'ALL' &&
       startDate === null &&
       endDate === null &&
@@ -123,7 +119,7 @@ function DCCheckOrderSearch() {
       setTextError('กรุณากรอกวันที่รับสินค้า');
     } else if (
       values.docNo === '' &&
-      valueBranchList === null &&
+      // valueBranchList === null &&
       values.verifyDCStatus === 'ALL' &&
       values.sdType === 'ALL'
     ) {
@@ -143,7 +139,7 @@ function DCCheckOrderSearch() {
     setFlagSearch(false);
     setStartDate(null);
     setEndDate(null);
-    setValueBranchList(null);
+    setClearBranchDropDown(!clearBranchDropDown);
     setValues({
       docNo: '',
       branchCode: '',
@@ -155,7 +151,7 @@ function DCCheckOrderSearch() {
     });
 
     const payload: CheckOrderRequest = {
-      limit: limit.toString(),
+      limit: limit ? limit.toString() : '10',
       page: page,
       docNo: values.docNo,
       branchCode: values.branchCode,
@@ -173,10 +169,6 @@ function DCCheckOrderSearch() {
     }, 300);
   };
 
-  // useEffect(() => {
-  //   dispatch(clearDataFilter());
-  // }, []);
-
   const handleStartDatePicker = (value: Date) => {
     setStartDate(value);
   };
@@ -185,17 +177,9 @@ function DCCheckOrderSearch() {
     setEndDate(value);
   };
 
-  //for branchList
-  const defaultPropsBranchList = {
-    options: branchList.branchList.data,
-    getOptionLabel: (option: branchListOptionType) => option.name,
-  };
-
-  const handleChangeBranch = (event: any, newValue: branchListOptionType | null) => {
-    setValueBranchList(newValue);
-
-    if (newValue !== null) {
-      let codes = JSON.stringify(newValue?.code);
+  const handleChangeBranch = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
       setValues({ ...values, branchCode: JSON.parse(codes) });
     } else {
       setValues({ ...values, branchCode: '' });
@@ -210,10 +194,10 @@ function DCCheckOrderSearch() {
       orderListData = <DCOrderList />;
     } else {
       orderListData = (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
+        <Grid item container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB'>
             <h2>
-              ไม่มีข้อมูล <SearchOff fontSize="large" />
+              ไม่มีข้อมูล <SearchOff fontSize='large' />
             </h2>
           </Box>
         </Grid>
@@ -238,25 +222,30 @@ function DCCheckOrderSearch() {
       <Box sx={{ flexGrow: 1 }}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id="txtDocNo"
-              name="docNo"
-              size="small"
+              id='txtDocNo'
+              name='docNo'
+              size='small'
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่เอกสาร LD/เลขที่เอกสาร SD"
+              placeholder='เลขที่เอกสาร LD/เลขที่เอกสาร SD'
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาขาปลายทาง
             </Typography>
-            <Autocomplete
+            <BranchListDropDown
+              sourceBranchCode={''}
+              onChangeBranch={handleChangeBranch}
+              isClear={clearBranchDropDown}
+            />
+            {/* <Autocomplete
               {...defaultPropsBranchList}
               className={classes.Mautocomplete}
               id="selBranchNo"
@@ -272,7 +261,7 @@ function DCCheckOrderSearch() {
               renderInput={(params) => (
                 <TextField {...params} placeholder="ทั้งหมด" size="small" className={classes.MtextField} fullWidth />
               )}
-            />
+            /> */}
 
             {/* <FormControl fullWidth className={classes.Mselect}>
               <Select
@@ -296,17 +285,16 @@ function DCCheckOrderSearch() {
             </FormControl> */}
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สถานะการตรวจสอบผลต่าง
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selVerifyDCStatus"
-                name="verifyDCStatus"
+                id='selVerifyDCStatus'
+                name='verifyDCStatus'
                 value={values.verifyDCStatus}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -317,17 +305,17 @@ function DCCheckOrderSearch() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่รับสินค้า
             </Typography>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ตั้งแต่
             </Typography>
             <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
-          <Grid item xs={4} container alignItems="flex-end">
+          <Grid item xs={4} container alignItems='flex-end'>
             <Box sx={{ width: '100%' }}>
-              <Typography gutterBottom variant="subtitle1" component="div">
+              <Typography gutterBottom variant='subtitle1' component='div'>
                 ถึง
               </Typography>
               <DatePickerComponent
@@ -338,18 +326,17 @@ function DCCheckOrderSearch() {
               />
             </Box>
           </Grid>
-          <Grid item xs={4} container alignItems="flex-end">
-            <Typography gutterBottom variant="subtitle1" component="div">
+          <Grid item xs={4} container alignItems='flex-end'>
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ประเภท
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selSdType"
-                name="sdType"
+                id='selSdType'
+                name='sdType'
                 value={values.sdType}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -359,25 +346,23 @@ function DCCheckOrderSearch() {
             </FormControl>
           </Grid>
 
-          <Grid item container xs={12} justifyContent="flex-end" direction="row" alignItems="flex-end">
+          <Grid item container xs={12} justifyContent='flex-end' direction='row' alignItems='flex-end'>
             <Button
-              id="btnClear"
-              variant="contained"
+              id='btnClear'
+              variant='contained'
               onClick={onClickClearBtn}
               sx={{ width: '13%' }}
               className={classes.MbtnClear}
-              color="cancelColor"
-            >
+              color='cancelColor'>
               เคลียร์
             </Button>
             <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
+              id='btnSearch'
+              variant='contained'
+              color='primary'
               onClick={onClickValidateForm}
               sx={{ width: '13%', ml: 2 }}
-              className={classes.MbtnSearch}
-            >
+              className={classes.MbtnSearch}>
               ค้นหา
             </Button>
           </Grid>
