@@ -1,26 +1,29 @@
 module.exports = {
-  testEnvironment: "jsdom",
+  testEnvironment: 'jsdom',
   // The root of your source code, typically /src
   // `<rootDir>` is a token Jest substitutes
-  roots: ["<rootDir>/src"],
+  roots: ['<rootDir>/src'],
 
   // Jest transformations -- this adds support for TypeScript
   // using ts-jest
   transform: {
-    "^.+\\.tsx?$": "ts-jest",
+    // '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.(t|j)sx?$': 'ts-jest',
   },
-
+  // coveragePathIgnorePatterns: ['/node_modules/'],
+  // transformIgnorePatterns: [`/node_modules/`],
+  transformIgnorePatterns: ['node_modules/(?!(dateformat)/)'],
   // Runs special logic, adding special
   // extended assertions to Jest
-  setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
+  setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
 
   // Test spec file resolution pattern
   // Matches parent folder `__tests__` and filename
   // should contain `test` or `spec`.
   // testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
   // testRegex: '.*\\.(test|spec)\\.tsx?$',
-  testRegex: "(/tests/.*|(\\.|/)(test|spec))\\.tsx?$",
+  testRegex: '(/tests/.*|(\\.|/)(test|spec))\\.tsx?$',
 
   // Module file extensions for importing
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };
