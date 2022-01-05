@@ -130,23 +130,16 @@ const columns: GridColDef[] = [
         type="number"
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
-        // onBlur={(e) => {
-        //   var value = e.target.value ? parseInt(e.target.value, 10) : '';
-        //   console.log('onBlur1:', value);
-        //   if (value === 0) value = '';
-        //   console.log('onBlur2:', value);
-        //   params.api.updateRows([{ ...params.row, actualQty: value }]);
-        // }}
         onChange={(e) => {
-          var value = e.target.value ? parseInt(e.target.value, 10) : '';
+          let actualQty = Number(params.getValue(params.id, 'actualQty'));
+          let value = e.target.value ? parseInt(e.target.value, 10) : '';
+          if (actualQty === 0) value = chkActualQty(value);
           if (value < 0) value = 0;
           var qty = Number(params.getValue(params.id, 'qty'));
           var isRefPO = Number(params.getValue(params.id, 'isRefPO'));
           if (isRefPO && value > qty) value = qty;
-          console.log('isRefPO :', isRefPO, ' / value:', value, ' / qty:', qty);
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
-        // disabled={isDisable(params) ? true : false}
         autoComplete="off"
       />
     ),
@@ -193,11 +186,21 @@ const columns: GridColDef[] = [
   },
 ];
 
+var chkActualQty = (value: any) => {
+  let v = String(value);
+  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  return value;
+};
+
+const numberWithCommas = (num: any) => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 var calProductDiff = function (params: GridValueGetterParams) {
   let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qty'));
 
-  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
-  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{numberWithCommas(diff)} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {numberWithCommas(diff)} </label>;
   return diff;
 };
 

@@ -224,7 +224,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
             skuCode: data.skuCode,
             unitCode: data.unitCode,
             unitName: data.unitName,
-            unitPrice: data.unitPrice,
+            unitPrice: data.unitPriceText,
           };
 
           arrayItemDup.push(itemsDup);
@@ -313,7 +313,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       barcodeName: item.barcodeName,
       actualQty: item.actualQty ? item.actualQty : 1,
       skuCode: item.skuCode,
-      unitPrice: item.unitPrice,
+      unitPrice: item.unitPriceText,
     };
   });
 
