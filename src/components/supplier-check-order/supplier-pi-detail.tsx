@@ -556,7 +556,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setTimeout(() => {
         setOpen(false);
         onClickClose();
-        setFlagSave(false);
       }, 500);
 
       await dispatch(updateItemsState({}));

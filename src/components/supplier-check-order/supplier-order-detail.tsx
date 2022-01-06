@@ -246,31 +246,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(isOpen);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const [flagSave, setFlagSave] = React.useState(false);
 
   const handleClose = async () => {
     let exit = false;
-    if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) {
-      exit = true;
-    }
+    if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) exit = true;
 
     if (fileUploadList.length > 0 && !uploadFileFlag) {
       exit = true;
     }
 
-    if (purchaseDetailItems.length > 0) {
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      let i = 0;
-      const itemsList: any = [];
-      rowsEdit.forEach((data: GridRowData) => {
-        if (data.actualQty !== purchaseDetailItems[i].actualQty) {
-          exit = true;
-        }
-        i++;
-        itemsList.push(data);
-      });
-
-      if (itemsList !== []) await dispatch(updateItemsState(itemsList));
-    }
+    if (rows.length !== purchaseDetailItems.length) exit = true;
+    if (rows.length > 0 && flagSave) exit = true;
 
     if (!exit) {
       await dispatch(updateItemsState({}));
@@ -571,8 +558,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchSupplierOrderDetailAsync(piNo));
-          dispatch(updateItemsState({}));
+          // dispatch(updateItemsState({}));
           dispatch(featchOrderListSupAsync(payloadSearch));
+          setFlagSave(false);
         })
         .catch((error: ApiError) => {
           setUploadFileFlag(false);
@@ -642,6 +630,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       }
 
       calculateItems(itemsList);
+      if (piStatus === 0) setFlagSave(true);
       // setOpenLoadingModal(false);
     }
   };
