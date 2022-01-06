@@ -64,8 +64,8 @@ const columns: GridColDef[] = [
   {
     field: 'index',
     headerName: 'ลำดับ',
-    flex: 0.5,
-    width: 30,
+    //flex: 0.5,
+    width: 70,
     headerAlign: 'center',
     sortable: false,
     // hide: true,
@@ -78,7 +78,7 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    width: 200,
+    width: 300,
     flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
@@ -88,7 +88,7 @@ const columns: GridColDef[] = [
     field: 'productName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
-    minWidth: 220,
+    width: 220,
     flex: 1,
     sortable: false,
     renderCell: (params) => (

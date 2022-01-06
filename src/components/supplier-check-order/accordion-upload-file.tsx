@@ -201,7 +201,14 @@ function AccordionUploadFile({ files }: Props): ReactElement {
     <>
       <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
         <label htmlFor={'btnBrowse'}>
-          <Button id="btnPrint" color="primary" variant="contained" component="span" className={classes.MbtnBrowse}>
+          <Button
+            id="btnPrint"
+            color="primary"
+            variant="contained"
+            component="span"
+            className={classes.MbtnBrowse}
+            disabled={newFileDisplayList.length === 5}
+          >
             แนบไฟล์
           </Button>
         </label>
