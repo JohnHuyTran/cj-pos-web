@@ -172,12 +172,11 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
-    renderCell: (params) => numberWithCommas(params.value),
   },
   {
     field: 'sumPrice',
     headerName: 'รวม',
-    width: 120,
+    width: 122,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -403,11 +402,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   if (Object.keys(payloadAddItem).length !== 0) {
     rows = payloadAddItem.map((item: any, index: number) => {
       let barcode = item.barCode ? item.barCode : item.barcode;
-      let setPrice = item.setPrice
-        ? item.setPrice
-        : item.amountText.setPrice
-        ? item.amountText.setPrice
-        : item.amountText.unitPrice;
+      let setPrice;
+      let sumPrice;
+      if (item.amountText) {
+        setPrice = item.amountText.setPrice
+          ? item.amountText.setPrice
+          : item.amountText.unitPrice
+          ? item.amountText.unitPrice
+          : 0;
+        sumPrice = item.amountText.sumPrice ? item.amountText.sumPrice : 0;
+      }
+
       return {
         id: `${barcode}-${index + 1}`,
         index: index + 1,
@@ -423,8 +428,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         qtyAll: item.qtyAll,
         controlPrice: item.controlPrice,
         salePrice: item.salePrice,
-        setPrice: setPrice ? setPrice : 0,
-        sumPrice: item.sumPrice ? item.sumPrice : item.amountText.sumPrice ? item.amountText.sumPrice : 0,
+        setPrice: setPrice,
+        sumPrice: sumPrice,
+        // setPrice: item.amountText.setPrice ? item.amountText.setPrice : 0,
+        // sumPrice: item.sumPrice ? item.sumPrice : item.amountText.sumPrice ? item.amountText.sumPrice : 0,
+        // sumPrice: item.amountText.sumPrice ? item.amountText.sumPrice : 0,
         actualQty: item.actualQty ? item.actualQty : 0,
         piType: piType,
         piStatus: piStatus,
@@ -661,7 +669,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           const calculate = calItem.filter((r: any) => r.barcode === data.barCode);
 
           const amountText: any = {
-            unitPrice: data.setPrice,
+            unitPrice: calculate[0].amountText.setPrice,
             sumPrice: calculate[0].amountText.sumPrice,
           };
           const item: any = {
