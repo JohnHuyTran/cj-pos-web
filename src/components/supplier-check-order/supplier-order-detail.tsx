@@ -91,7 +91,7 @@ const columns: GridColDef[] = [
   {
     field: 'barCode',
     headerName: 'บาร์โค้ด',
-    minWidth: 200,
+    minWidth: 190,
     // flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
@@ -101,7 +101,7 @@ const columns: GridColDef[] = [
     field: 'productName',
     headerName: 'สินค้า',
     headerAlign: 'center',
-    minWidth: 220,
+    minWidth: 210,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
@@ -176,7 +176,7 @@ const columns: GridColDef[] = [
   {
     field: 'sumPrice',
     headerName: 'รวม',
-    width: 122,
+    width: 140,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -246,31 +246,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(isOpen);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const [flagSave, setFlagSave] = React.useState(false);
 
   const handleClose = async () => {
     let exit = false;
-    if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) {
-      exit = true;
-    }
+    if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) exit = true;
 
     if (fileUploadList.length > 0 && !uploadFileFlag) {
       exit = true;
     }
 
-    if (rows.length > 0) {
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      let i = 0;
-      const itemsList: any = [];
-      rowsEdit.forEach((data: GridRowData) => {
-        if (data.actualQty !== rows[i].actualQty) {
-          exit = true;
-        }
-        i++;
-        itemsList.push(data);
-      });
-
-      if (itemsList !== []) await dispatch(updateItemsState(itemsList));
-    }
+    if (rows.length !== purchaseDetailItems.length) exit = true;
+    if (rows.length > 0 && flagSave) exit = true;
 
     if (!exit) {
       await dispatch(updateItemsState({}));
@@ -430,9 +417,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         salePrice: item.salePrice,
         setPrice: setPrice,
         sumPrice: sumPrice,
-        // setPrice: item.amountText.setPrice ? item.amountText.setPrice : 0,
-        // sumPrice: item.sumPrice ? item.sumPrice : item.amountText.sumPrice ? item.amountText.sumPrice : 0,
-        // sumPrice: item.amountText.sumPrice ? item.amountText.sumPrice : 0,
         actualQty: item.actualQty ? item.actualQty : 0,
         piType: piType,
         piStatus: piStatus,
@@ -574,7 +558,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchSupplierOrderDetailAsync(piNo));
+          // dispatch(updateItemsState({}));
           dispatch(featchOrderListSupAsync(payloadSearch));
+          setFlagSave(false);
         })
         .catch((error: ApiError) => {
           setUploadFileFlag(false);
@@ -644,6 +630,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       }
 
       calculateItems(itemsList);
+      if (piStatus === 0) setFlagSave(true);
       // setOpenLoadingModal(false);
     }
   };
