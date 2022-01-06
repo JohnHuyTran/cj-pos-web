@@ -182,7 +182,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <div>
-        {params.getValue(params.id, 'piType') === 0 && <label>{numberWithCommas(params.value)}</label>}
+        {params.getValue(params.id, 'piType') === 0 && <label>{params.value}</label>}
         {params.getValue(params.id, 'piType') === 1 && params.getValue(params.id, 'piStatus') === 1 && (
           <label>{params.value}</label>
         )}
