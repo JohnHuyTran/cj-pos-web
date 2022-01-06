@@ -540,7 +540,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             qty: data.qty,
             actualQty: calculate[0].actualQty,
             skuCode: data.skuCode,
-            unitPrice: data.setPrice,
+            unitPrice: calculate[0].amountText.setPrice,
             sumPrice: sumPrice,
           };
           items.push(item);
