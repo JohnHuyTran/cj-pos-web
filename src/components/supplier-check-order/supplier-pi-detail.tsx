@@ -232,21 +232,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const po = payloadSupplier.poSelection;
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+  const [flagSave, setFlagSave] = React.useState(false);
   const handleClose = async () => {
     let exit = false;
     if (comment !== commentOrigin || billNo !== billNoOrigin) exit = true;
 
-    if (rows.length > 0) {
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      let i = 0;
-      const itemsList: any = [];
-      rowsEdit.forEach((data: GridRowData) => {
-        if (data.actualQty !== rows[i].actualQty) exit = true;
-        i++;
-        itemsList.push(data);
-      });
-      if (rows.length > 0) await dispatch(updateItemsState(itemsList));
-    }
+    if (rows.length > 0 && flagSave) exit = true;
 
     if (!exit) {
       await dispatch(updateItemsState({}));
@@ -485,6 +476,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleModelAddItems = async () => {
+    setFlagSave(true);
     setFlagCalculate(false);
     setOpenModelAddItems(false);
   };
@@ -505,6 +497,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       }
 
       calculateItems(itemsList);
+      setFlagSave(true);
       // setOpenLoadingModal(false);
     }
   };
@@ -563,6 +556,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setTimeout(() => {
         setOpen(false);
         onClickClose();
+        setFlagSave(false);
       }, 500);
 
       await dispatch(updateItemsState({}));
@@ -612,6 +606,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          setFlagSave(false);
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
