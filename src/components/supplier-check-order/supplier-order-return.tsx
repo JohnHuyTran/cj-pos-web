@@ -270,7 +270,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       i++;
     });
 
-    if (!isExit) {
+    const isNewFile = fileUploadList.length > 0 ? true : false;
+    if (!isExit || isNewFile) {
       setConfirmModelExit(true);
     } else {
       setOpen(false);
