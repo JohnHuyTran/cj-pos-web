@@ -70,11 +70,12 @@ function AccordionUploadFile({ files }: Props): ReactElement {
     let checkError: boolean = false;
 
     //match file name
-    // if (newFileDisplayList.length > 0 && fileName === newFileDisplayList.fileName) {
-    //   console.log('have newFileDisplayList');
-    // } else {
-    //   console.log('do not have newFileDisplayList', newFileDisplayList.length);
-    // }
+    const matchFilename: any = newFileDisplayList.find((r: any) => r.fileName === fileName);
+    if (newFileDisplayList.length > 0 && matchFilename) {
+      setErrorBrowseFile(true);
+      setMsgErrorBrowseFile('ไม่สามารถอัพโหลดไฟล์ได้ เนื่องจากไฟล์นี้มีอยู่แล้ว');
+      return (checkError = true);
+    }
 
     // pdf, .jpg, .jpeg
     if (

@@ -251,7 +251,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       exit = true;
     }
 
-    if (fileUploadList.length > 0) {
+    if (fileUploadList.length > 0 && !uploadFileFlag) {
       exit = true;
     }
 
@@ -360,7 +360,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [deleteItems, setDeleteItems] = React.useState(false);
   if (Object.keys(payloadAddItem).length === 0 && !deleteItems) {
     updateStateRows(purchaseDetailItems);
-    console.log('setPurchaseDetailItems');
+    // console.log('setPurchaseDetailItems');
   }
   const [supplierCode, setsSupplierCode] = React.useState('');
   const [billNo, setBillNo] = React.useState('');
@@ -467,6 +467,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [items, setItems] = React.useState<any>([]);
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   // console.log('fileUploadList2: ', fileUploadList);
@@ -554,6 +555,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
       await saveSupplierOrder(payloadSave, piNo, fileUploadList)
         .then((_value) => {
+          setUploadFileFlag(true);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -561,6 +563,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           dispatch(featchOrderListSupAsync(payloadSearch));
         })
         .catch((error: ApiError) => {
+          setUploadFileFlag(false);
           setShowSnackBar(true);
           setContentMsg(error.message);
         });
