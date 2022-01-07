@@ -60,6 +60,7 @@ import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-retur
 import AccordionUploadFile from './accordion-upload-file';
 import { formatFileNam } from '../../utils/enum/check-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
+import { numberWithCommas } from '../../utils/utils';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -112,6 +113,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
   },
   {
     field: 'returnQty',
