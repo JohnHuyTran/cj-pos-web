@@ -37,7 +37,12 @@ import { ErrorOutline } from '@mui/icons-material';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
-import { approvePurchaseCreditNote, draftPurchaseCreditNote, getPathReportPI } from '../../services/purchase';
+import {
+  approvePurchaseCreditNote,
+  draftPurchaseCreditNote,
+  getPathReportPI,
+  getPathReportPN,
+} from '../../services/purchase';
 import {
   ItemsType,
   PurchaseCreditNoteType,
@@ -718,7 +723,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
-        url={getPathReportPI(purchaseDetail.piNo)}
+        url={getPathReportPN(pnNo)}
         statusFile={statusFile}
         sdImageFile=''
         fileName={formatFileNam(pnNo, pnStatus)}
