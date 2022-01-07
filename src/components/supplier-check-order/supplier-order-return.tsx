@@ -206,6 +206,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
 
+  const [uploadFileFlg, setUploadFileFlg] = React.useState(false);
+
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [open, setOpen] = React.useState(isOpen);
   const [pnStatus, setPnStatus] = React.useState(0);
@@ -262,35 +264,35 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const handleClose = async () => {
     await storeItem();
-    let isExit = true;
+    let showPopup = false;
     // onClickClose();
     if (comment !== purchaseDetail.comment) {
-      isExit = false;
+      showPopup = true;
     }
     const rowSelect = apiRef.current.getSelectedRows();
     if (rowSelect.size > 0) {
-      isExit = false;
+      showPopup = true;
     }
     const ent: PurchaseNoteDetailEntries[] = purchaseDetail.entries;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     if (rowsEdit.size !== ent.length) {
-      isExit = false;
+      showPopup = true;
     }
 
     let i = 0;
     rowsEdit.forEach((data: GridRowData) => {
       if (data.returnQty !== (ent[i].returnQty ? ent[i].returnQty : 0)) {
-        isExit = false;
+        showPopup = true;
       }
       i++;
     });
 
-    const isNewFile = fileUploadList.length > 0 ? true : false;
-    if (!isExit || isNewFile) {
-      setConfirmModelExit(true);
-    } else {
+    showPopup = fileUploadList.length > 0 && !uploadFileFlg ? true : false;
+    if (!showPopup) {
       setOpen(false);
       onClickClose();
+    } else {
+      setConfirmModelExit(true);
     }
   };
 
@@ -352,6 +354,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setPnNo(value.pnNo);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
+          setUploadFileFlg(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
           dispatch(featchOrderListSupAsync(payloadSearch));
@@ -359,6 +362,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         .catch((error: ApiError) => {
           setShowSnackBar(true);
           setContentMsg(error.message);
+          setUploadFileFlg(false);
         });
 
       setOpenLoadingModal(false);
