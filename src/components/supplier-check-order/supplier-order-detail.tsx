@@ -357,6 +357,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
 
+  console.log('purchaseDetail.files: ', purchaseDetail.files);
+
   const [deleteItems, setDeleteItems] = React.useState(false);
   if (Object.keys(payloadAddItem).length === 0 && !deleteItems) {
     updateStateRows(purchaseDetailItems);
@@ -393,6 +395,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     // { fileKey: 'key.jpg', fileName: 'new-image.jpg', mimeType: 'image/jpeg' },
     // { fileKey: 'SD21120002-000014-Draft.pdf', fileName: 'new-document.pdf', mimeType: 'application/pdf' },
   ]);
+
+  console.log('files: ', files);
 
   let rows: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
@@ -470,7 +474,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
-  // console.log('fileUploadList2: ', fileUploadList);
+  console.log('uploadFileFlag: ', uploadFileFlag);
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -569,6 +573,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         });
       setOpenLoadingModal(false);
     }
+    console.log('purchaseDetail.files in save function: ', purchaseDetail.files);
+
+    setFiles(purchaseDetail.files ? purchaseDetail.files : []);
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
@@ -800,7 +807,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     เรียกดูเอกสารใบรับสินค้า
                   </Link>
                 )}
-                {piStatus === 0 && <AccordionUploadFile files={files} />}
+                {piStatus === 0 && <AccordionUploadFile files={purchaseDetail.files} isStatus={uploadFileFlag} />}
               </Grid>
             </Grid>
           </Box>

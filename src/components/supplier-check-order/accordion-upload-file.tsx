@@ -31,15 +31,18 @@ interface fileDisplayList {
 
 interface Props {
   files: FileType[];
+  isStatus?: boolean;
 }
 
-function AccordionUploadFile({ files }: Props): ReactElement {
+function AccordionUploadFile({ files, isStatus }: Props): ReactElement {
   const classes = useStyles();
+
   const dispatch = useAppDispatch();
   const [accordionFile, setAccordionFile] = useState<boolean>(false);
 
   const [displayFile, setDisplayFile] = useState<boolean>(false);
   const [fileUrl, setFileUrl] = useState<string>('');
+
   const [newFilename, setNewFilename] = useState<string>('test-rename');
   const [isImage, setIsImage] = useState(false);
 
@@ -109,6 +112,7 @@ function AccordionUploadFile({ files }: Props): ReactElement {
   };
 
   const handleFileInputChange = (e: any) => {
+    setIsCheckStatus(false);
     setValidationFile(false);
     setErrorBrowseFile(false);
     setMsgErrorBrowseFile('');
@@ -151,35 +155,55 @@ function AccordionUploadFile({ files }: Props): ReactElement {
     }
   }
 
+  const statusCheck = isStatus ? isStatus : false;
+  console.log('statusCheck: ', statusCheck);
+
   useEffect(() => {
     dispatch(uploadFileState(fileList));
+    if (statusCheck) {
+      setIsCheckStatus(true);
+    } else {
+      setIsCheckStatus(false);
+    }
+
+    console.log('isCheckStatus in effect: ', isCheckStatus);
 
     if (newFileDisplayList.length > 0) {
       setAccordionFile(true);
     }
-  }, [fileList]);
+  }, [fileList, statusCheck]);
+
+  const [isCheckStatus, setIsCheckStatus] = useState<boolean>(false);
 
   let newFileHuawei: any = [];
   let newFileUpload: any = [];
   // console.log('file huawei: ', files);
-  newFileHuawei = files.map((data: FileType, index: number) => {
-    return {
-      file: null,
-      fileKey: data.fileKey,
-      fileName: data.fileName,
-      status: 'old',
-      mimeType: data.mimeType,
-    };
-  });
-  newFileUpload = fileList.map((data: File, index: number) => {
-    return {
-      file: data,
-      fileKey: '',
-      fileName: data.name,
-      status: 'new',
-      mimeType: '',
-    };
-  });
+  if (files !== undefined) {
+    newFileHuawei = files.map((data: FileType, index: number) => {
+      return {
+        file: null,
+        fileKey: data.fileKey,
+        fileName: data.fileName,
+        status: 'old',
+        mimeType: data.mimeType,
+      };
+    });
+  }
+
+  console.log('isCheckStatus: ', isCheckStatus);
+  if (!Boolean(isCheckStatus)) {
+    // const status = isStatus ? isStatus : false;
+    // setIsCheckStatus(status);
+    newFileUpload = fileList.map((data: File, index: number) => {
+      return {
+        file: data,
+        fileKey: '',
+        fileName: data.name,
+        status: 'new',
+        mimeType: '',
+      };
+    });
+  }
 
   let newFileDisplayList: any = [];
   newFileDisplayList = [...newFileHuawei, ...newFileUpload];
