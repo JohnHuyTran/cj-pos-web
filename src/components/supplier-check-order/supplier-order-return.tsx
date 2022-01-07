@@ -670,6 +670,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
+                onCellFocusOut={currentlySelected}
               />
             </div>
           </Box>
