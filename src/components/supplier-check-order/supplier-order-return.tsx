@@ -37,7 +37,12 @@ import { ErrorOutline } from '@mui/icons-material';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
-import { approvePurchaseCreditNote, draftPurchaseCreditNote, getPathReportPI } from '../../services/purchase';
+import {
+  approvePurchaseCreditNote,
+  draftPurchaseCreditNote,
+  getPathReportPI,
+  getPathReportPN,
+} from '../../services/purchase';
 import {
   ItemsType,
   PurchaseCreditNoteType,
@@ -55,6 +60,7 @@ import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-retur
 import AccordionUploadFile from './accordion-upload-file';
 import { formatFileNam } from '../../utils/enum/check-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
+import { numberWithCommas } from '../../utils/utils';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -107,6 +113,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
   },
   {
     field: 'returnQty',
@@ -201,6 +208,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
 
+  const [uploadFileFlg, setUploadFileFlg] = React.useState(false);
+
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [open, setOpen] = React.useState(isOpen);
   const [pnStatus, setPnStatus] = React.useState(0);
@@ -257,35 +266,35 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const handleClose = async () => {
     await storeItem();
-    let isExit = true;
+    let showPopup = false;
     // onClickClose();
     if (comment !== purchaseDetail.comment) {
-      isExit = false;
+      showPopup = true;
     }
     const rowSelect = apiRef.current.getSelectedRows();
     if (rowSelect.size > 0) {
-      isExit = false;
+      showPopup = true;
     }
     const ent: PurchaseNoteDetailEntries[] = purchaseDetail.entries;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     if (rowsEdit.size !== ent.length) {
-      isExit = false;
+      showPopup = true;
     }
 
     let i = 0;
     rowsEdit.forEach((data: GridRowData) => {
       if (data.returnQty !== (ent[i].returnQty ? ent[i].returnQty : 0)) {
-        isExit = false;
+        showPopup = true;
       }
       i++;
     });
 
-    const isNewFile = fileUploadList.length > 0 ? true : false;
-    if (!isExit || isNewFile) {
-      setConfirmModelExit(true);
-    } else {
+    showPopup = fileUploadList.length > 0 && !uploadFileFlg ? true : false;
+    if (!showPopup) {
       setOpen(false);
       onClickClose();
+    } else {
+      setConfirmModelExit(true);
     }
   };
 
@@ -347,6 +356,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setPnNo(value.pnNo);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
+          setUploadFileFlg(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
           dispatch(featchOrderListSupAsync(payloadSearch));
@@ -354,6 +364,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         .catch((error: ApiError) => {
           setShowSnackBar(true);
           setContentMsg(error.message);
+          setUploadFileFlg(false);
         });
 
       setOpenLoadingModal(false);
@@ -659,6 +670,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
+                onCellFocusOut={currentlySelected}
               />
             </div>
           </Box>
@@ -718,7 +730,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
-        url={getPathReportPI(purchaseDetail.piNo)}
+        url={getPathReportPN(pnNo)}
         statusFile={statusFile}
         sdImageFile=''
         fileName={formatFileNam(pnNo, pnStatus)}

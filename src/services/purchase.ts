@@ -186,3 +186,9 @@ export const getPathReportPI = (piNo: string) => {
     piNo: piNo,
   });
 };
+
+export const getPathReportPN = (pnNo: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.purchase.purchaseNote.exportFile.url}`, {
+    pnNo: pnNo,
+  });
+};
