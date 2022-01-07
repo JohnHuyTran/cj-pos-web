@@ -99,6 +99,9 @@ export const environment = {
       approve: {
         url: '/purchase/purchase-note/approve/{pnNo}',
       },
+      exportFile: {
+        url: '/purchase/purchase-note/export/{pnNo}',
+      },
     },
   },
   products: {

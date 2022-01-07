@@ -42,3 +42,7 @@ export function getDCStatus(codeStatus: number): string {
   }
   return '-';
 }
+
+export const numberWithCommas = (num: any) => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
