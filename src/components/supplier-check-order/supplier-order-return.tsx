@@ -1,5 +1,14 @@
 import React, { useMemo } from 'react';
-import { Button, Checkbox, DialogActions, DialogContent, DialogContentText, Grid, TextField } from '@mui/material';
+import {
+  Button,
+  Checkbox,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Grid,
+  Link,
+  TextField,
+} from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/system/Box';
@@ -9,9 +18,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
 import Steppers from '../commons/ui/steppers';
 
+import theme from '../../styles/theme';
 import { useStyles } from '../../styles/makeTheme';
 import {
   DataGrid,
+  GridCellParams,
   GridColDef,
   GridColumnHeaderParams,
   GridRenderCellParams,
@@ -20,18 +31,31 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { PurchaseDetailEntries, PurchaseDetailInfo } from '../../models/supplier-check-order-model';
+// import { PurchaseDetailEntries, PurchaseDetailInfo } from '../../models/supplier-check-order-model';
 import AlertError from '../commons/ui/alert-error';
 import { ErrorOutline } from '@mui/icons-material';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
-import { approvePurchaseCreditNote, draftPurchaseCreditNote } from '../../services/purchase';
-import { ItemsType, PurchaseCreditNoteType } from '../../models/purchase-credit-note';
+import { approvePurchaseCreditNote, draftPurchaseCreditNote, getPathReportPI } from '../../services/purchase';
+import {
+  ItemsType,
+  PurchaseCreditNoteType,
+  PurchaseNoteDetailEntries,
+  PurchaseNoteResponseType,
+} from '../../models/purchase-credit-note';
 import { ApiError } from '../../models/api-error-model';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 import ModalConfirmOrderReturn from './modal-confirm-order-return';
 import { featchOrderListSupAsync } from '../../store/slices/supplier-check-order-slice';
+import { isValid } from 'date-fns';
+import AccordionHuaweiFile from './accordion-huawei-file';
+import { FileType } from '../../models/supplier-check-order-model';
+import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
+import AccordionUploadFile from './accordion-upload-file';
+import { formatFileNam } from '../../utils/enum/check-order-enum';
+import ModalShowFile from '../commons/ui/modal-show-file';
+import { uploadFileState } from '../../store/slices/upload-file-slice';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -41,7 +65,8 @@ const columns: GridColDef[] = [
   {
     field: 'index',
     headerName: 'ลำดับ',
-    flex: 0.5,
+    //flex: 0.5,
+    width: 70,
     headerAlign: 'center',
     sortable: false,
     // hide: true,
@@ -54,7 +79,7 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    width: 200,
+    width: 300,
     flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
@@ -64,7 +89,7 @@ const columns: GridColDef[] = [
     field: 'productName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
-    minWidth: 220,
+    width: 220,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
@@ -77,9 +102,9 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'qty',
+    field: 'actualQty',
     headerName: 'จำนวนที่รับ',
-    width: 110,
+    width: 150,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -87,7 +112,7 @@ const columns: GridColDef[] = [
   {
     field: 'returnQty',
     headerName: 'จำนวนที่คืน',
-    width: 110,
+    width: 150,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -100,13 +125,15 @@ const columns: GridColDef[] = [
           value={params.value}
           onChange={(e) => {
             var qty: any =
-              params.getValue(params.id, 'qty') &&
-              params.getValue(params.id, 'qty') !== null &&
-              params.getValue(params.id, 'qty') != undefined
-                ? params.getValue(params.id, 'qty')
+              params.getValue(params.id, 'actualQty') &&
+              params.getValue(params.id, 'actualQty') !== null &&
+              params.getValue(params.id, 'actualQty') != undefined
+                ? params.getValue(params.id, 'actualQty')
                 : 0;
             var value = e.target.value ? parseInt(e.target.value, 10) : '0';
-            // if (value > qty) value = qty;
+            var returnQty = Number(params.getValue(params.id, 'returnQty'));
+            if (returnQty === 0) value = chkReturnQty(value);
+            if (value < 0) value = 0;
             params.api.updateRows([{ ...params.row, returnQty: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
@@ -118,11 +145,12 @@ const columns: GridColDef[] = [
   {
     field: 'unitName',
     headerName: 'หน่วย',
-    width: 90,
+    width: 110,
     headerAlign: 'center',
     sortable: false,
   },
 ];
+
 function useApiRef() {
   const apiRef = useGridApiRef();
   const _columns = useMemo(
@@ -142,17 +170,25 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
+const chkReturnQty = (value: any) => {
+  let v = String(value);
+  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  return value;
+};
+
 function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
+  const purchaseDetailList = useAppSelector((state) => state.SupplierOrderReturn.purchaseDetail);
   const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
 
   const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
-  const [purchaseDetailItems, setPurchaseDetailItems] = React.useState<PurchaseDetailEntries[]>(
+  const [purchaseDetailItems, setPurchaseDetailItems] = React.useState<PurchaseNoteDetailEntries[]>(
     purchaseDetail.entries ? purchaseDetail.entries : []
   );
 
+  const [files, setFiles] = React.useState<FileType[]>([]);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const { apiRef, columns } = useApiRef();
 
   const [openAlert, setOpenAlert] = React.useState(false);
@@ -169,10 +205,12 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [open, setOpen] = React.useState(isOpen);
   const [pnStatus, setPnStatus] = React.useState(0);
+  const [pnNo, setPnNo] = React.useState('');
   const [comment, setComment] = React.useState('');
   const [characterCount, setCharacterCount] = React.useState(0);
   const maxCommentLength = 255;
   const handleChangeComment = (event: any) => {
+    storeItem();
     const value = event.target.value;
     const length = event.target.value.length;
     if (length <= maxCommentLength) {
@@ -181,12 +219,15 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     }
   };
   const [cols, setCols] = React.useState(columns);
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
 
   React.useEffect(() => {
-    setComment(purchaseDetail.pnComment);
-    setPnStatus(purchaseDetail.pnState !== 2 ? 0 : 1);
+    setFiles(purchaseDetail.files ? purchaseDetail.files : []);
+    setComment(purchaseDetail.comment);
+    setPnStatus(purchaseDetail.pnState);
+    setPnNo(purchaseDetail.pnNo);
     let newColumns = [...cols];
-    if (purchaseDetail.pnState == 2) {
+    if (purchaseDetail.pnState == 1) {
       newColumns[0]['hide'] = false;
     } else {
       newColumns[0]['hide'] = true;
@@ -196,26 +237,20 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   let rows = purchaseDetailItems
     // .filter((item: PurchaseDetailEntries) => item.pnDisplay === 1)
-    .map((item: PurchaseDetailEntries, index: number) => {
+    .map((item: PurchaseNoteDetailEntries, index: number) => {
       return {
         id: `${item.barcode}-${index + 1}`,
         index: index + 1,
         seqItem: item.seqItem,
         produtStatus: item.produtStatus,
         isDraftStatus: pnStatus === 0 ? false : true,
-        isControlStock: item.isControlStock,
-        isAllowDiscount: item.isAllowDiscount,
         skuCode: item.skuCode,
         barcode: item.barcode,
         productName: item.productName,
-        unitCode: item.unitCode,
-        unitName: item.unitName,
         qty: item.qty,
         qtyAll: item.qtyAll,
-        controlPrice: item.controlPrice,
-        salePrice: item.salePrice,
-        setPrice: item.setPrice,
-        sumPrice: item.sumPrice,
+        unitName: item.unitName,
+        unitCode: item.unitCode,
         actualQty: item.actualQty,
         returnQty: item.returnQty ? item.returnQty : 0,
         actualQtyAll: item.actualQtyAll,
@@ -226,14 +261,14 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     await storeItem();
     let isExit = true;
     // onClickClose();
-    if (comment !== purchaseDetail.pnComment) {
+    if (comment !== purchaseDetail.comment) {
       isExit = false;
     }
     const rowSelect = apiRef.current.getSelectedRows();
     if (rowSelect.size > 0) {
       isExit = false;
     }
-    const ent: PurchaseDetailEntries[] = purchaseDetail.entries;
+    const ent: PurchaseNoteDetailEntries[] = purchaseDetail.entries;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     if (rowsEdit.size !== ent.length) {
       isExit = false;
@@ -247,7 +282,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       i++;
     });
 
-    if (!isExit) {
+    const isNewFile = fileUploadList.length > 0 ? true : false;
+    if (!isExit || isNewFile) {
       setConfirmModelExit(true);
     } else {
       setOpen(false);
@@ -259,56 +295,11 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     setOpenAlert(false);
   };
 
-  const storeItem_ = () => {
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    let itemNotValid: boolean = false;
-    rowsEdit.forEach((data: GridRowData) => {
-      if (data.returnQty > data.qty || data.returnQty <= 0) {
-        itemNotValid = true;
-        return;
-      }
-    });
-
-    const items: PurchaseDetailEntries[] = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      const newData: PurchaseDetailEntries = {
-        seqItem: data.seqItem,
-        produtStatus: data.produtStatus,
-        isDraftStatus: pnStatus === 0 ? false : true,
-        isControlStock: data.isControlStock,
-        isAllowDiscount: data.isAllowDiscount,
-        skuCode: data.skuCode,
-        barcode: data.barcode,
-        productName: data.productName,
-        unitCode: data.unitCode,
-        unitName: data.unitName,
-        qty: data.qty,
-        qtyAll: data.qtyAll,
-        controlPrice: data.controlPrice,
-        salePrice: data.salePrice,
-        setPrice: data.setPrice,
-        sumPrice: data.sumPrice,
-        actualQty: data.actualQty,
-        returnQty: data.returnQty,
-        actualQtyAll: data.actualQtyAll,
-      };
-      items.push(newData);
-    });
-    setPurchaseDetailItems(items);
-    if (itemNotValid) {
-      setOpenAlert(true);
-      setTextError('จำนวนที่คืนต้องมากกว่า 0 หรือ น้อยกว่า จำนวนที่รับ');
-      return false;
-    } else {
-      return true;
-    }
-  };
-
   const validateItem = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.returnQty > data.qty || data.returnQty <= 0) {
+      if (data.returnQty > data.actualQty || data.returnQty <= 0) {
         itemNotValid = true;
         return;
       }
@@ -324,28 +315,22 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const storeItem = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const items: PurchaseDetailEntries[] = [];
+    const items: PurchaseNoteDetailEntries[] = [];
     rowsEdit.forEach((data: GridRowData) => {
-      const newData: PurchaseDetailEntries = {
+      const newData: PurchaseNoteDetailEntries = {
         seqItem: data.seqItem,
         produtStatus: data.produtStatus,
         isDraftStatus: pnStatus === 0 ? false : true,
-        isControlStock: data.isControlStock,
-        isAllowDiscount: data.isAllowDiscount,
         skuCode: data.skuCode,
         barcode: data.barcode,
         productName: data.productName,
-        unitCode: data.unitCode,
-        unitName: data.unitName,
         qty: data.qty,
         qtyAll: data.qtyAll,
-        controlPrice: data.controlPrice,
-        salePrice: data.salePrice,
-        setPrice: data.setPrice,
-        sumPrice: data.sumPrice,
         actualQty: data.actualQty,
         returnQty: data.returnQty,
         actualQtyAll: data.actualQtyAll,
+        unitName: data.unitName,
+        unitCode: data.unitCode,
       };
       items.push(newData);
     });
@@ -358,36 +343,44 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     // call api
     if (rs) {
       setOpenLoadingModal(true);
-      let items: ItemsType[] = [];
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      rowsEdit.forEach((data: GridRowData) => {
-        const item: ItemsType = {
-          barcode: data.barcode,
-          returnQry: data.returnQty ? data.returnQty : 0,
-        };
-        items.push(item);
-      });
-
-      const payload: PurchaseCreditNoteType = {
-        pnNo: purchaseDetail.pnNo,
-        items: items,
-      };
-      await draftPurchaseCreditNote(payload)
-        .then((_value) => {
+      const payload = await mappingPayload();
+      await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileUploadList)
+        .then((value) => {
+          setPnNo(value.pnNo);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
+          setUploadFileFlag(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          dispatch(featchSupplierOrderDetailAsync(purchaseDetail.pnNo));
+          dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
           dispatch(featchOrderListSupAsync(payloadSearch));
-
-          // localStorage.removeItem('SupplierRowsEdit');
+          dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
+          setUploadFileFlag(false);
           setShowSnackBar(true);
           setContentMsg(error.message);
         });
+
       setOpenLoadingModal(false);
     }
+  };
+
+  const mappingPayload = () => {
+    let items: ItemsType[] = [];
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    rowsEdit.forEach((data: GridRowData) => {
+      const item: ItemsType = {
+        barcode: data.barcode,
+        qtyReturn: data.returnQty ? data.returnQty : 0,
+      };
+      items.push(item);
+    });
+
+    const payload: PurchaseCreditNoteType = {
+      comment: comment,
+      items: items,
+    };
+    return payload;
   };
 
   const handleDeleteBtn = () => {
@@ -402,25 +395,19 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       rowsEdit.delete(key);
     });
 
-    const items: PurchaseDetailEntries[] = [];
+    const items: PurchaseNoteDetailEntries[] = [];
     rowsEdit.forEach((data: GridRowData) => {
-      const newData: PurchaseDetailEntries = {
+      const newData: PurchaseNoteDetailEntries = {
         seqItem: data.seqItem,
         produtStatus: data.produtStatus,
         isDraftStatus: pnStatus === 0 ? false : true,
-        isControlStock: data.isControlStock,
-        isAllowDiscount: data.isAllowDiscount,
         skuCode: data.skuCode,
         barcode: data.barcode,
         productName: data.productName,
-        unitCode: data.unitCode,
-        unitName: data.unitName,
         qty: data.qty,
         qtyAll: data.qtyAll,
-        controlPrice: data.controlPrice,
-        salePrice: data.salePrice,
-        setPrice: data.setPrice,
-        sumPrice: data.sumPrice,
+        unitName: data.unitName,
+        unitCode: data.unitCode,
         actualQty: data.actualQty,
         returnQty: data.returnQty,
         actualQtyAll: data.actualQtyAll,
@@ -429,15 +416,6 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     });
     setPurchaseDetailItems([]);
     setPurchaseDetailItems(items);
-    // if (countIsDelete === rowsEdit.size) {
-    //   setOpenAlert(true);
-    //   setTextError('ไม่สามารถลบรายการทั้งหมดได้');
-    //   setPurchaseDetailItems([]);
-    //   setPurchaseDetailItems(itemsDelete);
-    // } else {
-    //   setPurchaseDetailItems([]);
-    //   setPurchaseDetailItems(itemsNoDelete);
-    // }
   };
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -458,97 +436,90 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const handleConfirmBtn = async () => {
     await storeItem();
+    const isFileValidate: boolean = validateFileInfo();
     const rs = validateItem();
-    if (rs) {
-      setOpenModelConfirm(true);
+    let isCallSaveDraft: boolean = true;
+    if (rs && isFileValidate) {
+      if (!pnNo) {
+        const payload = mappingPayload();
+        await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileUploadList)
+          .then((value: PurchaseNoteResponseType) => {
+            setPnNo(value.pnNo);
+          })
+          .catch((error: ApiError) => {
+            setShowSnackBar(true);
+            setContentMsg(error.message);
+            isCallSaveDraft = false;
+          });
+      }
+      if (isCallSaveDraft) {
+        setOpenModelConfirm(true);
+      }
     }
+  };
+
+  const validateFileInfo = () => {
+    const isvalid = fileUploadList.length > 0 ? true : false;
+    const isExistingFile = files.length > 0 ? true : false;
+    if (!(isvalid || isExistingFile)) {
+      setOpenAlert(true);
+      setTextError('กรุณาแนบเอกสาร');
+      return false;
+    }
+    return true;
   };
 
   const approvePN = async () => {
     setOpenLoadingModal(true);
     let items: ItemsType[] = [];
-    purchaseDetailItems.forEach((data: PurchaseDetailEntries) => {
+    purchaseDetailItems.forEach((data: PurchaseNoteDetailEntries) => {
       const item: ItemsType = {
         barcode: data.barcode,
-        returnQry: data.returnQty ? data.returnQty : 0,
+        qtyReturn: data.returnQty ? data.returnQty : 0,
       };
       items.push(item);
     });
 
     const payload: PurchaseCreditNoteType = {
-      pnNo: purchaseDetail.pnNo,
+      pnNo: pnNo,
+      comment: comment,
       items: items,
     };
-    // await approvePurchaseCreditNote(payload)
-    //   .then((_value) => {
-    //     handleOnCloseModalConfirm();
-    //     setShowSnackBar(true);
-    //     setSnackbarIsStatus(true);
-    //     setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
-    //     dispatch(featchOrderListSupAsync(payloadSearch));
-    //     setTimeout(() => {
-    //       setOpen(false);
-    //       onClickClose();
-    //     }, 500);
-    //   })
-    //   .catch((error: ApiError) => {
-    //     handleOnCloseModalConfirm();
-    //     setShowSnackBar(true);
-    //     setContentMsg(error.message);
-    //   });
-    // setOpen(false);
-    // onClickClose();
-    // handleOnCloseModalConfirm();
+    await approvePurchaseCreditNote(payload, fileUploadList)
+      .then((_value) => {
+        handleOnCloseModalConfirm();
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
+        dispatch(featchOrderListSupAsync(payloadSearch));
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        handleOnCloseModalConfirm();
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+      });
+    handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
   };
 
-  const [fileInfo, setFileInfo] = React.useState<any>([]);
-  const handleFileInputChange = (e: any) => {
-    // setValidationFile(false);
-    // setErrorBrowseFile(false);
-    // setMsgErrorBrowseFile('');
-    checkSizeFile(e);
-
-    let file: File = e.target.files[0];
-    console.log('filelist: ', e.target.files);
-    console.log('file: ', file);
-    let fileType = file.type.split('/');
-    const fileName = `test-01.${fileType[1]}`;
-
-    setFileInfo([...fileInfo, file]);
+  const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
+  const [statusFile, setStatusFile] = React.useState(0);
+  function handleModelPreviewDocument() {
+    setOpenModelPreviewDocument(false);
+  }
+  const handleLinkDocument = async () => {
+    setOpenLoadingModal(true);
+    setStatusFile(1);
+    setOpenModelPreviewDocument(true);
+    setOpenLoadingModal(false);
   };
 
-  const checkSizeFile = (e: any) => {
-    const fileSize = e.target.files[0].size;
-    const fileName = e.target.files[0].name;
-    let parts = fileName.split('.');
-    let length = parts.length - 1;
-    // pdf, .jpg, .jpeg
-    if (
-      parts[length].toLowerCase() !== 'pdf' &&
-      parts[length].toLowerCase() !== 'jpg' &&
-      parts[length].toLowerCase() !== 'jpeg'
-    ) {
-      // setValidationFile(true);
-      // setErrorBrowseFile(true);
-      // setMsgErrorBrowseFile('กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น');
-      return;
-    }
-
-    // 1024 = bytes
-    // 1024*1024*1024 = mb
-    let mb = 1024 * 1024 * 1024;
-    // fileSize = mb unit
-    if (fileSize < mb) {
-      //size > 5MB
-      let size = fileSize / 1024 / 1024;
-      if (size > 5) {
-        // setValidationFile(true);
-        // setErrorBrowseFile(true);
-        // setMsgErrorBrowseFile('ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่');
-        return;
-      }
-    }
+  const currentlySelected = async (params: GridCellParams) => {
+    storeItem();
   };
 
   return (
@@ -566,18 +537,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 <Typography variant="body2">เลขที่เอกสาร PN</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">
-                  {' '}
-                  <TextField
-                    id="txtDocPN"
-                    name="paramQuery"
-                    size="small"
-                    value={purchaseDetail.pnNo}
-                    className={classes.MtextFieldNumber}
-                    disabled
-                    sx={{ background: '#EAEBEB' }}
-                  />
-                </Typography>
+                <Typography variant="body2">{pnNo}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">ผู้จำหน่าย</Typography>
@@ -612,44 +572,39 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Button
-                  id="btnAttachedFile"
-                  color="primary"
-                  variant="contained"
-                  component="span"
-                  className={classes.MbtnBrowse}
-                  // style={{ marginLeft: 10, textTransform: "none" }}
-                  disabled
-                >
-                  แนบไฟล์
-                </Button>
-                <TextField
-                  name="browserTxf"
-                  className={classes.MtextFieldBrowse}
-                  value={fileInfo.fileName}
-                  placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
-                />
-                <input
-                  id="btnBrowse"
-                  type="file"
-                  multiple
-                  // onDrop
-                  accept=".pdf, .jpg, .jpeg"
-                  onChange={handleFileInputChange}
-                  style={{ display: 'none' }}
-                />
-                <label htmlFor={'btnBrowse'}>
-                  <Button
-                    id="btnPrint"
-                    color="primary"
-                    variant="contained"
-                    component="span"
-                    className={classes.MbtnBrowse}
-                    style={{ marginLeft: 10, textTransform: 'none' }}
-                  >
-                    Browse
-                  </Button>
-                </label>
+                {pnStatus === 1 && (
+                  <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
+                    <Button
+                      id="btnPrint"
+                      color="primary"
+                      variant="contained"
+                      component="span"
+                      className={classes.MbtnBrowse}
+                      disabled
+                    >
+                      แนบไฟล์
+                    </Button>
+
+                    <Typography
+                      variant="overline"
+                      sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
+                    >
+                      แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
+                    </Typography>
+                  </Box>
+                )}
+                {pnStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
+                {pnStatus === 1 && (
+                  <Link component="button" variant="body2" onClick={handleLinkDocument}>
+                    เรียกดูเอกสารใบคืนสินค้า
+                  </Link>
+                )}
+                {pnStatus === 0 && (
+                  <AccordionUploadFile
+                    files={purchaseDetail.files ? purchaseDetail.files : []}
+                    isStatus={uploadFileFlag}
+                  />
+                )}
               </Grid>
             </Grid>
           </Box>
@@ -721,6 +676,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 autoHeight={rows.length >= 8 ? false : true}
                 scrollbarSize={10}
                 rowHeight={65}
+                onCellClick={currentlySelected}
               />
             </div>
           </Box>
@@ -774,9 +730,18 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         open={openModelConfirm}
         onClose={handleOnCloseModalConfirm}
         handleConfirm={approvePN}
-        header="ยืนยันอนุมัติใบรับสินค้า"
+        header="ยืนยันอนุมัติใบคืนสินค้า"
         title="เลขที่เอกสาร PN"
-        value={purchaseDetail.pnNo}
+        value={pnNo}
+      />
+      <ModalShowFile
+        open={openModelPreviewDocument}
+        onClose={handleModelPreviewDocument}
+        url={getPathReportPI(purchaseDetail.piNo)}
+        statusFile={statusFile}
+        sdImageFile=""
+        fileName={formatFileNam(pnNo, pnStatus)}
+        btnPrintName="พิมพ์เอกสาร"
       />
       <LoadingModal open={openLoadingModal} />
     </div>

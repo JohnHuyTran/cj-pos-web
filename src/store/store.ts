@@ -15,6 +15,7 @@ import dcCheckOrderDetailSlice from './slices/dc-check-order-detail-slice';
 import supplierCheckOrderSlice from './slices/supplier-check-order-slice';
 import saveSearchOrderSup from './slices/save-search-order-supplier-slice';
 import supplierOrderDetail from './slices/supplier-order-detail-slice';
+import SupplierOrderReturn from './slices/supplier-order-return-slice';
 import searchItemBySupSlice from './slices/search-item-by-sup-slice';
 import supplierOrderPIDetail from './slices/supplier-order-pi-detail-slice';
 import supplierSelectionSlice from './slices/supplier-selection-slice';
@@ -40,6 +41,7 @@ const store = configureStore({
     supplierCheckOrderSlice: supplierCheckOrderSlice,
     saveSearchOrderSup: saveSearchOrderSup,
     supplierOrderDetail: supplierOrderDetail,
+    SupplierOrderReturn: SupplierOrderReturn,
     searchItemListBySup: searchItemBySupSlice,
     supplierOrderPIDetail: supplierOrderPIDetail,
     supplierSelectionSlice: supplierSelectionSlice,

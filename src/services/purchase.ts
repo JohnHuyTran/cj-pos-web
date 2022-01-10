@@ -105,20 +105,55 @@ export async function approveSupplierPI(payload: SavePurchasePIRequest, fileList
   return response;
 }
 
-export async function draftPurchaseCreditNote(payload: PurchaseCreditNoteType) {
-  const response = await put(environment.purchase.supplierOrder.approvePI.url, payload)
+export const getPathPurchaseNoteSaveDraft = (piNo: string) => {
+  return getPathUrl(`${environment.purchase.purchaseNote.save.url}`, {
+    piNo: piNo,
+  });
+};
+
+export const getPathPurchaseDetail = (piNo: string) => {
+  return getPathUrl(`${environment.purchase.purchaseNote.detail.url}`, {
+    piNo: piNo,
+  });
+};
+
+// export const getPathPurchaseNoteInit = (pnNo: string) => {
+//   return getPathUrl(`${environment.purchase.purchaseNote.initPn.url}`, {
+//     pnNo: pnNo,
+//   });
+// };
+
+export const getPathPurchaseNoteApprove = (pnNo: string) => {
+  return getPathUrl(`${environment.purchase.purchaseNote.approve.url}`, {
+    pnNo: pnNo,
+  });
+};
+export async function draftPurchaseCreditNote(payload: PurchaseCreditNoteType, piNo: string, files: File[]) {
+  const bodyFormData = new FormData();
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+  files.map((file: File) => {
+    return bodyFormData.append('file[]', file);
+  });
+
+  const response = await put(getPathPurchaseNoteSaveDraft(piNo), bodyFormData)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;
     });
   return response;
 }
-
-export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType, fileList: any) {
+export async function approvePurchaseCreditNote(payload: PurchaseCreditNoteType, files: File[]) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
-  bodyFormData.append('file', fileList);
-  const response = await put(environment.purchase.supplierOrder.approvePI.url, bodyFormData, ContentType.MULTIPART)
+  files.map((file: File) => {
+    return bodyFormData.append('file[]', file);
+  });
+  const response = await put(
+    getPathPurchaseNoteApprove(payload.pnNo ? payload.pnNo : ''),
+    bodyFormData,
+    ContentType.MULTIPART
+  )
+    // const response = await put(environment.purchase.supplierOrder.approve.url, bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;

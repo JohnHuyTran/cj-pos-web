@@ -79,12 +79,6 @@ export const environment = {
       searchSupplierPO: {
         url: '/purchase/receivable-purchase-order',
       },
-      purchaseCreditDraft: {
-        url: '/purchase/receivable-purchase-order',
-      },
-      purchaseCreditApprove: {
-        url: '/purchase/receivable-purchase-order',
-      },
       calculatePI: {
         url: '/purchase/purchase-invoice/calculate',
       },
@@ -93,6 +87,17 @@ export const environment = {
       },
       exportFile: {
         url: '/purchase/purchase-invoice/{piNo}/export',
+      },
+    },
+    purchaseNote: {
+      detail: {
+        url: '/purchase/purchase-note/{piNo}',
+      },
+      save: {
+        url: '/purchase/purchase-note/{piNo}/save',
+      },
+      approve: {
+        url: '/purchase/purchase-note/approve/{pnNo}',
       },
     },
   },

@@ -19,12 +19,7 @@ import {
   GridCellParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import {
-  PurchaseDetailEntries,
-  SavePurchaseRequest,
-  FileType,
-  CalculatePurchasePIRequest,
-} from '../../models/supplier-check-order-model';
+import { SavePurchaseRequest, FileType, CalculatePurchasePIRequest } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
 import { calculateSupplierPI, getPathReportPI, saveSupplierOrder } from '../../services/purchase';
@@ -44,6 +39,7 @@ import { GridEditCellValueParams } from '@material-ui/data-grid';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { formatFileNam } from '../../utils/enum/check-order-enum';
 import AlertError from '../commons/ui/alert-error';
+import { uploadFileState } from '../../store/slices/upload-file-slice';
 
 interface Props {
   isOpen: boolean;
@@ -96,7 +92,7 @@ const columns: GridColDef[] = [
   {
     field: 'barCode',
     headerName: 'บาร์โค้ด',
-    minWidth: 200,
+    minWidth: 190,
     // flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
@@ -106,7 +102,7 @@ const columns: GridColDef[] = [
     field: 'productName',
     headerName: 'สินค้า',
     headerAlign: 'center',
-    minWidth: 220,
+    minWidth: 210,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
@@ -132,6 +128,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
   },
   {
     field: 'actualQty',
@@ -146,13 +143,10 @@ const columns: GridColDef[] = [
         type="number"
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
-        // onBlur={(e) => {
-        //   var value = e.target.value ? parseInt(e.target.value, 10) : '';
-        //   if (value === 0) value = '';
-        //   params.api.updateRows([{ ...params.row, actualQty: value }]);
-        // }}
         onChange={(e) => {
-          var value = e.target.value ? parseInt(e.target.value, 10) : '';
+          let actualQty = Number(params.getValue(params.id, 'actualQty'));
+          let value = e.target.value ? parseInt(e.target.value, 10) : '';
+          if (actualQty === 0) value = chkActualQty(value);
           if (value < 0) value = 0;
           var qty = Number(params.getValue(params.id, 'qty'));
           var piType = Number(params.getValue(params.id, 'piType'));
@@ -184,7 +178,7 @@ const columns: GridColDef[] = [
   {
     field: 'sumPrice',
     headerName: 'รวม',
-    width: 110,
+    width: 140,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -208,11 +202,21 @@ const columns: GridColDef[] = [
   },
 ];
 
+var chkActualQty = (value: any) => {
+  let v = String(value);
+  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  return value;
+};
+
+const numberWithCommas = (num: any) => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 var calProductDiff = function (params: GridValueGetterParams) {
   let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qty'));
 
-  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
-  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{numberWithCommas(diff)} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {numberWithCommas(diff)} </label>;
   return diff;
 };
 const isDisable = (params: GridRenderCellParams) => {
@@ -244,31 +248,20 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(isOpen);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const [flagSave, setFlagSave] = React.useState(false);
+
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   const handleClose = async () => {
     let exit = false;
-    if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) {
+    if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) exit = true;
+
+    if (fileUploadList.length > 0 && flagSave) {
       exit = true;
     }
 
-    if (fileUploadList.length > 0 && !uploadFileFlag) {
-      exit = true;
-    }
-
-    if (rows.length > 0) {
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      let i = 0;
-      const itemsList: any = [];
-      rowsEdit.forEach((data: GridRowData) => {
-        if (data.actualQty !== rows[i].actualQty) {
-          exit = true;
-        }
-        i++;
-        itemsList.push(data);
-      });
-
-      if (itemsList !== []) await dispatch(updateItemsState(itemsList));
-    }
+    if (rows.length !== purchaseDetailItems.length) exit = true;
+    if (rows.length > 0 && flagSave) exit = true;
 
     if (!exit) {
       await dispatch(updateItemsState({}));
@@ -285,6 +278,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       const itemsList: any = [];
       rowsEdit.forEach((data: GridRowData) => {
+        const amountText: any = {
+          unitPrice: data.setPrice,
+          sumPrice: data.sumPrice,
+        };
+
         const item: any = {
           id: data.index,
           barcode: data.barCode,
@@ -293,8 +291,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           qty: data.qty,
           actualQty: data.actualQty,
           skuCode: data.skuCode,
-          unitPrice: data.setPrice,
-          sumPrice: data.sumPrice,
+          amountText: amountText,
         };
 
         itemsList.push(item);
@@ -330,12 +327,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
     }
     if (purchaseDetail.piStatus === 1) {
-      setTotalAmount(purchaseDetail.totalAmount);
-      setVat(purchaseDetail.vat);
-      setVatRate(purchaseDetail.vatRate);
-      setGrandTotalAmount(purchaseDetail.grandTotalAmount);
+      setTotalAmount(purchaseDetail.amountText.totalAmount);
+      setVat(purchaseDetail.amountText.vat);
+      setVatRate(purchaseDetail.amountText.vatRate);
+      setGrandTotalAmount(purchaseDetail.amountText.grandTotalAmount);
     }
-  }, [open]);
+  }, [open, fileUploadList]);
 
   const saveStateRows = async () => {
     if (rows.length > 0) {
@@ -344,7 +341,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       rowsEdit.forEach((data: GridRowData) => {
         itemsList.push(data);
       });
-      // console.log('itemsList:', JSON.stringify(itemsList));
       if (itemsList.length > 0) updateStateRows(itemsList);
     }
   };
@@ -357,12 +353,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
 
-  console.log('purchaseDetail.files: ', purchaseDetail.files);
+  // console.log('purchaseDetail.files: ', purchaseDetail.files);
 
   const [deleteItems, setDeleteItems] = React.useState(false);
   if (Object.keys(payloadAddItem).length === 0 && !deleteItems) {
     updateStateRows(purchaseDetailItems);
-    // console.log('setPurchaseDetailItems');
   }
   const [supplierCode, setsSupplierCode] = React.useState('');
   const [billNo, setBillNo] = React.useState('');
@@ -396,13 +391,21 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     // { fileKey: 'SD21120002-000014-Draft.pdf', fileName: 'new-document.pdf', mimeType: 'application/pdf' },
   ]);
 
-  console.log('files: ', files);
-
   let rows: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
     rows = payloadAddItem.map((item: any, index: number) => {
       let barcode = item.barCode ? item.barCode : item.barcode;
-      let setPrice = item.setPrice ? item.setPrice : item.unitPrice;
+      let setPrice;
+      let sumPrice;
+      if (item.amountText) {
+        setPrice = item.amountText.setPrice
+          ? item.amountText.setPrice
+          : item.amountText.unitPrice
+          ? item.amountText.unitPrice
+          : 0;
+        sumPrice = item.amountText.sumPrice ? item.amountText.sumPrice : 0;
+      }
+
       return {
         id: `${barcode}-${index + 1}`,
         index: index + 1,
@@ -418,8 +421,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         qtyAll: item.qtyAll,
         controlPrice: item.controlPrice,
         salePrice: item.salePrice,
-        setPrice: setPrice ? setPrice : 0,
-        sumPrice: item.sumPrice ? item.sumPrice : 0,
+        setPrice: setPrice,
+        sumPrice: sumPrice,
         actualQty: item.actualQty ? item.actualQty : 0,
         piType: piType,
         piStatus: piStatus,
@@ -435,7 +438,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   }
 
   if (purchaseDetail.piStatus === 0) {
-    // console.log('purchaseDetail.piStatus:', purchaseDetail.piStatus);
     if (!flagCalculate && rows.length > 0) {
       setItemCal();
       setFlagCalculate(true);
@@ -472,9 +474,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [items, setItems] = React.useState<any>([]);
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
-  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
-  console.log('uploadFileFlag: ', uploadFileFlag);
+  // console.log('fileUploadList: ', fileUploadList);
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -564,7 +565,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchSupplierOrderDetailAsync(piNo));
+          // dispatch(updateItemsState({}));
           dispatch(featchOrderListSupAsync(payloadSearch));
+          setFlagSave(false);
+          dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
           setUploadFileFlag(false);
@@ -573,7 +577,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         });
       setOpenLoadingModal(false);
     }
-    console.log('purchaseDetail.files in save function: ', purchaseDetail.files);
+    // console.log('purchaseDetail.files in save function: ', purchaseDetail.files);
 
     setFiles(purchaseDetail.files ? purchaseDetail.files : []);
   };
@@ -615,7 +619,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const setUploadfile = (value: any) => {
-    console.log('setUploadfile value: ', value);
     setUploadFileInfo(value.file);
   };
 
@@ -638,6 +641,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       }
 
       calculateItems(itemsList);
+      if (piStatus === 0) setFlagSave(true);
       // setOpenLoadingModal(false);
     }
   };
@@ -661,6 +665,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         const items: any = [];
         rows.forEach((data: GridRowData) => {
           const calculate = calItem.filter((r: any) => r.barcode === data.barCode);
+
+          const amountText: any = {
+            unitPrice: calculate[0].amountText.setPrice,
+            sumPrice: calculate[0].amountText.sumPrice,
+          };
           const item: any = {
             id: data.index,
             barCode: data.barCode,
@@ -669,9 +678,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             qty: data.qty,
             actualQty: calculate[0].actualQty,
             skuCode: data.skuCode,
-            unitPrice: data.setPrice,
-            sumPrice: calculate[0].amountText.sumPrice,
+            amountText: amountText,
           };
+
           items.push(item);
         });
         updateStateRows(items);
@@ -770,11 +779,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Typography>
                 </div>
               </Grid>
-              {/* <Grid item lg={2}>
-                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
-              </Grid> */}
-              {/* <Grid item lg={4}>
-                <AccordionUploadFile sdNo={piNo} /> */}
               <Grid item lg={2} sx={{ mt: -3 }}>
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
