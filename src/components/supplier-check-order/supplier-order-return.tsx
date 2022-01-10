@@ -289,7 +289,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       i++;
     });
 
-    showPopup = fileUploadList.length > 0 && !uploadFileFlg ? true : false;
+    showPopup = fileUploadList.length > 0 && !uploadFileFlg ? true : showPopup;
     if (!showPopup) {
       setOpen(false);
       onClickClose();
