@@ -140,6 +140,7 @@ const columns: GridColDef[] = [
             var returnQty = Number(params.getValue(params.id, 'returnQty'));
             if (returnQty === 0) value = chkReturnQty(value);
             if (value < 0) value = 0;
+            if (value > qty) value = qty;
             params.api.updateRows([{ ...params.row, returnQty: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
