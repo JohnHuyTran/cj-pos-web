@@ -103,6 +103,9 @@ export const environment = {
   },
   products: {
     addItem: {
+      allitemsList: {
+        url: '/products/barcode/all',
+      },
       itemList: {
         url: '/products/',
       },

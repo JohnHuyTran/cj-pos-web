@@ -24,6 +24,8 @@ import searchSupplierSelectionPOSlice from './slices/search-supplier-selection-p
 import supplierAddItems from './slices/supplier-add-items-slice';
 import SupplierSearchAddItemsSlice from './slices/supplier-search-add-items-slice';
 import UploadFileSlice from './slices/upload-file-slice';
+import allItemList from './slices/search-all-items';
+import addItems from './slices/add-items-slice';
 
 const store = configureStore({
   reducer: {
@@ -50,6 +52,8 @@ const store = configureStore({
     supplierAddItems: supplierAddItems,
     supplierSearchAddItems: SupplierSearchAddItemsSlice,
     uploadFileSlice: UploadFileSlice,
+    allItemList: allItemList,
+    addItems: addItems,
   },
 });
 
