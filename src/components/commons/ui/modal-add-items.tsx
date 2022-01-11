@@ -123,7 +123,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
-  const [valueItemList, setValueItemList] = React.useState<any | null>(null);
+  const [searchItem, setSearchItem] = React.useState<any | null>(null);
   const [valueItemSelect, setValueItemSelect] = React.useState<StateItem>({
     barcodeName: '',
     barcode: '',
@@ -132,7 +132,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
   const itemsList = useAppSelector((state) => state.searchAllItemsList.itemList);
   //search item
   const defaultSearchItemList = {
-    options: itemsList.data,
+    options: itemsList.data ? itemsList.data : [],
     getOptionLabel: (option: ItemInfo) => option.barcodeName,
   };
 
@@ -143,7 +143,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
   const handleChangeItem = (event: any, newValue: any | null) => {
     let nameItem = JSON.stringify(newValue?.barcodeName);
     let barcode = newValue?.barcode;
-    setValueItemList(newValue);
+    setSearchItem(newValue);
 
     if (newValue !== null) {
       setValueItemSelect({ ...valueItemSelect, barcodeName: JSON.parse(nameItem) });
@@ -162,14 +162,14 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
       setNewAddItemListArray(itemsList);
     }
 
-    setValueItemList(null);
+    setSearchItem(null);
     onClickAddItem(barcode);
   };
 
   const handldCloseAddItemModal = () => {
     onClose();
     setNewAddItemListArray([]);
-    setValueItemList(null);
+    setSearchItem(null);
   };
 
   const [barcodeNameDel, setBarcodeNameDel] = React.useState('');
@@ -218,7 +218,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
       setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, itemSelect]);
     }
 
-    setValueItemList(null);
+    setSearchItem(null);
   };
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
@@ -253,7 +253,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
 
     await dispatch(updateAddItemsState(result));
     setNewAddItemListArray([]);
-    setValueItemList(null);
+    setSearchItem(null);
 
     setTimeout(() => {
       setOpenLoadingModal(false);
@@ -340,7 +340,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
                 id="selItem"
                 freeSolo
                 loadingText="กำลังโหลด..."
-                value={valueItemList}
+                value={searchItem}
                 onChange={handleChangeItem}
                 filterOptions={filterOptions}
                 onInputChange={onInputChange}

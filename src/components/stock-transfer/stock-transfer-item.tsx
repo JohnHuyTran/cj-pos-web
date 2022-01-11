@@ -13,6 +13,7 @@ import {
 import { Box } from '@material-ui/core';
 import { useStyles } from '../../styles/makeTheme';
 import { TextField, Typography } from '@mui/material';
+import { DeleteForever } from '@mui/icons-material';
 
 export interface DataGridProps {
   id: string;
@@ -60,7 +61,7 @@ const columns: GridColDef[] = [
   {
     field: 'qty',
     headerName: 'จำนวนที่สั่ง',
-    minWidth: 200,
+    minWidth: 150,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -71,14 +72,14 @@ const columns: GridColDef[] = [
         type="number"
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
-        // onChange={(e) => {
-        //   var value = e.target.value ? parseInt(e.target.value, 10) : '';
-        //   if (value < 0) value = 0;
-        //   var qty = Number(params.getValue(params.id, 'qty'));
-        //   var piType = Number(params.getValue(params.id, 'piType'));
-        //   if (piType === 0 && value > qty) value = qty;
-        //   params.api.updateRows([{ ...params.row, actualQty: value }]);
-        // }}
+        onChange={(e) => {
+          var value = e.target.value ? parseInt(e.target.value, 10) : '';
+          if (value < 0) value = 0;
+          //   var qty = Number(params.getValue(params.id, 'qty'));
+          //   var piType = Number(params.getValue(params.id, 'piType'));
+          //   if (piType === 0 && value > qty) value = qty;
+          params.api.updateRows([{ ...params.row, qty: value }]);
+        }}
         // disabled={isDisable(params) ? true : false}
         autoComplete="off"
       />
@@ -87,10 +88,20 @@ const columns: GridColDef[] = [
   {
     field: 'unitName',
     headerName: 'หน่วย',
-    minWidth: 200,
+    minWidth: 150,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
+  },
+  {
+    field: 'delete',
+    headerName: 'ลบ',
+    flex: 0.2,
+    align: 'center',
+    sortable: false,
+    renderCell: () => {
+      return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
+    },
   },
 ];
 
