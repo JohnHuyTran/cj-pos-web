@@ -253,6 +253,16 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary="รับสินค้า จากผู้จำหน่าย" />
               </ListItemButton>
             </Link>
+            <Link to="/stock-transfer" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuStockTransfer">
+              <ListItemButton
+                key="StockTransfer"
+                selected={selectedIndex === 8}
+                onClick={() => handleListItemClick(8)}
+                sx={{ pl: 7 }}
+              >
+                <ListItemText primary="รับ-โอนสินค้าระหว่างสาขา/คลัง" />
+              </ListItemButton>
+            </Link>
           </List>
         </Collapse>
         {/* <Link to="/user" style={{ textDecoration: 'none', color: '#676767' }}>
