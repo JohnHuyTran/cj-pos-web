@@ -127,6 +127,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
   },
   {
     field: 'actualQty',
