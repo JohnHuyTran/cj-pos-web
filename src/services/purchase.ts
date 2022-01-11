@@ -186,3 +186,20 @@ export const getPathReportPI = (piNo: string) => {
     piNo: piNo,
   });
 };
+
+export const getPathReportPN = (pnNo: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.purchase.purchaseNote.exportFile.url}`, {
+    pnNo: pnNo,
+  });
+};
+
+export async function fetchDataFilePN(pnNo: string) {
+  try {
+    const path = getPathReportPN(pnNo);
+    const response = await get(path).then((result: any) => result);
+    return response;
+  } catch (error) {
+    console.log('error = ', error);
+    throw error;
+  }
+}

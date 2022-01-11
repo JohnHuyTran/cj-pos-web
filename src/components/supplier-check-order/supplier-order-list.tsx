@@ -278,7 +278,6 @@ export default function SupplierOrderList() {
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
   const currentlySelected = async (params: GridCellParams) => {
     const chkPN = params.colDef.field;
-    console.log('pn no:', params.row.pnNo);
     handleOpenLoading('open', true);
     try {
       // await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
