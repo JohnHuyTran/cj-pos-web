@@ -99,7 +99,7 @@ const columns: GridColDef[] = [
   },
   {
     field: 'productName',
-    headerName: 'สินค้า',
+    headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
     minWidth: 210,
     flex: 1,
@@ -390,8 +390,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   if (Object.keys(payloadAddItem).length !== 0) {
     rows = payloadAddItem.map((item: any, index: number) => {
       let barcode = item.barCode ? item.barCode : item.barcode;
-      let setPrice;
-      let sumPrice;
+      let setPrice = item.setPrice ? item.setPrice : 0;
+      let sumPrice = item.sumPrice ? item.sumPrice : 0;
       if (item.amountText) {
         setPrice = item.amountText.setPrice
           ? item.amountText.setPrice
@@ -617,6 +617,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   // }, [uploadFileInfo]);
   const handleCalculateItems = async (params: GridEditCellValueParams) => {
     saveStateRows();
+
     if (params.field === 'actualQty') {
       const itemsList: any = [];
       if (rows.length > 0) {
