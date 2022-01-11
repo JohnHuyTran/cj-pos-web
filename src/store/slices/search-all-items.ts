@@ -20,9 +20,9 @@ const initialState: State = {
   error: '',
 };
 
-export const featchAllItemsListAsync = createAsyncThunk('AllItemsList', async () => {
+export const featchAllItemsListAsync = createAsyncThunk('SearchAllItemsList', async (search: string) => {
   try {
-    const path = environment.products.addItem.allitemsList.url;
+    const path = `${environment.products.addItem.allitemsList.url}/${search}?limit=10`;
     let response = await get(path).then();
 
     if (response === 204) {

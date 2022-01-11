@@ -29,6 +29,7 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid';
 import LoadingModal from './loading-modal';
+import { featchAllItemsListAsync } from '../../../store/slices/search-all-items';
 
 interface StateItem {
   barcodeName: string;
@@ -128,9 +129,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
     barcode: '',
   });
 
-  const itemsList = useAppSelector((state) => state.allItemList.itemList);
-  // console.log('itemsList:', JSON.stringify(itemsList));
-
+  const itemsList = useAppSelector((state) => state.searchAllItemsList.itemList);
   //search item
   const defaultSearchItemList = {
     options: itemsList.data,
@@ -162,8 +161,6 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
 
       setNewAddItemListArray(itemsList);
     }
-
-    console.log('barcode :', JSON.stringify(barcode));
 
     setValueItemList(null);
     onClickAddItem(barcode);
@@ -220,10 +217,11 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
     } else {
       setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, itemSelect]);
     }
+
+    setValueItemList(null);
   };
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-
   const handleAddItems = async () => {
     setOpenLoadingModal(true);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -297,15 +295,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
   });
 
   let checkHaveItems;
-  if (itemsList.code === 204) {
-    checkHaveItems = (
-      <Grid item container xs={12} justifyContent="center">
-        <Box color="#CBD4DB">
-          <h4>ไม่พบสินค้า</h4>
-        </Box>
-      </Grid>
-    );
-  } else if (newAddItemListArray.length > 0) {
+  if (newAddItemListArray.length > 0) {
     checkHaveItems = (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
         <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
@@ -324,6 +314,17 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
     checkHaveItems = <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}></Box>;
   }
 
+  const onInputChange = async (event: any, value: string, reason: string) => {
+    if (event && event.keyCode && event.keyCode === 13) {
+      return false;
+    }
+
+    const keyword = value.trim();
+    if (keyword.length >= 3) {
+      await dispatch(featchAllItemsListAsync(keyword));
+    }
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="sm" fullWidth={true}>
@@ -337,10 +338,12 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
                 {...defaultSearchItemList}
                 className={classes.Mautocomplete}
                 id="selItem"
+                freeSolo
+                loadingText="กำลังโหลด..."
                 value={valueItemList}
                 onChange={handleChangeItem}
                 filterOptions={filterOptions}
-                disabled={itemsList.code === 204}
+                onInputChange={onInputChange}
                 renderOption={(props, option) => {
                   return (
                     <li {...props} key={option.barcode}>
@@ -356,7 +359,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder="ค้นหาด้วย รหัสสินค้า / Barcode / ชื่อสินค้า"
+                    placeholder="ค้นหา ชื่อสินค้า / Barcode"
                     size="small"
                     className={classes.MtextField}
                     fullWidth

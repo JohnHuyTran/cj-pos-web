@@ -14,8 +14,9 @@ import DatePickerComponent from '../commons/ui/date-picker';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import StockTransferItem from './stock-transfer-item';
 import { useAppDispatch } from '../../store/store';
-import { featchAllItemsListAsync } from '../../store/slices/search-all-items';
+// import { featchAllItemsListAsync } from '../../store/slices/search-all-items';
 import ModalAddItems from '../commons/ui/modal-add-items';
+import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
 
 interface State {
   branchCode: string;
@@ -77,7 +78,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
   useEffect(() => {
     setOpen(isOpen);
 
-    dispatch(featchAllItemsListAsync());
+    // dispatch(featchAllItemsListAsync());
   }, [open]);
 
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
@@ -97,19 +98,27 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
       setValues({ ...values, branchCode: JSON.parse(codes) });
-      setStartBranch(codes);
+      setStartBranch(branchCode);
     } else {
       setValues({ ...values, branchCode: '' });
+      setStartBranch('');
     }
   };
   const handleChangeEndBranch = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
       setValues({ ...values, branchCode: JSON.parse(codes) });
-      setEndBranch(codes);
+      setEndBranch(branchCode);
     } else {
       setValues({ ...values, branchCode: '' });
+      setEndBranch('');
     }
+  };
+
+  const [reasons, setReasons] = React.useState('');
+  const handleChangeReasons = (ReasonsCode: string) => {
+    console.log('ReasonsCode:', ReasonsCode);
+    setReasons(ReasonsCode);
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
@@ -191,6 +200,16 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
               />
             </Grid>
             <Grid item xs={1}></Grid>
+          </Grid>
+
+          <Grid container spacing={2} mb={2}>
+            <Grid item xs={2}>
+              สาเหตุการโอน :
+            </Grid>
+            <Grid item xs={3}>
+              <TransferReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
+            </Grid>
+            <Grid item xs={7}></Grid>
           </Grid>
 
           <Grid container spacing={2} mt={4} mb={2}>
