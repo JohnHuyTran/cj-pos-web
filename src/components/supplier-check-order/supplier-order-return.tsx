@@ -61,6 +61,7 @@ import AccordionUploadFile from './accordion-upload-file';
 import { formatFileNam } from '../../utils/enum/check-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { numberWithCommas } from '../../utils/utils';
+import { uploadFileState } from '../../store/slices/upload-file-slice';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -499,6 +500,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
         dispatch(featchOrderListSupAsync(payloadSearch));
+        dispatch(uploadFileState([]));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
