@@ -10,10 +10,10 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import ModalAlert from '../modal-alert';
 import { uploadFileState } from '../../store/slices/upload-file-slice';
-import { useAppDispatch } from '../../store/store';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 import { FileType } from '../../models/supplier-check-order-model';
 import { ApiError } from '../../models/api-error-model';
-import { getFileUrlHuawei } from '../../services/purchase';
+import { delFileUrlHuawei, getFileUrlHuawei } from '../../services/purchase';
 import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
 
 interface fileListProps {
@@ -31,15 +31,20 @@ interface fileDisplayList {
 
 interface Props {
   files: FileType[];
+  docNo: string;
+  docType: string;
+  isStatus: boolean;
 }
 
-function AccordionUploadFile({ files }: Props): ReactElement {
+function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactElement {
   const classes = useStyles();
+
   const dispatch = useAppDispatch();
   const [accordionFile, setAccordionFile] = useState<boolean>(false);
 
   const [displayFile, setDisplayFile] = useState<boolean>(false);
   const [fileUrl, setFileUrl] = useState<string>('');
+
   const [newFilename, setNewFilename] = useState<string>('test-rename');
   const [isImage, setIsImage] = useState(false);
 
@@ -47,20 +52,14 @@ function AccordionUploadFile({ files }: Props): ReactElement {
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
   const [checkErrorBrowseFile, setCheckErrorBrowseFile] = React.useState(false);
   const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
-
-  // const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
-  //   file: null,
-  //   fileName: '',
-  //   base64URL: '',
-  // });
-
-  // const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
-  //   file: null,
-  // });
-
-  // const [fileList, setFileList] = React.useState<fileListProps[]>([]);
   const [fileList, setFileList] = React.useState<File[]>([]);
-  const [fileDSList, setFileDSList] = React.useState<fileDisplayList[]>([]);
+  const [fileDSList, setFileDSList] = React.useState<any[]>([]);
+  const [fileHueweiList, setFileHueweiList] = React.useState<any[]>([]);
+
+  const [isCheckStatus, setIsCheckStatus] = useState<boolean>(false);
+  const [statusSaveFile, setStatusSaveFile] = useState<boolean>(false);
+
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   const checkSizeFile = (e: any) => {
     const fileSize = e.target.files[0].size;
@@ -114,16 +113,16 @@ function AccordionUploadFile({ files }: Props): ReactElement {
     setMsgErrorBrowseFile('');
     const isCheckError = checkSizeFile(e);
 
-    // console.log('isCheckError: ', isCheckError);
-
     let files: File = e.target.files[0];
     let fileType = files.type.split('/');
     // const fileName = `${sdNo}-01.${fileType[1]}`;
 
     if (fileList.length < 5 && !isCheckError) {
       setAccordionFile(true);
+      setIsCheckStatus(true);
+      setStatusSaveFile(false);
       // setFileList((fileList) => [...fileList, { file: files, filename: fileType[1] }]);
-      setFileList((fileList) => [...fileList, files]);
+      setFileList((fileList) => [...fileUploadList, files]);
     } else {
       setFileList((fileList) => [...fileList]);
     }
@@ -151,47 +150,82 @@ function AccordionUploadFile({ files }: Props): ReactElement {
     }
   }
 
+  let newFileDisplayList: any = [];
+
   useEffect(() => {
     dispatch(uploadFileState(fileList));
+    setStatusSaveFile(isStatus);
+    // setFileHueweiList(files);
+
+    console.log('use effect');
 
     if (newFileDisplayList.length > 0) {
       setAccordionFile(true);
     }
-  }, [fileList]);
+  }, [fileList, !isStatus]);
+
+  const [fileKeyDels, setFileKeyDels] = useState<string>('');
 
   let newFileHuawei: any = [];
   let newFileUpload: any = [];
-  // console.log('file huawei: ', files);
-  newFileHuawei = files.map((data: FileType, index: number) => {
-    return {
-      file: null,
-      fileKey: data.fileKey,
-      fileName: data.fileName,
-      status: 'old',
-      mimeType: data.mimeType,
-    };
-  });
-  newFileUpload = fileList.map((data: File, index: number) => {
-    return {
-      file: data,
-      fileKey: '',
-      fileName: data.name,
-      status: 'new',
-      mimeType: '',
-    };
-  });
 
-  let newFileDisplayList: any = [];
-  newFileDisplayList = [...newFileHuawei, ...newFileUpload];
+  if (files !== undefined) {
+    console.log('FileDSList in if: ', fileHueweiList);
+    console.log('files in if: ', files);
 
-  // const handleDelete = (file: fileListProps) => {
-  //   console.log('fileDelete', file);
-  //   console.log(
-  //     'file delete filter: ',
-  //     dataFile.filter((a: any) => a.filename !== file.filename)
-  //   );
-  //   const fileDelete = dataFile.filter((a: any) => a.filename !== file.filename);
-  // };
+    newFileHuawei = files.map((data: FileType, index: number) => {
+      return {
+        file: null,
+        fileKey: data.fileKey,
+        fileName: data.fileName,
+        status: 'old',
+        mimeType: data.mimeType,
+      };
+    });
+    // console.log('newFileHuawei: ', newFileHuawei);
+
+    newFileDisplayList = [...newFileHuawei];
+  }
+
+  if (fileList.length > 0) {
+    newFileUpload = fileList.map((data: File, index: number) => {
+      return {
+        file: data,
+        fileKey: '',
+        fileName: data.name,
+        status: 'new',
+        mimeType: '',
+      };
+    });
+  }
+
+  console.log('statusSaveFile: ', statusSaveFile);
+  console.log('fileUploadList: ', fileUploadList.length);
+
+  if (!statusSaveFile && newFileUpload.length > 0) {
+    console.log('if 1');
+    newFileDisplayList = [...newFileHuawei, ...newFileUpload];
+  } else if (statusSaveFile && fileUploadList.length <= 0) {
+    console.log('if 2');
+    newFileDisplayList = [...newFileHuawei];
+  } else {
+    console.log('if 3');
+    newFileDisplayList = [...newFileHuawei, ...newFileUpload];
+  }
+
+  const handleDelete = (file: any) => {
+    const fileNameDel = file.fileName;
+    const fileKeyDel = file.fileKey;
+
+    if (file.status === 'new') {
+      setFileList(fileList.filter((r: any) => r.name !== fileNameDel));
+    } else if (file.status === 'old') {
+      delFileUrlHuawei(fileKeyDel, docType, docNo);
+      const filess = files.filter((r: any) => r.fileKey !== fileKeyDel);
+      // setFileKeyDels(fileKeyDel);
+      // setFileDSList(filess);
+    }
+  };
 
   const closeDialogConfirm = (value: string) => {
     setErrorBrowseFile(false);
@@ -263,10 +297,13 @@ function AccordionUploadFile({ files }: Props): ReactElement {
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                 }}
-                onClick={() => getHuaweiFileUrl(item)}
               >
                 {item.status === 'old' && (
-                  <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: '13px' }}>
+                  <Typography
+                    color="secondary"
+                    sx={{ textDecoration: 'underline', fontSize: '13px' }}
+                    onClick={() => getHuaweiFileUrl(item)}
+                  >
                     {item.fileName}
                   </Typography>
                 )}
@@ -277,9 +314,9 @@ function AccordionUploadFile({ files }: Props): ReactElement {
                   </Typography>
                 )}
 
-                {/* <IconButton onClick={() => handleDelete(item)} size="small">
+                <IconButton onClick={() => handleDelete(item)} size="small">
                   <CloseIcon fontSize="small" color="error" />
-                </IconButton> */}
+                </IconButton>
               </Box>
             ))}
         </Box>

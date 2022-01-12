@@ -35,6 +35,7 @@ import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by
 import theme from '../../styles/theme';
 import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 import AlertError from '../commons/ui/alert-error';
+import { uploadFileState } from '../../store/slices/upload-file-slice';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -234,6 +235,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [flagSave, setFlagSave] = React.useState(false);
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const handleClose = async () => {
     let exit = false;
     if (comment !== commentOrigin || billNo !== billNoOrigin) exit = true;
@@ -441,9 +443,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setBillNoOrigin(billNo);
           setCommentOrigin(comment);
           setOpenModelConfirm(true);
+          setUploadFileFlag(true);
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
+          setUploadFileFlag(false);
           setContentMsg(error.message);
         });
 
@@ -607,6 +611,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           setFlagSave(false);
+          dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
@@ -708,7 +713,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4} sx={{ mt: -3 }}>
-                <AccordionUploadFile files={[]} />
+                <AccordionUploadFile files={[]} docNo="1234" docType="PI" isStatus={uploadFileFlag} />
               </Grid>
             </Grid>
           </Box>
