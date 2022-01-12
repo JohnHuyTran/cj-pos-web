@@ -206,9 +206,14 @@ const columns: GridColDef[] = [
     width: 50,
     align: 'center',
     sortable: false,
-    renderCell: () => {
-      return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
-    },
+    // hide: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <div>
+        {params.getValue(params.id, 'piType') === 1 && params.getValue(params.id, 'piStatus') === 0 && (
+          <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+        )}
+      </div>
+    ),
   },
 ];
 
