@@ -150,30 +150,25 @@ function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactE
     }
   }
 
+  const [fileKeyDels, setFileKeyDels] = useState<string>('');
   let newFileDisplayList: any = [];
 
   useEffect(() => {
     dispatch(uploadFileState(fileList));
     setStatusSaveFile(isStatus);
-    // setFileHueweiList(files);
-
-    console.log('use effect');
+    setFileHueweiList(files);
 
     if (newFileDisplayList.length > 0) {
       setAccordionFile(true);
     }
+
+    if (fileUploadList.length <= 0) {
+      setFileKeyDels('');
+    }
   }, [fileList, !isStatus]);
 
-  const [fileKeyDels, setFileKeyDels] = useState<string>('');
-
-  let newFileHuawei: any = [];
-  let newFileUpload: any = [];
-
-  if (files !== undefined) {
-    console.log('FileDSList in if: ', fileHueweiList);
-    console.log('files in if: ', files);
-
-    newFileHuawei = files.map((data: FileType, index: number) => {
+  const mapHuaweiFile = (file: any) => {
+    newFileHuawei = file.map((data: FileType, index: number) => {
       return {
         file: null,
         fileKey: data.fileKey,
@@ -182,7 +177,35 @@ function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactE
         mimeType: data.mimeType,
       };
     });
-    // console.log('newFileHuawei: ', newFileHuawei);
+  };
+
+  let newFileHuawei: any = [];
+  let newFileUpload: any = [];
+
+  if (files !== undefined) {
+    if (fileKeyDels.length > 0 && fileHueweiList != undefined) {
+      mapHuaweiFile(fileHueweiList);
+      // newFileHuawei = fileHueweiList.map((data: FileType, index: number) => {
+      //   return {
+      //     file: null,
+      //     fileKey: data.fileKey,
+      //     fileName: data.fileName,
+      //     status: 'old',
+      //     mimeType: data.mimeType,
+      //   };
+      // });
+    } else {
+      mapHuaweiFile(files);
+      // newFileHuawei = files.map((data: FileType, index: number) => {
+      //   return {
+      //     file: null,
+      //     fileKey: data.fileKey,
+      //     fileName: data.fileName,
+      //     status: 'old',
+      //     mimeType: data.mimeType,
+      //   };
+      // });
+    }
 
     newFileDisplayList = [...newFileHuawei];
   }
@@ -199,17 +222,11 @@ function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactE
     });
   }
 
-  console.log('statusSaveFile: ', statusSaveFile);
-  console.log('fileUploadList: ', fileUploadList.length);
-
   if (!statusSaveFile && newFileUpload.length > 0) {
-    console.log('if 1');
     newFileDisplayList = [...newFileHuawei, ...newFileUpload];
   } else if (statusSaveFile && fileUploadList.length <= 0) {
-    console.log('if 2');
     newFileDisplayList = [...newFileHuawei];
   } else {
-    console.log('if 3');
     newFileDisplayList = [...newFileHuawei, ...newFileUpload];
   }
 
@@ -221,9 +238,14 @@ function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactE
       setFileList(fileList.filter((r: any) => r.name !== fileNameDel));
     } else if (file.status === 'old') {
       delFileUrlHuawei(fileKeyDel, docType, docNo);
-      const filess = files.filter((r: any) => r.fileKey !== fileKeyDel);
-      // setFileKeyDels(fileKeyDel);
-      // setFileDSList(filess);
+      let filess = [];
+      if (fileHueweiList) {
+        filess = fileHueweiList.filter((r: any) => r.fileKey !== fileKeyDel);
+      } else {
+        filess = files.filter((r: any) => r.fileKey !== fileKeyDel);
+      }
+      setFileKeyDels(fileKeyDel);
+      setFileHueweiList(filess);
     }
   };
 

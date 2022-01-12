@@ -308,6 +308,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const handleExitModelConfirm = async () => {
     await dispatch(updateItemsState({}));
+    await dispatch(uploadFileState([]));
     setConfirmModelExit(false);
     setOpen(false);
     onClickClose();
