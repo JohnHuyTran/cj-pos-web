@@ -129,6 +129,10 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelAddItems(false);
   };
 
+  const handleChangeItems = (items: any) => {
+    console.log('handleChangeItems:', JSON.stringify(items));
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -150,7 +154,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
               วันที่สร้างรายการ :
             </Grid>
             <Grid item xs={4}>
-              {moment(createDate).format('DD/MM/YYYY')}
+              {moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
             </Grid>
             <Grid item xs={6}></Grid>
           </Grid>
@@ -268,7 +272,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
           </Grid>
 
-          <StockTransferItem id="" />
+          <StockTransferItem id="" onChangeItems={handleChangeItems} />
         </DialogContent>
       </Dialog>
 

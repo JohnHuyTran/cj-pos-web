@@ -53,7 +53,8 @@ const columns: GridColDef[] = [
     field: 'barcodeName',
     headerName: 'รายละเอียด',
     headerAlign: 'center',
-    flex: 1.7,
+    minWidth: 200,
+    flex: 2,
     sortable: false,
   },
   {
@@ -72,7 +73,7 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => (
       <TextField
         variant="outlined"
-        name="txnQuantityActual"
+        name="txnQuantity"
         type="number"
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
@@ -82,15 +83,16 @@ const columns: GridColDef[] = [
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
         autoComplete="off"
+        // sx={{ position: 'fixed', right: '3.9em', width: 70 }}
       />
     ),
   },
   {
     field: 'delete',
-    headerName: 'ลบ',
-    flex: 0.5,
-    // width: 50,
-    align: 'center',
+    headerName: ' ',
+    width: 40,
+    minWidth: 0,
+    align: 'right',
     sortable: false,
     renderCell: () => {
       return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
@@ -105,6 +107,7 @@ function useApiRef() {
       columns.concat({
         field: '',
         width: 0,
+        minWidth: 0,
         sortable: false,
         renderCell: (params) => {
           apiRef.current = params.api;
