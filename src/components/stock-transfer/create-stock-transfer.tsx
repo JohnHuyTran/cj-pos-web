@@ -17,6 +17,7 @@ import { useAppDispatch } from '../../store/store';
 // import { featchAllItemsListAsync } from '../../store/slices/search-all-items';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 interface State {
   branchCode: string;
@@ -129,10 +130,18 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelAddItems(false);
   };
 
-  const handleChangeItems = (items: any) => {
-    console.log('handleChangeItems:', JSON.stringify(items));
+  const handleChangeItems = async (items: any) => {
+    await dispatch(updateAddItemsState(items));
   };
 
+  const handleSave = () => {
+    console.log('startDate: ', moment(startDate).startOf('day').toISOString());
+    console.log('endDate: ', moment(endDate).startOf('day').toISOString());
+    console.log('startBranch: ', startBranch);
+    console.log('endBranch: ', endBranch);
+    console.log('reasons: ', reasons);
+    console.log('itemsEdit:', JSON.stringify(payloadAddItem));
+  };
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -211,7 +220,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
               สาเหตุการโอน :
             </Grid>
             <Grid item xs={3}>
-              <TransferReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
+              <TransferReasonsListDropDown onChangeReasons={handleChangeReasons} />
             </Grid>
             <Grid item xs={7}></Grid>
           </Grid>
@@ -236,7 +245,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
                 variant="contained"
                 color="warning"
                 className={classes.MbtnSave}
-                // onClick={handleSaveButton}
+                onClick={handleSave}
                 startIcon={<SaveIcon />}
                 sx={{ width: 140 }}
                 disabled={rowLength == 0}
@@ -252,7 +261,8 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
                 // onClick={handleSaveButton}
                 startIcon={<AddCircleOutlineOutlinedIcon />}
                 sx={{ width: 140 }}
-                disabled={rowLength == 0}
+                // disabled={rowLength == 0}
+                disabled
               >
                 สร้างใบโอน
               </Button>
@@ -266,6 +276,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
                 startIcon={<UploadFile />}
                 sx={{ width: 200 }}
                 // disabled={rows.length == 0}
+                disabled
               >
                 Upload งาน Batch
               </Button>

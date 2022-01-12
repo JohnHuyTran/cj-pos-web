@@ -16,6 +16,7 @@ import { useStyles } from '../../styles/makeTheme';
 import { TextField, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
+import ModelDeleteConfirm from '../commons/ui/modal-delete-confirm';
 
 export interface DataGridProps {
   id: string;
@@ -173,6 +174,30 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
     //   await dispatch(updateItemsState(items));
     // };
   };
+
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+  const [deleteItems, setDeleteItems] = React.useState(false);
+  const [productNameDel, setProductNameDel] = React.useState('');
+  const [skuCodeDel, setSkuCodeDel] = React.useState('');
+  const [barCodeDel, setBarCodeDel] = React.useState('');
+  const currentlySelected = async (params: GridCellParams) => {
+    const value = params.colDef.field;
+    const isRefPO = params.getValue(params.id, 'isRefPO');
+    //deleteItem
+    // handleUpdateRowState();
+
+    if (!isRefPO && value === 'delete') {
+      setDeleteItems(true);
+      setProductNameDel(String(params.getValue(params.id, 'barcodeName')));
+      setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
+      setBarCodeDel(String(params.getValue(params.id, 'barCode')));
+      setOpenModelDeleteConfirm(true);
+    }
+  };
+
+  const handleModelDeleteConfirm = () => {
+    setOpenModelDeleteConfirm(false);
+  };
   return (
     <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
       <DataGrid
@@ -186,8 +211,16 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
         autoHeight={rows.length >= 8 ? false : true}
         scrollbarSize={10}
         rowHeight={65}
-        // onCellClick={currentlySelected}
+        onCellClick={currentlySelected}
         onCellFocusOut={handleEditItems}
+      />
+
+      <ModelDeleteConfirm
+        open={openModelDeleteConfirm}
+        onClose={handleModelDeleteConfirm}
+        productName={productNameDel}
+        skuCode={skuCodeDel}
+        barCode={barCodeDel}
       />
     </div>
   );
