@@ -20,7 +20,7 @@ import {
   GridEditCellValueParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { CalculatePurchasePIRequest, SavePurchasePIRequest } from '../../models/supplier-check-order-model';
+import { CalculatePurchasePIRequest, FileType, SavePurchasePIRequest } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
 import { calculateSupplierPI, saveSupplierPI } from '../../services/purchase';
@@ -35,6 +35,7 @@ import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by
 import theme from '../../styles/theme';
 import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 import AlertError from '../commons/ui/alert-error';
+import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -358,6 +359,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [characterCount, setCharacterCount] = React.useState(0);
   const maxCommentLength = 255;
+
+  const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
+  const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
+  // const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
+  const [files, setFiles] = React.useState<FileType[]>([]);
+  const [flagSetFiles, setFlagSetFiles] = React.useState(false);
+  if (piNo !== '' && flagSetFiles) {
+    setFiles(purchaseDetail.files ? purchaseDetail.files : []);
+    setFlagSetFiles(false);
+  }
+
   const handleChangeComment = (event: any) => {
     saveStateRows();
     const value = event.target.value;
@@ -452,6 +464,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setBillNoOrigin(billNo);
           setCommentOrigin(comment);
           setOpenModelConfirm(true);
+
+          dispatch(featchSupplierOrderDetailAsync(value.piNo));
+          setFlagSetFiles(true);
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
@@ -617,6 +632,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+
+          dispatch(featchSupplierOrderDetailAsync(value.piNo));
+          setFlagSetFiles(true);
           setFlagSave(false);
         })
         .catch((error: ApiError) => {
@@ -719,7 +737,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4} sx={{ mt: -3 }}>
-                <AccordionUploadFile files={[]} />
+                <AccordionUploadFile files={files} />
               </Grid>
             </Grid>
           </Box>
