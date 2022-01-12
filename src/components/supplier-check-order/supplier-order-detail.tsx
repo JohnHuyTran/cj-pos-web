@@ -183,7 +183,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <div>
-        {params.getValue(params.id, 'piType') === 0 && <label>{params.value}</label>}
+        {params.value}
+        {/* {params.getValue(params.id, 'piType') === 0 && <label>{params.value}</label>}
         {params.getValue(params.id, 'piType') === 1 && params.getValue(params.id, 'piStatus') === 1 && (
           <label>{params.value}</label>
         )}
@@ -195,6 +196,21 @@ const columns: GridColDef[] = [
               sx={{ color: '#F54949', position: 'relative', right: '-2em', top: '5px' }}
             />
           </div>
+        )} */}
+      </div>
+    ),
+  },
+  {
+    field: 'delete',
+    headerName: ' ',
+    width: 50,
+    align: 'center',
+    sortable: false,
+    // hide: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <div>
+        {params.getValue(params.id, 'piType') === 1 && params.getValue(params.id, 'piStatus') === 0 && (
+          <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
         )}
       </div>
     ),
@@ -231,6 +247,7 @@ function useApiRef() {
       columns.concat({
         field: '',
         width: 0,
+        minWidth: 0,
         sortable: false,
         renderCell: (params) => {
           apiRef.current = params.api;
@@ -594,7 +611,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     //deleteItem
     handleUpdateRowState();
 
-    if (!isRefPO && value === 'sumPrice') {
+    if (!isRefPO && value === 'delete') {
       setDeleteItems(true);
       setProductNameDel(String(params.getValue(params.id, 'productName')));
       setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
