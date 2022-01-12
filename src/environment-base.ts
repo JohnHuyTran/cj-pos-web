@@ -106,12 +106,20 @@ export const environment = {
   },
   products: {
     addItem: {
+      allitemsList: {
+        url: '/products/barcode/all',
+      },
       itemList: {
         url: '/products/',
       },
       itemByBarcode: {
         url: '/products/barcode/',
       },
+    },
+  },
+  stock: {
+    transferReasonsList: {
+      url: '/stock/master-transfer-reasons',
     },
   },
 };
