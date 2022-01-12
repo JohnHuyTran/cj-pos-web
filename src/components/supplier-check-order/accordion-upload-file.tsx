@@ -68,6 +68,15 @@ function AccordionUploadFile({ files }: Props): ReactElement {
     let parts = fileName.split('.');
     let length = parts.length - 1;
     let checkError: boolean = false;
+
+    //match file name
+    const matchFilename: any = newFileDisplayList.find((r: any) => r.fileName === fileName);
+    if (newFileDisplayList.length > 0 && matchFilename) {
+      setErrorBrowseFile(true);
+      setMsgErrorBrowseFile('ไม่สามารถอัพโหลดไฟล์ได้ เนื่องจากไฟล์นี้มีอยู่แล้ว');
+      return (checkError = true);
+    }
+
     // pdf, .jpg, .jpeg
     if (
       parts[length].toLowerCase() !== 'pdf' &&
@@ -125,8 +134,8 @@ function AccordionUploadFile({ files }: Props): ReactElement {
     const name = item.fileName ? item.fileName : '';
 
     if (item.status === 'old') {
-      console.log('key: ', keys);
-      console.log('name: ', name);
+      // console.log('key: ', keys);
+      // console.log('name: ', name);
       getFileUrlHuawei(keys)
         .then((resp) => {
           if (resp && resp.data) {
@@ -152,7 +161,7 @@ function AccordionUploadFile({ files }: Props): ReactElement {
 
   let newFileHuawei: any = [];
   let newFileUpload: any = [];
-  console.log('file huawei: ', files);
+  // console.log('file huawei: ', files);
   newFileHuawei = files.map((data: FileType, index: number) => {
     return {
       file: null,
@@ -192,7 +201,14 @@ function AccordionUploadFile({ files }: Props): ReactElement {
     <>
       <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
         <label htmlFor={'btnBrowse'}>
-          <Button id="btnPrint" color="primary" variant="contained" component="span" className={classes.MbtnBrowse}>
+          <Button
+            id="btnPrint"
+            color="primary"
+            variant="contained"
+            component="span"
+            className={classes.MbtnBrowse}
+            disabled={newFileDisplayList.length === 5}
+          >
             แนบไฟล์
           </Button>
         </label>

@@ -11,16 +11,14 @@ import {
   Typography,
 } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import React, { ReactElement, useEffect, useMemo } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import { ItemBySupplierCodeResponse, ItemInfo, ItemByBarcodeInfo } from '../../models/modal-add-item-model';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
-import { updateSearchItemsState } from '../../store/slices/supplier-search-add-items-slice';
-
-import { useStyles } from '../../styles/makeTheme';
+import { ItemInfo } from '../../../models/modal-add-item-model';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
+import { updateAddItemsState } from '../../../store/slices/add-items-slice';
+import { useStyles } from '../../../styles/makeTheme';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { ConstructionOutlined, DeleteForever, PersonAddAlt1TwoTone } from '@mui/icons-material';
+import { DeleteForever } from '@mui/icons-material';
 import {
   DataGrid,
   GridCellParams,
@@ -30,8 +28,8 @@ import {
   GridRowId,
   useGridApiRef,
 } from '@mui/x-data-grid';
-import LoadingModal from '../commons/ui/loading-modal';
-import { isConstructorDeclaration } from 'typescript';
+import LoadingModal from './loading-modal';
+import { featchAllItemsListAsync } from '../../../store/slices/search-all-items';
 
 interface StateItem {
   barcodeName: string;
@@ -41,31 +39,14 @@ interface StateItem {
 interface Props {
   open: boolean;
   onClose: () => void;
-  supNo: string;
 }
-
-const initialAddItemListByBarcode: ItemByBarcodeInfo = {
-  barcode: '',
-  unitName: '',
-  barcodeName: '',
-  qty: 1,
-  skuCode: '',
-  unitCode: '',
-  unitFactor: 0,
-  pricePerUnit: 0,
-  isCalVat: false,
-  isControlStock: false,
-  isAllowDiscount: false,
-};
 
 const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
     flex: 1.2,
-    // minWidth: 125,
     headerAlign: 'center',
-    // disableColumnMenu: true,
     sortable: false,
   },
   {
@@ -73,8 +54,6 @@ const columns: GridColDef[] = [
     headerName: 'รายละเอียด',
     headerAlign: 'center',
     flex: 1.7,
-    // minWidth: 180,
-    // disableColumnMenu: true,
     sortable: false,
   },
   {
@@ -85,7 +64,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'actualQty',
+    field: 'qty',
     headerName: 'จำนวน',
     flex: 0.7,
     headerAlign: 'center',
@@ -100,7 +79,7 @@ const columns: GridColDef[] = [
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value) : '';
           if (value < 0) value = 0;
-          params.api.updateRows([{ ...params.row, actualQty: value }]);
+          params.api.updateRows([{ ...params.row, qty: value }]);
         }}
         autoComplete="off"
       />
@@ -138,23 +117,22 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
+export default function ModalAddItems({ open, onClose }: Props): ReactElement {
   const { apiRef, columns } = useApiRef();
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
-  const [valueItemList, setValueItemList] = React.useState<any | null>(null);
+  const [searchItem, setSearchItem] = React.useState<any | null>(null);
   const [valueItemSelect, setValueItemSelect] = React.useState<StateItem>({
     barcodeName: '',
     barcode: '',
   });
 
-  const itemsList = useAppSelector((state) => state.searchItemListBySup.itemList);
-
+  const itemsList = useAppSelector((state) => state.searchAllItemsList.itemList);
   //search item
   const defaultSearchItemList = {
-    options: itemsList.data,
+    options: itemsList.data ? itemsList.data : [],
     getOptionLabel: (option: ItemInfo) => option.barcodeName,
   };
 
@@ -164,7 +142,8 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
 
   const handleChangeItem = (event: any, newValue: any | null) => {
     let nameItem = JSON.stringify(newValue?.barcodeName);
-    setValueItemList(newValue);
+    let barcode = newValue?.barcode;
+    setSearchItem(newValue);
 
     if (newValue !== null) {
       setValueItemSelect({ ...valueItemSelect, barcodeName: JSON.parse(nameItem) });
@@ -182,12 +161,15 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
 
       setNewAddItemListArray(itemsList);
     }
+
+    setSearchItem(null);
+    onClickAddItem(barcode);
   };
 
   const handldCloseAddItemModal = () => {
     onClose();
     setNewAddItemListArray([]);
-    setValueItemList(null);
+    setSearchItem(null);
   };
 
   const [barcodeNameDel, setBarcodeNameDel] = React.useState('');
@@ -197,12 +179,10 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
 
   const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
 
-  const onClickAddItem = async () => {
-    setValueItemList(null);
-    let barcodeItem = valueItemList.barcode;
+  const onClickAddItem = async (barcode: any) => {
+    let barcodeItem = barcode;
     const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
     const checkDupItem: any = newAddItemListArray.find((a: any) => a.barcode === barcodeItem);
-
     const itemsListInRows: any = [];
     if (newAddItemListArray.length > 0) {
       const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -215,16 +195,16 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     if (checkDupItem) {
       let arrayItemDup: any = [];
       newAddItemListArray.forEach((data: any) => {
-        let qty = data.qty ? data.qty : data.actualQty;
+        let qty = data.qty ? data.qty : 0;
         if (data.barcode === barcodeItem) {
           const itemsDup: any = {
             barcode: data.barcode,
             barcodeName: data.barcodeName,
-            actualQty: Number(qty) + 1,
+            qty: Number(qty) + 1,
             skuCode: data.skuCode,
             unitCode: data.unitCode,
             unitName: data.unitName,
-            unitPrice: data.unitPriceText,
+            unitPrice: data.unitPrice,
           };
 
           arrayItemDup.push(itemsDup);
@@ -237,11 +217,12 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     } else {
       setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, itemSelect]);
     }
+
+    setSearchItem(null);
   };
 
-  const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
-
-  const handleAddItem = async () => {
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  const handleAddItems = async () => {
     setOpenLoadingModal(true);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const itemsList: any = [];
@@ -252,14 +233,13 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     let result: any = [];
     if (payloadAddItem.length > 0) {
       const sumAddItemList = [...itemsList, ...payloadAddItem];
-
       var o: any = {};
       sumAddItemList.forEach((i: any) => {
         var id = i.barcode;
         if (!o[id]) {
           return (o[id] = i);
         }
-        return (o[id].actualQty = o[id].actualQty + i.actualQty);
+        return (o[id].qty = o[id].qty + i.qty);
       });
 
       var itemResult: any = [];
@@ -271,9 +251,9 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       result = itemsList;
     }
 
-    await dispatch(updateItemsState(result));
+    await dispatch(updateAddItemsState(result));
     setNewAddItemListArray([]);
-    setValueItemList(null);
+    setSearchItem(null);
 
     setTimeout(() => {
       setOpenLoadingModal(false);
@@ -289,9 +269,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
       setBarCodeDel(String(params.getValue(params.id, 'barcode')));
       setOpenModelDeleteConfirm(true);
-      //   setNewAddItemListArray(
-      //     newAddItemListArray.filter((r: any) => r.barcode !== params.getValue(params.id, 'barcode'))
-      //   );
     }
   };
 
@@ -311,22 +288,14 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       barcode: item.barcode,
       unitName: item.unitName,
       barcodeName: item.barcodeName,
-      actualQty: item.actualQty ? item.actualQty : 1,
+      qty: item.qty ? item.qty : 1,
       skuCode: item.skuCode,
-      unitPrice: item.unitPriceText,
+      unitPrice: item.unitPrice,
     };
   });
 
   let checkHaveItems;
-  if (itemsList.code === 204) {
-    checkHaveItems = (
-      <Grid item container xs={12} justifyContent="center">
-        <Box color="#CBD4DB">
-          <h4>ไม่พบสินค้า</h4>
-        </Box>
-      </Grid>
-    );
-  } else if (newAddItemListArray.length > 0) {
+  if (newAddItemListArray.length > 0) {
     checkHaveItems = (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
         <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
@@ -337,7 +306,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
             hideFooter
             autoHeight
             onCellClick={currentlyDelete}
-            // rowHeight={65}
           />
         </div>
       </Box>
@@ -346,20 +314,36 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     checkHaveItems = <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}></Box>;
   }
 
+  const onInputChange = async (event: any, value: string, reason: string) => {
+    if (event && event.keyCode && event.keyCode === 13) {
+      return false;
+    }
+
+    const keyword = value.trim();
+    if (keyword.length >= 3) {
+      await dispatch(featchAllItemsListAsync(keyword));
+    }
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="sm" fullWidth={true}>
         <DialogContent>
           <Box sx={{ display: 'flex' }}>
+            <Box pt={1} sx={{ flex: 2 }}>
+              รายการสินค้า :
+            </Box>
             <Box sx={{ flex: 7 }}>
               <Autocomplete
                 {...defaultSearchItemList}
                 className={classes.Mautocomplete}
                 id="selItem"
-                value={valueItemList}
+                freeSolo
+                loadingText="กำลังโหลด..."
+                value={searchItem}
                 onChange={handleChangeItem}
                 filterOptions={filterOptions}
-                disabled={itemsList.code === 204}
+                onInputChange={onInputChange}
                 renderOption={(props, option) => {
                   return (
                     <li {...props} key={option.barcode}>
@@ -375,27 +359,13 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder="บาร์โค้ด/รายละเอียดสินค้า"
+                    placeholder="ค้นหา ชื่อสินค้า / Barcode"
                     size="small"
                     className={classes.MtextField}
                     fullWidth
                   />
                 )}
               />
-            </Box>
-
-            <Box sx={{ flex: 2 }}>
-              <Button
-                id="btnSearch"
-                variant="contained"
-                color="primary"
-                onClick={onClickAddItem}
-                sx={{ width: '100%', ml: 2 }}
-                className={classes.MbtnSearch}
-                disabled={!valueItemList}
-              >
-                เพิ่ม
-              </Button>
             </Box>
 
             <Box sx={{ flex: 1, ml: 2 }}>
@@ -423,7 +393,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
               id="btnSearch"
               variant="contained"
               color="secondary"
-              onClick={handleAddItem}
+              onClick={handleAddItems}
               className={classes.MbtnSearch}
               size="large"
               disabled={newAddItemListArray.length === 0}
@@ -435,8 +405,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
         </DialogContent>
         <LoadingModal open={openLoadingModal} />
       </Dialog>
-
-      {/* ModalDeleteConfirm */}
 
       <Dialog
         open={openModelDeleteConfirm}
@@ -491,5 +459,3 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     </div>
   );
 }
-
-export default ModalAddItem;

@@ -99,16 +99,27 @@ export const environment = {
       approve: {
         url: '/purchase/purchase-note/approve/{pnNo}',
       },
+      exportFile: {
+        url: '/purchase/purchase-note/export/{pnNo}',
+      },
     },
   },
   products: {
     addItem: {
+      allitemsList: {
+        url: '/products/barcode/all',
+      },
       itemList: {
         url: '/products/',
       },
       itemByBarcode: {
         url: '/products/barcode/',
       },
+    },
+  },
+  stock: {
+    transferReasonsList: {
+      url: '/stock/master-transfer-reasons',
     },
   },
 };

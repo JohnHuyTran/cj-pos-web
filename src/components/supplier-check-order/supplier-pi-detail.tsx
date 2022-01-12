@@ -116,6 +116,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
   },
   {
     field: 'actualQty',
@@ -130,23 +131,16 @@ const columns: GridColDef[] = [
         type="number"
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
-        // onBlur={(e) => {
-        //   var value = e.target.value ? parseInt(e.target.value, 10) : '';
-        //   console.log('onBlur1:', value);
-        //   if (value === 0) value = '';
-        //   console.log('onBlur2:', value);
-        //   params.api.updateRows([{ ...params.row, actualQty: value }]);
-        // }}
         onChange={(e) => {
-          var value = e.target.value ? parseInt(e.target.value, 10) : '';
+          let actualQty = Number(params.getValue(params.id, 'actualQty'));
+          let value = e.target.value ? parseInt(e.target.value, 10) : '';
+          if (actualQty === 0) value = chkActualQty(value);
           if (value < 0) value = 0;
           var qty = Number(params.getValue(params.id, 'qty'));
           var isRefPO = Number(params.getValue(params.id, 'isRefPO'));
           if (isRefPO && value > qty) value = qty;
-          console.log('isRefPO :', isRefPO, ' / value:', value, ' / qty:', qty);
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
-        // disabled={isDisable(params) ? true : false}
         autoComplete="off"
       />
     ),
@@ -193,11 +187,21 @@ const columns: GridColDef[] = [
   },
 ];
 
+var chkActualQty = (value: any) => {
+  let v = String(value);
+  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  return value;
+};
+
+const numberWithCommas = (num: any) => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 var calProductDiff = function (params: GridValueGetterParams) {
   let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qty'));
 
-  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
-  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{numberWithCommas(diff)} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {numberWithCommas(diff)} </label>;
   return diff;
 };
 
@@ -229,21 +233,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const po = payloadSupplier.poSelection;
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+  const [flagSave, setFlagSave] = React.useState(false);
   const handleClose = async () => {
     let exit = false;
     if (comment !== commentOrigin || billNo !== billNoOrigin) exit = true;
 
-    if (rows.length > 0) {
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      let i = 0;
-      const itemsList: any = [];
-      rowsEdit.forEach((data: GridRowData) => {
-        if (data.actualQty !== rows[i].actualQty) exit = true;
-        i++;
-        itemsList.push(data);
-      });
-      if (rows.length > 0) await dispatch(updateItemsState(itemsList));
-    }
+    if (rows.length > 0 && flagSave) exit = true;
 
     if (!exit) {
       await dispatch(updateItemsState({}));
@@ -482,6 +477,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleModelAddItems = async () => {
+    setFlagSave(true);
     setFlagCalculate(false);
     setOpenModelAddItems(false);
   };
@@ -502,6 +498,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       }
 
       calculateItems(itemsList);
+      setFlagSave(true);
       // setOpenLoadingModal(false);
     }
   };
@@ -537,7 +534,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             qty: data.qty,
             actualQty: calculate[0].actualQty,
             skuCode: data.skuCode,
-            unitPrice: data.setPrice,
+            unitPrice: calculate[0].amountText.setPrice,
             sumPrice: sumPrice,
           };
           items.push(item);
@@ -609,6 +606,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          setFlagSave(false);
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
