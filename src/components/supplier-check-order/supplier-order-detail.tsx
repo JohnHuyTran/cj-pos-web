@@ -265,6 +265,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
     if (!exit) {
       await dispatch(updateItemsState({}));
+      await dispatch(uploadFileState([]));
       setOpen(false);
       onClickClose();
     } else if (exit) {
@@ -811,7 +812,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     เรียกดูเอกสารใบรับสินค้า
                   </Link>
                 )}
-                {piStatus === 0 && <AccordionUploadFile files={purchaseDetail.files} isStatus={uploadFileFlag} />}
+                {piStatus === 0 && (
+                  <AccordionUploadFile
+                    files={purchaseDetail.files}
+                    docNo={purchaseDetail.piNo}
+                    docType="PI"
+                    isStatus={uploadFileFlag}
+                  />
+                )}
               </Grid>
             </Grid>
           </Box>

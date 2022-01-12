@@ -13,7 +13,7 @@ import { uploadFileState } from '../../store/slices/upload-file-slice';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { FileType } from '../../models/supplier-check-order-model';
 import { ApiError } from '../../models/api-error-model';
-import { getFileUrlHuawei } from '../../services/purchase';
+import { delFileUrlHuawei, getFileUrlHuawei } from '../../services/purchase';
 import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
 
 interface fileListProps {
@@ -31,10 +31,12 @@ interface fileDisplayList {
 
 interface Props {
   files: FileType[];
+  docNo: string;
+  docType: string;
   isStatus: boolean;
 }
 
-function AccordionUploadFile({ files, isStatus }: Props): ReactElement {
+function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactElement {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
@@ -51,7 +53,8 @@ function AccordionUploadFile({ files, isStatus }: Props): ReactElement {
   const [checkErrorBrowseFile, setCheckErrorBrowseFile] = React.useState(false);
   const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
   const [fileList, setFileList] = React.useState<File[]>([]);
-  const [fileDSList, setFileDSList] = React.useState<fileDisplayList[]>([]);
+  const [fileDSList, setFileDSList] = React.useState<any[]>([]);
+  const [fileHueweiList, setFileHueweiList] = React.useState<any[]>([]);
 
   const [isCheckStatus, setIsCheckStatus] = useState<boolean>(false);
   const [statusSaveFile, setStatusSaveFile] = useState<boolean>(false);
@@ -148,21 +151,28 @@ function AccordionUploadFile({ files, isStatus }: Props): ReactElement {
   }
 
   let newFileDisplayList: any = [];
-  let matchFilenameNew: any = [];
 
   useEffect(() => {
     dispatch(uploadFileState(fileList));
     setStatusSaveFile(isStatus);
+    // setFileHueweiList(files);
+
+    console.log('use effect');
 
     if (newFileDisplayList.length > 0) {
       setAccordionFile(true);
     }
   }, [fileList, !isStatus]);
 
+  const [fileKeyDels, setFileKeyDels] = useState<string>('');
+
   let newFileHuawei: any = [];
   let newFileUpload: any = [];
 
   if (files !== undefined) {
+    console.log('FileDSList in if: ', fileHueweiList);
+    console.log('files in if: ', files);
+
     newFileHuawei = files.map((data: FileType, index: number) => {
       return {
         file: null,
@@ -172,6 +182,7 @@ function AccordionUploadFile({ files, isStatus }: Props): ReactElement {
         mimeType: data.mimeType,
       };
     });
+    // console.log('newFileHuawei: ', newFileHuawei);
 
     newFileDisplayList = [...newFileHuawei];
   }
@@ -188,21 +199,32 @@ function AccordionUploadFile({ files, isStatus }: Props): ReactElement {
     });
   }
 
+  console.log('statusSaveFile: ', statusSaveFile);
+  console.log('fileUploadList: ', fileUploadList.length);
+
   if (!statusSaveFile && newFileUpload.length > 0) {
+    console.log('if 1');
     newFileDisplayList = [...newFileHuawei, ...newFileUpload];
   } else if (statusSaveFile && fileUploadList.length <= 0) {
+    console.log('if 2');
     newFileDisplayList = [...newFileHuawei];
   } else {
+    console.log('if 3');
     newFileDisplayList = [...newFileHuawei, ...newFileUpload];
   }
 
   const handleDelete = (file: any) => {
-    console.log('fileDelete', file);
-    // console.log(
-    //   'file delete filter: ',
-    //   dataFile.filter((a: any) => a.filename !== file.filename)
-    // );
-    // const fileDelete = dataFile.filter((a: any) => a.filename !== file.filename);
+    const fileNameDel = file.fileName;
+    const fileKeyDel = file.fileKey;
+
+    if (file.status === 'new') {
+      setFileList(fileList.filter((r: any) => r.name !== fileNameDel));
+    } else if (file.status === 'old') {
+      delFileUrlHuawei(fileKeyDel, docType, docNo);
+      const filess = files.filter((r: any) => r.fileKey !== fileKeyDel);
+      // setFileKeyDels(fileKeyDel);
+      // setFileDSList(filess);
+    }
   };
 
   const closeDialogConfirm = (value: string) => {
@@ -275,10 +297,13 @@ function AccordionUploadFile({ files, isStatus }: Props): ReactElement {
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                 }}
-                onClick={() => getHuaweiFileUrl(item)}
               >
                 {item.status === 'old' && (
-                  <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: '13px' }}>
+                  <Typography
+                    color="secondary"
+                    sx={{ textDecoration: 'underline', fontSize: '13px' }}
+                    onClick={() => getHuaweiFileUrl(item)}
+                  >
                     {item.fileName}
                   </Typography>
                 )}

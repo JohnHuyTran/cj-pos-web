@@ -602,6 +602,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 {pnStatus === 0 && (
                   <AccordionUploadFile
                     files={purchaseDetail.files ? purchaseDetail.files : []}
+                    docNo={pnNo}
+                    docType="PN"
                     isStatus={uploadFileFlag}
                   />
                 )}
