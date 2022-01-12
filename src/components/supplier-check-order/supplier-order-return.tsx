@@ -362,6 +362,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
           dispatch(featchOrderListSupAsync(payloadSearch));
+          dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
