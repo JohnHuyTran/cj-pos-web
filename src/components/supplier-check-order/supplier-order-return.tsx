@@ -392,7 +392,9 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     return payload;
   };
 
+  let deleteAction = false;
   const handleDeleteBtn = () => {
+    deleteAction = true;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const rowSelect = apiRef.current.getSelectedRows();
     if (rowSelect.size === rowsEdit.size) {
@@ -403,7 +405,6 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     rowSelect.forEach((data: GridRowData, key) => {
       rowsEdit.delete(key);
     });
-
     const items: PurchaseNoteDetailEntries[] = [];
     rowsEdit.forEach((data: GridRowData) => {
       const newData: PurchaseNoteDetailEntries = {
@@ -425,6 +426,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     });
     setPurchaseDetailItems([]);
     setPurchaseDetailItems(items);
+    deleteAction = true;
+    console.log('delete: ', deleteAction);
   };
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -531,6 +534,15 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const currentlySelected = async (params: GridCellParams) => {
     storeItem();
+  };
+
+  const currentlySelectedWithFocusOut = async (params: GridCellParams) => {
+    console.log('currentlySelectedWithFocusOut 1: ', deleteAction);
+    if (!deleteAction) {
+      storeItem();
+    }
+    deleteAction = false;
+    console.log('currentlySelectedWithFocusOut 2: ', deleteAction);
   };
 
   return (
@@ -675,7 +687,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
-                onCellFocusOut={currentlySelected}
+                onCellFocusOut={currentlySelectedWithFocusOut}
               />
             </div>
           </Box>
