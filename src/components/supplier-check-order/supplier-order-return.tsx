@@ -454,6 +454,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileUploadList)
           .then((value: PurchaseNoteResponseType) => {
             setPnNo(value.pnNo);
+            dispatch(uploadFileState([]));
           })
           .catch((error: ApiError) => {
             setShowSnackBar(true);
