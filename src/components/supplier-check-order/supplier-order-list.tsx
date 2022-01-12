@@ -99,7 +99,7 @@ export default function SupplierOrderList() {
     {
       field: 'piNo',
       headerName: 'เลขที่เอกสาร PI',
-      minWidth: 155,
+      minWidth: 160,
       // flex: 1,
       headerAlign: 'center',
       sortable: false,
@@ -279,25 +279,22 @@ export default function SupplierOrderList() {
   const currentlySelected = async (params: GridCellParams) => {
     const chkPN = params.colDef.field;
     handleOpenLoading('open', true);
-    try {
-      // await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
-      if (purchaseDetailList.data.length > 0 || purchaseDetailList.data) {
-        if (chkPN !== 'pnNo') {
+    if (chkPN !== 'pnNo') {
+      try {
+        // await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
+        if (purchaseDetailList.data.length > 0 || purchaseDetailList.data) {
           await dispatch(featchSupplierOrderDetailAsync(params.row.piNo));
           await dispatch(updateItemsState({}));
           setOpenDetail(true);
+        } else {
+          console.log('Purchase Detail No data');
+          await dispatch(updateItemsState({}));
         }
-      } else {
-        console.log('Purchase Detail No data');
-        await dispatch(updateItemsState({}));
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
     }
-
-    if (chkPN !== 'pnNo') {
-      handleOpenLoading('open', false);
-    }
+    handleOpenLoading('open', false);
   };
 
   const handleOpenReturnModal = async (piNo: string, status: string) => {
