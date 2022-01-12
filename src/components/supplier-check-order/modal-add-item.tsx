@@ -108,9 +108,9 @@ const columns: GridColDef[] = [
   },
   {
     field: 'delete',
-    headerName: 'ลบ',
-    flex: 0.5,
-    // width: 50,
+    headerName: ' ',
+    // flex: 0.5,
+    width: 50,
     align: 'center',
     sortable: false,
     renderCell: () => {
@@ -126,6 +126,7 @@ function useApiRef() {
       columns.concat({
         field: '',
         width: 0,
+        minWidth: 0,
         sortable: false,
         renderCell: (params) => {
           apiRef.current = params.api;
