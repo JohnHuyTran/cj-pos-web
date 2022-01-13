@@ -227,6 +227,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactE
   const handleDelete = (file: any) => {
     const fileNameDel = file.fileName;
     const fileKeyDel = file.fileKey;
+    console.log('fileKeyDel: ', fileKeyDel);
 
     if (file.status === 'new') {
       setFileList(fileList.filter((r: any) => r.name !== fileNameDel));

@@ -37,6 +37,7 @@ import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 import AlertError from '../commons/ui/alert-error';
 import { uploadFileState } from '../../store/slices/upload-file-slice';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
+import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -370,9 +371,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const [flagSetFiles, setFlagSetFiles] = React.useState(false);
 
-  if (piNo !== '' && flagSetFiles) {
+  console.log('purchaseDetail.files: ', purchaseDetail.files);
+  console.log('purchaseDetail.piNo: ', purchaseDetail.piNo);
+  console.log('FlagSetFiles: ', flagSetFiles);
+  if (purchaseDetail.piNo !== '' && flagSetFiles) {
     setFiles(purchaseDetail.files ? purchaseDetail.files : []);
-
     setFlagSetFiles(false);
   }
   const handleChangeComment = (event: any) => {
@@ -431,7 +434,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelConfirm(false);
   };
   const handlConfirmButton = async () => {
-    if (fileUploadList.length <= 0) {
+    if (files.length === 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาแนบเอกสาร');
+    } else if (files.length === 0 && fileUploadList.length === 0) {
       setOpenFailAlert(true);
       setTextFail('กรุณาแนบเอกสาร');
     } else if (!billNo) {
@@ -463,16 +469,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
+      setFlagSetFiles(true);
+
       await saveSupplierPI(payloadSave, fileUploadList)
         .then((value) => {
+          setUploadFileFlag(true);
+          setFlagSetFiles(true);
           setPiNo(value.piNo);
           setBillNoOrigin(billNo);
           setCommentOrigin(comment);
           setOpenModelConfirm(true);
-          setUploadFileFlag(true);
-
           dispatch(featchSupplierOrderDetailAsync(value.piNo));
-          setFlagSetFiles(true);
+          dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
@@ -599,6 +607,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleSaveButton = async () => {
+    setFlagSetFiles(true);
     const itemEditList: any = [];
     const itemsList: any = [];
     if (rows.length > 0) {
@@ -633,6 +642,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
       await saveSupplierPI(payloadSave, fileUploadList)
         .then((value) => {
+          setUploadFileFlag(true);
+          setFlagSetFiles(true);
           setPiNo(value.piNo);
           setBillNoOrigin(billNo);
           setCommentOrigin(comment);
@@ -640,11 +651,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           setFlagSave(false);
+          dispatch(featchSupplierOrderDetailAsync(value.piNo));
           dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
           setContentMsg(error.message);
           setShowSnackBar(true);
+          setUploadFileFlag(false);
         });
       setOpenLoadingModal(false);
     }
