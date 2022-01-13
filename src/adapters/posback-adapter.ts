@@ -101,3 +101,15 @@ export function deleteData(path: string, contentType = defaultForJSON) {
       throw err;
     });
 }
+
+export function deleteDataBody(path: string, payload: any, contentType = defaultForJSON) {
+  return instance(contentType)
+    .delete(path, { data: payload })
+    .then((response: AxiosResponse) => {
+      return response;
+    })
+    .catch((error: any) => {
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      throw err;
+    });
+}

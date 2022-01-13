@@ -20,7 +20,7 @@ import {
   GridEditCellValueParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { CalculatePurchasePIRequest, SavePurchasePIRequest } from '../../models/supplier-check-order-model';
+import { CalculatePurchasePIRequest, FileType, SavePurchasePIRequest } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
 import { calculateSupplierPI, saveSupplierPI } from '../../services/purchase';
@@ -35,6 +35,9 @@ import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by
 import theme from '../../styles/theme';
 import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 import AlertError from '../commons/ui/alert-error';
+import { uploadFileState } from '../../store/slices/upload-file-slice';
+import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
+import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -116,6 +119,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
   },
   {
     field: 'actualQty',
@@ -130,23 +134,16 @@ const columns: GridColDef[] = [
         type="number"
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
-        // onBlur={(e) => {
-        //   var value = e.target.value ? parseInt(e.target.value, 10) : '';
-        //   console.log('onBlur1:', value);
-        //   if (value === 0) value = '';
-        //   console.log('onBlur2:', value);
-        //   params.api.updateRows([{ ...params.row, actualQty: value }]);
-        // }}
         onChange={(e) => {
-          var value = e.target.value ? parseInt(e.target.value, 10) : '';
+          let actualQty = Number(params.getValue(params.id, 'actualQty'));
+          let value = e.target.value ? parseInt(e.target.value, 10) : '';
+          if (actualQty === 0) value = chkActualQty(value);
           if (value < 0) value = 0;
           var qty = Number(params.getValue(params.id, 'qty'));
           var isRefPO = Number(params.getValue(params.id, 'isRefPO'));
           if (isRefPO && value > qty) value = qty;
-          console.log('isRefPO :', isRefPO, ' / value:', value, ' / qty:', qty);
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
-        // disabled={isDisable(params) ? true : false}
         autoComplete="off"
       />
     ),
@@ -177,8 +174,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <div>
-        {params.getValue(params.id, 'isRefPO') && <label>{params.value}</label>}
-
+        {params.value}
+        {/* {params.getValue(params.id, 'isRefPO') && <label>{params.value}</label>}
         {!params.getValue(params.id, 'isRefPO') && (
           <div>
             <label style={{ position: 'relative', right: '-1.5em' }}>{params.value}</label>
@@ -187,17 +184,38 @@ const columns: GridColDef[] = [
               sx={{ color: '#F54949', position: 'relative', right: '-2em', top: '5px' }}
             />
           </div>
-        )}
+        )} */}
       </div>
     ),
   },
+  {
+    field: 'delete',
+    headerName: ' ',
+    width: 50,
+    minWidth: 0,
+    align: 'center',
+    sortable: false,
+    renderCell: () => {
+      return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
+    },
+  },
 ];
+
+var chkActualQty = (value: any) => {
+  let v = String(value);
+  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  return value;
+};
+
+const numberWithCommas = (num: any) => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
 
 var calProductDiff = function (params: GridValueGetterParams) {
   let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qty'));
 
-  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
-  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{numberWithCommas(diff)} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {numberWithCommas(diff)} </label>;
   return diff;
 };
 
@@ -208,6 +226,7 @@ function useApiRef() {
       columns.concat({
         field: '',
         width: 0,
+        minWidth: 0,
         sortable: false,
         renderCell: (params) => {
           apiRef.current = params.api;
@@ -229,21 +248,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const po = payloadSupplier.poSelection;
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+  const [flagSave, setFlagSave] = React.useState(false);
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const handleClose = async () => {
     let exit = false;
     if (comment !== commentOrigin || billNo !== billNoOrigin) exit = true;
 
-    if (rows.length > 0) {
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      let i = 0;
-      const itemsList: any = [];
-      rowsEdit.forEach((data: GridRowData) => {
-        if (data.actualQty !== rows[i].actualQty) exit = true;
-        i++;
-        itemsList.push(data);
-      });
-      if (rows.length > 0) await dispatch(updateItemsState(itemsList));
-    }
+    if (rows.length > 0 && flagSave) exit = true;
 
     if (!exit) {
       await dispatch(updateItemsState({}));
@@ -352,6 +363,23 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [characterCount, setCharacterCount] = React.useState(0);
   const maxCommentLength = 255;
+  const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
+  const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
+  // const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
+  const [files, setFiles] = React.useState<FileType[]>([]);
+  const [flagSetFiles, setFlagSetFiles] = React.useState(false);
+
+  let flag = false;
+  if (purchaseDetail.piNo && !flagSetFiles && flag) {
+    setFlagSetFiles(true);
+    flag = true;
+  }
+  // console.log('purchaseDetail.files 111: ', purchaseDetail.files);
+  // if (purchaseDetail.piNo !== '' && flagSetFiles) {
+  //   setFiles(purchaseDetail.files ? purchaseDetail.files : []);
+  //   setFlagSetFiles(false);
+  // }
+  // console.log('purchaseDetail.files 222: ', files);
   const handleChangeComment = (event: any) => {
     saveStateRows();
     const value = event.target.value;
@@ -408,7 +436,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelConfirm(false);
   };
   const handlConfirmButton = async () => {
-    if (fileUploadList.length <= 0) {
+    let purcheaseFiles = purchaseDetail.files ? purchaseDetail.files : [];
+    if (purcheaseFiles.length === 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาแนบเอกสาร');
+    } else if (purcheaseFiles.length === 0 && fileUploadList.length === 0) {
       setOpenFailAlert(true);
       setTextFail('กรุณาแนบเอกสาร');
     } else if (!billNo) {
@@ -440,15 +472,22 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
+      setFlagSetFiles(true);
+
       await saveSupplierPI(payloadSave, fileUploadList)
         .then((value) => {
+          setUploadFileFlag(true);
+          setFlagSetFiles(true);
           setPiNo(value.piNo);
           setBillNoOrigin(billNo);
           setCommentOrigin(comment);
           setOpenModelConfirm(true);
+          dispatch(featchSupplierOrderDetailAsync(value.piNo));
+          dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
+          setUploadFileFlag(false);
           setContentMsg(error.message);
         });
 
@@ -464,7 +503,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     const value = params.colDef.field;
     const isRefPO = params.getValue(params.id, 'isRefPO');
     //deleteItem
-    if (!isRefPO && value === 'sumPrice') {
+    if (!isRefPO && value === 'delete') {
       setProductNameDel(String(params.getValue(params.id, 'productName')));
       setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
       setBarCodeDel(String(params.getValue(params.id, 'barcode')));
@@ -482,6 +521,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleModelAddItems = async () => {
+    setFlagSave(true);
     setFlagCalculate(false);
     setOpenModelAddItems(false);
   };
@@ -502,6 +542,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       }
 
       calculateItems(itemsList);
+      setFlagSave(true);
       // setOpenLoadingModal(false);
     }
   };
@@ -537,7 +578,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             qty: data.qty,
             actualQty: calculate[0].actualQty,
             skuCode: data.skuCode,
-            unitPrice: data.setPrice,
+            unitPrice: calculate[0].amountText.setPrice,
             sumPrice: sumPrice,
           };
           items.push(item);
@@ -569,6 +610,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleSaveButton = async () => {
+    setFlagSetFiles(true);
     const itemEditList: any = [];
     const itemsList: any = [];
     if (rows.length > 0) {
@@ -603,16 +645,22 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
       await saveSupplierPI(payloadSave, fileUploadList)
         .then((value) => {
+          setUploadFileFlag(true);
+          setFlagSetFiles(true);
           setPiNo(value.piNo);
           setBillNoOrigin(billNo);
           setCommentOrigin(comment);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          setFlagSave(false);
+          dispatch(featchSupplierOrderDetailAsync(value.piNo));
+          dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
-          setShowSnackBar(true);
           setContentMsg(error.message);
+          setShowSnackBar(true);
+          setUploadFileFlag(false);
         });
       setOpenLoadingModal(false);
     }
@@ -710,7 +758,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4} sx={{ mt: -3 }}>
-                <AccordionUploadFile files={[]} />
+                {piNo && (
+                  <AccordionUploadFile
+                    files={purchaseDetail.files ? purchaseDetail.files : []}
+                    docNo={purchaseDetail.piNo}
+                    docType="PI"
+                    isStatus={uploadFileFlag}
+                  />
+                )}
+                {piNo === '' && (
+                  <AccordionUploadFile files={[]} docNo={purchaseDetail.piNo} docType="PI" isStatus={uploadFileFlag} />
+                )}
               </Grid>
             </Grid>
           </Box>

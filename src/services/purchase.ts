@@ -1,4 +1,4 @@
-import { put, get, post } from '../adapters/posback-adapter';
+import { put, get, post, deleteData, deleteDataBody } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { env } from '../adapters/environmentConfigs';
 import { getPathUrl } from './base-service';
@@ -181,8 +181,35 @@ export async function getFileUrlHuawei(filekey: string) {
   return response;
 }
 
+export async function delFileUrlHuawei(filekey: string, docType: string, docNo: string) {
+  const pathUrl = environment.purchase.supplierOrder.delFileHuawei.url + `/${docType}/${docNo}`;
+  const response = await deleteDataBody(pathUrl, { key: filekey })
+    .then((result: any) => result)
+    .catch((error: ApiError) => {
+      throw error;
+    });
+  return response;
+}
+
 export const getPathReportPI = (piNo: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.purchase.supplierOrder.exportFile.url}`, {
     piNo: piNo,
   });
 };
+
+export const getPathReportPN = (pnNo: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.purchase.purchaseNote.exportFile.url}`, {
+    pnNo: pnNo,
+  });
+};
+
+export async function fetchDataFilePN(pnNo: string) {
+  try {
+    const path = getPathReportPN(pnNo);
+    const response = await get(path).then((result: any) => result);
+    return response;
+  } catch (error) {
+    console.log('error = ', error);
+    throw error;
+  }
+}
