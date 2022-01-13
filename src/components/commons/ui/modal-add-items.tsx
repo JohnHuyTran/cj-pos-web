@@ -134,9 +134,9 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
 
   const itemsList = useAppSelector((state) => state.searchAllItemsList.itemList);
   //search item
-  const defaultSearchItemList = {
+  let defaultSearchItemList = {
     options: itemsList.data ? itemsList.data : [],
-    getOptionLabel: (option: ItemInfo) => option.barcodeName,
+    getOptionLabel: (option: ItemInfo) => (option.barcodeName ? option.barcodeName : ''),
   };
 
   const filterOptions = createFilterOptions({
@@ -318,10 +318,6 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
   }
 
   const onInputChange = async (event: any, value: string, reason: string) => {
-    if (event && event.keyCode && event.keyCode === 13) {
-      return false;
-    }
-
     const keyword = value.trim();
     if (keyword.length >= 3) {
       await dispatch(featchAllItemsListAsync(keyword));
@@ -340,7 +336,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
               <Autocomplete
                 {...defaultSearchItemList}
                 className={classes.Mautocomplete}
-                id="selItem"
+                id="selAddItem"
                 freeSolo
                 loadingText="กำลังโหลด..."
                 value={searchItem}
