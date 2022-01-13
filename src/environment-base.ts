@@ -124,5 +124,8 @@ export const environment = {
     transferReasonsList: {
       url: '/stock/master-transfer-reasons',
     },
+    saveStockTransfer: {
+      url: '/stock/stock-transfer/draft',
+    },
   },
 };

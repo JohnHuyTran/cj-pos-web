@@ -38,7 +38,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'barCode',
+    field: 'barcode',
     headerName: 'บาร์โค้ด',
     minWidth: 200,
     headerAlign: 'center',
@@ -78,9 +78,6 @@ const columns: GridColDef[] = [
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
-          //   var qty = Number(params.getValue(params.id, 'qty'));
-          //   var piType = Number(params.getValue(params.id, 'piType'));
-          //   if (piType === 0 && value > qty) value = qty;
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
         // disabled={isDisable(params) ? true : false}
@@ -129,9 +126,6 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-// export const StockTransferItem = (onChangeItems, props: DataGridProps) => {
-// const { onChangeItems, ...other } = props;
-
 function StockTransferItem({ onChangeItems }: DataGridProps) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -140,13 +134,11 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
   let rows: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
     rows = payloadAddItem.map((item: any, index: number) => {
-      console.log('item:', JSON.stringify(item));
-
       return {
         id: `${item.barcode}-${index + 1}`,
         index: index + 1,
         skuCode: item.skuCode,
-        barCode: item.barcode,
+        barcode: item.barcode,
         barcodeName: item.barcodeName,
         unitCode: item.unitCode,
         unitName: item.unitName,
@@ -166,8 +158,6 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
           itemsList.push(data);
         });
       }
-
-      console.log('itemsList:', JSON.stringify(itemsList));
       return onChangeItems(itemsList ? itemsList : []);
     }
     // const updateStateRows = async (items: any) => {
@@ -190,7 +180,7 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
       setDeleteItems(true);
       setProductNameDel(String(params.getValue(params.id, 'barcodeName')));
       setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
-      setBarCodeDel(String(params.getValue(params.id, 'barCode')));
+      setBarCodeDel(String(params.getValue(params.id, 'barcode')));
       setOpenModelDeleteConfirm(true);
     }
   };

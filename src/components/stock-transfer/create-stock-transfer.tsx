@@ -4,7 +4,7 @@ import { useAppSelector } from '../../store/store';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
-import { Button, DialogTitle, Grid, IconButton, InputBase, TextField } from '@mui/material';
+import { Button, DialogTitle, Grid, IconButton } from '@mui/material';
 import { ControlPoint, HighlightOff, UploadFile } from '@mui/icons-material';
 import SaveIcon from '@mui/icons-material/Save';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
@@ -14,10 +14,14 @@ import DatePickerComponent from '../commons/ui/date-picker';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import StockTransferItem from './stock-transfer-item';
 import { useAppDispatch } from '../../store/store';
-// import { featchAllItemsListAsync } from '../../store/slices/search-all-items';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { SaveStockTransferRequest } from '../../models/stock-transfer-model';
+import { ApiError } from '../../models/api-error-model';
+import { saveStockTransfer } from '../../services/stock-transfer';
+import SnackbarStatus from '../commons/ui/snackbar-status';
+import LoadingModal from '../commons/ui/loading-modal';
 
 interface State {
   branchCode: string;
@@ -65,11 +69,18 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
   let rowLength = Object.keys(payloadAddItem).length;
 
   const [status, setStatus] = React.useState(0);
-  const [btNo, setBtNo] = React.useState('-');
+  const [docNo, setDocNo] = React.useState(null);
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
   const [values, setValues] = React.useState<State>({
     branchCode: '',
   });
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
 
   const handleClose = async () => {
     setOpen(false);
@@ -118,7 +129,6 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
 
   const [reasons, setReasons] = React.useState('');
   const handleChangeReasons = (ReasonsCode: string) => {
-    console.log('ReasonsCode:', ReasonsCode);
     setReasons(ReasonsCode);
   };
 
@@ -134,20 +144,56 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
     await dispatch(updateAddItemsState(items));
   };
 
-  const handleSave = () => {
-    console.log('startDate: ', moment(startDate).startOf('day').toISOString());
-    console.log('endDate: ', moment(endDate).startOf('day').toISOString());
-    console.log('startBranch: ', startBranch);
-    console.log('endBranch: ', endBranch);
-    console.log('reasons: ', reasons);
-    console.log('itemsEdit:', JSON.stringify(payloadAddItem));
+  const handleSave = async () => {
+    setOpenLoadingModal(true);
+    const itemsList: any = [];
+    const itemsState: any = [];
+    if (payloadAddItem.length > 0) {
+      await payloadAddItem.forEach((data: any) => {
+        const item: any = {
+          barcode: data.barcode,
+          orderQty: data.qty,
+        };
+        itemsList.push(item);
+        itemsState.push(data);
+      });
+    }
+
+    let btNo = '';
+    if (docNo) btNo = docNo;
+    const payloadSave: SaveStockTransferRequest = {
+      btNo: btNo,
+      sdNo: '',
+      startDate: moment(startDate).startOf('day').toISOString(),
+      endDate: moment(endDate).startOf('day').toISOString(),
+      branchFrom: startBranch,
+      branchTo: endBranch,
+      transferReason: reasons,
+      items: itemsList,
+    };
+
+    await saveStockTransfer(payloadSave)
+      .then((value) => {
+        // setStatus(1);
+        setDocNo(value.docNo);
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+      })
+      .catch((error: ApiError) => {
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+      });
+    setOpenLoadingModal(false);
   };
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
           <Typography sx={{ fontSize: 24, fontWeight: 400 }}>สร้างรายการโอนสินค้า</Typography>
-          <Steppers status={status}></Steppers>
+          {/* <Steppers status={status}></Steppers> */}
+          {!docNo && <Steppers status={0}></Steppers>}
+          {docNo && <Steppers status={1}></Steppers>}
         </BootstrapDialogTitle>
 
         <DialogContent>
@@ -156,7 +202,8 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
               เลขที่เอกสาร BT :
             </Grid>
             <Grid item xs={4}>
-              {btNo}
+              {docNo && docNo}
+              {!docNo && '-'}
             </Grid>
             <Grid item xs={6}></Grid>
             <Grid item xs={2}>
@@ -288,6 +335,14 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
       </Dialog>
 
       <ModalAddItems open={openModelAddItems} onClose={handleModelAddItems}></ModalAddItems>
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={contentMsg}
+      />
+
+      <LoadingModal open={openLoadingModal} />
     </div>
   );
 }
