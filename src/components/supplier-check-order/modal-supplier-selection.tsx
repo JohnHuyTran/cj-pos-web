@@ -175,10 +175,8 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
     const payload = { supplier, poSelection };
 
     if (poSelection) {
-      // console.log('poSelection OK');
       await dispatch(updateItemsState(poSelection.items));
     } else {
-      // console.log('poSelection Noooo');
       await dispatch(updateItemsState({}));
     }
 
