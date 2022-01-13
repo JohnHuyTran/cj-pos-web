@@ -10,7 +10,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Steppers from './steppers';
 import { useStyles } from '../../styles/makeTheme';
-import DatePickerComponent from '../commons/ui/date-picker';
+import DatePickerComponent from '../commons/ui/date-picker-detail';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import StockTransferItem from './stock-transfer-item';
 import { useAppDispatch } from '../../store/store';
