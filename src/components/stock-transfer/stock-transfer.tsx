@@ -75,7 +75,7 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สาขาต้นทาง
+              สาขาต้นทาง*
             </Typography>
             <TextField
               id="txtParamQuery"
@@ -89,7 +89,7 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สาขาปลายทาง
+              สาขาปลายทาง*
             </Typography>
             <TextField
               id="txtParamQuery"
@@ -120,7 +120,7 @@ export default function SupplierCheckOrderSearch() {
 
           <Grid item xs={4} container>
             <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
-              ประเภท
+              สถานะ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
@@ -137,7 +137,7 @@ export default function SupplierCheckOrderSearch() {
 
           <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สถานะ
+              สาเหตุการโอน
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
@@ -147,7 +147,7 @@ export default function SupplierCheckOrderSearch() {
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}
               >
-                <MenuItem value={'0'}>ทั้งหมด</MenuItem>
+                <MenuItem value={'0'}>กรุณาเลือก</MenuItem>
               </Select>
             </FormControl>
           </Grid>
