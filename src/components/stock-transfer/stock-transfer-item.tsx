@@ -128,7 +128,6 @@ function useApiRef() {
 
 function StockTransferItem({ onChangeItems }: DataGridProps) {
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   let rows: any = [];

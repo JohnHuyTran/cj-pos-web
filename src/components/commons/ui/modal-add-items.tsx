@@ -139,6 +139,8 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
     getOptionLabel: (option: ItemInfo) => (option.barcodeName ? option.barcodeName : ''),
   };
 
+  console.log('defaultSearchItemList:', JSON.stringify(defaultSearchItemList));
+
   const filterOptions = createFilterOptions({
     stringify: (option: ItemInfo) => option.barcodeName + option.barcode,
   });
@@ -183,45 +185,51 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
   const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
 
   const onClickAddItem = async (barcode: any) => {
-    let barcodeItem = barcode;
-    const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
-    const checkDupItem: any = newAddItemListArray.find((a: any) => a.barcode === barcodeItem);
-    const itemsListInRows: any = [];
-    if (newAddItemListArray.length > 0) {
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    if (barcode) {
+      let barcodeItem = barcode;
+      const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
+      const checkDupItem: any = newAddItemListArray.find((a: any) => a.barcode === barcodeItem);
+      const itemsListInRows: any = [];
+      if (newAddItemListArray.length > 0) {
+        const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
 
-      rowsEdit.forEach((data: GridRowData) => {
-        itemsListInRows.push(data);
-      });
+        rowsEdit.forEach((data: GridRowData) => {
+          itemsListInRows.push(data);
+        });
+      }
+
+      if (checkDupItem) {
+        let arrayItemDup: any = [];
+        newAddItemListArray.forEach((data: any) => {
+          let qty = data.qty ? data.qty : 0;
+          if (data.barcode === barcodeItem) {
+            const itemsDup: any = {
+              barcode: data.barcode,
+              barcodeName: data.barcodeName,
+              qty: Number(qty) + 1,
+              skuCode: data.skuCode,
+              unitCode: data.unitCode,
+              unitName: data.unitName,
+              unitPrice: data.unitPrice,
+              unitPriceText: data.unitPriceText,
+            };
+
+            arrayItemDup.push(itemsDup);
+          } else {
+            arrayItemDup.push(data);
+          }
+        });
+
+        setNewAddItemListArray(arrayItemDup);
+      } else {
+        setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, itemSelect]);
+      }
+      setSearchItem(null);
+      // defaultSearchItemList = {
+      //   options: [],
+      //   getOptionLabel: (option: ItemInfo) => '',
+      // };
     }
-
-    if (checkDupItem) {
-      let arrayItemDup: any = [];
-      newAddItemListArray.forEach((data: any) => {
-        let qty = data.qty ? data.qty : 0;
-        if (data.barcode === barcodeItem) {
-          const itemsDup: any = {
-            barcode: data.barcode,
-            barcodeName: data.barcodeName,
-            qty: Number(qty) + 1,
-            skuCode: data.skuCode,
-            unitCode: data.unitCode,
-            unitName: data.unitName,
-            unitPrice: data.unitPrice,
-          };
-
-          arrayItemDup.push(itemsDup);
-        } else {
-          arrayItemDup.push(data);
-        }
-      });
-
-      setNewAddItemListArray(arrayItemDup);
-    } else {
-      setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, itemSelect]);
-    }
-
-    setSearchItem(null);
   };
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
@@ -286,14 +294,16 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
 
   let rows: any = [];
   rows = newAddItemListArray.map((item: any, index: number) => {
+    console.log('item:', JSON.stringify(item));
     return {
       id: index,
-      barcode: item.barcode,
+      barcode: item.barcode ? item.barcode : '',
       unitName: item.unitName,
       barcodeName: item.barcodeName,
       qty: item.qty ? item.qty : 1,
       skuCode: item.skuCode,
       unitPrice: item.unitPrice,
+      unitPriceText: item.unitPriceText,
     };
   });
 
