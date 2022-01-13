@@ -614,8 +614,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
-          setShowSnackBar(true);
           setContentMsg(error.message);
+          setShowSnackBar(true);
         });
       setOpenLoadingModal(false);
     }
