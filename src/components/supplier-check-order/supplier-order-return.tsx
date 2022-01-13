@@ -60,6 +60,7 @@ import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-retur
 import AccordionUploadFile from './accordion-upload-file';
 import { formatFileNam } from '../../utils/enum/check-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
+import { numberWithCommas } from '../../utils/utils';
 import { uploadFileState } from '../../store/slices/upload-file-slice';
 interface Props {
   isOpen: boolean;
@@ -113,6 +114,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
   },
   {
     field: 'returnQty',
@@ -139,6 +141,7 @@ const columns: GridColDef[] = [
             var returnQty = Number(params.getValue(params.id, 'returnQty'));
             if (returnQty === 0) value = chkReturnQty(value);
             if (value < 0) value = 0;
+            if (value > qty) value = qty;
             params.api.updateRows([{ ...params.row, returnQty: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
@@ -207,6 +210,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
 
+  const [uploadFileFlg, setUploadFileFlg] = React.useState(false);
+
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [open, setOpen] = React.useState(isOpen);
   const [pnStatus, setPnStatus] = React.useState(0);
@@ -264,35 +269,35 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const handleClose = async () => {
     await storeItem();
-    let isExit = true;
+    let showPopup = false;
     // onClickClose();
     if (comment !== purchaseDetail.comment) {
-      isExit = false;
+      showPopup = true;
     }
     const rowSelect = apiRef.current.getSelectedRows();
     if (rowSelect.size > 0) {
-      isExit = false;
+      showPopup = true;
     }
     const ent: PurchaseNoteDetailEntries[] = purchaseDetail.entries;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     if (rowsEdit.size !== ent.length) {
-      isExit = false;
+      showPopup = true;
     }
 
     let i = 0;
     rowsEdit.forEach((data: GridRowData) => {
       if (data.returnQty !== (ent[i].returnQty ? ent[i].returnQty : 0)) {
-        isExit = false;
+        showPopup = true;
       }
       i++;
     });
 
-    const isNewFile = fileUploadList.length > 0 ? true : false;
-    if (!isExit || isNewFile) {
-      setConfirmModelExit(true);
-    } else {
+    showPopup = fileUploadList.length > 0 && !uploadFileFlg ? true : showPopup;
+    if (!showPopup) {
       setOpen(false);
       onClickClose();
+    } else {
+      setConfirmModelExit(true);
     }
   };
 
@@ -354,6 +359,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setPnNo(value.pnNo);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
+          setUploadFileFlg(true);
           setUploadFileFlag(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
@@ -364,6 +370,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setUploadFileFlag(false);
           setShowSnackBar(true);
           setContentMsg(error.message);
+          setUploadFileFlg(false);
         });
 
       setOpenLoadingModal(false);
@@ -450,6 +457,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileUploadList)
           .then((value: PurchaseNoteResponseType) => {
             setPnNo(value.pnNo);
+            dispatch(uploadFileState([]));
           })
           .catch((error: ApiError) => {
             setShowSnackBar(true);
@@ -497,6 +505,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว');
         dispatch(featchOrderListSupAsync(payloadSearch));
+        dispatch(uploadFileState([]));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -684,6 +693,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
+                onCellFocusOut={currentlySelected}
               />
             </div>
           </Box>

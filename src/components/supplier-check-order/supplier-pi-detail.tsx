@@ -20,7 +20,7 @@ import {
   GridEditCellValueParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { CalculatePurchasePIRequest, SavePurchasePIRequest } from '../../models/supplier-check-order-model';
+import { CalculatePurchasePIRequest, FileType, SavePurchasePIRequest } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
 import { calculateSupplierPI, saveSupplierPI } from '../../services/purchase';
@@ -36,6 +36,7 @@ import theme from '../../styles/theme';
 import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 import AlertError from '../commons/ui/alert-error';
 import { uploadFileState } from '../../store/slices/upload-file-slice';
+import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -185,6 +186,16 @@ const columns: GridColDef[] = [
         )}
       </div>
     ),
+  },
+  {
+    field: 'delete',
+    headerName: ' ',
+    width: 50,
+    align: 'center',
+    sortable: false,
+    renderCell: () => {
+      return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
+    },
   },
 ];
 
@@ -349,6 +360,21 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [characterCount, setCharacterCount] = React.useState(0);
   const maxCommentLength = 255;
+  const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
+
+  const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
+
+  // const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
+
+  const [files, setFiles] = React.useState<FileType[]>([]);
+
+  const [flagSetFiles, setFlagSetFiles] = React.useState(false);
+
+  if (piNo !== '' && flagSetFiles) {
+    setFiles(purchaseDetail.files ? purchaseDetail.files : []);
+
+    setFlagSetFiles(false);
+  }
   const handleChangeComment = (event: any) => {
     saveStateRows();
     const value = event.target.value;
@@ -444,6 +470,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           setCommentOrigin(comment);
           setOpenModelConfirm(true);
           setUploadFileFlag(true);
+
+          dispatch(featchSupplierOrderDetailAsync(value.piNo));
+          setFlagSetFiles(true);
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
@@ -614,8 +643,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
-          setShowSnackBar(true);
           setContentMsg(error.message);
+          setShowSnackBar(true);
         });
       setOpenLoadingModal(false);
     }
@@ -713,7 +742,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4} sx={{ mt: -3 }}>
-                <AccordionUploadFile files={[]} docNo="1234" docType="PI" isStatus={uploadFileFlag} />
+                <AccordionUploadFile files={files} docNo={piNo} docType="PI" isStatus={uploadFileFlag} />
               </Grid>
             </Grid>
           </Box>
