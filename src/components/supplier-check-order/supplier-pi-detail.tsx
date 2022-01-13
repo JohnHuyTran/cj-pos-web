@@ -362,18 +362,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [characterCount, setCharacterCount] = React.useState(0);
   const maxCommentLength = 255;
   const purchaseDetailList = useAppSelector((state) => state.supplierOrderDetail.purchaseDetail);
-
   const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
-
   // const purchaseDetailItems = purchaseDetail.entries ? purchaseDetail.entries : [];
-
   const [files, setFiles] = React.useState<FileType[]>([]);
-
   const [flagSetFiles, setFlagSetFiles] = React.useState(false);
 
-  console.log('purchaseDetail.files: ', purchaseDetail.files);
-  console.log('purchaseDetail.piNo: ', purchaseDetail.piNo);
-  console.log('FlagSetFiles: ', flagSetFiles);
+  let flag = false;
+  if (purchaseDetail.piNo && !flagSetFiles && flag) {
+    setFlagSetFiles(true);
+    flag = true;
+  }
+
   if (purchaseDetail.piNo !== '' && flagSetFiles) {
     setFiles(purchaseDetail.files ? purchaseDetail.files : []);
     setFlagSetFiles(false);
