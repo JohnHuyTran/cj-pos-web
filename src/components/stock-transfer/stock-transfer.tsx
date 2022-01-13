@@ -15,26 +15,51 @@ import ModalCreateStockTransfer from './create-stock-transfer';
 import { useAppDispatch } from '../../store/store';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
+import BranchListDropDown from '../commons/ui/branch-list-dropdown';
+import ReasonsListDropDown from '../stock-transfer/transfer-reasons-list-dropdown';
+import { gridColumnsTotalWidthSelector } from '@material-ui/data-grid';
+import LoadingModal from '../commons/ui/loading-modal';
+
 interface State {
-  paramQuery: string;
-  piStatus: string;
-  piType: string;
+  limit: string;
+  page: string;
+  docNo: string;
+  branchFrom: string;
+  branchTo: string;
   dateFrom: string;
   dateTo: string;
+  statuses: string;
+  transferReason: string;
+}
+
+interface loadingModalState {
+  open: boolean;
 }
 
 export default function SupplierCheckOrderSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<State>({
-    paramQuery: '',
-    piStatus: '0',
-    piType: 'ALL',
+    limit: '10',
+    page: '1',
+    docNo: '',
+    branchFrom: '',
+    branchTo: '',
     dateFrom: '',
     dateTo: '',
+    statuses: 'ALL',
+    transferReason: '',
+  });
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
   });
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
+
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
 
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -49,6 +74,36 @@ export default function SupplierCheckOrderSearch() {
     setEndDate(value);
   };
 
+  const [branchFromCode, setBranchFromCode] = React.useState('');
+  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const handleChangeBranchFrom = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setBranchFromCode(codes);
+      setValues({ ...values, branchFrom: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branchFrom: '' });
+    }
+  };
+
+  const handleChangeBranchTo = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setValues({ ...values, branchTo: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branchTo: '' });
+    }
+  };
+
+  const handleChangeReasons = (ReasonsCode: string) => {
+    if (ReasonsCode !== null) {
+      let codes = JSON.stringify(ReasonsCode);
+      setValues({ ...values, transferReason: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, transferReason: '' });
+    }
+  };
+
   const [openCreateModal, setOpenCreateModal] = React.useState(false);
   const handleOpenCreateModal = async () => {
     await dispatch(updateAddItemsState({}));
@@ -57,6 +112,32 @@ export default function SupplierCheckOrderSearch() {
   function handleCloseCreateModal() {
     setOpenCreateModal(false);
   }
+
+  const onClickValidateForm = () => {
+    console.log('values: ', values);
+  };
+
+  const onClickClearBtn = () => {
+    handleOpenLoading('open', true);
+    setStartDate(null);
+    setEndDate(null);
+    setClearBranchDropDown(!clearBranchDropDown);
+    setValues({
+      limit: '10',
+      page: '1',
+      docNo: '',
+      branchFrom: '',
+      branchTo: '',
+      dateFrom: '',
+      dateTo: '',
+      statuses: 'ALL',
+      transferReason: '',
+    });
+
+    setTimeout(() => {
+      handleOpenLoading('open', false);
+    }, 300);
+  };
 
   return (
     <>
@@ -67,10 +148,10 @@ export default function SupplierCheckOrderSearch() {
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id="txtParamQuery"
-              name="paramQuery"
+              id="txtDocNo"
+              name="docNo"
               size="small"
-              value={values.paramQuery}
+              value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
@@ -81,28 +162,20 @@ export default function SupplierCheckOrderSearch() {
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาขาต้นทาง*
             </Typography>
-            <TextField
-              id="txtParamQuery"
-              name="paramQuery"
-              size="small"
-              value=""
-              className={classes.MtextField}
-              fullWidth
-              placeholder="ชื่อสาขา / รหัสสาขา"
+            <BranchListDropDown
+              sourceBranchCode={''}
+              onChangeBranch={handleChangeBranchFrom}
+              isClear={clearBranchDropDown}
             />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาขาปลายทาง*
             </Typography>
-            <TextField
-              id="txtParamQuery"
-              name="paramQuery"
-              size="small"
-              value=""
-              className={classes.MtextField}
-              fullWidth
-              placeholder="ชื่อสาขา / รหัสสาขา"
+            <BranchListDropDown
+              sourceBranchCode={branchFromCode}
+              onChangeBranch={handleChangeBranchTo}
+              isClear={clearBranchDropDown}
             />
           </Grid>
 
@@ -129,12 +202,18 @@ export default function SupplierCheckOrderSearch() {
             <FormControl fullWidth className={classes.Mselect}>
               <Select
                 id="selPiType"
-                name="piType"
-                value={values.piType}
+                name="statuses"
+                value={values.statuses}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}
               >
-                <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
+                <MenuItem value={'ALL'} selected={true}>
+                  ทั้งหมด
+                </MenuItem>
+                <MenuItem value={'1'}>บันทึก</MenuItem>
+                <MenuItem value={'2'}>อยู่ระหว่างดำเนินการ</MenuItem>
+                <MenuItem value={'3'}>เสร็จสิ้น</MenuItem>
+                <MenuItem value={'4'}>ยกเลิก</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -143,17 +222,7 @@ export default function SupplierCheckOrderSearch() {
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาเหตุการโอน
             </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id="selPiStatus"
-                name="piStatus"
-                value={values.piStatus}
-                onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
-                <MenuItem value={'0'}>กรุณาเลือก</MenuItem>
-              </Select>
-            </FormControl>
+            <ReasonsListDropDown onChangeReasons={handleChangeReasons} />
           </Grid>
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
@@ -171,7 +240,7 @@ export default function SupplierCheckOrderSearch() {
             <Button
               id="btnClear"
               variant="contained"
-              // onClick={onClickClearBtn}
+              onClick={onClickClearBtn}
               sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
@@ -182,7 +251,7 @@ export default function SupplierCheckOrderSearch() {
               id="btnSearch"
               variant="contained"
               color="primary"
-              // onClick={onClickValidateForm}
+              onClick={onClickValidateForm}
               sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}
             >
@@ -190,8 +259,11 @@ export default function SupplierCheckOrderSearch() {
             </Button>
           </Grid>
         </Grid>
+        <br />
         <hr />
       </Box>
+
+      <LoadingModal open={openLoadingModal.open} />
 
       {openCreateModal && <ModalCreateStockTransfer isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />}
     </>
