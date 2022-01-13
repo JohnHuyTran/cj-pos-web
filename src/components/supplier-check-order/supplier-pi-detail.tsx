@@ -372,11 +372,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setFlagSetFiles(true);
     flag = true;
   }
-
-  if (purchaseDetail.piNo !== '' && flagSetFiles) {
-    setFiles(purchaseDetail.files ? purchaseDetail.files : []);
-    setFlagSetFiles(false);
-  }
+  // console.log('purchaseDetail.files 111: ', purchaseDetail.files);
+  // if (purchaseDetail.piNo !== '' && flagSetFiles) {
+  //   setFiles(purchaseDetail.files ? purchaseDetail.files : []);
+  //   setFlagSetFiles(false);
+  // }
+  // console.log('purchaseDetail.files 222: ', files);
   const handleChangeComment = (event: any) => {
     saveStateRows();
     const value = event.target.value;
@@ -433,10 +434,11 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelConfirm(false);
   };
   const handlConfirmButton = async () => {
-    if (files.length === 0) {
+    let purcheaseFiles = purchaseDetail.files ? purchaseDetail.files : [];
+    if (purcheaseFiles.length === 0) {
       setOpenFailAlert(true);
       setTextFail('กรุณาแนบเอกสาร');
-    } else if (files.length === 0 && fileUploadList.length === 0) {
+    } else if (purcheaseFiles.length === 0 && fileUploadList.length === 0) {
       setOpenFailAlert(true);
       setTextFail('กรุณาแนบเอกสาร');
     } else if (!billNo) {
@@ -754,7 +756,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4} sx={{ mt: -3 }}>
-                <AccordionUploadFile files={files} docNo={piNo} docType="PI" isStatus={uploadFileFlag} />
+                {piNo && (
+                  <AccordionUploadFile
+                    files={purchaseDetail.files ? purchaseDetail.files : []}
+                    docNo={purchaseDetail.piNo}
+                    docType="PI"
+                    isStatus={uploadFileFlag}
+                  />
+                )}
+                {piNo === '' && (
+                  <AccordionUploadFile files={[]} docNo={purchaseDetail.piNo} docType="PI" isStatus={uploadFileFlag} />
+                )}
               </Grid>
             </Grid>
           </Box>
