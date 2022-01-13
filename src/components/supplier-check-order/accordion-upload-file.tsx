@@ -162,7 +162,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactE
       setAccordionFile(true);
     }
 
-    if (fileUploadList.length <= 0) {
+    if (fileUploadList.length === 0) {
       setFileKeyDels('');
     }
   }, [fileList, !isStatus]);
@@ -182,32 +182,20 @@ function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactE
   let newFileHuawei: any = [];
   let newFileUpload: any = [];
 
+  console.log('fileHueweiList: ', fileHueweiList);
+  console.log('files: ', files);
+  console.log('fileKeyDels.length: ', fileKeyDels.length);
+
   if (files !== undefined) {
     if (fileKeyDels.length > 0 && fileHueweiList != undefined) {
+      console.log('if fileHueweiList');
       mapHuaweiFile(fileHueweiList);
-      // newFileHuawei = fileHueweiList.map((data: FileType, index: number) => {
-      //   return {
-      //     file: null,
-      //     fileKey: data.fileKey,
-      //     fileName: data.fileName,
-      //     status: 'old',
-      //     mimeType: data.mimeType,
-      //   };
-      // });
     } else {
+      console.log('if files');
       mapHuaweiFile(files);
-      // newFileHuawei = files.map((data: FileType, index: number) => {
-      //   return {
-      //     file: null,
-      //     fileKey: data.fileKey,
-      //     fileName: data.fileName,
-      //     status: 'old',
-      //     mimeType: data.mimeType,
-      //   };
-      // });
     }
 
-    newFileDisplayList = [...newFileHuawei];
+    // newFileDisplayList = [...newFileHuawei];
   }
 
   if (fileList.length > 0) {
@@ -222,11 +210,17 @@ function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactE
     });
   }
 
+  console.log('statusSaveFile: ', statusSaveFile);
+  console.log('newFileUpload.length: ', newFileUpload.length);
+  console.log(' fileUploadList.length : ', fileUploadList.length);
   if (!statusSaveFile && newFileUpload.length > 0) {
+    console.log('if 1');
     newFileDisplayList = [...newFileHuawei, ...newFileUpload];
   } else if (statusSaveFile && fileUploadList.length <= 0) {
+    console.log('if 2');
     newFileDisplayList = [...newFileHuawei];
   } else {
+    console.log('if 3');
     newFileDisplayList = [...newFileHuawei, ...newFileUpload];
   }
 
@@ -240,10 +234,13 @@ function AccordionUploadFile({ files, docNo, docType, isStatus }: Props): ReactE
       delFileUrlHuawei(fileKeyDel, docType, docNo);
       let filess = [];
       if (fileHueweiList) {
+        console.log('if del 1');
         filess = fileHueweiList.filter((r: any) => r.fileKey !== fileKeyDel);
       } else {
+        console.log('if del 2');
         filess = files.filter((r: any) => r.fileKey !== fileKeyDel);
       }
+      console.log('filess in func-delete: ', filess);
       setFileKeyDels(fileKeyDel);
       setFileHueweiList(filess);
     }
