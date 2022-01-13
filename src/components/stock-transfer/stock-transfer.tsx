@@ -12,6 +12,8 @@ import { useStyles } from '../../styles/makeTheme';
 import { Button } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import ModalCreateStockTransfer from './create-stock-transfer';
+import { useAppDispatch } from '../../store/store';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 interface State {
   paramQuery: string;
@@ -23,6 +25,7 @@ interface State {
 
 export default function SupplierCheckOrderSearch() {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<State>({
     paramQuery: '',
     piStatus: '0',
@@ -47,7 +50,8 @@ export default function SupplierCheckOrderSearch() {
   };
 
   const [openCreateModal, setOpenCreateModal] = React.useState(false);
-  const handleOpenCreateModal = () => {
+  const handleOpenCreateModal = async () => {
+    await dispatch(updateAddItemsState({}));
     setOpenCreateModal(true);
   };
   function handleCloseCreateModal() {

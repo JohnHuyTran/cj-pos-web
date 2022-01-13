@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
   DataGrid,
@@ -10,14 +10,17 @@ import {
   GridValueGetterParams,
   GridCellParams,
 } from '@mui/x-data-grid';
+import { GridEditCellValueParams } from '@material-ui/data-grid';
 import { Box } from '@material-ui/core';
 import { useStyles } from '../../styles/makeTheme';
 import { TextField, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
+import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
+import ModelDeleteConfirm from '../commons/ui/modal-delete-confirm';
 
 export interface DataGridProps {
   id: string;
-  // onClose?: () => void;
+  onChangeItems: (items: Array<any>) => void;
 }
 
 const columns: GridColDef[] = [
@@ -35,7 +38,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'barCode',
+    field: 'barcode',
     headerName: 'บาร์โค้ด',
     minWidth: 200,
     headerAlign: 'center',
@@ -46,8 +49,8 @@ const columns: GridColDef[] = [
     field: 'barcodeName',
     headerName: 'รายการสินค้า',
     headerAlign: 'center',
-    minWidth: 220,
-    flex: 1,
+    minWidth: 300,
+    flex: 2,
     sortable: false,
     renderCell: (params) => (
       <div>
@@ -75,9 +78,6 @@ const columns: GridColDef[] = [
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
-          //   var qty = Number(params.getValue(params.id, 'qty'));
-          //   var piType = Number(params.getValue(params.id, 'piType'));
-          //   if (piType === 0 && value > qty) value = qty;
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
         // disabled={isDisable(params) ? true : false}
@@ -95,9 +95,10 @@ const columns: GridColDef[] = [
   },
   {
     field: 'delete',
-    headerName: 'ลบ',
-    flex: 0.2,
-    align: 'center',
+    headerName: ' ',
+    width: 40,
+    minWidth: 0,
+    align: 'right',
     sortable: false,
     renderCell: () => {
       return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
@@ -105,21 +106,39 @@ const columns: GridColDef[] = [
   },
 ];
 
-export const StockTransferItem = (props: DataGridProps) => {
-  const { ...other } = props;
+function useApiRef() {
+  const apiRef = useGridApiRef();
+  const _columns = useMemo(
+    () =>
+      columns.concat({
+        field: '',
+        width: 0,
+        minWidth: 0,
+        sortable: false,
+        renderCell: (params) => {
+          apiRef.current = params.api;
+          return null;
+        },
+      }),
+    [columns]
+  );
+
+  return { apiRef, columns: _columns };
+}
+
+function StockTransferItem({ onChangeItems }: DataGridProps) {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   let rows: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
     rows = payloadAddItem.map((item: any, index: number) => {
-      console.log('item:', JSON.stringify(item));
-
       return {
         id: `${item.barcode}-${index + 1}`,
         index: index + 1,
         skuCode: item.skuCode,
-        barCode: item.barcode,
+        barcode: item.barcode,
         barcodeName: item.barcodeName,
         unitCode: item.unitCode,
         unitName: item.unitName,
@@ -127,8 +146,48 @@ export const StockTransferItem = (props: DataGridProps) => {
       };
     });
   }
-
   const [pageSize, setPageSize] = React.useState<number>(10);
+
+  const { apiRef, columns } = useApiRef();
+  const handleEditItems = async (params: GridEditCellValueParams) => {
+    if (params.field === 'qty') {
+      const itemsList: any = [];
+      if (rows.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          itemsList.push(data);
+        });
+      }
+      return onChangeItems(itemsList ? itemsList : []);
+    }
+    // const updateStateRows = async (items: any) => {
+    //   await dispatch(updateItemsState(items));
+    // };
+  };
+
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+  const [deleteItems, setDeleteItems] = React.useState(false);
+  const [productNameDel, setProductNameDel] = React.useState('');
+  const [skuCodeDel, setSkuCodeDel] = React.useState('');
+  const [barCodeDel, setBarCodeDel] = React.useState('');
+  const currentlySelected = async (params: GridCellParams) => {
+    const value = params.colDef.field;
+    const isRefPO = params.getValue(params.id, 'isRefPO');
+    //deleteItem
+    // handleUpdateRowState();
+
+    if (!isRefPO && value === 'delete') {
+      setDeleteItems(true);
+      setProductNameDel(String(params.getValue(params.id, 'barcodeName')));
+      setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
+      setBarCodeDel(String(params.getValue(params.id, 'barcode')));
+      setOpenModelDeleteConfirm(true);
+    }
+  };
+
+  const handleModelDeleteConfirm = () => {
+    setOpenModelDeleteConfirm(false);
+  };
   return (
     <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
       <DataGrid
@@ -142,11 +201,19 @@ export const StockTransferItem = (props: DataGridProps) => {
         autoHeight={rows.length >= 8 ? false : true}
         scrollbarSize={10}
         rowHeight={65}
-        // onCellClick={currentlySelected}
-        // onCellFocusOut={handleCalculateItems}
+        onCellClick={currentlySelected}
+        onCellFocusOut={handleEditItems}
+      />
+
+      <ModelDeleteConfirm
+        open={openModelDeleteConfirm}
+        onClose={handleModelDeleteConfirm}
+        productName={productNameDel}
+        skuCode={skuCodeDel}
+        barCode={barCodeDel}
       />
     </div>
   );
-};
+}
 
 export default StockTransferItem;

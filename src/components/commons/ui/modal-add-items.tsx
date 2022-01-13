@@ -53,7 +53,8 @@ const columns: GridColDef[] = [
     field: 'barcodeName',
     headerName: 'รายละเอียด',
     headerAlign: 'center',
-    flex: 1.7,
+    minWidth: 200,
+    flex: 2,
     sortable: false,
   },
   {
@@ -72,7 +73,7 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => (
       <TextField
         variant="outlined"
-        name="txnQuantityActual"
+        name="txnQuantity"
         type="number"
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
@@ -82,15 +83,16 @@ const columns: GridColDef[] = [
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
         autoComplete="off"
+        // sx={{ position: 'fixed', right: '3.9em', width: 70 }}
       />
     ),
   },
   {
     field: 'delete',
-    headerName: 'ลบ',
-    flex: 0.5,
-    // width: 50,
-    align: 'center',
+    headerName: ' ',
+    width: 40,
+    minWidth: 0,
+    align: 'right',
     sortable: false,
     renderCell: () => {
       return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
@@ -105,6 +107,7 @@ function useApiRef() {
       columns.concat({
         field: '',
         width: 0,
+        minWidth: 0,
         sortable: false,
         renderCell: (params) => {
           apiRef.current = params.api;
@@ -131,9 +134,9 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
 
   const itemsList = useAppSelector((state) => state.searchAllItemsList.itemList);
   //search item
-  const defaultSearchItemList = {
+  let defaultSearchItemList = {
     options: itemsList.data ? itemsList.data : [],
-    getOptionLabel: (option: ItemInfo) => option.barcodeName,
+    getOptionLabel: (option: ItemInfo) => (option.barcodeName ? option.barcodeName : ''),
   };
 
   const filterOptions = createFilterOptions({
@@ -315,10 +318,6 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
   }
 
   const onInputChange = async (event: any, value: string, reason: string) => {
-    if (event && event.keyCode && event.keyCode === 13) {
-      return false;
-    }
-
     const keyword = value.trim();
     if (keyword.length >= 3) {
       await dispatch(featchAllItemsListAsync(keyword));
@@ -337,7 +336,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
               <Autocomplete
                 {...defaultSearchItemList}
                 className={classes.Mautocomplete}
-                id="selItem"
+                id="selAddItem"
                 freeSolo
                 loadingText="กำลังโหลด..."
                 value={searchItem}
