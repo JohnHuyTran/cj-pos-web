@@ -88,6 +88,9 @@ export const environment = {
       exportFile: {
         url: '/purchase/purchase-invoice/{piNo}/export',
       },
+      delFileHuawei: {
+        url: '/purchase/remove-file',
+      },
     },
     purchaseNote: {
       detail: {

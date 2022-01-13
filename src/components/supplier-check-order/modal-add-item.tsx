@@ -109,8 +109,9 @@ const columns: GridColDef[] = [
   {
     field: 'delete',
     headerName: 'ลบ',
-    flex: 0.5,
-    // width: 50,
+    // flex: 0.5,
+    width: 50,
+    minWidth: 0,
     align: 'center',
     sortable: false,
     renderCell: () => {
@@ -126,6 +127,7 @@ function useApiRef() {
       columns.concat({
         field: '',
         width: 0,
+        minWidth: 0,
         sortable: false,
         renderCell: (params) => {
           apiRef.current = params.api;
@@ -224,7 +226,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
             skuCode: data.skuCode,
             unitCode: data.unitCode,
             unitName: data.unitName,
-            unitPrice: data.unitPrice,
+            unitPrice: data.unitPriceText,
           };
 
           arrayItemDup.push(itemsDup);
@@ -313,7 +315,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       barcodeName: item.barcodeName,
       actualQty: item.actualQty ? item.actualQty : 1,
       skuCode: item.skuCode,
-      unitPrice: item.unitPrice,
+      unitPrice: item.unitPriceText,
     };
   });
 
