@@ -16,6 +16,7 @@ import {
     BarcodeDiscountSearchResponse
 } from "../../models/barcode-discount-model";
 import AlertError from "../../components/commons/ui/alert-error";
+import ModalCreateBarcodeDiscount from "../../components/barcode-discount/modal-create-barcode-discound";
 
 interface State {
     documentNumber: string;
@@ -60,6 +61,8 @@ const BarcodeDiscountSearch = () => {
         totalPage: 0,
     });
 
+    const [openModal, setOpenModal] = React.useState(false)
+
     useEffect(() => {
         setLstStatus(t("lstStatus", {returnObjects: true}));
     }, []);
@@ -75,6 +78,14 @@ const BarcodeDiscountSearch = () => {
     const handleCloseAlert = () => {
         setOpenAlert(false);
     };
+
+    const handleOpenModal = () => {
+        setOpenModal(true)
+    }
+
+    const handleCloseModal = () => {
+        setOpenModal(false)
+    }
 
     const onClear = () => {
         setValues({
@@ -421,6 +432,7 @@ const BarcodeDiscountSearch = () => {
                             className={classes.MbtnSearch}
                             color="secondary"
                             startIcon={<AddCircleOutlineOutlinedIcon/>}
+                            onClick={handleOpenModal}
                         >
                             {t("button.createNewDocument")}
                         </Button>
@@ -450,6 +462,7 @@ const BarcodeDiscountSearch = () => {
             {dataTable}
 
             <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
+            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal} />}
         </>
     );
 }

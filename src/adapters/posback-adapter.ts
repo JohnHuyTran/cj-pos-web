@@ -60,7 +60,7 @@ export function get(path: string, contentType = defaultForJSON) {
     });
 }
 
-export function post(path: string, payload: any, contentType = defaultForJSON) {
+export function post(path: string, payload?: any, contentType = defaultForJSON) {
   return instance(contentType)
     .post(path, payload)
     .then((response: AxiosResponse) => {
