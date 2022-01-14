@@ -183,7 +183,7 @@ export async function getFileUrlHuawei(filekey: string) {
 
 export async function delFileUrlHuawei(filekey: string, docType: string, docNo: string) {
   const pathUrl = environment.purchase.supplierOrder.delFileHuawei.url + `/${docType}/${docNo}`;
-  const response = await deleteDataBody(pathUrl, { key: filekey })
+  const response = await post(pathUrl, { key: filekey })
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;

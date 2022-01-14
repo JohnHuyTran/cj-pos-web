@@ -536,6 +536,13 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     storeItem();
   };
 
+  const handleOnChangeUploadFile = (status: boolean) => {
+    setUploadFileFlag(status);
+    if (status) {
+      dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
+    }
+  };
+
   return (
     <div>
       {' '}
@@ -619,6 +626,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                     docNo={pnNo}
                     docType="PN"
                     isStatus={uploadFileFlag}
+                    onChangeUploadFile={handleOnChangeUploadFile}
                   />
                 )}
               </Grid>
