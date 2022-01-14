@@ -5,17 +5,17 @@ import { FormControl, List, ListItem, ListItemText, MenuItem, Select } from '@mu
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 
 interface Props {
-  isClear: boolean;
+  // isClear: boolean;
   onChangeReasons: (branchCode: string) => void;
 }
 
-function ReasonsListDropDown({ onChangeReasons, isClear }: Props) {
+function ReasonsListDropDown({ onChangeReasons }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   let reasonsList = useAppSelector((state) => state.transferReasonsList.branchList.data);
   useEffect(() => {
     if (reasonsList === null || reasonsList.length <= 0) dispatch(featchTransferReasonsListAsync());
-  }, [isClear]);
+  }, []);
 
   const [reasons, setReasons] = React.useState('All');
   const handleChange = (event: any) => {
