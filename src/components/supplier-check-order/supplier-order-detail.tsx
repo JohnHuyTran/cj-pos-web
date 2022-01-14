@@ -256,7 +256,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     let exit = false;
     if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) exit = true;
 
-    if (fileUploadList.length > 0 && flagSave) {
+    if (fileUploadList.length > 0) {
       exit = true;
     }
 

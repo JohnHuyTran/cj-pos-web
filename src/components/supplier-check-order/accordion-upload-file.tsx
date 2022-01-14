@@ -56,7 +56,6 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
   const [fileList, setFileList] = React.useState<File[]>([]);
   const [fileDSList, setFileDSList] = React.useState<any[]>([]);
   const [fileHueweiList, setFileHueweiList] = React.useState<any[]>([]);
-  console.log('isStatus: ', isStatus);
 
   const [statusSaveFile, setStatusSaveFile] = useState<boolean>(false);
   const [statusUpload, setStatusUpload] = useState<boolean>(false);
