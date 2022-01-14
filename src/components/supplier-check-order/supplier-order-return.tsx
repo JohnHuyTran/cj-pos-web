@@ -229,6 +229,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     }
   };
   const [cols, setCols] = React.useState(columns);
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
 
   React.useEffect(() => {
     setFiles(purchaseDetail.files ? purchaseDetail.files : []);
@@ -359,11 +360,14 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setUploadFileFlg(true);
+          setUploadFileFlag(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
           dispatch(featchOrderListSupAsync(payloadSearch));
+          dispatch(uploadFileState([]));
         })
         .catch((error: ApiError) => {
+          setUploadFileFlag(false);
           setShowSnackBar(true);
           setContentMsg(error.message);
           setUploadFileFlg(false);
@@ -453,6 +457,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         await draftPurchaseCreditNote(payload, purchaseDetail.piNo, fileUploadList)
           .then((value: PurchaseNoteResponseType) => {
             setPnNo(value.pnNo);
+            dispatch(uploadFileState([]));
           })
           .catch((error: ApiError) => {
             setShowSnackBar(true);
@@ -468,7 +473,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const validateFileInfo = () => {
     const isvalid = fileUploadList.length > 0 ? true : false;
-    const isExistingFile = files.length > 0 ? true : false;
+    // const isExistingFile = files.length > 0 ? true : false;
+    const isExistingFile = purchaseDetail.files.length > 0 ? true : false;
     if (!(isvalid || isExistingFile)) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
@@ -605,7 +611,14 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                     เรียกดูเอกสารใบคืนสินค้า
                   </Link>
                 )}
-                {pnStatus === 0 && <AccordionUploadFile files={files} />}
+                {pnStatus === 0 && (
+                  <AccordionUploadFile
+                    files={purchaseDetail.files ? purchaseDetail.files : []}
+                    docNo={pnNo}
+                    docType='PN'
+                    isStatus={uploadFileFlag}
+                  />
+                )}
               </Grid>
             </Grid>
           </Box>

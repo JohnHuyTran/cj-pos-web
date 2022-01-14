@@ -88,6 +88,9 @@ export const environment = {
       exportFile: {
         url: '/purchase/purchase-invoice/{piNo}/export',
       },
+      delFileHuawei: {
+        url: '/purchase/remove-file',
+      },
     },
     purchaseNote: {
       detail: {
@@ -120,6 +123,9 @@ export const environment = {
   stock: {
     transferReasonsList: {
       url: '/stock/master-transfer-reasons',
+    },
+    saveStockTransfer: {
+      url: '/stock/stock-transfer/draft',
     },
   },
 };
