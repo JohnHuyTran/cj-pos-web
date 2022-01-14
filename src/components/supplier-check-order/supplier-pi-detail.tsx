@@ -254,6 +254,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     let exit = false;
     if (comment !== commentOrigin || billNo !== billNoOrigin) exit = true;
 
+    if (fileUploadList.length > 0) {
+      exit = true;
+    }
+
     if (rows.length > 0 && flagSave) exit = true;
 
     if (!exit) {
