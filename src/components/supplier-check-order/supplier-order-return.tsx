@@ -474,7 +474,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const validateFileInfo = () => {
     const isvalid = fileUploadList.length > 0 ? true : false;
     // const isExistingFile = files.length > 0 ? true : false;
-    const isExistingFile = purchaseDetail.files.length > 0 ? true : false;
+    const isExistingFile = purchaseDetail.files && purchaseDetail.files.length > 0 ? true : false;
     if (!(isvalid || isExistingFile)) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
