@@ -11,3 +11,11 @@ export enum ContentType {
   JSON = 'application/json',
   MULTIPART = 'multipart/form-data',
 }
+
+export enum BDStatus {
+  DRAFT = "1",
+  WAIT_FOR_APPROVAL = "2",
+  APPROVED = "3",
+  BARCODE_PRINTED = "4",
+  REJECT = "5",
+}

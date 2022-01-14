@@ -43,6 +43,27 @@ export function getDCStatus(codeStatus: number): string {
   return '-';
 }
 
+export const onChange = (setValues: any, values: Object, event: any) => {
+  const value = event.target.value;
+  setValues({ ...values, [event.target.name]: value });
+};
+
+export const onChangeDate = (setValues: any, values: Object, fieldName: string, value: any) => {
+  setValues({ ...values, [fieldName]: value });
+};
+
+export function genColumnValue(labelField: string, valueField: string, value: string, lstData: []): string {
+  if (lstData) {
+    let data: any = lstData.find(item => item[valueField] === value);
+    return data[labelField];
+  }
+  return "";
+}
+
+export function stringNullOrEmpty(value: any) {
+  return value === null || value === undefined || value === '' || value === 'Invalid date';
+}
+
 export const numberWithCommas = (num: any) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };

@@ -240,6 +240,15 @@ const useStyles = makeStyles({
     width: '200px',
     borderRadius: '4px !important',
   },
+  MLabelBDStatus: {
+    padding: "1px 20px 1px 20px",
+    borderRadius: "8px",
+    // width: "100px",
+    textAlign: "center",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis"
+  },
 });
 
 export { useStyles };

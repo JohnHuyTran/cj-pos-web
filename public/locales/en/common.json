@@ -1,0 +1,9 @@
+{
+  "button": {
+    "clear": "Clear",
+    "search": "Search"
+  },
+  "menu": {
+    "productDiscount": "Product discount"
+  }
+}
