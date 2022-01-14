@@ -208,7 +208,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
     return (
       <TextField
         {...params}
-        placeholder="รหัสผู้จำหน่าย/ชื่อผู้จำหน่าย"
+        placeholder="รหัสสินค้า / ชื่อสินค้า"
         className={classes.MtextField}
         variant="outlined"
         size="small"
