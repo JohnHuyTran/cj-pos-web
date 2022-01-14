@@ -17,6 +17,7 @@
   "remark": "Remark",
   "all": "ALL",
   "noData": "No data",
+  "list": "List",
   "dbStatus": {
     "draft": "Draft",
     "pendingApproval": "Pending approval",

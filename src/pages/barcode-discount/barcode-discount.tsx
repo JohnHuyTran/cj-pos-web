@@ -1,7 +1,7 @@
 import Container from "@mui/material/Container";
 import TitleHeader from "../../components/title-header";
 import {useTranslation} from "react-i18next";
-import BarcodeDiscountSearch from "./bd-search";
+import BarcodeDiscountSearch from "./barcode-discount-search";
 
 const BarcodeDiscount = () => {
     const {t} = useTranslation("common");

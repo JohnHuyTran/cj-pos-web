@@ -1,6 +1,6 @@
 {
   "documentSearch": "ค้นหาเอกสาร",
-  "bdDocumentNumber": "ค้นหาเอกสาร",
+  "bdDocumentNumber": "เลขที่เอกสาร BD",
   "branch": "สาขา",
   "status": "สถานะ",
   "fromDate": "วันที่ขอส่วนลด ตั้งแต่",
@@ -17,6 +17,7 @@
   "remark": "หมายเหตุ จากสาขา",
   "all": "ทั้งหมด",
   "noData": "ไม่มีข้อมูล",
+  "list": "รายการ",
   "dbStatus": {
     "draft": "บันทึก",
     "pendingApproval": "รออนุมัติ",
