@@ -289,7 +289,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
               สาเหตุการโอน :
             </Grid>
             <Grid item xs={3}>
-              <TransferReasonsListDropDown onChangeReasons={handleChangeReasons} />
+              <TransferReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={false} />
             </Grid>
             <Grid item xs={7}></Grid>
           </Grid>
