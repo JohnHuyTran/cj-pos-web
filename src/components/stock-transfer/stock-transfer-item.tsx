@@ -47,7 +47,7 @@ const columns: GridColDef[] = [
   },
   {
     field: 'barcodeName',
-    headerName: 'รายการสินค้า',
+    headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
     minWidth: 300,
     flex: 2,
@@ -76,7 +76,9 @@ const columns: GridColDef[] = [
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
+          let qty = Number(params.getValue(params.id, 'qty'));
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
+          if (qty === 0) value = chkQty(value);
           if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
@@ -106,6 +108,12 @@ const columns: GridColDef[] = [
   },
 ];
 
+var chkQty = (value: any) => {
+  let v = String(value);
+  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  return value;
+};
+
 function useApiRef() {
   const apiRef = useGridApiRef();
   const _columns = useMemo(
@@ -128,7 +136,6 @@ function useApiRef() {
 
 function StockTransferItem({ onChangeItems }: DataGridProps) {
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   let rows: any = [];

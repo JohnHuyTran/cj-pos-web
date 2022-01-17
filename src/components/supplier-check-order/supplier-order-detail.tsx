@@ -256,7 +256,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     let exit = false;
     if (comment !== purchaseDetail.comment || billNo !== purchaseDetail.billNo) exit = true;
 
-    if (fileUploadList.length > 0 && flagSave) {
+    if (fileUploadList.length > 0) {
       exit = true;
     }
 
@@ -713,6 +713,13 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setTextFail('');
   };
 
+  const handleOnChangeUploadFile = (status: boolean) => {
+    setUploadFileFlag(status);
+    if (status) {
+      dispatch(featchSupplierOrderDetailAsync(piNo));
+    }
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -820,6 +827,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     docNo={purchaseDetail.piNo}
                     docType="PI"
                     isStatus={uploadFileFlag}
+                    onChangeUploadFile={handleOnChangeUploadFile}
                   />
                 )}
               </Grid>

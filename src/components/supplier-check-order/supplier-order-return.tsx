@@ -394,8 +394,9 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     };
     return payload;
   };
-
+  let deleteAction = false;
   const handleDeleteBtn = () => {
+    deleteAction = true;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const rowSelect = apiRef.current.getSelectedRows();
     if (rowSelect.size === rowsEdit.size) {
@@ -428,6 +429,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     });
     setPurchaseDetailItems([]);
     setPurchaseDetailItems(items);
+    deleteAction = true;
   };
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -474,7 +476,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const validateFileInfo = () => {
     const isvalid = fileUploadList.length > 0 ? true : false;
     // const isExistingFile = files.length > 0 ? true : false;
-    const isExistingFile = purchaseDetail.files.length > 0 ? true : false;
+    const isExistingFile = purchaseDetail.files && purchaseDetail.files.length > 0 ? true : false;
     if (!(isvalid || isExistingFile)) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
@@ -535,6 +537,19 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
 
   const currentlySelected = async (params: GridCellParams) => {
     storeItem();
+  };
+  const currentlySelectedWithFocusOut = async (params: GridCellParams) => {
+    if (!deleteAction) {
+      storeItem();
+    }
+    deleteAction = false;
+  };
+
+  const handleOnChangeUploadFile = (status: boolean) => {
+    setUploadFileFlag(status);
+    if (status) {
+      dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
+    }
   };
 
   return (
@@ -617,6 +632,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                     docNo={pnNo}
                     docType='PN'
                     isStatus={uploadFileFlag}
+                    onChangeUploadFile={handleOnChangeUploadFile}
                   />
                 )}
               </Grid>
@@ -686,7 +702,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
-                onCellFocusOut={currentlySelected}
+                onCellFocusOut={currentlySelectedWithFocusOut}
               />
             </div>
           </Box>
