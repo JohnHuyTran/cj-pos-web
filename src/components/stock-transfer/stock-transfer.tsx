@@ -203,6 +203,13 @@ export default function SupplierCheckOrderSearch() {
     setOpenAlert(false);
   };
 
+  //check dateFrom-dateTo
+  if (endDate != null && startDate != null) {
+    if (endDate < startDate) {
+      setEndDate(null);
+    }
+  }
+
   let orderListData;
   const orderListDatas = items.orderList.data ? items.orderList.data : [];
   const [flagSearch, setFlagSearch] = React.useState(false);
@@ -307,7 +314,7 @@ export default function SupplierCheckOrderSearch() {
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาเหตุการโอน
             </Typography>
-            <ReasonsListDropDown onChangeReasons={handleChangeReasons} />
+            <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
           </Grid>
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
