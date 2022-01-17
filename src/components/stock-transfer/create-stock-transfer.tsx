@@ -239,14 +239,14 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
 
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              วันที่โอนสินค้า :
+              วันที่โอนสินค้า* :
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุด :
+              วันที่สิ้นสุด* :
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
