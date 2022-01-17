@@ -1,11 +1,12 @@
 export interface BarcodeDiscountSearchRequest {
-    limit: string;
+    perPage: string;
     page: string;
-    documentNumber: string;
+    query: string;
     branch: string;
     status: string;
-    fromDate: string;
-    toDate: string;
+    startDate: string;
+    endDate: string;
+    clearSearch?: boolean;
 }
 
 export interface BarcodeDiscountSearchResponse {
@@ -16,12 +17,15 @@ export interface BarcodeDiscountSearchResponse {
     total: number;
     page: number;
     perPage: number;
-    prev: number;
-    next: number;
     totalPage: number;
 }
 
 export interface BarcodeDiscount {
+    id: string;
+    branchId: string;
+    regionId: string;
+    requester: string;
+    requesterId: string;
     documentNumber: string;
     status: string;
     totalAmount: number;
@@ -29,8 +33,18 @@ export interface BarcodeDiscount {
     sumOfPrice: number;
     sumOfCashDiscount: number;
     sumOfPriceAfterDiscount: number;
-    branch: string;
+    branchName: string;
     createdDate: string;
     approvedDate: string;
     requesterNote: string;
+    percentDiscount: boolean;
+    products: BarcodeDiscountProductDetail[];
+}
+
+export interface BarcodeDiscountProductDetail{
+    productObjectId: string;
+    requestedDiscount: number;
+    numberOfDiscounted: number;
+    expiredDate: string;
+    price: number;
 }
