@@ -22,6 +22,7 @@ import { ApiError } from '../../models/api-error-model';
 import { saveStockTransfer } from '../../services/stock-transfer';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import LoadingModal from '../commons/ui/loading-modal';
+import AlertError from '../commons/ui/alert-error';
 
 interface State {
   branchCode: string;
@@ -150,46 +151,61 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
     await dispatch(updateAddItemsState(items));
   };
 
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
+
   const handleSave = async () => {
     setOpenLoadingModal(true);
-    const itemsList: any = [];
-    const itemsState: any = [];
-    if (payloadAddItem.length > 0) {
-      await payloadAddItem.forEach((data: any) => {
-        const item: any = {
-          barcode: data.barcode,
-          orderQty: data.qty,
-        };
-        itemsList.push(item);
-        itemsState.push(data);
-      });
+
+    if (!startDate || !endDate) {
+      setOpenAlert(true);
+      setTextError('กรุณาเลือกวันที่โอนสินค้า');
+    } else if (startBranch === '' || endBranch === '') {
+      setOpenAlert(true);
+      setTextError('กรุณาเลือกสาขาโอนสินค้า');
+    } else {
+      const itemsList: any = [];
+      const itemsState: any = [];
+      if (payloadAddItem.length > 0) {
+        await payloadAddItem.forEach((data: any) => {
+          const item: any = {
+            barcode: data.barcode,
+            orderQty: data.qty,
+          };
+          itemsList.push(item);
+          itemsState.push(data);
+        });
+      }
+
+      let btNo = '';
+      if (docNo) btNo = docNo;
+      const payloadSave: SaveStockTransferRequest = {
+        btNo: btNo,
+        sdNo: '',
+        startDate: moment(startDate).startOf('day').toISOString(),
+        endDate: moment(endDate).startOf('day').toISOString(),
+        branchFrom: startBranch,
+        branchTo: endBranch,
+        transferReason: reasons,
+        items: itemsList,
+      };
+
+      await saveStockTransfer(payloadSave)
+        .then((value) => {
+          // setStatus(1);
+          setDocNo(value.docNo);
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+        })
+        .catch((error: ApiError) => {
+          setShowSnackBar(true);
+          setContentMsg(error.message);
+        });
     }
-
-    let btNo = '';
-    if (docNo) btNo = docNo;
-    const payloadSave: SaveStockTransferRequest = {
-      btNo: btNo,
-      sdNo: '',
-      startDate: moment(startDate).startOf('day').toISOString(),
-      endDate: moment(endDate).startOf('day').toISOString(),
-      branchFrom: startBranch,
-      branchTo: endBranch,
-      transferReason: reasons,
-      items: itemsList,
-    };
-
-    await saveStockTransfer(payloadSave)
-      .then((value) => {
-        // setStatus(1);
-        setDocNo(value.docNo);
-        setShowSnackBar(true);
-        setSnackbarIsStatus(true);
-        setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-      })
-      .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setContentMsg(error.message);
-      });
     setOpenLoadingModal(false);
   };
   return (
@@ -349,6 +365,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
       />
 
       <LoadingModal open={openLoadingModal} />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </div>
   );
 }
