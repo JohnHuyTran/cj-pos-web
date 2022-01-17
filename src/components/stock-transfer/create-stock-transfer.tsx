@@ -103,6 +103,12 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
     setEndDate(value);
   };
 
+  if (endDate != null && startDate != null) {
+    if (endDate < startDate) {
+      setEndDate(null);
+    }
+  }
+
   const [startBranch, setStartBranch] = React.useState('');
   const [endBranch, setEndBranch] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
