@@ -12,17 +12,19 @@ import { useStyles } from '../../styles/makeTheme';
 import { Button } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import ModalCreateStockTransfer from './create-stock-transfer';
-import { useAppDispatch } from '../../store/store';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import ReasonsListDropDown from '../stock-transfer/transfer-reasons-list-dropdown';
 import { gridColumnsTotalWidthSelector } from '@material-ui/data-grid';
 import LoadingModal from '../commons/ui/loading-modal';
+import AlertError from '../../components/commons/ui/alert-error';
+import { StockTransferRequest } from '../../models/stock-transfer-model';
+import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
+import StockTransferList from '../../components/stock-transfer/stock-transfer-list';
 
 interface State {
-  limit: string;
-  page: string;
   docNo: string;
   branchFrom: string;
   branchTo: string;
@@ -39,9 +41,11 @@ interface loadingModalState {
 export default function SupplierCheckOrderSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  // const limit: number = 0;
+  const page = '1';
+  const items = useAppSelector((state) => state.searchStockTransfer);
+  const limit = useAppSelector((state) => state.searchStockTransfer.orderList.perPage);
   const [values, setValues] = React.useState<State>({
-    limit: '10',
-    page: '1',
     docNo: '',
     branchFrom: '',
     branchTo: '',
@@ -50,6 +54,8 @@ export default function SupplierCheckOrderSearch() {
     statuses: 'ALL',
     transferReason: '',
   });
+
+  console.log('items: ', items);
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -105,6 +111,8 @@ export default function SupplierCheckOrderSearch() {
   };
 
   const [openCreateModal, setOpenCreateModal] = React.useState(false);
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
   const handleOpenCreateModal = async () => {
     await dispatch(updateAddItemsState({}));
     setOpenCreateModal(true);
@@ -114,17 +122,54 @@ export default function SupplierCheckOrderSearch() {
   }
 
   const onClickValidateForm = () => {
+    if (values.branchFrom === '') {
+      setOpenAlert(true);
+      setTextError('กรุณาระบุสาขาต้นทาง');
+    } else if (values.branchTo === '') {
+      setOpenAlert(true);
+      setTextError('กรุณาระบุสาขาปลายทาง');
+    } else {
+      onClickSearchBtn();
+    }
+  };
+
+  const onClickSearchBtn = async () => {
     console.log('values: ', values);
+    // console.log('limit: ', limit);
+
+    let limits;
+    if (limit === 0 || limit === undefined) {
+      limits = '10';
+    } else {
+      limits = limit.toString();
+    }
+
+    const payload: StockTransferRequest = {
+      limit: limits,
+      page: page,
+      docNo: values.docNo,
+      branchFrom: values.branchFrom,
+      branchTo: values.branchTo,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      statuses: values.statuses,
+      transferReason: values.transferReason,
+      clearSearch: false,
+    };
+
+    handleOpenLoading('open', true);
+    await dispatch(featchSearchStockTransferAsync(payload));
+    setFlagSearch(true);
+    handleOpenLoading('open', false);
   };
 
   const onClickClearBtn = () => {
     handleOpenLoading('open', true);
+    setFlagSearch(false);
     setStartDate(null);
     setEndDate(null);
     setClearBranchDropDown(!clearBranchDropDown);
     setValues({
-      limit: '10',
-      page: '1',
       docNo: '',
       branchFrom: '',
       branchTo: '',
@@ -134,10 +179,50 @@ export default function SupplierCheckOrderSearch() {
       transferReason: '',
     });
 
+    const payload: StockTransferRequest = {
+      limit: limit ? limit.toString() : '10',
+      page: page,
+      docNo: values.docNo,
+      branchFrom: values.branchFrom,
+      branchTo: values.branchTo,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      statuses: values.statuses,
+      transferReason: values.transferReason,
+      clearSearch: true,
+    };
+    dispatch(featchSearchStockTransferAsync(payload));
+
     setTimeout(() => {
       handleOpenLoading('open', false);
     }, 300);
   };
+
+  //alert Errormodel
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
+
+  let orderListData;
+  const orderListDatas = items.orderList.data ? items.orderList.data : [];
+  const [flagSearch, setFlagSearch] = React.useState(false);
+  if (flagSearch) {
+    if (orderListDatas.length > 0) {
+      // orderListData = <DCOrderList />;
+      orderListData = <StockTransferList />;
+    } else {
+      orderListData = (
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
+            <h2>
+              {/* ไม่มีข้อมูล <SearchOff fontSize='large' /> */}
+              ไม่มีข้อมูล
+            </h2>
+          </Box>
+        </Grid>
+      );
+    }
+  }
 
   return (
     <>
@@ -210,10 +295,10 @@ export default function SupplierCheckOrderSearch() {
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={'1'}>บันทึก</MenuItem>
-                <MenuItem value={'2'}>อยู่ระหว่างดำเนินการ</MenuItem>
-                <MenuItem value={'3'}>เสร็จสิ้น</MenuItem>
-                <MenuItem value={'4'}>ยกเลิก</MenuItem>
+                <MenuItem value={'0'}>บันทึก</MenuItem>
+                <MenuItem value={'1'}>อยู่ระหว่างดำเนินการ</MenuItem>
+                <MenuItem value={'2'}>เสร็จสิ้น</MenuItem>
+                <MenuItem value={'3'}>ยกเลิก</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -259,12 +344,32 @@ export default function SupplierCheckOrderSearch() {
             </Button>
           </Grid>
         </Grid>
-        <br />
+
+        <Box mt={2}></Box>
+
         <hr />
+
+        <Box mt={2}>
+          <Button
+            id="btnSearch"
+            variant="contained"
+            color="primary"
+            // onClick={}
+            sx={{ width: '13%', ml: 2 }}
+            className={classes.MbtnSearch}
+            disabled
+          >
+            ส่งงาน
+          </Button>
+        </Box>
       </Box>
+
+      <Box mt={6}></Box>
+      {orderListData}
 
       <LoadingModal open={openLoadingModal.open} />
 
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       {openCreateModal && <ModalCreateStockTransfer isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />}
     </>
   );
