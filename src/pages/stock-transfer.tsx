@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import TitleHeader from '../components/title-header';
 import StockTransferSearch from '../components/stock-transfer/stock-transfer';
 
-const SupplierCheckOrder = () => {
+const StockTransfer = () => {
   return (
     <Container maxWidth="xl">
       <TitleHeader title="รับ-โอนสินค้าระหว่างสาขา/คลัง" />
@@ -14,4 +14,4 @@ const SupplierCheckOrder = () => {
   );
 };
 
-export default SupplierCheckOrder;
+export default StockTransfer;
