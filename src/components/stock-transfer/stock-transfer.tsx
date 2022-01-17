@@ -23,6 +23,7 @@ import AlertError from '../../components/commons/ui/alert-error';
 import { StockTransferRequest } from '../../models/stock-transfer-model';
 import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
 import StockTransferList from '../../components/stock-transfer/stock-transfer-list';
+import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
 
 interface State {
   docNo: string;
@@ -55,8 +56,6 @@ export default function SupplierCheckOrderSearch() {
     transferReason: '',
   });
 
-  console.log('items: ', items);
-
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
@@ -85,7 +84,7 @@ export default function SupplierCheckOrderSearch() {
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
-      setBranchFromCode(codes);
+      setBranchFromCode(branchCode);
       setValues({ ...values, branchFrom: JSON.parse(codes) });
     } else {
       setValues({ ...values, branchFrom: '' });
@@ -134,9 +133,6 @@ export default function SupplierCheckOrderSearch() {
   };
 
   const onClickSearchBtn = async () => {
-    console.log('values: ', values);
-    // console.log('limit: ', limit);
-
     let limits;
     if (limit === 0 || limit === undefined) {
       limits = '10';
@@ -159,6 +155,7 @@ export default function SupplierCheckOrderSearch() {
 
     handleOpenLoading('open', true);
     await dispatch(featchSearchStockTransferAsync(payload));
+    await dispatch(saveSearchStockTransfer(payload));
     setFlagSearch(true);
     handleOpenLoading('open', false);
   };

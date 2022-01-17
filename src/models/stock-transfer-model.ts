@@ -15,7 +15,6 @@ export interface StockTransferResponse {
   code: number;
   message: string;
   data: StockTransferInfo[];
-  status: number;
   total: number;
   page: number;
   perPage: number;

@@ -2,22 +2,17 @@ import React from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import { CheckOrderResponse, CheckOrderInfo, CheckOrderRequest } from '../../models/dc-check-order-model';
-import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { getSdType, getDCStatus } from '../../utils/utils';
 // import { makeStyles } from '@mui/styles';
 import { useStyles } from '../../styles/makeTheme';
 import Done from '@mui/icons-material/Done';
-import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
+
 import LoadingModal from '../commons/ui/loading-modal';
-import { PanoramaSharp } from '@mui/icons-material';
-import { saveSearchCriteriaDc } from '../../store/slices/save-search-order-dc-slice';
 import { Typography } from '@mui/material';
-import { ShipmentRequest } from '../../models/order-model';
-import { StockTransferInfo, StockTransferResponse } from '../../models/stock-transfer-model';
-//import CheckOrderDetail from './check-order-detail';
+import { StockTransferInfo, StockTransferRequest, StockTransferResponse } from '../../models/stock-transfer-model';
 import { DeleteForever } from '@mui/icons-material';
+import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
+import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -25,13 +20,12 @@ interface loadingModalState {
 
 function StockTransferList() {
   const classes = useStyles();
-  // const classes = useStyles2();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.searchStockTransfer);
   const cuurentPage = useAppSelector((state) => state.searchStockTransfer.orderList.page);
   const limit = useAppSelector((state) => state.searchStockTransfer.orderList.perPage);
   const res: StockTransferResponse = items.orderList;
-  // const payload = useAppSelector((state) => state.saveSearchOrderDc.searchCriteriaDc);
+  const payload = useAppSelector((state) => state.saveSearchStock.searchStockTransfer);
   // const [opensDCOrderDetail, setOpensDCOrderDetail] = React.useState(false);
 
   const [idDC, setidDC] = React.useState('');
@@ -59,12 +53,6 @@ function StockTransferList() {
       // flex: 1.3,
       headerAlign: 'center',
       sortable: false,
-      // renderCell: (params) => (
-      //   <div>
-      //     <Typography color="textSecondary">{params.value}</Typography>
-      //     <Typography>{params.getValue(params.id, "sdNo") || ""}</Typography>
-      //   </div>
-      // ),
     },
     {
       field: 'sdNo',
@@ -82,7 +70,6 @@ function StockTransferList() {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
-      // renderCell: (params) => showDateTransfer(params),
       renderCell: (params) => (
         <div>
           <Typography variant="body2" sx={{ lineHeight: '120%' }}>
@@ -141,24 +128,6 @@ function StockTransferList() {
     },
   ];
 
-  const showDateTransfer = (params: GridValueGetterParams) => {
-    let date1 = params.getValue(params.id, 'createdDate');
-    let date2 = params.getValue(params.id, 'endDate');
-    let resDate = (
-      <div>
-        {date1}
-        {/* <Typography variant="body2" sx={{ lineHeight: '120%' }}>
-          {date}
-        </Typography> */}
-        {/* <Typography color="textSecondary" variant="body2" sx={{ lineHeight: '120%' }}>
-            {Number(params.getValue(params.id, 'lastModifiedDate')) || ''}
-          </Typography> */}
-      </div>
-    );
-
-    return resDate;
-  };
-
   const rows = res.data.map((data: StockTransferInfo, indexs: number) => {
     return {
       id: data.id,
@@ -166,12 +135,11 @@ function StockTransferList() {
       btNo: data.btNo,
       sdNo: data.sdNo,
       startDate: convertUtcToBkkDate(data.startDate),
-      // startDate: `${convertUtcToBkkDate(data.startDate)}-${convertUtcToBkkDate(data.startDate)}`,
+      endDate: convertUtcToBkkDate(data.endDate),
       branchFrom: data.branchFrom,
       branchTo: data.branchTo,
       createdBy: data.createdBy,
       status: data.status,
-      endDate: convertUtcToBkkDate(data.endDate),
     };
   });
 
@@ -202,52 +170,51 @@ function StockTransferList() {
   // }
 
   const [loading, setLoading] = React.useState<boolean>(false);
-  // const handlePageChange = async (newPage: number) => {
-  //   setLoading(true);
+  const handlePageChange = async (newPage: number) => {
+    setLoading(true);
 
-  //   let page: string = (newPage + 1).toString();
+    let page: string = (newPage + 1).toString();
 
-  //   const payloadNewpage: CheckOrderRequest = {
-  //     limit: pageSize,
-  //     page: page,
-  //     docNo: payload.docNo,
-  //     branchCode: payload.branchCode,
-  //     verifyDCStatus: payload.verifyDCStatus,
-  //     dateFrom: payload.dateFrom,
-  //     dateTo: payload.dateTo,
-  //     sdType: payload.sdType,
-  //     sortBy: payload.sortBy,
-  //   };
+    const payloadNewpage: StockTransferRequest = {
+      limit: pageSize,
+      page: page,
+      docNo: payload.docNo,
+      branchFrom: payload.branchFrom,
+      branchTo: payload.branchTo,
+      dateFrom: payload.dateFrom,
+      dateTo: payload.dateTo,
+      statuses: payload.statuses,
+      transferReason: payload.transferReason,
+    };
 
-  //   await dispatch(featchOrderListDcAsync(payloadNewpage));
-  //   await dispatch(saveSearchCriteriaDc(payloadNewpage));
-  //   setLoading(false);
-  // };
+    await dispatch(featchSearchStockTransferAsync(payloadNewpage));
+    await dispatch(saveSearchStockTransfer(payloadNewpage));
+    setLoading(false);
+  };
 
-  // const handlePageSizeChange = async (pageSize: number) => {
-  //   // console.log("pageSize: ", pageSize);
-  //   setPageSize(pageSize.toString());
+  const handlePageSizeChange = async (pageSize: number) => {
+    // console.log("pageSize: ", pageSize);
+    setPageSize(pageSize.toString());
 
-  //   setLoading(true);
+    setLoading(true);
 
-  //   const payloadNewpage: CheckOrderRequest = {
-  //     limit: pageSize.toString(),
-  //     // page: cuurentPages.toString(),
-  //     page: '1',
-  //     docNo: payload.docNo,
-  //     branchCode: payload.branchCode,
-  //     verifyDCStatus: payload.verifyDCStatus,
-  //     dateFrom: payload.dateFrom,
-  //     dateTo: payload.dateTo,
-  //     sdType: payload.sdType,
-  //     sortBy: payload.sortBy,
-  //   };
+    const payloadNewpage: StockTransferRequest = {
+      limit: pageSize.toString(),
+      page: '1',
+      docNo: payload.docNo,
+      branchFrom: payload.branchFrom,
+      branchTo: payload.branchTo,
+      dateFrom: payload.dateFrom,
+      dateTo: payload.dateTo,
+      statuses: payload.statuses,
+      transferReason: payload.transferReason,
+    };
 
-  //   await dispatch(featchOrderListDcAsync(payloadNewpage));
-  //   await dispatch(saveSearchCriteriaDc(payloadNewpage));
+    await dispatch(featchSearchStockTransferAsync(payloadNewpage));
+    await dispatch(saveSearchStockTransfer(payloadNewpage));
 
-  //   setLoading(false);
-  // };
+    setLoading(false);
+  };
 
   return (
     <div>
@@ -264,10 +231,10 @@ function StockTransferList() {
             page={cuurentPage - 1}
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
-            rowCount={res.total}
+            rowCount={res.totalPage}
             paginationMode="server"
-            // onPageChange={handlePageChange}
-            // onPageSizeChange={handlePageSizeChange}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
             loading={loading}
             rowHeight={65}
           />
