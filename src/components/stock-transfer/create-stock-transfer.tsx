@@ -183,7 +183,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
       let btNo = '';
       if (docNo) btNo = docNo;
       let reason = reasons;
-      if (reasons === 'All') reason = '';
+      if (reason === 'All') reason = '';
       const payloadSave: SaveStockTransferRequest = {
         btNo: btNo,
         sdNo: '',
@@ -191,7 +191,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
         endDate: moment(endDate).startOf('day').toISOString(),
         branchFrom: startBranch,
         branchTo: endBranch,
-        transferReason: reasons,
+        transferReason: reason,
         items: itemsList,
       };
 
