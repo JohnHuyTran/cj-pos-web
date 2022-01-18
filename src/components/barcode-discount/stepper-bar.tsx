@@ -1,23 +1,29 @@
-import * as React from "react";
-import Box from "@mui/material/Box";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import { useStyles } from "../../styles/makeTheme";
-import { ReactElement } from "react";
-import { Typography } from "@material-ui/core";
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import { useStyles } from '../../styles/makeTheme';
+import { ReactElement } from 'react';
+import { Typography } from '@material-ui/core';
 
 interface Props {
-  status: number;
+  activeStep: number;
+  setActiveStep: (activeStep:number) => void;
 }
-const steps = ["บันทึก", "รออนุมัติ", "อนุมัติ", "พิมพ์บาร์โค้ดแล้ว"];
+const steps = ['บันทึก', 'รออนุมัติ', 'อนุมัติ', 'พิมพ์บาร์โค้ดแล้ว'];
 
-export default function StepperBar({ status }: Props): ReactElement {
-  const [activeStep, setActiveStep] = React.useState(0);
+export default function StepperBar({ activeStep, setActiveStep }: Props): ReactElement {
+
+  const [rejected, setRejected] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    setActiveStep(status === 5 ? 3 : status);
-  }, [open]);
+    if (activeStep === 5){
+      setRejected(true);
+      setActiveStep(3)
+    }
+    
+  }, [activeStep, open]);
 
   const classes = useStyles();
   return (
@@ -25,18 +31,19 @@ export default function StepperBar({ status }: Props): ReactElement {
       <Box sx={{ width: "45%", margin: "auto", marginTop: "-1em" }}>
         <Stepper activeStep={activeStep} alternativeLabel>
           {steps.map((label, index) => {
-            const labelProps: any = {};
-            if (index === 2 && status === 5) {
+
+            const labelProps:any = {};
+            if (index === 2 && rejected) {
               label = "ไม่อนุมัต";
               labelProps.error = true;
             }
-
+            
             return (
               <Step key={label}>
                 <StepLabel {...labelProps}>{label}</StepLabel>
               </Step>
-            );
-          })}
+            )
+        })}
         </Stepper>
       </Box>
     </div>

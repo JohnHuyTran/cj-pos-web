@@ -16,7 +16,7 @@ export interface DiscountDetail {
   unit: string;
   price: number;
   discount: number;
-  empiryDate: string | any;
+  expiryDate: string | any;
   cashDiscount: number;
   priceAffterDicount: number;
   numberOfDiscounted: number;
