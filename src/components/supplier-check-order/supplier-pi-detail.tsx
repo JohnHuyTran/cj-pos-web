@@ -440,18 +440,24 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelConfirm(false);
   };
   const handlConfirmButton = async () => {
+    setOpenLoadingModal(true);
+
     let purcheaseFiles = purchaseDetail.files ? purchaseDetail.files : [];
-    if (purcheaseFiles.length === 0) {
-      setOpenFailAlert(true);
-      setTextFail('กรุณาแนบเอกสาร');
-    } else if (purcheaseFiles.length === 0 && fileUploadList.length === 0) {
-      setOpenFailAlert(true);
-      setTextFail('กรุณาแนบเอกสาร');
-    } else if (!billNo) {
+    let fileLength = false;
+    if (purcheaseFiles.length > 0) {
+      fileLength = true;
+    } else if (fileUploadList.length > 0) {
+      fileLength = true;
+    }
+
+    if (!billNo) {
       setErrorBillNo(true);
+    } else if (!fileLength) {
+      console.log('=== 0');
+      setOpenFailAlert(true);
+      setTextFail('กรุณาแนบเอกสาร');
     } else {
       setErrorBillNo(false);
-      setOpenLoadingModal(true);
 
       const itemsList: any = [];
       if (rows.length > 0) {
@@ -466,37 +472,43 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         await setItems(itemsList);
       }
 
-      const payloadSave: SavePurchasePIRequest = {
-        piNo: piNo,
-        SupplierCode: supplierCode,
-        billNo: billNo,
-        docNo: docNo ? docNo : '',
-        flagPO: piType,
-        comment: comment,
-        items: itemsList,
-      };
-
-      setFlagSetFiles(true);
-
-      await saveSupplierPI(payloadSave, fileUploadList)
-        .then((value) => {
-          setUploadFileFlag(true);
-          setFlagSetFiles(true);
-          setPiNo(value.piNo);
-          setBillNoOrigin(billNo);
-          setCommentOrigin(comment);
-          setOpenModelConfirm(true);
-          dispatch(featchSupplierOrderDetailAsync(value.piNo));
-          dispatch(uploadFileState([]));
-        })
-        .catch((error: ApiError) => {
-          setShowSnackBar(true);
-          setUploadFileFlag(false);
-          setContentMsg(error.message);
-        });
-
-      setOpenLoadingModal(false);
+      let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0);
+      if (validateActualQty.length > 0) {
+        setOpenFailAlert(true);
+        setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+      } else {
+        const payloadSave: SavePurchasePIRequest = {
+          piNo: piNo,
+          SupplierCode: supplierCode,
+          billNo: billNo,
+          docNo: docNo ? docNo : '',
+          flagPO: piType,
+          comment: comment,
+          items: itemsList,
+        };
+        setFlagSetFiles(true);
+        if (piNo === '') {
+          await saveSupplierPI(payloadSave, fileUploadList)
+            .then((value) => {
+              setUploadFileFlag(true);
+              setFlagSetFiles(true);
+              setPiNo(value.piNo);
+              setBillNoOrigin(billNo);
+              setCommentOrigin(comment);
+              setOpenModelConfirm(true);
+              dispatch(featchSupplierOrderDetailAsync(value.piNo));
+              dispatch(uploadFileState([]));
+            })
+            .catch((error: ApiError) => {
+              setShowSnackBar(true);
+              setUploadFileFlag(false);
+              setContentMsg(error.message);
+            });
+        }
+        setOpenModelConfirm(true);
+      }
     }
+    setOpenLoadingModal(false);
   };
 
   const [productNameDel, setProductNameDel] = React.useState('');
@@ -615,59 +627,67 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const handleSaveButton = async () => {
     setFlagSetFiles(true);
-    const itemEditList: any = [];
-    const itemsList: any = [];
-    if (rows.length > 0) {
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      await rows.forEach((data: GridRowData) => {
-        const item: any = {
-          barcode: data.barcode,
-          actualQty: data.actualQty,
-        };
-
-        itemsList.push(item);
-        itemEditList.push(data);
-      });
-      await dispatch(updateItemsState(itemEditList));
-    }
+    setOpenLoadingModal(true);
 
     if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
-      setOpenLoadingModal(true);
 
-      const payloadSave: SavePurchasePIRequest = {
-        piNo: piNo,
-        SupplierCode: supplierCode,
-        billNo: billNo,
-        docNo: docNo ? docNo : '',
-        flagPO: piType,
-        comment: comment,
-        items: itemsList,
-      };
+      const itemEditList: any = [];
+      const itemsList: any = [];
+      if (rows.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          const item: any = {
+            barcode: data.barcode,
+            actualQty: data.actualQty,
+          };
 
-      await saveSupplierPI(payloadSave, fileUploadList)
-        .then((value) => {
-          setUploadFileFlag(true);
-          setFlagSetFiles(true);
-          setPiNo(value.piNo);
-          setBillNoOrigin(billNo);
-          setCommentOrigin(comment);
-          setShowSnackBar(true);
-          setSnackbarIsStatus(true);
-          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          setFlagSave(false);
-          dispatch(featchSupplierOrderDetailAsync(value.piNo));
-          dispatch(uploadFileState([]));
-        })
-        .catch((error: ApiError) => {
-          setContentMsg(error.message);
-          setShowSnackBar(true);
-          setUploadFileFlag(false);
+          itemsList.push(item);
+          itemEditList.push(data);
         });
-      setOpenLoadingModal(false);
+        await dispatch(updateItemsState(itemEditList));
+      }
+
+      let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0);
+      if (validateActualQty.length > 0) {
+        setOpenFailAlert(true);
+        setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+      } else {
+        const payloadSave: SavePurchasePIRequest = {
+          piNo: piNo,
+          SupplierCode: supplierCode,
+          billNo: billNo,
+          docNo: docNo ? docNo : '',
+          flagPO: piType,
+          comment: comment,
+          items: itemsList,
+        };
+
+        await saveSupplierPI(payloadSave, fileUploadList)
+          .then((value) => {
+            setUploadFileFlag(true);
+            setFlagSetFiles(true);
+            setPiNo(value.piNo);
+            setBillNoOrigin(billNo);
+            setCommentOrigin(comment);
+            setShowSnackBar(true);
+            setSnackbarIsStatus(true);
+            setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+            setFlagSave(false);
+            dispatch(featchSupplierOrderDetailAsync(value.piNo));
+            dispatch(uploadFileState([]));
+          })
+          .catch((error: ApiError) => {
+            setContentMsg(error.message);
+            setShowSnackBar(true);
+            setUploadFileFlag(false);
+          });
+      }
     }
+
+    setOpenLoadingModal(false);
   };
 
   const [openFailAlert, setOpenFailAlert] = React.useState(false);
