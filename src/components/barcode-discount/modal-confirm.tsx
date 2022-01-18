@@ -7,12 +7,10 @@ import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
 import LoadingModal from '../commons/ui/loading-modal';
 
-
 interface Props {
   open: boolean;
   onClose: () => void;
-  // onDeleteAction: (value: boolean, errorMsg: any) => void;
-  requesterId: string;
+  onDeleteAction: () => void;
   barCode: string;
 }
 interface loadingModalState {
@@ -22,8 +20,7 @@ interface loadingModalState {
 export default function ModelConfirm({
   open,
   onClose,
-  // onDeleteAction,
-  requesterId,
+  onDeleteAction,
   barCode,
 }: Props): ReactElement {
   const [openLoadingModal, setOpenLoadingModal] =
@@ -37,7 +34,7 @@ export default function ModelConfirm({
 
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-
+    await onDeleteAction();
     handleOpenLoading('open', false);
     onClose();
   };
@@ -59,13 +56,23 @@ export default function ModelConfirm({
             <Typography variant="h6" align="center" sx={{ marginBottom: 3 }}>
               ยืนยันอนุมัติส่วนลดสินค้า
             </Typography>
-            <Typography variant="body1" align="center">
-              เลขที่เอกสาร BD{' '}
-              <label style={{ color: '#AEAEAE', marginLeft: '10px', marginRight: "5px" }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
-                <b>{barCode}</b>
-              </label>
-            </Typography>
+            {!!barCode && (
+              <Typography variant="body1" align="center">
+                เลขที่เอกสาร BD{' '}
+                <label
+                  style={{
+                    color: '#AEAEAE',
+                    marginLeft: '10px',
+                    marginRight: '5px',
+                  }}
+                >
+                  |
+                </label>{' '}
+                <label style={{ color: '#36C690' }}>
+                  <b>{barCode}</b>
+                </label>
+              </Typography>
+            )}
           </DialogContentText>
         </DialogContent>
 

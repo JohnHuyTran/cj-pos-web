@@ -17,6 +17,7 @@ import {
 } from "../../models/barcode-discount-model";
 import AlertError from "../../components/commons/ui/alert-error";
 import ModalCreateBarcodeDiscount from "../../components/barcode-discount/modal-create-barcode-discound";
+import BarcodeDiscountPopup from "../../components/barcode-discount/barcode-discount-popup";
 
 interface State {
     documentNumber: string;
@@ -32,6 +33,7 @@ const BarcodeDiscountSearch = () => {
     const [openAlert, setOpenAlert] = React.useState(false);
     const [textError, setTextError] = React.useState('');
     const [lstStatus, setLstStatus] = React.useState([]);
+    const [openPopup, setOpenPopup] = React.useState<boolean>(false);
     const [values, setValues] = React.useState<State>({
         documentNumber: "",
         branch: "ALL",
@@ -85,6 +87,10 @@ const BarcodeDiscountSearch = () => {
 
     const handleCloseModal = () => {
         setOpenModal(false)
+    }
+
+    const handleClosePopup = () => {
+        setOpenPopup(false)
     }
 
     const onClear = () => {
@@ -462,7 +468,12 @@ const BarcodeDiscountSearch = () => {
             {dataTable}
 
             <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
-            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal} />}
+            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal} setOpenPopup={setOpenPopup}/>}
+            <BarcodeDiscountPopup
+                open={openPopup}
+                onClose={handleClosePopup}
+                contentMsg={"คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว"}
+            />
         </>
     );
 }

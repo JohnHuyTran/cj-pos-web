@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { Box, TextareaAutosize, Tooltip, withStyles } from "@material-ui/core";
+import React, { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { Box, TextareaAutosize, Tooltip, withStyles } from '@material-ui/core';
 import {
   Button,
   Dialog,
@@ -10,15 +10,15 @@ import {
   DialogContentText,
   TextField,
   Typography,
-} from "@mui/material";
-import { DeleteForever } from "@mui/icons-material";
-import { useStyles } from "../../styles/makeTheme";
-import { DiscountDetail } from "../../models/barcode-discount";
-import DatePickerComponent from "../../components/commons/ui/date-picker-detail";
-import { saveBarcodeDiscount } from "../../store/slices/barcode-discount-slice";
-import moment from "moment";
-import { updateAddItemsState } from "../../store/slices/add-items-slice";
-import { stringNullOrEmpty } from "../../utils/utils";
+} from '@mui/material';
+import { DeleteForever } from '@mui/icons-material';
+import { useStyles } from '../../styles/makeTheme';
+import { DiscountDetail } from '../../models/barcode-discount';
+import DatePickerComponent from '../../components/commons/ui/date-picker-detail';
+import { saveBarcodeDiscount } from '../../store/slices/barcode-discount-slice';
+import moment from 'moment';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { stringNullOrEmpty } from '../../utils/utils';
 export interface DataGridProps {
   id: string;
   typeDiscount: string;
@@ -41,10 +41,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const price = item.unitPrice;
         let discount = 0;
         const cashDiscount =
-          typeDiscount === "percent" ? (discount * price) / 100 : discount;
+          typeDiscount === 'percent' ? (discount * price) / 100 : discount;
 
         const priceAffterDicount = price - cashDiscount;
-        const date = moment(new Date()).startOf("day").toISOString();
+        const date = moment(new Date()).startOf('day').toISOString();
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -54,11 +54,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
           unit: item.unitName,
           price: price,
           discount: 0,
-          errorDiscount: "",
+          errorDiscount: '',
           qty: item.qty ? item.qty : 0,
-          errorQty: "",
+          errorQty: '',
           expiryDate: date,
-          errorExpiryDate: "",
+          errorExpiryDate: '',
           cashDiscount: cashDiscount || 0,
           priceAffterDicount: priceAffterDicount,
           numberOfDiscounted: item.qty,
@@ -92,7 +92,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       const data = [...preData];
       // const value = event.target.value;
       data[index - 1].discount = parseInt(event.target.value);
-      if (typeDiscount === "percent") {
+      if (typeDiscount === 'percent') {
         const number = data[index - 1].price * (data[index - 1].discount / 100);
 
         data[index - 1].cashDiscount = Math.trunc(number) || 0;
@@ -123,74 +123,72 @@ export const ModalTransferItem = (props: DataGridProps) => {
     });
   };
 
-  const CustomTooltip = withStyles({
-    tooltip: {
-      color: "#F54949",
-      backgroundColor: "#ffffff",
-      fontSize: "medium",
-    },
-  })(Tooltip);
+  const handleChangeNote = (e: any) => {
+    dispatch(
+      saveBarcodeDiscount({ ...payloadBarcodeDiscount, requestorNote: e })
+    );
+  };
 
   const columns: GridColDef[] = [
     {
-      field: "index",
-      headerName: "ลำดับ",
+      field: 'index',
+      headerName: 'ลำดับ',
       minWidth: 60,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: "20px" }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
     },
     {
-      field: "barCode",
-      headerName: "บาร์โค้ด",
+      field: 'barCode',
+      headerName: 'บาร์โค้ด',
       minWidth: 122,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
     },
     {
-      field: "productName",
-      headerName: "รายละเอียดสินค้า",
+      field: 'productName',
+      headerName: 'รายละเอียดสินค้า',
       minWidth: 250,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
       renderCell: (params) => (
         <div>
           <Typography variant="body2">{params.value}</Typography>
           <Typography color="textSecondary" sx={{ fontSize: 12 }}>
-            {params.getValue(params.id, "skuCode") || ""}
+            {params.getValue(params.id, 'skuCode') || ''}
           </Typography>
         </div>
       ),
     },
     {
-      field: "unit",
-      headerName: "หน่วย",
+      field: 'unit',
+      headerName: 'หน่วย',
       minWidth: 77,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
     },
     {
-      field: "price",
-      headerName: "ราคาปกติ",
+      field: 'price',
+      headerName: 'ราคาปกติ',
       minWidth: 80,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
     },
     {
-      field: "discount",
-      headerName: typeDiscount === "percent" ? "ยอดลด (%)" : "ยอดลด (บาท)",
+      field: 'discount',
+      headerName: typeDiscount === 'percent' ? 'ยอดลด (%)' : 'ยอดลด (บาท)',
       resizable: true,
       minWidth: 130,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
@@ -206,7 +204,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             (params.value < 0 || params.value > params.row.price)) ||
           (payloadBarcodeDiscount.validate && params.value == 0) ||
           (payloadBarcodeDiscount.validate && !params.value);
-        return typeDiscount === "percent" ? (
+        return typeDiscount === 'percent' ? (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
               type="number"
@@ -246,26 +244,26 @@ export const ModalTransferItem = (props: DataGridProps) => {
       },
     },
     {
-      field: "cashDiscount",
-      headerName: "ส่วนลด",
+      field: 'cashDiscount',
+      headerName: 'ส่วนลด',
       minWidth: 73,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
     },
     {
-      field: "priceAffterDicount",
-      headerName: "ราคาหลังลด",
+      field: 'priceAffterDicount',
+      headerName: 'ราคาหลังลด',
       minWidth: 120,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
     },
     {
-      field: "numberOfDiscounted",
-      headerName: "จำนวนที่ขอลด",
+      field: 'numberOfDiscounted',
+      headerName: 'จำนวนที่ขอลด',
       minWidth: 119,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
@@ -292,27 +290,27 @@ export const ModalTransferItem = (props: DataGridProps) => {
       },
     },
     {
-      field: "numberOfApproved",
-      headerName: "จำนวน<br>ที่อนุมัติ",
+      field: 'numberOfApproved',
+      headerName: 'จำนวน<br>ที่อนุมัติ',
       minWidth: 150,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       renderCell: () => <TextField type="number" disabled />,
     },
     {
-      field: "approvedDiscount",
-      headerName: "รวมส่วนลดที่อนุมัติ",
+      field: 'approvedDiscount',
+      headerName: 'รวมส่วนลดที่อนุมัติ',
       minWidth: 153,
-      headerAlign: "center",
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
     },
     {
-      field: "expiryDate",
-      headerName: "วันที่หมดอายุ",
+      field: 'expiryDate',
+      headerName: 'วันที่หมดอายุ',
       minWidth: 180,
-      headerAlign: "left",
+      headerAlign: 'left',
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
@@ -327,10 +325,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
       },
     },
     {
-      field: "delete",
-      headerName: " ",
+      field: 'delete',
+      headerName: ' ',
       flex: 0.2,
-      align: "center",
+      align: 'center',
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const [openModalDelete, setOpenModalDelete] =
@@ -359,7 +357,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
         return (
           <>
             <Button onClick={handleOpenModalDelete}>
-              <DeleteForever fontSize="medium" sx={{ color: "#F54949" }} />
+              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
             </Button>
 
             <Dialog
@@ -372,7 +370,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               <DialogContent sx={{ pl: 6, pr: 8 }}>
                 <DialogContentText
                   id="alert-dialog-description"
-                  sx={{ color: "#263238" }}
+                  sx={{ color: '#263238' }}
                 >
                   <Typography
                     variant="h6"
@@ -382,18 +380,18 @@ export const ModalTransferItem = (props: DataGridProps) => {
                     ต้องการลบสินค้า
                   </Typography>
                   <Typography variant="body1" align="left">
-                    สินค้า{" "}
-                    <label style={{ color: "#AEAEAE", marginRight: 5 }}>
+                    สินค้า{' '}
+                    <label style={{ color: '#AEAEAE', marginRight: 5 }}>
                       |
-                    </label>{" "}
-                    <label style={{ color: "#36C690" }}>
+                    </label>{' '}
+                    <label style={{ color: '#36C690' }}>
                       <b>{params.row.productName}</b>
                       <br />
                       <label
                         style={{
-                          color: "#AEAEAE",
+                          color: '#AEAEAE',
                           fontSize: 14,
-                          marginLeft: "3.8em",
+                          marginLeft: '3.8em',
                         }}
                       >
                         {params.row.skuCode}
@@ -401,11 +399,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
                     </label>
                   </Typography>
                   <Typography variant="body1" align="left">
-                    บาร์โค้ด{" "}
-                    <label style={{ color: "#AEAEAE", marginRight: 5 }}>
+                    บาร์โค้ด{' '}
+                    <label style={{ color: '#AEAEAE', marginRight: 5 }}>
                       |
-                    </label>{" "}
-                    <label style={{ color: "#36C690" }}>
+                    </label>{' '}
+                    <label style={{ color: '#36C690' }}>
                       <b>{params.row.barCode}</b>
                     </label>
                   </Typography>
@@ -413,7 +411,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               </DialogContent>
 
               <DialogActions
-                sx={{ justifyContent: "center", mb: 2, pl: 6, pr: 8 }}
+                sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}
               >
                 <Button
                   id="btnCancle"
@@ -443,7 +441,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const [pageSize, setPageSize] = React.useState<number>(10);
   return (
     <div
-      style={{ width: "100%", height: dtTable.length >= 8 ? "70vh" : "auto" }}
+      style={{ width: '100%', height: dtTable.length >= 8 ? '70vh' : 'auto' }}
       className={classes.MdataGridDetail}
     >
       <DataGrid
@@ -463,16 +461,22 @@ export const ModalTransferItem = (props: DataGridProps) => {
       <Box display="flex" justifyContent="space-between" paddingTop="30px">
         <Box>
           <Typography fontSize="14px" lineHeight="21px" height="24px">
-            หมายเหตุจากสาขา :{" "}
+            หมายเหตุจากสาขา :{' '}
           </Typography>
           <TextareaAutosize
             placeholder="ความยาวไม่เกิน 100 ตัวอักษร"
             style={{
-              width: "339px",
-              height: "115px",
-              border: "1px solid #C1C1C1",
-              borderRadius: "10px",
-              backgroundColor: "transparent",
+              width: '339px',
+              height: '115px',
+              border: '1px solid #C1C1C1',
+              borderRadius: '10px',
+              backgroundColor: 'transparent',
+            }}
+            value={
+              payloadBarcodeDiscount ? payloadBarcodeDiscount.requestorNote : ''
+            }
+            onChange={(e) => {
+              handleChangeNote(e.target.value);
             }}
           />
         </Box>
@@ -483,9 +487,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
             </Typography>
             <TextField
               style={{
-                backgroundColor: "#EAEBEB",
-                border: "1px solid #C1C1C1",
-                borderRadius: "6px",
+                backgroundColor: '#EAEBEB',
+                border: '1px solid #C1C1C1',
+                borderRadius: '6px',
               }}
             />
           </Box>
@@ -495,9 +499,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
             </Typography>
             <TextField
               style={{
-                backgroundColor: "#E7FFE9",
-                border: "1px solid #C1C1C1",
-                borderRadius: "6px",
+                backgroundColor: '#E7FFE9',
+                border: '1px solid #C1C1C1',
+                borderRadius: '6px',
               }}
             />
           </Box>

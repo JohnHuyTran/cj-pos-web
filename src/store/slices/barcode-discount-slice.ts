@@ -1,24 +1,29 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DiscountDetail } from "../../models/barcode-discount";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type ItemsState = {
   createDraft: any;
   validate: boolean;
+  dataDetail: any;
 };
 const initialState: ItemsState = {
   createDraft: {
-    branchId: "61de9ddab10bfe85dfab22e9",
-    regionId: "61de9ddab10bfe85dfab22e9",
-    requesterId: "61de9ddab10bfe85dfab22e9",
+    branchId: '61de9ddab10bfe85dfab22e9',
+    regionId: '61de9ddab10bfe85dfab22e9',
+    requesterId: '61de9ddab10bfe85dfab22e9',
     percentDiscount: true,
-    requestorNote: "",
+    requestorNote: '',
     products: [],
   },
   validate: false,
+  dataDetail: {
+    id: '',
+    documentNumber: '',
+    status: 0,
+  },
 };
 
 const barcodeDiscountSlice = createSlice({
-  name: "barcode",
+  name: 'barcode',
   initialState,
   reducers: {
     saveBarcodeDiscount: (state, action: PayloadAction<any>) => {
@@ -27,7 +32,11 @@ const barcodeDiscountSlice = createSlice({
     updateValidate: (state, action: any) => {
       state.validate = action.payload;
     },
+    updateDataDetail: (state, action: any) => {
+      state.dataDetail = action.payload;
+    },
   },
 });
-export const { saveBarcodeDiscount } = barcodeDiscountSlice.actions;
+export const { saveBarcodeDiscount, updateValidate, updateDataDetail } =
+  barcodeDiscountSlice.actions;
 export default barcodeDiscountSlice.reducer;

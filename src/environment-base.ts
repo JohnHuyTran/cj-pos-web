@@ -138,5 +138,8 @@ export const environment = {
     approve: {
       url: '/campaign/{id}/waiting-approve',
     },
+    cancel: {
+      url: '/campaign/{id}'
+    },
   }
 };

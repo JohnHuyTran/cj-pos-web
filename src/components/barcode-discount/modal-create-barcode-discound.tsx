@@ -1,5 +1,5 @@
-import React, { useState, ReactElement } from "react";
-import { Box } from "@mui/system";
+import React, { ReactElement, useEffect } from 'react';
+import { Box } from '@mui/system';
 import {
   Button,
   Dialog,
@@ -10,67 +10,59 @@ import {
   FormControlLabel,
   Typography,
   FormControl,
-} from "@mui/material";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import SaveIcon from "@mui/icons-material/Save";
-import { useStyles } from "../../styles/makeTheme";
-import StepperBar from "./stepper-bar";
-import { BootstrapDialogTitle } from "../commons/ui/dialog-title";
-import ModalAddItems from "../commons/ui/modal-add-items";
-import ModalBacodeTransferItem from "./modal-barcode-transfer-item";
-import moment from "moment";
-import ModelConfirm from "./modal-confirm";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { saveBarcodeDiscount } from "../../store/slices/barcode-discount-slice";
-import { saveDraftBarcodeDiscount } from "../../services/barcode-discount";
-import BarcodeDiscountPopup from "./barcode-discount-popup";
-import AlertError from "../commons/ui/alert-error";
-import { stringNullOrEmpty } from "../../utils/utils";
+} from '@mui/material';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import SaveIcon from '@mui/icons-material/Save';
+import { useStyles } from '../../styles/makeTheme';
+import StepperBar from './stepper-bar';
+import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
+import ModalAddItems from '../commons/ui/modal-add-items';
+import ModalBacodeTransferItem from './modal-barcode-transfer-item';
+import moment from 'moment';
+import ModelConfirm from './modal-confirm';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import {
+  saveBarcodeDiscount,
+  updateDataDetail,
+} from '../../store/slices/barcode-discount-slice';
+import {
+  cancelBarcodeDiscount,
+  saveDraftBarcodeDiscount,
+} from '../../services/barcode-discount';
+import BarcodeDiscountPopup from './barcode-discount-popup';
+import AlertError from '../commons/ui/alert-error';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 interface Props {
   isOpen: boolean;
+  setOpenPopup: (openPopup: boolean) => void;
   onClickClose: () => void;
-}
-interface Data {
-  name: string;
-  code: string;
-  population: number;
-  size: number;
-  density: number;
-}
-
-function createData(
-  name: string,
-  code: string,
-  population: number,
-  size: number
-): Data {
-  const density = population / size;
-  return { name, code, population, size, density };
 }
 
 export default function ModalCreateBarcodeDiscount({
   isOpen,
   onClickClose,
+  setOpenPopup,
 }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
-  const [page, setPage] = React.useState(0);
-  const [piStatus, setPiStatus] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
-  const [valueRadios, setValueRadios] = React.useState<string>("percent");
+  const [valueRadios, setValueRadios] = React.useState<string>('percent');
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const classes = useStyles();
 
   const [openModelAddItems, setOpenModelAddItems] =
     React.useState<boolean>(false);
-  const [openPopupSave, setOpenPopupSave] = React.useState<boolean>(false);
+  const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
+  const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<number>(0);
   const dispatch = useAppDispatch();
   const payloadBarcodeDiscount = useAppSelector(
     (state) => state.barcodeDiscount.createDraft
+  );
+  const dataDetail = useAppSelector(
+    (state) => state.barcodeDiscount.dataDetail
   );
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -78,23 +70,18 @@ export default function ModalCreateBarcodeDiscount({
   const handleModelAddItems = async () => {
     setOpenModelAddItems(false);
   };
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
 
-  const handleCancel = () => {
+  const handleOpenCancel = () => {
     setOpenModalCancel(true);
   };
   const handleCloseModalCancel = () => {
     setOpenModalCancel(false);
   };
 
-  const handleSendRequest = () => {
-    setStatus(2);
-  };
+  const handleSendRequest = () => {};
 
   const handdleClosePopup = () => {
-    setOpenPopupSave(false);
+    setOpenPopupModal(false);
   };
 
   const handleCloseModalError = () => {
@@ -102,19 +89,25 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleClose = async () => {
+    dispatch(updateAddItemsState({}));
+    dispatch(
+      updateDataDetail({
+        id: '',
+        documentNumber: '',
+        status: 0,
+      })
+    );
     setOpen(false);
     onClickClose();
   };
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
+
+  useEffect(() => {
+    setStatus(dataDetail.status);
+  }, [dataDetail.status]);
 
   const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValueRadios(event.target.value);
-    if (event.target.value === "percent") {
+    if (event.target.value === 'percent') {
       dispatch(
         saveBarcodeDiscount({
           ...payloadBarcodeDiscount,
@@ -154,12 +147,22 @@ export default function ModalCreateBarcodeDiscount({
           saveBarcodeDiscount({ ...payloadBarcodeDiscount, validate: false })
         );
         try {
-          const rs = await saveDraftBarcodeDiscount(payloadBarcodeDiscount);
+          const body = !!dataDetail.id
+            ? { ...payloadBarcodeDiscount, id: dataDetail.id }
+            : payloadBarcodeDiscount;
+
+          const rs = await saveDraftBarcodeDiscount(body);
           if (rs.code === 201) {
-            setOpenPopupSave(true);
-            setTimeout(() => {
-              setOpenPopupSave(false);
-            }, 3000);
+            setOpenPopupModal(true);
+            setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+            !!!dataDetail.id &&
+              dispatch(
+                updateDataDetail({
+                  id: rs.data.id,
+                  documentNumber: rs.data.documentNumber,
+                  status: rs.data.status,
+                })
+              );
           } else {
             setOpenModalError(true);
           }
@@ -174,6 +177,16 @@ export default function ModalCreateBarcodeDiscount({
       }
     }
   };
+
+  const handleDeleteDraft = async () => {
+    setOpenPopup(true);
+    if (status) {
+      const rs = await cancelBarcodeDiscount(dataDetail.id);
+    }
+    handleClose();
+    setOpenPopup(true);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={!!true}>
@@ -181,22 +194,22 @@ export default function ModalCreateBarcodeDiscount({
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          <Typography sx={{ fontSize: "1em" }}>
+          <Typography sx={{ fontSize: '1em' }}>
             ใบรับสินค้าจากผู้จำหน่าย
           </Typography>
           <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
         <DialogContent>
-          <Grid container sx={{ paddingTop: "50px" }}>
-            <Grid item container xs={6} sx={{ marginBottom: "15px" }}>
+          <Grid container sx={{ paddingTop: '50px' }}>
+            <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
                 เลขที่เอกสาร BD :
               </Grid>
               <Grid item xs={4}>
-                -
+                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '_'}
               </Grid>
             </Grid>
-            <Grid container item xs={6} sx={{ marginBottom: "15px" }}>
+            <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
                 วันที่อนุมัติ :
               </Grid>
@@ -204,15 +217,15 @@ export default function ModalCreateBarcodeDiscount({
                 -
               </Grid>
             </Grid>
-            <Grid container item xs={6} sx={{ marginBottom: "15px" }}>
+            <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
                 วันที่ขอส่วนลด
               </Grid>
               <Grid item xs={4}>
-                {moment(createDate).format("DD/MM/YYYY")}
+                {moment(createDate).format('DD/MM/YYYY')}
               </Grid>
             </Grid>
-            <Grid container item xs={6} sx={{ marginBottom: "15px" }}>
+            <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
                 สาขา :
               </Grid>
@@ -220,7 +233,7 @@ export default function ModalCreateBarcodeDiscount({
                 0223-สาขาที่00236 สนามจันทร์ (ชุมชนจัทรคามพิทักษ์)
               </Grid>
             </Grid>
-            <Grid item container xs={6} sx={{ marginBottom: "15px" }}>
+            <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
                 ยอดลด : :
               </Grid>
@@ -229,7 +242,7 @@ export default function ModalCreateBarcodeDiscount({
                   <RadioGroup
                     aria-label="discount"
                     value={valueRadios}
-                    defaultValue={"percent"}
+                    defaultValue={'percent'}
                     name="radio-buttons-group"
                     onChange={(
                       event: React.ChangeEvent<HTMLInputElement>,
@@ -255,7 +268,7 @@ export default function ModalCreateBarcodeDiscount({
           </Grid>
           <Box>
             <Box
-              sx={{ display: "flex", marginBottom: "18px", marginTop: "20px" }}
+              sx={{ display: 'flex', marginBottom: '18px', marginTop: '20px' }}
             >
               <Box>
                 <Button
@@ -270,7 +283,7 @@ export default function ModalCreateBarcodeDiscount({
                   เพิ่มสินค้า
                 </Button>
               </Box>
-              <Box sx={{ marginLeft: "auto" }}>
+              <Box sx={{ marginLeft: 'auto' }}>
                 <Button
                   variant="contained"
                   color="warning"
@@ -282,7 +295,7 @@ export default function ModalCreateBarcodeDiscount({
                 <Button
                   variant="contained"
                   color="primary"
-                  sx={{ margin: "0 17px" }}
+                  sx={{ margin: '0 17px' }}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleSendRequest}
                 >
@@ -293,7 +306,7 @@ export default function ModalCreateBarcodeDiscount({
                   color="error"
                   disabled={status > 1}
                   startIcon={<HighlightOffIcon />}
-                  onClick={handleCancel}
+                  onClick={handleOpenCancel}
                 >
                   เพิ่มสินค้า
                 </Button>
@@ -311,13 +324,13 @@ export default function ModalCreateBarcodeDiscount({
       <ModelConfirm
         open={openModalCancel}
         onClose={handleCloseModalCancel}
-        requesterId="4234213"
-        barCode="234234235524"
+        onDeleteAction={handleDeleteDraft}
+        barCode={dataDetail.documentNumber}
       />
       <BarcodeDiscountPopup
-        open={openPopupSave}
+        open={openPopupModal}
         onClose={handdleClosePopup}
-        contentMsg="คุณได้บันทึกข้อมูลเรียบร้อยแล้ว"
+        contentMsg={textPopup}
       />
       <AlertError
         open={openModalError}

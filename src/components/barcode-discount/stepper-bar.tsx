@@ -5,45 +5,44 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { useStyles } from '../../styles/makeTheme';
 import { ReactElement } from 'react';
-import { Typography } from '@material-ui/core';
 
 interface Props {
   activeStep: number;
-  setActiveStep: (activeStep:number) => void;
+  setActiveStep: (activeStep: number) => void;
 }
 const steps = ['บันทึก', 'รออนุมัติ', 'อนุมัติ', 'พิมพ์บาร์โค้ดแล้ว'];
 
-export default function StepperBar({ activeStep, setActiveStep }: Props): ReactElement {
-
+export default function StepperBar({
+  activeStep,
+  setActiveStep,
+}: Props): ReactElement {
   const [rejected, setRejected] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    if (activeStep === 5){
+    if (activeStep === 5) {
       setRejected(true);
-      setActiveStep(3)
+      setActiveStep(3);
     }
-    
   }, [activeStep, open]);
 
   const classes = useStyles();
   return (
     <div className={classes.MStepper} style={{ paddingBottom: 5 }}>
-      <Box sx={{ width: "45%", margin: "auto", marginTop: "-1em" }}>
+      <Box sx={{ width: '45%', margin: 'auto', marginTop: '-1em' }}>
         <Stepper activeStep={activeStep} alternativeLabel>
           {steps.map((label, index) => {
-
-            const labelProps:any = {};
+            const labelProps: any = {};
             if (index === 2 && rejected) {
-              label = "ไม่อนุมัต";
+              label = 'ไม่อนุมัต';
               labelProps.error = true;
             }
-            
+
             return (
               <Step key={label}>
                 <StepLabel {...labelProps}>{label}</StepLabel>
               </Step>
-            )
-        })}
+            );
+          })}
         </Stepper>
       </Box>
     </div>

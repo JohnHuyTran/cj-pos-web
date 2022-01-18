@@ -16,16 +16,9 @@ export default function BarcodeDiscountPopup({
   onClose,
   contentMsg,
 }: Props): ReactElement {
-  return (
-    <Snackbar
-      open={open}
-      autoHideDuration={6000}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-    >
-      <Box
+
+  const message = (
+    <Box
         width="433px"
         height="83px"
         display="flex"
@@ -50,6 +43,24 @@ export default function BarcodeDiscountPopup({
           {contentMsg}
         </Typography>
       </Box>
+  )
+
+  return (
+    <Snackbar
+      open={open}
+      autoHideDuration={3000}
+      ContentProps={{
+        'aria-describedby': 'message-id',
+      }}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      // message={message}
+      onClose={onClose}
+    >
+      {message}
     </Snackbar>
+      
   );
 }
