@@ -182,6 +182,8 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
 
       let btNo = '';
       if (docNo) btNo = docNo;
+      let reason = reasons;
+      if (reasons === 'All') reason = '';
       const payloadSave: SaveStockTransferRequest = {
         btNo: btNo,
         sdNo: '',
