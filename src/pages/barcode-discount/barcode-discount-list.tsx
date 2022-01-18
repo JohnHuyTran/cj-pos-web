@@ -1,27 +1,35 @@
-import {Box, Tooltip, Typography} from "@mui/material";
+import {Box, Typography} from "@mui/material";
 import {DataGrid, GridColDef, GridValueGetterParams} from "@mui/x-data-grid";
 import React from "react";
 import {useStyles} from "../../styles/makeTheme";
 import {useTranslation} from "react-i18next";
 import {
-    BarcodeDiscount,
+    BarcodeDiscount, BarcodeDiscountProductDetail,
     BarcodeDiscountSearchRequest,
     BarcodeDiscountSearchResponse
 } from "../../models/barcode-discount-model";
 import {convertUtcToBkkDate} from "../../utils/date-utill";
 import {BDStatus, DateFormat} from "../../utils/enum/common-enum";
 import {genColumnValue} from "../../utils/utils";
+import HtmlTooltip from "../../components/commons/ui/html-tooltip";
+import {useAppDispatch, useAppSelector} from "../../store/store";
+import {saveSearchCriteriaSup} from "../../store/slices/save-search-order-supplier-slice";
+import {barcodeDiscountSearch} from "../../store/slices/barcode-discount-search-slice";
 
-type BarcodeDiscountListProps = {
-    bdSearchRequest: BarcodeDiscountSearchRequest,
-    bdSearchResponse: BarcodeDiscountSearchResponse,
-};
+const _ = require("lodash");
 
-const BarcodeDiscountList: React.FC<BarcodeDiscountListProps> = (props) => {
+const BarcodeDiscountList = () => {
     const classes = useStyles();
     const {t} = useTranslation(["barcodeDiscount"]);
-    const [pageSize, setPageSize] = React.useState(props.bdSearchResponse.perPage.toString());
     const [loading, setLoading] = React.useState<boolean>(false);
+
+    const dispatch = useAppDispatch();
+    const barcodeDiscountSearchSlice = useAppSelector((state) => state.barcodeDiscountSearchSlice);
+    const bdSearchResponse: BarcodeDiscountSearchResponse = barcodeDiscountSearchSlice.bdSearchResponse;
+    const currentPage = useAppSelector((state) => state.barcodeDiscountSearchSlice.bdSearchResponse.page);
+    const limit = useAppSelector((state) => state.barcodeDiscountSearchSlice.bdSearchResponse.perPage);
+    const [pageSize, setPageSize] = React.useState(limit.toString());
+    const payload = useAppSelector((state) => state.barcodeDiscountCriteriaSearchSlice.searchCriteria);
 
     const columns: GridColDef[] = [
         {
@@ -97,7 +105,16 @@ const BarcodeDiscountList: React.FC<BarcodeDiscountListProps> = (props) => {
             headerName: t("branch"),
             flex: 1,
             headerAlign: 'center',
-            sortable: false
+            sortable: false,
+            renderCell: (params) => {
+                return (
+                    <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
+                        <Typography variant='body2' noWrap>
+                            {params.value}
+                        </Typography>
+                    </HtmlTooltip>
+                );
+            },
         },
         {
             field: 'createdDate',
@@ -121,15 +138,15 @@ const BarcodeDiscountList: React.FC<BarcodeDiscountListProps> = (props) => {
             flex: 1.2,
             headerAlign: 'center',
             sortable: false,
-            // renderCell: (params) => {
-            //     return (
-            //         <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
-            //             <Typography variant='body2' noWrap>
-            //                 {params.value}
-            //             </Typography>
-            //         </HtmlTooltip>
-            //     );
-            // },
+            renderCell: (params) => {
+                return (
+                    <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
+                        <Typography variant='body2' noWrap>
+                            {params.value}
+                        </Typography>
+                    </HtmlTooltip>
+                );
+            },
         },
     ];
 
@@ -159,47 +176,67 @@ const BarcodeDiscountList: React.FC<BarcodeDiscountListProps> = (props) => {
 
     const genRowStatusValue = (statusLabel: string, styleCustom: any) => {
         return (
-            <Tooltip title={statusLabel}>
+            <HtmlTooltip title={<React.Fragment>{statusLabel}</React.Fragment>}>
                 <Typography className={classes.MLabelBDStatus}
                             sx={styleCustom}>{statusLabel}</Typography>
-            </Tooltip>
+            </HtmlTooltip>
         );
     }
 
-    const currentPage = props.bdSearchResponse.page;
-    const rows = props.bdSearchResponse.data.map((data: BarcodeDiscount, index: number) => {
+    const genTotalPrice = (products: BarcodeDiscountProductDetail[]) => {
+        return _.sumBy(products, (item: BarcodeDiscountProductDetail) => {
+            return item.price * item.numberOfDiscounted;
+        });
+    };
+
+    const genTotalCashDiscount = (percentDiscount: boolean, products: BarcodeDiscountProductDetail[]) => {
+        return _.sumBy(products, (item: BarcodeDiscountProductDetail) => {
+            if (percentDiscount)
+                return ((item.price * item.requestedDiscount) / 100) * item.numberOfDiscounted;
+            else
+                return item.requestedDiscount * item.numberOfDiscounted;
+        });
+    };
+
+    const genTotalPriceAfterDiscount = (percentDiscount: boolean, products: BarcodeDiscountProductDetail[]) => {
+        let totalPriceAfterDiscount = genTotalPrice(products) - genTotalCashDiscount(percentDiscount, products);
+        return totalPriceAfterDiscount < 0 ? 0 : totalPriceAfterDiscount;
+    };
+
+    const rows = bdSearchResponse.data.map((data: BarcodeDiscount, index: number) => {
         return {
             id: index + 1,
             index: (currentPage - 1) * parseInt(pageSize) + index + 1,
             documentNumber: data.documentNumber,
             status: data.status,
-            totalAmount: data.totalAmount,
-            unit: data.unit,
-            sumOfPrice: data.sumOfPrice,
-            sumOfCashDiscount: data.sumOfCashDiscount,
-            sumOfPriceAfterDiscount: data.sumOfPriceAfterDiscount,
-            branch: data.branch,
+            totalAmount: data.products.length,
+            unit: t("list"),
+            sumOfPrice: genTotalPrice(data.products),
+            sumOfCashDiscount: genTotalCashDiscount(data.percentDiscount, data.products),
+            sumOfPriceAfterDiscount: genTotalPriceAfterDiscount(data.percentDiscount, data.products),
+            branch: data.branchName,
             createdDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
-            approvedDate: convertUtcToBkkDate(data.approvedDate, DateFormat.DATE_FORMAT),
+            approvedDate: (BDStatus.APPROVED === data.status || BDStatus.BARCODE_PRINTED === data.status) ? convertUtcToBkkDate(data.approvedDate, DateFormat.DATE_FORMAT) : "",
             requesterNote: data.requesterNote
         };
     });
 
     const handlePageChange = async (newPage: number) => {
         setLoading(true);
-
         let page: string = (newPage + 1).toString();
 
         const payloadNewPage: BarcodeDiscountSearchRequest = {
-            limit: pageSize,
+            perPage: pageSize,
             page: page,
-            documentNumber: props.bdSearchRequest.documentNumber,
-            branch: props.bdSearchRequest.branch,
-            status: props.bdSearchRequest.status,
-            fromDate: props.bdSearchRequest.fromDate,
-            toDate: props.bdSearchRequest.toDate,
+            query: payload.query,
+            branch: payload.branch,
+            status: payload.status,
+            startDate: payload.startDate,
+            endDate: payload.endDate,
         };
-        //call api
+
+        await dispatch(barcodeDiscountSearch(payloadNewPage));
+        await dispatch(saveSearchCriteriaSup(payloadNewPage));
         setLoading(false);
     };
 
@@ -207,15 +244,17 @@ const BarcodeDiscountList: React.FC<BarcodeDiscountListProps> = (props) => {
         setPageSize(pageSize.toString());
         setLoading(true);
         const payloadNewPage: BarcodeDiscountSearchRequest = {
-            limit: pageSize.toString(),
+            perPage: pageSize.toString(),
             page: "1",
-            documentNumber: props.bdSearchRequest.documentNumber,
-            branch: props.bdSearchRequest.branch,
-            status: props.bdSearchRequest.status,
-            fromDate: props.bdSearchRequest.fromDate,
-            toDate: props.bdSearchRequest.toDate,
+            query: payload.query,
+            branch: payload.branch,
+            status: payload.status,
+            startDate: payload.startDate,
+            endDate: payload.endDate,
         };
-        //call api
+
+        await dispatch(barcodeDiscountSearch(payloadNewPage));
+        await dispatch(saveSearchCriteriaSup(payloadNewPage));
         setLoading(false);
     };
 
@@ -235,7 +274,7 @@ const BarcodeDiscountList: React.FC<BarcodeDiscountListProps> = (props) => {
                         page={currentPage - 1}
                         pageSize={parseInt(pageSize)}
                         rowsPerPageOptions={[10, 20, 50, 100]}
-                        rowCount={props.bdSearchResponse.total}
+                        rowCount={bdSearchResponse.total}
                         paginationMode='server'
                         onPageChange={handlePageChange}
                         onPageSizeChange={handlePageSizeChange}

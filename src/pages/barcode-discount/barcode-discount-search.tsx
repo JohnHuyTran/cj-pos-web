@@ -11,13 +11,15 @@ import DatePickerComponent from "../../components/commons/ui/date-picker";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import {PrintSharp, SearchOff} from "@mui/icons-material";
 import BarcodeDiscountList from "./barcode-discount-list";
-import {
-    BarcodeDiscountSearchRequest,
-    BarcodeDiscountSearchResponse
-} from "../../models/barcode-discount-model";
+import {BarcodeDiscountSearchRequest} from "../../models/barcode-discount-model";
 import AlertError from "../../components/commons/ui/alert-error";
 import ModalCreateBarcodeDiscount from "../../components/barcode-discount/modal-create-barcode-discound";
 import BarcodeDiscountPopup from "../../components/barcode-discount/barcode-discount-popup";
+import moment from "moment";
+import {useAppDispatch, useAppSelector} from "../../store/store";
+import {barcodeDiscountSearch} from "../../store/slices/barcode-discount-search-slice";
+import {saveSearchCriteriaBD} from "../../store/slices/barcode-discount-criteria-search-slice";
+import LoadingModal from "../../components/commons/ui/loading-modal";
 
 interface State {
     documentNumber: string;
@@ -25,6 +27,10 @@ interface State {
     status: string;
     fromDate: any | Date | number | string;
     toDate: any | Date | number | string;
+}
+
+interface loadingModalState {
+    open: boolean;
 }
 
 const BarcodeDiscountSearch = () => {
@@ -41,29 +47,19 @@ const BarcodeDiscountSearch = () => {
         fromDate: new Date(),
         toDate: new Date()
     });
-    const [bdSearchRequest, setBDSearchRequest] = React.useState<BarcodeDiscountSearchRequest>({
-        limit: "0",
-        page: "0",
-        documentNumber: "",
-        branch: "",
-        status: "",
-        fromDate: "",
-        toDate: ""
-    });
-    const [bdSearchResponse, setBDSearchResponse] = React.useState<BarcodeDiscountSearchResponse>({
-        ref: "",
-        code: 0,
-        message: "",
-        data: [],
-        total: 0,
-        page: 0,
-        perPage: 0,
-        prev: 0,
-        next: 0,
-        totalPage: 0,
+
+    const dispatch = useAppDispatch();
+    const page = '1';
+    const limit = useAppSelector((state) => state.barcodeDiscountSearchSlice.bdSearchResponse.perPage);
+    const barcodeDiscountSearchSlice = useAppSelector((state) => state.barcodeDiscountSearchSlice);
+    const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+        open: false,
     });
 
     const [openModal, setOpenModal] = React.useState(false)
+    const handleOpenLoading = (prop: any, event: boolean) => {
+        setOpenLoadingModal({...openLoadingModal, [prop]: event});
+    };
 
     useEffect(() => {
         setLstStatus(t("lstStatus", {returnObjects: true}));
@@ -93,7 +89,9 @@ const BarcodeDiscountSearch = () => {
         setOpenPopup(false)
     }
 
-    const onClear = () => {
+    const onClear = async () => {
+        handleOpenLoading('open', true);
+        setFlagSearch(false);
         setValues({
             documentNumber: "",
             branch: "ALL",
@@ -101,7 +99,23 @@ const BarcodeDiscountSearch = () => {
             fromDate: new Date(),
             toDate: new Date()
         });
-    }
+
+        const payload: BarcodeDiscountSearchRequest = {
+            perPage: limit.toString(),
+            page: page,
+            query: values.documentNumber,
+            branch: values.branch,
+            status: values.status,
+            startDate: moment(values.fromDate).startOf('day').toISOString(),
+            endDate: moment(values.toDate).endOf('day').toISOString(),
+            clearSearch: true
+        };
+
+        dispatch(barcodeDiscountSearch(payload));
+        setTimeout(() => {
+            handleOpenLoading('open', false);
+        }, 300);
+    };
 
     const validateSearch = () => {
         let isValid = true;
@@ -118,211 +132,35 @@ const BarcodeDiscountSearch = () => {
             return;
         }
 
-        //mock data
-        let bdSearchResponse = {
-            ref: "",
-            code: 0,
-            message: "",
-            data: [
-                {
-                    documentNumber: "BD21110276-000001",
-                    status: "1",
-                    totalAmount: 3,
-                    unit: t("list"),
-                    sumOfPrice: 132.00,
-                    sumOfCashDiscount: 65.00,
-                    sumOfPriceAfterDiscount: 67.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000002",
-                    status: "2",
-                    totalAmount: 3,
-                    unit: t("list"),
-                    sumOfPrice: 132.00,
-                    sumOfCashDiscount: 65.00,
-                    sumOfPriceAfterDiscount: 67.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000003",
-                    status: "3",
-                    totalAmount: 3,
-                    unit: t("list"),
-                    sumOfPrice: 132.00,
-                    sumOfCashDiscount: 65.00,
-                    sumOfPriceAfterDiscount: 67.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "01/01/2022",
-                    requesterNote: "abcc",
-                },
-                {
-                    documentNumber: "BD21110276-000004",
-                    status: "4",
-                    totalAmount: 3,
-                    unit: t("list"),
-                    sumOfPrice: 132.00,
-                    sumOfCashDiscount: 65.00,
-                    sumOfPriceAfterDiscount: 67.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "01/01/2022",
-                    requesterNote: "abc",
-                }, {
-                    documentNumber: "BD21110276-000005",
-                    status: "5",
-                    totalAmount: 3,
-                    unit: t("list"),
-                    sumOfPrice: 132.00,
-                    sumOfCashDiscount: 65.00,
-                    sumOfPriceAfterDiscount: 67.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "01/01/2022",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000006",
-                    status: "1",
-                    totalAmount: 3,
-                    unit: t("list"),
-                    sumOfPrice: 132.00,
-                    sumOfCashDiscount: 65.00,
-                    sumOfPriceAfterDiscount: 67.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000007",
-                    status: "1",
-                    totalAmount: 3,
-                    unit: t("list"),
-                    sumOfPrice: 132.00,
-                    sumOfCashDiscount: 65.00,
-                    sumOfPriceAfterDiscount: 67.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000008",
-                    status: "1",
-                    totalAmount: 10,
-                    unit: t("list"),
-                    sumOfPrice: 200.00,
-                    sumOfCashDiscount: 100.00,
-                    sumOfPriceAfterDiscount: 100.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000009",
-                    status: "1",
-                    totalAmount: 10,
-                    unit: t("list"),
-                    sumOfPrice: 200.00,
-                    sumOfCashDiscount: 100.00,
-                    sumOfPriceAfterDiscount: 100.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000010",
-                    status: "1",
-                    totalAmount: 10,
-                    unit: t("list"),
-                    sumOfPrice: 200.00,
-                    sumOfCashDiscount: 100.00,
-                    sumOfPriceAfterDiscount: 100.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000011",
-                    status: "1",
-                    totalAmount: 10,
-                    unit: t("list"),
-                    sumOfPrice: 160.00,
-                    sumOfCashDiscount: 80.00,
-                    sumOfPriceAfterDiscount: 80.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000012",
-                    status: "1",
-                    totalAmount: 10,
-                    unit: t("list"),
-                    sumOfPrice: 160.00,
-                    sumOfCashDiscount: 80.00,
-                    sumOfPriceAfterDiscount: 80.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000013",
-                    status: "1",
-                    totalAmount: 10,
-                    unit: t("list"),
-                    sumOfPrice: 160.00,
-                    sumOfCashDiscount: 80.00,
-                    sumOfPriceAfterDiscount: 80.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                },
-                {
-                    documentNumber: "BD21110276-000014",
-                    status: "1",
-                    totalAmount: 10,
-                    unit: t("list"),
-                    sumOfPrice: 160.00,
-                    sumOfCashDiscount: 80.00,
-                    sumOfPriceAfterDiscount: 80.00,
-                    branch: "Branch A",
-                    createdDate: "01/01/2022",
-                    approvedDate: "",
-                    requesterNote: "abc",
-                }
-            ],
-            total: 20,
-            page: 1,
-            perPage: 10,
-            prev: 0,
-            next: 0,
-            totalPage: 2,
+        let limits;
+        if (limit === 0) {
+            limits = '10';
+        } else {
+            limits = limit.toString();
         }
-        setBDSearchResponse(bdSearchResponse);
+        const payload: BarcodeDiscountSearchRequest = {
+            perPage: limits,
+            page: page,
+            query: values.documentNumber,
+            branch: values.branch,
+            status: values.status,
+            startDate: moment(values.fromDate).startOf('day').toISOString(),
+            endDate: moment(values.toDate).endOf('day').toISOString(),
+        };
+
+        handleOpenLoading('open', true);
+        await dispatch(barcodeDiscountSearch(payload));
+        await dispatch(saveSearchCriteriaBD(payload));
         setFlagSearch(true);
-        // handleOpenLoading('open', false);
+        handleOpenLoading('open', false);
     };
 
     let dataTable;
+    const res = barcodeDiscountSearchSlice.bdSearchResponse;
     const [flagSearch, setFlagSearch] = React.useState(false);
     if (flagSearch) {
-        if (bdSearchResponse.data.length > 0) {
-            dataTable = <BarcodeDiscountList bdSearchRequest={bdSearchRequest} bdSearchResponse={bdSearchResponse}/>;
+        if (res.data.length > 0) {
+            dataTable = <BarcodeDiscountList/>;
         } else {
             dataTable = (
                 <Grid item container xs={12} justifyContent="center">
@@ -466,7 +304,7 @@ const BarcodeDiscountSearch = () => {
                 </Grid>
             </Box>
             {dataTable}
-
+            <LoadingModal open={openLoadingModal.open}/>
             <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
             {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal} setOpenPopup={setOpenPopup}/>}
             <BarcodeDiscountPopup
