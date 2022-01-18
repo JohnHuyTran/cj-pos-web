@@ -185,16 +185,16 @@ const BarcodeDiscountList = () => {
 
     const genTotalPrice = (products: BarcodeDiscountProductDetail[]) => {
         return _.sumBy(products, (item: BarcodeDiscountProductDetail) => {
-            return item.price
+            return item.price * item.numberOfDiscounted;
         });
     };
 
     const genTotalCashDiscount = (percentDiscount: boolean, products: BarcodeDiscountProductDetail[]) => {
         return _.sumBy(products, (item: BarcodeDiscountProductDetail) => {
             if (percentDiscount)
-                return (item.price * item.requestedDiscount) / 100;
+                return ((item.price * item.requestedDiscount) / 100) * item.numberOfDiscounted;
             else
-                return item.requestedDiscount;
+                return item.requestedDiscount * item.numberOfDiscounted;
         });
     };
 
