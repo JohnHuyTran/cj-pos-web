@@ -1,7 +1,6 @@
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { Box, Button, Chip, Typography } from '@mui/material';
 import { styled } from '@mui/styles';
-import { alpha } from '@mui/material/styles';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import React from 'react';
 import {
@@ -98,22 +97,6 @@ export default function SupplierOrderList() {
       ),
     },
     {
-      field: 'piNo',
-      headerName: 'เลขที่เอกสาร PI',
-      minWidth: 160,
-      // flex: 1,
-      headerAlign: 'center',
-      sortable: false,
-    },
-    // {
-    //   field: 'docNo',
-    //   headerName: 'เลขที่ใบสั่งซื้อ PO',
-    //   minWidth: 130,
-    //   // flex: 1,
-    //   headerAlign: 'center',
-    //   sortable: false,
-    // },
-    {
       field: 'docNo',
       headerName: 'เลขที่ใบสั่งซื้อ PO',
       minWidth: 130,
@@ -126,6 +109,47 @@ export default function SupplierOrderList() {
           {!params.value && <label>-</label>}
         </div>
       ),
+    },
+    {
+      field: 'piNo',
+      headerName: 'เลขที่เอกสาร PI',
+      minWidth: 160,
+      // flex: 1,
+      headerAlign: 'center',
+      sortable: false,
+    },
+    {
+      field: 'piStatus',
+      headerName: 'สถานะ PI',
+      minWidth: 70,
+      // flex: 0.8,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      renderCell: (params) => {
+        if (params.value === 0) {
+          return <Chip label="บันทึก" size="small" sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
+        } else if (params.value === 1) {
+          return <Chip label="อนุมัติ" size="small" sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
+        }
+      },
+    },
+    {
+      field: 'comment',
+      headerName: 'หมายเหตุ PI',
+      //   minWidth: 195,
+      flex: 1,
+      headerAlign: 'center',
+      sortable: false,
+      renderCell: (params) => {
+        return (
+          <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
+            <Typography variant="body2" noWrap>
+              {params.value}
+            </Typography>
+          </HtmlTooltip>
+        );
+      },
     },
     {
       field: 'pnNo',
@@ -172,39 +196,6 @@ export default function SupplierOrderList() {
             ></Box>
           );
         }
-      },
-    },
-    {
-      field: 'piStatus',
-      headerName: 'สถานะ',
-      minWidth: 70,
-      // flex: 0.8,
-      headerAlign: 'center',
-      align: 'center',
-      sortable: false,
-      renderCell: (params) => {
-        if (params.value === 0) {
-          return <Chip label="บันทึก" size="small" sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
-        } else if (params.value === 1) {
-          return <Chip label="อนุมัติ" size="small" sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
-        }
-      },
-    },
-    {
-      field: 'comment',
-      headerName: 'หมายเหตุ',
-      //   minWidth: 195,
-      flex: 1,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => {
-        return (
-          <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
-            <Typography variant="body2" noWrap>
-              {params.value}
-            </Typography>
-          </HtmlTooltip>
-        );
       },
     },
   ];
