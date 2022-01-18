@@ -3,6 +3,7 @@ import { DiscountDetail } from "../../models/barcode-discount";
 
 type ItemsState = {
   createDraft: any;
+  validate: boolean;
 };
 const initialState: ItemsState = {
   createDraft: {
@@ -13,6 +14,7 @@ const initialState: ItemsState = {
     requestorNote: "",
     products: [],
   },
+  validate: false,
 };
 
 const barcodeDiscountSlice = createSlice({
@@ -21,6 +23,9 @@ const barcodeDiscountSlice = createSlice({
   reducers: {
     saveBarcodeDiscount: (state, action: PayloadAction<any>) => {
       state.createDraft = action.payload;
+    },
+    updateValidate: (state, action: any) => {
+      state.validate = action.payload;
     },
   },
 });
