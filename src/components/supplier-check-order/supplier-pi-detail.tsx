@@ -440,18 +440,24 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenModelConfirm(false);
   };
   const handlConfirmButton = async () => {
+    setOpenLoadingModal(true);
+
     let purcheaseFiles = purchaseDetail.files ? purchaseDetail.files : [];
-    if (purcheaseFiles.length === 0) {
-      setOpenFailAlert(true);
-      setTextFail('กรุณาแนบเอกสาร');
-    } else if (purcheaseFiles.length === 0 && fileUploadList.length === 0) {
-      setOpenFailAlert(true);
-      setTextFail('กรุณาแนบเอกสาร');
-    } else if (!billNo) {
+    let fileLength = false;
+    if (purcheaseFiles.length > 0) {
+      fileLength = true;
+    } else if (fileUploadList.length > 0) {
+      fileLength = true;
+    }
+
+    if (!billNo) {
       setErrorBillNo(true);
+    } else if (!fileLength) {
+      console.log('=== 0');
+      setOpenFailAlert(true);
+      setTextFail('กรุณาแนบเอกสาร');
     } else {
       setErrorBillNo(false);
-      setOpenLoadingModal(true);
 
       const itemsList: any = [];
       if (rows.length > 0) {
@@ -475,28 +481,30 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         comment: comment,
         items: itemsList,
       };
-
       setFlagSetFiles(true);
 
-      await saveSupplierPI(payloadSave, fileUploadList)
-        .then((value) => {
-          setUploadFileFlag(true);
-          setFlagSetFiles(true);
-          setPiNo(value.piNo);
-          setBillNoOrigin(billNo);
-          setCommentOrigin(comment);
-          setOpenModelConfirm(true);
-          dispatch(featchSupplierOrderDetailAsync(value.piNo));
-          dispatch(uploadFileState([]));
-        })
-        .catch((error: ApiError) => {
-          setShowSnackBar(true);
-          setUploadFileFlag(false);
-          setContentMsg(error.message);
-        });
-
-      setOpenLoadingModal(false);
+      if (piNo === '') {
+        await saveSupplierPI(payloadSave, fileUploadList)
+          .then((value) => {
+            setUploadFileFlag(true);
+            setFlagSetFiles(true);
+            setPiNo(value.piNo);
+            setBillNoOrigin(billNo);
+            setCommentOrigin(comment);
+            setOpenModelConfirm(true);
+            dispatch(featchSupplierOrderDetailAsync(value.piNo));
+            dispatch(uploadFileState([]));
+          })
+          .catch((error: ApiError) => {
+            setShowSnackBar(true);
+            setUploadFileFlag(false);
+            setContentMsg(error.message);
+          });
+      } else {
+        setOpenModelConfirm(true);
+      }
     }
+    setOpenLoadingModal(false);
   };
 
   const [productNameDel, setProductNameDel] = React.useState('');
