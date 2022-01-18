@@ -22,43 +22,15 @@ import ModalAddItems from "../commons/ui/modal-add-items";
 import ModalBacodeTransferItem from "./modal-barcode-transfer-item";
 import moment from "moment";
 import ModelConfirm from "./modal-confirm";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { saveBarcodeDiscount } from "../../store/slices/barcode-discount-slice";
+import { saveDraftBarcodeDiscount } from "../../services/barcode-discount";
+import BarcodeDiscountPopup from "./barcode-discount-popup";
+import AlertError from "../commons/ui/alert-error";
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
 }
-interface Column {
-  id: "name" | "code" | "population" | "size" | "density";
-  label: string;
-  minWidth?: number;
-  align?: "right";
-  format?: (value: number) => string;
-}
-const columns: Column[] = [
-  { id: "name", label: "Name", minWidth: 170 },
-  { id: "code", label: "ISO\u00a0Code", minWidth: 100 },
-  {
-    id: "population",
-    label: "Population",
-    minWidth: 170,
-    align: "right",
-    format: (value: number) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "size",
-    label: "Size\u00a0(km\u00b2)",
-    minWidth: 170,
-    align: "right",
-    format: (value: number) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "density",
-    label: "Density",
-    minWidth: 170,
-    align: "right",
-    format: (value: number) => value.toFixed(2),
-  },
-];
-
 interface Data {
   name: string;
   code: string;
@@ -77,23 +49,6 @@ function createData(
   return { name, code, population, size, density };
 }
 
-const rows = [
-  createData("India", "IN", 1324171354, 3287263),
-  createData("China", "CN", 1403500365, 9596961),
-  createData("Italy", "IT", 60483973, 301340),
-  createData("United States", "US", 327167434, 9833520),
-  createData("Canada", "CA", 37602103, 9984670),
-  createData("Australia", "AU", 25475400, 7692024),
-  createData("Germany", "DE", 83019200, 357578),
-  createData("Ireland", "IE", 4857000, 70273),
-  createData("Mexico", "MX", 126577691, 1972550),
-  createData("Japan", "JP", 126317000, 377973),
-  createData("France", "FR", 67022000, 640679),
-  createData("United Kingdom", "GB", 67545757, 242495),
-  createData("Russia", "RU", 146793744, 17098246),
-  createData("Nigeria", "NG", 200962417, 923768),
-  createData("Brazil", "BR", 210147125, 8515767),
-];
 export default function ModalCreateBarcodeDiscount({
   isOpen,
   onClickClose,
@@ -107,7 +62,15 @@ export default function ModalCreateBarcodeDiscount({
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const classes = useStyles();
 
-  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const [openModelAddItems, setOpenModelAddItems] =
+    React.useState<boolean>(false);
+  const [openPopupSave, setOpenPopupSave] = React.useState<boolean>(false);
+  const [openModalError, setOpenModalError] = React.useState<boolean>(false);
+  const [status, setStatus] = React.useState<number>(0);
+  const dispatch = useAppDispatch();
+  const payloadBarcodeDiscount = useAppSelector(
+    (state) => state.barcodeDiscount.createDraft
+  );
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
   };
@@ -119,11 +82,23 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleCancel = () => {
-    setOpenModalCancel(true)
-  }
+    setOpenModalCancel(true);
+  };
   const handleCloseModalCancel = () => {
-    setOpenModalCancel(false)
-  }
+    setOpenModalCancel(false);
+  };
+
+  const handleSendRequest = () => {
+    setStatus(2);
+  };
+
+  const handdleClosePopup = () => {
+    setOpenPopupSave(false);
+  };
+
+  const handleCloseModalError = () => {
+    setOpenModalError(false);
+  };
 
   const handleClose = async () => {
     setOpen(false);
@@ -138,6 +113,36 @@ export default function ModalCreateBarcodeDiscount({
 
   const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValueRadios(event.target.value);
+    if (event.target.value === "percent") {
+      dispatch(
+        saveBarcodeDiscount({
+          ...payloadBarcodeDiscount,
+          percentDiscount: true,
+        })
+      );
+    } else {
+      dispatch(
+        saveBarcodeDiscount({
+          ...payloadBarcodeDiscount,
+          percentDiscount: false,
+        })
+      );
+    }
+  };
+
+  const handleCreateDraft = async () => {
+    try {
+      const rs = await saveDraftBarcodeDiscount(payloadBarcodeDiscount);
+      if (rs.code === 201) {
+        setOpenPopupSave(true);
+        setTimeout(() => {
+          setOpenPopupSave(false);
+        }, 3000);
+      }
+    } catch (error) {
+      throw error;
+    }
+    // setOpenPopupSave(true);
   };
   return (
     <div>
@@ -149,7 +154,7 @@ export default function ModalCreateBarcodeDiscount({
           <Typography sx={{ fontSize: "1em" }}>
             ใบรับสินค้าจากผู้จำหน่าย
           </Typography>
-          <StepperBar />
+          <StepperBar status={status} />
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container sx={{ paddingTop: "50px" }}>
@@ -158,7 +163,7 @@ export default function ModalCreateBarcodeDiscount({
                 เลขที่เอกสาร BD :
               </Grid>
               <Grid item xs={4}>
-                BD21110276-000006
+                -
               </Grid>
             </Grid>
             <Grid container item xs={6} sx={{ marginBottom: "15px" }}>
@@ -240,6 +245,7 @@ export default function ModalCreateBarcodeDiscount({
                   variant="contained"
                   color="warning"
                   startIcon={<SaveIcon />}
+                  onClick={handleCreateDraft}
                 >
                   เพิ่มสินค้า
                 </Button>
@@ -248,12 +254,14 @@ export default function ModalCreateBarcodeDiscount({
                   color="primary"
                   sx={{ margin: "0 17px" }}
                   startIcon={<CheckCircleOutlineIcon />}
+                  onClick={handleSendRequest}
                 >
                   เพิ่มสินค้า
                 </Button>
                 <Button
                   variant="contained"
                   color="error"
+                  disabled={status > 1}
                   startIcon={<HighlightOffIcon />}
                   onClick={handleCancel}
                 >
@@ -261,68 +269,6 @@ export default function ModalCreateBarcodeDiscount({
                 </Button>
               </Box>
             </Box>
-            {/* <Paper
-              sx={{
-                width: "100%",
-                overflow: "hidden",
-                padding: "17px 0 30px 0",
-              }}
-            >
-              <TablePagination
-                rowsPerPageOptions={[10, 25, 100]}
-                component="div"
-                count={rows.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-              <TableContainer sx={{ maxHeight: 440 }}>
-                <Table stickyHeader aria-label="sticky table">
-                  <TableHead>
-                    <TableRow>
-                      {columns.map((column) => (
-                        <TableCell
-                          key={column.id}
-                          align={column.align}
-                          style={{ minWidth: column.minWidth }}
-                        >
-                          {column.label}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows
-                      .slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                      .map((row) => {
-                        return (
-                          <TableRow
-                            hover
-                            role="checkbox"
-                            tabIndex={-1}
-                            key={row.code}
-                          >
-                            {columns.map((column) => {
-                              const value = row[column.id];
-                              return (
-                                <TableCell key={column.id} align={column.align}>
-                                  {column.format && typeof value === "number"
-                                    ? column.format(value)
-                                    : value}
-                                </TableCell>
-                              );
-                            })}
-                          </TableRow>
-                        );
-                      })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper> */}
             <ModalBacodeTransferItem id="" typeDiscount={valueRadios} />
           </Box>
         </DialogContent>
@@ -332,7 +278,22 @@ export default function ModalCreateBarcodeDiscount({
         open={openModelAddItems}
         onClose={handleModelAddItems}
       ></ModalAddItems>
-      <ModelConfirm open={openModalCancel} onClose={handleCloseModalCancel} requesterId="4234213" barCode="234234235524" />
+      <ModelConfirm
+        open={openModalCancel}
+        onClose={handleCloseModalCancel}
+        requesterId="4234213"
+        barCode="234234235524"
+      />
+      <BarcodeDiscountPopup
+        open={openPopupSave}
+        onClose={handdleClosePopup}
+        contentMsg="คุณได้บันทึกข้อมูลเรียบร้อยแล้ว"
+      />
+      <AlertError
+        open={openModalError}
+        onClose={handleCloseModalError}
+        textError="กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง"
+      />
     </div>
   );
 }

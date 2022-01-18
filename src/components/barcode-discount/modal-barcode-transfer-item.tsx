@@ -15,12 +15,26 @@ import {
   createStyles,
   makeStyles,
   TextareaAutosize,
+  Tooltip,
+  withStyles,
 } from "@material-ui/core";
-import { Button, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { DeleteForever } from "@mui/icons-material";
 import { useStyles } from "../../styles/makeTheme";
 import { DiscountDetail } from "../../models/barcode-discount";
-import DatePickerComponent from "../../components/commons/ui/date-picker";
+import DatePickerComponent from "../../components/commons/ui/date-picker-detail";
+import { saveBarcodeDiscount } from "../../store/slices/barcode-discount-slice";
+import moment from "moment";
+import { MobileDatePicker } from "@mui/lab";
+import { updateAddItemsState } from "../../store/slices/add-items-slice";
 export interface DataGridProps {
   id: string;
   typeDiscount: string;
@@ -30,19 +44,26 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const { typeDiscount } = props;
 
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  const payloadBarcodeDiscount = useAppSelector(
+    (state) => state.barcodeDiscount.createDraft
+  );
 
   const [dtTable, setDtTable] = React.useState<Array<DiscountDetail>>([]);
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
+      console.log("item", payloadAddItem);
+
       let rows = payloadAddItem.map((item: any, index: number) => {
-        console.log("item:", JSON.stringify(item));
-        const price = Math.floor(Math.random() * 101);
+        const price = item.unitPrice;
         let discount = 0;
         const cashDiscount =
           typeDiscount === "percent" ? (discount * price) / 100 : discount;
 
         const priceAffterDicount = price - cashDiscount;
+        const date = moment(new Date()).startOf("day").toISOString();
+
         return {
           id: `${item.barcode}-${index + 1}`,
           index: index + 1,
@@ -52,22 +73,40 @@ export const ModalTransferItem = (props: DataGridProps) => {
           price: price,
           discount: 0,
           qty: item.qty ? item.qty : 0,
-          empiryDate: new Date(),
+          empiryDate: date,
           cashDiscount: cashDiscount || 0,
           priceAffterDicount: priceAffterDicount,
-          numberOfDiscounted: 0,
+          numberOfDiscounted: item.qty,
+          approvedDiscount: 0,
         };
       });
       setDtTable(rows);
     }
   }, [payloadAddItem, typeDiscount]);
 
+  useEffect(() => {
+    if (dtTable.length !== 0) {
+      const products = dtTable.map((item) => {
+        console.log(item);
+
+        return {
+          barcode: item.barCode,
+          RequestedDiscount: item.discount,
+          NumberOfDiscounted: item.numberOfDiscounted,
+          ExpiredDate: item.empiryDate,
+        };
+      });
+      dispatch(
+        saveBarcodeDiscount({ ...payloadBarcodeDiscount, products: products })
+      );
+    }
+  }, [dtTable]);
+
   const handleChangeDiscount = (event: any, index: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      data[index - 1].discount = parseInt(event.target.value);
-      console.log(data[index - 1].discount);
-
+      const value = event.target.value;
+      data[index - 1].discount = !!value ? parseInt(value) : 0;
       if (typeDiscount === "percent") {
         const number = data[index - 1].price * (data[index - 1].discount / 100);
 
@@ -84,7 +123,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const handleChangeNumberOfDiscount = (event: any, index: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      data[index - 1].numberOfDiscounted = event.target.value;
+      data[index - 1].numberOfDiscounted = parseInt(event.target.value);
       return data;
     });
   };
@@ -92,16 +131,21 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const handleChangeExpiry = (e: any, index: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      console.log(e);
+      console.log({ e });
 
       data[index - 1].empiryDate = e;
+
       return data;
     });
   };
 
-  const demo = (e: any, id: any) => {
-    console.log(e);
-  };
+  const CustomTooltip = withStyles({
+    tooltip: {
+      color: "red",
+      backgroundColor: "white",
+      fontSize: "large",
+    },
+  })(Tooltip);
 
   const columns: GridColDef[] = [
     {
@@ -168,6 +212,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       renderCell: (params: GridRenderCellParams) =>
         typeDiscount === "percent" ? (
           <TextField
+            error
             type="number"
             value={params.value}
             inputProps={{ min: 0, max: 100 }}
@@ -178,7 +223,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
         ) : (
           <TextField
             type="number"
-            inputProps={{ min: 0, max: 100 }}
+            inputProps={{ min: 0, max: params.row.price }}
             onChange={(e) => {
               handleChangeDiscount(e, params.row.index);
             }}
@@ -209,13 +254,16 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
-        <TextField
-          type="number"
-          value={params.value}
-          onChange={(e) => {
-            handleChangeNumberOfDiscount(e, params.row.index);
-          }}
-        />
+        <CustomTooltip title={"errr"}>
+          <TextField
+            type="number"
+            value={params.value}
+            inputProps={{ min: 0, max: 100 }}
+            onChange={(e) => {
+              handleChangeNumberOfDiscount(e, params.row.index);
+            }}
+          />
+        </CustomTooltip>
       ),
     },
     {
@@ -255,15 +303,114 @@ export const ModalTransferItem = (props: DataGridProps) => {
     },
     {
       field: "delete",
-      headerName: "ลบ",
+      headerName: " ",
       flex: 0.2,
       align: "center",
       sortable: false,
-      renderCell: () => {
+      renderCell: (params: GridRenderCellParams) => {
+        const [openModalDelete, setOpenModalDelete] =
+          React.useState<boolean>(false);
+
+        const handleOpenModalDelete = () => {
+          setOpenModalDelete(true);
+        };
+
+        const handleCloseModalDelete = () => {
+          setOpenModalDelete(false);
+        };
+
+        const handleDeleteItem = () => {
+          dispatch(
+            updateAddItemsState(
+              payloadAddItem.filter(
+                (r: any) => r.barcode !== params.row.barCode
+              )
+            )
+          );
+
+          setOpenModalDelete(false);
+        };
+
         return (
-          <Button>
-            <DeleteForever fontSize="medium" sx={{ color: "#F54949" }} />
-          </Button>
+          <>
+            <Button onClick={handleOpenModalDelete}>
+              <DeleteForever fontSize="medium" sx={{ color: "#F54949" }} />
+            </Button>
+
+            <Dialog
+              open={openModalDelete}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+              maxWidth="md"
+              sx={{ minWidth: 800 }}
+            >
+              <DialogContent sx={{ pl: 6, pr: 8 }}>
+                <DialogContentText
+                  id="alert-dialog-description"
+                  sx={{ color: "#263238" }}
+                >
+                  <Typography
+                    variant="h6"
+                    align="center"
+                    sx={{ marginBottom: 2 }}
+                  >
+                    ต้องการลบสินค้า
+                  </Typography>
+                  <Typography variant="body1" align="left">
+                    สินค้า{" "}
+                    <label style={{ color: "#AEAEAE", marginRight: 5 }}>
+                      |
+                    </label>{" "}
+                    <label style={{ color: "#36C690" }}>
+                      <b>{params.row.productName}</b>
+                      <br />
+                      <label
+                        style={{
+                          color: "#AEAEAE",
+                          fontSize: 14,
+                          marginLeft: "3.8em",
+                        }}
+                      >
+                        {params.row.skuCode}
+                      </label>
+                    </label>
+                  </Typography>
+                  <Typography variant="body1" align="left">
+                    บาร์โค้ด{" "}
+                    <label style={{ color: "#AEAEAE", marginRight: 5 }}>
+                      |
+                    </label>{" "}
+                    <label style={{ color: "#36C690" }}>
+                      <b>{params.row.barCode}</b>
+                    </label>
+                  </Typography>
+                </DialogContentText>
+              </DialogContent>
+
+              <DialogActions
+                sx={{ justifyContent: "center", mb: 2, pl: 6, pr: 8 }}
+              >
+                <Button
+                  id="btnCancle"
+                  variant="contained"
+                  color="cancelColor"
+                  sx={{ borderRadius: 2, width: 90, mr: 2 }}
+                  onClick={handleCloseModalDelete}
+                >
+                  ยกเลิก
+                </Button>
+                <Button
+                  id="btnConfirm"
+                  variant="contained"
+                  color="error"
+                  sx={{ borderRadius: 2, width: 90 }}
+                  onClick={handleDeleteItem}
+                >
+                  ลบสินค้า
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </>
         );
       },
     },
