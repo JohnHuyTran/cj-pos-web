@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import clsx from "clsx";
+import clsx from 'clsx';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -8,8 +8,8 @@ import IconButton from '@mui/material/IconButton';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import InputAdornment from "@mui/material/InputAdornment";
-import Visibility from "@mui/icons-material/Visibility";
+import InputAdornment from '@mui/material/InputAdornment';
+import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Button from '@mui/material/Button';
 import { useAppSelector, useAppDispatch } from '../../store/store';
@@ -33,12 +33,12 @@ function LoginForm() {
     showPassword: false,
   });
   // console.log(isAllowPermission('FEATURE.ADMIN.SEARCH.DATA'));
-  const dispatch = useAppDispatch()
-  const { error } = useAppSelector((state) => state.auth)
+  const dispatch = useAppDispatch();
+  const { error } = useAppSelector((state) => state.auth);
   const [version, setVersion] = React.useState<any>(process.env.REACT_APP_REF);
   const handleChange = (prop: any) => (event: any) => {
     setValues({ ...values, [prop]: event.target.value });
-  }
+  };
 
   const handleClickShowPassword = () => {
     setValues({
@@ -54,10 +54,10 @@ function LoginForm() {
   const onClickLogin = () => {
     const form: loginForm = {
       userId: values.userId,
-      password: values.password
-    }
-    dispatch(loginKeyCloakAsync(form))
-  }
+      password: values.password,
+    };
+    dispatch(loginKeyCloakAsync(form));
+  };
 
   return (
     <div className={classes.root}>
@@ -70,34 +70,25 @@ function LoginForm() {
           <img src='images/CJlogo.png' alt='' />
         </div>
 
-        <div id='error'>
-          {" "}
-          {error && <p style={{ color: 'red', fontSize: '12px' }}>{error}</p>}
-        </div>
+        <div id='error'> {error && <p style={{ color: 'red', fontSize: '12px' }}>{error}</p>}</div>
         <div>
-          <FormControl sx={{ m: 3 }}
-            className={clsx(classes.textField)}
-            variant='outlined'
-          >
+          <FormControl sx={{ m: 3 }} className={clsx(classes.textField)} variant='outlined'>
             <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>
               รหัสผู้ใช้งาน
             </FormHelperText>
             <OutlinedInput
               id='txtUserid'
               value={values.userId}
-              onChange={handleChange("userId")}
+              onChange={handleChange('userId')}
               aria-describedby='outlined-user-id-text'
               inputProps={{
-                "aria-label": "weight",
+                'aria-label': 'weight',
               }}
             />
           </FormControl>
         </div>
         <div>
-          <FormControl sx={{ m: 3 }}
-            className={clsx(classes.textField)}
-            variant='outlined'
-          >
+          <FormControl sx={{ m: 3 }} className={clsx(classes.textField)} variant='outlined'>
             <FormHelperText id='outlined-password-text' sx={{ ml: 0 }}>
               รหัสผ่าน
             </FormHelperText>
@@ -106,17 +97,16 @@ function LoginForm() {
                 </InputLabel> */}
             <OutlinedInput
               id='txtPassword'
-              type={values.showPassword ? "text" : "password"}
+              type={values.showPassword ? 'text' : 'password'}
               value={values.password}
-              onChange={handleChange("password")}
+              onChange={handleChange('password')}
               endAdornment={
                 <InputAdornment position='end'>
                   <IconButton
                     aria-label='toggle password visibility'
                     onClick={handleClickShowPassword}
                     onMouseDown={handleMouseDownPassword}
-                    edge='end'
-                  >
+                    edge='end'>
                     {values.showPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
@@ -131,32 +121,25 @@ function LoginForm() {
             variant='contained'
             color='primary'
             onClick={onClickLogin}
-            className={classes.loginBtn}
-          >
-            <Typography
-              variant='button'
-              display='block'
-              className={clsx(classes.labelLoginBtn, classes.textField)}
-            >
+            className={classes.loginBtn}>
+            <Typography variant='button' display='block' className={clsx(classes.labelLoginBtn, classes.textField)}>
               เข้าสู่ระบบ
             </Typography>
           </Button>
         </div>
-        <Box sx={{
-          width: '350px',
-          height: '10px',
-          display: 'flex',
-          justifyContent: 'center',
-          color: '#AEAEAE',
-
-        }}>
-          <Typography sx={{ fontSize: '10px', position: 'relative', top: '60px' }}>
-            version: {version}
-          </Typography>
+        <Box
+          sx={{
+            width: '350px',
+            height: '10px',
+            display: 'flex',
+            justifyContent: 'center',
+            color: '#AEAEAE',
+          }}>
+          <Typography sx={{ fontSize: '10px', position: 'relative', top: '60px' }}>version: {version}</Typography>
         </Box>
       </Box>
     </div>
   );
 }
 
-export default LoginForm
+export default LoginForm;

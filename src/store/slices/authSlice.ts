@@ -18,18 +18,15 @@ const initialState: AuthState = {
   error: '',
 };
 
-export const loginKeyCloakAsync = createAsyncThunk(
-  'login',
-  async (payload: loginForm, store) => {
-    try {
-      const response = await authentication(payload);
-      return response;
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
+export const loginKeyCloakAsync = createAsyncThunk('login', async (payload: loginForm, store) => {
+  try {
+    const response = await authentication(payload);
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
-);
+});
 
 const authSlice = createSlice({
   name: 'auth',
@@ -49,25 +46,22 @@ const authSlice = createSlice({
       state.refreshToken = '';
       state.error = '';
     });
-    builder.addCase(
-      loginKeyCloakAsync.fulfilled,
-      (state, action: PayloadAction<any>) => {
-        state.token = action.payload.access_token;
-        state.refreshToken = action.payload.refresh_token;
-        state.sessionState = action.payload.session_state;
-        state.isLogin = true;
-      }
-    );
+    builder.addCase(loginKeyCloakAsync.fulfilled, (state, action: PayloadAction<any>) => {
+      state.token = action.payload.access_token;
+      state.refreshToken = action.payload.refresh_token;
+      state.sessionState = action.payload.session_state;
+      state.isLogin = true;
+    });
     builder.addCase(loginKeyCloakAsync.rejected, (state, action) => {
       // state.isLogin = false;
       // state.token = '';
       // state.refreshToken = '';
       // state.sessionState = '';
-      // state.error = action.error.message || '';
+      state.error = action.error.message || '';
       state.token = '123';
       state.refreshToken = '123';
       state.sessionState = '123';
-      state.isLogin = true;
+      state.isLogin = false;
     });
   },
 });
