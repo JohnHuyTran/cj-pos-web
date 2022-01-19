@@ -1,7 +1,6 @@
 export const env: any = {
   backEnd: {
     url: process.env.REACT_APP_POS_BACK_BE_URL,
-    url1: process.env.REACT_APP_POS_BACK_BE_URL_2,
     timeout: process.env.REACT_APP_POS_BACK_BE_TIME_OUT,
   },
 
