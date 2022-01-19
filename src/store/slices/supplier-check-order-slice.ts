@@ -1,11 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-import { environment } from "../../environment-base";
-import { get } from "../../adapters/posback-adapter";
+import { environment } from '../../environment-base';
+import { get } from '../../adapters/posback-adapter';
 import {
   PurchaseInvoiceSearchCriteriaRequest,
   PurchaseInvoiceSearchCriteriaResponse,
-} from "../../models/supplier-check-order-model";
+} from '../../models/supplier-check-order-model';
 
 type State = {
   orderList: PurchaseInvoiceSearchCriteriaResponse;
@@ -14,9 +14,9 @@ type State = {
 
 const initialState: State = {
   orderList: {
-    ref: "",
+    ref: '',
     code: 0,
-    message: "",
+    message: '',
     data: [],
     total: 0,
     page: 0,
@@ -25,11 +25,11 @@ const initialState: State = {
     next: 0,
     totalPage: 0,
   },
-  error: "",
+  error: '',
 };
 
 export const featchOrderListSupAsync = createAsyncThunk(
-  "orderListSup",
+  'orderListSup',
   async (payload: PurchaseInvoiceSearchCriteriaRequest) => {
     try {
       const apiRootPath = environment.purchase.supplierOrder.search.url;
@@ -37,10 +37,10 @@ export const featchOrderListSupAsync = createAsyncThunk(
       if (payload.paramQuery) {
         path = path + `&paramQuery=${payload.paramQuery}`;
       }
-      if (payload.piStatus == "0" || payload.piStatus == "1") {
+      if (payload.piStatus == '0' || payload.piStatus == '1' || payload.piStatus == '9') {
         path = path + `&piStatus=${payload.piStatus}`;
       }
-      if (payload.piType == "0" || payload.piType == "1") {
+      if (payload.piType == '0' || payload.piType == '1') {
         path = path + `&piType=${payload.piType}`;
       }
       if (payload.dateFrom) {
@@ -51,9 +51,9 @@ export const featchOrderListSupAsync = createAsyncThunk(
       }
 
       let response: PurchaseInvoiceSearchCriteriaResponse = {
-        ref: "",
+        ref: '',
         code: 0,
-        message: "",
+        message: '',
         data: [],
         total: 0,
         page: 0,
@@ -74,7 +74,7 @@ export const featchOrderListSupAsync = createAsyncThunk(
 );
 
 const supplierCheckOrderSlice = createSlice({
-  name: "supplierCheckOrder",
+  name: 'supplierCheckOrder',
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -83,12 +83,9 @@ const supplierCheckOrderSlice = createSlice({
     builer.addCase(featchOrderListSupAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(
-        featchOrderListSupAsync.fulfilled,
-        (state, action: PayloadAction<any>) => {
-          state.orderList = action.payload;
-        }
-      ),
+      builer.addCase(featchOrderListSupAsync.fulfilled, (state, action: PayloadAction<any>) => {
+        state.orderList = action.payload;
+      }),
       builer.addCase(featchOrderListSupAsync.rejected, () => {
         initialState;
       });
