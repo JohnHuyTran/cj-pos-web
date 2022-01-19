@@ -473,6 +473,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       }
 
       let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0);
+      if (po) validateActualQty = itemsList.filter((r: any) => r.actualQty > 0);
       if (validateActualQty.length > 0) {
         setOpenFailAlert(true);
         setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
@@ -651,6 +652,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       }
 
       let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0);
+      if (po) validateActualQty = itemsList.filter((r: any) => r.actualQty > 0);
       if (validateActualQty.length > 0) {
         setOpenFailAlert(true);
         setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
