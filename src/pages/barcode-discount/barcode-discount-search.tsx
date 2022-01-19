@@ -13,6 +13,8 @@ import {PrintSharp, SearchOff} from "@mui/icons-material";
 import BarcodeDiscountList from "./barcode-discount-list";
 import {BarcodeDiscountSearchRequest} from "../../models/barcode-discount-model";
 import AlertError from "../../components/commons/ui/alert-error";
+import ModalCreateBarcodeDiscount from "../../components/barcode-discount/modal-create-barcode-discound";
+import BarcodeDiscountPopup from "../../components/barcode-discount/barcode-discount-popup";
 import moment from "moment";
 import {useAppDispatch, useAppSelector} from "../../store/store";
 import {barcodeDiscountSearch} from "../../store/slices/barcode-discount-search-slice";
@@ -37,6 +39,7 @@ const BarcodeDiscountSearch = () => {
     const [openAlert, setOpenAlert] = React.useState(false);
     const [textError, setTextError] = React.useState('');
     const [lstStatus, setLstStatus] = React.useState([]);
+    const [openPopup, setOpenPopup] = React.useState<boolean>(false);
     const [values, setValues] = React.useState<State>({
         documentNumber: "",
         branch: "ALL",
@@ -53,6 +56,7 @@ const BarcodeDiscountSearch = () => {
         open: false,
     });
 
+    const [openModal, setOpenModal] = React.useState(false)
     const handleOpenLoading = (prop: any, event: boolean) => {
         setOpenLoadingModal({...openLoadingModal, [prop]: event});
     };
@@ -72,6 +76,18 @@ const BarcodeDiscountSearch = () => {
     const handleCloseAlert = () => {
         setOpenAlert(false);
     };
+
+    const handleOpenModal = () => {
+        setOpenModal(true)
+    }
+
+    const handleCloseModal = () => {
+        setOpenModal(false)
+    }
+
+    const handleClosePopup = () => {
+        setOpenPopup(false)
+    }
 
     const onClear = async () => {
         handleOpenLoading('open', true);
@@ -260,6 +276,7 @@ const BarcodeDiscountSearch = () => {
                             className={classes.MbtnSearch}
                             color="secondary"
                             startIcon={<AddCircleOutlineOutlinedIcon/>}
+                            onClick={handleOpenModal}
                         >
                             {t("button.createNewDocument")}
                         </Button>
@@ -289,6 +306,12 @@ const BarcodeDiscountSearch = () => {
             {dataTable}
             <LoadingModal open={openLoadingModal.open}/>
             <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
+            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal} setOpenPopup={setOpenPopup}/>}
+            <BarcodeDiscountPopup
+                open={openPopup}
+                onClose={handleClosePopup}
+                contentMsg={"คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว"}
+            />
         </>
     );
 }
