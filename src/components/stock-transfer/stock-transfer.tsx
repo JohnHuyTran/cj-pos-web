@@ -25,6 +25,7 @@ import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfe
 import StockTransferList from '../../components/stock-transfer/stock-transfer-list';
 import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
 import StockPackChecked from './stock-pack';
+import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 
 interface State {
   docNo: string;
@@ -115,6 +116,7 @@ export default function SupplierCheckOrderSearch() {
   const [textError, setTextError] = React.useState('');
   const handleOpenCreateModal = async () => {
     await dispatch(updateAddItemsState({}));
+    await dispatch(featchPurchaseNoteAsync('PI22010002-000231'));
     setOpenCreateModal(true);
   };
   function handleCloseCreateModal() {

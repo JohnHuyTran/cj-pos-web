@@ -1,5 +1,14 @@
 import React, { useMemo } from 'react';
-import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridColDef,
+  GridEditCellValueParams,
+  GridRenderCellParams,
+  GridRowData,
+  GridRowId,
+  GridValueGetterParams,
+  useGridApiRef,
+} from '@mui/x-data-grid';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
@@ -10,6 +19,18 @@ import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import { useStyles } from '../../styles/makeTheme';
 import { numberWithCommas } from '../../utils/utils';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { PurchaseNoteDetailEntries } from '../../models/purchase-credit-note';
+import SnackbarStatus from '../commons/ui/snackbar-status';
+import AlertError from '../commons/ui/alert-error';
+import LoadingModal from '../commons/ui/loading-modal';
+import ConfirmModalExit from '../commons/ui/confirm-exit-model';
+import ModalConfirmTransaction from './modal-confirm-transaction';
+import { SaveStockPackRequest, StockTransferItems } from '../../models/stock-transfer-model';
+import { saveStockPack, sendStockPackDC } from '../../services/stock-transfer';
+import moment from 'moment';
+import { ApiError } from '../../models/api-error-model';
+import TextBoxComment from '../commons/ui/tbx-comment';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -106,9 +127,9 @@ const columns: GridColDef[] = [
             if (returnQty === 0) value = chkReturnQty(value);
             if (value < 0) value = 0;
             if (value > qty) value = qty;
-            params.api.updateRows([{ ...params.row, returnQty: value }]);
+            params.api.updateRows([{ ...params.row, actualQty: value }]);
           }}
-          disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
+          // disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
           autoComplete='off'
         />
       </div>
@@ -135,14 +156,13 @@ const columns: GridColDef[] = [
               params.getValue(params.id, 'actualQty') != undefined
                 ? params.getValue(params.id, 'actualQty')
                 : 0;
-            var value = e.target.value ? parseInt(e.target.value, 10) : '0';
-            var returnQty = Number(params.getValue(params.id, 'returnQty'));
+            var value = e.target.value ? parseInt(e.target.value, 10) : parseInt('0');
+            var calValue = value * 2;
+            var returnQty = Number(calValue);
             if (returnQty === 0) value = chkReturnQty(value);
-            if (value < 0) value = 0;
-            if (value > qty) value = qty;
-            params.api.updateRows([{ ...params.row, returnQty: value }]);
+            params.api.updateRows([{ ...params.row, unitFactor: value }]);
           }}
-          disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
+          disabled={false}
           autoComplete='off'
         />
       </div>
@@ -159,30 +179,25 @@ const columns: GridColDef[] = [
         <TextField
           variant='outlined'
           name='txnQtyReturn'
-          type='number'
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
-            var qty: any =
-              params.getValue(params.id, 'actualQty') &&
-              params.getValue(params.id, 'actualQty') !== null &&
-              params.getValue(params.id, 'actualQty') != undefined
-                ? params.getValue(params.id, 'actualQty')
-                : 0;
-            var value = e.target.value ? parseInt(e.target.value, 10) : '0';
-            var returnQty = Number(params.getValue(params.id, 'returnQty'));
-            if (returnQty === 0) value = chkReturnQty(value);
-            if (value < 0) value = 0;
-            if (value > qty) value = qty;
-            params.api.updateRows([{ ...params.row, returnQty: value }]);
+            params.api.updateRows([{ ...params.row, tote: e.target.value }]);
           }}
-          disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
+          // disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
           autoComplete='off'
         />
       </div>
     ),
   },
 ];
+var calUnitFactor = function (params: GridValueGetterParams) {
+  let diff = Number(params.getValue(params.id, 'actualQty')) * Number(params.getValue(params.id, 'productQuantityRef'));
+
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  return diff;
+};
 
 function useApiRef() {
   const apiRef = useGridApiRef();
@@ -210,6 +225,31 @@ const chkReturnQty = (value: any) => {
 };
 function StockPackChecked({ isOpen, onClickClose }: Props) {
   const classes = useStyles();
+  const { apiRef, columns } = useApiRef();
+  const dispatch = useAppDispatch();
+  const purchaseDetailList = useAppSelector((state) => state.SupplierOrderReturn.purchaseDetail);
+  const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
+
+  const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
+  const [purchaseDetailItems, setPurchaseDetailItems] = React.useState<PurchaseNoteDetailEntries[]>(
+    purchaseDetail.entries ? purchaseDetail.entries : []
+  );
+  const [openModelConfirmTransaction, setOpenModelConfirmTransaction] = React.useState(false);
+  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
+
   const [cols, setCols] = React.useState(columns);
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [open, setOpen] = React.useState(isOpen);
@@ -220,20 +260,13 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const [btNo, setBtNo] = React.useState('');
   const [btStatus, setBtStatus] = React.useState<String>('');
   const [reasons, setReasons] = React.useState('');
+  const [isDraft, setIsDraft] = React.useState(false);
 
   const [comment, setComment] = React.useState('');
-  const [characterCount, setCharacterCount] = React.useState(0);
-  const maxCommentLength = 255;
-  const handleChangeComment = (event: any) => {
-    const value = event.target.value;
-    const length = event.target.value.length;
-    if (length <= maxCommentLength) {
-      setCharacterCount(event.target.value.length);
-      setComment(value);
-    }
+  const handleChangeComment = (value: any) => {
+    storeItem();
+    setComment(value);
   };
-
-  let rows;
 
   React.useEffect(() => {
     setSourceBranch('1123-ท่าช่าง');
@@ -241,6 +274,8 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setBtNo('AB123');
     setReasons('ทั้งหมด');
     setBtStatus('0');
+    setComment('Test Comment');
+    setIsDraft(true);
   }, [open]);
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
@@ -256,17 +291,206 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     }
   }
 
-  const handleSaveBtn = () => {};
+  function handleNotExitModelConfirm() {
+    setConfirmModelExit(false);
+  }
 
-  const handleConfirmBtn = () => {};
+  function handleExitModelConfirm() {
+    setConfirmModelExit(false);
+    setOpen(false);
+    onClickClose();
+  }
+
+  const handleOnCloseModalConfirm = () => {
+    setOpenModelConfirmTransaction(false);
+  };
+
+  const mappingPayload = () => {
+    let items: StockTransferItems[] = [];
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    rowsEdit.forEach((data: GridRowData) => {
+      const item: StockTransferItems = {
+        barcode: data.barcode,
+        orderQty: data.actualQty,
+      };
+      items.push(item);
+    });
+
+    const payload: SaveStockPackRequest = {
+      comment: comment,
+      items: items,
+      btNo: btNo,
+      sdNo: '',
+      startDate: moment(startDate).startOf('day').toISOString(),
+      endDate: moment(endDate).startOf('day').toISOString(),
+    };
+    return payload;
+  };
 
   const currentlySelected = () => {};
+
+  let rows = purchaseDetailItems
+    // .filter((item: PurchaseDetailEntries) => item.pnDisplay === 1)
+    .map((item: PurchaseNoteDetailEntries, index: number) => {
+      return {
+        id: `${item.barcode}-${index + 1}`,
+        index: index + 1,
+        seqItem: item.seqItem,
+        barcode: item.barcode,
+        productName: item.productName,
+        skuCode: item.skuCode,
+        stockQty: item.qty,
+        approveQty: item.actualQty,
+        unitName: item.unitName,
+        unitCode: item.unitCode,
+        actualQty: item.returnQty ? item.returnQty : 0,
+        unitFactor: '',
+        tote: '',
+        produtStatus: item.produtStatus,
+        isDraftStatus: btStatus === '0' ? false : true,
+        qtyAll: item.qtyAll,
+        actualQtyAll: item.actualQtyAll,
+      };
+    });
+
+  const handleCalculateItems = async (params: GridEditCellValueParams) => {
+    storeItem();
+    // if (params.field === 'actualQty') {
+    //   const itemsList: any = [];
+    //   if (rows.length > 0) {
+    //     const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    //     await rows.forEach((data: GridRowData) => {
+    //       const item: any = {
+    //         barcode: data.barcode,
+    //         actualQty: data.actualQty,
+    //       };
+    //       itemsList.push(item);
+    //     });
+    //   }
+
+    //   // setOpenLoadingModal(false);
+    // }
+  };
+
+  const storeItem = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const items: PurchaseNoteDetailEntries[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const newData: PurchaseNoteDetailEntries = {
+        seqItem: data.seqItem,
+        produtStatus: data.produtStatus,
+        isDraftStatus: btStatus === '0' ? false : true,
+        skuCode: data.skuCode,
+        barcode: data.barcode,
+        productName: data.productName,
+        qty: data.qty,
+        qtyAll: data.qtyAll,
+        actualQty: data.actualQty,
+        returnQty: data.returnQty,
+        actualQtyAll: data.actualQtyAll,
+        unitName: data.unitName,
+        unitCode: data.unitCode,
+      };
+      items.push(newData);
+    });
+    setPurchaseDetailItems(items);
+  };
+
+  const handleClose = async () => {
+    await storeItem();
+    let showPopup = false;
+    // onClickClose();
+    if (comment !== purchaseDetail.comment) {
+      showPopup = true;
+    }
+    const rowSelect = apiRef.current.getSelectedRows();
+    if (rowSelect.size > 0) {
+      showPopup = true;
+    }
+    const ent: PurchaseNoteDetailEntries[] = purchaseDetail.entries;
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    if (rowsEdit.size !== ent.length) {
+      showPopup = true;
+    }
+
+    let i = 0;
+    rowsEdit.forEach((data: GridRowData) => {
+      if (data.returnQty !== (ent[i].returnQty ? ent[i].returnQty : 0)) {
+        showPopup = true;
+      }
+      i++;
+    });
+
+    if (!showPopup) {
+      setOpen(false);
+      onClickClose();
+    } else {
+      setConfirmModelExit(true);
+    }
+  };
+
+  const handleSaveBtn = async () => {
+    const payload: SaveStockPackRequest = await mappingPayload();
+    await saveStockPack(payload)
+      .then((value) => {
+        // setStatus(1);
+        setBtNo(value.docNo);
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+      })
+      .catch((error: ApiError) => {
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+      });
+  };
+  const handleConfirmBtn = async () => {
+    setOpenLoadingModal(true);
+    if (!btNo) {
+      const payload: SaveStockPackRequest = await mappingPayload();
+      await saveStockPack(payload)
+        .then((value) => {
+          // setStatus(1);
+          setBtNo(value.docNo);
+          setOpenModelConfirmTransaction(true);
+        })
+        .catch((error: ApiError) => {
+          setShowSnackBar(true);
+          setContentMsg(error.message);
+        });
+    } else {
+      setOpenModelConfirmTransaction(true);
+    }
+  };
+
+  const sendTransactionToDC = async () => {
+    const payload: SaveStockPackRequest = await mappingPayload();
+    await sendStockPackDC(payload)
+      .then((value) => {
+        handleOnCloseModalConfirm();
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณส่งรายการให้ DC เรียบร้อยแล้ว');
+        // dispatch(featchOrderListSupAsync(payloadSearch));
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        handleOnCloseModalConfirm();
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+      });
+    handleOnCloseModalConfirm();
+    setOpenLoadingModal(false);
+  };
 
   return (
     <React.Fragment>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={onClickClose}>
-          <Typography sx={{ fontSize: 24, fontWeight: 400 }}>สร้างรายการโอนสินค้า</Typography>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
+          <Typography sx={{ fontSize: 24, fontWeight: 400 }}>ตรวจสอบรายการใบโอน</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box mt={4} sx={{ flexGrow: 1 }}>
@@ -373,11 +597,11 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           </Grid>
           <Box mt={2} bgcolor='background.paper'>
             <div
-              // style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
-              style={{ width: '100%', height: 'auto' }}
+              style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
+              // style={{ width: '100%', height: 'auto' }}
               className={classes.MdataGridDetail}>
               <DataGrid
-                rows={[]}
+                rows={rows}
                 columns={cols}
                 // checkboxSelection={pnStatus === 0 ? true : false}
                 disableSelectionOnClick
@@ -386,19 +610,25 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
                 disableColumnMenu
-                // autoHeight={rows.length >= 8 ? false : true}
-                autoHeight={true}
+                autoHeight={rows.length >= 8 ? false : true}
+                // autoHeight={true}
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
-                onCellFocusOut={currentlySelected}
+                onCellFocusOut={handleCalculateItems}
               />
             </div>
           </Box>
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
-                <Typography variant='body2'>หมายเหตุ:</Typography>
+                <TextBoxComment
+                  defaultValue={comment}
+                  maxLength={255}
+                  onChangeComment={handleChangeComment}
+                  isDisable={isDraft}
+                />
+                {/* <Typography variant='body2'>หมายเหตุ:</Typography>
                 <TextField
                   multiline
                   fullWidth
@@ -422,12 +652,37 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                     // marginTop: "-1.5em",
                   }}>
                   {characterCount}/{maxCommentLength}
-                </div>
+                </div> */}
               </Grid>
             </Grid>
           </Box>
         </DialogContent>
       </Dialog>
+
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={contentMsg}
+      />
+
+      <ConfirmModalExit
+        open={confirmModelExit}
+        onClose={handleNotExitModelConfirm}
+        onConfirm={handleExitModelConfirm}
+      />
+
+      <ModalConfirmTransaction
+        open={openModelConfirmTransaction}
+        onClose={handleOnCloseModalConfirm}
+        handleConfirm={sendTransactionToDC}
+        header='ยืนยันส่งรายการให้ DC'
+        title='เลขที่เอกสาร BT'
+        value={btNo}
+      />
+
+      <LoadingModal open={openLoadingModal} />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
   );
 }
