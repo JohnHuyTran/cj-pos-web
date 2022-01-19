@@ -264,7 +264,7 @@ export default function SupplierOrderList() {
 
     const payloadNewpage: PurchaseInvoiceSearchCriteriaRequest = {
       limit: pageSize.toString(),
-      // page: cuurentPages.toString(),
+      // page: cuurentPages.toString()
       page: '1',
       paramQuery: payload.paramQuery,
       piStatus: payload.piStatus,
