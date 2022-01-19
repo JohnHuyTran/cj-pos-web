@@ -477,8 +477,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [items, setItems] = React.useState<any>([]);
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
 
-  // console.log('fileUploadList: ', fileUploadList);
-
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
   };
@@ -489,18 +487,25 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const handlConfirmButton = async () => {
     handleUpdateRowState();
+    let fileLength = false;
+    let purcheaseFiles = purchaseDetail.files ? purchaseDetail.files : [];
+    if (purcheaseFiles.length > 0) {
+      fileLength = true;
+    } else if (fileUploadList.length > 0) {
+      fileLength = true;
+    }
 
-    if (files.length <= 0 && fileUploadList.length <= 0) {
+    if (!billNo) {
+      setErrorBillNo(true);
+    } else if (!fileLength) {
       setOpenFailAlert(true);
       setTextFail('กรุณาแนบเอกสาร');
-    } else if (!billNo) {
-      setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
 
+      const itemsList: any = [];
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-        const itemsList: any = [];
         await rows.forEach((data: GridRowData) => {
           const item: any = {
             barcode: data.barCode,
@@ -510,7 +515,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         });
         await setItems(itemsList);
       }
-      setOpenModelConfirm(true);
+
+      let validateActualQty = true;
+      validateActualQty = await handleValidateActualQty(itemsList);
+      if (validateActualQty) {
+        setOpenModelConfirm(true);
+      }
     }
   };
 
@@ -532,13 +542,30 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const handleValidateActualQty = async (itemsList: any) => {
+    let validatePOActualQty = itemsList.filter((r: any) => r.actualQty > 0); //PO
+    let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0); //no PO
+
+    if (piType === 0 && validatePOActualQty.length === 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+      return false;
+    } else if (piType === 1 && validateActualQty.length > 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+      return false;
+    }
+    return true;
+  };
+
   const handleSaveButton = async () => {
     handleUpdateRowState();
+    setOpenLoadingModal(true);
+
     if (!billNo) {
       setErrorBillNo(true);
     } else {
       setErrorBillNo(false);
-      setOpenLoadingModal(true);
 
       const itemsList: any = [];
       const itemsState: any = [];
@@ -554,34 +581,37 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         });
       }
 
-      const payloadSave: SavePurchaseRequest = {
-        billNo: billNo,
-        comment: comment,
-        items: itemsList,
-      };
+      let validateActualQty = true;
+      validateActualQty = await handleValidateActualQty(itemsList);
+      if (validateActualQty) {
+        const payloadSave: SavePurchaseRequest = {
+          billNo: billNo,
+          comment: comment,
+          items: itemsList,
+        };
 
-      await saveSupplierOrder(payloadSave, piNo, fileUploadList)
-        .then((_value) => {
-          setUploadFileFlag(true);
-          setShowSnackBar(true);
-          setSnackbarIsStatus(true);
-          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          dispatch(featchSupplierOrderDetailAsync(piNo));
-          // dispatch(updateItemsState({}));
-          dispatch(featchOrderListSupAsync(payloadSearch));
-          setFlagSave(false);
-          dispatch(uploadFileState([]));
-        })
-        .catch((error: ApiError) => {
-          setUploadFileFlag(false);
-          setShowSnackBar(true);
-          setContentMsg(error.message);
-        });
-      setOpenLoadingModal(false);
+        await saveSupplierOrder(payloadSave, piNo, fileUploadList)
+          .then((_value) => {
+            setUploadFileFlag(true);
+            setShowSnackBar(true);
+            setSnackbarIsStatus(true);
+            setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+            dispatch(featchSupplierOrderDetailAsync(piNo));
+            // dispatch(updateItemsState({}));
+            dispatch(featchOrderListSupAsync(payloadSearch));
+            setFlagSave(false);
+            dispatch(uploadFileState([]));
+          })
+          .catch((error: ApiError) => {
+            setUploadFileFlag(false);
+            setShowSnackBar(true);
+            setContentMsg(error.message);
+          });
+      }
     }
-    // console.log('purchaseDetail.files in save function: ', purchaseDetail.files);
 
     setFiles(purchaseDetail.files ? purchaseDetail.files : []);
+    setOpenLoadingModal(false);
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
