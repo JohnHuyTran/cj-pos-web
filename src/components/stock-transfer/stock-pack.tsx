@@ -244,7 +244,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   React.useEffect(() => {
     setSourceBranch('1123-ท่าช่าง');
     setDestinationBranch('1124-พรหมบุรี');
-    setBtNo('AB123');
+    setBtNo('');
     setReasons('ทั้งหมด');
     setBtStatus('0');
     setComment('Test Comment');
@@ -326,23 +326,22 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       };
     });
 
-  const handleCalculateItems = async (params: GridEditCellValueParams) => {
-    storeItem();
-    // if (params.field === 'actualQty') {
-    //   const itemsList: any = [];
-    //   if (rows.length > 0) {
-    //     const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    //     await rows.forEach((data: GridRowData) => {
-    //       const item: any = {
-    //         barcode: data.barcode,
-    //         actualQty: data.actualQty,
-    //       };
-    //       itemsList.push(item);
-    //     });
-    //   }
-
-    //   // setOpenLoadingModal(false);
-    // }
+  const validateItem = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    let itemNotValid: boolean = false;
+    rowsEdit.forEach((data: GridRowData) => {
+      if (!data.tote) {
+        itemNotValid = true;
+        return;
+      }
+    });
+    if (itemNotValid) {
+      setOpenAlert(true);
+      setTextError('กรุณาป้อนเลขที่ Tote/ลัง');
+      return false;
+    } else {
+      return true;
+    }
   };
 
   const storeItem = () => {
@@ -403,36 +402,42 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const handleSaveBtn = async () => {
-    const payload: SaveStockPackRequest = await mappingPayload();
-    await saveStockPack(payload)
-      .then((value) => {
-        // setStatus(1);
-        setBtNo(value.btNo);
-        setShowSnackBar(true);
-        setSnackbarIsStatus(true);
-        setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-      })
-      .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setContentMsg(error.message);
-      });
-  };
-  const handleConfirmBtn = async () => {
-    setOpenLoadingModal(true);
-    if (!btNo) {
+    const isvalidItem = validateItem();
+    if (isvalidItem) {
       const payload: SaveStockPackRequest = await mappingPayload();
       await saveStockPack(payload)
         .then((value) => {
           // setStatus(1);
-          setBtNo(value.docNo);
-          setOpenModelConfirmTransaction(true);
+          setBtNo(value.btNo);
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
           setContentMsg(error.message);
         });
-    } else {
-      setOpenModelConfirmTransaction(true);
+    }
+  };
+  const handleConfirmBtn = async () => {
+    const isvalidItem = validateItem();
+    if (isvalidItem) {
+      // setOpenLoadingModal(true);
+      if (!btNo) {
+        const payload: SaveStockPackRequest = await mappingPayload();
+        await saveStockPack(payload)
+          .then((value) => {
+            // setStatus(1);
+            setBtNo(value.docNo);
+            setOpenModelConfirmTransaction(true);
+          })
+          .catch((error: ApiError) => {
+            setShowSnackBar(true);
+            setContentMsg(error.message);
+          });
+      } else {
+        setOpenModelConfirmTransaction(true);
+      }
     }
   };
 
@@ -588,7 +593,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
-                onCellFocusOut={handleCalculateItems}
+                onCellFocusOut={currentlySelected}
               />
             </div>
           </Box>
