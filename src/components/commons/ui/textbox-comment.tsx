@@ -4,12 +4,13 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
 interface Props {
+  fieldName: string;
   defaultValue: string;
   maxLength: number;
   onChangeComment: (value: string) => void;
   isDisable: boolean;
 }
-function TextBoxComment({ defaultValue, maxLength, isDisable, onChangeComment }: Props): ReactElement {
+function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChangeComment }: Props): ReactElement {
   const classes = useStyles();
   const [characterCount, setCharacterCount] = React.useState(0);
   const [comment, setComment] = React.useState(defaultValue);
@@ -25,7 +26,7 @@ function TextBoxComment({ defaultValue, maxLength, isDisable, onChangeComment }:
 
   return (
     <>
-      <Typography variant='body2'>หมายเหตุ:</Typography>
+      <Typography variant='body2'>{fieldName}</Typography>
       <TextField
         multiline
         fullWidth

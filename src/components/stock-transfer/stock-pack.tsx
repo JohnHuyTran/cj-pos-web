@@ -30,7 +30,7 @@ import { SaveStockPackRequest, StockTransferItems } from '../../models/stock-tra
 import { saveStockPack, sendStockPackDC } from '../../services/stock-transfer';
 import moment from 'moment';
 import { ApiError } from '../../models/api-error-model';
-import TextBoxComment from '../commons/ui/tbx-comment';
+import TextBoxComment from '../commons/ui/textbox-comment';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -111,7 +111,7 @@ const columns: GridColDef[] = [
       <div>
         <TextField
           variant='outlined'
-          name='txnQtyReturn'
+          name='txnActualQty'
           type='number'
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
@@ -129,7 +129,7 @@ const columns: GridColDef[] = [
             if (value > qty) value = qty;
             params.api.updateRows([{ ...params.row, actualQty: value }]);
           }}
-          // disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
+          disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
           autoComplete='off'
         />
       </div>
@@ -141,32 +141,8 @@ const columns: GridColDef[] = [
     width: 150,
     headerAlign: 'center',
     sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <div>
-        <TextField
-          variant='outlined'
-          name='txnQtyReturn'
-          type='number'
-          inputProps={{ style: { textAlign: 'right' } }}
-          value={params.value}
-          onChange={(e) => {
-            var qty: any =
-              params.getValue(params.id, 'actualQty') &&
-              params.getValue(params.id, 'actualQty') !== null &&
-              params.getValue(params.id, 'actualQty') != undefined
-                ? params.getValue(params.id, 'actualQty')
-                : 0;
-            var value = e.target.value ? parseInt(e.target.value, 10) : parseInt('0');
-            var calValue = value * 2;
-            var returnQty = Number(calValue);
-            if (returnQty === 0) value = chkReturnQty(value);
-            params.api.updateRows([{ ...params.row, unitFactor: value }]);
-          }}
-          disabled={false}
-          autoComplete='off'
-        />
-      </div>
-    ),
+    align: 'right',
+    renderCell: (params: GridRenderCellParams) => calUnitFactor(params),
   },
   {
     field: 'tote',
@@ -184,7 +160,7 @@ const columns: GridColDef[] = [
           onChange={(e) => {
             params.api.updateRows([{ ...params.row, tote: e.target.value }]);
           }}
-          // disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
+          disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
           autoComplete='off'
         />
       </div>
@@ -192,10 +168,7 @@ const columns: GridColDef[] = [
   },
 ];
 var calUnitFactor = function (params: GridValueGetterParams) {
-  let diff = Number(params.getValue(params.id, 'actualQty')) * Number(params.getValue(params.id, 'productQuantityRef'));
-
-  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
-  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  let diff = Number(params.getValue(params.id, 'actualQty')) * Number(2);
   return diff;
 };
 
@@ -275,7 +248,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setReasons('ทั้งหมด');
     setBtStatus('0');
     setComment('Test Comment');
-    setIsDraft(true);
+    setIsDraft(false);
   }, [open]);
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
@@ -347,7 +320,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         unitFactor: '',
         tote: '',
         produtStatus: item.produtStatus,
-        isDraftStatus: btStatus === '0' ? false : true,
+        isDraftStatus: isDraft,
         qtyAll: item.qtyAll,
         actualQtyAll: item.actualQtyAll,
       };
@@ -373,27 +346,27 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const storeItem = () => {
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const items: PurchaseNoteDetailEntries[] = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      const newData: PurchaseNoteDetailEntries = {
-        seqItem: data.seqItem,
-        produtStatus: data.produtStatus,
-        isDraftStatus: btStatus === '0' ? false : true,
-        skuCode: data.skuCode,
-        barcode: data.barcode,
-        productName: data.productName,
-        qty: data.qty,
-        qtyAll: data.qtyAll,
-        actualQty: data.actualQty,
-        returnQty: data.returnQty,
-        actualQtyAll: data.actualQtyAll,
-        unitName: data.unitName,
-        unitCode: data.unitCode,
-      };
-      items.push(newData);
-    });
-    setPurchaseDetailItems(items);
+    // const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    // const items: PurchaseNoteDetailEntries[] = [];
+    // rowsEdit.forEach((data: GridRowData) => {
+    //   const newData: PurchaseNoteDetailEntries = {
+    //     seqItem: data.seqItem,
+    //     produtStatus: data.produtStatus,
+    //     isDraftStatus: btStatus === '0' ? false : true,
+    //     skuCode: data.skuCode,
+    //     barcode: data.barcode,
+    //     productName: data.productName,
+    //     qty: data.qty,
+    //     qtyAll: data.qtyAll,
+    //     actualQty: data.actualQty,
+    //     returnQty: data.returnQty,
+    //     actualQtyAll: data.actualQtyAll,
+    //     unitName: data.unitName,
+    //     unitCode: data.unitCode,
+    //   };
+    //   items.push(newData);
+    // });
+    // setPurchaseDetailItems(items);
   };
 
   const handleClose = async () => {
@@ -434,7 +407,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     await saveStockPack(payload)
       .then((value) => {
         // setStatus(1);
-        setBtNo(value.docNo);
+        setBtNo(value.btNo);
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -623,8 +596,9 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
                 <TextBoxComment
+                  fieldName='สาเหตุการเปลี่ยนจำนวน:'
                   defaultValue={comment}
-                  maxLength={255}
+                  maxLength={100}
                   onChangeComment={handleChangeComment}
                   isDisable={isDraft}
                 />
