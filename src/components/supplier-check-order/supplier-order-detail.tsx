@@ -516,12 +516,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         await setItems(itemsList);
       }
 
-      let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0);
-      if (piType === 0) validateActualQty = itemsList.filter((r: any) => r.actualQty > 0);
-      if (validateActualQty.length > 0) {
-        setOpenFailAlert(true);
-        setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
-      } else {
+      let validateActualQty = true;
+      validateActualQty = await handleValidateActualQty(itemsList);
+      if (validateActualQty) {
         setOpenModelConfirm(true);
       }
     }
@@ -543,6 +540,22 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     } else {
       setOpenLoadingModal(false);
     }
+  };
+
+  const handleValidateActualQty = async (itemsList: any) => {
+    let validatePOActualQty = itemsList.filter((r: any) => r.actualQty > 0); //PO
+    let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0); //no PO
+
+    if (piType === 0 && validatePOActualQty.length === 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+      return false;
+    } else if (piType === 1 && validateActualQty.length > 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+      return false;
+    }
+    return true;
   };
 
   const handleSaveButton = async () => {
@@ -568,12 +581,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         });
       }
 
-      let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0);
-      if (piType === 0) validateActualQty = itemsList.filter((r: any) => r.actualQty > 0);
-      if (validateActualQty.length > 0) {
-        setOpenFailAlert(true);
-        setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
-      } else {
+      let validateActualQty = true;
+      validateActualQty = await handleValidateActualQty(itemsList);
+      if (validateActualQty) {
         const payloadSave: SavePurchaseRequest = {
           billNo: billNo,
           comment: comment,
@@ -599,7 +609,6 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           });
       }
     }
-    // console.log('purchaseDetail.files in save function: ', purchaseDetail.files);
 
     setFiles(purchaseDetail.files ? purchaseDetail.files : []);
     setOpenLoadingModal(false);
