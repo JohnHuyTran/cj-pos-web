@@ -116,7 +116,7 @@ export default function SupplierCheckOrderSearch() {
   const [textError, setTextError] = React.useState('');
   const handleOpenCreateModal = async () => {
     await dispatch(updateAddItemsState({}));
-    await dispatch(featchPurchaseNoteAsync('PI22010002-000231'));
+    // await dispatch(featchPurchaseNoteAsync('PI22010002-000231'));
     setOpenCreateModal(true);
   };
   function handleCloseCreateModal() {
@@ -372,8 +372,8 @@ export default function SupplierCheckOrderSearch() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
-      {/* {openCreateModal && <ModalCreateStockTransfer isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />} */}
-      {openCreateModal && <StockPackChecked isOpen={true} onClickClose={handleCloseCreateModal} />}
+      {openCreateModal && <ModalCreateStockTransfer isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />}
+      {/* {openCreateModal && <StockPackChecked isOpen={true} onClickClose={handleCloseCreateModal} />} */}
     </>
   );
 }
