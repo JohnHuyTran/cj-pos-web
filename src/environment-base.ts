@@ -130,5 +130,11 @@ export const environment = {
     saveStockTransfer: {
       url: '/stock/stock-transfer/draft',
     },
+    saveStockPack: {
+      url: '/stock/stock-pack/draft',
+    },
+    sendStockPack: {
+      url: '/stock/stock-pack/send',
+    },
   },
 };
