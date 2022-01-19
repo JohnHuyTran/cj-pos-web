@@ -359,6 +359,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
       </Dialog>
 
       <ModalAddItems open={openModelAddItems} onClose={handleModelAddItems}></ModalAddItems>
+
       <SnackbarStatus
         open={showSnackBar}
         onClose={handleCloseSnackBar}
