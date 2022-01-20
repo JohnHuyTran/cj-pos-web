@@ -48,3 +48,10 @@ export interface BarcodeDiscountProductDetail{
     expiredDate: string;
     price: number;
 }
+
+export interface BarcodeDiscountDetailResponse {
+    ref: string;
+    code: number;
+    message: string;
+    data: any;
+}

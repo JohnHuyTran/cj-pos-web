@@ -136,7 +136,7 @@ const BarcodeDiscountSearch = () => {
         if (limit === 0) {
             limits = '10';
         } else {
-            limits = limit.toString();
+            limits = limit ? limit.toString() : '10';
         }
         const payload: BarcodeDiscountSearchRequest = {
             perPage: limits,
@@ -159,7 +159,7 @@ const BarcodeDiscountSearch = () => {
     const res = barcodeDiscountSearchSlice.bdSearchResponse;
     const [flagSearch, setFlagSearch] = React.useState(false);
     if (flagSearch) {
-        if (res.data.length > 0) {
+        if (res && res.data && res.data.length > 0) {
             dataTable = <BarcodeDiscountList/>;
         } else {
             dataTable = (
@@ -306,7 +306,8 @@ const BarcodeDiscountSearch = () => {
             {dataTable}
             <LoadingModal open={openLoadingModal.open}/>
             <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
-            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal} setOpenPopup={setOpenPopup}/>}
+            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal}
+                                                      setOpenPopup={setOpenPopup}/>}
             <BarcodeDiscountPopup
                 open={openPopup}
                 onClose={handleClosePopup}
