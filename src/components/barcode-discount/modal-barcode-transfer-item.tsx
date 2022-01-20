@@ -6,7 +6,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, TextFi
 import { DeleteForever } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
 import { DiscountDetail } from '../../models/barcode-discount';
-import DatePickerComponent from '../../components/commons/ui/date-picker-detail';
+import DatePickerComponent from '../../components/barcode-discount/date-picker';
 import { saveBarcodeDiscount } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
@@ -52,7 +52,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           errorDiscount: '',
           qty: item.qty ? item.qty : 0,
           errorQty: '',
-          expiryDate: date,
+          expiryDate: null,
           errorExpiryDate: '',
           cashDiscount: cashDiscount || 0,
           priceAfterDicount: priceAfterDicount,
@@ -92,8 +92,27 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const handleChangeDiscount = (event: any, index: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      // const value = event.target.value;
-      data[index - 1].discount = parseInt(event.target.value);
+      const value = event.target.value;
+      data[index - 1].discount = value;
+
+      if (typeDiscount === 'percent') {
+        const number = data[index - 1].price * (data[index - 1].discount / 100);
+
+        data[index - 1].cashDiscount = Math.trunc(number) || 0;
+      } else {
+        data[index - 1].cashDiscount = data[index - 1].discount || 0;
+      }
+      data[index - 1].priceAfterDicount = data[index - 1].price - data[index - 1].cashDiscount;
+      return data;
+    });
+  };
+
+  const handleBlurDiscount = (event: any, index: number) => {
+    setDtTable((preData: Array<DiscountDetail>) => {
+      const data = [...preData];
+      const value = event.target.value;
+      data[index - 1].discount = Number(parseFloat(value).toFixed(2));
+
       if (typeDiscount === 'percent') {
         const number = data[index - 1].price * (data[index - 1].discount / 100);
 
@@ -191,14 +210,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const condition =
-          (payloadBarcodeDiscount.validate && params.value && (params.value < 0 || params.value > 100)) ||
-          (payloadBarcodeDiscount.validate && params.value == 0) ||
-          (payloadBarcodeDiscount.validate && !params.value);
-        const condition2 =
-          (payloadBarcodeDiscount.validate && params.value && (params.value < 0 || params.value > params.row.price)) ||
-          (payloadBarcodeDiscount.validate && params.value == 0) ||
-          (payloadBarcodeDiscount.validate && !params.value);
+        const validate = payloadBarcodeDiscount.validate;
+        const value = params.value;
+        const price = params.row.price;
+        const condition = validate && ((value && (value < 0 || value > 100)) || !value);
+        const condition2 = validate && ((value && (value < 0 || value > price)) || !value);
         return typeDiscount === 'percent' ? (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
@@ -206,7 +222,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
               className={classes.MtextFieldNumber}
               error={condition}
               value={params.value}
-              // inputProps={{ min: 0, max: 100 }}
               onChange={(e) => {
                 handleChangeDiscount(e, params.row.index);
               }}
@@ -224,6 +239,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               onChange={(e) => {
                 handleChangeDiscount(e, params.row.index);
               }}
+              placeholder="0"
             />
             {condition2 && <div className="title">ราคาส่วนลดต้องมากกว่าหรือเท่ากับ 0 และน้อยกว่าราคาสินค้า</div>}
           </div>
@@ -264,10 +280,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const condition =
-          (payloadBarcodeDiscount.validate && params.value && params.value < 0) ||
-          (payloadBarcodeDiscount.validate && params.value == 0) ||
-          (payloadBarcodeDiscount.validate && !params.value);
+        const validate = payloadBarcodeDiscount.validate;
+        const value = params.value;
+
+        const condition = validate && ((value && value < 0) || !value);
         return (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
@@ -292,7 +308,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
-      renderCell: (params) => <TextField type="number" className={classes.MtextFieldNumberNoneArrow} value={params.value} />,
+      renderCell: (params) => (
+        <TextField type="number" className={classes.MtextFieldNumberNoneArrow} value={params.value} />
+      ),
     },
     {
       field: 'approvedDiscount',
@@ -301,12 +319,16 @@ export const ModalTransferItem = (props: DataGridProps) => {
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
-      renderCell: (params) => <Typography width="100%" textAlign="right">{params.value}</Typography>
+      renderCell: (params) => (
+        <Typography width="100%" textAlign="right">
+          {params.value}
+        </Typography>
+      ),
     },
     {
       field: 'expiryDate',
       headerName: 'วันที่หมดอายุ',
-      minWidth: 120,
+      minWidth: 185,
       headerAlign: 'left',
       disableColumnMenu: true,
       sortable: false,
@@ -317,6 +339,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               handleChangeExpiry(e, params.row.index);
             }}
             value={params.value}
+            placeHolder="วว/ดด/ปปปป"
           />
         );
       },
@@ -392,7 +415,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 <Button
                   id="btnCancle"
                   variant="contained"
-                  color="cancelColor"
                   sx={{ borderRadius: 2, width: 90, mr: 2 }}
                   onClick={handleCloseModalDelete}
                 >
@@ -457,7 +479,12 @@ export const ModalTransferItem = (props: DataGridProps) => {
             <Typography fontSize="14px" lineHeight="21px" height="24px">
               ขอส่วนลดทั้งหมด
             </Typography>
-            <TextField type="text" sx={{ bgcolor: '#EAEBEB' }} className={classes.MtextFieldNumber} value={sumOfDiscount.toFixed(2)} />
+            <TextField
+              type="text"
+              sx={{ bgcolor: '#EAEBEB' }}
+              className={classes.MtextFieldNumber}
+              value={sumOfDiscount.toFixed(2)}
+            />
           </Box>
           <Box display="flex" justifyContent="space-between" marginTop="10px">
             <Typography fontSize="14px" fontWeight="700" marginTop="6px">

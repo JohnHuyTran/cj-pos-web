@@ -7,7 +7,7 @@ type ItemsState = {
 };
 const initialState: ItemsState = {
   createDraft: {
-    branchId: '61de9ddab10bfe85dfab22e9',
+    branchId: '61dffd619bfc3701dce4eda4',
     regionId: '61de9ddab10bfe85dfab22e9',
     requesterId: '61de9ddab10bfe85dfab22e9',
     percentDiscount: true,
@@ -19,6 +19,8 @@ const initialState: ItemsState = {
     id: '',
     documentNumber: '',
     status: 0,
+    createdDate: new Date(),
+    percentDiscount: true,
   },
 };
 
@@ -37,6 +39,5 @@ const barcodeDiscountSlice = createSlice({
     },
   },
 });
-export const { saveBarcodeDiscount, updateValidate, updateDataDetail } =
-  barcodeDiscountSlice.actions;
+export const { saveBarcodeDiscount, updateValidate, updateDataDetail } = barcodeDiscountSlice.actions;
 export default barcodeDiscountSlice.reducer;

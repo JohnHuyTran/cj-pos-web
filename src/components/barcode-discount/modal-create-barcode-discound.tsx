@@ -23,10 +23,7 @@ import ModalBacodeTransferItem from './modal-barcode-transfer-item';
 import moment from 'moment';
 import ModelConfirm from './modal-confirm';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import {
-  saveBarcodeDiscount,
-  updateDataDetail,
-} from '../../store/slices/barcode-discount-slice';
+import { saveBarcodeDiscount, updateDataDetail } from '../../store/slices/barcode-discount-slice';
 import {
   approveBarcodeDiscount,
   cancelBarcodeDiscount,
@@ -41,30 +38,21 @@ interface Props {
   onClickClose: () => void;
 }
 
-export default function ModalCreateBarcodeDiscount({
-  isOpen,
-  onClickClose,
-  setOpenPopup,
-}: Props): ReactElement {
+export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOpenPopup }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
-  const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
+
   const [valueRadios, setValueRadios] = React.useState<string>('percent');
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const classes = useStyles();
 
-  const [openModelAddItems, setOpenModelAddItems] =
-    React.useState<boolean>(false);
+  const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<number>(0);
   const dispatch = useAppDispatch();
-  const payloadBarcodeDiscount = useAppSelector(
-    (state) => state.barcodeDiscount.createDraft
-  );
-  const dataDetail = useAppSelector(
-    (state) => state.barcodeDiscount.dataDetail
-  );
+  const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
+  const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -126,49 +114,47 @@ export default function ModalCreateBarcodeDiscount({
     }
   };
 
-  const handleCreateDraft = async (sendRequest:boolean) => {
-    if (status) return
+  const handleCreateDraft = async (sendRequest: boolean) => {
+    if (status) return;
     const data = [...payloadBarcodeDiscount.products];
     if (payloadBarcodeDiscount.products.length !== 0) {
       const check = data.every((item) => {
         if (payloadBarcodeDiscount.percentDiscount) {
-          if (item.RequestedDiscount <= 0 || item.RequestedDiscount > 100)
-            return false;
+          if (item.RequestedDiscount <= 0 || item.RequestedDiscount > 100) return false;
         }
         if (item.NumberOfDiscounted <= 0) {
           return false;
         } else {
-          return (
-            item.RequestedDiscount > 0 && item.RequestedDiscount <= item.price
-          );
+          return item.RequestedDiscount > 0 && item.RequestedDiscount <= item.price;
         }
       });
 
       if (check) {
-        await dispatch(
-          saveBarcodeDiscount({ ...payloadBarcodeDiscount, validate: false })
-        );
+        await dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, validate: false }));
         try {
-          const body = !!dataDetail.id
-            ? { ...payloadBarcodeDiscount, id: dataDetail.id }
-            : payloadBarcodeDiscount;
+          const body = !!dataDetail.id ? { ...payloadBarcodeDiscount, id: dataDetail.id } : payloadBarcodeDiscount;
 
-          const rs = await saveDraftBarcodeDiscount(body);       
-          if (rs.code === 201) { 
+          const rs = await saveDraftBarcodeDiscount(body);
+          console.log({ rs });
+
+          if (rs.code === 201) {
             if (!sendRequest) {
               setOpenPopupModal(true);
               setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
             }
-            !dataDetail.id && dispatch(
-              updateDataDetail({
-                id: rs.data.id,
-                documentNumber: rs.data.documentNumber,
-                status: rs.data.status,
-              })
+            !dataDetail.id &&
+              dispatch(
+                updateDataDetail({
+                  id: rs.data.id,
+                  documentNumber: rs.data.documentNumber,
+                  status: rs.data.status,
+                  createdDate: rs.data.createdDate,
+                  percentDiscount: rs.data.percentDiscount,
+                })
               );
-              if (rs.data.status === 1 && sendRequest){
-                handleSendForApproval(rs.data.id);
-              }
+            if (rs.data.status === 1 && sendRequest) {
+              handleSendForApproval(rs.data.id);
+            }
           } else {
             setOpenModalError(true);
           }
@@ -176,9 +162,7 @@ export default function ModalCreateBarcodeDiscount({
           setOpenModalError(true);
         }
       } else {
-        dispatch(
-          saveBarcodeDiscount({ ...payloadBarcodeDiscount, validate: true })
-        );
+        dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, validate: true }));
         setOpenModalError(true);
       }
     }
@@ -192,7 +176,7 @@ export default function ModalCreateBarcodeDiscount({
     }
   };
 
-  const handleSendForApproval = async(id: string)=>{
+  const handleSendForApproval = async (id: string) => {
     try {
       const rs = await approveBarcodeDiscount(id);
       if (rs.code === 200) {
@@ -204,13 +188,13 @@ export default function ModalCreateBarcodeDiscount({
       }
     } catch (error) {
       setOpenModalError(true);
-    }  
-  }
+    }
+  };
 
   const handleDeleteDraft = async () => {
     if (status) {
       try {
-        const rs = await cancelBarcodeDiscount(dataDetail.id);  
+        const rs = await cancelBarcodeDiscount(dataDetail.id);
         if (rs.status === 200) {
           setOpenPopup(true);
           handleClose();
@@ -231,13 +215,8 @@ export default function ModalCreateBarcodeDiscount({
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={!!true}>
-        <BootstrapDialogTitle
-          id="customized-dialog-title"
-          onClose={handleClose}
-        >
-          <Typography sx={{ fontSize: '1em' }}>
-            รายละเอียดส่วนลดสินค้า
-          </Typography>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+          <Typography sx={{ fontSize: '1em' }}>รายละเอียดส่วนลดสินค้า</Typography>
           <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
         <DialogContent>
@@ -263,7 +242,7 @@ export default function ModalCreateBarcodeDiscount({
                 วันที่ขอส่วนลด :
               </Grid>
               <Grid item xs={4}>
-                {moment(createDate).format('DD/MM/YYYY')}
+                {moment(dataDetail.createdDate).add(543, 'y').format('DD/MM/YYYY')}
               </Grid>
             </Grid>
             <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
@@ -285,32 +264,19 @@ export default function ModalCreateBarcodeDiscount({
                     value={valueRadios}
                     defaultValue={'percent'}
                     name="radio-buttons-group"
-                    onChange={(
-                      event: React.ChangeEvent<HTMLInputElement>,
-                      value: string
-                    ) => {
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>, value: string) => {
                       handleChangeRadio(event);
                     }}
                   >
-                    <FormControlLabel
-                      value="percent"
-                      control={<Radio />}
-                      label="ยอดลดเป็นเปอร์เซ็น (%)"
-                    />
-                    <FormControlLabel
-                      value="amount"
-                      control={<Radio />}
-                      label="ยอดลดเป็นจำนวนเงิน (บาท)"
-                    />
+                    <FormControlLabel value="percent" control={<Radio />} label="ยอดลดเป็นเปอร์เซ็น (%)" />
+                    <FormControlLabel value="amount" control={<Radio />} label="ยอดลดเป็นจำนวนเงิน (บาท)" />
                   </RadioGroup>
                 </FormControl>
               </Grid>
             </Grid>
           </Grid>
           <Box>
-            <Box
-              sx={{ display: 'flex', marginBottom: '18px', marginTop: '20px' }}
-            >
+            <Box sx={{ display: 'flex', marginBottom: '18px', marginTop: '20px' }}>
               <Box>
                 <Button
                   id="btnAddItem"
@@ -360,21 +326,14 @@ export default function ModalCreateBarcodeDiscount({
         </DialogContent>
       </Dialog>
 
-      <ModalAddItems
-        open={openModelAddItems}
-        onClose={handleModelAddItems}
-      ></ModalAddItems>
+      <ModalAddItems open={openModelAddItems} onClose={handleModelAddItems}></ModalAddItems>
       <ModelConfirm
         open={openModalCancel}
         onClose={handleCloseModalCancel}
         onDeleteAction={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
       />
-      <BarcodeDiscountPopup
-        open={openPopupModal}
-        onClose={handdleClosePopup}
-        contentMsg={textPopup}
-      />
+      <BarcodeDiscountPopup open={openPopupModal} onClose={handdleClosePopup} contentMsg={textPopup} />
       <AlertError
         open={openModalError}
         onClose={handleCloseModalError}
