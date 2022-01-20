@@ -25,6 +25,7 @@ import { useAppSelector, useAppDispatch } from '../store/store';
 import { changeState } from '../store/slices/nav-slice';
 import imgLogo from '../assets/images/Logo-CJ-More.png';
 import Menu from '@mui/icons-material/Menu';
+import {ShoppingCartSharp} from "@mui/icons-material";
 
 const drawerWidth = 240;
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -72,6 +73,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [openSaleMenu, setOpenSaleMenu] = React.useState(false);
   const [openProductMenu, setOpenProductMenu] = React.useState(false);
+  const [openSellMenu, setOpenSellMenu] = React.useState(false);
   const [openPickUpMenu, setOpenPickUpMenu] = React.useState(false);
 
   const navState = useAppSelector((state) => state.navigator.state);
@@ -97,6 +99,10 @@ export default function Sidebar({}: Props): ReactElement {
 
   const handleClickProduct = () => {
     setOpenProductMenu(!openProductMenu);
+  };
+
+  const handleClickSell = () => {
+    setOpenSellMenu(!openSellMenu);
   };
 
   const handleClickPickUp = () => {
@@ -147,6 +153,29 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemText primary="หน้าหลัก" style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
+        {/*sell menu start*/}
+        <ListItemButton key="SELL" onClick={handleClickSell}>
+          <ListItemIcon>
+            <ShoppingCartSharp />
+          </ListItemIcon>
+          <ListItemText primary="ขาย" style={{ marginLeft: -15 }} />
+          {openSellMenu ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openSellMenu} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <Link to="/barcode-discount" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuBarcodeDiscount">
+              <ListItemButton
+                  key="BARCODE DISCOUNT"
+                  selected={selectedIndex === 3}
+                  onClick={() => handleListItemClick(3)}
+                  sx={{ pl: 7 }}
+              >
+                <ListItemText primary="ส่วนลดสินค้า" />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        {/*sell menu end*/}
         {/* <Link to="/notification" style={{ textDecoration: 'none', color: '#676767' }}>
           <ListItemButton
             key="NOTIFICATION"
