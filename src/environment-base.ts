@@ -50,7 +50,10 @@ export const environment = {
   sell: {
     barcodeDiscount: {
       search: {
-        url: '/campaign'
+        url: '/campaign',
+      },
+      detail: {
+        url: '/campaign/detail-barcode',
       },
       save: {
         url: '/campaign',
