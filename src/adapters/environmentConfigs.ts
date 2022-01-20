@@ -11,4 +11,8 @@ export const env: any = {
     clientSecret: process.env.REACT_APP_KEYCLOAK_CLIENT_SECRET,
     timeout: process.env.REACT_APP_KEYCLOAK_TIME_OUT,
   },
+  ownBranch: {
+    code: process.env.REACT_APP_OWN_BRANCH_CODE,
+    name: process.env.REACT_APP_OWN_BRANCH_NAME,
+  },
 };

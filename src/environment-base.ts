@@ -153,7 +153,7 @@ export const environment = {
       url: '/stock/stock-pack/draft',
     },
     sendStockPack: {
-      url: '/stock/stock-pack/send',
+      url: '/stock/stock-transfer/save-to-dc',
     },
   },
 };

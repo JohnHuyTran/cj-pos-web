@@ -1,5 +1,6 @@
 {
   "status": {
-    "CREATE": "Draft"
-  }
+    "CREATED": "Draft"
+  },
+  "documentSearch": "ค้นหาเอกสาร"
 }
