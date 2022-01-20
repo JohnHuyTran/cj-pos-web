@@ -15,8 +15,8 @@ import { Box } from '@material-ui/core';
 import { useStyles } from '../../styles/makeTheme';
 import { TextField, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
-import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import ModelDeleteConfirm from '../commons/ui/modal-delete-confirm';
+import { numberWithCommas } from '../../utils/utils';
 
 export interface DataGridProps {
   id: string;
@@ -126,7 +126,7 @@ var chkQty = (value: any) => {
 
 var calBaseUnit = function (params: GridValueGetterParams) {
   let cal = Number(params.getValue(params.id, 'qty')) * Number(params.getValue(params.id, 'baseUnit'));
-  return cal;
+  return numberWithCommas(cal);
 };
 
 function useApiRef() {
