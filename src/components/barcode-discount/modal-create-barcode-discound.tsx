@@ -28,6 +28,7 @@ import {
   updateDataDetail,
 } from '../../store/slices/barcode-discount-slice';
 import {
+  approveBarcodeDiscount,
   cancelBarcodeDiscount,
   saveDraftBarcodeDiscount,
 } from '../../services/barcode-discount';
@@ -64,9 +65,11 @@ export default function ModalCreateBarcodeDiscount({
   const dataDetail = useAppSelector(
     (state) => state.barcodeDiscount.dataDetail
   );
+
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
   };
+
   const handleModelAddItems = async () => {
     setOpenModelAddItems(false);
   };
@@ -74,11 +77,10 @@ export default function ModalCreateBarcodeDiscount({
   const handleOpenCancel = () => {
     setOpenModalCancel(true);
   };
+
   const handleCloseModalCancel = () => {
     setOpenModalCancel(false);
   };
-
-  const handleSendRequest = () => {};
 
   const handdleClosePopup = () => {
     setOpenPopupModal(false);
@@ -124,9 +126,9 @@ export default function ModalCreateBarcodeDiscount({
     }
   };
 
-  const handleCreateDraft = async () => {
+  const handleCreateDraft = async (sendRequest:boolean) => {
+    if (status) return
     const data = [...payloadBarcodeDiscount.products];
-
     if (payloadBarcodeDiscount.products.length !== 0) {
       const check = data.every((item) => {
         if (payloadBarcodeDiscount.percentDiscount) {
@@ -151,18 +153,22 @@ export default function ModalCreateBarcodeDiscount({
             ? { ...payloadBarcodeDiscount, id: dataDetail.id }
             : payloadBarcodeDiscount;
 
-          const rs = await saveDraftBarcodeDiscount(body);
-          if (rs.code === 201) {
-            setOpenPopupModal(true);
-            setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-            !!!dataDetail.id &&
-              dispatch(
-                updateDataDetail({
-                  id: rs.data.id,
-                  documentNumber: rs.data.documentNumber,
-                  status: rs.data.status,
-                })
+          const rs = await saveDraftBarcodeDiscount(body);       
+          if (rs.code === 201) { 
+            if (!sendRequest) {
+              setOpenPopupModal(true);
+              setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+            }
+            !dataDetail.id && dispatch(
+              updateDataDetail({
+                id: rs.data.id,
+                documentNumber: rs.data.documentNumber,
+                status: rs.data.status,
+              })
               );
+              if (rs.data.status === 1 && sendRequest){
+                handleSendForApproval(rs.data.id);
+              }
           } else {
             setOpenModalError(true);
           }
@@ -178,13 +184,48 @@ export default function ModalCreateBarcodeDiscount({
     }
   };
 
-  const handleDeleteDraft = async () => {
-    setOpenPopup(true);
+  const handleSendRequest = () => {
     if (status) {
-      const rs = await cancelBarcodeDiscount(dataDetail.id);
+      handleSendForApproval(dataDetail.id);
+    } else {
+      handleCreateDraft(true);
     }
-    handleClose();
-    setOpenPopup(true);
+  };
+
+  const handleSendForApproval = async(id: string)=>{
+    try {
+      const rs = await approveBarcodeDiscount(id);
+      if (rs.code === 200) {
+        setOpenPopupModal(true);
+        setTextPopup('คุณได้อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
+        dispatch(updateDataDetail({ ...dataDetail, status: 2 }));
+      } else {
+        setOpenModalError(true);
+      }
+    } catch (error) {
+      setOpenModalError(true);
+    }  
+  }
+
+  const handleDeleteDraft = async () => {
+    if (status) {
+      try {
+        const rs = await cancelBarcodeDiscount(dataDetail.id);  
+        if (rs.status === 200) {
+          setOpenPopup(true);
+          handleClose();
+        } else {
+          setOpenModalError(true);
+          setOpenModalCancel(false);
+        }
+      } catch (error) {
+        setOpenModalError(true);
+        setOpenModalCancel(false);
+      }
+    } else {
+      setOpenPopup(true);
+      handleClose();
+    }
   };
 
   return (
@@ -195,7 +236,7 @@ export default function ModalCreateBarcodeDiscount({
           onClose={handleClose}
         >
           <Typography sx={{ fontSize: '1em' }}>
-            ใบรับสินค้าจากผู้จำหน่าย
+            รายละเอียดส่วนลดสินค้า
           </Typography>
           <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
@@ -219,7 +260,7 @@ export default function ModalCreateBarcodeDiscount({
             </Grid>
             <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
-                วันที่ขอส่วนลด
+                วันที่ขอส่วนลด :
               </Grid>
               <Grid item xs={4}>
                 {moment(createDate).format('DD/MM/YYYY')}
@@ -235,7 +276,7 @@ export default function ModalCreateBarcodeDiscount({
             </Grid>
             <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
-                ยอดลด : :
+                ยอดลด :
               </Grid>
               <Grid item xs={8}>
                 <FormControl component="fieldset">
@@ -288,18 +329,20 @@ export default function ModalCreateBarcodeDiscount({
                   variant="contained"
                   color="warning"
                   startIcon={<SaveIcon />}
-                  onClick={handleCreateDraft}
+                  disabled={status > 1}
+                  onClick={() => handleCreateDraft(false)}
                 >
-                  เพิ่มสินค้า
+                  บันทึก
                 </Button>
                 <Button
                   variant="contained"
                   color="primary"
                   sx={{ margin: '0 17px' }}
+                  disabled={status > 1}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleSendRequest}
                 >
-                  เพิ่มสินค้า
+                  ขออนุมัติ
                 </Button>
                 <Button
                   variant="contained"
@@ -308,7 +351,7 @@ export default function ModalCreateBarcodeDiscount({
                   startIcon={<HighlightOffIcon />}
                   onClick={handleOpenCancel}
                 >
-                  เพิ่มสินค้า
+                  ยกเลิก
                 </Button>
               </Box>
             </Box>

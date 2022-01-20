@@ -18,6 +18,7 @@ export interface DiscountDetail {
   discount: number;
   expiryDate: string | any;
   cashDiscount: number;
-  priceAffterDicount: number;
+  priceAfterDicount: number;
   numberOfDiscounted: number;
+  approvedDiscount: number;
 }
