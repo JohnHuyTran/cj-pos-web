@@ -472,11 +472,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         await setItems(itemsList);
       }
 
-      let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0);
-      if (validateActualQty.length > 0) {
-        setOpenFailAlert(true);
-        setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
-      } else {
+      let validateActualQty = true;
+      validateActualQty = await handleValidateActualQty(itemsList);
+      if (validateActualQty) {
         const payloadSave: SavePurchasePIRequest = {
           piNo: piNo,
           SupplierCode: supplierCode,
@@ -625,6 +623,22 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const handleValidateActualQty = async (itemsList: any) => {
+    let validatePOActualQty = itemsList.filter((r: any) => r.actualQty > 0); //PO
+    let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0); //no PO
+
+    if (po && validatePOActualQty.length === 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+      return false;
+    } else if (!po && validateActualQty.length > 0) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+      return false;
+    }
+    return true;
+  };
+
   const handleSaveButton = async () => {
     setFlagSetFiles(true);
     setOpenLoadingModal(true);
@@ -650,11 +664,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         await dispatch(updateItemsState(itemEditList));
       }
 
-      let validateActualQty = itemsList.filter((r: any) => r.actualQty === 0);
-      if (validateActualQty.length > 0) {
-        setOpenFailAlert(true);
-        setTextFail('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
-      } else {
+      let validateActualQty = true;
+      validateActualQty = await handleValidateActualQty(itemsList);
+      if (validateActualQty) {
         const payloadSave: SavePurchasePIRequest = {
           piNo: piNo,
           SupplierCode: supplierCode,

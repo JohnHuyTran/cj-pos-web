@@ -53,3 +53,12 @@ export interface StockTransferItems {
   barcode: string;
   orderQty: number;
 }
+
+export interface SaveStockPackRequest {
+  btNo: string;
+  sdNo: string;
+  startDate: string;
+  endDate: string;
+  comment: string;
+  items: StockTransferItems[];
+}
