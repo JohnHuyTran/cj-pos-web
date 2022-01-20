@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 import { Grid } from '@mui/material';
 import { TextField } from '@mui/material';
 import { FormControl } from '@mui/material';
@@ -42,6 +43,7 @@ interface loadingModalState {
 }
 
 export default function SupplierCheckOrderSearch() {
+  const { t } = useTranslation(['stockTransfer', 'common']);
   const classes = useStyles();
   const dispatch = useAppDispatch();
   // const limit: number = 0;
@@ -237,7 +239,7 @@ export default function SupplierCheckOrderSearch() {
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-              ค้นหาเอกสาร
+              {t('documentSearch')}
             </Typography>
             <TextField
               id='txtDocNo'

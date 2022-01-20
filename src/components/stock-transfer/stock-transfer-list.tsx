@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
@@ -21,6 +22,7 @@ interface loadingModalState {
 }
 
 function StockTransferList() {
+  const { t } = useTranslation(['stockTransfer', 'common']);
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.searchStockTransfer);
@@ -141,7 +143,7 @@ function StockTransferList() {
       branchFrom: data.branchFromName,
       branchTo: data.branchToName,
       createdBy: data.createdBy,
-      status: data.status,
+      status: t(`status.${data.status}`),
     };
   });
 
