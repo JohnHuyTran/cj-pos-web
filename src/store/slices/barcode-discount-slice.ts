@@ -7,7 +7,7 @@ type ItemsState = {
 };
 const initialState: ItemsState = {
   createDraft: {
-    branchId: '61de9ddab10bfe85dfab22e9',
+    branchId: '61dffd619bfc3701dce4eda4',
     regionId: '61de9ddab10bfe85dfab22e9',
     requesterId: '61de9ddab10bfe85dfab22e9',
     percentDiscount: true,

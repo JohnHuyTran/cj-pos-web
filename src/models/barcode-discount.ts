@@ -1,4 +1,6 @@
 export interface Payload {
+  id?: string;
+  documentNumber?: string;
   requestID?: string;
   percentDiscount: boolean;
   requestorNote: string;

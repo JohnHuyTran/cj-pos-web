@@ -149,21 +149,24 @@ export default function ModalCreateBarcodeDiscount({
             ? { ...payloadBarcodeDiscount, id: dataDetail.id, documentNumber: dataDetail.documentNumber }
             : payloadBarcodeDiscount;
           const rs = await saveDraftBarcodeDiscount(body);       
-          if (rs.code === 201) { 
+          if (rs.code === 201) {
             if (!sendRequest) {
               setOpenPopupModal(true);
               setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
             }
-            !dataDetail.id && dispatch(
+            dispatch(
               updateDataDetail({
+                ...dataDetail,
                 id: rs.data.id,
                 documentNumber: rs.data.documentNumber,
                 status: rs.data.status,
+                sumOfDiscount: dataDetail.sumOfDiscountDefault,
+                sumOfApprovedDiscount: dataDetail.sumOfApprovedDiscountDefault,
               })
-              );
-              if (rs.data.status === 1 && sendRequest){
-                handleSendForApproval(rs.data.id);
-              }
+            );
+            if (rs.data.status === 1 && sendRequest) {
+              handleSendForApproval(rs.data.id);
+            }
           } else {
             setOpenModalError(true);
           }
@@ -193,7 +196,14 @@ export default function ModalCreateBarcodeDiscount({
       if (rs.code === 200) {
         setOpenPopupModal(true);
         setTextPopup('คุณได้อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
-        dispatch(updateDataDetail({ ...dataDetail, status: 2 }));
+        dispatch(
+          updateDataDetail({
+            ...dataDetail,
+            sumOfDiscount: dataDetail.sumOfDiscountDefault,
+            sumOfApprovedDiscount: dataDetail.sumOfApprovedDiscountDefault,
+            status: 2,
+          })
+        );
       } else {
         setOpenModalError(true);
       }

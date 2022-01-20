@@ -7,7 +7,7 @@ import { DeleteForever, Tune } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
 import { DiscountDetail } from '../../models/barcode-discount';
 import DatePickerComponent from '../../components/commons/ui/date-picker-detail';
-import { saveBarcodeDiscount } from '../../store/slices/barcode-discount-slice';
+import { saveBarcodeDiscount, updateDataDetail } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { stringNullOrEmpty } from '../../utils/utils';
@@ -28,12 +28,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
 
   const [dtTable, setDtTable] = React.useState<Array<DiscountDetail>>([]);
-  const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
-  const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(
-    payloadBarcodeDiscount.requestorNote.split('').length
-  );
-  const [countText, setCountText] = React.useState<number>(0);
+  const [countText, setCountText] = React.useState<number>(payloadBarcodeDiscount.requestorNote.split('').length);
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let rows = payloadAddItem.map((item: any, index: number) => {
@@ -74,8 +70,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
 
   useEffect(() => {
     if (dtTable.length !== 0) {
-      updateSumOfApprovedDiscount(dtTable.reduce((acc, val) => acc + val.approvedDiscount, 0));
-      updateSumOfDiscount(dtTable.reduce((acc, val) => acc + val.cashDiscount * val.numberOfDiscounted, 0));
+      const sumOfApprovedDiscount = dtTable.reduce((acc, val) => acc + val.approvedDiscount, 0);
+      const sumOfDiscount = dtTable.reduce((acc, val) => acc + val.cashDiscount * val.numberOfDiscounted, 0);
       const products = dtTable.map((item) => {
         return {
           price: item.price,
@@ -86,9 +82,15 @@ export const ModalTransferItem = (props: DataGridProps) => {
         };
       });
       dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, products: products }));
+      dispatch(
+        updateDataDetail({
+          ...dataDetail,
+          sumOfApprovedDiscountDefault: sumOfApprovedDiscount,
+          sumOfDiscountDefault: sumOfDiscount,
+        })
+      );
     } else {
-      updateSumOfApprovedDiscount(0);
-      updateSumOfDiscount(0);
+      dispatch(updateDataDetail({ ...dataDetail, sumOfApprovedDiscountDefault: 0, sumOfDiscountDefault: 0 }));
     }
   }, [dtTable]);
 
@@ -476,7 +478,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               type="text"
               sx={{ bgcolor: '#EAEBEB' }}
               className={classes.MtextFieldNumberNoneArrow}
-              value={sumOfDiscount.toFixed(2)}
+              value={dataDetail.sumOfDiscount?.toFixed(2) || '0.00'}
             />
           </Box>
           <Box display="flex" justifyContent="space-between" marginTop="10px">
@@ -488,7 +490,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               disabled
               sx={{ bgcolor: '#E7FFE9' }}
               className={classes.MtextFieldNumberNoneArrow}
-              value={sumOfApprovedDiscount.toFixed(2)}
+              value={dataDetail.sumOfApprovedDiscount?.toFixed(2) || '0.00'}
             />
           </Box>
         </Box>
