@@ -59,12 +59,8 @@ export default function ModalCreateBarcodeDiscount({
   const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<number>(0);
   const dispatch = useAppDispatch();
-  const payloadBarcodeDiscount = useAppSelector(
-    (state) => state.barcodeDiscount.createDraft
-  );
-  const dataDetail = useAppSelector(
-    (state) => state.barcodeDiscount.dataDetail
-  );
+  const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
+  const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -99,6 +95,7 @@ export default function ModalCreateBarcodeDiscount({
         status: 0,
       })
     );
+    dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requestorNote: '' }));
     setOpen(false);
     onClickClose();
   };
@@ -127,7 +124,6 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleCreateDraft = async (sendRequest:boolean) => {
-    if (status) return
     const data = [...payloadBarcodeDiscount.products];
     if (payloadBarcodeDiscount.products.length !== 0) {
       const check = data.every((item) => {
@@ -150,9 +146,8 @@ export default function ModalCreateBarcodeDiscount({
         );
         try {
           const body = !!dataDetail.id
-            ? { ...payloadBarcodeDiscount, id: dataDetail.id }
+            ? { ...payloadBarcodeDiscount, id: dataDetail.id, documentNumber: dataDetail.documentNumber }
             : payloadBarcodeDiscount;
-
           const rs = await saveDraftBarcodeDiscount(body);       
           if (rs.code === 201) { 
             if (!sendRequest) {
@@ -236,7 +231,7 @@ export default function ModalCreateBarcodeDiscount({
           onClose={handleClose}
         >
           <Typography sx={{ fontSize: '1em' }}>
-            รายละเอียดส่วนลดสินค้า
+            ส่วนลดสินค้า
           </Typography>
           <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
