@@ -114,11 +114,6 @@ const BarcodeDiscountList = () => {
         );
     };
 
-    const addTwoDecimalPlaces = (value: any) => {
-        if (stringNullOrEmpty(value)) return '0.00';
-        else return value + '.00';
-    };
-
     const columns: GridColDef[] = [
         {
             field: 'checked',
@@ -195,7 +190,7 @@ const BarcodeDiscountList = () => {
             headerAlign: 'center',
             align: 'right',
             sortable: false,
-            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value)))
+            renderCell: (params) => renderCell(numberWithCommas(params.value))
         },
         {
             field: 'sumOfCashDiscount',
@@ -204,7 +199,7 @@ const BarcodeDiscountList = () => {
             headerAlign: 'center',
             align: 'right',
             sortable: false,
-            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value)))
+            renderCell: (params) => renderCell(numberWithCommas(params.value))
         },
         {
             field: 'sumOfPriceAfterDiscount',
@@ -213,7 +208,7 @@ const BarcodeDiscountList = () => {
             headerAlign: 'center',
             align: 'right',
             sortable: false,
-            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value)))
+            renderCell: (params) => renderCell(numberWithCommas(params.value))
         },
         {
             field: 'branch',
