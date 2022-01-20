@@ -5,7 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import { Button, DialogTitle, Grid, IconButton } from '@mui/material';
-import { ControlPoint, HighlightOff, UploadFile } from '@mui/icons-material';
+import { CheckCircleOutline, ControlPoint, HighlightOff, UploadFile } from '@mui/icons-material';
 import SaveIcon from '@mui/icons-material/Save';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Steppers from './steppers';
@@ -159,6 +159,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
 
   const handleSave = async () => {
     setOpenLoadingModal(true);
+    let validateActualQty = payloadAddItem.filter((r: any) => r.qty === 0);
 
     if (!startDate || !endDate) {
       setOpenAlert(true);
@@ -166,6 +167,9 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
     } else if (startBranch === '' || endBranch === '') {
       setOpenAlert(true);
       setTextError('กรุณาเลือกสาขาโอนสินค้า');
+    } else if (validateActualQty.length > 0) {
+      setOpenAlert(true);
+      setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
     } else {
       const itemsList: any = [];
       const itemsState: any = [];
@@ -323,19 +327,18 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
               >
                 บันทึก
               </Button>
-
               <Button
                 id="btnCreateTransfer"
                 variant="contained"
-                color="secondary"
+                color="primary"
                 className={classes.MbtnSave}
                 // onClick={handleSaveButton}
-                startIcon={<AddCircleOutlineOutlinedIcon />}
+                startIcon={<CheckCircleOutline />}
                 sx={{ width: 140 }}
                 // disabled={rowLength == 0}
                 disabled
               >
-                สร้างใบโอน
+                ส่งงาน
               </Button>
 
               <Button

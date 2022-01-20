@@ -138,6 +138,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
       skuCode: item.skuCode,
       unitPrice: item.unitPrice,
       unitPriceText: item.unitPriceText,
+      baseUnit: item.baseUnit,
     };
   });
 
@@ -235,6 +236,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
               unitName: data.unitName,
               unitPrice: data.unitPrice,
               unitPriceText: data.unitPriceText,
+              baseUnit: data.baseUnit,
             };
             duplicateIems.push(itemsDup);
           } else {

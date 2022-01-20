@@ -15,8 +15,8 @@ import { Box } from '@material-ui/core';
 import { useStyles } from '../../styles/makeTheme';
 import { TextField, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
-import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import ModelDeleteConfirm from '../commons/ui/modal-delete-confirm';
+import { numberWithCommas } from '../../utils/utils';
 
 export interface DataGridProps {
   id: string;
@@ -62,6 +62,14 @@ const columns: GridColDef[] = [
     ),
   },
   {
+    field: 'unitName',
+    headerName: 'หน่วย',
+    minWidth: 120,
+    headerAlign: 'center',
+    disableColumnMenu: true,
+    sortable: false,
+  },
+  {
     field: 'qty',
     headerName: 'จำนวนที่สั่ง',
     minWidth: 150,
@@ -88,12 +96,14 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'unitName',
-    headerName: 'หน่วย',
-    minWidth: 150,
+    field: 'baseUnit',
+    headerName: 'หน่วยย่อย',
+    minWidth: 120,
     headerAlign: 'center',
+    align: 'right',
     disableColumnMenu: true,
     sortable: false,
+    renderCell: (params) => calBaseUnit(params),
   },
   {
     field: 'delete',
@@ -112,6 +122,11 @@ var chkQty = (value: any) => {
   let v = String(value);
   if (v.substring(1) === '0') return Number(v.substring(0, 1));
   return value;
+};
+
+var calBaseUnit = function (params: GridValueGetterParams) {
+  let cal = Number(params.getValue(params.id, 'qty')) * Number(params.getValue(params.id, 'baseUnit'));
+  return numberWithCommas(cal);
 };
 
 function useApiRef() {
@@ -149,6 +164,7 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
         barcodeName: item.barcodeName,
         unitCode: item.unitCode,
         unitName: item.unitName,
+        baseUnit: item.baseUnit,
         qty: item.qty ? item.qty : 0,
       };
     });
