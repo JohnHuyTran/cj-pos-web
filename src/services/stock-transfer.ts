@@ -1,4 +1,4 @@
-import { put } from '../adapters/posback-adapter';
+import { post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { ContentType } from '../utils/enum/common-enum';
 import { SaveStockPackRequest, SaveStockTransferRequest } from '../models/stock-transfer-model';
@@ -29,7 +29,7 @@ export async function saveStockPack(payload: SaveStockPackRequest) {
 
 export async function sendStockPackDC(payload: SaveStockPackRequest) {
   try {
-    const response = await put(environment.stock.sendStockPack.url, payload, ContentType.JSON).then(
+    const response = await post(environment.stock.sendStockPack.url, payload, ContentType.JSON).then(
       (result: any) => result
     );
     return response;

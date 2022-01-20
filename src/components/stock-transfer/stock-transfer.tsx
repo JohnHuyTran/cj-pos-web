@@ -24,8 +24,8 @@ import { StockTransferRequest } from '../../models/stock-transfer-model';
 import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
 import StockTransferList from '../../components/stock-transfer/stock-transfer-list';
 import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
-import StockPackChecked from './stock-pack';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
+import StockPackChecked from './stock-pack';
 
 interface State {
   docNo: string;
@@ -116,7 +116,7 @@ export default function SupplierCheckOrderSearch() {
   const [textError, setTextError] = React.useState('');
   const handleOpenCreateModal = async () => {
     await dispatch(updateAddItemsState({}));
-    // await dispatch(featchPurchaseNoteAsync('PI22010002-000231'));
+    await dispatch(featchPurchaseNoteAsync('PI21120002-000031'));
     setOpenCreateModal(true);
   };
   function handleCloseCreateModal() {
@@ -247,7 +247,7 @@ export default function SupplierCheckOrderSearch() {
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder='เลขที่เอกสาร BT'
+              placeholder='เลขที่เอกสาร BT, RT'
             />
           </Grid>
           <Grid item xs={4}>
@@ -309,12 +309,12 @@ export default function SupplierCheckOrderSearch() {
             </FormControl>
           </Grid>
 
-          <Grid item xs={4} sx={{ pt: 30 }}>
+          {/* <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาเหตุการโอน
             </Typography>
             <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
-          </Grid>
+          </Grid> */}
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
             <Button
@@ -373,7 +373,6 @@ export default function SupplierCheckOrderSearch() {
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       {openCreateModal && <ModalCreateStockTransfer isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />}
-      {/* {openCreateModal && <StockPackChecked isOpen={true} onClickClose={handleCloseCreateModal} />} */}
     </>
   );
 }

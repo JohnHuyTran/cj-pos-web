@@ -18,7 +18,7 @@ import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import { useStyles } from '../../styles/makeTheme';
-import { numberWithCommas } from '../../utils/utils';
+import { isOwnBranch, numberWithCommas } from '../../utils/utils';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { PurchaseNoteDetailEntries } from '../../models/purchase-credit-note';
 import SnackbarStatus from '../commons/ui/snackbar-status';
@@ -31,6 +31,8 @@ import { saveStockPack, sendStockPackDC } from '../../services/stock-transfer';
 import moment from 'moment';
 import { ApiError } from '../../models/api-error-model';
 import TextBoxComment from '../commons/ui/textbox-comment';
+import Steppers from './steppers';
+import { convertUtcToBkkDate } from '../../utils/date-utill';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -129,7 +131,7 @@ const columns: GridColDef[] = [
             if (value > qty) value = qty;
             params.api.updateRows([{ ...params.row, actualQty: value }]);
           }}
-          disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
+          disabled={params.getValue(params.id, 'isDraftStatus') ? false : true}
           autoComplete='off'
         />
       </div>
@@ -160,7 +162,7 @@ const columns: GridColDef[] = [
           onChange={(e) => {
             params.api.updateRows([{ ...params.row, tote: e.target.value }]);
           }}
-          disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
+          disabled={params.getValue(params.id, 'isDraftStatus') ? false : true}
           autoComplete='off'
         />
       </div>
@@ -244,11 +246,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   React.useEffect(() => {
     setSourceBranch('1123-ท่าช่าง');
     setDestinationBranch('1124-พรหมบุรี');
-    setBtNo('');
+    setBtNo('BT01');
     setReasons('ทั้งหมด');
     setBtStatus('0');
     setComment('Test Comment');
-    setIsDraft(false);
+    const isBranch = isOwnBranch('D0002');
+    setIsDraft(isBranch && btStatus === 'CREATED' ? true : false);
   }, [open]);
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
@@ -442,7 +445,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const sendTransactionToDC = async () => {
-    const payload: SaveStockPackRequest = await mappingPayload();
+    const payload: SaveStockPackRequest = {
+      btNo: btNo,
+    };
+
     await sendStockPackDC(payload)
       .then((value) => {
         handleOnCloseModalConfirm();
@@ -469,6 +475,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: 24, fontWeight: 400 }}>ตรวจสอบรายการใบโอน</Typography>
+          <Steppers status={0}></Steppers>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box mt={4} sx={{ flexGrow: 1 }}>
@@ -486,7 +493,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'>วันที่สร้างรายการ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{'create date'}</Typography>
+                <Typography variant='body2'>{convertUtcToBkkDate('2022-02-02')}</Typography>
               </Grid>
               <Grid item lg={6}></Grid>
             </Grid>
@@ -540,39 +547,41 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
               <Grid item lg={6}></Grid>
             </Grid>
           </Box>
-          <Grid
-            item
-            container
-            xs={12}
-            sx={{ mt: 3 }}
-            justifyContent='space-between'
-            direction='row'
-            alignItems='flex-end'>
-            <Grid item xl={2}></Grid>
-            <Grid item>
-              <Button
-                id='btnSave'
-                variant='contained'
-                color='warning'
-                className={classes.MbtnSave}
-                onClick={handleSaveBtn}
-                startIcon={<SaveIcon />}
-                sx={{ width: 200 }}>
-                บันทึก
-              </Button>
+          {isDraft && (
+            <Grid
+              item
+              container
+              xs={12}
+              sx={{ mt: 3 }}
+              justifyContent='space-between'
+              direction='row'
+              alignItems='flex-end'>
+              <Grid item xl={2}></Grid>
+              <Grid item>
+                <Button
+                  id='btnSave'
+                  variant='contained'
+                  color='warning'
+                  className={classes.MbtnSave}
+                  onClick={handleSaveBtn}
+                  startIcon={<SaveIcon />}
+                  sx={{ width: 200 }}>
+                  บันทึก
+                </Button>
 
-              <Button
-                id='btnApprove'
-                variant='contained'
-                color='primary'
-                className={classes.MbtnApprove}
-                onClick={handleConfirmBtn}
-                startIcon={<CheckCircleOutline />}
-                sx={{ width: 200 }}>
-                ส่งงานให้ DC
-              </Button>
+                <Button
+                  id='btnApprove'
+                  variant='contained'
+                  color='primary'
+                  className={classes.MbtnApprove}
+                  onClick={handleConfirmBtn}
+                  startIcon={<CheckCircleOutline />}
+                  sx={{ width: 200 }}>
+                  ส่งงานให้ DC
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
+          )}
           <Box mt={2} bgcolor='background.paper'>
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
@@ -605,7 +614,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                   defaultValue={comment}
                   maxLength={100}
                   onChangeComment={handleChangeComment}
-                  isDisable={isDraft}
+                  isDisable={!isDraft}
                 />
                 {/* <Typography variant='body2'>หมายเหตุ:</Typography>
                 <TextField

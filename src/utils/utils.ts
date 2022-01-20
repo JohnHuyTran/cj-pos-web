@@ -1,4 +1,5 @@
 import jwtDecode from 'jwt-decode';
+import { env } from '../adapters/environmentConfigs';
 import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
 
 export const getDecodedAccessToken = (accessToken: string) => {
@@ -46,3 +47,7 @@ export function getDCStatus(codeStatus: number): string {
 export const numberWithCommas = (num: any) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
+
+export function isOwnBranch(branch: any): boolean {
+  return env.ownBranch.code === branch;
+}
