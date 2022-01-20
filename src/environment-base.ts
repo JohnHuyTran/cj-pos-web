@@ -51,8 +51,20 @@ export const environment = {
     barcodeDiscount: {
       search: {
         url: '/campaign'
-      }
-    }
+      },
+      save: {
+        url: '/campaign',
+      },
+      update: {
+        url: '/campaign/{id}',
+      },
+      approve: {
+        url: '/campaign/{id}/waiting-approve',
+      },
+      cancel: {
+        url: '/campaign/{id}'
+      },
+    },
   },
   purchase: {
     supplierOrder: {
@@ -135,18 +147,4 @@ export const environment = {
       url: '/stock/stock-transfer/draft',
     },
   },
-  barcodeDiscount: {
-    save: {
-      url: '/campaign',
-    },
-    update: {
-      url: '/campaign/{id}',
-    },
-    approve: {
-      url: '/campaign/{id}/waiting-approve',
-    },
-    cancel: {
-      url: '/campaign/{id}'
-    },
-  }
 };

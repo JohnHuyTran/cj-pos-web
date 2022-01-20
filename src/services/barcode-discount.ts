@@ -6,7 +6,7 @@ import { Payload } from "../models/barcode-discount";
 
 export async function saveDraftBarcodeDiscount(payload: Payload) {
   try {
-    const response = await post(`${env.backEnd.url}${environment.barcodeDiscount.save.url}`, payload);
+    const response = await post(`${env.backEnd.url}${environment.sell.barcodeDiscount.save.url}`, payload);
     return response;
   } catch (error) {
     throw error;
@@ -24,6 +24,7 @@ export async function updateBarcodeDiscount(payload: Payload, id: string) {
 export async function approveBarcodeDiscount(id: string) {
   try {
     const response = await post(getPathApproveDraft(id));
+    return response
   } catch (error) {
     throw error;
   }
@@ -40,21 +41,21 @@ export async function cancelBarcodeDiscount(id: string) {
 
 export const getPathUpdateDraft = (id: string) => {
   return getPathUrl(
-    `${env.backEnd.url}${environment.barcodeDiscount.update.url}`,
+    `${env.backEnd.url}${environment.sell.barcodeDiscount.update.url}`,
     { id: id }
   );
 };
 
 export const getPathApproveDraft = (id: string) => {
   return getPathUrl(
-    `${env.backEnd.url}${environment.barcodeDiscount.approve.url}`,
+    `${env.backEnd.url}${environment.sell.barcodeDiscount.approve.url}`,
     { id: id }
   );
 };
 
 export const getPathCancelDraft = (id: string) => {
   return getPathUrl(
-    `${env.backEnd.url}${environment.barcodeDiscount.cancel.url}`,
+    `${env.backEnd.url}${environment.sell.barcodeDiscount.cancel.url}`,
     { id: id }
   );
 };

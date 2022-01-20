@@ -1,4 +1,6 @@
 export interface Payload {
+  id?: string;
+  documentNumber?: string;
   requestID?: string;
   percentDiscount: boolean;
   requestorNote: string;
@@ -18,6 +20,7 @@ export interface DiscountDetail {
   discount: number;
   expiryDate: string | any;
   cashDiscount: number;
-  priceAffterDicount: number;
+  priceAfterDicount: number;
   numberOfDiscounted: number;
+  approvedDiscount: number;
 }

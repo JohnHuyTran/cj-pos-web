@@ -263,6 +263,22 @@ const useStyles = makeStyles({
       display: "block",
     },
   },
+  MtextFieldNumberNoneArrow: {
+    '& .MuiInput-input': {
+      '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+        '-webkit-appearance': 'none',
+      },
+     },
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "5px !important",
+      fontSize: "15px",
+      fontWeight: "bold",
+      textAlignLast: "end !important",
+    },
+    "& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {
+      color: "#263238 !important",
+    },
+  },
 });
 
 export { useStyles };
