@@ -3,11 +3,11 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box, TextareaAutosize, Tooltip, withStyles } from '@material-ui/core';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, TextField, Typography } from '@mui/material';
-import { DeleteForever } from '@mui/icons-material';
+import { DeleteForever, Tune } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
 import { DiscountDetail } from '../../models/barcode-discount';
 import DatePickerComponent from '../../components/barcode-discount/date-picker';
-import { saveBarcodeDiscount } from '../../store/slices/barcode-discount-slice';
+import { saveBarcodeDiscount, updateDataDetail } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { stringNullOrEmpty } from '../../utils/utils';
@@ -25,11 +25,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const dispatch = useAppDispatch();
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
+  const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
 
   const [dtTable, setDtTable] = React.useState<Array<DiscountDetail>>([]);
-  const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
-  const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(0);
+  const [countText, setCountText] = React.useState<number>(payloadBarcodeDiscount.requestorNote.split('').length);
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let rows = payloadAddItem.map((item: any, index: number) => {
@@ -70,8 +70,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
 
   useEffect(() => {
     if (dtTable.length !== 0) {
-      updateSumOfApprovedDiscount(dtTable.reduce((acc, val) => acc + val.approvedDiscount, 0));
-      updateSumOfDiscount(dtTable.reduce((acc, val) => acc + val.cashDiscount * val.numberOfDiscounted, 0));
+      const sumOfApprovedDiscount = dtTable.reduce((acc, val) => acc + val.approvedDiscount, 0);
+      const sumOfDiscount = dtTable.reduce((acc, val) => acc + val.cashDiscount * val.numberOfDiscounted, 0);
       const products = dtTable.map((item) => {
         return {
           price: item.price,
@@ -82,6 +82,15 @@ export const ModalTransferItem = (props: DataGridProps) => {
         };
       });
       dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, products: products }));
+      dispatch(
+        updateDataDetail({
+          ...dataDetail,
+          sumOfApprovedDiscountDefault: sumOfApprovedDiscount,
+          sumOfDiscountDefault: sumOfDiscount,
+        })
+      );
+    } else {
+      dispatch(updateDataDetail({ ...dataDetail, sumOfApprovedDiscountDefault: 0, sumOfDiscountDefault: 0 }));
     }
   }, [dtTable]);
 
@@ -93,7 +102,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       const value = event.target.value;
-      data[index - 1].discount = value;
+      data[index - 1].discount = parseFloat(value);
 
       if (typeDiscount === 'percent') {
         const number = data[index - 1].price * (data[index - 1].discount / 100);
@@ -145,6 +154,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
 
   const handleChangeNote = (e: any) => {
     dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requestorNote: e }));
+    setCountText(e.split('').length);
   };
 
   const columns: GridColDef[] = [
@@ -309,7 +319,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params) => (
-        <TextField type="number" className={classes.MtextFieldNumberNoneArrow} value={params.value} />
+        <TextField type="number" className={classes.MtextFieldNumberNoneArrow} value={params.value} disabled />
       ),
     },
     {
@@ -450,6 +460,13 @@ export const ModalTransferItem = (props: DataGridProps) => {
         autoHeight={dtTable.length >= 8 ? false : true}
         scrollbarSize={10}
         rowHeight={70}
+        components={{
+          NoRowsOverlay: () => (
+            <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
+              ไม่มีข้อมูล
+            </Typography>
+          ),
+        }}
         // onCellClick={currentlySelected}
         // onCellFocusOut={handleCalculateItems}
       />
@@ -458,21 +475,20 @@ export const ModalTransferItem = (props: DataGridProps) => {
           <Typography fontSize="14px" lineHeight="21px" height="24px">
             หมายเหตุจากสาขา :{' '}
           </Typography>
-          <TextareaAutosize
+          <TextField
             placeholder="ความยาวไม่เกิน 100 ตัวอักษร"
-            style={{
-              width: '339px',
-              height: '115px',
-              border: '1px solid #C1C1C1',
-              borderRadius: '10px',
-              backgroundColor: 'transparent',
-              padding: '5px',
-            }}
+            multiline
+            rows={5}
+            sx={{ width: '339px' }}
+            variant="outlined"
             value={payloadBarcodeDiscount ? payloadBarcodeDiscount.requestorNote : ''}
             onChange={(e) => {
               handleChangeNote(e.target.value);
             }}
           />
+          <Box color="#AEAEAE" width="100%" textAlign="right">
+            {countText}/100
+          </Box>
         </Box>
         <Box width="350px" marginTop="20px">
           <Box display="flex" justifyContent="space-between">
@@ -480,10 +496,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
               ขอส่วนลดทั้งหมด
             </Typography>
             <TextField
+              disabled
               type="text"
               sx={{ bgcolor: '#EAEBEB' }}
-              className={classes.MtextFieldNumber}
-              value={sumOfDiscount.toFixed(2)}
+              className={classes.MtextFieldNumberNoneArrow}
+              value={dataDetail.sumOfDiscount?.toFixed(2) || '0.00'}
             />
           </Box>
           <Box display="flex" justifyContent="space-between" marginTop="10px">
@@ -492,9 +509,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
             </Typography>
             <TextField
               type="text"
+              disabled
               sx={{ bgcolor: '#E7FFE9' }}
-              className={classes.MtextFieldNumber}
-              value={sumOfApprovedDiscount.toFixed(2)}
+              className={classes.MtextFieldNumberNoneArrow}
+              value={dataDetail.sumOfApprovedDiscount?.toFixed(2) || '0.00'}
             />
           </Box>
         </Box>

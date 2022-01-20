@@ -272,12 +272,11 @@ const useStyles = makeStyles({
     "& .MuiOutlinedInput-root": {
       borderRadius: "5px !important",
       fontSize: "15px",
-      fontWeight: "500",
+      fontWeight: "bold",
       textAlignLast: "end !important",
     },
     "& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {
       color: "#263238 !important",
-      "-webkit-text-fill-color": "rgb(0 0 0 / 100%)",
     },
   },
 });

@@ -87,6 +87,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
         status: 0,
       })
     );
+    dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requestorNote: '' }));
     setOpen(false);
     onClickClose();
   };
@@ -115,7 +116,6 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
   };
 
   const handleCreateDraft = async (sendRequest: boolean) => {
-    if (status) return;
     const data = [...payloadBarcodeDiscount.products];
     if (payloadBarcodeDiscount.products.length !== 0) {
       const check = data.every((item) => {
@@ -132,26 +132,25 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
       if (check) {
         await dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, validate: false }));
         try {
-          const body = !!dataDetail.id ? { ...payloadBarcodeDiscount, id: dataDetail.id } : payloadBarcodeDiscount;
-
+          const body = !!dataDetail.id
+            ? { ...payloadBarcodeDiscount, id: dataDetail.id, documentNumber: dataDetail.documentNumber }
+            : payloadBarcodeDiscount;
           const rs = await saveDraftBarcodeDiscount(body);
-          console.log({ rs });
-
           if (rs.code === 201) {
             if (!sendRequest) {
               setOpenPopupModal(true);
               setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
             }
-            !dataDetail.id &&
-              dispatch(
-                updateDataDetail({
-                  id: rs.data.id,
-                  documentNumber: rs.data.documentNumber,
-                  status: rs.data.status,
-                  createdDate: rs.data.createdDate,
-                  percentDiscount: rs.data.percentDiscount,
-                })
-              );
+            dispatch(
+              updateDataDetail({
+                ...dataDetail,
+                id: rs.data.id,
+                documentNumber: rs.data.documentNumber,
+                status: rs.data.status,
+                sumOfDiscount: dataDetail.sumOfDiscountDefault,
+                sumOfApprovedDiscount: dataDetail.sumOfApprovedDiscountDefault,
+              })
+            );
             if (rs.data.status === 1 && sendRequest) {
               handleSendForApproval(rs.data.id);
             }
@@ -182,7 +181,14 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
       if (rs.code === 200) {
         setOpenPopupModal(true);
         setTextPopup('คุณได้อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
-        dispatch(updateDataDetail({ ...dataDetail, status: 2 }));
+        dispatch(
+          updateDataDetail({
+            ...dataDetail,
+            sumOfDiscount: dataDetail.sumOfDiscountDefault,
+            sumOfApprovedDiscount: dataDetail.sumOfApprovedDiscountDefault,
+            status: 2,
+          })
+        );
       } else {
         setOpenModalError(true);
       }
@@ -216,7 +222,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={!!true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          <Typography sx={{ fontSize: '1em' }}>รายละเอียดส่วนลดสินค้า</Typography>
+          <Typography sx={{ fontSize: '1em' }}>ส่วนลดสินค้า</Typography>
           <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
         <DialogContent>
