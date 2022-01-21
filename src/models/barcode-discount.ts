@@ -23,4 +23,7 @@ export interface DiscountDetail {
   priceAfterDicount: number;
   numberOfDiscounted: number;
   approvedDiscount: number;
+  errorDiscount: string;
+  errorExpiryDate: string;
+  errorNumberOfDiscounted: string;
 }
