@@ -26,7 +26,7 @@ import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfe
 import StockTransferList from '../../components/stock-transfer/stock-transfer-list';
 import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
-import StockPackChecked from './stock-pack';
+import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
 
 interface State {
   docNo: string;
@@ -144,7 +144,7 @@ export default function SupplierCheckOrderSearch() {
     } else {
       limits = limit.toString();
     }
-
+    console.log(values);
     const payload: StockTransferRequest = {
       limit: limits,
       page: page,
@@ -303,10 +303,9 @@ export default function SupplierCheckOrderSearch() {
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={'0'}>บันทึก</MenuItem>
-                <MenuItem value={'1'}>อยู่ระหว่างดำเนินการ</MenuItem>
-                <MenuItem value={'2'}>เสร็จสิ้น</MenuItem>
-                <MenuItem value={'3'}>ยกเลิก</MenuItem>
+                {getStockTransferStatusList('BT').map((item, index: number) => {
+                  return <MenuItem value={item.key}>{t(`status.${item.value}`)}</MenuItem>;
+                })}
               </Select>
             </FormControl>
           </Grid>
