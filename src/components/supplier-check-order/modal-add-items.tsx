@@ -5,7 +5,6 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  Grid,
   IconButton,
   TextField,
   Typography,
@@ -13,14 +12,13 @@ import {
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import React, { ReactElement, useEffect, useMemo } from 'react';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import { ItemBySupplierCodeResponse, ItemInfo, ItemByBarcodeInfo } from '../../models/modal-add-item-model';
+import { ItemInfo, ItemByBarcodeInfo } from '../../models/modal-add-item-model';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
-import { updateSearchItemsState } from '../../store/slices/supplier-search-add-items-slice';
 
 import { useStyles } from '../../styles/makeTheme';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { ConstructionOutlined, DeleteForever, PersonAddAlt1TwoTone } from '@mui/icons-material';
+import { DeleteForever } from '@mui/icons-material';
 import {
   DataGrid,
   GridCellParams,
@@ -31,32 +29,12 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid';
 import LoadingModal from '../commons/ui/loading-modal';
-import { isConstructorDeclaration } from 'typescript';
-
-interface StateItem {
-  barcodeName: string;
-  barcode: string;
-}
 
 interface Props {
   open: boolean;
   onClose: () => void;
   supNo: string;
 }
-
-const initialAddItemListByBarcode: ItemByBarcodeInfo = {
-  barcode: '',
-  unitName: '',
-  barcodeName: '',
-  qty: 1,
-  skuCode: '',
-  unitCode: '',
-  unitFactor: 0,
-  pricePerUnit: 0,
-  isCalVat: false,
-  isControlStock: false,
-  isAllowDiscount: false,
-};
 
 const columns: GridColDef[] = [
   {
@@ -146,104 +124,133 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   const dispatch = useAppDispatch();
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
-  const [valueItemList, setValueItemList] = React.useState<any | null>(null);
-  const [valueItemSelect, setValueItemSelect] = React.useState<StateItem>({
-    barcodeName: '',
-    barcode: '',
+  // const [searchItem, setSearchItem] = React.useState<any | null>(null);
+  const [values, setValues] = React.useState<string[]>([]);
+  const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
+  let rows: any = [];
+  rows = newAddItemListArray.map((item: any, index: number) => {
+    return {
+      id: index,
+      barcode: item.barcode,
+      unitName: item.unitName,
+      barcodeName: item.barcodeName,
+      actualQty: item.actualQty ? item.actualQty : 1,
+      skuCode: item.skuCode,
+      unitPrice: item.unitPriceText,
+    };
   });
-
-  const itemsList = useAppSelector((state) => state.searchItemListBySup.itemList);
-
-  //search item
-  const defaultSearchItemList = {
-    options: itemsList.data,
-    getOptionLabel: (option: ItemInfo) => option.barcodeName,
-  };
-
-  const filterOptions = createFilterOptions({
-    stringify: (option: ItemInfo) => option.barcodeName + option.barcode,
-  });
-
-  const handleChangeItem = (event: any, newValue: any | null) => {
-    let nameItem = JSON.stringify(newValue?.barcodeName);
-    setValueItemList(newValue);
-
-    if (newValue !== null) {
-      setValueItemSelect({ ...valueItemSelect, barcodeName: JSON.parse(nameItem) });
-    } else {
-      setValueItemSelect({ ...valueItemSelect, barcodeName: '' });
-    }
-
-    const itemsList: any = [];
-    if (rows.length > 0) {
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-
-      rowsEdit.forEach((data: GridRowData) => {
-        itemsList.push(data);
-      });
-
-      setNewAddItemListArray(itemsList);
-    }
-  };
 
   const handldCloseAddItemModal = () => {
     onClose();
+    // setSearchItem(null);
     setNewAddItemListArray([]);
-    setValueItemList(null);
+  };
+
+  const itemsList = useAppSelector((state) => state.searchItemListBySup.itemList);
+  let options: any = itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
+  const filterOptions = createFilterOptions({
+    stringify: (option: any) => option.barcodeName + option.barcode,
+  });
+
+  const autocompleteRenderListItem = (props: any, option: any) => {
+    return (
+      <li {...props} key={option.barcode}>
+        <div>
+          <Typography variant="body2">{option.barcodeName}</Typography>
+          <Typography color="textSecondary" variant="caption">
+            {option.barcode}
+          </Typography>
+        </div>
+      </li>
+    );
+  };
+
+  const autocompleteRenderInput = (params: any) => {
+    return (
+      <TextField
+        {...params}
+        placeholder="บาร์โค้ด/รายละเอียดสินค้า"
+        className={classes.MtextField}
+        variant="outlined"
+        size="small"
+        fullWidth
+      />
+    );
+  };
+
+  const handleChangeItem = async (event: any, option: any, reason: string) => {
+    if (option && reason === 'selectOption') {
+      let barcode = option?.barcode;
+      // setSearchItem(null);
+      const chkduplicate: any = newAddItemListArray.find((r: any) => r.barcode === barcode);
+      if (chkduplicate) {
+        let duplicateIems: any = [];
+        newAddItemListArray.forEach((data: any) => {
+          let qty = data.qty ? data.qty : data.actualQty;
+          if (data.barcode === barcode) {
+            const itemsDup: any = {
+              barcode: data.barcode,
+              barcodeName: data.barcodeName,
+              actualQty: Number(qty) + 1,
+              skuCode: data.skuCode,
+              unitCode: data.unitCode,
+              unitName: data.unitName,
+              unitPrice: data.unitPriceText,
+            };
+            duplicateIems.push(itemsDup);
+          } else {
+            duplicateIems.push(data);
+          }
+        });
+        setNewAddItemListArray(duplicateIems);
+      } else {
+        const itemsList: any = [];
+        if (rows.length > 0) {
+          const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+          rowsEdit.forEach((data: GridRowData) => {
+            itemsList.push(data);
+          });
+          setNewAddItemListArray(itemsList);
+        }
+        itemsList.push(option);
+        setNewAddItemListArray(itemsList);
+      }
+    } else {
+      clearData();
+    }
+  };
+
+  const clearData = async () => {
+    options = [];
+  };
+
+  const clearInput = () => {
+    setValues([]);
   };
 
   const [barcodeNameDel, setBarcodeNameDel] = React.useState('');
   const [skuCodeDel, setSkuCodeDel] = React.useState('');
   const [barCodeDel, setBarCodeDel] = React.useState('');
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
-
-  const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
-
-  const onClickAddItem = async () => {
-    setValueItemList(null);
-    let barcodeItem = valueItemList.barcode;
-    const itemSelect: any = itemsList.data.find((r: any) => r.barcode === barcodeItem);
-    const checkDupItem: any = newAddItemListArray.find((a: any) => a.barcode === barcodeItem);
-
-    const itemsListInRows: any = [];
-    if (newAddItemListArray.length > 0) {
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-
-      rowsEdit.forEach((data: GridRowData) => {
-        itemsListInRows.push(data);
-      });
+  const currentlyDelete = (params: GridCellParams) => {
+    const value = params.colDef.field;
+    if (value === 'delete') {
+      setBarcodeNameDel(String(params.getValue(params.id, 'barcodeName')));
+      setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
+      setBarCodeDel(String(params.getValue(params.id, 'barcode')));
+      setOpenModelDeleteConfirm(true);
     }
-
-    if (checkDupItem) {
-      let arrayItemDup: any = [];
-      newAddItemListArray.forEach((data: any) => {
-        let qty = data.qty ? data.qty : data.actualQty;
-        if (data.barcode === barcodeItem) {
-          const itemsDup: any = {
-            barcode: data.barcode,
-            barcodeName: data.barcodeName,
-            actualQty: Number(qty) + 1,
-            skuCode: data.skuCode,
-            unitCode: data.unitCode,
-            unitName: data.unitName,
-            unitPrice: data.unitPriceText,
-          };
-
-          arrayItemDup.push(itemsDup);
-        } else {
-          arrayItemDup.push(data);
-        }
-      });
-
-      setNewAddItemListArray(arrayItemDup);
-    } else {
-      setNewAddItemListArray((newAddItemListArray) => [...newAddItemListArray, itemSelect]);
-    }
+  };
+  const handleModelDeleteConfirm = () => {
+    setOpenModelDeleteConfirm(false);
+  };
+  const handleDeleteItem = () => {
+    setNewAddItemListArray(newAddItemListArray.filter((r: any) => r.barcode !== barCodeDel));
+    setOpenModelDeleteConfirm(false);
   };
 
   const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
-
-  const handleAddItem = async () => {
+  const handleAddItems = async () => {
     setOpenLoadingModal(true);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const itemsList: any = [];
@@ -254,10 +261,10 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     let result: any = [];
     if (payloadAddItem.length > 0) {
       const sumAddItemList = [...itemsList, ...payloadAddItem];
-
       var o: any = {};
       sumAddItemList.forEach((i: any) => {
         var id = i.barcode;
+
         if (!o[id]) {
           return (o[id] = i);
         }
@@ -275,129 +282,46 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
 
     await dispatch(updateItemsState(result));
     setNewAddItemListArray([]);
-    setValueItemList(null);
-
+    // setSearchItem(null);
     setTimeout(() => {
       setOpenLoadingModal(false);
       onClose();
-    }, 500);
+    }, 300);
   };
 
-  const currentlyDelete = (params: GridCellParams) => {
-    const value = params.colDef.field;
-    //deleteItem
-    if (value === 'delete') {
-      setBarcodeNameDel(String(params.getValue(params.id, 'barcodeName')));
-      setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
-      setBarCodeDel(String(params.getValue(params.id, 'barcode')));
-      setOpenModelDeleteConfirm(true);
-      //   setNewAddItemListArray(
-      //     newAddItemListArray.filter((r: any) => r.barcode !== params.getValue(params.id, 'barcode'))
-      //   );
+  const onInputChange = async (event: any, value: string, reason: string) => {
+    if (event && event.keyCode && event.keyCode === 13) {
+      return false;
+    }
+
+    if (reason == 'reset') {
+      clearInput();
     }
   };
-
-  const handleDeleteItem = () => {
-    setNewAddItemListArray(newAddItemListArray.filter((r: any) => r.barcode !== barCodeDel));
-    setOpenModelDeleteConfirm(false);
-  };
-
-  const handleModelDeleteConfirm = () => {
-    setOpenModelDeleteConfirm(false);
-  };
-
-  let rows: any = [];
-  rows = newAddItemListArray.map((item: any, index: number) => {
-    return {
-      id: index,
-      barcode: item.barcode,
-      unitName: item.unitName,
-      barcodeName: item.barcodeName,
-      actualQty: item.actualQty ? item.actualQty : 1,
-      skuCode: item.skuCode,
-      unitPrice: item.unitPriceText,
-    };
-  });
-
-  let checkHaveItems;
-  if (itemsList.code === 204) {
-    checkHaveItems = (
-      <Grid item container xs={12} justifyContent="center">
-        <Box color="#CBD4DB">
-          <h4>ไม่พบสินค้า</h4>
-        </Box>
-      </Grid>
-    );
-  } else if (newAddItemListArray.length > 0) {
-    checkHaveItems = (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
-        <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            disableColumnMenu
-            hideFooter
-            autoHeight
-            onCellClick={currentlyDelete}
-            // rowHeight={65}
-          />
-        </div>
-      </Box>
-    );
-  } else {
-    checkHaveItems = <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}></Box>;
-  }
 
   return (
     <div>
       <Dialog open={open} maxWidth="sm" fullWidth={true}>
         <DialogContent>
           <Box sx={{ display: 'flex' }}>
+            <Box pt={1.5} sx={{ flex: 2 }}>
+              รายการสินค้า :
+            </Box>
             <Box sx={{ flex: 7 }}>
               <Autocomplete
-                {...defaultSearchItemList}
-                className={classes.Mautocomplete}
-                id="selItem"
-                value={valueItemList}
-                onChange={handleChangeItem}
+                id="selAddItem"
+                value={values}
+                fullWidth
+                loadingText="กำลังโหลด..."
+                options={options}
                 filterOptions={filterOptions}
-                disabled={itemsList.code === 204}
-                renderOption={(props, option) => {
-                  return (
-                    <li {...props} key={option.barcode}>
-                      <div>
-                        <Typography variant="body2">{option.barcodeName}</Typography>
-                        <Typography color="textSecondary" variant="caption">
-                          {option.barcode}
-                        </Typography>
-                      </div>
-                    </li>
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="บาร์โค้ด/รายละเอียดสินค้า"
-                    size="small"
-                    className={classes.MtextField}
-                    fullWidth
-                  />
-                )}
+                renderOption={autocompleteRenderListItem}
+                onChange={handleChangeItem}
+                onInputChange={onInputChange}
+                getOptionLabel={(option) => (option.barcodeName ? option.barcodeName : '')}
+                isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
+                renderInput={autocompleteRenderInput}
               />
-            </Box>
-
-            <Box sx={{ flex: 2 }}>
-              <Button
-                id="btnSearch"
-                variant="contained"
-                color="primary"
-                onClick={onClickAddItem}
-                sx={{ width: '100%', ml: 2 }}
-                className={classes.MbtnSearch}
-                disabled={!valueItemList}
-              >
-                เพิ่ม
-              </Button>
             </Box>
 
             <Box sx={{ flex: 1, ml: 2 }}>
@@ -418,14 +342,32 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
             </Box>
           </Box>
 
-          {checkHaveItems}
+          {newAddItemListArray.length > 0 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
+                <DataGrid
+                  rows={rows}
+                  columns={columns}
+                  disableColumnMenu
+                  hideFooter
+                  autoHeight
+                  onCellClick={currentlyDelete}
+                />
+              </div>
+            </Box>
+          )}
+          {newAddItemListArray.length == 0 && itemsList.code === 204 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }} color="#CBD4DB">
+              <h4>ไม่พบสินค้า</h4>
+            </Box>
+          )}
 
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               id="btnSearch"
               variant="contained"
               color="secondary"
-              onClick={handleAddItem}
+              onClick={handleAddItems}
               className={classes.MbtnSearch}
               size="large"
               disabled={newAddItemListArray.length === 0}
@@ -437,8 +379,6 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
         </DialogContent>
         <LoadingModal open={openLoadingModal} />
       </Dialog>
-
-      {/* ModalDeleteConfirm */}
 
       <Dialog
         open={openModelDeleteConfirm}

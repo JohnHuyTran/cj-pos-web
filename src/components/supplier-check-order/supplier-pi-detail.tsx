@@ -28,7 +28,7 @@ import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
 import ModelDeleteConfirm from './modal-delete-confirm';
-import ModalAddItem from './modal-add-item';
+import ModalAddItem from './modal-add-items';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { updateState } from '../../store/slices/supplier-selection-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
