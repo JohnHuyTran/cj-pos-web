@@ -214,7 +214,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          <Typography sx={{ fontSize: 24, fontWeight: 400 }}>สร้างรายการโอนสินค้า</Typography>
+          <Typography sx={{ fontSize: '1em' }}>สร้างรายการโอนสินค้า</Typography>
           {/* <Steppers status={status}></Steppers> */}
           {!docNo && <Steppers status={0}></Steppers>}
           {docNo && <Steppers status={1}></Steppers>}
