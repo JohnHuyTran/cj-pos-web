@@ -48,7 +48,7 @@ const columns: GridColDef[] = [
     sortable: false,
     // hide: true,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -71,8 +71,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant='body2'>{params.value}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+        <Typography variant="body2">{params.value}</Typography>
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
@@ -112,9 +112,9 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => (
       <div>
         <TextField
-          variant='outlined'
-          name='txnActualQty'
-          type='number'
+          variant="outlined"
+          name="txnActualQty"
+          type="number"
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
@@ -132,7 +132,7 @@ const columns: GridColDef[] = [
             params.api.updateRows([{ ...params.row, actualQty: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraftStatus') ? false : true}
-          autoComplete='off'
+          autoComplete="off"
         />
       </div>
     ),
@@ -155,15 +155,15 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => (
       <div>
         <TextField
-          variant='outlined'
-          name='txnQtyReturn'
+          variant="outlined"
+          name="txnQtyReturn"
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
             params.api.updateRows([{ ...params.row, tote: e.target.value }]);
           }}
           disabled={params.getValue(params.id, 'isDraftStatus') ? false : true}
-          autoComplete='off'
+          autoComplete="off"
         />
       </div>
     ),
@@ -473,42 +473,42 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
   return (
     <React.Fragment>
-      <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
+      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
           <Typography sx={{ fontSize: 24, fontWeight: 400 }}>ตรวจสอบรายการใบโอน</Typography>
-          <Steppers status={0}></Steppers>
+          <Steppers status="CREATED" type="BT"></Steppers>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box mt={4} sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร BT</Typography>
+                <Typography variant="body2">เลขที่เอกสาร BT</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{btNo}</Typography>
+                <Typography variant="body2">{btNo}</Typography>
               </Grid>
               <Grid item lg={6}></Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่สร้างรายการ:</Typography>
+                <Typography variant="body2">วันที่สร้างรายการ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{convertUtcToBkkDate('2022-02-02')}</Typography>
+                <Typography variant="body2">{convertUtcToBkkDate('2022-02-02')}</Typography>
               </Grid>
               <Grid item lg={6}></Grid>
             </Grid>
 
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่โอนสินค้า* :</Typography>
+                <Typography variant="body2">วันที่โอนสินค้า* :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่สิ้นสุด* :</Typography>
+                <Typography variant="body2">วันที่สิ้นสุด* :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <DatePickerComponent
@@ -523,14 +523,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant='body2'> สาขาต้นทาง* :</Typography>
+                <Typography variant="body2"> สาขาต้นทาง* :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <TextField value={sourceBranch} disabled fullWidth></TextField>
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>สาขาปลายทาง* :</Typography>
+                <Typography variant="body2">สาขาปลายทาง* :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <TextField value={destinationBranch} disabled fullWidth></TextField>
@@ -540,7 +540,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant='body2'> สาเหตุการโอน :</Typography>
+                <Typography variant="body2"> สาเหตุการโอน :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <TextField value={reasons} disabled fullWidth></TextField>
@@ -554,40 +554,44 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
               container
               xs={12}
               sx={{ mt: 3 }}
-              justifyContent='space-between'
-              direction='row'
-              alignItems='flex-end'>
+              justifyContent="space-between"
+              direction="row"
+              alignItems="flex-end"
+            >
               <Grid item xl={2}></Grid>
               <Grid item>
                 <Button
-                  id='btnSave'
-                  variant='contained'
-                  color='warning'
+                  id="btnSave"
+                  variant="contained"
+                  color="warning"
                   className={classes.MbtnSave}
                   onClick={handleSaveBtn}
                   startIcon={<SaveIcon />}
-                  sx={{ width: 200 }}>
+                  sx={{ width: 200 }}
+                >
                   บันทึก
                 </Button>
 
                 <Button
-                  id='btnApprove'
-                  variant='contained'
-                  color='primary'
+                  id="btnApprove"
+                  variant="contained"
+                  color="primary"
                   className={classes.MbtnApprove}
                   onClick={handleConfirmBtn}
                   startIcon={<CheckCircleOutline />}
-                  sx={{ width: 200 }}>
+                  sx={{ width: 200 }}
+                >
                   ส่งงานให้ DC
                 </Button>
               </Grid>
             </Grid>
           )}
-          <Box mt={2} bgcolor='background.paper'>
+          <Box mt={2} bgcolor="background.paper">
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
               // style={{ width: '100%', height: 'auto' }}
-              className={classes.MdataGridDetail}>
+              className={classes.MdataGridDetail}
+            >
               <DataGrid
                 rows={rows}
                 columns={cols}
@@ -611,7 +615,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
                 <TextBoxComment
-                  fieldName='สาเหตุการเปลี่ยนจำนวน:'
+                  fieldName="สาเหตุการเปลี่ยนจำนวน:"
                   defaultValue={comment}
                   maxLength={100}
                   onChangeComment={handleChangeComment}
@@ -665,8 +669,8 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         open={openModelConfirmTransaction}
         onClose={handleOnCloseModalConfirm}
         handleConfirm={sendTransactionToDC}
-        header='ยืนยันส่งรายการให้ DC'
-        title='เลขที่เอกสาร BT'
+        header="ยืนยันส่งรายการให้ DC"
+        title="เลขที่เอกสาร BT"
         value={btNo}
       />
 
