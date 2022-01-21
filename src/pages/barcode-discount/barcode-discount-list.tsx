@@ -1,27 +1,40 @@
-import {Box, Typography} from "@mui/material";
-import {DataGrid, GridColDef, GridValueGetterParams} from "@mui/x-data-grid";
-import React from "react";
+import {Box, Checkbox, FormControl, FormControlLabel, FormGroup, Typography} from "@mui/material";
+import {DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueGetterParams} from "@mui/x-data-grid";
+import React, {useEffect} from "react";
 import {useStyles} from "../../styles/makeTheme";
 import {useTranslation} from "react-i18next";
 import {
-    BarcodeDiscount, BarcodeDiscountProductDetail,
+    BarcodeDiscount,
+    BarcodeDiscountProductDetail,
     BarcodeDiscountSearchRequest,
     BarcodeDiscountSearchResponse
 } from "../../models/barcode-discount-model";
 import {convertUtcToBkkDate} from "../../utils/date-utill";
 import {BDStatus, DateFormat} from "../../utils/enum/common-enum";
-import {genColumnValue} from "../../utils/utils";
+import {genColumnValue, numberWithCommas, stringNullOrEmpty} from "../../utils/utils";
 import HtmlTooltip from "../../components/commons/ui/html-tooltip";
 import {useAppDispatch, useAppSelector} from "../../store/store";
 import {saveSearchCriteriaSup} from "../../store/slices/save-search-order-supplier-slice";
 import {barcodeDiscountSearch} from "../../store/slices/barcode-discount-search-slice";
+import ModalCreateBarcodeDiscount from "../../components/barcode-discount/modal-create-barcode-discound";
+import BarcodeDiscountPopup from "../../components/barcode-discount/barcode-discount-popup";
+import {getBarcodeDiscountDetail} from "../../store/slices/barcode-discount-detail-slice";
 
 const _ = require("lodash");
+
+interface loadingModalState {
+    open: boolean;
+}
 
 const BarcodeDiscountList = () => {
     const classes = useStyles();
     const {t} = useTranslation(["barcodeDiscount"]);
+    const [lstBarcodeDiscount, setLstBarcodeDiscount] = React.useState<any[]>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
+    const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({open: false});
+    const [openDetail, setOpenDetail] = React.useState(false);
+    const [openPopup, setOpenPopup] = React.useState<boolean>(false);
+    const [checkAll, setCheckAll] = React.useState<boolean>(false);
 
     const dispatch = useAppDispatch();
     const barcodeDiscountSearchSlice = useAppSelector((state) => state.barcodeDiscountSearchSlice);
@@ -31,13 +44,112 @@ const BarcodeDiscountList = () => {
     const [pageSize, setPageSize] = React.useState(limit.toString());
     const payload = useAppSelector((state) => state.barcodeDiscountCriteriaSearchSlice.searchCriteria);
 
+    useEffect(() => {
+        const lstBarcodeDiscount = bdSearchResponse.data;
+        if (lstBarcodeDiscount != null && lstBarcodeDiscount.length > 0) {
+            let rows = lstBarcodeDiscount.map((data: BarcodeDiscount, index: number) => {
+                return {
+                    checked: false,
+                    id: data.id,
+                    index: (currentPage - 1) * parseInt(pageSize) + index + 1,
+                    documentNumber: data.documentNumber,
+                    status: data.status,
+                    totalAmount: data.products.length,
+                    unit: t("list"),
+                    sumOfPrice: genTotalPrice(data.products),
+                    sumOfCashDiscount: genTotalCashDiscount(data.percentDiscount, data.products),
+                    sumOfPriceAfterDiscount: genTotalPriceAfterDiscount(data.percentDiscount, data.products),
+                    branch: data.branchName,
+                    createdDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
+                    approvedDate: (BDStatus.APPROVED === data.status || BDStatus.BARCODE_PRINTED === data.status) ? convertUtcToBkkDate(data.approvedDate, DateFormat.DATE_FORMAT) : '',
+                    requesterNote: stringNullOrEmpty(data.requesterNote) ? '' : data.requesterNote
+                };
+            });
+            setLstBarcodeDiscount(rows);
+            setCheckAll(false);
+        }
+    }, [bdSearchResponse]);
+
+    const handleOpenLoading = (prop: any, event: boolean) => {
+        setOpenLoadingModal({...openLoadingModal, [prop]: event});
+    };
+
+    const handleCloseDetail = () => {
+        setOpenDetail(false)
+    }
+
+    const handleClosePopup = () => {
+        setOpenPopup(false)
+    }
+
+    const onCheckCell = async (params: GridRenderCellParams, event: any) => {
+        await setLstBarcodeDiscount((prevData: any[]) => {
+            const data = [...prevData];
+            data[params.row.index - 1].checked = event.target.checked;
+            return data;
+        });
+        let lstUnCheck = lstBarcodeDiscount.filter(it => !it.checked);
+        if (lstUnCheck != null && lstUnCheck.length > 0)
+            setCheckAll(false);
+        else
+            setCheckAll(true);
+    }
+
+    const onCheckAll = (event: any) => {
+        setCheckAll(event.target.checked);
+        for (let item of lstBarcodeDiscount) {
+            if (BDStatus.APPROVED == item.status) {
+                item.checked = event.target.checked;
+            }
+        }
+    }
+
+    const renderCell = (value: any) => {
+        return (
+            <HtmlTooltip title={<React.Fragment>{value}</React.Fragment>}>
+                <Typography variant='body2' noWrap>
+                    {value}
+                </Typography>
+            </HtmlTooltip>
+        );
+    };
+
+    const addTwoDecimalPlaces = (value: any) => {
+        if (stringNullOrEmpty(value)) return '0.00';
+        else return value.toFixed(2);
+    };
+
     const columns: GridColDef[] = [
+        {
+            field: 'checked',
+            headerName: t("numberOrder"),
+            width: 100,
+            headerAlign: 'center',
+            align: 'center',
+            sortable: false,
+            renderHeader: (params) => (
+                <FormControl component="fieldset" sx={{marginLeft: "-15px"}}>
+                    <FormGroup aria-label="position" row>
+                        <FormControlLabel className={classes.MFormControlLabel}
+                                          value="top"
+                                          control={<Checkbox checked={checkAll} onClick={onCheckAll.bind(this)}/>}
+                                          label={t('selectAll')}
+                                          labelPlacement="top"
+
+                        />
+                    </FormGroup>
+                </FormControl>
+            ),
+            renderCell: (params) => (
+                <Checkbox checked={Boolean(params.value)} disabled={BDStatus.APPROVED != params.row.status}
+                          onClick={onCheckCell.bind(this, params)}/>
+            ),
+        },
         {
             field: 'index',
             headerName: t("numberOrder"),
             flex: 0.6,
             headerAlign: 'center',
-            align: 'center',
             sortable: false,
             renderCell: (params) => (
                 <Box component='div' sx={{paddingLeft: '20px'}}>
@@ -55,7 +167,7 @@ const BarcodeDiscountList = () => {
         {
             field: 'status',
             headerName: t("status"),
-            flex: 1,
+            flex: 1.2,
             headerAlign: 'center',
             align: 'center',
             sortable: false,
@@ -64,7 +176,7 @@ const BarcodeDiscountList = () => {
         {
             field: 'totalAmount',
             headerName: t("totalAmount"),
-            flex: 1,
+            flex: 0.9,
             headerAlign: 'center',
             align: 'right',
             sortable: false,
@@ -72,7 +184,7 @@ const BarcodeDiscountList = () => {
         {
             field: 'unit',
             headerName: t("unit"),
-            flex: 0.8,
+            flex: 0.6,
             headerAlign: 'center',
             sortable: false
         },
@@ -83,6 +195,7 @@ const BarcodeDiscountList = () => {
             headerAlign: 'center',
             align: 'right',
             sortable: false,
+            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value)))
         },
         {
             field: 'sumOfCashDiscount',
@@ -90,7 +203,8 @@ const BarcodeDiscountList = () => {
             flex: 1,
             headerAlign: 'center',
             align: 'right',
-            sortable: false
+            sortable: false,
+            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value)))
         },
         {
             field: 'sumOfPriceAfterDiscount',
@@ -99,6 +213,7 @@ const BarcodeDiscountList = () => {
             headerAlign: 'center',
             align: 'right',
             sortable: false,
+            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value)))
         },
         {
             field: 'branch',
@@ -106,15 +221,7 @@ const BarcodeDiscountList = () => {
             flex: 1,
             headerAlign: 'center',
             sortable: false,
-            renderCell: (params) => {
-                return (
-                    <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
-                        <Typography variant='body2' noWrap>
-                            {params.value}
-                        </Typography>
-                    </HtmlTooltip>
-                );
-            },
+            renderCell: (params) => renderCell(params.value)
         },
         {
             field: 'createdDate',
@@ -138,15 +245,7 @@ const BarcodeDiscountList = () => {
             flex: 1.2,
             headerAlign: 'center',
             sortable: false,
-            renderCell: (params) => {
-                return (
-                    <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
-                        <Typography variant='body2' noWrap>
-                            {params.value}
-                        </Typography>
-                    </HtmlTooltip>
-                );
-            },
+            renderCell: (params) => renderCell(params.value)
         },
     ];
 
@@ -203,24 +302,6 @@ const BarcodeDiscountList = () => {
         return totalPriceAfterDiscount < 0 ? 0 : totalPriceAfterDiscount;
     };
 
-    const rows = bdSearchResponse.data.map((data: BarcodeDiscount, index: number) => {
-        return {
-            id: index + 1,
-            index: (currentPage - 1) * parseInt(pageSize) + index + 1,
-            documentNumber: data.documentNumber,
-            status: data.status,
-            totalAmount: data.products.length,
-            unit: t("list"),
-            sumOfPrice: genTotalPrice(data.products),
-            sumOfCashDiscount: genTotalCashDiscount(data.percentDiscount, data.products),
-            sumOfPriceAfterDiscount: genTotalPriceAfterDiscount(data.percentDiscount, data.products),
-            branch: data.branchName,
-            createdDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
-            approvedDate: (BDStatus.APPROVED === data.status || BDStatus.BARCODE_PRINTED === data.status) ? convertUtcToBkkDate(data.approvedDate, DateFormat.DATE_FORMAT) : "",
-            requesterNote: data.requesterNote
-        };
-    });
-
     const handlePageChange = async (newPage: number) => {
         setLoading(true);
         let page: string = (newPage + 1).toString();
@@ -258,17 +339,35 @@ const BarcodeDiscountList = () => {
         setLoading(false);
     };
 
+    const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail);
+    const currentlySelected = async (params: GridCellParams) => {
+        const chkPN = params.colDef.field;
+        handleOpenLoading('open', true);
+        if (chkPN !== 'checked') {
+            try {
+                await dispatch(getBarcodeDiscountDetail(params.row.id));
+                if (barcodeDiscountDetail.data.length > 0 || barcodeDiscountDetail.data) {
+                    setOpenDetail(true);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        handleOpenLoading('open', false);
+    };
+
     return (
         <div>
             <Box mt={2} bgcolor='background.paper'>
-                <div className={classes.MdataGridPaginationTop} style={{height: rows.length >= 10 ? '60vh' : 'auto'}}>
+                <div className={classes.MdataGridPaginationTop}
+                     style={{height: lstBarcodeDiscount.length >= 10 ? '60vh' : 'auto'}}>
                     <DataGrid
-                        rows={rows}
+                        rows={lstBarcodeDiscount}
                         columns={columns}
                         disableColumnMenu
-                        checkboxSelection={true}
+                        hideFooterSelectedRowCount={true}
                         // onCellClick={currentlySelected}
-                        autoHeight={rows.length < 10}
+                        autoHeight={lstBarcodeDiscount.length < 10}
                         scrollbarSize={10}
                         pagination
                         page={currentPage - 1}
@@ -283,6 +382,13 @@ const BarcodeDiscountList = () => {
                     />
                 </div>
             </Box>
+            {openDetail && <ModalCreateBarcodeDiscount isOpen={openDetail} onClickClose={handleCloseDetail}
+                                                       setOpenPopup={setOpenPopup}/>}
+            <BarcodeDiscountPopup
+                open={openPopup}
+                onClose={handleClosePopup}
+                contentMsg={"คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว"}
+            />
         </div>
     );
 }

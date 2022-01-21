@@ -249,6 +249,12 @@ const useStyles = makeStyles({
     overflow: "hidden",
     textOverflow: "ellipsis",
   },
+  MFormControlLabel: {
+    "& .MuiFormControlLabel-label": {
+      fontSize: "small",
+      margin: "10px 0px -10px 0px"
+    }
+  },
   MLabelTooltipWrapper: {
     position: "relative",
     "& .title": {
