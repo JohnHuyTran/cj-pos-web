@@ -150,8 +150,6 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
                 id: rs.data.id,
                 documentNumber: rs.data.documentNumber,
                 status: rs.data.status,
-                sumOfDiscount: dataDetail.sumOfDiscountDefault,
-                sumOfApprovedDiscount: dataDetail.sumOfApprovedDiscountDefault,
               })
             );
             if (rs.data.status === 1 && sendRequest) {
@@ -219,8 +217,6 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
         dispatch(
           updateDataDetail({
             ...dataDetail,
-            sumOfDiscount: dataDetail.sumOfDiscountDefault,
-            sumOfApprovedDiscount: dataDetail.sumOfApprovedDiscountDefault,
             status: 2,
           })
         );
