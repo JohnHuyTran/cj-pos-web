@@ -55,6 +55,7 @@ export interface SaveStockTransferRequest {
 export interface StockTransferItems {
   barcode: string;
   orderQty: number;
+  toleNo?: string;
 }
 
 export interface SaveStockPackRequest {
