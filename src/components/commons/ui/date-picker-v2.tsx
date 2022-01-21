@@ -1,8 +1,8 @@
 //@ts-nocheck
 import React, { useState } from 'react';
 // npm i @date-io/moment@1.x moment
-import OverwriteMomentBE from '../commons/ui/OverwriteMoment'; // choose your lib
-import { useStyles } from '../commons/ui/date-picker-css';
+import OverwriteMomentBE from './OverwriteMoment'; // choose your lib
+import { useStyles } from './date-picker-css';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import CloseIcon from '@mui/icons-material/Close';

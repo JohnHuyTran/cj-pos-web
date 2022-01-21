@@ -118,18 +118,17 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
 
   const handleCreateDraft = async (sendRequest: boolean) => {
     const data = [...payloadBarcodeDiscount.products];
-    console.log({ data });
 
     if (payloadBarcodeDiscount.products.length !== 0) {
       const check = data.every((item) => {
         if (payloadBarcodeDiscount.percentDiscount) {
-          if (item.discount <= 0 || item.discount > 100) return false;
+          if (item.RequestedDiscount <= 0 || item.RequestedDiscount > 100) return false;
         }
-        if (stringNullOrEmpty(item.expiryDate)) return false;
-        if (item.numberOfDiscounted <= 0) {
+        if (stringNullOrEmpty(item.ExpiredDate)) return false;
+        if (item.NumberOfDiscounted <= 0) {
           return false;
         } else {
-          return item.discount > 0 && item.discount <= item.price;
+          return item.RequestedDiscount > 0 && item.RequestedDiscount <= item.price;
         }
       });
 
@@ -174,16 +173,20 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
           };
 
           if (payloadBarcodeDiscount.percentDiscount) {
-            if (preData.discount <= 0 || preData.discount > 100) {
+            if (preData.RequestedDiscount <= 0 || preData.RequestedDiscount > 100 || !preData.RequestedDiscount) {
               item.errorDiscount = 'ส่วนลดต้องมากกว่าหรือเท่ากับ 0 และน้อยกว่า 100';
             }
           } else {
-            if (preData.discount <= 0 || preData.discount > preData.price) {
+            if (
+              preData.RequestedDiscount <= 0 ||
+              preData.RequestedDiscount > preData.price ||
+              !preData.RequestedDiscount
+            ) {
               item.errorDiscount = 'ราคาส่วนลดต้องมากกว่าหรือเท่ากับ 0 และน้อยกว่าราคาสินค้า';
             }
           }
-          if (preData.numberOfDiscounted <= 0) {
-            preData.errorNumberOfDiscounted = 'ค่าต้องมากกว่า 0';
+          if (preData.NumberOfDiscounted <= 0 || !preData.NumberOfDiscounted) {
+            item.errorNumberOfDiscounted = 'ค่าต้องมากกว่า 0';
           }
           if (!preData.ExpiredDate) {
             item.errorExpiryDate = 'ค่าไม่ว่างเปล่า';

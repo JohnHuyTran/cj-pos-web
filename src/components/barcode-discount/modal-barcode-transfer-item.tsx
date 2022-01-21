@@ -6,8 +6,8 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, TextFi
 import { DeleteForever, Tune } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
 import { DiscountDetail } from '../../models/barcode-discount';
-import DatePickerComponent from '../../components/barcode-discount/date-picker';
-import { saveBarcodeDiscount, updateDataDetail } from '../../store/slices/barcode-discount-slice';
+import DatePickerComponent from '../commons/ui/date-picker-v2';
+import { saveBarcodeDiscount, updateDataDetail, updateErrorList } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { stringNullOrEmpty } from '../../utils/utils';
@@ -27,7 +27,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
   const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
   const errorList = useAppSelector((state) => state.barcodeDiscount.errorList);
-  console.log({ errorList });
 
   const [dtTable, setDtTable] = React.useState<Array<DiscountDetail>>([]);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
@@ -41,7 +40,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
         let discount = !!sameItem ? sameItem.discount : 0;
         const cashDiscount = typeDiscount === 'percent' ? (discount * price) / 100 : discount;
 
-        const priceAfterDicount = price - cashDiscount;
+        const priceAfterDicount = price - (cashDiscount || 0);
         const date = moment(new Date()).startOf('day').toISOString();
 
         return {
@@ -101,7 +100,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     setOpenPopupModal(false);
   };
 
-  const handleChangeDiscount = (event: any, index: number) => {
+  const handleChangeDiscount = (event: any, index: number, errorIndex: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       const value = event.target.value;
@@ -117,22 +116,58 @@ export const ModalTransferItem = (props: DataGridProps) => {
       data[index - 1].priceAfterDicount = data[index - 1].price - data[index - 1].cashDiscount;
       return data;
     });
+    dispatch(
+      updateErrorList(
+        errorList.map((item: any, idx: number) => {
+          return idx === errorIndex
+            ? {
+                ...item,
+                errorDiscount: '',
+              }
+            : item;
+        })
+      )
+    );
   };
 
-  const handleChangeNumberOfDiscount = (event: any, index: number) => {
+  const handleChangeNumberOfDiscount = (event: any, index: number, errorIndex: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       data[index - 1].numberOfDiscounted = parseInt(event.target.value);
       return data;
     });
+    dispatch(
+      updateErrorList(
+        errorList.map((item: any, idx: number) => {
+          return idx === errorIndex
+            ? {
+                ...item,
+                errorNumberOfDiscounted: '',
+              }
+            : item;
+        })
+      )
+    );
   };
 
-  const handleChangeExpiry = (e: any, index: number) => {
+  const handleChangeExpiry = (e: any, index: number, errorIndex: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       data[index - 1].expiryDate = e;
       return data;
     });
+    dispatch(
+      updateErrorList(
+        errorList.map((item: any, idx: number) => {
+          return idx === errorIndex
+            ? {
+                ...item,
+                errorExpiryDate: '',
+              }
+            : item;
+        })
+      )
+    );
   };
 
   const handleChangeNote = (e: any) => {
@@ -206,8 +241,18 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const validate = payloadBarcodeDiscount.validate;
         const value = params.value;
         const price = params.row.price;
-        const condition = validate && ((value && (value < 0 || value > 100)) || !value) && params.row.errorDiscount;
-        const condition2 = validate && ((value && (value < 0 || value > price)) || !value) && params.row.errorDiscount;
+        const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
+
+        const condition =
+          validate &&
+          ((value && (value < 0 || value > 100)) || !value) &&
+          index != -1 &&
+          errorList[index].errorDiscount;
+        const condition2 =
+          validate &&
+          ((value && (value < 0 || value > price)) || !value) &&
+          index !== -1 &&
+          errorList[index].errorDiscount;
         return typeDiscount === 'percent' ? (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
@@ -216,10 +261,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
               error={condition}
               value={params.value}
               onChange={(e) => {
-                handleChangeDiscount(e, params.row.index);
+                handleChangeDiscount(e, params.row.index, index);
               }}
             />
-            {condition && <div className="title">{params.row.errorDiscount}</div>}
+            {condition && <div className="title">{errorList[index].errorDiscount}</div>}
           </div>
         ) : (
           <div className={classes.MLabelTooltipWrapper}>
@@ -230,11 +275,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
               value={params.value}
               // inputProps={{ min: 0, max: 100 }}
               onChange={(e) => {
-                handleChangeDiscount(e, params.row.index);
+                handleChangeDiscount(e, params.row.index, index);
               }}
               placeholder="0"
             />
-            {condition2 && <div className="title">{params.row.errorDiscount}</div>}
+            {condition2 && <div className="title">{errorList[index].errorDiscount}</div>}
           </div>
         );
       },
@@ -275,8 +320,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
       renderCell: (params: GridRenderCellParams) => {
         const validate = payloadBarcodeDiscount.validate;
         const value = params.value;
-
-        const condition = validate && ((value && value < 0) || !value) && params.row.errorNumberOfDiscounted;
+        const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
+        const condition =
+          validate && ((value && value < 0) || !value) && index != -1 && errorList[index].errorNumberOfDiscounted;
         return (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
@@ -286,10 +332,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
               className={classes.MtextFieldNumber}
               inputProps={{ min: 0 }}
               onChange={(e) => {
-                handleChangeNumberOfDiscount(e, params.row.index);
+                handleChangeNumberOfDiscount(e, params.row.index, index);
               }}
             />
-            {condition && <div className="title">{params.row.errorNumberOfDiscounted}</div>}
+            {condition && <div className="title">{errorList[index].errorNumberOfDiscounted}</div>}
           </div>
         );
       },
@@ -326,17 +372,19 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
+        const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
+        const condition = index != -1 && errorList[index].errorExpiryDate;
         return (
           <div className={classes.MLabelTooltipWrapper}>
             <DatePickerComponent
-              // error={true}
+              error={condition}
               onClickDate={(e: any) => {
-                handleChangeExpiry(e, params.row.index);
+                handleChangeExpiry(e, params.row.index, index);
               }}
               value={params.value}
               placeHolder="วว/ดด/ปปปป"
             />
-            {false && <div className="title">demo</div>}
+            {condition && <div className="title">{errorList[index].errorExpiryDate}</div>}
           </div>
         );
       },
