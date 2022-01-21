@@ -88,7 +88,7 @@ const BarcodeDiscountList = () => {
             data[params.row.index - 1].checked = event.target.checked;
             return data;
         });
-        let lstUnCheck = lstBarcodeDiscount.filter(it => !it.checked);
+        let lstUnCheck = lstBarcodeDiscount.filter(it => !it.checked && BDStatus.APPROVED == it.status);
         if (lstUnCheck != null && lstUnCheck.length > 0)
             setCheckAll(false);
         else
@@ -119,6 +119,15 @@ const BarcodeDiscountList = () => {
         else return value.toFixed(2);
     };
 
+    const onDisabledCheckAll = () => {
+        let disabled = true;
+        if (lstBarcodeDiscount != null && lstBarcodeDiscount.length > 0) {
+            let lstBarcodeDiscountApproved = lstBarcodeDiscount.filter(it => BDStatus.APPROVED == it.status);
+            disabled = lstBarcodeDiscountApproved == null || lstBarcodeDiscountApproved.length == 0;
+        }
+        return disabled;
+    }
+
     const columns: GridColDef[] = [
         {
             field: 'checked',
@@ -132,10 +141,10 @@ const BarcodeDiscountList = () => {
                     <FormGroup aria-label="position" row>
                         <FormControlLabel className={classes.MFormControlLabel}
                                           value="top"
-                                          control={<Checkbox checked={checkAll} onClick={onCheckAll.bind(this)}/>}
+                                          control={<Checkbox checked={checkAll} onClick={onCheckAll.bind(this)}
+                                                             disabled={onDisabledCheckAll()}/>}
                                           label={t('selectAll')}
                                           labelPlacement="top"
-
                         />
                     </FormGroup>
                 </FormControl>
@@ -284,12 +293,18 @@ const BarcodeDiscountList = () => {
 
     const genTotalPrice = (products: BarcodeDiscountProductDetail[]) => {
         return _.sumBy(products, (item: BarcodeDiscountProductDetail) => {
+            if (stringNullOrEmpty(item.price) || stringNullOrEmpty(item.numberOfDiscounted)) {
+                return 0;
+            }
             return item.price * item.numberOfDiscounted;
         });
     };
 
     const genTotalCashDiscount = (percentDiscount: boolean, products: BarcodeDiscountProductDetail[]) => {
         return _.sumBy(products, (item: BarcodeDiscountProductDetail) => {
+            if (stringNullOrEmpty(item.price) || stringNullOrEmpty(item.requestedDiscount) || stringNullOrEmpty(item.numberOfDiscounted)) {
+                return 0;
+            }
             if (percentDiscount)
                 return ((item.price * item.requestedDiscount) / 100) * item.numberOfDiscounted;
             else
