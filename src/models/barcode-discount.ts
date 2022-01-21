@@ -17,10 +17,10 @@ export interface DiscountDetail {
   productName: string;
   unit: string;
   price: number;
-  discount: number;
+  discount: any;
   expiryDate: string | any;
-  cashDiscount: number;
-  priceAfterDicount: number;
+  cashDiscount: number | any;
+  priceAfterDicount: number | any;
   numberOfDiscounted: number;
   approvedDiscount: number;
   errorDiscount: string;
