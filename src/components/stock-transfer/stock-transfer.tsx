@@ -319,7 +319,7 @@ export default function SupplierCheckOrderSearch() {
           </Grid> */}
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
-            <Button
+            {/* <Button
               id='btnCreateStockTransferModal'
               variant='contained'
               onClick={handleOpenCreateModal}
@@ -328,7 +328,7 @@ export default function SupplierCheckOrderSearch() {
               startIcon={<AddCircleOutlineOutlinedIcon />}
               color='secondary'>
               สร้างรายการโอน
-            </Button>
+            </Button> */}
             <Button
               id='btnClear'
               variant='contained'
@@ -352,7 +352,7 @@ export default function SupplierCheckOrderSearch() {
 
         <Box mt={2}></Box>
 
-        <hr />
+        {/* <hr />
 
         <Box mt={2}>
           <Button
@@ -365,7 +365,7 @@ export default function SupplierCheckOrderSearch() {
             disabled>
             ส่งงาน
           </Button>
-        </Box>
+        </Box> */}
       </Box>
 
       <Box mt={6}></Box>

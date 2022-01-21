@@ -233,7 +233,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const [sourceBranch, setSourceBranch] = React.useState('');
   const [destinationBranch, setDestinationBranch] = React.useState('');
   const [btNo, setBtNo] = React.useState('');
-  const [btStatus, setBtStatus] = React.useState<String>('');
+  const [btStatus, setBtStatus] = React.useState<String>('CREATED');
   const [reasons, setReasons] = React.useState('');
   const [isDraft, setIsDraft] = React.useState(false);
 
@@ -248,9 +248,9 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setDestinationBranch('1124-พรหมบุรี');
     setBtNo('BT01');
     setReasons('ทั้งหมด');
-    setBtStatus('0');
+    setBtStatus('CREATED');
     setComment('Test Comment');
-    const isBranch = isOwnBranch('D0002');
+    const isBranch = isOwnBranch('D0001');
     setIsDraft(isBranch && btStatus === 'CREATED' ? true : false);
   }, [open]);
   const handleStartDatePicker = (value: any) => {
@@ -288,6 +288,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       const item: StockTransferItems = {
         barcode: data.barcode,
         orderQty: data.actualQty,
+        toleNo: data.tote,
       };
       items.push(item);
     });
@@ -321,7 +322,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         unitCode: item.unitCode,
         actualQty: item.returnQty ? item.returnQty : 0,
         unitFactor: '',
-        tote: '',
+        tote: '111111',
         produtStatus: item.produtStatus,
         isDraftStatus: isDraft,
         qtyAll: item.qtyAll,
