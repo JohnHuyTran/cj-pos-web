@@ -122,4 +122,5 @@ export interface Item {
   toteCode?: string;
   orderQty?: number;
   orderAllQty?: number;
+  isDraft?: boolean;
 }

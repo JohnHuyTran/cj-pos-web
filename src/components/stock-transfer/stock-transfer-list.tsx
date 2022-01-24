@@ -227,10 +227,10 @@ function StockTransferList() {
     setOpenCreateModal(false);
   }
 
-  async function currentlySelected() {
-    await dispatch(featchBranchTransferDetailAsync('BT22010002-000001'));
+  const currentlySelected = async (params: GridCellParams) => {
+    await dispatch(featchBranchTransferDetailAsync(params.row.btNo));
     setOpenCreateModal(true);
-  }
+  };
   return (
     <div>
       <Box mt={2} bgcolor='background.paper'>

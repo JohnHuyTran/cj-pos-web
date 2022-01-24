@@ -20,13 +20,12 @@ import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import { useStyles } from '../../styles/makeTheme';
 import { isOwnBranch, numberWithCommas } from '../../utils/utils';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { PurchaseNoteDetailEntries } from '../../models/purchase-credit-note';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import ModalConfirmTransaction from './modal-confirm-transaction';
-import { SaveStockPackRequest, StockTransferItems } from '../../models/stock-transfer-model';
+import { BranchTransferInfo, Item, SaveStockPackRequest, StockTransferItems } from '../../models/stock-transfer-model';
 import { saveBranchTransfer, sendBranchTransferToDC } from '../../services/stock-transfer';
 import moment from 'moment';
 import { ApiError } from '../../models/api-error-model';
@@ -79,7 +78,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'stockQty',
+    field: 'remainStock',
     headerName: 'สต๊อกสินค้าคงเหลือ',
     width: 150,
     headerAlign: 'center',
@@ -88,7 +87,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => numberWithCommas(params.value),
   },
   {
-    field: 'approveQty',
+    field: 'qty',
     headerName: 'จำนวนที่อนุมัติ',
     width: 150,
     headerAlign: 'center',
@@ -119,10 +118,10 @@ const columns: GridColDef[] = [
           value={params.value}
           onChange={(e) => {
             var qty: any =
-              params.getValue(params.id, 'approveQty') &&
-              params.getValue(params.id, 'approveQty') !== null &&
-              params.getValue(params.id, 'approveQty') != undefined
-                ? params.getValue(params.id, 'approveQty')
+              params.getValue(params.id, 'qty') &&
+              params.getValue(params.id, 'qty') !== null &&
+              params.getValue(params.id, 'qty') != undefined
+                ? params.getValue(params.id, 'qty')
                 : 0;
             var value = e.target.value ? parseInt(e.target.value, 10) : '0';
             var returnQty = Number(params.getValue(params.id, 'actualQty'));
@@ -131,7 +130,7 @@ const columns: GridColDef[] = [
             if (value > qty) value = qty;
             params.api.updateRows([{ ...params.row, actualQty: value }]);
           }}
-          disabled={params.getValue(params.id, 'isDraftStatus') ? false : true}
+          disabled={params.getValue(params.id, 'isDraft') ? false : true}
           autoComplete='off'
         />
       </div>
@@ -147,7 +146,7 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => calUnitFactor(params),
   },
   {
-    field: 'tote',
+    field: 'toteCode',
     headerName: 'เลข Tote/ลัง',
     width: 150,
     headerAlign: 'center',
@@ -162,7 +161,7 @@ const columns: GridColDef[] = [
           onChange={(e) => {
             params.api.updateRows([{ ...params.row, tote: e.target.value }]);
           }}
-          disabled={params.getValue(params.id, 'isDraftStatus') ? false : true}
+          disabled={params.getValue(params.id, 'isDraft') ? false : true}
           autoComplete='off'
         />
       </div>
@@ -170,7 +169,7 @@ const columns: GridColDef[] = [
   },
 ];
 var calUnitFactor = function (params: GridValueGetterParams) {
-  let diff = Number(params.getValue(params.id, 'actualQty')) * Number(2);
+  let diff = Number(params.getValue(params.id, 'actualQty')) * Number(params.getValue(params.id, 'baseUnit'));
   return diff;
 };
 
@@ -202,12 +201,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const classes = useStyles();
   const { apiRef, columns } = useApiRef();
   const dispatch = useAppDispatch();
-  const purchaseDetailList = useAppSelector((state) => state.SupplierOrderReturn.purchaseDetail);
+  const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
   const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
 
-  const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
-  const [purchaseDetailItems, setPurchaseDetailItems] = React.useState<PurchaseNoteDetailEntries[]>(
-    purchaseDetail.entries ? purchaseDetail.entries : []
+  const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
+  const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
+    branchTransferInfo.items ? branchTransferInfo.items : []
   );
   const [openModelConfirmTransaction, setOpenModelConfirmTransaction] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
@@ -244,12 +243,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   React.useEffect(() => {
-    setSourceBranch('1123-ท่าช่าง');
-    setDestinationBranch('1124-พรหมบุรี');
-    setBtNo('BT01');
-    setReasons('ทั้งหมด');
-    setBtStatus('CREATED');
-    setComment('Test Comment');
+    setSourceBranch(branchTransferInfo.branchFrom);
+    setDestinationBranch(branchTransferInfo.branchTo);
+    setBtNo(branchTransferInfo.btNo);
+    setReasons(branchTransferInfo.transferReason);
+    setBtStatus(branchTransferInfo.status);
+    setComment(branchTransferInfo.comment);
     const isBranch = isOwnBranch('D0001');
     setIsDraft(isBranch && btStatus === 'CREATED' ? true : false);
   }, [open]);
@@ -306,29 +305,34 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
   const currentlySelected = () => {};
 
-  let rows = purchaseDetailItems
-    // .filter((item: PurchaseDetailEntries) => item.pnDisplay === 1)
-    .map((item: PurchaseNoteDetailEntries, index: number) => {
-      return {
-        id: `${item.barcode}-${index + 1}`,
-        index: index + 1,
-        seqItem: item.seqItem,
-        barcode: item.barcode,
-        productName: item.productName,
-        skuCode: item.skuCode,
-        stockQty: item.qty,
-        approveQty: item.actualQty,
-        unitName: item.unitName,
-        unitCode: item.unitCode,
-        actualQty: item.returnQty ? item.returnQty : 0,
-        unitFactor: '',
-        tote: '111111',
-        produtStatus: item.produtStatus,
-        isDraftStatus: isDraft,
-        qtyAll: item.qtyAll,
-        actualQtyAll: item.actualQtyAll,
-      };
-    });
+  let rows = branchTransferItems.map((item: Item, index: number) => {
+    return {
+      id: `${item.barcode}-${index + 1}`,
+      index: index + 1,
+      seqItem: item.seqItem,
+      barcode: item.barcode,
+      productName: item.productName,
+      skuCode: item.skuCode,
+      baseUnit: item.baseUnit,
+      unitName: item.unitName,
+      remainStock: item.remainStock ? item.remainStock : 0,
+      qty: item.qty ? item.qty : 0,
+      actualQty: item.actualQty,
+      toteCode: item.toteCode,
+      isDraft: isDraft,
+      // stockQty: item.qty,
+      // approveQty: item.actualQty,
+      // unitName: item.unitName,
+      // unitCode: item.unitCode,
+      // actualQty: item.returnQty ? item.returnQty : 0,
+      // unitFactor: '',
+      // tote: '111111',
+      // produtStatus: item.produtStatus,
+      // isDraft: isDraft,
+      // qtyAll: item.qtyAll,
+      // actualQtyAll: item.actualQtyAll,
+    };
+  });
 
   const validateItem = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -349,41 +353,39 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const storeItem = () => {
-    // const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    // const items: PurchaseNoteDetailEntries[] = [];
-    // rowsEdit.forEach((data: GridRowData) => {
-    //   const newData: PurchaseNoteDetailEntries = {
-    //     seqItem: data.seqItem,
-    //     produtStatus: data.produtStatus,
-    //     isDraftStatus: btStatus === '0' ? false : true,
-    //     skuCode: data.skuCode,
-    //     barcode: data.barcode,
-    //     productName: data.productName,
-    //     qty: data.qty,
-    //     qtyAll: data.qtyAll,
-    //     actualQty: data.actualQty,
-    //     returnQty: data.returnQty,
-    //     actualQtyAll: data.actualQtyAll,
-    //     unitName: data.unitName,
-    //     unitCode: data.unitCode,
-    //   };
-    //   items.push(newData);
-    // });
-    // setPurchaseDetailItems(items);
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const items: Item[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const newData: Item = {
+        seqItem: data.seqItem,
+        barcode: data.barcode,
+        productName: data.productName,
+        skuCode: data.skuCode,
+        baseUnit: data.baseUnit,
+        unitName: data.unitName,
+        remainStock: data.remainStock,
+        qty: data.qty,
+        actualQty: data.actualQty,
+        toteCode: data.toteCode,
+        isDraft: isDraft,
+      };
+      items.push(newData);
+    });
+    setBranchTransferItems(items);
   };
 
   const handleClose = async () => {
     await storeItem();
     let showPopup = false;
     // onClickClose();
-    if (comment !== purchaseDetail.comment) {
+    if (comment !== branchTransferInfo.comment) {
       showPopup = true;
     }
     const rowSelect = apiRef.current.getSelectedRows();
     if (rowSelect.size > 0) {
       showPopup = true;
     }
-    const ent: PurchaseNoteDetailEntries[] = purchaseDetail.entries;
+    const ent: Item[] = branchTransferInfo.data;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     if (rowsEdit.size !== ent.length) {
       showPopup = true;
@@ -391,7 +393,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
     let i = 0;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.returnQty !== (ent[i].returnQty ? ent[i].returnQty : 0)) {
+      if (data.acturlQty !== (ent[i].qty ? ent[i].qty : 0)) {
         showPopup = true;
       }
       i++;
@@ -494,7 +496,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'>วันที่สร้างรายการ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{convertUtcToBkkDate('2022-02-02')}</Typography>
+                <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.createdDate)}</Typography>
               </Grid>
               <Grid item lg={6}></Grid>
             </Grid>
