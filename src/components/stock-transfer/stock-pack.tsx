@@ -18,7 +18,7 @@ import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import { useStyles } from '../../styles/makeTheme';
-import { isOwnBranch, numberWithCommas } from '../../utils/utils';
+import { getReasonLabel, isOwnBranch, numberWithCommas } from '../../utils/utils';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import AlertError from '../commons/ui/alert-error';
@@ -202,7 +202,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const { apiRef, columns } = useApiRef();
   const dispatch = useAppDispatch();
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
-  const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
+  const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
 
   const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
   const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
@@ -246,7 +246,9 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setSourceBranch(branchTransferInfo.branchFrom);
     setDestinationBranch(branchTransferInfo.branchTo);
     setBtNo(branchTransferInfo.btNo);
-    setReasons(branchTransferInfo.transferReason);
+    const reason = getReasonLabel(reasonsList, branchTransferInfo.transferReason);
+    setReasons(reason ? reason : '');
+
     setBtStatus(branchTransferInfo.status);
     setComment(branchTransferInfo.comment);
     const isBranch = isOwnBranch('D0001');

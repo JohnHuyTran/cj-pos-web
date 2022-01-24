@@ -1,6 +1,7 @@
 import jwtDecode from 'jwt-decode';
 import { env } from '../adapters/environmentConfigs';
 import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
+import { TransferReasonsInfo } from '../models/transfer-reasons-model';
 
 export const getDecodedAccessToken = (accessToken: string) => {
   return jwtDecode<KeyCloakTokenInfo>(accessToken);
@@ -86,3 +87,7 @@ export const numberWithCommas = (num: any) => {
 export function isOwnBranch(branch: any): boolean {
   return env.ownBranch.code === branch;
 }
+
+export const getReasonLabel = (reasons: TransferReasonsInfo[], key: string) => {
+  return reasons.find((reasons: TransferReasonsInfo) => reasons.code === key)?.name;
+};
