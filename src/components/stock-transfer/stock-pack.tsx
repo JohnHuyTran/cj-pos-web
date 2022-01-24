@@ -18,7 +18,7 @@ import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import { useStyles } from '../../styles/makeTheme';
-import { getReasonLabel, isOwnBranch, numberWithCommas } from '../../utils/utils';
+import { getBranchName, getReasonLabel, isOwnBranch, numberWithCommas } from '../../utils/utils';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import AlertError from '../commons/ui/alert-error';
@@ -159,7 +159,7 @@ const columns: GridColDef[] = [
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
-            params.api.updateRows([{ ...params.row, tote: e.target.value }]);
+            params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
           }}
           disabled={params.getValue(params.id, 'isDraft') ? false : true}
           autoComplete='off'
@@ -203,6 +203,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const dispatch = useAppDispatch();
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
   const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
 
   const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
   const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
@@ -243,14 +244,19 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   React.useEffect(() => {
-    setSourceBranch(branchTransferInfo.branchFrom);
-    setDestinationBranch(branchTransferInfo.branchTo);
+    const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
+    setSourceBranch(fromBranch ? fromBranch : '');
+
+    const toBranch = getBranchName(branchList, branchTransferInfo.branchTo);
+    setDestinationBranch(toBranch ? toBranch : '');
+
     setBtNo(branchTransferInfo.btNo);
     const reason = getReasonLabel(reasonsList, branchTransferInfo.transferReason);
     setReasons(reason ? reason : '');
 
     setBtStatus(branchTransferInfo.status);
     setComment(branchTransferInfo.comment);
+
     const isBranch = isOwnBranch('D0001');
     setIsDraft(isBranch && btStatus === 'CREATED' ? true : false);
   }, [open]);
@@ -392,7 +398,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
     let i = 0;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.acturlQty !== (ent[i].qty ? ent[i].qty : 0) || data.toteCode != ent[i].toteCode) {
+      if (data.actualQty !== (ent[i].actualQty ? ent[i].actualQty : 0) || data.toteCode != ent[i].toteCode) {
         showPopup = true;
         return;
       }

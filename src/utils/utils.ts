@@ -1,6 +1,7 @@
 import jwtDecode from 'jwt-decode';
 import { env } from '../adapters/environmentConfigs';
 import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
+import { BranchInfo } from '../models/search-branch-model';
 import { TransferReasonsInfo } from '../models/transfer-reasons-model';
 
 export const getDecodedAccessToken = (accessToken: string) => {
@@ -89,5 +90,9 @@ export function isOwnBranch(branch: any): boolean {
 }
 
 export const getReasonLabel = (reasons: TransferReasonsInfo[], key: string) => {
-  return reasons.find((reasons: TransferReasonsInfo) => reasons.code === key)?.name;
+  return reasons.find((reason: TransferReasonsInfo) => reason.code === key)?.name;
+};
+
+export const getBranchName = (branchs: BranchInfo[], key: string) => {
+  return branchs.find((branch: BranchInfo) => branch.code === key)?.name;
 };
