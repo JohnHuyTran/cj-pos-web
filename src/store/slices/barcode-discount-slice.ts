@@ -12,7 +12,7 @@ const initialState: ItemsState = {
     regionId: '61de9ddab10bfe85dfab22e9',
     requesterId: '61de9ddab10bfe85dfab22e9',
     percentDiscount: true,
-    requestorNote: '',
+    requesterNote: '',
     products: [],
   },
   validate: false,

@@ -10,7 +10,7 @@ import {
     BarcodeDiscountSearchResponse
 } from "../../models/barcode-discount-model";
 import {convertUtcToBkkDate} from "../../utils/date-utill";
-import {BDStatus, DateFormat} from "../../utils/enum/common-enum";
+import {Action, BDStatus, DateFormat} from "../../utils/enum/common-enum";
 import {genColumnValue, numberWithCommas, stringNullOrEmpty} from "../../utils/utils";
 import HtmlTooltip from "../../components/commons/ui/html-tooltip";
 import {useAppDispatch, useAppSelector} from "../../store/store";
@@ -189,6 +189,18 @@ const BarcodeDiscountList = () => {
             headerAlign: 'center',
             align: 'right',
             sortable: false,
+            renderHeader: (params) => {
+                return (
+                    <div style={{color:"#36C690"}}>
+                        <Typography variant='body2' noWrap>
+                            <b>{t('headerName.quantity')}</b>
+                        </Typography>
+                        <Typography variant='body2' noWrap>
+                            <b>{t('headerName.total')}</b>
+                        </Typography>
+                    </div>
+                );
+            }
         },
         {
             field: 'unit',
@@ -204,7 +216,19 @@ const BarcodeDiscountList = () => {
             headerAlign: 'center',
             align: 'right',
             sortable: false,
-            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value)))
+            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value))),
+            renderHeader: (params) => {
+                return (
+                    <div style={{color:"#36C690"}}>
+                        <Typography variant='body2' noWrap>
+                            <b>{t('headerName.price')}</b>
+                        </Typography>
+                        <Typography variant='body2' noWrap>
+                            <b>{t('headerName.total')}</b>
+                        </Typography>
+                    </div>
+                );
+            }
         },
         {
             field: 'sumOfCashDiscount',
@@ -213,7 +237,19 @@ const BarcodeDiscountList = () => {
             headerAlign: 'center',
             align: 'right',
             sortable: false,
-            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value)))
+            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value))),
+            renderHeader: (params) =>{
+                return (
+                    <div style={{color:"#36C690"}}>
+                        <Typography variant='body2' noWrap>
+                            <b>{t('headerName.discount')}</b>
+                        </Typography>
+                        <Typography variant='body2' noWrap>
+                            <b>{t('headerName.total')}</b>
+                        </Typography>
+                    </div>
+                );
+            }
         },
         {
             field: 'sumOfPriceAfterDiscount',
@@ -222,7 +258,19 @@ const BarcodeDiscountList = () => {
             headerAlign: 'center',
             align: 'right',
             sortable: false,
-            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value)))
+            renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value))),
+            renderHeader: (params) =>{
+                return (
+                    <div style={{color:"#36C690"}}>
+                        <Typography variant='body2' noWrap>
+                            <b>{t('headerName.priceAfterDiscount')}</b>
+                        </Typography>
+                        <Typography variant='body2' noWrap>
+                            <b>{t('headerName.total')}</b>
+                        </Typography>
+                    </div>
+                );
+            }
         },
         {
             field: 'branch',
@@ -239,6 +287,18 @@ const BarcodeDiscountList = () => {
             headerAlign: 'center',
             align: 'center',
             sortable: false,
+            renderHeader: (params) =>{
+                return (
+                    <div style={{color:"#36C690"}}>
+                        <Typography variant='body2' noWrap>
+                            <b>{t('headerName.requestedDate')}</b>
+                        </Typography>
+                        <Typography variant='body2' noWrap>
+                            <b>{t('headerName.discount')}</b>
+                        </Typography>
+                    </div>
+                );
+            }
         },
         {
             field: 'approvedDate',
@@ -397,7 +457,7 @@ const BarcodeDiscountList = () => {
                     />
                 </div>
             </Box>
-            {openDetail && <ModalCreateBarcodeDiscount isOpen={openDetail} onClickClose={handleCloseDetail}
+            {openDetail && <ModalCreateBarcodeDiscount isOpen={openDetail} onClickClose={handleCloseDetail} action={Action.UPDATE}
                                                        setOpenPopup={setOpenPopup}/>}
             <BarcodeDiscountPopup
                 open={openPopup}

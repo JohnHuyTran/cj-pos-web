@@ -20,6 +20,7 @@ import {useAppDispatch, useAppSelector} from "../../store/store";
 import {barcodeDiscountSearch} from "../../store/slices/barcode-discount-search-slice";
 import {saveSearchCriteriaBD} from "../../store/slices/barcode-discount-criteria-search-slice";
 import LoadingModal from "../../components/commons/ui/loading-modal";
+import {Action} from "../../utils/enum/common-enum";
 
 interface State {
     documentNumber: string;
@@ -306,7 +307,7 @@ const BarcodeDiscountSearch = () => {
             {dataTable}
             <LoadingModal open={openLoadingModal.open}/>
             <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
-            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal}
+            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal} action={Action.INSERT}
                                                       setOpenPopup={setOpenPopup}/>}
             <BarcodeDiscountPopup
                 open={openPopup}
