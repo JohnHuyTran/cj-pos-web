@@ -32,14 +32,16 @@ import {
 import BarcodeDiscountPopup from './barcode-discount-popup';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
-import { stringNullOrEmpty } from '../../utils/utils';
+import {objectNullOrEmpty, stringNullOrEmpty} from '../../utils/utils';
+import {Action} from "../../utils/enum/common-enum";
 interface Props {
+  action: Action | Action.INSERT;
   isOpen: boolean;
   setOpenPopup: (openPopup: boolean) => void;
   onClickClose: () => void;
 }
 
-export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOpenPopup }: Props): ReactElement {
+export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOpenPopup, action }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
 
   const [valueRadios, setValueRadios] = React.useState<string>('percent');
@@ -54,6 +56,9 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
   const dispatch = useAppDispatch();
   const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
   const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
+
+  //get detail from search
+  const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail.data);
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -88,7 +93,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
         status: 0,
       })
     );
-    dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requestorNote: '' }));
+    dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requesterNote: '' }));
     setOpen(false);
     onClickClose();
   };
@@ -96,6 +101,45 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
   useEffect(() => {
     setStatus(dataDetail.status);
   }, [dataDetail.status]);
+
+  useEffect(() => {
+    //set value detail from search
+    if (Action.UPDATE === action && !objectNullOrEmpty(barcodeDiscountDetail)) {
+      //set value for data detail
+      dispatch(
+          updateDataDetail({
+            id: barcodeDiscountDetail.id,
+            documentNumber: barcodeDiscountDetail.documentNumber,
+            status: barcodeDiscountDetail.status,
+            createdDate: barcodeDiscountDetail.createdDate,
+            percentDiscount: barcodeDiscountDetail.percentDiscount
+          })
+      );
+      //set value for products
+      if (barcodeDiscountDetail.products != null && barcodeDiscountDetail.products.length > 0) {
+        let lstProductDetail: any = [];
+        for (let item of barcodeDiscountDetail.products) {
+          lstProductDetail.push({
+            barcode: item.barcode,
+            barcodeName: item.productName,
+            unitName: item.unitFactor,
+            unitPrice: item.price,
+            discount: item.requestedDiscount,
+            qty: item.numberOfDiscounted,
+            expiredDate: item.expiredDate
+          });
+        }
+        dispatch(updateAddItemsState(lstProductDetail));
+      }
+      //set value for requesterNote
+      dispatch(
+          saveBarcodeDiscount({
+            ...payloadBarcodeDiscount,
+            requesterNote: barcodeDiscountDetail.requesterNote,
+          })
+      );
+    }
+  }, [barcodeDiscountDetail]);
 
   const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValueRadios(event.target.value);
@@ -358,7 +402,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
                 </Button>
               </Box>
             </Box>
-            <ModalBacodeTransferItem id="" typeDiscount={valueRadios} />
+            <ModalBacodeTransferItem id="" typeDiscount={valueRadios} action={action}/>
           </Box>
         </DialogContent>
       </Dialog>
