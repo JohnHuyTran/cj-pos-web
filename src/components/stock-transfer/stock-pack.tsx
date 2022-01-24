@@ -27,7 +27,7 @@ import LoadingModal from '../commons/ui/loading-modal';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import ModalConfirmTransaction from './modal-confirm-transaction';
 import { SaveStockPackRequest, StockTransferItems } from '../../models/stock-transfer-model';
-import { saveStockPack, sendStockPackDC } from '../../services/stock-transfer';
+import { saveBranchTransfer, sendBranchTransferToDC } from '../../services/stock-transfer';
 import moment from 'moment';
 import { ApiError } from '../../models/api-error-model';
 import TextBoxComment from '../commons/ui/textbox-comment';
@@ -409,7 +409,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const isvalidItem = validateItem();
     if (isvalidItem) {
       const payload: SaveStockPackRequest = await mappingPayload();
-      await saveStockPack(payload)
+      await saveBranchTransfer(payload)
         .then((value) => {
           // setStatus(1);
           setBtNo(value.btNo);
@@ -429,7 +429,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       // setOpenLoadingModal(true);
       if (!btNo) {
         const payload: SaveStockPackRequest = await mappingPayload();
-        await saveStockPack(payload)
+        await saveBranchTransfer(payload)
           .then((value) => {
             // setStatus(1);
             setBtNo(value.docNo);
@@ -450,7 +450,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       btNo: btNo,
     };
 
-    await sendStockPackDC(payload)
+    await sendBranchTransferToDC(payload)
       .then((value) => {
         handleOnCloseModalConfirm();
         setShowSnackBar(true);

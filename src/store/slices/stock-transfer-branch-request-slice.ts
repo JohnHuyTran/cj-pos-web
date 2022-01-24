@@ -1,32 +1,31 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
-import { PurchaseNoteDetailResponse } from '../../models/purchase-credit-note';
-import { getPathPurchaseDetail } from '../../services/purchase';
+import { BranchTransferResponse } from '../../models/stock-transfer-model';
+import { getPathBranchTransferDetail } from '../../services/stock-transfer';
 
 type State = {
-  purchaseDetail: PurchaseNoteDetailResponse;
+  branchTransferRs: BranchTransferResponse;
   error: string;
 };
 
 const initialState: State = {
-  purchaseDetail: {
+  branchTransferRs: {
     ref: '',
     code: 0,
     message: '',
-    data: [],
+    data: null,
   },
   error: '',
 };
 
-export const featchPurchaseNoteAsync = createAsyncThunk('purchaseNote', async (pi: string) => {
+export const featchBranchTransferDetailAsync = createAsyncThunk('branchTransfer', async (btNo: string) => {
   try {
-    const apiRootPath = getPathPurchaseDetail(pi); //remark
-    let response: PurchaseNoteDetailResponse = {
+    const apiRootPath = getPathBranchTransferDetail(btNo); //remark
+    let response: BranchTransferResponse = {
       ref: '',
       code: 0,
       message: '',
-      data: [],
+      data: null,
     };
 
     response = await get(apiRootPath).then();
@@ -36,24 +35,24 @@ export const featchPurchaseNoteAsync = createAsyncThunk('purchaseNote', async (p
   }
 });
 
-const purchaseNoteSlice = createSlice({
-  name: 'purchaseNote',
+const branchTransferDetailSlice = createSlice({
+  name: 'branchTransfer',
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
   },
   extraReducers: (builer) => {
-    builer.addCase(featchPurchaseNoteAsync.pending, () => {
+    builer.addCase(featchBranchTransferDetailAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchPurchaseNoteAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.purchaseDetail = action.payload;
+      builer.addCase(featchBranchTransferDetailAsync.fulfilled, (state, action: PayloadAction<any>) => {
+        state.branchTransferRs = action.payload;
       }),
-      builer.addCase(featchPurchaseNoteAsync.rejected, () => {
+      builer.addCase(featchBranchTransferDetailAsync.rejected, () => {
         initialState;
       });
   },
 });
 
-export const { clearDataFilter } = purchaseNoteSlice.actions;
-export default purchaseNoteSlice.reducer;
+export const { clearDataFilter } = branchTransferDetailSlice.actions;
+export default branchTransferDetailSlice.reducer;

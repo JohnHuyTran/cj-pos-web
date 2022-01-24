@@ -46,27 +46,27 @@ export function getDCStatus(codeStatus: number): string {
 
 export const onChange = (setValues: any, values: Object, event: any) => {
   const value = event.target.value;
-  setValues({...values, [event.target.name]: value});
+  setValues({ ...values, [event.target.name]: value });
 };
 
 export const onChangeDate = (setValues: any, values: Object, fieldName: string, value: any) => {
-  setValues({...values, [fieldName]: value});
+  setValues({ ...values, [fieldName]: value });
 };
 
 export const genColumnValue = (labelField: string, valueField: string, value: string, lstData: []) => {
   if (lstData == null || lstData.length === 0) {
-    return "";
+    return '';
   }
-  let data: any = lstData.find(item => item[valueField] === value);
+  let data: any = lstData.find((item) => item[valueField] === value);
   if (objectNullOrEmpty(data)) {
-    return "";
+    return '';
   }
   return data[labelField];
-}
+};
 
 export const stringNullOrEmpty = (value: any) => {
   return value === null || value === undefined || value === '' || value === 'Invalid date';
-}
+};
 
 export const objectNullOrEmpty = (value: any) => {
   if (value === null || value === undefined || value === {}) {
@@ -74,11 +74,10 @@ export const objectNullOrEmpty = (value: any) => {
   }
   if (value instanceof Object) {
     for (let prop in value) {
-      if (!value.hasOwnProperty(prop))
-        return true;
+      if (!value.hasOwnProperty(prop)) return true;
     }
   }
-}
+};
 
 export const numberWithCommas = (num: any) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

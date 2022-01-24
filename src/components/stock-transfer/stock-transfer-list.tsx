@@ -16,6 +16,7 @@ import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfe
 import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
 import StockPackChecked from './stock-pack';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
+import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -227,7 +228,7 @@ function StockTransferList() {
   }
 
   async function currentlySelected() {
-    await dispatch(featchPurchaseNoteAsync('PI21120002-000031'));
+    await dispatch(featchBranchTransferDetailAsync('BT22010002-000001'));
     setOpenCreateModal(true);
   }
   return (
