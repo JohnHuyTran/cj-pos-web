@@ -38,6 +38,7 @@ const BarcodeDiscountSearch = () => {
     const {t} = useTranslation(["barcodeDiscount", "common"]);
     const [openAlert, setOpenAlert] = React.useState(false);
     const [textError, setTextError] = React.useState('');
+    const [popupMsg, setPopupMsg] = React.useState<string>('');
     const [lstStatus, setLstStatus] = React.useState([]);
     const [openPopup, setOpenPopup] = React.useState<boolean>(false);
     const [values, setValues] = React.useState<State>({
@@ -307,11 +308,11 @@ const BarcodeDiscountSearch = () => {
             <LoadingModal open={openLoadingModal.open}/>
             <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
             {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal}
-                                                      setOpenPopup={setOpenPopup}/>}
+                                                      setOpenPopup={setOpenPopup} setPopupMsg={setPopupMsg} />}
             <BarcodeDiscountPopup
                 open={openPopup}
                 onClose={handleClosePopup}
-                contentMsg={"คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว"}
+                contentMsg={popupMsg}
             />
         </>
     );

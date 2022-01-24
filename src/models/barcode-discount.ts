@@ -3,7 +3,7 @@ export interface Payload {
   documentNumber?: string;
   requestID?: string;
   percentDiscount: boolean;
-  requestorNote: string;
+  requesterNote: string;
   products: Object[];
   barcode: string;
   requestDiscount: number;
@@ -14,7 +14,7 @@ export interface DiscountDetail {
   id: string;
   index: number;
   barCode: string;
-  productName: string;
+  barcodeName: string;
   unit: string;
   price: number;
   discount: any;

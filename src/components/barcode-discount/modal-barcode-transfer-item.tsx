@@ -30,7 +30,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
-  const [countText, setCountText] = React.useState<number>(payloadBarcodeDiscount.requestorNote.split('').length);
+  const [countText, setCountText] = React.useState<number>(payloadBarcodeDiscount.requesterNote.split('').length);
 
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
@@ -41,7 +41,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const cashDiscount = Math.floor(typeDiscount === 'percent' ? (discount * price) / 100 : discount);
 
         const priceAfterDicount = price - (cashDiscount || 0);
-        const date = moment(new Date()).startOf('day').toISOString();
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -54,7 +53,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           errorDiscount: '',
           qty: item.qty ? item.qty : 0,
           errorQty: '',
-          expiryDate: null,
+          expiryDate: !!sameItem ? sameItem.expiryDate : null,
           errorExpiryDate: '',
           cashDiscount: cashDiscount.toFixed(2) || 0,
           priceAfterDicount: priceAfterDicount.toFixed(2),
@@ -78,9 +77,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
         return {
           price: item.price,
           barcode: item.barCode,
-          RequestedDiscount: Math.floor(item.discount),
+          RequestedDiscount: parseFloat(item.discount),
           NumberOfDiscounted: item.numberOfDiscounted,
           ExpiredDate: item.expiryDate,
+          unitFactor: item.unit,
+          productName: item.barcodeName,
         };
       });
       dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, products: products }));
@@ -195,7 +196,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNote = (e: any) => {
-    dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requestorNote: e }));
+    dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requesterNote: e }));
     setCountText(e.split('').length);
   };
 
@@ -240,7 +241,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'unit',
       headerName: 'หน่วย',
-      minWidth: 77,
+      minWidth: 60,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -248,7 +249,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'price',
       headerName: 'ราคาปกติ',
-      minWidth: 80,
+      minWidth: 60,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -272,15 +273,25 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const price = params.row.price;
         const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
 
+        // const condition =
+        //   validate &&
+        //   ((value && (value < 0 || value > 100)) || !value) &&
+        //   index !== -1 &&
+        //   !!errorList[index].errorDiscount;
+
         const condition =
           validate &&
-          ((value && (value < 0 || value > 100)) || !value) &&
           index !== -1 &&
           !!errorList[index].errorDiscount;
 
+        // const condition2 =
+        //   validate &&
+        //   ((value && (value < 0 || value > price)) || !value) &&
+        //   index != -1 &&
+        //   !!errorList[index].errorDiscount;
+
         const condition2 =
           validate &&
-          ((value && (value < 0 || value > price)) || !value) &&
           index != -1 &&
           !!errorList[index].errorDiscount;
 
@@ -320,7 +331,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'cashDiscount',
       headerName: 'ส่วนลด',
-      minWidth: 73,
+      minWidth: 70,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -333,7 +344,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'priceAfterDicount',
       headerName: 'ราคาหลังลด',
-      minWidth: 120,
+      minWidth: 110,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -354,8 +365,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const validate = payloadBarcodeDiscount.validate;
         const value = params.value;
         const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
+        // const condition =
+        //   validate && ((value && value < 0) || !value) && index != -1 && errorList[index].errorNumberOfDiscounted;
         const condition =
-          validate && ((value && value < 0) || !value) && index != -1 && errorList[index].errorNumberOfDiscounted;
+          validate && index != -1 && errorList[index].errorNumberOfDiscounted;
         return (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
@@ -376,7 +389,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'numberOfApproved',
       headerName: 'จำนวนที่อนุมัติ',
-      minWidth: 150,
+      minWidth: 120,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -389,11 +402,23 @@ export const ModalTransferItem = (props: DataGridProps) => {
           disabled
         />
       ),
+      renderHeader: (params) => {
+        return (
+            <div style={{color:"#36C690"}}>
+                <Typography variant='body2' noWrap>
+                    <b>{'จำนวน'}</b>
+                </Typography>
+                <Typography variant='body2' noWrap>
+                    <b>{'ที่อนุมัติ'}</b>
+                </Typography>
+            </div>
+        );
+      },
     },
     {
       field: 'approvedDiscount',
       headerName: 'รวมส่วนลดที่อนุมัติ',
-      minWidth: 153,
+      minWidth: 120,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -402,6 +427,18 @@ export const ModalTransferItem = (props: DataGridProps) => {
           {params.value}.00
         </Typography>
       ),
+      renderHeader: (params) => {
+        return (
+            <div style={{color:"#36C690"}}>
+                <Typography variant='body2' noWrap>
+                    <b>{'รวมส่วนลด'}</b>
+                </Typography>
+                <Typography variant='body2' noWrap>
+                    <b>{'ที่อนุมัติ'}</b>
+                </Typography>
+            </div>
+        );
+      },
     },
     {
       field: 'expiryDate',
@@ -558,7 +595,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             }}
             sx={{ width: '339px' }}
             variant="outlined"
-            value={payloadBarcodeDiscount ? payloadBarcodeDiscount.requestorNote : ''}
+            value={payloadBarcodeDiscount ? payloadBarcodeDiscount.requesterNote : ''}
             onChange={(e) => {
               handleChangeNote(e.target.value);
             }}

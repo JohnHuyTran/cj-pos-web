@@ -37,9 +37,10 @@ interface Props {
   isOpen: boolean;
   setOpenPopup: (openPopup: boolean) => void;
   onClickClose: () => void;
+  setPopupMsg?: any;
 }
 
-export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOpenPopup }: Props): ReactElement {
+export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
 
   const [valueRadios, setValueRadios] = React.useState<string>('percent');
@@ -88,7 +89,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
         status: 0,
       })
     );
-    dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requestorNote: '' }));
+    dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requesterNote: '' }));
     setOpen(false);
     onClickClose();
   };
@@ -118,7 +119,6 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
 
   const handleCreateDraft = async (sendRequest: boolean) => {
     const data = [...payloadBarcodeDiscount.products];
-
     if (payloadBarcodeDiscount.products.length !== 0) {
       const check = data.every((item) => {
         if (payloadBarcodeDiscount.percentDiscount) {
@@ -149,7 +149,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
                 ...dataDetail,
                 id: rs.data.id,
                 documentNumber: rs.data.documentNumber,
-                status: rs.data.status,
+                status: 1,
               })
             );
             if (rs.data.status === 1 && sendRequest) {
@@ -212,14 +212,15 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
     try {
       const rs = await approveBarcodeDiscount(id);
       if (rs.code === 200) {
-        setOpenPopupModal(true);
-        setTextPopup('คุณได้อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
         dispatch(
           updateDataDetail({
             ...dataDetail,
             status: 2,
           })
         );
+        setOpenPopup(true);
+        setPopupMsg('คุณได้ส่งอนุมัติส่วนลดสินค้าเรียบร้อยแล้ว')
+        handleClose();
       } else {
         setOpenModalError(true);
       }
@@ -234,6 +235,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
         const rs = await cancelBarcodeDiscount(dataDetail.id);
         if (rs.status === 200) {
           setOpenPopup(true);
+          setPopupMsg("คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว")
           handleClose();
         } else {
           setOpenModalError(true);
@@ -245,6 +247,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
       }
     } else {
       setOpenPopup(true);
+      setPopupMsg("คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว")
       handleClose();
     }
   };
@@ -332,7 +335,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
                   variant="contained"
                   color="warning"
                   startIcon={<SaveIcon />}
-                  disabled={status > 1}
+                  disabled={status > 1 || !payloadBarcodeDiscount.products.length}
                   onClick={() => handleCreateDraft(false)}
                 >
                   บันทึก
@@ -341,7 +344,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
                   variant="contained"
                   color="primary"
                   sx={{ margin: '0 17px' }}
-                  disabled={status > 1}
+                  disabled={status > 1 || !payloadBarcodeDiscount.products.length}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleSendRequest}
                 >
