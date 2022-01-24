@@ -47,6 +47,28 @@ export const environment = {
       },
     },
   },
+  sell: {
+    barcodeDiscount: {
+      search: {
+        url: '/campaign',
+      },
+      detail: {
+        url: '/campaign/detail-barcode',
+      },
+      save: {
+        url: '/campaign',
+      },
+      update: {
+        url: '/campaign/{id}',
+      },
+      approve: {
+        url: '/campaign/{id}/waiting-approve',
+      },
+      cancel: {
+        url: '/campaign/{id}'
+      },
+    },
+  },
   purchase: {
     supplierOrder: {
       search: {

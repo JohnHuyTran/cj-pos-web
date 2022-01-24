@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { useSelector, useDispatch, TypedUseSelectorHook } from 'react-redux';
-
 import authSlice from './slices/authSlice';
 import checkOrderSlice from './slices/check-order-slice';
 import checkOrderDetailSlice from './slices/check-order-detail-slice';
@@ -29,6 +28,10 @@ import addItems from './slices/add-items-slice';
 import transferReasonsList from './slices/transfer-reasons-slice';
 import stockTransferSlice from './slices/stock-transfer-slice';
 import saveSearchStock from './slices/save-search-stock-transfer-slice';
+import barcodeDiscountSearchSlice from './slices/barcode-discount-search-slice';
+import barcodeDiscountCriteriaSearchSlice from './slices/barcode-discount-criteria-search-slice';
+import barcodeDiscount from './slices/barcode-discount-slice';
+import barcodeDiscountDetailSlice from './slices/barcode-discount-detail-slice';
 
 const store = configureStore({
   reducer: {
@@ -60,6 +63,10 @@ const store = configureStore({
     transferReasonsList: transferReasonsList,
     searchStockTransfer: stockTransferSlice,
     saveSearchStock: saveSearchStock,
+    barcodeDiscount: barcodeDiscount,
+    barcodeDiscountSearchSlice: barcodeDiscountSearchSlice,
+    barcodeDiscountCriteriaSearchSlice: barcodeDiscountCriteriaSearchSlice,
+    barcodeDiscountDetailSlice: barcodeDiscountDetailSlice,
   },
 });
 

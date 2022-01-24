@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {Suspense}  from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import './index.css';
+import './locales/i18n';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
@@ -15,8 +16,10 @@ ReactDOM.render(
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <BrowserRouter>
-          <CssBaseline />
-          <App />
+          <Suspense fallback="">
+              <CssBaseline />
+              <App />
+          </Suspense>
         </BrowserRouter>
       </ThemeProvider>
     </Provider>
