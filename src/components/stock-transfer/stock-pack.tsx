@@ -313,11 +313,11 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       barcode: item.barcode,
       productName: item.productName,
       skuCode: item.skuCode,
-      baseUnit: item.baseUnit,
+      baseUnit: item.baseUnit ? item.baseUnit : 0,
       unitName: item.unitName,
       remainStock: item.remainStock ? item.remainStock : 0,
       qty: item.qty ? item.qty : 0,
-      actualQty: item.actualQty,
+      actualQty: item.actualQty ? item.actualQty : 0,
       toteCode: item.toteCode,
       isDraft: isDraft,
       // stockQty: item.qty,
@@ -385,16 +385,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     if (rowSelect.size > 0) {
       showPopup = true;
     }
-    const ent: Item[] = branchTransferInfo.data;
+    const ent: Item[] = branchTransferInfo.items;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    if (rowsEdit.size !== ent.length) {
-      showPopup = true;
-    }
 
     let i = 0;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.acturlQty !== (ent[i].qty ? ent[i].qty : 0)) {
+      if (data.acturlQty !== (ent[i].qty ? ent[i].qty : 0) || data.toteCode != ent[i].toteCode) {
         showPopup = true;
+        return;
       }
       i++;
     });
