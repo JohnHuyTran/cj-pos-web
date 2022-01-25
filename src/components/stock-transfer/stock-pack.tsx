@@ -488,10 +488,17 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
               <Grid item lg={2}>
                 <Typography variant='body2'>เลขที่เอกสาร BT</Typography>
               </Grid>
-              <Grid item lg={4}>
+              <Grid item lg={3}>
                 <Typography variant='body2'>{btNo}</Typography>
               </Grid>
-              <Grid item lg={6}></Grid>
+              <Grid item lg={1}></Grid>
+              <Grid item lg={2}>
+                <Typography variant='body2'>เลขที่เอกสาร RT</Typography>
+              </Grid>
+              <Grid item lg={3}>
+                <Typography variant='body2'>{branchTransferInfo.rtNo}</Typography>
+              </Grid>
+              <Grid item lg={1}></Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
