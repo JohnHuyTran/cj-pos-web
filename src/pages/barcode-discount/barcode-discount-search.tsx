@@ -39,6 +39,7 @@ const BarcodeDiscountSearch = () => {
     const {t} = useTranslation(["barcodeDiscount", "common"]);
     const [openAlert, setOpenAlert] = React.useState(false);
     const [textError, setTextError] = React.useState('');
+    const [popupMsg, setPopupMsg] = React.useState<string>('');
     const [lstStatus, setLstStatus] = React.useState([]);
     const [openPopup, setOpenPopup] = React.useState<boolean>(false);
     const [values, setValues] = React.useState<State>({
@@ -142,7 +143,7 @@ const BarcodeDiscountSearch = () => {
         const payload: BarcodeDiscountSearchRequest = {
             perPage: limits,
             page: page,
-            query: values.documentNumber,
+            query: values.documentNumber.trim(),
             branch: values.branch,
             status: values.status,
             startDate: moment(values.fromDate).startOf('day').toISOString(),
@@ -305,16 +306,19 @@ const BarcodeDiscountSearch = () => {
                 </Grid>
             </Box>
             {dataTable}
-            <LoadingModal open={openLoadingModal.open}/>
-            <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
-            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal} action={Action.INSERT}
-                                                      setOpenPopup={setOpenPopup}/>}
-            <BarcodeDiscountPopup
-                open={openPopup}
-                onClose={handleClosePopup}
-                contentMsg={"คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว"}
-            />
-        </>
+        <LoadingModal open={openLoadingModal.open} />
+        <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+        {openModal && (
+          <ModalCreateBarcodeDiscount
+            isOpen={openModal}
+            onClickClose={handleCloseModal}
+            setOpenPopup={setOpenPopup}
+            setPopupMsg={setPopupMsg}
+            action={Action.INSERT}
+          />
+        )}
+        <BarcodeDiscountPopup open={openPopup} onClose={handleClosePopup} contentMsg={popupMsg} />
+      </>
     );
 }
 

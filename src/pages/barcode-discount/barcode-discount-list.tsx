@@ -32,6 +32,7 @@ const BarcodeDiscountList = () => {
     const [lstBarcodeDiscount, setLstBarcodeDiscount] = React.useState<any[]>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
     const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({open: false});
+    const [popupMsg, setPopupMsg] = React.useState<string>('');
     const [openDetail, setOpenDetail] = React.useState(false);
     const [openPopup, setOpenPopup] = React.useState<boolean>(false);
     const [checkAll, setCheckAll] = React.useState<boolean>(false);
@@ -458,12 +459,9 @@ const BarcodeDiscountList = () => {
                 </div>
             </Box>
             {openDetail && <ModalCreateBarcodeDiscount isOpen={openDetail} onClickClose={handleCloseDetail} action={Action.UPDATE}
+                                                       setPopupMsg={setPopupMsg}
                                                        setOpenPopup={setOpenPopup}/>}
-            <BarcodeDiscountPopup
-                open={openPopup}
-                onClose={handleClosePopup}
-                contentMsg={"คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว"}
-            />
+            <BarcodeDiscountPopup open={openPopup} onClose={handleClosePopup} contentMsg={popupMsg} />
         </div>
     );
 }

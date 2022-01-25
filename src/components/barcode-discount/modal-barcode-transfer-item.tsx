@@ -19,6 +19,9 @@ export interface DataGridProps {
   typeDiscount: string;
   // onClose?: () => void;
 }
+
+const _ = require('lodash');
+
 export const ModalTransferItem = (props: DataGridProps) => {
   const { typeDiscount, action } = props;
 
@@ -42,13 +45,18 @@ export const ModalTransferItem = (props: DataGridProps) => {
         let sameItem = dtTable.find((el) => el.barCode === item.barcode);
         const price = parseFloat(item.unitPrice);
         let discount = !!sameItem ? sameItem.discount : 0;
+        let expiryDate = !!sameItem ? sameItem.expiryDate : null;     
+        let numberOfDiscounted = (item.numberOfDiscounted || 0) + item.qty;
+        let approvedDiscount = 0;
         if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
           discount = stringNullOrEmpty(item.discount) ? 0 : item.discount;
+          expiryDate = stringNullOrEmpty(item.expiryDate) ? null : item.expiryDate;
+          numberOfDiscounted = stringNullOrEmpty(item.qty) ? null : item.qty;
         }
         discount = parseFloat(discount).toFixed(2);
         const cashDiscount = Math.floor(typeDiscount === 'percent' ? (discount * price) / 100 : discount);
+
         const priceAfterDiscount = price - (cashDiscount || 0);
-        const expiredDate = stringNullOrEmpty(item.expiredDate) ? null : item.expiredDate;
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -61,13 +69,13 @@ export const ModalTransferItem = (props: DataGridProps) => {
           errorDiscount: '',
           qty: item.qty ? item.qty : 0,
           errorQty: '',
-          expiryDate: expiredDate,
+          expiryDate: expiryDate,
           errorExpiryDate: '',
           cashDiscount: cashDiscount.toFixed(2) || 0,
           priceAfterDiscount: priceAfterDiscount.toFixed(2),
-          numberOfDiscounted: item.qty,
+          numberOfDiscounted: (item.NumberOfDiscounted || 0) + item.qty,
           numberOfApproved: 0,
-          approvedDiscount: 0,
+          approvedDiscount: approvedDiscount.toFixed(2),
           skuCode: item.skuCode,
         };
       });
@@ -79,15 +87,17 @@ export const ModalTransferItem = (props: DataGridProps) => {
 
   useEffect(() => {
     if (dtTable.length !== 0) {
-      updateSumOfApprovedDiscount(dtTable.reduce((acc, val) => acc + val.approvedDiscount, 0));
+      updateSumOfApprovedDiscount(dtTable.reduce((acc, val) => acc + Number(val.approvedDiscount), 0));
       updateSumOfDiscount(dtTable.reduce((acc, val) => acc + val.cashDiscount * val.numberOfDiscounted, 0));
       const products = dtTable.map((item) => {
         return {
           price: item.price,
           barcode: item.barCode,
-          RequestedDiscount: Math.floor(item.discount),
+          RequestedDiscount: parseFloat(item.discount),
           NumberOfDiscounted: item.numberOfDiscounted,
           ExpiredDate: item.expiryDate,
+          unitFactor: item.unit,
+          productName: item.barcodeName,
         };
       });
       dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, products: products }));
@@ -140,11 +150,20 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfDiscount = (event: any, index: number, errorIndex: number) => {
+    let currentData: any;
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
+      currentData = data[index - 1];
       data[index - 1].numberOfDiscounted = parseInt(event.target.value);
       return data;
     });
+    let updateList = _.cloneDeep(payloadAddItem);
+    updateList.map((item:any) => {
+      if (item.barcode === currentData.barCode) {
+        item.qty = parseInt(event.target.value);
+      }
+    })
+    dispatch(updateAddItemsState(updateList));
     dispatch(
       updateErrorList(
         errorList.map((item: any, idx: number) => {
@@ -206,6 +225,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
     setCountText(e.split('').length);
   };
 
+  const addTwoDecimalPlaces = (value: any) => {
+    if (stringNullOrEmpty(value)) return '0.00';
+    else return value.toFixed(2);
+};
+
   const columns: GridColDef[] = [
     {
       field: 'index',
@@ -247,7 +271,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'unit',
       headerName: 'หน่วย',
-      minWidth: 77,
+      minWidth: 60,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -255,13 +279,13 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'price',
       headerName: 'ราคาปกติ',
-      minWidth: 80,
+      minWidth: 60,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
       renderCell: (params) => (
         <Box component="div" width="100%" textAlign="end">
-          {params.value}.00
+          {addTwoDecimalPlaces(params.value)}
         </Box>
       ),
     },
@@ -279,15 +303,25 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const price = params.row.price;
         const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
 
+        // const condition =
+        //   validate &&
+        //   ((value && (value < 0 || value > 100)) || !value) &&
+        //   index !== -1 &&
+        //   !!errorList[index].errorDiscount;
+
         const condition =
           validate &&
-          ((value && (value < 0 || value > 100)) || !value) &&
           index !== -1 &&
           !!errorList[index].errorDiscount;
 
+        // const condition2 =
+        //   validate &&
+        //   ((value && (value < 0 || value > price)) || !value) &&
+        //   index != -1 &&
+        //   !!errorList[index].errorDiscount;
+
         const condition2 =
           validate &&
-          ((value && (value < 0 || value > price)) || !value) &&
           index != -1 &&
           !!errorList[index].errorDiscount;
 
@@ -327,7 +361,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'cashDiscount',
       headerName: 'ส่วนลด',
-      minWidth: 73,
+      minWidth: 70,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -340,7 +374,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'priceAfterDiscount',
       headerName: 'ราคาหลังลด',
-      minWidth: 120,
+      minWidth: 110,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -361,8 +395,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const validate = payloadBarcodeDiscount.validate;
         const value = params.value;
         const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
+        // const condition =
+        //   validate && ((value && value < 0) || !value) && index != -1 && errorList[index].errorNumberOfDiscounted;
         const condition =
-          validate && ((value && value < 0) || !value) && index != -1 && errorList[index].errorNumberOfDiscounted;
+          validate && index != -1 && errorList[index].errorNumberOfDiscounted;
         return (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
@@ -383,7 +419,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'numberOfApproved',
       headerName: 'จำนวนที่อนุมัติ',
-      minWidth: 150,
+      minWidth: 120,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -396,19 +432,43 @@ export const ModalTransferItem = (props: DataGridProps) => {
           disabled
         />
       ),
+      renderHeader: (params) => {
+        return (
+            <div style={{color:"#36C690"}}>
+                <Typography variant='body2' noWrap>
+                    <b>{'จำนวน'}</b>
+                </Typography>
+                <Typography variant='body2' noWrap>
+                    <b>{'ที่อนุมัติ'}</b>
+                </Typography>
+            </div>
+        );
+      },
     },
     {
       field: 'approvedDiscount',
       headerName: 'รวมส่วนลดที่อนุมัติ',
-      minWidth: 153,
+      minWidth: 120,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params) => (
         <Typography width="100%" textAlign="right">
-          {params.value}.00
+          {params.value}
         </Typography>
       ),
+      renderHeader: (params) => {
+        return (
+            <div style={{color:"#36C690"}}>
+                <Typography variant='body2' noWrap>
+                    <b>{'รวมส่วนลด'}</b>
+                </Typography>
+                <Typography variant='body2' noWrap>
+                    <b>{'ที่อนุมัติ'}</b>
+                </Typography>
+            </div>
+        );
+      },
     },
     {
       field: 'expiryDate',
