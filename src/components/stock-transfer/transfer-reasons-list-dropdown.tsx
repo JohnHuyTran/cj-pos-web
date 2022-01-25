@@ -12,7 +12,7 @@ interface Props {
 function ReasonsListDropDown({ isClear, onChangeReasons }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  let reasonsList = useAppSelector((state) => state.transferReasonsList.branchList.data);
+  let reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
   const [reasons, setReasons] = React.useState('All');
   useEffect(() => {
     if (reasonsList === null || reasonsList.length <= 0) dispatch(featchTransferReasonsListAsync());
@@ -27,7 +27,7 @@ function ReasonsListDropDown({ isClear, onChangeReasons }: Props) {
 
   return (
     <FormControl fullWidth className={classes.Mselect}>
-      <Select id="selReasons" value={reasons} onChange={handleChange} inputProps={{ 'aria-label': 'Without label' }}>
+      <Select id='selReasons' value={reasons} onChange={handleChange} inputProps={{ 'aria-label': 'Without label' }}>
         <MenuItem value={'All'}>ทั้งหมด</MenuItem>
         {reasonsList.map((reason) => (
           <MenuItem key={reason.id} value={reason.code}>

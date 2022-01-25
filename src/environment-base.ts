@@ -50,7 +50,7 @@ export const environment = {
   sell: {
     barcodeDiscount: {
       search: {
-        url: '/campaign'
+        url: '/campaign',
       },
       save: {
         url: '/campaign',
@@ -62,7 +62,7 @@ export const environment = {
         url: '/campaign/{id}/waiting-approve',
       },
       cancel: {
-        url: '/campaign/{id}'
+        url: '/campaign/{id}',
       },
     },
   },
@@ -149,11 +149,19 @@ export const environment = {
     saveStockTransfer: {
       url: '/stock/stock-transfer/draft',
     },
-    saveStockPack: {
-      url: '/stock/stock-pack/draft',
-    },
-    sendStockPack: {
-      url: '/stock/stock-transfer/save-to-dc',
+    branchTransfer: {
+      search: {
+        url: '/stock/stock-transfer',
+      },
+      detail: {
+        url: '/stock/stock-transfer/{btNo}',
+      },
+      save: {
+        url: '/stock/stock-pack/draft',
+      },
+      sendDC: {
+        url: '/stock/stock-transfer/save-to-dc',
+      },
     },
   },
 };
