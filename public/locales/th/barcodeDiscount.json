@@ -14,10 +14,18 @@
   "sumOfPriceAfterDiscount": "ราคาหลังลด รวมทั้งหมด",
   "createDate": "วันที่ขอ ส่วนลด",
   "approvedDate": "วันที่อนุมัติ",
-  "remark": "หมายเหตุ จากสาขา",
+  "remark": "หมายเหตุ",
   "all": "ทั้งหมด",
   "noData": "ไม่มีข้อมูล",
   "list": "รายการ",
+  "headerName": {
+    "quantity": "จำนวน",
+    "total": "รวมทั้งหมด",
+    "price": "ราคาปกติ",
+    "discount": "ส่วนลด",
+    "priceAfterDiscount": "ราคาหลังลด",
+    "requestedDate": "วันที่ขอ"
+  },
   "dbStatus": {
     "draft": "บันทึก",
     "pendingApproval": "รออนุมัติ",

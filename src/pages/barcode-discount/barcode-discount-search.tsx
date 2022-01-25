@@ -20,6 +20,7 @@ import {useAppDispatch, useAppSelector} from "../../store/store";
 import {barcodeDiscountSearch} from "../../store/slices/barcode-discount-search-slice";
 import {saveSearchCriteriaBD} from "../../store/slices/barcode-discount-criteria-search-slice";
 import LoadingModal from "../../components/commons/ui/loading-modal";
+import {Action} from "../../utils/enum/common-enum";
 
 interface State {
     documentNumber: string;
@@ -142,7 +143,7 @@ const BarcodeDiscountSearch = () => {
         const payload: BarcodeDiscountSearchRequest = {
             perPage: limits,
             page: page,
-            query: values.documentNumber,
+            query: values.documentNumber.trim(),
             branch: values.branch,
             status: values.status,
             startDate: moment(values.fromDate).startOf('day').toISOString(),
@@ -305,16 +306,19 @@ const BarcodeDiscountSearch = () => {
                 </Grid>
             </Box>
             {dataTable}
-            <LoadingModal open={openLoadingModal.open}/>
-            <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
-            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal}
-                                                      setOpenPopup={setOpenPopup} setPopupMsg={setPopupMsg} />}
-            <BarcodeDiscountPopup
-                open={openPopup}
-                onClose={handleClosePopup}
-                contentMsg={popupMsg}
-            />
-        </>
+        <LoadingModal open={openLoadingModal.open} />
+        <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+        {openModal && (
+          <ModalCreateBarcodeDiscount
+            isOpen={openModal}
+            onClickClose={handleCloseModal}
+            setOpenPopup={setOpenPopup}
+            setPopupMsg={setPopupMsg}
+            action={Action.INSERT}
+          />
+        )}
+        <BarcodeDiscountPopup open={openPopup} onClose={handleClosePopup} contentMsg={popupMsg} />
+      </>
     );
 }
 

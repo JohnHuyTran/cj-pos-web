@@ -32,15 +32,26 @@ import {
 import BarcodeDiscountPopup from './barcode-discount-popup';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
-import { stringNullOrEmpty } from '../../utils/utils';
+import { objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
+import { Action } from '../../utils/enum/common-enum';
+import ModalCheckPrice from './modal-check-price';
 interface Props {
+  action: Action | Action.INSERT;
   isOpen: boolean;
   setOpenPopup: (openPopup: boolean) => void;
   onClickClose: () => void;
   setPopupMsg?: any;
 }
 
-export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Props): ReactElement {
+const _ = require('lodash');
+
+export default function ModalCreateBarcodeDiscount({
+  isOpen,
+  onClickClose,
+  setOpenPopup,
+  action,
+  setPopupMsg,
+}: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
 
   const [valueRadios, setValueRadios] = React.useState<string>('percent');
@@ -49,12 +60,18 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
+  const [openModalCheck, setOpenModalCheck] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<number>(0);
+  const [listProducts, setListProducts] = React.useState<object[]>([]);
   const dispatch = useAppDispatch();
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
   const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
+
+  //get detail from search
+  const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail.data);
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -80,6 +97,18 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
     setOpenModalError(false);
   };
 
+  const handleCloseModalCheck = () => {
+    let updateList = _.cloneDeep(payloadAddItem);
+    updateList.map((item:any) => {
+      let sameItem:any = listProducts.find((el:any) => item.barcode === el.barcode);
+      if (sameItem) {
+        item.unitPrice = sameItem.currentPrice;
+      }
+    })
+    dispatch(updateAddItemsState(updateList))
+    setOpenModalCheck(false);
+  };
+
   const handleClose = async () => {
     dispatch(updateAddItemsState({}));
     dispatch(
@@ -97,6 +126,46 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
   useEffect(() => {
     setStatus(dataDetail.status);
   }, [dataDetail.status]);
+
+  useEffect(() => {
+    //set value detail from search
+    if (Action.UPDATE === action && !objectNullOrEmpty(barcodeDiscountDetail)) {
+      //set value for data detail
+      dispatch(
+        updateDataDetail({
+          id: barcodeDiscountDetail.id,
+          documentNumber: barcodeDiscountDetail.documentNumber,
+          status: barcodeDiscountDetail.status,
+          createdDate: barcodeDiscountDetail.createdDate,
+          percentDiscount: barcodeDiscountDetail.percentDiscount,
+        })
+      );
+      //set value for products
+      if (barcodeDiscountDetail.products != null && barcodeDiscountDetail.products.length > 0) {
+        let lstProductDetail: any = [];
+        for (let item of barcodeDiscountDetail.products) {
+          lstProductDetail.push({
+            barcode: item.barcode,
+            barcodeName: item.productName,
+            unitName: item.unitFactor,
+            unitPrice: item.price,
+            discount: item.requestedDiscount,
+            qty: item.numberOfDiscounted,
+            expiryDate: item.expiredDate,
+            skuCode: item.skuCode
+          });
+        }
+        dispatch(updateAddItemsState(lstProductDetail));
+      }
+      //set value for requesterNote
+      dispatch(
+        saveBarcodeDiscount({
+          ...payloadBarcodeDiscount,
+          requesterNote: barcodeDiscountDetail.requesterNote,
+        })
+      );
+    }
+  }, [barcodeDiscountDetail]);
 
   const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValueRadios(event.target.value);
@@ -138,7 +207,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
           const body = !!dataDetail.id
             ? { ...payloadBarcodeDiscount, id: dataDetail.id, documentNumber: dataDetail.documentNumber }
             : payloadBarcodeDiscount;
-          const rs = await saveDraftBarcodeDiscount(body);
+          const rs = await saveDraftBarcodeDiscount(body);       
           if (rs.code === 201) {
             if (!sendRequest) {
               setOpenPopupModal(true);
@@ -152,9 +221,12 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
                 status: 1,
               })
             );
-            if (rs.data.status === 1 && sendRequest) {
+            if (sendRequest) {  
               handleSendForApproval(rs.data.id);
             }
+          } else if (rs.code === 50004) {
+            setListProducts(rs.data);
+            setOpenModalCheck(true);
           } else {
             setOpenModalError(true);
           }
@@ -201,11 +273,8 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
   };
 
   const handleSendRequest = () => {
-    if (status) {
-      handleSendForApproval(dataDetail.id);
-    } else {
+
       handleCreateDraft(true);
-    }
   };
 
   const handleSendForApproval = async (id: string) => {
@@ -219,8 +288,11 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ส่งอนุมัติส่วนลดสินค้าเรียบร้อยแล้ว')
+        setPopupMsg('คุณได้ส่งอนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
         handleClose();
+      } else if (rs.code === 50004) {
+        setListProducts(rs.data);
+        setOpenModalCheck(true);
       } else {
         setOpenModalError(true);
       }
@@ -235,7 +307,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
         const rs = await cancelBarcodeDiscount(dataDetail.id);
         if (rs.status === 200) {
           setOpenPopup(true);
-          setPopupMsg("คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว")
+          setPopupMsg('คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว');
           handleClose();
         } else {
           setOpenModalError(true);
@@ -247,7 +319,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
       }
     } else {
       setOpenPopup(true);
-      setPopupMsg("คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว")
+      setPopupMsg('คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว');
       handleClose();
     }
   };
@@ -361,7 +433,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
                 </Button>
               </Box>
             </Box>
-            <ModalBacodeTransferItem id="" typeDiscount={valueRadios} />
+            <ModalBacodeTransferItem id="" typeDiscount={valueRadios} action={action} />
           </Box>
         </DialogContent>
       </Dialog>
@@ -379,6 +451,7 @@ export default function ModalCreateBarcodeDiscount({ isOpen, onClickClose, setOp
         onClose={handleCloseModalError}
         textError="กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง"
       />
+      <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts} />
     </div>
   );
 }
