@@ -15,6 +15,7 @@ export interface DiscountDetail {
   index: number;
   barCode: string;
   barcodeName: string;
+  skuCode: string;
   unit: string;
   price: number;
   discount: any;
@@ -26,4 +27,13 @@ export interface DiscountDetail {
   errorDiscount: string;
   errorExpiryDate: string;
   errorNumberOfDiscounted: string;
+}
+
+interface Product {
+  barcode: string;
+  NumberOfDiscounted: number;
+}
+export interface CheckStockPayload {
+  branchCode: string;
+  products: Product[];
 }

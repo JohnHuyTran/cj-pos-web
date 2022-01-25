@@ -46,7 +46,7 @@ const columns: GridColDef[] = [
         <div>
           <Typography variant="body2">{params.value}</Typography>
           <Typography color="textSecondary" sx={{ fontSize: 12 }}>
-            {params.getValue(params.id, 'skuCode') || ''}
+            {params.row}
           </Typography>
         </div>
       );
@@ -89,7 +89,7 @@ export default function ModalCheckPrice({ open, onClose, products }: Props): Rea
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   let rows: any = [];
-  if (Object.keys(payloadAddItem).length !== 0){
+  if (Object.keys(payloadAddItem).length !== 0) {
     rows = products.map((item: any, index: number) => {
       const itemConvert = payloadAddItem.find((el: any) => el.barcode === item.barcode);
       return {
@@ -103,7 +103,6 @@ export default function ModalCheckPrice({ open, onClose, products }: Props): Rea
       };
     });
   }
-  
 
   return (
     <Dialog

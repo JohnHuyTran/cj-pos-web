@@ -23,17 +23,24 @@ import ModalBacodeTransferItem from './modal-barcode-transfer-item';
 import moment from 'moment';
 import ModelConfirm from './modal-confirm';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { saveBarcodeDiscount, updateDataDetail, updateErrorList } from '../../store/slices/barcode-discount-slice';
+import {
+  saveBarcodeDiscount,
+  updateDataDetail,
+  updateErrorList,
+  updateCheckStock,
+} from '../../store/slices/barcode-discount-slice';
 import {
   approveBarcodeDiscount,
   cancelBarcodeDiscount,
   saveDraftBarcodeDiscount,
+  checkStockBalance,
 } from '../../services/barcode-discount';
 import BarcodeDiscountPopup from './barcode-discount-popup';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import { Action } from '../../utils/enum/common-enum';
+import ModalCheckStock from './modal-check-stock';
 import ModalCheckPrice from './modal-check-price';
 interface Props {
   action: Action | Action.INSERT;
@@ -62,6 +69,7 @@ export default function ModalCreateBarcodeDiscount({
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const [openModalCheck, setOpenModalCheck] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
+  const [openCheckStock, setOpenCheckStock] = React.useState<boolean>(false);
   const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<number>(0);
   const [listProducts, setListProducts] = React.useState<object[]>([]);
@@ -69,6 +77,7 @@ export default function ModalCreateBarcodeDiscount({
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
   const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
+  const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
 
   //get detail from search
   const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail.data);
@@ -99,13 +108,13 @@ export default function ModalCreateBarcodeDiscount({
 
   const handleCloseModalCheck = () => {
     let updateList = _.cloneDeep(payloadAddItem);
-    updateList.map((item:any) => {
-      let sameItem:any = listProducts.find((el:any) => item.barcode === el.barcode);
+    updateList.map((item: any) => {
+      let sameItem: any = listProducts.find((el: any) => item.barcode === el.barcode);
       if (sameItem) {
         item.unitPrice = sameItem.currentPrice;
       }
-    })
-    dispatch(updateAddItemsState(updateList))
+    });
+    dispatch(updateAddItemsState(updateList));
     setOpenModalCheck(false);
   };
 
@@ -131,6 +140,7 @@ export default function ModalCreateBarcodeDiscount({
     //set value detail from search
     if (Action.UPDATE === action && !objectNullOrEmpty(barcodeDiscountDetail)) {
       //set value for data detail
+      setValueRadios(barcodeDiscountDetail.percentDiscount ? 'percent' : 'amount');
       dispatch(
         updateDataDetail({
           id: barcodeDiscountDetail.id,
@@ -152,7 +162,7 @@ export default function ModalCreateBarcodeDiscount({
             discount: item.requestedDiscount,
             qty: item.numberOfDiscounted,
             expiryDate: item.expiredDate,
-            skuCode: item.skuCode
+            skuCode: item.skuCode,
           });
         }
         dispatch(updateAddItemsState(lstProductDetail));
@@ -191,47 +201,50 @@ export default function ModalCreateBarcodeDiscount({
     if (payloadBarcodeDiscount.products.length !== 0) {
       const check = data.every((item) => {
         if (payloadBarcodeDiscount.percentDiscount) {
-          if (item.RequestedDiscount <= 0 || item.RequestedDiscount > 100) return false;
+          if (item.requestedDiscount <= 0 || item.requestedDiscount > 100) return false;
         }
-        if (stringNullOrEmpty(item.ExpiredDate)) return false;
-        if (item.NumberOfDiscounted <= 0) {
+        if (stringNullOrEmpty(item.expiredDate)) return false;
+        if (item.numberOfDiscounted <= 0) {
           return false;
         } else {
-          return item.RequestedDiscount > 0 && item.RequestedDiscount <= item.price;
+          return item.requestedDiscount > 0 && item.requestedDiscount <= item.price;
         }
       });
 
       if (check) {
-        await dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, validate: false }));
-        try {
-          const body = !!dataDetail.id
-            ? { ...payloadBarcodeDiscount, id: dataDetail.id, documentNumber: dataDetail.documentNumber }
-            : payloadBarcodeDiscount;
-          const rs = await saveDraftBarcodeDiscount(body);       
-          if (rs.code === 201) {
-            if (!sendRequest) {
-              setOpenPopupModal(true);
-              setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+        const rsCheckStock = await handleCheckStock();
+        if (rsCheckStock) {
+          await dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, validate: false }));
+          try {
+            const body = !!dataDetail.id
+              ? { ...payloadBarcodeDiscount, id: dataDetail.id, documentNumber: dataDetail.documentNumber }
+              : payloadBarcodeDiscount;
+            const rs = await saveDraftBarcodeDiscount(body);
+            if (rs.code === 201) {
+              if (!sendRequest) {
+                setOpenPopupModal(true);
+                setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+              }
+              dispatch(
+                updateDataDetail({
+                  ...dataDetail,
+                  id: rs.data.id,
+                  documentNumber: rs.data.documentNumber,
+                  status: 1,
+                })
+              );
+              if (sendRequest) {
+                handleSendForApproval(rs.data.id);
+              }
+            } else if (rs.code === 50004) {
+              setListProducts(rs.data);
+              setOpenModalCheck(true);
+            } else {
+              setOpenModalError(true);
             }
-            dispatch(
-              updateDataDetail({
-                ...dataDetail,
-                id: rs.data.id,
-                documentNumber: rs.data.documentNumber,
-                status: 1,
-              })
-            );
-            if (sendRequest) {  
-              handleSendForApproval(rs.data.id);
-            }
-          } else if (rs.code === 50004) {
-            setListProducts(rs.data);
-            setOpenModalCheck(true);
-          } else {
+          } catch (error) {
             setOpenModalError(true);
           }
-        } catch (error) {
-          setOpenModalError(true);
         }
       } else {
         const dt = data.map((preData) => {
@@ -243,22 +256,22 @@ export default function ModalCreateBarcodeDiscount({
           };
 
           if (payloadBarcodeDiscount.percentDiscount) {
-            if (preData.RequestedDiscount <= 0 || preData.RequestedDiscount > 100 || !preData.RequestedDiscount) {
+            if (preData.requestedDiscount <= 0 || preData.requestedDiscount > 100 || !preData.requestedDiscount) {
               item.errorDiscount = 'ส่วนลดต้องมากกว่าหรือเท่ากับ 0 และน้อยกว่า 100';
             }
           } else {
             if (
-              preData.RequestedDiscount <= 0 ||
-              preData.RequestedDiscount > preData.price ||
-              !preData.RequestedDiscount
+              preData.requestedDiscount <= 0 ||
+              preData.requestedDiscount > preData.price ||
+              !preData.requestedDiscount
             ) {
               item.errorDiscount = 'ราคาส่วนลดต้องมากกว่าหรือเท่ากับ 0 และน้อยกว่าราคาสินค้า';
             }
           }
-          if (preData.NumberOfDiscounted <= 0 || !preData.NumberOfDiscounted) {
+          if (preData.numberOfDiscounted <= 0 || !preData.numberOfDiscounted) {
             item.errorNumberOfDiscounted = 'ค่าต้องมากกว่า 0';
           }
-          if (!preData.ExpiredDate) {
+          if (!preData.expiredDate) {
             item.errorExpiryDate = 'ค่าไม่ว่างเปล่า';
           }
           return item;
@@ -273,8 +286,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleSendRequest = () => {
-
-      handleCreateDraft(true);
+    handleCreateDraft(true);
   };
 
   const handleSendForApproval = async (id: string) => {
@@ -322,6 +334,30 @@ export default function ModalCreateBarcodeDiscount({
       setPopupMsg('คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว');
       handleClose();
     }
+  };
+
+  const handleCheckStock = async () => {
+    try {
+      const products = payloadBarcodeDiscount.products.map((item: any) => {
+        return {
+          barcode: item.barcode,
+          numberOfDiscounted: item.numberOfDiscounted,
+        };
+      });
+      const payload = {
+        branchCode: '0002',
+        products: products,
+      };
+      const rs = await checkStockBalance(payload);
+
+      if (rs.data && rs.data.length > 0) {
+        dispatch(updateCheckStock(rs.data));
+        setOpenCheckStock(true);
+      } else {
+        dispatch(updateCheckStock([]));
+      }
+      return rs.data ? !rs.data.length : true;
+    } catch (error) {}
   };
 
   return (
@@ -450,6 +486,12 @@ export default function ModalCreateBarcodeDiscount({
         open={openModalError}
         onClose={handleCloseModalError}
         textError="กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง"
+      />
+      <ModalCheckStock
+        open={openCheckStock}
+        onClose={() => {
+          setOpenCheckStock(false);
+        }}
       />
       <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts} />
     </div>
