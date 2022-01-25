@@ -12,7 +12,7 @@ import Steppers from './steppers';
 import { useStyles } from '../../styles/makeTheme';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
-import StockTransferItem from './stock-transfer-item';
+import StockTransferItem from './create-stock-transfer-item';
 import { useAppDispatch } from '../../store/store';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
@@ -69,7 +69,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   let rowLength = Object.keys(payloadAddItem).length;
 
-  const [status, setStatus] = React.useState(0);
+  const [status, setStatus] = React.useState('DRAFT');
   const [docNo, setDocNo] = React.useState(null);
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
   const [values, setValues] = React.useState<State>({
@@ -218,10 +218,9 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          <Typography sx={{ fontSize: 24, fontWeight: 400 }}>สร้างรายการโอนสินค้า</Typography>
-          {/* <Steppers status={status}></Steppers> */}
-          {!docNo && <Steppers status={0}></Steppers>}
-          {docNo && <Steppers status={1}></Steppers>}
+          <Typography sx={{ fontSize: '1em' }}>สร้างรายการโอนสินค้า</Typography>
+          <Steppers status={status} type="RT"></Steppers>
+          {/* <Steppers status="CREATED" type="BT"></Steppers> */}
         </BootstrapDialogTitle>
 
         <DialogContent>

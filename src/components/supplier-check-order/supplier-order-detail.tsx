@@ -30,7 +30,7 @@ import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
 import theme from '../../styles/theme';
 import AccordionHuaweiFile from './accordion-huawei-file';
-import ModalAddItem from './modal-add-item';
+import ModalAddItem from './modal-add-items';
 import ModelDeleteConfirm from './modal-delete-confirm';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
