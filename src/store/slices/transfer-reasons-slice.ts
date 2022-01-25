@@ -4,12 +4,12 @@ import { get } from '../../adapters/posback-adapter';
 import { TransferReasonsResponse } from '../../models/transfer-reasons-model';
 
 type State = {
-  branchList: TransferReasonsResponse;
+  reasonsList: TransferReasonsResponse;
   error: string;
 };
 
 const initialState: State = {
-  branchList: {
+  reasonsList: {
     ref: '',
     code: 0,
     message: '',
@@ -38,7 +38,7 @@ const transferReasonsSlice = createSlice({
       initialState;
     }),
       builer.addCase(featchTransferReasonsListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.branchList = action.payload;
+        state.reasonsList = action.payload;
       }),
       builer.addCase(featchTransferReasonsListAsync.rejected, () => {
         initialState;

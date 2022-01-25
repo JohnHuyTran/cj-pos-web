@@ -64,13 +64,65 @@ export interface StockTransferItems {
   toleNo?: string;
 }
 
-export interface SaveStockPackRequest {
+export interface BranchTransferRequest {
   btNo?: string;
   sdNo?: string;
   startDate?: string;
   endDate?: string;
   comment?: string;
-  items?: StockTransferItems[];
+  items?: Item[];
+}
+
+export interface BranchTransferResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: BranchTransferInfo | null;
+}
+export interface BranchTransferInfo {
+  id: string;
+  btNo: string;
+  rtNo: string;
+  branchCode: string;
+  startDate: string;
+  endDate: string;
+  branchFrom: string;
+  branchTo: string;
+  transferReason: string;
+  status: string;
+  comment: string;
+  items: Item[];
+  auditLogs: AuditLog[];
+  createdBy: string;
+  lastModifiedBy: string;
+  createdDate: string;
+  lastModifiedDate: string;
+}
+
+export interface AuditLog {
+  activity: string;
+  editBy: string;
+  editByName: string;
+  editDate: string;
+}
+
+export interface Item {
+  seqItem?: number;
+  skuCode?: string;
+  barcode?: string;
+  productName?: string;
+  baseUnit?: number;
+  unitCode?: string;
+  unitName?: string;
+  remainStock?: number;
+  qty?: number;
+  allQty?: number;
+  actualQty?: number;
+  actualAllQty?: number;
+  toteCode?: string;
+  orderQty?: number;
+  orderAllQty?: number;
+  isDraft?: boolean;
 }
 
 export interface BranchTransferResponse {
