@@ -189,8 +189,8 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
       let reason = reasons;
       if (reason === 'All') reason = '';
       const payloadSave: SaveStockTransferRequest = {
-        btNo: btNo,
-        sdNo: '',
+        rtNo: btNo,
+        // sdNo: '',
         startDate: moment(startDate).startOf('day').toISOString(),
         endDate: moment(endDate).startOf('day').toISOString(),
         branchFrom: startBranch,
