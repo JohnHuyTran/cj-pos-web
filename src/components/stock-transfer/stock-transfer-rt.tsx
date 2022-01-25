@@ -8,6 +8,7 @@ import DatePickerComponent from '../commons/ui/date-picker';
 import ReasonsListDropDown from './transfer-reasons-list-dropdown';
 import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
+import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
 
 interface State {
   docNo: string;
@@ -16,7 +17,7 @@ interface State {
   dateFrom: string;
   dateTo: string;
   statuses: string;
-  //   transferReason: string;
+  transferReason: string;
 }
 
 interface loadingModalState {
@@ -33,7 +34,7 @@ export default function StockTransferRt() {
     dateFrom: '',
     dateTo: '',
     statuses: 'ALL',
-    // transferReason: '',
+    transferReason: '',
   });
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
@@ -80,14 +81,14 @@ export default function StockTransferRt() {
     setEndDate(value);
   };
 
-  //   const handleChangeReasons = (ReasonsCode: string) => {
-  //     if (ReasonsCode !== null) {
-  //       let codes = JSON.stringify(ReasonsCode);
-  //       setValues({ ...values, transferReason: JSON.parse(codes) });
-  //     } else {
-  //       setValues({ ...values, transferReason: '' });
-  //     }
-  //   };
+  const handleChangeReasons = (ReasonsCode: string) => {
+    if (ReasonsCode !== null) {
+      let codes = JSON.stringify(ReasonsCode);
+      setValues({ ...values, transferReason: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, transferReason: '' });
+    }
+  };
 
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
@@ -100,8 +101,43 @@ export default function StockTransferRt() {
       setTextError('กรุณาระบุสาขาปลายทาง');
     } else {
       //   onClickSearchBtn();
-      console.log('pass validate');
+      console.log('value: ', values);
     }
+  };
+
+  const onClickClearBtn = () => {
+    handleOpenLoading('open', true);
+    // setFlagSearch(false);
+    setStartDate(null);
+    setEndDate(null);
+    setClearBranchDropDown(!clearBranchDropDown);
+    setValues({
+      docNo: '',
+      branchFrom: '',
+      branchTo: '',
+      dateFrom: '',
+      dateTo: '',
+      statuses: 'ALL',
+      transferReason: '',
+    });
+
+    // const payload: StockTransferRequest = {
+    //   limit: limit ? limit.toString() : '10',
+    //   page: page,
+    //   docNo: values.docNo,
+    //   branchFrom: values.branchFrom,
+    //   branchTo: values.branchTo,
+    //   dateFrom: moment(startDate).startOf('day').toISOString(),
+    //   dateTo: moment(endDate).endOf('day').toISOString(),
+    //   statuses: values.statuses,
+    //   transferReason: values.transferReason,
+    //   clearSearch: true,
+    // };
+    // dispatch(featchSearchStockTransferAsync(payload));
+
+    setTimeout(() => {
+      handleOpenLoading('open', false);
+    }, 300);
   };
 
   //alert Errormodel
@@ -128,8 +164,8 @@ export default function StockTransferRt() {
               id="txtDocNo"
               name="docNo"
               size="small"
-              //   value={values.docNo}
-              //   onChange={handleChange}
+              value={values.docNo}
+              onChange={handleChange}
               className={classes.MtextField}
               fullWidth
               placeholder="เลขที่เอกสาร RT"
@@ -186,20 +222,19 @@ export default function StockTransferRt() {
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={'0'}>บันทึก</MenuItem>
-                <MenuItem value={'1'}>อยู่ระหว่างดำเนินการ</MenuItem>
-                <MenuItem value={'2'}>เสร็จสิ้น</MenuItem>
-                <MenuItem value={'3'}>ยกเลิก</MenuItem>
+                {getStockTransferStatusList('RT').map((item, index: number) => {
+                  return <MenuItem value={item.key}>{t(`status.${item.value}`)}</MenuItem>;
+                })}
               </Select>
             </FormControl>
           </Grid>
 
-          {/* <Grid item xs={4} sx={{ pt: 30 }}>
+          <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาเหตุการโอน
             </Typography>
             <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
-          </Grid> */}
+          </Grid>
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
             <Button
@@ -216,7 +251,7 @@ export default function StockTransferRt() {
             <Button
               id="btnClear"
               variant="contained"
-              //   onClick={onClickClearBtn}
+              onClick={onClickClearBtn}
               sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
