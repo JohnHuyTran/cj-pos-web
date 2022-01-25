@@ -19,6 +19,9 @@ export interface DataGridProps {
   typeDiscount: string;
   // onClose?: () => void;
 }
+
+const _ = require('lodash');
+
 export const ModalTransferItem = (props: DataGridProps) => {
   const { typeDiscount, action } = props;
 
@@ -42,8 +45,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
         let sameItem = dtTable.find((el) => el.barCode === item.barcode);
         const price = parseFloat(item.unitPrice);
         let discount = !!sameItem ? sameItem.discount : 0;
-        let expiryDate = !!sameItem ? sameItem.expiryDate : null;
-        let qty = item.qty ? item.qty : 0;
+        let expiryDate = !!sameItem ? sameItem.expiryDate : null;     
         let numberOfDiscounted = (item.numberOfDiscounted || 0) + item.qty;
         let approvedDiscount = 0;
         if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
@@ -62,16 +64,16 @@ export const ModalTransferItem = (props: DataGridProps) => {
           barCode: item.barcode,
           barcodeName: item.barcodeName,
           unit: item.unitName,
-          price: price.toFixed(2),
+          price: price,
           discount: discount,
           errorDiscount: '',
-          qty: qty,
+          qty: item.qty ? item.qty : 0,
           errorQty: '',
           expiryDate: expiryDate,
           errorExpiryDate: '',
           cashDiscount: cashDiscount.toFixed(2) || 0,
           priceAfterDiscount: priceAfterDiscount.toFixed(2),
-          numberOfDiscounted: numberOfDiscounted,
+          numberOfDiscounted: (item.NumberOfDiscounted || 0) + item.qty,
           numberOfApproved: 0,
           approvedDiscount: approvedDiscount.toFixed(2),
           skuCode: item.skuCode,
@@ -148,11 +150,20 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfDiscount = (event: any, index: number, errorIndex: number) => {
+    let currentData: any;
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
+      currentData = data[index - 1];
       data[index - 1].numberOfDiscounted = parseInt(event.target.value);
       return data;
     });
+    let updateList = _.cloneDeep(payloadAddItem);
+    updateList.map((item:any) => {
+      if (item.barcode === currentData.barCode) {
+        item.qty = parseInt(event.target.value);
+      }
+    })
+    dispatch(updateAddItemsState(updateList));
     dispatch(
       updateErrorList(
         errorList.map((item: any, idx: number) => {
@@ -214,6 +225,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
     setCountText(e.split('').length);
   };
 
+  const addTwoDecimalPlaces = (value: any) => {
+    if (stringNullOrEmpty(value)) return '0.00';
+    else return value.toFixed(2);
+};
+
   const columns: GridColDef[] = [
     {
       field: 'index',
@@ -269,7 +285,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params) => (
         <Box component="div" width="100%" textAlign="end">
-          {params.value}
+          {addTwoDecimalPlaces(params.value)}
         </Box>
       ),
     },
