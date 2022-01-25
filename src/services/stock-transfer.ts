@@ -1,7 +1,7 @@
 import { post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { ContentType } from '../utils/enum/common-enum';
-import { SaveStockPackRequest, SaveStockTransferRequest } from '../models/stock-transfer-model';
+import { BranchTransferRequest, SaveStockTransferRequest } from '../models/stock-transfer-model';
 import { getPathUrl } from './base-service';
 
 export async function saveStockTransfer(payload: SaveStockTransferRequest) {
@@ -22,7 +22,7 @@ export const getPathBranchTransferDetail = (btNo: string) => {
   });
 };
 
-export async function saveBranchTransfer(payload: SaveStockPackRequest) {
+export async function saveBranchTransfer(payload: BranchTransferRequest) {
   try {
     const response = await put(environment.stock.branchTransfer.save.url, payload, ContentType.JSON).then(
       (result: any) => result
@@ -34,7 +34,7 @@ export async function saveBranchTransfer(payload: SaveStockPackRequest) {
   }
 }
 
-export async function sendBranchTransferToDC(payload: SaveStockPackRequest) {
+export async function sendBranchTransferToDC(payload: BranchTransferRequest) {
   try {
     const response = await post(environment.stock.branchTransfer.sendDC.url, payload, ContentType.JSON).then(
       (result: any) => result

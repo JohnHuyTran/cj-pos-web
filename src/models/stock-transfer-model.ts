@@ -64,13 +64,13 @@ export interface StockTransferItems {
   toleNo?: string;
 }
 
-export interface SaveStockPackRequest {
+export interface BranchTransferRequest {
   btNo?: string;
   sdNo?: string;
   startDate?: string;
   endDate?: string;
   comment?: string;
-  items?: StockTransferItems[];
+  items?: Item[];
 }
 
 export interface BranchTransferResponse {

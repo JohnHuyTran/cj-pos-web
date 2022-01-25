@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import {
   DataGrid,
+  GridCellParams,
   GridColDef,
   GridRenderCellParams,
   GridRowData,
@@ -23,13 +24,15 @@ import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import ModalConfirmTransaction from './modal-confirm-transaction';
-import { Item, SaveStockPackRequest, StockTransferItems } from '../../models/stock-transfer-model';
+import { BranchTransferRequest, Item } from '../../models/stock-transfer-model';
 import { saveBranchTransfer, sendBranchTransferToDC } from '../../services/stock-transfer';
 import moment from 'moment';
 import { ApiError } from '../../models/api-error-model';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import Steppers from './steppers';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
+import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
+import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
 
 interface Props {
   isOpen: boolean;
@@ -126,7 +129,7 @@ const columns: GridColDef[] = [
             var returnQty = Number(params.getValue(params.id, 'actualQty'));
             if (returnQty === 0) value = chkReturnQty(value);
             if (value < 0) value = 0;
-            if (value > qty) value = qty;
+            //if (value > qty) value = qty;
             params.api.updateRows([{ ...params.row, actualQty: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraft') ? false : true}
@@ -203,6 +206,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
   const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const payloadSearch = useAppSelector((state) => state.saveSearchStock.searchStockTransfer);
 
   const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
   const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
@@ -288,18 +292,18 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const mappingPayload = () => {
-    let items: StockTransferItems[] = [];
+    let items: Item[] = [];
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     rowsEdit.forEach((data: GridRowData) => {
-      const item: StockTransferItems = {
+      const item: Item = {
         barcode: data.barcode,
-        orderQty: data.actualQty,
-        toleNo: data.tote,
+        actualQty: data.actualQty,
+        toteCode: data.toteCode,
       };
       items.push(item);
     });
 
-    const payload: SaveStockPackRequest = {
+    const payload: BranchTransferRequest = {
       comment: comment,
       items: items,
       btNo: btNo,
@@ -309,8 +313,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     };
     return payload;
   };
-
-  const currentlySelected = () => {};
 
   let rows = branchTransferItems.map((item: Item, index: number) => {
     return {
@@ -327,17 +329,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       actualQty: item.actualQty ? item.actualQty : 0,
       toteCode: item.toteCode,
       isDraft: isDraft,
-      // stockQty: item.qty,
-      // approveQty: item.actualQty,
-      // unitName: item.unitName,
-      // unitCode: item.unitCode,
-      // actualQty: item.returnQty ? item.returnQty : 0,
-      // unitFactor: '',
-      // tote: '111111',
-      // produtStatus: item.produtStatus,
-      // isDraft: isDraft,
-      // qtyAll: item.qtyAll,
-      // actualQtyAll: item.actualQtyAll,
     };
   });
 
@@ -345,7 +336,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
-      if (!data.tote) {
+      if (!data.toteCode) {
         itemNotValid = true;
         return;
       }
@@ -415,14 +406,16 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const handleSaveBtn = async () => {
     const isvalidItem = validateItem();
     if (isvalidItem) {
-      const payload: SaveStockPackRequest = await mappingPayload();
+      const payload: BranchTransferRequest = await mappingPayload();
       await saveBranchTransfer(payload)
-        .then((value) => {
+        .then(async (value) => {
           // setStatus(1);
           setBtNo(value.btNo);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          await dispatch(featchBranchTransferDetailAsync(value.btNo));
+          await dispatch(featchSearchStockTransferAsync(payloadSearch));
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
@@ -431,15 +424,16 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     }
   };
   const handleConfirmBtn = async () => {
+    await storeItem();
     const isvalidItem = validateItem();
     if (isvalidItem) {
       // setOpenLoadingModal(true);
       if (!btNo) {
-        const payload: SaveStockPackRequest = await mappingPayload();
+        const payload: BranchTransferRequest = await mappingPayload();
         await saveBranchTransfer(payload)
-          .then((value) => {
+          .then(async (value) => {
             // setStatus(1);
-            setBtNo(value.docNo);
+            setBtNo(value.btNo);
             setOpenModelConfirmTransaction(true);
           })
           .catch((error: ApiError) => {
@@ -453,17 +447,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const sendTransactionToDC = async () => {
-    const payload: SaveStockPackRequest = {
-      btNo: btNo,
-    };
-
+    const payload: BranchTransferRequest = await mappingPayload();
     await sendBranchTransferToDC(payload)
-      .then((value) => {
+      .then(async (value) => {
         handleOnCloseModalConfirm();
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('คุณส่งรายการให้ DC เรียบร้อยแล้ว');
-        // dispatch(featchOrderListSupAsync(payloadSearch));
+        await dispatch(featchSearchStockTransferAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -476,6 +467,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       });
     handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
+  };
+
+  const currentlySelected = () => {
+    storeItem();
+  };
+
+  const onCellFocusOut = async (params: GridCellParams) => {
+    storeItem();
   };
 
   return (
@@ -610,7 +609,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
-                onCellFocusOut={currentlySelected}
+                onCellFocusOut={onCellFocusOut}
               />
             </div>
           </Box>
