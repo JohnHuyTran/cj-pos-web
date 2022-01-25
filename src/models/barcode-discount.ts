@@ -27,3 +27,12 @@ export interface DiscountDetail {
   errorExpiryDate: string;
   errorNumberOfDiscounted: string;
 }
+
+interface Product {
+  barcode: string;
+  NumberOfDiscounted: number;
+}
+export interface CheckStockPayload {
+  branchCode: string;
+  products: Product[];
+}

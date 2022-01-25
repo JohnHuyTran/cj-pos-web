@@ -65,7 +65,7 @@ export const environment = {
         url: '/campaign/{id}/waiting-approve',
       },
       cancel: {
-        url: '/campaign/{id}'
+        url: '/campaign/{id}',
       },
     },
   },
@@ -148,6 +148,9 @@ export const environment = {
     },
     saveStockTransfer: {
       url: '/stock/stock-transfer/draft',
+    },
+    stockBalanceCheck: {
+      url: '/stock/stock-balance-check',
     },
   },
 };
