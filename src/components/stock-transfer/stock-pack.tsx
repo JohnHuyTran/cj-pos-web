@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import {
   DataGrid,
   GridColDef,
-  GridEditCellValueParams,
   GridRenderCellParams,
   GridRowData,
   GridRowId,
@@ -14,7 +13,6 @@ import Dialog from '@mui/material/Dialog';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
-import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import { useStyles } from '../../styles/makeTheme';
@@ -25,13 +23,14 @@ import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import ModalConfirmTransaction from './modal-confirm-transaction';
-import { BranchTransferInfo, Item, SaveStockPackRequest, StockTransferItems } from '../../models/stock-transfer-model';
+import { Item, SaveStockPackRequest, StockTransferItems } from '../../models/stock-transfer-model';
 import { saveBranchTransfer, sendBranchTransferToDC } from '../../services/stock-transfer';
 import moment from 'moment';
 import { ApiError } from '../../models/api-error-model';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import Steppers from './steppers';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
+
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -250,15 +249,15 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const toBranch = getBranchName(branchList, branchTransferInfo.branchTo);
     setDestinationBranch(toBranch ? toBranch : '');
 
-    setBtNo(branchTransferInfo.btNo);
     const reason = getReasonLabel(reasonsList, branchTransferInfo.transferReason);
     setReasons(reason ? reason : '');
 
+    setBtNo(branchTransferInfo.btNo);
     setBtStatus(branchTransferInfo.status);
     setComment(branchTransferInfo.comment);
 
     const isBranch = isOwnBranch('D0001');
-    setIsDraft(isBranch && btStatus === 'CREATED' ? true : false);
+    setIsDraft(isBranch && branchTransferInfo.status === 'CREATED' ? true : false);
   }, [open]);
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
