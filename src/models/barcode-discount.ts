@@ -15,12 +15,13 @@ export interface DiscountDetail {
   index: number;
   barCode: string;
   barcodeName: string;
+  skuCode: string;
   unit: string;
   price: number;
   discount: any;
   expiryDate: string | any;
   cashDiscount: number | any;
-  priceAfterDicount: number | any;
+  priceAfterDiscount: number | any;
   numberOfDiscounted: number;
   approvedDiscount: number;
   errorDiscount: string;

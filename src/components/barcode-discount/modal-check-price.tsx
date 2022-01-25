@@ -1,0 +1,143 @@
+import React, { ReactElement } from 'react';
+import Dialog from '@mui/material/Dialog';
+import { Box, Button, DialogActions, DialogContent, DialogContentText, TextField, Typography } from '@mui/material';
+import { ErrorOutline } from '@mui/icons-material';
+import { DataGrid, GridColDef } from '@material-ui/data-grid';
+import { GridRenderCellParams } from '@mui/x-data-grid';
+import { useAppSelector } from '../../store/store';
+import { useStyles } from '../../styles/makeTheme';
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  products: object[];
+}
+
+const columns: GridColDef[] = [
+  {
+    field: 'index',
+    headerName: 'ลำดับ',
+    headerAlign: 'center',
+    disableColumnMenu: false,
+    flex: 0.6,
+    sortable: false,
+    renderCell: (params) => (
+      <Box component="div" sx={{ paddingLeft: '10px' }}>
+        {params.value}
+      </Box>
+    ),
+  },
+  {
+    field: 'barcode',
+    headerName: 'บาร์โค๊ด',
+    flex: 1.2,
+    headerAlign: 'left',
+    sortable: false,
+  },
+  {
+    field: 'barcodeName',
+    headerName: 'รายละเอียดสินค้า',
+    headerAlign: 'left',
+    flex: 1.8,
+    disableColumnMenu: false,
+    sortable: false,
+    renderCell: (params) => {
+      return (
+        <div>
+          <Typography variant="body2">{params.value}</Typography>
+          <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+            {params.row}
+          </Typography>
+        </div>
+      );
+    },
+  },
+  {
+    field: 'oldPrice',
+    headerName: 'ราคาเดิม',
+    flex: 1,
+    align: 'right',
+    headerAlign: 'left',
+    sortable: false,
+    renderCell: (params) => {
+      return (
+        <Typography variant="body2">
+          <b>{params.value}</b>
+        </Typography>
+      );
+    },
+  },
+  {
+    field: 'currentPrice',
+    headerName: 'ราคาใหม่',
+    flex: 1,
+    align: 'right',
+    headerAlign: 'left',
+    sortable: false,
+    renderCell: (params) => {
+      return (
+        <Typography variant="body2" sx={{ color: '#446EF2' }}>
+          <b>{params.value}</b>
+        </Typography>
+      );
+    },
+  },
+];
+
+export default function ModalCheckPrice({ open, onClose, products }: Props): ReactElement {
+  const classes = useStyles();
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
+
+  let rows: any = [];
+  if (Object.keys(payloadAddItem).length !== 0) {
+    rows = products.map((item: any, index: number) => {
+      const itemConvert = payloadAddItem.find((el: any) => el.barcode === item.barcode);
+      return {
+        id: index,
+        index: index + 1,
+        barcode: item.barcode,
+        barcodeName: itemConvert.barcodeName,
+        oldPrice: item.oldPrice,
+        skuCode: itemConvert.skuCode,
+        currentPrice: item.currentPrice,
+      };
+    });
+  }
+
+  return (
+    <Dialog
+      open={open}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      // fullWidth={true}
+      PaperProps={{ sx: { width: '673px', maxWidth: '673px' } }}
+    >
+      <DialogContent sx={{ padding: '1em' }}>
+        <DialogContentText sx={{ textAlign: 'center' }}>
+          <ErrorOutline sx={{ color: '#F54949', fontSize: '4em' }} />
+          <Typography>
+            ราคาสินค้าบางรายการมีการเปลี่ยนแปลง
+            <br />
+            โดยระบบทำการคำนวนราคาส่วนลดใหม่เรียบร้อยแล้ว
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 1.5 }}>
+            <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
+              <DataGrid rows={rows} columns={columns} disableColumnMenu hideFooter autoHeight />
+            </div>
+          </Box>
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          id="btnClose"
+          variant="contained"
+          color="error"
+          sx={{ margin: '0 auto', borderRadius: '5px', mb: 1.5 }}
+          onClick={onClose}
+        >
+          ปิด
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}

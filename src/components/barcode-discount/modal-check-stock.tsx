@@ -5,7 +5,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { Stack } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useStyles } from '../../styles/makeTheme';
@@ -20,34 +20,57 @@ const columns: GridColDef[] = [
   {
     field: 'id',
     headerName: 'ลำดับ',
-    headerAlign: 'center',
+    headerAlign: 'left',
     sortable: false,
+    flex: 0.8,
   },
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    headerAlign: 'center',
-    minWidth: 200,
+    headerAlign: 'left',
+    flex: 1.2,
     sortable: false,
   },
   {
     field: 'productName',
     headerName: 'รายละเอียดสินค้า',
-    headerAlign: 'center',
-    minWidth: 200,
+    headerAlign: 'left',
+    flex: 1.8,
     sortable: false,
+    renderCell: (params) => {
+      console.log(params.row);
+
+      return (
+        <div>
+          <Typography variant="body2">{params.value}</Typography>
+          <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+            {params.row.skuCode || ''}
+          </Typography>
+        </div>
+      );
+    },
   },
   {
     field: 'stockRemain',
     headerName: 'จำนวนสต๊อก',
-    headerAlign: 'center',
+    headerAlign: 'right',
+    flex: 1.2,
     sortable: false,
+    align: 'right',
+    renderCell: (params) => {
+      return (
+        <Typography variant="body2" sx={{ color: 'red', marginRight: '10px' }}>
+          <b>{params.value}</b>
+        </Typography>
+      );
+    },
   },
 ];
 
 export default function ModalCheckStock({ open, onClose }: Props) {
   const classes = useStyles();
   const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
+  console.log({ checkStocks });
 
   let rows: any = [];
   rows = checkStocks.map((item: any, index: number) => {
@@ -56,6 +79,7 @@ export default function ModalCheckStock({ open, onClose }: Props) {
       barcode: item.barcode,
       productName: item.productName,
       stockRemain: item.stockRemain,
+      skuCode: item.skuCode,
     };
   });
   const handleClose = () => {
