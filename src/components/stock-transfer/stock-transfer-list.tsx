@@ -16,6 +16,8 @@ import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfe
 import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
 import StockPackChecked from './stock-pack';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
+import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
+import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -225,11 +227,13 @@ function StockTransferList() {
   function handleCloseCreateModal() {
     setOpenCreateModal(false);
   }
+  const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
+  const currentlySelected = async (params: GridCellParams) => {
+    await dispatch(featchBranchTransferDetailAsync(params.row.btNo));
 
-  async function currentlySelected() {
-    await dispatch(featchPurchaseNoteAsync('PI21120002-000031'));
+    if (reasonsList === null || reasonsList.length <= 0) await dispatch(featchTransferReasonsListAsync());
     setOpenCreateModal(true);
-  }
+  };
   return (
     <div>
       <Box mt={2} bgcolor='background.paper'>
