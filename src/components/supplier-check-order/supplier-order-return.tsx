@@ -77,7 +77,7 @@ const columns: GridColDef[] = [
     sortable: false,
     // hide: true,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -100,8 +100,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant='body2'>{params.value}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+        <Typography variant="body2">{params.value}</Typography>
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
@@ -125,9 +125,9 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => (
       <div>
         <TextField
-          variant='outlined'
-          name='txnQtyReturn'
-          type='number'
+          variant="outlined"
+          name="txnQtyReturn"
+          type="number"
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
@@ -145,7 +145,7 @@ const columns: GridColDef[] = [
             params.api.updateRows([{ ...params.row, returnQty: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraftStatus') ? true : false}
-          autoComplete='off'
+          autoComplete="off"
         />
       </div>
     ),
@@ -394,8 +394,9 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     };
     return payload;
   };
-
+  let deleteAction = false;
   const handleDeleteBtn = () => {
+    deleteAction = true;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const rowSelect = apiRef.current.getSelectedRows();
     if (rowSelect.size === rowsEdit.size) {
@@ -428,6 +429,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     });
     setPurchaseDetailItems([]);
     setPurchaseDetailItems(items);
+    deleteAction = true;
   };
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -474,7 +476,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const validateFileInfo = () => {
     const isvalid = fileUploadList.length > 0 ? true : false;
     // const isExistingFile = files.length > 0 ? true : false;
-    const isExistingFile = purchaseDetail.files.length > 0 ? true : false;
+    const isExistingFile = purchaseDetail.files && purchaseDetail.files.length > 0 ? true : false;
     if (!(isvalid || isExistingFile)) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
@@ -536,12 +538,25 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   const currentlySelected = async (params: GridCellParams) => {
     storeItem();
   };
+  const currentlySelectedWithFocusOut = async (params: GridCellParams) => {
+    if (!deleteAction) {
+      storeItem();
+    }
+    deleteAction = false;
+  };
+
+  const handleOnChangeUploadFile = (status: boolean) => {
+    setUploadFileFlag(status);
+    if (status) {
+      dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
+    }
+  };
 
   return (
     <div>
       {' '}
-      <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
+      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>ใบคืนสินค้า</Typography>
           <Steppers status={pnStatus}></Steppers>
         </BootstrapDialogTitle>
@@ -549,13 +564,13 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           <Box mt={4} sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร PN</Typography>
+                <Typography variant="body2">เลขที่เอกสาร PN</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{pnNo}</Typography>
+                <Typography variant="body2">{pnNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>ผู้จำหน่าย</Typography>
+                <Typography variant="body2">ผู้จำหน่าย</Typography>
               </Grid>
               <Grid item lg={4}>
                 <div
@@ -565,11 +580,12 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                     maxWidth: 250,
                     background: '#EAEBEB',
                     padding: 2,
-                  }}>
-                  <Typography variant='body2' sx={{ color: '#263238' }}>
+                  }}
+                >
+                  <Typography variant="body2" sx={{ color: '#263238' }}>
                     {purchaseDetail.supplierName}
                   </Typography>
-                  <Typography variant='body2' sx={{ color: '#AEAEAE', fontSize: 12 }}>
+                  <Typography variant="body2" sx={{ color: '#AEAEAE', fontSize: 12 }}>
                     {purchaseDetail.supplierTaxNo}
                   </Typography>
                 </div>
@@ -577,37 +593,39 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร PI :</Typography>
+                <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{purchaseDetail.piNo}</Typography>
+                <Typography variant="body2">{purchaseDetail.piNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>แนบเอกสารจากผู้จำหน่าย :</Typography>
+                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
                 {pnStatus === 1 && (
                   <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
                     <Button
-                      id='btnPrint'
-                      color='primary'
-                      variant='contained'
-                      component='span'
+                      id="btnPrint"
+                      color="primary"
+                      variant="contained"
+                      component="span"
                       className={classes.MbtnBrowse}
-                      disabled>
+                      disabled
+                    >
                       แนบไฟล์
                     </Button>
 
                     <Typography
-                      variant='overline'
-                      sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
+                      variant="overline"
+                      sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
+                    >
                       แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
                     </Typography>
                   </Box>
                 )}
                 {pnStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
                 {pnStatus === 1 && (
-                  <Link component='button' variant='body2' onClick={handleLinkDocument}>
+                  <Link component="button" variant="body2" onClick={handleLinkDocument}>
                     เรียกดูเอกสารใบคืนสินค้า
                   </Link>
                 )}
@@ -615,8 +633,9 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                   <AccordionUploadFile
                     files={purchaseDetail.files ? purchaseDetail.files : []}
                     docNo={pnNo}
-                    docType='PN'
+                    docType="PN"
                     isStatus={uploadFileFlag}
+                    onChangeUploadFile={handleOnChangeUploadFile}
                   />
                 )}
               </Grid>
@@ -628,50 +647,55 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
               container
               xs={12}
               sx={{ mt: 3 }}
-              justifyContent='space-between'
-              direction='row'
-              alignItems='flex-end'>
+              justifyContent="space-between"
+              direction="row"
+              alignItems="flex-end"
+            >
               <Grid item xl={2}>
                 <Button
-                  id='btnSave'
-                  variant='contained'
-                  color='secondary'
+                  id="btnSave"
+                  variant="contained"
+                  color="secondary"
                   className={classes.MbtnSave}
                   onClick={handleDeleteBtn}
                   startIcon={<DeleteIcon />}
-                  sx={{ width: 200 }}>
+                  sx={{ width: 200 }}
+                >
                   ลบรายการ
                 </Button>
               </Grid>
               <Grid item>
                 <Button
-                  id='btnSave'
-                  variant='contained'
-                  color='warning'
+                  id="btnSave"
+                  variant="contained"
+                  color="warning"
                   className={classes.MbtnSave}
                   onClick={handleSaveBtn}
                   startIcon={<SaveIcon />}
-                  sx={{ width: 200 }}>
+                  sx={{ width: 200 }}
+                >
                   บันทึก
                 </Button>
 
                 <Button
-                  id='btnApprove'
-                  variant='contained'
-                  color='primary'
+                  id="btnApprove"
+                  variant="contained"
+                  color="primary"
                   className={classes.MbtnApprove}
                   onClick={handleConfirmBtn}
                   startIcon={<CheckCircleOutline />}
-                  sx={{ width: 200 }}>
+                  sx={{ width: 200 }}
+                >
                   ยืนยัน
                 </Button>
               </Grid>
             </Grid>
           )}
-          <Box mt={2} bgcolor='background.paper'>
+          <Box mt={2} bgcolor="background.paper">
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
-              className={classes.MdataGridDetail}>
+              className={classes.MdataGridDetail}
+            >
               <DataGrid
                 rows={rows}
                 columns={cols}
@@ -686,21 +710,21 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
-                onCellFocusOut={currentlySelected}
+                onCellFocusOut={currentlySelectedWithFocusOut}
               />
             </div>
           </Box>
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
-                <Typography variant='body2'>หมายเหตุ:</Typography>
+                <Typography variant="body2">หมายเหตุ:</Typography>
                 <TextField
                   multiline
                   fullWidth
                   rows={5}
                   onChange={handleChangeComment}
                   defaultValue={comment}
-                  placeholder='ความยาวไม่เกิน 255 ตัวอักษร'
+                  placeholder="ความยาวไม่เกิน 255 ตัวอักษร"
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
                   sx={{ maxWidth: 350 }}
@@ -715,7 +739,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                     maxWidth: 350,
                     textAlign: 'right',
                     // marginTop: "-1.5em",
-                  }}>
+                  }}
+                >
                   {characterCount}/{maxCommentLength}
                 </div>
               </Grid>
@@ -739,18 +764,20 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         open={openModelConfirm}
         onClose={handleOnCloseModalConfirm}
         handleConfirm={approvePN}
-        header='ยืนยันอนุมัติใบคืนสินค้า'
-        title='เลขที่เอกสาร PN'
-        value={pnNo}
+        header="ยืนยันอนุมัติใบคืนสินค้า"
+        title1="เลขที่เอกสาร PN"
+        title2="เลขที่เอกสาร PI"
+        valuePN={pnNo}
+        valuePI={purchaseDetail.piNo}
       />
       <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
         url={getPathReportPN(pnNo)}
         statusFile={statusFile}
-        sdImageFile=''
+        sdImageFile=""
         fileName={formatFileNam(pnNo, pnStatus)}
-        btnPrintName='พิมพ์เอกสาร'
+        btnPrintName="พิมพ์เอกสาร"
       />
       <LoadingModal open={openLoadingModal} />
     </div>

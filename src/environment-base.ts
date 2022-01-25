@@ -143,6 +143,9 @@ export const environment = {
     },
   },
   stock: {
+    searchStockTransfer: {
+      url: '/stock/stock-transfer',
+    },
     transferReasonsList: {
       url: '/stock/master-transfer-reasons',
     },

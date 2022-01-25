@@ -47,7 +47,7 @@ const columns: GridColDef[] = [
   },
   {
     field: 'barcodeName',
-    headerName: 'รายการสินค้า',
+    headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
     minWidth: 300,
     flex: 2,
@@ -167,9 +167,6 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
       }
       return onChangeItems(itemsList ? itemsList : []);
     }
-    // const updateStateRows = async (items: any) => {
-    //   await dispatch(updateItemsState(items));
-    // };
   };
 
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
@@ -210,6 +207,7 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
         rowHeight={65}
         onCellClick={currentlySelected}
         onCellFocusOut={handleEditItems}
+        onCellBlur={handleEditItems}
       />
 
       <ModelDeleteConfirm
