@@ -21,7 +21,7 @@ function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChang
       setCharacterCount(event.target.value.length);
       setComment(value);
     }
-    return onChangeComment(comment);
+    return onChangeComment(value);
   };
 
   return (

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import {
   DataGrid,
+  GridCellParams,
   GridColDef,
-  GridEditCellValueParams,
   GridRenderCellParams,
   GridRowData,
   GridRowId,
@@ -14,25 +14,26 @@ import Dialog from '@mui/material/Dialog';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
-import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import { useStyles } from '../../styles/makeTheme';
-import { isOwnBranch, numberWithCommas } from '../../utils/utils';
+import { getBranchName, getReasonLabel, isOwnBranch, numberWithCommas } from '../../utils/utils';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { PurchaseNoteDetailEntries } from '../../models/purchase-credit-note';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import ModalConfirmTransaction from './modal-confirm-transaction';
-import { SaveStockPackRequest, StockTransferItems } from '../../models/stock-transfer-model';
-import { saveStockPack, sendStockPackDC } from '../../services/stock-transfer';
+import { BranchTransferRequest, Item } from '../../models/stock-transfer-model';
+import { saveBranchTransfer, sendBranchTransferToDC } from '../../services/stock-transfer';
 import moment from 'moment';
 import { ApiError } from '../../models/api-error-model';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import Steppers from './steppers';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
+import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
+import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
+
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -48,7 +49,7 @@ const columns: GridColDef[] = [
     sortable: false,
     // hide: true,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -71,15 +72,15 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2">{params.value}</Typography>
-        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+        <Typography variant='body2'>{params.value}</Typography>
+        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
     ),
   },
   {
-    field: 'stockQty',
+    field: 'remainStock',
     headerName: 'สต๊อกสินค้าคงเหลือ',
     width: 150,
     headerAlign: 'center',
@@ -88,7 +89,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => numberWithCommas(params.value),
   },
   {
-    field: 'approveQty',
+    field: 'qty',
     headerName: 'จำนวนที่อนุมัติ',
     width: 150,
     headerAlign: 'center',
@@ -112,27 +113,27 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => (
       <div>
         <TextField
-          variant="outlined"
-          name="txnActualQty"
-          type="number"
+          variant='outlined'
+          name='txnActualQty'
+          type='number'
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
             var qty: any =
-              params.getValue(params.id, 'approveQty') &&
-              params.getValue(params.id, 'approveQty') !== null &&
-              params.getValue(params.id, 'approveQty') != undefined
-                ? params.getValue(params.id, 'approveQty')
+              params.getValue(params.id, 'qty') &&
+              params.getValue(params.id, 'qty') !== null &&
+              params.getValue(params.id, 'qty') != undefined
+                ? params.getValue(params.id, 'qty')
                 : 0;
             var value = e.target.value ? parseInt(e.target.value, 10) : '0';
             var returnQty = Number(params.getValue(params.id, 'actualQty'));
             if (returnQty === 0) value = chkReturnQty(value);
             if (value < 0) value = 0;
-            if (value > qty) value = qty;
+            //if (value > qty) value = qty;
             params.api.updateRows([{ ...params.row, actualQty: value }]);
           }}
-          disabled={params.getValue(params.id, 'isDraftStatus') ? false : true}
-          autoComplete="off"
+          disabled={params.getValue(params.id, 'isDraft') ? false : true}
+          autoComplete='off'
         />
       </div>
     ),
@@ -147,7 +148,7 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => calUnitFactor(params),
   },
   {
-    field: 'tote',
+    field: 'toteCode',
     headerName: 'เลข Tote/ลัง',
     width: 150,
     headerAlign: 'center',
@@ -155,22 +156,22 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => (
       <div>
         <TextField
-          variant="outlined"
-          name="txnQtyReturn"
+          variant='outlined'
+          name='txnQtyReturn'
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
-            params.api.updateRows([{ ...params.row, tote: e.target.value }]);
+            params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
           }}
-          disabled={params.getValue(params.id, 'isDraftStatus') ? false : true}
-          autoComplete="off"
+          disabled={params.getValue(params.id, 'isDraft') ? false : true}
+          autoComplete='off'
         />
       </div>
     ),
   },
 ];
 var calUnitFactor = function (params: GridValueGetterParams) {
-  let diff = Number(params.getValue(params.id, 'actualQty')) * Number(2);
+  let diff = Number(params.getValue(params.id, 'actualQty')) * Number(params.getValue(params.id, 'baseUnit'));
   return diff;
 };
 
@@ -202,12 +203,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const classes = useStyles();
   const { apiRef, columns } = useApiRef();
   const dispatch = useAppDispatch();
-  const purchaseDetailList = useAppSelector((state) => state.SupplierOrderReturn.purchaseDetail);
-  const payloadSearch = useAppSelector((state) => state.saveSearchOrderSup.searchCriteria);
+  const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
+  const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const payloadSearch = useAppSelector((state) => state.saveSearchStock.searchStockTransfer);
 
-  const purchaseDetail: any = purchaseDetailList.data ? purchaseDetailList.data : null;
-  const [purchaseDetailItems, setPurchaseDetailItems] = React.useState<PurchaseNoteDetailEntries[]>(
-    purchaseDetail.entries ? purchaseDetail.entries : []
+  const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
+  const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
+    branchTransferInfo.items ? branchTransferInfo.items : []
   );
   const [openModelConfirmTransaction, setOpenModelConfirmTransaction] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
@@ -244,14 +247,21 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   React.useEffect(() => {
-    setSourceBranch('1123-ท่าช่าง');
-    setDestinationBranch('1124-พรหมบุรี');
-    setBtNo('BT01');
-    setReasons('ทั้งหมด');
-    setBtStatus('CREATED');
-    setComment('Test Comment');
+    const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
+    setSourceBranch(fromBranch ? fromBranch : '');
+
+    const toBranch = getBranchName(branchList, branchTransferInfo.branchTo);
+    setDestinationBranch(toBranch ? toBranch : '');
+
+    const reason = getReasonLabel(reasonsList, branchTransferInfo.transferReason);
+    setReasons(reason ? reason : '');
+
+    setBtNo(branchTransferInfo.btNo);
+    setBtStatus(branchTransferInfo.status);
+    setComment(branchTransferInfo.comment);
+
     const isBranch = isOwnBranch('D0001');
-    setIsDraft(isBranch && btStatus === 'CREATED' ? true : false);
+    setIsDraft(isBranch && branchTransferInfo.status === 'CREATED' ? true : false);
   }, [open]);
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
@@ -282,18 +292,18 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const mappingPayload = () => {
-    let items: StockTransferItems[] = [];
+    let items: Item[] = [];
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     rowsEdit.forEach((data: GridRowData) => {
-      const item: StockTransferItems = {
+      const item: Item = {
         barcode: data.barcode,
-        orderQty: data.actualQty,
-        toleNo: data.tote,
+        actualQty: data.actualQty,
+        toteCode: data.toteCode,
       };
       items.push(item);
     });
 
-    const payload: SaveStockPackRequest = {
+    const payload: BranchTransferRequest = {
       comment: comment,
       items: items,
       btNo: btNo,
@@ -304,37 +314,29 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     return payload;
   };
 
-  const currentlySelected = () => {};
-
-  let rows = purchaseDetailItems
-    // .filter((item: PurchaseDetailEntries) => item.pnDisplay === 1)
-    .map((item: PurchaseNoteDetailEntries, index: number) => {
-      return {
-        id: `${item.barcode}-${index + 1}`,
-        index: index + 1,
-        seqItem: item.seqItem,
-        barcode: item.barcode,
-        productName: item.productName,
-        skuCode: item.skuCode,
-        stockQty: item.qty,
-        approveQty: item.actualQty,
-        unitName: item.unitName,
-        unitCode: item.unitCode,
-        actualQty: item.returnQty ? item.returnQty : 0,
-        unitFactor: '',
-        tote: '111111',
-        produtStatus: item.produtStatus,
-        isDraftStatus: isDraft,
-        qtyAll: item.qtyAll,
-        actualQtyAll: item.actualQtyAll,
-      };
-    });
+  let rows = branchTransferItems.map((item: Item, index: number) => {
+    return {
+      id: `${item.barcode}-${index + 1}`,
+      index: index + 1,
+      seqItem: item.seqItem,
+      barcode: item.barcode,
+      productName: item.productName,
+      skuCode: item.skuCode,
+      baseUnit: item.baseUnit ? item.baseUnit : 0,
+      unitName: item.unitName,
+      remainStock: item.remainStock ? item.remainStock : 0,
+      qty: item.qty ? item.qty : 0,
+      actualQty: item.actualQty ? item.actualQty : 0,
+      toteCode: item.toteCode,
+      isDraft: isDraft,
+    };
+  });
 
   const validateItem = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
-      if (!data.tote) {
+      if (!data.toteCode) {
         itemNotValid = true;
         return;
       }
@@ -349,50 +351,46 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const storeItem = () => {
-    // const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    // const items: PurchaseNoteDetailEntries[] = [];
-    // rowsEdit.forEach((data: GridRowData) => {
-    //   const newData: PurchaseNoteDetailEntries = {
-    //     seqItem: data.seqItem,
-    //     produtStatus: data.produtStatus,
-    //     isDraftStatus: btStatus === '0' ? false : true,
-    //     skuCode: data.skuCode,
-    //     barcode: data.barcode,
-    //     productName: data.productName,
-    //     qty: data.qty,
-    //     qtyAll: data.qtyAll,
-    //     actualQty: data.actualQty,
-    //     returnQty: data.returnQty,
-    //     actualQtyAll: data.actualQtyAll,
-    //     unitName: data.unitName,
-    //     unitCode: data.unitCode,
-    //   };
-    //   items.push(newData);
-    // });
-    // setPurchaseDetailItems(items);
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const items: Item[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const newData: Item = {
+        seqItem: data.seqItem,
+        barcode: data.barcode,
+        productName: data.productName,
+        skuCode: data.skuCode,
+        baseUnit: data.baseUnit,
+        unitName: data.unitName,
+        remainStock: data.remainStock,
+        qty: data.qty,
+        actualQty: data.actualQty,
+        toteCode: data.toteCode,
+        isDraft: isDraft,
+      };
+      items.push(newData);
+    });
+    setBranchTransferItems(items);
   };
 
   const handleClose = async () => {
     await storeItem();
     let showPopup = false;
     // onClickClose();
-    if (comment !== purchaseDetail.comment) {
+    if (comment !== branchTransferInfo.comment) {
       showPopup = true;
     }
     const rowSelect = apiRef.current.getSelectedRows();
     if (rowSelect.size > 0) {
       showPopup = true;
     }
-    const ent: PurchaseNoteDetailEntries[] = purchaseDetail.entries;
+    const ent: Item[] = branchTransferInfo.items;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    if (rowsEdit.size !== ent.length) {
-      showPopup = true;
-    }
 
     let i = 0;
     rowsEdit.forEach((data: GridRowData) => {
-      if (data.returnQty !== (ent[i].returnQty ? ent[i].returnQty : 0)) {
+      if (data.actualQty !== (ent[i].actualQty ? ent[i].actualQty : 0) || data.toteCode != ent[i].toteCode) {
         showPopup = true;
+        return;
       }
       i++;
     });
@@ -408,14 +406,16 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const handleSaveBtn = async () => {
     const isvalidItem = validateItem();
     if (isvalidItem) {
-      const payload: SaveStockPackRequest = await mappingPayload();
-      await saveStockPack(payload)
-        .then((value) => {
+      const payload: BranchTransferRequest = await mappingPayload();
+      await saveBranchTransfer(payload)
+        .then(async (value) => {
           // setStatus(1);
           setBtNo(value.btNo);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          await dispatch(featchBranchTransferDetailAsync(value.btNo));
+          await dispatch(featchSearchStockTransferAsync(payloadSearch));
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
@@ -424,15 +424,16 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     }
   };
   const handleConfirmBtn = async () => {
+    await storeItem();
     const isvalidItem = validateItem();
     if (isvalidItem) {
       // setOpenLoadingModal(true);
       if (!btNo) {
-        const payload: SaveStockPackRequest = await mappingPayload();
-        await saveStockPack(payload)
-          .then((value) => {
+        const payload: BranchTransferRequest = await mappingPayload();
+        await saveBranchTransfer(payload)
+          .then(async (value) => {
             // setStatus(1);
-            setBtNo(value.docNo);
+            setBtNo(value.btNo);
             setOpenModelConfirmTransaction(true);
           })
           .catch((error: ApiError) => {
@@ -446,17 +447,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const sendTransactionToDC = async () => {
-    const payload: SaveStockPackRequest = {
-      btNo: btNo,
-    };
-
-    await sendStockPackDC(payload)
-      .then((value) => {
+    const payload: BranchTransferRequest = await mappingPayload();
+    await sendBranchTransferToDC(payload)
+      .then(async (value) => {
         handleOnCloseModalConfirm();
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('คุณส่งรายการให้ DC เรียบร้อยแล้ว');
-        // dispatch(featchOrderListSupAsync(payloadSearch));
+        await dispatch(featchSearchStockTransferAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -471,44 +469,52 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setOpenLoadingModal(false);
   };
 
+  const currentlySelected = () => {
+    storeItem();
+  };
+
+  const onCellFocusOut = async (params: GridCellParams) => {
+    storeItem();
+  };
+
   return (
     <React.Fragment>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+      <Dialog open={open} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: 24, fontWeight: 400 }}>ตรวจสอบรายการใบโอน</Typography>
-          <Steppers status="CREATED" type="BT"></Steppers>
+          <Steppers status={branchTransferInfo.status} type='BT'></Steppers>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box mt={4} sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร BT</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร BT</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{btNo}</Typography>
+                <Typography variant='body2'>{btNo}</Typography>
               </Grid>
               <Grid item lg={6}></Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">วันที่สร้างรายการ:</Typography>
+                <Typography variant='body2'>วันที่สร้างรายการ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{convertUtcToBkkDate('2022-02-02')}</Typography>
+                <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.createdDate)}</Typography>
               </Grid>
               <Grid item lg={6}></Grid>
             </Grid>
 
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant="body2">วันที่โอนสินค้า* :</Typography>
+                <Typography variant='body2'>วันที่โอนสินค้า* :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">วันที่สิ้นสุด* :</Typography>
+                <Typography variant='body2'>วันที่สิ้นสุด* :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <DatePickerComponent
@@ -523,14 +529,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant="body2"> สาขาต้นทาง* :</Typography>
+                <Typography variant='body2'> สาขาต้นทาง* :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <TextField value={sourceBranch} disabled fullWidth></TextField>
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">สาขาปลายทาง* :</Typography>
+                <Typography variant='body2'>สาขาปลายทาง* :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <TextField value={destinationBranch} disabled fullWidth></TextField>
@@ -540,7 +546,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant="body2"> สาเหตุการโอน :</Typography>
+                <Typography variant='body2'> สาเหตุการโอน :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <TextField value={reasons} disabled fullWidth></TextField>
@@ -554,44 +560,40 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
               container
               xs={12}
               sx={{ mt: 3 }}
-              justifyContent="space-between"
-              direction="row"
-              alignItems="flex-end"
-            >
+              justifyContent='space-between'
+              direction='row'
+              alignItems='flex-end'>
               <Grid item xl={2}></Grid>
               <Grid item>
                 <Button
-                  id="btnSave"
-                  variant="contained"
-                  color="warning"
+                  id='btnSave'
+                  variant='contained'
+                  color='warning'
                   className={classes.MbtnSave}
                   onClick={handleSaveBtn}
                   startIcon={<SaveIcon />}
-                  sx={{ width: 200 }}
-                >
+                  sx={{ width: 200 }}>
                   บันทึก
                 </Button>
 
                 <Button
-                  id="btnApprove"
-                  variant="contained"
-                  color="primary"
+                  id='btnApprove'
+                  variant='contained'
+                  color='primary'
                   className={classes.MbtnApprove}
                   onClick={handleConfirmBtn}
                   startIcon={<CheckCircleOutline />}
-                  sx={{ width: 200 }}
-                >
+                  sx={{ width: 200 }}>
                   ส่งงานให้ DC
                 </Button>
               </Grid>
             </Grid>
           )}
-          <Box mt={2} bgcolor="background.paper">
+          <Box mt={2} bgcolor='background.paper'>
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
               // style={{ width: '100%', height: 'auto' }}
-              className={classes.MdataGridDetail}
-            >
+              className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rows}
                 columns={cols}
@@ -607,7 +609,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
-                onCellFocusOut={currentlySelected}
+                onCellFocusOut={onCellFocusOut}
               />
             </div>
           </Box>
@@ -615,7 +617,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
                 <TextBoxComment
-                  fieldName="สาเหตุการเปลี่ยนจำนวน:"
+                  fieldName='สาเหตุการเปลี่ยนจำนวน:'
                   defaultValue={comment}
                   maxLength={100}
                   onChangeComment={handleChangeComment}
@@ -669,8 +671,8 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         open={openModelConfirmTransaction}
         onClose={handleOnCloseModalConfirm}
         handleConfirm={sendTransactionToDC}
-        header="ยืนยันส่งรายการให้ DC"
-        title="เลขที่เอกสาร BT"
+        header='ยืนยันส่งรายการให้ DC'
+        title='เลขที่เอกสาร BT'
         value={btNo}
       />
 
