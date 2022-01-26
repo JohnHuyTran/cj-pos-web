@@ -104,6 +104,12 @@ export interface AuditLog {
   editBy: string;
   editByName: string;
   editDate: string;
+  comment: AuditLogComment | '';
+}
+
+export interface AuditLogComment {
+  by: string;
+  detail: string;
 }
 
 export interface Item {
@@ -151,36 +157,12 @@ export interface BranchTransferInfo {
   lastModifiedDate: string;
 }
 
-export interface AuditLog {
-  activity: string;
-  editBy: string;
-  editByName: string;
-  editDate: string;
-}
-
-export interface Item {
-  seqItem?: number;
-  skuCode?: string;
-  barcode?: string;
-  productName?: string;
-  baseUnit?: number;
-  unitCode?: string;
-  unitName?: string;
-  remainStock?: number;
-  qty?: number;
-  allQty?: number;
-  actualQty?: number;
-  actualAllQty?: number;
-  toteCode?: string;
-  orderQty?: number;
-  orderAllQty?: number;
-}
-
 export interface StockRequestResponse {
   ref: string;
   code: number;
   message: string;
   data: StockRequestInfo | null;
+  auditLogs?: AuditLog[];
 }
 
 export interface StockRequestInfo {
@@ -191,12 +173,26 @@ export interface StockRequestInfo {
   branchCode?: string;
   branchFrom: string;
   branchTo: string;
-  transferReason?: string;
-  status?: string;
+  transferReason: string;
+  status: string;
   items?: Item[];
   auditLogs?: AuditLog[];
   createdBy?: string;
   createdDate: Date;
   lastModifiedBy?: string;
   lastModifiedDate?: string;
+}
+
+export interface Approve1StockTransferRequest {
+  comment: ApproveComment;
+}
+
+export interface Approve2StockTransferRequest {
+  branchTo: string;
+  comment: ApproveComment;
+}
+
+export interface ApproveComment {
+  by: string;
+  detail: string;
 }

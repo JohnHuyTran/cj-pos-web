@@ -19,7 +19,7 @@ import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { SaveStockTransferRequest } from '../../models/stock-transfer-model';
 import { ApiError } from '../../models/api-error-model';
-import { saveStockTransfer } from '../../services/stock-transfer';
+import { saveStockRequest } from '../../services/stock-transfer';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import LoadingModal from '../commons/ui/loading-modal';
 import AlertError from '../commons/ui/alert-error';
@@ -199,7 +199,7 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
         items: itemsList,
       };
 
-      await saveStockTransfer(payloadSave)
+      await saveStockRequest(payloadSave)
         .then((value) => {
           // setStatus(1);
           setDocNo(value.docNo);
@@ -294,7 +294,11 @@ function createStockTransfer({ isOpen, onClickClose }: Props): ReactElement {
               สาเหตุการโอน :
             </Grid>
             <Grid item xs={3}>
-              <TransferReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={false} />
+              <TransferReasonsListDropDown
+                reasonsValue={reasons}
+                onChangeReasons={handleChangeReasons}
+                isClear={false}
+              />
             </Grid>
             <Grid item xs={7}></Grid>
           </Grid>

@@ -146,9 +146,6 @@ export const environment = {
     transferReasonsList: {
       url: '/stock/master-transfer-reasons',
     },
-    saveStockTransfer: {
-      url: '/stock/stock-transfer/draft',
-    },
     branchTransfer: {
       search: {
         url: '/stock/stock-transfer',
@@ -163,8 +160,19 @@ export const environment = {
         url: '/stock/stock-transfer/save-to-dc',
       },
     },
-    StockRequestDetail: {
-      url: '/stock/stock-request',
+    stockRequest: {
+      detail: {
+        url: '/stock/stock-request',
+      },
+      save: {
+        url: '/stock/stock-request/draft',
+      },
+      approve1: {
+        url: '/stock/stock-request/approve1/{rtNo}',
+      },
+      approve2: {
+        url: '/stock/stock-request/approve2/{rtNo}',
+      },
     },
   },
 };

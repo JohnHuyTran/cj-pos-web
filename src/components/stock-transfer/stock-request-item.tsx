@@ -69,7 +69,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'qty',
+    field: 'orderQty',
     headerName: 'จำนวนที่สั่ง',
     minWidth: 150,
     headerAlign: 'center',
@@ -93,7 +93,7 @@ const columns: GridColDef[] = [
 ];
 
 var calBaseUnit = function (params: GridValueGetterParams) {
-  let cal = Number(params.getValue(params.id, 'qty')) * Number(params.getValue(params.id, 'baseUnit'));
+  let cal = Number(params.getValue(params.id, 'orderQty')) * Number(params.getValue(params.id, 'baseUnit'));
   return numberWithCommas(cal);
 };
 
@@ -119,30 +119,48 @@ function useApiRef() {
 
 function StockTransferItem({ onChangeItems }: DataGridProps) {
   const classes = useStyles();
-  const payloadAddItem = useAppSelector((state) => state.addItems.state); //Type = CREATED
-  //Type = VIEW
+  const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
 
   let rows: any = [];
-  if (Object.keys(payloadAddItem).length !== 0) {
-    rows = payloadAddItem.map((item: any, index: number) => {
-      return {
-        id: `${item.barcode}-${index + 1}`,
-        index: index + 1,
-        skuCode: item.skuCode,
-        barcode: item.barcode,
-        barcodeName: item.barcodeName,
-        unitCode: item.unitCode,
-        unitName: item.unitName,
-        baseUnit: item.baseUnit,
-        qty: item.qty ? item.qty : 0,
-      };
-    });
+  // if (Object.keys(payloadAddItem).length !== 0) {
+  //   rows = payloadAddItem.map((item: any, index: number) => {
+  //     return {
+  //       id: `${item.barcode}-${index + 1}`,
+  //       index: index + 1,
+  //       skuCode: item.skuCode,
+  //       barcode: item.barcode,
+  //       barcodeName: item.barcodeName,
+  //       unitCode: item.unitCode,
+  //       unitName: item.unitName,
+  //       baseUnit: item.baseUnit,
+  //       qty: item.qty ? item.qty : 0,
+  //     };
+  //   });
+  // }
+
+  if (stockRequestDetail) {
+    const items = stockRequestDetail.items ? stockRequestDetail.items : [];
+    if (items.length > 0) {
+      rows = items.map((item: any, index: number) => {
+        return {
+          id: `${item.barcode}-${index + 1}`,
+          index: index + 1,
+          skuCode: item.skuCode,
+          barcode: item.barcode,
+          productName: item.productName ? item.productName : item.barcodeName,
+          unitCode: item.unitCode,
+          unitName: item.unitName,
+          baseUnit: item.baseUnit ? item.baseUnit : 0,
+          orderQty: item.orderQty ? item.orderQty : 0,
+        };
+      });
+    }
   }
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   const { apiRef, columns } = useApiRef();
   const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'qty') {
+    if (params.field === 'orderQty') {
       const itemsList: any = [];
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();

@@ -14,18 +14,20 @@ const initialState: State = {
     code: 0,
     message: '',
     data: null,
+    auditLogs: [],
   },
   error: '',
 };
 
 export const featchStockRequestDetailAsync = createAsyncThunk('stockRequestDetail', async (rtNo: string) => {
   try {
-    const apiRootPath = `${environment.stock.StockRequestDetail.url}/${rtNo}`;
+    const apiRootPath = `${environment.stock.stockRequest.detail.url}/${rtNo}`;
     let response: StockRequestResponse = {
       ref: '',
       code: 0,
       message: '',
       data: null,
+      auditLogs: [],
     };
 
     response = await get(apiRootPath).then();
