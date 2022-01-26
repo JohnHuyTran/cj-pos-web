@@ -372,7 +372,6 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     setOpenModelConfirm(false);
     setOpenLoadingModal(true);
 
-    alert('status: ' + status);
     if (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') {
       const itemsList: any = [];
       if (Object.keys(payloadAddItem).length > 0) {
