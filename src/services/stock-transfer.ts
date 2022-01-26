@@ -4,6 +4,12 @@ import { ContentType } from '../utils/enum/common-enum';
 import { BranchTransferRequest, SaveStockTransferRequest } from '../models/stock-transfer-model';
 import { getPathUrl } from './base-service';
 
+export const getPathStockRequestDetail = (rtNo: string) => {
+  return getPathUrl(`${environment.stock.stockRequest.detail.url}`, {
+    rtNo: rtNo,
+  });
+};
+
 export async function saveStockRequest(payload: SaveStockTransferRequest) {
   try {
     const response = await put(environment.stock.stockRequest.save.url, payload, ContentType.JSON).then(

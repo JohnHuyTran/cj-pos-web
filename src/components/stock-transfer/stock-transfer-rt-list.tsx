@@ -14,6 +14,10 @@ import { StockTransferInfo, StockTransferRequest, StockTransferResponse } from '
 import { DeleteForever } from '@mui/icons-material';
 import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
 import { saveSearchStockTransferRt } from '../../store/slices/save-search-stock-transfer-rt-slice';
+import ModalDetailStockTransfer from './stock-request-detail';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
+import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -170,28 +174,6 @@ function StockTransferRtList() {
     open: false,
   });
 
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
-  };
-
-  // const currentlySelected = async (params: GridCellParams) => {
-  //   handleOpenLoading('open', true);
-  //   setidDC(params.row.id);
-
-  //   try {
-  //     await dispatch(featchorderDetailDCAsync(params.row.id));
-  //     setOpensDCOrderDetail(true);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-
-  //   handleOpenLoading('open', false);
-  // };
-
-  // function isClosModal() {
-  //   setOpensDCOrderDetail(false);
-  // }
-
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
@@ -239,18 +221,28 @@ function StockTransferRtList() {
     setLoading(false);
   };
 
-  // const [openCreateModal, setOpenCreateModal] = React.useState(false);
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+  const currentlySelected = async (params: GridCellParams) => {
+    handleOpenLoading('open', true);
+    console.log('params.row:', JSON.stringify(params.row.rtNo));
+    await handleOpenDetailModal(params.row.rtNo);
+    handleOpenLoading('open', false);
+  };
 
-  // function handleCloseCreateModal() {
-  //   setOpenCreateModal(false);
-  // }
-  // const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
-  // const currentlySelected = async (params: GridCellParams) => {
-  //   await dispatch(featchBranchTransferDetailAsync(params.row.btNo));
+  const [openDetailModal, setOpenDetailModal] = React.useState(false);
+  const [typeDetailModal, setTypeDetailModal] = React.useState('View');
+  const handleOpenDetailModal = async (rtNo: string) => {
+    await dispatch(updateAddItemsState({}));
+    setTypeDetailModal('View');
+    await dispatch(featchStockRequestDetailAsync(rtNo));
+    setOpenDetailModal(true);
+  };
 
-  //   if (reasonsList === null || reasonsList.length <= 0) await dispatch(featchTransferReasonsListAsync());
-  //   setOpenCreateModal(true);
-  // };
+  function handleCloseDetailModal() {
+    setOpenDetailModal(false);
+  }
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
@@ -259,7 +251,7 @@ function StockTransferRtList() {
             rows={rows}
             columns={columns}
             disableColumnMenu
-            // onCellClick={currentlySelected}
+            onCellClick={currentlySelected}
             autoHeight={rows.length >= 10 ? false : true}
             scrollbarSize={10}
             page={cuurentPage - 1}
@@ -277,6 +269,14 @@ function StockTransferRtList() {
       </Box>
 
       <LoadingModal open={openLoadingModal.open} />
+
+      {openDetailModal && (
+        <ModalDetailStockTransfer
+          type={typeDetailModal}
+          isOpen={openDetailModal}
+          onClickClose={handleCloseDetailModal}
+        />
+      )}
     </div>
   );
 }

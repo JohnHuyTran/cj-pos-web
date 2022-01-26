@@ -15,6 +15,8 @@ import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-trans
 import moment from 'moment';
 import { saveSearchStockTransferRt } from '../../store/slices/save-search-stock-transfer-rt-slice';
 import StockTransferRtList from './stock-transfer-rt-list';
+import ModalCreateStockTransfer from './stock-request-detail';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 interface State {
   docNo: string;
@@ -210,6 +212,18 @@ export default function StockTransferRt() {
     }
   }
 
+  const [openCreateModal, setOpenCreateModal] = React.useState(false);
+  const [typeModal, setTypeModal] = React.useState('Create');
+  const handleOpenCreateModal = async () => {
+    await dispatch(updateAddItemsState({}));
+    setTypeModal('Create');
+    setOpenCreateModal(true);
+  };
+
+  function handleCloseCreateModal() {
+    setOpenCreateModal(false);
+  }
+
   return (
     <>
       <Box>
@@ -298,7 +312,7 @@ export default function StockTransferRt() {
             <Button
               id="btnCreateStockTransferModal"
               variant="contained"
-              //   onClick={handleOpenCreateModal}
+              onClick={handleOpenCreateModal}
               sx={{ minWidth: '15%' }}
               className={classes.MbtnClear}
               startIcon={<AddCircleOutlineOutlinedIcon />}
@@ -336,6 +350,9 @@ export default function StockTransferRt() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      {openCreateModal && (
+        <ModalCreateStockTransfer type={typeModal} isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />
+      )}
     </>
   );
 }

@@ -165,7 +165,7 @@ export const environment = {
     },
     stockRequest: {
       detail: {
-        url: '/stock/stock-request',
+        url: '/stock/stock-request/{rtNo}',
       },
       save: {
         url: '/stock/stock-request/draft',

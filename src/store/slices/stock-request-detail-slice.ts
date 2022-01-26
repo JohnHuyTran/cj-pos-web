@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
 import { StockRequestResponse } from '../../models/stock-transfer-model';
+import { getPathStockRequestDetail } from '../../services/stock-transfer';
 
 type State = {
   stockRequestDetail: StockRequestResponse;
@@ -21,7 +22,7 @@ const initialState: State = {
 
 export const featchStockRequestDetailAsync = createAsyncThunk('stockRequestDetail', async (rtNo: string) => {
   try {
-    const apiRootPath = `${environment.stock.stockRequest.detail.url}/${rtNo}`;
+    const apiRootPath = getPathStockRequestDetail(rtNo);
     let response: StockRequestResponse = {
       ref: '',
       code: 0,
