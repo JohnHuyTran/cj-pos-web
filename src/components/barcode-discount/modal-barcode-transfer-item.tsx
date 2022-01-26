@@ -119,6 +119,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     } else {
       updateSumOfApprovedDiscount(0);
       updateSumOfDiscount(0);
+      dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, products: [] }));
     }
   }, [dtTable]);
 
@@ -356,6 +357,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 handleChangeDiscount(e, params.row.index, index);
               }}
               onBlur={(e) => handleChangeNumber(e, params.row.index, index)}
+              disabled={dataDetail.status > 1}
             />
             {condition && <div className="title">{errorList[index].errorDiscount}</div>}
           </div>
@@ -372,6 +374,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               }}
               onBlur={(e) => handleChangeNumber(e, params.row.index, index)}
               placeholder="0"
+              disabled={dataDetail.status > 1}
             />
             {condition2 && <div className="title">{errorList[index].errorDiscount}</div>}
           </div>
@@ -431,6 +434,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               onChange={(e) => {
                 handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barCode);
               }}
+              disabled={dataDetail.status > 1}
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfDiscounted}</div>}
           </div>
@@ -494,7 +498,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'expiryDate',
       headerName: 'วันที่หมดอายุ',
-      minWidth: 185,
+      minWidth: 120,
       headerAlign: 'left',
       disableColumnMenu: true,
       sortable: false,
@@ -510,6 +514,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               }}
               value={params.value}
               placeHolder="วว/ดด/ปปปป"
+              disabled={dataDetail.status > 1}
             />
             {condition && <div className="title">{errorList[index].errorExpiryDate}</div>}
           </div>
@@ -542,7 +547,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
 
         return (
           <>
-            <Button onClick={handleOpenModalDelete}>
+            <Button
+              onClick={handleOpenModalDelete}
+              disabled={dataDetail.status > 1}
+              sx={{ opacity: dataDetail.status > 1 ? '0.5' : '1' }}
+            >
               <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
             </Button>
 

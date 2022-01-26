@@ -92,7 +92,8 @@ export default function ModalCheckStock({ open, onClose }: Props) {
         <DialogTitle id="alert-dialog-title" sx={{ textAlign: 'center' }}>
           <ErrorOutline sx={{ color: '#F54949', fontSize: '4em' }} />
           <br />
-          {'จำนวนที่ขอลดเกินจำนวนสินค้าในสต๊อก'}
+          <Typography sx={{ color: 'red', fontSize: '18px' }}>จำนวนที่ขอลดเกินจำนวนสินค้าในสต๊อก</Typography>
+          <Typography sx={{ fontSize: '18px' }}>รายการสินค้าในสต๊อค</Typography>
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">

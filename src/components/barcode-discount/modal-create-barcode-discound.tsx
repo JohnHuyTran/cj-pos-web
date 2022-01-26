@@ -405,7 +405,7 @@ export default function ModalCreateBarcodeDiscount({
               <Grid item xs={4}>
                 ยอดลด :
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={8} sx={{ marginTop: '-8px' }}>
                 <FormControl component="fieldset">
                   <RadioGroup
                     aria-label="discount"
@@ -430,10 +430,11 @@ export default function ModalCreateBarcodeDiscount({
                   id="btnAddItem"
                   variant="contained"
                   color="info"
-                  className={classes.MbtnPrint}
+                  className={classes.MbtnSearch}
                   startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenAddItems}
                   sx={{ width: 200 }}
+                  disabled={status > 1}
                 >
                   เพิ่มสินค้า
                 </Button>
@@ -445,6 +446,7 @@ export default function ModalCreateBarcodeDiscount({
                   startIcon={<SaveIcon />}
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
                   onClick={() => handleCreateDraft(false)}
+                  className={classes.MbtnSearch}
                 >
                   บันทึก
                 </Button>
@@ -455,6 +457,7 @@ export default function ModalCreateBarcodeDiscount({
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleSendRequest}
+                  className={classes.MbtnSearch}
                 >
                   ขออนุมัติ
                 </Button>
@@ -464,6 +467,7 @@ export default function ModalCreateBarcodeDiscount({
                   disabled={status > 1}
                   startIcon={<HighlightOffIcon />}
                   onClick={handleOpenCancel}
+                  className={classes.MbtnSearch}
                 >
                   ยกเลิก
                 </Button>
