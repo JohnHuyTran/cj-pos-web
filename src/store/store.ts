@@ -27,7 +27,9 @@ import searchAllItemsList from './slices/search-all-items';
 import addItems from './slices/add-items-slice';
 import transferReasonsList from './slices/transfer-reasons-slice';
 import stockTransferSlice from './slices/stock-transfer-slice';
+import stockTransferRtSlice from './slices/stock-transfer-rt-slice';
 import saveSearchStock from './slices/save-search-stock-transfer-slice';
+import saveSearchStockRt from './slices/save-search-stock-transfer-rt-slice';
 import barcodeDiscountSearchSlice from './slices/barcode-discount-search-slice';
 import barcodeDiscountCriteriaSearchSlice from './slices/barcode-discount-criteria-search-slice';
 import barcodeDiscount from './slices/barcode-discount-slice';
@@ -62,7 +64,9 @@ const store = configureStore({
     addItems: addItems,
     transferReasonsList: transferReasonsList,
     searchStockTransfer: stockTransferSlice,
+    searchStockTrnasferRt: stockTransferRtSlice,
     saveSearchStock: saveSearchStock,
+    saveSearchStockRt: saveSearchStockRt,
     barcodeDiscount: barcodeDiscount,
     barcodeDiscountSearchSlice: barcodeDiscountSearchSlice,
     barcodeDiscountCriteriaSearchSlice: barcodeDiscountCriteriaSearchSlice,
