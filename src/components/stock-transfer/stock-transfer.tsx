@@ -254,7 +254,7 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-              สาขาต้นทาง*
+              สาขาต้นทาง
             </Typography>
             <BranchListDropDown
               sourceBranchCode={''}
@@ -264,7 +264,7 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-              สาขาปลายทาง*
+              สาขาปลายทาง
             </Typography>
             <BranchListDropDown
               sourceBranchCode={branchFromCode}
