@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 import { Box, Grid, Typography, TextField, FormControl, Select, MenuItem, Button } from '@mui/material';
 import { useStyles } from '../../styles/makeTheme';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
@@ -9,6 +10,11 @@ import ReasonsListDropDown from './transfer-reasons-list-dropdown';
 import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
 import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
+import { StockTransferRequest } from '../../models/stock-transfer-model';
+import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
+import moment from 'moment';
+import { saveSearchStockTransferRt } from '../../store/slices/save-search-stock-transfer-rt-slice';
+import StockTransferRtList from './stock-transfer-rt-list';
 
 interface State {
   docNo: string;
@@ -27,6 +33,10 @@ interface loadingModalState {
 export default function StockTransferRt() {
   const { t } = useTranslation(['stockTransfer', 'common']);
   const classes = useStyles();
+  const dispatch = useAppDispatch();
+  const page = '1';
+  const items = useAppSelector((state) => state.searchStockTrnasferRt);
+  const limit = useAppSelector((state) => state.searchStockTrnasferRt.orderList.perPage);
   const [values, setValues] = React.useState<State>({
     docNo: '',
     branchFrom: '',
@@ -100,14 +110,41 @@ export default function StockTransferRt() {
       setOpenAlert(true);
       setTextError('กรุณาระบุสาขาปลายทาง');
     } else {
-      //   onClickSearchBtn();
-      console.log('value: ', values);
+      onClickSearchBtn();
     }
+  };
+
+  const onClickSearchBtn = async () => {
+    let limits;
+    if (limit === 0 || limit === undefined) {
+      limits = '10';
+    } else {
+      limits = limit.toString();
+    }
+
+    const payload: StockTransferRequest = {
+      limit: limits,
+      page: page,
+      docNo: values.docNo,
+      branchFrom: values.branchFrom,
+      branchTo: values.branchTo,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      statuses: values.statuses,
+      transferReason: values.transferReason,
+      clearSearch: false,
+    };
+
+    handleOpenLoading('open', true);
+    await dispatch(featchSearchStockTransferRtAsync(payload));
+    await dispatch(saveSearchStockTransferRt(payload));
+    setFlagSearch(true);
+    handleOpenLoading('open', false);
   };
 
   const onClickClearBtn = () => {
     handleOpenLoading('open', true);
-    // setFlagSearch(false);
+    setFlagSearch(false);
     setStartDate(null);
     setEndDate(null);
     setClearBranchDropDown(!clearBranchDropDown);
@@ -121,19 +158,19 @@ export default function StockTransferRt() {
       transferReason: '',
     });
 
-    // const payload: StockTransferRequest = {
-    //   limit: limit ? limit.toString() : '10',
-    //   page: page,
-    //   docNo: values.docNo,
-    //   branchFrom: values.branchFrom,
-    //   branchTo: values.branchTo,
-    //   dateFrom: moment(startDate).startOf('day').toISOString(),
-    //   dateTo: moment(endDate).endOf('day').toISOString(),
-    //   statuses: values.statuses,
-    //   transferReason: values.transferReason,
-    //   clearSearch: true,
-    // };
-    // dispatch(featchSearchStockTransferAsync(payload));
+    const payload: StockTransferRequest = {
+      limit: limit ? limit.toString() : '10',
+      page: page,
+      docNo: values.docNo,
+      branchFrom: values.branchFrom,
+      branchTo: values.branchTo,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      statuses: values.statuses,
+      transferReason: values.transferReason,
+      clearSearch: true,
+    };
+    dispatch(featchSearchStockTransferRtAsync(payload));
 
     setTimeout(() => {
       handleOpenLoading('open', false);
@@ -149,6 +186,27 @@ export default function StockTransferRt() {
   if (endDate != null && startDate != null) {
     if (endDate < startDate) {
       setEndDate(null);
+    }
+  }
+
+  const [flagSearch, setFlagSearch] = React.useState(false);
+  const orderListDatas = items.orderList.data ? items.orderList.data : [];
+
+  let orderListData;
+  if (flagSearch) {
+    if (orderListDatas.length > 0) {
+      orderListData = <StockTransferRtList />;
+    } else {
+      orderListData = (
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
+            <h2>
+              {/* ไม่มีข้อมูล <SearchOff fontSize='large' /> */}
+              ไม่มีข้อมูล
+            </h2>
+          </Box>
+        </Grid>
+      );
     }
   }
 
@@ -271,6 +329,9 @@ export default function StockTransferRt() {
           </Grid>
         </Grid>
       </Box>
+
+      <Box mt={6}></Box>
+      {orderListData}
 
       <LoadingModal open={openLoadingModal.open} />
 
