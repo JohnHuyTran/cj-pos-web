@@ -10,7 +10,7 @@ export const stockTransferStatus = [
   { key: 'WAIT_FOR_PICKUP', value: 'WAIT_FOR_PICKUP', stepperGrp: 2, type: 'BT' },
   { key: 'TRANSFERING', value: 'TRANSFERING', stepperGrp: 2, type: 'BT' },
   { key: 'COMPLETED', value: 'COMPLETED', stepperGrp: 3, type: 'BT' },
-  { key: 'CANCELED', value: 'CANCELED', stepperGrp: 3, type: 'ALL' },
+  { key: 'CANCELED', value: 'CANCELED', stepperGrp: 3, type: 'RT' },
 ];
 export const getStockTransferStatusInfo = (key: string) => stockTransferStatus.find((item) => item.key === key);
 export const getStockTransferStatusList = (type: string) => {

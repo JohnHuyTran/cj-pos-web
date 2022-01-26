@@ -11,7 +11,6 @@ export async function saveStockRequest(payload: SaveStockTransferRequest) {
     );
     return response;
   } catch (error) {
-    console.log('error = ', error);
     throw error;
   }
 }
@@ -59,7 +58,6 @@ export async function saveBranchTransfer(payload: BranchTransferRequest) {
     );
     return response;
   } catch (error) {
-    console.log('error = ', error);
     throw error;
   }
 }
@@ -71,7 +69,6 @@ export async function sendBranchTransferToDC(payload: BranchTransferRequest) {
     );
     return response;
   } catch (error) {
-    console.log('error = ', error);
     throw error;
   }
 }

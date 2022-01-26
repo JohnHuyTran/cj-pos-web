@@ -296,6 +296,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     rowsEdit.forEach((data: GridRowData) => {
       const item: Item = {
+        seqItem: data.seqItem,
         barcode: data.barcode,
         actualQty: data.actualQty,
         toteCode: data.toteCode,
@@ -307,9 +308,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       comment: comment,
       items: items,
       btNo: btNo,
-      sdNo: '',
-      startDate: moment(startDate).startOf('day').toISOString(),
-      endDate: moment(endDate).startOf('day').toISOString(),
     };
     return payload;
   };
@@ -410,7 +408,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       await saveBranchTransfer(payload)
         .then(async (value) => {
           // setStatus(1);
-          setBtNo(value.btNo);
+          setBtNo(value.docNo);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -486,16 +484,23 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         </BootstrapDialogTitle>
         <DialogContent>
           <Box mt={4} sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2} mb={1}>
+            <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
                 <Typography variant='body2'>เลขที่เอกสาร BT</Typography>
               </Grid>
-              <Grid item lg={4}>
+              <Grid item lg={3}>
                 <Typography variant='body2'>{btNo}</Typography>
               </Grid>
-              <Grid item lg={6}></Grid>
+              <Grid item lg={1}></Grid>
+              <Grid item lg={2}>
+                <Typography variant='body2'>เลขที่เอกสาร RT</Typography>
+              </Grid>
+              <Grid item lg={3}>
+                <Typography variant='body2'>{branchTransferInfo.rtNo}</Typography>
+              </Grid>
+              <Grid item lg={1}></Grid>
             </Grid>
-            <Grid container spacing={2} mb={1}>
+            <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
                 <Typography variant='body2'>วันที่สร้างรายการ:</Typography>
               </Grid>
@@ -510,19 +515,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'>วันที่โอนสินค้า* :</Typography>
               </Grid>
               <Grid item lg={3}>
-                <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+                <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.startDate)}</Typography>
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
                 <Typography variant='body2'>วันที่สิ้นสุด* :</Typography>
               </Grid>
               <Grid item lg={3}>
-                <DatePickerComponent
-                  onClickDate={handleEndDatePicker}
-                  value={endDate}
-                  type={'TO'}
-                  minDateTo={startDate}
-                />
+                <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.endDate)}</Typography>
               </Grid>
               <Grid item lg={1}></Grid>
             </Grid>
@@ -532,14 +532,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'> สาขาต้นทาง* :</Typography>
               </Grid>
               <Grid item lg={3}>
-                <TextField value={sourceBranch} disabled fullWidth></TextField>
+                <Typography variant='body2'>{sourceBranch} </Typography>
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
                 <Typography variant='body2'>สาขาปลายทาง* :</Typography>
               </Grid>
               <Grid item lg={3}>
-                <TextField value={destinationBranch} disabled fullWidth></TextField>
+                <Typography variant='body2'>{destinationBranch} </Typography>
               </Grid>
               <Grid item lg={1}></Grid>
             </Grid>
@@ -549,7 +549,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'> สาเหตุการโอน :</Typography>
               </Grid>
               <Grid item lg={3}>
-                <TextField value={reasons} disabled fullWidth></TextField>
+                <Typography variant='body2'>{reasons} </Typography>
               </Grid>
               <Grid item lg={6}></Grid>
             </Grid>

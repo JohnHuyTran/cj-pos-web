@@ -5,7 +5,7 @@ import { FormControl, List, ListItem, ListItemText, MenuItem, Select } from '@mu
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 
 interface Props {
-  reasonsValue: string;
+  reasonsValue?: string;
   isClear: boolean;
   onChangeReasons: (branchCode: string) => void;
 }
@@ -18,7 +18,7 @@ function ReasonsListDropDown({ reasonsValue, isClear, onChangeReasons }: Props) 
   useEffect(() => {
     if (reasonsList === null || reasonsList.length <= 0) dispatch(featchTransferReasonsListAsync());
 
-    if (reasonsValue !== '') setReasons(reasonsValue);
+    if (reasonsValue !== '' && reasonsValue !== undefined) setReasons(reasonsValue);
     else setReasons('All');
   }, [isClear]);
 

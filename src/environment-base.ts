@@ -142,6 +142,9 @@ export const environment = {
   stock: {
     searchStockTransfer: {
       url: '/stock/stock-transfer',
+      searchRT: {
+        url: '/stock/stock-request',
+      },
     },
     transferReasonsList: {
       url: '/stock/master-transfer-reasons',

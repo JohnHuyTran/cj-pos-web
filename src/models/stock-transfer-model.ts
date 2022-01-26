@@ -24,10 +24,9 @@ export interface StockTransferResponse {
 }
 
 export interface StockTransferInfo {
-  id: string;
-  btNo: string;
+  id?: string;
+  btNo?: string;
   rtNo: string;
-  sdNo: string;
   startDate: string;
   endDate: string;
   branchFrom: string;
@@ -35,11 +34,11 @@ export interface StockTransferInfo {
   branchTo: string;
   branchToName: string;
   transferReason: string;
-  createdBy: string;
-  lastModifiedBy: string;
-  createdDate: string;
-  lastModifiedDate: string;
   status: string;
+  createdBy: string;
+  createdDate: string;
+  lastModifiedBy: string;
+  lastModifiedDate: string;
 }
 export interface SaveStockTransferRequest {
   rtNo: string;
