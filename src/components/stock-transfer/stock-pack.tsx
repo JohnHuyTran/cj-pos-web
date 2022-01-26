@@ -412,7 +412,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          await dispatch(featchBranchTransferDetailAsync(value.btNo));
+          await dispatch(featchBranchTransferDetailAsync(value.docNo));
           await dispatch(featchSearchStockTransferAsync(payloadSearch));
         })
         .catch((error: ApiError) => {
@@ -512,14 +512,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่โอนสินค้า* :</Typography>
+                <Typography variant='body2'>วันที่โอนสินค้า :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.startDate)}</Typography>
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่สิ้นสุด* :</Typography>
+                <Typography variant='body2'>วันที่สิ้นสุด :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.endDate)}</Typography>
@@ -529,14 +529,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant='body2'> สาขาต้นทาง* :</Typography>
+                <Typography variant='body2'> สาขาต้นทาง :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <Typography variant='body2'>{sourceBranch} </Typography>
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>สาขาปลายทาง* :</Typography>
+                <Typography variant='body2'>สาขาปลายทาง :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <Typography variant='body2'>{destinationBranch} </Typography>
