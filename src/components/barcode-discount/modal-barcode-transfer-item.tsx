@@ -61,7 +61,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           numberOfDiscounted = stringNullOrEmpty(item.qty) ? null : item.qty;
         }
         discount = parseFloat(discount).toFixed(2);
-        const cashDiscount = Math.floor(typeDiscount === 'percent' ? (discount * price) / 100 : discount);
+        const cashDiscount = typeDiscount === 'percent' ? Math.floor((discount * price) / 100) : parseFloat(discount);
 
         const priceAfterDiscount = price - (cashDiscount || 0);
 
@@ -125,7 +125,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
 
   useEffect(() => {
     if (checkStocks.length !== 0) {
-      console.log({ checkStocks });
       const predata = _.cloneDeep(payloadAddItem);
       const products = predata.map((item: any) => {
         const stock = checkStocks.find((el: any) => el.barcode === item.barcode);
@@ -143,7 +142,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     setOpenPopupModal(false);
   };
 
-  const handleChangeDiscount = (event: any, index: number, errorIndex: number) => {
+  const handleChangeDiscount = (event: any, index: number, errorIndex: number) => {   
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       const value = event.target.value;
@@ -559,16 +558,15 @@ export const ModalTransferItem = (props: DataGridProps) => {
               open={openModalDelete}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
-              maxWidth="md"
-              sx={{ minWidth: 800 }}
+              PaperProps={{ sx: { minWidth: 450, height: 241 } }}
             >
-              <DialogContent sx={{ pl: 6, pr: 8 }}>
+              <DialogContent sx={{ margin: '0 auto', pl: 6, pr: 8 }}>
                 <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
                   <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
                     ต้องการลบสินค้า
                   </Typography>
-                  <Typography variant="body1" align="left">
-                    สินค้า <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
+                  <Typography variant="body1" align="left" marginLeft='17px'>
+                    สินค้า <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>{' '}
                     <label style={{ color: '#36C690' }}>
                       <b>{params.row.barcodeName}</b>
                       <br />
@@ -576,7 +574,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
                         style={{
                           color: '#AEAEAE',
                           fontSize: 14,
-                          marginLeft: '3.8em',
+                          marginLeft: '4em',
                         }}
                       >
                         {params.row.skuCode}
@@ -584,7 +582,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
                     </label>
                   </Typography>
                   <Typography variant="body1" align="left">
-                    บาร์โค้ด <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
+                    บาร์โค้ด <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>{' '}
                     <label style={{ color: '#36C690' }}>
                       <b>{params.row.barCode}</b>
                     </label>
@@ -596,6 +594,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 <Button
                   id="btnCancle"
                   variant="contained"
+                  color="inherit"
                   sx={{ borderRadius: 2, width: 90, mr: 2 }}
                   onClick={handleCloseModalDelete}
                 >

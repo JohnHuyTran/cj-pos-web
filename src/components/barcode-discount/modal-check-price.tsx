@@ -46,7 +46,7 @@ const columns: GridColDef[] = [
         <div>
           <Typography variant="body2">{params.value}</Typography>
           <Typography color="textSecondary" sx={{ fontSize: 12 }}>
-            {params.row}
+            {params.getValue(params.id, 'skuCode') || ''}
           </Typography>
         </div>
       );

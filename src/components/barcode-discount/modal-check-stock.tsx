@@ -38,8 +38,6 @@ const columns: GridColDef[] = [
     flex: 1.8,
     sortable: false,
     renderCell: (params) => {
-      console.log(params.row);
-
       return (
         <div>
           <Typography variant="body2">{params.value}</Typography>
@@ -70,8 +68,6 @@ const columns: GridColDef[] = [
 export default function ModalCheckStock({ open, onClose }: Props) {
   const classes = useStyles();
   const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
-  console.log({ checkStocks });
-
   let rows: any = [];
   rows = checkStocks.map((item: any, index: number) => {
     return {
