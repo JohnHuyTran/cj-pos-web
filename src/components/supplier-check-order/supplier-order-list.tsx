@@ -131,6 +131,8 @@ export default function SupplierOrderList() {
           return <Chip label="บันทึก" size="small" sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
         } else if (params.value === 1) {
           return <Chip label="อนุมัติ" size="small" sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
+        } else if (params.value === 9) {
+          return <Chip label="ยกเลิก" size="small" sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }} />;
         }
       },
     },

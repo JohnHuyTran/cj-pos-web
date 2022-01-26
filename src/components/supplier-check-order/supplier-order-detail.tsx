@@ -222,7 +222,7 @@ var calProductDiff = function (params: GridValueGetterParams) {
 const isDisable = (params: GridRenderCellParams) => {
   let piStatus = params.getValue(params.id, 'piStatus');
   if (piStatus === 0) return false;
-  else if (piStatus === 1) return true;
+  else if (piStatus === 1 || piStatus === 9) return true;
 };
 
 function useApiRef() {
@@ -883,7 +883,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
 
               <Grid item xl={10} sx={{ textAlign: 'end' }}>
-                {piStatus !== 1 && (
+                {piStatus === 0 && (
                   <Button
                     id="btnSave"
                     variant="contained"
@@ -897,7 +897,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     บันทึก
                   </Button>
                 )}
-                {piStatus !== 1 && (
+                {piStatus === 0 && (
                   <Button
                     id="btnApprove"
                     variant="contained"

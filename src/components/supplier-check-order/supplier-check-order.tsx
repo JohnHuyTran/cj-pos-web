@@ -228,6 +228,7 @@ export default function SupplierCheckOrderSearch() {
                 <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
                 <MenuItem value={'0'}>บันทึก</MenuItem>
                 <MenuItem value={'1'}>อนุมัติ</MenuItem>
+                <MenuItem value={'9'}>ยกเลิก</MenuItem>
               </Select>
             </FormControl>
           </Grid>
