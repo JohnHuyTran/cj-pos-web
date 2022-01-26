@@ -21,15 +21,22 @@ import {
   Approve1StockTransferRequest,
   Approve2StockTransferRequest,
   SaveStockTransferRequest,
+  SubmitStockTransferRequest,
 } from '../../models/stock-transfer-model';
 import { ApiError } from '../../models/api-error-model';
-import { approve1StockRequest, approve2StockRequest, saveStockRequest } from '../../services/stock-transfer';
+import {
+  approve1StockRequest,
+  approve2StockRequest,
+  saveStockRequest,
+  submitStockRequest,
+} from '../../services/stock-transfer';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import LoadingModal from '../commons/ui/loading-modal';
 import AlertError from '../commons/ui/alert-error';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import { getBranchName, getReasonLabel } from '../../utils/utils';
 import ModalConfirmTransaction from './modal-confirm-transaction';
+import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
 
 interface State {
   branchCode: string;
@@ -137,7 +144,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
 
       setReasons(stockRequestDetail.transferReason);
       const reason = getReasonLabel(reasonsList, stockRequestDetail.transferReason);
-      setReasonText(reason ? reason : '');
+      setReasonText(reason ? reason : '-');
 
       const auditLog = stockRequestDetail.auditLogs ? stockRequestDetail.auditLogs : [];
       if (stockRequestDetail.status === 'WAIT_FOR_APPROVAL_2') {
@@ -253,7 +260,6 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   const handleSave = async () => {
     setOpenLoadingModal(true);
     let validateActualQty = payloadAddItem.filter((r: any) => r.qty === 0);
-
     if (!startDate || !endDate) {
       setOpenAlert(true);
       setTextError('กรุณาเลือกวันที่โอนสินค้า');
@@ -275,6 +281,8 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
           itemsList.push(item);
           itemsState.push(data);
         });
+
+        // await dispatch(updateAddItemsState(itemsState));
       }
 
       let rt = '';
@@ -294,6 +302,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       await saveStockRequest(payloadSave)
         .then((value) => {
           setRTNo(value.docNo);
+          setStatus('DRAFT');
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -306,9 +315,29 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     setOpenLoadingModal(false);
   };
 
-  const handleApprove = async () => {
+  const handleSubmit = async () => {
     setOpenLoadingModal(true);
 
+    let validateActualQty = payloadAddItem.filter((r: any) => r.qty === 0);
+    if (!startDate || !endDate) {
+      setOpenAlert(true);
+      setTextError('กรุณาเลือกวันที่โอนสินค้า');
+    } else if (fromBranch === '' || toBranch === '') {
+      setOpenAlert(true);
+      setTextError('กรุณาเลือกสาขาโอนสินค้า');
+    } else if (validateActualQty.length > 0) {
+      setOpenAlert(true);
+      setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+    } else {
+      setTextHeaderConfirm('ยืนยันส่งงาน รายการโอนสินค้า');
+      setOpenModelConfirm(true);
+    }
+
+    setOpenLoadingModal(false);
+  };
+
+  const handleApprove = async () => {
+    setOpenLoadingModal(true);
     if (status === 'WAIT_FOR_APPROVAL_1') {
       if (commentOC === '') {
         setOpenAlert(true);
@@ -333,6 +362,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     setOpenLoadingModal(false);
   };
 
+  const payloadSearch = useAppSelector((state) => state.searchStockTransferRt.searchStockTransferRt);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
   const handleCloseModelConfirm = () => {
@@ -340,9 +370,49 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   };
   const handleApproveConfirm = async () => {
     setOpenModelConfirm(false);
-
     setOpenLoadingModal(true);
-    if (status === 'WAIT_FOR_APPROVAL_1') {
+
+    alert('status: ' + status);
+    if (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') {
+      const itemsList: any = [];
+      if (Object.keys(payloadAddItem).length > 0) {
+        await payloadAddItem.forEach((data: any) => {
+          const item: any = {
+            barcode: data.barcode,
+            orderQty: data.orderQty ? data.orderQty : data.qty ? data.qty : 0,
+          };
+          itemsList.push(item);
+        });
+
+        let reason = reasons;
+        if (reason === 'All') reason = '';
+        const payloadSubmit: SubmitStockTransferRequest = {
+          startDate: moment(startDate).startOf('day').toISOString(),
+          endDate: moment(endDate).startOf('day').toISOString(),
+          branchFrom: fromBranch,
+          branchTo: toBranch,
+          transferReason: reason,
+          items: itemsList,
+        };
+
+        await submitStockRequest(rtNo, payloadSubmit)
+          .then((value) => {
+            setShowSnackBar(true);
+            setSnackbarIsStatus(true);
+            setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+
+            dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+
+            setTimeout(() => {
+              handleClose();
+            }, 500);
+          })
+          .catch((error) => {
+            setShowSnackBar(true);
+            setContentMsg(error.message);
+          });
+      }
+    } else if (status === 'WAIT_FOR_APPROVAL_1') {
       const payloadApprove1: Approve1StockTransferRequest = {
         comment: {
           by: 'OC',
@@ -355,6 +425,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
+          dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
           setTimeout(() => {
             handleClose();
@@ -378,6 +449,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
+          dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
           setTimeout(() => {
             handleClose();
@@ -469,7 +541,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
                   isClear={clearBranchDropDown}
                 />
               )}
-              {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && valuebranchTo?.name}
+              {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && valuebranchFrom?.name}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -492,7 +564,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
                 status !== 'DRAFT' &&
                 status !== 'AWAITING_FOR_REQUESTER' &&
                 status !== 'WAIT_FOR_APPROVAL_2' &&
-                valuebranchFrom?.name}
+                valuebranchTo?.name}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
@@ -545,7 +617,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
                   variant="contained"
                   color="primary"
                   className={classes.MbtnSave}
-                  // onClick={handleSaveButton}
+                  onClick={handleSubmit}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 140 }}
                   disabled={rtNo === ''}

@@ -170,6 +170,9 @@ export const environment = {
       save: {
         url: '/stock/stock-request/draft',
       },
+      submit: {
+        url: '/stock/stock-request/submit/{rtNo}',
+      },
       approve1: {
         url: '/stock/stock-request/approve1/{rtNo}',
       },

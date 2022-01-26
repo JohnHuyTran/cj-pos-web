@@ -42,7 +42,15 @@ export interface StockTransferInfo {
 }
 export interface SaveStockTransferRequest {
   rtNo: string;
-  // sdNo: string;
+  startDate: string;
+  endDate: string;
+  branchFrom: string;
+  branchTo: string;
+  transferReason: string;
+  items: StockTransferItems[];
+}
+
+export interface SubmitStockTransferRequest {
   startDate: string;
   endDate: string;
   branchFrom: string;

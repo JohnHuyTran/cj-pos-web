@@ -226,7 +226,6 @@ function StockTransferRtList() {
   };
   const currentlySelected = async (params: GridCellParams) => {
     handleOpenLoading('open', true);
-    console.log('params.row:', JSON.stringify(params.row.rtNo));
     await handleOpenDetailModal(params.row.rtNo);
     handleOpenLoading('open', false);
   };

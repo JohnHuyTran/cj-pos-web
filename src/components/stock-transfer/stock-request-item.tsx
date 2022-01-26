@@ -122,22 +122,6 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
   const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
 
   let rows: any = [];
-  // if (Object.keys(payloadAddItem).length !== 0) {
-  //   rows = payloadAddItem.map((item: any, index: number) => {
-  //     return {
-  //       id: `${item.barcode}-${index + 1}`,
-  //       index: index + 1,
-  //       skuCode: item.skuCode,
-  //       barcode: item.barcode,
-  //       barcodeName: item.barcodeName,
-  //       unitCode: item.unitCode,
-  //       unitName: item.unitName,
-  //       baseUnit: item.baseUnit,
-  //       qty: item.qty ? item.qty : 0,
-  //     };
-  //   });
-  // }
-
   if (stockRequestDetail) {
     const items = stockRequestDetail.items ? stockRequestDetail.items : [];
     if (items.length > 0) {
@@ -210,7 +194,8 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
         rowHeight={65}
         onCellClick={currentlySelected}
         onCellFocusOut={handleEditItems}
-        onCellBlur={handleEditItems}
+        // onCellBlur={handleEditItems}
+        // onCellValueChange={handleEditItems}
       />
 
       <ModelDeleteConfirm

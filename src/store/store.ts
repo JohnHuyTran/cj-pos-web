@@ -35,6 +35,7 @@ import barcodeDiscountCriteriaSearchSlice from './slices/barcode-discount-criter
 import barcodeDiscount from './slices/barcode-discount-slice';
 import stockRequestDetail from './slices/stock-request-detail-slice';
 import branchTransferDetailSlice from './slices/stock-transfer-branch-request-slice';
+import searchStockTransferRt from './slices/save-search-stock-transfer-rt-slice';
 
 const store = configureStore({
   reducer: {
@@ -68,6 +69,7 @@ const store = configureStore({
     searchStockTrnasferRt: stockTransferRtSlice,
     saveSearchStock: saveSearchStock,
     saveSearchStockRt: saveSearchStockRt,
+    searchStockTransferRt: searchStockTransferRt,
     barcodeDiscount: barcodeDiscount,
     barcodeDiscountSearchSlice: barcodeDiscountSearchSlice,
     barcodeDiscountCriteriaSearchSlice: barcodeDiscountCriteriaSearchSlice,

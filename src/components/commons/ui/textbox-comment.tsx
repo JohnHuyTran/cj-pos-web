@@ -16,7 +16,7 @@ function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChang
   const [comment, setComment] = React.useState(defaultValue);
 
   useEffect(() => {
-    if (defaultValue !== '') setCharacterCount(defaultValue.length);
+    if (defaultValue !== '' && defaultValue !== undefined) setCharacterCount(defaultValue.length);
   }, []);
 
   const handleChangeComment = (event: any) => {
