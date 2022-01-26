@@ -43,15 +43,12 @@ export const featchSearchStockTransferAsync = createAsyncThunk('orderListDc', as
     if (payload.dateTo) {
       path = path + `&dateTo=${payload.dateTo}`;
     }
-    if (payload.statuses == '0' || payload.statuses == '1' || payload.statuses == '2' || payload.statuses == '3') {
+    if (payload.statuses !== 'ALL') {
       path = path + `&statuses=${payload.statuses}`;
     }
     if (payload.transferReason) {
       path = path + `&transferReason=${payload.transferReason}`;
     }
-
-    console.log('path: ', path);
-    console.log('payload.clearSearch: ', payload.clearSearch);
 
     let response: StockTransferResponse = {
       ref: '',
