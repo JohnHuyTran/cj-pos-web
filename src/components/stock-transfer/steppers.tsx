@@ -15,25 +15,21 @@ function Steppers({ status, type }: Props): ReactElement {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [steps, setSteps] = React.useState([]);
+  const stepsList: any = [];
 
   useEffect(() => {
-    const stepsList: any = [];
     getStockTransferStatusList(type).map((item, index: number) => {
       if (item.stepperGrp === 1 && item.value === status) {
         stepsList.push(t(`status.${item.value}`));
-        stepsList.push('อยู่ระหว่างดำเนินการ: สร้างใบงาน');
-        stepsList.push(t(`status.APPROVED`));
+        stepsList.push('อยู่ระหว่างดำเนินการ: -');
+        handleStepApproved(type);
       } else if (item.stepperGrp === 2 && item.value === status) {
-        if (type === 'RT') stepsList.push(t(`status.DRAFT`));
-        else if (type === 'BT') stepsList.push(t(`status.CREATED`));
-
+        handleStepDraft(type);
         stepsList.push('อยู่ระหว่างดำเนินการ: ' + t(`status.${item.value}`));
-        stepsList.push(t(`status.APPROVED`));
+        handleStepApproved(type);
       } else if (item.stepperGrp === 3 && item.value === status) {
-        if (type === 'RT') stepsList.push(t(`status.DRAFT`));
-        else if (type === 'BT') stepsList.push(t(`status.CREATED`));
-
-        stepsList.push('อยู่ระหว่างดำเนินการ');
+        handleStepDraft(type);
+        stepsList.push('อยู่ระหว่างดำเนินการ: -');
         stepsList.push(t(`status.${item.value}`));
       }
 
@@ -41,6 +37,16 @@ function Steppers({ status, type }: Props): ReactElement {
       if (item.value === status) setActiveStep(item.stepperGrp);
     });
   }, [open]);
+
+  const handleStepDraft = (type: string) => {
+    if (type === 'RT') stepsList.push(t(`status.DRAFT`));
+    else if (type === 'BT') stepsList.push(t(`status.CREATED`));
+  };
+
+  const handleStepApproved = (type: string) => {
+    if (type === 'RT') stepsList.push(t(`status.APPROVED`));
+    else if (type === 'BT') stepsList.push(t(`status.COMPLETED`));
+  };
 
   return (
     <div className={classes.MStepper} style={{ paddingBottom: 5 }}>

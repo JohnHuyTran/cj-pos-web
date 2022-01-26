@@ -17,9 +17,10 @@ import { TextField, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
 import ModelDeleteConfirm from '../commons/ui/modal-delete-confirm';
 import { numberWithCommas } from '../../utils/utils';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 export interface DataGridProps {
-  id: string;
+  type: string;
   onChangeItems: (items: Array<any>) => void;
 }
 
@@ -46,7 +47,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'barcodeName',
+    field: 'productName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
     minWidth: 300,
@@ -70,7 +71,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'qty',
+    field: 'orderQty',
     headerName: 'จำนวนที่สั่ง',
     minWidth: 150,
     headerAlign: 'center',
@@ -84,11 +85,11 @@ const columns: GridColDef[] = [
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
-          let qty = Number(params.getValue(params.id, 'qty'));
+          let orderQty = Number(params.getValue(params.id, 'orderQty'));
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
-          if (qty === 0) value = chkQty(value);
+          if (orderQty === 0) value = chkQty(value);
           if (value < 0) value = 0;
-          params.api.updateRows([{ ...params.row, qty: value }]);
+          params.api.updateRows([{ ...params.row, orderQty: value }]);
         }}
         // disabled={isDisable(params) ? true : false}
         autoComplete="off"
@@ -125,7 +126,7 @@ var chkQty = (value: any) => {
 };
 
 var calBaseUnit = function (params: GridValueGetterParams) {
-  let cal = Number(params.getValue(params.id, 'qty')) * Number(params.getValue(params.id, 'baseUnit'));
+  let cal = Number(params.getValue(params.id, 'orderQty')) * Number(params.getValue(params.id, 'baseUnit'));
   return numberWithCommas(cal);
 };
 
@@ -149,31 +150,67 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function StockTransferItem({ onChangeItems }: DataGridProps) {
+function StockTransferItem({ type, onChangeItems }: DataGridProps) {
+  const dispatch = useAppDispatch();
   const classes = useStyles();
+  const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   let rows: any = [];
-  if (Object.keys(payloadAddItem).length !== 0) {
-    rows = payloadAddItem.map((item: any, index: number) => {
+  const updateItemsState = async (items: any) => {
+    await dispatch(updateAddItemsState(items));
+  };
+  const itemsMap = (items: any) => {
+    rows = items.map((item: any, index: number) => {
       return {
         id: `${item.barcode}-${index + 1}`,
         index: index + 1,
         skuCode: item.skuCode,
         barcode: item.barcode,
-        barcodeName: item.barcodeName,
+        productName: item.productName ? item.productName : item.barcodeName,
         unitCode: item.unitCode,
         unitName: item.unitName,
-        baseUnit: item.baseUnit,
-        qty: item.qty ? item.qty : 0,
+        baseUnit: item.baseUnit ? item.baseUnit : 0,
+        orderQty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
       };
     });
+  };
+
+  if (type === 'Create') {
+    if (Object.keys(payloadAddItem).length > 0) itemsMap(payloadAddItem);
+  } else {
+    if (Object.keys(payloadAddItem).length > 0) {
+      itemsMap(payloadAddItem);
+    } else if (stockRequestDetail) {
+      const items = stockRequestDetail.items ? stockRequestDetail.items : [];
+      if (items.length > 0) {
+        updateItemsState(items);
+        itemsMap(items);
+      }
+    }
   }
+
+  // if (Object.keys(payloadAddItem).length !== 0) {
+  // rows = payloadAddItem.map((item: any, index: number) => {
+  //   return {
+  //     id: `${item.barcode}-${index + 1}`,
+  //     index: index + 1,
+  //     skuCode: item.skuCode,
+  //     barcode: item.barcode,
+  //     barcodeName: item.barcodeName,
+  //     unitCode: item.unitCode,
+  //     unitName: item.unitName,
+  //     baseUnit: item.baseUnit,
+  //     qty: item.qty ? item.qty : 0,
+  //   };
+  // });
+  // }
+
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   const { apiRef, columns } = useApiRef();
   const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'qty') {
+    if (params.field === 'orderQty') {
       const itemsList: any = [];
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -181,6 +218,8 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
           itemsList.push(data);
         });
       }
+
+      await dispatch(updateAddItemsState(itemsList));
       return onChangeItems(itemsList ? itemsList : []);
     }
   };
@@ -198,7 +237,7 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
 
     if (!isRefPO && value === 'delete') {
       setDeleteItems(true);
-      setProductNameDel(String(params.getValue(params.id, 'barcodeName')));
+      setProductNameDel(String(params.getValue(params.id, 'productName')));
       setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
       setBarCodeDel(String(params.getValue(params.id, 'barcode')));
       setOpenModelDeleteConfirm(true);
@@ -223,7 +262,7 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
         rowHeight={65}
         onCellClick={currentlySelected}
         onCellFocusOut={handleEditItems}
-        onCellBlur={handleEditItems}
+        // onCellBlur={handleEditItems}
       />
 
       <ModelDeleteConfirm

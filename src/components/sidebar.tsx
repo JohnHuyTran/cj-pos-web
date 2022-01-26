@@ -25,7 +25,7 @@ import { useAppSelector, useAppDispatch } from '../store/store';
 import { changeState } from '../store/slices/nav-slice';
 import imgLogo from '../assets/images/Logo-CJ-More.png';
 import Menu from '@mui/icons-material/Menu';
-import {ShoppingCartSharp} from "@mui/icons-material";
+import { ShoppingCartSharp } from '@mui/icons-material';
 
 const drawerWidth = 240;
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -163,12 +163,16 @@ export default function Sidebar({}: Props): ReactElement {
         </ListItemButton>
         <Collapse in={openSellMenu} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            <Link to="/barcode-discount" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuBarcodeDiscount">
+            <Link
+              to="/barcode-discount"
+              style={{ textDecoration: 'none', color: '#676767' }}
+              id="subMenuBarcodeDiscount"
+            >
               <ListItemButton
-                  key="BARCODE DISCOUNT"
-                  selected={selectedIndex === 3}
-                  onClick={() => handleListItemClick(3)}
-                  sx={{ pl: 7 }}
+                key="BARCODE DISCOUNT"
+                selected={selectedIndex === 3}
+                onClick={() => handleListItemClick(3)}
+                sx={{ pl: 7 }}
               >
                 <ListItemText primary="ส่วนลดสินค้า" />
               </ListItemButton>
@@ -290,6 +294,20 @@ export default function Sidebar({}: Props): ReactElement {
                 sx={{ pl: 7 }}
               >
                 <ListItemText primary="รับ-โอนสินค้าระหว่างสาขา/คลัง" />
+              </ListItemButton>
+            </Link>
+            <Link
+              to="/stock-transfer-rt"
+              style={{ textDecoration: 'none', color: '#676767' }}
+              id="subMenuStockTransferRt"
+            >
+              <ListItemButton
+                key="StockTransferRt"
+                selected={selectedIndex === 9}
+                onClick={() => handleListItemClick(9)}
+                sx={{ pl: 7 }}
+              >
+                <ListItemText primary="สร้างรายการโอนสินค้า" />
               </ListItemButton>
             </Link>
           </List>

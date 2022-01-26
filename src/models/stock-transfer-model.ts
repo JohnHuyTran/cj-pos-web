@@ -24,10 +24,9 @@ export interface StockTransferResponse {
 }
 
 export interface StockTransferInfo {
-  id: string;
-  btNo: string;
+  id?: string;
+  btNo?: string;
   rtNo: string;
-  sdNo: string;
   startDate: string;
   endDate: string;
   branchFrom: string;
@@ -35,15 +34,23 @@ export interface StockTransferInfo {
   branchTo: string;
   branchToName: string;
   transferReason: string;
-  createdBy: string;
-  lastModifiedBy: string;
-  createdDate: string;
-  lastModifiedDate: string;
   status: string;
+  createdBy: string;
+  createdDate: string;
+  lastModifiedBy: string;
+  lastModifiedDate: string;
 }
 export interface SaveStockTransferRequest {
-  btNo: string;
-  sdNo: string;
+  rtNo: string;
+  startDate: string;
+  endDate: string;
+  branchFrom: string;
+  branchTo: string;
+  transferReason: string;
+  items: StockTransferItems[];
+}
+
+export interface SubmitStockTransferRequest {
   startDate: string;
   endDate: string;
   branchFrom: string;
@@ -104,6 +111,12 @@ export interface AuditLog {
   editBy: string;
   editByName: string;
   editDate: string;
+  comment: AuditLogComment | '';
+}
+
+export interface AuditLogComment {
+  by: string;
+  detail: string;
 }
 
 export interface Item {
@@ -123,4 +136,70 @@ export interface Item {
   orderQty?: number;
   orderAllQty?: number;
   isDraft?: boolean;
+}
+
+export interface BranchTransferResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: BranchTransferInfo | null;
+}
+export interface BranchTransferInfo {
+  id: string;
+  btNo: string;
+  rtNo: string;
+  branchCode: string;
+  startDate: string;
+  endDate: string;
+  branchFrom: string;
+  branchTo: string;
+  transferReason: string;
+  status: string;
+  comment: string;
+  items: Item[];
+  auditLogs: AuditLog[];
+  createdBy: string;
+  lastModifiedBy: string;
+  createdDate: string;
+  lastModifiedDate: string;
+}
+
+export interface StockRequestResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: StockRequestInfo | null;
+  auditLogs?: AuditLog[];
+}
+
+export interface StockRequestInfo {
+  id: string;
+  rtNo: string;
+  startDate?: Date;
+  endDate?: Date;
+  branchCode?: string;
+  branchFrom: string;
+  branchTo: string;
+  transferReason: string;
+  status: string;
+  items?: Item[];
+  auditLogs?: AuditLog[];
+  createdBy?: string;
+  createdDate: Date;
+  lastModifiedBy?: string;
+  lastModifiedDate?: string;
+}
+
+export interface Approve1StockTransferRequest {
+  comment: ApproveComment;
+}
+
+export interface Approve2StockTransferRequest {
+  branchTo: string;
+  comment: ApproveComment;
+}
+
+export interface ApproveComment {
+  by: string;
+  detail: string;
 }

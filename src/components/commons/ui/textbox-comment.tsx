@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { useStyles } from '../../../styles/makeTheme';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -14,6 +14,11 @@ function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChang
   const classes = useStyles();
   const [characterCount, setCharacterCount] = React.useState(0);
   const [comment, setComment] = React.useState(defaultValue);
+
+  useEffect(() => {
+    if (defaultValue !== '' && defaultValue !== undefined) setCharacterCount(defaultValue.length);
+  }, []);
+
   const handleChangeComment = (event: any) => {
     const value = event.target.value;
     const length = event.target.value.length;
@@ -26,7 +31,7 @@ function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChang
 
   return (
     <>
-      <Typography variant='body2'>{fieldName}</Typography>
+      <Typography variant="body2">{fieldName}</Typography>
       <TextField
         multiline
         fullWidth
@@ -48,7 +53,8 @@ function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChang
           maxWidth: 350,
           textAlign: 'right',
           // marginTop: "-1.5em",
-        }}>
+        }}
+      >
         {characterCount}/{maxLength}
       </div>
     </>

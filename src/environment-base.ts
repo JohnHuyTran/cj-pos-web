@@ -142,12 +142,12 @@ export const environment = {
   stock: {
     searchStockTransfer: {
       url: '/stock/stock-transfer',
+      searchRT: {
+        url: '/stock/stock-request',
+      },
     },
     transferReasonsList: {
       url: '/stock/master-transfer-reasons',
-    },
-    saveStockTransfer: {
-      url: '/stock/stock-transfer/draft',
     },
     branchTransfer: {
       search: {
@@ -161,6 +161,23 @@ export const environment = {
       },
       sendDC: {
         url: '/stock/stock-transfer/save-to-dc',
+      },
+    },
+    stockRequest: {
+      detail: {
+        url: '/stock/stock-request/{rtNo}',
+      },
+      save: {
+        url: '/stock/stock-request/draft',
+      },
+      submit: {
+        url: '/stock/stock-request/submit/{rtNo}',
+      },
+      approve1: {
+        url: '/stock/stock-request/approve1/{rtNo}',
+      },
+      approve2: {
+        url: '/stock/stock-request/approve2/{rtNo}',
       },
     },
   },
