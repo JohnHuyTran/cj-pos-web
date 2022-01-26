@@ -12,7 +12,6 @@ import DatePickerComponent from '../commons/ui/date-picker';
 import { useStyles } from '../../styles/makeTheme';
 import { Button } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import ModalCreateStockTransfer from './create-stock-transfer';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
@@ -113,18 +112,8 @@ export default function SupplierCheckOrderSearch() {
     }
   };
 
-  const [openCreateModal, setOpenCreateModal] = React.useState(false);
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
-  const handleOpenCreateModal = async () => {
-    await dispatch(updateAddItemsState({}));
-    await dispatch(featchPurchaseNoteAsync('PI21120002-000031'));
-    setOpenCreateModal(true);
-  };
-  function handleCloseCreateModal() {
-    setOpenCreateModal(false);
-  }
-
   const onClickValidateForm = () => {
     if (values.branchFrom === '') {
       setOpenAlert(true);
@@ -221,8 +210,8 @@ export default function SupplierCheckOrderSearch() {
       orderListData = <StockTransferList />;
     } else {
       orderListData = (
-        <Grid item container xs={12} justifyContent='center'>
-          <Box color='#CBD4DB'>
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
             <h2>
               {/* ไม่มีข้อมูล <SearchOff fontSize='large' /> */}
               ไม่มีข้อมูล
@@ -238,22 +227,22 @@ export default function SupplierCheckOrderSearch() {
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('documentSearch')}
             </Typography>
             <TextField
-              id='txtDocNo'
-              name='docNo'
-              size='small'
+              id="txtDocNo"
+              name="docNo"
+              size="small"
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder='เลขที่เอกสาร BT, RT'
+              placeholder="เลขที่เอกสาร BT, RT"
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาขาต้นทาง*
             </Typography>
             <BranchListDropDown
@@ -263,7 +252,7 @@ export default function SupplierCheckOrderSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาขาปลายทาง*
             </Typography>
             <BranchListDropDown
@@ -274,32 +263,33 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               วันที่รับสินค้า
             </Typography>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               ตั้งแต่
             </Typography>
             <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
               ถึง
             </Typography>
             <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
           </Grid>
 
           <Grid item xs={4} container>
-            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
               สถานะ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id='selPiType'
-                name='statuses'
+                id="selPiType"
+                name="statuses"
                 value={values.statuses}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -317,33 +307,25 @@ export default function SupplierCheckOrderSearch() {
             <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
           </Grid> */}
 
-          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
-            {/* <Button
-              id='btnCreateStockTransferModal'
-              variant='contained'
-              onClick={handleOpenCreateModal}
-              sx={{ minWidth: '15%' }}
-              className={classes.MbtnClear}
-              startIcon={<AddCircleOutlineOutlinedIcon />}
-              color='secondary'>
-              สร้างรายการโอน
-            </Button> */}
+          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
             <Button
-              id='btnClear'
-              variant='contained'
+              id="btnClear"
+              variant="contained"
               onClick={onClickClearBtn}
               sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
-              color='cancelColor'>
+              color="cancelColor"
+            >
               เคลียร์
             </Button>
             <Button
-              id='btnSearch'
-              variant='contained'
-              color='primary'
+              id="btnSearch"
+              variant="contained"
+              color="primary"
               onClick={onClickValidateForm}
               sx={{ width: '13%', ml: 2 }}
-              className={classes.MbtnSearch}>
+              className={classes.MbtnSearch}
+            >
               ค้นหา
             </Button>
           </Grid>
@@ -373,7 +355,6 @@ export default function SupplierCheckOrderSearch() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
-      {openCreateModal && <ModalCreateStockTransfer isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />}
     </>
   );
 }
