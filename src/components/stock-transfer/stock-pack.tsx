@@ -412,7 +412,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          await dispatch(featchBranchTransferDetailAsync(value.btNo));
+          await dispatch(featchBranchTransferDetailAsync(value.docNo));
           await dispatch(featchSearchStockTransferAsync(payloadSearch));
         })
         .catch((error: ApiError) => {

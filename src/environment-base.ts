@@ -157,7 +157,7 @@ export const environment = {
         url: '/stock/stock-transfer/{btNo}',
       },
       save: {
-        url: '/stock/stock-pack/draft',
+        url: '/stock/stock-transfer/save',
       },
       sendDC: {
         url: '/stock/stock-transfer/save-to-dc',
