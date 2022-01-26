@@ -484,7 +484,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         </BootstrapDialogTitle>
         <DialogContent>
           <Box mt={4} sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2} mb={1}>
+            <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
                 <Typography variant='body2'>เลขที่เอกสาร BT</Typography>
               </Grid>
@@ -500,7 +500,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
               </Grid>
               <Grid item lg={1}></Grid>
             </Grid>
-            <Grid container spacing={2} mb={1}>
+            <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
                 <Typography variant='body2'>วันที่สร้างรายการ:</Typography>
               </Grid>
