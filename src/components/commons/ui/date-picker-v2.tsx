@@ -7,6 +7,7 @@ import { MuiPickersUtilsProvider, KeyboardDatePicker, DatePicker } from '@materi
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
+import moment from 'moment';
 
 interface StateProps {
   onClickDate: any;
@@ -32,6 +33,7 @@ const defaultMaterialTheme = createTheme({
 const DatePickerComponent: React.FC<StateProps> = (props) => {
   const classes = useStyles();
   const today = new Date();
+  const minDay = moment(today).add(1, 'd');
   const handleDateChange = (date: any) => {
     props.onClickDate(date);
   };
@@ -92,7 +94,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
           position: 'start',
         }}
         // maxDate={today}
-        minDate={today}
+        minDate={minDay}
         placeholder={props.placeHolder}
         disabled={props.disabled}
       />

@@ -203,7 +203,7 @@ export default function ModalCreateBarcodeDiscount({
     if (payloadBarcodeDiscount.products.length !== 0) {
       const check = data.every((item) => {
         if (payloadBarcodeDiscount.percentDiscount) {
-          if (item.requestedDiscount <= 0 || item.requestedDiscount > 100) return false;
+          if (item.requestedDiscount <= 0 || item.requestedDiscount >= 100) return false;
         }
         if (stringNullOrEmpty(item.expiredDate)) return false;
         if (item.numberOfDiscounted <= 0) {
@@ -259,7 +259,7 @@ export default function ModalCreateBarcodeDiscount({
           };
 
           if (payloadBarcodeDiscount.percentDiscount) {
-            if (preData.requestedDiscount <= 0 || preData.requestedDiscount > 100 || !preData.requestedDiscount) {
+            if (preData.requestedDiscount <= 0 || preData.requestedDiscount >= 100 || !preData.requestedDiscount) {
               item.errorDiscount = 'ส่วนลดต้องมากกว่าหรือเท่ากับ 0 และน้อยกว่า 100';
             }
           } else {
