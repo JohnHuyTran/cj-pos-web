@@ -323,7 +323,7 @@ export default function ModalCreateBarcodeDiscount({
         const rs = await cancelBarcodeDiscount(dataDetail.id);
         if (rs.status === 200) {
           setOpenPopup(true);
-          setPopupMsg('คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว');
+          setPopupMsg('คุณได้ยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว');
           handleClose();
           if (onSearchBD) onSearchBD();
         } else {
@@ -336,7 +336,7 @@ export default function ModalCreateBarcodeDiscount({
       }
     } else {
       setOpenPopup(true);
-      setPopupMsg('คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว');
+      setPopupMsg('คุณได้ยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว');
       handleClose();
     }
   };
@@ -438,7 +438,7 @@ export default function ModalCreateBarcodeDiscount({
                   className={classes.MbtnSearch}
                   startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenAddItems}
-                  sx={{ width: 200 }}
+                  sx={{ width: 126 }}
                   disabled={status > 1}
                 >
                   เพิ่มสินค้า

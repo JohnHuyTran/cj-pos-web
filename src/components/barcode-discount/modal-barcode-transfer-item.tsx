@@ -142,7 +142,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     setOpenPopupModal(false);
   };
 
-  const handleChangeDiscount = (event: any, index: number, errorIndex: number) => {   
+  const handleChangeDiscount = (event: any, index: number, errorIndex: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       const value = event.target.value;
@@ -499,7 +499,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'expiryDate',
       headerName: 'วันที่หมดอายุ',
-      minWidth: 120,
+      minWidth: 130,
       headerAlign: 'left',
       disableColumnMenu: true,
       sortable: false,
@@ -567,7 +567,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
                   <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
                     ต้องการลบสินค้า
                   </Typography>
-                  <Typography variant="body1" align="left" marginLeft='17px'>
+                  <Typography variant="body1" align="left" marginLeft="17px">
                     สินค้า <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>{' '}
                     <label style={{ color: '#36C690' }}>
                       <b>{params.row.barcodeName}</b>
