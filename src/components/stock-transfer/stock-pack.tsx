@@ -407,7 +407,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       const payload: BranchTransferRequest = await mappingPayload();
       await saveBranchTransfer(payload)
         .then(async (value) => {
-          // setStatus(1);
           setBtNo(value.docNo);
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
