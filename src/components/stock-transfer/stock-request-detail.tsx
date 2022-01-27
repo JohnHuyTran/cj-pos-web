@@ -27,6 +27,8 @@ import { ApiError } from '../../models/api-error-model';
 import {
   approve1StockRequest,
   approve2StockRequest,
+  reject1StockRequest,
+  reject2StockRequest,
   saveStockRequest,
   submitStockRequest,
 } from '../../services/stock-transfer';
@@ -383,13 +385,43 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     setOpenLoadingModal(false);
   };
 
+  const [flagReject, setFlagReject] = React.useState(false);
+  const handleReject = async () => {
+    setOpenLoadingModal(true);
+    if (status === 'WAIT_FOR_APPROVAL_1') {
+      if (commentOC === '') {
+        setOpenAlert(true);
+        setTextError('กรุณากรอกหมายเหตุจาก OC');
+      } else {
+        setFlagReject(true);
+        setTextHeaderConfirm('ยืนยันไม่อนุมัติรายการโอนสินค้า');
+        setOpenModelConfirm(true);
+      }
+    } else if (status === 'WAIT_FOR_APPROVAL_2') {
+      if (commentSCM === '') {
+        setOpenAlert(true);
+        setTextError('กรุณากรอกหมายเหตุจาก SCM');
+      } else if (toBranch === '') {
+        setOpenAlert(true);
+        setTextError('กรุณาเลือกสาขาโอนสินค้าปลายทาง');
+      } else {
+        setFlagReject(true);
+        setTextHeaderConfirm('ยืนยันไม่อนุมัติรายการโอนสินค้า');
+        setOpenModelConfirm(true);
+      }
+    }
+
+    setOpenLoadingModal(false);
+  };
+
   const payloadSearch = useAppSelector((state) => state.searchStockTransferRt.searchStockTransferRt);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
   const handleCloseModelConfirm = () => {
+    setFlagReject(false);
     setOpenModelConfirm(false);
   };
-  const handleApproveConfirm = async () => {
+  const handleConfirm = async () => {
     setOpenModelConfirm(false);
     setOpenLoadingModal(true);
 
@@ -433,30 +465,49 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
           });
       }
     } else if (status === 'WAIT_FOR_APPROVAL_1') {
-      const payloadApprove1: Approve1StockTransferRequest = {
+      const payload1: Approve1StockTransferRequest = {
         comment: {
           by: 'OC',
           detail: commentOC,
         },
       };
 
-      await approve1StockRequest(rtNo, payloadApprove1)
-        .then((value) => {
-          setShowSnackBar(true);
-          setSnackbarIsStatus(true);
-          setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
-          dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+      if (flagReject) {
+        setFlagReject(false);
+        await reject1StockRequest(rtNo, payload1)
+          .then((value) => {
+            setShowSnackBar(true);
+            setSnackbarIsStatus(true);
+            setContentMsg('คุณได้ปฎิเสธข้อมูลเรียบร้อยแล้ว');
+            dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
-          setTimeout(() => {
-            handleClose();
-          }, 500);
-        })
-        .catch((error) => {
-          setShowSnackBar(true);
-          setContentMsg(error.message);
-        });
+            setTimeout(() => {
+              handleClose();
+            }, 500);
+          })
+          .catch((error) => {
+            setShowSnackBar(true);
+            setContentMsg(error.message);
+          });
+      } else {
+        await approve1StockRequest(rtNo, payload1)
+          .then((value) => {
+            setShowSnackBar(true);
+            setSnackbarIsStatus(true);
+            setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
+            dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+
+            setTimeout(() => {
+              handleClose();
+            }, 500);
+          })
+          .catch((error) => {
+            setShowSnackBar(true);
+            setContentMsg(error.message);
+          });
+      }
     } else if (status === 'WAIT_FOR_APPROVAL_2') {
-      const payloadApprove2: Approve2StockTransferRequest = {
+      const payload2: Approve2StockTransferRequest = {
         branchTo: toBranch,
         comment: {
           by: 'SCM',
@@ -464,21 +515,40 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         },
       };
 
-      await approve2StockRequest(rtNo, payloadApprove2)
-        .then((value) => {
-          setShowSnackBar(true);
-          setSnackbarIsStatus(true);
-          setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
-          dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+      if (flagReject) {
+        setFlagReject(false);
+        await reject2StockRequest(rtNo, payload2)
+          .then((value) => {
+            setShowSnackBar(true);
+            setSnackbarIsStatus(true);
+            setContentMsg('คุณได้ปฎิเสธข้อมูลเรียบร้อยแล้ว');
+            dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
-          setTimeout(() => {
-            handleClose();
-          }, 500);
-        })
-        .catch((error) => {
-          setShowSnackBar(true);
-          setContentMsg(error.message);
-        });
+            setTimeout(() => {
+              handleClose();
+            }, 500);
+          })
+          .catch((error) => {
+            setShowSnackBar(true);
+            setContentMsg(error.message);
+          });
+      } else {
+        await approve2StockRequest(rtNo, payload2)
+          .then((value) => {
+            setShowSnackBar(true);
+            setSnackbarIsStatus(true);
+            setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
+            dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+
+            setTimeout(() => {
+              handleClose();
+            }, 500);
+          })
+          .catch((error) => {
+            setShowSnackBar(true);
+            setContentMsg(error.message);
+          });
+      }
     }
 
     setOpenLoadingModal(false);
@@ -657,10 +727,9 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
                   variant="contained"
                   color="error"
                   className={classes.MbtnSave}
-                  // onClick={handleSave}
+                  onClick={handleReject}
                   startIcon={<SaveIcon />}
                   sx={{ width: 140 }}
-                  // disabled={rowLength == 0}
                 >
                   ปฎิเสธ
                 </Button>
@@ -672,7 +741,6 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
                   onClick={handleApprove}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 140 }}
-                  // disabled={rowLength == 0}
                 >
                   อนุมัติ
                 </Button>
@@ -726,7 +794,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       <ModalConfirmTransaction
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
-        handleConfirm={handleApproveConfirm}
+        handleConfirm={handleConfirm}
         header={textHeaderConfirm}
         title="เลขที่เอกสาร RT"
         value={rtNo}

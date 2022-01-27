@@ -72,6 +72,36 @@ export async function approve2StockRequest(rtNo: string, payload: Approve2StockT
   return response;
 }
 
+export const getPathReject1StockRequest = (rtNo: string) => {
+  return getPathUrl(`${environment.stock.stockRequest.reject1.url}`, {
+    rtNo: rtNo,
+  });
+};
+
+export async function reject1StockRequest(rtNo: string, payload: Approve1StockTransferRequest) {
+  const response = await put(getPathReject1StockRequest(rtNo), payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
+export const getPathReject2StockRequest = (rtNo: string) => {
+  return getPathUrl(`${environment.stock.stockRequest.reject2.url}`, {
+    rtNo: rtNo,
+  });
+};
+
+export async function reject2StockRequest(rtNo: string, payload: Approve2StockTransferRequest) {
+  const response = await put(getPathReject2StockRequest(rtNo), payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
 export const getPathBranchTransferDetail = (btNo: string) => {
   return getPathUrl(`${environment.stock.branchTransfer.detail.url}`, {
     btNo: btNo,

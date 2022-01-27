@@ -179,6 +179,12 @@ export const environment = {
       approve2: {
         url: '/stock/stock-request/approve2/{rtNo}',
       },
+      reject1: {
+        url: '/stock/stock-request/reject1/{rtNo}',
+      },
+      reject2: {
+        url: '/stock/stock-request/reject2/{rtNo}',
+      },
     },
   },
 };
