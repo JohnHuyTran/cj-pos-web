@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import StockTransfer from '../../../pages/stock-transfer';
+// import StockTransfer from '../../../pages/stock-transfer';
+// import CheckOrderSearch from '../../../components/check-orders/check-order';
+import AlertError from '../../../components/commons/ui/alert-error';
 
 // let wrapper;
 // beforeEach(() => {
@@ -21,7 +23,7 @@ import StockTransfer from '../../../pages/stock-transfer';
 // });
 
 test('reader learn link', () => {
-  const { getByText } = render(<StockTransfer />);
+  const { getByText } = render(<AlertError open={false} onClose={function (): void {}} textError={''} />);
   const linkElement = getByText('/stock-transfer');
   expect(linkElement).toBeInTheDocument();
 });

@@ -1,3 +1,5 @@
+// const esModules = ['@agm', 'ngx-bootstrap'].join('|');// ...module.exports = {//...transformIgnorePatterns: [`/node_modules/(?!${esModules})`],// ...};
+
 module.exports = {
   testEnvironment: 'jsdom',
   // The root of your source code, typically /src
@@ -10,9 +12,12 @@ module.exports = {
     // '^.+\\.tsx?$': 'ts-jest',
     '^.+\\.(t|j)sx?$': 'ts-jest',
   },
-  // coveragePathIgnorePatterns: ['/node_modules/'],
-  // transformIgnorePatterns: [`/node_modules/`],
-  transformIgnorePatterns: ['node_modules/(?!(dateformat)/)'],
+  coveragePathIgnorePatterns: ['/node_modules/'],
+  // transformIgnorePatterns: [`node_modules/*`],
+  // transformIgnorePatterns: ['node_modules/(?!(dateformat)/)'],
+  // transformIgnorePatterns: ['node_modules/(?!(react-redux)/)'],
+  // transformIgnorePatterns: ['node_modules/(?!(pdfjs-dist)/)'],
+
   // Runs special logic, adding special
   // extended assertions to Jest
   setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
