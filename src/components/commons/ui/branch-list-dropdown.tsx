@@ -46,7 +46,8 @@ function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isC
     <Autocomplete
       {...defaultPropsBranchList}
       className={classes.Mautocomplete}
-      id="selBranchNo"
+      noOptionsText='ไม่พอข้อมูล'
+      id='selBranchNo'
       value={valueBranchList}
       onChange={handleChangeBranch}
       renderOption={(props, option) => {
@@ -57,7 +58,7 @@ function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isC
         );
       }}
       renderInput={(params) => (
-        <TextField {...params} placeholder="ทั้งหมด" size="small" className={classes.MtextField} fullWidth />
+        <TextField {...params} placeholder='ทั้งหมด' size='small' className={classes.MtextField} fullWidth />
       )}
     />
   );

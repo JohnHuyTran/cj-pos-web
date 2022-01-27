@@ -6,7 +6,7 @@ import SearchStockTransferRt from '../components/stock-transfer/stock-transfer-r
 const StockTransferRt = () => {
   return (
     <Container maxWidth="xl">
-      <TitleHeader title="สร้างรายการโอนสินค้า" />
+      <TitleHeader title="สร้างแผน/ขอโอนสินค้าระหว่างสาขา/คลัง" />
       <Box mt={3}>
         <SearchStockTransferRt />
       </Box>
