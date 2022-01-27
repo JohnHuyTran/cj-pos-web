@@ -270,35 +270,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       setOpenAlert(true);
       setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
     } else {
-      const itemsList: any = [];
-      const itemsState: any = [];
-      if (Object.keys(payloadAddItem).length > 0) {
-        await payloadAddItem.forEach((data: any) => {
-          const item: any = {
-            barcode: data.barcode,
-            orderQty: data.orderQty ? data.orderQty : data.qty ? data.qty : 0,
-          };
-          itemsList.push(item);
-          itemsState.push(data);
-        });
-
-        // await dispatch(updateAddItemsState(itemsState));
-      }
-
-      let rt = '';
-      if (rtNo) rt = rtNo;
-      let reason = reasons;
-      if (reason === 'All') reason = '';
-      const payloadSave: SaveStockTransferRequest = {
-        rtNo: rt,
-        startDate: moment(startDate).startOf('day').toISOString(),
-        endDate: moment(endDate).startOf('day').toISOString(),
-        branchFrom: fromBranch,
-        branchTo: toBranch,
-        transferReason: reason,
-        items: itemsList,
-      };
-
+      const payloadSave: any = await handleMapPayloadSave();
       await saveStockRequest(payloadSave)
         .then((value) => {
           setRTNo(value.docNo);
@@ -315,6 +287,39 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     setOpenLoadingModal(false);
   };
 
+  const handleMapPayloadSave = async () => {
+    const itemsList: any = [];
+    const itemsState: any = [];
+    if (Object.keys(payloadAddItem).length > 0) {
+      await payloadAddItem.forEach((data: any) => {
+        const item: any = {
+          barcode: data.barcode,
+          orderQty: data.orderQty ? data.orderQty : data.qty ? data.qty : 0,
+        };
+        itemsList.push(item);
+        itemsState.push(data);
+      });
+
+      // await dispatch(updateAddItemsState(itemsState));
+    }
+
+    let rt = '';
+    if (rtNo) rt = rtNo;
+    let reason = reasons;
+    if (reason === 'All') reason = '';
+    const payload: SaveStockTransferRequest = {
+      rtNo: rt,
+      startDate: moment(startDate).startOf('day').toISOString(),
+      endDate: moment(endDate).startOf('day').toISOString(),
+      branchFrom: fromBranch,
+      branchTo: toBranch,
+      transferReason: reason,
+      items: itemsList,
+    };
+
+    return await payload;
+  };
+
   const handleSubmit = async () => {
     setOpenLoadingModal(true);
 
@@ -329,8 +334,24 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       setOpenAlert(true);
       setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
     } else {
-      setTextHeaderConfirm('ยืนยันส่งงาน รายการโอนสินค้า');
-      setOpenModelConfirm(true);
+      if (rtNo === '') {
+        const payloadSave: any = await handleMapPayloadSave();
+        await saveStockRequest(payloadSave)
+          .then((value) => {
+            setRTNo(value.docNo);
+            setStatus('DRAFT');
+
+            setTextHeaderConfirm('ยืนยันส่งงาน รายการโอนสินค้า');
+            setOpenModelConfirm(true);
+          })
+          .catch((error: ApiError) => {
+            setShowSnackBar(true);
+            setContentMsg(error.message);
+          });
+      } else {
+        setTextHeaderConfirm('ยืนยันส่งงาน รายการโอนสินค้า');
+        setOpenModelConfirm(true);
+      }
     }
 
     setOpenLoadingModal(false);
@@ -619,7 +640,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
                   onClick={handleSubmit}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 140 }}
-                  disabled={rtNo === ''}
+                  disabled={rowLength == 0}
                 >
                   ส่งงาน
                 </Button>
