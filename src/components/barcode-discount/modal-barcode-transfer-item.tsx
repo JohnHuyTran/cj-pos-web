@@ -2,7 +2,16 @@ import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@material-ui/core';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, TextField, Typography } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Grid,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { DeleteForever, Tune } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
 import { DiscountDetail } from '../../models/barcode-discount';
@@ -16,7 +25,7 @@ import {
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import BarcodeDiscountPopup from './barcode-discount-popup';
-import { objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
+import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import { Action } from '../../utils/enum/common-enum';
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -562,12 +571,12 @@ export const ModalTransferItem = (props: DataGridProps) => {
               aria-describedby="alert-dialog-description"
               PaperProps={{ sx: { minWidth: 450, height: 241 } }}
             >
-              <DialogContent sx={{ margin: '0 auto', pl: 6, pr: 8 }}>
+              <DialogContent sx={{ pl: 6, pr: 8 }}>
                 <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
                   <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
                     ต้องการลบสินค้า
                   </Typography>
-                  <Typography variant="body1" align="left" marginLeft="17px">
+                  {/* <Typography variant="body1" align="left" marginLeft="17px">
                     สินค้า <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>{' '}
                     <label style={{ color: '#36C690' }}>
                       <b>{params.row.barcodeName}</b>
@@ -588,7 +597,34 @@ export const ModalTransferItem = (props: DataGridProps) => {
                     <label style={{ color: '#36C690' }}>
                       <b>{params.row.barCode}</b>
                     </label>
-                  </Typography>
+                  </Typography> */}
+                  <Grid container>
+                    <Grid item xs={4} sx={{ textAlign: 'right' }}>
+                      สินค้า <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
+                    </Grid>
+                    <Grid item xs={8} sx={{ pl: 2 }}>
+                      <label style={{ color: '#36C690' }}>
+                        <b>{params.row.barcodeName}</b>
+                        <br />
+                        <label
+                          style={{
+                            color: '#AEAEAE',
+                            fontSize: 14,
+                          }}
+                        >
+                          {params.row.skuCode}
+                        </label>
+                      </label>
+                    </Grid>
+                    <Grid item xs={4} sx={{ textAlign: 'right' }}>
+                      บาร์โค้ด <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
+                    </Grid>
+                    <Grid item xs={8} sx={{ pl: 1 }}>
+                      <label style={{ color: '#36C690' }}>
+                        <b>{params.row.barCode}</b>
+                      </label>
+                    </Grid>
+                  </Grid>
                 </DialogContentText>
               </DialogContent>
 
@@ -653,7 +689,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             rows={5}
             className={classes.MTextareaBD}
             inputProps={{
-              maxLength: '100'
+              maxLength: '100',
             }}
             sx={{ width: '339px' }}
             variant="outlined"
@@ -661,6 +697,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             onChange={(e) => {
               handleChangeNote(e.target.value);
             }}
+            disabled={dataDetail.status > 1}
           />
           <Box color="#AEAEAE" width="100%" textAlign="right">
             {countText}/100
@@ -676,7 +713,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               type="text"
               sx={{ bgcolor: '#EAEBEB' }}
               className={classes.MtextFieldNumberNoneArrow}
-              value={sumOfDiscount.toFixed(2) || '0.00'}
+              value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
             />
           </Box>
           <Box display="flex" justifyContent="space-between" marginTop="10px">
@@ -686,9 +723,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
             <TextField
               type="text"
               sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
-              inputProps={{style: {fontWeight: "bolder", color: '#263238'}}}
+              inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
               className={classes.MtextFieldNumberNoneArrow}
-              value={sumOfApprovedDiscount.toFixed(2) || '0.00'}
+              value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
             />
           </Box>
         </Box>
