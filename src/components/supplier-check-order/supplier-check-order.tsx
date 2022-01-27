@@ -20,7 +20,6 @@ import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supp
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import ModalSupplierSelection from './modal-supplier-selection';
 import { SearchOff } from '@mui/icons-material';
-import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 
 interface State {
   paramQuery: string;
@@ -229,6 +228,7 @@ export default function SupplierCheckOrderSearch() {
                 <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
                 <MenuItem value={'0'}>บันทึก</MenuItem>
                 <MenuItem value={'1'}>อนุมัติ</MenuItem>
+                <MenuItem value={'9'}>ยกเลิก</MenuItem>
               </Select>
             </FormControl>
           </Grid>

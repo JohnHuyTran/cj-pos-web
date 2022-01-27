@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { useSelector, useDispatch, TypedUseSelectorHook } from 'react-redux';
-
 import authSlice from './slices/authSlice';
 import checkOrderSlice from './slices/check-order-slice';
 import checkOrderDetailSlice from './slices/check-order-detail-slice';
@@ -27,6 +26,16 @@ import UploadFileSlice from './slices/upload-file-slice';
 import searchAllItemsList from './slices/search-all-items';
 import addItems from './slices/add-items-slice';
 import transferReasonsList from './slices/transfer-reasons-slice';
+import stockTransferSlice from './slices/stock-transfer-slice';
+import stockTransferRtSlice from './slices/stock-transfer-rt-slice';
+import saveSearchStock from './slices/save-search-stock-transfer-slice';
+import saveSearchStockRt from './slices/save-search-stock-transfer-rt-slice';
+import barcodeDiscountSearchSlice from './slices/barcode-discount-search-slice';
+import barcodeDiscountCriteriaSearchSlice from './slices/barcode-discount-criteria-search-slice';
+import barcodeDiscount from './slices/barcode-discount-slice';
+import stockRequestDetail from './slices/stock-request-detail-slice';
+import branchTransferDetailSlice from './slices/stock-transfer-branch-request-slice';
+import searchStockTransferRt from './slices/save-search-stock-transfer-rt-slice';
 
 const store = configureStore({
   reducer: {
@@ -56,6 +65,16 @@ const store = configureStore({
     searchAllItemsList: searchAllItemsList,
     addItems: addItems,
     transferReasonsList: transferReasonsList,
+    searchStockTransfer: stockTransferSlice,
+    searchStockTrnasferRt: stockTransferRtSlice,
+    saveSearchStock: saveSearchStock,
+    saveSearchStockRt: saveSearchStockRt,
+    searchStockTransferRt: searchStockTransferRt,
+    barcodeDiscount: barcodeDiscount,
+    barcodeDiscountSearchSlice: barcodeDiscountSearchSlice,
+    barcodeDiscountCriteriaSearchSlice: barcodeDiscountCriteriaSearchSlice,
+    stockRequestDetail: stockRequestDetail,
+    branchTransferDetailSlice: branchTransferDetailSlice,
   },
 });
 

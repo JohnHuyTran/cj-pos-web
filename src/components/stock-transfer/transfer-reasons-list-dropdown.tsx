@@ -5,19 +5,23 @@ import { FormControl, List, ListItem, ListItemText, MenuItem, Select } from '@mu
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 
 interface Props {
-  // isClear: boolean;
+  reasonsValue?: string;
+  isClear: boolean;
   onChangeReasons: (branchCode: string) => void;
 }
 
-function ReasonsListDropDown({ onChangeReasons }: Props) {
+function ReasonsListDropDown({ reasonsValue, isClear, onChangeReasons }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  let reasonsList = useAppSelector((state) => state.transferReasonsList.branchList.data);
+  let reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
+  const [reasons, setReasons] = React.useState('All');
   useEffect(() => {
     if (reasonsList === null || reasonsList.length <= 0) dispatch(featchTransferReasonsListAsync());
-  }, []);
 
-  const [reasons, setReasons] = React.useState('All');
+    if (reasonsValue !== '' && reasonsValue !== undefined) setReasons(reasonsValue);
+    else setReasons('All');
+  }, [isClear]);
+
   const handleChange = (event: any) => {
     const value = event.target.value;
     setReasons(value);

@@ -138,6 +138,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
       skuCode: item.skuCode,
       unitPrice: item.unitPrice,
       unitPriceText: item.unitPriceText,
+      baseUnit: item.baseUnit,
     };
   });
 
@@ -208,7 +209,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
     return (
       <TextField
         {...params}
-        placeholder="รหัสสินค้า / ชื่อสินค้า"
+        placeholder="บาร์โค้ด/รายละเอียดสินค้า"
         className={classes.MtextField}
         variant="outlined"
         size="small"
@@ -235,6 +236,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
               unitName: data.unitName,
               unitPrice: data.unitPrice,
               unitPriceText: data.unitPriceText,
+              baseUnit: data.baseUnit,
             };
             duplicateIems.push(itemsDup);
           } else {
@@ -311,7 +313,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
       <Dialog open={open} maxWidth="sm" fullWidth={true}>
         <DialogContent>
           <Box sx={{ display: 'flex' }}>
-            <Box pt={1} sx={{ flex: 2 }}>
+            <Box pt={1.5} sx={{ flex: 2 }}>
               รายการสินค้า :
             </Box>
             <Box sx={{ flex: 7 }}>

@@ -28,7 +28,6 @@ export default function ModelConfirm({ open, onClose, productName, skuCode, barC
   const handleDeleteItem = async () => {
     setOpenLoadingModal(true);
     let items = payloadItem;
-    console.log();
     let payload = items.filter((r: any) => (r.barCode ? r.barCode : r.barcode !== barCode));
     await dispatch(updateAddItemsState(payload));
     // }

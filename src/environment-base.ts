@@ -47,6 +47,25 @@ export const environment = {
       },
     },
   },
+  sell: {
+    barcodeDiscount: {
+      search: {
+        url: '/campaign',
+      },
+      save: {
+        url: '/campaign',
+      },
+      update: {
+        url: '/campaign/{id}',
+      },
+      approve: {
+        url: '/campaign/{id}/waiting-approve',
+      },
+      cancel: {
+        url: '/campaign/{id}',
+      },
+    },
+  },
   purchase: {
     supplierOrder: {
       search: {
@@ -121,11 +140,51 @@ export const environment = {
     },
   },
   stock: {
+    searchStockTransfer: {
+      url: '/stock/stock-transfer',
+      searchRT: {
+        url: '/stock/stock-request',
+      },
+    },
     transferReasonsList: {
       url: '/stock/master-transfer-reasons',
     },
-    saveStockTransfer: {
-      url: '/stock/stock-transfer/draft',
+    branchTransfer: {
+      search: {
+        url: '/stock/stock-transfer',
+      },
+      detail: {
+        url: '/stock/stock-transfer/{btNo}',
+      },
+      save: {
+        url: '/stock/stock-transfer/save',
+      },
+      sendDC: {
+        url: '/stock/stock-transfer/save-to-dc',
+      },
+    },
+    stockRequest: {
+      detail: {
+        url: '/stock/stock-request/{rtNo}',
+      },
+      save: {
+        url: '/stock/stock-request/draft',
+      },
+      submit: {
+        url: '/stock/stock-request/submit/{rtNo}',
+      },
+      approve1: {
+        url: '/stock/stock-request/approve1/{rtNo}',
+      },
+      approve2: {
+        url: '/stock/stock-request/approve2/{rtNo}',
+      },
+      reject1: {
+        url: '/stock/stock-request/reject1/{rtNo}',
+      },
+      reject2: {
+        url: '/stock/stock-request/reject2/{rtNo}',
+      },
     },
   },
 };

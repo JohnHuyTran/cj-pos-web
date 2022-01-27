@@ -10,7 +10,9 @@ import CheckOrder from './pages/check-order';
 import DCCheckOrder from './pages/dc-check-order';
 import SupplierCheckOrder from './pages/supplier-check-order';
 import StockTransfer from './pages/stock-transfer';
+import StockTransferRt from './pages/stock-transfer-rt';
 import LoginForm from './components/login/login-form';
+import BarcodeDiscount from './pages/barcode-discount/barcode-discount';
 
 import { useAppSelector } from './store/store';
 const drawerWidth = 240;
@@ -69,10 +71,12 @@ export default function App2() {
         <DrawerHeader />
         <Switch>
           <Route exact path="/" component={Home} />
+          <Route path="/barcode-discount" component={BarcodeDiscount} />
           <Route path="/check-order" component={CheckOrder} />
           <Route path="/dc-check-order" component={DCCheckOrder} />
           <Route path="/supplier-check-order" component={SupplierCheckOrder} />
           <Route path="/stock-transfer" component={StockTransfer} />
+          <Route path="/stock-transfer-rt" component={StockTransferRt} />
         </Switch>
       </Main>
     </Box>

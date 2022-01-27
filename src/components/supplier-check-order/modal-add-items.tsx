@@ -1,67 +1,58 @@
-import React, { ReactElement } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import Typography from '@mui/material/Typography';
-import { useAppDispatch } from '../../store/store';
-import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
-import LoadingModal from '../commons/ui/loading-modal';
-import { IconButton, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  IconButton,
+  TextField,
+  Typography,
+} from '@mui/material';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import React, { ReactElement, useEffect, useMemo } from 'react';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import { DeleteForever } from '@mui/icons-material';
-import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box } from '@mui/system';
+import { ItemInfo, ItemByBarcodeInfo } from '../../models/modal-add-item-model';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
+
 import { useStyles } from '../../styles/makeTheme';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import ModelDeleteConfirm from './modal-delete-confirm';
+import { DeleteForever } from '@mui/icons-material';
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRenderCellParams,
+  GridRowData,
+  GridRowId,
+  useGridApiRef,
+} from '@mui/x-data-grid';
+import LoadingModal from '../commons/ui/loading-modal';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  SupplierCode: string;
+  supNo: string;
 }
-
-interface StateItem {
-  barcodeName: string;
-  barcode: string;
-}
-
-const mockRows = [
-  {
-    barcode: '0810000000024',
-    skuCode: '081000000000000002',
-    unitCode: 'ST',
-    unitName: 'ชิ้น',
-    unitFactor: 1,
-    barcodeName: 'แก้วพลาสติก 22oz Piece',
-    pricePerUnit: 0,
-    qty: 1,
-    actualQty: 1,
-    isCalVat: true,
-    isControlStock: true,
-  },
-  {
-    barcode: '8859356501011',
-    skuCode: '000000000010000055',
-    unitCode: 'KAR',
-    unitName: 'ลัง',
-    unitFactor: 500,
-    barcodeName: 'ถ้วยร้อนDW8oz พิมพ์ลายBaoCafe Carton',
-    pricePerUnit: 0,
-    qty: 1,
-    actualQty: 1,
-    isCalVat: true,
-    isControlStock: true,
-  },
-];
 
 const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    flex: 1.5,
+    flex: 1.2,
+    // minWidth: 125,
     headerAlign: 'center',
-    disableColumnMenu: true,
+    // disableColumnMenu: true,
+    sortable: false,
+  },
+  {
+    field: 'barcodeName',
+    headerName: 'รายละเอียด',
+    headerAlign: 'center',
+    flex: 1.7,
+    // minWidth: 180,
+    // disableColumnMenu: true,
     sortable: false,
   },
   {
@@ -72,17 +63,9 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'barcodeName',
-    headerName: 'รายละเอียด',
-    headerAlign: 'center',
-    flex: 2,
-    disableColumnMenu: true,
-    sortable: false,
-  },
-  {
-    field: 'qty',
+    field: 'actualQty',
     headerName: 'จำนวน',
-    flex: 1,
+    flex: 0.7,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -94,8 +77,8 @@ const columns: GridColDef[] = [
         value={params.value}
         onChange={(e) => {
           var value = e.target.value ? parseInt(e.target.value) : '';
-          if (value < 0) value = 1;
-          params.api.updateRows([{ ...params.row, qty: value }]);
+          if (value < 0) value = 0;
+          params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         autoComplete="off"
       />
@@ -104,7 +87,9 @@ const columns: GridColDef[] = [
   {
     field: 'delete',
     headerName: 'ลบ',
+    // flex: 0.5,
     width: 50,
+    minWidth: 0,
     align: 'center',
     sortable: false,
     renderCell: () => {
@@ -113,32 +98,134 @@ const columns: GridColDef[] = [
   },
 ];
 
-export default function ModelAddItems({ open, onClose, SupplierCode }: Props): ReactElement {
-  const dispatch = useAppDispatch();
-  const classes = useStyles();
-  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+function useApiRef() {
+  const apiRef = useGridApiRef();
+  const _columns = useMemo(
+    () =>
+      columns.concat({
+        field: '',
+        width: 0,
+        minWidth: 0,
+        sortable: false,
+        renderCell: (params) => {
+          apiRef.current = params.api;
+          return null;
+        },
+      }),
+    [columns]
+  );
 
-  // let rows: any = [];
-  const rows = mockRows.map((item: any, index: number) => {
+  return { apiRef, columns: _columns };
+}
+
+function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
+  const { apiRef, columns } = useApiRef();
+  const classes = useStyles();
+  const dispatch = useAppDispatch();
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  // const [searchItem, setSearchItem] = React.useState<any | null>(null);
+  const [values, setValues] = React.useState<string[]>([]);
+  const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
+  let rows: any = [];
+  rows = newAddItemListArray.map((item: any, index: number) => {
     return {
       id: index,
       barcode: item.barcode,
       unitName: item.unitName,
       barcodeName: item.barcodeName,
-      qty: 1,
+      actualQty: item.actualQty ? item.actualQty : 1,
       skuCode: item.skuCode,
+      unitPrice: item.unitPriceText,
     };
   });
 
-  const handleAddItem = async () => {
-    setOpenLoadingModal(true);
-    const payload = mockRows;
-    await dispatch(updateItemsState(payload));
+  const handldCloseAddItemModal = () => {
+    onClose();
+    // setSearchItem(null);
+    setNewAddItemListArray([]);
+  };
 
-    setTimeout(() => {
-      setOpenLoadingModal(false);
-      onClose();
-    }, 300);
+  const itemsList = useAppSelector((state) => state.searchItemListBySup.itemList);
+  let options: any = itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
+  const filterOptions = createFilterOptions({
+    stringify: (option: any) => option.barcodeName + option.barcode,
+  });
+
+  const autocompleteRenderListItem = (props: any, option: any) => {
+    return (
+      <li {...props} key={option.barcode}>
+        <div>
+          <Typography variant="body2">{option.barcodeName}</Typography>
+          <Typography color="textSecondary" variant="caption">
+            {option.barcode}
+          </Typography>
+        </div>
+      </li>
+    );
+  };
+
+  const autocompleteRenderInput = (params: any) => {
+    return (
+      <TextField
+        {...params}
+        placeholder="บาร์โค้ด/รายละเอียดสินค้า"
+        className={classes.MtextField}
+        variant="outlined"
+        size="small"
+        fullWidth
+      />
+    );
+  };
+
+  const handleChangeItem = async (event: any, option: any, reason: string) => {
+    if (option && reason === 'selectOption') {
+      let barcode = option?.barcode;
+      // setSearchItem(null);
+      const chkduplicate: any = newAddItemListArray.find((r: any) => r.barcode === barcode);
+      if (chkduplicate) {
+        let duplicateIems: any = [];
+        newAddItemListArray.forEach((data: any) => {
+          let qty = data.qty ? data.qty : data.actualQty;
+          if (data.barcode === barcode) {
+            const itemsDup: any = {
+              barcode: data.barcode,
+              barcodeName: data.barcodeName,
+              actualQty: Number(qty) + 1,
+              skuCode: data.skuCode,
+              unitCode: data.unitCode,
+              unitName: data.unitName,
+              unitPrice: data.unitPriceText,
+            };
+            duplicateIems.push(itemsDup);
+          } else {
+            duplicateIems.push(data);
+          }
+        });
+        setNewAddItemListArray(duplicateIems);
+      } else {
+        const itemsList: any = [];
+        if (rows.length > 0) {
+          const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+          rowsEdit.forEach((data: GridRowData) => {
+            itemsList.push(data);
+          });
+          setNewAddItemListArray(itemsList);
+        }
+        itemsList.push(option);
+        setNewAddItemListArray(itemsList);
+      }
+    } else {
+      clearData();
+    }
+  };
+
+  const clearData = async () => {
+    options = [];
+  };
+
+  const clearInput = () => {
+    setValues([]);
   };
 
   const [barcodeNameDel, setBarcodeNameDel] = React.useState('');
@@ -146,9 +233,7 @@ export default function ModelAddItems({ open, onClose, SupplierCode }: Props): R
   const [barCodeDel, setBarCodeDel] = React.useState('');
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
   const currentlyDelete = (params: GridCellParams) => {
-    localStorage.removeItem('checkLoadRow');
     const value = params.colDef.field;
-    //deleteItem
     if (value === 'delete') {
       setBarcodeNameDel(String(params.getValue(params.id, 'barcodeName')));
       setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
@@ -159,91 +244,194 @@ export default function ModelAddItems({ open, onClose, SupplierCode }: Props): R
   const handleModelDeleteConfirm = () => {
     setOpenModelDeleteConfirm(false);
   };
+  const handleDeleteItem = () => {
+    setNewAddItemListArray(newAddItemListArray.filter((r: any) => r.barcode !== barCodeDel));
+    setOpenModelDeleteConfirm(false);
+  };
 
-  const onCloseModal = async () => {
-    localStorage.clear();
-    onClose();
+  const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
+  const handleAddItems = async () => {
+    setOpenLoadingModal(true);
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const itemsList: any = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      itemsList.push(data);
+    });
+
+    let result: any = [];
+    if (payloadAddItem.length > 0) {
+      const sumAddItemList = [...itemsList, ...payloadAddItem];
+      var o: any = {};
+      sumAddItemList.forEach((i: any) => {
+        var id = i.barcode;
+
+        if (!o[id]) {
+          return (o[id] = i);
+        }
+        return (o[id].actualQty = o[id].actualQty + i.actualQty);
+      });
+
+      var itemResult: any = [];
+      Object.keys(o).forEach((key) => {
+        itemResult.push(o[key]);
+      });
+      result = itemResult;
+    } else {
+      result = itemsList;
+    }
+
+    await dispatch(updateItemsState(result));
+    setNewAddItemListArray([]);
+    // setSearchItem(null);
+    setTimeout(() => {
+      setOpenLoadingModal(false);
+      onClose();
+    }, 300);
+  };
+
+  const onInputChange = async (event: any, value: string, reason: string) => {
+    if (event && event.keyCode && event.keyCode === 13) {
+      return false;
+    }
+
+    if (reason == 'reset') {
+      clearInput();
+    }
   };
 
   return (
-    <Dialog open={open} maxWidth="sm" fullWidth={true}>
-      <DialogContent>
-        <Box sx={{ display: 'flex' }}>
-          <Box sx={{ flex: 7 }}>
-            <TextField placeholder="บาร์โค้ด/รายละเอียดสินค้า" size="small" className={classes.MtextField} fullWidth />
+    <div>
+      <Dialog open={open} maxWidth="sm" fullWidth={true}>
+        <DialogContent>
+          <Box sx={{ display: 'flex' }}>
+            <Box pt={1.5} sx={{ flex: 2 }}>
+              รายการสินค้า :
+            </Box>
+            <Box sx={{ flex: 7 }}>
+              <Autocomplete
+                id="selAddItem"
+                value={values}
+                fullWidth
+                loadingText="กำลังโหลด..."
+                options={options}
+                filterOptions={filterOptions}
+                renderOption={autocompleteRenderListItem}
+                onChange={handleChangeItem}
+                onInputChange={onInputChange}
+                getOptionLabel={(option) => (option.barcodeName ? option.barcodeName : '')}
+                isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
+                renderInput={autocompleteRenderInput}
+              />
+            </Box>
+
+            <Box sx={{ flex: 1, ml: 2 }}>
+              {handldCloseAddItemModal ? (
+                <IconButton
+                  aria-label="close"
+                  onClick={handldCloseAddItemModal}
+                  sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    color: (theme: any) => theme.palette.grey[400],
+                  }}
+                >
+                  <CancelOutlinedIcon fontSize="large" stroke={'white'} stroke-width={1} />
+                </IconButton>
+              ) : null}
+            </Box>
           </Box>
 
-          <Box sx={{ flex: 2 }}>
+          {newAddItemListArray.length > 0 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
+                <DataGrid
+                  rows={rows}
+                  columns={columns}
+                  disableColumnMenu
+                  hideFooter
+                  autoHeight
+                  onCellClick={currentlyDelete}
+                />
+              </div>
+            </Box>
+          )}
+          {newAddItemListArray.length == 0 && itemsList.code === 204 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }} color="#CBD4DB">
+              <h4>ไม่พบสินค้า</h4>
+            </Box>
+          )}
+
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               id="btnSearch"
               variant="contained"
-              color="primary"
-              // onClick={onClickAddItem}
-              sx={{ width: '100%', ml: 2 }}
+              color="secondary"
+              onClick={handleAddItems}
               className={classes.MbtnSearch}
+              size="large"
+              disabled={newAddItemListArray.length === 0}
+              startIcon={<AddCircleOutlineIcon />}
             >
-              เพิ่ม
+              เพิ่มสินค้า
             </Button>
           </Box>
+        </DialogContent>
+        <LoadingModal open={openLoadingModal} />
+      </Dialog>
 
-          <Box sx={{ flex: 1, ml: 2 }}>
-            {onCloseModal ? (
-              <IconButton
-                aria-label="close"
-                onClick={onCloseModal}
-                sx={{
-                  position: 'absolute',
-                  right: 8,
-                  top: 8,
-                  color: (theme: any) => theme.palette.grey[400],
-                }}
-              >
-                <CancelOutlinedIcon fontSize="large" stroke={'white'} stroke-width={1} />
-              </IconButton>
-            ) : null}
-          </Box>
-        </Box>
-
-        <Typography variant="h5" sx={{ mt: 4, color: '#F54949' }}>
-          ** Mock Data
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
-          <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              disableColumnMenu
-              hideFooter
-              autoHeight
-              onCellClick={currentlyDelete}
-            />
-          </div>
-        </Box>
-
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            id="btnSearch"
-            variant="contained"
-            color="secondary"
-            onClick={handleAddItem}
-            className={classes.MbtnSearch}
-            size="large"
-            startIcon={<AddCircleOutlineIcon />}
-          >
-            เพิ่มสินค้า
-          </Button>
-        </Box>
-      </DialogContent>
-
-      <ModelDeleteConfirm
+      <Dialog
         open={openModelDeleteConfirm}
-        onClose={handleModelDeleteConfirm}
-        productName={barcodeNameDel}
-        skuCode={skuCodeDel}
-        barCode={barCodeDel}
-      />
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="md"
+        sx={{ minWidth: 800 }}
+      >
+        <DialogContent sx={{ pl: 6, pr: 8 }}>
+          <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
+            <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+              ต้องการลบสินค้า
+            </Typography>
+            <Typography variant="body1" align="left">
+              สินค้า <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
+              <label style={{ color: '#36C690' }}>
+                <b>{barcodeNameDel}</b>
+                <br />
+                <label style={{ color: '#AEAEAE', fontSize: 14, marginLeft: '3.8em' }}>{skuCodeDel}</label>
+              </label>
+            </Typography>
+            <Typography variant="body1" align="left">
+              บาร์โค้ด <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
+              <label style={{ color: '#36C690' }}>
+                <b>{barCodeDel}</b>
+              </label>
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
 
-      <LoadingModal open={openLoadingModal} />
-    </Dialog>
+        <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
+          <Button
+            id="btnCancle"
+            variant="contained"
+            color="cancelColor"
+            sx={{ borderRadius: 2, width: 90, mr: 2 }}
+            onClick={handleModelDeleteConfirm}
+          >
+            ยกเลิก
+          </Button>
+          <Button
+            id="btnConfirm"
+            variant="contained"
+            color="error"
+            sx={{ borderRadius: 2, width: 90 }}
+            onClick={handleDeleteItem}
+          >
+            ลบสินค้า
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 }
+
+export default ModalAddItem;

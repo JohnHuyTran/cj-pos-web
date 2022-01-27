@@ -9,6 +9,11 @@ const useStyles = makeStyles({
     '& .MuiOutlinedInput-root input::placeholder': {
       fontSize: '14px',
     },
+    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+      // opacity: 0,
+      color: '#263238 !important',
+      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+    },
   },
   MtextFieldDetail: {
     '& .MuiOutlinedInput-root': {
@@ -239,6 +244,45 @@ const useStyles = makeStyles({
   MbtnClose: {
     width: '200px',
     borderRadius: '4px !important',
+  },
+  MLabelBDStatus: {
+    padding: '1px 20px 1px 20px',
+    borderRadius: '8px',
+    // width: "100px",
+    textAlign: 'center',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  MLabelTooltipWrapper: {
+    position: 'relative',
+    '& .title': {
+      position: 'absolute',
+      top: '110%',
+      left: '0',
+      color: 'red',
+      width: '300px',
+      display: 'none',
+    },
+    '&:hover .title': {
+      display: 'block',
+    },
+  },
+  MtextFieldNumberNoneArrow: {
+    '& .MuiInput-input': {
+      '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+        '-webkit-appearance': 'none',
+      },
+    },
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      fontSize: '15px',
+      fontWeight: 'bold',
+      textAlignLast: 'end !important',
+    },
+    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+      color: '#263238 !important',
+    },
   },
 });
 
