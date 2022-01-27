@@ -80,15 +80,15 @@ const BarcodeDiscountSearch = () => {
     };
 
     const handleOpenModal = () => {
-        setOpenModal(true)
+        setOpenModal(true);
     }
 
     const handleCloseModal = () => {
-        setOpenModal(false)
+        setOpenModal(false);
     }
 
     const handleClosePopup = () => {
-        setOpenPopup(false)
+        setOpenPopup(false);
     }
 
     const onClear = async () => {
@@ -162,7 +162,7 @@ const BarcodeDiscountSearch = () => {
     const [flagSearch, setFlagSearch] = React.useState(false);
     if (flagSearch) {
         if (res && res.data && res.data.length > 0) {
-            dataTable = <BarcodeDiscountList/>;
+            dataTable = <BarcodeDiscountList onSearch={onSearch}/>;
         } else {
             dataTable = (
                 <Grid item container xs={12} justifyContent="center">
@@ -315,6 +315,7 @@ const BarcodeDiscountSearch = () => {
             setOpenPopup={setOpenPopup}
             setPopupMsg={setPopupMsg}
             action={Action.INSERT}
+            onSearchBD={onSearch}
           />
         )}
         <BarcodeDiscountPopup open={openPopup} onClose={handleClosePopup} contentMsg={popupMsg} />

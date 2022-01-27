@@ -26,7 +26,11 @@ interface loadingModalState {
   open: boolean;
 }
 
-const BarcodeDiscountList = () => {
+interface StateProps {
+  onSearch: () => void;
+}
+
+const BarcodeDiscountList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
   const { t } = useTranslation(['barcodeDiscount']);
   const [lstBarcodeDiscount, setLstBarcodeDiscount] = React.useState<any[]>([]);
@@ -474,6 +478,7 @@ const BarcodeDiscountList = () => {
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
+          onSearchBD={props.onSearch}
         />
       )}
       <BarcodeDiscountPopup open={openPopup} onClose={handleClosePopup} contentMsg={popupMsg} />

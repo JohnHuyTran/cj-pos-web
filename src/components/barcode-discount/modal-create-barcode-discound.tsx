@@ -48,6 +48,7 @@ interface Props {
   setOpenPopup: (openPopup: boolean) => void;
   onClickClose: () => void;
   setPopupMsg?: any;
+  onSearchBD?: () => void;
 }
 
 const _ = require('lodash');
@@ -58,6 +59,7 @@ export default function ModalCreateBarcodeDiscount({
   setOpenPopup,
   action,
   setPopupMsg,
+  onSearchBD,
 }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
 
@@ -98,7 +100,7 @@ export default function ModalCreateBarcodeDiscount({
     setOpenModalCancel(false);
   };
 
-  const handdleClosePopup = () => {
+  const handleClosePopup = () => {
     setOpenPopupModal(false);
   };
 
@@ -224,6 +226,7 @@ export default function ModalCreateBarcodeDiscount({
               if (!sendRequest) {
                 setOpenPopupModal(true);
                 setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+                if (onSearchBD) onSearchBD();
               }
               dispatch(
                 updateDataDetail({
@@ -302,6 +305,7 @@ export default function ModalCreateBarcodeDiscount({
         setOpenPopup(true);
         setPopupMsg('คุณได้ส่งอนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
         handleClose();
+        if (onSearchBD) onSearchBD();
       } else if (rs.code === 50004) {
         setListProducts(rs.data);
         setOpenModalCheck(true);
@@ -321,6 +325,7 @@ export default function ModalCreateBarcodeDiscount({
           setOpenPopup(true);
           setPopupMsg('คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว');
           handleClose();
+          if (onSearchBD) onSearchBD();
         } else {
           setOpenModalError(true);
           setOpenModalCancel(false);
@@ -485,7 +490,7 @@ export default function ModalCreateBarcodeDiscount({
         onDeleteAction={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
       />
-      <BarcodeDiscountPopup open={openPopupModal} onClose={handdleClosePopup} contentMsg={textPopup} />
+      <BarcodeDiscountPopup open={openPopupModal} onClose={handleClosePopup} contentMsg={textPopup} />
       <AlertError
         open={openModalError}
         onClose={handleCloseModalError}

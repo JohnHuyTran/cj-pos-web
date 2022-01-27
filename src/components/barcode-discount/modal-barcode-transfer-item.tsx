@@ -124,7 +124,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   }, [dtTable]);
 
   useEffect(() => {
-    if (checkStocks.length !== 0) {
+    if (checkStocks.length !== 0 && Object.keys(payloadAddItem).length !== 0) {
       const predata = _.cloneDeep(payloadAddItem);
       const products = predata.map((item: any) => {
         const stock = checkStocks.find((el: any) => el.barcode === item.barcode);
@@ -181,13 +181,15 @@ export const ModalTransferItem = (props: DataGridProps) => {
       data[index - 1].numberOfDiscounted = parseInt(event.target.value);
       return data;
     });
-    let updateList = _.cloneDeep(payloadAddItem);
-    updateList.map((item: any) => {
-      if (item.barcode === currentData.barCode) {
-        item.qty = parseInt(event.target.value);
-      }
-    });
-    dispatch(updateAddItemsState(updateList));
+    if (Object.keys(payloadAddItem).length !== 0) {
+      let updateList = _.cloneDeep(payloadAddItem);
+      updateList.map((item: any) => {
+        if (item.barcode === currentData.barCode) {
+          item.qty = parseInt(event.target.value);
+        }
+      });
+      dispatch(updateAddItemsState(updateList));
+    }
     dispatch(
       updateErrorList(
         errorList.map((item: any, idx: number) => {
@@ -646,11 +648,12 @@ export const ModalTransferItem = (props: DataGridProps) => {
             หมายเหตุจากสาขา :{' '}
           </Typography>
           <TextField
-            placeholder="ความยาวไม่เกิน 100 ตัวอักษร"
+            placeholder=" ความยาวไม่เกิน 100 ตัวอักษร"
             multiline
             rows={5}
+            className={classes.MTextareaBD}
             inputProps={{
-              maxLength: '100',
+              maxLength: '100'
             }}
             sx={{ width: '339px' }}
             variant="outlined"
@@ -682,8 +685,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
             </Typography>
             <TextField
               type="text"
-              disabled
-              sx={{ bgcolor: '#E7FFE9' }}
+              sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
+              inputProps={{style: {fontWeight: "bolder", color: '#263238'}}}
               className={classes.MtextFieldNumberNoneArrow}
               value={sumOfApprovedDiscount.toFixed(2) || '0.00'}
             />
