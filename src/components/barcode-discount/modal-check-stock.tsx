@@ -20,7 +20,8 @@ const columns: GridColDef[] = [
   {
     field: 'id',
     headerName: 'ลำดับ',
-    headerAlign: 'left',
+    headerAlign: 'right',
+    align: 'right',
     sortable: false,
     flex: 0.8,
   },
@@ -85,21 +86,28 @@ export default function ModalCheckStock({ open, onClose }: Props) {
   return (
     <div>
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth={true}>
-        <DialogTitle id="alert-dialog-title" sx={{ textAlign: 'center' }}>
-          <ErrorOutline sx={{ color: '#F54949', fontSize: '4em' }} />
+        <DialogTitle id="alert-dialog-title" sx={{ textAlign: 'center', paddingTop: '30px', paddingBottom: '0' }}>
+          <ErrorOutline sx={{ color: '#F54949', fontSize: '43px' }} />
           <br />
-          <Typography sx={{ color: 'red', fontSize: '18px' }}>จำนวนที่ขอลดเกินจำนวนสินค้าในสต๊อก</Typography>
-          <Typography sx={{ fontSize: '18px' }}>รายการสินค้าในสต๊อค</Typography>
+          <Typography sx={{ color: 'red', fontSize: '18px', marginBottom: '8px' }}>
+            จำนวนที่ขอลดเกินจำนวนสินค้าในสต๊อก
+          </Typography>
+          <Typography sx={{ fontSize: '18px', color: '#000000', marginBottom: '8px' }}>รายการสินค้าในสต๊อค</Typography>
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <div className={classes.MdataGridPaginationTop}>
-              <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
+        <DialogContent sx={{ paddingBottom: '0', marginBottom: '40px' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+            <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
+              <DataGrid rows={rows} columns={columns} hideFooter autoHeight rowHeight={60} />
             </div>
-          </DialogContentText>
+          </Box>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center' }}>
-          <Button variant="contained" color="error" onClick={handleClose} sx={{ borderRadius: '5px' }}>
+        <DialogActions sx={{ justifyContent: 'center', paddingBottom: '30px' }}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleClose}
+            sx={{ borderRadius: '5px', height: '40px', width: '126.14px' }}
+          >
             ปิด
           </Button>
         </DialogActions>

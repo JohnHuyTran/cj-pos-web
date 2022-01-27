@@ -1,9 +1,8 @@
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import Dialog from '@mui/material/Dialog';
 import { Box, Button, DialogActions, DialogContent, DialogContentText, TextField, Typography } from '@mui/material';
 import { ErrorOutline } from '@mui/icons-material';
 import { DataGrid, GridColDef } from '@material-ui/data-grid';
-import { GridRenderCellParams } from '@mui/x-data-grid';
 import { useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 
@@ -17,12 +16,12 @@ const columns: GridColDef[] = [
   {
     field: 'index',
     headerName: 'ลำดับ',
-    headerAlign: 'center',
+    headerAlign: 'right',
     disableColumnMenu: false,
     flex: 0.6,
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '10px' }}>
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -30,7 +29,7 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค๊ด',
-    flex: 1.2,
+    flex: 1,
     headerAlign: 'left',
     sortable: false,
   },
@@ -38,7 +37,7 @@ const columns: GridColDef[] = [
     field: 'barcodeName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'left',
-    flex: 1.8,
+    flex: 2,
     disableColumnMenu: false,
     sortable: false,
     renderCell: (params) => {
@@ -55,7 +54,7 @@ const columns: GridColDef[] = [
   {
     field: 'oldPrice',
     headerName: 'ราคาเดิม',
-    flex: 1,
+    flex: 0.8,
     align: 'right',
     headerAlign: 'left',
     sortable: false,
@@ -70,7 +69,7 @@ const columns: GridColDef[] = [
   {
     field: 'currentPrice',
     headerName: 'ราคาใหม่',
-    flex: 1,
+    flex: 0.8,
     align: 'right',
     headerAlign: 'left',
     sortable: false,
@@ -110,19 +109,19 @@ export default function ModalCheckPrice({ open, onClose, products }: Props): Rea
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       // fullWidth={true}
-      PaperProps={{ sx: { width: '673px', maxWidth: '673px' } }}
+      PaperProps={{ sx: { width: '700px', maxWidth: '700px' } }}
     >
       <DialogContent sx={{ padding: '1em' }}>
         <DialogContentText sx={{ textAlign: 'center' }}>
           <ErrorOutline sx={{ color: '#F54949', fontSize: '4em' }} />
-          <Typography>
+          <Typography fontWeight="bold">
             ราคาสินค้าบางรายการมีการเปลี่ยนแปลง
             <br />
             โดยระบบทำการคำนวนราคาส่วนลดใหม่เรียบร้อยแล้ว
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 1.5 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1, mb: 1.5 }}>
             <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
-              <DataGrid rows={rows} columns={columns} disableColumnMenu hideFooter autoHeight />
+              <DataGrid rows={rows} columns={columns} disableColumnMenu hideFooter autoHeight rowHeight={70} />
             </div>
           </Box>
         </DialogContentText>
@@ -132,7 +131,7 @@ export default function ModalCheckPrice({ open, onClose, products }: Props): Rea
           id="btnClose"
           variant="contained"
           color="error"
-          sx={{ margin: '0 auto', borderRadius: '5px', mb: 1.5 }}
+          sx={{ margin: '0 auto', borderRadius: '5px', mb: 3, width: 126, height: 40 }}
           onClick={onClose}
         >
           ปิด
