@@ -133,7 +133,7 @@ export default function SupplierCheckOrderSearch() {
     } else {
       limits = limit.toString();
     }
-    console.log(values);
+    // console.log(values);
     const payload: StockTransferRequest = {
       limit: limits,
       page: page,

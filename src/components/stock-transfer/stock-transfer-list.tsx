@@ -9,7 +9,7 @@ import { useStyles } from '../../styles/makeTheme';
 import Done from '@mui/icons-material/Done';
 
 import LoadingModal from '../commons/ui/loading-modal';
-import { Typography } from '@mui/material';
+import { Chip, Typography } from '@mui/material';
 import { StockTransferInfo, StockTransferRequest, StockTransferResponse } from '../../models/stock-transfer-model';
 import { DeleteForever } from '@mui/icons-material';
 import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
@@ -47,7 +47,7 @@ function StockTransferList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -79,7 +79,7 @@ function StockTransferList() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
             {params.value} - {params.getValue(params.id, 'endDate') || ''}
           </Typography>
         </div>
@@ -120,7 +120,32 @@ function StockTransferList() {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
+      renderCell: (params) => {
+        if (
+          params.value === 'CREATED' ||
+          params.value === 'READY_TO_TRANSFER' ||
+          params.value === 'WAIT_FOR_PICKUP' ||
+          params.value === 'TRANSFERING'
+        ) {
+          return (
+            <Chip
+              label={t(`status.${params.value}`)}
+              size="small"
+              sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
+            />
+          );
+        } else if (params.value === 'COMPLETED') {
+          return (
+            <Chip
+              label={t(`status.${params.value}`)}
+              size="small"
+              sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
+            />
+          );
+        }
+      },
     },
+
     // {
     //   field: 'button',
     //   headerName: ' ',
@@ -145,7 +170,7 @@ function StockTransferList() {
       branchFrom: data.branchFromName,
       branchTo: data.branchToName,
       createdBy: data.createdBy,
-      status: t(`status.${data.status}`),
+      status: data.status,
     };
   });
 
@@ -236,7 +261,7 @@ function StockTransferList() {
   };
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -250,7 +275,7 @@ function StockTransferList() {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.totalPage}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
