@@ -379,7 +379,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       ) {
         return 0;
       }
-      if (percentDiscount) return ((item.price * item.requestedDiscount) / 100) * item.numberOfDiscounted;
+      if (percentDiscount) return Math.trunc((item.price * item.requestedDiscount) / 100) * item.numberOfDiscounted;
       else return item.requestedDiscount * item.numberOfDiscounted;
     });
   };

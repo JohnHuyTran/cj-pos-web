@@ -204,13 +204,14 @@ export default function ModalCreateBarcodeDiscount({
       const check = data.every((item) => {
         if (payloadBarcodeDiscount.percentDiscount) {
           if (item.requestedDiscount <= 0 || item.requestedDiscount >= 100) return false;
+        } else {
+          return item.requestedDiscount > 0 && item.requestedDiscount <= item.price;
         }
         if (stringNullOrEmpty(item.expiredDate)) return false;
         if (item.numberOfDiscounted <= 0) {
           return false;
-        } else {
-          return item.requestedDiscount > 0 && item.requestedDiscount <= item.price;
         }
+        return true;
       });
 
       if (check) {
@@ -421,8 +422,16 @@ export default function ModalCreateBarcodeDiscount({
                       handleChangeRadio(event);
                     }}
                   >
-                    <FormControlLabel value="percent" control={<Radio />} label="ยอดลดเป็นเปอร์เซ็น (%)" />
-                    <FormControlLabel value="amount" control={<Radio />} label="ยอดลดเป็นจำนวนเงิน (บาท)" />
+                    <FormControlLabel
+                      value="percent"
+                      control={<Radio disabled={status > 1} />}
+                      label="ยอดลดเป็นเปอร์เซ็น (%)"
+                    />
+                    <FormControlLabel
+                      value="amount"
+                      control={<Radio disabled={status > 1} />}
+                      label="ยอดลดเป็นจำนวนเงิน (บาท)"
+                    />
                   </RadioGroup>
                 </FormControl>
               </Grid>
