@@ -33,6 +33,7 @@ function Steppers({ status, type }: Props): ReactElement {
         stepsList.push(t(`status.${item.value}`));
       }
 
+      //setSteps
       setSteps(stepsList);
       if (item.value === status) setActiveStep(item.stepperGrp);
     });
