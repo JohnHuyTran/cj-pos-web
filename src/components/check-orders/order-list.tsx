@@ -41,7 +41,7 @@ function OrderList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -183,7 +183,7 @@ function OrderList() {
 
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
-
+    console.log('newPage: ', newPage);
     let page: string = (newPage + 1).toString();
 
     const payloadNewpage: ShipmentRequest = {
@@ -248,7 +248,7 @@ function OrderList() {
           pageSize={parseInt(pageSize)}
           rowsPerPageOptions={[10, 20, 50, 100]}
           rowCount={res.total}
-          paginationMode='server'
+          paginationMode="server"
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           loading={loading}

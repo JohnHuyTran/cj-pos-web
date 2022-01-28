@@ -1,31 +1,22 @@
-import moment from 'moment';
-import { useTranslation } from 'react-i18next';
-import { Grid } from '@mui/material';
-import { TextField } from '@mui/material';
-import { FormControl } from '@mui/material';
-import { MenuItem } from '@mui/material';
-import { Select } from '@mui/material';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/material';
 import React from 'react';
-import DatePickerComponent from '../commons/ui/date-picker';
-import { useStyles } from '../../styles/makeTheme';
-import { Button } from '@mui/material';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { updateAddItemsState } from '../../store/slices/add-items-slice';
-
+import { Box, Grid, Typography, TextField, FormControl, Select, MenuItem, Button } from '@mui/material';
+import { useStyles } from '../../styles/makeTheme';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
-import ReasonsListDropDown from '../stock-transfer/transfer-reasons-list-dropdown';
-import { gridColumnsTotalWidthSelector } from '@material-ui/data-grid';
+import DatePickerComponent from '../commons/ui/date-picker';
+import ReasonsListDropDown from './transfer-reasons-list-dropdown';
+import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
-import AlertError from '../../components/commons/ui/alert-error';
-import { StockTransferRequest } from '../../models/stock-transfer-model';
-import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
-import StockTransferList from '../../components/stock-transfer/stock-transfer-list';
-import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
 import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
-import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
+import { StockTransferRequest } from '../../models/stock-transfer-model';
+import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
+import moment from 'moment';
+import { saveSearchStockTransferRt } from '../../store/slices/save-search-stock-transfer-rt-slice';
+import StockTransferRtList from './stock-transfer-rt-list';
+import ModalCreateStockTransfer from './stock-request-detail';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 interface State {
   docNo: string;
@@ -41,14 +32,13 @@ interface loadingModalState {
   open: boolean;
 }
 
-export default function SupplierCheckOrderSearch() {
+export default function StockTransferRt() {
   const { t } = useTranslation(['stockTransfer', 'common']);
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  // const limit: number = 0;
   const page = '1';
-  const items = useAppSelector((state) => state.searchStockTransfer);
-  const limit = useAppSelector((state) => state.searchStockTransfer.orderList.perPage);
+  const items = useAppSelector((state) => state.searchStockTrnasferRt);
+  const limit = useAppSelector((state) => state.searchStockTrnasferRt.orderList.perPage);
   const [values, setValues] = React.useState<State>({
     docNo: '',
     branchFrom: '',
@@ -62,8 +52,6 @@ export default function SupplierCheckOrderSearch() {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
-  const [startDate, setStartDate] = React.useState<Date | null>(new Date());
-  const [endDate, setEndDate] = React.useState<Date | null>(new Date());
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -72,14 +60,6 @@ export default function SupplierCheckOrderSearch() {
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
-  };
-
-  const handleStartDatePicker = (value: any) => {
-    setStartDate(value);
-  };
-
-  const handleEndDatePicker = (value: Date) => {
-    setEndDate(value);
   };
 
   const [branchFromCode, setBranchFromCode] = React.useState('');
@@ -101,6 +81,16 @@ export default function SupplierCheckOrderSearch() {
     } else {
       setValues({ ...values, branchTo: '' });
     }
+  };
+
+  const [startDate, setStartDate] = React.useState<Date | null>(new Date());
+  const [endDate, setEndDate] = React.useState<Date | null>(new Date());
+  const handleStartDatePicker = (value: any) => {
+    setStartDate(value);
+  };
+
+  const handleEndDatePicker = (value: Date) => {
+    setEndDate(value);
   };
 
   const handleChangeReasons = (ReasonsCode: string) => {
@@ -133,7 +123,7 @@ export default function SupplierCheckOrderSearch() {
     } else {
       limits = limit.toString();
     }
-    // console.log(values);
+
     const payload: StockTransferRequest = {
       limit: limits,
       page: page,
@@ -148,8 +138,8 @@ export default function SupplierCheckOrderSearch() {
     };
 
     handleOpenLoading('open', true);
-    await dispatch(featchSearchStockTransferAsync(payload));
-    await dispatch(saveSearchStockTransfer(payload));
+    await dispatch(featchSearchStockTransferRtAsync(payload));
+    await dispatch(saveSearchStockTransferRt(payload));
     setFlagSearch(true);
     handleOpenLoading('open', false);
   };
@@ -182,7 +172,7 @@ export default function SupplierCheckOrderSearch() {
       transferReason: values.transferReason,
       clearSearch: true,
     };
-    dispatch(featchSearchStockTransferAsync(payload));
+    dispatch(featchSearchStockTransferRtAsync(payload));
 
     setTimeout(() => {
       handleOpenLoading('open', false);
@@ -201,13 +191,13 @@ export default function SupplierCheckOrderSearch() {
     }
   }
 
-  let orderListData;
-  const orderListDatas = items.orderList.data ? items.orderList.data : [];
   const [flagSearch, setFlagSearch] = React.useState(false);
+  const orderListDatas = items.orderList.data ? items.orderList.data : [];
+
+  let orderListData;
   if (flagSearch) {
     if (orderListDatas.length > 0) {
-      // orderListData = <DCOrderList />;
-      orderListData = <StockTransferList />;
+      orderListData = <StockTransferRtList />;
     } else {
       orderListData = (
         <Grid item container xs={12} justifyContent="center">
@@ -220,6 +210,18 @@ export default function SupplierCheckOrderSearch() {
         </Grid>
       );
     }
+  }
+
+  const [openCreateModal, setOpenCreateModal] = React.useState(false);
+  const [typeModal, setTypeModal] = React.useState('Create');
+  const handleOpenCreateModal = async () => {
+    await dispatch(updateAddItemsState({}));
+    setTypeModal('Create');
+    setOpenCreateModal(true);
+  };
+
+  function handleCloseCreateModal() {
+    setOpenCreateModal(false);
   }
 
   return (
@@ -238,7 +240,7 @@ export default function SupplierCheckOrderSearch() {
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่เอกสาร BT, RT"
+              placeholder="เลขที่เอกสาร RT"
             />
           </Grid>
           <Grid item xs={4}>
@@ -277,7 +279,6 @@ export default function SupplierCheckOrderSearch() {
             </Typography>
             <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
           </Grid>
-
           <Grid item xs={4} container>
             <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
               สถานะ
@@ -293,21 +294,32 @@ export default function SupplierCheckOrderSearch() {
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                {getStockTransferStatusList('BT').map((item, index: number) => {
+                {getStockTransferStatusList('RT').map((item, index: number) => {
                   return <MenuItem value={item.key}>{t(`status.${item.value}`)}</MenuItem>;
                 })}
               </Select>
             </FormControl>
           </Grid>
 
-          {/* <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+          <Grid item xs={4} sx={{ pt: 30 }}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาเหตุการโอน
             </Typography>
             <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
-          </Grid> */}
+          </Grid>
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+            <Button
+              id="btnCreateStockTransferModal"
+              variant="contained"
+              onClick={handleOpenCreateModal}
+              sx={{ minWidth: '15%' }}
+              className={classes.MbtnClear}
+              startIcon={<AddCircleOutlineOutlinedIcon />}
+              color="secondary"
+            >
+              สร้างรายการโอน
+            </Button>
             <Button
               id="btnClear"
               variant="contained"
@@ -330,24 +342,6 @@ export default function SupplierCheckOrderSearch() {
             </Button>
           </Grid>
         </Grid>
-
-        <Box mt={2}></Box>
-
-        {/* <hr />
-
-        <Box mt={2}>
-          <Button
-            id="btnSearch"
-            variant="contained"
-            color="primary"
-            // onClick={}
-            sx={{ width: '13%', ml: 2 }}
-            className={classes.MbtnSearch}
-            disabled
-          >
-            ส่งงาน
-          </Button>
-        </Box> */}
       </Box>
 
       <Box mt={6}></Box>
@@ -356,6 +350,9 @@ export default function SupplierCheckOrderSearch() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      {openCreateModal && (
+        <ModalCreateStockTransfer type={typeModal} isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />
+      )}
     </>
   );
 }

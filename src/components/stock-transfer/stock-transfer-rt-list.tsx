@@ -12,29 +12,27 @@ import LoadingModal from '../commons/ui/loading-modal';
 import { Chip, Typography } from '@mui/material';
 import { StockTransferInfo, StockTransferRequest, StockTransferResponse } from '../../models/stock-transfer-model';
 import { DeleteForever } from '@mui/icons-material';
-import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
-import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
-import StockPackChecked from './stock-pack';
-import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
-import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
+import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
+import { saveSearchStockTransferRt } from '../../store/slices/save-search-stock-transfer-rt-slice';
+import ModalDetailStockTransfer from './stock-request-detail';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
+import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 
 interface loadingModalState {
   open: boolean;
 }
 
-function StockTransferList() {
+function StockTransferRtList() {
   const { t } = useTranslation(['stockTransfer', 'common']);
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const items = useAppSelector((state) => state.searchStockTransfer);
-  const cuurentPage = useAppSelector((state) => state.searchStockTransfer.orderList.page);
-  const limit = useAppSelector((state) => state.searchStockTransfer.orderList.perPage);
+  const items = useAppSelector((state) => state.searchStockTrnasferRt);
+  const cuurentPage = useAppSelector((state) => state.searchStockTrnasferRt.orderList.page);
+  const limit = useAppSelector((state) => state.searchStockTrnasferRt.orderList.perPage);
   const res: StockTransferResponse = items.orderList;
-  const payload = useAppSelector((state) => state.saveSearchStock.searchStockTransfer);
+  const payload = useAppSelector((state) => state.saveSearchStockRt.searchStockTransferRt);
   // const [opensDCOrderDetail, setOpensDCOrderDetail] = React.useState(false);
-
-  const [idDC, setidDC] = React.useState('');
 
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
@@ -53,24 +51,16 @@ function StockTransferList() {
       ),
     },
     {
-      field: 'btNo',
-      headerName: 'เลขที่เอกสาร BT',
+      field: 'rtNo',
+      headerName: 'เลขที่เอกสารร้องขอ RT',
       minWidth: 180,
       // flex: 1.3,
       headerAlign: 'center',
       sortable: false,
     },
     {
-      field: 'sdNo',
-      headerName: 'เลขที่เอกสารร้องขอ RT',
-      minWidth: 180,
-      // flex: 1.2,
-      headerAlign: 'center',
-      sortable: false,
-    },
-    {
       field: 'startDate',
-      headerName: 'วันที่โอนสินค้า',
+      headerName: 'วันที่ต้องการโอน',
       width: 200,
       // minWidth: 200,
       // flex: 1,
@@ -86,7 +76,7 @@ function StockTransferList() {
       ),
     },
     {
-      field: 'branchFrom',
+      field: 'branchFromName',
       headerName: 'สาขาต้นทาง',
       minWidth: 128,
       width: 200,
@@ -95,7 +85,7 @@ function StockTransferList() {
       sortable: false,
     },
     {
-      field: 'branchTo',
+      field: 'branchToName',
       headerName: 'สาขาปลายทาง',
       // minWidth: 128,
       width: 200,
@@ -103,18 +93,18 @@ function StockTransferList() {
       headerAlign: 'center',
       sortable: false,
     },
-    // {
-    //   field: 'createdBy',
-    //   headerName: 'ผู้สร้างรายการ',
-    //   minWidth: 80,
-    //   flex: 0.75,
-    //   headerAlign: 'center',
-    //   align: 'left',
-    //   sortable: false,
-    // },
+    {
+      field: 'createdBy',
+      headerName: 'ผู้สร้างรายการ',
+      minWidth: 80,
+      flex: 0.75,
+      headerAlign: 'center',
+      align: 'left',
+      sortable: false,
+    },
     {
       field: 'status',
-      headerName: 'สถานะ BT',
+      headerName: 'สถานะ RT',
       minWidth: 80,
       flex: 0.7,
       headerAlign: 'center',
@@ -122,10 +112,10 @@ function StockTransferList() {
       sortable: false,
       renderCell: (params) => {
         if (
-          params.value === 'CREATED' ||
-          params.value === 'READY_TO_TRANSFER' ||
-          params.value === 'WAIT_FOR_PICKUP' ||
-          params.value === 'TRANSFERING'
+          params.value === 'DRAFT' ||
+          params.value === 'WAIT_FOR_APPROVAL_1' ||
+          params.value === 'WAIT_FOR_APPROVAL_2' ||
+          params.value === 'AWAITING_FOR_REQUESTER'
         ) {
           return (
             <Chip
@@ -134,7 +124,7 @@ function StockTransferList() {
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
-        } else if (params.value === 'COMPLETED') {
+        } else if (params.value === 'APPROVED') {
           return (
             <Chip
               label={t(`status.${params.value}`)}
@@ -142,10 +132,17 @@ function StockTransferList() {
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
+        } else if (params.value === 'CANCELED') {
+          return (
+            <Chip
+              label={t(`status.${params.value}`)}
+              size="small"
+              sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
+            />
+          );
         }
       },
     },
-
     // {
     //   field: 'button',
     //   headerName: ' ',
@@ -163,12 +160,11 @@ function StockTransferList() {
     return {
       id: data.id,
       index: (cuurentPage - 1) * parseInt(pageSize) + indexs + 1,
-      btNo: data.btNo,
-      sdNo: data.rtNo,
+      rtNo: data.rtNo,
       startDate: convertUtcToBkkDate(data.startDate),
       endDate: convertUtcToBkkDate(data.endDate),
-      branchFrom: data.branchFromName,
-      branchTo: data.branchToName,
+      branchFromName: data.branchFromName,
+      branchToName: data.branchToName,
       createdBy: data.createdBy,
       status: data.status,
     };
@@ -178,32 +174,10 @@ function StockTransferList() {
     open: false,
   });
 
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
-  };
-
-  // const currentlySelected = async (params: GridCellParams) => {
-  //   handleOpenLoading('open', true);
-  //   setidDC(params.row.id);
-
-  //   try {
-  //     await dispatch(featchorderDetailDCAsync(params.row.id));
-  //     setOpensDCOrderDetail(true);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-
-  //   handleOpenLoading('open', false);
-  // };
-
-  // function isClosModal() {
-  //   setOpensDCOrderDetail(false);
-  // }
-
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
-
+    console.log('newPage: ', newPage);
     let page: string = (newPage + 1).toString();
 
     const payloadNewpage: StockTransferRequest = {
@@ -218,8 +192,8 @@ function StockTransferList() {
       transferReason: payload.transferReason,
     };
 
-    await dispatch(featchSearchStockTransferAsync(payloadNewpage));
-    await dispatch(saveSearchStockTransfer(payloadNewpage));
+    await dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
+    await dispatch(saveSearchStockTransferRt(payloadNewpage));
     setLoading(false);
   };
 
@@ -241,24 +215,33 @@ function StockTransferList() {
       transferReason: payload.transferReason,
     };
 
-    await dispatch(featchSearchStockTransferAsync(payloadNewpage));
-    await dispatch(saveSearchStockTransfer(payloadNewpage));
+    await dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
+    await dispatch(saveSearchStockTransferRt(payloadNewpage));
 
     setLoading(false);
   };
 
-  const [openCreateModal, setOpenCreateModal] = React.useState(false);
-
-  function handleCloseCreateModal() {
-    setOpenCreateModal(false);
-  }
-  const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
-  const currentlySelected = async (params: GridCellParams) => {
-    await dispatch(featchBranchTransferDetailAsync(params.row.btNo));
-
-    if (reasonsList === null || reasonsList.length <= 0) await dispatch(featchTransferReasonsListAsync());
-    setOpenCreateModal(true);
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+  const currentlySelected = async (params: GridCellParams) => {
+    handleOpenLoading('open', true);
+    await handleOpenDetailModal(params.row.rtNo);
+    handleOpenLoading('open', false);
+  };
+
+  const [openDetailModal, setOpenDetailModal] = React.useState(false);
+  const [typeDetailModal, setTypeDetailModal] = React.useState('View');
+  const handleOpenDetailModal = async (rtNo: string) => {
+    await dispatch(updateAddItemsState({}));
+    setTypeDetailModal('View');
+    await dispatch(featchStockRequestDetailAsync(rtNo));
+    setOpenDetailModal(true);
+  };
+
+  function handleCloseDetailModal() {
+    setOpenDetailModal(false);
+  }
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
@@ -270,24 +253,31 @@ function StockTransferList() {
             onCellClick={currentlySelected}
             autoHeight={rows.length >= 10 ? false : true}
             scrollbarSize={10}
-            pagination
             page={cuurentPage - 1}
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
-            rowCount={res.totalPage}
+            rowCount={res.total}
             paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
             rowHeight={65}
+            pagination
           />
         </div>
       </Box>
-      {/* {opensDCOrderDetail && <DCOrderDetail idDC={idDC} isOpen={opensDCOrderDetail} onClickClose={isClosModal} />} */}
-      {openCreateModal && <StockPackChecked isOpen={true} onClickClose={handleCloseCreateModal} />}
+
       <LoadingModal open={openLoadingModal.open} />
+
+      {openDetailModal && (
+        <ModalDetailStockTransfer
+          type={typeDetailModal}
+          isOpen={openDetailModal}
+          onClickClose={handleCloseDetailModal}
+        />
+      )}
     </div>
   );
 }
 
-export default StockTransferList;
+export default StockTransferRtList;

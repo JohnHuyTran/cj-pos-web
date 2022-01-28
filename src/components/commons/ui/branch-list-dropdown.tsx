@@ -12,19 +12,22 @@ interface branchListOptionType {
 }
 
 interface Props {
+  valueBranch?: branchListOptionType | null;
   sourceBranchCode: string | null | undefined | '';
   onChangeBranch: (branchCode: string) => void;
   isClear: boolean;
 }
 
-function BranchListDropDown({ sourceBranchCode, onChangeBranch, isClear }: Props) {
+function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isClear }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [valueBranchList, setValueBranchList] = React.useState<branchListOptionType | null>(null);
   let branchList = useAppSelector((state) => state.searchBranchSlice);
   useEffect(() => {
     if (branchList === null || branchList.branchList.data.length <= 0) dispatch(featchBranchListAsync());
-    setValueBranchList(null);
+
+    if (valueBranch) setValueBranchList(valueBranch);
+    else setValueBranchList(null);
   }, [isClear]);
 
   const defaultPropsBranchList = {
@@ -43,6 +46,7 @@ function BranchListDropDown({ sourceBranchCode, onChangeBranch, isClear }: Props
     <Autocomplete
       {...defaultPropsBranchList}
       className={classes.Mautocomplete}
+      noOptionsText='ไม่พอข้อมูล'
       id='selBranchNo'
       value={valueBranchList}
       onChange={handleChangeBranch}
