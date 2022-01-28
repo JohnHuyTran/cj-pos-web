@@ -33,6 +33,7 @@ import saveSearchStockRt from './slices/save-search-stock-transfer-rt-slice';
 import barcodeDiscountSearchSlice from './slices/barcode-discount-search-slice';
 import barcodeDiscountCriteriaSearchSlice from './slices/barcode-discount-criteria-search-slice';
 import barcodeDiscount from './slices/barcode-discount-slice';
+import barcodeDiscountDetailSlice from './slices/barcode-discount-detail-slice';
 import stockRequestDetail from './slices/stock-request-detail-slice';
 import branchTransferDetailSlice from './slices/stock-transfer-branch-request-slice';
 import searchStockTransferRt from './slices/save-search-stock-transfer-rt-slice';
@@ -73,6 +74,7 @@ const store = configureStore({
     barcodeDiscount: barcodeDiscount,
     barcodeDiscountSearchSlice: barcodeDiscountSearchSlice,
     barcodeDiscountCriteriaSearchSlice: barcodeDiscountCriteriaSearchSlice,
+    barcodeDiscountDetailSlice: barcodeDiscountDetailSlice,
     stockRequestDetail: stockRequestDetail,
     branchTransferDetailSlice: branchTransferDetailSlice,
   },

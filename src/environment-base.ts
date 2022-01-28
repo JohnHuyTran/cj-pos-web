@@ -52,6 +52,9 @@ export const environment = {
       search: {
         url: '/campaign',
       },
+      detail: {
+        url: '/campaign/detail-barcode',
+      },
       save: {
         url: '/campaign',
       },
