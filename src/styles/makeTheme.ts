@@ -274,6 +274,11 @@ const useStyles = makeStyles({
       display: 'block',
     },
   },
+  MTextareaBD: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '10px !important'
+    }
+  },
   MtextFieldNumberNoneArrow: {
     '& .MuiInput-input': {
       '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {

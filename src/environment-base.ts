@@ -189,5 +189,8 @@ export const environment = {
         url: '/stock/stock-request/reject2/{rtNo}',
       },
     },
+    stockBalanceCheck: {
+      url: '/stock/stock-balance-check',
+    },
   },
 };

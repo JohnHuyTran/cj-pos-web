@@ -17,16 +17,10 @@ interface loadingModalState {
   open: boolean;
 }
 
-export default function ModelConfirm({
-  open,
-  onClose,
-  onDeleteAction,
-  barCode,
-}: Props): ReactElement {
-  const [openLoadingModal, setOpenLoadingModal] =
-    React.useState<loadingModalState>({
-      open: false,
-    });
+export default function ModelConfirm({ open, onClose, onDeleteAction, barCode }: Props): ReactElement {
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
+  });
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -46,15 +40,12 @@ export default function ModelConfirm({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
-        sx={{ minWidth: 500 }}
+        PaperProps={{ sx: { minWidth: 450, height: 241 } }}
       >
         <DialogContent sx={{ mt: 3, mr: 5, ml: 5 }}>
-          <DialogContentText
-            id="alert-dialog-description"
-            sx={{ color: '#263238' }}
-          >
+          <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
             <Typography variant="h6" align="center" sx={{ marginBottom: 3 }}>
-              ยืนยันอนุมัติส่วนลดสินค้า
+              ยืนยันยกเลิกขอส่วนลดสินค้า
             </Typography>
             {!!barCode && (
               <Typography variant="body1" align="center">

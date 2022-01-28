@@ -3,10 +3,11 @@ import React, { useState } from 'react';
 // npm i @date-io/moment@1.x moment
 import OverwriteMomentBE from './OverwriteMoment'; // choose your lib
 import { useStyles } from './date-picker-css';
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import { MuiPickersUtilsProvider, KeyboardDatePicker, DatePicker } from '@material-ui/pickers';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
+import moment from 'moment';
 
 interface StateProps {
   onClickDate: any;
@@ -15,6 +16,7 @@ interface StateProps {
   minDateTo?: any | Date | number | string;
   placeHolder?: string | 'กรุณาเลือกวันที่';
   error?: boolean;
+  disabled?: boolean;
 }
 
 const defaultMaterialTheme = createTheme({
@@ -31,6 +33,7 @@ const defaultMaterialTheme = createTheme({
 const DatePickerComponent: React.FC<StateProps> = (props) => {
   const classes = useStyles();
   const today = new Date();
+  const minDay = moment(today).add(1, 'd');
   const handleDateChange = (date: any) => {
     props.onClickDate(date);
   };
@@ -38,7 +41,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
   let datePicker;
   if (props.type === 'TO') {
     datePicker = (
-      <KeyboardDatePicker
+      <DatePicker
         disableToolbar
         clearable
         autoOk
@@ -46,17 +49,18 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         variant="inline"
         inputVariant="outlined"
         format="DD/MM/YYYY"
-        className={props.error ? classes.MdatepickerError : classes.Mdatepicker}
+        className={props.error ? classes.MdatepickerError : classes.MdatepickerV2}
         value={props.value}
         onChange={handleDateChange}
-        InputProps={{
-          endAdornment: (
-            <IconButton size="small" onClick={() => handleDateChange(null)}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          ),
-          readOnly: true,
-        }}
+        disabled={props.disabled}
+        // InputProps={{
+        //   endAdornment: (
+        //     <IconButton size="small" onClick={() => handleDateChange(null)}>
+        //       <CloseIcon fontSize="small" />
+        //     </IconButton>
+        //   ),
+        //   readOnly: true,
+        // }}
         InputAdornmentProps={{
           position: 'start',
         }}
@@ -67,7 +71,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
     );
   } else {
     datePicker = (
-      <KeyboardDatePicker
+      <DatePicker
         disableToolbar
         clearable
         autoOk
@@ -75,23 +79,24 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         variant="inline"
         inputVariant="outlined"
         format="DD/MM/YYYY"
-        className={props.error ? classes.MdatepickerError : classes.Mdatepicker}
+        className={props.error ? classes.MdatepickerError : classes.MdatepickerV2}
         value={props.value}
         onChange={handleDateChange}
-        InputProps={{
-          endAdornment: (
-            <IconButton size="small" onClick={() => handleDateChange(null)}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          ),
-          readOnly: true,
-        }}
+        // InputProps={{
+        //   endAdornment: (
+        //     <IconButton size="small" onClick={() => handleDateChange(null)}>
+        //       <CloseIcon fontSize="small" />
+        //     </IconButton>
+        //   ),
+        //   readOnly: true,
+        // }}
         InputAdornmentProps={{
           position: 'start',
         }}
         // maxDate={today}
-        minDate={today}
+        minDate={minDay}
         placeholder={props.placeHolder}
+        disabled={props.disabled}
       />
     );
   }
