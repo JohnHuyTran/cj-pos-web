@@ -422,8 +422,16 @@ export default function ModalCreateBarcodeDiscount({
                       handleChangeRadio(event);
                     }}
                   >
-                    <FormControlLabel value="percent" control={<Radio />} label="ยอดลดเป็นเปอร์เซ็น (%)" />
-                    <FormControlLabel value="amount" control={<Radio />} label="ยอดลดเป็นจำนวนเงิน (บาท)" />
+                    <FormControlLabel
+                      value="percent"
+                      control={<Radio disabled={status > 1} />}
+                      label="ยอดลดเป็นเปอร์เซ็น (%)"
+                    />
+                    <FormControlLabel
+                      value="amount"
+                      control={<Radio disabled={status > 1} />}
+                      label="ยอดลดเป็นจำนวนเงิน (บาท)"
+                    />
                   </RadioGroup>
                 </FormControl>
               </Grid>
