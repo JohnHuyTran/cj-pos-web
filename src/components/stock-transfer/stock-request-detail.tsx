@@ -151,12 +151,12 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       const auditLog = stockRequestDetail.auditLogs ? stockRequestDetail.auditLogs : [];
       if (stockRequestDetail.status === 'WAIT_FOR_APPROVAL_2') {
         const OC = `${auditLog[auditLog.length - 1].comment ? auditLog[auditLog.length - 1].comment : ''}`;
-        if (JSON.parse(`${OC}`).by === 'OC') setCommentOC(JSON.parse(`${OC}`).detail);
+        if (OC !== '') setCommentOC(JSON.parse(`${OC}`).detail);
       } else if (stockRequestDetail.status === 'APPROVED') {
         const SCM = `${auditLog[auditLog.length - 1].comment ? auditLog[auditLog.length - 1].comment : ''}`;
-        if (JSON.parse(`${SCM}`).by === 'SCM') setCommentSCM(JSON.parse(`${SCM}`).detail);
+        if (SCM !== '') setCommentSCM(JSON.parse(`${SCM}`).detail);
         const OC = `${auditLog[auditLog.length - 2].comment ? auditLog[auditLog.length - 2].comment : ''}`;
-        if (JSON.parse(`${OC}`).by === 'OC') setCommentOC(JSON.parse(`${OC}`).detail);
+        if (OC !== '') setCommentOC(JSON.parse(`${OC}`).detail);
       }
     }
   }, [open]);
@@ -362,18 +362,10 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   const handleApprove = async () => {
     setOpenLoadingModal(true);
     if (status === 'WAIT_FOR_APPROVAL_1') {
-      if (commentOC === '') {
-        setOpenAlert(true);
-        setTextError('กรุณากรอกหมายเหตุจาก OC');
-      } else {
-        setTextHeaderConfirm('ยืนยันส่งรายการโอนสินค้าให้ SCM');
-        setOpenModelConfirm(true);
-      }
+      setTextHeaderConfirm('ยืนยันส่งรายการโอนสินค้าให้ SCM');
+      setOpenModelConfirm(true);
     } else if (status === 'WAIT_FOR_APPROVAL_2') {
-      if (commentSCM === '') {
-        setOpenAlert(true);
-        setTextError('กรุณากรอกหมายเหตุจาก SCM');
-      } else if (toBranch === '') {
+      if (toBranch === '') {
         setOpenAlert(true);
         setTextError('กรุณาเลือกสาขาโอนสินค้าปลายทาง');
       } else {
@@ -570,7 +562,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         <DialogContent>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              เลขที่เอกสาร BT :
+              เลขที่เอกสาร RT :
             </Grid>
             <Grid item xs={4}>
               {rtNo !== '' && rtNo}
