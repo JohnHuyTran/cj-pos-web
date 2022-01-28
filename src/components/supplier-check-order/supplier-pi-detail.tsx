@@ -172,32 +172,21 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <div>
-        {params.value}
-        {/* {params.getValue(params.id, 'isRefPO') && <label>{params.value}</label>}
-        {!params.getValue(params.id, 'isRefPO') && (
-          <div>
-            <label style={{ position: 'relative', right: '-1.5em' }}>{params.value}</label>
-            <DeleteForever
-              fontSize="small"
-              sx={{ color: '#F54949', position: 'relative', right: '-2em', top: '5px' }}
-            />
-          </div>
-        )} */}
-      </div>
-    ),
+    renderCell: (params: GridRenderCellParams) => params.value,
   },
   {
     field: 'delete',
     headerName: ' ',
-    width: 50,
+    width: 30,
     minWidth: 0,
     align: 'center',
     sortable: false,
-    renderCell: () => {
-      return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
-    },
+    renderCell: (params: GridRenderCellParams) => (
+      <div>
+        {params.getValue(params.id, 'isRefPO') && <div></div>}
+        {!params.getValue(params.id, 'isRefPO') && <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />}
+      </div>
+    ),
   },
 ];
 

@@ -164,6 +164,7 @@ function useApiRef() {
       columns.concat({
         field: '',
         width: 0,
+        minWidth: 0,
         sortable: false,
         renderCell: (params) => {
           apiRef.current = params.api;
