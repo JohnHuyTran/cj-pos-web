@@ -45,7 +45,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'barcodeName',
+    field: 'productName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
     minWidth: 300,
