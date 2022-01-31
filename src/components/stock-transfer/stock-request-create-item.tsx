@@ -262,7 +262,7 @@ function StockTransferItem({ type, onChangeItems }: DataGridProps) {
         rowHeight={65}
         onCellClick={currentlySelected}
         onCellFocusOut={handleEditItems}
-        // onCellBlur={handleEditItems}
+        onCellOut={handleEditItems}
       />
 
       <ModelDeleteConfirm

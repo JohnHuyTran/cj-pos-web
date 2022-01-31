@@ -42,7 +42,7 @@ function StockTransferList() {
     {
       field: 'index',
       headerName: 'ลำดับ',
-      width: 70,
+      width: 65,
       // flex: 0.7,
       headerAlign: 'center',
       sortable: false,
@@ -55,7 +55,7 @@ function StockTransferList() {
     {
       field: 'btNo',
       headerName: 'เลขที่เอกสาร BT',
-      minWidth: 180,
+      minWidth: 158,
       // flex: 1.3,
       headerAlign: 'center',
       sortable: false,
@@ -63,7 +63,7 @@ function StockTransferList() {
     {
       field: 'sdNo',
       headerName: 'เลขที่เอกสารร้องขอ RT',
-      minWidth: 180,
+      minWidth: 168,
       // flex: 1.2,
       headerAlign: 'center',
       sortable: false,
@@ -71,7 +71,7 @@ function StockTransferList() {
     {
       field: 'startDate',
       headerName: 'วันที่โอนสินค้า',
-      width: 200,
+      width: 180,
       // minWidth: 200,
       // flex: 1,
       headerAlign: 'center',
