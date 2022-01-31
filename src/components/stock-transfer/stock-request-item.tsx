@@ -76,8 +76,6 @@ const columns: GridColDef[] = [
     align: 'right',
     disableColumnMenu: true,
     sortable: false,
-    // renderCell: (params: GridRenderCellParams) => <label>{params.value}</label>,
-
     renderCell: (params) => numberWithCommas(params.value),
   },
   {
@@ -97,25 +95,25 @@ var calBaseUnit = function (params: GridValueGetterParams) {
   return numberWithCommas(cal);
 };
 
-function useApiRef() {
-  const apiRef = useGridApiRef();
-  const _columns = useMemo(
-    () =>
-      columns.concat({
-        field: '',
-        width: 0,
-        minWidth: 0,
-        sortable: false,
-        renderCell: (params) => {
-          apiRef.current = params.api;
-          return null;
-        },
-      }),
-    [columns]
-  );
+// function useApiRef() {
+//   const apiRef = useGridApiRef();
+//   const _columns = useMemo(
+//     () =>
+//       columns.concat({
+//         field: '',
+//         width: 0,
+//         minWidth: 0,
+//         sortable: false,
+//         renderCell: (params) => {
+//           apiRef.current = params.api;
+//           return null;
+//         },
+//       }),
+//     [columns]
+//   );
 
-  return { apiRef, columns: _columns };
-}
+//   return { apiRef, columns: _columns };
+// }
 
 function StockTransferItem({ onChangeItems }: DataGridProps) {
   const classes = useStyles();
@@ -142,19 +140,19 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
   }
   const [pageSize, setPageSize] = React.useState<number>(10);
 
-  const { apiRef, columns } = useApiRef();
-  const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'orderQty') {
-      const itemsList: any = [];
-      if (rows.length > 0) {
-        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-        await rows.forEach((data: GridRowData) => {
-          itemsList.push(data);
-        });
-      }
-      return onChangeItems(itemsList ? itemsList : []);
-    }
-  };
+  // const { apiRef, columns } = useApiRef();
+  // const handleEditItems = async (params: GridEditCellValueParams) => {
+  //   if (params.field === 'orderQty') {
+  //     const itemsList: any = [];
+  //     if (rows.length > 0) {
+  //       const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+  //       await rows.forEach((data: GridRowData) => {
+  //         itemsList.push(data);
+  //       });
+  //     }
+  //     return onChangeItems(itemsList ? itemsList : []);
+  //   }
+  // };
 
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
   const [deleteItems, setDeleteItems] = React.useState(false);
@@ -193,7 +191,7 @@ function StockTransferItem({ onChangeItems }: DataGridProps) {
         scrollbarSize={10}
         rowHeight={65}
         onCellClick={currentlySelected}
-        onCellFocusOut={handleEditItems}
+        // onCellFocusOut={handleEditItems}
         // onCellBlur={handleEditItems}
         // onCellValueChange={handleEditItems}
       />
