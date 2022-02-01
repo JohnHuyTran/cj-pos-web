@@ -11,6 +11,7 @@ import { useReactToPrint } from 'react-to-print';
 import AlertError from './alert-error';
 import { HighlightOff } from '@mui/icons-material';
 import store from '../../../store/store';
+import { getAccessToken } from '../../../store/sessionStore';
 
 interface ModalShowPDFProp {
   open: boolean;
@@ -83,7 +84,7 @@ export default function ModalShowPDF({
   const [initialWidth, setInitialWidth] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
   const pdfWrapper = React.useRef<HTMLDivElement>(null);
-  let token = store.getState().auth.token;
+  let token = getAccessToken();
   token = token ? `Bearer ${token}` : '';
 
   const setPdfSize = () => {
