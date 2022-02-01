@@ -2,8 +2,7 @@ import { env } from './environmentConfigs';
 import axios, { AxiosResponse } from 'axios';
 
 import { loginForm, Response } from '../models/user-interface';
-import store, { useAppDispatch } from '../store/store';
-import { logout } from '../store/slices/authSlice';
+import { setAccessToken, setRefreshToken, setSessionId, getAccessToken, getRefreshToken } from '../store/sessionStore';
 
 const instance = axios.create({
   baseURL: env.keycloak.url,
@@ -25,6 +24,9 @@ export function authentication(payload: loginForm): Promise<Response> {
     .post(env.keycloak.url, params)
     .then((response: AxiosResponse) => {
       if (response.status == 200) {
+        setAccessToken(response.data.access_token);
+        setRefreshToken(response.data.refresh_token);
+        setSessionId(response.data.session_state);
         return response.data;
       }
       throw new Error(response.status.toString());
@@ -36,27 +38,26 @@ export function authentication(payload: loginForm): Promise<Response> {
 }
 
 export function refreshToken(): Promise<Response> {
-  const dispatch = useAppDispatch();
-  const refresh_Token: any = store.getState().auth.refreshToken;
-  const params = new URLSearchParams();
-  params.append('grant_type', 'refresh_token');
-  params.append('refresh_token', refresh_Token);
-  params.append('client_id', env.keycloak.clientId);
-
-  return instance
-    .post(env.keycloak.path.url, params)
-    .then((response: any) => {
-      if (response.status === 200) {
-        dispatch(refreshTokenState(response.data));
-        return response.data;
-      }
-      throw new Error(response.status.toString());
-    })
-    .catch((error: any) => {
-      dispatch(logout());
-      throw new Error('refresh token failed');
-    });
-}
-function refreshTokenState(data: any): any {
-  throw new Error('Function not implemented.');
+  try {
+    const refreshToken = getRefreshToken();
+    const params = new URLSearchParams();
+    params.append('grant_type', 'refresh_token');
+    params.append('refresh_token', refreshToken ? refreshToken : '');
+    params.append('client_id', env.keycloak.clientId);
+    return instance
+      .post(env.keycloak.url, params)
+      .then((response: any) => {
+        if (response.status === 200) {
+          setRefreshToken(response.data.refresh_token);
+          setAccessToken(response.data.access_token);
+          return response.data;
+        }
+        throw new Error(response.status.toString());
+      })
+      .catch((error: any) => {
+        throw new Error('refresh token failed');
+      });
+  } catch (error) {
+    throw new Error('refresh token failed');
+  }
 }

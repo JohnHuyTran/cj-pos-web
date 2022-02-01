@@ -16,6 +16,7 @@ import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
+import ControlPoint from '@mui/icons-material/ControlPoint';
 import { useStyles } from '../../styles/makeTheme';
 import { getBranchName, getReasonLabel, isOwnBranch, numberWithCommas } from '../../utils/utils';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -33,6 +34,7 @@ import Steppers from './steppers';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
+import ModalAddItems from '../commons/ui/modal-add-items';
 
 interface Props {
   isOpen: boolean;
@@ -474,6 +476,13 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     storeItem();
   };
 
+  const handleOpenAddItems = () => {};
+
+  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const handleModelAddItems = async () => {
+    setOpenModelAddItems(false);
+  };
+
   return (
     <React.Fragment>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -562,7 +571,18 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
               justifyContent='space-between'
               direction='row'
               alignItems='flex-end'>
-              <Grid item xl={2}></Grid>
+              <Grid item xl={5}>
+                <Button
+                  id='btnAddItem'
+                  variant='contained'
+                  color='info'
+                  className={classes.MbtnPrint}
+                  onClick={handleOpenAddItems}
+                  startIcon={<ControlPoint />}
+                  sx={{ width: 200 }}>
+                  เพิ่มสินค้า
+                </Button>
+              </Grid>
               <Grid item>
                 <Button
                   id='btnSave'
@@ -675,6 +695,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         value={btNo}
       />
 
+      <ModalAddItems open={openModelAddItems} onClose={handleModelAddItems}></ModalAddItems>
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
