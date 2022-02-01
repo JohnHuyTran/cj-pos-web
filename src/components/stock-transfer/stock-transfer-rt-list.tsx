@@ -61,11 +61,11 @@ function StockTransferRtList() {
     {
       field: 'startDate',
       headerName: 'วันที่ต้องการโอน',
-      width: 200,
+      width: 160,
       // minWidth: 200,
       // flex: 1,
       headerAlign: 'center',
-      align: 'center',
+      align: 'left',
       sortable: false,
       renderCell: (params) => (
         <div>
@@ -96,8 +96,8 @@ function StockTransferRtList() {
     {
       field: 'createdBy',
       headerName: 'ผู้สร้างรายการ',
-      minWidth: 80,
-      flex: 0.75,
+      minWidth: 120,
+      // flex: 0.75,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
@@ -106,7 +106,7 @@ function StockTransferRtList() {
       field: 'status',
       headerName: 'สถานะ RT',
       minWidth: 80,
-      flex: 0.7,
+      // flex: 0.7,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
