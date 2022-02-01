@@ -31,9 +31,11 @@ const instance = (contentType: string) => {
     function (response) {
       // Any status code that lie within the range of 2xx cause this function to trigger
       // Do something with response data
+      console.log(response);
       return response;
     },
     async function (error) {
+      console.log(error);
       const originalRequest = error.config;
       if (error.response && error.response.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
