@@ -68,16 +68,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
-          <HighlightOff fontSize="large" />
+          }}>
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -548,15 +547,15 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
 
   return (
     <div>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+      <Dialog open={open} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>
             {type === 'Create' && 'สร้างรายการโอนสินค้า'}
             {type !== 'Create' && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && 'รายการโอนสินค้า'}
             {type !== 'Create' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && 'ตรวจสอบรายการโอนสินค้า'}
           </Typography>
-          {status !== '' && <Steppers status={status} type="RT"></Steppers>}
-          {status === '' && <Steppers status="DRAFT" type="RT"></Steppers>}
+          {status !== '' && <Steppers status={status} type='RT'></Steppers>}
+          {status === '' && <Steppers status='DRAFT' type='RT'></Steppers>}
         </BootstrapDialogTitle>
 
         <DialogContent>
@@ -670,40 +669,37 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
             <Grid container spacing={2} mt={4} mb={2}>
               <Grid item xs={5}>
                 <Button
-                  id="btnAddItem"
-                  variant="contained"
-                  color="info"
+                  id='btnAddItem'
+                  variant='contained'
+                  color='info'
                   className={classes.MbtnPrint}
                   onClick={handleOpenAddItems}
                   startIcon={<ControlPoint />}
-                  sx={{ width: 200 }}
-                >
+                  sx={{ width: 200 }}>
                   เพิ่มสินค้า
                 </Button>
               </Grid>
               <Grid item xs={7} sx={{ textAlign: 'end' }}>
                 <Button
-                  id="btnSave"
-                  variant="contained"
-                  color="warning"
+                  id='btnSave'
+                  variant='contained'
+                  color='warning'
                   className={classes.MbtnSave}
                   onClick={handleSave}
                   startIcon={<SaveIcon />}
                   sx={{ width: 140 }}
-                  disabled={rowLength == 0}
-                >
+                  disabled={rowLength == 0}>
                   บันทึก
                 </Button>
                 <Button
-                  id="btnCreateTransfer"
-                  variant="contained"
-                  color="primary"
+                  id='btnCreateTransfer'
+                  variant='contained'
+                  color='primary'
                   className={classes.MbtnSave}
                   onClick={handleSubmit}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 140 }}
-                  disabled={rowLength == 0}
-                >
+                  disabled={rowLength == 0}>
                   ส่งงาน
                 </Button>
               </Grid>
@@ -715,25 +711,23 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
               <Grid item xs={5}></Grid>
               <Grid item xs={7} sx={{ textAlign: 'end' }}>
                 <Button
-                  id="btnSave"
-                  variant="contained"
-                  color="error"
+                  id='btnSave'
+                  variant='contained'
+                  color='error'
                   className={classes.MbtnSave}
                   onClick={handleReject}
                   startIcon={<SaveIcon />}
-                  sx={{ width: 140 }}
-                >
+                  sx={{ width: 140 }}>
                   ปฎิเสธ
                 </Button>
                 <Button
-                  id="btnCreateTransfer"
-                  variant="contained"
-                  color="primary"
+                  id='btnCreateTransfer'
+                  variant='contained'
+                  color='primary'
                   className={classes.MbtnSave}
                   onClick={handleApprove}
                   startIcon={<CheckCircleOutline />}
-                  sx={{ width: 140 }}
-                >
+                  sx={{ width: 140 }}>
                   อนุมัติ
                 </Button>
               </Grid>
@@ -752,7 +746,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
             <Grid container spacing={2} mb={2}>
               <Grid item xs={3}>
                 <TextBoxComment
-                  fieldName="หมายเหตุจาก OC :"
+                  fieldName='หมายเหตุจาก OC :'
                   defaultValue={commentOC}
                   maxLength={100}
                   onChangeComment={handleChangeCommentOC}
@@ -762,7 +756,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
               <Grid item xs={6}></Grid>
               <Grid item xs={3}>
                 <TextBoxComment
-                  fieldName="หมายเหตุจาก SCM :"
+                  fieldName='หมายเหตุจาก SCM :'
                   defaultValue={commentSCM}
                   maxLength={100}
                   onChangeComment={handleChangeCommentSCM}
@@ -774,7 +768,12 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         </DialogContent>
       </Dialog>
 
-      <ModalAddItems open={openModelAddItems} onClose={handleModelAddItems}></ModalAddItems>
+      <ModalAddItems
+        open={openModelAddItems}
+        onClose={handleModelAddItems}
+        requestBody={{
+          skuCodes: [],
+        }}></ModalAddItems>
 
       <SnackbarStatus
         open={showSnackBar}
@@ -788,7 +787,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         onClose={handleCloseModelConfirm}
         handleConfirm={handleConfirm}
         header={textHeaderConfirm}
-        title="เลขที่เอกสาร RT"
+        title='เลขที่เอกสาร RT'
         value={rtNo}
       />
 

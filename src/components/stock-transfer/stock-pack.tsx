@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   DataGrid,
   GridCellParams,
@@ -35,6 +35,8 @@ import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
 import ModalAddItems from '../commons/ui/modal-add-items';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { FindProductRequest } from '../../models/product-model';
 
 interface Props {
   isOpen: boolean;
@@ -203,6 +205,7 @@ const chkReturnQty = (value: any) => {
 };
 function StockPackChecked({ isOpen, onClickClose }: Props) {
   const classes = useStyles();
+  const _ = require('lodash');
   const { apiRef, columns } = useApiRef();
   const dispatch = useAppDispatch();
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
@@ -248,6 +251,8 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setComment(value);
   };
 
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
+
   React.useEffect(() => {
     const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
     setSourceBranch(fromBranch ? fromBranch : '');
@@ -265,13 +270,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const isBranch = isOwnBranch('D0001');
     setIsDraft(isBranch && branchTransferInfo.status === 'CREATED' ? true : false);
   }, [open]);
-  const handleStartDatePicker = (value: any) => {
-    setStartDate(value);
-  };
-
-  const handleEndDatePicker = (value: Date) => {
-    setEndDate(value);
-  };
 
   if (endDate != null && startDate != null) {
     if (endDate < startDate) {
@@ -349,6 +347,18 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       return true;
     }
   };
+  const [bodyRequest, setBodyRequest] = useState<FindProductRequest>();
+  const getSkuList = () => {
+    const list = _.uniqBy(branchTransferItems, 'skuCode');
+    const skucodeList: string[] = [];
+    list.map((i: any) => {
+      skucodeList.push(i.skuCode);
+    });
+    const payload: FindProductRequest = {
+      skuCodes: skucodeList,
+    };
+    setBodyRequest(payload);
+  };
 
   const storeItem = () => {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -368,6 +378,46 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         isDraft: isDraft,
       };
       items.push(newData);
+    });
+    setBranchTransferItems(items);
+  };
+
+  const storeItemAddItem = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const items: Item[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const chkItems = payloadAddItem.find((_item: any) => _item.barcode === data.barcode);
+      if (chkItems) {
+        const newData: Item = {
+          seqItem: data.seqItem,
+          barcode: data.barcode,
+          productName: data.barcodeName,
+          skuCode: data.skuCode,
+          baseUnit: data.baseUnit,
+          unitName: data.unitName,
+          remainStock: data.remainStock,
+          qty: data.qty,
+          actualQty: Number(data.qty ? data.qty : 0) + chkItems.qty,
+          toteCode: data.toteCode,
+          isDraft: isDraft,
+        };
+        items.push(newData);
+      } else {
+        const newData: Item = {
+          seqItem: 0,
+          barcode: data.barcode,
+          productName: data.barcodeName,
+          skuCode: data.skuCode,
+          baseUnit: data.baseUnit,
+          unitName: data.unitName,
+          remainStock: 0,
+          qty: 0,
+          actualQty: Number(data.qty ? data.qty : 0),
+          toteCode: '',
+          isDraft: isDraft,
+        };
+        items.push(newData);
+      }
     });
     setBranchTransferItems(items);
   };
@@ -479,12 +529,15 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     storeItem();
   };
 
-  const handleOpenAddItems = () => {
+  const handleOpenAddItems = async () => {
+    await getSkuList();
     setOpenModelAddItems(true);
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
   const handleModelAddItems = async () => {
+    await storeItemAddItem();
+    await dispatch(updateAddItemsState({}));
     setOpenModelAddItems(false);
   };
 
@@ -647,31 +700,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                   onChangeComment={handleChangeComment}
                   isDisable={!isDraft}
                 />
-                {/* <Typography variant='body2'>หมายเหตุ:</Typography>
-                <TextField
-                  multiline
-                  fullWidth
-                  rows={5}
-                  onChange={handleChangeComment}
-                  defaultValue={comment}
-                  placeholder='ความยาวไม่เกิน 255 ตัวอักษร'
-                  className={classes.MtextFieldRemark}
-                  inputProps={{ maxLength: maxCommentLength }}
-                  sx={{ maxWidth: 350 }}
-                  disabled={btStatus !== '0'}
-                />
-
-                <div
-                  style={{
-                    fontSize: '11px',
-                    color: '#AEAEAE',
-                    width: '100%',
-                    maxWidth: 350,
-                    textAlign: 'right',
-                    // marginTop: "-1.5em",
-                  }}>
-                  {characterCount}/{maxCommentLength}
-                </div> */}
               </Grid>
             </Grid>
           </Box>
@@ -700,7 +728,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         value={btNo}
       />
 
-      <ModalAddItems open={openModelAddItems} onClose={handleModelAddItems}></ModalAddItems>
+      <ModalAddItems
+        open={openModelAddItems}
+        onClose={handleModelAddItems}
+        requestBody={bodyRequest ? bodyRequest : { skuCodes: [] }}></ModalAddItems>
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
@@ -708,3 +739,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 }
 
 export default StockPackChecked;
+function skuCodes<T>(skuCodes: any, arg1: never[]): [any, any] {
+  throw new Error('Function not implemented.');
+}
