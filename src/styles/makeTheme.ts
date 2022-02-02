@@ -213,6 +213,7 @@ const useStyles = makeStyles({
     '& .css-2vifws-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
       // opacity: 0,
       color: '#263238 !important',
+      'background-color': '#f1f1f1 !important',
       '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
     },
   },
@@ -255,10 +256,10 @@ const useStyles = makeStyles({
     textOverflow: 'ellipsis',
   },
   MFormControlLabel: {
-    "& .MuiFormControlLabel-label": {
-      fontSize: "small",
-      margin: "10px 0px -10px 0px"
-    }
+    '& .MuiFormControlLabel-label': {
+      fontSize: 'small',
+      margin: '10px 0px -10px 0px',
+    },
   },
   MLabelTooltipWrapper: {
     position: 'relative',
@@ -276,8 +277,8 @@ const useStyles = makeStyles({
   },
   MTextareaBD: {
     '& .MuiOutlinedInput-root': {
-      borderRadius: '10px !important'
-    }
+      borderRadius: '10px !important',
+    },
   },
   MtextFieldNumberNoneArrow: {
     '& .MuiInput-input': {
