@@ -39,6 +39,7 @@ import TextBoxComment from '../commons/ui/textbox-comment';
 import { getBranchName, getReasonLabel } from '../../utils/utils';
 import ModalConfirmTransaction from './modal-confirm-transaction';
 import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
+import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 
 interface State {
   branchCode: string;
@@ -175,10 +176,28 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     setShowSnackBar(false);
   };
 
+  const [flagSave, setFlagSave] = React.useState(false);
+  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const handleChkSaveClose = async () => {
+    if (flagSave) {
+      setConfirmModelExit(true);
+    } else {
+      handleClose();
+    }
+  };
+
   const handleClose = async () => {
     await dispatch(updateAddItemsState({}));
     setOpen(false);
     onClickClose();
+  };
+
+  function handleNotExitModelConfirm() {
+    setConfirmModelExit(false);
+  }
+
+  const handleExitModelConfirm = async () => {
+    handleClose();
   };
 
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
@@ -203,6 +222,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   const [toBranch, setToBranch] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const handleChangeFromBranch = (branchCode: string) => {
+    setFlagSave(true);
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
       setValues({ ...values, branchCode: JSON.parse(codes) });
@@ -213,6 +233,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     }
   };
   const handleChangeToBranch = (branchCode: string) => {
+    setFlagSave(true);
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
       setValues({ ...values, branchCode: JSON.parse(codes) });
@@ -226,6 +247,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   const [reasons, setReasons] = React.useState('');
   const [reasonText, setReasonText] = React.useState('');
   const handleChangeReasons = (ReasonsCode: string) => {
+    setFlagSave(true);
     setReasons(ReasonsCode);
   };
 
@@ -238,6 +260,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   };
 
   const handleChangeItems = async (items: any) => {
+    setFlagSave(true);
     await dispatch(updateAddItemsState(items));
   };
 
@@ -247,9 +270,11 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   const [isDisableSCM, setIsDisableSCM] = React.useState(true);
 
   const handleChangeCommentOC = (value: any) => {
+    setFlagSave(true);
     setCommentOC(value);
   };
   const handleChangeCommentSCM = (value: any) => {
+    setFlagSave(true);
     setCommentSCM(value);
   };
 
@@ -275,6 +300,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       const payloadSave: any = await handleMapPayloadSave();
       await saveStockRequest(payloadSave)
         .then((value) => {
+          setFlagSave(false);
           setRTNo(value.docNo);
           setStatus('DRAFT');
           setShowSnackBar(true);
@@ -340,6 +366,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         const payloadSave: any = await handleMapPayloadSave();
         await saveStockRequest(payloadSave)
           .then((value) => {
+            setFlagSave(false);
             setRTNo(value.docNo);
             setStatus('DRAFT');
 
@@ -441,6 +468,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
 
         await submitStockRequest(rtNo, payloadSubmit)
           .then((value) => {
+            setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
             setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
@@ -468,6 +496,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         setFlagReject(false);
         await reject1StockRequest(rtNo, payload1)
           .then((value) => {
+            setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
             setContentMsg('คุณได้ปฎิเสธข้อมูลเรียบร้อยแล้ว');
@@ -484,6 +513,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       } else {
         await approve1StockRequest(rtNo, payload1)
           .then((value) => {
+            setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
             setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
@@ -511,6 +541,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         setFlagReject(false);
         await reject2StockRequest(rtNo, payload2)
           .then((value) => {
+            setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
             setContentMsg('คุณได้ปฎิเสธข้อมูลเรียบร้อยแล้ว');
@@ -527,6 +558,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       } else {
         await approve2StockRequest(rtNo, payload2)
           .then((value) => {
+            setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
             setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
@@ -549,7 +581,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleChkSaveClose}>
           <Typography sx={{ fontSize: '1em' }}>
             {type === 'Create' && 'สร้างรายการโอนสินค้า'}
             {type !== 'Create' && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && 'รายการโอนสินค้า'}
@@ -794,6 +826,50 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
 
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+      <ConfirmModelExit
+        open={confirmModelExit}
+        onClose={handleNotExitModelConfirm}
+        onConfirm={handleExitModelConfirm}
+      />
+
+      {/* <Dialog
+        open={confirmModelExit}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="md"
+      >
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }} width={350}>
+            <Typography variant="body1" align="center">
+              ข้อมูลที่แก้ไขยังไม่ได้รับการบันทึก <br /> ต้องการออกจากหน้าจอนี้หรือไม่
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
+          <Button
+            id="btnCancel"
+            variant="contained"
+            size="small"
+            color="cancelColor"
+            sx={{ borderRadius: 2, width: 80, mr: 2 }}
+            onClick={handleNotExitModelConfirm}
+          >
+            ยกเลิก
+          </Button>
+          <Button
+            id="btnConfirm"
+            variant="contained"
+            size="small"
+            color="primary"
+            sx={{ borderRadius: 2, width: 80 }}
+            onClick={handleExitModelConfirm}
+          >
+            ยืนยัน
+          </Button>
+        </DialogActions>
+      </Dialog> */}
     </div>
   );
 }

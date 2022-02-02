@@ -71,7 +71,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'orderQty',
+    field: 'qty',
     headerName: 'จำนวนที่สั่ง',
     minWidth: 150,
     headerAlign: 'center',
@@ -85,11 +85,11 @@ const columns: GridColDef[] = [
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
-          let orderQty = Number(params.getValue(params.id, 'orderQty'));
+          let qty = Number(params.getValue(params.id, 'qty'));
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
-          if (orderQty === 0) value = chkQty(value);
+          if (qty === 0) value = chkQty(value);
           if (value < 0) value = 0;
-          params.api.updateRows([{ ...params.row, orderQty: value }]);
+          params.api.updateRows([{ ...params.row, qty: value }]);
         }}
         // disabled={isDisable(params) ? true : false}
         autoComplete="off"
@@ -126,7 +126,7 @@ var chkQty = (value: any) => {
 };
 
 var calBaseUnit = function (params: GridValueGetterParams) {
-  let cal = Number(params.getValue(params.id, 'orderQty')) * Number(params.getValue(params.id, 'baseUnit'));
+  let cal = Number(params.getValue(params.id, 'qty')) * Number(params.getValue(params.id, 'baseUnit'));
   return numberWithCommas(cal);
 };
 
@@ -158,8 +158,22 @@ function StockTransferItem({ type, onChangeItems }: DataGridProps) {
 
   let rows: any = [];
   const updateItemsState = async (items: any) => {
-    await dispatch(updateAddItemsState(items));
+    const itemsList: any = [];
+    await items.forEach((item: any) => {
+      const data: any = {
+        skuCode: item.skuCode,
+        barcode: item.barcode,
+        productName: item.productName ? item.productName : item.barcodeName,
+        unitCode: item.unitCode,
+        unitName: item.unitName,
+        baseUnit: item.baseUnit ? item.baseUnit : 0,
+        qty: item.orderQty ? item.orderQty : 0,
+      };
+      itemsList.push(data);
+    });
+    if (itemsList.length > 0) await dispatch(updateAddItemsState(items));
   };
+
   const itemsMap = (items: any) => {
     rows = items.map((item: any, index: number) => {
       return {
@@ -171,9 +185,11 @@ function StockTransferItem({ type, onChangeItems }: DataGridProps) {
         unitCode: item.unitCode,
         unitName: item.unitName,
         baseUnit: item.baseUnit ? item.baseUnit : 0,
-        orderQty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
+        qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
       };
     });
+
+    // return onChangeItems(items ? items : []);
   };
 
   if (type === 'Create') {
@@ -210,7 +226,7 @@ function StockTransferItem({ type, onChangeItems }: DataGridProps) {
 
   const { apiRef, columns } = useApiRef();
   const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'orderQty') {
+    if (params.field === 'qty') {
       const itemsList: any = [];
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
