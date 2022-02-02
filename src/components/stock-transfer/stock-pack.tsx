@@ -343,7 +343,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     });
     if (itemNotValid) {
       setOpenAlert(true);
-      setTextError('กรุณาป้อนเลขที่ Tote/ลัง');
+      setTextError('กรุณาระบุเลขที่ Tote/ลัง');
       return false;
     } else {
       return true;
@@ -418,6 +418,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
+          setSnackbarIsStatus(false);
           setContentMsg(error.message);
         });
     }
@@ -437,6 +438,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           })
           .catch((error: ApiError) => {
             setShowSnackBar(true);
+            setSnackbarIsStatus(false);
             setContentMsg(error.message);
           });
       } else {
@@ -462,6 +464,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       .catch((error: ApiError) => {
         handleOnCloseModalConfirm();
         setShowSnackBar(true);
+        setSnackbarIsStatus(false);
         setContentMsg(error.message);
       });
     handleOnCloseModalConfirm();

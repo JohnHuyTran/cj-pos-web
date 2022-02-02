@@ -12,6 +12,12 @@ export enum ContentType {
   MULTIPART = 'multipart/form-data',
 }
 
+export enum Action {
+  INSERT = "INSERT",
+  UPDATE = "UPDATE",
+  VIEW = "VIEW"
+}
+
 export enum BDStatus {
   DRAFT = "1",
   WAIT_FOR_APPROVAL = "2",

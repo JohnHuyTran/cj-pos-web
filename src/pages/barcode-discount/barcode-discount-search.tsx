@@ -20,6 +20,7 @@ import {useAppDispatch, useAppSelector} from "../../store/store";
 import {barcodeDiscountSearch} from "../../store/slices/barcode-discount-search-slice";
 import {saveSearchCriteriaBD} from "../../store/slices/barcode-discount-criteria-search-slice";
 import LoadingModal from "../../components/commons/ui/loading-modal";
+import {Action} from "../../utils/enum/common-enum";
 
 interface State {
     documentNumber: string;
@@ -38,6 +39,7 @@ const BarcodeDiscountSearch = () => {
     const {t} = useTranslation(["barcodeDiscount", "common"]);
     const [openAlert, setOpenAlert] = React.useState(false);
     const [textError, setTextError] = React.useState('');
+    const [popupMsg, setPopupMsg] = React.useState<string>('');
     const [lstStatus, setLstStatus] = React.useState([]);
     const [openPopup, setOpenPopup] = React.useState<boolean>(false);
     const [values, setValues] = React.useState<State>({
@@ -78,15 +80,15 @@ const BarcodeDiscountSearch = () => {
     };
 
     const handleOpenModal = () => {
-        setOpenModal(true)
+        setOpenModal(true);
     }
 
     const handleCloseModal = () => {
-        setOpenModal(false)
+        setOpenModal(false);
     }
 
     const handleClosePopup = () => {
-        setOpenPopup(false)
+        setOpenPopup(false);
     }
 
     const onClear = async () => {
@@ -136,12 +138,12 @@ const BarcodeDiscountSearch = () => {
         if (limit === 0) {
             limits = '10';
         } else {
-            limits = limit.toString();
+            limits = limit ? limit.toString() : '10';
         }
         const payload: BarcodeDiscountSearchRequest = {
             perPage: limits,
             page: page,
-            query: values.documentNumber,
+            query: values.documentNumber.trim(),
             branch: values.branch,
             status: values.status,
             startDate: moment(values.fromDate).startOf('day').toISOString(),
@@ -159,8 +161,8 @@ const BarcodeDiscountSearch = () => {
     const res = barcodeDiscountSearchSlice.bdSearchResponse;
     const [flagSearch, setFlagSearch] = React.useState(false);
     if (flagSearch) {
-        if (res.data.length > 0) {
-            dataTable = <BarcodeDiscountList/>;
+        if (res && res.data && res.data.length > 0) {
+            dataTable = <BarcodeDiscountList onSearch={onSearch}/>;
         } else {
             dataTable = (
                 <Grid item container xs={12} justifyContent="center">
@@ -304,15 +306,20 @@ const BarcodeDiscountSearch = () => {
                 </Grid>
             </Box>
             {dataTable}
-            <LoadingModal open={openLoadingModal.open}/>
-            <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
-            {openModal && <ModalCreateBarcodeDiscount isOpen={openModal} onClickClose={handleCloseModal} setOpenPopup={setOpenPopup}/>}
-            <BarcodeDiscountPopup
-                open={openPopup}
-                onClose={handleClosePopup}
-                contentMsg={"คุณไดยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว"}
-            />
-        </>
+        <LoadingModal open={openLoadingModal.open} />
+        <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+        {openModal && (
+          <ModalCreateBarcodeDiscount
+            isOpen={openModal}
+            onClickClose={handleCloseModal}
+            setOpenPopup={setOpenPopup}
+            setPopupMsg={setPopupMsg}
+            action={Action.INSERT}
+            onSearchBD={onSearch}
+          />
+        )}
+        <BarcodeDiscountPopup open={openPopup} onClose={handleClosePopup} contentMsg={popupMsg} />
+      </>
     );
 }
 

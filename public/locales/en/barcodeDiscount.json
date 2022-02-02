@@ -18,6 +18,14 @@
   "all": "ALL",
   "noData": "No data",
   "list": "List",
+  "headerName": {
+    "quantity": "Quantity",
+    "total": "Total",
+    "price": "Price",
+    "discount": "Discount",
+    "priceAfterDiscount": "Price after discount",
+    "requestedDate": "Requested date"
+  },
   "dbStatus": {
     "draft": "Draft",
     "pendingApproval": "Pending approval",

@@ -3,7 +3,7 @@ export interface Payload {
   documentNumber?: string;
   requestID?: string;
   percentDiscount: boolean;
-  requestorNote: string;
+  requesterNote: string;
   products: Object[];
   barcode: string;
   requestDiscount: number;
@@ -14,13 +14,26 @@ export interface DiscountDetail {
   id: string;
   index: number;
   barCode: string;
-  productName: string;
+  barcodeName: string;
+  skuCode: string;
   unit: string;
   price: number;
-  discount: number;
+  discount: any;
   expiryDate: string | any;
-  cashDiscount: number;
-  priceAfterDicount: number;
+  cashDiscount: number | any;
+  priceAfterDiscount: number | any;
   numberOfDiscounted: number;
   approvedDiscount: number;
+  errorDiscount: string;
+  errorExpiryDate: string;
+  errorNumberOfDiscounted: string;
+}
+
+interface Product {
+  barcode: string;
+  NumberOfDiscounted: number;
+}
+export interface CheckStockPayload {
+  branchCode: string;
+  products: Product[];
 }

@@ -52,6 +52,9 @@ export const environment = {
       search: {
         url: '/campaign',
       },
+      detail: {
+        url: '/campaign/detail-barcode',
+      },
       save: {
         url: '/campaign',
       },
@@ -185,6 +188,9 @@ export const environment = {
       reject2: {
         url: '/stock/stock-request/reject2/{rtNo}',
       },
+    },
+    stockBalanceCheck: {
+      url: '/stock/stock-balance-check',
     },
   },
 };
