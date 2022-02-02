@@ -92,7 +92,7 @@ const columns: GridColDef[] = [
   },
   {
     field: 'qty',
-    headerName: 'จำนวนที่อนุมัติ',
+    headerName: 'จำนวนที่สั่ง',
     width: 150,
     headerAlign: 'center',
     align: 'right',
@@ -142,7 +142,7 @@ const columns: GridColDef[] = [
   },
   {
     field: 'unitFactor',
-    headerName: 'หน่วยย่อย',
+    headerName: 'จัด(ชิ้น)',
     width: 150,
     headerAlign: 'center',
     sortable: false,
@@ -336,7 +336,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
-      if (!data.toteCode) {
+      if (!data.toteCode && data.actualQty > 0) {
         itemNotValid = true;
         return;
       }
@@ -479,7 +479,9 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     storeItem();
   };
 
-  const handleOpenAddItems = () => {};
+  const handleOpenAddItems = () => {
+    setOpenModelAddItems(true);
+  };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
   const handleModelAddItems = async () => {
@@ -523,7 +525,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่โอนสินค้า :</Typography>
+                <Typography variant='body2'>วันที่โอน :</Typography>
               </Grid>
               <Grid item lg={3}>
                 <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.startDate)}</Typography>
