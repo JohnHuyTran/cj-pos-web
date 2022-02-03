@@ -85,7 +85,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElement {
+function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const dispatch = useAppDispatch();
   const classes = useStyles();
@@ -179,8 +179,20 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   const [flagSave, setFlagSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const handleChkSaveClose = async () => {
+    // console.log('type :', type);
+    // console.log('payloadAddItem :', Object.keys(payloadAddItem).length);
+    // console.log('rowLength :', rowLength);
+
     if (flagSave) {
       setConfirmModelExit(true);
+    } else if (!flagSave) {
+      if (type === 'View' && rowLength !== Object.keys(payloadAddItem).length) {
+        setConfirmModelExit(true);
+      } else if (type === 'Create' && rowLength > 0) {
+        setConfirmModelExit(true);
+      } else {
+        handleClose();
+      }
     } else {
       handleClose();
     }
@@ -256,6 +268,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     setOpenModelAddItems(true);
   };
   const handleModelAddItems = async () => {
+    // if(Object.keys(payloadAddItem).length > 1) rowLength = Object.keys(payloadAddItem).length
     setOpenModelAddItems(false);
   };
 
@@ -844,4 +857,4 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   );
 }
 
-export default createStockTransfer;
+export default stockRequestDetail;

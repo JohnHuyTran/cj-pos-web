@@ -168,7 +168,7 @@ function StockTransferItem({ type, onChangeItems, changeItems }: DataGridProps) 
         unitCode: item.unitCode,
         unitName: item.unitName,
         baseUnit: item.baseUnit ? item.baseUnit : 0,
-        qty: item.orderQty ? item.orderQty : 0,
+        qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
       };
       itemsList.push(data);
     });
