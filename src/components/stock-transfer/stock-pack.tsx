@@ -252,6 +252,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
 
   React.useEffect(() => {
     const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
@@ -269,7 +270,9 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
     const isBranch = isOwnBranch('D0001');
     setIsDraft(isBranch && branchTransferInfo.status === 'CREATED' ? true : false);
-  }, [open]);
+
+    storeItemAddItem(payloadAddItem);
+  }, [open, payloadAddItem]);
 
   if (endDate != null && startDate != null) {
     if (endDate < startDate) {
@@ -336,17 +339,39 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     rowsEdit.forEach((data: GridRowData) => {
       if (!data.toteCode && data.actualQty > 0) {
         itemNotValid = true;
+        setTextError('กรุณาป้อนเลขที่ Tote/ลัง');
         return;
       }
     });
+
+    const list = _.uniqBy(branchTransferItems, 'skuCode');
+    list.forEach((l: any) => {
+      let sumActual: any = branchTransferItems
+        .filter((item: Item) => item.skuCode === l.skuCode)
+        .reduce((total, item: Item) => total + Number(calBaseUnit(item.actualQty, item.baseUnit)), 0);
+
+      let sumQty: any = branchTransferItems
+        .filter((item: Item) => item.skuCode === l.skuCode)
+        .reduce((total, item: Item) => total + Number(calBaseUnit(item.qty, item.baseUnit)), 0);
+      if (sumActual < sumQty && !comment) {
+        itemNotValid = true;
+        setTextError('กรุณาป้อนสาเหตุการเปลี่ยนจำนวน');
+        return;
+      }
+    });
+
     if (itemNotValid) {
       setOpenAlert(true);
-      setTextError('กรุณาป้อนเลขที่ Tote/ลัง');
       return false;
     } else {
       return true;
     }
   };
+
+  function calBaseUnit(qty: any, baseUnit: any): Number {
+    return Number(qty ? qty : 0) * Number(baseUnit ? baseUnit : 0);
+  }
+
   const [bodyRequest, setBodyRequest] = useState<FindProductRequest>();
   const getSkuList = () => {
     const list = _.uniqBy(branchTransferItems, 'skuCode');
@@ -381,45 +406,50 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     });
     setBranchTransferItems(items);
   };
-
-  const storeItemAddItem = () => {
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+  const storeItemAddItem = (_newItem: any) => {
     const items: Item[] = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      const chkItems = payloadAddItem.find((_item: any) => _item.barcode === data.barcode);
-      if (chkItems) {
-        const newData: Item = {
-          seqItem: data.seqItem,
-          barcode: data.barcode,
-          productName: data.barcodeName,
-          skuCode: data.skuCode,
-          baseUnit: data.baseUnit,
-          unitName: data.unitName,
-          remainStock: data.remainStock,
-          qty: data.qty,
-          actualQty: Number(data.qty ? data.qty : 0) + chkItems.qty,
-          toteCode: data.toteCode,
-          isDraft: isDraft,
-        };
-        items.push(newData);
-      } else {
-        const newData: Item = {
-          seqItem: 0,
-          barcode: data.barcode,
-          productName: data.barcodeName,
-          skuCode: data.skuCode,
-          baseUnit: data.baseUnit,
-          unitName: data.unitName,
-          remainStock: 0,
-          qty: 0,
-          actualQty: Number(data.qty ? data.qty : 0),
-          toteCode: '',
-          isDraft: isDraft,
-        };
-        items.push(newData);
-      }
-    });
-    setBranchTransferItems(items);
+    if (Object.keys(_newItem).length !== 0) {
+      _newItem.map((data: any, index: number) => {
+        const dupItem: any = branchTransferItems.find((item: Item, index: number) => {
+          return item.barcode === data.barcode;
+        });
+
+        if (dupItem) {
+          const newData: Item = {
+            seqItem: dupItem.seqItem,
+            barcode: dupItem.barcode,
+            productName: dupItem.productName,
+            skuCode: dupItem.skuCode,
+            baseUnit: dupItem.baseUnit,
+            unitName: dupItem.unitName,
+            remainStock: dupItem.remainStock,
+            qty: dupItem.remainStock,
+            actualQty: dupItem.actualQty + data.qty,
+            toteCode: dupItem.toteCode,
+            isDraft: isDraft,
+          };
+          _.remove(branchTransferItems, function (item: Item) {
+            return item.barcode === data.barcode;
+          });
+          setBranchTransferItems([...branchTransferItems, newData]);
+        } else {
+          const newData: Item = {
+            seqItem: 0,
+            barcode: data.barcode,
+            productName: data.barcodeName,
+            skuCode: data.skuCode,
+            baseUnit: data.baseUnit,
+            unitName: data.unitName,
+            remainStock: 0,
+            qty: 0,
+            actualQty: data.qty,
+            toteCode: '',
+            isDraft: isDraft,
+          };
+          setBranchTransferItems([...branchTransferItems, newData]);
+        }
+      });
+    }
   };
 
   const handleClose = async () => {
@@ -437,13 +467,17 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
 
     let i = 0;
-    rowsEdit.forEach((data: GridRowData) => {
-      if (data.actualQty !== (ent[i].actualQty ? ent[i].actualQty : 0) || data.toteCode != ent[i].toteCode) {
-        showPopup = true;
-        return;
-      }
-      i++;
-    });
+    if (rowsEdit.size != ent.length) {
+      showPopup = true;
+    } else {
+      rowsEdit.forEach((data: GridRowData) => {
+        if (data.actualQty !== (ent[i].actualQty ? ent[i].actualQty : 0) || data.toteCode != ent[i].toteCode) {
+          showPopup = true;
+          return;
+        }
+        i++;
+      });
+    }
 
     if (!showPopup) {
       setOpen(false);
@@ -530,14 +564,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const handleOpenAddItems = async () => {
+    await dispatch(updateAddItemsState({}));
     await getSkuList();
     setOpenModelAddItems(true);
   };
 
-  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
   const handleModelAddItems = async () => {
-    await storeItemAddItem();
-    await dispatch(updateAddItemsState({}));
     setOpenModelAddItems(false);
   };
 
@@ -740,5 +772,8 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
 export default StockPackChecked;
 function skuCodes<T>(skuCodes: any, arg1: never[]): [any, any] {
+  throw new Error('Function not implemented.');
+}
+function arr(arg0: string, arr: any) {
   throw new Error('Function not implemented.');
 }

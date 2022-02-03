@@ -194,7 +194,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
   };
 
   let options: any = [];
-  if (searchItem) options = itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
+  if (searchItem) options = itemsList && itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.barcodeName + option.barcode,
   });
@@ -351,7 +351,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
                     top: 8,
                     color: (theme: any) => theme.palette.grey[400],
                   }}>
-                  <CancelOutlinedIcon fontSize='large' stroke={'white'} stroke-width={1} />
+                  <CancelOutlinedIcon fontSize='large' stroke={'white'} strokeWidth={1} />
                 </IconButton>
               ) : null}
             </Box>
