@@ -179,13 +179,9 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   const [flagSave, setFlagSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const handleChkSaveClose = async () => {
-    // console.log('type :', type);
-    // console.log('payloadAddItem :', Object.keys(payloadAddItem).length);
-    // console.log('rowLength :', rowLength);
-
     if (flagSave) {
       setConfirmModelExit(true);
-    } else if (!flagSave) {
+    } else if (!flagSave && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) {
       if (type === 'View' && rowLength !== Object.keys(payloadAddItem).length) {
         setConfirmModelExit(true);
       } else if (type === 'Create' && rowLength > 0) {
@@ -268,7 +264,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setOpenModelAddItems(true);
   };
   const handleModelAddItems = async () => {
-    // if(Object.keys(payloadAddItem).length > 1) rowLength = Object.keys(payloadAddItem).length
+    setFlagSave(true);
     setOpenModelAddItems(false);
   };
 

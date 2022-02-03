@@ -179,7 +179,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
     }
 
     const keyword = value.trim();
-    if (keyword.length >= 3) {
+    if (keyword.length >= 3 && reason !== 'reset') {
       setSearchItem(keyword);
       await dispatch(featchAllItemsListAsync(keyword));
     } else {
