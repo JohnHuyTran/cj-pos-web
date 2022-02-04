@@ -50,6 +50,7 @@ import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { FindProductRequest } from '../../models/product-model';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { parseWithOptions } from 'date-fns/fp';
+import { BranchInfo } from '../../models/search-branch-model';
 
 interface Props {
   isOpen: boolean;
@@ -480,13 +481,19 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     }
     const ent: Item[] = branchTransferInfo.items;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-
     let i = 0;
     if (rowsEdit.size != ent.length) {
       showPopup = true;
     } else {
       rowsEdit.forEach((data: GridRowData) => {
-        if (data.actualQty !== (ent[i].actualQty ? ent[i].actualQty : 0) || data.toteCode != ent[i].toteCode) {
+        const item = ent.find((item: Item) => {
+          return item.barcode === data.barcode;
+        });
+        if (!item) {
+          showPopup = true;
+          return;
+        }
+        if (data.actualQty !== (item.actualQty ? item.actualQty : 0) || data.toteCode != item.toteCode) {
           showPopup = true;
           return;
         }
