@@ -175,7 +175,7 @@ const columns: GridColDef[] = [
       <div>
         <TextField
           variant='outlined'
-          name='txnQtyReturn'
+          name='txnTole'
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
@@ -430,7 +430,9 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const items: Item[] = [];
     if (Object.keys(_newItem).length !== 0) {
       _newItem.map((data: any, index: number) => {
+        let indexDup = 0;
         const dupItem: any = branchTransferItems.find((item: Item, index: number) => {
+          indexDup = index;
           return item.barcode === data.barcode;
         });
 
@@ -443,15 +445,17 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             baseUnit: dupItem.baseUnit,
             unitName: dupItem.unitName,
             remainStock: dupItem.remainStock,
-            qty: dupItem.remainStock,
+            qty: dupItem.qty,
             actualQty: dupItem.actualQty + data.qty,
             toteCode: dupItem.toteCode,
             isDraft: isDraft,
           };
-          _.remove(branchTransferItems, function (item: Item) {
+
+          const removeItem = [...branchTransferItems];
+          _.remove(removeItem, function (item: Item) {
             return item.barcode === data.barcode;
           });
-          setBranchTransferItems([...branchTransferItems, newData]);
+          setBranchTransferItems([...removeItem, newData]);
         } else {
           const newData: Item = {
             seqItem: 0,
@@ -485,7 +489,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     }
     const ent: Item[] = branchTransferInfo.items;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    let i = 0;
     if (rowsEdit.size != ent.length) {
       showPopup = true;
     } else {
@@ -501,7 +504,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           showPopup = true;
           return;
         }
-        i++;
       });
     }
 
@@ -923,7 +925,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 disableSelectionOnClick
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                rowsPerPageOptions={[2, 10, 20, 50, 100]}
+                rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
                 disableColumnMenu
                 autoHeight={rows.length >= 8 ? false : true}
