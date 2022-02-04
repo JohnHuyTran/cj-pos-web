@@ -9,6 +9,8 @@ import {
   SubmitStockTransferRequest,
 } from '../models/stock-transfer-model';
 import { getPathUrl } from './base-service';
+import { env } from '../adapters/environmentConfigs';
+import { fi } from 'date-fns/locale';
 
 export const getPathStockRequestDetail = (rtNo: string) => {
   return getPathUrl(`${environment.stock.stockRequest.detail.url}`, {
@@ -129,3 +131,27 @@ export async function sendBranchTransferToDC(payload: BranchTransferRequest) {
     throw error;
   }
 }
+export async function sendBranchTransferToPickup(payload: BranchTransferRequest) {
+  try {
+    const response = await post(environment.stock.branchTransfer.sendToPickup.url, payload, ContentType.JSON).then(
+      (result: any) => result
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getPathReportBT = (docType: string, btNo: string) => {
+  if (docType === 'BT') {
+    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportBT.url}`, { btNo: btNo });
+  } else if (docType === 'BO') {
+    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportBO.url}`, { btNo: btNo });
+  } else if (docType === 'PAPERWORK') {
+    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportPaperWork.url}`, { btNo: btNo });
+  } else if (docType === 'INVOICE') {
+    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportInvoiceDocument.url}`, {
+      btNo: btNo,
+    });
+  }
+};
