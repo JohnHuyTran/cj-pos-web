@@ -163,7 +163,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     align: 'right',
-    renderCell: (params: GridRenderCellParams) => calUnitFactor(params),
+    renderCell: (params: GridRenderCellParams) => numberWithCommas(calUnitFactor(params)),
   },
   {
     field: 'toteCode',
