@@ -279,7 +279,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
     const reason = getReasonLabel(reasonsList, branchTransferInfo.transferReason);
     setReasons(reason ? reason : '');
-
     setBtNo(branchTransferInfo.btNo);
     setBtStatus(branchTransferInfo.status);
     setComment(branchTransferInfo.comment);
@@ -355,7 +354,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     rowsEdit.forEach((data: GridRowData) => {
       if (!data.toteCode && data.actualQty > 0) {
         itemNotValid = true;
-        setTextError('กรุณาป้อนเลขที่ Tote/ลัง');
+        setTextError('กรุณาระบุเลขที่ Tote/ลัง');
+        return;
+      }
+      if (data.toteCode && data.actualQty <= 0) {
+        itemNotValid = true;
+        setTextError('จำนวนโอนจริงเป็น 0 ไม่ต้องป้อนเลขที่ Tote/ลัง ');
         return;
       }
     });
@@ -668,16 +672,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             </Grid>
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่สร้างรายการ:</Typography>
-              </Grid>
-              <Grid item lg={4}>
-                <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.createdDate)}</Typography>
-              </Grid>
-              <Grid item lg={6}></Grid>
-            </Grid>
-
-            <Grid container spacing={2} mb={2}>
-              <Grid item lg={2}>
                 <Typography variant='body2'>วันที่โอน :</Typography>
               </Grid>
               <Grid item lg={3}>
@@ -710,30 +704,56 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
               <Grid item lg={1}></Grid>
             </Grid>
 
-            <Grid container spacing={2} mb={2}>
-              <Grid item lg={2}>
-                <Typography variant='body2'> สาเหตุการโอน :</Typography>
-              </Grid>
-              <Grid item lg={3}>
-                <Typography variant='body2'>{reasons} </Typography>
-              </Grid>
-              <Grid item lg={1}></Grid>
-              <Grid item lg={2}></Grid>
-              <Grid item lg={3}>
-                {!isDC && (
-                  <Box>
-                    <Link
-                      component='button'
-                      variant='body2'
-                      onClick={(e) => {
-                        handleLinkDocument('BT');
-                      }}>
-                      เรียกดูเอกสารใบโอน BT
-                    </Link>
-                  </Box>
-                )}
-                {!isDraft && (
+            {isDraft && (
+              <Grid container spacing={2} mb={2}>
+                <Grid item lg={2}>
+                  <Typography variant='body2'> สาเหตุการโอน :</Typography>
+                </Grid>
+                <Grid item lg={3}>
+                  <Typography variant='body2'>{reasons} </Typography>
+                </Grid>
+                <Grid item lg={1}></Grid>
+                <Grid item lg={2}></Grid>
+                <Grid item lg={3}>
                   <>
+                    <Box>
+                      <Link
+                        component='button'
+                        variant='body2'
+                        onClick={(e) => {
+                          handleLinkDocument('BT');
+                        }}>
+                        เรียกดูเอกสารใบโอน BT
+                      </Link>
+                    </Box>
+                  </>
+                </Grid>
+                <Grid item lg={1}></Grid>
+              </Grid>
+            )}
+
+            {!isDraft && !isDC && (
+              <Grid container spacing={2} mb={2}>
+                <Grid item lg={2}>
+                  <Typography variant='body2'> สาเหตุการโอน :</Typography>
+                </Grid>
+                <Grid item lg={3}>
+                  <Typography variant='body2'>{reasons} </Typography>
+                </Grid>
+                <Grid item lg={1}></Grid>
+                <Grid item lg={2}></Grid>
+                <Grid item lg={3}>
+                  <>
+                    <Box>
+                      <Link
+                        component='button'
+                        variant='body2'
+                        onClick={(e) => {
+                          handleLinkDocument('BT');
+                        }}>
+                        เรียกดูเอกสารใบโอน BT
+                      </Link>
+                    </Box>
                     <Box>
                       <Link
                         component='button'
@@ -755,20 +775,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                       </Link>
                     </Box>
                   </>
-                )}
-                {isDC && (
-                  <Link
-                    component='button'
-                    variant='body2'
-                    onClick={(e) => {
-                      handleLinkDocument('BT');
-                    }}>
-                    เรียกดูเอกสารใบเรียกเก็บ
-                  </Link>
-                )}
+                </Grid>
+                <Grid item lg={1}></Grid>
               </Grid>
-              <Grid item lg={1}></Grid>
-            </Grid>
+            )}
           </Box>
           {isDraft && (
             <Grid
@@ -817,7 +827,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             </Grid>
           )}
 
-          {isDC && (
+          {isDC && btStatus === 'READY_TO_TRANSFER' && (
             <Grid
               item
               container
@@ -861,6 +871,44 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 </Button>
               </Grid>
             </Grid>
+          )}
+          {isDC && btStatus === 'WAIT_FOR_PICKUP' && (
+            <>
+              <Grid container spacing={2} mb={2}>
+                <Grid item lg={2}>
+                  <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
+                </Grid>
+                <Grid item lg={3}>
+                  <Typography variant='body2'>{sourceBranch} </Typography>
+                </Grid>
+                <Grid item lg={1}></Grid>
+                <Grid item lg={2}>
+                  <Typography variant='body2'>ถึง :</Typography>
+                </Grid>
+                <Grid item lg={3}>
+                  <Typography variant='body2'>{destinationBranch} </Typography>
+                </Grid>
+                <Grid item lg={1}></Grid>
+              </Grid>
+
+              <Grid container spacing={2} mb={2}>
+                <Grid item lg={2}></Grid>
+                <Grid item lg={3}></Grid>
+                <Grid item lg={1}></Grid>
+                <Grid item lg={2}></Grid>
+                <Grid item lg={3}>
+                  <Link
+                    component='button'
+                    variant='body2'
+                    onClick={(e) => {
+                      handleLinkDocument('BT');
+                    }}>
+                    เรียกดูเอกสารใบเรียกเก็บ
+                  </Link>
+                </Grid>
+                <Grid item lg={1}></Grid>
+              </Grid>
+            </>
           )}
           <Box mt={2} bgcolor='background.paper'>
             <div
