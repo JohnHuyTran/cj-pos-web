@@ -11,14 +11,20 @@ import {
 } from '@mui/x-data-grid';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, Link, TextField, Typography } from '@mui/material';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import ControlPoint from '@mui/icons-material/ControlPoint';
 import { useStyles } from '../../styles/makeTheme';
-import { getBranchName, getReasonLabel, isOwnBranch, numberWithCommas } from '../../utils/utils';
+import {
+  formatFileStockTransfer,
+  getBranchName,
+  getReasonLabel,
+  isOwnBranch,
+  numberWithCommas,
+} from '../../utils/utils';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import AlertError from '../commons/ui/alert-error';
@@ -26,7 +32,12 @@ import LoadingModal from '../commons/ui/loading-modal';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import ModalConfirmTransaction from './modal-confirm-transaction';
 import { BranchTransferRequest, Item } from '../../models/stock-transfer-model';
-import { saveBranchTransfer, sendBranchTransferToDC } from '../../services/stock-transfer';
+import {
+  getPathReportBT,
+  saveBranchTransfer,
+  sendBranchTransferToDC,
+  sendBranchTransferToPickup,
+} from '../../services/stock-transfer';
 import moment from 'moment';
 import { ApiError } from '../../models/api-error-model';
 import TextBoxComment from '../commons/ui/textbox-comment';
@@ -37,6 +48,8 @@ import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfe
 import ModalAddItems from '../commons/ui/modal-add-items';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { FindProductRequest } from '../../models/product-model';
+import ModalShowFile from '../commons/ui/modal-show-file';
+import { parseWithOptions } from 'date-fns/fp';
 
 interface Props {
   isOpen: boolean;
@@ -241,10 +254,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const [sourceBranch, setSourceBranch] = React.useState('');
   const [destinationBranch, setDestinationBranch] = React.useState('');
   const [btNo, setBtNo] = React.useState('');
-  const [btStatus, setBtStatus] = React.useState<String>('CREATED');
+  const [btStatus, setBtStatus] = React.useState<string>('CREATED');
   const [reasons, setReasons] = React.useState('');
   const [isDraft, setIsDraft] = React.useState(false);
-
+  const [isDC, setIsDC] = React.useState(false);
   const [comment, setComment] = React.useState('');
   const handleChangeComment = (value: any) => {
     storeItem();
@@ -253,6 +266,8 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
+  const [pathReport, setPathReport] = React.useState<string>('');
 
   React.useEffect(() => {
     const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
@@ -555,6 +570,34 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setOpenLoadingModal(false);
   };
 
+  const sendToPickup = async () => {
+    const payload: BranchTransferRequest = {
+      btNo: btNo,
+      startDate: moment(startDate).startOf('day').toISOString(),
+      endDate: moment(endDate).startOf('day').toISOString(),
+    };
+    await sendBranchTransferToPickup(payload)
+      .then(async (value) => {
+        handleOnCloseModalConfirm();
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณส่งรายการให้ DC เรียบร้อยแล้ว');
+        await dispatch(featchSearchStockTransferAsync(payloadSearch));
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        handleOnCloseModalConfirm();
+        setShowSnackBar(true);
+        setSnackbarIsStatus(false);
+        setContentMsg(error.message);
+      });
+    handleOnCloseModalConfirm();
+    setOpenLoadingModal(false);
+  };
+
   const currentlySelected = () => {
     storeItem();
   };
@@ -572,6 +615,24 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const handleModelAddItems = async () => {
     setOpenModelAddItems(false);
   };
+
+  const handleLinkDocument = (docType: string) => {
+    const path = getPathReportBT(docType ? docType : 'BT', btNo);
+    setPathReport(path ? path : '');
+    setOpenModelPreviewDocument(true);
+  };
+
+  const handleStartDatePicker = (value: any) => {
+    setStartDate(value);
+  };
+
+  const handleEndDatePicker = (value: Date) => {
+    setEndDate(value);
+  };
+
+  function handleModelPreviewDocument() {
+    setOpenModelPreviewDocument(false);
+  }
 
   return (
     <React.Fragment>
@@ -649,7 +710,57 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
               <Grid item lg={3}>
                 <Typography variant='body2'>{reasons} </Typography>
               </Grid>
-              <Grid item lg={6}></Grid>
+              <Grid item lg={1}></Grid>
+              <Grid item lg={2}></Grid>
+              <Grid item lg={3}>
+                {!isDC && (
+                  <Box>
+                    <Link
+                      component='button'
+                      variant='body2'
+                      onClick={(e) => {
+                        handleLinkDocument('BT');
+                      }}>
+                      เรียกดูเอกสารใบโอน BT
+                    </Link>
+                  </Box>
+                )}
+                {!isDraft && (
+                  <>
+                    <Box>
+                      <Link
+                        component='button'
+                        variant='body2'
+                        onClick={(e) => {
+                          handleLinkDocument('BT');
+                        }}>
+                        เรียกดูเอกสารใบ BO
+                      </Link>
+                    </Box>
+                    <Box>
+                      <Link
+                        component='button'
+                        variant='body2'
+                        onClick={(e) => {
+                          handleLinkDocument('BT');
+                        }}>
+                        เรียกดูเอกสารใบปะลัง
+                      </Link>
+                    </Box>
+                  </>
+                )}
+                {isDC && (
+                  <Link
+                    component='button'
+                    variant='body2'
+                    onClick={(e) => {
+                      handleLinkDocument('BT');
+                    }}>
+                    เรียกดูเอกสารใบเรียกเก็บ
+                  </Link>
+                )}
+              </Grid>
+              <Grid item lg={1}></Grid>
             </Grid>
           </Box>
           {isDraft && (
@@ -694,6 +805,52 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 200 }}>
                   ส่งงานให้ DC
+                </Button>
+              </Grid>
+            </Grid>
+          )}
+
+          {isDC && (
+            <Grid
+              item
+              container
+              xs={12}
+              sx={{ mt: 3 }}
+              justifyContent='space-between'
+              direction='row'
+              alignItems='flex-end'>
+              <Grid item xl={8}>
+                <Grid container>
+                  <Grid item>
+                    <Typography gutterBottom variant='subtitle1' component='div'>
+                      รอบรถเข้าต้นทางตั้งแต่
+                    </Typography>
+                    <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+                  </Grid>
+                  <Grid item xs={1}></Grid>
+                  <Grid item>
+                    <Typography gutterBottom variant='subtitle1' component='div'>
+                      ถึง
+                    </Typography>
+                    <DatePickerComponent
+                      onClickDate={handleEndDatePicker}
+                      value={endDate}
+                      type={'TO'}
+                      minDateTo={startDate}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid item>
+                <Button
+                  id='btnSave'
+                  variant='contained'
+                  color='warning'
+                  className={classes.MbtnSave}
+                  onClick={handleSaveBtn}
+                  startIcon={<SaveIcon />}
+                  sx={{ width: 200 }}>
+                  บันทึก
                 </Button>
               </Grid>
             </Grid>
@@ -766,6 +923,16 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         requestBody={bodyRequest ? bodyRequest : { skuCodes: [] }}></ModalAddItems>
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+      <ModalShowFile
+        open={openModelPreviewDocument}
+        onClose={handleModelPreviewDocument}
+        url={pathReport}
+        statusFile={1}
+        sdImageFile={''}
+        fileName={formatFileStockTransfer(btNo, btStatus)}
+        btnPrintName='พิมพ์เอกสาร'
+      />
     </React.Fragment>
   );
 }
