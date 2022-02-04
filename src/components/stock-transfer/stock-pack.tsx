@@ -514,6 +514,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const handleSaveBtn = async () => {
+    await storeItem();
     const isvalidItem = validateItem();
     if (isvalidItem) {
       const payload: BranchTransferRequest = await mappingPayload();
@@ -922,7 +923,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 disableSelectionOnClick
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                rowsPerPageOptions={[10, 20, 50, 100]}
+                rowsPerPageOptions={[2, 10, 20, 50, 100]}
                 pagination
                 disableColumnMenu
                 autoHeight={rows.length >= 8 ? false : true}

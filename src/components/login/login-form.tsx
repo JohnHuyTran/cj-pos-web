@@ -17,6 +17,9 @@ import { loginKeyCloakAsync } from '../../store/slices/authSlice';
 import { loginForm } from '../../models/user-interface';
 import { loginFormStyle } from './loginForm-css';
 import { env } from '../../adapters/environmentConfigs';
+import { getAccessToken } from '../../store/sessionStore';
+import { getDecodedAccessToken } from '../../utils/utils';
+import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 
 interface State {
   userId: string;
@@ -51,12 +54,17 @@ function LoginForm() {
     event.preventDefault();
   };
 
-  const onClickLogin = () => {
+  const onClickLogin = async () => {
     const form: loginForm = {
       userId: values.userId,
       password: values.password,
     };
-    dispatch(loginKeyCloakAsync(form));
+    await dispatch(loginKeyCloakAsync(form));
+    if (!error) {
+      const token = getAccessToken();
+      const userInfo: KeyCloakTokenInfo = getDecodedAccessToken(token ? token : '');
+      console.log(userInfo);
+    }
   };
 
   return (
