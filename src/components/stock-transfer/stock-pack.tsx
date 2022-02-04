@@ -716,7 +716,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Grid item lg={1}></Grid>
                 <Grid item lg={2}></Grid>
                 <Grid item lg={3}>
-                  <>
+                  {/* <>
                     <Box>
                       <Link
                         component='button'
@@ -727,7 +727,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         เรียกดูเอกสารใบโอน BT
                       </Link>
                     </Box>
-                  </>
+                  </> */}
                 </Grid>
                 <Grid item lg={1}></Grid>
               </Grid>
@@ -744,7 +744,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Grid item lg={1}></Grid>
                 <Grid item lg={2}></Grid>
                 <Grid item lg={3}>
-                  <>
+                  {/* <>
                     <Box>
                       <Link
                         component='button'
@@ -775,7 +775,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         เรียกดูเอกสารใบปะลัง
                       </Link>
                     </Box>
-                  </>
+                  </> */}
                 </Grid>
                 <Grid item lg={1}></Grid>
               </Grid>
