@@ -451,10 +451,11 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             isDraft: isDraft,
           };
 
-          _.remove(branchTransferItems, function (item: Item) {
+          const removeItem = [...branchTransferItems];
+          _.remove(removeItem, function (item: Item) {
             return item.barcode === data.barcode;
           });
-          setBranchTransferItems([...branchTransferItems, newData]);
+          setBranchTransferItems([...removeItem, newData]);
         } else {
           const newData: Item = {
             seqItem: 0,
@@ -488,7 +489,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     }
     const ent: Item[] = branchTransferInfo.items;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    let i = 0;
     if (rowsEdit.size != ent.length) {
       showPopup = true;
     } else {
@@ -504,7 +504,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           showPopup = true;
           return;
         }
-        i++;
       });
     }
 
@@ -923,7 +922,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 rows={rows}
                 columns={cols}
                 // checkboxSelection={pnStatus === 0 ? true : false}
-                // disableSelectionOnClick
+                disableSelectionOnClick
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 rowsPerPageOptions={[10, 20, 50, 100]}
