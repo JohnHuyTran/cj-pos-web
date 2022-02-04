@@ -179,7 +179,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
     }
 
     const keyword = value.trim();
-    if (keyword.length >= 3) {
+    if (keyword.length >= 3 && reason !== 'reset') {
       setSearchItem(keyword);
       await dispatch(featchAllItemsListAsync(keyword));
     } else {
@@ -308,6 +308,18 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
     }, 300);
   };
 
+  const handleEditItems = async () => {
+    const itemsList: any = [];
+    if (rows.length > 0) {
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      rowsEdit.forEach((data: GridRowData) => {
+        itemsList.push(data);
+      });
+    }
+
+    if (itemsList.length > 0) setNewAddItemListArray(itemsList);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="sm" fullWidth={true}>
@@ -362,6 +374,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
                   hideFooter
                   autoHeight
                   onCellClick={currentlyDelete}
+                  onCellOut={handleEditItems}
                 />
               </div>
             </Box>

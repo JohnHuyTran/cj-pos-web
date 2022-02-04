@@ -39,6 +39,7 @@ import TextBoxComment from '../commons/ui/textbox-comment';
 import { getBranchName, getReasonLabel } from '../../utils/utils';
 import ModalConfirmTransaction from './modal-confirm-transaction';
 import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
+import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 
 interface State {
   branchCode: string;
@@ -84,7 +85,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElement {
+function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const dispatch = useAppDispatch();
   const classes = useStyles();
@@ -151,12 +152,12 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       const auditLog = stockRequestDetail.auditLogs ? stockRequestDetail.auditLogs : [];
       if (stockRequestDetail.status === 'WAIT_FOR_APPROVAL_2') {
         const OC = `${auditLog[auditLog.length - 1].comment ? auditLog[auditLog.length - 1].comment : ''}`;
-        if (JSON.parse(`${OC}`).by === 'OC') setCommentOC(JSON.parse(`${OC}`).detail);
+        if (OC !== '') setCommentOC(JSON.parse(`${OC}`).detail);
       } else if (stockRequestDetail.status === 'APPROVED') {
         const SCM = `${auditLog[auditLog.length - 1].comment ? auditLog[auditLog.length - 1].comment : ''}`;
-        if (JSON.parse(`${SCM}`).by === 'SCM') setCommentSCM(JSON.parse(`${SCM}`).detail);
+        if (SCM !== '') setCommentSCM(JSON.parse(`${SCM}`).detail);
         const OC = `${auditLog[auditLog.length - 2].comment ? auditLog[auditLog.length - 2].comment : ''}`;
-        if (JSON.parse(`${OC}`).by === 'OC') setCommentOC(JSON.parse(`${OC}`).detail);
+        if (OC !== '') setCommentOC(JSON.parse(`${OC}`).detail);
       }
     }
   }, [open]);
@@ -175,10 +176,36 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     setShowSnackBar(false);
   };
 
+  const [flagSave, setFlagSave] = React.useState(false);
+  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const handleChkSaveClose = async () => {
+    if (flagSave) {
+      setConfirmModelExit(true);
+    } else if (!flagSave && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) {
+      if (type === 'View' && rowLength !== Object.keys(payloadAddItem).length) {
+        setConfirmModelExit(true);
+      } else if (type === 'Create' && rowLength > 0) {
+        setConfirmModelExit(true);
+      } else {
+        handleClose();
+      }
+    } else {
+      handleClose();
+    }
+  };
+
   const handleClose = async () => {
     await dispatch(updateAddItemsState({}));
     setOpen(false);
     onClickClose();
+  };
+
+  function handleNotExitModelConfirm() {
+    setConfirmModelExit(false);
+  }
+
+  const handleExitModelConfirm = async () => {
+    handleClose();
   };
 
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
@@ -203,6 +230,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   const [toBranch, setToBranch] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const handleChangeFromBranch = (branchCode: string) => {
+    setFlagSave(true);
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
       setValues({ ...values, branchCode: JSON.parse(codes) });
@@ -213,6 +241,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     }
   };
   const handleChangeToBranch = (branchCode: string) => {
+    setFlagSave(true);
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
       setValues({ ...values, branchCode: JSON.parse(codes) });
@@ -226,6 +255,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   const [reasons, setReasons] = React.useState('');
   const [reasonText, setReasonText] = React.useState('');
   const handleChangeReasons = (ReasonsCode: string) => {
+    setFlagSave(true);
     setReasons(ReasonsCode);
   };
 
@@ -234,11 +264,17 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
     setOpenModelAddItems(true);
   };
   const handleModelAddItems = async () => {
+    setFlagSave(true);
     setOpenModelAddItems(false);
   };
 
   const handleChangeItems = async (items: any) => {
+    // setFlagSave(true);
     await dispatch(updateAddItemsState(items));
+  };
+
+  const handleStatusChangeItems = async (items: any) => {
+    setFlagSave(true);
   };
 
   const [commentOC, setCommentOC] = React.useState('');
@@ -247,9 +283,11 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   const [isDisableSCM, setIsDisableSCM] = React.useState(true);
 
   const handleChangeCommentOC = (value: any) => {
+    setFlagSave(true);
     setCommentOC(value);
   };
   const handleChangeCommentSCM = (value: any) => {
+    setFlagSave(true);
     setCommentSCM(value);
   };
 
@@ -275,6 +313,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       const payloadSave: any = await handleMapPayloadSave();
       await saveStockRequest(payloadSave)
         .then((value) => {
+          setFlagSave(false);
           setRTNo(value.docNo);
           setStatus('DRAFT');
           setShowSnackBar(true);
@@ -340,6 +379,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         const payloadSave: any = await handleMapPayloadSave();
         await saveStockRequest(payloadSave)
           .then((value) => {
+            setFlagSave(false);
             setRTNo(value.docNo);
             setStatus('DRAFT');
 
@@ -362,18 +402,10 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   const handleApprove = async () => {
     setOpenLoadingModal(true);
     if (status === 'WAIT_FOR_APPROVAL_1') {
-      if (commentOC === '') {
-        setOpenAlert(true);
-        setTextError('กรุณากรอกหมายเหตุจาก OC');
-      } else {
-        setTextHeaderConfirm('ยืนยันส่งรายการโอนสินค้าให้ SCM');
-        setOpenModelConfirm(true);
-      }
+      setTextHeaderConfirm('ยืนยันส่งรายการโอนสินค้าให้ SCM');
+      setOpenModelConfirm(true);
     } else if (status === 'WAIT_FOR_APPROVAL_2') {
-      if (commentSCM === '') {
-        setOpenAlert(true);
-        setTextError('กรุณากรอกหมายเหตุจาก SCM');
-      } else if (toBranch === '') {
+      if (toBranch === '') {
         setOpenAlert(true);
         setTextError('กรุณาเลือกสาขาโอนสินค้าปลายทาง');
       } else {
@@ -449,6 +481,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
 
         await submitStockRequest(rtNo, payloadSubmit)
           .then((value) => {
+            setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
             setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
@@ -476,6 +509,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         setFlagReject(false);
         await reject1StockRequest(rtNo, payload1)
           .then((value) => {
+            setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
             setContentMsg('คุณได้ปฎิเสธข้อมูลเรียบร้อยแล้ว');
@@ -492,6 +526,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       } else {
         await approve1StockRequest(rtNo, payload1)
           .then((value) => {
+            setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
             setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
@@ -519,6 +554,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         setFlagReject(false);
         await reject2StockRequest(rtNo, payload2)
           .then((value) => {
+            setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
             setContentMsg('คุณได้ปฎิเสธข้อมูลเรียบร้อยแล้ว');
@@ -535,6 +571,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
       } else {
         await approve2StockRequest(rtNo, payload2)
           .then((value) => {
+            setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
             setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
@@ -557,7 +594,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleChkSaveClose}>
           <Typography sx={{ fontSize: '1em' }}>
             {type === 'Create' && 'สร้างรายการโอนสินค้า'}
             {type !== 'Create' && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && 'รายการโอนสินค้า'}
@@ -570,7 +607,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
         <DialogContent>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              เลขที่เอกสาร BT :
+              เลขที่เอกสาร RT :
             </Grid>
             <Grid item xs={4}>
               {rtNo !== '' && rtNo}
@@ -587,7 +624,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              วันที่โอนสินค้า* :
+              วันที่โอนสินค้า :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -600,7 +637,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุด* :
+              วันที่สิ้นสุด :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -620,7 +657,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาขาต้นทาง* :
+              สาขาต้นทาง :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -635,7 +672,7 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              สาขาปลายทาง* :
+              สาขาปลายทาง :
             </Grid>
             <Grid item xs={3}>
               {(status === '' ||
@@ -749,7 +786,11 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
           )}
           <Box mb={4}>
             {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-              <StockRequestCreateItem type={type} onChangeItems={handleChangeItems} />
+              <StockRequestCreateItem
+                type={type}
+                onChangeItems={handleChangeItems}
+                changeItems={handleStatusChangeItems}
+              />
             )}
 
             {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && (
@@ -802,8 +843,14 @@ function createStockTransfer({ type, isOpen, onClickClose }: Props): ReactElemen
 
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+      <ConfirmModelExit
+        open={confirmModelExit}
+        onClose={handleNotExitModelConfirm}
+        onConfirm={handleExitModelConfirm}
+      />
     </div>
   );
 }
 
-export default createStockTransfer;
+export default stockRequestDetail;

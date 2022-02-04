@@ -10,6 +10,8 @@ import throttle from 'lodash.throttle';
 import { useReactToPrint } from 'react-to-print';
 import AlertError from './alert-error';
 import { HighlightOff } from '@mui/icons-material';
+import store from '../../../store/store';
+import { getAccessToken } from '../../../store/sessionStore';
 
 interface ModalShowPDFProp {
   open: boolean;
@@ -37,28 +39,26 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
-          <HighlightOff fontSize="large" />
+          }}>
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
       {onPrint ? (
         <div>
           {status === 1 && (
             <Button
-              id="btnPrint"
-              variant="contained"
-              color="secondary"
+              id='btnPrint'
+              variant='contained'
+              color='secondary'
               onClick={onPrint}
-              endIcon={<LocalPrintshopOutlinedIcon />}
-            >
+              endIcon={<LocalPrintshopOutlinedIcon />}>
               {/* {text && 'พิมพ์เอกสาร'}
               {!text && 'พิมพ์ใบผลต่าง'} */}
               {text}
@@ -84,6 +84,8 @@ export default function ModalShowPDF({
   const [initialWidth, setInitialWidth] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
   const pdfWrapper = React.useRef<HTMLDivElement>(null);
+  let token = getAccessToken();
+  token = token ? `Bearer ${token}` : '';
 
   const setPdfSize = () => {
     if (pdfWrapper && pdfWrapper.current) {
@@ -135,7 +137,7 @@ export default function ModalShowPDF({
     <div>
       <Dialog open={open} maxWidth={false}>
         <BootstrapDialogTitle
-          id="customized-dialog-title"
+          id='customized-dialog-title'
           onClose={handleClose}
           onPrint={showPrint}
           status={statusFile}
@@ -146,21 +148,19 @@ export default function ModalShowPDF({
             minWidth: 600,
             minHeight: 600,
             textAlign: 'center',
-          }}
-        >
+          }}>
           {/* <div id="placeholderWrapper" style={{ height: "3000vh" }} /> */}
           {statusFile === 1 && (
-            <div id="pdfWrapper" style={{ width: '50vw' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ width: '50vw' }} ref={pdfWrapper}>
               <Document
                 file={{
                   url: url,
                   httpHeaders: {
-                    Authorization: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwbmZJNmF1MXZ5LWhRQ0s3ODJ1V2E3cWIzQVFYY1FfNnZYOWZwdE5FaHR3In0.eyJleHAiOjE2MzE3NzY3OTUsImlhdCI6MTYzMTc3NjQ5NSwianRpIjoiYjA5ZGM0ZmQtMTRlMS00M2UwLThkNTItMzU0YTBlMjU2NzM0IiwiaXNzIjoiaHR0cHM6Ly9hZG1pbi5hdXRoLWRldi5jamV4cHJlc3MuaW8vYXV0aC9yZWFsbXMvY2pleHByZXNzIiwic3ViIjoiOWY2ZDEyODEtOTJhOS00N2EzLTk0NWQtNWJkMTg0MjkzMjBjIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYXBwLm5ld3Bvc2JhY2siLCJzZXNzaW9uX3N0YXRlIjoiMGM2ODkwMjMtZWI3ZC00MTQyLTgwOWMtYzRjNWFmODdiOTRmIiwiYWNyIjoiMSIsInNjb3BlIjoic2NvcGUubmV3cG9zYmFjayBlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoicG9zMiBwb3MyIiwicHJlZmVycmVkX3VzZXJuYW1lIjoicG9zMiIsImFjbCI6eyJzZXJ2aWNlLm5ld3Bvc2JhY2siOlsiQ0FTSERSQVdFUi5ERVBPU0lUIiwiU0FMRS5JVEVNLkNBTkNFTCIsIkZFQVRVUkUuQURNSU4uU0VBUkNILkRBVEEiLCJDQVNIRFJBV0VSLldJVEhEUkFXIl19LCJnaXZlbl9uYW1lIjoicG9zMiIsImJyYW5jaCI6IjAwMDIiLCJmYW1pbHlfbmFtZSI6InBvczIiLCJlbWFpbCI6InBvczJAdGVzdC5jb20ifQ.myRuJJxraId5ZptOahCJl2lt3YQczXDbatKGrEoquzuyRz4ID1QYOi2IZT6ND4Gpa8CCvtIjWKNuUrYQbRrjG8o1dJMzSAi5pt40HXbEiBvN2QDCuCF2NMPcBYZPMlPfMyNGTAafolpJYGHhjZy_4oGGZiUSbTzgQ91iVoY_WUHgdNTk9H8c-nvKxNRXIWos92AMox6-tlLkjksQsMusu9JZWEQ2v7Fmex_oIBghxPr-r9JGstm0_f16bbvMTyPskaDoOUehKNbw6V3I1IsfJgUnbUFbOlMXuCDsGmOtKbpouycPXJvj2BJJQ11PY28W4g7w3ddffLyVm4i8_OJRBg`,
+                    Authorization: token,
                   },
                 }}
                 onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadFail}
-              >
+                onLoadError={onDocumentLoadFail}>
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page
                     key={`page_${index + 1}`}
@@ -175,7 +175,7 @@ export default function ModalShowPDF({
           {statusFile === 0 && (
             <div>
               {imgFile !== 'image' && (
-                <div id="pdfWrapper" style={{ width: '50vw' }} ref={pdfWrapper}>
+                <div id='pdfWrapper' style={{ width: '50vw' }} ref={pdfWrapper}>
                   <Document file={sdImageFile} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
                     {Array.from(new Array(numPages), (el, index) => (
                       <Page
@@ -195,7 +195,7 @@ export default function ModalShowPDF({
         </DialogContent>
       </Dialog>
 
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError="Failed to load PDF" />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError='Failed to load PDF' />
     </div>
   );
 }
