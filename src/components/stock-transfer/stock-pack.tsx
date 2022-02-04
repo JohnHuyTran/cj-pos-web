@@ -175,7 +175,7 @@ const columns: GridColDef[] = [
       <div>
         <TextField
           variant='outlined'
-          name='txnQtyReturn'
+          name='txnTole'
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
@@ -430,7 +430,9 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const items: Item[] = [];
     if (Object.keys(_newItem).length !== 0) {
       _newItem.map((data: any, index: number) => {
+        let indexDup = 0;
         const dupItem: any = branchTransferItems.find((item: Item, index: number) => {
+          indexDup = index;
           return item.barcode === data.barcode;
         });
 
@@ -443,11 +445,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             baseUnit: dupItem.baseUnit,
             unitName: dupItem.unitName,
             remainStock: dupItem.remainStock,
-            qty: dupItem.remainStock,
+            qty: dupItem.qty,
             actualQty: dupItem.actualQty + data.qty,
             toteCode: dupItem.toteCode,
             isDraft: isDraft,
           };
+
           _.remove(branchTransferItems, function (item: Item) {
             return item.barcode === data.barcode;
           });
@@ -920,10 +923,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 rows={rows}
                 columns={cols}
                 // checkboxSelection={pnStatus === 0 ? true : false}
-                disableSelectionOnClick
+                // disableSelectionOnClick
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                rowsPerPageOptions={[2, 10, 20, 50, 100]}
+                rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
                 disableColumnMenu
                 autoHeight={rows.length >= 8 ? false : true}
