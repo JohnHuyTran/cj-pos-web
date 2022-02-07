@@ -48,7 +48,7 @@ function StockTransferList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -56,31 +56,31 @@ function StockTransferList() {
     {
       field: 'btNo',
       headerName: 'เลขที่เอกสาร BT',
-      // minWidth: 160,
-      flex: 1,
+      minWidth: 185,
+      // flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
     {
       field: 'rtNo',
       headerName: 'เลขที่เอกสารร้องขอ RT',
-      // minWidth: 168,
-      flex: 1,
+      minWidth: 185,
+      // flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
     {
       field: 'startDate',
-      headerName: 'วันที่โอนสินค้า',
-      width: 160,
-      // minWidth: 200,
+      headerName: 'วันที่โอน',
+      // width: 160,
+      minWidth: 130,
       // flex: 1,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
             {params.value} - {params.getValue(params.id, 'endDate') || ''}
           </Typography>
         </div>
@@ -89,8 +89,8 @@ function StockTransferList() {
     {
       field: 'branchFrom',
       headerName: 'สาขาต้นทาง',
-      // minWidth: 128,
-      width: 195,
+      minWidth: 205,
+      // width: 195,
       // flex: 1.2,
       headerAlign: 'center',
       sortable: false,
@@ -98,8 +98,8 @@ function StockTransferList() {
     {
       field: 'branchTo',
       headerName: 'สาขาปลายทาง',
-      // minWidth: 128,
-      width: 195,
+      minWidth: 205,
+      // width: 195,
       // flex: 0.,
       headerAlign: 'center',
       sortable: false,
@@ -116,8 +116,8 @@ function StockTransferList() {
     {
       field: 'status',
       headerName: 'สถานะ BT',
-      minWidth: 80,
-      // flex: 0.7,
+      // minWidth: 80,
+      flex: 0.7,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
@@ -131,7 +131,7 @@ function StockTransferList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size='small'
+              size="small"
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
@@ -139,7 +139,7 @@ function StockTransferList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size='small'
+              size="small"
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
@@ -263,7 +263,7 @@ function StockTransferList() {
   };
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -277,7 +277,7 @@ function StockTransferList() {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.totalPage}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
