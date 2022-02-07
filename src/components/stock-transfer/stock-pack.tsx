@@ -295,8 +295,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setComment(branchTransferInfo.comment);
 
     const isBranch = isOwnBranch('D0001');
-    setIsDraft(isBranch && branchTransferInfo.status === 'CREATED' ? true : false);
-
+    setIsDraft(branchTransferInfo.status === 'CREATED' ? true : false);
     setIsDC(isBranchDC(getUserInfo()));
 
     let newColumns = [...cols];
