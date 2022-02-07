@@ -22,6 +22,7 @@ import { getDecodedAccessToken } from '../../utils/utils';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 
 interface State {
+  branch: string;
   userId: string;
   password: string;
   showPassword: boolean;
@@ -34,6 +35,7 @@ function LoginForm() {
     password: '',
     userId: '',
     showPassword: false,
+    branch: '',
   });
   // console.log(isAllowPermission('FEATURE.ADMIN.SEARCH.DATA'));
   const dispatch = useAppDispatch();
@@ -58,6 +60,7 @@ function LoginForm() {
     const form: loginForm = {
       userId: values.userId,
       password: values.password,
+      branchCode: values.branch,
     };
     await dispatch(loginKeyCloakAsync(form));
   };
@@ -121,6 +124,22 @@ function LoginForm() {
                   </IconButton>
                 </InputAdornment>
               }
+            />
+          </FormControl>
+        </div>
+        <div>
+          <FormControl sx={{ m: 3 }} className={clsx(classes.textField)} variant='outlined'>
+            <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>
+              สาขา
+            </FormHelperText>
+            <OutlinedInput
+              id='txtBranchCoce'
+              value={values.branch}
+              onChange={handleChange('branch')}
+              aria-describedby='outlined-user-id-text'
+              inputProps={{
+                'aria-label': 'weight',
+              }}
             />
           </FormControl>
         </div>

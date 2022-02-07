@@ -1,5 +1,5 @@
 import { env } from './environmentConfigs';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import { loginForm, Response } from '../models/user-interface';
 import { setAccessToken, setRefreshToken, setSessionId, getAccessToken, getRefreshToken } from '../store/sessionStore';
@@ -11,6 +11,7 @@ const instance = axios.create({
     'Content-Type': 'application/x-www-form-urlencoded',
   },
 });
+let branchCode = '';
 
 export function authentication(payload: loginForm): Promise<Response> {
   const params = new URLSearchParams();
@@ -18,8 +19,9 @@ export function authentication(payload: loginForm): Promise<Response> {
   params.append('password', payload.password);
   params.append('grant_type', env.keycloak.grantType);
   params.append('client_id', env.keycloak.clientId);
+  params.append('branchCode', payload.branchCode);
   // params.append("client_secret", env.keycloak.clientSecret);
-
+  branchCode = payload.branchCode;
   return instance
     .post(env.keycloak.url, params)
     .then((response: AxiosResponse) => {
@@ -61,3 +63,8 @@ export function refreshToken(): Promise<Response> {
     throw new Error('refresh token failed');
   }
 }
+
+instance.interceptors.request.use(function (config: AxiosRequestConfig) {
+  // config.headers.common['branchCode'] = branchCode;
+  return config;
+});
