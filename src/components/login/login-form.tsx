@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import clsx from 'clsx';
 
@@ -17,7 +17,7 @@ import { loginKeyCloakAsync } from '../../store/slices/authSlice';
 import { loginForm } from '../../models/user-interface';
 import { loginFormStyle } from './loginForm-css';
 import { env } from '../../adapters/environmentConfigs';
-import { getAccessToken } from '../../store/sessionStore';
+import { getAccessToken, setUserInfo } from '../../store/sessionStore';
 import { getDecodedAccessToken } from '../../utils/utils';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 
@@ -60,12 +60,14 @@ function LoginForm() {
       password: values.password,
     };
     await dispatch(loginKeyCloakAsync(form));
+  };
+  useEffect(() => {
     if (!error) {
       const token = getAccessToken();
       const userInfo: KeyCloakTokenInfo = getDecodedAccessToken(token ? token : '');
-      console.log(userInfo);
+      setUserInfo(userInfo);
     }
-  };
+  }, []);
 
   return (
     <div className={classes.root}>
