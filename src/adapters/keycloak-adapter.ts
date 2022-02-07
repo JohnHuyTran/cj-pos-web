@@ -65,6 +65,6 @@ export function refreshToken(): Promise<Response> {
 }
 
 instance.interceptors.request.use(function (config: AxiosRequestConfig) {
-  // config.headers.common['branchCode'] = branchCode;
+  config.headers.common['X-Requested-With'] = branchCode;
   return config;
 });

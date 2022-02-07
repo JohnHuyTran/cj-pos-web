@@ -77,7 +77,7 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    minWidth: 300,
+    minWidth: 200,
     flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
@@ -102,7 +102,7 @@ const columns: GridColDef[] = [
   {
     field: 'remainStock',
     headerName: 'สต๊อกสินค้าคงเหลือ',
-    minWidth: 150,
+    minWidth: 120,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -111,7 +111,7 @@ const columns: GridColDef[] = [
   {
     field: 'qty',
     headerName: 'จำนวนที่สั่ง',
-    minWidth: 150,
+    minWidth: 120,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -127,7 +127,7 @@ const columns: GridColDef[] = [
   {
     field: 'actualQty',
     headerName: 'จำนวนโอนจริง',
-    minWidth: 150,
+    minWidth: 120,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -161,7 +161,7 @@ const columns: GridColDef[] = [
   {
     field: 'unitFactor',
     headerName: 'จัด(ชิ้น)',
-    minWidth: 150,
+    minWidth: 120,
     headerAlign: 'center',
     sortable: false,
     align: 'right',
@@ -170,7 +170,7 @@ const columns: GridColDef[] = [
   {
     field: 'toteCode',
     headerName: 'เลข Tote/ลัง',
-    minWidth: 150,
+    minWidth: 120,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -188,6 +188,15 @@ const columns: GridColDef[] = [
         />
       </div>
     ),
+  },
+  {
+    field: 'boNo',
+    headerName: 'เลขที่ BO',
+    minWidth: 200,
+    flex: 0.7,
+    headerAlign: 'center',
+    disableColumnMenu: true,
+    sortable: false,
   },
 ];
 var calUnitFactor = function (params: GridValueGetterParams) {
@@ -272,7 +281,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
   const [pathReport, setPathReport] = React.useState<string>('');
   const [suffixDocType, setSuffixDocType] = React.useState<string>('');
-
+  let loop = 0;
   React.useEffect(() => {
     const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
     setSourceBranch(fromBranch ? fromBranch : '');
@@ -290,8 +299,16 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setIsDraft(isBranch && branchTransferInfo.status === 'CREATED' ? true : false);
 
     setIsDC(isBranchDC(getUserInfo()));
+
+    let newColumns = [...cols];
+    if (branchTransferInfo.status === 'CREATED') {
+      newColumns[9]['hide'] = true;
+    } else {
+      newColumns[9]['hide'] = false;
+    }
+
     storeItemAddItem(payloadAddItem);
-  }, [open, payloadAddItem]);
+  }, [open, payloadAddItem, loop]);
 
   if (endDate != null && startDate != null) {
     if (endDate < startDate) {
@@ -349,6 +366,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       actualQty: item.actualQty ? item.actualQty : 0,
       toteCode: item.toteCode,
       isDraft: isDraft,
+      boNo: item.boNo,
     };
   });
 
@@ -363,7 +381,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       }
       if (data.toteCode && data.actualQty <= 0) {
         itemNotValid = true;
-        setTextError('จำนวนโอนจริงเป็น 0 ไม่ต้องป้อนเลขที่ Tote/ลัง ');
+        setTextError('จำนวนโอนจริงเป็น 0 ไม่ต้องระบุเลขที่ Tote/ลัง ');
         return;
       }
     });
@@ -379,7 +397,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         .reduce((total, item: Item) => total + Number(calBaseUnit(item.qty, item.baseUnit)), 0);
       if (sumActual < sumQty && !comment) {
         itemNotValid = true;
-        setTextError('กรุณาป้อนสาเหตุการเปลี่ยนจำนวน');
+        setTextError('กรุณาระบุสาเหตุการเปลี่ยนจำนวน');
         return;
       }
     });
@@ -430,8 +448,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     });
     setBranchTransferItems(items);
   };
+
   const storeItemAddItem = (_newItem: any) => {
     const items: Item[] = [];
+    let _items = [...branchTransferItems];
     if (Object.keys(_newItem).length !== 0) {
       _newItem.map((data: any, index: number) => {
         let indexDup = 0;
@@ -439,7 +459,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           indexDup = index;
           return item.barcode === data.barcode;
         });
-
+        loop++;
         if (dupItem) {
           const newData: Item = {
             seqItem: dupItem.seqItem,
@@ -455,11 +475,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             isDraft: isDraft,
           };
 
-          const removeItem = [...branchTransferItems];
-          _.remove(removeItem, function (item: Item) {
+          // const removeItem = [...branchTransferItems];
+          _.remove(_items, function (item: Item) {
             return item.barcode === data.barcode;
           });
-          setBranchTransferItems([...removeItem, newData]);
+          // console.log(branchTransferItems);
+          // setBranchTransferItems([...removeItem, newData]);
+          // console.log(branchTransferItems);
+          _items = [..._items, newData];
         } else {
           const newData: Item = {
             seqItem: 0,
@@ -474,10 +497,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             toteCode: '',
             isDraft: isDraft,
           };
-          setBranchTransferItems([...branchTransferItems, newData]);
+          // setBranchTransferItems([...branchTransferItems, newData]);
+          _items = [..._items, newData];
         }
       });
     }
+    setBranchTransferItems(_items);
   };
 
   const handleClose = async () => {
@@ -521,6 +546,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
   const handleSaveBtn = async () => {
     await storeItem();
+    await dispatch(updateAddItemsState({}));
     const isvalidItem = validateItem();
     if (isvalidItem) {
       const payload: BranchTransferRequest = await mappingPayload();
@@ -542,6 +568,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
   const handleConfirmBtn = async () => {
     await storeItem();
+    await dispatch(updateAddItemsState({}));
     const isvalidItem = validateItem();
     if (isvalidItem) {
       // setOpenLoadingModal(true);
