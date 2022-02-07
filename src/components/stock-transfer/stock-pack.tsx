@@ -22,6 +22,7 @@ import {
   formatFileStockTransfer,
   getBranchName,
   getReasonLabel,
+  isBranchDC,
   isOwnBranch,
   numberWithCommas,
 } from '../../utils/utils';
@@ -51,6 +52,7 @@ import { FindProductRequest } from '../../models/product-model';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { parseWithOptions } from 'date-fns/fp';
 import { BranchInfo } from '../../models/search-branch-model';
+import { getUserInfo } from '../../store/sessionStore';
 
 interface Props {
   isOpen: boolean;
@@ -62,7 +64,7 @@ const columns: GridColDef[] = [
     field: 'index',
     headerName: 'ลำดับ',
     //flex: 0.5,
-    width: 70,
+    minWidth: 70,
     headerAlign: 'center',
     sortable: false,
     // hide: true,
@@ -75,7 +77,7 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    width: 300,
+    minWidth: 200,
     flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
@@ -85,7 +87,7 @@ const columns: GridColDef[] = [
     field: 'productName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
-    width: 220,
+    minWidth: 220,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
@@ -100,7 +102,7 @@ const columns: GridColDef[] = [
   {
     field: 'remainStock',
     headerName: 'สต๊อกสินค้าคงเหลือ',
-    width: 150,
+    minWidth: 120,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -109,7 +111,7 @@ const columns: GridColDef[] = [
   {
     field: 'qty',
     headerName: 'จำนวนที่สั่ง',
-    width: 150,
+    minWidth: 120,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -118,14 +120,14 @@ const columns: GridColDef[] = [
   {
     field: 'unitName',
     headerName: 'หน่วย',
-    width: 110,
+    minWidth: 110,
     headerAlign: 'center',
     sortable: false,
   },
   {
     field: 'actualQty',
     headerName: 'จำนวนโอนจริง',
-    width: 150,
+    minWidth: 120,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -159,7 +161,7 @@ const columns: GridColDef[] = [
   {
     field: 'unitFactor',
     headerName: 'จัด(ชิ้น)',
-    width: 150,
+    minWidth: 120,
     headerAlign: 'center',
     sortable: false,
     align: 'right',
@@ -168,7 +170,7 @@ const columns: GridColDef[] = [
   {
     field: 'toteCode',
     headerName: 'เลข Tote/ลัง',
-    width: 150,
+    minWidth: 120,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -186,6 +188,15 @@ const columns: GridColDef[] = [
         />
       </div>
     ),
+  },
+  {
+    field: 'boNo',
+    headerName: 'เลขที่ BO',
+    minWidth: 200,
+    flex: 0.7,
+    headerAlign: 'center',
+    disableColumnMenu: true,
+    sortable: false,
   },
 ];
 var calUnitFactor = function (params: GridValueGetterParams) {
@@ -269,7 +280,8 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
   const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
   const [pathReport, setPathReport] = React.useState<string>('');
-
+  const [suffixDocType, setSuffixDocType] = React.useState<string>('');
+  let loop = 0;
   React.useEffect(() => {
     const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
     setSourceBranch(fromBranch ? fromBranch : '');
@@ -286,8 +298,17 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const isBranch = isOwnBranch('D0001');
     setIsDraft(isBranch && branchTransferInfo.status === 'CREATED' ? true : false);
 
+    setIsDC(isBranchDC(getUserInfo()));
+
+    let newColumns = [...cols];
+    if (branchTransferInfo.status === 'CREATED') {
+      newColumns[9]['hide'] = true;
+    } else {
+      newColumns[9]['hide'] = false;
+    }
+
     storeItemAddItem(payloadAddItem);
-  }, [open, payloadAddItem]);
+  }, [open, payloadAddItem, loop]);
 
   if (endDate != null && startDate != null) {
     if (endDate < startDate) {
@@ -345,6 +366,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       actualQty: item.actualQty ? item.actualQty : 0,
       toteCode: item.toteCode,
       isDraft: isDraft,
+      boNo: item.boNo,
     };
   });
 
@@ -359,7 +381,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       }
       if (data.toteCode && data.actualQty <= 0) {
         itemNotValid = true;
-        setTextError('จำนวนโอนจริงเป็น 0 ไม่ต้องป้อนเลขที่ Tote/ลัง ');
+        setTextError('จำนวนโอนจริงเป็น 0 ไม่ต้องระบุเลขที่ Tote/ลัง ');
         return;
       }
     });
@@ -375,7 +397,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         .reduce((total, item: Item) => total + Number(calBaseUnit(item.qty, item.baseUnit)), 0);
       if (sumActual < sumQty && !comment) {
         itemNotValid = true;
-        setTextError('กรุณาป้อนสาเหตุการเปลี่ยนจำนวน');
+        setTextError('กรุณาระบุสาเหตุการเปลี่ยนจำนวน');
         return;
       }
     });
@@ -426,8 +448,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     });
     setBranchTransferItems(items);
   };
+
   const storeItemAddItem = (_newItem: any) => {
     const items: Item[] = [];
+    let _items = [...branchTransferItems];
     if (Object.keys(_newItem).length !== 0) {
       _newItem.map((data: any, index: number) => {
         let indexDup = 0;
@@ -435,7 +459,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           indexDup = index;
           return item.barcode === data.barcode;
         });
-
+        loop++;
         if (dupItem) {
           const newData: Item = {
             seqItem: dupItem.seqItem,
@@ -451,11 +475,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             isDraft: isDraft,
           };
 
-          const removeItem = [...branchTransferItems];
-          _.remove(removeItem, function (item: Item) {
+          // const removeItem = [...branchTransferItems];
+          _.remove(_items, function (item: Item) {
             return item.barcode === data.barcode;
           });
-          setBranchTransferItems([...removeItem, newData]);
+          // console.log(branchTransferItems);
+          // setBranchTransferItems([...removeItem, newData]);
+          // console.log(branchTransferItems);
+          _items = [..._items, newData];
         } else {
           const newData: Item = {
             seqItem: 0,
@@ -470,10 +497,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             toteCode: '',
             isDraft: isDraft,
           };
-          setBranchTransferItems([...branchTransferItems, newData]);
+          // setBranchTransferItems([...branchTransferItems, newData]);
+          _items = [..._items, newData];
         }
       });
     }
+    setBranchTransferItems(_items);
   };
 
   const handleClose = async () => {
@@ -517,6 +546,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
   const handleSaveBtn = async () => {
     await storeItem();
+    await dispatch(updateAddItemsState({}));
     const isvalidItem = validateItem();
     if (isvalidItem) {
       const payload: BranchTransferRequest = await mappingPayload();
@@ -538,6 +568,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
   const handleConfirmBtn = async () => {
     await storeItem();
+    await dispatch(updateAddItemsState({}));
     const isvalidItem = validateItem();
     if (isvalidItem) {
       // setOpenLoadingModal(true);
@@ -632,6 +663,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
   const handleLinkDocument = (docType: string) => {
     const path = getPathReportBT(docType ? docType : 'BT', btNo);
+    setSuffixDocType(docType !== 'BT' ? docType : '');
     setPathReport(path ? path : '');
     setOpenModelPreviewDocument(true);
   };
@@ -718,7 +750,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Grid item lg={1}></Grid>
                 <Grid item lg={2}></Grid>
                 <Grid item lg={3}>
-                  {/* <>
+                  <>
                     <Box>
                       <Link
                         component='button'
@@ -729,7 +761,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         เรียกดูเอกสารใบโอน BT
                       </Link>
                     </Box>
-                  </> */}
+                  </>
                 </Grid>
                 <Grid item lg={1}></Grid>
               </Grid>
@@ -746,7 +778,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Grid item lg={1}></Grid>
                 <Grid item lg={2}></Grid>
                 <Grid item lg={3}>
-                  {/* <>
+                  <>
                     <Box>
                       <Link
                         component='button'
@@ -762,7 +794,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         component='button'
                         variant='body2'
                         onClick={(e) => {
-                          handleLinkDocument('BT');
+                          handleLinkDocument('BO');
                         }}>
                         เรียกดูเอกสารใบ BO
                       </Link>
@@ -772,12 +804,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         component='button'
                         variant='body2'
                         onClick={(e) => {
-                          handleLinkDocument('BT');
+                          handleLinkDocument('Box');
                         }}>
                         เรียกดูเอกสารใบปะลัง
                       </Link>
                     </Box>
-                  </> */}
+                  </>
                 </Grid>
                 <Grid item lg={1}></Grid>
               </Grid>
@@ -904,7 +936,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                     component='button'
                     variant='body2'
                     onClick={(e) => {
-                      handleLinkDocument('BT');
+                      handleLinkDocument('Recall');
                     }}>
                     เรียกดูเอกสารใบเรียกเก็บ
                   </Link>
@@ -988,7 +1020,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         url={pathReport}
         statusFile={1}
         sdImageFile={''}
-        fileName={formatFileStockTransfer(btNo, btStatus)}
+        fileName={formatFileStockTransfer(btNo, btStatus, suffixDocType)}
         btnPrintName='พิมพ์เอกสาร'
       />
     </React.Fragment>

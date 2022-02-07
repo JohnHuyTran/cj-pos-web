@@ -136,6 +136,7 @@ export interface Item {
   orderQty?: number;
   orderAllQty?: number;
   isDraft?: boolean;
+  boNo?: boolean;
 }
 
 export interface BranchTransferResponse {

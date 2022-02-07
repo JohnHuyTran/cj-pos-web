@@ -166,15 +166,15 @@ export const environment = {
         url: '/stock/stock-transfer/save-to-dc',
       },
       reportBO: {
-        url: '/stock/stock-transfer/{btNo}/export',
+        url: '/stock/stock-transfer/export/branch-out/{btNo}',
       },
       reportBT: {
-        url: '/stock/stock-transfer/{btNo}/export',
+        url: '/stock/stock-transfer/export/recall/{btNo}',
       },
-      reportPaperWork: {
-        url: '/stock/stock-transfer/{btNo}/export',
+      reportReCall: {
+        url: '/stock/stock-transfer/export/recall/{btNo}',
       },
-      reportInvoiceDocument: {
+      reportPaperBox: {
         url: '/stock/stock-transfer/{btNo}/export',
       },
       sendToPickup: {
