@@ -69,15 +69,16 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label='close'
+          aria-label="close"
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}>
-          <HighlightOff fontSize='large' />
+          }}
+        >
+          <HighlightOff fontSize="large" />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -298,6 +299,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
 
   const handleSave = async () => {
     setOpenLoadingModal(true);
+
     let validateActualQty = payloadAddItem.filter((r: any) => r.qty === 0);
     if (!startDate || !endDate) {
       setOpenAlert(true);
@@ -305,6 +307,9 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     } else if (fromBranch === '' || toBranch === '') {
       setOpenAlert(true);
       setTextError('กรุณาเลือกสาขาโอนสินค้า');
+    } else if (reasons === 'All' || reasons === undefined) {
+      setOpenAlert(true);
+      setTextError('กรุณาเลือกสาเหตุการโอน');
     } else if (validateActualQty.length > 0) {
       setOpenAlert(true);
       setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
@@ -321,7 +326,11 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
-          setContentMsg(error.message);
+          if (error.code === 40010) {
+            setContentMsg('สาขาปลายทางไม่สามารถรับโอนสินค้าได้เนื่องจากไม่มี assortment');
+          } else {
+            setContentMsg(error.message);
+          }
         });
     }
     setOpenLoadingModal(false);
@@ -345,15 +354,15 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
 
     let rt = '';
     if (rtNo) rt = rtNo;
-    let reason = reasons;
-    if (reason === 'All') reason = '';
+    // let reason = reasons;
+    // if (reason === 'All') reason = '';
     const payload: SaveStockTransferRequest = {
       rtNo: rt,
       startDate: moment(startDate).startOf('day').toISOString(),
       endDate: moment(endDate).startOf('day').toISOString(),
       branchFrom: fromBranch,
       branchTo: toBranch,
-      transferReason: reason,
+      transferReason: reasons,
       items: itemsList,
     };
 
@@ -370,6 +379,9 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     } else if (fromBranch === '' || toBranch === '') {
       setOpenAlert(true);
       setTextError('กรุณาเลือกสาขาโอนสินค้า');
+    } else if (reasons === 'All' || reasons === undefined) {
+      setOpenAlert(true);
+      setTextError('กรุณาเลือกสาเหตุการโอน');
     } else if (validateActualQty.length > 0) {
       setOpenAlert(true);
       setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
@@ -467,14 +479,14 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           itemsList.push(item);
         });
 
-        let reason = reasons;
-        if (reason === 'All') reason = '';
+        // let reason = reasons;
+        // if (reason === 'All') reason = '';
         const payloadSubmit: SubmitStockTransferRequest = {
           startDate: moment(startDate).startOf('day').toISOString(),
           endDate: moment(endDate).startOf('day').toISOString(),
           branchFrom: fromBranch,
           branchTo: toBranch,
-          transferReason: reason,
+          transferReason: reasons,
           items: itemsList,
         };
 
@@ -491,9 +503,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               handleClose();
             }, 500);
           })
-          .catch((error) => {
+          .catch((error: ApiError) => {
             setShowSnackBar(true);
-            setContentMsg(error.message);
+            if (error.code === 40010) {
+              setContentMsg('สาขาปลายทางไม่สามารถรับโอนสินค้าได้เนื่องจากไม่มี assortment');
+            } else {
+              setContentMsg(error.message);
+            }
           });
       }
     } else if (status === 'WAIT_FOR_APPROVAL_1') {
@@ -580,9 +596,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               handleClose();
             }, 500);
           })
-          .catch((error) => {
+          .catch((error: ApiError) => {
             setShowSnackBar(true);
-            setContentMsg(error.message);
+            if (error.code === 40010) {
+              setContentMsg('สาขาปลายทางไม่สามารถรับโอนสินค้าได้เนื่องจากไม่มี assortment');
+            } else {
+              setContentMsg(error.message);
+            }
           });
       }
     }
@@ -592,15 +612,15 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
 
   return (
     <div>
-      <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleChkSaveClose}>
+      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleChkSaveClose}>
           <Typography sx={{ fontSize: '1em' }}>
             {type === 'Create' && 'สร้างรายการโอนสินค้า'}
             {type !== 'Create' && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && 'รายการโอนสินค้า'}
             {type !== 'Create' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && 'ตรวจสอบรายการโอนสินค้า'}
           </Typography>
-          {status !== '' && <Steppers status={status} type='RT'></Steppers>}
-          {status === '' && <Steppers status='DRAFT' type='RT'></Steppers>}
+          {status !== '' && <Steppers status={status} type="RT"></Steppers>}
+          {status === '' && <Steppers status="DRAFT" type="RT"></Steppers>}
         </BootstrapDialogTitle>
 
         <DialogContent>
@@ -612,14 +632,12 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               {rtNo !== '' && rtNo}
               {rtNo === '' && '-'}
             </Grid>
-            <Grid item xs={6}></Grid>
             <Grid item xs={2}>
               วันที่สร้างรายการ :
             </Grid>
             <Grid item xs={4}>
               {moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
             </Grid>
-            <Grid item xs={6}></Grid>
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
@@ -714,37 +732,40 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             <Grid container spacing={2} mt={4} mb={2}>
               <Grid item xs={5}>
                 <Button
-                  id='btnAddItem'
-                  variant='contained'
-                  color='info'
+                  id="btnAddItem"
+                  variant="contained"
+                  color="info"
                   className={classes.MbtnPrint}
                   onClick={handleOpenAddItems}
                   startIcon={<ControlPoint />}
-                  sx={{ width: 200 }}>
+                  sx={{ width: 200 }}
+                >
                   เพิ่มสินค้า
                 </Button>
               </Grid>
               <Grid item xs={7} sx={{ textAlign: 'end' }}>
                 <Button
-                  id='btnSave'
-                  variant='contained'
-                  color='warning'
+                  id="btnSave"
+                  variant="contained"
+                  color="warning"
                   className={classes.MbtnSave}
                   onClick={handleSave}
                   startIcon={<SaveIcon />}
                   sx={{ width: 140 }}
-                  disabled={rowLength == 0}>
+                  disabled={rowLength == 0}
+                >
                   บันทึก
                 </Button>
                 <Button
-                  id='btnCreateTransfer'
-                  variant='contained'
-                  color='primary'
+                  id="btnCreateTransfer"
+                  variant="contained"
+                  color="primary"
                   className={classes.MbtnSave}
                   onClick={handleSubmit}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 140 }}
-                  disabled={rowLength == 0}>
+                  disabled={rowLength == 0}
+                >
                   ส่งงาน
                 </Button>
               </Grid>
@@ -756,23 +777,25 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               <Grid item xs={5}></Grid>
               <Grid item xs={7} sx={{ textAlign: 'end' }}>
                 <Button
-                  id='btnSave'
-                  variant='contained'
-                  color='error'
+                  id="btnSave"
+                  variant="contained"
+                  color="error"
                   className={classes.MbtnSave}
                   onClick={handleReject}
                   startIcon={<SaveIcon />}
-                  sx={{ width: 140 }}>
+                  sx={{ width: 140 }}
+                >
                   ปฎิเสธ
                 </Button>
                 <Button
-                  id='btnCreateTransfer'
-                  variant='contained'
-                  color='primary'
+                  id="btnCreateTransfer"
+                  variant="contained"
+                  color="primary"
                   className={classes.MbtnSave}
                   onClick={handleApprove}
                   startIcon={<CheckCircleOutline />}
-                  sx={{ width: 140 }}>
+                  sx={{ width: 140 }}
+                >
                   อนุมัติ
                 </Button>
               </Grid>
@@ -795,7 +818,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             <Grid container spacing={2} mb={2}>
               <Grid item xs={3}>
                 <TextBoxComment
-                  fieldName='หมายเหตุจาก OC :'
+                  fieldName="หมายเหตุจาก OC :"
                   defaultValue={commentOC}
                   maxLength={100}
                   onChangeComment={handleChangeCommentOC}
@@ -805,7 +828,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               <Grid item xs={6}></Grid>
               <Grid item xs={3}>
                 <TextBoxComment
-                  fieldName='หมายเหตุจาก SCM :'
+                  fieldName="หมายเหตุจาก SCM :"
                   defaultValue={commentSCM}
                   maxLength={100}
                   onChangeComment={handleChangeCommentSCM}
@@ -822,7 +845,8 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
         onClose={handleModelAddItems}
         requestBody={{
           skuCodes: [],
-        }}></ModalAddItems>
+        }}
+      ></ModalAddItems>
 
       <SnackbarStatus
         open={showSnackBar}
@@ -836,7 +860,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
         onClose={handleCloseModelConfirm}
         handleConfirm={handleConfirm}
         header={textHeaderConfirm}
-        title='เลขที่เอกสาร RT'
+        title="เลขที่เอกสาร RT"
         value={rtNo}
       />
 
