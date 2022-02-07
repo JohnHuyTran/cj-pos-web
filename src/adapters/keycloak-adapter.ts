@@ -2,7 +2,15 @@ import { env } from './environmentConfigs';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import { loginForm, Response } from '../models/user-interface';
-import { setAccessToken, setRefreshToken, setSessionId, getAccessToken, getRefreshToken } from '../store/sessionStore';
+import {
+  setAccessToken,
+  setRefreshToken,
+  setSessionId,
+  getAccessToken,
+  getRefreshToken,
+  setUserInfo,
+} from '../store/sessionStore';
+import { getDecodedAccessToken } from '../utils/utils';
 
 const instance = axios.create({
   baseURL: env.keycloak.url,
@@ -29,6 +37,7 @@ export function authentication(payload: loginForm): Promise<Response> {
         setAccessToken(response.data.access_token);
         setRefreshToken(response.data.refresh_token);
         setSessionId(response.data.session_state);
+        setUserInfo(getDecodedAccessToken(response.data.access_token ? response.data.access_token : ''));
         return response.data;
       }
       throw new Error(response.status.toString());

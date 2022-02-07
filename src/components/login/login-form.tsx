@@ -39,7 +39,7 @@ function LoginForm() {
   });
   // console.log(isAllowPermission('FEATURE.ADMIN.SEARCH.DATA'));
   const dispatch = useAppDispatch();
-  const { error } = useAppSelector((state) => state.auth);
+  const { error, isLogin } = useAppSelector((state) => state.auth);
   const [version, setVersion] = React.useState<any>(process.env.REACT_APP_POS_BACK_VERSION);
   const handleChange = (prop: any) => (event: any) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -64,13 +64,6 @@ function LoginForm() {
     };
     await dispatch(loginKeyCloakAsync(form));
   };
-  useEffect(() => {
-    if (!error) {
-      const token = getAccessToken();
-      const userInfo: KeyCloakTokenInfo = getDecodedAccessToken(token ? token : '');
-      setUserInfo(userInfo);
-    }
-  }, []);
 
   return (
     <div className={classes.root}>
