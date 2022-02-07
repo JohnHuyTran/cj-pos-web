@@ -281,7 +281,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
   const [pathReport, setPathReport] = React.useState<string>('');
   const [suffixDocType, setSuffixDocType] = React.useState<string>('');
-  let loop = 0;
   React.useEffect(() => {
     const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
     setSourceBranch(fromBranch ? fromBranch : '');
@@ -308,7 +307,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     }
 
     storeItemAddItem(payloadAddItem);
-  }, [open, payloadAddItem, loop]);
+  }, [open, payloadAddItem]);
 
   if (endDate != null && startDate != null) {
     if (endDate < startDate) {
@@ -459,7 +458,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           indexDup = index;
           return item.barcode === data.barcode;
         });
-        loop++;
         if (dupItem) {
           const newData: Item = {
             seqItem: dupItem.seqItem,
