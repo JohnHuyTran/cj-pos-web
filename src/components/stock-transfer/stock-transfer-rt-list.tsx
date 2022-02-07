@@ -53,7 +53,7 @@ function StockTransferRtList() {
     {
       field: 'rtNo',
       headerName: 'เลขที่เอกสารร้องขอ RT',
-      minWidth: 180,
+      minWidth: 190,
       // flex: 1.3,
       headerAlign: 'center',
       sortable: false,
@@ -61,8 +61,8 @@ function StockTransferRtList() {
     {
       field: 'startDate',
       headerName: 'วันที่ต้องการโอน',
-      width: 160,
-      // minWidth: 200,
+      // width: 160,
+      minWidth: 150,
       // flex: 1,
       headerAlign: 'center',
       align: 'left',
@@ -78,26 +78,41 @@ function StockTransferRtList() {
     {
       field: 'branchFromName',
       headerName: 'สาขาต้นทาง',
-      minWidth: 128,
-      width: 200,
+      minWidth: 210,
+      // width: 210,
       // flex: 1.2,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.getValue(params.id, 'branchFrom') || ''}-{params.value}
+          </Typography>
+        </div>
+      ),
     },
     {
       field: 'branchToName',
       headerName: 'สาขาปลายทาง',
-      // minWidth: 128,
-      width: 200,
+      minWidth: 210,
+      // width: 210,
       // flex: 0.,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.getValue(params.id, 'branchTo') || ''}-{params.value}
+          </Typography>
+        </div>
+      ),
     },
     {
       field: 'createdBy',
       headerName: 'ผู้สร้างรายการ',
       minWidth: 120,
-      // flex: 0.75,
+      // width: 130,
+      // flex: 1,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
@@ -143,17 +158,29 @@ function StockTransferRtList() {
         }
       },
     },
-    // {
-    //   field: 'button',
-    //   headerName: ' ',
-    //   width: 60,
-    //   minWidth: 0,
-    //   align: 'center',
-    //   sortable: false,
-    //   renderCell: () => {
-    //     return <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />;
-    //   },
-    // },
+    {
+      field: 'delete',
+      headerName: ' ',
+      // width: 40,
+      // minWidth: 0,
+      flex: 0.75,
+      align: 'center',
+      sortable: false,
+      renderCell: (params) => {
+        if (
+          params.getValue(params.id, 'status') === 'DRAFT' ||
+          params.getValue(params.id, 'status') === 'AWAITING_FOR_REQUESTER'
+        ) {
+          return (
+            <div>
+              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+            </div>
+          );
+        } else {
+          return <div></div>;
+        }
+      },
+    },
   ];
 
   const rows = res.data.map((data: StockTransferInfo, indexs: number) => {
@@ -165,6 +192,8 @@ function StockTransferRtList() {
       endDate: convertUtcToBkkDate(data.endDate),
       branchFromName: data.branchFromName,
       branchToName: data.branchToName,
+      branchFrom: data.branchFrom,
+      branchTo: data.branchTo,
       createdBy: data.createdBy,
       status: data.status,
     };
