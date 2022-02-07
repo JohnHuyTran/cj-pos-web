@@ -64,7 +64,7 @@ const columns: GridColDef[] = [
     field: 'index',
     headerName: 'ลำดับ',
     //flex: 0.5,
-    width: 70,
+    minWidth: 70,
     headerAlign: 'center',
     sortable: false,
     // hide: true,
@@ -77,7 +77,7 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    width: 300,
+    minWidth: 300,
     flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
@@ -87,7 +87,7 @@ const columns: GridColDef[] = [
     field: 'productName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
-    width: 220,
+    minWidth: 220,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
@@ -102,7 +102,7 @@ const columns: GridColDef[] = [
   {
     field: 'remainStock',
     headerName: 'สต๊อกสินค้าคงเหลือ',
-    width: 150,
+    minWidth: 150,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -111,7 +111,7 @@ const columns: GridColDef[] = [
   {
     field: 'qty',
     headerName: 'จำนวนที่สั่ง',
-    width: 150,
+    minWidth: 150,
     headerAlign: 'center',
     align: 'right',
     sortable: false,
@@ -120,14 +120,14 @@ const columns: GridColDef[] = [
   {
     field: 'unitName',
     headerName: 'หน่วย',
-    width: 110,
+    minWidth: 110,
     headerAlign: 'center',
     sortable: false,
   },
   {
     field: 'actualQty',
     headerName: 'จำนวนโอนจริง',
-    width: 150,
+    minWidth: 150,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -161,7 +161,7 @@ const columns: GridColDef[] = [
   {
     field: 'unitFactor',
     headerName: 'จัด(ชิ้น)',
-    width: 150,
+    minWidth: 150,
     headerAlign: 'center',
     sortable: false,
     align: 'right',
@@ -170,7 +170,7 @@ const columns: GridColDef[] = [
   {
     field: 'toteCode',
     headerName: 'เลข Tote/ลัง',
-    width: 150,
+    minWidth: 150,
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
