@@ -22,6 +22,7 @@ import {
   formatFileStockTransfer,
   getBranchName,
   getReasonLabel,
+  isBranchDC,
   isOwnBranch,
   numberWithCommas,
 } from '../../utils/utils';
@@ -51,6 +52,7 @@ import { FindProductRequest } from '../../models/product-model';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { parseWithOptions } from 'date-fns/fp';
 import { BranchInfo } from '../../models/search-branch-model';
+import { getUserInfo } from '../../store/sessionStore';
 
 interface Props {
   isOpen: boolean;
@@ -269,6 +271,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
   const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
   const [pathReport, setPathReport] = React.useState<string>('');
+  const [suffixDocType, setSuffixDocType] = React.useState<string>('');
 
   React.useEffect(() => {
     const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
@@ -286,6 +289,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const isBranch = isOwnBranch('D0001');
     setIsDraft(isBranch && branchTransferInfo.status === 'CREATED' ? true : false);
 
+    setIsDC(isBranchDC(getUserInfo()));
     storeItemAddItem(payloadAddItem);
   }, [open, payloadAddItem]);
 
@@ -632,6 +636,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 
   const handleLinkDocument = (docType: string) => {
     const path = getPathReportBT(docType ? docType : 'BT', btNo);
+    setSuffixDocType(docType !== 'BT' ? docType : '');
     setPathReport(path ? path : '');
     setOpenModelPreviewDocument(true);
   };
@@ -718,7 +723,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Grid item lg={1}></Grid>
                 <Grid item lg={2}></Grid>
                 <Grid item lg={3}>
-                  {/* <>
+                  <>
                     <Box>
                       <Link
                         component='button'
@@ -729,7 +734,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         เรียกดูเอกสารใบโอน BT
                       </Link>
                     </Box>
-                  </> */}
+                  </>
                 </Grid>
                 <Grid item lg={1}></Grid>
               </Grid>
@@ -746,7 +751,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Grid item lg={1}></Grid>
                 <Grid item lg={2}></Grid>
                 <Grid item lg={3}>
-                  {/* <>
+                  <>
                     <Box>
                       <Link
                         component='button'
@@ -762,7 +767,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         component='button'
                         variant='body2'
                         onClick={(e) => {
-                          handleLinkDocument('BT');
+                          handleLinkDocument('BO');
                         }}>
                         เรียกดูเอกสารใบ BO
                       </Link>
@@ -772,12 +777,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         component='button'
                         variant='body2'
                         onClick={(e) => {
-                          handleLinkDocument('BT');
+                          handleLinkDocument('Box');
                         }}>
                         เรียกดูเอกสารใบปะลัง
                       </Link>
                     </Box>
-                  </> */}
+                  </>
                 </Grid>
                 <Grid item lg={1}></Grid>
               </Grid>
@@ -904,7 +909,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                     component='button'
                     variant='body2'
                     onClick={(e) => {
-                      handleLinkDocument('BT');
+                      handleLinkDocument('Recall');
                     }}>
                     เรียกดูเอกสารใบเรียกเก็บ
                   </Link>
@@ -988,7 +993,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         url={pathReport}
         statusFile={1}
         sdImageFile={''}
-        fileName={formatFileStockTransfer(btNo, btStatus)}
+        fileName={formatFileStockTransfer(btNo, btStatus, suffixDocType)}
         btnPrintName='พิมพ์เอกสาร'
       />
     </React.Fragment>

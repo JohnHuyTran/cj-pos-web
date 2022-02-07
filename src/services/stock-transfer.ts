@@ -147,10 +147,10 @@ export const getPathReportBT = (docType: string, btNo: string) => {
     return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportBT.url}`, { btNo: btNo });
   } else if (docType === 'BO') {
     return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportBO.url}`, { btNo: btNo });
-  } else if (docType === 'PAPERWORK') {
-    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportPaperWork.url}`, { btNo: btNo });
-  } else if (docType === 'INVOICE') {
-    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportInvoiceDocument.url}`, {
+  } else if (docType === 'Recall') {
+    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportReCall.url}`, { btNo: btNo });
+  } else if (docType === 'Box') {
+    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportPaperBox.url}`, {
       btNo: btNo,
     });
   }
