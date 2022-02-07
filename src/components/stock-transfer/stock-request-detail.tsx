@@ -177,6 +177,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   };
 
   const [flagSave, setFlagSave] = React.useState(false);
+  const [flagCreateSave, setFlagCreateSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const handleChkSaveClose = async () => {
     if (flagSave) {
@@ -184,7 +185,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     } else if (!flagSave && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) {
       if (type === 'View' && rowLength !== Object.keys(payloadAddItem).length) {
         setConfirmModelExit(true);
-      } else if (type === 'Create' && rowLength > 0) {
+      } else if (type === 'Create' && rowLength > 0 && !flagCreateSave) {
         setConfirmModelExit(true);
       } else {
         handleClose();
@@ -307,7 +308,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     } else if (fromBranch === '' || toBranch === '') {
       setOpenAlert(true);
       setTextError('กรุณาเลือกสาขาโอนสินค้า');
-    } else if (reasons === 'All' || reasons === undefined) {
+    } else if (reasons === 'All' || reasons === undefined || reasons === '') {
       setOpenAlert(true);
       setTextError('กรุณาเลือกสาเหตุการโอน');
     } else if (validateActualQty.length > 0) {
@@ -317,6 +318,10 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
       const payloadSave: any = await handleMapPayloadSave();
       await saveStockRequest(payloadSave)
         .then((value) => {
+          if (type === 'Create') {
+            setFlagCreateSave(true);
+          }
+
           setFlagSave(false);
           setRTNo(value.docNo);
           setStatus('DRAFT');
@@ -379,7 +384,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     } else if (fromBranch === '' || toBranch === '') {
       setOpenAlert(true);
       setTextError('กรุณาเลือกสาขาโอนสินค้า');
-    } else if (reasons === 'All' || reasons === undefined) {
+    } else if (reasons === 'All' || reasons === undefined || reasons === '') {
       setOpenAlert(true);
       setTextError('กรุณาเลือกสาเหตุการโอน');
     } else if (validateActualQty.length > 0) {
