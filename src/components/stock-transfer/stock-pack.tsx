@@ -180,7 +180,6 @@ const columns: GridColDef[] = [
         onChange={(e) => {
           const cursorStart = e.target.selectionStart;
           const cursorEnd = e.target.selectionEnd;
-          console.log(`${cursorStart}  ${cursorEnd}`);
           params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
           e.target.setSelectionRange(cursorStart, cursorEnd);
         }}
@@ -397,11 +396,11 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         return;
       }
     });
-
     if (itemNotValid) {
       setOpenAlert(true);
       return false;
     } else {
+      setOpenAlert(false);
       return true;
     }
   };
@@ -424,6 +423,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const storeItem = () => {
+    setComment(comment);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const items: Item[] = [];
     rowsEdit.forEach((data: GridRowData) => {
@@ -515,8 +515,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         const item = ent.find((item: Item) => {
           return item.barcode === data.barcode;
         });
-        console.log(`${item?.toteCode} ${item?.actualAllQty}`);
-        console.log(`${data?.toteCode} ${data?.actualAllQty}`);
         if (!item) {
           showPopup = true;
           return;
