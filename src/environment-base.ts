@@ -178,7 +178,7 @@ export const environment = {
         url: '/stock/stock-transfer/{btNo}/export',
       },
       sendToPickup: {
-        url: '/stock/stock-transfer/{btNo}/export',
+        url: '/stock/stock-transfer/save-wait-dc',
       },
     },
     stockRequest: {

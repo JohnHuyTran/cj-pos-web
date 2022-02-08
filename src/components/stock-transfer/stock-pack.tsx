@@ -32,7 +32,7 @@ import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import ModalConfirmTransaction from './modal-confirm-transaction';
-import { BranchTransferRequest, Item } from '../../models/stock-transfer-model';
+import { BranchTransferRequest, Delivery, Item } from '../../models/stock-transfer-model';
 import {
   getPathReportBT,
   saveBranchTransfer,
@@ -174,20 +174,17 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
-      <div>
-        <TextField
-          variant='outlined'
-          name='txnTole'
-          id='txbToteCode'
-          inputProps={{ style: { textAlign: 'right' } }}
-          value={params.value}
-          onChange={(e) => {
-            params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
-          }}
-          disabled={params.getValue(params.id, 'isDraft') ? false : true}
-          autoComplete='off'
-        />
-      </div>
+      <TextField
+        variant='outlined'
+        name='txnToteCode'
+        inputProps={{ style: { textAlign: 'right' } }}
+        value={params.value}
+        onChange={(e) => {
+          params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
+        }}
+        disabled={params.getValue(params.id, 'isDraft') ? false : true}
+        autoComplete='off'
+      />
     ),
   },
   {
@@ -614,10 +611,13 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const sendToPickup = async () => {
+    const _dalivery: Delivery = {
+      fromDate: moment(startDate).startOf('day').toISOString(),
+      toDate: moment(endDate).startOf('day').toISOString(),
+    };
     const payload: BranchTransferRequest = {
       btNo: btNo,
-      startDate: moment(startDate).startOf('day').toISOString(),
-      endDate: moment(endDate).startOf('day').toISOString(),
+      delivery: _dalivery,
     };
     await sendBranchTransferToPickup(payload)
       .then(async (value) => {
@@ -625,6 +625,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('คุณส่งรายการให้ DC เรียบร้อยแล้ว');
+        await dispatch(featchBranchTransferDetailAsync(btNo));
         await dispatch(featchSearchStockTransferAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
@@ -897,7 +898,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                   variant='contained'
                   color='warning'
                   className={classes.MbtnSave}
-                  onClick={handleSaveBtn}
+                  onClick={sendToPickup}
                   startIcon={<SaveIcon />}
                   sx={{ width: 200 }}>
                   บันทึก
