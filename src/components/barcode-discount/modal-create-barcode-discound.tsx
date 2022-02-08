@@ -28,6 +28,7 @@ import {
   updateDataDetail,
   updateErrorList,
   updateCheckStock,
+  updateCheckEdit,
 } from '../../store/slices/barcode-discount-slice';
 import {
   approveBarcodeDiscount,
@@ -42,6 +43,7 @@ import { objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import { Action } from '../../utils/enum/common-enum';
 import ModalCheckStock from './modal-check-stock';
 import ModalCheckPrice from './modal-check-price';
+import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 interface Props {
   action: Action | Action.INSERT;
   isOpen: boolean;
@@ -72,6 +74,7 @@ export default function ModalCreateBarcodeDiscount({
   const [openModalCheck, setOpenModalCheck] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const [openCheckStock, setOpenCheckStock] = React.useState<boolean>(false);
+  const [openModalClose, setOpenModalClose] = React.useState<boolean>(false);
   const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<number>(0);
   const [listProducts, setListProducts] = React.useState<object[]>([]);
@@ -80,6 +83,7 @@ export default function ModalCreateBarcodeDiscount({
   const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
   const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
   const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
+  const checkEdit = useAppSelector((state) => state.barcodeDiscount.checkEdit);
 
   //get detail from search
   const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail.data);
@@ -129,9 +133,20 @@ export default function ModalCreateBarcodeDiscount({
         status: 0,
       })
     );
+    dispatch(updateCheckEdit(false));
     dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requesterNote: '' }));
     setOpen(false);
     onClickClose();
+  };
+
+  const handleCloseModalCreate = () => {
+    if (dataDetail.status === 0 && Object.keys(payloadAddItem).length) {
+      setOpenModalClose(true);
+    } else if (dataDetail.status === 1 && checkEdit) {
+      setOpenModalClose(true);
+    } else {
+      handleClose();
+    }
   };
 
   useEffect(() => {
@@ -203,9 +218,9 @@ export default function ModalCreateBarcodeDiscount({
     if (payloadBarcodeDiscount.products.length !== 0) {
       const check = data.every((item) => {
         if (payloadBarcodeDiscount.percentDiscount) {
-          if (item.requestedDiscount <= 0 || item.requestedDiscount >= 100) return false;
+          if (item.requestedDiscount <= 0 || item.requestedDiscount > 100) return false;
         } else {
-          return item.requestedDiscount > 0 && item.requestedDiscount <= item.price;
+          return item.requestedDiscount > 0 && item.requestedDiscount < item.price;
         }
         if (stringNullOrEmpty(item.expiredDate)) return false;
         if (item.numberOfDiscounted <= 0) {
@@ -260,23 +275,23 @@ export default function ModalCreateBarcodeDiscount({
           };
 
           if (payloadBarcodeDiscount.percentDiscount) {
-            if (preData.requestedDiscount <= 0 || preData.requestedDiscount >= 100 || !preData.requestedDiscount) {
-              item.errorDiscount = 'ส่วนลดต้องมากกว่าหรือเท่ากับ 0 และน้อยกว่า 100';
+            if (preData.requestedDiscount <= 0 || preData.requestedDiscount > 100 || !preData.requestedDiscount) {
+              item.errorDiscount = 'ยอดลดต้องไม่เกิน 100%';
             }
           } else {
             if (
               preData.requestedDiscount <= 0 ||
-              preData.requestedDiscount > preData.price ||
+              preData.requestedDiscount >= preData.price ||
               !preData.requestedDiscount
             ) {
-              item.errorDiscount = 'ราคาส่วนลดต้องมากกว่าหรือเท่ากับ 0 และน้อยกว่าราคาสินค้า';
+              item.errorDiscount = 'ยอดลดต้องไม่เกินราคาปกติ';
             }
           }
           if (preData.numberOfDiscounted <= 0 || !preData.numberOfDiscounted) {
-            item.errorNumberOfDiscounted = 'ค่าต้องมากกว่า 0';
+            item.errorNumberOfDiscounted = 'จำนวนที่ขอลดต้องมากกว่า 0';
           }
           if (!preData.expiredDate) {
-            item.errorExpiryDate = 'ค่าไม่ว่างเปล่า';
+            item.errorExpiryDate = 'กรุณาระบุวันหมดอายุ';
           }
           return item;
         });
@@ -369,7 +384,7 @@ export default function ModalCreateBarcodeDiscount({
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={!!true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleCloseModalCreate}>
           <Typography sx={{ fontSize: '1em' }}>ส่วนลดสินค้า</Typography>
           <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
@@ -412,7 +427,7 @@ export default function ModalCreateBarcodeDiscount({
                 ยอดลด :
               </Grid>
               <Grid item xs={8} sx={{ marginTop: '-8px' }}>
-                <FormControl component="fieldset">
+                <FormControl component="fieldset" disabled={dataDetail.status > 1}>
                   <RadioGroup
                     aria-label="discount"
                     value={valueRadios}
@@ -512,6 +527,7 @@ export default function ModalCreateBarcodeDiscount({
         }}
       />
       <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts} />
+      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
     </div>
   );
 }
