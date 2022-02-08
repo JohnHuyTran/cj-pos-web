@@ -99,7 +99,7 @@ export function isBranchDC(userInfo: KeyCloakTokenInfo): boolean {
   return (
     userInfo.azp === location &&
     userInfo.groups.some((item: string) => {
-      item === group;
+      return item === group;
     })
   );
 }

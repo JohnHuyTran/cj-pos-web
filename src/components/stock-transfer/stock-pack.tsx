@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   DataGrid,
   GridCellParams,
@@ -26,13 +26,13 @@ import {
   isOwnBranch,
   numberWithCommas,
 } from '../../utils/utils';
-import { useAppDispatch, useAppSelector } from '../../store/store';
+import store, { useAppDispatch, useAppSelector } from '../../store/store';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
 import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import ModalConfirmTransaction from './modal-confirm-transaction';
-import { BranchTransferRequest, Item } from '../../models/stock-transfer-model';
+import { BranchTransferRequest, Delivery, Item } from '../../models/stock-transfer-model';
 import {
   getPathReportBT,
   saveBranchTransfer,
@@ -63,11 +63,9 @@ const columns: GridColDef[] = [
   {
     field: 'index',
     headerName: 'ลำดับ',
-    //flex: 0.5,
     minWidth: 70,
     headerAlign: 'center',
     sortable: false,
-    // hide: true,
     renderCell: (params) => (
       <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
@@ -149,7 +147,6 @@ const columns: GridColDef[] = [
             var returnQty = Number(params.getValue(params.id, 'actualQty'));
             if (returnQty === 0) value = chkReturnQty(value);
             if (value < 0) value = 0;
-            //if (value > qty) value = qty;
             params.api.updateRows([{ ...params.row, actualQty: value }]);
           }}
           disabled={params.getValue(params.id, 'isDraft') ? false : true}
@@ -174,19 +171,21 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
-      <div>
-        <TextField
-          variant='outlined'
-          name='txnTole'
-          inputProps={{ style: { textAlign: 'right' } }}
-          value={params.value}
-          onChange={(e) => {
-            params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
-          }}
-          disabled={params.getValue(params.id, 'isDraft') ? false : true}
-          autoComplete='off'
-        />
-      </div>
+      <TextField
+        variant='outlined'
+        name='txbToteCode'
+        inputProps={{ style: { textAlign: 'right' } }}
+        value={params.value}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(e) => {
+          const cursorStart = e.target.selectionStart;
+          const cursorEnd = e.target.selectionEnd;
+          params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
+          e.target.setSelectionRange(cursorStart, cursorEnd);
+        }}
+        disabled={params.getValue(params.id, 'isDraft') ? false : true}
+        autoComplete='off'
+      />
     ),
   },
   {
@@ -294,9 +293,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setBtStatus(branchTransferInfo.status);
     setComment(branchTransferInfo.comment);
 
-    const isBranch = isOwnBranch('D0001');
-    setIsDraft(isBranch && branchTransferInfo.status === 'CREATED' ? true : false);
-
+    setIsDraft(branchTransferInfo.status === 'CREATED' ? true : false);
     setIsDC(isBranchDC(getUserInfo()));
 
     let newColumns = [...cols];
@@ -305,7 +302,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     } else {
       newColumns[9]['hide'] = false;
     }
-
     storeItemAddItem(payloadAddItem);
   }, [open, payloadAddItem]);
 
@@ -400,11 +396,11 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         return;
       }
     });
-
     if (itemNotValid) {
       setOpenAlert(true);
       return false;
     } else {
+      setOpenAlert(false);
       return true;
     }
   };
@@ -427,6 +423,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const storeItem = () => {
+    setComment(comment);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const items: Item[] = [];
     rowsEdit.forEach((data: GridRowData) => {
@@ -442,6 +439,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         actualQty: data.actualQty,
         toteCode: data.toteCode,
         isDraft: isDraft,
+        boNo: data.boNo,
       };
       items.push(newData);
     });
@@ -471,15 +469,11 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             actualQty: dupItem.actualQty + data.qty,
             toteCode: dupItem.toteCode,
             isDraft: isDraft,
+            boNo: dupItem.boNo,
           };
-
-          // const removeItem = [...branchTransferItems];
           _.remove(_items, function (item: Item) {
             return item.barcode === data.barcode;
           });
-          // console.log(branchTransferItems);
-          // setBranchTransferItems([...removeItem, newData]);
-          // console.log(branchTransferItems);
           _items = [..._items, newData];
         } else {
           const newData: Item = {
@@ -495,7 +489,6 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             toteCode: '',
             isDraft: isDraft,
           };
-          // setBranchTransferItems([...branchTransferItems, newData]);
           _items = [..._items, newData];
         }
       });
@@ -506,14 +499,13 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const handleClose = async () => {
     await storeItem();
     let showPopup = false;
-    // onClickClose();
     if (comment !== branchTransferInfo.comment) {
       showPopup = true;
     }
-    const rowSelect = apiRef.current.getSelectedRows();
-    if (rowSelect.size > 0) {
-      showPopup = true;
-    }
+    // const rowSelect = apiRef.current.getSelectedRows();
+    // if (rowSelect.size > 0) {
+    //   showPopup = true;
+    // }
     const ent: Item[] = branchTransferInfo.items;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     if (rowsEdit.size != ent.length) {
@@ -543,6 +535,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const handleSaveBtn = async () => {
+    setOpenLoadingModal(true);
     await storeItem();
     await dispatch(updateAddItemsState({}));
     const isvalidItem = validateItem();
@@ -556,6 +549,11 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           await dispatch(featchBranchTransferDetailAsync(value.docNo));
           await dispatch(featchSearchStockTransferAsync(payloadSearch));
+
+          const _branchTransferRslList = store.getState().branchTransferDetailSlice.branchTransferRs;
+          const _branchTransferInfo: any = _branchTransferRslList.data ? _branchTransferRslList.data : null;
+          setBranchTransferItems(_branchTransferInfo.items);
+          // await storeItem();
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
@@ -563,18 +561,17 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           setContentMsg(error.message);
         });
     }
+    setOpenLoadingModal(false);
   };
   const handleConfirmBtn = async () => {
     await storeItem();
     await dispatch(updateAddItemsState({}));
     const isvalidItem = validateItem();
     if (isvalidItem) {
-      // setOpenLoadingModal(true);
       if (!btNo) {
         const payload: BranchTransferRequest = await mappingPayload();
         await saveBranchTransfer(payload)
           .then(async (value) => {
-            // setStatus(1);
             setBtNo(value.btNo);
             setOpenModelConfirmTransaction(true);
           })
@@ -614,10 +611,13 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const sendToPickup = async () => {
+    const _dalivery: Delivery = {
+      fromDate: moment(startDate).startOf('day').toISOString(),
+      toDate: moment(endDate).startOf('day').toISOString(),
+    };
     const payload: BranchTransferRequest = {
       btNo: btNo,
-      startDate: moment(startDate).startOf('day').toISOString(),
-      endDate: moment(endDate).startOf('day').toISOString(),
+      delivery: _dalivery,
     };
     await sendBranchTransferToPickup(payload)
       .then(async (value) => {
@@ -625,6 +625,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('คุณส่งรายการให้ DC เรียบร้อยแล้ว');
+        await dispatch(featchBranchTransferDetailAsync(btNo));
         await dispatch(featchSearchStockTransferAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
@@ -897,7 +898,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                   variant='contained'
                   color='warning'
                   className={classes.MbtnSave}
-                  onClick={handleSaveBtn}
+                  onClick={sendToPickup}
                   startIcon={<SaveIcon />}
                   sx={{ width: 200 }}>
                   บันทึก
@@ -946,24 +947,21 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
           <Box mt={2} bgcolor='background.paper'>
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
-              // style={{ width: '100%', height: 'auto' }}
               className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rows}
                 columns={cols}
-                // checkboxSelection={pnStatus === 0 ? true : false}
-                disableSelectionOnClick
+                // disableSelectionOnClick
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 rowsPerPageOptions={[10, 20, 50, 100]}
                 pagination
                 disableColumnMenu
                 autoHeight={rows.length >= 8 ? false : true}
-                // autoHeight={true}
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
-                onCellFocusOut={onCellFocusOut}
+                // onCellFocusOut={onCellFocusOut}
               />
             </div>
           </Box>
@@ -1026,9 +1024,3 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 }
 
 export default StockPackChecked;
-function skuCodes<T>(skuCodes: any, arg1: never[]): [any, any] {
-  throw new Error('Function not implemented.');
-}
-function arr(arg0: string, arr: any) {
-  throw new Error('Function not implemented.');
-}
