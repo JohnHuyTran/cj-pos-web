@@ -179,6 +179,7 @@ const columns: GridColDef[] = [
         name='txnToteCode'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
+        onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
           params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
         }}
@@ -439,6 +440,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         actualQty: data.actualQty,
         toteCode: data.toteCode,
         isDraft: isDraft,
+        boNo: data.boNo,
       };
       items.push(newData);
     });
@@ -468,6 +470,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             actualQty: dupItem.actualQty + data.qty,
             toteCode: dupItem.toteCode,
             isDraft: isDraft,
+            boNo: dupItem.boNo,
           };
 
           // const removeItem = [...branchTransferItems];
@@ -507,10 +510,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     if (comment !== branchTransferInfo.comment) {
       showPopup = true;
     }
-    const rowSelect = apiRef.current.getSelectedRows();
-    if (rowSelect.size > 0) {
-      showPopup = true;
-    }
+    // const rowSelect = apiRef.current.getSelectedRows();
+    // if (rowSelect.size > 0) {
+    //   showPopup = true;
+    // }
     const ent: Item[] = branchTransferInfo.items;
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     if (rowsEdit.size != ent.length) {
@@ -953,7 +956,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 rows={rows}
                 columns={cols}
                 // checkboxSelection={pnStatus === 0 ? true : false}
-                disableSelectionOnClick
+                // disableSelectionOnClick
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 rowsPerPageOptions={[10, 20, 50, 100]}
