@@ -962,7 +962,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 scrollbarSize={10}
                 rowHeight={65}
                 onCellClick={currentlySelected}
-                onCellFocusOut={onCellFocusOut}
+                // onCellFocusOut={onCellFocusOut}
               />
             </div>
           </Box>
