@@ -178,6 +178,7 @@ const columns: GridColDef[] = [
         <TextField
           variant='outlined'
           name='txnTole'
+          id='txbToteCode'
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
@@ -1025,9 +1026,3 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
 }
 
 export default StockPackChecked;
-function skuCodes<T>(skuCodes: any, arg1: never[]): [any, any] {
-  throw new Error('Function not implemented.');
-}
-function arr(arg0: string, arr: any) {
-  throw new Error('Function not implemented.');
-}

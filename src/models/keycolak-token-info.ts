@@ -22,10 +22,5 @@ export interface KeyCloakTokenInfo {
 }
 
 export interface ACL {
-  'service.posback-purchase': string[];
-  'service.posback-supplier': string[];
-  'service.posback-stock': string[];
-  'service.posback-authority': string[];
-  'service.posback-order': string[];
-  'service.posback-product': string[];
+  [key: string]: string[];
 }
