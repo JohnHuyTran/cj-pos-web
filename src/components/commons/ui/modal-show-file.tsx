@@ -1,5 +1,5 @@
 import { Dialog, Button, DialogContent } from '@mui/material';
-import React, { ReactElement, useRef } from 'react';
+import React, { ReactElement, useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -12,6 +12,7 @@ import AlertError from './alert-error';
 import { HighlightOff } from '@mui/icons-material';
 import store from '../../../store/store';
 import { getAccessToken } from '../../../store/sessionStore';
+import { getReport } from '../../../adapters/externalApi';
 
 interface ModalShowPDFProp {
   open: boolean;
@@ -132,6 +133,10 @@ export default function ModalShowPDF({
 
   const pdfFile = sdImageFile.substr(5, 15);
   const imgFile = sdImageFile.substr(5, 5);
+
+  React.useEffect(() => {
+    if (statusFile === 1) getReport(url);
+  }, [open]);
 
   return (
     <div>
