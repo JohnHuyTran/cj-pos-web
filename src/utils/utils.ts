@@ -13,7 +13,7 @@ export function getActionLists(): string[] {
   const tokenInfo = getDecodedAccessToken(
     'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwbmZJNmF1MXZ5LWhRQ0s3ODJ1V2E3cWIzQVFYY1FfNnZYOWZwdE5FaHR3In0.eyJleHAiOjE2MzE3NzY3OTUsImlhdCI6MTYzMTc3NjQ5NSwianRpIjoiYjA5ZGM0ZmQtMTRlMS00M2UwLThkNTItMzU0YTBlMjU2NzM0IiwiaXNzIjoiaHR0cHM6Ly9hZG1pbi5hdXRoLWRldi5jamV4cHJlc3MuaW8vYXV0aC9yZWFsbXMvY2pleHByZXNzIiwic3ViIjoiOWY2ZDEyODEtOTJhOS00N2EzLTk0NWQtNWJkMTg0MjkzMjBjIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYXBwLm5ld3Bvc2JhY2siLCJzZXNzaW9uX3N0YXRlIjoiMGM2ODkwMjMtZWI3ZC00MTQyLTgwOWMtYzRjNWFmODdiOTRmIiwiYWNyIjoiMSIsInNjb3BlIjoic2NvcGUubmV3cG9zYmFjayBlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoicG9zMiBwb3MyIiwicHJlZmVycmVkX3VzZXJuYW1lIjoicG9zMiIsImFjbCI6eyJzZXJ2aWNlLm5ld3Bvc2JhY2siOlsiQ0FTSERSQVdFUi5ERVBPU0lUIiwiU0FMRS5JVEVNLkNBTkNFTCIsIkZFQVRVUkUuQURNSU4uU0VBUkNILkRBVEEiLCJDQVNIRFJBV0VSLldJVEhEUkFXIl19LCJnaXZlbl9uYW1lIjoicG9zMiIsImJyYW5jaCI6IjAwMDIiLCJmYW1pbHlfbmFtZSI6InBvczIiLCJlbWFpbCI6InBvczJAdGVzdC5jb20ifQ.myRuJJxraId5ZptOahCJl2lt3YQczXDbatKGrEoquzuyRz4ID1QYOi2IZT6ND4Gpa8CCvtIjWKNuUrYQbRrjG8o1dJMzSAi5pt40HXbEiBvN2QDCuCF2NMPcBYZPMlPfMyNGTAafolpJYGHhjZy_4oGGZiUSbTzgQ91iVoY_WUHgdNTk9H8c-nvKxNRXIWos92AMox6-tlLkjksQsMusu9JZWEQ2v7Fmex_oIBghxPr-r9JGstm0_f16bbvMTyPskaDoOUehKNbw6V3I1IsfJgUnbUFbOlMXuCDsGmOtKbpouycPXJvj2BJJQ11PY28W4g7w3ddffLyVm4i8_OJRBg'
   );
-  return tokenInfo.acl['service.newposback'];
+  return [];
 }
 
 export function isAllowPermission(action: string): boolean {
@@ -87,7 +87,21 @@ export const numberWithCommas = (num: any) => {
 };
 
 export function isOwnBranch(branch: any): boolean {
-  return env.ownBranch.code === branch;
+  return env.branch.code === branch;
+}
+
+export function isBranchDC(userInfo: KeyCloakTokenInfo): boolean {
+  const group = env.branch.default.dc.group;
+  const location = env.branch.default.dc.location;
+  if (!userInfo) {
+    return false;
+  }
+  return (
+    userInfo.azp === location &&
+    userInfo.groups.some((item: string) => {
+      item === group;
+    })
+  );
 }
 
 export const getReasonLabel = (reasons: TransferReasonsInfo[], key: string) => {
@@ -98,6 +112,10 @@ export const getBranchName = (branchs: BranchInfo[], key: string) => {
   return branchs.find((branch: BranchInfo) => branch.code === key)?.name;
 };
 
-export const formatFileStockTransfer = (docNo: string, status: string) => {
-  return `${docNo}-${getStockTransferStatusInfo(status)?.value}.pdf`;
+export const formatFileStockTransfer = (docNo: string, status: string, suffix: string) => {
+  if (suffix) {
+    return `${docNo}-${suffix}.pdf`;
+  } else {
+    return `${docNo}-${getStockTransferStatusInfo(status)?.value}.pdf`;
+  }
 };

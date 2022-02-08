@@ -1,6 +1,9 @@
+import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
+
 const ACCESS_TOKEN = 'access_token';
 const REFRESH_TOKEN = 'refresh_token';
 const SESSION_ID = 'session_id';
+const USER_INFO = 'user_info';
 
 export const getAccessToken = () => {
   return sessionStorage.getItem(ACCESS_TOKEN);
@@ -36,4 +39,20 @@ export const setSessionId = (value: string) => {
 
 export const removeSessionId = () => {
   return sessionStorage.removeItem(SESSION_ID);
+};
+
+export const getUserInfo = () => {
+  const item = sessionStorage.getItem(USER_INFO);
+  if (!item) {
+    return {};
+  }
+  return JSON.parse(item);
+};
+
+export const setUserInfo = (value: KeyCloakTokenInfo) => {
+  return sessionStorage.setItem(USER_INFO, JSON.stringify(value));
+};
+
+export const removeUserInfo = () => {
+  return sessionStorage.removeItem(USER_INFO);
 };
