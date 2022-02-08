@@ -169,7 +169,7 @@ export const environment = {
         url: '/stock/stock-transfer/export/branch-out/{btNo}',
       },
       reportBT: {
-        url: '/stock/stock-transfer/export/recall/{btNo}',
+        url: '/stock/stock-transfer/export/{btNo}',
       },
       reportReCall: {
         url: '/stock/stock-transfer/export/recall/{btNo}',
