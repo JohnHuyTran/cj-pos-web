@@ -21,6 +21,7 @@ import {
   updateDataDetail,
   updateErrorList,
   updateCheckStock,
+  updateCheckEdit,
 } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
@@ -69,8 +70,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
           expiryDate = stringNullOrEmpty(item.expiryDate) ? null : item.expiryDate;
           numberOfDiscounted = stringNullOrEmpty(item.qty) ? null : item.qty;
         }
-        discount = parseFloat(discount).toFixed(2);
-        const cashDiscount = typeDiscount === 'percent' ? Math.floor((discount * price) / 100) : parseFloat(discount);
+        const cashDiscount =
+          typeDiscount === 'percent'
+            ? Math.floor((parseFloat(String(discount).replace(/,/g, '')) * price) / 100)
+            : parseFloat(String(discount).replace(/,/g, ''));
 
         const priceAfterDiscount = price - (cashDiscount || 0);
 
@@ -104,13 +107,13 @@ export const ModalTransferItem = (props: DataGridProps) => {
   useEffect(() => {
     if (dtTable.length !== 0) {
       updateSumOfApprovedDiscount(dtTable.reduce((acc, val) => acc + Number(val.approvedDiscount), 0));
-      updateSumOfDiscount(dtTable.reduce((acc, val) => acc + val.cashDiscount * val.numberOfDiscounted, 0));
+      updateSumOfDiscount(dtTable.reduce((acc, val) => acc + val.cashDiscount * Number(val.numberOfDiscounted), 0));
       const products = dtTable.map((item) => {
         return {
           price: item.price,
           barcode: item.barCode,
-          requestedDiscount: parseFloat(item.discount),
-          numberOfDiscounted: item.numberOfDiscounted,
+          requestedDiscount: parseFloat(String(item.discount).replace(/,/g, '')),
+          numberOfDiscounted: parseInt(String(item.numberOfDiscounted).replace(/,/g, '')),
           expiredDate: item.expiryDate,
           unitFactor: item.unit,
           productName: item.barcodeName,
@@ -154,15 +157,15 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const handleChangeDiscount = (event: any, index: number, errorIndex: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      const value = event.target.value;
-      data[index - 1].discount = parseFloat(value);
+      const value = event.target.value.replace(/[^0-9.]/g, '').replace(/,/g, '');
+      data[index - 1].discount = value || 0;
 
       if (typeDiscount === 'percent') {
         const number = data[index - 1].price * (data[index - 1].discount / 100) || 0;
 
         data[index - 1].cashDiscount = Math.trunc(number).toFixed(2) || 0;
       } else {
-        data[index - 1].cashDiscount = (data[index - 1].discount || 0).toFixed(2) || 0;
+        data[index - 1].cashDiscount = parseFloat(data[index - 1].discount || 0).toFixed(2) || 0;
       }
       data[index - 1].priceAfterDiscount = (data[index - 1].price - data[index - 1].cashDiscount).toFixed(2);
 
@@ -180,6 +183,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
         })
       )
     );
+    dispatch(updateCheckEdit(true));
   };
 
   const handleChangeNumberOfDiscount = (event: any, index: number, errorIndex: number, barcode: string) => {
@@ -187,14 +191,14 @@ export const ModalTransferItem = (props: DataGridProps) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       currentData = data[index - 1];
-      data[index - 1].numberOfDiscounted = parseInt(event.target.value);
+      data[index - 1].numberOfDiscounted = parseInt(event.target.value.replace(/,/g, ''));
       return data;
     });
     if (Object.keys(payloadAddItem).length !== 0) {
       let updateList = _.cloneDeep(payloadAddItem);
       updateList.map((item: any) => {
         if (item.barcode === currentData.barCode) {
-          item.qty = parseInt(event.target.value);
+          item.qty = parseInt(event.target.value.replace(/,/g, ''));
         }
       });
       dispatch(updateAddItemsState(updateList));
@@ -211,7 +215,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
         })
       )
     );
-
+    dispatch(updateCheckEdit(true));
     dispatch(updateCheckStock(checkStocks.filter((el: any) => el.barcode !== barcode)));
   };
 
@@ -233,33 +237,22 @@ export const ModalTransferItem = (props: DataGridProps) => {
         })
       )
     );
+    dispatch(updateCheckEdit(true));
   };
 
-  const handleChangeNumber = (e: any, index: number, errorIndex: number) => {
+  const handleChangeNumber = (e: any, index: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-
-      data[index - 1].discount = parseFloat(e.target.value).toFixed(2);
+      data[index - 1].discount = numberWithCommas(parseFloat(e.target.value).toFixed(2));
 
       return data;
     });
-    dispatch(
-      updateErrorList(
-        errorList.map((item: any, idx: number) => {
-          return idx === errorIndex
-            ? {
-                ...item,
-                errorDiscount: '',
-              }
-            : item;
-        })
-      )
-    );
   };
 
   const handleChangeNote = (e: any) => {
     dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requesterNote: e }));
     setCountText(e.split('').length);
+    dispatch(updateCheckEdit(true));
   };
 
   const addTwoDecimalPlaces = (value: any) => {
@@ -322,7 +315,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params) => (
         <Box component="div" width="100%" textAlign="end">
-          {addTwoDecimalPlaces(params.value)}
+          {numberWithCommas(addTwoDecimalPlaces(params.value))}
         </Box>
       ),
     },
@@ -359,14 +352,15 @@ export const ModalTransferItem = (props: DataGridProps) => {
         return typeDiscount === 'percent' ? (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
-              type="number"
+              type="text"
               className={classes.MtextFieldNumber}
               error={condition}
               value={params.value}
+              inputProps={{ min: 0 }}
               onChange={(e) => {
                 handleChangeDiscount(e, params.row.index, index);
               }}
-              onBlur={(e) => handleChangeNumber(e, params.row.index, index)}
+              onBlur={(e) => handleChangeNumber(e, params.row.index)}
               disabled={dataDetail.status > 1}
             />
             {condition && <div className="title">{errorList[index].errorDiscount}</div>}
@@ -374,15 +368,15 @@ export const ModalTransferItem = (props: DataGridProps) => {
         ) : (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
-              type="number"
+              type="text"
               className={classes.MtextFieldNumber}
               error={condition2}
               value={params.value}
-              // inputProps={{ min: 0, max: 100 }}
+              inputProps={{ min: 0 }}
               onChange={(e) => {
                 handleChangeDiscount(e, params.row.index, index);
               }}
-              onBlur={(e) => handleChangeNumber(e, params.row.index, index)}
+              onBlur={(e) => handleChangeNumber(e, params.row.index)}
               placeholder="0"
               disabled={dataDetail.status > 1}
             />
@@ -400,7 +394,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params) => (
         <Typography color="#F54949" fontSize="15px" textAlign="end" width="100%" fontWeight="bold">
-          {params.value}
+          {numberWithCommas(params.value)}
         </Typography>
       ),
     },
@@ -413,7 +407,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params) => (
         <Typography color="#36C690" fontSize="15px" textAlign="end" width="100%" fontWeight="bold">
-          {params.value}
+          {numberWithCommas(params.value)}
         </Typography>
       ),
     },
@@ -437,10 +431,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
               error={condition}
-              type="number"
-              value={params.value}
+              type="text"
+              value={numberWithCommas(params.value)}
               className={classes.MtextFieldNumber}
-              inputProps={{ min: 0 }}
+              // inputProps={{ min: 0 }}
               onChange={(e) => {
                 handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barCode);
               }}
@@ -550,7 +544,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
 
         const handleDeleteItem = () => {
           dispatch(updateAddItemsState(payloadAddItem.filter((r: any) => r.barcode !== params.row.barCode)));
-
+          dispatch(updateCheckEdit(true));
           setOpenModalDelete(false);
           setOpenPopupModal(true);
         };

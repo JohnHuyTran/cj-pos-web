@@ -6,6 +6,7 @@ type ItemsState = {
   dataDetail: any;
   errorList: any;
   checkStock: any;
+  checkEdit: boolean;
 };
 const initialState: ItemsState = {
   createDraft: {
@@ -26,6 +27,7 @@ const initialState: ItemsState = {
   },
   errorList: [],
   checkStock: [],
+  checkEdit: false,
 };
 
 const barcodeDiscountSlice = createSlice({
@@ -47,8 +49,17 @@ const barcodeDiscountSlice = createSlice({
     updateCheckStock: (state, action: any) => {
       state.checkStock = action.payload;
     },
+    updateCheckEdit: (state, action: any) => {
+      state.checkEdit = action.payload;
+    },
   },
 });
-export const { saveBarcodeDiscount, updateValidate, updateDataDetail, updateErrorList, updateCheckStock } =
-  barcodeDiscountSlice.actions;
+export const {
+  saveBarcodeDiscount,
+  updateValidate,
+  updateDataDetail,
+  updateErrorList,
+  updateCheckStock,
+  updateCheckEdit,
+} = barcodeDiscountSlice.actions;
 export default barcodeDiscountSlice.reducer;
