@@ -296,6 +296,30 @@ const useStyles = makeStyles({
       color: '#263238 !important',
     },
   },
+  MSearchBranch: {
+    '& button': {
+      transform: 'none !important',
+    },
+  },
+  MWrapperListBranch: {
+    border: '1px solid #C1C1C1',
+    borderRadius: '10px',
+    padding: '10px',
+    minHeight: '300px',
+    '& .wrapper-item': {
+      border: '1px solid #CBD4DB',
+      boxSizing: 'border-box',
+      borderRadius: '5px',
+      background: '#EAEBEB',
+      color: '#C1C1C1',
+      marginRight: '10px',
+      padding: '5px',
+      '& svg': {
+        cursor: 'pointer',
+        fontSize: '14px',
+      },
+    },
+  },
 });
 
 export { useStyles };
