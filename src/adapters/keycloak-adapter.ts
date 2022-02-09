@@ -38,9 +38,9 @@ export function authentication(payload: loginForm): Promise<Response> {
         setRefreshToken(response.data.refresh_token);
         setSessionId(response.data.session_state);
         let userInfo = getDecodedAccessToken(response.data.access_token ? response.data.access_token : '');
-        const group = getUserGroup(userInfo.groups);
-
-        setUserInfo(getDecodedAccessToken(response.data.access_token ? response.data.access_token : ''));
+        const _group = getUserGroup(userInfo.groups);
+        userInfo = { ...userInfo, group: _group ? _group : '' };
+        setUserInfo(userInfo);
         return response.data;
       }
       throw new Error(response.status.toString());
@@ -64,6 +64,10 @@ export function refreshToken(): Promise<Response> {
         if (response.status === 200) {
           setRefreshToken(response.data.refresh_token);
           setAccessToken(response.data.access_token);
+          let userInfo = getDecodedAccessToken(response.data.access_token ? response.data.access_token : '');
+          const _group = getUserGroup(userInfo.groups);
+          userInfo = { ...userInfo, group: _group ? _group : '' };
+          setUserInfo(userInfo);
           return response.data;
         }
         throw new Error(response.status.toString());

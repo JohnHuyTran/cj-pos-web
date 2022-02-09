@@ -8,8 +8,8 @@ export const isAllowActionPermission = (key: string) => {
 };
 
 export const isAllowMenuPermission = (key: string) => {
-  const aclGroup: KeyCloakTokenInfo = getUserInfo();
-  return aclGroup.acl[key] ? true : false;
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return Object.keys(userInfo.group) ? true : false;
 };
 
 const permission = {
