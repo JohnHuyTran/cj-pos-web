@@ -3,6 +3,7 @@ import { env } from '../adapters/environmentConfigs';
 import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
 import { BranchInfo } from '../models/search-branch-model';
 import { TransferReasonsInfo } from '../models/transfer-reasons-model';
+import { Params } from '../models/search-branch-province-model';
 
 export const getDecodedAccessToken = (accessToken: string) => {
   return jwtDecode<KeyCloakTokenInfo>(accessToken);
@@ -95,4 +96,10 @@ export const getReasonLabel = (reasons: TransferReasonsInfo[], key: string) => {
 
 export const getBranchName = (branchs: BranchInfo[], key: string) => {
   return branchs.find((branch: BranchInfo) => branch.code === key)?.name;
+};
+
+export const paramsConvert = (params: Params) => {
+  return Object.keys(params)
+    .map((key: string) => `${key}=${encodeURIComponent(params[key].toString())}`)
+    .join('&');
 };

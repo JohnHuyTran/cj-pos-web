@@ -193,4 +193,12 @@ export const environment = {
       url: '/stock/stock-balance-check',
     },
   },
+  test: {
+    province: {
+      url: '/province/search',
+    },
+    branch: {
+      url: '/branch/search',
+    },
+  },
 };

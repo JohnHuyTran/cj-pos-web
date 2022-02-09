@@ -259,7 +259,7 @@ const BarcodeDiscountSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <SearchBranch />
+            {/* <SearchBranch /> */}
           </Grid>
         </Grid>
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
