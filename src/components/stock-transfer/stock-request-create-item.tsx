@@ -159,7 +159,7 @@ function StockTransferItem({ type, onChangeItems, changeItems, update }: DataGri
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   useEffect(() => {
-    if (!update) {
+    if (!update && type !== 'Create') {
       if (stockRequestDetail) {
         const items = stockRequestDetail.items ? stockRequestDetail.items : [];
         if (items.length > 0) {

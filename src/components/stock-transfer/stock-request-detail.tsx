@@ -322,6 +322,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           await dispatch(featchStockRequestDetailAsync(value.docNo));
 
           if (type === 'Create') {
+            type = 'View';
             setFlagCreateSave(true);
           }
 
