@@ -20,6 +20,18 @@ export function isAllowPermission(action: string): boolean {
   return getActionLists().indexOf(action) > -1;
 }
 
+export function getUserGroup(groups: string[]) {
+  const group = groups.length > 0 ? groups[0] : '';
+  if (!group) {
+    return '';
+  }
+  if (group === '/service.posback/manager') {
+    return 'dc';
+  } else if (group === '/service.posback/scm') {
+    return 'scm';
+  }
+}
+
 export function getSdType(codeType: number): string {
   if (codeType === 0) {
     return 'ลังกระดาษ /Tote';
