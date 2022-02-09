@@ -56,8 +56,8 @@ function StockTransferList() {
     {
       field: 'btNo',
       headerName: 'เลขที่เอกสาร BT',
-      minWidth: 185,
-      // flex: 1,
+      // minWidth: 185,
+      flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
@@ -65,7 +65,7 @@ function StockTransferList() {
       field: 'rtNo',
       headerName: 'เลขที่เอกสารร้องขอ RT',
       minWidth: 185,
-      // flex: 1,
+      flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
@@ -87,22 +87,36 @@ function StockTransferList() {
       ),
     },
     {
-      field: 'branchFrom',
+      field: 'branchFromName',
       headerName: 'สาขาต้นทาง',
-      minWidth: 205,
+      // minWidth: 205,
       // width: 195,
-      // flex: 1.2,
+      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.getValue(params.id, 'branchFrom') || ''}-{params.value}
+          </Typography>
+        </div>
+      ),
     },
     {
-      field: 'branchTo',
+      field: 'branchToName',
       headerName: 'สาขาปลายทาง',
-      minWidth: 205,
+      // minWidth: 205,
       // width: 195,
-      // flex: 0.,
+      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.getValue(params.id, 'branchTo') || ''}-{params.value}
+          </Typography>
+        </div>
+      ),
     },
     // {
     //   field: 'createdBy',
@@ -116,8 +130,8 @@ function StockTransferList() {
     {
       field: 'status',
       headerName: 'สถานะ BT',
-      // minWidth: 80,
-      flex: 0.7,
+      minWidth: 80,
+      // flex: 0.7,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
@@ -168,8 +182,10 @@ function StockTransferList() {
       rtNo: data.rtNo,
       startDate: convertUtcToBkkDate(data.startDate),
       endDate: convertUtcToBkkDate(data.endDate),
-      branchFrom: data.branchFromName,
-      branchTo: data.branchToName,
+      branchFromName: data.branchFromName,
+      branchToName: data.branchToName,
+      branchFrom: data.branchFrom,
+      branchTo: data.branchTo,
       createdBy: data.createdBy,
       status: data.status,
     };

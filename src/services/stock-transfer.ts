@@ -155,3 +155,18 @@ export const getPathReportBT = (docType: string, btNo: string) => {
     });
   }
 };
+
+export const getPathRemoveStockRequest = (rtNo: string) => {
+  return getPathUrl(`${environment.stock.stockRequest.remove.url}`, {
+    rtNo: rtNo,
+  });
+};
+
+export async function removeStockRequest(rtNo: string) {
+  const response = await post(getPathRemoveStockRequest(rtNo), ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}

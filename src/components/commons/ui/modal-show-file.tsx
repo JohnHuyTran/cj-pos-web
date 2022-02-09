@@ -124,7 +124,12 @@ export default function ModalShowPDF({
     // }, 1000);
   };
 
-  // const componentRef = useRef();
+  const setPageSize = (cssPageSize: string) => {
+    const style = document.createElement('style');
+    style.innerHTML = `@page {size: ${cssPageSize}}`;
+    // style.id = 'page-orientation';
+    document.head.appendChild(style);
+  };
   const showPrint = useReactToPrint({
     documentTitle: fileName,
     content: () => pdfWrapper.current,
@@ -136,6 +141,7 @@ export default function ModalShowPDF({
 
   React.useEffect(() => {
     if (statusFile === 1) getReport(url);
+    setPageSize('A4 portrait');
   }, [open]);
 
   return (

@@ -53,6 +53,7 @@ import ModalShowFile from '../commons/ui/modal-show-file';
 import { parseWithOptions } from 'date-fns/fp';
 import { BranchInfo } from '../../models/search-branch-model';
 import { getUserInfo } from '../../store/sessionStore';
+import DatePickerAllComponent from '../commons/ui/date-picker-all';
 
 interface Props {
   isOpen: boolean;
@@ -878,7 +879,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                     <Typography gutterBottom variant='subtitle1' component='div'>
                       รอบรถเข้าต้นทางตั้งแต่
                     </Typography>
-                    <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+                    <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
                   </Grid>
                   <Grid item xs={1}></Grid>
                   <Grid item>
