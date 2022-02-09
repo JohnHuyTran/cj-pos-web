@@ -370,17 +370,20 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   });
 
   const validateItem = () => {
+    setComment(comment);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     let itemNotValid: boolean = false;
     rowsEdit.forEach((data: GridRowData) => {
       if (!data.toteCode && data.actualQty > 0) {
         itemNotValid = true;
         setTextError('กรุณาระบุเลขที่ Tote/ลัง');
+        setComment(comment);
         return;
       }
       if (data.toteCode && data.actualQty <= 0) {
         itemNotValid = true;
         setTextError('จำนวนโอนจริงเป็น 0 ไม่ต้องระบุเลขที่ Tote/ลัง ');
+        setComment(comment);
         return;
       }
     });
@@ -397,6 +400,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       if (sumActual < sumQty && !comment) {
         itemNotValid = true;
         setTextError('กรุณาระบุสาเหตุการเปลี่ยนจำนวน');
+        setComment(comment);
         return;
       }
     });
