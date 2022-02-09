@@ -40,6 +40,7 @@ import { getBranchName, getReasonLabel } from '../../utils/utils';
 import ModalConfirmTransaction from './modal-confirm-transaction';
 import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
+import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 
 interface State {
   branchCode: string;
@@ -317,7 +318,9 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     } else {
       const payloadSave: any = await handleMapPayloadSave();
       await saveStockRequest(payloadSave)
-        .then((value) => {
+        .then(async (value) => {
+          await dispatch(featchStockRequestDetailAsync(value.docNo));
+
           if (type === 'Create') {
             setFlagCreateSave(true);
           }
@@ -332,7 +335,9 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
         .catch((error: ApiError) => {
           setShowSnackBar(true);
           if (error.code === 40010) {
-            setContentMsg('สาขาปลายทางไม่สามารถรับโอนสินค้าได้เนื่องจากไม่มี assortment');
+            setContentMsg(
+              'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+            );
           } else {
             setContentMsg(error.message);
           }
@@ -511,7 +516,9 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           .catch((error: ApiError) => {
             setShowSnackBar(true);
             if (error.code === 40010) {
-              setContentMsg('สาขาปลายทางไม่สามารถรับโอนสินค้าได้เนื่องจากไม่มี assortment');
+              setContentMsg(
+                'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+              );
             } else {
               setContentMsg(error.message);
             }
@@ -604,7 +611,9 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           .catch((error: ApiError) => {
             setShowSnackBar(true);
             if (error.code === 40010) {
-              setContentMsg('สาขาปลายทางไม่สามารถรับโอนสินค้าได้เนื่องจากไม่มี assortment');
+              setContentMsg(
+                'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+              );
             } else {
               setContentMsg(error.message);
             }
@@ -812,6 +821,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                 type={type}
                 onChangeItems={handleChangeItems}
                 changeItems={handleStatusChangeItems}
+                update={flagSave}
               />
             )}
 

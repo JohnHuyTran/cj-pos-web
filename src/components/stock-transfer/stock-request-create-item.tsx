@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
   DataGrid,
@@ -23,6 +23,7 @@ export interface DataGridProps {
   type: string;
   onChangeItems: (items: Array<any>) => void;
   changeItems: (chang: Boolean) => void;
+  update: boolean;
 }
 
 const columns: GridColDef[] = [
@@ -151,11 +152,23 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function StockTransferItem({ type, onChangeItems, changeItems }: DataGridProps) {
+function StockTransferItem({ type, onChangeItems, changeItems, update }: DataGridProps) {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
+
+  useEffect(() => {
+    if (!update) {
+      if (stockRequestDetail) {
+        const items = stockRequestDetail.items ? stockRequestDetail.items : [];
+        if (items.length > 0) {
+          updateItemsState(items);
+          itemsMap(items);
+        }
+      }
+    }
+  }, [update]);
 
   let rows: any = [];
   const updateItemsState = async (items: any) => {
