@@ -11,6 +11,7 @@ import Done from '@mui/icons-material/Done';
 import LoadingModal from '../commons/ui/loading-modal';
 import { Chip, Typography } from '@mui/material';
 import { StockTransferInfo, StockTransferRequest, StockTransferResponse } from '../../models/stock-transfer-model';
+import ModelDeleteConfirm from './modal-delete-confirm';
 import { DeleteForever } from '@mui/icons-material';
 import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
 import { saveSearchStockTransferRt } from '../../store/slices/save-search-stock-transfer-rt-slice';
@@ -18,6 +19,7 @@ import ModalDetailStockTransfer from './stock-request-detail';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
+import { removeStockRequest } from '../../services/stock-transfer';
 
 interface loadingModalState {
   open: boolean;
@@ -161,9 +163,9 @@ function StockTransferRtList() {
     {
       field: 'delete',
       headerName: ' ',
-      // width: 40,
+      width: 70,
       // minWidth: 0,
-      flex: 0.75,
+      // flex: 0.5,
       align: 'center',
       sortable: false,
       renderCell: (params) => {
@@ -206,7 +208,7 @@ function StockTransferRtList() {
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
-    console.log('newPage: ', newPage);
+    // console.log('newPage: ', newPage);
     let page: string = (newPage + 1).toString();
 
     const payloadNewpage: StockTransferRequest = {
@@ -253,10 +255,47 @@ function StockTransferRtList() {
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+
+  const [rtNoDel, setRtNoDel] = React.useState('');
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+
   const currentlySelected = async (params: GridCellParams) => {
-    handleOpenLoading('open', true);
-    await handleOpenDetailModal(params.row.rtNo);
-    handleOpenLoading('open', false);
+    const value = params.colDef.field;
+    const rtNo = params.getValue(params.id, 'rtNo');
+
+    if (value === 'delete') {
+      setRtNoDel(params.row.rtNo);
+      setOpenModelDeleteConfirm(true);
+    } else {
+      handleOpenLoading('open', true);
+      await handleOpenDetailModal(params.row.rtNo);
+      handleOpenLoading('open', false);
+    }
+  };
+
+  const handleModelDeleteConfirm = async (confirm: boolean) => {
+    if (confirm === true) {
+      await removeStockRequest(rtNoDel)
+        .then((value) => {
+          const payloadNewpage: StockTransferRequest = {
+            limit: pageSize,
+            page: cuurentPage.toString(),
+            docNo: payload.docNo,
+            branchFrom: payload.branchFrom,
+            branchTo: payload.branchTo,
+            dateFrom: payload.dateFrom,
+            dateTo: payload.dateTo,
+            statuses: payload.statuses,
+            transferReason: payload.transferReason,
+          };
+          dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
+          dispatch(saveSearchStockTransferRt(payloadNewpage));
+          setOpenModelDeleteConfirm(false);
+        })
+        .catch((error) => {});
+    } else {
+      setOpenModelDeleteConfirm(false);
+    }
   };
 
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
@@ -305,6 +344,8 @@ function StockTransferRtList() {
           onClickClose={handleCloseDetailModal}
         />
       )}
+
+      <ModelDeleteConfirm open={openModelDeleteConfirm} onClose={handleModelDeleteConfirm} />
     </div>
   );
 }

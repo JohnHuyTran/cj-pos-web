@@ -87,22 +87,36 @@ function StockTransferList() {
       ),
     },
     {
-      field: 'branchFrom',
+      field: 'branchFromName',
       headerName: 'สาขาต้นทาง',
       minWidth: 205,
       // width: 195,
       // flex: 1.2,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.getValue(params.id, 'branchFrom') || ''}-{params.value}
+          </Typography>
+        </div>
+      ),
     },
     {
-      field: 'branchTo',
+      field: 'branchToName',
       headerName: 'สาขาปลายทาง',
       minWidth: 205,
       // width: 195,
       // flex: 0.,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.getValue(params.id, 'branchTo') || ''}-{params.value}
+          </Typography>
+        </div>
+      ),
     },
     // {
     //   field: 'createdBy',
@@ -168,8 +182,10 @@ function StockTransferList() {
       rtNo: data.rtNo,
       startDate: convertUtcToBkkDate(data.startDate),
       endDate: convertUtcToBkkDate(data.endDate),
-      branchFrom: data.branchFromName,
-      branchTo: data.branchToName,
+      branchFromName: data.branchFromName,
+      branchToName: data.branchToName,
+      branchFrom: data.branchFrom,
+      branchTo: data.branchTo,
       createdBy: data.createdBy,
       status: data.status,
     };

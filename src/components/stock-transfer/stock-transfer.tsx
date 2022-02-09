@@ -83,6 +83,7 @@ export default function SupplierCheckOrderSearch() {
   };
 
   const [branchFromCode, setBranchFromCode] = React.useState('');
+  const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
@@ -97,6 +98,7 @@ export default function SupplierCheckOrderSearch() {
   const handleChangeBranchTo = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
+      setBranchToCode(branchCode);
       setValues({ ...values, branchTo: JSON.parse(codes) });
     } else {
       setValues({ ...values, branchTo: '' });
@@ -243,7 +245,7 @@ export default function SupplierCheckOrderSearch() {
               สาขาต้นทาง*
             </Typography>
             <BranchListDropDown
-              sourceBranchCode={''}
+              sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
             />
