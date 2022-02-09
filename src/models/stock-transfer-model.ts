@@ -162,6 +162,7 @@ export interface BranchTransferInfo {
   lastModifiedBy: string;
   createdDate: string;
   lastModifiedDate: string;
+  delivery: Delivery;
 }
 
 export interface StockRequestResponse {

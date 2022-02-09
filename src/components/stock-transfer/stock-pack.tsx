@@ -669,7 +669,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const path = getPathReportBT(docType ? docType : 'BT', btNo);
     setSuffixDocType(docType !== 'BT' ? docType : '');
     setPathReport(path ? path : '');
-    setDocLayoutLandscape(docType === 'Box' || docType === 'Recall' ? true : false);
+    setDocLayoutLandscape(docType === 'Recall' ? true : false);
     setOpenModelPreviewDocument(true);
   };
 
@@ -919,14 +919,14 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                   <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
                 </Grid>
                 <Grid item lg={3}>
-                  <Typography variant='body2'>{sourceBranch} </Typography>
+                  <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
                 </Grid>
                 <Grid item lg={1}></Grid>
                 <Grid item lg={2}>
                   <Typography variant='body2'>ถึง :</Typography>
                 </Grid>
                 <Grid item lg={3}>
-                  <Typography variant='body2'>{destinationBranch} </Typography>
+                  <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
                 </Grid>
                 <Grid item lg={1}></Grid>
               </Grid>
