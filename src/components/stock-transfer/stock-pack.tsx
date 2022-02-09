@@ -299,7 +299,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setIsDC(isBranchDC(getUserInfo()));
 
     let newColumns = [...cols];
-    if (branchTransferInfo.status === 'WAIT_FOR_PICKUP') {
+    if (branchTransferInfo.status != 'CREATED') {
       newColumns[9]['hide'] = false;
     } else {
       newColumns[9]['hide'] = true;
