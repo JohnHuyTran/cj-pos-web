@@ -10,7 +10,7 @@ import {
   getRefreshToken,
   setUserInfo,
 } from '../store/sessionStore';
-import { getDecodedAccessToken } from '../utils/utils';
+import { getDecodedAccessToken, getUserGroup } from '../utils/utils';
 
 const instance = axios.create({
   baseURL: env.keycloak.url,
@@ -37,7 +37,10 @@ export function authentication(payload: loginForm): Promise<Response> {
         setAccessToken(response.data.access_token);
         setRefreshToken(response.data.refresh_token);
         setSessionId(response.data.session_state);
-        setUserInfo(getDecodedAccessToken(response.data.access_token ? response.data.access_token : ''));
+        let userInfo = getDecodedAccessToken(response.data.access_token ? response.data.access_token : '');
+        const _group = getUserGroup(userInfo.groups);
+        userInfo = { ...userInfo, group: _group ? _group : '' };
+        setUserInfo(userInfo);
         return response.data;
       }
       throw new Error(response.status.toString());
@@ -61,6 +64,10 @@ export function refreshToken(): Promise<Response> {
         if (response.status === 200) {
           setRefreshToken(response.data.refresh_token);
           setAccessToken(response.data.access_token);
+          let userInfo = getDecodedAccessToken(response.data.access_token ? response.data.access_token : '');
+          const _group = getUserGroup(userInfo.groups);
+          userInfo = { ...userInfo, group: _group ? _group : '' };
+          setUserInfo(userInfo);
           return response.data;
         }
         throw new Error(response.status.toString());
