@@ -15,3 +15,13 @@ export enum SUBMENU {
   STOCK_REQUEST = 'stock.request',
   STOCK_TRANSFER = 'stock.transfer',
 }
+
+export enum PERMISSION_GROUP {
+  DC = 'dc',
+  SCM = 'scm',
+  OC = 'oc',
+}
+
+export const KEYCLOAK_GROUP_DC = '/service.posback/manager';
+export const KEYCLOAK_GROUP_SCM = '/service.posback/scm';
+export const KEYCLOAK_GROUP_OC = '/service.posback/OC';

@@ -26,7 +26,6 @@ import { changeState } from '../store/slices/nav-slice';
 import imgLogo from '../assets/images/Logo-CJ-More.png';
 import Menu from '@mui/icons-material/Menu';
 import { ShoppingCartSharp } from '@mui/icons-material';
-import { isAllowMenuPermission } from '../utils/role-permission';
 
 const drawerWidth = 240;
 const DrawerHeader = styled('div')(({ theme }) => ({
