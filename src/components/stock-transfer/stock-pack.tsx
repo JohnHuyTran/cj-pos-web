@@ -281,6 +281,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
   const [pathReport, setPathReport] = React.useState<string>('');
   const [suffixDocType, setSuffixDocType] = React.useState<string>('');
+  const [docLayoutLandscape, setDocLayoutLandscape] = React.useState(false);
   React.useEffect(() => {
     const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
     setSourceBranch(fromBranch ? fromBranch : '');
@@ -306,7 +307,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setStartDate(new Date(branchTransferInfo.createdDate));
     setEndDate(new Date(branchTransferInfo.createdDate));
     storeItemAddItem(payloadAddItem);
-  }, [open, payloadAddItem]);
+  }, [open, payloadAddItem, branchTransferInfo]);
 
   if (endDate != null && startDate != null) {
     if (endDate < startDate) {
@@ -641,7 +642,8 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         setSnackbarIsStatus(false);
         setContentMsg(error.message);
       });
-    handleOnCloseModalConfirm();
+
+    // handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
   };
 
@@ -667,6 +669,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     const path = getPathReportBT(docType ? docType : 'BT', btNo);
     setSuffixDocType(docType !== 'BT' ? docType : '');
     setPathReport(path ? path : '');
+    setDocLayoutLandscape(docType === 'Box' || docType === 'Recall' ? true : false);
     setOpenModelPreviewDocument(true);
   };
 
@@ -696,7 +699,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                 <Typography variant='body2'>เลขที่เอกสาร BT</Typography>
               </Grid>
               <Grid item lg={3}>
-                <Typography variant='body2'>{btNo}</Typography>
+                <Typography variant='body2'>{branchTransferInfo.btNo}</Typography>
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
@@ -1021,6 +1024,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         sdImageFile={''}
         fileName={formatFileStockTransfer(btNo, btStatus, suffixDocType)}
         btnPrintName='พิมพ์เอกสาร'
+        landscape={docLayoutLandscape}
       />
     </React.Fragment>
   );

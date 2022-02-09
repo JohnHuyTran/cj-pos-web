@@ -23,6 +23,7 @@ interface ModalShowPDFProp {
   btnPrintName: string;
   onClose: () => void;
   onPrint?: () => void;
+  landscape?: boolean;
 }
 export interface DialogTitleProps {
   id: string;
@@ -79,6 +80,7 @@ export default function ModalShowPDF({
   fileName,
   btnPrintName,
   onClose,
+  landscape,
 }: ModalShowPDFProp): ReactElement {
   const [numPages, setNumPages] = useState(0);
   // const [pageNumber, setPageNumber] = useState(1);
@@ -141,7 +143,7 @@ export default function ModalShowPDF({
 
   React.useEffect(() => {
     if (statusFile === 1) getReport(url);
-    setPageSize('A4 portrait');
+    setPageSize(landscape ? 'A4 landscape' : 'A4 portrait');
   }, [open]);
 
   return (
