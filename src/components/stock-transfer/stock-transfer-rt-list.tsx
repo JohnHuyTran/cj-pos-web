@@ -56,7 +56,7 @@ function StockTransferRtList() {
       field: 'rtNo',
       headerName: 'เลขที่เอกสารร้องขอ RT',
       minWidth: 190,
-      // flex: 1.3,
+      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
     },
@@ -82,7 +82,7 @@ function StockTransferRtList() {
       headerName: 'สาขาต้นทาง',
       minWidth: 210,
       // width: 210,
-      // flex: 1.2,
+      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -98,7 +98,7 @@ function StockTransferRtList() {
       headerName: 'สาขาปลายทาง',
       minWidth: 210,
       // width: 210,
-      // flex: 0.,
+      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (

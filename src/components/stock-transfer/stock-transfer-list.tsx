@@ -56,8 +56,8 @@ function StockTransferList() {
     {
       field: 'btNo',
       headerName: 'เลขที่เอกสาร BT',
-      minWidth: 185,
-      // flex: 1,
+      // minWidth: 185,
+      flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
@@ -65,7 +65,7 @@ function StockTransferList() {
       field: 'rtNo',
       headerName: 'เลขที่เอกสารร้องขอ RT',
       minWidth: 185,
-      // flex: 1,
+      flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
@@ -89,9 +89,9 @@ function StockTransferList() {
     {
       field: 'branchFromName',
       headerName: 'สาขาต้นทาง',
-      minWidth: 205,
+      // minWidth: 205,
       // width: 195,
-      // flex: 1.2,
+      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -105,9 +105,9 @@ function StockTransferList() {
     {
       field: 'branchToName',
       headerName: 'สาขาปลายทาง',
-      minWidth: 205,
+      // minWidth: 205,
       // width: 195,
-      // flex: 0.,
+      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -130,8 +130,8 @@ function StockTransferList() {
     {
       field: 'status',
       headerName: 'สถานะ BT',
-      // minWidth: 80,
-      flex: 0.7,
+      minWidth: 80,
+      // flex: 0.7,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
