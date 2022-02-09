@@ -40,7 +40,7 @@ export function authentication(payload: loginForm): Promise<Response> {
         let userInfo = getDecodedAccessToken(response.data.access_token ? response.data.access_token : '');
         const group = getUserGroup(userInfo.groups);
 
-        // setUserInfo({...userInfo, group:group});
+        setUserInfo(getDecodedAccessToken(response.data.access_token ? response.data.access_token : ''));
         return response.data;
       }
       throw new Error(response.status.toString());
