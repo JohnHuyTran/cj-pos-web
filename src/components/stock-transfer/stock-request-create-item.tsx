@@ -250,6 +250,7 @@ function StockTransferItem({ type, onChangeItems, changeItems, update }: DataGri
       }
 
       await dispatch(updateAddItemsState(itemsList));
+      handleChangeItems();
       return onChangeItems(itemsList ? itemsList : []);
     }
   };
@@ -298,7 +299,7 @@ function StockTransferItem({ type, onChangeItems, changeItems, update }: DataGri
         onCellFocusOut={handleEditItems}
         onCellOut={handleEditItems}
         onCellKeyDown={handleChangeItems}
-        onCellBlur={handleChangeItems}
+        // onCellBlur={handleChangeItems}
       />
 
       <ModelDeleteConfirm
