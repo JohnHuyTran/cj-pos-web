@@ -29,6 +29,7 @@ import {
 } from '@mui/x-data-grid';
 import LoadingModal from './loading-modal';
 import { featchAllItemsListAsync } from '../../../store/slices/search-all-items';
+import { FindProductProps, FindProductRequest } from '../../../models/product-model';
 
 interface StateItem {
   barcodeName: string;
@@ -38,6 +39,7 @@ interface StateItem {
 interface Props {
   open: boolean;
   onClose: () => void;
+  requestBody: FindProductRequest;
 }
 
 const columns: GridColDef[] = [
@@ -118,7 +120,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-export default function ModalAddItems({ open, onClose }: Props): ReactElement {
+export default function ModalAddItems({ open, onClose, requestBody }: Props): ReactElement {
   const { apiRef, columns } = useApiRef();
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -179,16 +181,20 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
     }
 
     const keyword = value.trim();
+    const payload: FindProductProps = {
+      search: keyword,
+      payload: requestBody,
+    };
     if (keyword.length >= 3 && reason !== 'reset') {
       setSearchItem(keyword);
-      await dispatch(featchAllItemsListAsync(keyword));
+      await dispatch(featchAllItemsListAsync(payload));
     } else {
       clearData();
     }
   };
 
   let options: any = [];
-  if (searchItem) options = itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
+  if (searchItem) options = itemsList && itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.barcodeName + option.barcode,
   });
@@ -256,6 +262,8 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
         itemsList.push(option);
         setNewAddItemListArray(itemsList);
       }
+
+      clearInput();
     } else {
       clearData();
     }
@@ -287,7 +295,8 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
         if (!o[id]) {
           return (o[id] = i);
         }
-        return (o[id].qty = o[id].qty + i.qty);
+        var iQty = i.qty ? i.qty : i.orderQty;
+        return (o[id].qty = o[id].qty + iQty);
       });
 
       var itemResult: any = [];
@@ -358,7 +367,7 @@ export default function ModalAddItems({ open, onClose }: Props): ReactElement {
                     color: (theme: any) => theme.palette.grey[400],
                   }}
                 >
-                  <CancelOutlinedIcon fontSize="large" stroke={'white'} stroke-width={1} />
+                  <CancelOutlinedIcon fontSize="large" stroke={'white'} strokeWidth={1} />
                 </IconButton>
               ) : null}
             </Box>

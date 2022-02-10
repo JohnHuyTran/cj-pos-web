@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import clsx from 'clsx';
 
@@ -17,8 +17,12 @@ import { loginKeyCloakAsync } from '../../store/slices/authSlice';
 import { loginForm } from '../../models/user-interface';
 import { loginFormStyle } from './loginForm-css';
 import { env } from '../../adapters/environmentConfigs';
+import { getAccessToken, setUserInfo } from '../../store/sessionStore';
+import { getDecodedAccessToken } from '../../utils/utils';
+import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 
 interface State {
+  branch: string;
   userId: string;
   password: string;
   showPassword: boolean;
@@ -31,10 +35,11 @@ function LoginForm() {
     password: '',
     userId: '',
     showPassword: false,
+    branch: '',
   });
   // console.log(isAllowPermission('FEATURE.ADMIN.SEARCH.DATA'));
   const dispatch = useAppDispatch();
-  const { error } = useAppSelector((state) => state.auth);
+  const { error, isLogin } = useAppSelector((state) => state.auth);
   const [version, setVersion] = React.useState<any>(process.env.REACT_APP_POS_BACK_VERSION);
   const handleChange = (prop: any) => (event: any) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -51,12 +56,13 @@ function LoginForm() {
     event.preventDefault();
   };
 
-  const onClickLogin = () => {
+  const onClickLogin = async () => {
     const form: loginForm = {
       userId: values.userId,
       password: values.password,
+      branchCode: values.branch,
     };
-    dispatch(loginKeyCloakAsync(form));
+    await dispatch(loginKeyCloakAsync(form));
   };
 
   return (
@@ -111,6 +117,22 @@ function LoginForm() {
                   </IconButton>
                 </InputAdornment>
               }
+            />
+          </FormControl>
+        </div>
+        <div>
+          <FormControl sx={{ m: 3 }} className={clsx(classes.textField)} variant='outlined'>
+            <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>
+              สาขา
+            </FormHelperText>
+            <OutlinedInput
+              id='txtBranchCoce'
+              value={values.branch}
+              onChange={handleChange('branch')}
+              aria-describedby='outlined-user-id-text'
+              inputProps={{
+                'aria-label': 'weight',
+              }}
             />
           </FormControl>
         </div>

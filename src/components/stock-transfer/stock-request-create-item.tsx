@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
   DataGrid,
@@ -23,6 +23,7 @@ export interface DataGridProps {
   type: string;
   onChangeItems: (items: Array<any>) => void;
   changeItems: (chang: Boolean) => void;
+  update: boolean;
 }
 
 const columns: GridColDef[] = [
@@ -99,7 +100,7 @@ const columns: GridColDef[] = [
   },
   {
     field: 'baseUnit',
-    headerName: 'หน่วยย่อย',
+    headerName: 'สั่ง(ชิ้น)',
     minWidth: 120,
     headerAlign: 'center',
     align: 'right',
@@ -151,11 +152,23 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function StockTransferItem({ type, onChangeItems, changeItems }: DataGridProps) {
+function StockTransferItem({ type, onChangeItems, changeItems, update }: DataGridProps) {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
+
+  useEffect(() => {
+    if (!update && type !== 'Create') {
+      if (stockRequestDetail) {
+        const items = stockRequestDetail.items ? stockRequestDetail.items : [];
+        if (items.length > 0) {
+          updateItemsState(items);
+          itemsMap(items);
+        }
+      }
+    }
+  }, [update]);
 
   let rows: any = [];
   const updateItemsState = async (items: any) => {
@@ -237,6 +250,7 @@ function StockTransferItem({ type, onChangeItems, changeItems }: DataGridProps) 
       }
 
       await dispatch(updateAddItemsState(itemsList));
+      handleChangeItems();
       return onChangeItems(itemsList ? itemsList : []);
     }
   };
@@ -285,7 +299,7 @@ function StockTransferItem({ type, onChangeItems, changeItems }: DataGridProps) 
         onCellFocusOut={handleEditItems}
         onCellOut={handleEditItems}
         onCellKeyDown={handleChangeItems}
-        onCellBlur={handleChangeItems}
+        // onCellBlur={handleChangeItems}
       />
 
       <ModelDeleteConfirm

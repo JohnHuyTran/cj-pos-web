@@ -5,7 +5,7 @@ import { Box, Grid, Typography, TextField, FormControl, Select, MenuItem, Button
 import { useStyles } from '../../styles/makeTheme';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
-import DatePickerComponent from '../commons/ui/date-picker';
+import DatePickerAllComponent from '../commons/ui/date-picker-all';
 import ReasonsListDropDown from './transfer-reasons-list-dropdown';
 import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
@@ -63,6 +63,7 @@ export default function StockTransferRt() {
   };
 
   const [branchFromCode, setBranchFromCode] = React.useState('');
+  const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
@@ -77,6 +78,7 @@ export default function StockTransferRt() {
   const handleChangeBranchTo = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
+      setBranchToCode(branchCode);
       setValues({ ...values, branchTo: JSON.parse(codes) });
     } else {
       setValues({ ...values, branchTo: '' });
@@ -105,12 +107,9 @@ export default function StockTransferRt() {
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
   const onClickValidateForm = () => {
-    if (values.branchFrom === '') {
+    if (startDate === null || endDate === null) {
       setOpenAlert(true);
-      setTextError('กรุณาระบุสาขาต้นทาง');
-    } else if (values.branchTo === '') {
-      setOpenAlert(true);
-      setTextError('กรุณาระบุสาขาปลายทาง');
+      setTextError('กรุณาระบุวันที่รับสินค้า');
     } else {
       onClickSearchBtn();
     }
@@ -245,17 +244,17 @@ export default function StockTransferRt() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สาขาต้นทาง*
+              สาขาต้นทาง
             </Typography>
             <BranchListDropDown
-              sourceBranchCode={''}
+              sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
             />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สาขาปลายทาง*
+              สาขาปลายทาง
             </Typography>
             <BranchListDropDown
               sourceBranchCode={branchFromCode}
@@ -269,15 +268,20 @@ export default function StockTransferRt() {
               วันที่รับสินค้า
             </Typography>
             <Typography gutterBottom variant="subtitle1" component="div">
-              ตั้งแต่
+              ตั้งแต่*
             </Typography>
-            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+            <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
-              ถึง
+              ถึง*
             </Typography>
-            <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
+            <DatePickerAllComponent
+              onClickDate={handleEndDatePicker}
+              value={endDate}
+              type={'TO'}
+              minDateTo={startDate}
+            />
           </Grid>
           <Grid item xs={4} container>
             <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>

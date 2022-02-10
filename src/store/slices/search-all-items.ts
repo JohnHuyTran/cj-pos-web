@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
+import { get, post } from '../../adapters/posback-adapter';
 import { ItemsResponse } from '../../models/modal-add-all-items-model';
+import { ContentType } from '../../utils/enum/common-enum';
+import { FindProductProps, FindProductRequest } from '../../models/product-model';
 
 type State = {
   itemList: ItemsResponse;
@@ -20,10 +22,10 @@ const initialState: State = {
   error: '',
 };
 
-export const featchAllItemsListAsync = createAsyncThunk('SearchAllItemsList', async (search: string) => {
+export const featchAllItemsListAsync = createAsyncThunk('SearchAllItemsList', async (payload: FindProductProps) => {
   try {
-    const path = `${environment.products.addItem.allitemsList.url}/${search}?limit=10`;
-    let response = await get(path).then();
+    const path = `${environment.products.addItem.allitemsList.url}/${payload.search}?limit=10`;
+    let response = await post(path, payload.payload, ContentType.JSON).then();
 
     if (response === 204) {
       let responseCode: any = {

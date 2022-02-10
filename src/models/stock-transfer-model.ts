@@ -74,8 +74,7 @@ export interface StockTransferItems {
 export interface BranchTransferRequest {
   btNo?: string;
   sdNo?: string;
-  startDate?: string;
-  endDate?: string;
+  delivery?: Delivery;
   comment?: string;
   items?: Item[];
 }
@@ -136,6 +135,7 @@ export interface Item {
   orderQty?: number;
   orderAllQty?: number;
   isDraft?: boolean;
+  boNo?: boolean;
 }
 
 export interface BranchTransferResponse {
@@ -162,6 +162,7 @@ export interface BranchTransferInfo {
   lastModifiedBy: string;
   createdDate: string;
   lastModifiedDate: string;
+  delivery: Delivery;
 }
 
 export interface StockRequestResponse {
@@ -202,4 +203,9 @@ export interface Approve2StockTransferRequest {
 export interface ApproveComment {
   by: string;
   detail: string;
+}
+
+export interface Delivery {
+  fromDate: string;
+  toDate: string;
 }

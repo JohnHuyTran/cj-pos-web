@@ -50,3 +50,12 @@ code {
 [class*='Mdatepicker'] .MuiInputBase-root.MuiOutlinedInput-root {
   height: 38px;
 }
+/* @media print {
+  html,
+  body {
+    border: 1px solid white;
+    height: 99%;
+    page-break-after: avoid;
+    page-break-before: avoid;
+  }
+} */
