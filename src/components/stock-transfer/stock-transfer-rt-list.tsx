@@ -261,7 +261,6 @@ function StockTransferRtList() {
 
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
-    const rtNo = params.getValue(params.id, 'rtNo');
 
     if (value === 'delete') {
       setRtNoDel(params.row.rtNo);
@@ -345,7 +344,7 @@ function StockTransferRtList() {
         />
       )}
 
-      <ModelDeleteConfirm open={openModelDeleteConfirm} onClose={handleModelDeleteConfirm} />
+      <ModelDeleteConfirm open={openModelDeleteConfirm} onClose={handleModelDeleteConfirm} rtNo={rtNoDel} />
     </div>
   );
 }
