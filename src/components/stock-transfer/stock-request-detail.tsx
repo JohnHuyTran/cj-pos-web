@@ -656,7 +656,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              วันที่โอนสินค้า :
+              วันที่โอนสินค้า* :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -669,7 +669,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุด :
+              วันที่สิ้นสุด* :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -689,7 +689,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาขาต้นทาง :
+              สาขาต้นทาง* :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -704,7 +704,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              สาขาปลายทาง :
+              สาขาปลายทาง* :
             </Grid>
             <Grid item xs={3}>
               {(status === '' ||
@@ -729,7 +729,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาเหตุการโอน :
+              สาเหตุการโอน* :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
