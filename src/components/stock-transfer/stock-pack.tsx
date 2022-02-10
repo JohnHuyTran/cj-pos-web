@@ -890,7 +890,12 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                     <Typography gutterBottom variant='subtitle1' component='div'>
                       รอบรถเข้าต้นทางตั้งแต่
                     </Typography>
-                    <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
+                    <DatePickerAllComponent
+                      onClickDate={handleStartDatePicker}
+                      value={startDate}
+                      type={'TO'}
+                      minDateTo={startDate}
+                    />
                   </Grid>
                   <Grid item xs={1}></Grid>
                   <Grid item>
