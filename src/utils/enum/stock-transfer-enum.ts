@@ -16,3 +16,10 @@ export const getStockTransferStatusInfo = (key: string) => stockTransferStatus.f
 export const getStockTransferStatusList = (type: string) => {
   return stockTransferStatus.filter((item) => item.type === type || item.type === 'ALL');
 };
+
+export enum DOCUMENT_TYPE {
+  BT = 'BT',
+  BO = 'BO',
+  RECALL = 'Recall',
+  BOX = 'Box',
+}
