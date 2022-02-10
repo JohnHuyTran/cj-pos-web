@@ -9,10 +9,11 @@ import LoadingModal from '../commons/ui/loading-modal';
 
 interface Props {
   open: boolean;
+  rtNo: string;
   onClose: (confirm: boolean) => void;
 }
 
-export default function ModelConfirm({ open, onClose }: Props): ReactElement {
+export default function ModelConfirm({ open, onClose, rtNo }: Props): ReactElement {
   const handleDeleteItem = async () => {
     return onClose(true);
   };
@@ -33,6 +34,14 @@ export default function ModelConfirm({ open, onClose }: Props): ReactElement {
         <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
           <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
             ยืนยันการลบ
+          </Typography>
+          <Typography variant="body1" align="left">
+            เลขที่เอกสารร้องขอ RT <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
+            <label style={{ color: '#36C690' }}>
+              <b>{rtNo}</b>
+              {/* <br />
+              <label style={{ color: '#AEAEAE', fontSize: 14, marginLeft: '3.8em' }}>{skuCode}</label> */}
+            </label>
           </Typography>
         </DialogContentText>
       </DialogContent>
