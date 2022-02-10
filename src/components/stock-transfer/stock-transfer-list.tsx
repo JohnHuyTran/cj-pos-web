@@ -292,7 +292,7 @@ function StockTransferList() {
             page={cuurentPage - 1}
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
-            rowCount={res.totalPage}
+            rowCount={res.total}
             paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
