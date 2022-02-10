@@ -80,10 +80,6 @@ const store = configureStore({
     branchTransferDetailSlice: branchTransferDetailSlice,
     searchBranchProvince: searchBranchProvince,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-    }),
 });
 
 // Types of root state and dispatch

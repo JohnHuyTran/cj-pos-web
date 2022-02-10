@@ -22,19 +22,13 @@ import { useStyles } from '../../../styles/makeTheme';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import { ItemProps, ListBranches } from '../../../models/search-branch-province-model';
-import { featchProvinceListAsync } from '../../../store/slices/search-branches-province-slice';
+import {
+  featchProvinceListAsync,
+  featchBranchProvinceListAsync,
+  updatePayloadBranches,
+} from '../../../store/slices/search-branches-province-slice';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
-
-const options = [
-  {
-    id: 1,
-    label: 'Province 1',
-  },
-  {
-    id: 2,
-    label: 'Province 3',
-  },
-];
+import { paramsConvert } from '../../../utils/utils';
 
 const BranchItem = (props: ItemProps) => {
   const { label, onDelete, ...other } = props;
@@ -52,17 +46,49 @@ export default function SearchBranch(): ReactElement {
   const { t } = useTranslation(['common']);
   const [province, setProvince] = React.useState<any | null>(null);
   const [branch, setBranch] = React.useState<any | null>(null);
-  const [branchList, setBranchList] = React.useState<any>([]);
   const [listBranch, setListBranch] = React.useState<ListBranches>({ branches: [], provinces: [] });
   const [checked, setChecked] = React.useState<boolean>(false);
   const [allBranches, setAllBranches] = React.useState<boolean>(true);
+  const [errorProvince, setErrorProvince] = React.useState<string | null>();
+  const [errorBranch, setErrorBranch] = React.useState<string | null>();
+  const [value, setValue] = React.useState<string | null>(null);
 
   const provinceList = useAppSelector((state) => state.searchBranchProvince.provinceList);
+  const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
+  const totalBranches = useAppSelector((state) => state.searchBranchProvince.totalBranches);
+  const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (provinceList === null || provinceList.data.length == 0) dispatch(featchProvinceListAsync());
+    if (branchList === null || branchList.data.length == 0) {
+      dispatch(featchBranchProvinceListAsync('limit=10'));
+    }
   }, []);
+
+  useEffect(() => {
+    try {
+      const payload = {
+        ...(!!branch && { name: branch.name }),
+        ...(!!province && { province: province.name }),
+        limit: '10',
+      };
+      const params = paramsConvert(payload);
+      dispatch(featchBranchProvinceListAsync(params));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }, [province]);
+
+  useEffect(() => {
+    if (payloadBranches.isAllBranches) {
+      setValue(`สาขาทั้งหมด (${totalBranches} สาขา)`);
+    } else {
+      // const stringProvince = payloadBranches.appliedBranches.province.map((item: any) => item.name).join();
+      console.log(payloadBranches.appliedBranches);
+    }
+  }, [payloadBranches]);
 
   const handleCloseModal = () => {
     setOpen(false);
@@ -93,11 +119,18 @@ export default function SearchBranch(): ReactElement {
 
     const keyword = value.trim();
     if (keyword.length >= 3 && reason !== 'reset') {
-      const payload = {
-        name: keyword,
-        province: province,
-      };
-      console.log({ payload });
+      try {
+        const payload = {
+          name: keyword,
+          ...(!!province && { province: province.name }),
+          limit: '10',
+        };
+        const params = paramsConvert(payload);
+        dispatch(featchBranchProvinceListAsync(params));
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
     } else {
       clearData();
     }
@@ -111,30 +144,63 @@ export default function SearchBranch(): ReactElement {
           ...listBranch,
           provinces: preData,
         });
+        setProvince(null);
+        setChecked(false);
+        setErrorProvince(null);
+      } else {
+        setErrorProvince('จังหวัดนี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง');
       }
     } else {
       const existBranch = listBranch['branches'].some((item: any) => item.id == branch.id);
       if (!existBranch) {
         const preData = [...listBranch['branches'], branch];
         setListBranch({ ...listBranch, branches: preData });
+        setBranch(null);
+        setErrorBranch(null);
+      } else {
+        setErrorBranch('สาขานี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง');
       }
     }
-    console.log({ listBranch });
   };
 
-  const handleDeleteBranch = () => {};
+  const handleDeleteBranch = (code: string) => {
+    const newList = listBranch['branches'].filter((item: any) => item.code !== code);
+    setListBranch({ ...listBranch, branches: newList });
+  };
 
-  const handleDeleteProvinceBranch = () => {};
+  const handleDeleteProvinceBranch = (code: string) => {
+    const newList = listBranch['provinces'].filter((item: any) => item.code !== code);
+    setListBranch({ ...listBranch, provinces: newList });
+  };
+
+  const handleAddForm = () => {
+    const payload = {
+      isAllBranches: allBranches,
+      appliedBranches: {
+        branchList: listBranch['branches'].map((item: any) => {
+          return { name: item.name, code: item.code };
+        }),
+        province: listBranch['provinces'],
+      },
+    };
+    dispatch(updatePayloadBranches(payload));
+    setOpen(false);
+  };
 
   return (
     <div>
       <TextField
         fullWidth
         className={classes.MtextFieldNumber}
+        sx={{ textAlign: 'left' }}
         InputProps={{
           endAdornment: <SearchIcon color="primary" />,
+          inputProps: {
+            style: { textAlignLast: 'start' },
+          },
         }}
         onClick={handleClickSearch}
+        value={value}
       />
       <Dialog maxWidth="lg" fullWidth open={open}>
         <Box sx={{ flex: 1, ml: 2 }}>
@@ -153,95 +219,120 @@ export default function SearchBranch(): ReactElement {
             </IconButton>
           ) : null}
         </Box>
-        <DialogContent sx={{ padding: '50px' }}>
-          <Grid container spacing={2}>
-            <Grid item xs={5}>
-              <FormControl>
+        <DialogContent sx={{ padding: '45px 24px 32px 100px' }}>
+          <Grid container spacing={2} sx={{ minHeight: '465px' }}>
+            <Grid item xs={5} pr={4}>
+              <FormControl sx={{ marginBottom: '15px' }}>
                 <RadioGroup
                   aria-labelledby="branch-radio-buttons-group-label"
                   value={allBranches}
                   name="radio-buttons-group"
                   onChange={handleChangeRadio}
                 >
-                  <FormControlLabel value={true} control={<Radio />} label={t('searchbranch.allBranches')} />
+                  <FormControlLabel
+                    value={true}
+                    control={<Radio />}
+                    label={`${t('searchbranch.allBranches')} (${totalBranches} สาขา)`}
+                  />
                   <FormControlLabel value={false} control={<Radio />} label={t('searchbranch.someBranches')} />
                 </RadioGroup>
               </FormControl>
-              <Box>
+              {!allBranches && (
                 <Box>
-                  <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-                    {t('searchbranch.province')}
-                  </Typography>
-                  <Autocomplete
-                    options={provinceList.data}
-                    id="combo-box-province"
-                    popupIcon={<SearchIcon color="primary" />}
-                    renderInput={(params) => <TextField {...params} />}
-                    size="small"
-                    className={classes.MSearchBranch}
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event: any, newValue: any) => {
-                      setProvince(newValue);
-                    }}
-                    value={province}
-                  />
-                </Box>
-                <Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography gutterBottom variant="subtitle1" component="div" mb={1} mr={3}>
-                      {t('searchbranch.branch')}
+                  <Box mb={2}>
+                    <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+                      {t('searchbranch.province')}
                     </Typography>
-                    <FormGroup>
-                      <FormControlLabel
-                        disabled={!province}
-                        control={<Checkbox checked={checked} onChange={handleCheckBox} />}
-                        label={t('searchbranch.selectAllBranchProvince')}
-                      />
-                    </FormGroup>
+                    <Autocomplete
+                      options={provinceList.data}
+                      id="combo-box-province"
+                      popupIcon={<SearchIcon color="primary" />}
+                      renderInput={(params) => (
+                        <TextField {...params} error={!!errorProvince} helperText={errorProvince} />
+                      )}
+                      size="small"
+                      className={classes.MSearchBranch}
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event: any, newValue: any) => {
+                        setProvince(newValue);
+                        !newValue && setChecked(false);
+                      }}
+                      value={province}
+                    />
                   </Box>
-                  <Autocomplete
-                    options={branchList}
-                    id="combo-box-branch"
-                    popupIcon={<SearchIcon color="primary" />}
-                    renderInput={(params) => <TextField {...params} />}
-                    size="small"
-                    className={classes.MSearchBranch}
-                    getOptionLabel={(option) => option.label}
-                    onChange={(event: any, newValue: any) => {
-                      setBranch(newValue);
-                    }}
-                    onInputChange={onInputChange}
-                    value={branch}
-                    disabled={checked}
-                  />
+                  <Box sx={{ marginBottom: '20px' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography gutterBottom variant="subtitle1" component="div" mr={3}>
+                        {t('searchbranch.branch')}
+                      </Typography>
+                      <FormGroup>
+                        <FormControlLabel
+                          disabled={!province}
+                          control={<Checkbox checked={checked} onChange={handleCheckBox} />}
+                          label={t('searchbranch.selectAllBranchProvince')}
+                        />
+                      </FormGroup>
+                    </Box>
+                    <Autocomplete
+                      options={branchList.data}
+                      id="combo-box-branch"
+                      popupIcon={<SearchIcon color="primary" />}
+                      renderInput={(params) => <TextField {...params} error={!!errorBranch} helperText={errorBranch} />}
+                      size="small"
+                      className={classes.MSearchBranch}
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event: any, newValue: any) => {
+                        setBranch(newValue);
+                      }}
+                      onInputChange={onInputChange}
+                      value={branch}
+                      disabled={checked}
+                    />
+                  </Box>
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      className={classes.MbtnSearch}
+                      disabled={!branch && !checked}
+                      onClick={handleAddBranch}
+                    >
+                      {t('button.add')}
+                    </Button>
+                  </Box>
                 </Box>
-                <Box sx={{ textAlign: 'right' }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.MbtnSearch}
-                    disabled={!branch && !checked}
-                    onClick={handleAddBranch}
-                  >
-                    {t('button.add')}
-                  </Button>
-                </Box>
-              </Box>
+              )}
             </Grid>
-            <Grid item xs={7}>
+            <Grid item xs={7} pr={5}>
               <Box className={classes.MWrapperListBranch}>
-                <Box sx={{ display: 'flex', flex: 'wrap' }}>
-                  {listBranch['provinces'].map((item: any, index: number) => (
-                    <BranchItem label={item.name} onDelete={handleDeleteProvinceBranch} key={index} />
-                  ))}
-                  {listBranch['branches'].map((item: any, index: number) => (
-                    <BranchItem label={item.label} onDelete={handleDeleteBranch} key={index} />
-                  ))}
-                </Box>
+                {allBranches ? (
+                  <Box sx={{ display: 'flex', flex: 'wrap' }}>
+                    <BranchItem label={`สาขาทั้งหมด (${totalBranches} สาขา)`} onDelete={() => {}} />
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', flex: 'wrap' }}>
+                    {listBranch['provinces'].map((item: any, index: number) => (
+                      <BranchItem
+                        label={`สาขาจังหวัด${item.name}`}
+                        onDelete={() => handleDeleteProvinceBranch(item.code)}
+                        key={index}
+                      />
+                    ))}
+                    {listBranch['branches'].map((item: any, index: number) => (
+                      <BranchItem label={item.name} onDelete={() => handleDeleteBranch(item.code)} key={index} />
+                    ))}
+                  </Box>
+                )}
               </Box>
             </Grid>
             <Grid item xs={12} sx={{ textAlign: 'right' }}>
-              <Button variant="contained" color="info" className={classes.MbtnSearch}>
+              <Button
+                variant="contained"
+                color="info"
+                className={classes.MbtnSearch}
+                size="large"
+                onClick={handleAddForm}
+              >
                 {t('searchbranch.addBranches')}
               </Button>
             </Grid>
