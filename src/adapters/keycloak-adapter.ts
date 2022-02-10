@@ -10,7 +10,8 @@ import {
   getRefreshToken,
   setUserInfo,
 } from '../store/sessionStore';
-import { getDecodedAccessToken, getUserGroup } from '../utils/utils';
+import { getDecodedAccessToken } from '../utils/utils';
+import { getUserGroup } from '../utils/role-permission';
 
 const instance = axios.create({
   baseURL: env.keycloak.url,

@@ -11,6 +11,7 @@ import {
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
 import { fi } from 'date-fns/locale';
+import { DOCUMENT_TYPE } from '../utils/enum/stock-transfer-enum';
 
 export const getPathStockRequestDetail = (rtNo: string) => {
   return getPathUrl(`${environment.stock.stockRequest.detail.url}`, {
@@ -133,7 +134,7 @@ export async function sendBranchTransferToDC(payload: BranchTransferRequest) {
 }
 export async function sendBranchTransferToPickup(payload: BranchTransferRequest) {
   try {
-    const response = await post(environment.stock.branchTransfer.sendToPickup.url, payload, ContentType.JSON).then(
+    const response = await put(environment.stock.branchTransfer.sendToPickup.url, payload, ContentType.JSON).then(
       (result: any) => result
     );
     return response;
@@ -143,13 +144,13 @@ export async function sendBranchTransferToPickup(payload: BranchTransferRequest)
 }
 
 export const getPathReportBT = (docType: string, btNo: string) => {
-  if (docType === 'BT') {
+  if (docType === DOCUMENT_TYPE.BT) {
     return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportBT.url}`, { btNo: btNo });
-  } else if (docType === 'BO') {
+  } else if (docType === DOCUMENT_TYPE.BO) {
     return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportBO.url}`, { btNo: btNo });
-  } else if (docType === 'Recall') {
+  } else if (docType === DOCUMENT_TYPE.RECALL) {
     return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportReCall.url}`, { btNo: btNo });
-  } else if (docType === 'Box') {
+  } else if (docType === DOCUMENT_TYPE.BOX) {
     return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportPaperBox.url}`, {
       btNo: btNo,
     });
