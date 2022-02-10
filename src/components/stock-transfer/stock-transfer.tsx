@@ -242,7 +242,7 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สาขาต้นทาง*
+              สาขาต้นทาง
             </Typography>
             <BranchListDropDown
               sourceBranchCode={branchToCode}
@@ -252,7 +252,7 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สาขาปลายทาง*
+              สาขาปลายทาง
             </Typography>
             <BranchListDropDown
               sourceBranchCode={branchFromCode}
@@ -266,13 +266,13 @@ export default function SupplierCheckOrderSearch() {
               วันที่โอนสินค้า
             </Typography>
             <Typography gutterBottom variant="subtitle1" component="div">
-              ตั้งแต่
+              ตั้งแต่*
             </Typography>
             <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
-              ถึง
+              ถึง*
             </Typography>
             <DatePickerAllComponent
               onClickDate={handleEndDatePicker}
