@@ -310,7 +310,9 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   }, [open, payloadAddItem, branchTransferInfo]);
 
   if (endDate != null && startDate != null) {
-    if (endDate < startDate) {
+    const _startDate = moment(startDate).startOf('day').toISOString();
+    const _endDate = moment(endDate).startOf('day').toISOString();
+    if (_endDate < _startDate) {
       setEndDate(null);
     }
   }
@@ -632,13 +634,13 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         handleOnCloseModalConfirm();
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
-        setContentMsg('คุณส่งรายการให้ DC เรียบร้อยแล้ว');
+        setContentMsg('คุณบันทึกรอบรถเข้าต้นทางเรียบร้อยแล้ว');
         await dispatch(featchBranchTransferDetailAsync(btNo));
         await dispatch(featchSearchStockTransferAsync(payloadSearch));
-        setTimeout(() => {
-          setOpen(false);
-          onClickClose();
-        }, 500);
+        // setTimeout(() => {
+        //   setOpen(false);
+        //   onClickClose();
+        // }, 500);
       })
       .catch((error: ApiError) => {
         handleOnCloseModalConfirm();
@@ -893,7 +895,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                     <Typography gutterBottom variant='subtitle1' component='div'>
                       ถึง
                     </Typography>
-                    <DatePickerComponent
+                    <DatePickerAllComponent
                       onClickDate={handleEndDatePicker}
                       value={endDate}
                       type={'TO'}

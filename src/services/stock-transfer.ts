@@ -133,7 +133,7 @@ export async function sendBranchTransferToDC(payload: BranchTransferRequest) {
 }
 export async function sendBranchTransferToPickup(payload: BranchTransferRequest) {
   try {
-    const response = await post(environment.stock.branchTransfer.sendToPickup.url, payload, ContentType.JSON).then(
+    const response = await put(environment.stock.branchTransfer.sendToPickup.url, payload, ContentType.JSON).then(
       (result: any) => result
     );
     return response;
