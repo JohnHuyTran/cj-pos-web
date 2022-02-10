@@ -3,7 +3,7 @@ ARG BUILDER_IMAGE=node:16-alpine3.11
 ################Builder Image###################
 FROM $BUILDER_IMAGE AS builder
 #FROM node:13.12.0-alpine
-
+ENV NODE_OPTIONS=--max_old_space_size=1500
 # set working directory
 WORKDIR /app
 

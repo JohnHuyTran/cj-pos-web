@@ -1,5 +1,5 @@
 import { Dialog, Button, DialogContent } from '@mui/material';
-import React, { ReactElement, useRef } from 'react';
+import React, { ReactElement, useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -12,6 +12,7 @@ import AlertError from './alert-error';
 import { HighlightOff } from '@mui/icons-material';
 import store from '../../../store/store';
 import { getAccessToken } from '../../../store/sessionStore';
+import { getReport } from '../../../adapters/externalApi';
 
 interface ModalShowPDFProp {
   open: boolean;
@@ -22,6 +23,7 @@ interface ModalShowPDFProp {
   btnPrintName: string;
   onClose: () => void;
   onPrint?: () => void;
+  landscape?: boolean;
 }
 export interface DialogTitleProps {
   id: string;
@@ -78,6 +80,7 @@ export default function ModalShowPDF({
   fileName,
   btnPrintName,
   onClose,
+  landscape,
 }: ModalShowPDFProp): ReactElement {
   const [numPages, setNumPages] = useState(0);
   // const [pageNumber, setPageNumber] = useState(1);
@@ -123,7 +126,12 @@ export default function ModalShowPDF({
     // }, 1000);
   };
 
-  // const componentRef = useRef();
+  const setPageSize = (cssPageSize: string) => {
+    const style = document.createElement('style');
+    style.innerHTML = `@page {size: ${cssPageSize}}`;
+    // style.id = 'page-orientation';
+    document.head.appendChild(style);
+  };
   const showPrint = useReactToPrint({
     documentTitle: fileName,
     content: () => pdfWrapper.current,
@@ -132,6 +140,11 @@ export default function ModalShowPDF({
 
   const pdfFile = sdImageFile.substr(5, 15);
   const imgFile = sdImageFile.substr(5, 5);
+
+  React.useEffect(() => {
+    if (statusFile === 1) getReport(url);
+    setPageSize(landscape ? 'A4 landscape' : 'A4 portrait');
+  }, [open]);
 
   return (
     <div>

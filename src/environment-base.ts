@@ -165,6 +165,21 @@ export const environment = {
       sendDC: {
         url: '/stock/stock-transfer/save-to-dc',
       },
+      reportBO: {
+        url: '/stock/stock-transfer/export/branch-out/{btNo}',
+      },
+      reportBT: {
+        url: '/stock/stock-transfer/export/{btNo}',
+      },
+      reportReCall: {
+        url: '/stock/stock-transfer/export/recall/{btNo}',
+      },
+      reportPaperBox: {
+        url: '/stock/stock-transfer/{btNo}/export',
+      },
+      sendToPickup: {
+        url: '/stock/stock-transfer/save-wait-dc',
+      },
     },
     stockRequest: {
       detail: {
@@ -187,6 +202,9 @@ export const environment = {
       },
       reject2: {
         url: '/stock/stock-request/reject2/{rtNo}',
+      },
+      remove: {
+        url: '/stock/stock-request/remove/{rtNo}',
       },
     },
     stockBalanceCheck: {

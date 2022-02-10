@@ -18,6 +18,10 @@ find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_POS_BACK_BE_TIME_O
 find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_POS_BACK_VERSION_VALUE,$REACT_APP_POS_BACK_VERSION,g" {} \;
 find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_OWN_BRANCH_CODE_VALUE,$REACT_APP_OWN_BRANCH_CODE,g" {} \;
 
+find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_BRANCH_GROUP_DC_VALUE,$REACT_APP_BRANCH_GROUP_DC,g" {} \;
+find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_BRANCH_LOCATION_DC_VALUE,$REACT_APP_BRANCH_LOCATION_DC,g" {} \;
+find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_BRANCH_GROUP_OC_VALUE,$REACT_APP_BRANCH_GROUP_OC,g" {} \;
+
 
 
 

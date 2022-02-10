@@ -10,3 +10,12 @@ export type ItemProductRequest = {
   name: string;
   price: number;
 };
+
+export type FindProductProps = {
+  search: string;
+  payload: FindProductRequest;
+};
+
+export type FindProductRequest = {
+  skuCodes: string[];
+};

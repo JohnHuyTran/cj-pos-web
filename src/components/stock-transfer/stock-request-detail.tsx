@@ -40,6 +40,7 @@ import { getBranchName, getReasonLabel } from '../../utils/utils';
 import ModalConfirmTransaction from './modal-confirm-transaction';
 import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
+import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 
 interface State {
   branchCode: string;
@@ -177,6 +178,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   };
 
   const [flagSave, setFlagSave] = React.useState(false);
+  const [flagCreateSave, setFlagCreateSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const handleChkSaveClose = async () => {
     if (flagSave) {
@@ -184,7 +186,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     } else if (!flagSave && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) {
       if (type === 'View' && rowLength !== Object.keys(payloadAddItem).length) {
         setConfirmModelExit(true);
-      } else if (type === 'Create' && rowLength > 0) {
+      } else if (type === 'Create' && rowLength > 0 && !flagCreateSave) {
         setConfirmModelExit(true);
       } else {
         handleClose();
@@ -299,6 +301,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
 
   const handleSave = async () => {
     setOpenLoadingModal(true);
+
     let validateActualQty = payloadAddItem.filter((r: any) => r.qty === 0);
     if (!startDate || !endDate) {
       setOpenAlert(true);
@@ -306,13 +309,23 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     } else if (fromBranch === '' || toBranch === '') {
       setOpenAlert(true);
       setTextError('กรุณาเลือกสาขาโอนสินค้า');
+    } else if (reasons === 'All' || reasons === undefined || reasons === '') {
+      setOpenAlert(true);
+      setTextError('กรุณาเลือกสาเหตุการโอน');
     } else if (validateActualQty.length > 0) {
       setOpenAlert(true);
       setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
     } else {
       const payloadSave: any = await handleMapPayloadSave();
       await saveStockRequest(payloadSave)
-        .then((value) => {
+        .then(async (value) => {
+          await dispatch(featchStockRequestDetailAsync(value.docNo));
+
+          if (type === 'Create') {
+            type = 'View';
+            setFlagCreateSave(true);
+          }
+
           setFlagSave(false);
           setRTNo(value.docNo);
           setStatus('DRAFT');
@@ -322,7 +335,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
-          setContentMsg(error.message);
+          if (error.code === 40010) {
+            setContentMsg(
+              'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+            );
+          } else {
+            setContentMsg(error.message);
+          }
         });
     }
     setOpenLoadingModal(false);
@@ -346,15 +365,15 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
 
     let rt = '';
     if (rtNo) rt = rtNo;
-    let reason = reasons;
-    if (reason === 'All') reason = '';
+    // let reason = reasons;
+    // if (reason === 'All') reason = '';
     const payload: SaveStockTransferRequest = {
       rtNo: rt,
       startDate: moment(startDate).startOf('day').toISOString(),
       endDate: moment(endDate).startOf('day').toISOString(),
       branchFrom: fromBranch,
       branchTo: toBranch,
-      transferReason: reason,
+      transferReason: reasons,
       items: itemsList,
     };
 
@@ -371,6 +390,9 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     } else if (fromBranch === '' || toBranch === '') {
       setOpenAlert(true);
       setTextError('กรุณาเลือกสาขาโอนสินค้า');
+    } else if (reasons === 'All' || reasons === undefined || reasons === '') {
+      setOpenAlert(true);
+      setTextError('กรุณาเลือกสาเหตุการโอน');
     } else if (validateActualQty.length > 0) {
       setOpenAlert(true);
       setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
@@ -468,14 +490,14 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           itemsList.push(item);
         });
 
-        let reason = reasons;
-        if (reason === 'All') reason = '';
+        // let reason = reasons;
+        // if (reason === 'All') reason = '';
         const payloadSubmit: SubmitStockTransferRequest = {
           startDate: moment(startDate).startOf('day').toISOString(),
           endDate: moment(endDate).startOf('day').toISOString(),
           branchFrom: fromBranch,
           branchTo: toBranch,
-          transferReason: reason,
+          transferReason: reasons,
           items: itemsList,
         };
 
@@ -492,9 +514,15 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               handleClose();
             }, 500);
           })
-          .catch((error) => {
+          .catch((error: ApiError) => {
             setShowSnackBar(true);
-            setContentMsg(error.message);
+            if (error.code === 40010) {
+              setContentMsg(
+                'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+              );
+            } else {
+              setContentMsg(error.message);
+            }
           });
       }
     } else if (status === 'WAIT_FOR_APPROVAL_1') {
@@ -581,9 +609,15 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               handleClose();
             }, 500);
           })
-          .catch((error) => {
+          .catch((error: ApiError) => {
             setShowSnackBar(true);
-            setContentMsg(error.message);
+            if (error.code === 40010) {
+              setContentMsg(
+                'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+              );
+            } else {
+              setContentMsg(error.message);
+            }
           });
       }
     }
@@ -613,18 +647,16 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               {rtNo !== '' && rtNo}
               {rtNo === '' && '-'}
             </Grid>
-            <Grid item xs={6}></Grid>
             <Grid item xs={2}>
               วันที่สร้างรายการ :
             </Grid>
             <Grid item xs={4}>
               {moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
             </Grid>
-            <Grid item xs={6}></Grid>
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              วันที่โอนสินค้า :
+              วันที่โอนสินค้า* :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -637,7 +669,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุด :
+              วันที่สิ้นสุด* :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -657,7 +689,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาขาต้นทาง :
+              สาขาต้นทาง* :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -672,7 +704,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              สาขาปลายทาง :
+              สาขาปลายทาง* :
             </Grid>
             <Grid item xs={3}>
               {(status === '' ||
@@ -697,7 +729,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาเหตุการโอน :
+              สาเหตุการโอน* :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -790,6 +822,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                 type={type}
                 onChangeItems={handleChangeItems}
                 changeItems={handleStatusChangeItems}
+                update={flagSave}
               />
             )}
 
@@ -823,7 +856,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
         </DialogContent>
       </Dialog>
 
-      <ModalAddItems open={openModelAddItems} onClose={handleModelAddItems}></ModalAddItems>
+      <ModalAddItems
+        open={openModelAddItems}
+        onClose={handleModelAddItems}
+        requestBody={{
+          skuCodes: [],
+        }}
+      ></ModalAddItems>
 
       <SnackbarStatus
         open={showSnackBar}

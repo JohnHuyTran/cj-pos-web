@@ -77,7 +77,7 @@ const columns: GridColDef[] = [
   },
   {
     field: 'baseUnit',
-    headerName: 'หน่วยย่อย',
+    headerName: 'สั่ง(ชิ้น)',
     minWidth: 120,
     headerAlign: 'center',
     align: 'right',

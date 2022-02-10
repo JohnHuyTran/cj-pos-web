@@ -18,6 +18,7 @@ import StockPackChecked from './stock-pack';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -55,7 +56,7 @@ function StockTransferList() {
     {
       field: 'btNo',
       headerName: 'เลขที่เอกสาร BT',
-      // minWidth: 160,
+      // minWidth: 185,
       flex: 1,
       headerAlign: 'center',
       sortable: false,
@@ -63,16 +64,16 @@ function StockTransferList() {
     {
       field: 'rtNo',
       headerName: 'เลขที่เอกสารร้องขอ RT',
-      // minWidth: 168,
+      minWidth: 185,
       flex: 1,
       headerAlign: 'center',
       sortable: false,
     },
     {
       field: 'startDate',
-      headerName: 'วันที่โอนสินค้า',
-      width: 160,
-      // minWidth: 200,
+      headerName: 'วันที่โอน',
+      // width: 160,
+      minWidth: 130,
       // flex: 1,
       headerAlign: 'center',
       align: 'left',
@@ -86,22 +87,36 @@ function StockTransferList() {
       ),
     },
     {
-      field: 'branchFrom',
+      field: 'branchFromName',
       headerName: 'สาขาต้นทาง',
-      // minWidth: 128,
-      width: 195,
-      // flex: 1.2,
+      // minWidth: 205,
+      // width: 195,
+      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.getValue(params.id, 'branchFrom') || ''}-{params.value}
+          </Typography>
+        </div>
+      ),
     },
     {
-      field: 'branchTo',
+      field: 'branchToName',
       headerName: 'สาขาปลายทาง',
-      // minWidth: 128,
-      width: 195,
-      // flex: 0.,
+      // minWidth: 205,
+      // width: 195,
+      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.getValue(params.id, 'branchTo') || ''}-{params.value}
+          </Typography>
+        </div>
+      ),
     },
     // {
     //   field: 'createdBy',
@@ -167,8 +182,10 @@ function StockTransferList() {
       rtNo: data.rtNo,
       startDate: convertUtcToBkkDate(data.startDate),
       endDate: convertUtcToBkkDate(data.endDate),
-      branchFrom: data.branchFromName,
-      branchTo: data.branchToName,
+      branchFromName: data.branchFromName,
+      branchToName: data.branchToName,
+      branchFrom: data.branchFrom,
+      branchTo: data.branchTo,
       createdBy: data.createdBy,
       status: data.status,
     };
@@ -254,6 +271,7 @@ function StockTransferList() {
   }
   const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
   const currentlySelected = async (params: GridCellParams) => {
+    await dispatch(updateAddItemsState({}));
     await dispatch(featchBranchTransferDetailAsync(params.row.btNo));
 
     if (reasonsList === null || reasonsList.length <= 0) await dispatch(featchTransferReasonsListAsync());

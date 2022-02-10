@@ -24,14 +24,14 @@ function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChang
     const length = event.target.value.length;
     if (length <= maxLength) {
       setCharacterCount(event.target.value.length);
-      setComment(value);
+      // setComment(value);
     }
     return onChangeComment(value);
   };
 
   return (
     <>
-      <Typography variant="body2">{fieldName}</Typography>
+      <Typography variant='body2'>{fieldName}</Typography>
       <TextField
         multiline
         fullWidth
@@ -53,8 +53,7 @@ function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChang
           maxWidth: 350,
           textAlign: 'right',
           // marginTop: "-1.5em",
-        }}
-      >
+        }}>
         {characterCount}/{maxLength}
       </div>
     </>

@@ -8,7 +8,7 @@ import { Select } from '@mui/material';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/material';
 import React from 'react';
-import DatePickerComponent from '../commons/ui/date-picker';
+import DatePickerAllComponent from '../commons/ui/date-picker-all';
 import { useStyles } from '../../styles/makeTheme';
 import { Button } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
@@ -83,6 +83,7 @@ export default function SupplierCheckOrderSearch() {
   };
 
   const [branchFromCode, setBranchFromCode] = React.useState('');
+  const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
@@ -97,6 +98,7 @@ export default function SupplierCheckOrderSearch() {
   const handleChangeBranchTo = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
+      setBranchToCode(branchCode);
       setValues({ ...values, branchTo: JSON.parse(codes) });
     } else {
       setValues({ ...values, branchTo: '' });
@@ -115,12 +117,9 @@ export default function SupplierCheckOrderSearch() {
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
   const onClickValidateForm = () => {
-    if (values.branchFrom === '') {
+    if (startDate === null || endDate === null) {
       setOpenAlert(true);
-      setTextError('กรุณาระบุสาขาต้นทาง');
-    } else if (values.branchTo === '') {
-      setOpenAlert(true);
-      setTextError('กรุณาระบุสาขาปลายทาง');
+      setTextError('กรุณาระบุวันที่รับสินค้า');
     } else {
       onClickSearchBtn();
     }
@@ -243,17 +242,17 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สาขาต้นทาง*
+              สาขาต้นทาง
             </Typography>
             <BranchListDropDown
-              sourceBranchCode={''}
+              sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
             />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สาขาปลายทาง*
+              สาขาปลายทาง
             </Typography>
             <BranchListDropDown
               sourceBranchCode={branchFromCode}
@@ -264,18 +263,23 @@ export default function SupplierCheckOrderSearch() {
 
           <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant="subtitle1" component="div">
-              วันที่รับสินค้า
+              วันที่โอนสินค้า
             </Typography>
             <Typography gutterBottom variant="subtitle1" component="div">
-              ตั้งแต่
+              ตั้งแต่*
             </Typography>
-            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+            <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
-              ถึง
+              ถึง*
             </Typography>
-            <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
+            <DatePickerAllComponent
+              onClickDate={handleEndDatePicker}
+              value={endDate}
+              type={'TO'}
+              minDateTo={startDate}
+            />
           </Grid>
 
           <Grid item xs={4} container>
