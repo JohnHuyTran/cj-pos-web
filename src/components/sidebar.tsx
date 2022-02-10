@@ -156,7 +156,8 @@ export default function Sidebar({}: Props): ReactElement {
           </ListItemButton>
         </Link>
         {/*sell menu start*/}
-        <ListItemButton key='SELL' onClick={handleClickSell} sx={{ display: disableSellMainMenu ? 'none' : '' }}>
+        {/* <ListItemButton key='SELL' onClick={handleClickSell} sx={{ display: disableSellMainMenu ? 'none' : '' }}></ListItemButton> */}
+        <ListItemButton key='SELL' onClick={handleClickSell}>
           <ListItemIcon>
             <ShoppingCartSharp />
           </ListItemIcon>

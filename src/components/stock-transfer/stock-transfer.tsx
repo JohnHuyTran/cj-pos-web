@@ -334,8 +334,8 @@ export default function SupplierCheckOrderSearch() {
               variant='contained'
               color='primary'
               onClick={onClickValidateForm}
-              sx={{ width: '13%', ml: 2, display: `${displaySearchBtn ? 'none' : ''}` }}
-              // sx={{ width: '13%', ml: 2 }}
+              // sx={{ width: '13%', ml: 2, display: `${displaySearchBtn ? 'none' : ''}` }}
+              sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}>
               ค้นหา
             </Button>
