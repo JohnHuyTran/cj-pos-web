@@ -37,7 +37,7 @@ function Steppers({ status, type }: Props): ReactElement {
       setSteps(stepsList);
       if (item.value === status) setActiveStep(item.stepperGrp);
     });
-  }, [open]);
+  }, [open, status]);
 
   const handleStepDraft = (type: string) => {
     if (type === 'RT') stepsList.push(t(`status.DRAFT`));

@@ -54,6 +54,8 @@ import { parseWithOptions } from 'date-fns/fp';
 import { BranchInfo } from '../../models/search-branch-model';
 import { getUserInfo } from '../../store/sessionStore';
 import DatePickerAllComponent from '../commons/ui/date-picker-all';
+import { DOCUMENT_TYPE } from '../../utils/enum/stock-transfer-enum';
+import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 
 interface Props {
   isOpen: boolean;
@@ -296,7 +298,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setComment(branchTransferInfo.comment);
 
     setIsDraft(branchTransferInfo.status === 'CREATED' ? true : false);
-    setIsDC(isBranchDC(getUserInfo()));
+    setIsDC(getUserInfo().group === PERMISSION_GROUP.DC);
 
     let newColumns = [...cols];
     if (branchTransferInfo.status != 'CREATED') {
@@ -310,7 +312,9 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   }, [open, payloadAddItem, branchTransferInfo]);
 
   if (endDate != null && startDate != null) {
-    if (endDate < startDate) {
+    const _startDate = moment(startDate).startOf('day').toISOString();
+    const _endDate = moment(endDate).startOf('day').toISOString();
+    if (_endDate < _startDate) {
       setEndDate(null);
     }
   }
@@ -632,13 +636,13 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         handleOnCloseModalConfirm();
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
-        setContentMsg('คุณส่งรายการให้ DC เรียบร้อยแล้ว');
+        setContentMsg('คุณบันทึกรอบรถเข้าต้นทางเรียบร้อยแล้ว');
         await dispatch(featchBranchTransferDetailAsync(btNo));
         await dispatch(featchSearchStockTransferAsync(payloadSearch));
-        setTimeout(() => {
-          setOpen(false);
-          onClickClose();
-        }, 500);
+        // setTimeout(() => {
+        //   setOpen(false);
+        //   onClickClose();
+        // }, 500);
       })
       .catch((error: ApiError) => {
         handleOnCloseModalConfirm();
@@ -670,10 +674,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const handleLinkDocument = (docType: string) => {
-    const path = getPathReportBT(docType ? docType : 'BT', btNo);
-    setSuffixDocType(docType !== 'BT' ? docType : '');
+    const path = getPathReportBT(docType ? docType : DOCUMENT_TYPE.BT, btNo);
+    setSuffixDocType(docType !== DOCUMENT_TYPE.BT ? docType : '');
     setPathReport(path ? path : '');
-    setDocLayoutLandscape(docType === 'Recall' ? true : false);
+    setDocLayoutLandscape(docType === DOCUMENT_TYPE.RECALL ? true : false);
     setOpenModelPreviewDocument(true);
   };
 
@@ -765,7 +769,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         component='button'
                         variant='body2'
                         onClick={(e) => {
-                          handleLinkDocument('BT');
+                          handleLinkDocument(DOCUMENT_TYPE.BT);
                         }}>
                         เรียกดูเอกสารใบโอน BT
                       </Link>
@@ -793,7 +797,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         component='button'
                         variant='body2'
                         onClick={(e) => {
-                          handleLinkDocument('BT');
+                          handleLinkDocument(DOCUMENT_TYPE.BT);
                         }}>
                         เรียกดูเอกสารใบโอน BT
                       </Link>
@@ -803,7 +807,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         component='button'
                         variant='body2'
                         onClick={(e) => {
-                          handleLinkDocument('BO');
+                          handleLinkDocument(DOCUMENT_TYPE.BO);
                         }}>
                         เรียกดูเอกสารใบ BO
                       </Link>
@@ -813,7 +817,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                         component='button'
                         variant='body2'
                         onClick={(e) => {
-                          handleLinkDocument('Box');
+                          handleLinkDocument(DOCUMENT_TYPE.BOX);
                         }}>
                         เรียกดูเอกสารใบปะลัง
                       </Link>
@@ -893,7 +897,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                     <Typography gutterBottom variant='subtitle1' component='div'>
                       ถึง
                     </Typography>
-                    <DatePickerComponent
+                    <DatePickerAllComponent
                       onClickDate={handleEndDatePicker}
                       value={endDate}
                       type={'TO'}
@@ -945,7 +949,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                     component='button'
                     variant='body2'
                     onClick={(e) => {
-                      handleLinkDocument('Recall');
+                      handleLinkDocument(DOCUMENT_TYPE.RECALL);
                     }}>
                     เรียกดูเอกสารใบเรียกเก็บ
                   </Link>
