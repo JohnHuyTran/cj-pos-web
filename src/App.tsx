@@ -13,6 +13,7 @@ import StockTransfer from './pages/stock-transfer';
 import StockTransferRt from './pages/stock-transfer-rt';
 import LoginForm from './components/login/login-form';
 import BarcodeDiscount from './pages/barcode-discount/barcode-discount';
+import SaleLimitTime from './pages/sale-limit-time/sale-limit-time';
 
 import { useAppSelector } from './store/store';
 const drawerWidth = 240;
@@ -72,6 +73,7 @@ export default function App2() {
         <Switch>
           <Route exact path="/" component={Home} />
           <Route path="/barcode-discount" component={BarcodeDiscount} />
+          <Route path="/sale-limit-time" component={SaleLimitTime} />
           <Route path="/check-order" component={CheckOrder} />
           <Route path="/dc-check-order" component={DCCheckOrder} />
           <Route path="/supplier-check-order" component={SupplierCheckOrder} />

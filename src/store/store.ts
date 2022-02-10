@@ -38,6 +38,7 @@ import stockRequestDetail from './slices/stock-request-detail-slice';
 import branchTransferDetailSlice from './slices/stock-transfer-branch-request-slice';
 import searchStockTransferRt from './slices/save-search-stock-transfer-rt-slice';
 import searchBranchProvince from './slices/search-branches-province-slice';
+import STDetail from './slices/sale-limit-time-detail';
 
 const store = configureStore({
   reducer: {
@@ -79,6 +80,7 @@ const store = configureStore({
     stockRequestDetail: stockRequestDetail,
     branchTransferDetailSlice: branchTransferDetailSlice,
     searchBranchProvince: searchBranchProvince,
+    STDetail: STDetail,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
