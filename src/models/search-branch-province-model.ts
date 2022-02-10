@@ -13,3 +13,22 @@ export interface Payload {
 }
 
 export type Params = { [key: string]: string };
+
+export interface BranchResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: Object[];
+}
+
+export interface ProvinceResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: ProvinceInfo[];
+}
+
+export interface ProvinceInfo {
+  code: string;
+  name: string;
+}

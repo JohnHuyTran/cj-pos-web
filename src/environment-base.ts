@@ -211,9 +211,9 @@ export const environment = {
       url: '/stock/stock-balance-check',
     },
   },
-  test: {
+  branch: {
     province: {
-      url: '/province/search',
+      url: '/branch/province',
     },
     branch: {
       url: '/branch/search',
