@@ -27,6 +27,7 @@ import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-tr
 import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import { isAllowActionPermission } from '../../utils/role-permission';
+import { ACTIONS } from '../../utils/enum/permission-enum';
 
 interface State {
   docNo: string;
@@ -43,6 +44,7 @@ interface loadingModalState {
 }
 
 export default function SupplierCheckOrderSearch() {
+  const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const { t } = useTranslation(['stockTransfer', 'common']);
   const [displaySearchBtn, setDisplaySearchBtn] = React.useState(true);
   const classes = useStyles();
@@ -225,7 +227,7 @@ export default function SupplierCheckOrderSearch() {
 
   React.useEffect(() => {
     // console.log('show: ', isAllowActionPermission('test'));
-    setDisplaySearchBtn(isAllowActionPermission('test'));
+    setDisplaySearchBtn(isAllowActionPermission(ACTIONS.PURCHASE_PI_CLOSE));
   }, []);
 
   return (
@@ -332,8 +334,8 @@ export default function SupplierCheckOrderSearch() {
               variant='contained'
               color='primary'
               onClick={onClickValidateForm}
-              // sx={{ width: '13%', ml: 2, display: `${displaySearchBtn ? 'none' : ''}` }}
-              sx={{ width: '13%', ml: 2 }}
+              sx={{ width: '13%', ml: 2, display: `${displaySearchBtn ? 'none' : ''}` }}
+              // sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}>
               ค้นหา
             </Button>

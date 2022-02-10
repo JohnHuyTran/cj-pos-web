@@ -26,6 +26,8 @@ import { changeState } from '../store/slices/nav-slice';
 import imgLogo from '../assets/images/Logo-CJ-More.png';
 import Menu from '@mui/icons-material/Menu';
 import { ShoppingCartSharp } from '@mui/icons-material';
+import { MAINMENU } from '../utils/enum/permission-enum';
+import { isAllowMainMenuPermission } from '../utils/role-permission';
 
 const drawerWidth = 240;
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -78,9 +80,10 @@ export default function Sidebar({}: Props): ReactElement {
 
   const navState = useAppSelector((state) => state.navigator.state);
 
+  const [disableSellMainMenu, setDisableSellMainMenu] = React.useState(true);
   useEffect(() => {
     setOpen(navState);
-    // isAllowMenuPermission();
+    setDisableSellMainMenu(isAllowMainMenuPermission(MAINMENU.SALE));
   }, [navState]);
 
   const dispatch = useAppDispatch();
@@ -153,7 +156,7 @@ export default function Sidebar({}: Props): ReactElement {
           </ListItemButton>
         </Link>
         {/*sell menu start*/}
-        <ListItemButton key='SELL' onClick={handleClickSell}>
+        <ListItemButton key='SELL' onClick={handleClickSell} sx={{ display: disableSellMainMenu ? 'none' : '' }}>
           <ListItemIcon>
             <ShoppingCartSharp />
           </ListItemIcon>

@@ -5,15 +5,16 @@ export enum ACTIONS {
 
 export enum MAINMENU {
   SALE = 'sale',
-  STOCK = 'stock',
+  ORDER_RECEIVE = 'orderReceive',
 }
 
 export enum SUBMENU {
   SALE_DISCOUNT = 'sale.discount',
-  STOCK_CHECK = 'stock.checking',
-  STOCK_SUPPLY = 'stock.supply',
-  STOCK_REQUEST = 'stock.request',
-  STOCK_TRANSFER = 'stock.transfer',
+  STOCK_ORDER_RECEIVE = 'orderReceive.orderReceive',
+  STOCK_DIFF = 'orderReceive.stockDiff',
+  STOCK_SUPPLIER = 'orderReceive.supplier',
+  STOCK_REQUEST = 'orderReceive.stockRequest',
+  STOCK_TRANSFER = 'orderReceive.stockTransfer',
 }
 
 export enum PERMISSION_GROUP {
@@ -24,4 +25,4 @@ export enum PERMISSION_GROUP {
 
 export const KEYCLOAK_GROUP_DC = '/service.posback/manager';
 export const KEYCLOAK_GROUP_SCM = '/service.posback/scm';
-export const KEYCLOAK_GROUP_OC = '/service.posback/OC';
+export const KEYCLOAK_GROUP_OC = '/service.posback/oc';

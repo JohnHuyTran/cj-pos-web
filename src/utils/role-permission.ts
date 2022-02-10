@@ -42,7 +42,7 @@ export const isAllowMainMenuPermission = (key: string) => {
 export const isAllowSubMenuPermission = (key: string) => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   const permissionObj = _.get(permission, userInfo.group);
-  return !permissionObj.menu.submenu.some((_a: string) => {
+  return !permissionObj.menu.SUBMENU.some((_a: string) => {
     return _a === key;
   });
 };
@@ -50,29 +50,29 @@ export const isAllowSubMenuPermission = (key: string) => {
 const permission = {
   scm: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.STOCK_CHECK],
+      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
+      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.STOCK_DIFF],
     },
     action: [ACTIONS.PURCHASE_PI_CLOSE, ACTIONS.PURCHASE_PN_EXPORT],
   },
   oc: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.STOCK_CHECK],
+      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
+      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.STOCK_DIFF],
     },
     action: [ACTIONS.PURCHASE_PI_CLOSE, ACTIONS.PURCHASE_PN_EXPORT],
   },
   dc: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.STOCK_CHECK],
+      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
+      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.STOCK_DIFF],
     },
     action: [ACTIONS.PURCHASE_PI_CLOSE, ACTIONS.PURCHASE_PN_EXPORT],
   },
   branch: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.STOCK_CHECK],
+      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
+      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.STOCK_DIFF],
     },
     action: [ACTIONS.PURCHASE_PI_CLOSE, ACTIONS.PURCHASE_PN_EXPORT],
   },
