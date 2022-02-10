@@ -215,6 +215,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
         itemsList.push(option);
         setNewAddItemListArray(itemsList);
       }
+      clearInput();
     } else {
       clearData();
     }

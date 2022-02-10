@@ -262,6 +262,8 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
         itemsList.push(option);
         setNewAddItemListArray(itemsList);
       }
+
+      clearInput();
     } else {
       clearData();
     }
