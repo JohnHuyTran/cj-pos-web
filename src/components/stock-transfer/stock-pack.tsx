@@ -306,8 +306,8 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     } else {
       newColumns[9]['hide'] = true;
     }
-    setStartDate(new Date(branchTransferInfo.createdDate));
-    setEndDate(new Date(branchTransferInfo.createdDate));
+    setStartDate(new Date(branchTransferInfo.startDate));
+    setEndDate(new Date(branchTransferInfo.endDate));
     storeItemAddItem(payloadAddItem);
   }, [open, payloadAddItem, branchTransferInfo]);
 
@@ -623,33 +623,39 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const sendToPickup = async () => {
-    const _dalivery: Delivery = {
-      fromDate: moment(startDate).startOf('day').toISOString(),
-      toDate: moment(endDate).startOf('day').toISOString(),
-    };
-    const payload: BranchTransferRequest = {
-      btNo: btNo,
-      delivery: _dalivery,
-    };
-    await sendBranchTransferToPickup(payload)
-      .then(async (value) => {
-        handleOnCloseModalConfirm();
-        setShowSnackBar(true);
-        setSnackbarIsStatus(true);
-        setContentMsg('คุณบันทึกรอบรถเข้าต้นทางเรียบร้อยแล้ว');
-        await dispatch(featchBranchTransferDetailAsync(btNo));
-        await dispatch(featchSearchStockTransferAsync(payloadSearch));
-        // setTimeout(() => {
-        //   setOpen(false);
-        //   onClickClose();
-        // }, 500);
-      })
-      .catch((error: ApiError) => {
-        handleOnCloseModalConfirm();
-        setShowSnackBar(true);
-        setSnackbarIsStatus(false);
-        setContentMsg(error.message);
-      });
+    setOpenLoadingModal(true);
+    if (startDate === null || endDate === null) {
+      setOpenAlert(true);
+      setTextError('กรุณาระบุรอบรถเข้าต้นทาง');
+    } else {
+      const _dalivery: Delivery = {
+        fromDate: moment(startDate).startOf('day').toISOString(),
+        toDate: moment(endDate).startOf('day').toISOString(),
+      };
+      const payload: BranchTransferRequest = {
+        btNo: btNo,
+        delivery: _dalivery,
+      };
+      await sendBranchTransferToPickup(payload)
+        .then(async (value) => {
+          handleOnCloseModalConfirm();
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณบันทึกรอบรถเข้าต้นทางเรียบร้อยแล้ว');
+          await dispatch(featchBranchTransferDetailAsync(btNo));
+          await dispatch(featchSearchStockTransferAsync(payloadSearch));
+          // setTimeout(() => {
+          //   setOpen(false);
+          //   onClickClose();
+          // }, 500);
+        })
+        .catch((error: ApiError) => {
+          handleOnCloseModalConfirm();
+          setShowSnackBar(true);
+          setSnackbarIsStatus(false);
+          setContentMsg(error.message);
+        });
+    }
 
     // handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
@@ -894,7 +900,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                       onClickDate={handleStartDatePicker}
                       value={startDate}
                       type={'TO'}
-                      minDateTo={startDate}
+                      minDateTo={new Date(branchTransferInfo.startDate)}
                     />
                   </Grid>
                   <Grid item xs={1}></Grid>
@@ -939,7 +945,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
                   <Typography variant='body2'>ถึง :</Typography>
                 </Grid>
                 <Grid item lg={3}>
-                  <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
+                  <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
                 </Grid>
                 <Grid item lg={1}></Grid>
               </Grid>
