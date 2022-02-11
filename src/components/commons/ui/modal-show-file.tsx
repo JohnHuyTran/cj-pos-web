@@ -92,7 +92,6 @@ export default function ModalShowPDF({
   const [initialPageSize, setInitialPageSize] = React.useState(false);
   const setPdfSize = () => {
     if (pdfWrapper && pdfWrapper.current) {
-      // pdfWrapper.current.getBoundingClientRect().width;
       setInitialWidth(pdfWrapper.current.getBoundingClientRect().width);
     }
   };
@@ -112,10 +111,10 @@ export default function ModalShowPDF({
 
   function onDocumentLoadSuccess(pdf: any) {
     setNumPages(pdf.numPages);
-    window.addEventListener('resize', throttle(setPdfSize, 300));
+    // window.addEventListener('resize', throttle(setPdfSize, 300));
     setPdfSize();
     return () => {
-      window.removeEventListener('resize', throttle(setPdfSize, 300));
+      // window.removeEventListener('resize', throttle(setPdfSize, 300));
     };
   }
 
