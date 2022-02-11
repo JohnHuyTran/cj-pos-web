@@ -39,6 +39,8 @@ import branchTransferDetailSlice from './slices/stock-transfer-branch-request-sl
 import searchStockTransferRt from './slices/save-search-stock-transfer-rt-slice';
 import searchBranchProvince from './slices/search-branches-province-slice';
 import STDetail from './slices/sale-limit-time-detail';
+import searchTypeAndProduct from './slices/search-type-product-slice';
+import addTypeAndProduct from './slices/add-type-product-slice';
 
 const store = configureStore({
   reducer: {
@@ -81,6 +83,8 @@ const store = configureStore({
     branchTransferDetailSlice: branchTransferDetailSlice,
     searchBranchProvince: searchBranchProvince,
     STDetail: STDetail,
+    searchTypeAndProduct: searchTypeAndProduct,
+    addTypeAndProduct: addTypeAndProduct,
   },
 });
 
