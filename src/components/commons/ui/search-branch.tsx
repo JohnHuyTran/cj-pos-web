@@ -49,7 +49,7 @@ interface Props {
 export default function SearchBranch(props: Props): ReactElement {
   const { error, helperText } = props;
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   const { t } = useTranslation(['common']);
   const [province, setProvince] = React.useState<any | null>(null);
   const [branch, setBranch] = React.useState<any | null>(null);

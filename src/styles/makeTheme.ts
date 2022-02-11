@@ -159,6 +159,52 @@ const useStyles = makeStyles({
     //   overflow: "unset !important",
     // },
   },
+  MdataGridChangeColorRow: {
+    '& .MuiDataGrid-columnHeaderTitle': {
+      color: '#36C690',
+      fontWeight: '600 !important',
+      whiteSpace: 'unset !important',
+      // overflow: "unset !important",
+    },
+    '& .MuiDataGrid-root': {
+      fontFamily: 'Kanit',
+      borderRadius: '10px !important',
+      display: 'flex !important',
+      flexDirection: 'column-reverse',
+      '& .MuiDataGrid-row': {
+        maxHeight: 'none !important',
+        '& .MuiDataGrid-cell': {
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          lineHeight: '120% !important',
+          maxHeight: 'none !important',
+          whiteSpace: 'unset !important',
+          overflow: 'unset !important',
+        },
+        '& .MuiDataGrid-cell--textRight': {
+          justifyContent: 'flex-end',
+        },
+        '& .MuiDataGrid-cell--textLeft': {
+          justifyContent: 'flex-start',
+        },
+      },
+      '& .MuiDataGrid-row.Mui-selected': {
+        backgroundColor: '#E7FFE9 !important',
+      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
+        {
+          outline: 'none',
+        },
+    },
+    '& .MuiDataGrid-footerContainer': {
+      borderBottom: '1px solid #E5E5E5 !important',
+      // height: '50px',
+    },
+    '& .MuiTablePagination-toolbar': {
+      color: '#AEAEAE',
+    },
+  },
   MdataGridNew: {
     //column wrap text
     '& .MuiDataGrid-columnHeaderTitleContainer': {
@@ -171,6 +217,7 @@ const useStyles = makeStyles({
     '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
       padding: '1.5px !important',
       paddingRight: '65px !important',
+      height: '38px',
     },
     '& .MuiAutocomplete-input': {
       // padding: "2px 4px 2px 6px !important",

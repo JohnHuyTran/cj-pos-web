@@ -130,6 +130,11 @@ export const environment = {
     },
   },
   products: {
+    type: {
+      search: {
+        url: '/products/type/all',
+      }
+    },
     addItem: {
       allitemsList: {
         url: '/products/barcode/all',

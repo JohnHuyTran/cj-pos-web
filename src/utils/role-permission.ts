@@ -20,6 +20,8 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.DC;
   } else if (group === KEYCLOAK_GROUP_SCM) {
     return PERMISSION_GROUP.SCM;
+  } else {
+    return PERMISSION_GROUP.DC;
   }
 };
 
@@ -70,6 +72,13 @@ const permission = {
     action: [ACTIONS.PURCHASE_PI_CLOSE, ACTIONS.PURCHASE_PN_EXPORT],
   },
   branch: {
+    menu: {
+      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
+      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.STOCK_DIFF],
+    },
+    action: [ACTIONS.PURCHASE_PI_CLOSE, ACTIONS.PURCHASE_PN_EXPORT],
+  },
+  area01: {
     menu: {
       mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
       submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.STOCK_DIFF],

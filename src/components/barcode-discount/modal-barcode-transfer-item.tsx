@@ -222,7 +222,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const handleChangeExpiry = (e: any, index: number, errorIndex: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      data[index - 1].expiryDate = e;
+      data[index - 1].expiryDate = stringNullOrEmpty(e) ? null : moment(e).toISOString();
       return data;
     });
     dispatch(
@@ -322,7 +322,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'discount',
       headerName: typeDiscount === 'percent' ? 'ยอดลด (%)' : 'ยอดลด (บาท)',
-      resizable: true,
       minWidth: 130,
       headerAlign: 'center',
       disableColumnMenu: true,
