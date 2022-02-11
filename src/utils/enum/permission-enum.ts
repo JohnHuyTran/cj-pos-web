@@ -58,8 +58,10 @@ export enum PERMISSION_GROUP {
   DC = 'dc',
   SCM = 'scm',
   OC = 'oc',
+  KEYCLOAK_GROUP_AREA_MANAGER_01 = 'area01',
 }
 
 export const KEYCLOAK_GROUP_DC = '/service.posback/manager';
 export const KEYCLOAK_GROUP_SCM = '/service.posback/scm';
 export const KEYCLOAK_GROUP_OC = '/service.posback/oc';
+export const KEYCLOAK_GROUP_AREA_MANAGER_01 = '/service.posback/area-manager01';
