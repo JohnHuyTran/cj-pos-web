@@ -16,26 +16,27 @@ import { DeleteForever, ErrorOutline } from '@mui/icons-material';
 import { DataGrid, GridColDef } from '@material-ui/data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
-import { updateListSelect } from '../../store/slices/sale-limit-time-detail';
-
-interface Props {
-  open: boolean;
-  onClose: () => void;
-  products: object[];
-}
+import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
+import SnackbarStatus from '../commons/ui/snackbar-status';
+import { STProductDetail } from '../../models/sale-limit-time';
 
 export default function STProductItems(): ReactElement {
   const classes = useStyles();
+  const [updateData, setUpdateData] = React.useState(false);
   const [showAll, setShowAll] = React.useState(false);
-  const [dtTable, setDtTable] = React.useState([]);
-  const listSelect = useAppSelector((state) => state.STDetail.listSelect);
-  const listAppliedProducts = useAppSelector((state) => state.STDetail.listAppliedProducts);
+  const [dtTable, setDtTable] = React.useState<Array<STProductDetail>>([]);
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+
+  const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const dispatch = useAppDispatch();
 
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
   useEffect(() => {
-    if (Object.keys(listSelect).length !== 0) {
-      let rows = listSelect
-        .filter((el: any) => el.type === 2)
+    if (Object.keys(payloadAddTypeProduct).length !== 0) {
+      let rows = payloadAddTypeProduct
+        .filter((el: any) => el.selectedType === 2)
         .map((item: any, index: number) => {
           return {
             id: item.barcode,
@@ -51,14 +52,14 @@ export default function STProductItems(): ReactElement {
     } else {
       setDtTable([]);
     }
-  }, [listSelect]);
+  }, [payloadAddTypeProduct, updateData]);
   const handleShowProducts = () => {
     if (showAll) {
-      dispatch(updateListSelect([]));
       setShowAll(false);
+      setDtTable([]);
     } else {
-      dispatch(updateListSelect(listAppliedProducts));
-      setShowAll(false);
+      setShowAll(true);
+      setUpdateData(!updateData);
     }
   };
   const columns: GridColDef[] = [
@@ -134,8 +135,10 @@ export default function STProductItems(): ReactElement {
         };
 
         const handleDeleteItem = () => {
-          dispatch(updateListSelect(listSelect.filter((r: any) => r.barcode !== params.row.id)));
+          let newList = payloadAddTypeProduct.filter((r: any) => r.barcode !== params.row.id);
+          dispatch(updateAddTypeAndProductState(newList));
           setOpenModalDelete(false);
+          setShowSnackBar(true);
         };
 
         return (
@@ -241,6 +244,13 @@ export default function STProductItems(): ReactElement {
           />
         </div>
       </Box>
+
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={true}
+        contentMsg={'คุณได้ลบข้อมูลเรียบร้อยแล้ว'}
+      />
     </>
   );
 }

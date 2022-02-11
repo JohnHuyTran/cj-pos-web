@@ -25,10 +25,17 @@ import ImportAppIcon from '@mui/icons-material/ExitToApp';
 import STProductTypeItems from './ST-product-type-item';
 import STProductItems from './ST-product-item';
 import TimePickerComponent from '../commons/ui/time-picker-detail';
-import { updateListSelect } from '../../store/slices/sale-limit-time-detail';
+import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
+import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 
 interface State {
-  branchCode: string;
+  stNo: string;
+  detailMsg: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  startTime: Date | null;
+  endTime: Date | null;
+  comment: string;
 }
 
 interface Props {
@@ -69,15 +76,18 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const dispatch = useAppDispatch();
   const classes = useStyles();
-
+  const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
+  const [values, setValues] = React.useState<State>({
+    stNo: '',
+    detailMsg: '',
+    startDate: null,
+    endDate: null,
+    startTime: null,
+    endTime: null,
+    comment: '',
+  });
   const [status, setStatus] = React.useState<number>(0);
-  const [stNo, setSTNo] = React.useState('');
-  const listAppliedProducts = useAppSelector((state) => state.STDetail.listAppliedProducts);
-  const listSelect = useAppSelector((state) => state.STDetail.listSelect);
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
-  const [timeFrom, setTimeFrom] = React.useState<Date | null>(null);
-  const [timeTo, setTimeTo] = React.useState<Date | null>(null);
-
   const [countText, setCountText] = React.useState<number>(0);
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
@@ -86,65 +96,102 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
   };
-
-  const [flagSave, setFlagSave] = React.useState(false);
-  const [showModalProduct, setShowModalProduct] = React.useState(false);
+  const [showModalProduct, setShowModalProduct] = React.useState(true);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
 
   useEffect(() => {
-    setShowModalProduct(Object.keys(listSelect).length !== 0);
-  }, [listSelect]);
+    setShowModalProduct(!!Object.keys(payloadAddTypeProduct).length);
+  }, [payloadAddTypeProduct]);
 
+  const clearData = async () => {
+    dispatch(updateAddTypeAndProductState({}));
+  };
   const handleClose = async () => {
     setOpen(false);
     onClickClose();
+    clearData();
   };
 
   const topFunction = () => {
-    document.getElementById('top-item')?.scrollIntoView(true);
+    document.getElementById('top-item')?.scrollIntoView({
+      block: 'start',
+      behavior: 'smooth',
+    });
   };
 
-  function handleNotExitModelConfirm() {
+  const handleCheckClose = () => {
+    if (!!Object.keys(payloadAddTypeProduct).length) {
+      setConfirmModelExit(true);
+    } else {
+      handleClose();
+    }
+  };
+
+  const handleNotExitModelConfirm = () => {
     setConfirmModelExit(false);
-  }
+  };
 
   const handleExitModelConfirm = async () => {
     handleClose();
   };
 
-  const [startDate, setStartDate] = React.useState<any>();
-  const [endDate, setEndDate] = React.useState<any>();
+  const handleChangeDetailMsg = (value: any) => {
+    setValues({
+      ...values,
+      detailMsg: value,
+    });
+  };
+
   const handleStartDatePicker = (value: any) => {
-    setStartDate(value);
+    setValues({
+      ...values,
+      startDate: value,
+    });
   };
 
   const handleEndDatePicker = (value: Date) => {
-    setEndDate(value);
+    setValues({
+      ...values,
+      endDate: value,
+    });
   };
 
   const handleStartTimePicker = (value: Date) => {
-    setTimeFrom(value);
+    setValues({
+      ...values,
+      startTime: value,
+    });
   };
 
   const handleEndTimePicker = (value: Date) => {
-    setTimeTo(value);
+    setValues({
+      ...values,
+      endTime: value,
+    });
   };
 
-  if (endDate != null && startDate != null) {
-    if (endDate < startDate) {
-      setEndDate(null);
+  if (values.startDate != null && values.endDate != null) {
+    if (values.endDate < values.startDate) {
+      setValues({
+        ...values,
+        endDate: null,
+      });
     }
   }
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
   const handleOpenAddItems = () => {
-    dispatch(updateListSelect(listAppliedProducts));
+    setOpenModelAddItems(true);
+  };
+  const handleCloseModalAddItems = () => {
+    setOpenModelAddItems(false);
   };
 
-  const [commentOC, setCommentOC] = React.useState('');
-
   const handleChangeComment = (value: any) => {
-    setCommentOC(value);
+    setValues({
+      ...values,
+      comment: value,
+    });
     setCountText(value.split('').length);
   };
 
@@ -154,26 +201,10 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
     setOpenAlert(false);
   };
 
-  const handleSave = async () => {};
-
-  const handleMapPayloadSave = async () => {};
-
-  const handleSubmit = async () => {};
-
-  const handleApprove = async () => {};
-
-  const [flagReject, setFlagReject] = React.useState(false);
-  const handleReject = async () => {};
-
-  const handleCloseModelConfirm = () => {
-    setFlagReject(false);
-  };
-  const handleConfirm = async () => {};
-
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleCheckClose}>
           <Typography sx={{ fontSize: '1em', mb: 2 }}>{'สร้างเอกสารกำหนดเวลา (งด) ขายสินค้าใหม่'}</Typography>
           <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
@@ -185,7 +216,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               <Box>วันที่สร้างรายการ :</Box>
             </Grid>
             <Grid item xs={3}>
-              <Box mb={2}>{!!stNo ? stNo : '-'}</Box>
+              <Box mb={2}>{!!values.stNo ? values.stNo : '-'}</Box>
               <Box>{moment(createDate).add(543, 'y').format('DD/MM/YYYY')}</Box>
             </Grid>
             <Grid item xs={1}></Grid>
@@ -204,9 +235,9 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                   maxLength: '50',
                 }}
                 variant="outlined"
-                // onChange={(e) => {
-                //   handleChangeNote(e.target.value);
-                // }}
+                onChange={(e) => {
+                  handleChangeDetailMsg(e.target.value);
+                }}
                 // disabled={dataDetail.status > 1}
               />
               {/* <Box textAlign="right" color="#F54949">
@@ -219,7 +250,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               วันที่เริ่มงดขาย :
             </Grid>
             <Grid item xs={3}>
-              <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+              <DatePickerComponent onClickDate={handleStartDatePicker} value={values.startDate} />
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -228,9 +259,9 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
             <Grid item xs={3}>
               <DatePickerComponent
                 onClickDate={handleEndDatePicker}
-                value={endDate}
+                value={values.endDate}
                 type={'TO'}
-                minDateTo={startDate}
+                minDateTo={values.startDate}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -240,14 +271,14 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               วันที่สิ้นสุดงดขาย :
             </Grid>
             <Grid item xs={3}>
-              <TimePickerComponent error={false} onClickTime={handleStartTimePicker} value={timeFrom} />
+              <TimePickerComponent error={false} onClickTime={handleStartTimePicker} value={values.startTime} />
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
               เวลาที่สิ้นสุดงดขาย :
             </Grid>
             <Grid item xs={3}>
-              <TimePickerComponent error={false} onClickTime={handleEndTimePicker} value={timeTo} />
+              <TimePickerComponent error={false} onClickTime={handleEndTimePicker} value={values.endTime} />
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
@@ -326,7 +357,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                   maxLength: '100',
                 }}
                 variant="outlined"
-                value={commentOC}
+                value={values.comment}
                 onChange={(e) => {
                   handleChangeComment(e.target.value);
                 }}
@@ -364,14 +395,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
         contentMsg={contentMsg}
       />
 
-      {/* <ModalConfirmTransaction
-        open={openModelConfirm}
-        onClose={handleCloseModelConfirm}
-        handleConfirm={handleConfirm}
-        header={textHeaderConfirm}
-        title="เลขที่เอกสาร RT"
-        value={rtNo}
-      /> */}
+      <ModalAddTypeProduct open={openModelAddItems} onClose={handleCloseModalAddItems} />
 
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />

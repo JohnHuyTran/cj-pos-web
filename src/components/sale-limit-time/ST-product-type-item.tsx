@@ -1,45 +1,56 @@
 import React, { ReactElement, useEffect } from 'react';
 import Dialog from '@mui/material/Dialog';
 import { Box, Button, DialogActions, DialogContent, DialogContentText, Grid, Typography } from '@mui/material';
-import { DeleteForever, ErrorOutline } from '@mui/icons-material';
+import { DeleteForever } from '@mui/icons-material';
 import { DataGrid, GridColDef } from '@material-ui/data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
-import { GridRenderCellParams } from '@mui/x-data-grid';
-import { updateListSelect } from '../../store/slices/sale-limit-time-detail';
+import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
+import SnackbarStatus from '../commons/ui/snackbar-status';
 
-interface Props {
-  open: boolean;
-  onClose: () => void;
-  products: object[];
-}
+const _ = require('lodash');
 
 export default function STProductTypeItems(): ReactElement {
   const classes = useStyles();
   const [dtTable, setDtTable] = React.useState([]);
-  const listSelect = useAppSelector((state) => state.STDetail.listSelect);
   const dispatch = useAppDispatch();
+  const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
   useEffect(() => {
-    if (Object.keys(listSelect).length !== 0) {
-      let rows = listSelect
-        .filter((el: any) => el.type === 1)
+    if (Object.keys(payloadAddTypeProduct).length !== 0) {
+      let rows = payloadAddTypeProduct
+        .filter((el: any) => el.selectedType === 1)
         .map((item: any, index: number) => {
           return {
-            id: item.categoryTypeCode,
+            id: item.productTypeCode,
             index: index + 1,
-            typeProduct: item.categoryName,
-            numberOfPruducts: listSelect.filter(
-              (el1: any) => el1.type === 2 && el1.categoryTypeCode === item.categoryTypeCode
+            productTypeName: item.productTypeName,
+            numberOfPruducts: payloadAddTypeProduct.filter(
+              (el1: any) => el1.selectedType === 2 && el1.productTypeCode === item.productTypeCode
             ).length,
           };
         });
-      console.log(rows);
 
       setDtTable(rows);
     } else {
       setDtTable([]);
     }
-  }, [listSelect]);
+  }, [payloadAddTypeProduct]);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const handleClickRow = (value: any) => {
+    // let newList = _.cloneDeep(listSelect);
+    // newList.map((el: any) => {
+    //   if (el.type === 2 && el.productTypeCode !== value.id) {
+    //     el.categoryTypeSelected = false;
+    //   } else {
+    //     el.categoryTypeSelected = true;
+    //   }
+    // });
+    // dispatch(updateListSelect(newList));
+  };
 
   const columns: GridColDef[] = [
     {
@@ -56,7 +67,7 @@ export default function STProductTypeItems(): ReactElement {
       ),
     },
     {
-      field: 'typeProduct',
+      field: 'productTypeName',
       headerName: 'ประเภท',
       headerAlign: 'center',
       flex: 1.8,
@@ -76,14 +87,14 @@ export default function STProductTypeItems(): ReactElement {
       sortable: false,
       renderCell: (params) => {
         return (
-          <Typography variant="body2" paddingLeft="30px">
+          <Typography variant="body2" paddingLeft="10rem">
             <b>{params.value}</b>
           </Typography>
         );
       },
       renderHeader: (params) => {
         return (
-          <div style={{ color: '#36C690', marginLeft: '30px' }}>
+          <div style={{ color: '#36C690', marginLeft: '3rem' }}>
             <b>{'จำนวนสินค้า (รายการ)'}</b>
           </div>
         );
@@ -107,9 +118,10 @@ export default function STProductTypeItems(): ReactElement {
         };
 
         const handleDeleteItem = () => {
-          dispatch(updateListSelect(listSelect.filter((r: any) => r.id !== params.row.id)));
+          let newList = payloadAddTypeProduct.filter((r: any) => r.productTypeCode !== params.row.id);
+          dispatch(updateAddTypeAndProductState(newList));
           setOpenModalDelete(false);
-          // setOpenPopupModal(true);
+          setShowSnackBar(true);
         };
 
         return (
@@ -134,7 +146,7 @@ export default function STProductTypeItems(): ReactElement {
                     <Grid item xs={5} sx={{ textAlign: 'left' }}>
                       ประเภท <label style={{ color: '#AEAEAE', margin: '0 10px' }}>|</label>
                       <label style={{ color: '#36C690', paddingLeft: '10px' }}>
-                        <b>{params.row.typeProduct}</b>
+                        <b>{params.row.productTypeName}</b>
                       </label>
                     </Grid>
                     <Grid item xs={4}></Grid>
@@ -178,24 +190,33 @@ export default function STProductTypeItems(): ReactElement {
   ];
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1, mb: 1.5 }}>
-      <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
-        <DataGrid
-          rows={dtTable}
-          columns={columns}
-          disableColumnMenu
-          hideFooter
-          autoHeight
-          rowHeight={70}
-          components={{
-            NoRowsOverlay: () => (
-              <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
-                ไม่มีข้อมูล
-              </Typography>
-            ),
-          }}
-        />
-      </div>
-    </Box>
+    <>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1, mb: 1.5 }}>
+        <div style={{ width: '100%' }} className={classes.MdataGridChangeColorRow}>
+          <DataGrid
+            rows={dtTable}
+            columns={columns}
+            disableColumnMenu
+            onRowClick={(params) => handleClickRow(params.row)}
+            hideFooter
+            autoHeight
+            rowHeight={70}
+            components={{
+              NoRowsOverlay: () => (
+                <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
+                  ไม่มีข้อมูล
+                </Typography>
+              ),
+            }}
+          />
+        </div>
+      </Box>
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={true}
+        contentMsg={'คุณได้ลบข้อมูลเรียบร้อยแล้ว'}
+      />
+    </>
   );
 }
