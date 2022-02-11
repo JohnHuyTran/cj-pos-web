@@ -786,7 +786,8 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
               </Grid>
             )}
 
-            {!isDraft && !isDC && (
+            {/* {!isDraft && !isDC && ( */}
+            {!isDraft && (
               <Grid container spacing={2} mb={2}>
                 <Grid item lg={2}>
                   <Typography variant='body2'> สาเหตุการโอน :</Typography>
