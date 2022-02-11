@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -185,9 +186,12 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
       search: keyword,
       payload: requestBody,
     };
+
     if (keyword.length >= 3 && reason !== 'reset') {
+      setLoading(true);
       setSearchItem(keyword);
       await dispatch(featchAllItemsListAsync(payload));
+      setLoading(false);
     } else {
       clearData();
     }
@@ -211,10 +215,20 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
     );
   };
 
+  const [loading, setLoading] = React.useState(false);
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
         {...params}
+        InputProps={{
+          ...params.InputProps,
+          endAdornment: (
+            <React.Fragment>
+              {loading ? <CircularProgress color="inherit" size={20} /> : null}
+              {params.InputProps.endAdornment}
+            </React.Fragment>
+          ),
+        }}
         placeholder="บาร์โค้ด/รายละเอียดสินค้า"
         className={classes.MtextField}
         variant="outlined"
@@ -344,6 +358,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
                 fullWidth
                 freeSolo
                 loadingText="กำลังโหลด..."
+                loading={loading}
                 options={options}
                 filterOptions={filterOptions}
                 renderOption={autocompleteRenderListItem}
