@@ -24,14 +24,18 @@ const initialState: State = {
     message: '',
     data: [],
   },
-  totalBranches: 620,
+  totalBranches: 0,
   payloadBranches: {
     isAllBranches: false,
+    appliedBranches: {
+      province: [],
+      branchList: [],
+    },
   },
   error: '',
 };
 
-export const featchProvinceListAsync = createAsyncThunk('ProvinceList', async () => {
+export const fetchProvinceListAsync = createAsyncThunk('ProvinceList', async () => {
   try {
     const path = environment.branch.province.url;
 
@@ -43,9 +47,21 @@ export const featchProvinceListAsync = createAsyncThunk('ProvinceList', async ()
   }
 });
 
-export const featchBranchProvinceListAsync = createAsyncThunk('BranchList', async (params: string) => {
+export const fetchBranchProvinceListAsync = createAsyncThunk('BranchList', async (params: string) => {
   try {
     const path = `${environment.branch.branch.url}?${params}`;
+
+    let response = await get(path).then();
+
+    return response;
+  } catch (error) {
+    throw error;
+  }
+});
+
+export const fetchTotalBranch = createAsyncThunk('TotalBranch', async () => {
+  try {
+    const path = environment.branch.branchTotal.url;
 
     let response = await get(path).then();
 
@@ -64,22 +80,31 @@ const searchBranchSlice = createSlice({
     },
   },
   extraReducers: (builer) => {
-    builer.addCase(featchProvinceListAsync.pending, () => {
+    builer.addCase(fetchProvinceListAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchProvinceListAsync.fulfilled, (state, action: PayloadAction<any>) => {
+      builer.addCase(fetchProvinceListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         state.provinceList = action.payload;
       }),
-      builer.addCase(featchProvinceListAsync.rejected, () => {
+      builer.addCase(fetchProvinceListAsync.rejected, () => {
         initialState;
       }),
-      builer.addCase(featchBranchProvinceListAsync.pending, () => {
+      builer.addCase(fetchBranchProvinceListAsync.pending, () => {
         initialState;
       }),
-      builer.addCase(featchBranchProvinceListAsync.fulfilled, (state, action: PayloadAction<any>) => {
+      builer.addCase(fetchBranchProvinceListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         state.branchList = action.payload;
       }),
-      builer.addCase(featchBranchProvinceListAsync.rejected, () => {
+      builer.addCase(fetchBranchProvinceListAsync.rejected, () => {
+        initialState;
+      }),
+      builer.addCase(fetchTotalBranch.pending, () => {
+        initialState;
+      }),
+      builer.addCase(fetchTotalBranch.fulfilled, (state, action: PayloadAction<any>) => {
+        state.totalBranches = action.payload.data;
+      }),
+      builer.addCase(fetchTotalBranch.rejected, () => {
         initialState;
       });
   },

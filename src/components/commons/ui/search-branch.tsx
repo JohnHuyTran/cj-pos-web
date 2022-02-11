@@ -23,9 +23,10 @@ import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import { ItemProps, ListBranches } from '../../../models/search-branch-province-model';
 import {
-  featchProvinceListAsync,
-  featchBranchProvinceListAsync,
+  fetchProvinceListAsync,
+  fetchBranchProvinceListAsync,
   updatePayloadBranches,
+  fetchTotalBranch,
 } from '../../../store/slices/search-branches-province-slice';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { paramsConvert } from '../../../utils/utils';
@@ -40,7 +41,13 @@ const BranchItem = (props: ItemProps) => {
   );
 };
 
-export default function SearchBranch(): ReactElement {
+interface Props {
+  error?: boolean;
+  helperText?: string;
+}
+
+export default function SearchBranch(props: Props): ReactElement {
+  const { error, helperText } = props;
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const { t } = useTranslation(['common']);
@@ -51,7 +58,7 @@ export default function SearchBranch(): ReactElement {
   const [allBranches, setAllBranches] = React.useState<boolean>(true);
   const [errorProvince, setErrorProvince] = React.useState<string | null>();
   const [errorBranch, setErrorBranch] = React.useState<string | null>();
-  const [value, setValue] = React.useState<string | null>(null);
+  const [value, setValue] = React.useState<string>('');
 
   const provinceList = useAppSelector((state) => state.searchBranchProvince.provinceList);
   const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
@@ -60,10 +67,8 @@ export default function SearchBranch(): ReactElement {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (provinceList === null || provinceList.data.length == 0) dispatch(featchProvinceListAsync());
-    if (branchList === null || branchList.data.length == 0) {
-      dispatch(featchBranchProvinceListAsync('limit=10'));
-    }
+    if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
+    dispatch(fetchTotalBranch());
   }, []);
 
   useEffect(() => {
@@ -74,7 +79,7 @@ export default function SearchBranch(): ReactElement {
         limit: '10',
       };
       const params = paramsConvert(payload);
-      dispatch(featchBranchProvinceListAsync(params));
+      dispatch(fetchBranchProvinceListAsync(params));
     } catch (error) {
       console.log(error);
       throw error;
@@ -85,8 +90,15 @@ export default function SearchBranch(): ReactElement {
     if (payloadBranches.isAllBranches) {
       setValue(`สาขาทั้งหมด (${totalBranches} สาขา)`);
     } else {
-      // const stringProvince = payloadBranches.appliedBranches.province.map((item: any) => item.name).join();
-      console.log(payloadBranches.appliedBranches);
+      const stringProvince = payloadBranches.appliedBranches['province']
+        .map((item: any) => `สาขาจังหวัด${item.name}`)
+        .join(', ');
+      const stringBranch = payloadBranches.appliedBranches['branchList'].map((item: any) => item.name).join(', ');
+      const stringList =
+        !!stringProvince && !!stringBranch
+          ? stringProvince.concat(', ', stringBranch)
+          : stringProvince.concat('', stringBranch);
+      setValue(stringList);
     }
   }, [payloadBranches]);
 
@@ -107,7 +119,6 @@ export default function SearchBranch(): ReactElement {
     event.target.checked && setBranch(null);
   };
 
-  const clearData = () => {};
   const onInputChange = async (event: any, value: string, reason: string) => {
     if (event && event.keyCode && event.keyCode === 13) {
       return false;
@@ -126,13 +137,11 @@ export default function SearchBranch(): ReactElement {
           limit: '10',
         };
         const params = paramsConvert(payload);
-        dispatch(featchBranchProvinceListAsync(params));
+        dispatch(fetchBranchProvinceListAsync(params));
       } catch (error) {
         console.log(error);
         throw error;
       }
-    } else {
-      clearData();
     }
   };
   const handleAddBranch = () => {
@@ -201,6 +210,14 @@ export default function SearchBranch(): ReactElement {
         }}
         onClick={handleClickSearch}
         value={value}
+        error={error}
+        helperText={helperText}
+        FormHelperTextProps={{
+          style: {
+            textAlign: 'right',
+            marginRight: 0,
+          },
+        }}
       />
       <Dialog maxWidth="lg" fullWidth open={open}>
         <Box sx={{ flex: 1, ml: 2 }}>
@@ -248,7 +265,17 @@ export default function SearchBranch(): ReactElement {
                       id="combo-box-province"
                       popupIcon={<SearchIcon color="primary" />}
                       renderInput={(params) => (
-                        <TextField {...params} error={!!errorProvince} helperText={errorProvince} />
+                        <TextField
+                          {...params}
+                          FormHelperTextProps={{
+                            style: {
+                              textAlign: 'right',
+                              marginRight: 0,
+                            },
+                          }}
+                          error={!!errorProvince}
+                          helperText={errorProvince}
+                        />
                       )}
                       size="small"
                       className={classes.MSearchBranch}
@@ -277,7 +304,19 @@ export default function SearchBranch(): ReactElement {
                       options={branchList.data}
                       id="combo-box-branch"
                       popupIcon={<SearchIcon color="primary" />}
-                      renderInput={(params) => <TextField {...params} error={!!errorBranch} helperText={errorBranch} />}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          error={!!errorBranch}
+                          helperText={errorBranch}
+                          FormHelperTextProps={{
+                            style: {
+                              textAlign: 'right',
+                              marginRight: 0,
+                            },
+                          }}
+                        />
+                      )}
                       size="small"
                       className={classes.MSearchBranch}
                       getOptionLabel={(option) => option.name}
@@ -306,11 +345,11 @@ export default function SearchBranch(): ReactElement {
             <Grid item xs={7} pr={5}>
               <Box className={classes.MWrapperListBranch}>
                 {allBranches ? (
-                  <Box sx={{ display: 'flex', flex: 'wrap' }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                     <BranchItem label={`สาขาทั้งหมด (${totalBranches} สาขา)`} onDelete={() => {}} />
                   </Box>
                 ) : (
-                  <Box sx={{ display: 'flex', flex: 'wrap' }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                     {listBranch['provinces'].map((item: any, index: number) => (
                       <BranchItem
                         label={`สาขาจังหวัด${item.name}`}

@@ -218,5 +218,8 @@ export const environment = {
     branch: {
       url: '/branch/search',
     },
+    branchTotal: {
+      url: '/branch/branch-total',
+    },
   },
 };
