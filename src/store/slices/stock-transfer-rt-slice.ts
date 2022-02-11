@@ -48,7 +48,7 @@ export const featchSearchStockTransferRtAsync = createAsyncThunk(
       if (payload.statuses !== 'ALL') {
         path = path + `&statuses=${payload.statuses}`;
       }
-      if (payload.transferReason) {
+      if (payload.transferReason !== 'All') {
         path = path + `&transferReason=${payload.transferReason}`;
       }
 

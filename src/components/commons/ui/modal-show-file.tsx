@@ -142,7 +142,9 @@ export default function ModalShowPDF({
   const imgFile = sdImageFile.substr(5, 5);
 
   React.useEffect(() => {
-    if (statusFile === 1) getReport(url);
+    if (statusFile === 1 && url) {
+      getReport(url);
+    }
     setPageSize(landscape ? 'A4 landscape' : 'A4 portrait');
   }, [open]);
 

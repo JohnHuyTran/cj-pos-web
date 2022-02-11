@@ -304,8 +304,9 @@ const useStyles = makeStyles({
   MWrapperListBranch: {
     border: '1px solid #C1C1C1',
     borderRadius: '10px',
-    padding: '10px',
-    minHeight: '300px',
+    padding: '15px 13px',
+    minHeight: '270px',
+    marginTop: '26px !important',
     '& .wrapper-item': {
       border: '1px solid #CBD4DB',
       boxSizing: 'border-box',
@@ -313,10 +314,15 @@ const useStyles = makeStyles({
       background: '#EAEBEB',
       color: '#C1C1C1',
       marginRight: '10px',
-      padding: '5px',
+      padding: '0px 9px',
+      fontSize: '14px',
+      height: '28px',
+      display: 'flex',
+      alignItems: 'center',
       '& svg': {
         cursor: 'pointer',
         fontSize: '14px',
+        marginLeft: '5px',
       },
     },
   },

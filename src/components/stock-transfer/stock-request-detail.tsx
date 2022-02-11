@@ -787,35 +787,39 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
           )}
 
-          {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && status !== 'APPROVED' && (
-            <Grid container spacing={2} mt={4} mb={2}>
-              <Grid item xs={5}></Grid>
-              <Grid item xs={7} sx={{ textAlign: 'end' }}>
-                <Button
-                  id="btnSave"
-                  variant="contained"
-                  color="error"
-                  className={classes.MbtnSave}
-                  onClick={handleReject}
-                  startIcon={<SaveIcon />}
-                  sx={{ width: 140 }}
-                >
-                  ปฎิเสธ
-                </Button>
-                <Button
-                  id="btnCreateTransfer"
-                  variant="contained"
-                  color="primary"
-                  className={classes.MbtnSave}
-                  onClick={handleApprove}
-                  startIcon={<CheckCircleOutline />}
-                  sx={{ width: 140 }}
-                >
-                  อนุมัติ
-                </Button>
+          {status !== '' &&
+            status !== 'DRAFT' &&
+            status !== 'AWAITING_FOR_REQUESTER' &&
+            status !== 'APPROVED' &&
+            status !== 'CANCELED' && (
+              <Grid container spacing={2} mt={4} mb={2}>
+                <Grid item xs={5}></Grid>
+                <Grid item xs={7} sx={{ textAlign: 'end' }}>
+                  <Button
+                    id="btnSave"
+                    variant="contained"
+                    color="error"
+                    className={classes.MbtnSave}
+                    onClick={handleReject}
+                    startIcon={<SaveIcon />}
+                    sx={{ width: 140 }}
+                  >
+                    ปฎิเสธ
+                  </Button>
+                  <Button
+                    id="btnCreateTransfer"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnSave}
+                    onClick={handleApprove}
+                    startIcon={<CheckCircleOutline />}
+                    sx={{ width: 140 }}
+                  >
+                    อนุมัติ
+                  </Button>
+                </Grid>
               </Grid>
-            </Grid>
-          )}
+            )}
           <Box mb={4}>
             {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
               <StockRequestCreateItem

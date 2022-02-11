@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { BranchResponse } from '../../models/search-branch-model';
+import { BranchResponse, ProvinceResponse } from '../../models/search-branch-province-model';
 import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
 
 type State = {
-  provinceList: BranchResponse;
+  provinceList: ProvinceResponse;
   branchList: BranchResponse;
+  totalBranches: number;
+  payloadBranches: any;
   error: string;
 };
 
@@ -22,12 +24,16 @@ const initialState: State = {
     message: '',
     data: [],
   },
+  totalBranches: 620,
+  payloadBranches: {
+    isAllBranches: false,
+  },
   error: '',
 };
 
 export const featchProvinceListAsync = createAsyncThunk('ProvinceList', async () => {
   try {
-    const path = environment.test.province.url;
+    const path = environment.branch.province.url;
 
     let response = await get(path).then();
 
@@ -37,9 +43,9 @@ export const featchProvinceListAsync = createAsyncThunk('ProvinceList', async ()
   }
 });
 
-export const featchBranchProvinceListAsync = createAsyncThunk('BranchList', async () => {
+export const featchBranchProvinceListAsync = createAsyncThunk('BranchList', async (params: string) => {
   try {
-    const path = environment.test.province.url;
+    const path = `${environment.branch.branch.url}?${params}`;
 
     let response = await get(path).then();
 
@@ -52,7 +58,11 @@ export const featchBranchProvinceListAsync = createAsyncThunk('BranchList', asyn
 const searchBranchSlice = createSlice({
   name: 'searchBranchProvince',
   initialState,
-  reducers: {},
+  reducers: {
+    updatePayloadBranches: (state, action: PayloadAction<any>) => {
+      state.payloadBranches = action.payload;
+    },
+  },
   extraReducers: (builer) => {
     builer.addCase(featchProvinceListAsync.pending, () => {
       initialState;
@@ -74,5 +84,5 @@ const searchBranchSlice = createSlice({
       });
   },
 });
-
+export const { updatePayloadBranches } = searchBranchSlice.actions;
 export default searchBranchSlice.reducer;

@@ -82,10 +82,6 @@ const store = configureStore({
     searchBranchProvince: searchBranchProvince,
     STDetail: STDetail,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-    }),
 });
 
 // Types of root state and dispatch

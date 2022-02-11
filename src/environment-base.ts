@@ -175,7 +175,7 @@ export const environment = {
         url: '/stock/stock-transfer/export/recall/{btNo}',
       },
       reportPaperBox: {
-        url: '/stock/stock-transfer/{btNo}/export',
+        url: '/stock/stock-transfer/export/bt-cover-sheet/{btNo}',
       },
       sendToPickup: {
         url: '/stock/stock-transfer/save-wait-dc',
@@ -211,9 +211,9 @@ export const environment = {
       url: '/stock/stock-balance-check',
     },
   },
-  test: {
+  branch: {
     province: {
-      url: '/province/search',
+      url: '/branch/province',
     },
     branch: {
       url: '/branch/search',
