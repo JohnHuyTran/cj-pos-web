@@ -89,12 +89,25 @@ export default function ModalShowPDF({
   const pdfWrapper = React.useRef<HTMLDivElement>(null);
   let token = getAccessToken();
   token = token ? `Bearer ${token}` : '';
-
+  const [initialPageSize, setInitialPageSize] = React.useState(false);
   const setPdfSize = () => {
     if (pdfWrapper && pdfWrapper.current) {
       // pdfWrapper.current.getBoundingClientRect().width;
       setInitialWidth(pdfWrapper.current.getBoundingClientRect().width);
     }
+  };
+
+  const onSourceSuccess = () => {
+    if (!initialPageSize) {
+      if (pdfWrapper && pdfWrapper.current) {
+        setPageSize(
+          `${pdfWrapper.current.getBoundingClientRect().width}px ${pdfWrapper.current.getBoundingClientRect().height}px`
+        );
+      } else {
+        setPageSize(landscape ? 'A4 landscape' : 'A4 portrait');
+      }
+    }
+    setInitialPageSize(true);
   };
 
   function onDocumentLoadSuccess(pdf: any) {
@@ -119,17 +132,10 @@ export default function ModalShowPDF({
     onClose();
   };
 
-  const handlePrint = () => {
-    showPrint;
-    // setTimeout(() => {
-    //     onClose()
-    // }, 1000);
-  };
-
   const setPageSize = (cssPageSize: string) => {
     const style = document.createElement('style');
     style.innerHTML = `@page {size: ${cssPageSize}}`;
-    // style.id = 'page-orientation';
+    style.id = 'page-orientation';
     document.head.appendChild(style);
   };
   const showPrint = useReactToPrint({
@@ -145,7 +151,7 @@ export default function ModalShowPDF({
     if (statusFile === 1 && url) {
       getReport(url);
     }
-    setPageSize(landscape ? 'A4 landscape' : 'A4 portrait');
+    setInitialPageSize(false);
   }, [open]);
 
   return (
@@ -178,6 +184,7 @@ export default function ModalShowPDF({
                 onLoadError={onDocumentLoadFail}>
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page
+                    onLoadSuccess={onSourceSuccess}
                     key={`page_${index + 1}`}
                     pageNumber={index + 1}
                     width={initialWidth}
