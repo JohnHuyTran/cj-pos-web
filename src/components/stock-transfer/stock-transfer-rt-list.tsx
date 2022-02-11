@@ -62,7 +62,7 @@ function StockTransferRtList() {
     },
     {
       field: 'startDate',
-      headerName: 'วันที่ต้องการโอน',
+      headerName: 'วันที่โอน',
       // width: 160,
       minWidth: 150,
       // flex: 1,

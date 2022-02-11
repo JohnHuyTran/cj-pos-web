@@ -109,7 +109,7 @@ export default function StockTransferRt() {
   const onClickValidateForm = () => {
     if (startDate === null || endDate === null) {
       setOpenAlert(true);
-      setTextError('กรุณาระบุวันที่รับสินค้า');
+      setTextError('กรุณาระบุวันที่โอน');
     } else {
       onClickSearchBtn();
     }
@@ -265,7 +265,7 @@ export default function StockTransferRt() {
 
           <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant="subtitle1" component="div">
-              วันที่รับสินค้า
+              วันที่โอน
             </Typography>
             <Typography gutterBottom variant="subtitle1" component="div">
               ตั้งแต่*
