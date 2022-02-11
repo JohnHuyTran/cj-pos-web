@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import moment from 'moment';
 
 type ItemsState = {
   createDraft: any;
@@ -22,7 +23,7 @@ const initialState: ItemsState = {
     id: '',
     documentNumber: '',
     status: 0,
-    createdDate: new Date(),
+    createdDate: moment(new Date()).toISOString(),
     percentDiscount: true,
   },
   errorList: [],

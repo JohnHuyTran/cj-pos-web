@@ -42,7 +42,7 @@ const BranchItem = (props: ItemProps) => {
 
 export default function SearchBranch(): ReactElement {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   const { t } = useTranslation(['common']);
   const [province, setProvince] = React.useState<any | null>(null);
   const [branch, setBranch] = React.useState<any | null>(null);
