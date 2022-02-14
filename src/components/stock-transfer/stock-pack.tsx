@@ -670,6 +670,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   };
 
   const handleOpenAddItems = async () => {
+    await storeItem();
     await dispatch(updateAddItemsState({}));
     await getSkuList();
     setOpenModelAddItems(true);
