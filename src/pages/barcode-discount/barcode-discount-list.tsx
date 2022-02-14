@@ -17,8 +17,8 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
 import ModalCreateBarcodeDiscount from '../../components/barcode-discount/modal-create-barcode-discound';
-import BarcodeDiscountPopup from '../../components/barcode-discount/barcode-discount-popup';
 import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-detail-slice';
+import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 
 const _ = require('lodash');
 
@@ -481,7 +481,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
           onSearchBD={props.onSearch}
         />
       )}
-      <BarcodeDiscountPopup open={openPopup} onClose={handleClosePopup} contentMsg={popupMsg} />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </div>
   );
 };
