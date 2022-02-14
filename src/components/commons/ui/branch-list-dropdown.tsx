@@ -34,7 +34,7 @@ function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isC
     options: branchList.branchList.data.filter((branch: BranchInfo) => {
       return branch.code !== sourceBranchCode;
     }),
-    getOptionLabel: (option: branchListOptionType) => option.name,
+    getOptionLabel: (option: branchListOptionType) => `${option.code}-${option.name}`,
   };
 
   const handleChangeBranch = (event: any, newValue: branchListOptionType | null) => {
@@ -53,7 +53,7 @@ function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isC
       renderOption={(props, option) => {
         return (
           <li {...props} key={option.code}>
-            {option.name}
+            {`${option.code}-${option.name}`}
           </li>
         );
       }}
