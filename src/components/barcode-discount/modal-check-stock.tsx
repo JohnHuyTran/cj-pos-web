@@ -87,17 +87,17 @@ export default function ModalCheckStock({ open, onClose }: Props) {
     <div>
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth={true}>
         <DialogTitle id="alert-dialog-title" sx={{ textAlign: 'center', paddingTop: '30px', paddingBottom: '0' }}>
-          <ErrorOutline sx={{ color: '#F54949', fontSize: '43px' }} />
+          <ErrorOutline sx={{ color: '#F54949', fontSize: '3em' }} />
           <br />
           <Typography sx={{ color: 'red', fontSize: '18px', marginBottom: '8px' }}>
             จำนวนที่ขอลดเกินจำนวนสินค้าในสต๊อก
           </Typography>
-          <Typography sx={{ fontSize: '18px', color: '#000000', marginBottom: '8px' }}>รายการสินค้าในสต๊อค</Typography>
+          <Typography sx={{ fontSize: '18px', color: '#000000', marginBottom: '8px' }}>รายการสินค้าในสต๊อก</Typography>
         </DialogTitle>
-        <DialogContent sx={{ paddingBottom: '0', marginBottom: '40px' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+        <DialogContent sx={{ paddingBottom: '0', marginBottom: '30px' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
-              <DataGrid rows={rows} columns={columns} hideFooter autoHeight rowHeight={60} />
+              <DataGrid rows={rows} columns={columns} hideFooter autoHeight rowHeight={70} />
             </div>
           </Box>
         </DialogContent>
@@ -106,7 +106,7 @@ export default function ModalCheckStock({ open, onClose }: Props) {
             variant="contained"
             color="error"
             onClick={handleClose}
-            sx={{ borderRadius: '5px', height: '40px', width: '126.14px' }}
+            sx={{ borderRadius: '5px', mb: 1, height: '40px', width: '126.14px' }}
           >
             ปิด
           </Button>

@@ -25,9 +25,9 @@ import {
 } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
-import BarcodeDiscountPopup from './barcode-discount-popup';
 import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import { Action } from '../../utils/enum/common-enum';
+import SnackbarStatus from '../commons/ui/snackbar-status';
 export interface DataGridProps {
   action: Action | Action.INSERT;
   id: string;
@@ -724,9 +724,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
         </Box>
       </Box>
 
-      <BarcodeDiscountPopup
+      <SnackbarStatus
         open={openPopupModal}
         onClose={handleClosePopup}
+        isSuccess={true}
         contentMsg={'คุณได้ลบข้อมูลเรียบร้อยแล้ว'}
       />
     </div>
