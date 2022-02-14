@@ -165,7 +165,6 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         stringify: (option: any) => option.productTypeCode + option.productTypeName,
     });
     const renderProductTypeListItem = (props: any, option: any) => {
-        console.log(option);
         return (
             <li {...props} key={option.productTypeCode}>
                 <Typography variant="body2">{option.productTypeName}</Typography>
@@ -295,7 +294,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
 
     const handleAddItem = async () => {
         let selectedAddItems = _.cloneDeep(selectedItems);
-        if (!objectNullOrEmpty(values.productType)) {
+        if (!objectNullOrEmpty(values.productType) && values.selectAllProduct) {
             let productTypeExist = selectedItems.filter((it: any) => it.selectedType === 1 && it.productTypeCode === values.productType.productTypeCode);
             if (productTypeExist != null && productTypeExist.length > 0) {
                 let error = {...values.error};
