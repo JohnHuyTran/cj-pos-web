@@ -26,11 +26,12 @@ const initialState: State = {
   },
   totalBranches: 0,
   payloadBranches: {
-    isAllBranches: false,
+    isAllBranches: true,
     appliedBranches: {
       province: [],
       branchList: [],
     },
+    saved: false,
   },
   error: '',
 };

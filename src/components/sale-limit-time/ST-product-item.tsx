@@ -26,7 +26,7 @@ export default function STProductItems(): ReactElement {
   const [showAll, setShowAll] = React.useState(false);
   const [dtTable, setDtTable] = React.useState<Array<STProductDetail>>([]);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
-
+  const [pageSize, setPageSize] = React.useState<number>(10);
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const dispatch = useAppDispatch();
 
@@ -231,7 +231,10 @@ export default function STProductItems(): ReactElement {
             rows={dtTable}
             columns={columns}
             disableColumnMenu
-            hideFooter
+            pageSize={pageSize}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            rowsPerPageOptions={[10, 20, 50, 100]}
+            pagination
             autoHeight
             rowHeight={70}
             components={{

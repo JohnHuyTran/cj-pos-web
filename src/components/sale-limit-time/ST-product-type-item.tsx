@@ -15,6 +15,7 @@ export default function STProductTypeItems(): ReactElement {
   const [dtTable, setDtTable] = React.useState([]);
   const dispatch = useAppDispatch();
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
+  const [pageSize, setPageSize] = React.useState<number>(10);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   useEffect(() => {
     if (Object.keys(payloadAddTypeProduct).length !== 0) {
@@ -196,9 +197,12 @@ export default function STProductTypeItems(): ReactElement {
           <DataGrid
             rows={dtTable}
             columns={columns}
+            pageSize={pageSize}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            rowsPerPageOptions={[10, 20, 50, 100]}
+            pagination
             disableColumnMenu
             onRowClick={(params) => handleClickRow(params.row)}
-            hideFooter
             autoHeight
             rowHeight={70}
             components={{
