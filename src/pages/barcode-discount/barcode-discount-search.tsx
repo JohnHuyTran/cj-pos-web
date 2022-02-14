@@ -1,9 +1,9 @@
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import TextField from '@mui/material/TextField';
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useStyles } from '../../styles/makeTheme';
-import { onChange, onChangeDate, stringNullOrEmpty } from '../../utils/utils';
+import {objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty} from '../../utils/utils';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -21,6 +21,7 @@ import { saveSearchCriteriaBD } from '../../store/slices/barcode-discount-criter
 import LoadingModal from '../../components/commons/ui/loading-modal';
 import { Action } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
+
 interface State {
   documentNumber: string;
   branch: string;

@@ -1,6 +1,6 @@
 import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useStyles } from '../../styles/makeTheme';
 import { useTranslation } from 'react-i18next';
 import {
@@ -11,7 +11,7 @@ import {
 } from '../../models/barcode-discount-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { Action, BDStatus, DateFormat } from '../../utils/enum/common-enum';
-import { genColumnValue, numberWithCommas, stringNullOrEmpty } from '../../utils/utils';
+import {genColumnValue, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty} from '../../utils/utils';
 import HtmlTooltip from '../../components/commons/ui/html-tooltip';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
@@ -19,6 +19,8 @@ import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-searc
 import ModalCreateBarcodeDiscount from '../../components/barcode-discount/modal-create-barcode-discound';
 import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-detail-slice';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
+import {KeyCloakTokenInfo} from "../../models/keycolak-token-info";
+import {getUserInfo} from "../../store/sessionStore";
 
 const _ = require('lodash');
 
@@ -48,6 +50,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
   const limit = useAppSelector((state) => state.barcodeDiscountSearchSlice.bdSearchResponse.perPage);
   const [pageSize, setPageSize] = React.useState(limit.toString());
   const payload = useAppSelector((state) => state.barcodeDiscountCriteriaSearchSlice.searchCriteria);
+  const [userPermission, setUserPermission] = useState<any[]>([]);
 
   useEffect(() => {
     const lstBarcodeDiscount = bdSearchResponse.data;
@@ -75,6 +78,11 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       });
       setLstBarcodeDiscount(rows);
       setCheckAll(false);
+      //permission
+      const userInfo: KeyCloakTokenInfo = getUserInfo();
+      if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
+        setUserPermission((userInfo.acl['service.posback-campaign'] != null && userInfo.acl['service.posback-campaign'].length > 0) ? userInfo.acl['service.posback-campaign'] : []);
+      }
     }
   }, [bdSearchResponse]);
 
@@ -479,6 +487,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           onSearchBD={props.onSearch}
+          userPermission={userPermission}
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />

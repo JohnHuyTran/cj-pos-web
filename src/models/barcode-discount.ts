@@ -23,6 +23,7 @@ export interface DiscountDetail {
   cashDiscount: number | any;
   priceAfterDiscount: number | any;
   numberOfDiscounted: number;
+  numberOfApproved: number;
   approvedDiscount: number;
   errorDiscount: string;
   errorExpiryDate: string;

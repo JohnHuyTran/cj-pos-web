@@ -16,6 +16,7 @@ export enum ACTIONS {
   CAMPAIGN_BD_PRINT = 'campaign.bd.print',
   CAMPAIGN_BD_VIEW = 'campaign.bd.view',
   CAMPAIGN_BD_CREATE = 'campaign.bd.create',
+  CAMPAIGN_BD_APPROVE = 'campaign.bd.approve',
   SUPPLIER_SEARCH = 'supplier.search',
   STOCK_RT_APPROVE = 'stock.rt.approve',
   STOCK_CHECK = 'stock.check',
