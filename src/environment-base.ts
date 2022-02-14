@@ -61,8 +61,14 @@ export const environment = {
       update: {
         url: '/campaign/{id}',
       },
-      approve: {
+      sendForApproval: {
         url: '/campaign/{id}/waiting-approve',
+      },
+      approve: {
+        url: '/campaign/approve-barcode/{id}',
+      },
+      reject: {
+        url: '/campaign/barcode/reject?id={id}&reason={reason}',
       },
       cancel: {
         url: '/campaign/{id}',
@@ -133,6 +139,9 @@ export const environment = {
     type: {
       search: {
         url: '/products/type/all',
+      },
+      productByType: {
+        url: '/products/barcode/type',
       }
     },
     addItem: {

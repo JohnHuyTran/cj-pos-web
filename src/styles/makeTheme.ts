@@ -36,6 +36,26 @@ const useStyles = makeStyles({
       '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
     },
   },
+  MtextFieldNumberError: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      fontSize: '14px',
+      textAlignLast: 'end !important',
+      '& fieldset': {
+        borderColor: 'red',
+      },
+      '&:hover fieldset': {
+        borderColor: 'red',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: 'red',
+      },
+    },
+    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+      color: '#263238 !important',
+      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+    },
+  },
   Mselect: {
     '& .css-y4ygc1-MuiInputBase-root-MuiOutlinedInput-root': {
       borderRadius: '5px !important',

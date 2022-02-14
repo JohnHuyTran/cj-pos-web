@@ -6,6 +6,7 @@ import {ItemsResponse, PayloadSearchProduct, ProductTypeResponse} from '../../mo
 type State = {
   itemList: ItemsResponse;
   productTypeList: ProductTypeResponse;
+  productByTypeList: ItemsResponse;
   error: string;
 };
 
@@ -19,6 +20,14 @@ const initialState: State = {
     data: [],
   },
   productTypeList: {
+    timestamp: '',
+    ref: '',
+    code: 0,
+    message: '',
+    error_details: '',
+    data: [],
+  },
+  productByTypeList: {
     timestamp: '',
     ref: '',
     code: 0,
@@ -73,6 +82,28 @@ export const searchAllProductTypeAsync = createAsyncThunk('searchAllProductTypeA
   }
 });
 
+export const getAllProductByType = createAsyncThunk('getAllProductByType', async (productTypeCode: string) => {
+  try {
+    const path = `${environment.products.type.productByType.url}?product-type=${productTypeCode}`;
+    let response = await get(path).then();
+
+    if (response === 204) {
+      let responseCode: any = {
+        ref: '',
+        code: response,
+        message: '',
+        data: [],
+      };
+
+      return responseCode;
+    }
+
+    return response;
+  } catch (error) {
+    throw error;
+  }
+});
+
 const searchTypeAndProduct = createSlice({
   name: 'searchTypeAndProduct',
   initialState,
@@ -99,8 +130,16 @@ const searchTypeAndProduct = createSlice({
     }),
     builer.addCase(searchAllProductTypeAsync.rejected, () => {
       initialState;
-    })
-    ;
+    }),
+    builer.addCase(getAllProductByType.pending, () => {
+      initialState;
+    }),
+    builer.addCase(getAllProductByType.fulfilled, (state, action: PayloadAction<any>) => {
+      state.productByTypeList = action.payload;
+    }),
+    builer.addCase(getAllProductByType.rejected, () => {
+      initialState;
+    });
   },
 });
 

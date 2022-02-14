@@ -22,7 +22,7 @@ import _ from "lodash";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import {objectNullOrEmpty, stringNullOrEmpty} from "../../../utils/utils";
 import {
-    clearSearchAllProductAsync,
+    clearSearchAllProductAsync, getAllProductByType,
     searchAllProductAsync,
     searchAllProductTypeAsync
 } from "../../../store/slices/search-type-product-slice";
@@ -72,6 +72,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     const [selectedItems, setSelectedItems] = useState<any[]>([]);
     const productResponse = useAppSelector((state) => state.searchTypeAndProduct.itemList);
     const productTypeResponse = useAppSelector((state) => state.searchTypeAndProduct.productTypeList);
+    const productByTypeResponse = useAppSelector((state) => state.searchTypeAndProduct.productByTypeList);
     const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
 
     useEffect(() => {
@@ -311,16 +312,13 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             productTypeItem.selectedType = 1;
             selectedAddItems.push(productTypeItem);
             //add product by type to selectedAddItems
-            let productTypeCodes = [];
+            let productTypeCode = '';
             if (!objectNullOrEmpty(values.productType)) {
-                productTypeCodes.push(values.productType.productTypeCode);
+                productTypeCode = values.productType.productTypeCode;
             }
-            await dispatch(searchAllProductAsync({
-                search: '',
-                productTypeCodes: productTypeCodes
-            }));
-            if (productResponse.data && productResponse.data.length > 0) {
-                let lstProductByType = productResponse.data;
+            await dispatch(getAllProductByType(productTypeCode));
+            if (productByTypeResponse.data && productByTypeResponse.data.length > 0) {
+                let lstProductByType = productByTypeResponse.data;
                 for (const item of lstProductByType) {
                     let productItem: any = _.cloneDeep(item);
                     let productExist = selectedItems.find((it: any) => it.selectedType === 2 && it.barcode === item.barcode);
