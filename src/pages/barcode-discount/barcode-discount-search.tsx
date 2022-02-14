@@ -14,14 +14,13 @@ import BarcodeDiscountList from './barcode-discount-list';
 import { BarcodeDiscountSearchRequest } from '../../models/barcode-discount-model';
 import AlertError from '../../components/commons/ui/alert-error';
 import ModalCreateBarcodeDiscount from '../../components/barcode-discount/modal-create-barcode-discound';
-import BarcodeDiscountPopup from '../../components/barcode-discount/barcode-discount-popup';
 import moment from 'moment';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
 import { saveSearchCriteriaBD } from '../../store/slices/barcode-discount-criteria-search-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
 import { Action } from '../../utils/enum/common-enum';
-import SearchBranch from '../../components/commons/ui/search-branch';
+import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 interface State {
   documentNumber: string;
   branch: string;
@@ -323,7 +322,7 @@ const BarcodeDiscountSearch = () => {
           onSearchBD={onSearch}
         />
       )}
-      <BarcodeDiscountPopup open={openPopup} onClose={handleClosePopup} contentMsg={popupMsg} />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>
   );
 };

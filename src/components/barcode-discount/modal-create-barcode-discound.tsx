@@ -36,7 +36,6 @@ import {
   saveDraftBarcodeDiscount,
   checkStockBalance,
 } from '../../services/barcode-discount';
-import BarcodeDiscountPopup from './barcode-discount-popup';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
@@ -44,6 +43,7 @@ import { Action } from '../../utils/enum/common-enum';
 import ModalCheckStock from './modal-check-stock';
 import ModalCheckPrice from './modal-check-price';
 import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
+import SnackbarStatus from '../commons/ui/snackbar-status';
 interface Props {
   action: Action | Action.INSERT;
   isOpen: boolean;
@@ -228,7 +228,6 @@ export default function ModalCreateBarcodeDiscount({
         }
         return true;
       });
-
       if (check) {
         const rsCheckStock = await handleCheckStock();
         if (rsCheckStock) {
@@ -383,8 +382,8 @@ export default function ModalCreateBarcodeDiscount({
 
   return (
     <div>
-      <Dialog open={open} maxWidth='xl' fullWidth={!!true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCloseModalCreate}>
+      <Dialog open={open} maxWidth="xl" fullWidth={!!true}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleCloseModalCreate}>
           <Typography sx={{ fontSize: '1em' }}>ส่วนลดสินค้า</Typography>
           <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
@@ -427,24 +426,25 @@ export default function ModalCreateBarcodeDiscount({
                 ยอดลด :
               </Grid>
               <Grid item xs={8} sx={{ marginTop: '-8px' }}>
-                <FormControl component='fieldset' disabled={dataDetail.status > 1}>
+                <FormControl component="fieldset" disabled={dataDetail.status > 1}>
                   <RadioGroup
-                    aria-label='discount'
+                    aria-label="discount"
                     value={valueRadios}
                     defaultValue={'percent'}
-                    name='radio-buttons-group'
+                    name="radio-buttons-group"
                     onChange={(event: React.ChangeEvent<HTMLInputElement>, value: string) => {
                       handleChangeRadio(event);
-                    }}>
+                    }}
+                  >
                     <FormControlLabel
-                      value='percent'
+                      value="percent"
                       control={<Radio disabled={status > 1} />}
-                      label='ยอดลดเป็นเปอร์เซ็น (%)'
+                      label="ยอดลดเป็นเปอร์เซ็น (%)"
                     />
                     <FormControlLabel
-                      value='amount'
+                      value="amount"
                       control={<Radio disabled={status > 1} />}
-                      label='ยอดลดเป็นจำนวนเงิน (บาท)'
+                      label="ยอดลดเป็นจำนวนเงิน (บาท)"
                     />
                   </RadioGroup>
                 </FormControl>
@@ -455,49 +455,53 @@ export default function ModalCreateBarcodeDiscount({
             <Box sx={{ display: 'flex', marginBottom: '18px', marginTop: '20px' }}>
               <Box>
                 <Button
-                  id='btnAddItem'
-                  variant='contained'
-                  color='info'
+                  id="btnAddItem"
+                  variant="contained"
+                  color="info"
                   className={classes.MbtnSearch}
                   startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
-                  disabled={status > 1}>
+                  disabled={status > 1}
+                >
                   เพิ่มสินค้า
                 </Button>
               </Box>
               <Box sx={{ marginLeft: 'auto' }}>
                 <Button
-                  variant='contained'
-                  color='warning'
+                  variant="contained"
+                  color="warning"
                   startIcon={<SaveIcon />}
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
                   onClick={() => handleCreateDraft(false)}
-                  className={classes.MbtnSearch}>
+                  className={classes.MbtnSearch}
+                >
                   บันทึก
                 </Button>
                 <Button
-                  variant='contained'
-                  color='primary'
+                  variant="contained"
+                  color="primary"
                   sx={{ margin: '0 17px' }}
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleSendRequest}
-                  className={classes.MbtnSearch}>
+                  className={classes.MbtnSearch}
+                >
                   ขออนุมัติ
                 </Button>
                 <Button
-                  variant='contained'
-                  color='error'
+                  variant="contained"
+                  color="error"
                   disabled={status > 1}
                   startIcon={<HighlightOffIcon />}
                   onClick={handleOpenCancel}
-                  className={classes.MbtnSearch}>
+                  className={classes.MbtnSearch}
+                >
                   ยกเลิก
                 </Button>
               </Box>
             </Box>
-            <ModalBacodeTransferItem id='' typeDiscount={valueRadios} action={action} />
+            <ModalBacodeTransferItem id="" typeDiscount={valueRadios} action={action} />
           </Box>
         </DialogContent>
       </Dialog>
@@ -507,18 +511,19 @@ export default function ModalCreateBarcodeDiscount({
         onClose={handleModelAddItems}
         requestBody={{
           skuCodes: [],
-        }}></ModalAddItems>
+        }}
+      ></ModalAddItems>
       <ModelConfirm
         open={openModalCancel}
         onClose={handleCloseModalCancel}
         onDeleteAction={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
       />
-      <BarcodeDiscountPopup open={openPopupModal} onClose={handleClosePopup} contentMsg={textPopup} />
+      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
       <AlertError
         open={openModalError}
         onClose={handleCloseModalError}
-        textError='กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง'
+        textError="กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง"
       />
       <ModalCheckStock
         open={openCheckStock}

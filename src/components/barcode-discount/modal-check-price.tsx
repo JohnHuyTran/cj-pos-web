@@ -5,6 +5,7 @@ import { ErrorOutline } from '@mui/icons-material';
 import { DataGrid, GridColDef } from '@material-ui/data-grid';
 import { useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
+import { numberWithCommas } from '../../utils/utils';
 
 interface Props {
   open: boolean;
@@ -61,7 +62,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => {
       return (
         <Typography variant="body2">
-          <b>{params.value}</b>
+          <b>{numberWithCommas(params.value)}</b>
         </Typography>
       );
     },
@@ -76,7 +77,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => {
       return (
         <Typography variant="body2" sx={{ color: '#446EF2' }}>
-          <b>{params.value}</b>
+          <b>{numberWithCommas(params.value)}</b>
         </Typography>
       );
     },
@@ -113,7 +114,7 @@ export default function ModalCheckPrice({ open, onClose, products }: Props): Rea
     >
       <DialogContent sx={{ padding: '1em' }}>
         <DialogContentText sx={{ textAlign: 'center' }}>
-          <ErrorOutline sx={{ color: '#F54949', fontSize: '4em' }} />
+          <ErrorOutline sx={{ color: '#F54949', fontSize: '3em' }} />
           <Typography fontWeight="bold">
             ราคาสินค้าบางรายการมีการเปลี่ยนแปลง
             <br />
