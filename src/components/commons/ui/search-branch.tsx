@@ -95,7 +95,9 @@ export default function SearchBranch(props: Props): ReactElement {
       const stringProvince = payloadBranches.appliedBranches['province']
         .map((item: any) => `สาขาจังหวัด${item.name}`)
         .join(', ');
-      const stringBranch = payloadBranches.appliedBranches['branchList'].map((item: any) => item.name).join(', ');
+      const stringBranch = payloadBranches.appliedBranches['branchList']
+        .map((item: any) => `${item.code}-${item.name}`)
+        .join(', ');
       const stringList =
         !!stringProvince && !!stringBranch
           ? stringProvince.concat(', ', stringBranch)
@@ -390,7 +392,11 @@ export default function SearchBranch(props: Props): ReactElement {
                       />
                     ))}
                     {listBranch['branches'].map((item: any, index: number) => (
-                      <BranchItem label={item.name} onDelete={() => handleDeleteBranch(item.code)} key={index} />
+                      <BranchItem
+                        label={`${item.code}-${item.name}`}
+                        onDelete={() => handleDeleteBranch(item.code)}
+                        key={index}
+                      />
                     ))}
                   </Box>
                 )}
