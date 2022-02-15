@@ -22,12 +22,13 @@ import _ from "lodash";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import {objectNullOrEmpty, stringNullOrEmpty} from "../../../utils/utils";
 import {
-    clearSearchAllProductAsync, getAllProductByType,
+    clearSearchAllProductAsync,
     searchAllProductAsync,
     searchAllProductTypeAsync
 } from "../../../store/slices/search-type-product-slice";
 import {updateAddTypeAndProductState} from "../../../store/slices/add-type-product-slice";
 import LoadingModal from "./loading-modal";
+import {getAllProductByType} from "../../../services/common";
 
 interface Error {
     productTypeExist: string,
@@ -316,9 +317,10 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             if (!objectNullOrEmpty(values.productType)) {
                 productTypeCode = values.productType.productTypeCode;
             }
-            await dispatch(getAllProductByType(productTypeCode));
-            if (productByTypeResponse.data && productByTypeResponse.data.length > 0) {
-                let lstProductByType = productByTypeResponse.data;
+            setOpenLoadingModal(true);
+            let res = await getAllProductByType(productTypeCode);
+            if (res && res.data && res.data.length > 0) {
+                let lstProductByType = res.data;
                 for (const item of lstProductByType) {
                     let productItem: any = _.cloneDeep(item);
                     let productExist = selectedItems.find((it: any) => it.selectedType === 2 && it.barcode === item.barcode);
@@ -329,6 +331,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                     }
                 }
             }
+            setOpenLoadingModal(false);
         } else if (!objectNullOrEmpty(values.product)) {
             let productExist = selectedItems.filter((it: any) => it.selectedType === 2 && it.barcode === values.product.barcode);
             if (productExist != null && productExist.length > 0) {

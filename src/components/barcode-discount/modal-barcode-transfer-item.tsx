@@ -21,7 +21,7 @@ import {
   updateDataDetail,
   updateErrorList,
   updateCheckStock,
-  updateCheckEdit,
+  updateCheckEdit, updateApproveEdit,
 } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
@@ -49,6 +49,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
   const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
+  const approveReject = useAppSelector((state) => state.barcodeDiscount.approveReject);
   const errorList = useAppSelector((state) => state.barcodeDiscount.errorList);
 
   const [dtTable, setDtTable] = React.useState<Array<DiscountDetail>>([]);
@@ -285,6 +286,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const handleChangeNote = (e: any) => {
     dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requesterNote: e }));
     setCountText(e.split('').length);
+    dispatch(updateCheckEdit(true));
+  };
+
+  const handleChangeReason = (e: any) => {
+    dispatch(updateApproveEdit({ ...approveReject, approvalNote: e }));
     dispatch(updateCheckEdit(true));
   };
 
@@ -675,28 +681,54 @@ export const ModalTransferItem = (props: DataGridProps) => {
         // onCellFocusOut={handleCalculateItems}
       />
       <Box display="flex" justifyContent="space-between" paddingTop="30px">
-        <Box>
-          <Typography fontSize="14px" lineHeight="21px" height="24px">
-            หมายเหตุจากสาขา :{' '}
-          </Typography>
-          <TextField
-            placeholder=" ความยาวไม่เกิน 100 ตัวอักษร"
-            multiline
-            rows={5}
-            className={classes.MTextareaBD}
-            inputProps={{
-              maxLength: '100',
-            }}
-            sx={{ width: '339px' }}
-            variant="outlined"
-            value={payloadBarcodeDiscount ? payloadBarcodeDiscount.requesterNote : ''}
-            onChange={(e) => {
-              handleChangeNote(e.target.value);
-            }}
-            disabled={dataDetail.status > 1}
-          />
-          <Box color="#AEAEAE" width="100%" textAlign="right">
-            {countText}/100
+        <Box display="flex">
+          <Box>
+            <Typography fontSize="14px" lineHeight="21px" height="24px">
+              หมายเหตุจากสาขา :{' '}
+            </Typography>
+            <TextField
+              placeholder=" ความยาวไม่เกิน 100 ตัวอักษร"
+              multiline
+              rows={5}
+              className={classes.MTextareaBD}
+              inputProps={{
+                maxLength: '100',
+              }}
+              sx={{ width: '339px' }}
+              variant="outlined"
+              value={payloadBarcodeDiscount ? payloadBarcodeDiscount.requesterNote : ''}
+              onChange={(e) => {
+                handleChangeNote(e.target.value);
+              }}
+              disabled={dataDetail.status > 1}
+            />
+            <Box color="#AEAEAE" width="100%" textAlign="right">
+              {countText}/100
+            </Box>
+          </Box>
+          <Box sx={{paddingLeft: 20}} style={{ display: (dataDetail.status > 1 && approvePermission) ? undefined : 'none' }}>
+            <Typography fontSize="14px" lineHeight="21px" height="24px">
+              หมายเหตุจากผู้อนุมัติ :{' '}
+            </Typography>
+            <TextField
+                placeholder=" ความยาวไม่เกิน 100 ตัวอักษร"
+                multiline
+                rows={5}
+                className={classes.MTextareaBD}
+                inputProps={{
+                  maxLength: '100',
+                }}
+                sx={{ width: '339px' }}
+                variant="outlined"
+                value={approveReject ? approveReject.approvalNote : ''}
+                onChange={(e) => {
+                  handleChangeReason(e.target.value);
+                }}
+                disabled={!approvePermission}
+            />
+            <Box color="#AEAEAE" width="100%" textAlign="right">
+              {approveReject ? approveReject.approvalNote.split('').length : 0}/100
+            </Box>
           </Box>
         </Box>
         <Box width="350px" marginTop="20px">
