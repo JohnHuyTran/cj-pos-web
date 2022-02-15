@@ -20,6 +20,7 @@ import { env } from '../../adapters/environmentConfigs';
 import { getAccessToken, setUserInfo } from '../../store/sessionStore';
 import { getDecodedAccessToken } from '../../utils/utils';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
+import { useTranslation } from 'react-i18next';
 
 interface State {
   branch: string;
@@ -30,7 +31,7 @@ interface State {
 
 function LoginForm() {
   const classes = loginFormStyle();
-
+  const { t } = useTranslation(['error', 'common']);
   const [values, setValues] = React.useState<State>({
     password: '',
     userId: '',
@@ -76,7 +77,7 @@ function LoginForm() {
           <img src='images/CJlogo.png' alt='' />
         </div>
 
-        <div id='error'> {error && <p style={{ color: 'red', fontSize: '12px' }}>{error}</p>}</div>
+        <div id='error'> {error && <p style={{ color: 'red', fontSize: '12px' }}>{t(error)}</p>}</div>
         <div>
           <FormControl sx={{ m: 3 }} className={clsx(classes.textField)} variant='outlined'>
             <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>

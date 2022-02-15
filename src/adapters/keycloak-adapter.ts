@@ -10,8 +10,10 @@ import {
   getRefreshToken,
   setUserInfo,
 } from '../store/sessionStore';
-import { getDecodedAccessToken } from '../utils/utils';
+import { getDecodedAccessToken, objectNullOrEmpty, stringNullOrEmpty } from '../utils/utils';
 import { getUserGroup } from '../utils/role-permission';
+import { POSException } from '../utils/exception/pos-exception';
+import { ERROR_CODE } from '../utils/enum/common-enum';
 
 const instance = axios.create({
   baseURL: env.keycloak.url,
@@ -40,6 +42,11 @@ export function authentication(payload: loginForm): Promise<Response> {
         setSessionId(response.data.session_state);
         let userInfo = getDecodedAccessToken(response.data.access_token ? response.data.access_token : '');
         const _group = getUserGroup(userInfo.groups);
+        if (stringNullOrEmpty(_group)) {
+          const err = new POSException(401, ERROR_CODE.NOT_AUTHORIZE, 'ผู้ใช้งานไม่สิทธิ์');
+          throw err;
+        }
+
         userInfo = { ...userInfo, group: _group ? _group : '' };
         setUserInfo(userInfo);
         return response.data;
@@ -47,8 +54,15 @@ export function authentication(payload: loginForm): Promise<Response> {
       throw new Error(response.status.toString());
     })
     .catch((error: any) => {
-      throw new Error(error.response.data.error_description);
-      // throw new KeyCloakError(error.response.status,error.response.data.error_description);
+      console.log(error.code);
+      if (error.code === 'ECONNABORTED') {
+        const err = new POSException(
+          error.response?.status,
+          ERROR_CODE.TIME_OUT,
+          'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
+        );
+        throw err;
+      }
     });
 }
 
