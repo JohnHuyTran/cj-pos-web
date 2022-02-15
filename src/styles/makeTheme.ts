@@ -373,6 +373,7 @@ const useStyles = makeStyles({
       textOverflow: 'ellipsis',
       overflow: 'hidden',
       whiteSpace: 'nowrap',
+      paddingLeft: '12px',
     },
   },
   MWrapperListBranch: {

@@ -238,7 +238,7 @@ export default function SearchBranch(props: Props): ReactElement {
         className={`${classes.MtextFieldNumber} ${classes.MSearchBranchInput}`}
         sx={{ textAlign: 'left' }}
         InputProps={{
-          endAdornment: <SearchIcon color="primary" />,
+          endAdornment: <SearchIcon color="primary" sx={{ marginRight: '12px' }} />,
           inputProps: {
             style: { textAlignLast: 'start' },
           },
@@ -253,6 +253,7 @@ export default function SearchBranch(props: Props): ReactElement {
             marginRight: 0,
           },
         }}
+        placeholder="กรุณาเลือก"
       />
       <Dialog maxWidth="lg" fullWidth open={open}>
         <Box sx={{ flex: 1, ml: 2 }}>
