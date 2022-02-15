@@ -26,11 +26,13 @@ import StockTransferList from '../../components/stock-transfer/stock-transfer-li
 import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
 import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
-import { isAllowActionPermission } from '../../utils/role-permission';
+import { isAllowActionPermission, isGroupBranch, isGroupDC } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { getBranchName } from '../../utils/utils';
 import { env } from '../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../models/branch-model';
+import { getUserInfo } from '../../store/sessionStore';
+import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 
 interface State {
   docNo: string;
@@ -72,25 +74,34 @@ export default function SupplierCheckOrderSearch() {
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(null);
+
   const [branchFromCode, setBranchFromCode] = React.useState('');
   const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   React.useEffect(() => {
-    // console.log('show: ', isAllowActionPermission('test'));
     setDisplaySearchBtn(isAllowActionPermission(ACTIONS.PURCHASE_PI_CLOSE));
-    const branchFrom = getBranchName(branchList, env.branch.code);
-    const branchFromMap: BranchListOptionType = {
-      code: env.branch.code,
-      name: branchFrom ? branchFrom : '',
-    };
-    setValuebranchFrom(branchFromMap);
-    setBranchFromCode(env.branch.code);
-    console.log('value branch from', branchFromMap);
+    if (groupBranch) {
+      setBranchFromCode(env.branch.code);
+      setValues({ ...values, branchFrom: env.branch.code });
+    }
   }, []);
 
+  const branchFrom = getBranchName(branchList, env.branch.code);
+  const branchFromMap: BranchListOptionType = {
+    code: env.branch.code,
+    name: branchFrom ? branchFrom : '',
+  };
+  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
+    groupBranch
+      ? branchFromMap
+      : {
+          code: '',
+          name: '',
+        }
+  );
+
   const handleChangeBranchFrom = (branchCode: string) => {
-    console.log('handleChangeBranchFrom:', branchCode);
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
       setBranchFromCode(branchCode);
@@ -271,7 +282,7 @@ export default function SupplierCheckOrderSearch() {
               sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
-              disable={true}
+              disable={false}
             />
           </Grid>
           <Grid item xs={4}>
