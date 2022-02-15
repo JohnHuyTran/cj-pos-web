@@ -19,6 +19,7 @@ import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-retur
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import StockTransferBT from './stock-transfer-bt';
 
 interface loadingModalState {
   open: boolean;
@@ -48,7 +49,7 @@ function StockTransferList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -80,7 +81,7 @@ function StockTransferList() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
             {params.value} - {params.getValue(params.id, 'endDate') || ''}
           </Typography>
         </div>
@@ -96,7 +97,7 @@ function StockTransferList() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
             {params.getValue(params.id, 'branchFrom') || ''}-{params.value}
           </Typography>
         </div>
@@ -112,7 +113,7 @@ function StockTransferList() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
             {params.getValue(params.id, 'branchTo') || ''}-{params.value}
           </Typography>
         </div>
@@ -145,7 +146,7 @@ function StockTransferList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
@@ -153,7 +154,7 @@ function StockTransferList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
@@ -279,7 +280,7 @@ function StockTransferList() {
   };
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -293,7 +294,7 @@ function StockTransferList() {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
@@ -302,7 +303,8 @@ function StockTransferList() {
         </div>
       </Box>
       {/* {opensDCOrderDetail && <DCOrderDetail idDC={idDC} isOpen={opensDCOrderDetail} onClickClose={isClosModal} />} */}
-      {openCreateModal && <StockPackChecked isOpen={true} onClickClose={handleCloseCreateModal} />}
+      {/* {openCreateModal && <StockPackChecked isOpen={true} onClickClose={handleCloseCreateModal} />} */}
+      {openCreateModal && <StockTransferBT isOpen={true} onClickClose={handleCloseCreateModal} />}
       <LoadingModal open={openLoadingModal.open} />
     </div>
   );

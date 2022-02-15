@@ -21,7 +21,6 @@ function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isC
   const [valueBranchList, setValueBranchList] = React.useState<BranchListOptionType | null>(null);
   let branchList = useAppSelector((state) => state.searchBranchSlice);
   useEffect(() => {
-    console.log('componet branch: ', valueBranch);
     if (branchList === null || branchList.branchList.data.length <= 0) dispatch(featchBranchListAsync());
 
     if (valueBranch) setValueBranchList(valueBranch);
