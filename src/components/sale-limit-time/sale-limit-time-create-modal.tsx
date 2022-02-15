@@ -24,17 +24,16 @@ import SearchBranch from '../commons/ui/search-branch';
 import ImportAppIcon from '@mui/icons-material/ExitToApp';
 import STProductTypeItems from './ST-product-type-item';
 import STProductItems from './ST-product-item';
-import TimePickerComponent from '../commons/ui/time-picker-detail';
 import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 
 interface State {
   stNo: string;
   detailMsg: string;
-  startDate: Date | null;
-  endDate: Date | null;
-  startTime: Date | null;
-  endTime: Date | null;
+  startDate: any;
+  endDate: any;
+  startTime: string | null;
+  endTime: string | null;
   comment: string;
 }
 
@@ -80,8 +79,8 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   const [values, setValues] = React.useState<State>({
     stNo: '',
     detailMsg: '',
-    startDate: null,
-    endDate: null,
+    startDate: new Date(),
+    endDate: new Date(),
     startTime: null,
     endTime: null,
     comment: '',
@@ -98,6 +97,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   };
   const [showModalProduct, setShowModalProduct] = React.useState(true);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const [selectProductType, setSelectProductType] = React.useState(false);
 
   useEffect(() => {
     setShowModalProduct(!!Object.keys(payloadAddTypeProduct).length);
@@ -142,7 +142,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
     });
   };
 
-  const handleStartDatePicker = (value: any) => {
+  const handleStartDatePicker = (value: Date) => {
     setValues({
       ...values,
       startDate: value,
@@ -156,14 +156,14 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
     });
   };
 
-  const handleStartTimePicker = (value: Date) => {
+  const handleStartTimePicker = (value: string) => {
     setValues({
       ...values,
       startTime: value,
     });
   };
 
-  const handleEndTimePicker = (value: Date) => {
+  const handleEndTimePicker = (value: string) => {
     setValues({
       ...values,
       endTime: value,
@@ -199,6 +199,14 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   const [textError, setTextError] = React.useState('');
   const handleCloseAlert = () => {
     setOpenAlert(false);
+  };
+
+  const handleCreateSTDetail = () => {
+    console.log(values);
+  };
+
+  const unSelectAllType = (showAll: boolean) => {
+    setSelectProductType(showAll);
   };
 
   return (
@@ -271,14 +279,34 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               วันที่สิ้นสุดงดขาย :
             </Grid>
             <Grid item xs={3}>
-              <TimePickerComponent error={false} onClickTime={handleStartTimePicker} value={values.startTime} />
+              <TextField
+                id="time-start"
+                type="time"
+                fullWidth
+                className={classes.MtimeTextField}
+                value={values.startTime}
+                onChange={(e) => handleStartTimePicker(e.target.value)}
+                inputProps={{
+                  step: 300,
+                }}
+              />
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
               เวลาที่สิ้นสุดงดขาย :
             </Grid>
             <Grid item xs={3}>
-              <TimePickerComponent error={false} onClickTime={handleEndTimePicker} value={values.endTime} />
+              <TextField
+                id="time-end"
+                type="time"
+                fullWidth
+                className={classes.MtimeTextField}
+                value={values.endTime}
+                onChange={(e) => handleEndTimePicker(e.target.value)}
+                inputProps={{
+                  step: 300,
+                }}
+              />
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
@@ -320,7 +348,14 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               </Button>
             </Grid>
             <Grid item xs={7} sx={{ textAlign: 'end' }}>
-              <Button variant="contained" color="warning" startIcon={<SaveIcon />} className={classes.MbtnSearch}>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={handleCreateSTDetail}
+                startIcon={<SaveIcon />}
+                className={classes.MbtnSearch}
+                disabled={!!!Object.keys(payloadAddTypeProduct).length}
+              >
                 บันทึก
               </Button>
               <Button
@@ -329,19 +364,26 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                 sx={{ margin: '0 17px' }}
                 startIcon={<CheckCircleOutlineIcon />}
                 className={classes.MbtnSearch}
+                disabled={!!!Object.keys(payloadAddTypeProduct).length}
               >
                 เริ่มใช้งาน
               </Button>
-              <Button variant="contained" color="error" startIcon={<HighlightOffIcon />} className={classes.MbtnSearch}>
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<HighlightOffIcon />}
+                disabled={!!!Object.keys(payloadAddTypeProduct).length}
+                className={classes.MbtnSearch}
+              >
                 ยกเลิก
               </Button>
             </Grid>
           </Grid>
 
           <Box mb={4}>
-            <STProductTypeItems />
+            <STProductTypeItems selectProductType={selectProductType} />
           </Box>
-          <Box mb={4}>{showModalProduct && <STProductItems />}</Box>
+          <Box mb={4}>{showModalProduct && <STProductItems unSelectAllType={unSelectAllType} />}</Box>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={3}>
               <Typography fontSize="14px" lineHeight="21px" height="24px">

@@ -20,10 +20,15 @@ import { updateAddTypeAndProductState } from '../../store/slices/add-type-produc
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { STProductDetail } from '../../models/sale-limit-time';
 
-export default function STProductItems(): ReactElement {
+const _ = require('lodash');
+
+interface Props {
+  unSelectAllType: (showAll: boolean) => void;
+}
+
+export default function STProductItems({ unSelectAllType }: Props): ReactElement {
   const classes = useStyles();
   const [updateData, setUpdateData] = React.useState(false);
-  const [showAll, setShowAll] = React.useState(false);
   const [dtTable, setDtTable] = React.useState<Array<STProductDetail>>([]);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -36,7 +41,7 @@ export default function STProductItems(): ReactElement {
   useEffect(() => {
     if (Object.keys(payloadAddTypeProduct).length !== 0) {
       let rows = payloadAddTypeProduct
-        .filter((el: any) => el.selectedType === 2)
+        .filter((el: any) => el.selectedType === 2 && el.showProduct)
         .map((item: any, index: number) => {
           return {
             id: item.barcode,
@@ -53,14 +58,20 @@ export default function STProductItems(): ReactElement {
       setDtTable([]);
     }
   }, [payloadAddTypeProduct, updateData]);
-  const handleShowProducts = () => {
+  const handleShowProducts = (e: any) => {
+    const showAll = e.target.checked;
     if (showAll) {
-      setShowAll(false);
-      setDtTable([]);
+      let newList = _.cloneDeep(payloadAddTypeProduct);
+      newList.map((el: any) => {
+        if (el.selectedType === 2) {
+          el.showProduct = true;
+        }
+      });
+      dispatch(updateAddTypeAndProductState(newList));
     } else {
-      setShowAll(true);
-      setUpdateData(!updateData);
+      setDtTable([]);
     }
+    unSelectAllType(showAll);
   };
   const columns: GridColDef[] = [
     {
@@ -136,7 +147,17 @@ export default function STProductItems(): ReactElement {
 
         const handleDeleteItem = () => {
           let newList = payloadAddTypeProduct.filter((r: any) => r.barcode !== params.row.id);
-          dispatch(updateAddTypeAndProductState(newList));
+          let listCodeProductByType = newList
+            .filter((el: any) => el.productByType)
+            .map((el1: any) => el1.ProductTypeCode);
+
+          let listAdd = newList.filter((item: any) => {
+            if (item.selectedType === 1 && !listCodeProductByType.includes(item.productTypeCode)) {
+              return false;
+            } else return true;
+          });
+
+          dispatch(updateAddTypeAndProductState(listAdd));
           setOpenModalDelete(false);
           setShowSnackBar(true);
         };
