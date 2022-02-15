@@ -382,12 +382,19 @@ const useStyles = makeStyles({
       transform: 'none !important',
     },
   },
+  MSearchBranchInput: {
+    '& .MuiOutlinedInput-input': {
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      paddingLeft: '12px',
+    },
+  },
   MWrapperListBranch: {
     border: '1px solid #C1C1C1',
     borderRadius: '10px',
     padding: '15px 13px',
     minHeight: '270px',
-    marginTop: '26px !important',
     '& .wrapper-item': {
       border: '1px solid #AEAEAE',
       boxSizing: 'border-box',
