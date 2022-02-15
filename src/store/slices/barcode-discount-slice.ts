@@ -5,6 +5,7 @@ type ItemsState = {
   createDraft: any;
   validate: boolean;
   dataDetail: any;
+  approveReject: any;
   errorList: any;
   checkStock: any;
   checkEdit: boolean;
@@ -25,6 +26,15 @@ const initialState: ItemsState = {
     status: 0,
     createdDate: moment(new Date()).toISOString(),
     percentDiscount: true,
+  },
+  approveReject: {
+    branchId: '61dffd619bfc3701dce4eda4',
+    regionId: '61de9ddab10bfe85dfab22e9',
+    requesterId: '61de9ddab10bfe85dfab22e9',
+    id: '',
+    products: [],
+    approvalNote: '',
+    reason: '',
   },
   errorList: [],
   checkStock: [],
@@ -53,6 +63,9 @@ const barcodeDiscountSlice = createSlice({
     updateCheckEdit: (state, action: any) => {
       state.checkEdit = action.payload;
     },
+    updateApproveEdit: (state, action: any) => {
+      state.approveReject = action.payload;
+    },
   },
 });
 export const {
@@ -62,5 +75,6 @@ export const {
   updateErrorList,
   updateCheckStock,
   updateCheckEdit,
+  updateApproveEdit
 } = barcodeDiscountSlice.actions;
 export default barcodeDiscountSlice.reducer;

@@ -45,6 +45,7 @@ import ModalCheckPrice from './modal-check-price';
 import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import {ACTIONS} from "../../utils/enum/permission-enum";
+import ModalReject from "./modal-reject";
 interface Props {
   action: Action | Action.INSERT;
   isOpen: boolean;
@@ -70,6 +71,7 @@ export default function ModalCreateBarcodeDiscount({
 
   const [valueRadios, setValueRadios] = React.useState<string>('percent');
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
+  const [openModalReject, setOpenModalReject] = React.useState<boolean>(false);
   const classes = useStyles();
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
@@ -108,6 +110,14 @@ export default function ModalCreateBarcodeDiscount({
 
   const handleCloseModalCancel = () => {
     setOpenModalCancel(false);
+  };
+
+  const handleOpenModalReject = () => {
+    setOpenModalReject(true);
+  };
+
+  const handleCloseModalReject = () => {
+    setOpenModalReject(false);
   };
 
   const handleClosePopup = () => {
@@ -432,6 +442,10 @@ export default function ModalCreateBarcodeDiscount({
     } catch (error) {}
   };
 
+  const handleReject = () => {
+    setOpenModalReject(true);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={!!true}>
@@ -563,6 +577,7 @@ export default function ModalCreateBarcodeDiscount({
                     style={{display: (status > 1 && approvePermission) ? undefined : 'none'}}
                     color='error'
                     startIcon={<HighlightOffIcon />}
+                    onClick={handleReject}
                     className={classes.MbtnSearch}>
                   ไม่อนุมัติ
                 </Button>
@@ -599,6 +614,11 @@ export default function ModalCreateBarcodeDiscount({
       />
       <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts} />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
+      <ModalReject
+          open={openModalReject}
+          onClose={handleCloseModalReject}
+          barCode={dataDetail.documentNumber}
+      />
     </div>
   );
 }
