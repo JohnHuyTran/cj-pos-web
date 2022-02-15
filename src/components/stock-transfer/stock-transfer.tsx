@@ -28,6 +28,9 @@ import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import { isAllowActionPermission } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
+import { getBranchName } from '../../utils/utils';
+import { env } from '../../adapters/environmentConfigs';
+import { BranchListOptionType } from '../../models/branch-model';
 
 interface State {
   docNo: string;
@@ -68,28 +71,26 @@ export default function SupplierCheckOrderSearch() {
   });
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
-
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
-  };
-
-  const handleChange = (event: any) => {
-    const value = event.target.value;
-    setValues({ ...values, [event.target.name]: value });
-  };
-
-  const handleStartDatePicker = (value: any) => {
-    setStartDate(value);
-  };
-
-  const handleEndDatePicker = (value: Date) => {
-    setEndDate(value);
-  };
-
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(null);
   const [branchFromCode, setBranchFromCode] = React.useState('');
   const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  React.useEffect(() => {
+    // console.log('show: ', isAllowActionPermission('test'));
+    setDisplaySearchBtn(isAllowActionPermission(ACTIONS.PURCHASE_PI_CLOSE));
+    const branchFrom = getBranchName(branchList, env.branch.code);
+    const branchFromMap: BranchListOptionType = {
+      code: env.branch.code,
+      name: branchFrom ? branchFrom : '',
+    };
+    setValuebranchFrom(branchFromMap);
+    setBranchFromCode(env.branch.code);
+    console.log('value branch from', branchFromMap);
+  }, []);
+
   const handleChangeBranchFrom = (branchCode: string) => {
+    console.log('handleChangeBranchFrom:', branchCode);
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
       setBranchFromCode(branchCode);
@@ -107,6 +108,23 @@ export default function SupplierCheckOrderSearch() {
     } else {
       setValues({ ...values, branchTo: '' });
     }
+  };
+
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+
+  const handleChange = (event: any) => {
+    const value = event.target.value;
+    setValues({ ...values, [event.target.name]: value });
+  };
+
+  const handleStartDatePicker = (value: any) => {
+    setStartDate(value);
+  };
+
+  const handleEndDatePicker = (value: Date) => {
+    setEndDate(value);
   };
 
   const handleChangeReasons = (ReasonsCode: string) => {
@@ -225,11 +243,6 @@ export default function SupplierCheckOrderSearch() {
     }
   }
 
-  React.useEffect(() => {
-    // console.log('show: ', isAllowActionPermission('test'));
-    setDisplaySearchBtn(isAllowActionPermission(ACTIONS.PURCHASE_PI_CLOSE));
-  }, []);
-
   return (
     <>
       <Box>
@@ -254,9 +267,11 @@ export default function SupplierCheckOrderSearch() {
               สาขาต้นทาง
             </Typography>
             <BranchListDropDown
+              valueBranch={valuebranchFrom}
               sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
+              disable={true}
             />
           </Grid>
           <Grid item xs={4}>

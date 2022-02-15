@@ -5,25 +5,23 @@ import { useStyles } from '../../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { featchBranchListAsync } from '../../../store/slices/search-branches-slice';
 import { BranchInfo } from '../../../models/search-branch-model';
-
-interface branchListOptionType {
-  name: string;
-  code: string;
-}
+import { BranchListOptionType } from '../../../models/branch-model';
 
 interface Props {
-  valueBranch?: branchListOptionType | null;
+  valueBranch?: BranchListOptionType | null;
   sourceBranchCode: string | null | undefined | '';
   onChangeBranch: (branchCode: string) => void;
   isClear: boolean;
+  disable?: boolean;
 }
 
-function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isClear }: Props) {
+function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isClear, disable }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const [valueBranchList, setValueBranchList] = React.useState<branchListOptionType | null>(null);
+  const [valueBranchList, setValueBranchList] = React.useState<BranchListOptionType | null>(null);
   let branchList = useAppSelector((state) => state.searchBranchSlice);
   useEffect(() => {
+    console.log('componet branch: ', valueBranch);
     if (branchList === null || branchList.branchList.data.length <= 0) dispatch(featchBranchListAsync());
 
     if (valueBranch) setValueBranchList(valueBranch);
@@ -34,10 +32,10 @@ function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isC
     options: branchList.branchList.data.filter((branch: BranchInfo) => {
       return branch.code !== sourceBranchCode;
     }),
-    getOptionLabel: (option: branchListOptionType) => `${option.code}-${option.name}`,
+    getOptionLabel: (option: BranchListOptionType) => `${option.code}-${option.name}`,
   };
 
-  const handleChangeBranch = (event: any, newValue: branchListOptionType | null) => {
+  const handleChangeBranch = (event: any, newValue: BranchListOptionType | null) => {
     setValueBranchList(newValue);
     return onChangeBranch(newValue?.code ? newValue.code : '');
   };
@@ -60,6 +58,7 @@ function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isC
       renderInput={(params) => (
         <TextField {...params} placeholder='ทั้งหมด' size='small' className={classes.MtextField} fullWidth />
       )}
+      disabled={disable ? true : false}
     />
   );
 }
