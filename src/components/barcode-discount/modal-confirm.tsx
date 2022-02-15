@@ -10,14 +10,15 @@ import LoadingModal from '../commons/ui/loading-modal';
 interface Props {
   open: boolean;
   onClose: () => void;
-  onDeleteAction: () => void;
+  onConfirm: () => void;
   barCode: string;
+  headerTitle: string;
 }
 interface loadingModalState {
   open: boolean;
 }
 
-export default function ModelConfirm({ open, onClose, onDeleteAction, barCode }: Props): ReactElement {
+export default function ModelConfirm({ open, onClose, onConfirm, barCode, headerTitle }: Props): ReactElement {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
@@ -28,7 +29,7 @@ export default function ModelConfirm({ open, onClose, onDeleteAction, barCode }:
 
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-    await onDeleteAction();
+    await onConfirm();
     handleOpenLoading('open', false);
     onClose();
   };
@@ -45,7 +46,7 @@ export default function ModelConfirm({ open, onClose, onDeleteAction, barCode }:
         <DialogContent sx={{ mt: 3, mr: 5, ml: 5 }}>
           <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
             <Typography variant="h6" align="center" sx={{ marginBottom: 3 }}>
-              ยืนยันยกเลิกขอส่วนลดสินค้า
+              {headerTitle}
             </Typography>
             {!!barCode && (
               <Typography variant="body1" align="center">

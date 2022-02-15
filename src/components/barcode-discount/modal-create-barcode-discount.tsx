@@ -28,7 +28,7 @@ import {
   updateDataDetail,
   updateErrorList,
   updateCheckStock,
-  updateCheckEdit,
+  updateCheckEdit, updateApproveReject,
 } from '../../store/slices/barcode-discount-slice';
 import {
   sendForApprovalBarcodeDiscount,
@@ -39,7 +39,7 @@ import {
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action } from '../../utils/enum/common-enum';
+import {Action, BDStatus} from '../../utils/enum/common-enum';
 import ModalCheckStock from './modal-check-stock';
 import ModalCheckPrice from './modal-check-price';
 import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
@@ -71,6 +71,7 @@ export default function ModalCreateBarcodeDiscount({
 
   const [valueRadios, setValueRadios] = React.useState<string>('percent');
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
+  const [openModalConfirmApprove, setOpenModalConfirmApprove] = React.useState<boolean>(false);
   const [openModalReject, setOpenModalReject] = React.useState<boolean>(false);
   const classes = useStyles();
 
@@ -87,6 +88,7 @@ export default function ModalCreateBarcodeDiscount({
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
   const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
+  const approveReject = useAppSelector((state) => state.barcodeDiscount.approveReject);
   const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
   const checkEdit = useAppSelector((state) => state.barcodeDiscount.checkEdit);
 
@@ -112,12 +114,28 @@ export default function ModalCreateBarcodeDiscount({
     setOpenModalCancel(false);
   };
 
+  const handleOpenModalConfirmApprove = () => {
+    setOpenModalConfirmApprove(true);
+  };
+
+  const handleCloseModalConfirmApprove = (confirm: boolean) => {
+    setOpenModalConfirmApprove(false);
+    if (confirm) {
+      handleApprove();
+    }
+  };
+
   const handleOpenModalReject = () => {
     setOpenModalReject(true);
   };
 
-  const handleCloseModalReject = () => {
+  const handleCloseModalReject = (confirm: boolean) => {
     setOpenModalReject(false);
+    if (confirm) {
+      setTextPopup('คุณได้ทำการไม่อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
+      setOpenPopupModal(true);
+      handleClose();
+    }
   };
 
   const handleClosePopup = () => {
@@ -184,6 +202,13 @@ export default function ModalCreateBarcodeDiscount({
           percentDiscount: barcodeDiscountDetail.percentDiscount,
         })
       );
+      //set value for approve/reject
+      dispatch(
+          updateApproveReject({
+            ...approveReject,
+            approvalNote: barcodeDiscountDetail.rejectReason
+          })
+      );
       //set value for products
       if (barcodeDiscountDetail.products != null && barcodeDiscountDetail.products.length > 0) {
         let lstProductDetail: any = [];
@@ -241,17 +266,18 @@ export default function ModalCreateBarcodeDiscount({
             id: preData.barcode,
             errorDiscount: '',
             errorNumberOfDiscounted: '',
+            errorNumberOfApproved: '',
             errorExpiryDate: '',
           };
 
           if (checkApprove) {
             if (stringNullOrEmpty(preData.numberOfApproved) || preData.numberOfApproved <= 0) {
               isValid = false;
-              item.errorNumberOfDiscounted = 'จำนวนที่อนุมัติต้องมากกว่า 0';
+              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องมากกว่า 0';
             } else {
               if (preData.numberOfApproved > preData.numberOfDiscounted) {
                 isValid = false;
-                item.errorNumberOfDiscounted = 'จำนวนที่อนุมัติต้องไม่เกินจำนวนที่ขอลด';
+                item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่เกินจำนวนที่ขอลด';
               }
             }
           } else {
@@ -281,7 +307,9 @@ export default function ModalCreateBarcodeDiscount({
               item.errorExpiryDate = 'กรุณาระบุวันหมดอายุ';
             }
           }
-         dt.push(item);
+          if(!isValid) {
+            dt.push(item);
+          }
        }
        dataAfterValidate = dt;
     }
@@ -291,6 +319,7 @@ export default function ModalCreateBarcodeDiscount({
   const handleCreateDraft = async (sendRequest: boolean) => {
     if (validate(false)) {
       // const rsCheckStock = await handleCheckStock();
+      // if (rsCheckStock) {
       if (true) {
         await dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount}));
         try {
@@ -343,7 +372,7 @@ export default function ModalCreateBarcodeDiscount({
         dispatch(
           updateDataDetail({
             ...dataDetail,
-            status: 2,
+            status: Number(BDStatus.WAIT_FOR_APPROVAL),
           })
         );
         setOpenPopup(true);
@@ -361,19 +390,19 @@ export default function ModalCreateBarcodeDiscount({
     }
   };
 
-  const handleApprove = async (id: string) => {
+  const handleApprove = async () => {
     if (validate(true)) {
       try {
-        const rs = await approveBarcodeDiscount(id);
-        if (rs.code === 200) {
+        const rs = await approveBarcodeDiscount(dataDetail.id, payloadBarcodeDiscount.products);
+        if (rs.code === 20000) {
           dispatch(
               updateDataDetail({
                 ...dataDetail,
-                status: 3,
+                status: Number(BDStatus.APPROVED),
               })
           );
           setOpenPopup(true);
-          setPopupMsg('คุณได้ส่งอนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
+          setPopupMsg('คุณได้อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
           handleClose();
           if (onSearchBD) onSearchBD();
         } else if (rs.code === 50003) {
@@ -443,7 +472,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleReject = () => {
-    setOpenModalReject(true);
+    handleOpenModalReject();
   };
 
   return (
@@ -517,7 +546,7 @@ export default function ModalCreateBarcodeDiscount({
             </Grid>
           </Grid>
           <Box>
-            <Box sx={{ display: 'flex', marginBottom: '18px', marginTop: '20px' }}>
+            <Box sx={{ display: 'flex', marginBottom: '18px'}}>
               <Box>
                 <Button
                   id='btnAddItem'
@@ -527,6 +556,7 @@ export default function ModalCreateBarcodeDiscount({
                   startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
+                  style={{display: (status > 1 && approvePermission) ? 'none' : undefined}}
                   disabled={status > 1}>
                   เพิ่มสินค้า
                 </Button>
@@ -565,16 +595,17 @@ export default function ModalCreateBarcodeDiscount({
                 </Button>
                 <Button
                     sx={{ margin: '0 17px' }}
-                    style={{display: (status > 1 && approvePermission) ? undefined : 'none'}}
+                    style={{display: (status > Number(BDStatus.DRAFT) && status < Number(BDStatus.APPROVED) && approvePermission) ? undefined : 'none'}}
                     variant='contained'
                     color='primary'
                     startIcon={<CheckCircleOutlineIcon />}
+                    onClick={handleOpenModalConfirmApprove}
                     className={classes.MbtnSearch}>
                   อนุมัติ
                 </Button>
                 <Button
                     variant='contained'
-                    style={{display: (status > 1 && approvePermission) ? undefined : 'none'}}
+                    style={{display: (status > Number(BDStatus.DRAFT) && status < Number(BDStatus.APPROVED) && approvePermission) ? undefined : 'none'}}
                     color='error'
                     startIcon={<HighlightOffIcon />}
                     onClick={handleReject}
@@ -597,8 +628,9 @@ export default function ModalCreateBarcodeDiscount({
       <ModelConfirm
         open={openModalCancel}
         onClose={handleCloseModalCancel}
-        onDeleteAction={handleDeleteDraft}
+        onConfirm={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
+        headerTitle={'ยืนยันยกเลิกขอส่วนลดสินค้า'}
       />
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
       <AlertError
@@ -614,10 +646,18 @@ export default function ModalCreateBarcodeDiscount({
       />
       <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts} />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
+      <ModelConfirm
+          open={openModalConfirmApprove}
+          onClose={() => handleCloseModalConfirmApprove(false)}
+          onConfirm={() => handleCloseModalConfirmApprove(true)}
+          barCode={dataDetail.documentNumber}
+          headerTitle={'ยืนยันอนุมัติส่วนลดสินค้า'}
+      />
       <ModalReject
           open={openModalReject}
-          onClose={handleCloseModalReject}
+          onClose={(confirm) => handleCloseModalReject(confirm)}
           barCode={dataDetail.documentNumber}
+          id={dataDetail.id}
       />
     </div>
   );

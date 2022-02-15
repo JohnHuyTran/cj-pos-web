@@ -63,7 +63,7 @@ const barcodeDiscountSlice = createSlice({
     updateCheckEdit: (state, action: any) => {
       state.checkEdit = action.payload;
     },
-    updateApproveEdit: (state, action: any) => {
+    updateApproveReject: (state, action: any) => {
       state.approveReject = action.payload;
     },
   },
@@ -75,6 +75,6 @@ export const {
   updateErrorList,
   updateCheckStock,
   updateCheckEdit,
-  updateApproveEdit
+  updateApproveReject
 } = barcodeDiscountSlice.actions;
 export default barcodeDiscountSlice.reducer;
