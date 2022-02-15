@@ -7,16 +7,22 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
+import { GridSelectionModel } from '@mui/x-data-grid';
 
 const _ = require('lodash');
 
-export default function STProductTypeItems(): ReactElement {
+interface Props {
+  selectProductType: boolean;
+}
+
+export default function STProductTypeItems({ selectProductType }: Props): ReactElement {
   const classes = useStyles();
   const [dtTable, setDtTable] = React.useState([]);
   const dispatch = useAppDispatch();
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [selectionModel, setSelectionModel] = React.useState<any>([]);
   useEffect(() => {
     if (Object.keys(payloadAddTypeProduct).length !== 0) {
       let rows = payloadAddTypeProduct
@@ -27,12 +33,15 @@ export default function STProductTypeItems(): ReactElement {
             index: index + 1,
             productTypeName: item.productTypeName,
             numberOfPruducts: payloadAddTypeProduct.filter(
-              (el1: any) => el1.selectedType === 2 && el1.productTypeCode === item.productTypeCode
+              (el1: any) => el1.selectedType === 2 && el1.ProductTypeCode === item.productTypeCode
             ).length,
           };
         });
 
       setDtTable(rows);
+      let listProductShow = payloadAddTypeProduct.filter((el: any) => {
+        el.selectedType === 2 && !el.showProduct;
+      });
     } else {
       setDtTable([]);
     }
@@ -41,16 +50,22 @@ export default function STProductTypeItems(): ReactElement {
     setShowSnackBar(false);
   };
 
+  useEffect(() => {
+    if (selectProductType) {
+      setSelectionModel([]);
+    }
+  }, [selectProductType]);
+
   const handleClickRow = (value: any) => {
-    // let newList = _.cloneDeep(listSelect);
-    // newList.map((el: any) => {
-    //   if (el.type === 2 && el.productTypeCode !== value.id) {
-    //     el.categoryTypeSelected = false;
-    //   } else {
-    //     el.categoryTypeSelected = true;
-    //   }
-    // });
-    // dispatch(updateListSelect(newList));
+    let newList = _.cloneDeep(payloadAddTypeProduct);
+    newList.map((el: any) => {
+      if (el.selectedType === 2 && el.ProductTypeCode !== value.id) {
+        el.showProduct = false;
+      } else {
+        el.showProduct = true;
+      }
+    });
+    dispatch(updateAddTypeAndProductState(newList));
   };
 
   const columns: GridColDef[] = [
@@ -119,7 +134,15 @@ export default function STProductTypeItems(): ReactElement {
         };
 
         const handleDeleteItem = () => {
-          let newList = payloadAddTypeProduct.filter((r: any) => r.productTypeCode !== params.row.id);
+          let newList = payloadAddTypeProduct
+            .filter((r: any) => r.productTypeCode !== params.row.id)
+            .filter((r: any) => {
+              if (r.productByType) {
+                return r.ProductTypeCode !== params.row.id;
+              } else {
+                return true;
+              }
+            });
           dispatch(updateAddTypeAndProductState(newList));
           setOpenModalDelete(false);
           setShowSnackBar(true);
@@ -202,6 +225,8 @@ export default function STProductTypeItems(): ReactElement {
             rowsPerPageOptions={[10, 20, 50, 100]}
             pagination
             disableColumnMenu
+            selectionModel={selectionModel}
+            onSelectionModelChange={(selectionModel: GridSelectionModel) => setSelectionModel(selectionModel)}
             onRowClick={(params) => handleClickRow(params.row)}
             autoHeight
             rowHeight={70}

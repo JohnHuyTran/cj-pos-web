@@ -56,6 +56,20 @@ const useStyles = makeStyles({
       '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
     },
   },
+  MtimeTextField: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      padding: '6px 6px 6px 20px',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      fontSize: '14px',
+    },
+    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+      // opacity: 0,
+      color: '#263238 !important',
+      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+    },
+  },
   Mselect: {
     '& .css-y4ygc1-MuiInputBase-root-MuiOutlinedInput-root': {
       borderRadius: '5px !important',
