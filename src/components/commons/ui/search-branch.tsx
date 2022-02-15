@@ -235,7 +235,7 @@ export default function SearchBranch(props: Props): ReactElement {
     <div>
       <TextField
         fullWidth
-        className={classes.MtextFieldNumber}
+        className={`${classes.MtextFieldNumber} ${classes.MSearchBranchInput}`}
         sx={{ textAlign: 'left' }}
         InputProps={{
           endAdornment: <SearchIcon color="primary" />,
@@ -271,7 +271,7 @@ export default function SearchBranch(props: Props): ReactElement {
           ) : null}
         </Box>
         <DialogContent sx={{ padding: '45px 24px 32px 100px' }}>
-          <Grid container spacing={2} sx={{ minHeight: '465px' }}>
+          <Grid container spacing={2}>
             <Grid item xs={5} pr={4}>
               <FormControl sx={{ marginBottom: '15px' }}>
                 <RadioGroup
@@ -290,8 +290,8 @@ export default function SearchBranch(props: Props): ReactElement {
               </FormControl>
               {!allBranches && (
                 <Box>
-                  <Box mb={2}>
-                    <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+                  <Box mb={1}>
+                    <Typography gutterBottom variant="subtitle1" component="div">
                       จังหวัด
                     </Typography>
                     <Autocomplete
@@ -376,7 +376,7 @@ export default function SearchBranch(props: Props): ReactElement {
                 </Box>
               )}
             </Grid>
-            <Grid item xs={7} pr={5}>
+            <Grid item xs={7} pr={5} mt={5}>
               <Box className={classes.MWrapperListBranch}>
                 {allBranches ? (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
@@ -402,7 +402,7 @@ export default function SearchBranch(props: Props): ReactElement {
                 )}
               </Box>
             </Grid>
-            <Grid item xs={12} sx={{ textAlign: 'right' }}>
+            <Grid item xs={12} sx={{ textAlign: 'right', height: '43px', padding: '0 !important', marginTop: '30px' }}>
               {!allBranches && (
                 <Button
                   variant="contained"
