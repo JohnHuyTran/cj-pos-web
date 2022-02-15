@@ -43,23 +43,26 @@ export enum ACTIONS {
 export enum MAINMENU {
   SALE = 'sale',
   ORDER_RECEIVE = 'orderReceive',
+  STOCK_TRANSFER = 'stockTransfer',
 }
 
 export enum SUBMENU {
   SALE_DISCOUNT = 'sale.discount',
-  STOCK_ORDER_RECEIVE = 'orderReceive.orderReceive',
-  STOCK_DIFF = 'orderReceive.stockDiff',
-  STOCK_SUPPLIER = 'orderReceive.supplier',
-  STOCK_REQUEST = 'orderReceive.stockRequest',
-  STOCK_TRANSFER = 'orderReceive.stockTransfer',
+  OR_ORDER_RECEIVE = 'orderReceive.orderReceive',
+  OR_DIFF = 'orderReceive.stockDiff',
+  OR_SUPPLIER = 'orderReceive.supplier',
+  ST_REQUEST = 'stockTransfer.stockRequest',
+  ST_TRANSFER = 'stockTransfer.stockTransfer',
 }
 
 export enum PERMISSION_GROUP {
   DC = 'dc',
   SCM = 'scm',
   OC = 'oc',
+  BRANCH = 'branch',
 }
 
-export const KEYCLOAK_GROUP_DC = '/service.posback/manager';
+export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
 export const KEYCLOAK_GROUP_SCM = '/service.posback/scm';
-export const KEYCLOAK_GROUP_OC = '/service.posback/oc';
+export const KEYCLOAK_GROUP_OC1 = '/service.posback/oc01';
+export const KEYCLOAK_GROUP_BRANCH_MANAGER01 = '/service.posback/branch-manager';
