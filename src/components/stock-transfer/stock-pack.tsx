@@ -284,6 +284,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
   const [pathReport, setPathReport] = React.useState<string>('');
   const [suffixDocType, setSuffixDocType] = React.useState<string>('');
   const [docLayoutLandscape, setDocLayoutLandscape] = React.useState(false);
+  const [isClickBtnApprove, setIsClickBtnApprove] = React.useState(false);
   React.useEffect(() => {
     const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
     setSourceBranch(fromBranch ? fromBranch : '');
@@ -295,7 +296,9 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setReasons(reason ? reason : '');
     setBtNo(branchTransferInfo.btNo);
     setBtStatus(branchTransferInfo.status);
-    setComment(branchTransferInfo.comment);
+    if (!isClickBtnApprove) {
+      setComment(branchTransferInfo.comment);
+    }
 
     setIsDraft(branchTransferInfo.status === 'CREATED' ? true : false);
     setIsDC(getUserInfo().group === PERMISSION_GROUP.DC);
@@ -576,6 +579,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     setOpenLoadingModal(false);
   };
   const handleConfirmBtn = async () => {
+    setIsClickBtnApprove(true);
     await storeItem();
     await dispatch(updateAddItemsState({}));
     const isvalidItem = validateItem();
