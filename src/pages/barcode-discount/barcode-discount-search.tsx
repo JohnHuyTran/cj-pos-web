@@ -13,7 +13,7 @@ import { PrintSharp, SearchOff } from '@mui/icons-material';
 import BarcodeDiscountList from './barcode-discount-list';
 import { BarcodeDiscountSearchRequest } from '../../models/barcode-discount-model';
 import AlertError from '../../components/commons/ui/alert-error';
-import ModalCreateBarcodeDiscount from '../../components/barcode-discount/modal-create-barcode-discound';
+import ModalCreateBarcodeDiscount from '../../components/barcode-discount/modal-create-barcode-discount';
 import moment from 'moment';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';

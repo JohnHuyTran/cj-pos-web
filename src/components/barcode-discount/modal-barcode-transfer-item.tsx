@@ -21,12 +21,12 @@ import {
   updateDataDetail,
   updateErrorList,
   updateCheckStock,
-  updateCheckEdit, updateApproveEdit,
+  updateCheckEdit, updateApproveReject,
 } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action } from '../../utils/enum/common-enum';
+import {Action, BDStatus} from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import {ACTIONS} from "../../utils/enum/permission-enum";
 import NumberFormat from 'react-number-format';
@@ -124,6 +124,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           barcode: item.barCode,
           requestedDiscount: parseFloat(String(item.discount).replace(/,/g, '')),
           numberOfDiscounted: parseInt(String(item.numberOfDiscounted).replace(/,/g, '')),
+          numberOfApproved: parseInt(String(item.numberOfApproved).replace(/,/g, '')),
           expiredDate: item.expiryDate,
           unitFactor: item.unit,
           productName: item.barcodeName,
@@ -216,7 +217,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             })
         )
     );
-    // dispatch(updateCheckEdit(true));
+    dispatch(updateCheckEdit(true));
     // dispatch(updateCheckStock(checkStocks.filter((el: any) => el.barcode !== barcode)));
   };
 
@@ -290,7 +291,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeReason = (e: any) => {
-    dispatch(updateApproveEdit({ ...approveReject, approvalNote: e }));
+    dispatch(updateApproveReject({ ...approveReject, approvalNote: e }));
     dispatch(updateCheckEdit(true));
   };
 
@@ -430,7 +431,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             <TextField
               error={condition}
               type="text"
-              value={numberWithCommas(params.value)}
+              value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
               className={classes.MtextFieldNumber}
               // inputProps={{ min: 0 }}
               onChange={(e) => {
@@ -453,14 +454,15 @@ export const ModalTransferItem = (props: DataGridProps) => {
       renderCell: (params: GridRenderCellParams) => {
         const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
         const indexStock = checkStocks.findIndex((item: any) => item.barcode === params.row.barCode);
-        const condition = (index != -1 && errorList[index].errorNumberOfDiscounted) || indexStock !== -1;
+        const condition = (index != -1 && errorList[index].errorNumberOfApproved) || indexStock !== -1;
         return (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
+              error={condition}
               type="number"
               className={classes.MtextFieldNumber}
               value={numberWithCommas(params.value)}
-              disabled={!approvePermission}
+              disabled={!approvePermission || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)}
               onChange={(e) => {
                 handleChangeNumberOfApprove(e, params.row.index, index, params.row.barCode);
               }}
@@ -526,7 +528,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               }}
               value={params.value}
               placeHolder="วว/ดด/ปปปป"
-              disabled={dataDetail.status > 1 && !approvePermission}
+              disabled={(dataDetail.status > 1 && !approvePermission) || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)}
             />
             {condition && <div className="title">{errorList[index].errorExpiryDate}</div>}
           </div>
@@ -724,10 +726,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 onChange={(e) => {
                   handleChangeReason(e.target.value);
                 }}
-                disabled={!approvePermission}
+                disabled={dataDetail.status > 2 || !approvePermission}
             />
             <Box color="#AEAEAE" width="100%" textAlign="right">
-              {approveReject ? approveReject.approvalNote.split('').length : 0}/100
+              {(approveReject && approveReject.approvalNote) ? approveReject.approvalNote.split('').length : 0}/100
             </Box>
           </Box>
         </Box>

@@ -16,7 +16,7 @@ import HtmlTooltip from '../../components/commons/ui/html-tooltip';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
-import ModalCreateBarcodeDiscount from '../../components/barcode-discount/modal-create-barcode-discound';
+import ModalCreateBarcodeDiscount from '../../components/barcode-discount/modal-create-barcode-discount';
 import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-detail-slice';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import {KeyCloakTokenInfo} from "../../models/keycolak-token-info";
