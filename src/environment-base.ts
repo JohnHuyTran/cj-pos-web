@@ -74,6 +74,17 @@ export const environment = {
         url: '/campaign/{id}',
       },
     },
+    saleLimitTime: {
+      save: {
+        url: '/campaign/sale-limit',
+      },
+      update: {
+        url: '/campaign/sale-limit/{id}',
+      },
+      cancel: {
+        url: '/campaign/sale-limit/{id}',
+      },
+    },
   },
   purchase: {
     supplierOrder: {
@@ -142,7 +153,7 @@ export const environment = {
       },
       productByType: {
         url: '/products/barcode/type',
-      }
+      },
     },
     addItem: {
       allitemsList: {
