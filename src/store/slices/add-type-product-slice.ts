@@ -5,7 +5,7 @@ type ItemsState = {
 };
 
 const initialState: ItemsState = {
-  state: {},
+  state: [],
 };
 
 export const addTypeAndProduct = createSlice({

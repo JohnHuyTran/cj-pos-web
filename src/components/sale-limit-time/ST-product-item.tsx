@@ -28,11 +28,11 @@ interface Props {
 
 export default function STProductItems({ unSelectAllType }: Props): ReactElement {
   const classes = useStyles();
-  const [updateData, setUpdateData] = React.useState(false);
   const [dtTable, setDtTable] = React.useState<Array<STProductDetail>>([]);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
+  const [showAll, setShowAll] = React.useState(true);
   const dispatch = useAppDispatch();
 
   const handleCloseSnackBar = () => {
@@ -54,13 +54,16 @@ export default function STProductItems({ unSelectAllType }: Props): ReactElement
           };
         });
       setDtTable(rows);
+      if (payloadAddTypeProduct.filter((el: any) => el.selectedType === 2 && !el.showProduct).length !== 0) {
+        setShowAll(false);
+        unSelectAllType(false);
+      }
     } else {
       setDtTable([]);
     }
-  }, [payloadAddTypeProduct, updateData]);
-  const handleShowProducts = (e: any) => {
-    const showAll = e.target.checked;
-    if (showAll) {
+  }, [payloadAddTypeProduct]);
+  useEffect(() => {
+    if (showAll && !!Object.keys(payloadAddTypeProduct).length) {
       let newList = _.cloneDeep(payloadAddTypeProduct);
       newList.map((el: any) => {
         if (el.selectedType === 2) {
@@ -68,10 +71,14 @@ export default function STProductItems({ unSelectAllType }: Props): ReactElement
         }
       });
       dispatch(updateAddTypeAndProductState(newList));
-    } else {
+    }
+  }, [showAll]);
+  const handleShowProducts = (e: any) => {
+    setShowAll(e.target.checked);
+    if (!e.target.checked) {
       setDtTable([]);
     }
-    unSelectAllType(showAll);
+    unSelectAllType(e.target.checked);
   };
   const columns: GridColDef[] = [
     {
@@ -242,7 +249,7 @@ export default function STProductItems({ unSelectAllType }: Props): ReactElement
       </Typography>
       <FormGroup>
         <FormControlLabel
-          control={<Checkbox size="small" onClick={handleShowProducts} />}
+          control={<Checkbox size="small" checked={showAll} onClick={handleShowProducts} />}
           label="แสดงรายการสินค้าทั้งหมด"
         />
       </FormGroup>

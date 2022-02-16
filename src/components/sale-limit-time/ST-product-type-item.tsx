@@ -12,10 +12,10 @@ import { GridSelectionModel } from '@mui/x-data-grid';
 const _ = require('lodash');
 
 interface Props {
-  selectProductType: boolean;
+  unSelectAllType: boolean;
 }
 
-export default function STProductTypeItems({ selectProductType }: Props): ReactElement {
+export default function STProductTypeItems({ unSelectAllType }: Props): ReactElement {
   const classes = useStyles();
   const [dtTable, setDtTable] = React.useState([]);
   const dispatch = useAppDispatch();
@@ -39,9 +39,6 @@ export default function STProductTypeItems({ selectProductType }: Props): ReactE
         });
 
       setDtTable(rows);
-      let listProductShow = payloadAddTypeProduct.filter((el: any) => {
-        el.selectedType === 2 && !el.showProduct;
-      });
     } else {
       setDtTable([]);
     }
@@ -51,10 +48,10 @@ export default function STProductTypeItems({ selectProductType }: Props): ReactE
   };
 
   useEffect(() => {
-    if (selectProductType) {
+    if (unSelectAllType) {
       setSelectionModel([]);
     }
-  }, [selectProductType]);
+  }, [unSelectAllType]);
 
   const handleClickRow = (value: any) => {
     let newList = _.cloneDeep(payloadAddTypeProduct);

@@ -77,9 +77,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
 
     useEffect(() => {
-        if (!objectNullOrEmpty(payloadAddTypeProduct)) {
-            setSelectedItems(payloadAddTypeProduct);
-        }
+        setSelectedItems(payloadAddTypeProduct);  
     }, [payloadAddTypeProduct]);
 
     const onInputChangeProduct = async (event: any, value: string, reason: string) => {
@@ -269,15 +267,17 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     };
 
     const renderSelectedItems = () => {
-        return selectedItems.map((item: any, index: number) => {
-            if (item.selectedType === 1) {
-                return <SelectedItem label={item.productTypeName} onDelete={() => handleDeleteTypeOrProduct(item)}
-                                     key={index}/>
-            } else if (item.selectedType === 2 && !item.productByType) {
-                return <SelectedItem label={item.barcodeName} onDelete={() => handleDeleteTypeOrProduct(item)}
-                                     key={index}/>
-            }
-        });
+        if (selectedItems && selectedItems.length > 0) {
+            return selectedItems.map((item: any, index: number) => {
+                if (item.selectedType === 1) {
+                    return <SelectedItem label={item.productTypeName} onDelete={() => handleDeleteTypeOrProduct(item)}
+                                        key={index}/>
+                } else if (item.selectedType === 2 && !item.productByType) {
+                    return <SelectedItem label={item.barcodeName} onDelete={() => handleDeleteTypeOrProduct(item)}
+                                        key={index}/>
+                }
+            });
+        }
     }
 
     const handleDeleteTypeOrProduct = (data: any) => {
@@ -297,7 +297,8 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     const handleAddItem = async () => {
         let selectedAddItems = _.cloneDeep(selectedItems);
         if (!objectNullOrEmpty(values.productType) && values.selectAllProduct) {
-            let productTypeExist = selectedItems.filter((it: any) => it.selectedType === 1 && it.productTypeCode === values.productType.productTypeCode);
+            let productTypeExist = (selectedItems && selectedItems.length > 0) 
+            ? selectedItems.filter((it: any) => it.selectedType === 1 && it.productTypeCode === values.productType.productTypeCode) : [];
             if (productTypeExist != null && productTypeExist.length > 0) {
                 let error = {...values.error};
                 error.productTypeExist = 'ประเภทสินค้านี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง';
@@ -327,13 +328,15 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                     if (objectNullOrEmpty(productExist)) {
                         productItem.productByType = true;
                         productItem.selectedType = 2;
+                        productItem.showProduct = true;
                         selectedAddItems.push(productItem);
                     }
                 }
             }
             setOpenLoadingModal(false);
         } else if (!objectNullOrEmpty(values.product)) {
-            let productExist = selectedItems.filter((it: any) => it.selectedType === 2 && it.barcode === values.product.barcode);
+            let productExist =  (selectedItems && selectedItems.length > 0) ? 
+            selectedItems.filter((it: any) => it.selectedType === 2 && it.barcode === values.product.barcode) : [];
             if (productExist != null && productExist.length > 0) {
                 let error = {...values.error};
                 error.productExist = 'สินค้านี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง';
@@ -347,6 +350,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             let productItem: any = _.cloneDeep(values.product);
             productItem.selectedType = 2
             productItem.productByType = false;
+            productItem.showProduct = true;
             selectedAddItems.push(productItem);
         }
         setSelectedItems(selectedAddItems);

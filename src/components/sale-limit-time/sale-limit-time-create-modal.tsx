@@ -26,6 +26,7 @@ import STProductTypeItems from './ST-product-type-item';
 import STProductItems from './ST-product-item';
 import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
+import { updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 
 interface State {
   stNo: string;
@@ -76,15 +77,25 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
+  const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
   const [values, setValues] = React.useState<State>({
     stNo: '',
     detailMsg: '',
     startDate: new Date(),
     endDate: new Date(),
-    startTime: null,
-    endTime: null,
+    startTime: '',
+    endTime: '',
     comment: '',
   });
+  const [checkValue, setCheckValue] = React.useState({
+    detailMsgError: false,
+    startDateError: false,
+    endDateError: false,
+    startTimeError: false,
+    endTimeError: false,
+    payloadBranchesError: false,
+  });
+
   const [status, setStatus] = React.useState<number>(0);
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
   const [countText, setCountText] = React.useState<number>(0);
@@ -97,14 +108,21 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   };
   const [showModalProduct, setShowModalProduct] = React.useState(true);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
-  const [selectProductType, setSelectProductType] = React.useState(false);
+  const [unSelectAllType, setUnSelectAllType] = React.useState(false);
 
   useEffect(() => {
+    console.log(payloadAddTypeProduct);
+
     setShowModalProduct(!!Object.keys(payloadAddTypeProduct).length);
   }, [payloadAddTypeProduct]);
 
+  useEffect(() => {
+    setCheckValue({ ...checkValue, payloadBranchesError: false });
+  }, [payloadBranches.saved]);
+
   const clearData = async () => {
-    dispatch(updateAddTypeAndProductState({}));
+    dispatch(updateAddTypeAndProductState([]));
+    dispatch(updatePayloadBranches({ ...payloadBranches, saved: false }));
   };
   const handleClose = async () => {
     setOpen(false);
@@ -136,38 +154,28 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleChangeDetailMsg = (value: any) => {
-    setValues({
-      ...values,
-      detailMsg: value,
-    });
+    setValues({ ...values, detailMsg: value });
+    setCheckValue({ ...checkValue, detailMsgError: false });
   };
 
   const handleStartDatePicker = (value: Date) => {
-    setValues({
-      ...values,
-      startDate: value,
-    });
+    setValues({ ...values, startDate: value });
+    setCheckValue({ ...checkValue, startDateError: false });
   };
 
   const handleEndDatePicker = (value: Date) => {
-    setValues({
-      ...values,
-      endDate: value,
-    });
+    setValues({ ...values, endDate: value });
+    setCheckValue({ ...checkValue, endDateError: false });
   };
 
   const handleStartTimePicker = (value: string) => {
-    setValues({
-      ...values,
-      startTime: value,
-    });
+    setValues({ ...values, startTime: value });
+    setCheckValue({ ...checkValue, startTimeError: false });
   };
 
   const handleEndTimePicker = (value: string) => {
-    setValues({
-      ...values,
-      endTime: value,
-    });
+    setValues({ ...values, endTime: value });
+    setCheckValue({ ...checkValue, endTimeError: false });
   };
 
   if (values.startDate != null && values.endDate != null) {
@@ -188,10 +196,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleChangeComment = (value: any) => {
-    setValues({
-      ...values,
-      comment: value,
-    });
+    setValues({ ...values, comment: value });
     setCountText(value.split('').length);
   };
 
@@ -201,12 +206,76 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
     setOpenAlert(false);
   };
 
-  const handleCreateSTDetail = () => {
-    console.log(values);
+  const valiDateData = () => {
+    let valiDate: boolean = true;
+    let item = { ...checkValue };
+    if (values.startDate === null) {
+      item.startDateError = true;
+      valiDate = false;
+    }
+    if (values.endDate === null) {
+      item.endDateError = true;
+      valiDate = false;
+    }
+    if (values.startTime === '') {
+      item.startTimeError = true;
+      valiDate = false;
+    }
+    if (values.endTime === '') {
+      item.endTimeError = true;
+      valiDate = false;
+    }
+    if (values.detailMsg === '') {
+      item.detailMsgError = true;
+      valiDate = false;
+    }
+    if (!payloadBranches.saved) {
+      item.payloadBranchesError = true;
+      valiDate = false;
+    }
+    setCheckValue(item);
+    return valiDate;
   };
 
-  const unSelectAllType = (showAll: boolean) => {
-    setSelectProductType(showAll);
+  const handleCreateSTDetail = () => {
+    if (valiDateData()) {
+      const stStartTime = values.startDate;
+      stStartTime.setUTCHours(Number(values.startTime?.split(':')[0]), Number(values.startTime?.split(':')[1]));
+      const stEndTime = values.endDate;
+      stEndTime.setUTCHours(Number(values.endTime?.split(':')[0]), Number(values.endTime?.split(':')[1]));
+      const appliedProduct = {
+        appliedProducts: payloadAddTypeProduct
+          .filter((el: any) => el.selectedType === 2)
+          .map((item: any) => {
+            return {
+              name: item.barcodeName,
+              skuCode: item.skuCode,
+            };
+          }),
+        appliedCategories: payloadAddTypeProduct
+          .filter((el: any) => el.selectedType === 1)
+          .map((item: any) => {
+            return {
+              name: item.productTypeName,
+              code: item.productTypeCode,
+            };
+          }),
+      };
+      const body = {
+        stStartTime: stStartTime.toISOString(),
+        stEndTime: stEndTime.toISOString(),
+        remark: values.comment,
+        description: values.detailMsg,
+        stDetail: {
+          isAllBranches: payloadBranches.isAllBranches,
+          appliedBranches: payloadBranches.appliedBranches,
+          appliedProduct: appliedProduct,
+        }, 
+      };
+    }
+  };
+  const handleUnSelectAllType = (showAll: boolean) => {
+    setUnSelectAllType(showAll);
   };
 
   return (
@@ -238,7 +307,9 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                 multiline
                 fullWidth
                 rows={2}
+                error={checkValue.detailMsgError}
                 className={classes.MtextField}
+                value={values.detailMsg}
                 inputProps={{
                   maxLength: '50',
                 }}
@@ -248,9 +319,11 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                 }}
                 // disabled={dataDetail.status > 1}
               />
-              {/* <Box textAlign="right" color="#F54949">
-                กรุณาระบุรายละเอียด
-              </Box> */}
+              {checkValue.detailMsgError && (
+                <Box textAlign="right" color="#F54949">
+                  กรุณาระบุรายละเอียด
+                </Box>
+              )}
             </Grid>
           </Grid>
           <Grid container spacing={2} mb={2.5}>
@@ -283,6 +356,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                 id="time-start"
                 type="time"
                 fullWidth
+                error={checkValue.startTimeError}
                 className={classes.MtimeTextField}
                 value={values.startTime}
                 onChange={(e) => handleStartTimePicker(e.target.value)}
@@ -290,6 +364,11 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                   step: 300,
                 }}
               />
+              {checkValue.startTimeError && (
+                <Box textAlign="right" color="#F54949">
+                  กรุณาระบุรายละเอียด
+                </Box>
+              )}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -300,6 +379,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                 id="time-end"
                 type="time"
                 fullWidth
+                error={checkValue.endTimeError}
                 className={classes.MtimeTextField}
                 value={values.endTime}
                 onChange={(e) => handleEndTimePicker(e.target.value)}
@@ -307,6 +387,11 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                   step: 300,
                 }}
               />
+              {checkValue.endTimeError && (
+                <Box textAlign="right" color="#F54949">
+                  กรุณาระบุรายละเอียด
+                </Box>
+              )}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
@@ -315,10 +400,12 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               สาขา :
             </Grid>
             <Grid item xs={3}>
-              <SearchBranch />
-              {/* <Box textAlign="right" color="#F54949">
-                กรุณาระบุรายละเอียด
-              </Box> */}
+              <SearchBranch error={checkValue.payloadBranchesError} />
+              {checkValue.payloadBranchesError && (
+                <Box textAlign="right" color="#F54949">
+                  กรุณาระบุรายละเอียด
+                </Box>
+              )}
             </Grid>
             <Grid item xs={7}></Grid>
           </Grid>
@@ -381,9 +468,9 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
           </Grid>
 
           <Box mb={4}>
-            <STProductTypeItems selectProductType={selectProductType} />
+            <STProductTypeItems unSelectAllType={unSelectAllType} />
           </Box>
-          <Box mb={4}>{showModalProduct && <STProductItems unSelectAllType={unSelectAllType} />}</Box>
+          <Box mb={4}>{showModalProduct && <STProductItems unSelectAllType={handleUnSelectAllType} />}</Box>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={3}>
               <Typography fontSize="14px" lineHeight="21px" height="24px">
