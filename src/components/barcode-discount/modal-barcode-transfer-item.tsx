@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box } from '@material-ui/core';
+import {useAppDispatch, useAppSelector} from '../../store/store';
+import {DataGrid, GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
+import {Box} from '@material-ui/core';
 import {
   Button,
   Dialog,
@@ -12,24 +12,26 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { DeleteForever, Tune } from '@mui/icons-material';
-import { useStyles } from '../../styles/makeTheme';
-import { DiscountDetail } from '../../models/barcode-discount';
+import {DeleteForever} from '@mui/icons-material';
+import {useStyles} from '../../styles/makeTheme';
+import {DiscountDetail} from '../../models/barcode-discount';
 import DatePickerComponent from '../commons/ui/date-picker-v2';
 import {
   saveBarcodeDiscount,
+  updateApproveReject,
+  updateCheckEdit,
+  updateCheckStock,
   updateDataDetail,
   updateErrorList,
-  updateCheckStock,
-  updateCheckEdit, updateApproveReject,
 } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
-import { updateAddItemsState } from '../../store/slices/add-items-slice';
-import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
+import {updateAddItemsState} from '../../store/slices/add-items-slice';
+import {numberWithCommas, objectNullOrEmpty, stringNullOrEmpty} from '../../utils/utils';
 import {Action, BDStatus} from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import {ACTIONS} from "../../utils/enum/permission-enum";
 import NumberFormat from 'react-number-format';
+import HtmlTooltip from "../commons/ui/html-tooltip";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -72,8 +74,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
         let discount = !!sameItem ? sameItem.discount : 0;
         let expiryDate = !!sameItem ? sameItem.expiryDate : null;
         let numberOfDiscounted = item.qty ? item.qty : 0;
-        let approvedDiscount = 0;
-        let numberOfApproved = !!sameItem ? sameItem.numberOfApproved : 0;
         if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
           discount = stringNullOrEmpty(item.discount) ? 0 : item.discount;
           expiryDate = stringNullOrEmpty(item.expiryDate) ? null : item.expiryDate;
@@ -85,6 +85,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
             : parseFloat(String(discount).replace(/,/g, ''));
 
         const priceAfterDiscount = price - (cashDiscount || 0);
+        let numberOfApproved = !!sameItem ? sameItem.numberOfApproved : (item.numberOfApproved ? item.numberOfApproved : 0);
+        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : (numberOfApproved * priceAfterDiscount);
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -147,12 +149,14 @@ export const ModalTransferItem = (props: DataGridProps) => {
   }, [dtTable]);
 
   useEffect(() => {
-    if (checkStocks.length !== 0 && Object.keys(payloadAddItem).length !== 0) {
-      const predata = _.cloneDeep(payloadAddItem);
-      const products = predata.map((item: any) => {
+    if (checkStocks && checkStocks.length > 0 && Object.keys(payloadAddItem).length !== 0) {
+      const preData = _.cloneDeep(payloadAddItem);
+      const products = preData.map((item: any) => {
         const stock = checkStocks.find((el: any) => el.barcode === item.barcode);
         if (stock) {
-          item.qty = stock.stockRemain;
+          if (Number(BDStatus.WAIT_FOR_APPROVAL) !== dataDetail.status && !approvePermission) {
+            item.qty = stock.stockRemain;
+          }
         }
         return item;
       });
@@ -197,12 +201,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfApprove = (event: any, index: number, errorIndex: number, barcode: string) => {
-    let currentData: any;
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      currentData = data[index - 1];
-      currentData.numberOfApproved = parseInt(event.target.value.replace(/,/g, ''));
-      currentData.approvedDiscount = currentData.numberOfApproved * currentData.priceAfterDiscount;
+      data[index - 1].numberOfApproved = event.target.value ? parseInt(event.target.value.replace(/,/g, '')) : 0;
+      data[index - 1].approvedDiscount = data[index - 1].numberOfApproved * data[index - 1].priceAfterDiscount;
       return data;
     });
     dispatch(
@@ -226,7 +228,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       currentData = data[index - 1];
-      data[index - 1].numberOfDiscounted = parseInt(event.target.value.replace(/,/g, ''));
+      data[index - 1].numberOfDiscounted = event.target.value ? parseInt(event.target.value.replace(/,/g, '')) : 0;
       return data;
     });
     if (Object.keys(payloadAddItem).length !== 0) {
@@ -354,20 +356,24 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: false,
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" width="100%" textAlign="end">
-          {numberWithCommas(addTwoDecimalPlaces(params.value))}
-        </Box>
+        <HtmlTooltip title={<React.Fragment>{numberWithCommas(addTwoDecimalPlaces(params.value))}</React.Fragment>}>
+          <Typography fontSize="15px" textAlign="end" width="100%"
+                      className={classes.MTextEllipsis}
+          >
+            {numberWithCommas(addTwoDecimalPlaces(params.value))}
+          </Typography>
+        </HtmlTooltip>
       ),
     },
     {
       field: 'discount',
       headerName: typeDiscount === 'percent' ? 'ยอดลด (%)' : 'ยอดลด (บาท)',
-      minWidth: 130,
+      minWidth: 150,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
+        const index = (errorList && errorList.length > 0) ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
         const condition = index !== -1 && !!errorList[index].errorDiscount;
         return (
           <div className={classes.MLabelTooltipWrapper}>
@@ -380,6 +386,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
                           onChange={(e: any) => {
                             handleChangeDiscount(e, params.row.index, index);
                           }}
+                          inputProps={{ maxLength: 15 }}
+                          allowNegative={false}
                           fixedDecimalScale
                           value={String(params.value)}
                           disabled={dataDetail.status > 1}
@@ -397,9 +405,13 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params) => (
-        <Typography color="#F54949" fontSize="15px" textAlign="end" width="100%" fontWeight="bold">
-          {numberWithCommas(params.value)}
-        </Typography>
+        <HtmlTooltip title={<React.Fragment>{numberWithCommas(params.value)}</React.Fragment>}>
+          <Typography color="#F54949" fontSize="15px" textAlign="end" width="100%" fontWeight="bold"
+                      className={classes.MTextEllipsis}
+          >
+            {numberWithCommas(params.value)}
+          </Typography>
+        </HtmlTooltip>
       ),
     },
     {
@@ -410,27 +422,32 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params) => (
-        <Typography color="#36C690" fontSize="15px" textAlign="end" width="100%" fontWeight="bold">
-          {numberWithCommas(params.value)}
-        </Typography>
+        <HtmlTooltip title={<React.Fragment>{numberWithCommas(params.value)}</React.Fragment>}>
+          <Typography color="#36C690" fontSize="15px" textAlign="end" width="100%" fontWeight="bold"
+                      className={classes.MTextEllipsis}
+          >
+            {numberWithCommas(params.value)}
+          </Typography>
+        </HtmlTooltip>
       ),
     },
     {
       field: 'numberOfDiscounted',
       headerName: 'จำนวนที่ขอลด',
-      minWidth: 119,
+      minWidth: 125,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
-        const indexStock = checkStocks.findIndex((item: any) => item.barcode === params.row.barCode);
+        const index = (errorList && errorList.length > 0) ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+        const indexStock = (checkStocks && checkStocks.length > 0) ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode) : -1;
         const condition = (index != -1 && errorList[index].errorNumberOfDiscounted) || indexStock !== -1;
         return (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
               error={condition}
               type="text"
+              inputProps={{ maxLength: 13 }}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
               className={classes.MtextFieldNumber}
               // inputProps={{ min: 0 }}
@@ -447,21 +464,22 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'numberOfApproved',
       headerName: 'จำนวนที่อนุมัติ',
-      minWidth: 120,
+      minWidth: 125,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
-        const indexStock = checkStocks.findIndex((item: any) => item.barcode === params.row.barCode);
+        const index = (errorList && errorList.length > 0) ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+        const indexStock = (checkStocks && checkStocks.length > 0) ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode) : -1;
         const condition = (index != -1 && errorList[index].errorNumberOfApproved) || indexStock !== -1;
         return (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
               error={condition}
-              type="number"
+              type="text"
+              inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
-              value={numberWithCommas(params.value)}
+              value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
               disabled={!approvePermission || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)}
               onChange={(e) => {
                 handleChangeNumberOfApprove(e, params.row.index, index, params.row.barCode);
@@ -492,9 +510,13 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params) => (
-        <Typography width="100%" textAlign="right">
-          {numberWithCommas(addTwoDecimalPlaces(params.value))}
-        </Typography>
+        <HtmlTooltip title={<React.Fragment>{numberWithCommas(addTwoDecimalPlaces(params.value))}</React.Fragment>}>
+          <Typography width="100%" textAlign="right"
+                      className={classes.MTextEllipsis}
+          >
+            {numberWithCommas(addTwoDecimalPlaces(params.value))}
+          </Typography>
+        </HtmlTooltip>
       ),
       renderHeader: (params) => {
         return (
@@ -517,7 +539,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const index = errorList.findIndex((item: any) => item.id === params.row.barCode);
+        const index = (errorList && errorList.length > 0) ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
         const condition = index != -1 && errorList[index].errorExpiryDate;
         return (
           <div className={classes.MLabelTooltipWrapper}>

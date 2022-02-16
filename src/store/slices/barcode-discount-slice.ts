@@ -24,6 +24,7 @@ const initialState: ItemsState = {
     id: '',
     documentNumber: '',
     status: 0,
+    approvedDate: null,
     createdDate: moment(new Date()).toISOString(),
     percentDiscount: true,
   },
