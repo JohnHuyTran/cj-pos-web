@@ -186,7 +186,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                         marginRight: 0
                     }
                 }}
-                placeholder=""
+                placeholder={'ค้นหาบาร์โค๊ด / รายละเอียดสินค้า'}
                 className={classes.MtextField}
                 variant="outlined"
                 size="small"
@@ -207,7 +207,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                         marginRight: 0
                     }
                 }}
-                placeholder=""
+                placeholder={'รหัสประเภท/ประเภทสินค้า'}
                 className={classes.MtextField}
                 variant="outlined"
                 size="small"

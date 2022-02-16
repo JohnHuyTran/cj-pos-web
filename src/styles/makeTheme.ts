@@ -336,6 +336,11 @@ const useStyles = makeStyles({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  MTextEllipsis: {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
   MFormControlLabel: {
     '& .MuiFormControlLabel-label': {
       fontSize: 'small',

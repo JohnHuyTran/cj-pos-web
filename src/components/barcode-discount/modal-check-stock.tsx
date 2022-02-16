@@ -70,15 +70,17 @@ export default function ModalCheckStock({ open, onClose }: Props) {
   const classes = useStyles();
   const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
   let rows: any = [];
-  rows = checkStocks.map((item: any, index: number) => {
-    return {
-      id: index + 1,
-      barcode: item.barcode,
-      productName: item.productName,
-      stockRemain: item.stockRemain,
-      skuCode: item.skuCode,
-    };
-  });
+  if (checkStocks && checkStocks.length > 0) {
+    rows = checkStocks.map((item: any, index: number) => {
+      return {
+        id: index + 1,
+        barcode: item.barcode,
+        productName: item.productName,
+        stockRemain: item.stockRemain,
+        skuCode: item.skuCode,
+      };
+    });
+  }
   const handleClose = () => {
     onClose();
   };
