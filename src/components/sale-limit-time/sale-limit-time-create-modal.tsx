@@ -27,6 +27,8 @@ import STProductItems from './ST-product-item';
 import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import { updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
+import TextBoxComment from '../commons/ui/textbox-comment';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 
 interface State {
   stNo: string;
@@ -49,6 +51,18 @@ export interface DialogTitleProps {
   children?: React.ReactNode;
   onClose?: () => void;
 }
+
+const defaultMaterialTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#36C690',
+    },
+  },
+  typography: {
+    fontFamily: 'Kanit',
+  },
+});
+
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
   const { children, onClose, ...other } = props;
   return (
@@ -98,7 +112,6 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
 
   const [status, setStatus] = React.useState<number>(0);
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
-  const [countText, setCountText] = React.useState<number>(0);
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
@@ -197,7 +210,6 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
 
   const handleChangeComment = (value: any) => {
     setValues({ ...values, comment: value });
-    setCountText(value.split('').length);
   };
 
   const [openAlert, setOpenAlert] = React.useState(false);
@@ -270,7 +282,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
           isAllBranches: payloadBranches.isAllBranches,
           appliedBranches: payloadBranches.appliedBranches,
           appliedProduct: appliedProduct,
-        }, 
+        },
       };
     }
   };
@@ -352,18 +364,21 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               วันที่สิ้นสุดงดขาย :
             </Grid>
             <Grid item xs={3}>
-              <TextField
-                id="time-start"
-                type="time"
-                fullWidth
-                error={checkValue.startTimeError}
-                className={classes.MtimeTextField}
-                value={values.startTime}
-                onChange={(e) => handleStartTimePicker(e.target.value)}
-                inputProps={{
-                  step: 300,
-                }}
-              />
+              <ThemeProvider theme={defaultMaterialTheme}>
+                <TextField
+                  id="time-start"
+                  type="time"
+                  fullWidth
+                  error={checkValue.startTimeError}
+                  className={classes.MtimeTextField}
+                  value={values.startTime}
+                  onChange={(e) => handleStartTimePicker(e.target.value)}
+                  inputProps={{
+                    step: 300,
+                  }}
+                />
+              </ThemeProvider>
+
               {checkValue.startTimeError && (
                 <Box textAlign="right" color="#F54949">
                   กรุณาระบุรายละเอียด
@@ -476,25 +491,13 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               <Typography fontSize="14px" lineHeight="21px" height="24px">
                 หมายเหตุ :
               </Typography>
-              <TextField
-                placeholder=" ความยาวไม่เกิน 100 ตัวอักษร"
-                multiline
-                fullWidth
-                rows={5}
-                className={classes.MTextareaBD}
-                inputProps={{
-                  maxLength: '100',
-                }}
-                variant="outlined"
-                value={values.comment}
-                onChange={(e) => {
-                  handleChangeComment(e.target.value);
-                }}
-                // disabled={dataDetail.status > 1}
+              <TextBoxComment
+                fieldName=" ความยาวไม่เกิน 100 ตัวอักษร"
+                defaultValue={values.comment}
+                maxLength={100}
+                onChangeComment={handleChangeComment}
+                isDisable={status > 1}
               />
-              <Box color="#AEAEAE" textAlign="right">
-                {countText}/100
-              </Box>
             </Grid>
             <Grid item xs={7}></Grid>
             <Grid item xs={2} mt={15} textAlign="center">

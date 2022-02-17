@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@material-ui/core';
@@ -21,15 +21,17 @@ import {
   updateDataDetail,
   updateErrorList,
   updateCheckStock,
-  updateCheckEdit, updateApproveReject,
+  updateCheckEdit,
+  updateApproveReject,
 } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import {Action, BDStatus} from '../../utils/enum/common-enum';
+import { Action, BDStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
-import {ACTIONS} from "../../utils/enum/permission-enum";
+import { ACTIONS } from '../../utils/enum/permission-enum';
 import NumberFormat from 'react-number-format';
+import TextBoxComment from '../commons/ui/textbox-comment';
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -61,8 +63,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
   );
   const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
   //permission
-  const [approvePermission, setApprovePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
-      ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false);
+  const [approvePermission, setApprovePermission] = useState<boolean>(
+    userPermission != null && userPermission.length > 0 ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false
+  );
 
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
@@ -206,16 +209,16 @@ export const ModalTransferItem = (props: DataGridProps) => {
       return data;
     });
     dispatch(
-        updateErrorList(
-            errorList.map((item: any, idx: number) => {
-              return idx === errorIndex
-                  ? {
-                    ...item,
-                    errorNumberOfApproved: '',
-                  }
-                  : item;
-            })
-        )
+      updateErrorList(
+        errorList.map((item: any, idx: number) => {
+          return idx === errorIndex
+            ? {
+                ...item,
+                errorNumberOfApproved: '',
+              }
+            : item;
+        })
+      )
     );
     dispatch(updateCheckEdit(true));
     // dispatch(updateCheckStock(checkStocks.filter((el: any) => el.barcode !== barcode)));
@@ -371,19 +374,21 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const condition = index !== -1 && !!errorList[index].errorDiscount;
         return (
           <div className={classes.MLabelTooltipWrapper}>
-            <NumberFormat customInput={TextField}
-                          variant="outlined"
-                          className={condition ? classes.MtextFieldNumberError : classes.MtextFieldNumber}
-                          style={{borderColor:'red'}}
-                          thousandSeparator={true}
-                          decimalScale={2}
-                          onChange={(e: any) => {
-                            handleChangeDiscount(e, params.row.index, index);
-                          }}
-                          fixedDecimalScale
-                          value={String(params.value)}
-                          disabled={dataDetail.status > 1}
-                          autoComplete="off"/>
+            <NumberFormat
+              customInput={TextField}
+              variant="outlined"
+              className={condition ? classes.MtextFieldNumberError : classes.MtextFieldNumber}
+              style={{ borderColor: 'red' }}
+              thousandSeparator={true}
+              decimalScale={2}
+              onChange={(e: any) => {
+                handleChangeDiscount(e, params.row.index, index);
+              }}
+              fixedDecimalScale
+              value={String(params.value)}
+              disabled={dataDetail.status > 1}
+              autoComplete="off"
+            />
             {condition && <div className="title">{errorList[index].errorDiscount}</div>}
           </div>
         );
@@ -469,7 +474,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfApproved}</div>}
           </div>
-        )
+        );
       },
       renderHeader: (params) => {
         return (
@@ -528,7 +533,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
               }}
               value={params.value}
               placeHolder="วว/ดด/ปปปป"
-              disabled={(dataDetail.status > 1 && !approvePermission) || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)}
+              disabled={
+                (dataDetail.status > 1 && !approvePermission) || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)
+              }
             />
             {condition && <div className="title">{errorList[index].errorExpiryDate}</div>}
           </div>
@@ -688,49 +695,28 @@ export const ModalTransferItem = (props: DataGridProps) => {
             <Typography fontSize="14px" lineHeight="21px" height="24px">
               หมายเหตุจากสาขา :{' '}
             </Typography>
-            <TextField
-              placeholder=" ความยาวไม่เกิน 100 ตัวอักษร"
-              multiline
-              rows={5}
-              className={classes.MTextareaBD}
-              inputProps={{
-                maxLength: '100',
-              }}
-              sx={{ width: '339px' }}
-              variant="outlined"
-              value={payloadBarcodeDiscount ? payloadBarcodeDiscount.requesterNote : ''}
-              onChange={(e) => {
-                handleChangeNote(e.target.value);
-              }}
-              disabled={dataDetail.status > 1}
+            <TextBoxComment
+              fieldName=" ความยาวไม่เกิน 100 ตัวอักษร"
+              defaultValue={classes.MTextareaBD}
+              maxLength={100}
+              onChangeComment={handleChangeNote}
+              isDisable={dataDetail.status > 1}
             />
-            <Box color="#AEAEAE" width="100%" textAlign="right">
-              {countText}/100
-            </Box>
           </Box>
-          <Box sx={{paddingLeft: 20}} style={{ display: (dataDetail.status > 1 && approvePermission) ? undefined : 'none' }}>
+          <Box
+            sx={{ paddingLeft: 20 }}
+            style={{ display: dataDetail.status > 1 && approvePermission ? undefined : 'none' }}
+          >
             <Typography fontSize="14px" lineHeight="21px" height="24px">
               หมายเหตุจากผู้อนุมัติ :{' '}
             </Typography>
-            <TextField
-                placeholder=" ความยาวไม่เกิน 100 ตัวอักษร"
-                multiline
-                rows={5}
-                className={classes.MTextareaBD}
-                inputProps={{
-                  maxLength: '100',
-                }}
-                sx={{ width: '339px' }}
-                variant="outlined"
-                value={approveReject ? approveReject.approvalNote : ''}
-                onChange={(e) => {
-                  handleChangeReason(e.target.value);
-                }}
-                disabled={dataDetail.status > 2 || !approvePermission}
+            <TextBoxComment
+              fieldName=" ความยาวไม่เกิน 100 ตัวอักษร"
+              defaultValue={approveReject ? approveReject.approvalNote : ''}
+              maxLength={100}
+              onChangeComment={handleChangeReason}
+              isDisable={dataDetail.status > 2 || !approvePermission}
             />
-            <Box color="#AEAEAE" width="100%" textAlign="right">
-              {(approveReject && approveReject.approvalNote) ? approveReject.approvalNote.split('').length : 0}/100
-            </Box>
           </Box>
         </Box>
         <Box width="350px" marginTop="20px">
