@@ -150,16 +150,24 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
       const reason = getReasonLabel(reasonsList, stockRequestDetail.transferReason);
       setReasonText(reason ? reason : '-');
 
+      // auditLog get comment
       const auditLog = stockRequestDetail.auditLogs ? stockRequestDetail.auditLogs : [];
-      if (stockRequestDetail.status === 'WAIT_FOR_APPROVAL_2') {
-        const OC = `${auditLog[auditLog.length - 1].comment ? auditLog[auditLog.length - 1].comment : ''}`;
-        if (OC !== '') setCommentOC(JSON.parse(`${OC}`).detail);
-      } else if (stockRequestDetail.status === 'APPROVED') {
-        const SCM = `${auditLog[auditLog.length - 1].comment ? auditLog[auditLog.length - 1].comment : ''}`;
-        if (SCM !== '') setCommentSCM(JSON.parse(`${SCM}`).detail);
-        const OC = `${auditLog[auditLog.length - 2].comment ? auditLog[auditLog.length - 2].comment : ''}`;
-        if (OC !== '') setCommentOC(JSON.parse(`${OC}`).detail);
-      }
+      const comments = auditLog.filter((r: any) => r.comment !== undefined);
+      const commentOC: any[] = [];
+      const commentSCM: any[] = [];
+      comments.forEach((c: any) => {
+        const comment = `${c.comment ? c.comment : ''}`;
+        const by = JSON.parse(`${comment}`).by;
+        const detail = JSON.parse(`${comment}`).detail;
+        if (by === 'OC') {
+          commentOC.push(detail);
+        } else if (by === 'SCM') {
+          commentSCM.push(detail);
+        }
+      });
+
+      setCommentOC(commentOC[commentOC.length - 1]);
+      setCommentSCM(commentSCM[commentSCM.length - 1]);
     }
   }, [open]);
 
@@ -834,11 +842,12 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               <StockRequestItem onChangeItems={handleChangeItems} />
             )}
           </Box>
-          {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && (
+
+          {status !== '' && status !== 'DRAFT' && (
             <Grid container spacing={2} mb={2}>
               <Grid item xs={3}>
                 <TextBoxComment
-                  fieldName="หมายเหตุจาก OC :"
+                  fieldName="หมายเหตุจากผู้อนุมัติ 1 :"
                   defaultValue={commentOC}
                   maxLength={100}
                   onChangeComment={handleChangeCommentOC}
@@ -848,7 +857,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               <Grid item xs={6}></Grid>
               <Grid item xs={3}>
                 <TextBoxComment
-                  fieldName="หมายเหตุจาก SCM :"
+                  fieldName="หมายเหตุจากผู้อนุมัติ 2 :"
                   defaultValue={commentSCM}
                   maxLength={100}
                   onChangeComment={handleChangeCommentSCM}
