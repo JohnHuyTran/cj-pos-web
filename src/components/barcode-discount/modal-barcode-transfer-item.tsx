@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {useAppDispatch, useAppSelector} from '../../store/store';
-import {DataGrid, GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
-import {Box} from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { Box } from '@material-ui/core';
 import {
   Button,
   Dialog,
@@ -12,9 +12,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {DeleteForever} from '@mui/icons-material';
-import {useStyles} from '../../styles/makeTheme';
-import {DiscountDetail} from '../../models/barcode-discount';
+import { DeleteForever } from '@mui/icons-material';
+import { useStyles } from '../../styles/makeTheme';
+import { DiscountDetail } from '../../models/barcode-discount';
 import DatePickerComponent from '../commons/ui/date-picker-v2';
 import {
   saveBarcodeDiscount,
@@ -25,13 +25,14 @@ import {
   updateErrorList,
 } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
-import {updateAddItemsState} from '../../store/slices/add-items-slice';
-import {numberWithCommas, objectNullOrEmpty, stringNullOrEmpty} from '../../utils/utils';
-import {Action, BDStatus} from '../../utils/enum/common-enum';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
+import { Action, BDStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
-import {ACTIONS} from "../../utils/enum/permission-enum";
+import { ACTIONS } from '../../utils/enum/permission-enum';
 import NumberFormat from 'react-number-format';
-import HtmlTooltip from "../commons/ui/html-tooltip";
+import TextBoxComment from '../commons/ui/textbox-comment';
+import HtmlTooltip from '../commons/ui/html-tooltip';
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -63,8 +64,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
   );
   const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
   //permission
-  const [approvePermission, setApprovePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
-      ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false);
+  const [approvePermission, setApprovePermission] = useState<boolean>(
+    userPermission != null && userPermission.length > 0 ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false
+  );
 
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
@@ -85,8 +87,12 @@ export const ModalTransferItem = (props: DataGridProps) => {
             : parseFloat(String(discount).replace(/,/g, ''));
 
         const priceAfterDiscount = price - (cashDiscount || 0);
-        let numberOfApproved = !!sameItem ? sameItem.numberOfApproved : (item.numberOfApproved ? item.numberOfApproved : 0);
-        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : (numberOfApproved * priceAfterDiscount);
+        let numberOfApproved = !!sameItem
+          ? sameItem.numberOfApproved
+          : item.numberOfApproved
+          ? item.numberOfApproved
+          : 0;
+        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : numberOfApproved * priceAfterDiscount;
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -208,16 +214,16 @@ export const ModalTransferItem = (props: DataGridProps) => {
       return data;
     });
     dispatch(
-        updateErrorList(
-            errorList.map((item: any, idx: number) => {
-              return idx === errorIndex
-                  ? {
-                    ...item,
-                    errorNumberOfApproved: '',
-                  }
-                  : item;
-            })
-        )
+      updateErrorList(
+        errorList.map((item: any, idx: number) => {
+          return idx === errorIndex
+            ? {
+                ...item,
+                errorNumberOfApproved: '',
+              }
+            : item;
+        })
+      )
     );
     dispatch(updateCheckEdit(true));
     // dispatch(updateCheckStock(checkStocks.filter((el: any) => el.barcode !== barcode)));
@@ -357,9 +363,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params) => (
         <HtmlTooltip title={<React.Fragment>{numberWithCommas(addTwoDecimalPlaces(params.value))}</React.Fragment>}>
-          <Typography fontSize="15px" textAlign="end" width="100%"
-                      className={classes.MTextEllipsis}
-          >
+          <Typography fontSize="15px" textAlign="end" width="100%" className={classes.MTextEllipsis}>
             {numberWithCommas(addTwoDecimalPlaces(params.value))}
           </Typography>
         </HtmlTooltip>
@@ -373,25 +377,26 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const index = (errorList && errorList.length > 0) ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+        const index =
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
         const condition = index !== -1 && !!errorList[index].errorDiscount;
         return (
           <div className={classes.MLabelTooltipWrapper}>
-            <NumberFormat customInput={TextField}
-                          variant="outlined"
-                          className={condition ? classes.MtextFieldNumberError : classes.MtextFieldNumber}
-                          style={{borderColor:'red'}}
-                          thousandSeparator={true}
-                          decimalScale={2}
-                          onChange={(e: any) => {
-                            handleChangeDiscount(e, params.row.index, index);
-                          }}
-                          inputProps={{ maxLength: 15 }}
-                          allowNegative={false}
-                          fixedDecimalScale
-                          value={String(params.value)}
-                          disabled={dataDetail.status > 1}
-                          autoComplete="off"/>
+            <NumberFormat
+              customInput={TextField}
+              variant="outlined"
+              className={condition ? classes.MtextFieldNumberError : classes.MtextFieldNumber}
+              style={{ borderColor: 'red' }}
+              thousandSeparator={true}
+              decimalScale={2}
+              onChange={(e: any) => {
+                handleChangeDiscount(e, params.row.index, index);
+              }}
+              fixedDecimalScale
+              value={String(params.value)}
+              disabled={dataDetail.status > 1}
+              autoComplete="off"
+            />
             {condition && <div className="title">{errorList[index].errorDiscount}</div>}
           </div>
         );
@@ -406,8 +411,13 @@ export const ModalTransferItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params) => (
         <HtmlTooltip title={<React.Fragment>{numberWithCommas(params.value)}</React.Fragment>}>
-          <Typography color="#F54949" fontSize="15px" textAlign="end" width="100%" fontWeight="bold"
-                      className={classes.MTextEllipsis}
+          <Typography
+            color="#F54949"
+            fontSize="15px"
+            textAlign="end"
+            width="100%"
+            fontWeight="bold"
+            className={classes.MTextEllipsis}
           >
             {numberWithCommas(params.value)}
           </Typography>
@@ -423,8 +433,13 @@ export const ModalTransferItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params) => (
         <HtmlTooltip title={<React.Fragment>{numberWithCommas(params.value)}</React.Fragment>}>
-          <Typography color="#36C690" fontSize="15px" textAlign="end" width="100%" fontWeight="bold"
-                      className={classes.MTextEllipsis}
+          <Typography
+            color="#36C690"
+            fontSize="15px"
+            textAlign="end"
+            width="100%"
+            fontWeight="bold"
+            className={classes.MTextEllipsis}
           >
             {numberWithCommas(params.value)}
           </Typography>
@@ -439,8 +454,12 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const index = (errorList && errorList.length > 0) ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
-        const indexStock = (checkStocks && checkStocks.length > 0) ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode) : -1;
+        const index =
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+        const indexStock =
+          checkStocks && checkStocks.length > 0
+            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode)
+            : -1;
         const condition = (index != -1 && errorList[index].errorNumberOfDiscounted) || indexStock !== -1;
         return (
           <div className={classes.MLabelTooltipWrapper}>
@@ -469,8 +488,12 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const index = (errorList && errorList.length > 0) ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
-        const indexStock = (checkStocks && checkStocks.length > 0) ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode) : -1;
+        const index =
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+        const indexStock =
+          checkStocks && checkStocks.length > 0
+            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode)
+            : -1;
         const condition = (index != -1 && errorList[index].errorNumberOfApproved) || indexStock !== -1;
         return (
           <div className={classes.MLabelTooltipWrapper}>
@@ -487,7 +510,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfApproved}</div>}
           </div>
-        )
+        );
       },
       renderHeader: (params) => {
         return (
@@ -511,9 +534,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params) => (
         <HtmlTooltip title={<React.Fragment>{numberWithCommas(addTwoDecimalPlaces(params.value))}</React.Fragment>}>
-          <Typography width="100%" textAlign="right"
-                      className={classes.MTextEllipsis}
-          >
+          <Typography width="100%" textAlign="right" className={classes.MTextEllipsis}>
             {numberWithCommas(addTwoDecimalPlaces(params.value))}
           </Typography>
         </HtmlTooltip>
@@ -539,7 +560,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const index = (errorList && errorList.length > 0) ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+        const index =
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
         const condition = index != -1 && errorList[index].errorExpiryDate;
         return (
           <div className={classes.MLabelTooltipWrapper}>
@@ -550,7 +572,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
               }}
               value={params.value}
               placeHolder="วว/ดด/ปปปป"
-              disabled={(dataDetail.status > 1 && !approvePermission) || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)}
+              disabled={
+                (dataDetail.status > 1 && !approvePermission) || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)
+              }
             />
             {condition && <div className="title">{errorList[index].errorExpiryDate}</div>}
           </div>
@@ -705,82 +729,56 @@ export const ModalTransferItem = (props: DataGridProps) => {
         // onCellFocusOut={handleCalculateItems}
       />
       <Box display="flex" justifyContent="space-between" paddingTop="30px">
-        <Box display="flex">
-          <Box>
-            <Typography fontSize="14px" lineHeight="21px" height="24px">
-              หมายเหตุจากสาขา :{' '}
-            </Typography>
-            <TextField
-              placeholder=" ความยาวไม่เกิน 100 ตัวอักษร"
-              multiline
-              rows={5}
-              className={classes.MTextareaBD}
-              inputProps={{
-                maxLength: '100',
-              }}
-              sx={{ width: '339px' }}
-              variant="outlined"
-              value={payloadBarcodeDiscount ? payloadBarcodeDiscount.requesterNote : ''}
-              onChange={(e) => {
-                handleChangeNote(e.target.value);
-              }}
-              disabled={dataDetail.status > 1}
+        <Grid container spacing={2} mb={2}>
+          <Grid item xs={3}>
+            <TextBoxComment
+              fieldName="หมายเหตุจากผู้อนุมัติ :"
+              defaultValue={classes.MTextareaBD}
+              maxLength={100}
+              onChangeComment={handleChangeNote}
+              isDisable={dataDetail.status > 1}
             />
-            <Box color="#AEAEAE" width="100%" textAlign="right">
-              {countText}/100
+          </Grid>
+          <Grid item xs={1}></Grid>
+          <Grid item xs={3}>
+            <Box style={{ display: dataDetail.status > 1 && approvePermission ? undefined : 'none' }}>
+              <TextBoxComment
+                fieldName="หมายเหตุจากผู้อนุมัติ :"
+                defaultValue={approveReject ? approveReject.approvalNote : ''}
+                maxLength={100}
+                onChangeComment={handleChangeReason}
+                isDisable={dataDetail.status > 2 || !approvePermission}
+              />
             </Box>
-          </Box>
-          <Box sx={{paddingLeft: 20}} style={{ display: (dataDetail.status > 1 && approvePermission) ? undefined : 'none' }}>
-            <Typography fontSize="14px" lineHeight="21px" height="24px">
-              หมายเหตุจากผู้อนุมัติ :{' '}
-            </Typography>
-            <TextField
-                placeholder=" ความยาวไม่เกิน 100 ตัวอักษร"
-                multiline
-                rows={5}
-                className={classes.MTextareaBD}
-                inputProps={{
-                  maxLength: '100',
-                }}
-                sx={{ width: '339px' }}
-                variant="outlined"
-                value={approveReject ? approveReject.approvalNote : ''}
-                onChange={(e) => {
-                  handleChangeReason(e.target.value);
-                }}
-                disabled={dataDetail.status > 2 || !approvePermission}
-            />
-            <Box color="#AEAEAE" width="100%" textAlign="right">
-              {(approveReject && approveReject.approvalNote) ? approveReject.approvalNote.split('').length : 0}/100
+          </Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={3}>
+            <Box display="flex" justifyContent="space-between" marginTop="25px">
+              <Typography fontSize="14px" lineHeight="21px" height="24px">
+                ขอส่วนลดทั้งหมด
+              </Typography>
+              <TextField
+                disabled
+                type="text"
+                sx={{ bgcolor: '#EAEBEB' }}
+                className={classes.MtextFieldNumberNoneArrow}
+                value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
+              />
             </Box>
-          </Box>
-        </Box>
-        <Box width="350px" marginTop="20px">
-          <Box display="flex" justifyContent="space-between">
-            <Typography fontSize="14px" lineHeight="21px" height="24px">
-              ขอส่วนลดทั้งหมด
-            </Typography>
-            <TextField
-              disabled
-              type="text"
-              sx={{ bgcolor: '#EAEBEB' }}
-              className={classes.MtextFieldNumberNoneArrow}
-              value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
-            />
-          </Box>
-          <Box display="flex" justifyContent="space-between" marginTop="10px">
-            <Typography fontSize="14px" fontWeight="700" marginTop="6px">
-              ส่วนลดที่อนุมัติทั้งหมด
-            </Typography>
-            <TextField
-              type="text"
-              sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
-              inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
-              className={classes.MtextFieldNumberNoneArrow}
-              value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
-            />
-          </Box>
-        </Box>
+            <Box display="flex" justifyContent="space-between" marginTop="10px">
+              <Typography fontSize="14px" fontWeight="700" marginTop="6px">
+                ส่วนลดที่อนุมัติทั้งหมด
+              </Typography>
+              <TextField
+                type="text"
+                sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
+                inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
+                className={classes.MtextFieldNumberNoneArrow}
+                value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
+              />
+            </Box>
+          </Grid>
+        </Grid>
       </Box>
 
       <SnackbarStatus
