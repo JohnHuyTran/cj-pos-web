@@ -282,7 +282,7 @@ export default function SupplierCheckOrderSearch() {
               sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
-              disable={false}
+              disable={groupBranch}
             />
           </Grid>
           <Grid item xs={4}>
@@ -293,6 +293,7 @@ export default function SupplierCheckOrderSearch() {
               sourceBranchCode={branchFromCode}
               onChangeBranch={handleChangeBranchTo}
               isClear={clearBranchDropDown}
+              filterOutDC={groupBranch}
             />
           </Grid>
 

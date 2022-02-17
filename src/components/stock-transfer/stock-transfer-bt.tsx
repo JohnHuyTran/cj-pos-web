@@ -212,31 +212,77 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             </Grid>
 
             {isDraft && (
-              <Grid container spacing={2} mb={2}>
-                <Grid item lg={2}>
-                  <Typography variant='body2'> สาเหตุการโอน :</Typography>
+              <>
+                <Grid container spacing={2} mb={2}>
+                  <Grid item lg={2}>
+                    <Typography variant='body2'> สาเหตุการโอน :</Typography>
+                  </Grid>
+                  <Grid item lg={3}>
+                    <Typography variant='body2'>{reasons} </Typography>
+                  </Grid>
+                  <Grid item lg={1}></Grid>
+                  <Grid item lg={2}></Grid>
+                  <Grid item lg={3}>
+                    <>
+                      <Box>
+                        <Link
+                          component='button'
+                          variant='body2'
+                          onClick={(e) => {
+                            handleLinkDocument(DOCUMENT_TYPE.BT);
+                          }}>
+                          เรียกดูเอกสารใบโอน BT
+                        </Link>
+                      </Box>
+                    </>
+                  </Grid>
+                  <Grid item lg={1}></Grid>
                 </Grid>
-                <Grid item lg={3}>
-                  <Typography variant='body2'>{reasons} </Typography>
+                <Grid
+                  item
+                  container
+                  xs={12}
+                  sx={{ mt: 3 }}
+                  justifyContent='space-between'
+                  direction='row'
+                  alignItems='flex-end'>
+                  <Grid item xl={5}>
+                    <Button
+                      id='btnAddItem'
+                      variant='contained'
+                      color='info'
+                      className={classes.MbtnPrint}
+                      onClick={handleOpenAddItems}
+                      startIcon={<ControlPoint />}
+                      sx={{ width: 200 }}>
+                      เพิ่มสินค้า
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button
+                      id='btnSave'
+                      variant='contained'
+                      color='warning'
+                      className={classes.MbtnSave}
+                      onClick={handleSaveBtn}
+                      startIcon={<SaveIcon />}
+                      sx={{ width: 200 }}>
+                      บันทึก
+                    </Button>
+
+                    <Button
+                      id='btnApprove'
+                      variant='contained'
+                      color='primary'
+                      className={classes.MbtnApprove}
+                      onClick={handleConfirmBtn}
+                      startIcon={<CheckCircleOutline />}
+                      sx={{ width: 200 }}>
+                      ส่งงานให้ DC
+                    </Button>
+                  </Grid>
                 </Grid>
-                <Grid item lg={1}></Grid>
-                <Grid item lg={2}></Grid>
-                <Grid item lg={3}>
-                  <>
-                    <Box>
-                      <Link
-                        component='button'
-                        variant='body2'
-                        onClick={(e) => {
-                          handleLinkDocument(DOCUMENT_TYPE.BT);
-                        }}>
-                        เรียกดูเอกสารใบโอน BT
-                      </Link>
-                    </Box>
-                  </>
-                </Grid>
-                <Grid item lg={1}></Grid>
-              </Grid>
+              </>
             )}
 
             {!isDraft && !isDC && (
@@ -287,52 +333,9 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               </Grid>
             )}
           </Box>
-          {isDraft && (
-            <Grid
-              item
-              container
-              xs={12}
-              sx={{ mt: 3 }}
-              justifyContent='space-between'
-              direction='row'
-              alignItems='flex-end'>
-              <Grid item xl={5}>
-                <Button
-                  id='btnAddItem'
-                  variant='contained'
-                  color='info'
-                  className={classes.MbtnPrint}
-                  onClick={handleOpenAddItems}
-                  startIcon={<ControlPoint />}
-                  sx={{ width: 200 }}>
-                  เพิ่มสินค้า
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  id='btnSave'
-                  variant='contained'
-                  color='warning'
-                  className={classes.MbtnSave}
-                  onClick={handleSaveBtn}
-                  startIcon={<SaveIcon />}
-                  sx={{ width: 200 }}>
-                  บันทึก
-                </Button>
-
-                <Button
-                  id='btnApprove'
-                  variant='contained'
-                  color='primary'
-                  className={classes.MbtnApprove}
-                  onClick={handleConfirmBtn}
-                  startIcon={<CheckCircleOutline />}
-                  sx={{ width: 200 }}>
-                  ส่งงานให้ DC
-                </Button>
-              </Grid>
-            </Grid>
-          )}
+          {/* {isDraft && (
+           
+          )} */}
 
           {isDC && btStatus === 'READY_TO_TRANSFER' && (
             <Grid

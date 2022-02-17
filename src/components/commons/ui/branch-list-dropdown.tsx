@@ -13,9 +13,10 @@ interface Props {
   onChangeBranch: (branchCode: string) => void;
   isClear: boolean;
   disable?: boolean;
+  filterOutDC?: boolean;
 }
 
-function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isClear, disable }: Props) {
+function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isClear, disable, filterOutDC }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [valueBranchList, setValueBranchList] = React.useState<BranchListOptionType | null>(null);
@@ -26,10 +27,12 @@ function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isC
     if (valueBranch) setValueBranchList(valueBranch);
     else setValueBranchList(null);
   }, [isClear]);
-
+  const filterDC = (branch: BranchInfo) => {
+    return filterOutDC && branch.isDC ? false : true;
+  };
   const defaultPropsBranchList = {
     options: branchList.branchList.data.filter((branch: BranchInfo) => {
-      return branch.code !== sourceBranchCode;
+      return branch.code !== sourceBranchCode && filterDC(branch);
     }),
     getOptionLabel: (option: BranchListOptionType) => `${option.code}-${option.name}`,
   };
