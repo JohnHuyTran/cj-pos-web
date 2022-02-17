@@ -301,7 +301,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       headerName: t('branch'),
       headerAlign: 'center',
       sortable: false,
-      minWidth: 120,
+      minWidth: 110,
       renderCell: (params) => renderCell(params.value),
     },
     {

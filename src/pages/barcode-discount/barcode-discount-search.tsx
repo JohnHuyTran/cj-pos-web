@@ -106,7 +106,6 @@ const BarcodeDiscountSearch = () => {
   };
 
   const onClear = async () => {
-    handleOpenLoading('open', true);
     setFlagSearch(false);
     setValues({
       documentNumber: '',
@@ -126,11 +125,7 @@ const BarcodeDiscountSearch = () => {
       endDate: moment(values.toDate).endOf('day').toISOString(),
       clearSearch: true,
     };
-
     dispatch(barcodeDiscountSearch(payload));
-    setTimeout(() => {
-      handleOpenLoading('open', false);
-    }, 300);
   };
 
   const validateSearch = () => {
