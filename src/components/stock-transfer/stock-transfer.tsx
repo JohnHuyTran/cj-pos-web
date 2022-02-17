@@ -80,7 +80,7 @@ export default function SupplierCheckOrderSearch() {
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   React.useEffect(() => {
-    setDisplaySearchBtn(isAllowActionPermission(ACTIONS.PURCHASE_PI_CLOSE));
+    setDisplaySearchBtn(isAllowActionPermission(ACTIONS.STOCK_BT_VIEW));
     if (groupBranch) {
       setBranchFromCode(env.branch.code);
       setValues({ ...values, branchFrom: env.branch.code });
@@ -361,8 +361,8 @@ export default function SupplierCheckOrderSearch() {
               variant='contained'
               color='primary'
               onClick={onClickValidateForm}
-              // sx={{ width: '13%', ml: 2, display: `${displaySearchBtn ? 'none' : ''}` }}
-              sx={{ width: '13%', ml: 2 }}
+              sx={{ width: '13%', ml: 2, display: `${displaySearchBtn ? 'none' : ''}` }}
+              // sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}>
               ค้นหา
             </Button>
