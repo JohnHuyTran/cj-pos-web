@@ -48,7 +48,7 @@ function OrderList() {
     },
     {
       field: 'shipmentNo',
-      headerName: 'เลขที่เอกสาร LD',
+      headerName: 'เลขที่เอกสาร',
       // minWidth: 161,
       flex: 1.3,
       headerAlign: 'center',

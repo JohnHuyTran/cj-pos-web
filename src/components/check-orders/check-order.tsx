@@ -19,6 +19,8 @@ import LoadingModal from '../commons/ui/loading-modal';
 import { useStyles } from '../../styles/makeTheme';
 import { SearchOff } from '@mui/icons-material';
 import AlertError from '../commons/ui/alert-error';
+import BranchListDropDown from '../commons/ui/branch-list-dropdown';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 
 // moment.locale("en");
 moment.locale('th');
@@ -30,6 +32,8 @@ interface State {
   orderType: string;
   dateFrom: string;
   dateTo: string;
+  branchFrom: string;
+  branchTo: string;
 }
 interface loadingModalState {
   open: boolean;
@@ -49,6 +53,8 @@ function CheckOrderSearch() {
     orderType: 'ALL',
     dateFrom: '',
     dateTo: '',
+    branchFrom: '',
+    branchTo: '',
   });
 
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
@@ -122,6 +128,7 @@ function CheckOrderSearch() {
     setFlagSearch(false);
     setStartDate(null);
     setEndDate(null);
+    setClearBranchDropDown(!clearBranchDropDown);
     setValues({
       orderShipment: '',
       // orderNo: "",
@@ -129,6 +136,8 @@ function CheckOrderSearch() {
       orderType: 'ALL',
       dateFrom: '',
       dateTo: '',
+      branchFrom: '',
+      branchTo: '',
     });
 
     const payload: ShipmentRequest = {
@@ -157,6 +166,29 @@ function CheckOrderSearch() {
 
   const handleEndDatePicker = (value: Date) => {
     setEndDate(value);
+  };
+
+  const [branchFromCode, setBranchFromCode] = React.useState('');
+  const [branchToCode, setBranchToCode] = React.useState('');
+  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const handleChangeBranchFrom = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setBranchFromCode(branchCode);
+      setValues({ ...values, branchFrom: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branchFrom: '' });
+    }
+  };
+
+  const handleChangeBranchTo = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setBranchToCode(branchCode);
+      setValues({ ...values, branchTo: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branchTo: '' });
+    }
   };
 
   let orderListData;
@@ -206,10 +238,69 @@ function CheckOrderSearch() {
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่เอกสาร LD/เลขที่เอกสาร SD"
+              placeholder="เลขที่เอกสาร LD/BT/SD"
             />
           </Grid>
           <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              สาขาต้นทาง
+            </Typography>
+            <BranchListDropDown
+              sourceBranchCode={branchToCode}
+              onChangeBranch={handleChangeBranchFrom}
+              isClear={clearBranchDropDown}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              สาขาปลายทาง
+            </Typography>
+            <BranchListDropDown
+              sourceBranchCode={branchFromCode}
+              onChangeBranch={handleChangeBranchTo}
+              isClear={clearBranchDropDown}
+            />
+          </Grid>
+
+          <Grid item xs={4} sx={{ pt: 30 }}>
+            <Typography gutterBottom variant="subtitle1" component="div">
+              วันที่รับสินค้า
+            </Typography>
+            <Typography gutterBottom variant="subtitle1" component="div">
+              ตั้งแต่
+            </Typography>
+            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+          </Grid>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+              ถึง
+            </Typography>
+            <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
+          </Grid>
+          <Grid item xs={4} container>
+            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+              สถานะ
+            </Typography>
+            <FormControl fullWidth className={classes.Mselect}>
+              <Select
+                id="selOrderStatus"
+                name="orderStatus"
+                value={values.orderStatus}
+                onChange={handleChange}
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
+                <MenuItem value={'ALL'} selected={true}>
+                  ทั้งหมด
+                </MenuItem>
+                <MenuItem value={'0'}>บันทึก</MenuItem>
+                <MenuItem value={'1'}>อนุมัติ</MenuItem>
+                <MenuItem value={'9'}>รออนุมัติ 1</MenuItem>
+                <MenuItem value={'2'}>ปิดงาน</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               ประเภท
             </Typography>
@@ -230,56 +321,24 @@ function CheckOrderSearch() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สถานะ
-            </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id="selOrderStatus"
-                name="orderStatus"
-                value={values.orderStatus}
-                onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
-                <MenuItem value={'ALL'} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem value={'0'}>บันทึก</MenuItem>
-                <MenuItem value={'1'}>อนุมัติ</MenuItem>
-                <MenuItem value={'2'}>ปิดงาน</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
 
-          <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div">
-              วันที่รับสินค้า
-            </Typography>
-            <Typography gutterBottom variant="subtitle1" component="div">
-              ตั้งแต่
-            </Typography>
-            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
-          </Grid>
-          <Grid item xs={4} container alignItems="flex-end">
-            <Box sx={{ width: '100%' }}>
-              <Typography gutterBottom variant="subtitle1" component="div">
-                ถึง
-              </Typography>
-              <DatePickerComponent
-                onClickDate={handleEndDatePicker}
-                value={endDate}
-                type={'TO'}
-                minDateTo={startDate}
-              />
-            </Box>
-          </Grid>
-          <Grid item container xs={4} justifyContent="flex-end" direction="row" alignItems="flex-end">
+          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+            <Button
+              id="btnCreateStockTransferModal"
+              variant="contained"
+              // onClick={handleOpenCreateModal}
+              sx={{ minWidth: '15%' }}
+              className={classes.MbtnClear}
+              startIcon={<AddCircleOutlineOutlinedIcon />}
+              color="secondary"
+            >
+              รับสินค้า
+            </Button>
             <Button
               id="btnClear"
               variant="contained"
               onClick={onClickClearBtn}
-              sx={{ width: '40%' }}
+              sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
             >
@@ -290,7 +349,7 @@ function CheckOrderSearch() {
               variant="contained"
               color="primary"
               onClick={onClickValidateForm}
-              sx={{ width: '40%', ml: 2 }}
+              sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}
             >
               ค้นหา
