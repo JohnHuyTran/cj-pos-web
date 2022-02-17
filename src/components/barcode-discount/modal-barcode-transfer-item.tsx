@@ -729,61 +729,56 @@ export const ModalTransferItem = (props: DataGridProps) => {
         // onCellFocusOut={handleCalculateItems}
       />
       <Box display="flex" justifyContent="space-between" paddingTop="30px">
-        <Box display="flex">
-          <Box>
-            <Typography fontSize="14px" lineHeight="21px" height="24px">
-              หมายเหตุจากสาขา :{' '}
-            </Typography>
+        <Grid container spacing={2} mb={2}>
+          <Grid item xs={3}>
             <TextBoxComment
-              fieldName=" ความยาวไม่เกิน 100 ตัวอักษร"
+              fieldName="หมายเหตุจากผู้อนุมัติ :"
               defaultValue={classes.MTextareaBD}
               maxLength={100}
               onChangeComment={handleChangeNote}
               isDisable={dataDetail.status > 1}
             />
-          </Box>
-          <Box
-            sx={{ paddingLeft: 20 }}
-            style={{ display: dataDetail.status > 1 && approvePermission ? undefined : 'none' }}
-          >
-            <Typography fontSize="14px" lineHeight="21px" height="24px">
-              หมายเหตุจากผู้อนุมัติ :{' '}
-            </Typography>
-            <TextBoxComment
-              fieldName=" ความยาวไม่เกิน 100 ตัวอักษร"
-              defaultValue={approveReject ? approveReject.approvalNote : ''}
-              maxLength={100}
-              onChangeComment={handleChangeReason}
-              isDisable={dataDetail.status > 2 || !approvePermission}
-            />
-          </Box>
-        </Box>
-        <Box width="350px" marginTop="20px">
-          <Box display="flex" justifyContent="space-between">
-            <Typography fontSize="14px" lineHeight="21px" height="24px">
-              ขอส่วนลดทั้งหมด
-            </Typography>
-            <TextField
-              disabled
-              type="text"
-              sx={{ bgcolor: '#EAEBEB' }}
-              className={classes.MtextFieldNumberNoneArrow}
-              value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
-            />
-          </Box>
-          <Box display="flex" justifyContent="space-between" marginTop="10px">
-            <Typography fontSize="14px" fontWeight="700" marginTop="6px">
-              ส่วนลดที่อนุมัติทั้งหมด
-            </Typography>
-            <TextField
-              type="text"
-              sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
-              inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
-              className={classes.MtextFieldNumberNoneArrow}
-              value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
-            />
-          </Box>
-        </Box>
+          </Grid>
+          <Grid item xs={1}></Grid>
+          <Grid item xs={3}>
+            <Box style={{ display: dataDetail.status > 1 && approvePermission ? undefined : 'none' }}>
+              <TextBoxComment
+                fieldName="หมายเหตุจากผู้อนุมัติ :"
+                defaultValue={approveReject ? approveReject.approvalNote : ''}
+                maxLength={100}
+                onChangeComment={handleChangeReason}
+                isDisable={dataDetail.status > 2 || !approvePermission}
+              />
+            </Box>
+          </Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={3}>
+            <Box display="flex" justifyContent="space-between" marginTop="25px">
+              <Typography fontSize="14px" lineHeight="21px" height="24px">
+                ขอส่วนลดทั้งหมด
+              </Typography>
+              <TextField
+                disabled
+                type="text"
+                sx={{ bgcolor: '#EAEBEB' }}
+                className={classes.MtextFieldNumberNoneArrow}
+                value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
+              />
+            </Box>
+            <Box display="flex" justifyContent="space-between" marginTop="10px">
+              <Typography fontSize="14px" fontWeight="700" marginTop="6px">
+                ส่วนลดที่อนุมัติทั้งหมด
+              </Typography>
+              <TextField
+                type="text"
+                sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
+                inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
+                className={classes.MtextFieldNumberNoneArrow}
+                value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
+              />
+            </Box>
+          </Grid>
+        </Grid>
       </Box>
 
       <SnackbarStatus

@@ -488,11 +488,8 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
           <Box mb={4}>{showModalProduct && <STProductItems unSelectAllType={handleUnSelectAllType} />}</Box>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={3}>
-              <Typography fontSize="14px" lineHeight="21px" height="24px">
-                หมายเหตุ :
-              </Typography>
               <TextBoxComment
-                fieldName=" ความยาวไม่เกิน 100 ตัวอักษร"
+                fieldName="หมายเหตุ :"
                 defaultValue={values.comment}
                 maxLength={100}
                 onChangeComment={handleChangeComment}
