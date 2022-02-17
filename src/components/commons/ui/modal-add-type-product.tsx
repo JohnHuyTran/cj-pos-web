@@ -73,12 +73,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     const [selectedItems, setSelectedItems] = useState<any[]>([]);
     const productResponse = useAppSelector((state) => state.searchTypeAndProduct.itemList);
     const productTypeResponse = useAppSelector((state) => state.searchTypeAndProduct.productTypeList);
-    const productByTypeResponse = useAppSelector((state) => state.searchTypeAndProduct.productByTypeList);
     const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
-
-    useEffect(() => {
-        setSelectedItems(payloadAddTypeProduct);  
-    }, [payloadAddTypeProduct]);
 
     const onInputChangeProduct = async (event: any, value: string, reason: string) => {
         if (event && event.keyCode && event.keyCode === 13) {
@@ -271,10 +266,10 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             return selectedItems.map((item: any, index: number) => {
                 if (item.selectedType === 1) {
                     return <SelectedItem label={item.productTypeName} onDelete={() => handleDeleteTypeOrProduct(item)}
-                                        key={index}/>
+                                         key={index}/>
                 } else if (item.selectedType === 2 && !item.productByType) {
                     return <SelectedItem label={item.barcodeName} onDelete={() => handleDeleteTypeOrProduct(item)}
-                                        key={index}/>
+                                         key={index}/>
                 }
             });
         }
@@ -286,19 +281,20 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         }
         let selectedItemFilter = _.cloneDeep(selectedItems);
         if (data.selectedType === 1) {
-            selectedItemFilter = selectedItems.filter((it: any) => it.selectedType === 2 || (it.selectedType === data.selectedType && data.productTypeCode !== it.productTypeCode));
+            selectedItemFilter = selectedItems.filter((it: any) => (
+                    it.selectedType === data.selectedType && it.productTypeCode !== data.productTypeCode)
+                || (it.selectedType === 2 && data.productTypeCode !== it.ProductTypeCode));
         } else if (data.selectedType === 2) {
-            selectedItemFilter = selectedItems.filter((it: any) => it.selectedType === 1 || (it.selectedType === data.selectedType && data.barcode !== it.barcode));
+            selectedItemFilter = selectedItems.filter((it: any) => it.selectedType === 1 || it.barcode !== data.barcode);
         }
         setSelectedItems(selectedItemFilter);
-
     };
 
     const handleAddItem = async () => {
         let selectedAddItems = _.cloneDeep(selectedItems);
         if (!objectNullOrEmpty(values.productType) && values.selectAllProduct) {
-            let productTypeExist = (selectedItems && selectedItems.length > 0) 
-            ? selectedItems.filter((it: any) => it.selectedType === 1 && it.productTypeCode === values.productType.productTypeCode) : [];
+            let productTypeExist = (selectedItems && selectedItems.length > 0)
+                ? selectedItems.filter((it: any) => it.selectedType === 1 && it.productTypeCode === values.productType.productTypeCode) : [];
             if (productTypeExist != null && productTypeExist.length > 0) {
                 let error = {...values.error};
                 error.productTypeExist = 'ประเภทสินค้านี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง';
@@ -335,8 +331,8 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             }
             setOpenLoadingModal(false);
         } else if (!objectNullOrEmpty(values.product)) {
-            let productExist =  (selectedItems && selectedItems.length > 0) ? 
-            selectedItems.filter((it: any) => it.selectedType === 2 && it.barcode === values.product.barcode) : [];
+            let productExist = (selectedItems && selectedItems.length > 0) ?
+                selectedItems.filter((it: any) => it.selectedType === 2 && it.barcode === values.product.barcode) : [];
             if (productExist != null && productExist.length > 0) {
                 let error = {...values.error};
                 error.productExist = 'สินค้านี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง';
@@ -366,7 +362,26 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
 
     const handleAddProduct = () => {
         setOpenLoadingModal(true);
-        dispatch(updateAddTypeAndProductState(selectedItems));
+        let selectedItemEnds = _.cloneDeep(selectedItems);
+        if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0) {
+            for (const item of payloadAddTypeProduct) {
+                if (item.selectedType === 1) {
+                    let selectedItemFilter = selectedItems.filter(it => it.selectedType === item.selectedType
+                        && it.productTypeCode === item.productTypeCode);
+                    if (selectedItemFilter && selectedItemFilter.length === 0) {
+                        selectedItemEnds.push(item);
+                    }
+                } else if (item.selectedType === 2) {
+                    let selectedItemFilter = selectedItems.filter(it => it.selectedType === item.selectedType
+                        && it.barcode === item.barcode);
+                    if (selectedItemFilter && selectedItemFilter.length === 0) {
+                        selectedItemEnds.push(item);
+                    }
+                }
+            }
+        }
+        dispatch(updateAddTypeAndProductState(selectedItemEnds));
+        setSelectedItems([]);
         setTimeout(() => {
             setOpenLoadingModal(false);
             props.onClose();
@@ -429,7 +444,8 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                                 </Typography>
                                 <FormGroup>
                                     <FormControlLabel
-                                        control={<Checkbox checked={values.selectAllProduct}/>}
+                                        control={<Checkbox checked={values.selectAllProduct}
+                                                           disabled={objectNullOrEmpty(values.productType)}/>}
                                         onClick={onChangeSelectAllProduct}
                                         label={"เลือกสินค้าทั้งหมด"}
                                     />
@@ -478,6 +494,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 <Button variant="contained" color="info"
                         startIcon={<AddCircleOutlineOutlinedIcon/>}
                         onClick={handleAddProduct}
+                        disabled={!(selectedItems && selectedItems.length > 0)}
                         className={classes.MbtnSearch}>
                     เพิ่มสินค้า
                 </Button>
