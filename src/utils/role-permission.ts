@@ -2,6 +2,7 @@ import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
 import { getUserInfo } from '../store/sessionStore';
 import {
   ACTIONS,
+  KEYCLOAK_GROUP_BRANCH_MANAGER,
   KEYCLOAK_GROUP_BRANCH_MANAGER01,
   KEYCLOAK_GROUP_DC01,
   KEYCLOAK_GROUP_OC1,
@@ -20,7 +21,7 @@ export const getUserGroup = (groups: string[]) => {
   }
   if (group === KEYCLOAK_GROUP_DC01) {
     return PERMISSION_GROUP.DC;
-  } else if (group === KEYCLOAK_GROUP_BRANCH_MANAGER01) {
+  } else if (group === KEYCLOAK_GROUP_BRANCH_MANAGER01 || group === KEYCLOAK_GROUP_BRANCH_MANAGER) {
     return PERMISSION_GROUP.BRANCH;
   } else if (group === KEYCLOAK_GROUP_SCM) {
     return PERMISSION_GROUP.SCM;

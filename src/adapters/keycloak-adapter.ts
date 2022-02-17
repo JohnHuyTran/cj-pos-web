@@ -51,17 +51,22 @@ export function authentication(payload: loginForm): Promise<Response> {
         setUserInfo(userInfo);
         return response.data;
       }
+
       throw new Error(response.status.toString());
     })
     .catch((error: any) => {
-      console.log(error.code);
-      if (error.code === 'ECONNABORTED') {
-        const err = new POSException(
-          error.response?.status,
-          ERROR_CODE.TIME_OUT,
-          'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
-        );
-        throw err;
+      // if (error.code === 'Network Error') {
+      //   const err = new POSException(
+      //     error.response?.status,
+      //     ERROR_CODE.TIME_OUT,
+      //     'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
+      //   );
+      // }
+      if (error.code) {
+        throw new Error(error.code);
+      }
+      if (error.response.status) {
+        throw new Error(error.response.status);
       }
     });
 }

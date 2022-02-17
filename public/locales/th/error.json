@@ -6,8 +6,9 @@
     "commentIsEmpty": "กรุณาระบุสาเหตุการเปลี่ยนจำนวน"
   },
   "authentication": {
-    "notauthorize": "user is not permissiong"
+    "notauthorize": "user is not permission"
   },
   "default": "ไม่สามารถเชื่อมต่อกับระบบได้ในขณะนี้\nกรุณาลองใหม่อีกครั้ง",
-  "timeout": "ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด"
+  "timeout": "ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด",
+  "401": "user is unauthorized"
 }
