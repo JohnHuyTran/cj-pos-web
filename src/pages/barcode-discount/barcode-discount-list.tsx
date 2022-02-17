@@ -1,6 +1,6 @@
 import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useStyles } from '../../styles/makeTheme';
 import { useTranslation } from 'react-i18next';
 import {
@@ -11,7 +11,7 @@ import {
 } from '../../models/barcode-discount-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { Action, BDStatus, DateFormat } from '../../utils/enum/common-enum';
-import {genColumnValue, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty} from '../../utils/utils';
+import { genColumnValue, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import HtmlTooltip from '../../components/commons/ui/html-tooltip';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
@@ -19,8 +19,8 @@ import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-searc
 import ModalCreateBarcodeDiscount from '../../components/barcode-discount/modal-create-barcode-discount';
 import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-detail-slice';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
-import {KeyCloakTokenInfo} from "../../models/keycolak-token-info";
-import {getUserInfo} from "../../store/sessionStore";
+import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
+import { getUserInfo } from '../../store/sessionStore';
 
 const _ = require('lodash');
 
@@ -70,7 +70,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
           branch: data.branchName,
           createdDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
           approvedDate:
-            BDStatus.APPROVED === data.status || BDStatus.BARCODE_PRINTED === data.status
+            BDStatus.APPROVED == data.status || BDStatus.BARCODE_PRINTED == data.status
               ? convertUtcToBkkDate(data.approvedDate, DateFormat.DATE_FORMAT)
               : '',
           requesterNote: stringNullOrEmpty(data.requesterNote) ? '' : data.requesterNote,
@@ -81,7 +81,11 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       //permission
       const userInfo: KeyCloakTokenInfo = getUserInfo();
       if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
-        setUserPermission((userInfo.acl['service.posback-campaign'] != null && userInfo.acl['service.posback-campaign'].length > 0) ? userInfo.acl['service.posback-campaign'] : []);
+        setUserPermission(
+          userInfo.acl['service.posback-campaign'] != null && userInfo.acl['service.posback-campaign'].length > 0
+            ? userInfo.acl['service.posback-campaign']
+            : []
+        );
       }
     }
   }, [bdSearchResponse]);
@@ -174,9 +178,10 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
     {
       field: 'index',
       headerName: t('numberOrder'),
-      flex: 0.6,
       headerAlign: 'center',
       sortable: false,
+      minWidth: 80,
+      width: 80,
       renderCell: (params) => (
         <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
@@ -186,26 +191,27 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
     {
       field: 'documentNumber',
       headerName: t('bdDocumentNumber'),
-      flex: 1.5,
       headerAlign: 'center',
       sortable: false,
+      minWidth: 170,
     },
     {
       field: 'status',
       headerName: t('status'),
-      flex: 1.2,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
+      minWidth: 120,
       renderCell: (params) => genRowStatus(params),
     },
     {
       field: 'totalAmount',
       headerName: t('totalAmount'),
-      flex: 0.9,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      minWidth: 115,
+      width: 115,
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
@@ -222,17 +228,18 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
     {
       field: 'unit',
       headerName: t('unit'),
-      flex: 0.6,
       headerAlign: 'center',
       sortable: false,
+      minWidth: 70,
+      width: 70,
     },
     {
       field: 'sumOfPrice',
       headerName: t('sumOfPrice'),
-      flex: 1,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      minWidth: 135,
       renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value))),
       renderHeader: (params) => {
         return (
@@ -250,10 +257,10 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
     {
       field: 'sumOfCashDiscount',
       headerName: t('sumOfCashDiscount'),
-      flex: 1,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      minWidth: 135,
       renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value))),
       renderHeader: (params) => {
         return (
@@ -271,10 +278,10 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
     {
       field: 'sumOfPriceAfterDiscount',
       headerName: t('sumOfPriceAfterDiscount'),
-      flex: 1,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      minWidth: 135,
       renderCell: (params) => renderCell(numberWithCommas(addTwoDecimalPlaces(params.value))),
       renderHeader: (params) => {
         return (
@@ -292,17 +299,17 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
     {
       field: 'branch',
       headerName: t('branch'),
-      flex: 1,
       headerAlign: 'center',
       sortable: false,
+      minWidth: 120,
       renderCell: (params) => renderCell(params.value),
     },
     {
       field: 'createdDate',
       headerName: t('createDate'),
-      flex: 1,
       headerAlign: 'center',
       align: 'center',
+      minWidth: 100,
       sortable: false,
       renderHeader: (params) => {
         return (
@@ -320,21 +327,20 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
     {
       field: 'approvedDate',
       headerName: t('approvedDate'),
-      flex: 1,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
+      minWidth: 100,
     },
     {
       field: 'requesterNote',
       headerName: t('remark'),
-      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
+      minWidth: 105,
       renderCell: (params) => renderCell(params.value),
     },
   ];
-
   const genRowStatus = (params: GridValueGetterParams) => {
     let statusDisplay;
     let status = params.value ? params.value.toString() : '';

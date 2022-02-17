@@ -135,6 +135,7 @@ export default function ModalCreateBarcodeDiscount({
       setTextPopup('คุณได้ทำการไม่อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
       setOpenPopupModal(true);
       handleClose();
+      if (onSearchBD) onSearchBD();
     }
   };
 
@@ -199,6 +200,7 @@ export default function ModalCreateBarcodeDiscount({
           documentNumber: barcodeDiscountDetail.documentNumber,
           status: barcodeDiscountDetail.status,
           createdDate: barcodeDiscountDetail.createdDate,
+          approvedDate: barcodeDiscountDetail.approvedDate,
           percentDiscount: barcodeDiscountDetail.percentDiscount,
         })
       );
@@ -220,6 +222,7 @@ export default function ModalCreateBarcodeDiscount({
             unitPrice: item.price,
             discount: item.requestedDiscount,
             qty: item.numberOfDiscounted,
+            numberOfApproved: item.numberOfApproved,
             expiryDate: item.expiredDate,
             skuCode: item.skuCode,
           });
@@ -318,9 +321,8 @@ export default function ModalCreateBarcodeDiscount({
 
   const handleCreateDraft = async (sendRequest: boolean) => {
     if (validate(false)) {
-      // const rsCheckStock = await handleCheckStock();
-      // if (rsCheckStock) {
-      if (true) {
+      const rsCheckStock = await handleCheckStock();
+      if (rsCheckStock) {
         await dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount}));
         try {
           const body = !!dataDetail.id
@@ -497,7 +499,7 @@ export default function ModalCreateBarcodeDiscount({
                 วันที่อนุมัติ :
               </Grid>
               <Grid item xs={4}>
-                -
+                {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
               </Grid>
             </Grid>
             <Grid container item xs={6} sx={{ marginBottom: '15px' }}>

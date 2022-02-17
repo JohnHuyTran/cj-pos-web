@@ -19,8 +19,11 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
 import { saveSearchCriteriaBD } from '../../store/slices/barcode-discount-criteria-search-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
-import { Action } from '../../utils/enum/common-enum';
+import {Action} from '../../utils/enum/common-enum';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
+import {KeyCloakTokenInfo} from "../../models/keycolak-token-info";
+import {getUserInfo} from "../../store/sessionStore";
+import {ACTIONS} from "../../utils/enum/permission-enum";
 
 interface State {
   documentNumber: string;
@@ -54,6 +57,8 @@ const BarcodeDiscountSearch = () => {
   const page = '1';
   const limit = useAppSelector((state) => state.barcodeDiscountSearchSlice.bdSearchResponse.perPage);
   const barcodeDiscountSearchSlice = useAppSelector((state) => state.barcodeDiscountSearchSlice);
+  const [userPermission, setUserPermission] = useState<any[]>([]);
+  const [approvePermission, setApprovePermission] = useState<boolean>(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
@@ -65,6 +70,15 @@ const BarcodeDiscountSearch = () => {
 
   useEffect(() => {
     setLstStatus(t('lstStatus', { returnObjects: true }));
+    //permission
+    const userInfo: KeyCloakTokenInfo = getUserInfo();
+    if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
+      let userPermission = (userInfo.acl['service.posback-campaign'] != null && userInfo.acl['service.posback-campaign'].length > 0)
+          ? userInfo.acl['service.posback-campaign'] : []
+      setUserPermission(userPermission);
+      setApprovePermission((userPermission != null && userPermission.length > 0)
+          ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false);
+    }
   }, []);
 
   const getStatusText = (key: string) => {
@@ -228,7 +242,7 @@ const BarcodeDiscountSearch = () => {
                 <MenuItem value={'ALL'} selected={true}>
                   {t('all')}
                 </MenuItem>
-                <MenuItem value={'1'}>{getStatusText('1')}</MenuItem>
+                {approvePermission ? <></> : <MenuItem value={'1'}>{getStatusText('1')}</MenuItem>}
                 <MenuItem value={'2'}>{getStatusText('2')}</MenuItem>
                 <MenuItem value={'3'}>{getStatusText('3')}</MenuItem>
                 <MenuItem value={'4'}>{getStatusText('4')}</MenuItem>
@@ -269,6 +283,7 @@ const BarcodeDiscountSearch = () => {
               variant="contained"
               sx={{ width: '200px' }}
               className={classes.MbtnPrint}
+              style={{display: approvePermission ? 'none' : undefined}}
               color="cancelColor"
               startIcon={<PrintSharp />}
             >
@@ -281,6 +296,7 @@ const BarcodeDiscountSearch = () => {
               variant="contained"
               sx={{ width: '220px' }}
               className={classes.MbtnSearch}
+              style={{display: approvePermission ? 'none' : undefined}}
               color="secondary"
               startIcon={<AddCircleOutlineOutlinedIcon />}
               onClick={handleOpenModal}
