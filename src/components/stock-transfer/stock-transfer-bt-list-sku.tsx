@@ -14,9 +14,6 @@ function BranchTransferListSKU() {
 
   const dispatch = useAppDispatch();
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
-  const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
-  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const payloadSearch = useAppSelector((state) => state.saveSearchStock.searchStockTransfer);
 
   const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
   const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
@@ -63,6 +60,17 @@ function BranchTransferListSKU() {
       align: 'right',
       sortable: false,
       renderCell: (params) => numberWithCommas(params.value),
+    },
+    {
+      field: 'orderQty',
+      headerName: 'สั่ง(ชิ้น)',
+      minWidth: 200,
+      headerAlign: 'center',
+      sortable: false,
+      align: 'right',
+      renderCell: (params: GridRenderCellParams) => {
+        return numberWithCommas(calUnitFactor(params));
+      },
     },
     {
       field: 'unitFactor',

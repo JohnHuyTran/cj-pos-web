@@ -6,6 +6,7 @@ import {
   Approve2StockTransferRequest,
   BranchTransferRequest,
   SaveStockTransferRequest,
+  StockBalanceType,
   SubmitStockTransferRequest,
 } from '../models/stock-transfer-model';
 import { getPathUrl } from './base-service';
@@ -174,6 +175,15 @@ export const getPathReportBT = (docType: string, btNo: string) => {
     });
   }
 };
+
+export async function checkStockBalance(payload: StockBalanceType) {
+  try {
+    const response = await post(`${env.backEnd.url}${environment.stock.stockBalance.stockBalanceBySKU.url}`, payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export const getPathRemoveStockRequest = (rtNo: string) => {
   return getPathUrl(`${environment.stock.stockRequest.remove.url}`, {
