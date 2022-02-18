@@ -89,10 +89,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const priceAfterDiscount = price - (cashDiscount || 0);
         let numberOfApproved = !!sameItem
           ? sameItem.numberOfApproved
-          : item.numberOfApproved
-          ? item.numberOfApproved
-          : 0;
-        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : numberOfApproved * priceAfterDiscount;
+          : (item.numberOfApproved ? item.numberOfApproved : 0);
+        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : (numberOfApproved * priceAfterDiscount);
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -153,23 +151,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
       dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, products: [] }));
     }
   }, [dtTable]);
-
-  useEffect(() => {
-    if (checkStocks && checkStocks.length > 0 && Object.keys(payloadAddItem).length !== 0) {
-      const preData = _.cloneDeep(payloadAddItem);
-      const products = preData.map((item: any) => {
-        const stock = checkStocks.find((el: any) => el.barcode === item.barcode);
-        if (stock) {
-          if (Number(BDStatus.WAIT_FOR_APPROVAL) !== dataDetail.status && !approvePermission) {
-            item.qty = stock.stockRemain;
-          }
-        }
-        return item;
-      });
-
-      dispatch(updateAddItemsState(products));
-    }
-  }, [checkStocks]);
 
   const handleClosePopup = () => {
     setOpenPopupModal(false);
@@ -739,7 +720,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
               isDisable={dataDetail.status > 1}
             />
           </Grid>
-          <Grid item xs={1}></Grid>
           <Grid item xs={3}>
             <Box style={{ display: dataDetail.status > 1 && approvePermission ? undefined : 'none' }}>
               <TextBoxComment
@@ -751,7 +731,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               />
             </Box>
           </Grid>
-          <Grid item xs={2}></Grid>
+          <Grid item xs={3}/>
           <Grid item xs={3}>
             <Box display="flex" justifyContent="space-between" marginTop="25px">
               <Typography fontSize="14px" lineHeight="21px" height="24px">
