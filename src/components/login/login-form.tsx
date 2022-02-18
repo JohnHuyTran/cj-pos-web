@@ -58,14 +58,14 @@ function LoginForm() {
     event.preventDefault();
   };
 
-  const onClickLogin = async () => {
+  const onClickLogin = () => {
     const form: loginForm = {
       userId: values.userId,
       password: values.password,
       branchCode: values.branch,
     };
-    await dispatch(loginKeyCloakAsync(form));
-    await dispatch(featchBranchListAsync());
+    dispatch(loginKeyCloakAsync(form));
+    dispatch(featchBranchListAsync());
   };
 
   return (

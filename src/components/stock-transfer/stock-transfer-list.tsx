@@ -302,7 +302,7 @@ function StockTransferList() {
           />
         </div>
       </Box>
-      {openCreateModal && <StockTransferBT isOpen={true} onClickClose={handleCloseCreateModal} />}
+      {openCreateModal && <StockPackChecked isOpen={true} onClickClose={handleCloseCreateModal} />}
       {/* {openCreateModal && <StockTransferBT isOpen={true} onClickClose={handleCloseCreateModal} />} */}
       <LoadingModal open={openLoadingModal.open} />
     </div>
