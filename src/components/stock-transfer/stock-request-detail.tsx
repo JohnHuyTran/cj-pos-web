@@ -13,6 +13,7 @@ import DatePickerComponent from '../commons/ui/date-picker-detail';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import StockRequestItem from './stock-request-item';
 import StockRequestCreateItem from './stock-request-create-item';
+import StockRequestItems from './stock-request-items';
 import { useAppDispatch } from '../../store/store';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
@@ -828,7 +829,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                 </Grid>
               </Grid>
             )}
-          <Box mb={4}>
+          {/* <Box mb={4}>
             {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
               <StockRequestCreateItem
                 type={type}
@@ -841,6 +842,14 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && (
               <StockRequestItem onChangeItems={handleChangeItems} />
             )}
+          </Box> */}
+          <Box mb={4}>
+            <StockRequestItems
+              type={type}
+              onChangeItems={handleChangeItems}
+              changeItems={handleStatusChangeItems}
+              update={flagSave}
+            />
           </Box>
 
           {status !== '' && status !== 'DRAFT' && (
