@@ -77,6 +77,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [openProductMenu, setOpenProductMenu] = React.useState(false);
   const [openSellMenu, setOpenSellMenu] = React.useState(false);
   const [openPickUpMenu, setOpenPickUpMenu] = React.useState(false);
+  const [openTransferMenu, setOpenTransferMenu] = React.useState(false);
 
   const navState = useAppSelector((state) => state.navigator.state);
 
@@ -112,6 +113,10 @@ export default function Sidebar({}: Props): ReactElement {
   const handleClickPickUp = () => {
     setOpenPickUpMenu(!openPickUpMenu);
   };
+
+  const handleClickTransfer = () => {
+    setOpenTransferMenu(!openTransferMenu);
+  };
   return (
     <Drawer
       sx={{
@@ -123,11 +128,12 @@ export default function Sidebar({}: Props): ReactElement {
           boxShadow: '10px 10px 20px rgba(0, 0, 0, 0.1)',
         },
       }}
-      variant='persistent'
-      anchor='left'
-      open={open}>
+      variant="persistent"
+      anchor="left"
+      open={open}
+    >
       <DrawerHeader>
-        <img src={imgLogo} alt='' width='50' />
+        <img src={imgLogo} alt="" width="50" />
         {/* <IconButton onClick={handleDrawerClose}>
           {theme.direction === "ltr" ? (
             <ChevronLeftIcon color="primary" />
@@ -137,83 +143,43 @@ export default function Sidebar({}: Props): ReactElement {
         </IconButton> */}
 
         <div onClick={handleDrawerClose}>
-          <ChevronLeftIcon color='primary' sx={{ marginRight: '-5px' }} />
-          <Menu color='primary' />
+          <ChevronLeftIcon color="primary" sx={{ marginRight: '-5px' }} />
+          <Menu color="primary" />
         </div>
       </DrawerHeader>
 
       <List sx={{ marginTop: 2 }}>
-        <Link to='/' style={{ textDecoration: 'none', color: '#676767' }}>
+        <Link to="/" style={{ textDecoration: 'none', color: '#676767' }}>
           <ListItemButton
-            key='HOME'
+            key="HOME"
             selected={selectedIndex === 0}
             onClick={() => handleListItemClick(0)}
-            id='mainMenuHome'>
+            id="mainMenuHome"
+          >
             <ListItemIcon>
               <HomeOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary='หน้าหลัก' style={{ marginLeft: -15 }} />
+            <ListItemText primary="หน้าหลัก" style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
         {/*sell menu start*/}
         {/* <ListItemButton key='SELL' onClick={handleClickSell} sx={{ display: disableSellMainMenu ? 'none' : '' }}></ListItemButton> */}
-        <ListItemButton key='SELL' onClick={handleClickSell}>
+        <ListItemButton key="SELL" onClick={handleClickSell}>
           <ListItemIcon>
             <ShoppingCartSharp />
           </ListItemIcon>
-          <ListItemText primary='ขาย' style={{ marginLeft: -15 }} />
+          <ListItemText primary="ขาย" style={{ marginLeft: -15 }} />
           {openSellMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openSellMenu} timeout='auto' unmountOnExit>
-          <List component='div' disablePadding>
-            <Link
-              to='/barcode-discount'
-              style={{ textDecoration: 'none', color: '#676767' }}
-              id='subMenuBarcodeDiscount'>
-              <ListItemButton
-                key='BARCODE DISCOUNT'
-                selected={selectedIndex === 3}
-                onClick={() => handleListItemClick(3)}
-                sx={{ pl: 7 }}>
-                <ListItemText primary='ส่วนลดสินค้า' />
-              </ListItemButton>
-            </Link>
-          </List>
-        </Collapse>
-        {/*sell menu end*/}
-        {/* <Link to="/notification" style={{ textDecoration: 'none', color: '#676767' }}>
-          <ListItemButton
-            key="NOTIFICATION"
-            selected={selectedIndex === 1}
-            onClick={() => handleListItemClick(1)}
-            id="mainMenuNotification"
-          >
-            <ListItemIcon>
-              <NotificationsNoneOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText primary="แจ้งเตือน" style={{ marginLeft: -15 }} />
-          </ListItemButton>
-        </Link> */}
-        {/* <Link to="/purchase" style={{ textDecoration: 'none', color: '#676767' }}>
-          <ListItemButton key="PURCHASE" selected={selectedIndex === 2} onClick={() => handleListItemClick(2)}>
-            <ListItemIcon>
-              <ShoppingCartOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText primary="ซื้อ" style={{ marginLeft: -15 }} />
-          </ListItemButton>
-        </Link> */}
-        {/* <ListItemButton onClick={handleClick} id="mainMenuSale">
-          <ListItemIcon>
-            <LoyaltyOutlinedIcon />
-          </ListItemIcon>
-          <ListItemText primary="ขาย" style={{ marginLeft: -15 }} />
-          {openSaleMenu ? <ExpandLess /> : <ExpandMore />}
-        </ListItemButton>
-        <Collapse in={openSaleMenu} timeout="auto" unmountOnExit>
+        <Collapse in={openSellMenu} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            <Link to="/sale" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuSale">
+            <Link
+              to="/barcode-discount"
+              style={{ textDecoration: 'none', color: '#676767' }}
+              id="subMenuBarcodeDiscount"
+            >
               <ListItemButton
-                key="SALE"
+                key="BARCODE DISCOUNT"
                 selected={selectedIndex === 3}
                 onClick={() => handleListItemClick(3)}
                 sx={{ pl: 7 }}
@@ -222,103 +188,88 @@ export default function Sidebar({}: Props): ReactElement {
               </ListItemButton>
             </Link>
           </List>
-        </Collapse> */}
-        {/* <ListItemButton onClick={handleClickProduct} id="mainMenuProducts">
+        </Collapse>
+        <ListItemButton onClick={handleClickPickUp} id="mainMenuPickUp">
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText primary="สินค้า" style={{ marginLeft: -15 }} />
-          {openProductMenu ? <ExpandLess /> : <ExpandMore />}
-        </ListItemButton>
-        <Collapse in={openProductMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <Link to="/products" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuProducts">
-              <ListItemButton
-                key="PRODUCTS"
-                selected={selectedIndex === 4}
-                onClick={() => handleListItemClick(4)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="ข้อมูลสินค้า" />
-              </ListItemButton>
-            </Link>
-          </List>
-        </Collapse> */}
-        <ListItemButton onClick={handleClickPickUp} id='mainMenuProducts'>
-          <ListItemIcon>
-            <LoyaltyOutlinedIcon />
-          </ListItemIcon>
-          <ListItemText primary='รับสินค้า' style={{ marginLeft: -15 }} />
+          <ListItemText primary="รับสินค้า" style={{ marginLeft: -15 }} />
           {openPickUpMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openPickUpMenu} timeout='auto' unmountOnExit>
-          <List component='div' disablePadding>
-            <Link to='/check-order' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuCheckOrder'>
+        <Collapse in={openPickUpMenu} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <Link to="/check-order" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuCheckOrder">
               <ListItemButton
-                key='SALE'
+                key="SALE"
                 selected={selectedIndex === 5}
                 onClick={() => handleListItemClick(5)}
-                sx={{ pl: 7 }}>
-                <ListItemText primary='รับสินค้า' />
+                sx={{ pl: 7 }}
+              >
+                <ListItemText primary="รับสินค้า" />
               </ListItemButton>
             </Link>
-            <Link to='/dc-check-order' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuDCCheckOrder'>
+            <Link to="/dc-check-order" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuDCCheckOrder">
               <ListItemButton
-                key='dcConfirmOrder'
+                key="dcConfirmOrder"
                 selected={selectedIndex === 6}
                 onClick={() => handleListItemClick(6)}
-                sx={{ pl: 7 }}>
-                <ListItemText primary='ตรวจสอบผลต่างการรับสินค้า' />
+                sx={{ pl: 7 }}
+              >
+                <ListItemText primary="ตรวจสอบผลต่างการรับสินค้า" />
               </ListItemButton>
             </Link>
             <Link
-              to='/supplier-check-order'
+              to="/supplier-check-order"
               style={{ textDecoration: 'none', color: '#676767' }}
-              id='subMenuSupplierCheckOrder'>
+              id="subMenuSupplierCheckOrder"
+            >
               <ListItemButton
-                key='supplierCheckOrder'
+                key="supplierCheckOrder"
                 selected={selectedIndex === 7}
                 onClick={() => handleListItemClick(7)}
-                sx={{ pl: 7 }}>
-                <ListItemText primary='รับสินค้า จากผู้จำหน่าย' />
-              </ListItemButton>
-            </Link>
-            <Link
-              to='/stock-transfer-rt'
-              style={{ textDecoration: 'none', color: '#676767' }}
-              id='subMenuStockTransferRt'>
-              <ListItemButton
-                key='StockTransferRt'
-                selected={selectedIndex === 8}
-                onClick={() => handleListItemClick(8)}
-                sx={{ pl: 7 }}>
-                <ListItemText primary='สร้างแผนโอนสินค้าระหว่างสาขา/คลัง' />
-              </ListItemButton>
-            </Link>
-            <Link to='/stock-transfer' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuStockTransfer'>
-              <ListItemButton
-                key='StockTransfer'
-                selected={selectedIndex === 9}
-                onClick={() => handleListItemClick(9)}
-                sx={{ pl: 7 }}>
-                <ListItemText primary='โอนสินค้าระหว่างสาขา/คลัง' />
+                sx={{ pl: 7 }}
+              >
+                <ListItemText primary="รับสินค้า จากผู้จำหน่าย" />
               </ListItemButton>
             </Link>
           </List>
         </Collapse>
-        {/* <Link to="/user" style={{ textDecoration: 'none', color: '#676767' }}>
-          <ListItemButton
-            key="USER"
-            selected={selectedIndex === 8}
-            onClick={() => handleListItemClick(8)}
-            id="mainMenuUser"
-          >
-            <ListItemIcon>
-              <GroupAddOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText primary="จัดการผู้ใช้งาน" style={{ marginLeft: -15 }} />
-          </ListItemButton>
-        </Link> */}
+
+        <ListItemButton onClick={handleClickTransfer} id="mainMenuTransfer">
+          <ListItemIcon>
+            <LoyaltyOutlinedIcon />
+          </ListItemIcon>
+          <ListItemText primary="โอนสินค้า" style={{ marginLeft: -15 }} />
+          {openTransferMenu ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openTransferMenu} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <Link
+              to="/stock-transfer-rt"
+              style={{ textDecoration: 'none', color: '#676767' }}
+              id="subMenuStockTransferRt"
+            >
+              <ListItemButton
+                key="StockTransferRt"
+                selected={selectedIndex === 8}
+                onClick={() => handleListItemClick(8)}
+                sx={{ pl: 7 }}
+              >
+                <ListItemText primary="สร้างแผนโอนสินค้าระหว่างสาขา/คลัง" />
+              </ListItemButton>
+            </Link>
+            <Link to="/stock-transfer" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuStockTransfer">
+              <ListItemButton
+                key="StockTransfer"
+                selected={selectedIndex === 9}
+                onClick={() => handleListItemClick(9)}
+                sx={{ pl: 7 }}
+              >
+                <ListItemText primary="โอนสินค้าระหว่างสาขา/คลัง" />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
       </List>
     </Drawer>
   );
