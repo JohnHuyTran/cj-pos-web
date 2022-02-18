@@ -215,14 +215,22 @@ export const ModalTransferItem = (props: DataGridProps) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       currentData = data[index - 1];
-      data[index - 1].numberOfDiscounted = event.target.value ? parseInt(event.target.value.replace(/,/g, '')) : 0;
+      data[index - 1].numberOfDiscounted = event.target.value
+        ? parseInt(event.target.value.replace(/,/g, '')) < 10000000000
+          ? parseInt(event.target.value.replace(/,/g, ''))
+          : 0
+        : 0;
+
       return data;
     });
     if (Object.keys(payloadAddItem).length !== 0) {
       let updateList = _.cloneDeep(payloadAddItem);
       updateList.map((item: any) => {
         if (item.barcode === currentData.barCode) {
-          item.qty = parseInt(event.target.value.replace(/,/g, ''));
+          item.qty =
+            parseInt(event.target.value.replace(/,/g, '')) < 10000000000
+              ? parseInt(event.target.value.replace(/,/g, ''))
+              : 0;
         }
       });
       dispatch(updateAddItemsState(updateList));

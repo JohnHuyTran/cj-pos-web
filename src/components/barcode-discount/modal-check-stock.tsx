@@ -51,7 +51,7 @@ const columns: GridColDef[] = [
   },
   {
     field: 'stockRemain',
-    headerName: 'จำนวนสต๊อก',
+    headerName: 'จำนวนสต๊อค',
     headerAlign: 'right',
     flex: 1.2,
     sortable: false,
