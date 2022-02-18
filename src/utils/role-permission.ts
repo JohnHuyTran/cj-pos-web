@@ -51,7 +51,7 @@ export const isAllowMainMenuPermission = (key: string) => {
 export const isAllowSubMenuPermission = (key: string) => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   const permissionObj = _.get(permission, userInfo.group);
-  return !permissionObj.menu.SUBMENU.some((_a: string) => {
+  return !permissionObj.menu.submenu.some((_a: string) => {
     return _a === key;
   });
 };
@@ -68,29 +68,54 @@ export const isGroupBranch = () => {
 const permission = {
   scm: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_DIFF],
+      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
+      submenu: [
+        SUBMENU.SALE_DISCOUNT,
+        SUBMENU.OR_ORDER_RECEIVE,
+        SUBMENU.OR_DIFF,
+        SUBMENU.OR_SUPPLIER,
+        SUBMENU.ST_REQUEST,
+      ],
     },
     action: [ACTIONS.STOCK_RT_APPROVE, ACTIONS.STOCK_RT_REJECT, ACTIONS.STOCK_RT_VIEW],
   },
   oc: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_DIFF],
+      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
+      submenu: [
+        SUBMENU.SALE_DISCOUNT,
+        SUBMENU.OR_ORDER_RECEIVE,
+        SUBMENU.OR_DIFF,
+        SUBMENU.OR_SUPPLIER,
+        SUBMENU.ST_REQUEST,
+      ],
     },
     action: [ACTIONS.STOCK_RT_VIEW, ACTIONS.STOCK_RT_APPROVE, ACTIONS.STOCK_RT_REJECT],
   },
   dc: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_DIFF],
+      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
+      submenu: [
+        SUBMENU.SALE_DISCOUNT,
+        SUBMENU.OR_ORDER_RECEIVE,
+        SUBMENU.OR_DIFF,
+        SUBMENU.OR_SUPPLIER,
+        SUBMENU.ST_TRANSFER,
+      ],
     },
     action: [ACTIONS.STOCK_BT_VIEW, ACTIONS.STOCK_BT_EXPORT],
   },
   branch: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_DIFF],
+      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
+      submenu: [
+        SUBMENU.SALE_DISCOUNT,
+        SUBMENU.OR_ORDER_RECEIVE,
+        SUBMENU.OR_DIFF,
+        SUBMENU.OR_SUPPLIER,
+        SUBMENU.ST_REQUEST,
+        SUBMENU.ST_TRANSFER,
+      ],
     },
     action: [
       ACTIONS.STOCK_RT_VIEW,
