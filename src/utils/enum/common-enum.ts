@@ -28,4 +28,5 @@ export enum BDStatus {
 
 export enum ERROR_CODE {
   TIME_OUT = 'timeout',
+  NOT_AUTHORIZE = 'authentication.notauthorize',
 }

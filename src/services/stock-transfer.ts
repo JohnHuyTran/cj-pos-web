@@ -142,6 +142,24 @@ export async function sendBranchTransferToPickup(payload: BranchTransferRequest)
     throw error;
   }
 }
+export async function submitStockTransfer(payload: BranchTransferRequest, files: File[]) {
+  try {
+    const bodyFormData = new FormData();
+    bodyFormData.append('requestBody', JSON.stringify(payload));
+    files.map((file: File) => {
+      return bodyFormData.append('file[]', file);
+    });
+
+    const response = await post(
+      environment.stock.branchTransfer.submitTransfer.url,
+      bodyFormData,
+      ContentType.MULTIPART
+    ).then((result: any) => result);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export const getPathReportBT = (docType: string, btNo: string) => {
   if (docType === DOCUMENT_TYPE.BT) {

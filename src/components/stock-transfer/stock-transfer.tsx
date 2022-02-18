@@ -26,8 +26,13 @@ import StockTransferList from '../../components/stock-transfer/stock-transfer-li
 import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
 import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
-import { isAllowActionPermission } from '../../utils/role-permission';
+import { isAllowActionPermission, isGroupBranch, isGroupDC } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
+import { getBranchName } from '../../utils/utils';
+import { env } from '../../adapters/environmentConfigs';
+import { BranchListOptionType } from '../../models/branch-model';
+import { getUserInfo } from '../../store/sessionStore';
+import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 
 interface State {
   docNo: string;
@@ -68,27 +73,29 @@ export default function SupplierCheckOrderSearch() {
   });
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
-
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
-  };
-
-  const handleChange = (event: any) => {
-    const value = event.target.value;
-    setValues({ ...values, [event.target.name]: value });
-  };
-
-  const handleStartDatePicker = (value: any) => {
-    setStartDate(value);
-  };
-
-  const handleEndDatePicker = (value: Date) => {
-    setEndDate(value);
-  };
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
 
   const [branchFromCode, setBranchFromCode] = React.useState('');
   const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  React.useEffect(() => {
+    setDisplaySearchBtn(isAllowActionPermission(ACTIONS.STOCK_BT_VIEW));
+    if (groupBranch) {
+      setBranchFromCode(env.branch.code);
+      setValues({ ...values, branchFrom: env.branch.code });
+    }
+  }, []);
+
+  const branchFrom = getBranchName(branchList, env.branch.code);
+  const branchFromMap: BranchListOptionType = {
+    code: env.branch.code,
+    name: branchFrom ? branchFrom : '',
+  };
+  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
+    groupBranch ? branchFromMap : null
+  );
+
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
@@ -107,6 +114,23 @@ export default function SupplierCheckOrderSearch() {
     } else {
       setValues({ ...values, branchTo: '' });
     }
+  };
+
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+
+  const handleChange = (event: any) => {
+    const value = event.target.value;
+    setValues({ ...values, [event.target.name]: value });
+  };
+
+  const handleStartDatePicker = (value: any) => {
+    setStartDate(value);
+  };
+
+  const handleEndDatePicker = (value: Date) => {
+    setEndDate(value);
   };
 
   const handleChangeReasons = (ReasonsCode: string) => {
@@ -225,11 +249,6 @@ export default function SupplierCheckOrderSearch() {
     }
   }
 
-  React.useEffect(() => {
-    // console.log('show: ', isAllowActionPermission('test'));
-    setDisplaySearchBtn(isAllowActionPermission(ACTIONS.PURCHASE_PI_CLOSE));
-  }, []);
-
   return (
     <>
       <Box>
@@ -254,9 +273,11 @@ export default function SupplierCheckOrderSearch() {
               สาขาต้นทาง
             </Typography>
             <BranchListDropDown
+              valueBranch={valuebranchFrom}
               sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
+              disable={groupBranch}
             />
           </Grid>
           <Grid item xs={4}>
@@ -267,6 +288,7 @@ export default function SupplierCheckOrderSearch() {
               sourceBranchCode={branchFromCode}
               onChangeBranch={handleChangeBranchTo}
               isClear={clearBranchDropDown}
+              filterOutDC={groupBranch}
             />
           </Grid>
 
@@ -334,8 +356,8 @@ export default function SupplierCheckOrderSearch() {
               variant='contained'
               color='primary'
               onClick={onClickValidateForm}
-              // sx={{ width: '13%', ml: 2, display: `${displaySearchBtn ? 'none' : ''}` }}
-              sx={{ width: '13%', ml: 2 }}
+              sx={{ width: '13%', ml: 2, display: `${displaySearchBtn ? 'none' : ''}` }}
+              // sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}>
               ค้นหา
             </Button>
