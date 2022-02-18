@@ -59,9 +59,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
-  const [countText, setCountText] = React.useState<number>(
-    stringNullOrEmpty(payloadBarcodeDiscount.requesterNote) ? 0 : payloadBarcodeDiscount.requesterNote.split('').length
-  );
   const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>(
@@ -89,8 +86,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const priceAfterDiscount = price - (cashDiscount || 0);
         let numberOfApproved = !!sameItem
           ? sameItem.numberOfApproved
-          : (item.numberOfApproved ? item.numberOfApproved : 0);
-        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : (numberOfApproved * priceAfterDiscount);
+          : item.numberOfApproved
+          ? item.numberOfApproved
+          : 0;
+        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : numberOfApproved * priceAfterDiscount;
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -283,7 +282,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
 
   const handleChangeNote = (e: any) => {
     dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requesterNote: e }));
-    setCountText(e.split('').length);
     dispatch(updateCheckEdit(true));
   };
 
@@ -722,7 +720,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           <Grid item xs={3}>
             <TextBoxComment
               fieldName="หมายเหตุจากผู้อนุมัติ :"
-              defaultValue={classes.MTextareaBD}
+              defaultValue={payloadBarcodeDiscount.requesterNote}
               maxLength={100}
               onChangeComment={handleChangeNote}
               isDisable={dataDetail.status > 1}
@@ -739,7 +737,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               />
             </Box>
           </Grid>
-          <Grid item xs={3}/>
+          <Grid item xs={3} />
           <Grid item xs={3}>
             <Box display="flex" justifyContent="space-between" marginTop="25px">
               <Typography fontSize="14px" lineHeight="21px" height="24px">
