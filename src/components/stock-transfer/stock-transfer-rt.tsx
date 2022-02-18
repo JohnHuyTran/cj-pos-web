@@ -87,12 +87,7 @@ export default function StockTransferRt() {
     name: branchFrom ? branchFrom : '',
   };
   const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
-    groupBranch
-      ? branchFromMap
-      : {
-          code: '',
-          name: '',
-        }
+    groupBranch ? branchFromMap : null
   );
 
   const handleChangeBranchFrom = (branchCode: string) => {
