@@ -17,17 +17,19 @@ export enum ACTIONS {
   CAMPAIGN_BD_VIEW = 'campaign.bd.view',
   CAMPAIGN_BD_CREATE = 'campaign.bd.create',
   SUPPLIER_SEARCH = 'supplier.search',
-  STOCK_RT_APPROVE = 'stock.rt.approve',
-  STOCK_CHECK = 'stock.check',
-  STOCK_RT_EDIT = 'stock.rt.edit',
-  STOCK_BT_EXPORT = 'stock.bt.export',
-  STOCK_RT_REJECT = 'stock.rt.reject',
-  STOCK_BT_VIEW = 'stock.bt.view',
-  STOCK_BT_EDIT = 'stock.bt.edit',
-  STOCK_RT_DRAFT = 'stock.rt.draft',
+
   STOCK_RT_VIEW = 'stock.rt.view',
-  STOCK_BT_SAVE_DC = 'stock.bt.save.dc',
+  STOCK_RT_MANAGE = 'stock.rt.manage',
   STOCK_RT_SEND = 'stock.rt.send',
+  STOCK_RT_APPROVE = 'stock.rt.approve',
+  STOCK_RT_REJECT = 'stock.rt.reject',
+
+  STOCK_BT_VIEW = 'stock.bt.view',
+  STOCK_BT_MANAGE = 'stock.rt.manage',
+  STOCK_BT_SAVEDC = 'stock.bt.save_dc',
+  STOCK_BT_EXPORT = 'stock.bt.export',
+  STOCK_BT_WAITDC = 'stock.bt.wait_dc',
+
   AUTHORITY_CHECK = 'authority.check',
   ORDER_RO_DRAFT = 'order.ro.draft',
   ORDER_RO_APPROVE = 'order.ro.approve',
@@ -43,23 +45,27 @@ export enum ACTIONS {
 export enum MAINMENU {
   SALE = 'sale',
   ORDER_RECEIVE = 'orderReceive',
+  STOCK_TRANSFER = 'stockTransfer',
 }
 
 export enum SUBMENU {
   SALE_DISCOUNT = 'sale.discount',
-  STOCK_ORDER_RECEIVE = 'orderReceive.orderReceive',
-  STOCK_DIFF = 'orderReceive.stockDiff',
-  STOCK_SUPPLIER = 'orderReceive.supplier',
-  STOCK_REQUEST = 'orderReceive.stockRequest',
-  STOCK_TRANSFER = 'orderReceive.stockTransfer',
+  OR_ORDER_RECEIVE = 'orderReceive.orderReceive',
+  OR_DIFF = 'orderReceive.stockDiff',
+  OR_SUPPLIER = 'orderReceive.supplier',
+  ST_REQUEST = 'stockTransfer.stockRequest',
+  ST_TRANSFER = 'stockTransfer.stockTransfer',
 }
 
 export enum PERMISSION_GROUP {
   DC = 'dc',
   SCM = 'scm',
   OC = 'oc',
+  BRANCH = 'branch',
 }
 
-export const KEYCLOAK_GROUP_DC = '/service.posback/manager';
+export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
 export const KEYCLOAK_GROUP_SCM = '/service.posback/scm';
-export const KEYCLOAK_GROUP_OC = '/service.posback/oc';
+export const KEYCLOAK_GROUP_OC1 = '/service.posback/oc01';
+export const KEYCLOAK_GROUP_BRANCH_MANAGER01 = '/service.posback/branch-manager';
+export const KEYCLOAK_GROUP_BRANCH_MANAGER = '/service.posback/manager';
