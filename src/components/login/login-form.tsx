@@ -21,6 +21,7 @@ import { getAccessToken, setUserInfo } from '../../store/sessionStore';
 import { getDecodedAccessToken } from '../../utils/utils';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { useTranslation } from 'react-i18next';
+import { featchBranchListAsync } from '../../store/slices/search-branches-slice';
 
 interface State {
   branch: string;
@@ -64,6 +65,7 @@ function LoginForm() {
       branchCode: values.branch,
     };
     await dispatch(loginKeyCloakAsync(form));
+    await dispatch(featchBranchListAsync());
   };
 
   return (
