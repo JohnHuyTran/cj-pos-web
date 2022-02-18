@@ -9,7 +9,6 @@ import { ControlPoint, HighlightOff } from '@mui/icons-material';
 import SaveIcon from '@mui/icons-material/Save';
 
 import { useStyles } from '../../styles/makeTheme';
-import DatePickerComponent from '../commons/ui/date-picker-detail';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -29,12 +28,14 @@ import { updateAddTypeAndProductState } from '../../store/slices/add-type-produc
 import { updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import { onChangeDate } from '../../utils/utils';
+import DatePickerComponent from '../commons/ui/date-picker-detail';
 
 interface State {
   stNo: string;
   detailMsg: string;
-  startDate: any;
-  endDate: any;
+  startDate: any | Date | number | string;
+  endDate: any | Date | number | string;
   startTime: string | null;
   endTime: string | null;
   comment: string;
@@ -124,8 +125,6 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   const [unSelectAllType, setUnSelectAllType] = React.useState(false);
 
   useEffect(() => {
-    console.log(payloadAddTypeProduct);
-
     setShowModalProduct(!!Object.keys(payloadAddTypeProduct).length);
   }, [payloadAddTypeProduct]);
 
@@ -169,16 +168,6 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   const handleChangeDetailMsg = (value: any) => {
     setValues({ ...values, detailMsg: value });
     setCheckValue({ ...checkValue, detailMsgError: false });
-  };
-
-  const handleStartDatePicker = (value: Date) => {
-    setValues({ ...values, startDate: value });
-    setCheckValue({ ...checkValue, startDateError: false });
-  };
-
-  const handleEndDatePicker = (value: Date) => {
-    setValues({ ...values, endDate: value });
-    setCheckValue({ ...checkValue, endDateError: false });
   };
 
   const handleStartTimePicker = (value: string) => {
@@ -251,39 +240,40 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
 
   const handleCreateSTDetail = () => {
     if (valiDateData()) {
-      const stStartTime = values.startDate;
-      stStartTime.setUTCHours(Number(values.startTime?.split(':')[0]), Number(values.startTime?.split(':')[1]));
-      const stEndTime = values.endDate;
-      stEndTime.setUTCHours(Number(values.endTime?.split(':')[0]), Number(values.endTime?.split(':')[1]));
-      const appliedProduct = {
-        appliedProducts: payloadAddTypeProduct
-          .filter((el: any) => el.selectedType === 2)
-          .map((item: any) => {
-            return {
-              name: item.barcodeName,
-              skuCode: item.skuCode,
-            };
-          }),
-        appliedCategories: payloadAddTypeProduct
-          .filter((el: any) => el.selectedType === 1)
-          .map((item: any) => {
-            return {
-              name: item.productTypeName,
-              code: item.productTypeCode,
-            };
-          }),
-      };
-      const body = {
-        stStartTime: stStartTime.toISOString(),
-        stEndTime: stEndTime.toISOString(),
-        remark: values.comment,
-        description: values.detailMsg,
-        stDetail: {
-          isAllBranches: payloadBranches.isAllBranches,
-          appliedBranches: payloadBranches.appliedBranches,
-          appliedProduct: appliedProduct,
-        },
-      };
+      // const stStartTime = values.startDate._d ? values.startDate._d : values.startDate;
+      // stStartTime.setUTCHours(Number(values.startTime?.split(':')[0]), Number(values.startTime?.split(':')[1]));
+      // const stEndTime = values.endDate._d ? values.endDate._d : values.endDate;
+      // stEndTime.setUTCHours(Number(values.endTime?.split(':')[0]), Number(values.endTime?.split(':')[1]));
+      // const appliedProduct = {
+      //   appliedProducts: payloadAddTypeProduct
+      //     .filter((el: any) => el.selectedType === 2)
+      //     .map((item: any) => {
+      //       return {
+      //         name: item.barcodeName,
+      //         skuCode: item.skuCode,
+      //       };
+      //     }),
+      //   appliedCategories: payloadAddTypeProduct
+      //     .filter((el: any) => el.selectedType === 1)
+      //     .map((item: any) => {
+      //       return {
+      //         name: item.productTypeName,
+      //         code: item.productTypeCode,
+      //       };
+      //     }),
+      // };
+      // const body = {
+      //   stStartTime: stStartTime.toISOString(),
+      //   stEndTime: stEndTime.toISOString(),
+      //   remark: values.comment,
+      //   description: values.detailMsg,
+      //   stDetail: {
+      //     isAllBranches: payloadBranches.isAllBranches,
+      //     appliedBranches: payloadBranches.appliedBranches,
+      //     appliedProduct: appliedProduct,
+      //   },
+      // };
+      // console.log(body);
     }
   };
   const handleUnSelectAllType = (showAll: boolean) => {
@@ -343,7 +333,10 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               วันที่เริ่มงดขาย :
             </Grid>
             <Grid item xs={3}>
-              <DatePickerComponent onClickDate={handleStartDatePicker} value={values.startDate} />
+              <DatePickerComponent
+                onClickDate={onChangeDate.bind(values.startDate, setValues, values, 'startDate')}
+                value={values.startDate}
+              />
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -351,9 +344,9 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
-                onClickDate={handleEndDatePicker}
+                onClickDate={onChangeDate.bind(values.endDate, setValues, values, 'endDate')}
                 value={values.endDate}
-                type={'TO'}
+                type="TO"
                 minDateTo={values.startDate}
               />
             </Grid>
@@ -361,7 +354,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              วันที่สิ้นสุดงดขาย :
+              เวลาที่เริ่มงดขาย :
             </Grid>
             <Grid item xs={3}>
               <ThemeProvider theme={defaultMaterialTheme}>
