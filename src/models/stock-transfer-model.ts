@@ -215,3 +215,12 @@ export interface StockBalanceType {
   skuCodes: string[];
   branchCode: string;
 }
+
+export interface skuType {
+  seqItem?: number;
+  skuCode?: string;
+  skuName: string;
+  remainStock?: number;
+  orderQty?: number;
+  actualQty?: number;
+}

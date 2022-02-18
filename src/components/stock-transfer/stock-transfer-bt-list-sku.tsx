@@ -13,6 +13,7 @@ function BranchTransferListSKU() {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
+
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
 
   const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
@@ -21,7 +22,7 @@ function BranchTransferListSKU() {
   );
   const [isDraft, setIsDraft] = React.useState(false);
 
-  const [pageSize, setPageSize] = React.useState<number>(10);
+  const [pageSize, setPageSize] = React.useState<number>(5);
 
   const columns: GridColDef[] = [
     {
@@ -140,7 +141,7 @@ function BranchTransferListSKU() {
           columns={columns}
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
+          rowsPerPageOptions={[5, 10, 20, 50, 100]}
           pagination
           disableColumnMenu
           autoHeight={rows.length >= 8 ? false : true}
