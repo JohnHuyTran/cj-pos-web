@@ -197,5 +197,4 @@ function BranchTransferListItem() {
     </Box>
   );
 }
-
 export default BranchTransferListItem;

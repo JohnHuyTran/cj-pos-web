@@ -3,7 +3,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
-import { Item } from '../../models/stock-transfer-model';
+import { BranchTransferRequest, Delivery, Item } from '../../models/stock-transfer-model';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
 import { Button, Grid, Link, Typography } from '@mui/material';
 import Steppers from './steppers';
@@ -29,7 +29,21 @@ import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import ModalConfirmTransaction from './modal-confirm-transaction';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import { FindProductRequest } from '../../models/product-model';
-import { getPathReportBT } from '../../services/stock-transfer';
+import {
+  getPathReportBT,
+  sendBranchTransferToDC,
+  sendBranchTransferToPickup,
+  submitStockTransfer,
+} from '../../services/stock-transfer';
+import theme from '../../styles/theme';
+import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
+import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
+import { FileType } from '../../models/supplier-check-order-model';
+import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
+import { ApiError } from '../../models/api-error-model';
+import { GridRowData } from '@mui/x-data-grid';
+import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
+import moment from 'moment';
 
 interface Props {
   isOpen: boolean;
@@ -84,6 +98,9 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   };
 
   const [bodyRequest, setBodyRequest] = React.useState<FindProductRequest>();
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
+  const [files, setFiles] = React.useState<FileType[]>([]);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   React.useEffect(() => {
     const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
@@ -146,11 +163,139 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setDocLayoutLandscape(docType === DOCUMENT_TYPE.RECALL ? true : false);
     setOpenModelPreviewDocument(true);
   };
+
+  const mappingPayload = () => {
+    let items: Item[] = [];
+    const rowsEdit: GridRowData[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const item: Item = {
+        seqItem: data.seqItem,
+        barcode: data.barcode,
+        actualQty: data.actualQty,
+        toteCode: data.toteCode,
+      };
+      items.push(item);
+    });
+
+    const payload: BranchTransferRequest = {
+      comment: comment,
+      items: items,
+      btNo: btNo,
+    };
+    return payload;
+  };
+
+  const validateFileInfo = () => {
+    const isvalid = fileUploadList.length > 0 ? true : false;
+    // const isExistingFile = purchaseDetail.files && purchaseDetail.files.length > 0 ? true : false;
+    if (!isvalid) {
+      setOpenAlert(true);
+      setTextError('กรุณาแนบเอกสาร');
+      return false;
+    }
+    return true;
+  };
+
   const handleOpenAddItems = () => {};
   const handleSaveBtn = () => {};
   const handleConfirmBtn = () => {};
-  const handleSendToPickup = () => {};
-  const sendTransactionToDC = async () => {};
+
+  const handleSendToPickup = async () => {
+    setOpenLoadingModal(true);
+    if (startDate === null || endDate === null) {
+      setOpenAlert(true);
+      setTextError('กรุณาระบุรอบรถเข้าต้นทาง');
+    } else {
+      const _dalivery: Delivery = {
+        fromDate: moment(startDate).startOf('day').toISOString(),
+        toDate: moment(endDate).startOf('day').toISOString(),
+      };
+      const payload: BranchTransferRequest = {
+        btNo: btNo,
+        delivery: _dalivery,
+      };
+      await sendBranchTransferToPickup(payload)
+        .then(async (value) => {
+          handleOnCloseModalConfirm();
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณบันทึกรอบรถเข้าต้นทางเรียบร้อยแล้ว');
+          await dispatch(featchBranchTransferDetailAsync(btNo));
+          await dispatch(featchSearchStockTransferAsync(payloadSearch));
+          // setTimeout(() => {
+          //   setOpen(false);
+          //   onClickClose();
+          // }, 500);
+        })
+        .catch((error: ApiError) => {
+          handleOnCloseModalConfirm();
+          setShowSnackBar(true);
+          setSnackbarIsStatus(false);
+          setContentMsg(error.message);
+        });
+    }
+  };
+
+  const sendTransactionToDC = async () => {
+    const payload: BranchTransferRequest = await mappingPayload();
+    await sendBranchTransferToDC(payload)
+      .then(async (value) => {
+        handleOnCloseModalConfirm();
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณส่งรายการให้ DC เรียบร้อยแล้ว');
+        await dispatch(featchSearchStockTransferAsync(payloadSearch));
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        handleOnCloseModalConfirm();
+        setShowSnackBar(true);
+        setSnackbarIsStatus(false);
+        setContentMsg(error.message);
+      });
+    handleOnCloseModalConfirm();
+    setOpenLoadingModal(false);
+  };
+
+  const handleOnChangeUploadFile = (status: boolean) => {
+    setUploadFileFlag(status);
+    if (status) {
+      dispatch(featchPurchaseNoteAsync(btNo));
+    }
+  };
+
+  const handleSubmitTransfer = async () => {
+    setOpenLoadingModal(false);
+    const isFileValidate: boolean = validateFileInfo();
+    if (isFileValidate) {
+      const payload: BranchTransferRequest = {
+        docNo: btNo,
+      };
+      await submitStockTransfer(payload, fileUploadList)
+        .then(async (value) => {
+          handleOnCloseModalConfirm();
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณส่งงาน เรียบร้อยแล้ว');
+          await dispatch(featchSearchStockTransferAsync(payloadSearch));
+          setTimeout(() => {
+            setOpen(false);
+            onClickClose();
+          }, 500);
+        })
+        .catch((error: ApiError) => {
+          handleOnCloseModalConfirm();
+          setShowSnackBar(true);
+          setSnackbarIsStatus(false);
+          setContentMsg(error.message);
+        });
+      handleOnCloseModalConfirm();
+    }
+    setOpenLoadingModal(false);
+  };
 
   return (
     <React.Fragment>
@@ -285,7 +430,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               </>
             )}
 
-            {!isDraft && !isDC && (
+            {!isDraft && !isDC && btStatus === 'READY_TO_TRANSFER' && (
               <Grid container spacing={2} mb={2}>
                 <Grid item lg={2}>
                   <Typography variant='body2'> สาเหตุการโอน :</Typography>
@@ -333,9 +478,6 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               </Grid>
             )}
           </Box>
-          {/* {isDraft && (
-           
-          )} */}
 
           {isDC && btStatus === 'READY_TO_TRANSFER' && (
             <Grid
@@ -426,6 +568,98 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             </>
           )}
 
+          {btStatus === 'WAIT_FOR_PICKUP' && (
+            <>
+              <Grid container spacing={2} mb={2}>
+                <Grid item lg={2}>
+                  <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
+                </Grid>
+                <Grid item lg={3}>
+                  <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
+                </Grid>
+                <Grid item lg={1}></Grid>
+                <Grid item lg={2}>
+                  <Typography variant='body2'>ถึง :</Typography>
+                </Grid>
+                <Grid item lg={3}>
+                  <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
+                </Grid>
+                <Grid item lg={1}></Grid>
+              </Grid>
+
+              <Grid container spacing={2} mb={2}>
+                <Grid item lg={2}></Grid>
+                <Grid item lg={3}></Grid>
+                <Grid item lg={1}></Grid>
+                <Grid item lg={2}>
+                  <Typography variant='body2'>แนบไฟล์</Typography>
+                </Grid>
+                <Grid item lg={3}>
+                  <AccordionUploadFile
+                    files={[]}
+                    docNo={btNo}
+                    docType='PN'
+                    isStatus={uploadFileFlag}
+                    onChangeUploadFile={handleOnChangeUploadFile}
+                  />
+                  <Box>
+                    <Link
+                      component='button'
+                      variant='body2'
+                      onClick={(e) => {
+                        handleLinkDocument(DOCUMENT_TYPE.BT);
+                      }}>
+                      เรียกดูเอกสารใบโอน BT
+                    </Link>
+                  </Box>
+                  <Box>
+                    <Link
+                      component='button'
+                      variant='body2'
+                      onClick={(e) => {
+                        handleLinkDocument(DOCUMENT_TYPE.BO);
+                      }}>
+                      เรียกดูเอกสารใบ BO
+                    </Link>
+                  </Box>
+                  <Box>
+                    <Link
+                      component='button'
+                      variant='body2'
+                      onClick={(e) => {
+                        handleLinkDocument(DOCUMENT_TYPE.BOX);
+                      }}>
+                      เรียกดูเอกสารใบปะลัง
+                    </Link>
+                  </Box>
+                </Grid>
+                <Grid item lg={1}></Grid>
+              </Grid>
+              <Grid
+                item
+                container
+                xs={12}
+                sx={{ mt: 3 }}
+                justifyContent='space-between'
+                direction='row'
+                alignItems='flex-end'>
+                <Grid item xl={8}></Grid>
+                <Grid item>
+                  <Button
+                    id='btnSave'
+                    variant='contained'
+                    color='warning'
+                    className={classes.MbtnSave}
+                    onClick={handleSubmitTransfer}
+                    // startIcon={<SaveIcon />}
+                    sx={{ width: 200 }}>
+                    ส่งงาน
+                  </Button>
+                </Grid>
+              </Grid>
+            </>
+          )}
+
           <BranchTransferListSKU />
           <Box mt={6}></Box>
           <BranchTransferListItem />
@@ -487,5 +721,4 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     </React.Fragment>
   );
 }
-
 export default StockTransferBT;
