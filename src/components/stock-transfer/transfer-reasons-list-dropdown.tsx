@@ -7,10 +7,11 @@ import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reas
 interface Props {
   reasonsValue?: string;
   isClear: boolean;
+  isDetail?: boolean;
   onChangeReasons: (branchCode: string) => void;
 }
 
-function ReasonsListDropDown({ reasonsValue, isClear, onChangeReasons }: Props) {
+function ReasonsListDropDown({ reasonsValue, isClear, isDetail, onChangeReasons }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   let reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
@@ -31,7 +32,10 @@ function ReasonsListDropDown({ reasonsValue, isClear, onChangeReasons }: Props) 
   return (
     <FormControl fullWidth className={classes.Mselect}>
       <Select id="selReasons" value={reasons} onChange={handleChange} inputProps={{ 'aria-label': 'Without label' }}>
-        <MenuItem value={'All'}>ทั้งหมด</MenuItem>
+        <MenuItem value={'All'}>
+          {isDetail && <label style={{ fontSize: 14, color: '#a2a2a2' }}>กรุณาเลือก</label>}
+          {!isDetail && 'ทั้งหมด'}
+        </MenuItem>
         {reasonsList.map((reason) => (
           <MenuItem key={reason.id} value={reason.code}>
             {reason.name}
