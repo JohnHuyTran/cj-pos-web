@@ -21,6 +21,7 @@ import { SearchOff } from '@mui/icons-material';
 import AlertError from '../commons/ui/alert-error';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import { shipmentStatus } from '../../utils/enum/check-order-enum';
 
 // moment.locale("en");
 moment.locale('th');
@@ -80,11 +81,19 @@ function CheckOrderSearch() {
       values.orderStatus === 'ALL' &&
       values.orderType === 'ALL' &&
       startDate === null &&
-      endDate === null
+      endDate === null &&
+      values.branchFrom === '' &&
+      values.branchFrom === ''
     ) {
       setOpenAlert(true);
       setTextError('กรุณากรอกข้อมูลค้นหา');
-    } else if (values.orderShipment === '' && values.orderStatus === 'ALL' && values.orderType === 'ALL') {
+    } else if (
+      values.orderShipment === '' &&
+      values.orderStatus === 'ALL' &&
+      values.orderType === 'ALL' &&
+      values.branchFrom === '' &&
+      values.branchFrom === ''
+    ) {
       if (startDate === null || endDate === null) {
         setOpenAlert(true);
         setTextError('กรุณากรอกวันที่รับสินค้าให้ครบ');
@@ -110,8 +119,10 @@ function CheckOrderSearch() {
       paramQuery: values.orderShipment,
       dateFrom: moment(startDate).startOf('day').toISOString(),
       dateTo: moment(endDate).endOf('day').toISOString(),
-      sdStatus: parseInt(values.orderStatus),
+      sdStatus: values.orderStatus,
       sdType: parseInt(values.orderType),
+      shipBranchFrom: values.branchFrom,
+      shipBranchTo: values.branchTo,
       clearSearch: false,
     };
 
@@ -148,7 +159,7 @@ function CheckOrderSearch() {
       // sdNo: values.orderNo,
       dateFrom: moment(startDate).format('DD/MM/YYYY'),
       dateTo: moment(endDate).format('DD/MM/YYYY'),
-      sdStatus: parseInt(values.orderStatus),
+      sdStatus: values.orderStatus,
       sdType: parseInt(values.orderType),
       clearSearch: true,
     };
@@ -292,10 +303,11 @@ function CheckOrderSearch() {
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={'0'}>บันทึก</MenuItem>
-                <MenuItem value={'1'}>อนุมัติ</MenuItem>
-                <MenuItem value={'9'}>รออนุมัติ 1</MenuItem>
-                <MenuItem value={'2'}>ปิดงาน</MenuItem>
+                {shipmentStatus.map((status) => (
+                  <MenuItem key={status.key} value={status.key}>
+                    {status.text}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>

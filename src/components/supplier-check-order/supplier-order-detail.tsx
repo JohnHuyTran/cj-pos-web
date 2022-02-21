@@ -37,7 +37,7 @@ import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by
 import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 import { GridEditCellValueParams } from '@material-ui/data-grid';
 import ModalShowFile from '../commons/ui/modal-show-file';
-import { formatFileNam } from '../../utils/enum/check-order-enum';
+import { formatFileNam } from '../../utils/enum/supplier-order-enum';
 import AlertError from '../commons/ui/alert-error';
 import { uploadFileState } from '../../store/slices/upload-file-slice';
 
