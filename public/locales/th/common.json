@@ -1,9 +1,18 @@
 {
   "button": {
     "clear": "เคลียร์",
-    "search": "ค้นหา"
+    "search": "ค้นหา",
+    "add": "เพิ่ม"
   },
   "menu": {
     "productDiscount": "ส่วนลดสินค้า"
+  },
+  "searchbranch": {
+    "allBranches": "Select All Branches",
+    "someBranches": "Select some branches",
+    "province": "Province",
+    "branch": "Branch",
+    "selectAllBranchProvince": "Select All Branch Province",
+    "addBranches": "Add Branches"
   }
 }

@@ -61,11 +61,28 @@ export const environment = {
       update: {
         url: '/campaign/{id}',
       },
-      approve: {
+      sendForApproval: {
         url: '/campaign/{id}/waiting-approve',
+      },
+      approve: {
+        url: '/campaign/approve-barcode/{id}',
+      },
+      reject: {
+        url: '/campaign/barcode/reject?id={id}&reason={reason}',
       },
       cancel: {
         url: '/campaign/{id}',
+      },
+    },
+    saleLimitTime: {
+      save: {
+        url: '/campaign/sale-limit',
+      },
+      update: {
+        url: '/campaign/sale-limit/{id}',
+      },
+      cancel: {
+        url: '/campaign/sale-limit/{id}',
       },
     },
   },
@@ -130,6 +147,14 @@ export const environment = {
     },
   },
   products: {
+    type: {
+      search: {
+        url: '/products/type/all',
+      },
+      productByType: {
+        url: '/products/barcode/type',
+      },
+    },
     addItem: {
       allitemsList: {
         url: '/products/barcode/all',
@@ -212,6 +237,17 @@ export const environment = {
     },
     stockBalanceCheck: {
       url: '/stock/stock-balance-check',
+    },
+  },
+  branch: {
+    province: {
+      url: '/branch/province',
+    },
+    branch: {
+      url: '/branch/search',
+    },
+    branchTotal: {
+      url: '/branch/branch-total',
     },
   },
 };

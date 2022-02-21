@@ -129,4 +129,11 @@ const permission = {
       ACTIONS.STOCK_BT_EXPORT,
     ],
   },
+  area01: {
+    menu: {
+      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
+      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_DIFF],
+    },
+    action: [ACTIONS.PURCHASE_PI_CLOSE, ACTIONS.PURCHASE_PN_EXPORT],
+  },
 };
