@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { get } from '../../adapters/posback-adapter';
+import { getStrockTransferMockup } from '../../mockdata/stock-transfer';
 import { BranchTransferResponse } from '../../models/stock-transfer-model';
 import { getPathBranchTransferDetail } from '../../services/stock-transfer';
 
@@ -29,7 +30,8 @@ export const featchBranchTransferDetailAsync = createAsyncThunk('branchTransfer'
     };
 
     response = await get(apiRootPath).then();
-    return response;
+    // return response;
+    return getStrockTransferMockup();
   } catch (error) {
     throw error;
   }

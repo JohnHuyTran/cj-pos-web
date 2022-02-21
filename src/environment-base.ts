@@ -215,7 +215,7 @@ export const environment = {
     },
     stockBalance: {
       stockBalanceBySKU: {
-        url: '/stock-balance/check-by-sku-codes',
+        url: '/stock/stock-balance/check-by-sku-codes',
       },
     },
   },

@@ -1,3 +1,5 @@
+import { iteratee } from 'lodash';
+
 export interface StockTransferRequest {
   limit: string;
   page: string;
@@ -77,6 +79,7 @@ export interface BranchTransferRequest {
   delivery?: Delivery;
   comment?: string;
   items?: Item[];
+  itemGroups?: ItemGroups[];
   docNo?: string;
 }
 
@@ -139,6 +142,29 @@ export interface Item {
   boNo?: boolean;
 }
 
+export interface Item_ {
+  seqItem?: number;
+  skuCode?: string;
+  barcode?: string;
+  productName?: string;
+  barFactor?: number;
+  unitCode?: string;
+  unitName?: string;
+  orderQty?: number;
+  actualQty?: number;
+  toteCode?: string;
+  boNo?: boolean;
+  isDraft?: boolean;
+}
+
+export interface ItemGroups {
+  skuCode: string;
+  productName?: string;
+  orderAllQty?: number;
+  actualAllQty?: number;
+  remainingQty?: number;
+}
+
 export interface BranchTransferResponse {
   ref: string;
   code: number;
@@ -158,6 +184,8 @@ export interface BranchTransferInfo {
   status: string;
   comment: string;
   items: Item[];
+  itemsNew: Item_[];
+  itemGroups: ItemGroups[];
   auditLogs: AuditLog[];
   createdBy: string;
   lastModifiedBy: string;

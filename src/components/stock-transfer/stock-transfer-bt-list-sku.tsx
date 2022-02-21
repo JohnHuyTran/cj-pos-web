@@ -7,8 +7,8 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } fro
 import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { Item } from '../../models/stock-transfer-model';
-import Done from '@mui/icons-material/Done';
+import { Item, ItemGroups } from '../../models/stock-transfer-model';
+
 function BranchTransferListSKU() {
   const classes = useStyles();
 
@@ -20,6 +20,11 @@ function BranchTransferListSKU() {
   const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
     branchTransferInfo.items ? branchTransferInfo.items : []
   );
+
+  const [btItemGroups, setBtItemGroups] = React.useState<ItemGroups[]>(
+    branchTransferInfo.itemGroups ? branchTransferInfo.itemGroups : []
+  );
+
   const [isDraft, setIsDraft] = React.useState(false);
 
   const [pageSize, setPageSize] = React.useState<number>(5);
@@ -54,7 +59,7 @@ function BranchTransferListSKU() {
       ),
     },
     {
-      field: 'remainStock',
+      field: 'remainingQty',
       headerName: 'สต๊อกสินค้าคงเหลือ',
       minWidth: 200,
       headerAlign: 'center',
@@ -63,26 +68,22 @@ function BranchTransferListSKU() {
       renderCell: (params) => numberWithCommas(params.value),
     },
     {
-      field: 'orderQty',
+      field: 'orderAllQty',
       headerName: 'สั่ง(ชิ้น)',
       minWidth: 200,
       headerAlign: 'center',
       sortable: false,
       align: 'right',
-      renderCell: (params: GridRenderCellParams) => {
-        return numberWithCommas(calUnitFactor(params));
-      },
+      renderCell: (params) => params.value,
     },
     {
-      field: 'unitFactor',
+      field: 'actualAllQty',
       headerName: 'จัด(ชิ้น)',
       minWidth: 200,
       headerAlign: 'center',
       sortable: false,
       align: 'right',
-      renderCell: (params: GridRenderCellParams) => {
-        return numberWithCommas(calUnitFactor(params));
-      },
+      renderCell: (params) => params.value,
     },
     {
       field: 'unitDiff',
@@ -101,12 +102,12 @@ function BranchTransferListSKU() {
     return value;
   };
   var calUnitFactor = function (params: GridValueGetterParams) {
-    let diff = Number(params.getValue(params.id, 'actualQty')) * Number(params.getValue(params.id, 'baseUnit'));
+    let diff = Number(params.getValue(params.id, 'actualAllQty')) * Number(params.getValue(params.id, 'actualAllQty'));
     return diff;
   };
 
   var calProductDiff = function (params: GridValueGetterParams) {
-    let diff = Number(params.getValue(params.id, 'actualQty')) * Number(params.getValue(params.id, 'baseUnit'));
+    let diff = Number(params.getValue(params.id, 'orderAllQty')) - Number(params.getValue(params.id, 'actualAllQty'));
 
     if (diff !== 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
     return diff;
@@ -114,24 +115,20 @@ function BranchTransferListSKU() {
 
   const currentlySelected = () => {};
 
-  let rows = branchTransferItems.map((item: Item, index: number) => {
+  let rows = btItemGroups.map((item: ItemGroups, index: number) => {
     return {
-      id: `${item.barcode}-${index + 1}`,
+      id: `${item.skuCode}-${index + 1}`,
       index: index + 1,
-      seqItem: item.seqItem,
-      barcode: item.barcode,
       productName: item.productName,
       skuCode: item.skuCode,
-      baseUnit: item.baseUnit ? item.baseUnit : 0,
-      unitName: item.unitName,
-      remainStock: item.remainStock ? item.remainStock : 0,
-      qty: item.qty ? item.qty : 0,
-      actualQty: item.actualQty ? item.actualQty : 0,
-      toteCode: item.toteCode,
+      remainingQty: item.remainingQty ? item.remainingQty : 0,
+      orderAllQty: item.orderAllQty ? item.orderAllQty : 0,
+      actualAllQty: item.actualAllQty ? item.actualAllQty : 0,
       isDraft: isDraft,
-      boNo: item.boNo,
     };
   });
+
+  React.useEffect(() => {}, []);
 
   return (
     <Box mt={2} bgcolor='background.paper'>

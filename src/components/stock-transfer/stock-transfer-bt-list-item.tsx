@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useStyles } from '../../styles/makeTheme';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -7,7 +7,7 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } fro
 import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { Item } from '../../models/stock-transfer-model';
+import { Item, Item_ } from '../../models/stock-transfer-model';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 
 function BranchTransferListItem() {
@@ -63,7 +63,7 @@ function BranchTransferListItem() {
       ),
     },
     {
-      field: 'qty',
+      field: 'orderQty',
       headerName: 'จำนวนที่สั่ง',
       minWidth: 120,
       headerAlign: 'center',
@@ -154,7 +154,7 @@ function BranchTransferListItem() {
 
   const currentlySelected = () => {};
 
-  let rows = branchTransferItems.map((item: Item, index: number) => {
+  let rows = branchTransferItems.map((item: Item_, index: number) => {
     return {
       id: `${item.barcode}-${index + 1}`,
       index: index + 1,
@@ -162,10 +162,10 @@ function BranchTransferListItem() {
       barcode: item.barcode,
       productName: item.productName,
       skuCode: item.skuCode,
-      baseUnit: item.baseUnit ? item.baseUnit : 0,
+      barFactor: item.barFactor,
+      unitCode: item.unitCode ? item.unitCode : 0,
       unitName: item.unitName,
-      remainStock: item.remainStock ? item.remainStock : 0,
-      qty: item.qty ? item.qty : 0,
+      orderQty: item.orderQty ? item.orderQty : 0,
       actualQty: item.actualQty ? item.actualQty : 0,
       toteCode: item.toteCode,
       isDraft: isDraft,
@@ -173,6 +173,15 @@ function BranchTransferListItem() {
     };
   });
 
+  React.useEffect(() => {
+    setIsDraft(branchTransferInfo.status === 'CREATED' ? true : false);
+    let newColumns = [...columns];
+    if (branchTransferInfo.status != 'CREATED') {
+      newColumns[7]['hide'] = false;
+    } else {
+      newColumns[7]['hide'] = true;
+    }
+  }, []);
   return (
     <Box mt={2} bgcolor='background.paper'>
       <Typography>รายการสินค้า: รายการสินค้าทั้งหมด</Typography>

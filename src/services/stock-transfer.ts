@@ -13,6 +13,7 @@ import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
 import { fi } from 'date-fns/locale';
 import { DOCUMENT_TYPE } from '../utils/enum/stock-transfer-enum';
+import { getStrockTransferMockup } from '../mockdata/stock-transfer';
 
 export const getPathStockRequestDetail = (rtNo: string) => {
   return getPathUrl(`${environment.stock.stockRequest.detail.url}`, {

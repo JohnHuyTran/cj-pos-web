@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
-import { BranchTransferRequest, Delivery, Item } from '../../models/stock-transfer-model';
+import { BranchTransferRequest, Delivery, Item, StockBalanceType } from '../../models/stock-transfer-model';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
 import { Button, Grid, Link, Typography } from '@mui/material';
 import Steppers from './steppers';
@@ -34,6 +34,7 @@ import {
   sendBranchTransferToDC,
   sendBranchTransferToPickup,
   submitStockTransfer,
+  checkStockBalance,
 } from '../../services/stock-transfer';
 import theme from '../../styles/theme';
 import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
@@ -44,6 +45,7 @@ import { ApiError } from '../../models/api-error-model';
 import { GridRowData } from '@mui/x-data-grid';
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import moment from 'moment';
+import { env } from 'process';
 
 interface Props {
   isOpen: boolean;
@@ -119,7 +121,29 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setIsDC(getUserInfo().group === PERMISSION_GROUP.DC);
     setStartDate(new Date(branchTransferInfo.startDate));
     setEndDate(new Date(branchTransferInfo.endDate));
+
+    const list = _.uniqBy(branchTransferInfo.itemGroups, 'skuCode');
+    const skucodeList: string[] = [];
+    list.map((i: any) => {
+      skucodeList.push(i.skuCode);
+    });
   }, [open]);
+
+  async function fetchStockBalance(skuList: string[]) {
+    const payload: StockBalanceType = {
+      skuCodes: skuList,
+      branchCode: branchTransferInfo.branchTo,
+    };
+
+    await checkStockBalance(payload)
+      .then(async (value) => {
+        console.log(value);
+        value.data;
+      })
+      .catch((error: ApiError) => {
+        handleOnCloseModalConfirm();
+      });
+  }
 
   const mappingPayload = () => {
     let items: Item[] = [];
