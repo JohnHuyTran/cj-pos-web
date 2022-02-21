@@ -79,17 +79,24 @@ export default function SupplierCheckOrderSearch() {
   const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [ownBranch, setOwnBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : env.branch.code
+      : env.branch.code
+  );
   React.useEffect(() => {
     setDisplaySearchBtn(isAllowActionPermission(ACTIONS.STOCK_BT_VIEW));
     if (groupBranch) {
-      setBranchFromCode(env.branch.code);
-      setValues({ ...values, branchFrom: env.branch.code });
+      setBranchFromCode(ownBranch);
+      setValues({ ...values, branchFrom: ownBranch });
     }
   }, []);
 
-  const branchFrom = getBranchName(branchList, env.branch.code);
+  const branchFrom = getBranchName(branchList, ownBranch);
   const branchFromMap: BranchListOptionType = {
-    code: env.branch.code,
+    code: ownBranch,
     name: branchFrom ? branchFrom : '',
   };
   const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
@@ -277,7 +284,7 @@ export default function SupplierCheckOrderSearch() {
               sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
-              disable={groupBranch}
+              disable={false}
             />
           </Grid>
           <Grid item xs={4}>
