@@ -236,7 +236,18 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 }
             }
         );
-        if (!option) {
+        if (objectNullOrEmpty(option)) {
+            setValues({
+                    ...values,
+                    productType: objectNullOrEmpty(option) ? {} : option,
+                    selectAllProduct: false,
+                    btnAddStatus: false,
+                    error: {
+                        productTypeExist: '',
+                        productExist: ''
+                    }
+                }
+            );
             clearData();
         }
     }
@@ -282,7 +293,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         let selectedItemFilter = _.cloneDeep(selectedItems);
         if (data.selectedType === 1) {
             selectedItemFilter = selectedItems.filter((it: any) => (
-                    it.selectedType === data.selectedType && it.productTypeCode !== data.productTypeCode)
+                it.selectedType === data.selectedType && it.productTypeCode !== data.productTypeCode)
                 || (it.selectedType === 2 && data.productTypeCode !== it.ProductTypeCode));
         } else if (data.selectedType === 2) {
             selectedItemFilter = selectedItems.filter((it: any) => it.selectedType === 1 || it.barcode !== data.barcode);
