@@ -284,7 +284,7 @@ export default function StockTransferRt() {
               sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
-              disable={false}
+              disable={groupBranch}
             />
           </Grid>
           <Grid item xs={4}>
