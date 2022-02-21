@@ -745,6 +745,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   reasonsValue={reasons}
                   onChangeReasons={handleChangeReasons}
                   isClear={false}
+                  isDetail={true}
                 />
               )}
               {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && reasonText}
