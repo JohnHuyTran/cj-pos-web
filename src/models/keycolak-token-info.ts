@@ -20,6 +20,7 @@ export interface KeyCloakTokenInfo {
   family_name: string;
   email: string;
   group: string | '';
+  branch: string | '';
 }
 
 export interface ACL {

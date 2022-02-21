@@ -22,6 +22,7 @@ import { env } from '../../adapters/environmentConfigs';
 import { getBranchName } from '../../utils/utils';
 import { BranchListOptionType } from '../../models/branch-model';
 import { ACTIONS } from '../../utils/enum/permission-enum';
+import { getUserInfo } from '../../store/sessionStore';
 
 interface State {
   docNo: string;
@@ -73,22 +74,29 @@ export default function StockTransferRt() {
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [displayBtnCreate, setDisplayBtnCreate] = React.useState(false);
-  React.useEffect(() => {
-    setDisplayBtnCreate(isAllowActionPermission(ACTIONS.STOCK_RT_MANAGE));
-    if (groupBranch) {
-      setBranchFromCode(env.branch.code);
-      setValues({ ...values, branchFrom: env.branch.code });
-    }
-  }, []);
-
-  const branchFrom = getBranchName(branchList, env.branch.code);
+  const [ownBranch, setOwnBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : env.branch.code
+      : env.branch.code
+  );
+  const branchFrom = getBranchName(branchList, ownBranch);
   const branchFromMap: BranchListOptionType = {
-    code: env.branch.code,
+    code: ownBranch,
     name: branchFrom ? branchFrom : '',
   };
   const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
     groupBranch ? branchFromMap : null
   );
+
+  React.useEffect(() => {
+    setDisplayBtnCreate(isAllowActionPermission(ACTIONS.STOCK_RT_MANAGE));
+    if (groupBranch) {
+      setBranchFromCode(ownBranch);
+      setValues({ ...values, branchFrom: ownBranch });
+    }
+  }, []);
 
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
