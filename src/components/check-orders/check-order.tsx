@@ -22,6 +22,7 @@ import AlertError from '../commons/ui/alert-error';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { shipmentStatus } from '../../utils/enum/check-order-enum';
+import OrderReceiveDetail from '../check-orders/order-receive-detail';
 
 // moment.locale("en");
 moment.locale('th');
@@ -221,6 +222,15 @@ function CheckOrderSearch() {
     }
   }
 
+  const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
+  const handleOpenOrderReceiveModal = () => {
+    setOpenOrderReceiveModal(true);
+  };
+
+  function handleCloseOrderReceiveModal() {
+    setOpenOrderReceiveModal(false);
+  }
+
   //check dateFrom-dateTo
   if (endDate != null && startDate != null) {
     if (endDate < startDate) {
@@ -338,7 +348,7 @@ function CheckOrderSearch() {
             <Button
               id="btnCreateStockTransferModal"
               variant="contained"
-              // onClick={handleOpenCreateModal}
+              onClick={handleOpenOrderReceiveModal}
               sx={{ minWidth: '15%' }}
               className={classes.MbtnClear}
               startIcon={<AddCircleOutlineOutlinedIcon />}
@@ -375,6 +385,10 @@ function CheckOrderSearch() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+      {openOrderReceiveModal && (
+        <OrderReceiveDetail defaultOpen={openOrderReceiveModal} onClickClose={handleCloseOrderReceiveModal} />
+      )}
     </>
   );
 }
