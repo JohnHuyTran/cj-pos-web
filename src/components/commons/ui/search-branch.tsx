@@ -68,6 +68,19 @@ export default function SearchBranch(props: Props): ReactElement {
 
   const dispatch = useAppDispatch();
 
+  const autocompleteRenderListItem = (props: any, option: any) => {
+    return (
+      <li {...props} key={option.code}>
+        <Box sx={{ display: 'flex', width: '100%' }}>
+          <Typography variant="body2">{option.name}</Typography>
+          <Typography variant="caption" sx={{ marginLeft: 'auto' }}>
+            {option.code}
+          </Typography>
+        </Box>
+      </li>
+    );
+  };
+
   useEffect(() => {
     if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
     dispatch(fetchTotalBranch());
@@ -355,6 +368,7 @@ export default function SearchBranch(props: Props): ReactElement {
                       size="small"
                       className={classes.MSearchBranch}
                       getOptionLabel={(option) => option.name}
+                      renderOption={autocompleteRenderListItem}
                       onChange={(event: any, newValue: any) => {
                         setBranch(newValue);
                       }}
