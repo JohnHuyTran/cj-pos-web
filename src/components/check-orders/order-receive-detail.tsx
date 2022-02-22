@@ -71,7 +71,7 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
                 <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">-</Typography>
+                {/* <Typography variant="body2">{sdNo ? sdNo : '-'}</Typography> */}
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">วันที่:</Typography>
