@@ -44,6 +44,12 @@ export const featchOrderListAsync = createAsyncThunk('orderList', async (payload
     if (payload.dateTo) {
       path = path + `&dateTo=${payload.dateTo}`;
     }
+    if (payload.shipBranchFrom) {
+      path = path + `&shipBranchFrom=${payload.shipBranchFrom}`;
+    }
+    if (payload.shipBranchTo) {
+      path = path + `&shipBranchTo=${payload.shipBranchTo}`;
+    }
     // console.log("path : ", path);
     let response: ShipmentResponse = {
       ref: '',
