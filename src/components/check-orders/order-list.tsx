@@ -47,7 +47,7 @@ function OrderList() {
       ),
     },
     {
-      field: 'shipmentNo',
+      field: 'docRefNo',
       headerName: 'เลขที่เอกสาร',
       // minWidth: 161,
       flex: 1.3,
@@ -152,9 +152,10 @@ function OrderList() {
   // console.log('res: ', JSON.stringify(res));
   const rows = res.data.map((data: ShipmentInfo, indexs: number) => {
     return {
-      id: `${data.shipmentNo}_${data.sdNo}`,
+      id: `${data.docRefNo}_${data.sdNo}`,
       index: (cuurentPages - 1) * parseInt(pageSize) + indexs + 1,
       shipmentNo: data.shipmentNo,
+      docRefNo: data.docRefNo,
       sdNo: data.sdNo,
       sdType: getShipmentTypeText(data.sdType),
       boxCnt: data.boxCnt,
@@ -172,7 +173,8 @@ function OrderList() {
   const currentlySelected = async (params: GridCellParams) => {
     setOpenLoadingModal(true);
     setSdNo(params.row.sdNo);
-    setShipment(params.row.shipmentNo);
+    // setShipment(params.row.shipmentNo);
+    setShipment(params.row.docRefNo);
 
     await dispatch(featchOrderDetailAsync(params.row.sdNo))
       .then(
