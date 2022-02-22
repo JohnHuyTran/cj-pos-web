@@ -180,6 +180,9 @@ export const environment = {
       sendToPickup: {
         url: '/stock/stock-transfer/save-wait-dc',
       },
+      submitTransfer: {
+        url: '/stock/stock-transfer/submit-transfer',
+      },
     },
     stockRequest: {
       detail: {
