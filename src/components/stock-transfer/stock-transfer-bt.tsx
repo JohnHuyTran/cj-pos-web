@@ -46,6 +46,7 @@ import { GridRowData } from '@mui/x-data-grid';
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import moment from 'moment';
 import { env } from 'process';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 interface Props {
   isOpen: boolean;
@@ -225,7 +226,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   const handleCloseModelAddItems = () => {
     setOpenModelAddItems(false);
   };
-  const handleOpenAddItems = () => {
+  const handleOpenAddItems = async () => {
+    await dispatch(updateAddItemsState({}));
     setOpenModelAddItems(true);
   };
   const handleSaveBtn = () => {};

@@ -7,25 +7,26 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } fro
 import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { Item, Item_ } from '../../models/stock-transfer-model';
+import { Item, ItemGroups, Item_ } from '../../models/stock-transfer-model';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 
 function BranchTransferListItem() {
   const classes = useStyles();
-
+  const _ = require('lodash');
   const dispatch = useAppDispatch();
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
-  const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
-  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const payloadSearch = useAppSelector((state) => state.saveSearchStock.searchStockTransfer);
-
   const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
   const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
     branchTransferInfo.items ? branchTransferInfo.items : []
   );
-  const [isDraft, setIsDraft] = React.useState(false);
 
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  const skuGroupItems = useAppSelector((state) => state.branchTransferUpdateBTSkuSlice.state);
+
+  const [isDraft, setIsDraft] = React.useState(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
+
+  const [rowTable, setRowTable] = React.useState([]);
 
   const columns: GridColDef[] = [
     {
@@ -175,13 +176,73 @@ function BranchTransferListItem() {
 
   React.useEffect(() => {
     setIsDraft(branchTransferInfo.status === 'CREATED' ? true : false);
-    let newColumns = [...columns];
-    if (branchTransferInfo.status != 'CREATED') {
-      newColumns[7]['hide'] = false;
-    } else {
-      newColumns[7]['hide'] = true;
+    storeItemAddItem(payloadAddItem);
+  }, [payloadAddItem]);
+
+  const storeItemAddItem = (_newItem: any) => {
+    console.log('sku : ', skuGroupItems);
+    console.log('new item: ', _newItem);
+    const items: Item_[] = [];
+    let _items = [...branchTransferItems];
+    let _sku = [...skuGroupItems];
+    if (Object.keys(_newItem).length !== 0) {
+      _newItem.map((data: any, index: number) => {
+        let indexDup = 0;
+        const dupItem: any = branchTransferItems.find((item: Item_, index: number) => {
+          indexDup = index;
+          return item.barcode === data.barcode;
+        });
+        const dupSku: any = skuGroupItems.find((item: ItemGroups, index: number) => {
+          indexDup = index;
+          return item.skuCode === data.skuCode;
+        });
+
+        if (dupItem) {
+          const newData: Item_ = {
+            seqItem: dupItem.seqItem,
+            barcode: dupItem.barcode,
+            productName: dupItem.productName,
+            skuCode: dupItem.skuCode,
+            barFactor: dupItem.barFactor,
+            unitName: dupItem.unitName,
+            unitCode: dupItem.unitCode,
+            orderQty: dupItem.orderQty ? dupItem.orderQty : 0,
+            actualQty: dupItem.actualQty + data.qty,
+            toteCode: dupItem.toteCode,
+            isDraft: isDraft,
+            boNo: dupItem.boNo,
+          };
+          _.remove(_items, function (item: Item_) {
+            return item.barcode === data.barcode;
+          });
+          _items = [..._items, newData];
+        } else {
+          const newData: Item_ = {
+            seqItem: 0,
+            barcode: data.barcode,
+            productName: data.barcodeName,
+            skuCode: data.skuCode,
+            barFactor: data.barFactor,
+            unitCode: data.unitCode ? data.unitCode : 0,
+            unitName: data.unitName,
+            orderQty: data.orderQty ? data.orderQty : 0,
+            actualQty: data.qty,
+            toteCode: '',
+            isDraft: isDraft,
+          };
+          _items = [..._items, newData];
+        }
+      });
     }
-  }, []);
+    setBranchTransferItems(_items);
+  };
+
+  let newColumns = [...columns];
+  if (branchTransferInfo.status != 'CREATED') {
+    newColumns[7]['hide'] = false;
+  } else {
+    newColumns[7]['hide'] = true;
+  }
   return (
     <Box mt={2} bgcolor='background.paper'>
       <Typography>รายการสินค้า: รายการสินค้าทั้งหมด</Typography>

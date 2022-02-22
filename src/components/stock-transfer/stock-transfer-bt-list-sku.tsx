@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { Item, ItemGroups } from '../../models/stock-transfer-model';
+import { updateAddItemsState } from '../../store/slices/stock-transfer-bt-sku-slice';
 
 function BranchTransferListSKU() {
   const classes = useStyles();
@@ -17,10 +18,6 @@ function BranchTransferListSKU() {
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
 
   const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
-  const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
-    branchTransferInfo.items ? branchTransferInfo.items : []
-  );
-
   const [btItemGroups, setBtItemGroups] = React.useState<ItemGroups[]>(
     branchTransferInfo.itemGroups ? branchTransferInfo.itemGroups : []
   );
@@ -128,7 +125,9 @@ function BranchTransferListSKU() {
     };
   });
 
-  React.useEffect(() => {}, []);
+  React.useEffect(() => {
+    dispatch(updateAddItemsState(btItemGroups));
+  }, []);
 
   return (
     <Box mt={2} bgcolor='background.paper'>
