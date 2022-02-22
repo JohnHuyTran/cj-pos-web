@@ -9,9 +9,13 @@ export interface ItemsResponse {
 
 export interface ItemInfo {
   barcode: string;
+  barcodeName: string;
   skuCode?: string;
+  skuName?: string;
   unitCode?: string;
   unitName?: string;
-  barcodeName: string;
+  unitPrice?: number;
+  unitText?: string;
+  baseUnit?: number;
   qty?: number;
 }

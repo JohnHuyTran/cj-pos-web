@@ -13,7 +13,7 @@ import DatePickerComponent from '../commons/ui/date-picker-detail';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import StockRequestItem from './stock-request-item';
 import StockRequestCreateItem from './stock-request-create-item';
-import StockRequestItems from './stock-request-items';
+import StockRequestItems from './stock-request-list-items';
 import { useAppDispatch } from '../../store/store';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
@@ -764,6 +764,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   onClick={handleOpenAddItems}
                   startIcon={<ControlPoint />}
                   sx={{ width: 200 }}
+                  disabled={fromBranch == ''}
                 >
                   เพิ่มสินค้า
                 </Button>

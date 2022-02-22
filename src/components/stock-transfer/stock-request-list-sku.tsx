@@ -41,56 +41,6 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'productName',
-    headerName: 'รายละเอียดสินค้า',
-    headerAlign: 'center',
-    minWidth: 300,
-    flex: 2,
-    sortable: false,
-    renderCell: (params) => (
-      <div>
-        <Typography variant="body2">{params.value}</Typography>
-        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
-          {params.getValue(params.id, 'skuCode') || ''}
-        </Typography>
-      </div>
-    ),
-  },
-  {
-    field: 'unitName',
-    headerName: 'สต๊อกสินค้าคงเหลือ',
-    minWidth: 150,
-    headerAlign: 'right',
-    disableColumnMenu: true,
-    sortable: false,
-  },
-  {
-    field: 'baseUnit',
-    headerName: 'สั่ง(ชิ้น)',
-    minWidth: 120,
-    headerAlign: 'center',
-    align: 'right',
-    disableColumnMenu: true,
-    sortable: false,
-    renderCell: (params) => calBaseUnit(params),
-  },
-];
-
-const columnsItems: GridColDef[] = [
-  {
-    field: 'index',
-    headerName: 'ลำดับ',
-    width: 80,
-    headerAlign: 'center',
-    disableColumnMenu: true,
-    sortable: false,
-    renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
-        {params.value}
-      </Box>
-    ),
-  },
-  {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
     minWidth: 200,
@@ -192,43 +142,47 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function StockTransferItem({ type, onChangeItems, changeItems, update }: DataGridProps) {
+function StockTransferListSKU({ type, onChangeItems, changeItems, update }: DataGridProps) {
   const dispatch = useAppDispatch();
+  const _ = require('lodash');
   const classes = useStyles();
   const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
-  const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  // const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  const stockRequestItems = useAppSelector((state) => state.stockRequestItems.state);
 
   useEffect(() => {
-    if (!update && type !== 'Create') {
-      if (stockRequestDetail) {
-        const items = stockRequestDetail.items ? stockRequestDetail.items : [];
-        if (items.length > 0) {
-          updateItemsState(items);
-          itemsMap(items);
-        }
-      }
-    }
+    // if (!update && type !== 'Create') {
+    //   if (stockRequestDetail) {
+    //     const items = stockRequestDetail.items ? stockRequestDetail.items : [];
+    //     if (items.length > 0) {
+    //       updateItemsState(items);
+    //       itemsMap(items);
+    //     }
+    //   }
+    // }
+    // console.log('stockRequestItems :', JSON.stringify(stockRequestItems));
   }, [update]);
 
   let rows: any = [];
-  const updateItemsState = async (items: any) => {
-    const itemsList: any = [];
-    await items.forEach((item: any) => {
-      const data: any = {
-        skuCode: item.skuCode,
-        barcode: item.barcode,
-        productName: item.productName ? item.productName : item.barcodeName,
-        unitCode: item.unitCode,
-        unitName: item.unitName,
-        baseUnit: item.baseUnit ? item.baseUnit : 0,
-        qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
-      };
-      itemsList.push(data);
-    });
-    if (itemsList.length > 0) await dispatch(updateAddItemsState(items));
-  };
+  // const updateItemsState = async (items: any) => {
+  //   const itemsList: any = [];
+  //   await items.forEach((item: any) => {
+  //     const data: any = {
+  //       skuCode: item.skuCode,
+  //       barcode: item.barcode,
+  //       productName: item.productName ? item.productName : item.barcodeName,
+  //       unitCode: item.unitCode,
+  //       unitName: item.unitName,
+  //       baseUnit: item.baseUnit ? item.baseUnit : 0,
+  //       qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
+  //     };
+  //     itemsList.push(data);
+  //   });
+  //   if (itemsList.length > 0) await dispatch(updateAddItemsState(items));
+  // };
 
   const itemsMap = (items: any) => {
+    // console.log('itemsMap :', JSON.stringify(items));
     rows = items.map((item: any, index: number) => {
       return {
         id: `${item.barcode}-${index + 1}`,
@@ -247,14 +201,14 @@ function StockTransferItem({ type, onChangeItems, changeItems, update }: DataGri
   };
 
   if (type === 'Create') {
-    if (Object.keys(payloadAddItem).length > 0) itemsMap(payloadAddItem);
+    if (Object.keys(stockRequestItems).length > 0) itemsMap(stockRequestItems);
   } else {
-    if (Object.keys(payloadAddItem).length > 0) {
-      itemsMap(payloadAddItem);
+    if (Object.keys(stockRequestItems).length > 0) {
+      itemsMap(stockRequestItems);
     } else if (stockRequestDetail) {
       const items = stockRequestDetail.items ? stockRequestDetail.items : [];
       if (items.length > 0) {
-        updateItemsState(items);
+        //   updateItemsState(items);
         itemsMap(items);
       }
     }
@@ -324,51 +278,25 @@ function StockTransferItem({ type, onChangeItems, changeItems, update }: DataGri
   };
   return (
     <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
-      <Box mb={4}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
-          pagination
-          disableColumnMenu
-          autoHeight={rows.length >= 8 ? false : true}
-          scrollbarSize={10}
-          rowHeight={65}
-          onCellClick={currentlySelected}
-          onCellFocusOut={handleEditItems}
-          onCellOut={handleEditItems}
-          onCellKeyDown={handleChangeItems}
-          // onCellBlur={handleChangeItems}
-        />
-      </Box>
-
-      <Box mb={4}>
-        <Box ml={1} mb={1}>
-          <Typography variant="body1">รายการสินค้า : รายการสินค้าทั้งหมด</Typography>
-          <FormGroup>
-            <FormControlLabel control={<Checkbox defaultChecked size="small" />} label="แสดงสินค้าทั้งหมด" />
-          </FormGroup>
-        </Box>
-        <DataGrid
-          rows={rows}
-          columns={columnsItems}
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
-          pagination
-          disableColumnMenu
-          autoHeight={rows.length >= 8 ? false : true}
-          scrollbarSize={10}
-          rowHeight={65}
-          onCellClick={currentlySelected}
-          onCellFocusOut={handleEditItems}
-          onCellOut={handleEditItems}
-          onCellKeyDown={handleChangeItems}
-          // onCellBlur={handleChangeItems}
-        />
-      </Box>
+      {/* <Box mb={1}> */}
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSize={pageSize}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        rowsPerPageOptions={[10, 20, 50, 100]}
+        pagination
+        disableColumnMenu
+        autoHeight={rows.length >= 8 ? false : true}
+        scrollbarSize={10}
+        rowHeight={65}
+        // onCellClick={currentlySelected}
+        // onCellFocusOut={handleEditItems}
+        // onCellOut={handleEditItems}
+        // onCellKeyDown={handleChangeItems}
+        // onCellBlur={handleChangeItems}
+      />
+      {/* </Box> */}
 
       <ModelDeleteConfirm
         open={openModelDeleteConfirm}
@@ -381,4 +309,4 @@ function StockTransferItem({ type, onChangeItems, changeItems, update }: DataGri
   );
 }
 
-export default StockTransferItem;
+export default StockTransferListSKU;
