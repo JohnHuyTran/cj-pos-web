@@ -1,7 +1,7 @@
 export enum ShipmentDeliveryStatusCodeEnum {
-  STATUS_APPROVE = 1,
-  STATUS_DRAFT = 0,
-  STATUS_CLOSEJOB = 2,
+  STATUS_APPROVE = 'APPROVED',
+  STATUS_DRAFT = 'DRAFT',
+  STATUS_CLOSEJOB = 'CLOSED',
 }
 
 export const shipmentStatus = [
