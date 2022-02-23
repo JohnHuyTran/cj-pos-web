@@ -50,6 +50,7 @@ import { env } from 'process';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
 import stockRequestDetail from './stock-request-detail';
+import { isGroupBranch } from '../../utils/role-permission';
 
 interface Props {
   isOpen: boolean;
@@ -153,10 +154,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
   const mappingPayload = () => {
     let items: Item[] = [];
-    // const _branchTransferRslList = store.getState().branchTransferDetailSlice.branchTransferRs;
-    const _productSelector = store.getState().updateBTProductSlice.state;
-    console.log(_productSelector);
-    // const _productSelector = useAppSelector((state) => state.updateBTProductSlice.state);
+    const _productSelector: any = store.getState().updateBTProductSlice.state;
     _productSelector.forEach((data: GridRowData) => {
       const item: Item = {
         seqItem: data.seqItem,
@@ -197,7 +195,42 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   };
 
   const validateItem = () => {
-    return true;
+    const _productSelector: any = store.getState().updateBTProductSlice.state;
+    let itemNotValid: boolean = false;
+    _productSelector.forEach((data: GridRowData) => {
+      console.log(`toteCode: ${data.toteCode} actualQty: ${data.actualQty}`);
+      if (!data.toteCode && data.actualQty > 0) {
+        itemNotValid = true;
+        setTextError('กรุณาระบุเลขที่ Tote/ลัง');
+        setComment(comment);
+        return;
+      }
+      if (data.toteCode && data.actualQty <= 0) {
+        itemNotValid = true;
+        setTextError('จำนวนโอนจริงเป็น 0 ไม่ต้องระบุเลขที่ Tote/ลัง ');
+        setComment(comment);
+        return;
+      }
+    });
+
+    const _skuSelector = store.getState().updateBTSkuSlice.state;
+    _skuSelector.forEach((data: ItemGroups) => {
+      const actualQty = data.actualAllQty ? data.actualAllQty : 0;
+      const orderQty = data.orderAllQty ? data.orderAllQty : 0;
+      if (actualQty < orderQty && !comment) {
+        itemNotValid = true;
+        setTextError('กรุณาระบุสาเหตุการเปลี่ยนจำนวน');
+        setComment(comment);
+        return;
+      }
+    });
+    if (itemNotValid) {
+      setOpenAlert(true);
+      return false;
+    } else {
+      setOpenAlert(false);
+      return true;
+    }
   };
 
   const handleStartDatePicker = (value: any) => {
@@ -245,8 +278,23 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   const handleCloseModelAddItems = () => {
     setOpenModelAddItems(false);
   };
+
+  const getSkuList = () => {
+    const _skuSlice = store.getState().updateBTSkuSlice.state;
+    const list = _.uniqBy(_skuSlice, 'skuCode');
+    const skucodeList: string[] = [];
+    list.map((i: any) => {
+      skucodeList.push(i.skuCode);
+    });
+    const payload: FindProductRequest = {
+      skuCodes: skucodeList,
+    };
+    setBodyRequest(payload);
+  };
+
   const handleOpenAddItems = async () => {
     await dispatch(updateAddItemsState({}));
+    await getSkuList();
     setOpenModelAddItems(true);
   };
   const handleSaveBtn = async () => {
@@ -336,6 +384,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           setContentMsg(error.message);
         });
     }
+    setOpenLoadingModal(false);
   };
 
   const sendTransactionToDC = async () => {
@@ -745,7 +794,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           {!isDraft && !isDC && btStatus === 'READY_TO_TRANSFER' && componentViewReport}
           {isDC && btStatus === 'READY_TO_TRANSFER' && componentDCStatusReadyToTransfer}
           {isDC && btStatus === 'WAIT_FOR_PICKUP' && componentDCStatusWaitForPicup}
-          {btStatus === 'WAIT_FOR_PICKUP' && componentBranchStatusWaitForPickup}
+          {isGroupBranch() && btStatus === 'WAIT_FOR_PICKUP' && componentBranchStatusWaitForPickup}
 
           <BranchTransferListSKU />
           <Box mt={6}></Box>

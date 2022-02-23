@@ -118,12 +118,8 @@ const columns: GridColDef[] = [
         name='txbToteCode'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
-        onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
-          const cursorStart = e.target.selectionStart;
-          const cursorEnd = e.target.selectionEnd;
           params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
-          e.target.setSelectionRange(cursorStart, cursorEnd);
         }}
         disabled={params.getValue(params.id, 'isDraft') ? false : true}
         autoComplete='off'
@@ -208,7 +204,6 @@ function BranchTransferListItem() {
   }, [payloadAddItem]);
 
   const storeItemAddItem = (_newItem: any) => {
-    const items: Item_[] = [];
     let _items = [...branchTransferItems];
     let _sku = [...skuGroupItems];
     if (Object.keys(_newItem).length !== 0) {
@@ -282,29 +277,55 @@ function BranchTransferListItem() {
     }
     setBranchTransferItems(_items);
     dispatch(updateAddItemSkuGroupState(_sku));
+    dispatch(updateAddItemsGroupState(_items));
   };
 
   const storeItem = () => {
+    let _sku = [...skuGroupItems];
+    let _newSku: ItemGroups[] = [];
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const items: Item[] = [];
+    const items: Item_[] = [];
     rowsEdit.forEach((data: GridRowData) => {
-      const newData: Item = {
+      const newData: Item_ = {
         seqItem: data.seqItem,
         barcode: data.barcode,
         productName: data.productName,
         skuCode: data.skuCode,
-        baseUnit: data.baseUnit,
         unitName: data.unitName,
-        remainStock: data.remainStock,
-        qty: data.qty,
         actualQty: data.actualQty,
         toteCode: data.toteCode,
         isDraft: isDraft,
         boNo: data.boNo,
+        barFactor: data.barFactor,
+        unitCode: data.unitCode ? data.unitCode : 0,
+        orderQty: data.orderQty ? data.orderQty : 0,
       };
       items.push(newData);
     });
+
+    _sku.forEach((data: ItemGroups) => {
+      const sum = items
+        .filter((dataItem: Item_) => {
+          return data.skuCode === dataItem.skuCode;
+        })
+        .reduce((sum, dataItem: Item_) => {
+          return (
+            sum + Number((dataItem.actualQty ? dataItem.actualQty : 0) * (dataItem.barFactor ? dataItem.barFactor : 0))
+          );
+        }, 0);
+
+      const newData: ItemGroups = {
+        skuCode: data.skuCode,
+        productName: data.productName,
+        orderAllQty: data.orderAllQty,
+        actualAllQty: sum,
+        remainingQty: data.remainingQty,
+      };
+      _newSku.push(newData);
+    });
+
     setBranchTransferItems(items);
+    dispatch(updateAddItemSkuGroupState(_newSku));
     dispatch(updateAddItemsGroupState(items));
   };
 

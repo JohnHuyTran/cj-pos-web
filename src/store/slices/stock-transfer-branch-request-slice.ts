@@ -30,8 +30,7 @@ export const featchBranchTransferDetailAsync = createAsyncThunk('branchTransfer'
     };
 
     response = await get(apiRootPath).then();
-    // return response;
-    return getStrockTransferMockup();
+    return response;
   } catch (error) {
     throw error;
   }
