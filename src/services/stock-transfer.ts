@@ -6,6 +6,7 @@ import {
   Approve2StockTransferRequest,
   BranchTransferRequest,
   SaveStockTransferRequest,
+  StockBalanceBySKURequest,
   SubmitStockTransferRequest,
 } from '../models/stock-transfer-model';
 import { getPathUrl } from './base-service';
@@ -183,6 +184,15 @@ export const getPathRemoveStockRequest = (rtNo: string) => {
 
 export async function removeStockRequest(rtNo: string) {
   const response = await post(getPathRemoveStockRequest(rtNo), ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function StockBalanceBySKU(payload: StockBalanceBySKURequest) {
+  const response = await post(environment.stock.stockRequest.stockBalanceBySKU.url, payload, ContentType.JSON)
     .then((result: any) => result)
     .catch((error) => {
       throw error;

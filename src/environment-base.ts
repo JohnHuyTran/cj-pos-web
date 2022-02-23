@@ -209,6 +209,9 @@ export const environment = {
       remove: {
         url: '/stock/stock-request/remove/{rtNo}',
       },
+      stockBalanceBySKU: {
+        url: '/stock/stock-balance/check-by-sku-codes',
+      },
     },
     stockBalanceCheck: {
       url: '/stock/stock-balance-check',

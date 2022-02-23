@@ -1,32 +1,26 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-  useGridApiRef,
-  GridRowId,
-  GridRowData,
-  GridValueGetterParams,
-  GridCellParams,
-} from '@mui/x-data-grid';
-import { GridEditCellValueParams } from '@material-ui/data-grid';
+import { DataGrid, GridColDef, GridValueGetterParams, GridCellParams } from '@mui/x-data-grid';
 import { Box } from '@material-ui/core';
 import { useStyles } from '../../styles/makeTheme';
-import { Checkbox, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
-import { DeleteForever } from '@mui/icons-material';
-import ModelDeleteConfirm from '../commons/ui/modal-delete-confirm';
+import { Checkbox, FormControlLabel, FormGroup, Grid, TextField, Typography } from '@mui/material';
 import { numberWithCommas } from '../../utils/utils';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
+import StockRequestItem from './stock-request-list-item';
+import { StockBalanceBySKU } from '../../services/stock-transfer';
+import { StockBalanceBySKURequest } from '../../models/stock-transfer-model';
 
 export interface DataGridProps {
   type: string;
   onChangeItems: (items: Array<any>) => void;
   changeItems: (chang: Boolean) => void;
   update: boolean;
+  stock: boolean;
+  branch: string;
 }
 
-const columns: GridColDef[] = [
+const columnsSKU: GridColDef[] = [
   {
     field: 'index',
     headerName: 'ลำดับ',
@@ -41,15 +35,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'barcode',
-    headerName: 'บาร์โค้ด',
-    minWidth: 200,
-    headerAlign: 'center',
-    disableColumnMenu: true,
-    sortable: false,
-  },
-  {
-    field: 'productName',
+    field: 'skuName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
     minWidth: 300,
@@ -65,146 +51,161 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'qty',
-    headerName: 'จำนวนที่สั่ง',
+    field: 'stock',
+    headerName: 'สต๊อกสินค้าคงเหลือ',
     minWidth: 150,
     headerAlign: 'center',
+    align: 'right',
     disableColumnMenu: true,
     sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <TextField
-        variant="outlined"
-        name="txnQuantity"
-        type="number"
-        inputProps={{ style: { textAlign: 'right' } }}
-        value={params.value}
-        onChange={(e) => {
-          let qty = Number(params.getValue(params.id, 'qty'));
-          var value = e.target.value ? parseInt(e.target.value, 10) : '';
-          if (qty === 0) value = chkQty(value);
-          if (value < 0) value = 0;
-          params.api.updateRows([{ ...params.row, qty: value }]);
-        }}
-        // disabled={isDisable(params) ? true : false}
-        autoComplete="off"
-      />
-    ),
   },
   {
-    field: 'unitName',
-    headerName: 'หน่วย',
+    field: 'baseUnit',
+    headerName: 'สั่ง(ชิ้น)',
     minWidth: 120,
     headerAlign: 'center',
+    align: 'right',
     disableColumnMenu: true,
     sortable: false,
-  },
-  {
-    field: 'delete',
-    headerName: ' ',
-    width: 40,
-    minWidth: 0,
-    align: 'right',
-    sortable: false,
-    renderCell: () => {
-      return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
-    },
+    renderCell: (params) => calBaseUnit(params),
   },
 ];
-
-var chkQty = (value: any) => {
-  let v = String(value);
-  if (v.substring(1) === '0') return Number(v.substring(0, 1));
-  return value;
-};
 
 var calBaseUnit = function (params: GridValueGetterParams) {
   let cal = Number(params.getValue(params.id, 'qty')) * Number(params.getValue(params.id, 'baseUnit'));
   return numberWithCommas(cal);
 };
 
-function useApiRef() {
-  const apiRef = useGridApiRef();
-  const _columns = useMemo(
-    () =>
-      columns.concat({
-        field: '',
-        width: 0,
-        minWidth: 0,
-        sortable: false,
-        renderCell: (params) => {
-          apiRef.current = params.api;
-          return null;
-        },
-      }),
-    [columns]
-  );
-
-  return { apiRef, columns: _columns };
-}
-
-function StockTransferListSKU({ type, onChangeItems, changeItems, update }: DataGridProps) {
+function StockRequestSKU({ type, onChangeItems, changeItems, update, stock, branch }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
   const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
-  // const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  const stockRequestItems = useAppSelector((state) => state.stockRequestItems.state);
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   useEffect(() => {
     // if (!update && type !== 'Create') {
     //   if (stockRequestDetail) {
     //     const items = stockRequestDetail.items ? stockRequestDetail.items : [];
     //     if (items.length > 0) {
-    //       updateItemsState(items);
+    //       // updateItemsState(items);
     //       itemsMap(items);
     //     }
     //   }
     // }
-    // console.log('stockRequestItems :', JSON.stringify(stockRequestItems));
-  }, [update]);
 
-  let rows: any = [];
-  // const updateItemsState = async (items: any) => {
-  //   const itemsList: any = [];
-  //   await items.forEach((item: any) => {
-  //     const data: any = {
-  //       skuCode: item.skuCode,
-  //       barcode: item.barcode,
-  //       productName: item.productName ? item.productName : item.barcodeName,
-  //       unitCode: item.unitCode,
-  //       unitName: item.unitName,
-  //       baseUnit: item.baseUnit ? item.baseUnit : 0,
-  //       qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
-  //     };
-  //     itemsList.push(data);
-  //   });
-  //   if (itemsList.length > 0) await dispatch(updateAddItemsState(items));
-  // };
+    console.log('useEffect update:', update);
+    console.log('useEffect stock:', stock);
 
-  const itemsMap = (items: any) => {
-    // console.log('itemsMap :', JSON.stringify(items));
-    rows = items.map((item: any, index: number) => {
+    if (stock) {
+      let skuCodes: any = [];
+      // payloadAddItem.forEach((data: any) => {
+      //   skuCodes.push(data.skuCode);
+      // });
+
+      payloadAddItem.map((item: any) => {
+        //chk duplicates sku
+        const sku = skuCodes.filter((r: any) => r === item.skuCode);
+        if (sku.length == 0) {
+          skuCodes.push(item.skuCode);
+        }
+      });
+
+      console.log('useEffect skuCodes :', JSON.stringify(skuCodes));
+
+      stockBalanceBySKU(skuCodes);
+    }
+  }, [update, stock]);
+
+  const [stockBalanceList, setStockBalanceList] = React.useState([]);
+  // const [flagCheckStock, setFlagCheckStock] = React.useState(false);
+  const stockBalanceBySKU = async (skuCodes: any) => {
+    console.log('stockBalanceBySKU skuCodes :', JSON.stringify(skuCodes));
+
+    const payload: StockBalanceBySKURequest = {
+      branchCode: branch,
+      skuCodes: skuCodes,
+    };
+
+    await StockBalanceBySKU(payload)
+      .then((value) => {
+        console.log('StockBalanceBySKU :', JSON.stringify(value));
+        setStockBalanceList(value.data);
+        // itemsMapStock(payloadAddItem, value.data);
+      })
+      .catch((error: any) => {
+        console.log('StockBalanceBySKU Error:', error);
+      });
+  };
+
+  let rowsSKU: any = [];
+  const itemsMapStock = async (items: any, stockBalance: any) => {
+    console.log(stockBalance.length, 'stockBalance :', JSON.stringify(stockBalance));
+
+    let resultSKU: any = [];
+    let stockRemain = 0;
+    items.map((a: any) => {
+      if (stockBalance.length > 0) {
+        stockBalance.forEach((s: any) => {
+          if (s.skuCode === a.skuCode) stockRemain = s.stockRemain;
+        });
+      }
+      const x = resultSKU.filter((r: any) => r.skuCode === a.skuCode);
+      if (x.length == 0) {
+        const item: any = {
+          skuCode: a.skuCode,
+          skuName: a.skuName,
+          qty: a.qty,
+          baseUnit: a.baseUnit,
+          stock: stockRemain,
+        };
+        resultSKU.push(item);
+      }
+    });
+    // }, Object.create(null));
+
+    rowsSKU = resultSKU.map((item: any, index: number) => {
       return {
-        id: `${item.barcode}-${index + 1}`,
+        id: `${item.skuCode}-${index + 1}`,
         index: index + 1,
         skuCode: item.skuCode,
-        barcode: item.barcode,
-        productName: item.productName ? item.productName : item.barcodeName,
-        unitCode: item.unitCode,
-        unitName: item.unitName,
+        skuName: item.skuName ? item.skuName : '',
+        stock: item.stock,
         baseUnit: item.baseUnit ? item.baseUnit : 0,
-        qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
+        qty: item.qty ? item.qty : 0,
       };
     });
 
-    // return onChangeItems(items ? items : []);
+    console.log('rowsSKU :', JSON.stringify(rowsSKU));
+  };
+
+  const itemsMap = async (items: any) => {
+    //orderBy skuCode
+    items = _.orderBy(items, ['skuCode'], ['asc']);
+
+    // if (!stock)
+    itemsMapStock(items, stockBalanceList);
+
+    let itemsOrderBy: any = [];
+    rowsSKU.map((data: any) => {
+      let i = items.filter((r: any) => r.skuCode === data.skuCode);
+      i = _.orderBy(i, ['baseUnit'], ['asc']);
+
+      i.forEach((data: any) => {
+        itemsOrderBy.push(data);
+      });
+    });
+
+    await dispatch(updatestockRequestItemsState(itemsOrderBy));
   };
 
   if (type === 'Create') {
-    if (Object.keys(stockRequestItems).length > 0) itemsMap(stockRequestItems);
+    if (Object.keys(payloadAddItem).length > 0) {
+      itemsMap(payloadAddItem);
+    }
   } else {
-    if (Object.keys(stockRequestItems).length > 0) {
-      itemsMap(stockRequestItems);
+    if (Object.keys(payloadAddItem).length > 0) {
+      itemsMap(payloadAddItem);
     } else if (stockRequestDetail) {
       const items = stockRequestDetail.items ? stockRequestDetail.items : [];
       if (items.length > 0) {
@@ -214,99 +215,57 @@ function StockTransferListSKU({ type, onChangeItems, changeItems, update }: Data
     }
   }
 
-  // if (Object.keys(payloadAddItem).length !== 0) {
-  // rows = payloadAddItem.map((item: any, index: number) => {
-  //   return {
-  //     id: `${item.barcode}-${index + 1}`,
-  //     index: index + 1,
-  //     skuCode: item.skuCode,
-  //     barcode: item.barcode,
-  //     barcodeName: item.barcodeName,
-  //     unitCode: item.unitCode,
-  //     unitName: item.unitName,
-  //     baseUnit: item.baseUnit,
-  //     qty: item.qty ? item.qty : 0,
-  //   };
-  // });
-  // }
-
-  const [pageSize, setPageSize] = React.useState<number>(10);
-
-  const { apiRef, columns } = useApiRef();
-  const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'qty') {
-      const itemsList: any = [];
-      if (rows.length > 0) {
-        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-        await rows.forEach((data: GridRowData) => {
-          itemsList.push(data);
-        });
-      }
-
-      await dispatch(updateAddItemsState(itemsList));
-      handleChangeItems();
-      return onChangeItems(itemsList ? itemsList : []);
-    }
-  };
+  const [pageSizeSKU, setPageSizeSKU] = React.useState<number>(10);
 
   const handleChangeItems = () => {
     return changeItems(true);
   };
 
-  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
-  const [deleteItems, setDeleteItems] = React.useState(false);
-  const [productNameDel, setProductNameDel] = React.useState('');
-  const [skuCodeDel, setSkuCodeDel] = React.useState('');
-  const [barCodeDel, setBarCodeDel] = React.useState('');
   const currentlySelected = async (params: GridCellParams) => {
-    const value = params.colDef.field;
-    const isRefPO = params.getValue(params.id, 'isRefPO');
-    //deleteItem
-    // handleUpdateRowState();
-
-    if (!isRefPO && value === 'delete') {
-      setDeleteItems(true);
-      setProductNameDel(String(params.getValue(params.id, 'productName')));
-      setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
-      setBarCodeDel(String(params.getValue(params.id, 'barcode')));
-      setOpenModelDeleteConfirm(true);
-    }
+    alert('currentlySelected');
   };
 
-  const handleModelDeleteConfirm = () => {
-    setOpenModelDeleteConfirm(false);
+  const [flagSave, setFlagSave] = React.useState(false);
+  const handleStatusChangeItems = async (items: any) => {
+    setFlagSave(true);
   };
   return (
-    <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
-      {/* <Box mb={1}> */}
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={pageSize}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        rowsPerPageOptions={[10, 20, 50, 100]}
-        pagination
-        disableColumnMenu
-        autoHeight={rows.length >= 8 ? false : true}
-        scrollbarSize={10}
-        rowHeight={65}
-        // onCellClick={currentlySelected}
-        // onCellFocusOut={handleEditItems}
-        // onCellOut={handleEditItems}
-        // onCellKeyDown={handleChangeItems}
-        // onCellBlur={handleChangeItems}
-      />
-      {/* </Box> */}
+    <div>
+      <div style={{ width: '100%', height: rowsSKU.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+        <DataGrid
+          rows={rowsSKU}
+          columns={columnsSKU}
+          pageSize={pageSizeSKU}
+          onPageSizeChange={(newPageSize) => setPageSizeSKU(newPageSize)}
+          rowsPerPageOptions={[10, 20, 50, 100]}
+          pagination
+          disableColumnMenu
+          autoHeight={rowsSKU.length >= 8 ? false : true}
+          scrollbarSize={10}
+          rowHeight={65}
+        />
+      </div>
 
-      <ModelDeleteConfirm
-        open={openModelDeleteConfirm}
-        onClose={handleModelDeleteConfirm}
-        productName={productNameDel}
-        skuCode={skuCodeDel}
-        barCode={barCodeDel}
+      <Box mt={4} ml={1} mb={1}>
+        <Typography variant="body1">รายการสินค้า : รายการสินค้าทั้งหมด</Typography>
+        <Grid container spacing={2} mb={2}>
+          <Grid item xs={2}>
+            <FormGroup>
+              <FormControlLabel control={<Checkbox defaultChecked size="small" />} label="แสดงสินค้าทั้งหมด" />
+            </FormGroup>
+          </Grid>
+          <Grid item xs={10}></Grid>
+        </Grid>
+      </Box>
+
+      <StockRequestItem
+        type={type}
+        onChangeItems={handleChangeItems}
+        changeItems={handleStatusChangeItems}
+        update={flagSave}
       />
     </div>
   );
 }
 
-export default StockTransferListSKU;
+export default StockRequestSKU;

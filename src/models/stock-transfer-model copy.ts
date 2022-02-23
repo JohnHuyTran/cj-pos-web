@@ -210,8 +210,3 @@ export interface Delivery {
   fromDate: string;
   toDate: string;
 }
-
-export interface StockBalanceBySKURequest {
-  branchCode: string;
-  skuCodes: Array<any>;
-}

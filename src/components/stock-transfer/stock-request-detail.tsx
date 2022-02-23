@@ -11,9 +11,9 @@ import Steppers from './steppers';
 import { useStyles } from '../../styles/makeTheme';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
-import StockRequestItem from './stock-request-item';
-import StockRequestCreateItem from './stock-request-create-item';
-import StockRequestItems from './stock-request-list-items';
+// import StockRequestItem from './stock-request-item';
+// import StockRequestCreateItem from './stock-request-create-item';
+import StockRequestSKU from './stock-request-list-SKU';
 import { useAppDispatch } from '../../store/store';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
@@ -240,25 +240,25 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     }
   }
 
-  const [valuebranchTo, setValuebranchTo] = React.useState<BranchListOptionType | null>(null);
+  // const [fromBranch, setFromBranch] = React.useState('');
   // const [valuebranchFrom, setValuebranchFrom] = React.useState<branchListOptionType | null>(null);
-  const [ownBranch, setOwnBranch] = React.useState(
+  const [fromBranch, setFromBranch] = React.useState(
     getUserInfo().branch
       ? getBranchName(branchList, getUserInfo().branch)
         ? getUserInfo().branch
         : env.branch.code
       : env.branch.code
   );
-  const branchFrom = getBranchName(branchList, ownBranch);
+  const branchFrom = getBranchName(branchList, fromBranch);
   const branchFromMap: BranchListOptionType = {
-    code: ownBranch,
+    code: fromBranch,
     name: branchFrom ? branchFrom : '',
   };
   const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
     groupBranch ? branchFromMap : null
   );
 
-  const [fromBranch, setFromBranch] = React.useState('');
+  const [valuebranchTo, setValuebranchTo] = React.useState<BranchListOptionType | null>(null);
   const [toBranch, setToBranch] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const handleChangeFromBranch = (branchCode: string) => {
@@ -292,10 +292,14 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const [flagStock, setFlagStock] = React.useState(false);
+
   const handleOpenAddItems = () => {
+    setFlagStock(false);
     setOpenModelAddItems(true);
   };
   const handleModelAddItems = async () => {
+    setFlagStock(true);
     setFlagSave(true);
     setOpenModelAddItems(false);
   };
@@ -868,11 +872,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             )}
           </Box> */}
           <Box mb={4}>
-            <StockRequestItems
+            <StockRequestSKU
               type={type}
               onChangeItems={handleChangeItems}
               changeItems={handleStatusChangeItems}
               update={flagSave}
+              stock={flagStock}
+              branch={fromBranch}
             />
           </Box>
 
