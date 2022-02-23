@@ -127,30 +127,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setStartDate(new Date(branchTransferInfo.startDate));
     setEndDate(new Date(branchTransferInfo.endDate));
 
-    const list = _.uniqBy(branchTransferInfo.itemGroups, 'skuCode');
-    const skucodeList: string[] = [];
-    list.map((i: any) => {
-      skucodeList.push(i.skuCode);
-    });
-
     dispatch(updateAddItemSkuGroupState(branchTransferInfo.itemGroups));
   }, [open]);
-
-  async function fetchStockBalance(skuList: string[]) {
-    const payload: StockBalanceType = {
-      skuCodes: skuList,
-      branchCode: branchTransferInfo.branchTo,
-    };
-
-    await checkStockBalance(payload)
-      .then(async (value) => {
-        console.log(value);
-        value.data;
-      })
-      .catch((error: ApiError) => {
-        handleOnCloseModalConfirm();
-      });
-  }
 
   const mappingPayload = () => {
     let items: Item[] = [];

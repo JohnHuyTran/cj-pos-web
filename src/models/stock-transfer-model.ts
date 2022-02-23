@@ -240,8 +240,11 @@ export interface Delivery {
 }
 
 export interface StockBalanceType {
-  skuCodes: string[];
-  branchCode: string;
+  skuCodes?: string[];
+  branchCode?: string;
+  skuCode?: string;
+  stockRemain?: number;
+  baseUnitFactor?: string;
 }
 
 export interface skuType {
@@ -251,4 +254,8 @@ export interface skuType {
   remainStock?: number;
   orderQty?: number;
   actualQty?: number;
+}
+
+export interface StockBalanceResponseType {
+  data: StockBalanceType[];
 }

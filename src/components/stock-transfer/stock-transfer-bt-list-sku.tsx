@@ -3,12 +3,15 @@ import { useStyles } from '../../styles/makeTheme';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { numberWithCommas } from '../../utils/utils';
-import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { Item, ItemGroups } from '../../models/stock-transfer-model';
+import store, { useAppDispatch, useAppSelector } from '../../store/store';
+import { Item, ItemGroups, StockBalanceResponseType, StockBalanceType } from '../../models/stock-transfer-model';
 import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
+import { checkStockBalance } from '../../services/stock-transfer';
+import { ApiError } from '../../models/api-error-model';
+import _ from 'lodash';
 
 function BranchTransferListSKU() {
   const classes = useStyles();
@@ -111,7 +114,9 @@ function BranchTransferListSKU() {
     return diff;
   };
 
-  const currentlySelected = () => {};
+  const currentlySelected = async (params: GridCellParams) => {
+    const skuCode = params.getValue(params.id, 'skuCode');
+  };
 
   let rows = btItemGroups.map((item: ItemGroups, index: number) => {
     return {
@@ -133,6 +138,64 @@ function BranchTransferListSKU() {
   React.useEffect(() => {
     setBtItemGroups(skuGroupItems);
   }, [skuGroupItems]);
+
+  React.useEffect(() => {
+    fetchStockBalance();
+  }, []);
+
+  async function fetchStockBalance() {
+    const _skuSlice = store.getState().updateBTSkuSlice.state;
+    const list = _.uniqBy(_skuSlice, 'skuCode');
+    const skucodeList: string[] = [];
+    list.map((i: any) => {
+      skucodeList.push(i.skuCode);
+    });
+    const payload: StockBalanceType = {
+      skuCodes: skucodeList,
+      branchCode: branchTransferInfo.branchFrom,
+    };
+
+    await checkStockBalance(payload)
+      .then(async (value) => {
+        mappingSkuWithRemainingQty(value);
+      })
+      .catch((error: ApiError) => {});
+  }
+
+  const mappingSkuWithRemainingQty = (stockBalanceRs: StockBalanceResponseType) => {
+    const stockBalanceList: StockBalanceType[] = stockBalanceRs.data;
+    const _skuSlice = store.getState().updateBTSkuSlice.state;
+    let _newSku: ItemGroups[] = [];
+    _skuSlice.forEach((data: ItemGroups) => {
+      const result = stockBalanceList.find((balance: StockBalanceType) => {
+        return data.skuCode === balance.skuCode;
+      });
+      let newData: ItemGroups = {
+        skuCode: data.skuCode,
+      };
+      if (result) {
+        newData = {
+          skuCode: data.skuCode,
+          productName: data.productName,
+          orderAllQty: data.orderAllQty,
+          actualAllQty: data.actualAllQty,
+          remainingQty: result.stockRemain,
+        };
+      } else {
+        newData = {
+          skuCode: data.skuCode,
+          productName: data.productName,
+          orderAllQty: data.orderAllQty,
+          actualAllQty: data.actualAllQty,
+          remainingQty: data.remainingQty,
+        };
+      }
+
+      _newSku.push(newData);
+    });
+    setBtItemGroups(_newSku);
+    dispatch(updateAddItemSkuGroupState(_newSku));
+  };
 
   return (
     <Box mt={2} bgcolor='background.paper'>
