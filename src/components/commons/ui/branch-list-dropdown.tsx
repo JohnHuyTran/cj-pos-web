@@ -6,7 +6,8 @@ import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { featchBranchListAsync } from '../../../store/slices/search-branches-slice';
 import { BranchInfo } from '../../../models/search-branch-model';
 import { BranchListOptionType } from '../../../models/branch-model';
-
+import SearchIcon from '@mui/icons-material/Search';
+import InputAdornment from '@mui/material/InputAdornment';
 interface Props {
   valueBranch?: BranchListOptionType | null;
   sourceBranchCode: string | null | undefined | '';
@@ -46,6 +47,7 @@ function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isC
     <Autocomplete
       {...defaultPropsBranchList}
       className={classes.Mautocomplete}
+      popupIcon={<SearchIcon />}
       noOptionsText='ไม่พอข้อมูล'
       id='selBranchNo'
       value={valueBranchList}
@@ -58,8 +60,39 @@ function BranchListDropDown({ valueBranch, sourceBranchCode, onChangeBranch, isC
         );
       }}
       renderInput={(params) => (
-        <TextField {...params} placeholder='ทั้งหมด' size='small' className={classes.MtextField} fullWidth />
+        <TextField
+          {...params}
+          placeholder='ทั้งหมด'
+          size='small'
+          className={classes.MtextField}
+          fullWidth
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <InputAdornment position='start'>
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
       )}
+      // renderInput={(params) => (
+      //   <TextField
+      //     {...params}
+      //     placeholder='ทั้งหมด'
+      //     size='small'
+      //     className={classes.MtextField}
+      //     fullWidth
+      //     InputProps={{
+      //       ...params.InputProps,
+      //       endAdornment: (
+      //         <InputAdornment position='end'>
+      //           <SearchIcon />
+      //         </InputAdornment>
+      //       ),
+      //     }}
+      //   />
+      // )}
       disabled={disable ? true : false}
     />
   );

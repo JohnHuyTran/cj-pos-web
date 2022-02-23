@@ -1,19 +1,21 @@
 export enum ShipmentDeliveryStatusCodeEnum {
-  STATUS_APPROVE = 1,
-  STATUS_DRAFT = 0,
-  STATUS_CLOSEJOB = 2,
+  STATUS_APPROVE = 'APPROVED',
+  STATUS_DRAFT = 'DRAFT',
+  STATUS_CLOSEJOB = 'CLOSED',
 }
 
-const shipmentStatus = [
-  { key: 0, text: 'บันทึก' },
-  { key: 1, text: 'อนุมัติ' },
-  { key: 2, text: 'ปิดงาน' },
+export const shipmentStatus = [
+  { key: 'DRAFT', text: 'บันทึก' },
+  { key: 'WAIT_FOR_APPROVE_1', text: 'รออนุมัติ1' },
+  { key: 'APPROVED', text: 'อนุมัติ' },
+  { key: 'CLOSED', text: 'ปิดงาน' },
 ];
 
 const shipmentEnStatus = [
-  { key: 0, text: 'Draft' },
-  { key: 1, text: 'Approved' },
-  { key: 2, text: 'Close' },
+  { key: 'DRAFT', text: 'Draft' },
+  { key: 'WAIT_FOR_APPROVE_1', text: 'WaitForApprove1' },
+  { key: 'APPROVED', text: 'Approved' },
+  { key: 'CLOSED', text: 'Close' },
 ];
 
 const shipmentType = [
@@ -22,12 +24,12 @@ const shipmentType = [
   { key: 2, text: 'โอนลอย' },
 ];
 
-export const getShipmentStatusText = (key: number) => shipmentStatus.find((item) => item.key === key)?.text;
+export const getShipmentStatusText = (key: string) => shipmentStatus.find((item) => item.key === key)?.text;
 
 export const getShipmentTypeText = (key: number) => shipmentType.find((item) => item.key === key)?.text;
 
-export const getShipmentStatusTextEn = (key: number) => shipmentEnStatus.find((item) => item.key === key)?.text;
+export const getShipmentStatusTextEn = (key: string) => shipmentEnStatus.find((item) => item.key === key)?.text;
 
-export const formatFileNam = (sdNo: string, sdStatus: number) => {
+export const formatFileNam = (sdNo: string, sdStatus: string) => {
   return `${sdNo}-${getShipmentStatusTextEn(sdStatus)}.pdf`;
 };
