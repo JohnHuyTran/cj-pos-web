@@ -427,7 +427,11 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   };
 
   const [skuCodeSelect, setSkuCodeSelect] = React.useState<string>('');
+  const [defaultSkuSelected, setDefaultSkuSelected] = React.useState<string>(branchTransferInfo.itemGroups[0].skuCode);
   const onClickSku = (skuCode: string) => {
+    if (skuCode) {
+      setDefaultSkuSelected(skuCode);
+    }
     setSkuCodeSelect(skuCode);
     setIschecked(false);
   };
@@ -442,8 +446,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       setIschecked(true);
     } else {
       setIschecked(false);
-      setSkuCodeSelect(skuCodeSelect);
-      onClickSku(skuCodeSelect);
+      setSkuCodeSelect(defaultSkuSelected);
+      onClickSku(defaultSkuSelected);
     }
   };
 
