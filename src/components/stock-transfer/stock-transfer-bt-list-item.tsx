@@ -1,19 +1,176 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useStyles } from '../../styles/makeTheme';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { numberWithCommas } from '../../utils/utils';
-import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridEditCellValueParams,
+  GridRenderCellParams,
+  GridRowData,
+  GridRowId,
+  GridValueGetterParams,
+  useGridApiRef,
+} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { Item, ItemGroups, Item_ } from '../../models/stock-transfer-model';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
+import { updateAddItemSkuGroupState, updateBTSkuSlice } from '../../store/slices/stock-transfer-bt-sku-slice';
+import { updateAddItemsGroupState } from '../../store/slices/stock-transfer-bt-product-slice';
+
+const columns: GridColDef[] = [
+  {
+    field: 'index',
+    headerName: 'ลำดับ',
+    minWidth: 70,
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params) => (
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
+        {params.value}
+      </Box>
+    ),
+  },
+  {
+    field: 'barcode',
+    headerName: 'บาร์โค้ด',
+    minWidth: 200,
+    flex: 0.7,
+    headerAlign: 'center',
+    disableColumnMenu: true,
+    sortable: false,
+  },
+  {
+    field: 'productName',
+    headerName: 'รายละเอียดสินค้า',
+    headerAlign: 'center',
+    minWidth: 220,
+    flex: 1,
+    sortable: false,
+    renderCell: (params) => (
+      <div>
+        <Typography variant='body2'>{params.value}</Typography>
+      </div>
+    ),
+  },
+  {
+    field: 'orderQty',
+    headerName: 'จำนวนที่สั่ง',
+    minWidth: 120,
+    headerAlign: 'center',
+    align: 'right',
+    sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
+  },
+  {
+    field: 'unitName',
+    headerName: 'หน่วย',
+    minWidth: 110,
+    headerAlign: 'center',
+    sortable: false,
+  },
+  {
+    field: 'actualQty',
+    headerName: 'จำนวนโอนจริง',
+    minWidth: 120,
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <div>
+        <TextField
+          variant='outlined'
+          name='txnActualQty'
+          type='number'
+          inputProps={{ style: { textAlign: 'right' } }}
+          value={params.value}
+          onChange={(e) => {
+            var qty: any =
+              params.getValue(params.id, 'qty') &&
+              params.getValue(params.id, 'qty') !== null &&
+              params.getValue(params.id, 'qty') != undefined
+                ? params.getValue(params.id, 'qty')
+                : 0;
+            var value = e.target.value ? parseInt(e.target.value, 10) : '0';
+            var returnQty = Number(params.getValue(params.id, 'actualQty'));
+            if (returnQty === 0) value = chkReturnQty(value);
+            if (value < 0) value = 0;
+            params.api.updateRows([{ ...params.row, actualQty: value }]);
+          }}
+          disabled={params.getValue(params.id, 'isDraft') ? false : true}
+          autoComplete='off'
+        />
+      </div>
+    ),
+  },
+  {
+    field: 'toteCode',
+    headerName: 'เลข Tote/ลัง',
+    minWidth: 120,
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <TextField
+        variant='outlined'
+        name='txbToteCode'
+        inputProps={{ style: { textAlign: 'right' } }}
+        value={params.value}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(e) => {
+          const cursorStart = e.target.selectionStart;
+          const cursorEnd = e.target.selectionEnd;
+          params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
+          e.target.setSelectionRange(cursorStart, cursorEnd);
+        }}
+        disabled={params.getValue(params.id, 'isDraft') ? false : true}
+        autoComplete='off'
+      />
+    ),
+  },
+  {
+    field: 'boNo',
+    headerName: 'เลขที่ BO',
+    minWidth: 200,
+    flex: 0.7,
+    headerAlign: 'center',
+    disableColumnMenu: true,
+    sortable: false,
+  },
+];
+
+const chkReturnQty = (value: any) => {
+  let v = String(value);
+  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  return value;
+};
+function useApiRef() {
+  const apiRef = useGridApiRef();
+  const _columns = useMemo(
+    () =>
+      columns.concat({
+        field: '',
+        width: 0,
+        sortable: false,
+        renderCell: (params) => {
+          apiRef.current = params.api;
+          return null;
+        },
+      }),
+    [columns]
+  );
+
+  return { apiRef, columns: _columns };
+}
 
 function BranchTransferListItem() {
   const classes = useStyles();
   const _ = require('lodash');
+  const { apiRef, columns } = useApiRef();
   const dispatch = useAppDispatch();
+
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
   const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
   const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
@@ -21,139 +178,10 @@ function BranchTransferListItem() {
   );
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  const skuGroupItems = useAppSelector((state) => state.branchTransferUpdateBTSkuSlice.state);
+  const skuGroupItems = useAppSelector((state) => state.updateBTSkuSlice.state);
 
   const [isDraft, setIsDraft] = React.useState(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
-
-  const [rowTable, setRowTable] = React.useState([]);
-
-  const columns: GridColDef[] = [
-    {
-      field: 'index',
-      headerName: 'ลำดับ',
-      minWidth: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: 'barcode',
-      headerName: 'บาร์โค้ด',
-      minWidth: 200,
-      flex: 0.7,
-      headerAlign: 'center',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-    {
-      field: 'productName',
-      headerName: 'รายละเอียดสินค้า',
-      headerAlign: 'center',
-      minWidth: 220,
-      flex: 1,
-      sortable: false,
-      renderCell: (params) => (
-        <div>
-          <Typography variant='body2'>{params.value}</Typography>
-        </div>
-      ),
-    },
-    {
-      field: 'orderQty',
-      headerName: 'จำนวนที่สั่ง',
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'right',
-      sortable: false,
-      renderCell: (params) => numberWithCommas(params.value),
-    },
-    {
-      field: 'unitName',
-      headerName: 'หน่วย',
-      minWidth: 110,
-      headerAlign: 'center',
-      sortable: false,
-    },
-    {
-      field: 'actualQty',
-      headerName: 'จำนวนโอนจริง',
-      minWidth: 120,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <div>
-          <TextField
-            variant='outlined'
-            name='txnActualQty'
-            type='number'
-            inputProps={{ style: { textAlign: 'right' } }}
-            value={params.value}
-            onChange={(e) => {
-              var qty: any =
-                params.getValue(params.id, 'qty') &&
-                params.getValue(params.id, 'qty') !== null &&
-                params.getValue(params.id, 'qty') != undefined
-                  ? params.getValue(params.id, 'qty')
-                  : 0;
-              var value = e.target.value ? parseInt(e.target.value, 10) : '0';
-              var returnQty = Number(params.getValue(params.id, 'actualQty'));
-              if (returnQty === 0) value = chkReturnQty(value);
-              if (value < 0) value = 0;
-              params.api.updateRows([{ ...params.row, actualQty: value }]);
-            }}
-            disabled={params.getValue(params.id, 'isDraft') ? false : true}
-            autoComplete='off'
-          />
-        </div>
-      ),
-    },
-    {
-      field: 'toteCode',
-      headerName: 'เลข Tote/ลัง',
-      minWidth: 120,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <TextField
-          variant='outlined'
-          name='txbToteCode'
-          inputProps={{ style: { textAlign: 'right' } }}
-          value={params.value}
-          onClick={(e) => e.stopPropagation()}
-          onChange={(e) => {
-            const cursorStart = e.target.selectionStart;
-            const cursorEnd = e.target.selectionEnd;
-            params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
-            e.target.setSelectionRange(cursorStart, cursorEnd);
-          }}
-          disabled={params.getValue(params.id, 'isDraft') ? false : true}
-          autoComplete='off'
-        />
-      ),
-    },
-    {
-      field: 'boNo',
-      headerName: 'เลขที่ BO',
-      minWidth: 200,
-      flex: 0.7,
-      headerAlign: 'center',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-  ];
-
-  const chkReturnQty = (value: any) => {
-    let v = String(value);
-    if (v.substring(1) === '0') return Number(v.substring(0, 1));
-    return value;
-  };
-
-  const currentlySelected = () => {};
 
   let rows = branchTransferItems.map((item: Item_, index: number) => {
     return {
@@ -180,22 +208,40 @@ function BranchTransferListItem() {
   }, [payloadAddItem]);
 
   const storeItemAddItem = (_newItem: any) => {
-    console.log('sku : ', skuGroupItems);
-    console.log('new item: ', _newItem);
     const items: Item_[] = [];
     let _items = [...branchTransferItems];
     let _sku = [...skuGroupItems];
     if (Object.keys(_newItem).length !== 0) {
       _newItem.map((data: any, index: number) => {
-        let indexDup = 0;
         const dupItem: any = branchTransferItems.find((item: Item_, index: number) => {
-          indexDup = index;
           return item.barcode === data.barcode;
         });
         const dupSku: any = skuGroupItems.find((item: ItemGroups, index: number) => {
-          indexDup = index;
           return item.skuCode === data.skuCode;
         });
+
+        if (dupSku) {
+          const newData: ItemGroups = {
+            skuCode: dupSku.skuCode,
+            productName: dupSku.productName,
+            orderAllQty: dupSku.orderAllQty,
+            actualAllQty: dupSku.actualAllQty + data.baseUnit * data.qty,
+            remainingQty: dupSku.remainingQty,
+          };
+          _.remove(_sku, function (item: ItemGroups) {
+            return item.skuCode === data.skuCode;
+          });
+          _sku = [..._sku, newData];
+        } else {
+          const newData: ItemGroups = {
+            skuCode: data.skuCode,
+            productName: data.barcodeName,
+            orderAllQty: 0,
+            actualAllQty: 0,
+            remainingQty: 0,
+          };
+          _sku = [..._sku, newData];
+        }
 
         if (dupItem) {
           const newData: Item_ = {
@@ -235,6 +281,31 @@ function BranchTransferListItem() {
       });
     }
     setBranchTransferItems(_items);
+    dispatch(updateAddItemSkuGroupState(_sku));
+  };
+
+  const storeItem = () => {
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const items: Item[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const newData: Item = {
+        seqItem: data.seqItem,
+        barcode: data.barcode,
+        productName: data.productName,
+        skuCode: data.skuCode,
+        baseUnit: data.baseUnit,
+        unitName: data.unitName,
+        remainStock: data.remainStock,
+        qty: data.qty,
+        actualQty: data.actualQty,
+        toteCode: data.toteCode,
+        isDraft: isDraft,
+        boNo: data.boNo,
+      };
+      items.push(newData);
+    });
+    setBranchTransferItems(items);
+    dispatch(updateAddItemsGroupState(items));
   };
 
   let newColumns = [...columns];
@@ -243,6 +314,12 @@ function BranchTransferListItem() {
   } else {
     newColumns[7]['hide'] = true;
   }
+
+  const handleFocusOut = async (params: GridCellParams) => {
+    storeItem();
+  };
+  const handleOnKeyDown = async (params: GridCellParams) => {};
+
   return (
     <Box mt={2} bgcolor='background.paper'>
       <Typography>รายการสินค้า: รายการสินค้าทั้งหมด</Typography>
@@ -261,7 +338,8 @@ function BranchTransferListItem() {
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          onCellClick={currentlySelected}
+          onCellFocusOut={handleFocusOut}
+          onCellKeyDown={handleOnKeyDown}
         />
       </div>
     </Box>

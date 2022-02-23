@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { Item, ItemGroups } from '../../models/stock-transfer-model';
-import { updateAddItemsState } from '../../store/slices/stock-transfer-bt-sku-slice';
+import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
 
 function BranchTransferListSKU() {
   const classes = useStyles();
@@ -25,6 +25,7 @@ function BranchTransferListSKU() {
   const [isDraft, setIsDraft] = React.useState(false);
 
   const [pageSize, setPageSize] = React.useState<number>(5);
+  const skuGroupItems = useAppSelector((state) => state.updateBTSkuSlice.state);
 
   const columns: GridColDef[] = [
     {
@@ -126,8 +127,12 @@ function BranchTransferListSKU() {
   });
 
   React.useEffect(() => {
-    dispatch(updateAddItemsState(btItemGroups));
+    dispatch(updateAddItemSkuGroupState(btItemGroups));
   }, []);
+
+  React.useEffect(() => {
+    setBtItemGroups(skuGroupItems);
+  }, [skuGroupItems]);
 
   return (
     <Box mt={2} bgcolor='background.paper'>

@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
-import { useAppDispatch, useAppSelector } from '../../store/store';
+import store, { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
-import { BranchTransferRequest, Delivery, Item, StockBalanceType } from '../../models/stock-transfer-model';
+import { BranchTransferRequest, Delivery, Item, ItemGroups, StockBalanceType } from '../../models/stock-transfer-model';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
 import { Button, Grid, Link, Typography } from '@mui/material';
 import Steppers from './steppers';
@@ -35,6 +35,7 @@ import {
   sendBranchTransferToPickup,
   submitStockTransfer,
   checkStockBalance,
+  saveBranchTransfer,
 } from '../../services/stock-transfer';
 import theme from '../../styles/theme';
 import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
@@ -47,6 +48,8 @@ import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transf
 import moment from 'moment';
 import { env } from 'process';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
+import stockRequestDetail from './stock-request-detail';
 
 interface Props {
   isOpen: boolean;
@@ -128,6 +131,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     list.map((i: any) => {
       skucodeList.push(i.skuCode);
     });
+
+    dispatch(updateAddItemSkuGroupState(branchTransferInfo.itemGroups));
   }, [open]);
 
   async function fetchStockBalance(skuList: string[]) {
@@ -148,8 +153,11 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
   const mappingPayload = () => {
     let items: Item[] = [];
-    const rowsEdit: GridRowData[] = [];
-    rowsEdit.forEach((data: GridRowData) => {
+    // const _branchTransferRslList = store.getState().branchTransferDetailSlice.branchTransferRs;
+    const _productSelector = store.getState().updateBTProductSlice.state;
+    console.log(_productSelector);
+    // const _productSelector = useAppSelector((state) => state.updateBTProductSlice.state);
+    _productSelector.forEach((data: GridRowData) => {
       const item: Item = {
         seqItem: data.seqItem,
         barcode: data.barcode,
@@ -159,9 +167,20 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       items.push(item);
     });
 
+    const _skuSelector = store.getState().updateBTSkuSlice.state;
+    let sku: ItemGroups[] = [];
+    _skuSelector.forEach((data: ItemGroups) => {
+      const itemGroup: ItemGroups = {
+        skuCode: data.skuCode,
+        remainingQty: data.remainingQty,
+      };
+      sku.push(itemGroup);
+    });
+
     const payload: BranchTransferRequest = {
       comment: comment,
       items: items,
+      itemGroups: sku,
       btNo: btNo,
     };
     return payload;
@@ -230,9 +249,59 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     await dispatch(updateAddItemsState({}));
     setOpenModelAddItems(true);
   };
-  const handleSaveBtn = () => {};
-  const handleConfirmBtn = () => {};
+  const handleSaveBtn = async () => {
+    setOpenLoadingModal(true);
+    // await storeItem();
+    await dispatch(updateAddItemsState({}));
 
+    const isvalidItem = validateItem();
+    if (isvalidItem) {
+      const payload: BranchTransferRequest = await mappingPayload();
+      await saveBranchTransfer(payload)
+        .then(async (value) => {
+          setBtNo(value.docNo);
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          await dispatch(featchBranchTransferDetailAsync(value.docNo));
+          await dispatch(featchSearchStockTransferAsync(payloadSearch));
+
+          const _branchTransferRslList = store.getState().branchTransferDetailSlice.branchTransferRs;
+          const _branchTransferInfo: any = _branchTransferRslList.data ? _branchTransferRslList.data : null;
+          setBranchTransferItems(_branchTransferInfo.items);
+          // await storeItem();
+        })
+        .catch((error: ApiError) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(false);
+          setContentMsg(error.message);
+        });
+    }
+    setOpenLoadingModal(false);
+  };
+  const handleConfirmBtn = async () => {
+    // setIsClickBtnApprove(true);
+    // await storeItem();
+    await dispatch(updateAddItemsState({}));
+    const isvalidItem = validateItem();
+    if (isvalidItem) {
+      if (!btNo) {
+        const payload: BranchTransferRequest = await mappingPayload();
+        await saveBranchTransfer(payload)
+          .then(async (value) => {
+            setBtNo(value.btNo);
+            setOpenModelConfirmTransaction(true);
+          })
+          .catch((error: ApiError) => {
+            setShowSnackBar(true);
+            setSnackbarIsStatus(false);
+            setContentMsg(error.message);
+          });
+      } else {
+        setOpenModelConfirmTransaction(true);
+      }
+    }
+  };
   const handleSendToPickup = async () => {
     setOpenLoadingModal(true);
     if (startDate === null || endDate === null) {
