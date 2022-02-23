@@ -154,7 +154,7 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
         let stEndTime = compareDateTime(values.endDate, values.endTime);
         if (stStartTime < moment(new Date(), DateFormat.DATE_TIME_DISPLAY_FORMAT)) {
           setCheckValue({ ...checkValue, startTimeError: 'เวลาเริ่มต้นต้องสูงกว่าเวลาปัจจุบัน' });
-        } else if (stStartTime > stEndTime) {
+        } else if (stStartTime >= stEndTime) {
           setCheckValue({ ...checkValue, endTimeError: 'เวลาสิ้นสุดต้องมากกว่าเวลาเริ่มต้น' });
         } else {
           setValues({ ...values, stStartTime: stStartTime, stEndTime: stEndTime });
