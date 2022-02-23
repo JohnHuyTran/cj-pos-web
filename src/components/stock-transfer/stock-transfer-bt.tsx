@@ -5,7 +5,7 @@ import store, { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { BranchTransferRequest, Delivery, Item, ItemGroups, StockBalanceType } from '../../models/stock-transfer-model';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
-import { Button, Grid, Link, Typography } from '@mui/material';
+import { Button, Checkbox, FormControlLabel, FormGroup, Grid, Link, Typography } from '@mui/material';
 import Steppers from './steppers';
 import Box from '@mui/system/Box';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
@@ -426,6 +426,27 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setOpenLoadingModal(false);
   };
 
+  const [skuCodeSelect, setSkuCodeSelect] = React.useState<string>('');
+  const onClickSku = (skuCode: string) => {
+    setSkuCodeSelect(skuCode);
+    setIschecked(false);
+  };
+
+  const [isChecked, setIschecked] = React.useState(true);
+  const handleCheckboxChange = (e: any) => {
+    const ischeck = e.target.checked;
+
+    if (ischeck) {
+      setSkuCodeSelect('');
+      onClickSku('');
+      setIschecked(true);
+    } else {
+      setIschecked(false);
+      setSkuCodeSelect(skuCodeSelect);
+      onClickSku(skuCodeSelect);
+    }
+  };
+
   const componetStatusCreate = (
     <>
       <Grid container spacing={2} mb={2}>
@@ -774,9 +795,21 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           {isDC && btStatus === 'WAIT_FOR_PICKUP' && componentDCStatusWaitForPicup}
           {isGroupBranch() && btStatus === 'WAIT_FOR_PICKUP' && componentBranchStatusWaitForPickup}
 
-          <BranchTransferListSKU />
-          <Box mt={6}></Box>
-          <BranchTransferListItem />
+          <BranchTransferListSKU onSelectSku={onClickSku} />
+          <Box mt={6}>
+            {' '}
+            <Typography>รายการสินค้า: รายการสินค้าทั้งหมด</Typography>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox />}
+                checked={isChecked}
+                label='รายการสินค้าทั้งหมด'
+                onChange={handleCheckboxChange}
+              />
+            </FormGroup>
+          </Box>
+
+          <BranchTransferListItem skuCodeSelect={skuCodeSelect} />
 
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>

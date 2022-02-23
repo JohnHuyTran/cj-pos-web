@@ -22,6 +22,9 @@ import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { updateAddItemSkuGroupState, updateBTSkuSlice } from '../../store/slices/stock-transfer-bt-sku-slice';
 import { updateAddItemsGroupState } from '../../store/slices/stock-transfer-bt-product-slice';
 
+interface Props {
+  skuCodeSelect: string;
+}
 const columns: GridColDef[] = [
   {
     field: 'index',
@@ -161,7 +164,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function BranchTransferListItem() {
+function BranchTransferListItem({ skuCodeSelect }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const { apiRef, columns } = useApiRef();
@@ -179,24 +182,32 @@ function BranchTransferListItem() {
   const [isDraft, setIsDraft] = React.useState(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
 
-  let rows = branchTransferItems.map((item: Item_, index: number) => {
-    return {
-      id: `${item.barcode}-${index + 1}`,
-      index: index + 1,
-      seqItem: item.seqItem,
-      barcode: item.barcode,
-      productName: item.productName,
-      skuCode: item.skuCode,
-      barFactor: item.barFactor,
-      unitCode: item.unitCode ? item.unitCode : 0,
-      unitName: item.unitName,
-      orderQty: item.orderQty ? item.orderQty : 0,
-      actualQty: item.actualQty ? item.actualQty : 0,
-      toteCode: item.toteCode,
-      isDraft: isDraft,
-      boNo: item.boNo,
-    };
-  });
+  let rows = branchTransferItems
+    .filter((item: Item_, index: number) => {
+      if (skuCodeSelect) {
+        return item.skuCode === skuCodeSelect;
+      } else {
+        return item;
+      }
+    })
+    .map((item: Item_, index: number) => {
+      return {
+        id: `${item.barcode}-${index + 1}`,
+        index: index + 1,
+        seqItem: item.seqItem,
+        barcode: item.barcode,
+        productName: item.productName,
+        skuCode: item.skuCode,
+        barFactor: item.barFactor,
+        unitCode: item.unitCode ? item.unitCode : 0,
+        unitName: item.unitName,
+        orderQty: item.orderQty ? item.orderQty : 0,
+        actualQty: item.actualQty ? item.actualQty : 0,
+        toteCode: item.toteCode,
+        isDraft: isDraft,
+        boNo: item.boNo,
+      };
+    });
 
   React.useEffect(() => {
     setIsDraft(branchTransferInfo.status === 'CREATED' ? true : false);
@@ -343,10 +354,6 @@ function BranchTransferListItem() {
 
   return (
     <Box mt={2} bgcolor='background.paper'>
-      <Typography>รายการสินค้า: รายการสินค้าทั้งหมด</Typography>
-      <FormGroup>
-        <FormControlLabel control={<Checkbox defaultChecked />} label='รายการสินค้าทั้งหมด' />
-      </FormGroup>
       <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
         <DataGrid
           rows={rows}

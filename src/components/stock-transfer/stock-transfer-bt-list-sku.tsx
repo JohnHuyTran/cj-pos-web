@@ -13,7 +13,11 @@ import { checkStockBalance } from '../../services/stock-transfer';
 import { ApiError } from '../../models/api-error-model';
 import _ from 'lodash';
 
-function BranchTransferListSKU() {
+interface Props {
+  onSelectSku: (value: any) => void;
+}
+
+function BranchTransferListSKU({ onSelectSku }: Props) {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
@@ -116,6 +120,7 @@ function BranchTransferListSKU() {
 
   const currentlySelected = async (params: GridCellParams) => {
     const skuCode = params.getValue(params.id, 'skuCode');
+    onSelectSku(skuCode);
   };
 
   let rows = btItemGroups.map((item: ItemGroups, index: number) => {
