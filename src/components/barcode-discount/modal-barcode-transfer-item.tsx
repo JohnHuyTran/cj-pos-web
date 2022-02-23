@@ -89,7 +89,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           : item.numberOfApproved
           ? item.numberOfApproved
           : 0;
-        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : numberOfApproved * priceAfterDiscount;
+        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : numberOfApproved * cashDiscount;
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -190,7 +190,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       data[index - 1].numberOfApproved = event.target.value ? parseInt(event.target.value.replace(/,/g, '')) : 0;
-      data[index - 1].approvedDiscount = data[index - 1].numberOfApproved * data[index - 1].priceAfterDiscount;
+      data[index - 1].approvedDiscount = data[index - 1].numberOfApproved * data[index - 1].cashDiscount;
       return data;
     });
     dispatch(
