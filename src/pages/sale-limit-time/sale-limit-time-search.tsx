@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import DatePickerComponent from '../../components/commons/ui/date-picker';
 import SaleLimitTimelist from './sale-limit-time-list';
 import SearchBranch from '../../components/commons/ui/search-branch';
+import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 
 interface State {
   documentNumber: string;
@@ -30,7 +31,8 @@ const SaleLimitTimeSearch = () => {
     fromDate: new Date(),
     toDate: new Date(),
   });
-
+  const [popupMsg, setPopupMsg] = React.useState<string>('');
+  const [openPopup, setOpenPopup] = React.useState<boolean>(false);
   useEffect(() => {
     setLstStatus(t('lstStatus', { returnObjects: true }));
   }, []);
@@ -53,6 +55,10 @@ const SaleLimitTimeSearch = () => {
     }
     let item: any = lstStatus.find((item: any) => item.value === key);
     return item.label;
+  };
+
+  const handleClosePopup = () => {
+    setOpenPopup(false);
   };
 
   const handleOpenCreateModal = () => {
@@ -160,8 +166,15 @@ const SaleLimitTimeSearch = () => {
       <SaleLimitTimelist onSearch={onSearch} />
 
       {openCreateModal && (
-        <STCreateModal type={'Create'} isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />
+        <STCreateModal
+          type={'Create'}
+          setOpenPopup={setOpenPopup}
+          setPopupMsg={setPopupMsg}
+          isOpen={openCreateModal}
+          onClickClose={handleCloseCreateModal}
+        />
       )}
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>
   );
 };

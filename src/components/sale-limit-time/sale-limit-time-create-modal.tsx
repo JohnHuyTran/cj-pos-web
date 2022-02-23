@@ -5,7 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import { Box, Button, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
-import { ControlPoint, HighlightOff } from '@mui/icons-material';
+import { ControlPoint, HighlightOff, Tune } from '@mui/icons-material';
 import SaveIcon from '@mui/icons-material/Save';
 
 import { useStyles } from '../../styles/makeTheme';
@@ -30,20 +30,27 @@ import TextBoxComment from '../commons/ui/textbox-comment';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import { onChangeDate } from '../../utils/utils';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
+import { cancelDraftST, getStartSaleLimitTime, saveDraftST } from '../../services/sale-limit-time';
+import { DateFormat } from '../../utils/enum/common-enum';
+import { updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
+import ModelConfirm from './modal-confirm';
 
 interface State {
-  stNo: string;
   detailMsg: string;
   startDate: any | Date | number | string;
   endDate: any | Date | number | string;
   startTime: string | null;
   endTime: string | null;
   comment: string;
+  stStartTime: any;
+  stEndTime: any;
 }
 
 interface Props {
   type: string;
   isOpen: boolean;
+  setOpenPopup: (openPopup: boolean) => void;
+  setPopupMsg?: any;
   onClickClose: () => void;
 }
 
@@ -87,27 +94,29 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
+function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
+  const payLoadSt = useAppSelector((state) => state.saleLimitTime.state);
   const [values, setValues] = React.useState<State>({
-    stNo: '',
     detailMsg: '',
     startDate: new Date(),
     endDate: new Date(),
     startTime: '',
     endTime: '',
     comment: '',
+    stStartTime: '',
+    stEndTime: '',
   });
   const [checkValue, setCheckValue] = React.useState({
     detailMsgError: false,
     startDateError: false,
     endDateError: false,
-    startTimeError: false,
-    endTimeError: false,
+    startTimeError: '',
+    endTimeError: '',
     payloadBranchesError: false,
   });
 
@@ -116,7 +125,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
-  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
   };
@@ -132,7 +141,35 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
     setCheckValue({ ...checkValue, payloadBranchesError: false });
   }, [payloadBranches.saved]);
 
+  useEffect(() => {
+    if (values.startDate != null && values.endDate != null) {
+      if (values.endDate < values.startDate) {
+        setValues({
+          ...values,
+          endDate: null,
+        });
+      }
+      if (values.startTime != '' && values.endTime != '') {
+        let stStartTime = compareDateTime(values.startDate, values.startTime);
+        let stEndTime = compareDateTime(values.endDate, values.endTime);
+        if (stStartTime < moment(new Date(), DateFormat.DATE_TIME_DISPLAY_FORMAT)) {
+          setCheckValue({ ...checkValue, startTimeError: 'เวลาเริ่มต้นต้องสูงกว่าเวลาปัจจุบัน' });
+        } else if (stStartTime > stEndTime) {
+          setCheckValue({ ...checkValue, endTimeError: 'เวลาสิ้นสุดต้องมากกว่าเวลาเริ่มต้น' });
+        } else {
+          setValues({ ...values, stStartTime: stStartTime, stEndTime: stEndTime });
+          setCheckValue({ ...checkValue, startTimeError: '', endTimeError: '' });
+        }
+      }
+    }
+  }, [values.startDate, values.endDate, values.startTime, values.endTime]);
+
+  useEffect(() => {
+    setStatus(payLoadSt.status);
+  }, [payLoadSt.status]);
+
   const clearData = async () => {
+    dispatch(updatesaleLimitTimeState({}));
     dispatch(updateAddTypeAndProductState([]));
     dispatch(updatePayloadBranches({ ...payloadBranches, saved: false }));
   };
@@ -140,6 +177,11 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
     setOpen(false);
     onClickClose();
     clearData();
+  };
+
+  const compareDateTime = (date: Date, time: string | null) => {
+    let dateAppend = moment(date).format(DateFormat.DATE_FORMAT) + ' ' + time;
+    return moment(dateAppend, DateFormat.DATE_TIME_DISPLAY_FORMAT);
   };
 
   const topFunction = () => {
@@ -172,22 +214,21 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
 
   const handleStartTimePicker = (value: string) => {
     setValues({ ...values, startTime: value });
-    setCheckValue({ ...checkValue, startTimeError: false });
+    setCheckValue({ ...checkValue, startTimeError: '' });
   };
 
   const handleEndTimePicker = (value: string) => {
     setValues({ ...values, endTime: value });
-    setCheckValue({ ...checkValue, endTimeError: false });
+    setCheckValue({ ...checkValue, endTimeError: '' });
   };
 
-  if (values.startDate != null && values.endDate != null) {
-    if (values.endDate < values.startDate) {
-      setValues({
-        ...values,
-        endDate: null,
-      });
-    }
-  }
+  const handleStartDatePicker = (value: any) => {
+    setValues({ ...values, startDate: value._d });
+  };
+
+  const handleEndDatePicker = (value: any) => {
+    setValues({ ...values, endDate: value._d });
+  };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
   const handleOpenAddItems = () => {
@@ -219,11 +260,11 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
       valiDate = false;
     }
     if (values.startTime === '') {
-      item.startTimeError = true;
+      item.startTimeError = 'กรุณาระบุรายละเอียด';
       valiDate = false;
     }
     if (values.endTime === '') {
-      item.endTimeError = true;
+      item.endTimeError = 'กรุณาระบุรายละเอียด';
       valiDate = false;
     }
     if (values.detailMsg === '') {
@@ -234,47 +275,133 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
       item.payloadBranchesError = true;
       valiDate = false;
     }
+    if (checkValue.startTimeError != '') valiDate = false;
+    if (checkValue.endTimeError != '') valiDate = false;
     setCheckValue(item);
     return valiDate;
   };
 
-  const handleCreateSTDetail = () => {
+  const handleCreateSTDetail = async (getStart: boolean) => {
     if (valiDateData()) {
-      // const stStartTime = values.startDate._d ? values.startDate._d : values.startDate;
-      // stStartTime.setUTCHours(Number(values.startTime?.split(':')[0]), Number(values.startTime?.split(':')[1]));
-      // const stEndTime = values.endDate._d ? values.endDate._d : values.endDate;
-      // stEndTime.setUTCHours(Number(values.endTime?.split(':')[0]), Number(values.endTime?.split(':')[1]));
-      // const appliedProduct = {
-      //   appliedProducts: payloadAddTypeProduct
-      //     .filter((el: any) => el.selectedType === 2)
-      //     .map((item: any) => {
-      //       return {
-      //         name: item.barcodeName,
-      //         skuCode: item.skuCode,
-      //       };
-      //     }),
-      //   appliedCategories: payloadAddTypeProduct
-      //     .filter((el: any) => el.selectedType === 1)
-      //     .map((item: any) => {
-      //       return {
-      //         name: item.productTypeName,
-      //         code: item.productTypeCode,
-      //       };
-      //     }),
-      // };
-      // const body = {
-      //   stStartTime: stStartTime.toISOString(),
-      //   stEndTime: stEndTime.toISOString(),
-      //   remark: values.comment,
-      //   description: values.detailMsg,
-      //   stDetail: {
-      //     isAllBranches: payloadBranches.isAllBranches,
-      //     appliedBranches: payloadBranches.appliedBranches,
-      //     appliedProduct: appliedProduct,
-      //   },
-      // };
-      // console.log(body);
+      try {
+        const appliedProduct = {
+          appliedProducts: payloadAddTypeProduct
+            .filter((el: any) => el.selectedType === 2)
+            .map((item: any) => {
+              return {
+                name: item.barcodeName,
+                skuCode: item.skuCode,
+                categoryTypeCode: item.ProductTypeCode,
+              };
+            }),
+          appliedCategories: payloadAddTypeProduct
+            .filter((el: any) => el.selectedType === 1)
+            .map((item: any) => {
+              return {
+                name: item.productTypeName,
+                code: item.productTypeCode,
+              };
+            }),
+        };
+        const body = {
+          stStartTime: values.stStartTime.toISOString(true),
+          stEndTime: values.stEndTime.toISOString(true),
+          remark: values.comment,
+          description: values.detailMsg,
+          stDetail: {
+            isAllBranches: payloadBranches.isAllBranches,
+            appliedBranches: payloadBranches.appliedBranches,
+            appliedProduct: appliedProduct,
+          },
+        };
+
+        const bodyPayload = !!payLoadSt.id
+          ? { ...body, id: payLoadSt.id, documentNumber: payLoadSt.documentNumber }
+          : body;
+        const rs = await saveDraftST(bodyPayload);
+        if (rs.code === 201) {
+          if (!getStart) {
+            setShowSnackBar(true);
+            setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+            // if (onSearchBD) onSearchBD();
+          }
+          dispatch(
+            updatesaleLimitTimeState({
+              ...payLoadSt,
+              id: rs.data.id,
+              documentNumber: rs.data.documentNumber,
+              status: 1,
+            })
+          );
+          if (getStart) {
+            handleGetStart(rs.data.id);
+          }
+        } else {
+          setOpenAlert(true);
+          setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+        }
+      } catch (error) {
+        setOpenAlert(true);
+        setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+      }
     }
+  };
+
+  const handleGetStart = async (id: string) => {
+    try {
+      const rs = await getStartSaleLimitTime(id);
+
+      if (rs.code === 200) {
+        dispatch(
+          updatesaleLimitTimeState({
+            ...payLoadSt,
+            // status: Number(BDStatus.WAIT_FOR_APPROVAL),
+          })
+        );
+        setOpenPopup(true);
+        setPopupMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+        handleClose();
+        // if (onSearchBD) onSearchBD();
+      } else {
+        setOpenAlert(true);
+        setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+      }
+    } catch (error) {
+      setOpenAlert(true);
+      setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    }
+  };
+
+  const handleDeleteDraft = async () => {
+    if (status) {
+      try {
+        const rs = await cancelDraftST(payLoadSt.id);
+        if (rs.status === 200) {
+          setOpenPopup(true);
+          setPopupMsg('คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว');
+          handleClose();
+          // if (onSearchBD) onSearchBD();
+        } else {
+          setOpenAlert(true);
+          setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+        }
+      } catch (error) {
+        setOpenAlert(true);
+        setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+      }
+    } else {
+      setOpenPopup(true);
+      setPopupMsg('คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว');
+      handleClose();
+    }
+  };
+
+  const handleCloseModalCancel = () => {
+    setOpenModalCancel(false);
+  };
+
+  const handleOpenCancel = () => {
+    setOpenModalCancel(true);
   };
   const handleUnSelectAllType = (showAll: boolean) => {
     setUnSelectAllType(showAll);
@@ -295,7 +422,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               <Box>วันที่สร้างรายการ :</Box>
             </Grid>
             <Grid item xs={3}>
-              <Box mb={2}>{!!values.stNo ? values.stNo : '-'}</Box>
+              <Box mb={2}>{!!payLoadSt.documentNumber ? payLoadSt.documentNumber : '-'}</Box>
               <Box>{moment(createDate).add(543, 'y').format('DD/MM/YYYY')}</Box>
             </Grid>
             <Grid item xs={1}></Grid>
@@ -333,10 +460,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               วันที่เริ่มงดขาย :
             </Grid>
             <Grid item xs={3}>
-              <DatePickerComponent
-                onClickDate={onChangeDate.bind(values.startDate, setValues, values, 'startDate')}
-                value={values.startDate}
-              />
+              <DatePickerComponent onClickDate={handleStartDatePicker} value={values.startDate} />
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -344,7 +468,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
-                onClickDate={onChangeDate.bind(values.endDate, setValues, values, 'endDate')}
+                onClickDate={handleEndDatePicker}
                 value={values.endDate}
                 type="TO"
                 minDateTo={values.startDate}
@@ -362,7 +486,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                   id="time-start"
                   type="time"
                   fullWidth
-                  error={checkValue.startTimeError}
+                  error={!!checkValue.startTimeError}
                   className={classes.MtimeTextField}
                   value={values.startTime}
                   onChange={(e) => handleStartTimePicker(e.target.value)}
@@ -374,7 +498,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
 
               {checkValue.startTimeError && (
                 <Box textAlign="right" color="#F54949">
-                  กรุณาระบุรายละเอียด
+                  {checkValue.startTimeError}
                 </Box>
               )}
             </Grid>
@@ -387,7 +511,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                 id="time-end"
                 type="time"
                 fullWidth
-                error={checkValue.endTimeError}
+                error={!!checkValue.endTimeError}
                 className={classes.MtimeTextField}
                 value={values.endTime}
                 onChange={(e) => handleEndTimePicker(e.target.value)}
@@ -397,7 +521,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               />
               {checkValue.endTimeError && (
                 <Box textAlign="right" color="#F54949">
-                  กรุณาระบุรายละเอียด
+                  {checkValue.endTimeError}
                 </Box>
               )}
             </Grid>
@@ -446,7 +570,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               <Button
                 variant="contained"
                 color="warning"
-                onClick={handleCreateSTDetail}
+                onClick={() => handleCreateSTDetail(false)}
                 startIcon={<SaveIcon />}
                 className={classes.MbtnSearch}
                 disabled={!!!Object.keys(payloadAddTypeProduct).length}
@@ -458,6 +582,7 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
                 color="primary"
                 sx={{ margin: '0 17px' }}
                 startIcon={<CheckCircleOutlineIcon />}
+                onClick={() => handleCreateSTDetail(true)}
                 className={classes.MbtnSearch}
                 disabled={!!!Object.keys(payloadAddTypeProduct).length}
               >
@@ -466,8 +591,9 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
               <Button
                 variant="contained"
                 color="error"
+                onClick={handleOpenCancel}
                 startIcon={<HighlightOffIcon />}
-                disabled={!!!Object.keys(payloadAddTypeProduct).length}
+                // disabled={!!!Object.keys(payloadAddTypeProduct).length}
                 className={classes.MbtnSearch}
               >
                 ยกเลิก
@@ -510,12 +636,16 @@ function STCreateModal({ type, isOpen, onClickClose }: Props): ReactElement {
         </DialogContent>
       </Dialog>
 
-      <SnackbarStatus
-        open={showSnackBar}
-        onClose={handleCloseSnackBar}
-        isSuccess={snackbarIsStatus}
-        contentMsg={contentMsg}
+      <ModelConfirm
+        open={openModalCancel}
+        status={status}
+        onClose={handleCloseModalCancel}
+        onConfirm={handleDeleteDraft}
+        HQCode={payLoadSt.documentNumber}
+        headerTitle={'ยืนยันเริ่มใช้งานกำหนดเวลา (งด) ขายสินค้า'}
       />
+
+      <SnackbarStatus open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={true} contentMsg={contentMsg} />
 
       <ModalAddTypeProduct open={openModelAddItems} onClose={handleCloseModalAddItems} />
 
