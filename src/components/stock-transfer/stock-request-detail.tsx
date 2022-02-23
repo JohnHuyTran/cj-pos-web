@@ -43,11 +43,15 @@ import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-trans
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 
+import { isAllowActionPermission, isAllowMainMenuPermission, isGroupBranch } from '../../utils/role-permission';
+import { env } from '../../adapters/environmentConfigs';
+import { getUserInfo } from '../../store/sessionStore';
+
 interface State {
   branchCode: string;
 }
 
-interface branchListOptionType {
+interface BranchListOptionType {
   name: string;
   code: string;
 }
@@ -92,6 +96,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   const dispatch = useAppDispatch();
   const classes = useStyles();
 
+  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
   const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
@@ -132,7 +137,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
       setEndDate(new Date(endD));
 
       const branchFrom = getBranchName(branchList, stockRequestDetail.branchFrom);
-      const branchFromMap: branchListOptionType = {
+      const branchFromMap: BranchListOptionType = {
         code: stockRequestDetail.branchFrom,
         name: branchFrom ? branchFrom : '',
       };
@@ -140,7 +145,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
       setFromBranch(stockRequestDetail.branchFrom);
 
       const branchTo = getBranchName(branchList, stockRequestDetail.branchTo);
-      const branchToMap: branchListOptionType = {
+      const branchToMap: BranchListOptionType = {
         code: stockRequestDetail.branchTo,
         name: branchTo ? branchTo : '',
       };
@@ -235,8 +240,24 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     }
   }
 
-  const [valuebranchTo, setValuebranchTo] = React.useState<branchListOptionType | null>(null);
-  const [valuebranchFrom, setValuebranchFrom] = React.useState<branchListOptionType | null>(null);
+  const [valuebranchTo, setValuebranchTo] = React.useState<BranchListOptionType | null>(null);
+  // const [valuebranchFrom, setValuebranchFrom] = React.useState<branchListOptionType | null>(null);
+  const [ownBranch, setOwnBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : env.branch.code
+      : env.branch.code
+  );
+  const branchFrom = getBranchName(branchList, ownBranch);
+  const branchFromMap: BranchListOptionType = {
+    code: ownBranch,
+    name: branchFrom ? branchFrom : '',
+  };
+  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
+    groupBranch ? branchFromMap : null
+  );
+
   const [fromBranch, setFromBranch] = React.useState('');
   const [toBranch, setToBranch] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
@@ -707,6 +728,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   sourceBranchCode={toBranch}
                   onChangeBranch={handleChangeFromBranch}
                   isClear={clearBranchDropDown}
+                  disable={groupBranch}
                 />
               )}
               {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && valuebranchFrom?.name}
