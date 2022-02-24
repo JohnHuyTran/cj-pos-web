@@ -30,7 +30,7 @@ interface ConfirmOrderShipment {
   onUpdateShipmentStatus: (value: boolean, errorMsg: any) => void;
   shipmentNo: string;
   sdNo: string;
-  action: number;
+  action: string;
   items: Entry[];
   percentDiffType: boolean;
   percentDiffValue: string;

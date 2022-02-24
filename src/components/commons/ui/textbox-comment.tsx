@@ -35,7 +35,7 @@ function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChang
       <TextField
         multiline
         fullWidth
-        rows={5}
+        rows={2}
         onChange={handleChangeComment}
         defaultValue={defaultValue}
         placeholder={`ความยาวไม่เกิน ${maxLength} ตัวอักษร`}

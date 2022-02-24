@@ -23,6 +23,11 @@ import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { shipmentStatus } from '../../utils/enum/check-order-enum';
 import OrderReceiveDetail from '../check-orders/order-receive-detail';
+import { isGroupBranch } from '../../utils/role-permission';
+import { getUserInfo } from '../../store/sessionStore';
+import { getBranchName } from '../../utils/utils';
+import { env } from '../../adapters/environmentConfigs';
+import { BranchListOptionType } from '../../models/branch-model';
 
 // moment.locale("en");
 moment.locale('th');
@@ -183,6 +188,31 @@ function CheckOrderSearch() {
   const [branchFromCode, setBranchFromCode] = React.useState('');
   const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [ownBranch, setOwnBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : env.branch.code
+      : env.branch.code
+  );
+  const branchTo = getBranchName(branchList, ownBranch);
+  const branchToMap: BranchListOptionType = {
+    code: ownBranch,
+    name: branchTo ? branchTo : '',
+  };
+  const [valuebranchTo, setValuebranchTo] = React.useState<BranchListOptionType | null>(
+    groupBranch ? branchToMap : null
+  );
+
+  React.useEffect(() => {
+    if (groupBranch) {
+      setBranchToCode(ownBranch);
+      setValues({ ...values, branchTo: ownBranch });
+    }
+  }, []);
+
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
@@ -277,9 +307,11 @@ function CheckOrderSearch() {
               สาขาปลายทาง
             </Typography>
             <BranchListDropDown
+              valueBranch={valuebranchTo}
               sourceBranchCode={branchFromCode}
               onChangeBranch={handleChangeBranchTo}
               isClear={clearBranchDropDown}
+              disable={groupBranch}
             />
           </Grid>
 

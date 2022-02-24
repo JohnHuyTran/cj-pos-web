@@ -1,6 +1,6 @@
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
-export class POSError {
+export class POSException {
   code: any;
   httpStatus: number;
   message: string;
@@ -13,7 +13,7 @@ export class POSError {
 }
 
 export function getErrorMessage(httpCode: number, errorCode: any, message: string) {
-  const { t } = useTranslation('error');
+  const t = i18next.t;
   const err = errorCode ? errorCode : String(httpCode);
   const err_msg = t(err);
   return err_msg ? err_msg : t('default');

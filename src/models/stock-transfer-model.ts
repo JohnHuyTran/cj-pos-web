@@ -77,6 +77,7 @@ export interface BranchTransferRequest {
   delivery?: Delivery;
   comment?: string;
   items?: Item[];
+  docNo?: string;
 }
 
 export interface BranchTransferResponse {
