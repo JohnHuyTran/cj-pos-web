@@ -13,9 +13,10 @@ const _ = require('lodash');
 
 interface Props {
   unSelectAllType: boolean;
+  disabled?: boolean;
 }
 
-export default function STProductTypeItems({ unSelectAllType }: Props): ReactElement {
+export default function STProductTypeItems({ unSelectAllType, disabled }: Props): ReactElement {
   const classes = useStyles();
   const [dtTable, setDtTable] = React.useState([]);
   const dispatch = useAppDispatch();
@@ -147,9 +148,11 @@ export default function STProductTypeItems({ unSelectAllType }: Props): ReactEle
 
         return (
           <>
-            <Button onClick={handleOpenModalDelete}>
-              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
-            </Button>
+            {!disabled && (
+              <Button onClick={handleOpenModalDelete}>
+                <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+              </Button>
+            )}
 
             <Dialog
               open={openModalDelete}

@@ -13,7 +13,7 @@ interface Props {
   onConfirm: () => void;
   HQCode: string;
   headerTitle: string;
-  status: number;
+  status?: number;
 }
 interface loadingModalState {
   open: boolean;

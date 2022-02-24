@@ -24,9 +24,10 @@ const _ = require('lodash');
 
 interface Props {
   unSelectAllType: (showAll: boolean) => void;
+  disabled?: boolean;
 }
 
-export default function STProductItems({ unSelectAllType }: Props): ReactElement {
+export default function STProductItems({ unSelectAllType, disabled }: Props): ReactElement {
   const classes = useStyles();
   const [dtTable, setDtTable] = React.useState<Array<STProductDetail>>([]);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
@@ -171,9 +172,11 @@ export default function STProductItems({ unSelectAllType }: Props): ReactElement
 
         return (
           <>
-            <Button onClick={handleOpenModalDelete}>
-              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
-            </Button>
+            {!disabled && (
+              <Button onClick={handleOpenModalDelete}>
+                <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+              </Button>
+            )}
 
             <Dialog
               open={openModalDelete}
