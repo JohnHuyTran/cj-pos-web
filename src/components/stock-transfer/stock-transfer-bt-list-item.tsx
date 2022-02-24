@@ -358,6 +358,9 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
   const handleOnCellBlur = () => {
     storeItem();
   };
+  const handleOnCellClick = () => {
+    storeItem();
+  };
 
   return (
     <Box mt={2} bgcolor='background.paper'>
@@ -373,9 +376,10 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          // onCellFocusOut={handleFocusOut}
+          onCellFocusOut={handleFocusOut}
+          onCellClick={handleOnCellClick}
           // onCellKeyDown={handleOnKeyDown}
-          onCellBlur={handleOnCellBlur}
+          // onCellBlur={handleOnCellBlur}
         />
       </div>
     </Box>
