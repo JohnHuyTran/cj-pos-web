@@ -241,7 +241,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
         } else {
           const newData: ItemGroups = {
             skuCode: data.skuCode,
-            productName: data.barcodeName,
+            productName: data.skuName,
             orderAllQty: 0,
             actualAllQty: 0,
             remainingQty: 0,
@@ -274,7 +274,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
             barcode: data.barcode,
             productName: data.barcodeName,
             skuCode: data.skuCode,
-            barFactor: data.barFactor,
+            barFactor: data.baseUnit,
             unitCode: data.unitCode ? data.unitCode : 0,
             unitName: data.unitName,
             orderQty: data.orderQty ? data.orderQty : 0,

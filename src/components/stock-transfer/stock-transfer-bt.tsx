@@ -224,8 +224,33 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setEndDate(value);
   };
   const handleClose = async () => {
-    setOpen(false);
-    onClickClose();
+    let showPopup = false;
+    if (comment !== branchTransferInfo.comment) {
+      showPopup = true;
+    }
+
+    const _productSelector: any = store.getState().updateBTProductSlice.state;
+    const btItems: Item[] = branchTransferInfo.items;
+    _productSelector.forEach((data: GridRowData) => {
+      const item = btItems.find((item: Item) => {
+        return item.barcode === data.barcode;
+      });
+      if (!item) {
+        showPopup = true;
+        return;
+      }
+      if (data.actualQty !== (item.actualQty ? item.actualQty : 0) || data.toteCode != item.toteCode) {
+        showPopup = true;
+        return;
+      }
+    });
+
+    if (!showPopup) {
+      setOpen(false);
+      onClickClose();
+    } else {
+      setConfirmModelExit(true);
+    }
   };
 
   const handleChangeComment = (value: any) => {
