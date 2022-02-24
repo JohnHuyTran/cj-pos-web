@@ -12,22 +12,22 @@ export interface BranchResponse {
 export interface PayloadST {
   perPage: string;
   page: string;
-  query: string;
-  branch: string;
-  status: string;
+  query?: string;
+  branch?: string;
+  status?: string;
   startDate: string;
   endDate: string;
   clearSearch?: boolean;
 }
 
 export interface DataResponse {
-  _id: string;
+  id: string;
   documentNumber: string;
   status: string;
   description: string;
   branch: string;
   creationDate: string;
-  startDate: string;
-  endDate: string;
+  stStartTime: string;
+  stEndTime: string;
   remark: string;
 }

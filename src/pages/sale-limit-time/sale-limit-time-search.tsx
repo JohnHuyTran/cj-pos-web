@@ -11,26 +11,37 @@ import SaleLimitTimelist from './sale-limit-time-list';
 import SearchBranch from '../../components/commons/ui/search-branch';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
-
+import { fetchSaleLimitTimeListAsync, updatePayloadST } from '../../store/slices/sale-limit-time-search-slice';
+import { getUserInfo } from '../../store/sessionStore';
+import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
+import { paramsConvert } from '../../utils/utils';
+import moment from 'moment';
+import AlertError from '../../components/commons/ui/alert-error';
 interface State {
-  documentNumber: string;
+  query: string;
   branch: string;
   status: string;
-  fromDate: any | Date | number | string;
-  toDate: any | Date | number | string;
+  startDate: any | Date | number | string;
+  endDate: any | Date | number | string;
 }
 const SaleLimitTimeSearch = () => {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const [openCreateModal, setOpenCreateModal] = React.useState(false);
   const { t } = useTranslation(['barcodeDiscount', 'common']);
   const [lstStatus, setLstStatus] = React.useState([]);
-
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+  const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
+  const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
+  const branch = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
   const [values, setValues] = React.useState<State>({
-    documentNumber: '',
-    branch: '',
-    status: 'ALL',
-    fromDate: new Date(),
-    toDate: new Date(),
+    query: '',
+    branch: userInfo.branch,
+    status: '1',
+    startDate: new Date(),
+    endDate: new Date(),
   });
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
@@ -56,8 +67,28 @@ const SaleLimitTimeSearch = () => {
   const handleCloseCreateModal = () => {
     setOpenCreateModal(false);
   };
+  const handleSearchST = () => {
+    if (stringNullOrEmpty(values.startDate) || stringNullOrEmpty(values.endDate)) {
+      setOpenAlert(true);
+      setTextError(t('msg.inputDateSearch'));
+    } else {
+      const params = {
+        page: payloadST.page,
+        perPage: payloadST.perPage,
+        query: values.query,
+        status: values.status,
+        branch: values.branch,
+        startDate: moment(values.startDate).startOf('day').toISOString(),
+        endDate: moment(values.endDate).startOf('day').toISOString(),
+      };
+      const query = paramsConvert(params);
+      dispatch(fetchSaleLimitTimeListAsync(query));
+    }
+  };
   const onSearch = () => {};
-  const onInputBranch = () => {};
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
   return (
     <>
       <Box sx={{ flexGrow: 1 }} mb={3}>
@@ -67,10 +98,10 @@ const SaleLimitTimeSearch = () => {
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id="documentNumber"
-              name="documentNumber"
+              id="query"
+              name="query"
               size="small"
-              value={values.documentNumber}
+              value={values.query}
               onChange={onChange.bind(this, setValues, values)}
               InputProps={{
                 endAdornment: <SearchIcon color="primary" sx={{ marginRight: '12px' }} />,
@@ -94,10 +125,13 @@ const SaleLimitTimeSearch = () => {
               สถานะ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
-              <Select id="status" name="status" value={values.status} onChange={onChange.bind(this, setValues, values)}>
-                <MenuItem value={'ALL'} selected={true}>
-                  {t('all')}
-                </MenuItem>
+              <Select
+                id="status"
+                name="status"
+                value={values.status}
+                onChange={onChange.bind(this, setValues, values)}
+                disabled={true}
+              >
                 <MenuItem value={'1'}>{getStatusText('1')}</MenuItem>
                 <MenuItem value={'2'}>{getStatusText('2')}</MenuItem>
                 <MenuItem value={'3'}>{getStatusText('3')}</MenuItem>
@@ -111,8 +145,8 @@ const SaleLimitTimeSearch = () => {
               วันที่เริ่มงดขายสินค้า ตั้งแต่
             </Typography>
             <DatePickerComponent
-              onClickDate={onChangeDate.bind(this, setValues, values, 'fromDate')}
-              value={values.fromDate}
+              onClickDate={onChangeDate.bind(this, setValues, values, 'startDate')}
+              value={values.startDate}
             />
           </Grid>
           <Grid item xs={4}>
@@ -120,10 +154,10 @@ const SaleLimitTimeSearch = () => {
               ถึง
             </Typography>
             <DatePickerComponent
-              onClickDate={onChangeDate.bind(this, setValues, values, 'toDate')}
+              onClickDate={onChangeDate.bind(this, setValues, values, 'endDate')}
               type={'TO'}
-              minDateTo={values.fromDate}
-              value={values.toDate}
+              minDateTo={values.startDate}
+              value={values.endDate}
             />
           </Grid>
         </Grid>
@@ -148,11 +182,41 @@ const SaleLimitTimeSearch = () => {
         >
           เคลียร์
         </Button>
-        <Button variant="contained" color="primary" className={classes.MbtnSearch} sx={{ width: '126px' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.MbtnSearch}
+          sx={{ width: '126px' }}
+          onClick={handleSearchST}
+        >
           เคลียร์
         </Button>
       </Box>
-      <SaleLimitTimelist onSearch={onSearch} />
+      {false && (
+        <Box sx={{ marginBottom: '20px' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.MbtnSearch}
+            sx={{ marginRight: '20px', width: '126px' }}
+            onClick={handleSearchST}
+          >
+            เริ่มต้นใช้งาน
+          </Button>
+          <Button variant="contained" color="error" className={classes.MbtnSearch} sx={{ width: '126px' }}>
+            ยกเลิก
+          </Button>
+        </Box>
+      )}
+      {responveST && responveST.data && responveST.data.length > 0 ? (
+        <SaleLimitTimelist onSearch={onSearch} />
+      ) : (
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
+            <h2>{t('noData')}</h2>
+          </Box>
+        </Grid>
+      )}
 
       {openCreateModal && (
         <STCreateModal
@@ -163,6 +227,7 @@ const SaleLimitTimeSearch = () => {
           onClickClose={handleCloseCreateModal}
         />
       )}
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>
   );

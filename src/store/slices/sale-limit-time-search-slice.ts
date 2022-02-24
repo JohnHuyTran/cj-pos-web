@@ -23,14 +23,14 @@ const initialState: State = {
     message: '',
     data: [],
     total: 0,
-    page: 0,
-    perPage: 0,
+    page: 1,
+    perPage: 10,
     totalPage: 0,
   },
 };
 export const fetchSaleLimitTimeListAsync = createAsyncThunk('saleLimitTimeList', async (params: string) => {
   try {
-    const path = `${environment.branch.branch.url}?${params}`;
+    const path = `${environment.sell.saleLimitTime.save.url}?${params}`;
 
     let response = await get(path).then();
 
@@ -52,7 +52,11 @@ const saleLimitTimeSlice = createSlice({
       initialState;
     }),
       builer.addCase(fetchSaleLimitTimeListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.responseST = action.payload;
+        if (action.payload.code == 20000) {
+          state.responseST = action.payload;
+        } else {
+          state.responseST = initialState.responseST;
+        }
       }),
       builer.addCase(fetchSaleLimitTimeListAsync.rejected, () => {
         initialState;
