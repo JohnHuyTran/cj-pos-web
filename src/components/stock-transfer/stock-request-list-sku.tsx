@@ -10,10 +10,12 @@ import { updatestockRequestItemsState } from '../../store/slices/stock-request-i
 import StockRequestItem from './stock-request-list-item';
 import { StockBalanceBySKU } from '../../services/stock-transfer';
 import { StockBalanceBySKURequest } from '../../models/stock-transfer-model';
+import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 
 export interface DataGridProps {
   type: string;
-  onChangeItems: (items: Array<any>) => void;
+  onMapSKU: (SKU: Array<any>) => void;
+  // onChangeItems: (items: Array<any>) => void;
   changeItems: (chang: Boolean) => void;
   update: boolean;
   stock: boolean;
@@ -76,43 +78,30 @@ var calBaseUnit = function (params: GridValueGetterParams) {
   return numberWithCommas(cal);
 };
 
-function StockRequestSKU({ type, onChangeItems, changeItems, update, stock, branch }: DataGridProps) {
+function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
   const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
-  useEffect(() => {
-    // if (!update && type !== 'Create') {
-    //   if (stockRequestDetail) {
-    //     const items = stockRequestDetail.items ? stockRequestDetail.items : [];
-    //     if (items.length > 0) {
-    //       // updateItemsState(items);
-    //       itemsMap(items);
-    //     }
-    //   }
-    // }
+  let rowsSKU: any = [];
 
-    console.log('useEffect update:', update);
+  useEffect(() => {
+    console.log(type, ' | useEffect update:', update);
     console.log('useEffect stock:', stock);
 
+    let skuCodes: any = [];
     if (stock) {
-      let skuCodes: any = [];
-      // payloadAddItem.forEach((data: any) => {
-      //   skuCodes.push(data.skuCode);
-      // });
-
-      payloadAddItem.map((item: any) => {
-        //chk duplicates sku
-        const sku = skuCodes.filter((r: any) => r === item.skuCode);
-        if (sku.length == 0) {
-          skuCodes.push(item.skuCode);
-        }
-      });
-
-      console.log('useEffect skuCodes :', JSON.stringify(skuCodes));
-
+      if (Object.keys(payloadAddItem).length !== 0) {
+        payloadAddItem.map((item: any) => {
+          //chk duplicates sku
+          const sku = skuCodes.filter((r: any) => r === item.skuCode);
+          if (sku.length == 0) {
+            skuCodes.push(item.skuCode);
+          }
+        });
+      }
       stockBalanceBySKU(skuCodes);
     }
   }, [update, stock]);
@@ -138,18 +127,20 @@ function StockRequestSKU({ type, onChangeItems, changeItems, update, stock, bran
       });
   };
 
-  let rowsSKU: any = [];
-  const itemsMapStock = async (items: any, stockBalance: any) => {
-    console.log(stockBalance.length, 'stockBalance :', JSON.stringify(stockBalance));
+  const skuMapStock = async (items: any, stockBalance: any) => {
+    console.log(stockBalance.length, 'skuMapStock :', JSON.stringify(stockBalance));
 
+    //orderBy skuCode
+    items = _.orderBy(items, ['skuCode'], ['asc']);
     let resultSKU: any = [];
-    let stockRemain = 0;
     items.map((a: any) => {
+      let stockRemain = 0;
       if (stockBalance.length > 0) {
         stockBalance.forEach((s: any) => {
           if (s.skuCode === a.skuCode) stockRemain = s.stockRemain;
         });
       }
+
       const x = resultSKU.filter((r: any) => r.skuCode === a.skuCode);
       if (x.length == 0) {
         const item: any = {
@@ -176,21 +167,18 @@ function StockRequestSKU({ type, onChangeItems, changeItems, update, stock, bran
       };
     });
 
-    console.log('rowsSKU :', JSON.stringify(rowsSKU));
+    return onMapSKU(rowsSKU ? rowsSKU : []);
   };
 
   const itemsMap = async (items: any) => {
-    //orderBy skuCode
-    items = _.orderBy(items, ['skuCode'], ['asc']);
-
+    console.log('itemsMap >>>> ', 'stockBalanceList :', JSON.stringify(stockBalanceList));
     // if (!stock)
-    itemsMapStock(items, stockBalanceList);
+    skuMapStock(items, stockBalanceList);
 
     let itemsOrderBy: any = [];
     rowsSKU.map((data: any) => {
       let i = items.filter((r: any) => r.skuCode === data.skuCode);
-      i = _.orderBy(i, ['baseUnit'], ['asc']);
-
+      i = _.orderBy(i, ['skuCode', 'baseUnit'], ['asc', 'asc']);
       i.forEach((data: any) => {
         itemsOrderBy.push(data);
       });
@@ -199,25 +187,157 @@ function StockRequestSKU({ type, onChangeItems, changeItems, update, stock, bran
     await dispatch(updatestockRequestItemsState(itemsOrderBy));
   };
 
-  if (type === 'Create') {
-    if (Object.keys(payloadAddItem).length > 0) {
-      itemsMap(payloadAddItem);
-    }
-  } else {
-    if (Object.keys(payloadAddItem).length > 0) {
-      itemsMap(payloadAddItem);
-    } else if (stockRequestDetail) {
+  const updateItemsState = async (items: any) => {
+    await dispatch(updateAddItemsState(items));
+  };
+
+  if (Object.keys(payloadAddItem).length > 0) {
+    console.log('Object.keys(payloadAddItem).length :', Object.keys(payloadAddItem).length);
+    itemsMap(payloadAddItem);
+  } else if (!update && type !== 'Create') {
+    let _item: any = [];
+    if (stockRequestDetail) {
+      const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
       const items = stockRequestDetail.items ? stockRequestDetail.items : [];
       if (items.length > 0) {
-        //   updateItemsState(items);
-        itemsMap(items);
+        items.map((item: any) => {
+          let productName: any = '';
+          let remainingQty: any = 0;
+          if (itemGroups.length > 0) {
+            itemGroups.forEach((i: any) => {
+              if (i.skuCode === item.skuCode) {
+                productName = i.productName;
+                remainingQty = i.remainingQty;
+              }
+            });
+          }
+
+          console.log('skuName :', productName);
+
+          const _i: any = {
+            barcode: item.barcode,
+            barcodeName: item.productName,
+            baseUnit: item.barFactor,
+            qty: item.orderQty,
+            skuCode: item.skuCode,
+            skuName: productName,
+            unitCode: item.unitCode,
+            unitName: item.unitName,
+            stock: remainingQty,
+          };
+
+          _item.push(_i);
+        });
       }
+
+      updateItemsState(_item);
+
+      // itemsMap(_item);
+      // skuMapStock(_item, skuCodes);
+      // console.log('useEffect _item :', JSON.stringify(_item));
+
+      rowsSKU = _item.map((item: any, index: number) => {
+        return {
+          id: `${item.skuCode}-${index + 1}`,
+          index: index + 1,
+          skuCode: item.skuCode,
+          skuName: item.skuName ? item.skuName : '',
+          stock: item.stock,
+          baseUnit: item.baseUnit ? item.baseUnit : 0,
+          qty: item.qty ? item.qty : 0,
+        };
+      });
+
+      console.log('_item xxxxxxxxxxxxxxxx :');
     }
   }
 
+  // if (!update && type !== 'Create') {
+  // if (stockRequestDetail) {
+
+  // if (Object.keys(payloadAddItem).length == 0 && stockRequestDetail && stock) {
+  //   let _item: any = [];
+  //   let skuCodes: any = [];
+
+  //   const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
+  //   const items = stockRequestDetail.items ? stockRequestDetail.items : [];
+
+  //   if (itemGroups.length > 0) {
+  //     console.log('itemGroups view :', JSON.stringify(itemGroups));
+  //   }
+  //   if (items.length > 0) {
+  //     // itemsMap(items);
+  //     console.log('items view :', JSON.stringify(items));
+  //   }
+
+  //   items.map((item: any) => {
+  //     let productName: any = '';
+  //     itemGroups.forEach((i: any) => {
+  //       if (i.skuCode === item.skuCode) {
+  //         productName = i.productName;
+  //       }
+  //     });
+
+  //     const _i: any = {
+  //       barcode: item.barcode,
+  //       barcodeName: item.productName,
+  //       baseUnit: item.barFactor,
+  //       qty: item.orderQty,
+  //       skuCode: item.skuCode,
+  //       skuName: productName,
+  //       unitCode: item.unitCode,
+  //       unitName: item.unitName,
+  //     };
+
+  //     _item.push(_i);
+  //   });
+
+  //   updateItemsState(_item);
+
+  //   _item.map((item: any) => {
+  //     //chk duplicates sku
+  //     const sku = skuCodes.filter((r: any) => r === item.skuCode);
+  //     if (sku.length == 0) {
+  //       skuCodes.push(item.skuCode);
+  //     }
+  //   });
+  //   stockBalanceBySKU(skuCodes);
+
+  //   itemsMap(_item);
+  //   console.log('useEffect _item :', JSON.stringify(_item));
+  //   stock = true;
+  // }
+
+  // if (type === 'Create') {
+  //   if (Object.keys(payloadAddItem).length > 0) {
+  //     itemsMap(payloadAddItem);
+  //   }
+  // } else {
+  //   if (Object.keys(payloadAddItem).length > 0) {
+  //     itemsMap(payloadAddItem);
+  //   } else if (stockRequestDetail) {
+  //     const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
+  //     const items = stockRequestDetail.items ? stockRequestDetail.items : [];
+
+  //     if (itemGroups.length > 0) {
+  //       console.log('itemGroups view :', JSON.stringify(itemGroups));
+  //     }
+  //     if (items.length > 0) {
+  //       //   updateItemsState(items);
+  //       // itemsMap(items);
+
+  //       console.log('items view :', JSON.stringify(items));
+  //     }
+  //   }
+  // }
+
   const [pageSizeSKU, setPageSizeSKU] = React.useState<number>(10);
 
-  const handleChangeItems = () => {
+  const handleChangeItems = async (items: any) => {
+    console.log('handleChangeItems xxx :', JSON.stringify(items));
+
+    await dispatch(updateAddItemsState(items));
+
     return changeItems(true);
   };
 
@@ -261,7 +381,7 @@ function StockRequestSKU({ type, onChangeItems, changeItems, update, stock, bran
       <StockRequestItem
         type={type}
         onChangeItems={handleChangeItems}
-        changeItems={handleStatusChangeItems}
+        // changeItems={handleStatusChangeItems}
         update={flagSave}
       />
     </div>

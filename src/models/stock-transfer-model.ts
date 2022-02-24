@@ -47,7 +47,18 @@ export interface SaveStockTransferRequest {
   branchFrom: string;
   branchTo: string;
   transferReason: string;
-  items: StockTransferItems[];
+  itemGroups: StockTransferitemGroupsRequest[];
+  items: StockTransferItemsRequest[];
+}
+
+export interface StockTransferitemGroupsRequest {
+  skuCode?: string;
+  remainingQty?: number;
+}
+
+export interface StockTransferItemsRequest {
+  barcode?: string;
+  orderQty?: number;
 }
 
 export interface SubmitStockTransferRequest {
@@ -119,10 +130,18 @@ export interface AuditLogComment {
   detail: string;
 }
 
+export interface itemGroups {
+  skuCode?: string;
+  productName?: string;
+  orderAllQty?: number;
+  remainingQty?: number;
+}
+
 export interface Item {
   seqItem?: number;
   skuCode?: string;
   barcode?: string;
+  barcodeName?: string;
   productName?: string;
   baseUnit?: number;
   unitCode?: string;
@@ -184,6 +203,7 @@ export interface StockRequestInfo {
   branchTo: string;
   transferReason: string;
   status: string;
+  itemGroups: itemGroups[];
   items?: Item[];
   auditLogs?: AuditLog[];
   createdBy?: string;

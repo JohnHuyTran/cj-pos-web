@@ -13,7 +13,7 @@ import DatePickerComponent from '../commons/ui/date-picker-detail';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 // import StockRequestItem from './stock-request-item';
 // import StockRequestCreateItem from './stock-request-create-item';
-import StockRequestSKU from './stock-request-list-SKU';
+import StockRequestSKU from './stock-request-list-sku';
 import { useAppDispatch } from '../../store/store';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
@@ -304,9 +304,18 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setOpenModelAddItems(false);
   };
 
-  const handleChangeItems = async (items: any) => {
-    // setFlagSave(true);
-    await dispatch(updateAddItemsState(items));
+  // const handleChangeItems = async (items: any) => {
+  //   // setFlagSave(true);
+  //   await dispatch(updateAddItemsState(items));
+  // };
+
+  // const [skuList, setSkuList] = React.useState([]);
+  let skuList: any = [];
+  const handleMapSKU = async (sku: any) => {
+    console.log('handleMapSKU: ', JSON.stringify(sku));
+
+    // setSkuList(sku);
+    skuList = sku;
   };
 
   const handleStatusChangeItems = async (items: any) => {
@@ -382,25 +391,35 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   };
 
   const handleMapPayloadSave = async () => {
-    const itemsList: any = [];
-    const itemsState: any = [];
+    console.log('skuList :', JSON.stringify(skuList));
+
+    const itemGroups: any = [];
+    if (skuList.length > 0) {
+      await skuList.forEach((data: any) => {
+        const item: any = {
+          skuCode: data.skuCode,
+          remainingQty: data.stock ? data.stock : 0,
+        };
+        itemGroups.push(item);
+      });
+    }
+
+    const items: any = [];
     if (Object.keys(payloadAddItem).length > 0) {
       await payloadAddItem.forEach((data: any) => {
         const item: any = {
           barcode: data.barcode,
           orderQty: data.orderQty ? data.orderQty : data.qty ? data.qty : 0,
         };
-        itemsList.push(item);
-        itemsState.push(data);
+        items.push(item);
       });
-
-      // await dispatch(updateAddItemsState(itemsState));
     }
+
+    console.log('itemGroups: ', JSON.stringify(itemGroups));
+    console.log('items: ', JSON.stringify(items));
 
     let rt = '';
     if (rtNo) rt = rtNo;
-    // let reason = reasons;
-    // if (reason === 'All') reason = '';
     const payload: SaveStockTransferRequest = {
       rtNo: rt,
       startDate: moment(startDate).startOf('day').toISOString(),
@@ -408,7 +427,8 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
       branchFrom: fromBranch,
       branchTo: toBranch,
       transferReason: reasons,
-      items: itemsList,
+      itemGroups: itemGroups,
+      items: items,
     };
 
     return await payload;
@@ -857,24 +877,12 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                 </Grid>
               </Grid>
             )}
-          {/* <Box mb={4}>
-            {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-              <StockRequestCreateItem
-                type={type}
-                onChangeItems={handleChangeItems}
-                changeItems={handleStatusChangeItems}
-                update={flagSave}
-              />
-            )}
 
-            {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && (
-              <StockRequestItem onChangeItems={handleChangeItems} />
-            )}
-          </Box> */}
           <Box mb={4}>
             <StockRequestSKU
               type={type}
-              onChangeItems={handleChangeItems}
+              onMapSKU={handleMapSKU}
+              // onChangeItems={handleChangeItems}
               changeItems={handleStatusChangeItems}
               update={flagSave}
               stock={flagStock}

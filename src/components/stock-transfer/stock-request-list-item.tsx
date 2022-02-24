@@ -18,11 +18,12 @@ import { DeleteForever } from '@mui/icons-material';
 import ModelDeleteConfirm from '../commons/ui/modal-delete-confirm';
 import { numberWithCommas } from '../../utils/utils';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 
 export interface DataGridProps {
   type: string;
   onChangeItems: (items: Array<any>) => void;
-  changeItems: (chang: Boolean) => void;
+  // changeItems: (chang: Boolean) => void;
   update: boolean;
 }
 
@@ -142,7 +143,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function StockTransferListItem({ type, onChangeItems, changeItems, update }: DataGridProps) {
+function StockTransferListItem({ type, onChangeItems, update }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
@@ -187,6 +188,7 @@ function StockTransferListItem({ type, onChangeItems, changeItems, update }: Dat
       return {
         id: `${item.barcode}-${index + 1}`,
         index: index + 1,
+        skuName: item.skuName ? item.skuName : '',
         skuCode: item.skuCode,
         barcode: item.barcode,
         productName: item.productName ? item.productName : item.barcodeName,
@@ -243,15 +245,23 @@ function StockTransferListItem({ type, onChangeItems, changeItems, update }: Dat
         });
       }
 
-      await dispatch(updateAddItemsState(itemsList));
-      handleChangeItems();
+      // console.log('itemsList :', JSON.stringify(itemsList));
+
+      // updateState(itemsList);
+
+      // handleChangeItems();
       return onChangeItems(itemsList ? itemsList : []);
     }
   };
 
-  const handleChangeItems = () => {
-    return changeItems(true);
+  const updateState = async (items: any) => {
+    await dispatch(updateAddItemsState(items));
+    // await dispatch(updatestockRequestItemsState(itemsList));
   };
+
+  // const handleChangeItems = () => {
+  //   return changeItems(true);
+  // };
 
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
   const [deleteItems, setDeleteItems] = React.useState(false);
@@ -290,11 +300,10 @@ function StockTransferListItem({ type, onChangeItems, changeItems, update }: Dat
         autoHeight={rows.length >= 8 ? false : true}
         scrollbarSize={10}
         rowHeight={65}
-        // onCellClick={currentlySelected}
-        // onCellFocusOut={handleEditItems}
+        onCellClick={currentlySelected}
+        onCellFocusOut={handleEditItems}
         // onCellOut={handleEditItems}
-        // onCellKeyDown={handleChangeItems}
-        // onCellBlur={handleChangeItems}
+        onCellKeyDown={handleEditItems}
       />
       {/* </Box> */}
 
