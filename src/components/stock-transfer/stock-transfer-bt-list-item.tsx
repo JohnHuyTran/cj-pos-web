@@ -17,7 +17,7 @@ import {
 import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { Item, ItemGroups, Item_ } from '../../models/stock-transfer-model';
+import { Item, ItemGroups } from '../../models/stock-transfer-model';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { updateAddItemSkuGroupState, updateBTSkuSlice } from '../../store/slices/stock-transfer-bt-sku-slice';
 import { updateAddItemsGroupState } from '../../store/slices/stock-transfer-bt-product-slice';
@@ -183,14 +183,14 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   let rows = branchTransferItems
-    .filter((item: Item_, index: number) => {
+    .filter((item: Item, index: number) => {
       if (skuCodeSelect) {
         return item.skuCode === skuCodeSelect;
       } else {
         return item;
       }
     })
-    .map((item: Item_, index: number) => {
+    .map((item: Item, index: number) => {
       return {
         id: `${item.barcode}-${index + 1}`,
         index: index + 1,
@@ -219,7 +219,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     let _sku = [...skuGroupItems];
     if (Object.keys(_newItem).length !== 0) {
       _newItem.map((data: any, index: number) => {
-        const dupItem: any = branchTransferItems.find((item: Item_, index: number) => {
+        const dupItem: any = branchTransferItems.find((item: Item, index: number) => {
           return item.barcode === data.barcode;
         });
         const dupSku: any = skuGroupItems.find((item: ItemGroups, index: number) => {
@@ -250,7 +250,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
         }
 
         if (dupItem) {
-          const newData: Item_ = {
+          const newData: Item = {
             seqItem: dupItem.seqItem,
             barcode: dupItem.barcode,
             productName: dupItem.productName,
@@ -264,12 +264,12 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
             isDraft: isDraft,
             boNo: dupItem.boNo,
           };
-          _.remove(_items, function (item: Item_) {
+          _.remove(_items, function (item: Item) {
             return item.barcode === data.barcode;
           });
           _items = [..._items, newData];
         } else {
-          const newData: Item_ = {
+          const newData: Item = {
             seqItem: 0,
             barcode: data.barcode,
             productName: data.barcodeName,
@@ -296,9 +296,9 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     let _sku = [...skuGroupItems];
     let _newSku: ItemGroups[] = [];
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const items: Item_[] = [];
+    const items: Item[] = [];
     rowsEdit.forEach((data: GridRowData) => {
-      const newData: Item_ = {
+      const newData: Item = {
         seqItem: data.seqItem,
         barcode: data.barcode,
         productName: data.productName,
@@ -317,10 +317,10 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
 
     _sku.forEach((data: ItemGroups) => {
       const sum = items
-        .filter((dataItem: Item_) => {
+        .filter((dataItem: Item) => {
           return data.skuCode === dataItem.skuCode;
         })
-        .reduce((sum, dataItem: Item_) => {
+        .reduce((sum, dataItem: Item) => {
           return (
             sum + Number((dataItem.actualQty ? dataItem.actualQty : 0) * (dataItem.barFactor ? dataItem.barFactor : 0))
           );

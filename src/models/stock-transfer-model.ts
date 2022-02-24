@@ -122,27 +122,27 @@ export interface AuditLogComment {
   detail: string;
 }
 
-export interface Item {
-  seqItem?: number;
-  skuCode?: string;
-  barcode?: string;
-  productName?: string;
-  baseUnit?: number;
-  unitCode?: string;
-  unitName?: string;
-  remainStock?: number;
-  qty?: number;
-  allQty?: number;
-  actualQty?: number;
-  actualAllQty?: number;
-  toteCode?: string;
-  orderQty?: number;
-  orderAllQty?: number;
-  isDraft?: boolean;
-  boNo?: boolean;
-}
+// export interface Item {
+//   seqItem?: number;
+//   skuCode?: string;
+//   barcode?: string;
+//   productName?: string;
+//   baseUnit?: number;
+//   unitCode?: string;
+//   unitName?: string;
+//   remainStock?: number;
+//   qty?: number;
+//   allQty?: number;
+//   actualQty?: number;
+//   actualAllQty?: number;
+//   toteCode?: string;
+//   orderQty?: number;
+//   orderAllQty?: number;
+//   isDraft?: boolean;
+//   boNo?: boolean;
+// }
 
-export interface Item_ {
+export interface Item {
   seqItem?: number;
   skuCode?: string;
   barcode?: string;
@@ -184,7 +184,7 @@ export interface BranchTransferInfo {
   status: string;
   comment: string;
   items: Item[];
-  itemsNew: Item_[];
+  // itemsNew: Item_[];
   itemGroups: ItemGroups[];
   auditLogs: AuditLog[];
   createdBy: string;

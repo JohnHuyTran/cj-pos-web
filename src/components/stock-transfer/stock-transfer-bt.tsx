@@ -938,6 +938,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             <Typography>
               รายการสินค้า: {isChecked && 'รายการสินค้าทั้งหมด'} {!isChecked && `${skuNameDisplay} (${skuCodeSelect})`}
             </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
             <FormGroup>
               <FormControlLabel
                 control={<Checkbox />}
