@@ -341,6 +341,19 @@ const useStyles = makeStyles({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  MTextFieldNumberPrint: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      fontSize: '14px',
+      textAlignLast: 'end !important',
+      width: '92px',
+      height: '26px'
+    },
+    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+      color: '#263238 !important',
+      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+    },
+  },
   MFormControlLabel: {
     '& .MuiFormControlLabel-label': {
       fontSize: 'small',

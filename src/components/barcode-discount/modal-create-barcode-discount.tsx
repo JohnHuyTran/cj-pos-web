@@ -46,6 +46,9 @@ import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import {ACTIONS} from "../../utils/enum/permission-enum";
 import ModalReject from "./modal-reject";
+import { PrintSharp } from "@mui/icons-material";
+import ModalConfirmPrintedBarcode from "./modal-confirm-printed-barcode";
+
 interface Props {
   action: Action | Action.INSERT;
   isOpen: boolean;
@@ -97,6 +100,20 @@ export default function ModalCreateBarcodeDiscount({
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
       ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false);
+  const [printPermission, setPrintPermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
+    ? userPermission.includes(ACTIONS.CAMPAIGN_BD_PRINT) : false);
+  //print barcode
+  const barcodeDiscountPrint = useAppSelector((state) => state.barcodeDiscountPrintSlice.state);
+  const printInDetail = useAppSelector((state) => state.barcodeDiscountPrintSlice.inDetail);
+  const [valuePrints, setValuePrints] = React.useState<any>({
+    printNormal: true,
+    printInDetail: false,
+    id: '',
+    barcode: '',
+    lstProductNotPrinted: [],
+    lstProductPrintAgain: []
+  });
+  const [openModalPrint, setOpenModalPrint] = React.useState(false);
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -477,6 +494,39 @@ export default function ModalCreateBarcodeDiscount({
     handleOpenModalReject();
   };
 
+  const handleOpenModalPrint = () => {
+    setOpenModalPrint(true);
+  };
+
+  const handleCloseModalPrint = () => {
+    setOpenModalPrint(false);
+  };
+
+  const onPrintedBarcode = async () => {
+    let lstProductNotPrinted = [];
+    if (barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail) {
+      let products = _.cloneDeep(barcodeDiscountPrint);
+      for (const itPro of products) {
+            if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isSameOrBefore(moment(new Date()))) {
+              itPro.barcode = itPro.barCode;
+              itPro.productName = itPro.barcodeName;
+              lstProductNotPrinted.push(itPro);
+            }
+      }
+    }
+    await setValuePrints({
+      ...valuePrints,
+      printNormal: !(lstProductNotPrinted && lstProductNotPrinted.length > 0),
+      printInDetail: printInDetail,
+      lstProductNotPrinted: lstProductNotPrinted
+    });
+    handleOpenModalPrint();
+  };
+
+  const onConfirmModalPrint = () => {
+
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={!!true}>
@@ -551,6 +601,18 @@ export default function ModalCreateBarcodeDiscount({
             <Box sx={{ display: 'flex', marginBottom: '18px'}}>
               <Box>
                 <Button
+                  id='btnPrint'
+                  variant='contained'
+                  color='info'
+                  className={classes.MbtnSearch}
+                  onClick={onPrintedBarcode}
+                  startIcon={<PrintSharp/>}
+                  sx={{ width: '208px' }}
+                  style={{display: (status >= Number(BDStatus.APPROVED) && status != Number(BDStatus.REJECT) && printPermission) ? undefined : 'none'}}
+                >
+                  พิมพบาร์โค้ด
+                </Button>
+                <Button
                   id='btnAddItem'
                   variant='contained'
                   color='info'
@@ -558,38 +620,41 @@ export default function ModalCreateBarcodeDiscount({
                   startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
-                  style={{display: (status > 1 && approvePermission) ? 'none' : undefined}}
+                  style={{display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) ? 'none' : undefined}}
                   disabled={status > 1}>
                   เพิ่มสินค้า
                 </Button>
               </Box>
               <Box sx={{ marginLeft: 'auto' }}>
                 <Button
+                  id='btnSaveDraft'
                   variant='contained'
                   color='warning'
                   startIcon={<SaveIcon />}
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
-                  style={{display: (status > 1 && approvePermission) ? 'none' : undefined}}
+                  style={{display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) ? 'none' : undefined}}
                   onClick={() => handleCreateDraft(false)}
                   className={classes.MbtnSearch}>
                   บันทึก
                 </Button>
                 <Button
+                  id='btnSendForApproval'
                   variant='contained'
                   color='primary'
                   sx={{ margin: '0 17px' }}
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
-                  style={{display: (status > 1 && approvePermission) ? 'none' : undefined}}
+                  style={{display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) ? 'none' : undefined}}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleSendRequest}
                   className={classes.MbtnSearch}>
                   ขออนุมัติ
                 </Button>
                 <Button
+                  id='btnCancel'
                   variant='contained'
                   color='error'
                   disabled={status > 1}
-                  style={{display: (status > 1 && approvePermission) ? 'none' : undefined}}
+                  style={{display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) ? 'none' : undefined}}
                   startIcon={<HighlightOffIcon />}
                   onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
@@ -597,7 +662,7 @@ export default function ModalCreateBarcodeDiscount({
                 </Button>
                 <Button
                     sx={{ margin: '0 17px' }}
-                    style={{display: (status > Number(BDStatus.DRAFT) && status < Number(BDStatus.APPROVED) && approvePermission) ? undefined : 'none'}}
+                    style={{display: (status == Number(BDStatus.WAIT_FOR_APPROVAL) && approvePermission) ? undefined : 'none'}}
                     variant='contained'
                     color='primary'
                     startIcon={<CheckCircleOutlineIcon />}
@@ -607,7 +672,7 @@ export default function ModalCreateBarcodeDiscount({
                 </Button>
                 <Button
                     variant='contained'
-                    style={{display: (status > Number(BDStatus.DRAFT) && status < Number(BDStatus.APPROVED) && approvePermission) ? undefined : 'none'}}
+                    style={{display: (status == Number(BDStatus.WAIT_FOR_APPROVAL) && approvePermission) ? undefined : 'none'}}
                     color='error'
                     startIcon={<HighlightOffIcon />}
                     onClick={handleReject}
@@ -660,6 +725,11 @@ export default function ModalCreateBarcodeDiscount({
           onClose={(confirm) => handleCloseModalReject(confirm)}
           barCode={dataDetail.documentNumber}
           id={dataDetail.id}
+      />
+      <ModalConfirmPrintedBarcode onClose={handleCloseModalPrint}
+                                  onConfirm={onConfirmModalPrint}
+                                  open={openModalPrint}
+                                  values={valuePrints}
       />
     </div>
   );
