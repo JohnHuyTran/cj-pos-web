@@ -5,13 +5,14 @@ import store, { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { BranchTransferRequest, Delivery, Item, ItemGroups, StockBalanceType } from '../../models/stock-transfer-model';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
-import { Button, Checkbox, FormControlLabel, FormGroup, Grid, Link, Typography } from '@mui/material';
+import { Button, Checkbox, FormControlLabel, FormGroup, Grid, IconButton, Link, Typography } from '@mui/material';
 import Steppers from './steppers';
 import Box from '@mui/system/Box';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import ControlPoint from '@mui/icons-material/ControlPoint';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { formatFileStockTransfer, getBranchName, getReasonLabel } from '../../utils/utils';
 import { getUserInfo } from '../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
@@ -852,6 +853,12 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       </Grid>
     </>
   );
+  const topFunction = () => {
+    document.getElementById('top-item')?.scrollIntoView({
+      block: 'start',
+      behavior: 'smooth',
+    });
+  };
 
   return (
     <React.Fragment>
@@ -861,7 +868,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           <Steppers status={branchTransferInfo.status} type='BT'></Steppers>
         </BootstrapDialogTitle>
         <DialogContent>
-          <Box mt={4} sx={{ flexGrow: 1 }}>
+          <Box mt={4} sx={{ flexGrow: 1 }} id='top-item'>
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
                 <Typography variant='body2'>เลขที่เอกสาร BT</Typography>
@@ -937,7 +944,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
-              <Grid item lg={4}>
+              <Grid item lg={3}>
                 <TextBoxComment
                   fieldName='สาเหตุการเปลี่ยนจำนวน:'
                   defaultValue={comment}
@@ -945,6 +952,23 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
                   onChangeComment={handleChangeComment}
                   isDisable={!isDraft}
                 />
+              </Grid>
+              <Grid item xs={7}></Grid>
+              <Grid item xs={2} textAlign='center'>
+                <IconButton onClick={topFunction}>
+                  <ArrowForwardIosIcon
+                    sx={{
+                      fontSize: '41px',
+                      padding: '6px',
+                      backgroundColor: '#C8E8FF',
+                      transform: 'rotate(270deg)',
+                      color: '#fff',
+                      borderRadius: '50%',
+                    }}
+                  />
+                </IconButton>
+
+                <Box fontSize='13px'>กลับขึ้นด้านบน</Box>
               </Grid>
             </Grid>
           </Box>
