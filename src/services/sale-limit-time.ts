@@ -12,7 +12,7 @@ export async function saveDraftST(payload: Payload) {
     throw error;
   }
 }
-export async function updateBarcodeDiscount(payload: Payload, id: string) {
+export async function updateDraftST(payload: Payload, id: string) {
   try {
     const response = await post(getPathUpdateDraftST(id), payload);
     return response;
@@ -21,7 +21,16 @@ export async function updateBarcodeDiscount(payload: Payload, id: string) {
   }
 }
 
-export async function cancelBarcodeDiscount(id: string) {
+export async function getStartSaleLimitTime(id: string) {
+  try {
+    const response = await post(getPathGetStart(id));
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function cancelDraftST(id: string) {
   try {
     const response = await deleteData(getPathCancelDraftST(id));
     return response;
@@ -35,5 +44,9 @@ export const getPathUpdateDraftST = (id: string) => {
 };
 
 export const getPathCancelDraftST = (id: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.sell.saleLimitTime.cancel.url}`, { id: id });
+};
+
+export const getPathGetStart = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.sell.saleLimitTime.cancel.url}`, { id: id });
 };

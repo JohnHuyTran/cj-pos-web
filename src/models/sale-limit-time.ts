@@ -26,6 +26,12 @@ export interface Payload {
     };
   };
 }
+export interface SaleLimitTimeDetailResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: any;
+}
 
 interface branchLists {
   code: string;

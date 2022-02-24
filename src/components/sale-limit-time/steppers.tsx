@@ -13,12 +13,12 @@ interface Props {
 const steps = ['บันทึก', 'เริ่มใช้งาน', 'ครบกำหนด'];
 
 export default function StepperBar({ activeStep, setActiveStep }: Props): ReactElement {
-  const [rejected, setRejected] = React.useState<boolean>(false);
+  const [cancel, setCancel] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    if (activeStep === 5) {
-      setRejected(true);
-      setActiveStep(3);
+    if (activeStep === 4) {
+      setCancel(true);
+      setActiveStep(2);
     }
   }, [activeStep, open]);
 
@@ -29,8 +29,8 @@ export default function StepperBar({ activeStep, setActiveStep }: Props): ReactE
         <Stepper activeStep={activeStep} alternativeLabel>
           {steps.map((label, index) => {
             const labelProps: any = {};
-            if (index === 2 && rejected) {
-              label = 'ไม่อนุมัต';
+            if (index === 1 && cancel) {
+              label = 'ยกเลิก';
               labelProps.error = true;
             }
 
