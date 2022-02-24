@@ -51,6 +51,7 @@ import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
 import stockRequestDetail from './stock-request-detail';
 import { isGroupBranch } from '../../utils/role-permission';
+import AccordionHuaweiFile from '../supplier-check-order/accordion-huawei-file';
 
 interface Props {
   isOpen: boolean;
@@ -764,6 +765,92 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     </>
   );
 
+  const componentBranchStatusTransfering = (
+    <>
+      <Grid container spacing={2} mb={2}>
+        <Grid item lg={2}>
+          <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
+        </Grid>
+        <Grid item lg={1}></Grid>
+        <Grid item lg={2}>
+          <Typography variant='body2'>ถึง :</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
+        </Grid>
+        <Grid item lg={1}></Grid>
+      </Grid>
+
+      <Grid container spacing={2} mb={2}>
+        <Grid item lg={2}></Grid>
+        <Grid item lg={3}></Grid>
+        <Grid item lg={1}></Grid>
+        <Grid item lg={2}>
+          <Typography variant='body2'>แนบไฟล์</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          {branchTransferInfo.files.length > 0 && <AccordionHuaweiFile files={branchTransferInfo.files} />}
+          {/* <AccordionUploadFile
+            files={branchTransferInfo.files}
+            docNo={btNo}
+            docType='PN'
+            isStatus={uploadFileFlag}
+            onChangeUploadFile={handleOnChangeUploadFile}
+          /> */}
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BT);
+              }}>
+              เรียกดูเอกสารใบโอน BT
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BO);
+              }}>
+              เรียกดูเอกสารใบ BO
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BOX);
+              }}>
+              เรียกดูเอกสารใบปะลัง
+            </Link>
+          </Box>
+        </Grid>
+        <Grid item lg={1}></Grid>
+      </Grid>
+      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
+        <Grid item xl={8}></Grid>
+        <Grid item>
+          {/* <Button
+            id='btnSave'
+            variant='contained'
+            color='warning'
+            className={classes.MbtnSave}
+            onClick={handleSubmitTransfer}
+            // startIcon={<SaveIcon />}
+            sx={{ width: 200 }}>
+            ส่งงาน
+          </Button> */}
+        </Grid>
+      </Grid>
+    </>
+  );
+
   return (
     <React.Fragment>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -828,6 +915,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           {isDC && btStatus === 'READY_TO_TRANSFER' && componentDCStatusReadyToTransfer}
           {isDC && btStatus === 'WAIT_FOR_PICKUP' && componentDCStatusWaitForPicup}
           {isGroupBranch() && btStatus === 'WAIT_FOR_PICKUP' && componentBranchStatusWaitForPickup}
+          {btStatus === 'TRANSFERING' && componentBranchStatusTransfering}
 
           <BranchTransferListSKU onSelectSku={onClickSku} />
           <Box mt={6}>
