@@ -176,7 +176,6 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     const _productSelector: any = store.getState().updateBTProductSlice.state;
     let itemNotValid: boolean = false;
     _productSelector.forEach((data: GridRowData) => {
-      console.log(`toteCode: ${data.toteCode} actualQty: ${data.actualQty}`);
       if (!data.toteCode && data.actualQty > 0) {
         itemNotValid = true;
         setTextError('กรุณาระบุเลขที่ Tote/ลัง');
@@ -198,6 +197,12 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       if (actualQty < orderQty && !comment) {
         itemNotValid = true;
         setTextError('กรุณาระบุสาเหตุการเปลี่ยนจำนวน');
+        setComment(comment);
+        return;
+      }
+      if (actualQty > orderQty) {
+        itemNotValid = true;
+        setTextError(`SKU : ${data.skuCode}\nมีจำนวนที่จัดมากว่า จำนวนที่สั่ง `);
         setComment(comment);
         return;
       }

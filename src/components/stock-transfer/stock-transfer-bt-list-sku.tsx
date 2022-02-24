@@ -112,9 +112,10 @@ function BranchTransferListSKU({ onSelectSku }: Props) {
   };
 
   var calProductDiff = function (params: GridValueGetterParams) {
-    let diff = Number(params.getValue(params.id, 'orderAllQty')) - Number(params.getValue(params.id, 'actualAllQty'));
+    let diff = Number(params.getValue(params.id, 'actualAllQty')) - Number(params.getValue(params.id, 'orderAllQty'));
 
-    if (diff !== 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+    if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+    if (diff > 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> +{diff} </label>;
     return diff;
   };
 
