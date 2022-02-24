@@ -792,7 +792,9 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           <Typography variant='body2'>แนบไฟล์</Typography>
         </Grid>
         <Grid item lg={3}>
-          {branchTransferInfo.files.length > 0 && <AccordionHuaweiFile files={branchTransferInfo.files} />}
+          {branchTransferInfo.files && branchTransferInfo.files.length > 0 && (
+            <AccordionHuaweiFile files={branchTransferInfo.files} />
+          )}
           {/* <AccordionUploadFile
             files={branchTransferInfo.files}
             docNo={btNo}
