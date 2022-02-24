@@ -147,6 +147,7 @@ export interface Item {
   skuCode?: string;
   barcode?: string;
   productName?: string;
+  barcodeName?: string;
   barFactor?: number;
   unitCode?: string;
   unitName?: string;
