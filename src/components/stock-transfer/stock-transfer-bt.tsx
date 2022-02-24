@@ -382,10 +382,10 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           setContentMsg('คุณบันทึกรอบรถเข้าต้นทางเรียบร้อยแล้ว');
           await dispatch(featchBranchTransferDetailAsync(btNo));
           await dispatch(featchSearchStockTransferAsync(payloadSearch));
-          // setTimeout(() => {
-          //   setOpen(false);
-          //   onClickClose();
-          // }, 500);
+          setTimeout(() => {
+            setOpen(false);
+            onClickClose();
+          }, 500);
         })
         .catch((error: ApiError) => {
           handleOnCloseModalConfirm();
@@ -673,14 +673,46 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         <Grid item lg={1}></Grid>
         <Grid item lg={2}></Grid>
         <Grid item lg={3}>
-          <Link
-            component='button'
-            variant='body2'
-            onClick={(e) => {
-              handleLinkDocument(DOCUMENT_TYPE.RECALL);
-            }}>
-            เรียกดูเอกสารใบเรียกเก็บ
-          </Link>
+          {/* <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BT);
+              }}>
+              เรียกดูเอกสารใบโอน BT
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BO);
+              }}>
+              เรียกดูเอกสารใบ BO
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BOX);
+              }}>
+              เรียกดูเอกสารใบปะลัง
+            </Link>
+          </Box> */}
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.RECALL);
+              }}>
+              เรียกดูเอกสารใบเรียกเก็บ
+            </Link>
+          </Box>
         </Grid>
         <Grid item lg={1}></Grid>
       </Grid>
@@ -925,11 +957,12 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               <Grid item lg={1}></Grid>
             </Grid>
           </Box>
-          {isDraft && componetStatusCreate}
-          {!isDraft && !isDC && btStatus === 'READY_TO_TRANSFER' && componentViewReport}
-          {isDC && btStatus === 'READY_TO_TRANSFER' && componentDCStatusReadyToTransfer}
+          {!isDC && isDraft && componetStatusCreate}
           {isDC && btStatus === 'WAIT_FOR_PICKUP' && componentDCStatusWaitForPicup}
           {isGroupBranch() && btStatus === 'WAIT_FOR_PICKUP' && componentBranchStatusWaitForPickup}
+          {!isDraft && !isDC && btStatus === 'READY_TO_TRANSFER' && componentViewReport}
+          {isDC && btStatus === 'READY_TO_TRANSFER' && componentDCStatusReadyToTransfer}
+
           {btStatus === 'TRANSFERING' && componentBranchStatusTransfering}
 
           <BranchTransferListSKU onSelectSku={onClickSku} />
