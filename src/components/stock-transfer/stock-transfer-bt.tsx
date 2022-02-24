@@ -204,7 +204,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       }
       if (actualQty > orderQty) {
         itemNotValid = true;
-        setTextError(`SKU : ${data.skuCode}\nมีจำนวนที่จัดมากว่า จำนวนที่สั่ง `);
+        setTextError(`สินค้า :${data.productName}\nกรุณาแก้ไขจำนวนโอน ต้องไม่มากกว่า จำนวนสั่ง`);
         setComment(comment);
         return;
       }
@@ -460,15 +460,21 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
   const [skuCodeSelect, setSkuCodeSelect] = React.useState<string>('');
   const [defaultSkuSelected, setDefaultSkuSelected] = React.useState<string>(branchTransferInfo.itemGroups[0].skuCode);
+  const [skuNameDisplay, setSkuNameDisplay] = React.useState<string>(branchTransferInfo.itemGroups[0].productName);
   const onClickSku = (skuCode: string) => {
     if (skuCode) {
       setDefaultSkuSelected(skuCode);
+      const sku: ItemGroups = branchTransferInfo.itemGroups.find((item: ItemGroups, index: number) => {
+        return skuCode === item.skuCode;
+      });
+      setSkuNameDisplay(sku.productName ? sku.productName : '');
     }
     setSkuCodeSelect(skuCode);
     setIschecked(false);
   };
 
   const [isChecked, setIschecked] = React.useState(true);
+
   const handleCheckboxChange = (e: any) => {
     const ischeck = e.target.checked;
 
@@ -929,7 +935,9 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           <BranchTransferListSKU onSelectSku={onClickSku} />
           <Box mt={6}>
             {' '}
-            <Typography>รายการสินค้า: รายการสินค้าทั้งหมด</Typography>
+            <Typography>
+              รายการสินค้า: {isChecked && 'รายการสินค้าทั้งหมด'} {!isChecked && `${skuNameDisplay} (${skuCodeSelect})`}
+            </Typography>
             <FormGroup>
               <FormControlLabel
                 control={<Checkbox />}
