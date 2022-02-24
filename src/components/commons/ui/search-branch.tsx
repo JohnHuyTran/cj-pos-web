@@ -31,24 +31,14 @@ import {
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { paramsConvert } from '../../../utils/utils';
 const _ = require('lodash');
-
-const BranchItem = (props: ItemProps) => {
-  const { label, onDelete, ...other } = props;
-  return (
-    <div className="wrapper-item">
-      <span>{label}</span>
-      <CloseIcon onClick={onDelete} />
-    </div>
-  );
-};
-
 interface Props {
   error?: boolean;
   helperText?: string;
+  disabled?: boolean;
 }
 
 export default function SearchBranch(props: Props): ReactElement {
-  const { error, helperText } = props;
+  const { error, helperText, disabled } = props;
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const { t } = useTranslation(['common']);
@@ -72,12 +62,19 @@ export default function SearchBranch(props: Props): ReactElement {
     return (
       <li {...props} key={option.code}>
         <Box sx={{ display: 'flex', width: '100%' }}>
-          <Typography variant="body2">{option.name}</Typography>
-          <Typography variant="caption" sx={{ marginLeft: 'auto' }}>
-            {option.code}
-          </Typography>
+          <Typography variant="body2">{option.code}-{option.name}</Typography>
         </Box>
       </li>
+    );
+  };
+
+  const BranchItem = (props: ItemProps) => {
+    const { label, onDelete, ...other } = props;
+    return (
+      <div className="wrapper-item">
+        <span>{label}</span>
+        {!disabled && <CloseIcon onClick={onDelete} />}
+      </div>
     );
   };
 
@@ -208,7 +205,6 @@ export default function SearchBranch(props: Props): ReactElement {
         const preData = [...listBranch['branches'], branch];
         setListBranch({ ...listBranch, branches: preData });
       }
-      setProvince(null);
       setBranch(null);
       setErrorBranch(null);
       // else {
@@ -256,6 +252,7 @@ export default function SearchBranch(props: Props): ReactElement {
             style: { textAlignLast: 'start' },
           },
         }}
+        style={{ backgroundColor: disabled ? '#f1f1f1' : 'transparent' }}
         onClick={handleClickSearch}
         value={value}
         error={error}
@@ -298,8 +295,9 @@ export default function SearchBranch(props: Props): ReactElement {
                     value={true}
                     control={<Radio />}
                     label={`เลือกสาขาทั้งหมด (${totalBranches} สาขา)`}
+                    disabled={disabled}
                   />
-                  <FormControlLabel value={false} control={<Radio />} label="เลือกสาขาเอง" />
+                  <FormControlLabel disabled={disabled} value={false} control={<Radio />} label="เลือกสาขาเอง" />
                 </RadioGroup>
               </FormControl>
               {!allBranches && (
@@ -326,6 +324,7 @@ export default function SearchBranch(props: Props): ReactElement {
                         />
                       )}
                       size="small"
+                      disabled={disabled}
                       className={classes.MSearchBranch}
                       getOptionLabel={(option) => option.name}
                       onChange={(event: any, newValue: any) => {
@@ -373,8 +372,8 @@ export default function SearchBranch(props: Props): ReactElement {
                         setBranch(newValue);
                       }}
                       onInputChange={onInputChange}
+                      disabled={disabled}
                       value={branch}
-                      disabled={checked}
                     />
                   </Box>
                   <Box sx={{ textAlign: 'right' }}>
@@ -436,7 +435,10 @@ export default function SearchBranch(props: Props): ReactElement {
                 className={classes.MbtnSearch}
                 size="large"
                 onClick={handleAddForm}
-                disabled={!allBranches && listBranch['branches'].length === 0 && listBranch['provinces'].length === 0}
+                disabled={
+                  (!allBranches && listBranch['branches'].length === 0 && listBranch['provinces'].length === 0) ||
+                  disabled
+                }
               >
                 เลือกสาขา
               </Button>
