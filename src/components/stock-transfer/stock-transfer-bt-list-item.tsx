@@ -48,7 +48,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'productName',
+    field: 'barcodeName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
     minWidth: 220,
@@ -199,7 +199,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
         index: index + 1,
         seqItem: item.seqItem,
         barcode: item.barcode,
-        productName: item.productName,
+        barcodeName: item.barcodeName,
         skuCode: item.skuCode,
         barFactor: item.barFactor,
         unitCode: item.unitCode ? item.unitCode : 0,
@@ -256,7 +256,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           const newData: Item = {
             seqItem: dupItem.seqItem,
             barcode: dupItem.barcode,
-            productName: dupItem.productName,
+            barcodeName: dupItem.barcodeName,
             skuCode: dupItem.skuCode,
             barFactor: dupItem.barFactor,
             unitName: dupItem.unitName,
@@ -275,7 +275,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           const newData: Item = {
             seqItem: 0,
             barcode: data.barcode,
-            productName: data.barcodeName,
+            barcodeName: data.barcodeName,
             skuCode: data.skuCode,
             barFactor: data.baseUnit,
             unitCode: data.unitCode ? data.unitCode : 0,
@@ -304,7 +304,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
       const newData: Item = {
         seqItem: data.seqItem,
         barcode: data.barcode,
-        productName: data.productName,
+        barcodeName: data.barcodeName,
         skuCode: data.skuCode,
         unitName: data.unitName,
         actualQty: data.actualQty,
