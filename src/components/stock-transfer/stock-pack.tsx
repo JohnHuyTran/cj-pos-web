@@ -365,10 +365,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
       barcode: item.barcode,
       productName: item.productName,
       skuCode: item.skuCode,
-      baseUnit: item.baseUnit ? item.baseUnit : 0,
+      baseUnit: item.barFactor ? item.barFactor : 0,
       unitName: item.unitName,
-      remainStock: item.remainStock ? item.remainStock : 0,
-      qty: item.qty ? item.qty : 0,
+      remainStock: 0,
+      qty: item.orderQty ? item.orderQty : 0,
       actualQty: item.actualQty ? item.actualQty : 0,
       toteCode: item.toteCode,
       isDraft: isDraft,
@@ -399,11 +399,11 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
     list.forEach((l: any) => {
       let sumActual: any = branchTransferItems
         .filter((item: Item) => item.skuCode === l.skuCode)
-        .reduce((total, item: Item) => total + Number(calBaseUnit(item.actualQty, item.baseUnit)), 0);
+        .reduce((total, item: Item) => total + Number(calBaseUnit(item.actualQty, item.barFactor)), 0);
 
       let sumQty: any = branchTransferItems
         .filter((item: Item) => item.skuCode === l.skuCode)
-        .reduce((total, item: Item) => total + Number(calBaseUnit(item.qty, item.baseUnit)), 0);
+        .reduce((total, item: Item) => total + Number(calBaseUnit(item.orderQty, item.barFactor)), 0);
       if (sumActual < sumQty && !comment) {
         itemNotValid = true;
         setTextError('กรุณาระบุสาเหตุการเปลี่ยนจำนวน');
@@ -447,10 +447,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         barcode: data.barcode,
         productName: data.productName,
         skuCode: data.skuCode,
-        baseUnit: data.baseUnit,
+        barFactor: data.barFactor,
         unitName: data.unitName,
-        remainStock: data.remainStock,
-        qty: data.qty,
+        // remainStock: data.remainStock,
+        orderQty: data.qty,
         actualQty: data.actualQty,
         toteCode: data.toteCode,
         isDraft: isDraft,
@@ -477,10 +477,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             barcode: dupItem.barcode,
             productName: dupItem.productName,
             skuCode: dupItem.skuCode,
-            baseUnit: dupItem.baseUnit,
+            barFactor: dupItem.barFactor,
             unitName: dupItem.unitName,
-            remainStock: dupItem.remainStock,
-            qty: dupItem.qty,
+            // remainStock: dupItem.remainStock,
+            orderQty: dupItem.qty,
             actualQty: dupItem.actualQty + data.qty,
             toteCode: dupItem.toteCode,
             isDraft: isDraft,
@@ -496,10 +496,10 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             barcode: data.barcode,
             productName: data.barcodeName,
             skuCode: data.skuCode,
-            baseUnit: data.baseUnit,
+            barFactor: data.barFactor,
             unitName: data.unitName,
-            remainStock: 0,
-            qty: 0,
+            // remainStock: 0,
+            orderQty: 0,
             actualQty: data.qty,
             toteCode: '',
             isDraft: isDraft,

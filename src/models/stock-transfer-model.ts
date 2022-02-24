@@ -1,3 +1,5 @@
+import { iteratee } from 'lodash';
+
 export interface StockTransferRequest {
   limit: string;
   page: string;
@@ -77,6 +79,7 @@ export interface BranchTransferRequest {
   delivery?: Delivery;
   comment?: string;
   items?: Item[];
+  itemGroups?: ItemGroups[];
   docNo?: string;
 }
 
@@ -119,24 +122,47 @@ export interface AuditLogComment {
   detail: string;
 }
 
+// export interface Item {
+//   seqItem?: number;
+//   skuCode?: string;
+//   barcode?: string;
+//   productName?: string;
+//   baseUnit?: number;
+//   unitCode?: string;
+//   unitName?: string;
+//   remainStock?: number;
+//   qty?: number;
+//   allQty?: number;
+//   actualQty?: number;
+//   actualAllQty?: number;
+//   toteCode?: string;
+//   orderQty?: number;
+//   orderAllQty?: number;
+//   isDraft?: boolean;
+//   boNo?: boolean;
+// }
+
 export interface Item {
   seqItem?: number;
   skuCode?: string;
   barcode?: string;
   productName?: string;
-  baseUnit?: number;
+  barFactor?: number;
   unitCode?: string;
   unitName?: string;
-  remainStock?: number;
-  qty?: number;
-  allQty?: number;
-  actualQty?: number;
-  actualAllQty?: number;
-  toteCode?: string;
   orderQty?: number;
-  orderAllQty?: number;
-  isDraft?: boolean;
+  actualQty?: number;
+  toteCode?: string;
   boNo?: boolean;
+  isDraft?: boolean;
+}
+
+export interface ItemGroups {
+  skuCode: string;
+  productName?: string;
+  orderAllQty?: number;
+  actualAllQty?: number;
+  remainingQty?: number;
 }
 
 export interface BranchTransferResponse {
@@ -158,6 +184,8 @@ export interface BranchTransferInfo {
   status: string;
   comment: string;
   items: Item[];
+  // itemsNew: Item_[];
+  itemGroups: ItemGroups[];
   auditLogs: AuditLog[];
   createdBy: string;
   lastModifiedBy: string;
@@ -209,4 +237,25 @@ export interface ApproveComment {
 export interface Delivery {
   fromDate: string;
   toDate: string;
+}
+
+export interface StockBalanceType {
+  skuCodes?: string[];
+  branchCode?: string;
+  skuCode?: string;
+  stockRemain?: number;
+  baseUnitFactor?: string;
+}
+
+export interface skuType {
+  seqItem?: number;
+  skuCode?: string;
+  skuName: string;
+  remainStock?: number;
+  orderQty?: number;
+  actualQty?: number;
+}
+
+export interface StockBalanceResponseType {
+  data: StockBalanceType[];
 }

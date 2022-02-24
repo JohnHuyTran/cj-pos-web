@@ -3,28 +3,36 @@ import { useStyles } from '../../styles/makeTheme';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { numberWithCommas } from '../../utils/utils';
-import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { Item } from '../../models/stock-transfer-model';
-import Done from '@mui/icons-material/Done';
-function BranchTransferListSKU() {
+import store, { useAppDispatch, useAppSelector } from '../../store/store';
+import { Item, ItemGroups, StockBalanceResponseType, StockBalanceType } from '../../models/stock-transfer-model';
+import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
+import { checkStockBalance } from '../../services/stock-transfer';
+import { ApiError } from '../../models/api-error-model';
+import _ from 'lodash';
+
+interface Props {
+  onSelectSku: (value: any) => void;
+}
+
+function BranchTransferListSKU({ onSelectSku }: Props) {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
+
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
-  const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
-  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const payloadSearch = useAppSelector((state) => state.saveSearchStock.searchStockTransfer);
 
   const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
-  const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
-    branchTransferInfo.items ? branchTransferInfo.items : []
+  const [btItemGroups, setBtItemGroups] = React.useState<ItemGroups[]>(
+    branchTransferInfo.itemGroups ? branchTransferInfo.itemGroups : []
   );
+
   const [isDraft, setIsDraft] = React.useState(false);
 
-  const [pageSize, setPageSize] = React.useState<number>(10);
+  const [pageSize, setPageSize] = React.useState<number>(5);
+  const skuGroupItems = useAppSelector((state) => state.updateBTSkuSlice.state);
 
   const columns: GridColDef[] = [
     {
@@ -56,7 +64,7 @@ function BranchTransferListSKU() {
       ),
     },
     {
-      field: 'remainStock',
+      field: 'remainingQty',
       headerName: 'สต๊อกสินค้าคงเหลือ',
       minWidth: 200,
       headerAlign: 'center',
@@ -65,15 +73,22 @@ function BranchTransferListSKU() {
       renderCell: (params) => numberWithCommas(params.value),
     },
     {
-      field: 'unitFactor',
+      field: 'orderAllQty',
+      headerName: 'สั่ง(ชิ้น)',
+      minWidth: 200,
+      headerAlign: 'center',
+      sortable: false,
+      align: 'right',
+      renderCell: (params) => params.value,
+    },
+    {
+      field: 'actualAllQty',
       headerName: 'จัด(ชิ้น)',
       minWidth: 200,
       headerAlign: 'center',
       sortable: false,
       align: 'right',
-      renderCell: (params: GridRenderCellParams) => {
-        return numberWithCommas(calUnitFactor(params));
-      },
+      renderCell: (params) => params.value,
     },
     {
       field: 'unitDiff',
@@ -92,47 +107,111 @@ function BranchTransferListSKU() {
     return value;
   };
   var calUnitFactor = function (params: GridValueGetterParams) {
-    let diff = Number(params.getValue(params.id, 'actualQty')) * Number(params.getValue(params.id, 'baseUnit'));
+    let diff = Number(params.getValue(params.id, 'actualAllQty')) * Number(params.getValue(params.id, 'actualAllQty'));
     return diff;
   };
 
   var calProductDiff = function (params: GridValueGetterParams) {
-    let diff = Number(params.getValue(params.id, 'actualQty')) * Number(params.getValue(params.id, 'baseUnit'));
+    let diff = Number(params.getValue(params.id, 'actualAllQty')) - Number(params.getValue(params.id, 'orderAllQty'));
 
-    if (diff !== 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+    if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+    if (diff > 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> +{diff} </label>;
     return diff;
   };
 
-  const currentlySelected = () => {};
+  const currentlySelected = async (params: GridCellParams) => {
+    const skuCode = params.getValue(params.id, 'skuCode');
+    onSelectSku(skuCode);
+  };
 
-  let rows = branchTransferItems.map((item: Item, index: number) => {
+  let rows = btItemGroups.map((item: ItemGroups, index: number) => {
     return {
-      id: `${item.barcode}-${index + 1}`,
+      id: `${item.skuCode}-${index + 1}`,
       index: index + 1,
-      seqItem: item.seqItem,
-      barcode: item.barcode,
       productName: item.productName,
       skuCode: item.skuCode,
-      baseUnit: item.baseUnit ? item.baseUnit : 0,
-      unitName: item.unitName,
-      remainStock: item.remainStock ? item.remainStock : 0,
-      qty: item.qty ? item.qty : 0,
-      actualQty: item.actualQty ? item.actualQty : 0,
-      toteCode: item.toteCode,
+      remainingQty: item.remainingQty ? item.remainingQty : 0,
+      orderAllQty: item.orderAllQty ? item.orderAllQty : 0,
+      actualAllQty: item.actualAllQty ? item.actualAllQty : 0,
       isDraft: isDraft,
-      boNo: item.boNo,
     };
   });
 
+  React.useEffect(() => {
+    dispatch(updateAddItemSkuGroupState(btItemGroups));
+  }, []);
+
+  React.useEffect(() => {
+    setBtItemGroups(skuGroupItems);
+  }, [skuGroupItems]);
+
+  React.useEffect(() => {
+    fetchStockBalance();
+  }, []);
+
+  async function fetchStockBalance() {
+    const _skuSlice = store.getState().updateBTSkuSlice.state;
+    const list = _.uniqBy(_skuSlice, 'skuCode');
+    const skucodeList: string[] = [];
+    list.map((i: any) => {
+      skucodeList.push(i.skuCode);
+    });
+    const payload: StockBalanceType = {
+      skuCodes: skucodeList,
+      branchCode: branchTransferInfo.branchFrom,
+    };
+
+    await checkStockBalance(payload)
+      .then(async (value) => {
+        mappingSkuWithRemainingQty(value);
+      })
+      .catch((error: ApiError) => {});
+  }
+
+  const mappingSkuWithRemainingQty = (stockBalanceRs: StockBalanceResponseType) => {
+    const stockBalanceList: StockBalanceType[] = stockBalanceRs.data;
+    const _skuSlice = store.getState().updateBTSkuSlice.state;
+    let _newSku: ItemGroups[] = [];
+    _skuSlice.forEach((data: ItemGroups) => {
+      const result = stockBalanceList.find((balance: StockBalanceType) => {
+        return data.skuCode === balance.skuCode;
+      });
+      let newData: ItemGroups = {
+        skuCode: data.skuCode,
+      };
+      if (result) {
+        newData = {
+          skuCode: data.skuCode,
+          productName: data.productName,
+          orderAllQty: data.orderAllQty,
+          actualAllQty: data.actualAllQty,
+          remainingQty: result.stockRemain,
+        };
+      } else {
+        newData = {
+          skuCode: data.skuCode,
+          productName: data.productName,
+          orderAllQty: data.orderAllQty,
+          actualAllQty: data.actualAllQty,
+          remainingQty: data.remainingQty,
+        };
+      }
+
+      _newSku.push(newData);
+    });
+    setBtItemGroups(_newSku);
+    dispatch(updateAddItemSkuGroupState(_newSku));
+  };
+
   return (
-    <Box mt={2} bgcolor='background.paper'>
+    <Box mt={2} bgcolor='background.paper' id='item-sku'>
       <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
         <DataGrid
           rows={rows}
           columns={columns}
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
+          rowsPerPageOptions={[5, 10, 20, 50, 100]}
           pagination
           disableColumnMenu
           autoHeight={rows.length >= 8 ? false : true}

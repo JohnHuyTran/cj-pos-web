@@ -213,5 +213,10 @@ export const environment = {
     stockBalanceCheck: {
       url: '/stock/stock-balance-check',
     },
+    stockBalance: {
+      stockBalanceBySKU: {
+        url: '/stock/stock-balance/check-by-sku-codes',
+      },
+    },
   },
 };
