@@ -27,14 +27,13 @@ import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import { updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 import TextBoxComment from '../commons/ui/textbox-comment';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
-import { onChangeDate } from '../../utils/utils';
-import DatePickerComponent from '../commons/ui/date-picker-detail';
+import { createTheme } from '@material-ui/core/styles';
 import { cancelDraftST, getStartSaleLimitTime, saveDraftST } from '../../services/sale-limit-time';
 import { DateFormat } from '../../utils/enum/common-enum';
-import { updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
+import { setCheckEdit, updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
 import ModelConfirm from './modal-confirm';
-
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DatePickerComponent from './date-picker-detail';
 interface State {
   detailMsg: string;
   startDate: any | Date | number | string;
@@ -101,6 +100,7 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
   const payLoadSt = useAppSelector((state) => state.saleLimitTime.state);
+  const checkEdit = useAppSelector((state) => state.saleLimitTime.checkEdit);
   const [values, setValues] = React.useState<State>({
     detailMsg: '',
     startDate: new Date(),
@@ -126,6 +126,7 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
+  const [openModalStart, setOpenModalStart] = React.useState<boolean>(false);
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
   };
@@ -135,6 +136,11 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
 
   useEffect(() => {
     setShowModalProduct(!!Object.keys(payloadAddTypeProduct).length);
+    if (!!!Object.keys(payloadAddTypeProduct).length && status === 0) {
+      dispatch(setCheckEdit(false))
+    } else(
+      dispatch(setCheckEdit(true))
+    )
   }, [payloadAddTypeProduct]);
 
   useEffect(() => {
@@ -165,7 +171,7 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
   }, [values.startDate, values.endDate, values.startTime, values.endTime]);
 
   useEffect(() => {
-    setStatus(payLoadSt.status);
+    payLoadSt.status && setStatus(payLoadSt.status);
   }, [payLoadSt.status]);
 
   const clearData = async () => {
@@ -192,7 +198,7 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
   };
 
   const handleCheckClose = () => {
-    if (!!Object.keys(payloadAddTypeProduct).length) {
+    if (checkEdit) {
       setConfirmModelExit(true);
     } else {
       handleClose();
@@ -223,11 +229,13 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
   };
 
   const handleStartDatePicker = (value: any) => {
-    setValues({ ...values, startDate: value._d });
+    setValues({ ...values, startDate: value });
+    setCheckValue({ ...checkValue, startDateError: false });
   };
 
   const handleEndDatePicker = (value: any) => {
-    setValues({ ...values, endDate: value._d });
+    setValues({ ...values, endDate: value });
+    setCheckValue({ ...checkValue, endDateError: false });
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
@@ -321,6 +329,7 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
         const rs = await saveDraftST(bodyPayload);
         if (rs.code === 201) {
           if (!getStart) {
+            dispatch(setCheckEdit(false))
             setShowSnackBar(true);
             setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
             // if (onSearchBD) onSearchBD();
@@ -403,6 +412,13 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
   const handleOpenCancel = () => {
     setOpenModalCancel(true);
   };
+  const handleCloseModalStart = () => {
+    setOpenModalStart(false);
+  };
+
+  const handleOpenStart = () => {
+    setOpenModalStart(true);
+  };
   const handleUnSelectAllType = (showAll: boolean) => {
     setUnSelectAllType(showAll);
   };
@@ -460,7 +476,17 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
               วันที่เริ่มงดขาย :
             </Grid>
             <Grid item xs={3}>
-              <DatePickerComponent onClickDate={handleStartDatePicker} value={values.startDate} />
+              <DatePickerComponent
+                error={checkValue.startDateError}
+                disabled={status > 1}
+                onClickDate={handleStartDatePicker}
+                value={values.startDate}
+              />
+              {checkValue.startDateError && (
+                <Box textAlign="right" color="#F54949">
+                  กรุณาระบุรายละเอียด
+                </Box>
+              )}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -468,11 +494,18 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
+                error={checkValue.endDateError}
+                disabled={status > 1}
                 onClickDate={handleEndDatePicker}
                 value={values.endDate}
                 type="TO"
                 minDateTo={values.startDate}
               />
+              {checkValue.endDateError && (
+                <Box textAlign="right" color="#F54949">
+                  กรุณาระบุรายละเอียด
+                </Box>
+              )}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
@@ -481,20 +514,20 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
               เวลาที่เริ่มงดขาย :
             </Grid>
             <Grid item xs={3}>
-              <ThemeProvider theme={defaultMaterialTheme}>
-                <TextField
-                  id="time-start"
-                  type="time"
-                  fullWidth
-                  error={!!checkValue.startTimeError}
-                  className={classes.MtimeTextField}
-                  value={values.startTime}
-                  onChange={(e) => handleStartTimePicker(e.target.value)}
-                  inputProps={{
-                    step: 300,
-                  }}
-                />
-              </ThemeProvider>
+              <TextField
+                id="time-start"
+                type="time"
+                fullWidth
+                style={{ backgroundColor: status > 1 ? '#f1f1f1' : 'transparent' }}
+                error={!!checkValue.startTimeError}
+                className={classes.MtimeTextField}
+                value={values.startTime}
+                onChange={(e) => handleStartTimePicker(e.target.value)}
+                inputProps={{
+                  step: 300,
+                }}
+                disabled={status > 1}
+              />
 
               {checkValue.startTimeError && (
                 <Box textAlign="right" color="#F54949">
@@ -512,12 +545,14 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
                 type="time"
                 fullWidth
                 error={!!checkValue.endTimeError}
+                style={{ backgroundColor: status > 1 ? '#f1f1f1' : 'transparent' }}
                 className={classes.MtimeTextField}
                 value={values.endTime}
                 onChange={(e) => handleEndTimePicker(e.target.value)}
                 inputProps={{
                   step: 300,
                 }}
+                disabled={status > 1}
               />
               {checkValue.endTimeError && (
                 <Box textAlign="right" color="#F54949">
@@ -532,7 +567,7 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
               สาขา :
             </Grid>
             <Grid item xs={3}>
-              <SearchBranch error={checkValue.payloadBranchesError} />
+              <SearchBranch disabled={status > 1} error={checkValue.payloadBranchesError} />
               {checkValue.payloadBranchesError && (
                 <Box textAlign="right" color="#F54949">
                   กรุณาระบุรายละเอียด
@@ -544,56 +579,75 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
 
           <Grid container spacing={2} mt={4} mb={2}>
             <Grid item xs={5}>
-              <Button
-                id="btnAddItem"
-                variant="contained"
-                color="info"
-                className={classes.MbtnPrint}
-                onClick={handleOpenAddItems}
-                startIcon={<ControlPoint />}
-                sx={{ width: 126 }}
-              >
-                เพิ่มสินค้า
-              </Button>
-              <Button
-                id="btnImport"
-                variant="contained"
-                color="primary"
-                className={classes.MbtnPrint}
-                startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
-                sx={{ width: 126, ml: '19px' }}
-              >
-                Import
-              </Button>
+              {status < 2 && (
+                <>
+                  <Button
+                    id="btnAddItem"
+                    variant="contained"
+                    color="info"
+                    className={classes.MbtnPrint}
+                    onClick={handleOpenAddItems}
+                    startIcon={<ControlPoint />}
+                    sx={{ width: 126 }}
+                  >
+                    เพิ่มสินค้า
+                  </Button>
+                  <Button
+                    id="btnImport"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnPrint}
+                    startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
+                    sx={{ width: 126, ml: '19px' }}
+                    disabled={status === 1}
+                  >
+                    Import
+                  </Button>
+                </>
+              )}
             </Grid>
             <Grid item xs={7} sx={{ textAlign: 'end' }}>
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={() => handleCreateSTDetail(false)}
-                startIcon={<SaveIcon />}
-                className={classes.MbtnSearch}
-                disabled={!!!Object.keys(payloadAddTypeProduct).length}
-              >
-                บันทึก
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{ margin: '0 17px' }}
-                startIcon={<CheckCircleOutlineIcon />}
-                onClick={() => handleCreateSTDetail(true)}
-                className={classes.MbtnSearch}
-                disabled={!!!Object.keys(payloadAddTypeProduct).length}
-              >
-                เริ่มใช้งาน
-              </Button>
+              {status < 2 ? (
+                <>
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    onClick={() => handleCreateSTDetail(false)}
+                    startIcon={<SaveIcon />}
+                    className={classes.MbtnSearch}
+                    style={{ display: status > 1 ? 'none' : undefined }}
+                    disabled={!!!Object.keys(payloadAddTypeProduct).length}
+                  >
+                    บันทึก
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ margin: '0 17px' }}
+                    startIcon={<CheckCircleOutlineIcon />}
+                    onClick={() => handleOpenStart()}
+                    className={classes.MbtnSearch}
+                    disabled={!!!Object.keys(payloadAddTypeProduct).length}
+                  >
+                    เริ่มใช้งาน
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="info"
+                  sx={{ margin: '0 17px' }}
+                  startIcon={<ContentCopyIcon />}
+                  className={classes.MbtnSearch}
+                >
+                  Copy
+                </Button>
+              )}
               <Button
                 variant="contained"
                 color="error"
                 onClick={handleOpenCancel}
                 startIcon={<HighlightOffIcon />}
-                // disabled={!!!Object.keys(payloadAddTypeProduct).length}
                 className={classes.MbtnSearch}
               >
                 ยกเลิก
@@ -602,9 +656,11 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
           </Grid>
 
           <Box mb={4}>
-            <STProductTypeItems unSelectAllType={unSelectAllType} />
+            <STProductTypeItems disabled={status > 1} unSelectAllType={unSelectAllType} />
           </Box>
-          <Box mb={4}>{showModalProduct && <STProductItems unSelectAllType={handleUnSelectAllType} />}</Box>
+          <Box mb={4}>
+            {showModalProduct && <STProductItems disabled={status > 1} unSelectAllType={handleUnSelectAllType} />}
+          </Box>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={3}>
               <TextBoxComment
@@ -641,6 +697,14 @@ function STCreateModal({ isOpen, onClickClose, setOpenPopup, setPopupMsg }: Prop
         status={status}
         onClose={handleCloseModalCancel}
         onConfirm={handleDeleteDraft}
+        HQCode={payLoadSt.documentNumber}
+        headerTitle={'ต้องการยกเลิกกำหนดเวลา (งด) ขายสินค้า'}
+      />
+
+      <ModelConfirm
+        open={openModalStart}
+        onClose={handleCloseModalStart}
+        onConfirm={() => handleCreateSTDetail(true)}
         HQCode={payLoadSt.documentNumber}
         headerTitle={'ยืนยันเริ่มใช้งานกำหนดเวลา (งด) ขายสินค้า'}
       />

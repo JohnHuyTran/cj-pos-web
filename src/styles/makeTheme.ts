@@ -64,10 +64,10 @@ const useStyles = makeStyles({
     '& .MuiOutlinedInput-root input::placeholder': {
       fontSize: '14px',
     },
-    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+    '& .css-ieen6m-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
       // opacity: 0,
-      color: '#263238 !important',
-      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+      color: 'rgba(0, 0, 0, 0.87) !important',
+      '-webkit-text-fill-color': 'rgba(0, 0, 0, 0.87)',
     },
   },
   Mselect: {
