@@ -6,13 +6,14 @@ import {
   Approve2StockTransferRequest,
   BranchTransferRequest,
   SaveStockTransferRequest,
-  StockBalanceBySKURequest,
+  StockBalanceType,
   SubmitStockTransferRequest,
 } from '../models/stock-transfer-model';
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
 import { fi } from 'date-fns/locale';
 import { DOCUMENT_TYPE } from '../utils/enum/stock-transfer-enum';
+import { getStrockTransferMockup } from '../mockdata/stock-transfer';
 
 export const getPathStockRequestDetail = (rtNo: string) => {
   return getPathUrl(`${environment.stock.stockRequest.detail.url}`, {
@@ -176,6 +177,15 @@ export const getPathReportBT = (docType: string, btNo: string) => {
   }
 };
 
+export async function checkStockBalance(payload: StockBalanceType) {
+  try {
+    const response = await post(`${env.backEnd.url}${environment.stock.stockBalance.stockBalanceBySKU.url}`, payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const getPathRemoveStockRequest = (rtNo: string) => {
   return getPathUrl(`${environment.stock.stockRequest.remove.url}`, {
     rtNo: rtNo,
@@ -184,15 +194,6 @@ export const getPathRemoveStockRequest = (rtNo: string) => {
 
 export async function removeStockRequest(rtNo: string) {
   const response = await post(getPathRemoveStockRequest(rtNo), ContentType.JSON)
-    .then((result: any) => result)
-    .catch((error) => {
-      throw error;
-    });
-  return response;
-}
-
-export async function StockBalanceBySKU(payload: StockBalanceBySKURequest) {
-  const response = await post(environment.stock.stockRequest.stockBalanceBySKU.url, payload, ContentType.JSON)
     .then((result: any) => result)
     .catch((error) => {
       throw error;

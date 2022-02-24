@@ -8,8 +8,8 @@ import { numberWithCommas } from '../../utils/utils';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 import StockRequestItem from './stock-request-list-item';
-import { StockBalanceBySKU } from '../../services/stock-transfer';
-import { StockBalanceBySKURequest } from '../../models/stock-transfer-model';
+import { checkStockBalance } from '../../services/stock-transfer';
+// import { StockBalanceBySKURequest } from '../../models/stock-transfer-model';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 
 export interface DataGridProps {
@@ -111,12 +111,12 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
   const stockBalanceBySKU = async (skuCodes: any) => {
     console.log('stockBalanceBySKU skuCodes :', JSON.stringify(skuCodes));
 
-    const payload: StockBalanceBySKURequest = {
+    const payload: any = {
       branchCode: branch,
       skuCodes: skuCodes,
     };
 
-    await StockBalanceBySKU(payload)
+    await checkStockBalance(payload)
       .then((value) => {
         console.log('StockBalanceBySKU :', JSON.stringify(value));
         setStockBalanceList(value.data);
