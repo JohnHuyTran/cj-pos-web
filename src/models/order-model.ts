@@ -40,8 +40,10 @@ export interface ShipmentRequest {
   sdNo?: string;
   dateFrom?: string;
   dateTo?: string;
-  sdStatus?: number;
+  sdStatus?: string;
   sdType?: number;
+  shipBranchFrom?: string;
+  shipBranchTo?: string;
   clearSearch?: boolean;
 }
 
@@ -62,22 +64,25 @@ export interface ShipmentInfo {
   status: string;
   sapDocType: string;
   sdNo: string;
-  sdStatus: number;
+  docRefNo: string;
+  sdStatus: string;
   sdType: number;
   toteCnt: number;
   boxCnt: number;
   hasDoc: boolean;
   comment: string;
   entries: Entry[] | null;
+  shipBranchFrom: shipBranchInfo;
+  shipBranchTo: shipBranchInfo;
 }
 
 export interface Entry {
+  deliveryOrderNo: string;
   seqItem: number;
   itemNo: string;
   shipmentSAPRef: string;
   skuCode: string;
   skuType: string;
-  deliveryOrderNo: string;
   productName: string;
   barcode: string;
   unitCode: string;
@@ -96,6 +101,10 @@ export interface Entry {
   comment: string;
 }
 
+export interface shipBranchInfo {
+  code: string;
+  name: string;
+}
 export interface ShipmentDetailResponse {
   ref: string;
   code: number;
