@@ -57,6 +57,9 @@ const columns: GridColDef[] = [
     renderCell: (params) => (
       <div>
         <Typography variant='body2'>{params.value}</Typography>
+        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+          {params.getValue(params.id, 'skuCode') || ''}
+        </Typography>
       </div>
     ),
   },
@@ -352,6 +355,9 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     storeItem();
   };
   const handleOnKeyDown = async (params: GridCellParams) => {};
+  const handleOnCellBlur = () => {
+    storeItem();
+  };
 
   return (
     <Box mt={2} bgcolor='background.paper'>
@@ -367,8 +373,9 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          onCellFocusOut={handleFocusOut}
-          onCellKeyDown={handleOnKeyDown}
+          // onCellFocusOut={handleFocusOut}
+          // onCellKeyDown={handleOnKeyDown}
+          onCellBlur={handleOnCellBlur}
         />
       </div>
     </Box>
