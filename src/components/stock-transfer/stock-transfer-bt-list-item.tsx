@@ -214,7 +214,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     storeItemAddItem(payloadAddItem);
   }, [payloadAddItem]);
 
-  const storeItemAddItem = (_newItem: any) => {
+  const storeItemAddItem = async (_newItem: any) => {
     let _items = [...branchTransferItems];
     let _sku = [...skuGroupItems];
     if (Object.keys(_newItem).length !== 0) {
@@ -286,9 +286,10 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
         }
       });
     }
-    setBranchTransferItems(_items);
-    dispatch(updateAddItemSkuGroupState(_sku));
-    dispatch(updateAddItemsGroupState(_items));
+    const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
+    setBranchTransferItems(orderItem);
+    dispatch(updateAddItemSkuGroupState(_.orderBy(_sku, ['skuCode'], ['asc'])));
+    dispatch(updateAddItemsGroupState(orderItem));
   };
 
   const storeItem = () => {
