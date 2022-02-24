@@ -45,10 +45,11 @@ const BranchItem = (props: ItemProps) => {
 interface Props {
   error?: boolean;
   helperText?: string;
+  disabled?: boolean;
 }
 
 export default function SearchBranch(props: Props): ReactElement {
-  const { error, helperText } = props;
+  const { error, helperText, disabled } = props;
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const { t } = useTranslation(['common']);
@@ -137,7 +138,7 @@ export default function SearchBranch(props: Props): ReactElement {
     setChecked(false);
   };
   const handleClickSearch = () => {
-    setOpen(true);
+    !disabled && setOpen(true);
   };
 
   const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -267,6 +268,7 @@ export default function SearchBranch(props: Props): ReactElement {
           },
         }}
         placeholder="กรุณาเลือก"
+        disabled={disabled}
       />
       <Dialog maxWidth="lg" fullWidth open={open}>
         <Box sx={{ flex: 1, ml: 2 }}>

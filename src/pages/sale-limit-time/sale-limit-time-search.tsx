@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import DatePickerComponent from '../../components/commons/ui/date-picker';
 import SaleLimitTimelist from './sale-limit-time-list';
 import SearchBranch from '../../components/commons/ui/search-branch';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 
 interface State {
   documentNumber: string;
@@ -22,7 +23,7 @@ const SaleLimitTimeSearch = () => {
   const [openCreateModal, setOpenCreateModal] = React.useState(false);
   const { t } = useTranslation(['barcodeDiscount', 'common']);
   const [lstStatus, setLstStatus] = React.useState([]);
-  const [branchList, setBranchList] = React.useState<any[]>([]);
+
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
     branch: '',
@@ -35,18 +36,6 @@ const SaleLimitTimeSearch = () => {
     setLstStatus(t('lstStatus', { returnObjects: true }));
   }, []);
 
-  const autocompleteRenderListItem = (props: any, option: any) => {
-    return (
-      <li {...props} key={option.code}>
-        <Box sx={{ display: 'flex', width: '100%' }}>
-          <Typography variant="body2">{option.name}</Typography>
-          <Typography variant="caption" sx={{ marginLeft: 'auto' }}>
-            {option.code}
-          </Typography>
-        </Box>
-      </li>
-    );
-  };
   const getStatusText = (key: string) => {
     if (lstStatus === null || lstStatus.length === 0) {
       return '';

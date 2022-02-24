@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import React from 'react';
@@ -14,45 +14,46 @@ interface StateProps {
 const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
   const { t } = useTranslation(['barcodeDiscount']);
-  const [rows, setRows] = React.useState<any[]>([]);
-  const [currentPage, setCurrentPage] = React.useState<number>(10);
-  const [loading, setLoading] = React.useState<boolean>(false);
-
-  const genRowStatus = (params: GridValueGetterParams) => {
-    let statusDisplay;
-    let status = params.value ? params.value.toString() : '';
-    const statusLabel = genColumnValue('label', 'value', status, t('lstStatus', { returnObjects: true }));
-    switch (status) {
-      case BDStatus.DRAFT:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#FBA600', backgroundColor: '#FFF0CA' });
-        break;
-      case BDStatus.WAIT_FOR_APPROVAL:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#FBA600', backgroundColor: '#FFF0CA' });
-        break;
-      case BDStatus.APPROVED:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#20AE79', backgroundColor: '#E7FFE9' });
-        break;
-      case BDStatus.BARCODE_PRINTED:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#4465CD', backgroundColor: '#C8E8FF' });
-        break;
-      case BDStatus.REJECT:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#F54949', backgroundColor: '#FFD7D7' });
-        break;
-    }
-    return statusDisplay;
-  };
-
-  const genRowStatusValue = (statusLabel: string, styleCustom: any) => {
-    return (
-      <HtmlTooltip title={<React.Fragment>{statusLabel}</React.Fragment>}>
-        <Typography className={classes.MLabelBDStatus} sx={styleCustom}>
-          {statusLabel}
-        </Typography>
-      </HtmlTooltip>
-    );
-  };
-
+  const [checkAll, setCheckAll] = React.useState<boolean>(false);
+  const rows = [
+    {
+      id: '1',
+      index: `1`,
+      documentNumber: 'documentNumber',
+      status: '1',
+      description: '1',
+      branch: 'branch',
+      createdAt: 'createdAt',
+      startDate: 'startDate',
+      endDate: 'endDate',
+      remark: '213',
+    },
+  ];
   const columns: GridColDef[] = [
+    {
+      field: 'checked',
+      headerName: t('numberOrder'),
+      width: 100,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      renderHeader: (params) => (
+        <FormControl component="fieldset" sx={{ marginLeft: '-15px' }}>
+          <FormGroup aria-label="position" row>
+            <FormControlLabel
+              className={classes.MFormControlLabel}
+              value="top"
+              control={<Checkbox checked={checkAll} />}
+              label={t('selectAll')}
+              labelPlacement="top"
+            />
+          </FormGroup>
+        </FormControl>
+      ),
+      renderCell: (params) => (
+        <Checkbox checked={Boolean(params.value)} disabled={BDStatus.APPROVED != params.row.status} />
+      ),
+    },
     {
       field: 'index',
       headerName: 'ลำดับ',
@@ -73,7 +74,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       sortable: false,
       minWidth: 170,
-      renderCell: (params) => genRowStatus(params),
+      // renderCell: (params) => genRowStatus(params),
     },
     {
       field: 'description',
@@ -121,34 +122,11 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const handlePageChange = () => {};
   const handlePageSizeChange = () => {};
   return (
-    <div className={classes.MdataGridDetail}>
-      <Box>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          disableColumnMenu
-          hideFooterSelectedRowCount={true}
-          autoHeight={rows.length < 10}
-          scrollbarSize={10}
-          pagination
-          page={currentPage - 1}
-          pageSize={10}
-          rowsPerPageOptions={[10, 20, 50, 100]}
-          paginationMode="server"
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          loading={loading}
-          rowHeight={45}
-          components={{
-            NoRowsOverlay: () => (
-              <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
-                ไม่มีข้อมูล
-              </Typography>
-            ),
-          }}
-        />
-      </Box>
-    </div>
+    <>
+      <div className={classes.MdataGridPaginationTop} style={{ height: '60vh', width: '100%' }}>
+        <DataGrid columns={columns} rows={rows} />
+      </div>
+    </>
   );
 };
 export default SaleLimitTimeList;

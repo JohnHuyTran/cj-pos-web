@@ -40,6 +40,7 @@ import searchStockTransferRt from './slices/save-search-stock-transfer-rt-slice'
 import searchBranchProvince from './slices/search-branches-province-slice';
 import searchTypeAndProduct from './slices/search-type-product-slice';
 import addTypeAndProduct from './slices/add-type-product-slice';
+import saleLimitTimeSlice from './slices/sale-limit-time-search-slice';
 
 const store = configureStore({
   reducer: {
@@ -83,6 +84,7 @@ const store = configureStore({
     searchBranchProvince: searchBranchProvince,
     searchTypeAndProduct: searchTypeAndProduct,
     addTypeAndProduct: addTypeAndProduct,
+    searchSaleLimitTime: saleLimitTimeSlice,
   },
 });
 
