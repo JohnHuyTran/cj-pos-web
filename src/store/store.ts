@@ -42,6 +42,7 @@ import searchTypeAndProduct from './slices/search-type-product-slice';
 import addTypeAndProduct from './slices/add-type-product-slice';
 import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
+import stockRequestItems from './slices/stock-request-items-slice';
 
 const store = configureStore({
   reducer: {
@@ -87,6 +88,7 @@ const store = configureStore({
     addTypeAndProduct: addTypeAndProduct,
     updateBTSkuSlice: updateBTSkuSlice,
     updateBTProductSlice: updateBTProductSlice,
+    stockRequestItems: stockRequestItems,
   },
 });
 

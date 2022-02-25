@@ -18,6 +18,7 @@ export const getUserGroup = (groups: string[]) => {
   if (!group) {
     return '';
   }
+
   if (group === KEYCLOAK_GROUP_DC01) {
     return PERMISSION_GROUP.DC;
   } else if (group === KEYCLOAK_GROUP_BRANCH_MANAGER01 || group === KEYCLOAK_GROUP_BRANCH_MANAGER) {
@@ -60,6 +61,14 @@ export const isAllowSubMenuPermission = (key: string) => {
 export const isGroupDC = () => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   return userInfo.group === PERMISSION_GROUP.DC;
+};
+export const isGroupOC = () => {
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return userInfo.group === PERMISSION_GROUP.OC;
+};
+export const isGroupSCM = () => {
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return userInfo.group === PERMISSION_GROUP.SCM;
 };
 export const isGroupBranch = () => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
