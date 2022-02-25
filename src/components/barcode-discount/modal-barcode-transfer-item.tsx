@@ -116,7 +116,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       });
       setDtTable(rows);
       if (Action.UPDATE === action) {
-        dispatch(updateBarcodeDiscountPrintState(rows));
+        dispatch(updateBarcodeDiscountPrintState(_.cloneDeep(rows)));
         dispatch(updatePrintInDetail(true));
       }
     } else {

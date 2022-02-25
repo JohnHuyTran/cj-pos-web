@@ -70,6 +70,9 @@ export const environment = {
       reject: {
         url: '/campaign/barcode/reject?id={id}&reason={reason}',
       },
+      print: {
+        url: '/campaign/print-barcode',
+      },
       cancel: {
         url: '/campaign/{id}',
       },
