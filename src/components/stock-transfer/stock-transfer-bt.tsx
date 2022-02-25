@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
-import { useAppDispatch, useAppSelector } from '../../store/store';
+import store, { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
-import { BranchTransferRequest, Delivery, Item } from '../../models/stock-transfer-model';
+import { BranchTransferRequest, Delivery, Item, ItemGroups, StockBalanceType } from '../../models/stock-transfer-model';
 import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
-import { Button, Grid, Link, Typography } from '@mui/material';
+import { Button, Checkbox, FormControlLabel, FormGroup, Grid, IconButton, Link, Typography } from '@mui/material';
 import Steppers from './steppers';
 import Box from '@mui/system/Box';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import ControlPoint from '@mui/icons-material/ControlPoint';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { formatFileStockTransfer, getBranchName, getReasonLabel } from '../../utils/utils';
 import { getUserInfo } from '../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
@@ -34,6 +35,8 @@ import {
   sendBranchTransferToDC,
   sendBranchTransferToPickup,
   submitStockTransfer,
+  checkStockBalance,
+  saveBranchTransfer,
 } from '../../services/stock-transfer';
 import theme from '../../styles/theme';
 import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
@@ -44,6 +47,12 @@ import { ApiError } from '../../models/api-error-model';
 import { GridRowData } from '@mui/x-data-grid';
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import moment from 'moment';
+import { env } from 'process';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
+import stockRequestDetail from './stock-request-detail';
+import { isGroupBranch } from '../../utils/role-permission';
+import AccordionHuaweiFile from '../supplier-check-order/accordion-huawei-file';
 
 interface Props {
   isOpen: boolean;
@@ -119,7 +128,95 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setIsDC(getUserInfo().group === PERMISSION_GROUP.DC);
     setStartDate(new Date(branchTransferInfo.startDate));
     setEndDate(new Date(branchTransferInfo.endDate));
+
+    dispatch(updateAddItemSkuGroupState(branchTransferInfo.itemGroups));
   }, [open]);
+
+  const mappingPayload = () => {
+    let items: Item[] = [];
+    const _productSelector: any = store.getState().updateBTProductSlice.state;
+    _productSelector.forEach((data: GridRowData) => {
+      const item: Item = {
+        seqItem: data.seqItem,
+        barcode: data.barcode,
+        actualQty: data.actualQty,
+        toteCode: data.toteCode,
+      };
+      items.push(item);
+    });
+
+    const _skuSelector = store.getState().updateBTSkuSlice.state;
+    let sku: ItemGroups[] = [];
+    _skuSelector.forEach((data: ItemGroups) => {
+      const itemGroup: ItemGroups = {
+        skuCode: data.skuCode,
+        remainingQty: data.remainingQty,
+      };
+      sku.push(itemGroup);
+    });
+
+    const payload: BranchTransferRequest = {
+      comment: comment,
+      items: items,
+      itemGroups: sku,
+      btNo: btNo,
+    };
+    return payload;
+  };
+
+  const validateFileInfo = () => {
+    const isvalid = fileUploadList.length > 0 ? true : false;
+    if (!isvalid) {
+      setOpenAlert(true);
+      setTextError('กรุณาแนบเอกสาร');
+      return false;
+    }
+    return true;
+  };
+
+  const validateItem = () => {
+    const _productSelector: any = store.getState().updateBTProductSlice.state;
+    let itemNotValid: boolean = false;
+    _productSelector.forEach((data: GridRowData) => {
+      if (!data.toteCode && data.actualQty > 0) {
+        itemNotValid = true;
+        setTextError('กรุณาระบุเลขที่ Tote/ลัง');
+        setComment(comment);
+        return;
+      }
+      if (data.toteCode && data.actualQty <= 0) {
+        itemNotValid = true;
+        setTextError('จำนวนโอนจริงเป็น 0 ไม่ต้องระบุเลขที่ Tote/ลัง ');
+        setComment(comment);
+        return;
+      }
+    });
+
+    const _skuSelector = store.getState().updateBTSkuSlice.state;
+    _skuSelector.forEach((data: ItemGroups) => {
+      const actualQty = data.actualAllQty ? data.actualAllQty : 0;
+      const orderQty = data.orderAllQty ? data.orderAllQty : 0;
+      if (actualQty < orderQty && !comment) {
+        itemNotValid = true;
+        setTextError('กรุณาระบุสาเหตุการเปลี่ยนจำนวน');
+        setComment(comment);
+        return;
+      }
+      if (actualQty > orderQty) {
+        itemNotValid = true;
+        setTextError(`สินค้า :${data.productName}\nกรุณาแก้ไขจำนวนโอน ต้องไม่มากกว่า จำนวนสั่ง`);
+        setComment(comment);
+        return;
+      }
+    });
+    if (itemNotValid) {
+      setOpenAlert(true);
+      return false;
+    } else {
+      setOpenAlert(false);
+      return true;
+    }
+  };
 
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
@@ -129,8 +226,33 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setEndDate(value);
   };
   const handleClose = async () => {
-    setOpen(false);
-    onClickClose();
+    let showPopup = false;
+    if (comment !== branchTransferInfo.comment) {
+      showPopup = true;
+    }
+
+    const _productSelector: any = store.getState().updateBTProductSlice.state;
+    const btItems: Item[] = branchTransferInfo.items;
+    _productSelector.forEach((data: GridRowData) => {
+      const item = btItems.find((item: Item) => {
+        return item.barcode === data.barcode;
+      });
+      if (!item) {
+        showPopup = true;
+        return;
+      }
+      if (data.actualQty !== (item.actualQty ? item.actualQty : 0) || data.toteCode != item.toteCode) {
+        showPopup = true;
+        return;
+      }
+    });
+
+    if (!showPopup) {
+      setOpen(false);
+      onClickClose();
+    } else {
+      setConfirmModelExit(true);
+    }
   };
 
   const handleChangeComment = (value: any) => {
@@ -155,7 +277,6 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setOpenModelConfirmTransaction(false);
   };
 
-  const handleModelAddItems = () => {};
   const handleLinkDocument = (docType: string) => {
     const path = getPathReportBT(docType ? docType : DOCUMENT_TYPE.BT, btNo);
     setSuffixDocType(docType !== DOCUMENT_TYPE.BT ? docType : '');
@@ -164,42 +285,81 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setOpenModelPreviewDocument(true);
   };
 
-  const mappingPayload = () => {
-    let items: Item[] = [];
-    const rowsEdit: GridRowData[] = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      const item: Item = {
-        seqItem: data.seqItem,
-        barcode: data.barcode,
-        actualQty: data.actualQty,
-        toteCode: data.toteCode,
-      };
-      items.push(item);
+  const handleCloseModelAddItems = () => {
+    setOpenModelAddItems(false);
+  };
+
+  const getSkuList = () => {
+    const _skuSlice = store.getState().updateBTSkuSlice.state;
+    const list = _.uniqBy(_skuSlice, 'skuCode');
+    const skucodeList: string[] = [];
+    list.map((i: any) => {
+      skucodeList.push(i.skuCode);
     });
-
-    const payload: BranchTransferRequest = {
-      comment: comment,
-      items: items,
-      btNo: btNo,
+    const payload: FindProductRequest = {
+      skuCodes: skucodeList,
     };
-    return payload;
+    setBodyRequest(payload);
   };
 
-  const validateFileInfo = () => {
-    const isvalid = fileUploadList.length > 0 ? true : false;
-    // const isExistingFile = purchaseDetail.files && purchaseDetail.files.length > 0 ? true : false;
-    if (!isvalid) {
-      setOpenAlert(true);
-      setTextError('กรุณาแนบเอกสาร');
-      return false;
+  const handleOpenAddItems = async () => {
+    await dispatch(updateAddItemsState({}));
+    await getSkuList();
+    setOpenModelAddItems(true);
+  };
+  const handleSaveBtn = async () => {
+    setOpenLoadingModal(true);
+    // await storeItem();
+    await dispatch(updateAddItemsState({}));
+
+    const isvalidItem = validateItem();
+    if (isvalidItem) {
+      const payload: BranchTransferRequest = await mappingPayload();
+      await saveBranchTransfer(payload)
+        .then(async (value) => {
+          setBtNo(value.docNo);
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          await dispatch(featchBranchTransferDetailAsync(value.docNo));
+          await dispatch(featchSearchStockTransferAsync(payloadSearch));
+
+          const _branchTransferRslList = store.getState().branchTransferDetailSlice.branchTransferRs;
+          const _branchTransferInfo: any = _branchTransferRslList.data ? _branchTransferRslList.data : null;
+          setBranchTransferItems(_branchTransferInfo.items);
+          // await storeItem();
+        })
+        .catch((error: ApiError) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(false);
+          setContentMsg(error.message);
+        });
     }
-    return true;
+    setOpenLoadingModal(false);
   };
-
-  const handleOpenAddItems = () => {};
-  const handleSaveBtn = () => {};
-  const handleConfirmBtn = () => {};
-
+  const handleConfirmBtn = async () => {
+    // setIsClickBtnApprove(true);
+    // await storeItem();
+    await dispatch(updateAddItemsState({}));
+    const isvalidItem = validateItem();
+    if (isvalidItem) {
+      if (!btNo) {
+        const payload: BranchTransferRequest = await mappingPayload();
+        await saveBranchTransfer(payload)
+          .then(async (value) => {
+            setBtNo(value.btNo);
+            setOpenModelConfirmTransaction(true);
+          })
+          .catch((error: ApiError) => {
+            setShowSnackBar(true);
+            setSnackbarIsStatus(false);
+            setContentMsg(error.message);
+          });
+      } else {
+        setOpenModelConfirmTransaction(true);
+      }
+    }
+  };
   const handleSendToPickup = async () => {
     setOpenLoadingModal(true);
     if (startDate === null || endDate === null) {
@@ -222,10 +382,10 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           setContentMsg('คุณบันทึกรอบรถเข้าต้นทางเรียบร้อยแล้ว');
           await dispatch(featchBranchTransferDetailAsync(btNo));
           await dispatch(featchSearchStockTransferAsync(payloadSearch));
-          // setTimeout(() => {
-          //   setOpen(false);
-          //   onClickClose();
-          // }, 500);
+          setTimeout(() => {
+            setOpen(false);
+            onClickClose();
+          }, 500);
         })
         .catch((error: ApiError) => {
           handleOnCloseModalConfirm();
@@ -234,6 +394,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           setContentMsg(error.message);
         });
     }
+    setOpenLoadingModal(false);
   };
 
   const sendTransactionToDC = async () => {
@@ -297,6 +458,446 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setOpenLoadingModal(false);
   };
 
+  const [skuCodeSelect, setSkuCodeSelect] = React.useState<string>('');
+  const [defaultSkuSelected, setDefaultSkuSelected] = React.useState<string>(branchTransferInfo.itemGroups[0].skuCode);
+  const [skuNameDisplay, setSkuNameDisplay] = React.useState<string>(branchTransferInfo.itemGroups[0].productName);
+  const onClickSku = (skuCode: string) => {
+    if (skuCode) {
+      setDefaultSkuSelected(skuCode);
+      const sku: ItemGroups = branchTransferInfo.itemGroups.find((item: ItemGroups, index: number) => {
+        return skuCode === item.skuCode;
+      });
+      setSkuNameDisplay(sku.productName ? sku.productName : '');
+    }
+    setSkuCodeSelect(skuCode);
+    setIschecked(false);
+  };
+
+  const [isChecked, setIschecked] = React.useState(true);
+
+  const handleCheckboxChange = (e: any) => {
+    const ischeck = e.target.checked;
+
+    if (ischeck) {
+      setSkuCodeSelect('');
+      onClickSku('');
+      setIschecked(true);
+    } else {
+      setIschecked(false);
+      setSkuCodeSelect(defaultSkuSelected);
+      onClickSku(defaultSkuSelected);
+    }
+  };
+
+  const componetStatusCreate = (
+    <>
+      <Grid container spacing={2} mb={2}>
+        <Grid item lg={2}>
+          <Typography variant='body2'> สาเหตุการโอน :</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          <Typography variant='body2'>{reasons} </Typography>
+        </Grid>
+        <Grid item lg={1}></Grid>
+        <Grid item lg={2}></Grid>
+        <Grid item lg={3}>
+          <>
+            <Box>
+              <Link
+                component='button'
+                variant='body2'
+                onClick={(e) => {
+                  handleLinkDocument(DOCUMENT_TYPE.BT);
+                }}>
+                เรียกดูเอกสารใบโอน BT
+              </Link>
+            </Box>
+          </>
+        </Grid>
+        <Grid item lg={1}></Grid>
+      </Grid>
+      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
+        <Grid item xl={5}>
+          <Button
+            id='btnAddItem'
+            variant='contained'
+            color='info'
+            className={classes.MbtnPrint}
+            onClick={handleOpenAddItems}
+            startIcon={<ControlPoint />}
+            sx={{ width: 200 }}>
+            เพิ่มสินค้า
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            id='btnSave'
+            variant='contained'
+            color='warning'
+            className={classes.MbtnSave}
+            onClick={handleSaveBtn}
+            startIcon={<SaveIcon />}
+            sx={{ width: 200 }}>
+            บันทึก
+          </Button>
+
+          <Button
+            id='btnApprove'
+            variant='contained'
+            color='primary'
+            className={classes.MbtnApprove}
+            onClick={handleConfirmBtn}
+            startIcon={<CheckCircleOutline />}
+            sx={{ width: 200 }}>
+            ส่งงานให้ DC
+          </Button>
+        </Grid>
+      </Grid>
+    </>
+  );
+
+  const componentViewReport = (
+    <Grid container spacing={2} mb={2}>
+      <Grid item lg={2}>
+        <Typography variant='body2'> สาเหตุการโอน :</Typography>
+      </Grid>
+      <Grid item lg={3}>
+        <Typography variant='body2'>{reasons} </Typography>
+      </Grid>
+      <Grid item lg={1}></Grid>
+      <Grid item lg={2}></Grid>
+      <Grid item lg={3}>
+        <>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BT);
+              }}>
+              เรียกดูเอกสารใบโอน BT
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BO);
+              }}>
+              เรียกดูเอกสารใบ BO
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BOX);
+              }}>
+              เรียกดูเอกสารใบปะลัง
+            </Link>
+          </Box>
+        </>
+      </Grid>
+      <Grid item lg={1}></Grid>
+    </Grid>
+  );
+
+  const componentDCStatusReadyToTransfer = (
+    <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
+      <Grid item xl={8}>
+        <Grid container>
+          <Grid item>
+            <Typography gutterBottom variant='subtitle1' component='div'>
+              รอบรถเข้าต้นทางตั้งแต่
+            </Typography>
+            <DatePickerAllComponent
+              onClickDate={handleStartDatePicker}
+              value={startDate}
+              type={'TO'}
+              minDateTo={new Date(branchTransferInfo.startDate)}
+            />
+          </Grid>
+          <Grid item xs={1}></Grid>
+          <Grid item>
+            <Typography gutterBottom variant='subtitle1' component='div'>
+              ถึง
+            </Typography>
+            <DatePickerAllComponent
+              onClickDate={handleEndDatePicker}
+              value={endDate}
+              type={'TO'}
+              minDateTo={startDate}
+            />
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item>
+        <Button
+          id='btnSave'
+          variant='contained'
+          color='warning'
+          className={classes.MbtnSave}
+          onClick={handleSendToPickup}
+          startIcon={<SaveIcon />}
+          sx={{ width: 200 }}>
+          บันทึก
+        </Button>
+      </Grid>
+    </Grid>
+  );
+
+  const componentDCStatusWaitForPicup = (
+    <>
+      <Grid container spacing={2} mb={2}>
+        <Grid item lg={2}>
+          <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
+        </Grid>
+        <Grid item lg={1}></Grid>
+        <Grid item lg={2}>
+          <Typography variant='body2'>ถึง :</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
+        </Grid>
+        <Grid item lg={1}></Grid>
+      </Grid>
+
+      <Grid container spacing={2} mb={2}>
+        <Grid item lg={2}></Grid>
+        <Grid item lg={3}></Grid>
+        <Grid item lg={1}></Grid>
+        <Grid item lg={2}></Grid>
+        <Grid item lg={3}>
+          {/* <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BT);
+              }}>
+              เรียกดูเอกสารใบโอน BT
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BO);
+              }}>
+              เรียกดูเอกสารใบ BO
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BOX);
+              }}>
+              เรียกดูเอกสารใบปะลัง
+            </Link>
+          </Box> */}
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.RECALL);
+              }}>
+              เรียกดูเอกสารใบเรียกเก็บ
+            </Link>
+          </Box>
+        </Grid>
+        <Grid item lg={1}></Grid>
+      </Grid>
+    </>
+  );
+
+  const componentBranchStatusWaitForPickup = (
+    <>
+      <Grid container spacing={2} mb={2}>
+        <Grid item lg={2}>
+          <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
+        </Grid>
+        <Grid item lg={1}></Grid>
+        <Grid item lg={2}>
+          <Typography variant='body2'>ถึง :</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
+        </Grid>
+        <Grid item lg={1}></Grid>
+      </Grid>
+
+      <Grid container spacing={2} mb={2}>
+        <Grid item lg={2}></Grid>
+        <Grid item lg={3}></Grid>
+        <Grid item lg={1}></Grid>
+        <Grid item lg={2}>
+          <Typography variant='body2'>แนบไฟล์</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          <AccordionUploadFile
+            files={[]}
+            docNo={btNo}
+            docType='PN'
+            isStatus={uploadFileFlag}
+            onChangeUploadFile={handleOnChangeUploadFile}
+          />
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BT);
+              }}>
+              เรียกดูเอกสารใบโอน BT
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BO);
+              }}>
+              เรียกดูเอกสารใบ BO
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BOX);
+              }}>
+              เรียกดูเอกสารใบปะลัง
+            </Link>
+          </Box>
+        </Grid>
+        <Grid item lg={1}></Grid>
+      </Grid>
+      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
+        <Grid item xl={8}></Grid>
+        <Grid item>
+          <Button
+            id='btnSave'
+            variant='contained'
+            color='warning'
+            className={classes.MbtnSave}
+            onClick={handleSubmitTransfer}
+            // startIcon={<SaveIcon />}
+            sx={{ width: 200 }}>
+            ส่งงาน
+          </Button>
+        </Grid>
+      </Grid>
+    </>
+  );
+
+  const componentBranchStatusTransfering = (
+    <>
+      <Grid container spacing={2} mb={2}>
+        <Grid item lg={2}>
+          <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
+        </Grid>
+        <Grid item lg={1}></Grid>
+        <Grid item lg={2}>
+          <Typography variant='body2'>ถึง :</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
+        </Grid>
+        <Grid item lg={1}></Grid>
+      </Grid>
+
+      <Grid container spacing={2} mb={2}>
+        <Grid item lg={2}></Grid>
+        <Grid item lg={3}></Grid>
+        <Grid item lg={1}></Grid>
+        <Grid item lg={2}>
+          <Typography variant='body2'>แนบไฟล์</Typography>
+        </Grid>
+        <Grid item lg={3}>
+          {branchTransferInfo.files && branchTransferInfo.files.length > 0 && (
+            <AccordionHuaweiFile files={branchTransferInfo.files} />
+          )}
+          {/* <AccordionUploadFile
+            files={branchTransferInfo.files}
+            docNo={btNo}
+            docType='PN'
+            isStatus={uploadFileFlag}
+            onChangeUploadFile={handleOnChangeUploadFile}
+          /> */}
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BT);
+              }}>
+              เรียกดูเอกสารใบโอน BT
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BO);
+              }}>
+              เรียกดูเอกสารใบ BO
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              component='button'
+              variant='body2'
+              onClick={(e) => {
+                handleLinkDocument(DOCUMENT_TYPE.BOX);
+              }}>
+              เรียกดูเอกสารใบปะลัง
+            </Link>
+          </Box>
+        </Grid>
+        <Grid item lg={1}></Grid>
+      </Grid>
+      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
+        <Grid item xl={8}></Grid>
+        <Grid item>
+          {/* <Button
+            id='btnSave'
+            variant='contained'
+            color='warning'
+            className={classes.MbtnSave}
+            onClick={handleSubmitTransfer}
+            // startIcon={<SaveIcon />}
+            sx={{ width: 200 }}>
+            ส่งงาน
+          </Button> */}
+        </Grid>
+      </Grid>
+    </>
+  );
+  const topFunction = () => {
+    document.getElementById('top-item')?.scrollIntoView({
+      block: 'start',
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <React.Fragment>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -305,7 +906,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           <Steppers status={branchTransferInfo.status} type='BT'></Steppers>
         </BootstrapDialogTitle>
         <DialogContent>
-          <Box mt={4} sx={{ flexGrow: 1 }}>
+          <Box mt={4} sx={{ flexGrow: 1 }} id='top-item'>
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
                 <Typography variant='body2'>เลขที่เอกสาร BT</Typography>
@@ -355,318 +956,38 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               </Grid>
               <Grid item lg={1}></Grid>
             </Grid>
+          </Box>
+          {!isDC && isDraft && componetStatusCreate}
+          {isDC && btStatus === 'WAIT_FOR_PICKUP' && componentDCStatusWaitForPicup}
+          {isGroupBranch() && btStatus === 'WAIT_FOR_PICKUP' && componentBranchStatusWaitForPickup}
+          {!isDraft && !isDC && btStatus === 'READY_TO_TRANSFER' && componentViewReport}
+          {isDC && btStatus === 'READY_TO_TRANSFER' && componentDCStatusReadyToTransfer}
 
-            {isDraft && (
-              <>
-                <Grid container spacing={2} mb={2}>
-                  <Grid item lg={2}>
-                    <Typography variant='body2'> สาเหตุการโอน :</Typography>
-                  </Grid>
-                  <Grid item lg={3}>
-                    <Typography variant='body2'>{reasons} </Typography>
-                  </Grid>
-                  <Grid item lg={1}></Grid>
-                  <Grid item lg={2}></Grid>
-                  <Grid item lg={3}>
-                    <>
-                      <Box>
-                        <Link
-                          component='button'
-                          variant='body2'
-                          onClick={(e) => {
-                            handleLinkDocument(DOCUMENT_TYPE.BT);
-                          }}>
-                          เรียกดูเอกสารใบโอน BT
-                        </Link>
-                      </Box>
-                    </>
-                  </Grid>
-                  <Grid item lg={1}></Grid>
-                </Grid>
-                <Grid
-                  item
-                  container
-                  xs={12}
-                  sx={{ mt: 3 }}
-                  justifyContent='space-between'
-                  direction='row'
-                  alignItems='flex-end'>
-                  <Grid item xl={5}>
-                    <Button
-                      id='btnAddItem'
-                      variant='contained'
-                      color='info'
-                      className={classes.MbtnPrint}
-                      onClick={handleOpenAddItems}
-                      startIcon={<ControlPoint />}
-                      sx={{ width: 200 }}>
-                      เพิ่มสินค้า
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      id='btnSave'
-                      variant='contained'
-                      color='warning'
-                      className={classes.MbtnSave}
-                      onClick={handleSaveBtn}
-                      startIcon={<SaveIcon />}
-                      sx={{ width: 200 }}>
-                      บันทึก
-                    </Button>
+          {btStatus === 'TRANSFERING' && componentBranchStatusTransfering}
 
-                    <Button
-                      id='btnApprove'
-                      variant='contained'
-                      color='primary'
-                      className={classes.MbtnApprove}
-                      onClick={handleConfirmBtn}
-                      startIcon={<CheckCircleOutline />}
-                      sx={{ width: 200 }}>
-                      ส่งงานให้ DC
-                    </Button>
-                  </Grid>
-                </Grid>
-              </>
-            )}
-
-            {!isDraft && !isDC && btStatus === 'READY_TO_TRANSFER' && (
-              <Grid container spacing={2} mb={2}>
-                <Grid item lg={2}>
-                  <Typography variant='body2'> สาเหตุการโอน :</Typography>
-                </Grid>
-                <Grid item lg={3}>
-                  <Typography variant='body2'>{reasons} </Typography>
-                </Grid>
-                <Grid item lg={1}></Grid>
-                <Grid item lg={2}></Grid>
-                <Grid item lg={3}>
-                  <>
-                    <Box>
-                      <Link
-                        component='button'
-                        variant='body2'
-                        onClick={(e) => {
-                          handleLinkDocument(DOCUMENT_TYPE.BT);
-                        }}>
-                        เรียกดูเอกสารใบโอน BT
-                      </Link>
-                    </Box>
-                    <Box>
-                      <Link
-                        component='button'
-                        variant='body2'
-                        onClick={(e) => {
-                          handleLinkDocument(DOCUMENT_TYPE.BO);
-                        }}>
-                        เรียกดูเอกสารใบ BO
-                      </Link>
-                    </Box>
-                    <Box>
-                      <Link
-                        component='button'
-                        variant='body2'
-                        onClick={(e) => {
-                          handleLinkDocument(DOCUMENT_TYPE.BOX);
-                        }}>
-                        เรียกดูเอกสารใบปะลัง
-                      </Link>
-                    </Box>
-                  </>
-                </Grid>
-                <Grid item lg={1}></Grid>
-              </Grid>
-            )}
+          <BranchTransferListSKU onSelectSku={onClickSku} />
+          <Box mt={6}>
+            {' '}
+            <Typography>
+              รายการสินค้า: {isChecked && 'รายการสินค้าทั้งหมด'} {!isChecked && `${skuNameDisplay} (${skuCodeSelect})`}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox />}
+                checked={isChecked}
+                label='รายการสินค้าทั้งหมด'
+                onChange={handleCheckboxChange}
+              />
+            </FormGroup>
           </Box>
 
-          {isDC && btStatus === 'READY_TO_TRANSFER' && (
-            <Grid
-              item
-              container
-              xs={12}
-              sx={{ mt: 3 }}
-              justifyContent='space-between'
-              direction='row'
-              alignItems='flex-end'>
-              <Grid item xl={8}>
-                <Grid container>
-                  <Grid item>
-                    <Typography gutterBottom variant='subtitle1' component='div'>
-                      รอบรถเข้าต้นทางตั้งแต่
-                    </Typography>
-                    <DatePickerAllComponent
-                      onClickDate={handleStartDatePicker}
-                      value={startDate}
-                      type={'TO'}
-                      minDateTo={new Date(branchTransferInfo.startDate)}
-                    />
-                  </Grid>
-                  <Grid item xs={1}></Grid>
-                  <Grid item>
-                    <Typography gutterBottom variant='subtitle1' component='div'>
-                      ถึง
-                    </Typography>
-                    <DatePickerAllComponent
-                      onClickDate={handleEndDatePicker}
-                      value={endDate}
-                      type={'TO'}
-                      minDateTo={startDate}
-                    />
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item>
-                <Button
-                  id='btnSave'
-                  variant='contained'
-                  color='warning'
-                  className={classes.MbtnSave}
-                  onClick={handleSendToPickup}
-                  startIcon={<SaveIcon />}
-                  sx={{ width: 200 }}>
-                  บันทึก
-                </Button>
-              </Grid>
-            </Grid>
-          )}
-          {isDC && btStatus === 'WAIT_FOR_PICKUP' && (
-            <>
-              <Grid container spacing={2} mb={2}>
-                <Grid item lg={2}>
-                  <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
-                </Grid>
-                <Grid item lg={3}>
-                  <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
-                </Grid>
-                <Grid item lg={1}></Grid>
-                <Grid item lg={2}>
-                  <Typography variant='body2'>ถึง :</Typography>
-                </Grid>
-                <Grid item lg={3}>
-                  <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
-                </Grid>
-                <Grid item lg={1}></Grid>
-              </Grid>
-
-              <Grid container spacing={2} mb={2}>
-                <Grid item lg={2}></Grid>
-                <Grid item lg={3}></Grid>
-                <Grid item lg={1}></Grid>
-                <Grid item lg={2}></Grid>
-                <Grid item lg={3}>
-                  <Link
-                    component='button'
-                    variant='body2'
-                    onClick={(e) => {
-                      handleLinkDocument(DOCUMENT_TYPE.RECALL);
-                    }}>
-                    เรียกดูเอกสารใบเรียกเก็บ
-                  </Link>
-                </Grid>
-                <Grid item lg={1}></Grid>
-              </Grid>
-            </>
-          )}
-
-          {btStatus === 'WAIT_FOR_PICKUP' && (
-            <>
-              <Grid container spacing={2} mb={2}>
-                <Grid item lg={2}>
-                  <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
-                </Grid>
-                <Grid item lg={3}>
-                  <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
-                </Grid>
-                <Grid item lg={1}></Grid>
-                <Grid item lg={2}>
-                  <Typography variant='body2'>ถึง :</Typography>
-                </Grid>
-                <Grid item lg={3}>
-                  <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
-                </Grid>
-                <Grid item lg={1}></Grid>
-              </Grid>
-
-              <Grid container spacing={2} mb={2}>
-                <Grid item lg={2}></Grid>
-                <Grid item lg={3}></Grid>
-                <Grid item lg={1}></Grid>
-                <Grid item lg={2}>
-                  <Typography variant='body2'>แนบไฟล์</Typography>
-                </Grid>
-                <Grid item lg={3}>
-                  <AccordionUploadFile
-                    files={[]}
-                    docNo={btNo}
-                    docType='PN'
-                    isStatus={uploadFileFlag}
-                    onChangeUploadFile={handleOnChangeUploadFile}
-                  />
-                  <Box>
-                    <Link
-                      component='button'
-                      variant='body2'
-                      onClick={(e) => {
-                        handleLinkDocument(DOCUMENT_TYPE.BT);
-                      }}>
-                      เรียกดูเอกสารใบโอน BT
-                    </Link>
-                  </Box>
-                  <Box>
-                    <Link
-                      component='button'
-                      variant='body2'
-                      onClick={(e) => {
-                        handleLinkDocument(DOCUMENT_TYPE.BO);
-                      }}>
-                      เรียกดูเอกสารใบ BO
-                    </Link>
-                  </Box>
-                  <Box>
-                    <Link
-                      component='button'
-                      variant='body2'
-                      onClick={(e) => {
-                        handleLinkDocument(DOCUMENT_TYPE.BOX);
-                      }}>
-                      เรียกดูเอกสารใบปะลัง
-                    </Link>
-                  </Box>
-                </Grid>
-                <Grid item lg={1}></Grid>
-              </Grid>
-              <Grid
-                item
-                container
-                xs={12}
-                sx={{ mt: 3 }}
-                justifyContent='space-between'
-                direction='row'
-                alignItems='flex-end'>
-                <Grid item xl={8}></Grid>
-                <Grid item>
-                  <Button
-                    id='btnSave'
-                    variant='contained'
-                    color='warning'
-                    className={classes.MbtnSave}
-                    onClick={handleSubmitTransfer}
-                    // startIcon={<SaveIcon />}
-                    sx={{ width: 200 }}>
-                    ส่งงาน
-                  </Button>
-                </Grid>
-              </Grid>
-            </>
-          )}
-
-          <BranchTransferListSKU />
-          <Box mt={6}></Box>
-          <BranchTransferListItem />
+          <BranchTransferListItem skuCodeSelect={skuCodeSelect} />
 
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
-              <Grid item lg={4}>
+              <Grid item lg={3}>
                 <TextBoxComment
                   fieldName='สาเหตุการเปลี่ยนจำนวน:'
                   defaultValue={comment}
@@ -674,6 +995,23 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
                   onChangeComment={handleChangeComment}
                   isDisable={!isDraft}
                 />
+              </Grid>
+              <Grid item xs={7}></Grid>
+              <Grid item xs={2} textAlign='center'>
+                <IconButton onClick={topFunction}>
+                  <ArrowForwardIosIcon
+                    sx={{
+                      fontSize: '41px',
+                      padding: '6px',
+                      backgroundColor: '#C8E8FF',
+                      transform: 'rotate(270deg)',
+                      color: '#fff',
+                      borderRadius: '50%',
+                    }}
+                  />
+                </IconButton>
+
+                <Box fontSize='13px'>กลับขึ้นด้านบน</Box>
               </Grid>
             </Grid>
           </Box>
@@ -704,7 +1042,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
       <ModalAddItems
         open={openModelAddItems}
-        onClose={handleModelAddItems}
+        onClose={handleCloseModelAddItems}
         requestBody={bodyRequest ? bodyRequest : { skuCodes: [] }}></ModalAddItems>
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />

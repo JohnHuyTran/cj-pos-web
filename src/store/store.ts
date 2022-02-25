@@ -40,6 +40,8 @@ import searchStockTransferRt from './slices/save-search-stock-transfer-rt-slice'
 import searchBranchProvince from './slices/search-branches-province-slice';
 import searchTypeAndProduct from './slices/search-type-product-slice';
 import addTypeAndProduct from './slices/add-type-product-slice';
+import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
+import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 
 const store = configureStore({
   reducer: {
@@ -83,6 +85,8 @@ const store = configureStore({
     searchBranchProvince: searchBranchProvince,
     searchTypeAndProduct: searchTypeAndProduct,
     addTypeAndProduct: addTypeAndProduct,
+    updateBTSkuSlice: updateBTSkuSlice,
+    updateBTProductSlice: updateBTProductSlice,
   },
 });
 
