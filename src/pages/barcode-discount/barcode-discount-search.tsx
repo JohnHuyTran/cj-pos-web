@@ -58,8 +58,7 @@ const BarcodeDiscountSearch = () => {
   const [valuePrints, setValuePrints] = React.useState<any>({
     printNormal: true,
     printInDetail: false,
-    id: '',
-    barcode: '',
+    ids: '',
     lstProductNotPrinted: [],
     lstProductPrintAgain: []
   });
@@ -192,9 +191,11 @@ const BarcodeDiscountSearch = () => {
 
   const onPrintedBarcode = async () => {
     let lstProductNotPrinted = [];
+    let ids = [];
     if (barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && !printInDetail) {
       let barcodeDiscountPrintData = _.cloneDeep(barcodeDiscountPrint);
       for (const item of barcodeDiscountPrintData) {
+        ids.push(item.id);
         let products = item.products;
         if (products && products.length > 0) {
           for (const itPro of products) {
@@ -208,6 +209,7 @@ const BarcodeDiscountSearch = () => {
     }
     await setValuePrints({
       ...valuePrints,
+      ids: ids,
       printNormal: !(lstProductNotPrinted && lstProductNotPrinted.length > 0),
       printInDetail: printInDetail,
       lstProductNotPrinted: lstProductNotPrinted
@@ -215,8 +217,8 @@ const BarcodeDiscountSearch = () => {
     handleOpenModalPrint();
   };
 
-  const onConfirmModalPrint = () => {
-
+  const onConfirmModalPrint = async () => {
+    onSearch();
   };
 
   let dataTable;
@@ -332,7 +334,7 @@ const BarcodeDiscountSearch = () => {
               sx={{ width: '200px' }}
               className={classes.MbtnPrint}
               disabled={!(barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && !printInDetail)}
-              style={{ display: printPermission ? undefined : 'none'}}
+              style={{ display: printPermission ? undefined : 'none' }}
               color="secondary"
               onClick={onPrintedBarcode}
               startIcon={<PrintSharp/>}

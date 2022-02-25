@@ -25,8 +25,7 @@ interface Props {
   values: {
     printNormal: boolean;
     printInDetail: boolean;
-    id: string;
-    barcode: string;
+    ids: any[];
     lstProductNotPrinted: any[];
     lstProductPrintAgain: any[];
   };
@@ -117,12 +116,18 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
           });
         }
         payload.push({
-          id: values.id,
+          id: (values.ids && values.ids.length > 0) ? values.ids[0] : '',
           printReason: reasonForReprint,
           listOfProduct: lstOfProduct
         });
       } else {
-        payload.push({ id: values.id });
+        if (values.ids && values.ids.length > 0) {
+          for (const id of values.ids) {
+            payload.push({
+              id: id
+            });
+          }
+        }
       }
       const rs = await printBarcodeDiscount(payload);
       if (rs.code === 200) {
@@ -132,6 +137,7 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
         setOpenModalError(true);
       }
     } catch (error) {
+      setTextError('ไม่มีผลิตภัณฑ์การตรวจสอบความถูกต้อง');
       setOpenModalError(true);
     }
   };

@@ -111,8 +111,7 @@ export default function ModalCreateBarcodeDiscount({
   const [valuePrints, setValuePrints] = React.useState<any>({
     printNormal: true,
     printInDetail: false,
-    id: '',
-    barcode: '',
+    ids: '',
     lstProductNotPrinted: [],
     lstProductPrintAgain: []
   });
@@ -548,10 +547,11 @@ export default function ModalCreateBarcodeDiscount({
         }
       }
     }
+    let ids = [];
+    ids.push(dataDetail.id);
     await setValuePrints({
       ...valuePrints,
-      id: dataDetail.id,
-      barcode: dataDetail.documentNumber,
+      ids: ids,
       printNormal: lstProductNotPrinted.length === 0 && lstProductPrintAgain.length === 0,
       printInDetail: printInDetail,
       lstProductNotPrinted: lstProductNotPrinted,
