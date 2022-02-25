@@ -20,6 +20,7 @@ export interface DataGridProps {
   update: boolean;
   stock: boolean;
   branch: string;
+  status: string;
 }
 
 const columnsSKU: GridColDef[] = [
@@ -78,7 +79,7 @@ var calBaseUnit = function (params: GridValueGetterParams) {
   return numberWithCommas(cal);
 };
 
-function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }: DataGridProps) {
+function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, status }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
@@ -88,9 +89,6 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
   let rowsSKU: any = [];
 
   useEffect(() => {
-    console.log(type, ' | useEffect update:', update);
-    console.log('useEffect stock:', stock);
-
     let skuCodes: any = [];
     if (stock) {
       if (Object.keys(payloadAddItem).length !== 0) {
@@ -109,8 +107,6 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
   const [stockBalanceList, setStockBalanceList] = React.useState([]);
   // const [flagCheckStock, setFlagCheckStock] = React.useState(false);
   const stockBalanceBySKU = async (skuCodes: any) => {
-    console.log('stockBalanceBySKU skuCodes :', JSON.stringify(skuCodes));
-
     const payload: any = {
       branchCode: branch,
       skuCodes: skuCodes,
@@ -118,7 +114,6 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
 
     await checkStockBalance(payload)
       .then((value) => {
-        console.log('StockBalanceBySKU :', JSON.stringify(value));
         setStockBalanceList(value.data);
         // itemsMapStock(payloadAddItem, value.data);
       })
@@ -128,8 +123,6 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
   };
 
   const skuMapStock = async (items: any, stockBalance: any) => {
-    console.log(stockBalance.length, 'skuMapStock :', JSON.stringify(stockBalance));
-
     //orderBy skuCode
     items = _.orderBy(items, ['skuCode'], ['asc']);
     let resultSKU: any = [];
@@ -171,7 +164,6 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
   };
 
   const itemsMap = async (items: any) => {
-    console.log('itemsMap >>>> ', 'stockBalanceList :', JSON.stringify(stockBalanceList));
     // if (!stock)
     skuMapStock(items, stockBalanceList);
 
@@ -192,7 +184,6 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
   };
 
   if (Object.keys(payloadAddItem).length > 0) {
-    console.log('Object.keys(payloadAddItem).length :', Object.keys(payloadAddItem).length);
     itemsMap(payloadAddItem);
   } else if (!update && type !== 'Create') {
     let _item: any = [];
@@ -211,8 +202,6 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
               }
             });
           }
-
-          console.log('skuName :', productName);
 
           const _i: any = {
             barcode: item.barcode,
@@ -247,8 +236,6 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
           qty: item.qty ? item.qty : 0,
         };
       });
-
-      console.log('_item xxxxxxxxxxxxxxxx :');
     }
   }
 
@@ -334,10 +321,7 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
   const [pageSizeSKU, setPageSizeSKU] = React.useState<number>(10);
 
   const handleChangeItems = async (items: any) => {
-    console.log('handleChangeItems xxx :', JSON.stringify(items));
-
     await dispatch(updateAddItemsState(items));
-
     return changeItems(true);
   };
 
@@ -383,6 +367,7 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch }:
         onChangeItems={handleChangeItems}
         // changeItems={handleStatusChangeItems}
         update={flagSave}
+        status={status}
       />
     </div>
   );

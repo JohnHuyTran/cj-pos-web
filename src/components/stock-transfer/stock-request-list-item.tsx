@@ -25,6 +25,7 @@ export interface DataGridProps {
   onChangeItems: (items: Array<any>) => void;
   // changeItems: (chang: Boolean) => void;
   update: boolean;
+  status: string;
 }
 
 const columns: GridColDef[] = [
@@ -86,7 +87,7 @@ const columns: GridColDef[] = [
           if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
-        // disabled={isDisable(params) ? true : false}
+        disabled={params.getValue(params.id, 'editMode') ? false : true}
         autoComplete="off"
       />
     ),
@@ -143,7 +144,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function StockTransferListItem({ type, onChangeItems, update }: DataGridProps) {
+function StockTransferListItem({ type, onChangeItems, update, status }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
@@ -184,6 +185,10 @@ function StockTransferListItem({ type, onChangeItems, update }: DataGridProps) {
 
   const itemsMap = (items: any) => {
     // console.log('itemsMap :', JSON.stringify(items));
+
+    let edit = false;
+    if (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') edit = true;
+
     rows = items.map((item: any, index: number) => {
       return {
         id: `${item.barcode}-${index + 1}`,
@@ -196,6 +201,7 @@ function StockTransferListItem({ type, onChangeItems, update }: DataGridProps) {
         unitName: item.unitName,
         baseUnit: item.baseUnit ? item.baseUnit : 0,
         qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
+        editMode: edit,
       };
     });
 
