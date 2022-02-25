@@ -69,7 +69,8 @@ export interface SubmitStockTransferRequest {
   branchFrom: string;
   branchTo: string;
   transferReason: string;
-  items: StockTransferItems[];
+  itemGroups: ItemGroups[];
+  items: Item[];
 }
 
 export interface StockTransferItems {

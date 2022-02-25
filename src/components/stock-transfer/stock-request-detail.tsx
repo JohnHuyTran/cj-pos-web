@@ -544,6 +544,17 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           itemsList.push(item);
         });
 
+        const itemGroups: any = [];
+        if (skuList.length > 0) {
+          await skuList.forEach((data: any) => {
+            const item: any = {
+              skuCode: data.skuCode,
+              remainingQty: data.stock ? data.stock : 0,
+            };
+            itemGroups.push(item);
+          });
+        }
+
         // let reason = reasons;
         // if (reason === 'All') reason = '';
         const payloadSubmit: SubmitStockTransferRequest = {
@@ -552,6 +563,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           branchFrom: fromBranch,
           branchTo: toBranch,
           transferReason: reasons,
+          itemGroups: itemGroups,
           items: itemsList,
         };
 
