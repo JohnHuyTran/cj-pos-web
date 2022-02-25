@@ -52,7 +52,7 @@ import {
 } from '../../utils/role-permission';
 import { env } from '../../adapters/environmentConfigs';
 import { getUserInfo } from '../../store/sessionStore';
-import { ACTIONS, KEYCLOAK_GROUP_OC1, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 
 interface State {
   branchCode: string;
