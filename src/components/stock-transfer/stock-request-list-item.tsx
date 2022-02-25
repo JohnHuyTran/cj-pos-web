@@ -107,9 +107,14 @@ const columns: GridColDef[] = [
     minWidth: 0,
     align: 'right',
     sortable: false,
-    renderCell: () => {
-      return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
-    },
+    renderCell: (params: GridRenderCellParams) => (
+      <div>
+        {params.getValue(params.id, 'editMode') && <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />}
+      </div>
+    ),
+    // renderCell: () => {
+    //   return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
+    // },
   },
 ];
 

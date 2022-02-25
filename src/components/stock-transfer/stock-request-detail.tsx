@@ -43,10 +43,16 @@ import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-trans
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 
-import { isAllowActionPermission, isGroupBranch, getUserGroup } from '../../utils/role-permission';
+import {
+  isAllowActionPermission,
+  isGroupBranch,
+  getUserGroup,
+  isGroupOC,
+  isGroupSCM,
+} from '../../utils/role-permission';
 import { env } from '../../adapters/environmentConfigs';
 import { getUserInfo } from '../../store/sessionStore';
-import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import { ACTIONS, KEYCLOAK_GROUP_OC1, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 
 interface State {
   branchCode: string;
@@ -98,11 +104,12 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   const classes = useStyles();
 
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
-
   const [displayBtnSave, setDisplayBtnSave] = React.useState(false);
   const [displayBtnSubmit, setDisplayBtnSubmit] = React.useState(false);
   const [displayBtnApprove, setDisplayBtnApprove] = React.useState(false);
   const [displayBtnReject, setDisplayBtnReject] = React.useState(false);
+  const [groupOC, setGroupOC] = React.useState(false);
+  const [groupSCM, setGroupSCM] = React.useState(false);
 
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
@@ -123,6 +130,19 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
 
   useEffect(() => {
     setOpen(isOpen);
+
+    setDisplayBtnSave(isAllowActionPermission(ACTIONS.STOCK_RT_MANAGE));
+    setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.STOCK_RT_SEND));
+    setDisplayBtnApprove(isAllowActionPermission(ACTIONS.STOCK_RT_APPROVE));
+    setDisplayBtnReject(isAllowActionPermission(ACTIONS.STOCK_RT_REJECT));
+    setGroupOC(isGroupOC());
+    setGroupSCM(isGroupSCM());
+    // console.log('getUserGroup OC :', getUserGroup([KEYCLOAK_GROUP_OC1]));
+
+    // const OC = isGroupOC();
+    // const SCM = isGroupSCM();
+    // console.log('getUserGroup OC :', OC);
+    // console.log('getUserGroup SCM :', SCM);
 
     if (type === 'View' && stockRequestDetail) {
       setStatus(stockRequestDetail.status);
@@ -182,13 +202,6 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
       setCommentOC(commentOC[commentOC.length - 1]);
       setCommentSCM(commentSCM[commentSCM.length - 1]);
     }
-
-    setDisplayBtnSave(isAllowActionPermission(ACTIONS.STOCK_RT_MANAGE));
-    setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.STOCK_RT_SEND));
-    setDisplayBtnApprove(isAllowActionPermission(ACTIONS.STOCK_RT_APPROVE));
-    setDisplayBtnReject(isAllowActionPermission(ACTIONS.STOCK_RT_REJECT));
-
-    // console.log('getUserGroup OC :', getUserGroup([PERMISSION_GROUP.OC]));
   }, [open]);
 
   const [status, setStatus] = React.useState('');
@@ -866,7 +879,8 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
           )}
 
-          {status !== '' &&
+          {/* {(groupOC || groupSCM) &&
+            status !== '' &&
             status !== 'DRAFT' &&
             status !== 'AWAITING_FOR_REQUESTER' &&
             status !== 'APPROVED' &&
@@ -882,7 +896,6 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                     onClick={handleReject}
                     startIcon={<SaveIcon />}
                     // sx={{ width: 140 }}
-
                     sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
                   >
                     ปฎิเสธ
@@ -895,14 +908,76 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                     onClick={handleApprove}
                     startIcon={<CheckCircleOutline />}
                     // sx={{ width: 140 }}
-
                     sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
                   >
                     อนุมัติ
                   </Button>
                 </Grid>
               </Grid>
-            )}
+            )} */}
+
+          <Grid container spacing={2} mt={4} mb={2}>
+            <Grid item xs={5}></Grid>
+            <Grid item xs={7} sx={{ textAlign: 'end' }}>
+              {groupOC && status === 'WAIT_FOR_APPROVAL_1' && (
+                <div>
+                  <Button
+                    id="btnSave"
+                    variant="contained"
+                    color="error"
+                    className={classes.MbtnSave}
+                    onClick={handleReject}
+                    startIcon={<SaveIcon />}
+                    // sx={{ width: 140 }}
+                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
+                  >
+                    ปฎิเสธ
+                  </Button>
+                  <Button
+                    id="btnCreateTransfer"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnSave}
+                    onClick={handleApprove}
+                    startIcon={<CheckCircleOutline />}
+                    // sx={{ width: 140 }}
+                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
+                  >
+                    อนุมัติ
+                  </Button>
+                </div>
+              )}
+
+              {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
+                <div>
+                  <Button
+                    id="btnSave"
+                    variant="contained"
+                    color="error"
+                    className={classes.MbtnSave}
+                    onClick={handleReject}
+                    startIcon={<SaveIcon />}
+                    // sx={{ width: 140 }}
+                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
+                  >
+                    ปฎิเสธ
+                  </Button>
+                  <Button
+                    id="btnCreateTransfer"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnSave}
+                    onClick={handleApprove}
+                    startIcon={<CheckCircleOutline />}
+                    // sx={{ width: 140 }}
+                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
+                  >
+                    อนุมัติ
+                  </Button>
+                </div>
+              )}
+            </Grid>
+          </Grid>
 
           <Box mb={4}>
             <StockRequestSKU
