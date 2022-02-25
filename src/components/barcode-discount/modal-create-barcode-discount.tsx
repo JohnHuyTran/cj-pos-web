@@ -348,6 +348,7 @@ export default function ModalCreateBarcodeDiscount({
           const rs = await saveDraftBarcodeDiscount(body);
           if (rs.code === 201) {
             if (!sendRequest) {
+              dispatch(updateCheckEdit(false));
               setOpenPopupModal(true);
               setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
               if (onSearchBD) onSearchBD();
