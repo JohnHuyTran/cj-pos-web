@@ -787,7 +787,10 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   disable={groupBranch}
                 />
               )}
-              {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && valuebranchFrom?.name}
+              {status !== '' &&
+                status !== 'DRAFT' &&
+                status !== 'AWAITING_FOR_REQUESTER' &&
+                `${fromBranch}-${valuebranchFrom?.name}`}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -810,7 +813,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                 status !== 'DRAFT' &&
                 status !== 'AWAITING_FOR_REQUESTER' &&
                 status !== 'WAIT_FOR_APPROVAL_2' &&
-                valuebranchTo?.name}
+                `${toBranch}-${valuebranchTo?.name}`}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
