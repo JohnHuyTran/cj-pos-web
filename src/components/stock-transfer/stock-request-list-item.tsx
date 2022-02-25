@@ -26,6 +26,7 @@ export interface DataGridProps {
   // changeItems: (chang: Boolean) => void;
   update: boolean;
   status: string;
+  skuCode: string;
 }
 
 const columns: GridColDef[] = [
@@ -149,7 +150,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function StockTransferListItem({ type, onChangeItems, update, status }: DataGridProps) {
+function StockTransferListItem({ type, onChangeItems, update, status, skuCode }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
@@ -157,6 +158,7 @@ function StockTransferListItem({ type, onChangeItems, update, status }: DataGrid
   // const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const stockRequestItems = useAppSelector((state) => state.stockRequestItems.state);
 
+  let rows: any = [];
   useEffect(() => {
     // if (!update && type !== 'Create') {
     //   if (stockRequestDetail) {
@@ -168,29 +170,18 @@ function StockTransferListItem({ type, onChangeItems, update, status }: DataGrid
     //   }
     // }
     // console.log('stockRequestItems :', JSON.stringify(stockRequestItems));
-  }, [update]);
-
-  let rows: any = [];
-  // const updateItemsState = async (items: any) => {
-  //   const itemsList: any = [];
-  //   await items.forEach((item: any) => {
-  //     const data: any = {
-  //       skuCode: item.skuCode,
-  //       barcode: item.barcode,
-  //       productName: item.productName ? item.productName : item.barcodeName,
-  //       unitCode: item.unitCode,
-  //       unitName: item.unitName,
-  //       baseUnit: item.baseUnit ? item.baseUnit : 0,
-  //       qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
-  //     };
-  //     itemsList.push(data);
-  //   });
-  //   if (itemsList.length > 0) await dispatch(updateAddItemsState(items));
-  // };
+    // if (skuCode !== 'ALL') {
+    //   let itemsOrderBy: any = [];
+    //   let i = stockRequestItems.filter((r: any) => r.skuCode === skuCode);
+    //   i = _.orderBy(i, ['skuCode', 'baseUnit'], ['asc', 'asc']);
+    //   i.forEach((data: any) => {
+    //     itemsOrderBy.push(data);
+    //   });
+    //   dispatch(updatestockRequestItemsState(itemsOrderBy));
+    // }
+  }, [update, skuCode]);
 
   const itemsMap = (items: any) => {
-    // console.log('itemsMap :', JSON.stringify(items));
-
     let edit = false;
     if (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') edit = true;
 
@@ -213,6 +204,7 @@ function StockTransferListItem({ type, onChangeItems, update, status }: DataGrid
     // return onChangeItems(items ? items : []);
   };
 
+  // if (skuCode === 'ALL') {
   if (type === 'Create') {
     if (Object.keys(stockRequestItems).length > 0) itemsMap(stockRequestItems);
   } else {
@@ -226,21 +218,6 @@ function StockTransferListItem({ type, onChangeItems, update, status }: DataGrid
       }
     }
   }
-
-  // if (Object.keys(payloadAddItem).length !== 0) {
-  // rows = payloadAddItem.map((item: any, index: number) => {
-  //   return {
-  //     id: `${item.barcode}-${index + 1}`,
-  //     index: index + 1,
-  //     skuCode: item.skuCode,
-  //     barcode: item.barcode,
-  //     barcodeName: item.barcodeName,
-  //     unitCode: item.unitCode,
-  //     unitName: item.unitName,
-  //     baseUnit: item.baseUnit,
-  //     qty: item.qty ? item.qty : 0,
-  //   };
-  // });
   // }
 
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -255,12 +232,6 @@ function StockTransferListItem({ type, onChangeItems, update, status }: DataGrid
           itemsList.push(data);
         });
       }
-
-      // console.log('itemsList :', JSON.stringify(itemsList));
-
-      // updateState(itemsList);
-
-      // handleChangeItems();
       return onChangeItems(itemsList ? itemsList : []);
     }
   };
@@ -269,10 +240,6 @@ function StockTransferListItem({ type, onChangeItems, update, status }: DataGrid
     await dispatch(updateAddItemsState(items));
     // await dispatch(updatestockRequestItemsState(itemsList));
   };
-
-  // const handleChangeItems = () => {
-  //   return changeItems(true);
-  // };
 
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
   const [deleteItems, setDeleteItems] = React.useState(false);

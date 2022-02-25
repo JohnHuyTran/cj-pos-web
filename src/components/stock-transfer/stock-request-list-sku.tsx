@@ -106,6 +106,9 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
 
   const [stockBalanceList, setStockBalanceList] = React.useState([]);
   // const [flagCheckStock, setFlagCheckStock] = React.useState(false);
+  const [selectSKU, setSelectSKU] = React.useState('ALL');
+  const [isChecked, setIschecked] = React.useState(true);
+
   const stockBalanceBySKU = async (skuCodes: any) => {
     const payload: any = {
       branchCode: branch,
@@ -163,13 +166,11 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
     return onMapSKU(rowsSKU ? rowsSKU : []);
   };
 
-  const itemsMap = async (items: any) => {
-    // if (!stock)
-    skuMapStock(items, stockBalanceList);
-
+  const itemMap = async (items: any) => {
     let itemsOrderBy: any = [];
     rowsSKU.map((data: any) => {
-      let i = items.filter((r: any) => r.skuCode === data.skuCode);
+      let skuCode = data.skuCode;
+      let i = items.filter((r: any) => r.skuCode === skuCode);
       i = _.orderBy(i, ['skuCode', 'baseUnit'], ['asc', 'asc']);
       i.forEach((data: any) => {
         itemsOrderBy.push(data);
@@ -177,6 +178,16 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
     });
 
     await dispatch(updatestockRequestItemsState(itemsOrderBy));
+  };
+
+  const itemsMap = async (items: any) => {
+    // if (!stock)
+    skuMapStock(items, stockBalanceList);
+
+    console.log('selectSKU :', selectSKU);
+    // if (isChecked) {
+    itemMap(items);
+    // }
   };
 
   const updateItemsState = async (items: any) => {
@@ -319,19 +330,31 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
   // }
 
   const [pageSizeSKU, setPageSizeSKU] = React.useState<number>(10);
-
   const handleChangeItems = async (items: any) => {
     await dispatch(updateAddItemsState(items));
     return changeItems(true);
   };
 
   const currentlySelected = async (params: GridCellParams) => {
-    alert('currentlySelected');
+    setIschecked(false);
+    setSelectSKU(params.row.skuCode);
   };
 
   const [flagSave, setFlagSave] = React.useState(false);
-  const handleStatusChangeItems = async (items: any) => {
-    setFlagSave(true);
+  // const handleStatusChangeItems = async (items: any) => {
+  //   setFlagSave(true);
+  // };
+
+  const handleCheckboxChange = (e: any) => {
+    const ischeck = e.target.checked;
+
+    // if (ischeck) {
+    //   setIschecked(false);
+    // } else {
+    //   setIschecked(true);
+    //   setSelectSKU('ALL');
+    //   // itemMap(payloadAddItem);
+    // }
   };
   return (
     <div>
@@ -347,6 +370,7 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
           autoHeight={rowsSKU.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
+          onCellClick={currentlySelected}
         />
       </div>
 
@@ -357,6 +381,27 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
             <FormGroup>
               <FormControlLabel control={<Checkbox defaultChecked size="small" />} label="แสดงสินค้าทั้งหมด" />
             </FormGroup>
+
+            {/* {isChecked && (
+              <FormGroup>
+                <FormControlLabel
+                  control={<Checkbox />}
+                  checked={true}
+                  label="รายการสินค้าทั้งหมด"
+                  onChange={handleCheckboxChange}
+                />
+              </FormGroup>
+            )}
+            {!isChecked && (
+              <FormGroup>
+                <FormControlLabel
+                  control={<Checkbox />}
+                  checked={false}
+                  label="รายการสินค้าทั้งหมด"
+                  onChange={handleCheckboxChange}
+                />
+              </FormGroup>
+            )} */}
           </Grid>
           <Grid item xs={10}></Grid>
         </Grid>
@@ -368,6 +413,7 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
         // changeItems={handleStatusChangeItems}
         update={flagSave}
         status={status}
+        skuCode={selectSKU}
       />
     </div>
   );
