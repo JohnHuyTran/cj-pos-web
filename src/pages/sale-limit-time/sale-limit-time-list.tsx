@@ -4,20 +4,22 @@ import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
 import { useStyles } from '../../styles/makeTheme';
 import { genColumnValue, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, BDStatus, DateFormat } from '../../utils/enum/common-enum';
+import { Action, STStatus, DateFormat } from '../../utils/enum/common-enum';
 import HtmlTooltip from '../../components/commons/ui/html-tooltip';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updatePayloadST } from '../../store/slices/sale-limit-time-search-slice';
-import moment from 'moment';
+import ViewBranch from '../../components/sale-limit-time/view-branch';
 import STCreateModal from '../../components/sale-limit-time/sale-limit-time-create-modal';
-
+import moment from 'moment';
+import { convertUtcToBkkDate } from '../../utils/date-utill';
+const _ = require('lodash');
 interface StateProps {
   onSearch: () => void;
 }
 const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
-  const { t } = useTranslation(['barcodeDiscount']);
+  const { t } = useTranslation(['saleLimitTime']);
   const [checkAll, setCheckAll] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [lstST, setListST] = React.useState<any[]>([]);
@@ -39,13 +41,14 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
         return {
           checked: false,
           id: item.id,
-          index: index,
+          index: index + 1,
           documentNumber: item.documentNumber,
           status: item.status,
           description: item.description,
           remark: item.remark,
           stStartTime: item.stStartTime,
           stEndTime: item.stEndTime,
+          branch: item.stDetail,
         };
       });
       setListST(rows);
@@ -111,26 +114,32 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       sortable: false,
       minWidth: 170,
+      renderCell: (params) => genBranch(params),
     },
     {
       field: 'createdAt',
       headerName: 'วันที่สร้าง รายการ',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 170,
+      minWidth: 160,
     },
     {
       field: 'stStartTime',
       headerName: 'วัน/เวลา ที่เริ่ม',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 170,
+      minWidth: 160,
       renderCell: (params) => {
         const start = params.value?.toString();
         return (
-          <Typography variant="body2" noWrap>
-            {moment(start).format('HH:mm a')}
-          </Typography>
+          <div>
+            <Typography variant="body2" noWrap>
+              {moment(start).add(543, 'year').format('DD/MM/YYYY')}
+            </Typography>
+            <Typography variant="body2" noWrap>
+              {moment(start).format('HH:mm ')}
+            </Typography>
+          </div>
         );
       },
     },
@@ -139,13 +148,18 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       headerName: 'วัน/เวลา ที่สิ้นสุด',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 170,
+      minWidth: 160,
       renderCell: (params) => {
         const end = params.value?.toString();
         return (
-          <Typography variant="body2" noWrap>
-            {moment(end).format('HH:mm a')}
-          </Typography>
+          <div>
+            <Typography variant="body2" noWrap>
+              {moment(end).add(543, 'year').format('DD/MM/YYYY')}
+            </Typography>
+            <Typography variant="body2" noWrap>
+              {moment(end).format('HH:mm ')}
+            </Typography>
+          </div>
         );
       },
     },
@@ -157,6 +171,12 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       minWidth: 170,
     },
   ];
+
+  const genBranch = (params: GridValueGetterParams) => {
+    const branch = _.cloneDeep(params.value);
+    return <ViewBranch values={branch} />;
+  };
+
   const genRowStatusValue = (statusLabel: string, styleCustom: any) => {
     return (
       <HtmlTooltip title={<React.Fragment>{statusLabel}</React.Fragment>}>
@@ -166,24 +186,23 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       </HtmlTooltip>
     );
   };
+
   const genRowStatus = (params: GridValueGetterParams) => {
     let statusDisplay;
     let status = params.value ? params.value.toString() : '';
     const statusLabel = genColumnValue('label', 'value', status, t('lstStatus', { returnObjects: true }));
+
     switch (status) {
-      case BDStatus.DRAFT:
+      case STStatus.DRAFT:
         statusDisplay = genRowStatusValue(statusLabel, { color: '#FBA600', backgroundColor: '#FFF0CA' });
         break;
-      case BDStatus.WAIT_FOR_APPROVAL:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#FBA600', backgroundColor: '#FFF0CA' });
+      case STStatus.START:
+        statusDisplay = genRowStatusValue(statusLabel, { color: '#36C690', backgroundColor: '#E7FFE9' });
         break;
-      case BDStatus.APPROVED:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#20AE79', backgroundColor: '#E7FFE9' });
+      case STStatus.END:
+        statusDisplay = genRowStatusValue(statusLabel, { color: '#676767', backgroundColor: '#EAEBEB;' });
         break;
-      case BDStatus.BARCODE_PRINTED:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#4465CD', backgroundColor: '#C8E8FF' });
-        break;
-      case BDStatus.REJECT:
+      case STStatus.CANCEL:
         statusDisplay = genRowStatusValue(statusLabel, { color: '#F54949', backgroundColor: '#FFD7D7' });
         break;
     }
@@ -209,7 +228,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     setOpenCreateModal(false);
   };
   const handleClickCell = () => {
-    setOpenCreateModal(true);
+    // setOpenCreateModal(true);
   };
 
   return (

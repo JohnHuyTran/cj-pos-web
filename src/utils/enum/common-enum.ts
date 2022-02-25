@@ -26,6 +26,12 @@ export enum BDStatus {
   REJECT = '5',
 }
 
+export enum STStatus {
+  DRAFT = '1',
+  START = '2',
+  END = '3',
+  CANCEL = '4',
+}
 export enum ERROR_CODE {
   TIME_OUT = 'timeout',
   NOT_AUTHORIZE = 'authentication.notauthorize',

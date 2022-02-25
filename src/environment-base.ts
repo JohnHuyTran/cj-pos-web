@@ -241,13 +241,13 @@ export const environment = {
   },
   branch: {
     province: {
-      url: '/branch/province',
+      url: '/master/branch/province',
     },
     branch: {
-      url: '/branch/search',
+      url: '/master/branch/search',
     },
     branchTotal: {
-      url: '/branch/branch-total',
+      url: '/master/branch/branch-total',
     },
   },
 };

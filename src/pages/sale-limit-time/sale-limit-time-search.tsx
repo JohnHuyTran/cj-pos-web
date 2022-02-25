@@ -17,6 +17,7 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { paramsConvert } from '../../utils/utils';
 import moment from 'moment';
 import AlertError from '../../components/commons/ui/alert-error';
+import { fetchBranchProvinceListAsync, updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 interface State {
   query: string;
   branch: string;
@@ -28,14 +29,14 @@ const SaleLimitTimeSearch = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [openCreateModal, setOpenCreateModal] = React.useState(false);
-  const { t } = useTranslation(['barcodeDiscount', 'common']);
+  const { t } = useTranslation(['saleLimitTime', 'common']);
   const [lstStatus, setLstStatus] = React.useState([]);
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
   const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
   const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
-  const branch = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
+  const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
   const [values, setValues] = React.useState<State>({
     query: '',
     branch: userInfo.branch,
@@ -43,11 +44,36 @@ const SaleLimitTimeSearch = () => {
     startDate: new Date(),
     endDate: new Date(),
   });
+  let checkAdmin = userInfo.acl['service.posback-campaign'].includes('campaign.st.create');
+
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
   useEffect(() => {
     setLstStatus(t('lstStatus', { returnObjects: true }));
+    if (!checkAdmin) {
+      const payload = {
+        limit: '10',
+        code: userInfo.branch,
+      };
+      const params = paramsConvert(payload);
+      dispatch(fetchBranchProvinceListAsync(params));
+    }
   }, []);
+  useEffect(() => {
+    if (!checkAdmin) {
+      const payloadBranch = {
+        isAllBranches: false,
+        appliedBranches: {
+          branchList: branchList.data || [],
+          province: [],
+        },
+        saved: true,
+      };
+      console.log({ branchList });
+
+      dispatch(updatePayloadBranches(payloadBranch));
+    }
+  }, [branchList]);
 
   const getStatusText = (key: string) => {
     if (lstStatus === null || lstStatus.length === 0) {
@@ -70,7 +96,7 @@ const SaleLimitTimeSearch = () => {
   const handleSearchST = () => {
     if (stringNullOrEmpty(values.startDate) || stringNullOrEmpty(values.endDate)) {
       setOpenAlert(true);
-      setTextError(t('msg.inputDateSearch'));
+      setTextError('กรุณากรอกวันที่');
     } else {
       const params = {
         page: payloadST.page,
@@ -79,7 +105,7 @@ const SaleLimitTimeSearch = () => {
         status: values.status,
         branch: values.branch,
         startDate: moment(values.startDate).startOf('day').toISOString(),
-        endDate: moment(values.endDate).startOf('day').toISOString(),
+        endDate: moment(values.endDate).endOf('day').toISOString(),
       };
       const query = paramsConvert(params);
       dispatch(fetchSaleLimitTimeListAsync(query));
@@ -118,7 +144,7 @@ const SaleLimitTimeSearch = () => {
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาขา
             </Typography>
-            <SearchBranch />
+            <SearchBranch disabled={!checkAdmin} />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
@@ -130,13 +156,12 @@ const SaleLimitTimeSearch = () => {
                 name="status"
                 value={values.status}
                 onChange={onChange.bind(this, setValues, values)}
-                disabled={true}
+                disabled={!checkAdmin}
               >
                 <MenuItem value={'1'}>{getStatusText('1')}</MenuItem>
                 <MenuItem value={'2'}>{getStatusText('2')}</MenuItem>
                 <MenuItem value={'3'}>{getStatusText('3')}</MenuItem>
                 <MenuItem value={'4'}>{getStatusText('4')}</MenuItem>
-                <MenuItem value={'5'}>{getStatusText('5')}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -163,17 +188,19 @@ const SaleLimitTimeSearch = () => {
         </Grid>
       </Box>
       <Box sx={{ textAlign: 'right', marginBottom: '20px' }}>
-        <Button
-          id="btnCreate"
-          variant="contained"
-          sx={{ width: '172px', marginRight: '20px' }}
-          className={classes.MbtnSearch}
-          color="secondary"
-          startIcon={<AddCircleOutlineOutlinedIcon />}
-          onClick={handleOpenCreateModal}
-        >
-          {'สร้างเอกสารใหม่'}
-        </Button>
+        {checkAdmin && (
+          <Button
+            id="btnCreate"
+            variant="contained"
+            sx={{ width: '172px', marginRight: '20px' }}
+            className={classes.MbtnSearch}
+            color="secondary"
+            startIcon={<AddCircleOutlineOutlinedIcon />}
+            onClick={handleOpenCreateModal}
+          >
+            {'สร้างเอกสารใหม่'}
+          </Button>
+        )}
         <Button
           variant="contained"
           color="cancelColor"
@@ -192,7 +219,7 @@ const SaleLimitTimeSearch = () => {
           เคลียร์
         </Button>
       </Box>
-      {false && (
+      {checkAdmin && (
         <Box sx={{ marginBottom: '20px' }}>
           <Button
             variant="contained"

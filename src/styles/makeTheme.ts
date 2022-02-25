@@ -78,6 +78,9 @@ const useStyles = makeStyles({
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
     },
+    '& .Mui-disabled': {
+      background: '#EAEBEB',
+    },
   },
   MdataGridDetail: {
     '& .MuiDataGrid-columnHeaderTitle': {
