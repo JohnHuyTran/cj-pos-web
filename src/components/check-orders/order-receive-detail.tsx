@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAppSelector, useAppDispatch } from '../../store/store';
 import { Box, Button, Dialog, DialogContent, DialogTitle, Grid, IconButton, Typography } from '@mui/material';
 import { HighlightOff, CheckCircleOutline } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
@@ -40,7 +41,12 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
+const handleTest = () => {
+  alert('test');
+};
+
 export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderReceiveDetailProps) {
+  const dispatch = useAppDispatch();
   const classes = useStyles();
   const [open, setOpen] = React.useState(defaultOpen);
 
@@ -122,6 +128,18 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
                 sx={{ width: '15%' }}
               >
                 ยืนยัน
+              </Button>
+
+              <Button
+                id="btnApprove"
+                variant="contained"
+                color="primary"
+                className={classes.MbtnApprove}
+                onClick={handleTest}
+                startIcon={<CheckCircleOutline />}
+                sx={{ width: '15%' }}
+              >
+                test
               </Button>
             </Grid>
           </Box>
