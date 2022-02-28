@@ -1001,7 +1001,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
                   maxLength={100}
                   onChangeComment={handleChangeComment}
                   isDisable={!isDraft}
-                  rowDisplay={10}
+                  rowDisplay={2}
                 />
               </Grid>
               <Grid item xs={7}></Grid>

@@ -389,8 +389,8 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           scrollbarSize={10}
           rowHeight={65}
           onCellFocusOut={handleFocusOut}
-          // onCellClick={handleOnCellClick}
-          onCellKeyDown={handleOnKeyDown}
+          onCellClick={handleOnCellClick}
+          // onCellKeyDown={handleOnKeyDown}
           // onCellBlur={handleOnCellBlur}
         />
       </div>
