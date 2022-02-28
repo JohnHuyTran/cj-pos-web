@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { get } from '../../adapters/posback-adapter';
+import { getStrockTransferMockup } from '../../mockdata/stock-transfer';
 import { BranchTransferResponse } from '../../models/stock-transfer-model';
 import { getPathBranchTransferDetail } from '../../services/stock-transfer';
 

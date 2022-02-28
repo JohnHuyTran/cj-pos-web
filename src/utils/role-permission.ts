@@ -6,8 +6,8 @@ import {
   KEYCLOAK_GROUP_BRANCH_MANAGER,
   KEYCLOAK_GROUP_BRANCH_MANAGER01,
   KEYCLOAK_GROUP_DC01,
-  KEYCLOAK_GROUP_OC1,
-  KEYCLOAK_GROUP_SCM,
+  KEYCLOAK_GROUP_OC01,
+  KEYCLOAK_GROUP_SCM01,
   MAINMENU,
   PERMISSION_GROUP,
   SUBMENU,
@@ -20,16 +20,17 @@ export const getUserGroup = (groups: string[]) => {
   if (!group) {
     return '';
   }
+
   if (group === KEYCLOAK_GROUP_DC01) {
     return PERMISSION_GROUP.DC;
   } else if (group === KEYCLOAK_GROUP_BRANCH_MANAGER01 || group === KEYCLOAK_GROUP_BRANCH_MANAGER) {
     return PERMISSION_GROUP.BRANCH;
-  } else if (group === KEYCLOAK_GROUP_SCM) {
+  } else if (group === KEYCLOAK_GROUP_SCM01) {
     return PERMISSION_GROUP.SCM;
-  } else if (group === KEYCLOAK_GROUP_OC1) {
+  } else if (group === KEYCLOAK_GROUP_OC01) {
     return PERMISSION_GROUP.OC;
   } else if (group === KEYCLOAK_GROUP_AREA_MANAGER01) {
-    return PERMISSION_GROUP.AREA_MANAGER01;
+    return PERMISSION_GROUP.AREA_MANAGER;
   }
 
   return '';
@@ -80,7 +81,7 @@ const permission = {
         SUBMENU.ST_REQUEST,
       ],
     },
-    action: [ACTIONS.STOCK_RT_APPROVE, ACTIONS.STOCK_RT_REJECT, ACTIONS.STOCK_RT_VIEW],
+    action: [ACTIONS.STOCK_RT_APPROVE, ACTIONS.STOCK_RT_REJECT, ACTIONS.STOCK_RT_VIEW, ACTIONS.STOCK_RT_MANAGE],
   },
   oc: {
     menu: {
@@ -131,13 +132,6 @@ const permission = {
       ACTIONS.STOCK_BT_SAVEDC,
       ACTIONS.STOCK_BT_EXPORT,
     ],
-  },
-  area01: {
-    menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.ORDER_RECEIVE],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_DIFF],
-    },
-    action: [ACTIONS.PURCHASE_PI_CLOSE, ACTIONS.PURCHASE_PN_EXPORT],
   },
   areaManager: {
     menu: {

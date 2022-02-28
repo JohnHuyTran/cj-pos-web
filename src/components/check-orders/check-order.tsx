@@ -19,6 +19,14 @@ import LoadingModal from '../commons/ui/loading-modal';
 import { useStyles } from '../../styles/makeTheme';
 import { SearchOff } from '@mui/icons-material';
 import AlertError from '../commons/ui/alert-error';
+import BranchListDropDown from '../commons/ui/branch-list-dropdown';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import { shipmentStatus } from '../../utils/enum/check-order-enum';
+import { isGroupBranch } from '../../utils/role-permission';
+import { getUserInfo } from '../../store/sessionStore';
+import { getBranchName } from '../../utils/utils';
+import { env } from '../../adapters/environmentConfigs';
+import { BranchListOptionType } from '../../models/branch-model';
 
 // moment.locale("en");
 moment.locale('th');
@@ -30,6 +38,8 @@ interface State {
   orderType: string;
   dateFrom: string;
   dateTo: string;
+  branchFrom: string;
+  branchTo: string;
 }
 interface loadingModalState {
   open: boolean;
@@ -49,6 +59,8 @@ function CheckOrderSearch() {
     orderType: 'ALL',
     dateFrom: '',
     dateTo: '',
+    branchFrom: '',
+    branchTo: '',
   });
 
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
@@ -74,11 +86,19 @@ function CheckOrderSearch() {
       values.orderStatus === 'ALL' &&
       values.orderType === 'ALL' &&
       startDate === null &&
-      endDate === null
+      endDate === null &&
+      values.branchFrom === '' &&
+      values.branchFrom === ''
     ) {
       setOpenAlert(true);
       setTextError('กรุณากรอกข้อมูลค้นหา');
-    } else if (values.orderShipment === '' && values.orderStatus === 'ALL' && values.orderType === 'ALL') {
+    } else if (
+      values.orderShipment === '' &&
+      values.orderStatus === 'ALL' &&
+      values.orderType === 'ALL' &&
+      values.branchFrom === '' &&
+      values.branchFrom === ''
+    ) {
       if (startDate === null || endDate === null) {
         setOpenAlert(true);
         setTextError('กรุณากรอกวันที่รับสินค้าให้ครบ');
@@ -104,8 +124,10 @@ function CheckOrderSearch() {
       paramQuery: values.orderShipment,
       dateFrom: moment(startDate).startOf('day').toISOString(),
       dateTo: moment(endDate).endOf('day').toISOString(),
-      sdStatus: parseInt(values.orderStatus),
+      sdStatus: values.orderStatus,
       sdType: parseInt(values.orderType),
+      shipBranchFrom: values.branchFrom,
+      shipBranchTo: values.branchTo,
       clearSearch: false,
     };
 
@@ -122,6 +144,7 @@ function CheckOrderSearch() {
     setFlagSearch(false);
     setStartDate(null);
     setEndDate(null);
+    setClearBranchDropDown(!clearBranchDropDown);
     setValues({
       orderShipment: '',
       // orderNo: "",
@@ -129,6 +152,8 @@ function CheckOrderSearch() {
       orderType: 'ALL',
       dateFrom: '',
       dateTo: '',
+      branchFrom: '',
+      branchTo: '',
     });
 
     const payload: ShipmentRequest = {
@@ -139,7 +164,7 @@ function CheckOrderSearch() {
       // sdNo: values.orderNo,
       dateFrom: moment(startDate).format('DD/MM/YYYY'),
       dateTo: moment(endDate).format('DD/MM/YYYY'),
-      sdStatus: parseInt(values.orderStatus),
+      sdStatus: values.orderStatus,
       sdType: parseInt(values.orderType),
       clearSearch: true,
     };
@@ -157,6 +182,54 @@ function CheckOrderSearch() {
 
   const handleEndDatePicker = (value: Date) => {
     setEndDate(value);
+  };
+
+  const [branchFromCode, setBranchFromCode] = React.useState('');
+  const [branchToCode, setBranchToCode] = React.useState('');
+  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [ownBranch, setOwnBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : env.branch.code
+      : env.branch.code
+  );
+  const branchTo = getBranchName(branchList, ownBranch);
+  const branchToMap: BranchListOptionType = {
+    code: ownBranch,
+    name: branchTo ? branchTo : '',
+  };
+  const [valuebranchTo, setValuebranchTo] = React.useState<BranchListOptionType | null>(
+    groupBranch ? branchToMap : null
+  );
+
+  React.useEffect(() => {
+    if (groupBranch) {
+      setBranchToCode(ownBranch);
+      setValues({ ...values, branchTo: ownBranch });
+    }
+  }, []);
+
+  const handleChangeBranchFrom = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setBranchFromCode(branchCode);
+      setValues({ ...values, branchFrom: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branchFrom: '' });
+    }
+  };
+
+  const handleChangeBranchTo = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setBranchToCode(branchCode);
+      setValues({ ...values, branchTo: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branchTo: '' });
+    }
   };
 
   let orderListData;
@@ -206,10 +279,72 @@ function CheckOrderSearch() {
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่เอกสาร LD/เลขที่เอกสาร SD"
+              placeholder="เลขที่เอกสาร LD/BT/SD"
             />
           </Grid>
           <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              สาขาต้นทาง
+            </Typography>
+            <BranchListDropDown
+              sourceBranchCode={branchToCode}
+              onChangeBranch={handleChangeBranchFrom}
+              isClear={clearBranchDropDown}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              สาขาปลายทาง
+            </Typography>
+            <BranchListDropDown
+              valueBranch={valuebranchTo}
+              sourceBranchCode={branchFromCode}
+              onChangeBranch={handleChangeBranchTo}
+              isClear={clearBranchDropDown}
+              disable={groupBranch}
+            />
+          </Grid>
+
+          <Grid item xs={4} sx={{ pt: 30 }}>
+            <Typography gutterBottom variant="subtitle1" component="div">
+              วันที่รับสินค้า
+            </Typography>
+            <Typography gutterBottom variant="subtitle1" component="div">
+              ตั้งแต่
+            </Typography>
+            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+          </Grid>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+              ถึง
+            </Typography>
+            <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
+          </Grid>
+          <Grid item xs={4} container>
+            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+              สถานะ
+            </Typography>
+            <FormControl fullWidth className={classes.Mselect}>
+              <Select
+                id="selOrderStatus"
+                name="orderStatus"
+                value={values.orderStatus}
+                onChange={handleChange}
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
+                <MenuItem value={'ALL'} selected={true}>
+                  ทั้งหมด
+                </MenuItem>
+                {shipmentStatus.map((status) => (
+                  <MenuItem key={status.key} value={status.key}>
+                    {status.text}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               ประเภท
             </Typography>
@@ -230,56 +365,24 @@ function CheckOrderSearch() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สถานะ
-            </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id="selOrderStatus"
-                name="orderStatus"
-                value={values.orderStatus}
-                onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
-                <MenuItem value={'ALL'} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem value={'0'}>บันทึก</MenuItem>
-                <MenuItem value={'1'}>อนุมัติ</MenuItem>
-                <MenuItem value={'2'}>ปิดงาน</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
 
-          <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div">
-              วันที่รับสินค้า
-            </Typography>
-            <Typography gutterBottom variant="subtitle1" component="div">
-              ตั้งแต่
-            </Typography>
-            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
-          </Grid>
-          <Grid item xs={4} container alignItems="flex-end">
-            <Box sx={{ width: '100%' }}>
-              <Typography gutterBottom variant="subtitle1" component="div">
-                ถึง
-              </Typography>
-              <DatePickerComponent
-                onClickDate={handleEndDatePicker}
-                value={endDate}
-                type={'TO'}
-                minDateTo={startDate}
-              />
-            </Box>
-          </Grid>
-          <Grid item container xs={4} justifyContent="flex-end" direction="row" alignItems="flex-end">
+          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+            <Button
+              id="btnCreateStockTransferModal"
+              variant="contained"
+              // onClick={handleOpenCreateModal}
+              sx={{ minWidth: '15%' }}
+              className={classes.MbtnClear}
+              startIcon={<AddCircleOutlineOutlinedIcon />}
+              color="secondary"
+            >
+              รับสินค้า
+            </Button>
             <Button
               id="btnClear"
               variant="contained"
               onClick={onClickClearBtn}
-              sx={{ width: '40%' }}
+              sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
             >
@@ -290,7 +393,7 @@ function CheckOrderSearch() {
               variant="contained"
               color="primary"
               onClick={onClickValidateForm}
-              sx={{ width: '40%', ml: 2 }}
+              sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}
             >
               ค้นหา

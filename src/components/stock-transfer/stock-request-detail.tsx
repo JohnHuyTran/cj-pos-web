@@ -11,8 +11,9 @@ import Steppers from './steppers';
 import { useStyles } from '../../styles/makeTheme';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
-import StockRequestItem from './stock-request-item';
-import StockRequestCreateItem from './stock-request-create-item';
+// import StockRequestItem from './stock-request-item';
+// import StockRequestCreateItem from './stock-request-create-item';
+import StockRequestSKU from './stock-request-list-sku';
 import { useAppDispatch } from '../../store/store';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
@@ -42,11 +43,23 @@ import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-trans
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 
+import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permission';
+import { env } from '../../adapters/environmentConfigs';
+import { getUserInfo } from '../../store/sessionStore';
+import {
+  ACTIONS,
+  KEYCLOAK_GROUP_BRANCH_MANAGER,
+  KEYCLOAK_GROUP_OC01,
+  KEYCLOAK_GROUP_SCM01,
+  PERMISSION_GROUP,
+} from '../../utils/enum/permission-enum';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+
 interface State {
   branchCode: string;
 }
 
-interface branchListOptionType {
+interface BranchListOptionType {
   name: string;
   code: string;
 }
@@ -91,6 +104,14 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   const dispatch = useAppDispatch();
   const classes = useStyles();
 
+  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [displayBtnSave, setDisplayBtnSave] = React.useState(false);
+  const [displayBtnSubmit, setDisplayBtnSubmit] = React.useState(false);
+  const [displayBtnApprove, setDisplayBtnApprove] = React.useState(false);
+  const [displayBtnReject, setDisplayBtnReject] = React.useState(false);
+  const [groupOC, setGroupOC] = React.useState(false);
+  const [groupSCM, setGroupSCM] = React.useState(false);
+
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
   const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
@@ -110,6 +131,20 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
 
   useEffect(() => {
     setOpen(isOpen);
+
+    setDisplayBtnSave(isAllowActionPermission(ACTIONS.STOCK_RT_MANAGE));
+    setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.STOCK_RT_SEND));
+    setDisplayBtnApprove(isAllowActionPermission(ACTIONS.STOCK_RT_APPROVE));
+    setDisplayBtnReject(isAllowActionPermission(ACTIONS.STOCK_RT_REJECT));
+    setGroupOC(getUserInfo().group === PERMISSION_GROUP.OC);
+    setGroupSCM(getUserInfo().group === PERMISSION_GROUP.SCM);
+
+    // console.log('getUserGroup :', getUserInfo().group);
+
+    // const OC = isGroupOC();
+    // const SCM = isGroupSCM();
+    // console.log('getUserGroup OC :', OC);
+    // console.log('getUserGroup SCM :', SCM);
 
     if (type === 'View' && stockRequestDetail) {
       setStatus(stockRequestDetail.status);
@@ -131,7 +166,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
       setEndDate(new Date(endD));
 
       const branchFrom = getBranchName(branchList, stockRequestDetail.branchFrom);
-      const branchFromMap: branchListOptionType = {
+      const branchFromMap: BranchListOptionType = {
         code: stockRequestDetail.branchFrom,
         name: branchFrom ? branchFrom : '',
       };
@@ -139,7 +174,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
       setFromBranch(stockRequestDetail.branchFrom);
 
       const branchTo = getBranchName(branchList, stockRequestDetail.branchTo);
-      const branchToMap: branchListOptionType = {
+      const branchToMap: BranchListOptionType = {
         code: stockRequestDetail.branchTo,
         name: branchTo ? branchTo : '',
       };
@@ -234,9 +269,25 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     }
   }
 
-  const [valuebranchTo, setValuebranchTo] = React.useState<branchListOptionType | null>(null);
-  const [valuebranchFrom, setValuebranchFrom] = React.useState<branchListOptionType | null>(null);
-  const [fromBranch, setFromBranch] = React.useState('');
+  // const [fromBranch, setFromBranch] = React.useState('');
+  // const [valuebranchFrom, setValuebranchFrom] = React.useState<branchListOptionType | null>(null);
+  const [fromBranch, setFromBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : env.branch.code
+      : env.branch.code
+  );
+  const branchFrom = getBranchName(branchList, fromBranch);
+  const branchFromMap: BranchListOptionType = {
+    code: fromBranch,
+    name: branchFrom ? branchFrom : '',
+  };
+  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
+    groupBranch ? branchFromMap : null
+  );
+
+  const [valuebranchTo, setValuebranchTo] = React.useState<BranchListOptionType | null>(null);
   const [toBranch, setToBranch] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const handleChangeFromBranch = (branchCode: string) => {
@@ -270,17 +321,28 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const [flagStock, setFlagStock] = React.useState(false);
+
   const handleOpenAddItems = () => {
+    setFlagStock(false);
     setOpenModelAddItems(true);
   };
   const handleModelAddItems = async () => {
+    setFlagStock(true);
     setFlagSave(true);
     setOpenModelAddItems(false);
   };
 
-  const handleChangeItems = async (items: any) => {
-    // setFlagSave(true);
-    await dispatch(updateAddItemsState(items));
+  // const handleChangeItems = async (items: any) => {
+  //   // setFlagSave(true);
+  //   await dispatch(updateAddItemsState(items));
+  // };
+
+  // const [skuList, setSkuList] = React.useState([]);
+  let skuList: any = [];
+  const handleMapSKU = async (sku: any) => {
+    // setSkuList(sku);
+    skuList = sku;
   };
 
   const handleStatusChangeItems = async (items: any) => {
@@ -356,25 +418,30 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   };
 
   const handleMapPayloadSave = async () => {
-    const itemsList: any = [];
-    const itemsState: any = [];
+    const itemGroups: any = [];
+    if (skuList.length > 0) {
+      await skuList.forEach((data: any) => {
+        const item: any = {
+          skuCode: data.skuCode,
+          remainingQty: data.stock ? data.stock : 0,
+        };
+        itemGroups.push(item);
+      });
+    }
+
+    const items: any = [];
     if (Object.keys(payloadAddItem).length > 0) {
       await payloadAddItem.forEach((data: any) => {
         const item: any = {
           barcode: data.barcode,
           orderQty: data.orderQty ? data.orderQty : data.qty ? data.qty : 0,
         };
-        itemsList.push(item);
-        itemsState.push(data);
+        items.push(item);
       });
-
-      // await dispatch(updateAddItemsState(itemsState));
     }
 
     let rt = '';
     if (rtNo) rt = rtNo;
-    // let reason = reasons;
-    // if (reason === 'All') reason = '';
     const payload: SaveStockTransferRequest = {
       rtNo: rt,
       startDate: moment(startDate).startOf('day').toISOString(),
@@ -382,7 +449,8 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
       branchFrom: fromBranch,
       branchTo: toBranch,
       transferReason: reasons,
-      items: itemsList,
+      itemGroups: itemGroups,
+      items: items,
     };
 
     return await payload;
@@ -498,6 +566,17 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           itemsList.push(item);
         });
 
+        const itemGroups: any = [];
+        if (skuList.length > 0) {
+          await skuList.forEach((data: any) => {
+            const item: any = {
+              skuCode: data.skuCode,
+              remainingQty: data.stock ? data.stock : 0,
+            };
+            itemGroups.push(item);
+          });
+        }
+
         // let reason = reasons;
         // if (reason === 'All') reason = '';
         const payloadSubmit: SubmitStockTransferRequest = {
@@ -506,6 +585,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           branchFrom: fromBranch,
           branchTo: toBranch,
           transferReason: reasons,
+          itemGroups: itemGroups,
           items: itemsList,
         };
 
@@ -633,6 +713,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setOpenLoadingModal(false);
   };
 
+  const topFunction = () => {
+    document.getElementById('top-item')?.scrollIntoView({
+      block: 'start',
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -647,7 +734,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
         </BootstrapDialogTitle>
 
         <DialogContent>
-          <Grid container spacing={2} mb={2}>
+          <Grid container spacing={2} mb={2} id="top-item">
             <Grid item xs={2}>
               เลขที่เอกสาร RT :
             </Grid>
@@ -664,7 +751,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              วันที่โอนสินค้า* :
+              วันที่โอนสินค้า{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -677,7 +764,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุด* :
+              วันที่สิ้นสุด{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -697,7 +784,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาขาต้นทาง* :
+              สาขาต้นทาง{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -706,13 +793,17 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   sourceBranchCode={toBranch}
                   onChangeBranch={handleChangeFromBranch}
                   isClear={clearBranchDropDown}
+                  disable={groupBranch}
                 />
               )}
-              {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && valuebranchFrom?.name}
+              {status !== '' &&
+                status !== 'DRAFT' &&
+                status !== 'AWAITING_FOR_REQUESTER' &&
+                `${fromBranch}-${valuebranchFrom?.name}`}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              สาขาปลายทาง* :
+              สาขาปลายทาง{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' ||
@@ -731,13 +822,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                 status !== 'DRAFT' &&
                 status !== 'AWAITING_FOR_REQUESTER' &&
                 status !== 'WAIT_FOR_APPROVAL_2' &&
-                valuebranchTo?.name}
+                `${toBranch}-${valuebranchTo?.name}`}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาเหตุการโอน* :
+              สาเหตุการโอน{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -763,6 +854,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   onClick={handleOpenAddItems}
                   startIcon={<ControlPoint />}
                   sx={{ width: 200 }}
+                  disabled={fromBranch == ''}
                 >
                   เพิ่มสินค้า
                 </Button>
@@ -775,11 +867,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   className={classes.MbtnSave}
                   onClick={handleSave}
                   startIcon={<SaveIcon />}
-                  sx={{ width: 140 }}
+                  // sx={{ width: 140 }}
+                  sx={{ width: 140, display: `${displayBtnSave ? 'none' : ''}` }}
                   disabled={rowLength == 0}
                 >
                   บันทึก
                 </Button>
+
                 <Button
                   id="btnCreateTransfer"
                   variant="contained"
@@ -787,7 +881,8 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   className={classes.MbtnSave}
                   onClick={handleSubmit}
                   startIcon={<CheckCircleOutline />}
-                  sx={{ width: 140 }}
+                  // sx={{ width: 140 }}
+                  sx={{ width: 140, display: `${displayBtnSubmit ? 'none' : ''}` }}
                   disabled={rowLength == 0}
                 >
                   ส่งงาน
@@ -796,7 +891,8 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
           )}
 
-          {status !== '' &&
+          {/* {(groupOC || groupSCM) &&
+            status !== '' &&
             status !== 'DRAFT' &&
             status !== 'AWAITING_FOR_REQUESTER' &&
             status !== 'APPROVED' &&
@@ -811,7 +907,8 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                     className={classes.MbtnSave}
                     onClick={handleReject}
                     startIcon={<SaveIcon />}
-                    sx={{ width: 140 }}
+                    // sx={{ width: 140 }}
+                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
                   >
                     ปฎิเสธ
                   </Button>
@@ -822,26 +919,89 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                     className={classes.MbtnSave}
                     onClick={handleApprove}
                     startIcon={<CheckCircleOutline />}
-                    sx={{ width: 140 }}
+                    // sx={{ width: 140 }}
+                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
                   >
                     อนุมัติ
                   </Button>
                 </Grid>
               </Grid>
-            )}
-          <Box mb={4}>
-            {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-              <StockRequestCreateItem
-                type={type}
-                onChangeItems={handleChangeItems}
-                changeItems={handleStatusChangeItems}
-                update={flagSave}
-              />
-            )}
+            )} */}
 
-            {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && (
-              <StockRequestItem onChangeItems={handleChangeItems} />
-            )}
+          <Grid container spacing={2} mt={4} mb={2}>
+            <Grid item xs={5}></Grid>
+            <Grid item xs={7} sx={{ textAlign: 'end' }}>
+              {groupOC && status === 'WAIT_FOR_APPROVAL_1' && (
+                <div>
+                  <Button
+                    id="btnSave"
+                    variant="contained"
+                    color="error"
+                    className={classes.MbtnSave}
+                    onClick={handleReject}
+                    startIcon={<SaveIcon />}
+                    // sx={{ width: 140 }}
+                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
+                  >
+                    ปฎิเสธ
+                  </Button>
+                  <Button
+                    id="btnCreateTransfer"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnSave}
+                    onClick={handleApprove}
+                    startIcon={<CheckCircleOutline />}
+                    // sx={{ width: 140 }}
+                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
+                  >
+                    อนุมัติ
+                  </Button>
+                </div>
+              )}
+
+              {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
+                <div>
+                  <Button
+                    id="btnSave"
+                    variant="contained"
+                    color="error"
+                    className={classes.MbtnSave}
+                    onClick={handleReject}
+                    startIcon={<SaveIcon />}
+                    // sx={{ width: 140 }}
+                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
+                  >
+                    ปฎิเสธ
+                  </Button>
+                  <Button
+                    id="btnCreateTransfer"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnSave}
+                    onClick={handleApprove}
+                    startIcon={<CheckCircleOutline />}
+                    // sx={{ width: 140 }}
+                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
+                  >
+                    อนุมัติ
+                  </Button>
+                </div>
+              )}
+            </Grid>
+          </Grid>
+
+          <Box mb={4}>
+            <StockRequestSKU
+              type={type}
+              onMapSKU={handleMapSKU}
+              // onChangeItems={handleChangeItems}
+              changeItems={handleStatusChangeItems}
+              update={flagSave}
+              stock={flagStock}
+              branch={fromBranch}
+              status={status}
+            />
           </Box>
 
           {status !== '' && status !== 'DRAFT' && (
@@ -867,6 +1027,28 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               </Grid>
             </Grid>
           )}
+
+          <Box mt={3}>
+            <Grid container spacing={2} mb={1}>
+              <Grid item xs={10}></Grid>
+              <Grid item xs={2} textAlign="center">
+                <IconButton onClick={topFunction}>
+                  <ArrowForwardIosIcon
+                    sx={{
+                      fontSize: '41px',
+                      padding: '6px',
+                      backgroundColor: '#C8E8FF',
+                      transform: 'rotate(270deg)',
+                      color: '#fff',
+                      borderRadius: '50%',
+                    }}
+                  />
+                </IconButton>
+
+                <Box fontSize="13px">กลับขึ้นด้านบน</Box>
+              </Grid>
+            </Grid>
+          </Box>
         </DialogContent>
       </Dialog>
 
