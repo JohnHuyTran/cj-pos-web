@@ -17,6 +17,7 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import { getsaleLimitTimeDetail } from '../../store/slices/sale-limit-time-detail-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
+import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 
 const _ = require('lodash');
 interface loadingModalState {
@@ -261,6 +262,9 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const handleCloseCreateModal = () => {
     setOpenDetailModal(false);
   };
+  const handleClosePopup = () => {
+    setOpenPopup(false);
+  };
 
   const handleClickCell = async (params: GridCellParams) => {
     // const chkPN = params.colDef.field;
@@ -275,7 +279,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     } catch (error) {
       console.log(error);
     }
-  
+
     handleOpenLoading('close', false);
   };
 
@@ -309,7 +313,8 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
           onClickClose={handleCloseCreateModal}
         />
       )}
-      <LoadingModal open={openLoadingModal.open}/>
+      <LoadingModal open={openLoadingModal.open} />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>
   );
 };

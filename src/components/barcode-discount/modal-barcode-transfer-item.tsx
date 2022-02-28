@@ -729,6 +729,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               maxLength={100}
               onChangeComment={handleChangeNote}
               isDisable={dataDetail.status > 1}
+              rowDisplay={4}
             />
           </Grid>
           <Grid item xs={3}>
@@ -739,6 +740,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 maxLength={100}
                 onChangeComment={handleChangeReason}
                 isDisable={dataDetail.status > 2 || !approvePermission}
+                rowDisplay={4}
               />
             </Box>
           </Grid>
