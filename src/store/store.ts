@@ -42,6 +42,7 @@ import searchTypeAndProduct from './slices/search-type-product-slice';
 import addTypeAndProduct from './slices/add-type-product-slice';
 import saleLimitTimeSlice from './slices/sale-limit-time-search-slice';
 import saleLimitTime from './slices/sale-limit-time-slice';
+import barcodeDiscountPrintSlice from "./slices/barcode-discount-print-slice";
 
 const store = configureStore({
   reducer: {
@@ -87,6 +88,7 @@ const store = configureStore({
     addTypeAndProduct: addTypeAndProduct,
     searchSaleLimitTime: saleLimitTimeSlice,
     saleLimitTime: saleLimitTime,
+    barcodeDiscountPrintSlice: barcodeDiscountPrintSlice,
   },
 });
 

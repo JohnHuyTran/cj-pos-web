@@ -33,6 +33,7 @@ import { ACTIONS } from '../../utils/enum/permission-enum';
 import NumberFormat from 'react-number-format';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import HtmlTooltip from '../commons/ui/html-tooltip';
+import { updateBarcodeDiscountPrintState, updatePrintInDetail } from "../../store/slices/barcode-discount-print-slice";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -114,6 +115,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
         };
       });
       setDtTable(rows);
+      if (Action.UPDATE === action) {
+        dispatch(updateBarcodeDiscountPrintState(_.cloneDeep(rows)));
+        dispatch(updatePrintInDetail(true));
+      }
     } else {
       setDtTable([]);
     }

@@ -1,9 +1,9 @@
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import TextField from '@mui/material/TextField';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useStyles } from '../../styles/makeTheme';
-import {objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty} from '../../utils/utils';
+import { objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../utils/utils';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -19,11 +19,14 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
 import { saveSearchCriteriaBD } from '../../store/slices/barcode-discount-criteria-search-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
-import {Action} from '../../utils/enum/common-enum';
+import { Action } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
-import {KeyCloakTokenInfo} from "../../models/keycolak-token-info";
-import {getUserInfo} from "../../store/sessionStore";
-import {ACTIONS} from "../../utils/enum/permission-enum";
+import { KeyCloakTokenInfo } from "../../models/keycolak-token-info";
+import { getUserInfo } from "../../store/sessionStore";
+import { ACTIONS } from "../../utils/enum/permission-enum";
+import ModalConfirmPrintedBarcode from "../../components/barcode-discount/modal-confirm-printed-barcode";
+
+const _ = require('lodash');
 
 interface State {
   documentNumber: string;
@@ -52,21 +55,31 @@ const BarcodeDiscountSearch = () => {
     fromDate: new Date(),
     toDate: new Date(),
   });
+  const [valuePrints, setValuePrints] = React.useState<any>({
+    printNormal: true,
+    printInDetail: false,
+    ids: '',
+    lstProductNotPrinted: [],
+    lstProductPrintAgain: []
+  });
 
   const dispatch = useAppDispatch();
   const page = '1';
   const limit = useAppSelector((state) => state.barcodeDiscountSearchSlice.bdSearchResponse.perPage);
   const barcodeDiscountSearchSlice = useAppSelector((state) => state.barcodeDiscountSearchSlice);
+  const barcodeDiscountPrint = useAppSelector((state) => state.barcodeDiscountPrintSlice.state);
+  const printInDetail = useAppSelector((state) => state.barcodeDiscountPrintSlice.inDetail);
   const [userPermission, setUserPermission] = useState<any[]>([]);
   const [approvePermission, setApprovePermission] = useState<boolean>(false);
+  const [printPermission, setPrintPermission] = useState<boolean>(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
-
   const [openModal, setOpenModal] = React.useState(false);
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+  const [openModalPrint, setOpenModalPrint] = React.useState(false);
 
   useEffect(() => {
     setLstStatus(t('lstStatus', { returnObjects: true }));
@@ -74,10 +87,12 @@ const BarcodeDiscountSearch = () => {
     const userInfo: KeyCloakTokenInfo = getUserInfo();
     if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
       let userPermission = (userInfo.acl['service.posback-campaign'] != null && userInfo.acl['service.posback-campaign'].length > 0)
-          ? userInfo.acl['service.posback-campaign'] : []
+        ? userInfo.acl['service.posback-campaign'] : []
       setUserPermission(userPermission);
       setApprovePermission((userPermission != null && userPermission.length > 0)
-          ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false);
+        ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false);
+      setPrintPermission((userPermission != null && userPermission.length > 0)
+        ? userPermission.includes(ACTIONS.CAMPAIGN_BD_PRINT) : false)
     }
   }, []);
 
@@ -103,6 +118,14 @@ const BarcodeDiscountSearch = () => {
 
   const handleClosePopup = () => {
     setOpenPopup(false);
+  };
+
+  const handleOpenModalPrint = () => {
+    setOpenModalPrint(true);
+  };
+
+  const handleCloseModalPrint = () => {
+    setOpenModalPrint(false);
   };
 
   const onClear = async () => {
@@ -166,18 +189,50 @@ const BarcodeDiscountSearch = () => {
     handleOpenLoading('open', false);
   };
 
+  const onPrintedBarcode = async () => {
+    let lstProductNotPrinted = [];
+    let ids = [];
+    if (barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && !printInDetail) {
+      let barcodeDiscountPrintData = _.cloneDeep(barcodeDiscountPrint);
+      for (const item of barcodeDiscountPrintData) {
+        ids.push(item.id);
+        let products = item.products;
+        if (products && products.length > 0) {
+          for (const itPro of products) {
+            if (!stringNullOrEmpty(itPro.expiredDate) && moment(itPro.expiredDate).isSameOrBefore(moment(new Date()))) {
+              itPro.documentNumber = item.documentNumber;
+              lstProductNotPrinted.push(itPro);
+            }
+          }
+        }
+      }
+    }
+    await setValuePrints({
+      ...valuePrints,
+      ids: ids,
+      printNormal: !(lstProductNotPrinted && lstProductNotPrinted.length > 0),
+      printInDetail: printInDetail,
+      lstProductNotPrinted: lstProductNotPrinted
+    });
+    handleOpenModalPrint();
+  };
+
+  const onConfirmModalPrint = async () => {
+    onSearch();
+  };
+
   let dataTable;
   const res = barcodeDiscountSearchSlice.bdSearchResponse;
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      dataTable = <BarcodeDiscountList onSearch={onSearch} />;
+      dataTable = <BarcodeDiscountList onSearch={onSearch}/>;
     } else {
       dataTable = (
         <Grid item container xs={12} justifyContent="center">
           <Box color="#CBD4DB">
             <h2>
-              {t('noData')} <SearchOff fontSize="large" />
+              {t('noData')} <SearchOff fontSize="large"/>
             </h2>
           </Box>
         </Grid>
@@ -278,9 +333,11 @@ const BarcodeDiscountSearch = () => {
               variant="contained"
               sx={{ width: '200px' }}
               className={classes.MbtnPrint}
-              style={{display: approvePermission ? 'none' : undefined}}
-              color="cancelColor"
-              startIcon={<PrintSharp />}
+              disabled={!(barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && !printInDetail)}
+              style={{ display: printPermission ? undefined : 'none' }}
+              color="secondary"
+              onClick={onPrintedBarcode}
+              startIcon={<PrintSharp/>}
             >
               {t('button.printBarcode')}
             </Button>
@@ -291,9 +348,9 @@ const BarcodeDiscountSearch = () => {
               variant="contained"
               sx={{ width: '220px' }}
               className={classes.MbtnSearch}
-              style={{display: approvePermission ? 'none' : undefined}}
+              style={{ display: approvePermission ? 'none' : undefined }}
               color="secondary"
-              startIcon={<AddCircleOutlineOutlinedIcon />}
+              startIcon={<AddCircleOutlineOutlinedIcon/>}
               onClick={handleOpenModal}
             >
               {t('button.createNewDocument')}
@@ -322,8 +379,8 @@ const BarcodeDiscountSearch = () => {
         </Grid>
       </Box>
       {dataTable}
-      <LoadingModal open={openLoadingModal.open} />
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <LoadingModal open={openLoadingModal.open}/>
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
       {openModal && (
         <ModalCreateBarcodeDiscount
           isOpen={openModal}
@@ -334,7 +391,12 @@ const BarcodeDiscountSearch = () => {
           onSearchBD={onSearch}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
+      <ModalConfirmPrintedBarcode onClose={handleCloseModalPrint}
+                                  onConfirm={onConfirmModalPrint}
+                                  open={openModalPrint}
+                                  values={valuePrints}
+      />
     </>
   );
 };

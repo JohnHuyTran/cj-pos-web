@@ -21,6 +21,7 @@ import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-de
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
+import { updateBarcodeDiscountPrintState, updatePrintInDetail } from "../../store/slices/barcode-discount-print-slice";
 
 const _ = require('lodash');
 
@@ -74,6 +75,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
               ? convertUtcToBkkDate(data.approvedDate, DateFormat.DATE_FORMAT)
               : '',
           requesterNote: stringNullOrEmpty(data.requesterNote) ? '' : data.requesterNote,
+          products: data.products
         };
       });
       setLstBarcodeDiscount(rows);
@@ -89,6 +91,13 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       }
     }
   }, [bdSearchResponse]);
+
+  useEffect(() => {
+    let lstBarcodeDiscountData = _.cloneDeep(lstBarcodeDiscount);
+    let lstBarcodeDiscountChecked = lstBarcodeDiscountData.filter((it: any) => it.checked);
+    dispatch(updateBarcodeDiscountPrintState(lstBarcodeDiscountChecked));
+    dispatch(updatePrintInDetail(false));
+  }, [lstBarcodeDiscount]);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -113,13 +122,15 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
     else setCheckAll(true);
   };
 
-  const onCheckAll = (event: any) => {
+  const onCheckAll = async (event: any) => {
     setCheckAll(event.target.checked);
-    for (let item of lstBarcodeDiscount) {
+    let lstBarcodeDiscountHandle = _.cloneDeep(lstBarcodeDiscount);
+    for (let item of lstBarcodeDiscountHandle) {
       if (BDStatus.APPROVED == item.status) {
         item.checked = event.target.checked;
       }
     }
+    setLstBarcodeDiscount(lstBarcodeDiscountHandle);
   };
 
   const renderCell = (value: any) => {
@@ -160,7 +171,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
             <FormControlLabel
               className={classes.MFormControlLabel}
               value="top"
-              control={<Checkbox checked={checkAll} onClick={onCheckAll.bind(this)} disabled={onDisabledCheckAll()} />}
+              control={<Checkbox checked={checkAll} onClick={onCheckAll.bind(this)} disabled={onDisabledCheckAll()}/>}
               label={t('selectAll')}
               labelPlacement="top"
             />
@@ -496,7 +507,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
           userPermission={userPermission}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
     </div>
   );
 };
