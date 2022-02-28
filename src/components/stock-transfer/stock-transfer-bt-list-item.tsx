@@ -350,8 +350,8 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     });
 
     setBranchTransferItems(items);
-    // dispatch(updateAddItemSkuGroupState(_newSku));
-    // dispatch(updateAddItemsGroupState(items));
+    dispatch(updateAddItemSkuGroupState(_newSku));
+    dispatch(updateAddItemsGroupState(items));
   };
 
   let newColumns = [...columns];
