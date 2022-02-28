@@ -94,9 +94,9 @@ const columns: GridColDef[] = [
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
-            e.persist();
-            const caretStart = e.target.selectionStart;
-            const caretEnd = e.target.selectionEnd;
+            // e.persist();
+            // const caretStart = e.target.selectionStart;
+            // const caretEnd = e.target.selectionEnd;
             var qty: any =
               params.getValue(params.id, 'qty') &&
               params.getValue(params.id, 'qty') !== null &&
@@ -110,7 +110,7 @@ const columns: GridColDef[] = [
             params.api.updateRows([{ ...params.row, actualQty: value }]);
 
             // update the state and reset the caret
-            e.target.setSelectionRange(caretStart, caretEnd);
+            // e.target.setSelectionRange(caretStart, caretEnd);
           }}
           disabled={params.getValue(params.id, 'isDraft') ? false : true}
           autoComplete='off'
@@ -131,11 +131,11 @@ const columns: GridColDef[] = [
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
-          e.persist();
-          const caretStart = e.target.selectionStart;
-          const caretEnd = e.target.selectionEnd;
+          // e.persist();
+          // const caretStart = e.target.selectionStart;
+          // const caretEnd = e.target.selectionEnd;
           params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
-          e.target.setSelectionRange(caretStart, caretEnd);
+          // e.target.setSelectionRange(caretStart, caretEnd);
         }}
         disabled={params.getValue(params.id, 'isDraft') ? false : true}
         autoComplete='off'
@@ -350,8 +350,8 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     });
 
     setBranchTransferItems(items);
-    dispatch(updateAddItemSkuGroupState(_newSku));
-    dispatch(updateAddItemsGroupState(items));
+    // dispatch(updateAddItemSkuGroupState(_newSku));
+    // dispatch(updateAddItemsGroupState(items));
   };
 
   let newColumns = [...columns];
@@ -361,10 +361,12 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     newColumns[7]['hide'] = true;
   }
 
-  const handleFocusOut = async (params: GridCellParams) => {
+  const handleFocusOut = () => {
     storeItem();
   };
-  const handleOnKeyDown = async (params: GridCellParams) => {};
+  const handleOnKeyDown = () => {
+    storeItem();
+  };
   const handleOnCellBlur = () => {
     storeItem();
   };
@@ -387,8 +389,8 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           scrollbarSize={10}
           rowHeight={65}
           onCellFocusOut={handleFocusOut}
-          onCellClick={handleOnCellClick}
-          // onCellKeyDown={handleOnKeyDown}
+          // onCellClick={handleOnCellClick}
+          onCellKeyDown={handleOnKeyDown}
           // onCellBlur={handleOnCellBlur}
         />
       </div>

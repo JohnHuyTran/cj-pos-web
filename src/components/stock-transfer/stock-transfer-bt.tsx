@@ -458,6 +458,13 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setOpenLoadingModal(false);
   };
 
+  if (endDate != null && startDate != null) {
+    const _startDate = moment(startDate).startOf('day').toISOString();
+    const _endDate = moment(endDate).startOf('day').toISOString();
+    if (_endDate < _startDate) {
+      setEndDate(null);
+    }
+  }
   const [skuCodeSelect, setSkuCodeSelect] = React.useState<string>('');
   const [defaultSkuSelected, setDefaultSkuSelected] = React.useState<string>(branchTransferInfo.itemGroups[0].skuCode);
   const [skuNameDisplay, setSkuNameDisplay] = React.useState<string>(branchTransferInfo.itemGroups[0].productName);
@@ -994,6 +1001,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
                   maxLength={100}
                   onChangeComment={handleChangeComment}
                   isDisable={!isDraft}
+                  rowDisplay={10}
                 />
               </Grid>
               <Grid item xs={7}></Grid>
