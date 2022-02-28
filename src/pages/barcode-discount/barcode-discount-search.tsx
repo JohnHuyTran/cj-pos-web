@@ -56,6 +56,8 @@ const BarcodeDiscountSearch = () => {
     toDate: new Date(),
   });
   const [valuePrints, setValuePrints] = React.useState<any>({
+    action: Action.INSERT,
+    dialogTitle: 'พิมพ์บาร์โค้ด',
     printNormal: true,
     printInDetail: false,
     ids: '',
@@ -199,7 +201,7 @@ const BarcodeDiscountSearch = () => {
         let products = item.products;
         if (products && products.length > 0) {
           for (const itPro of products) {
-            if (!stringNullOrEmpty(itPro.expiredDate) && moment(itPro.expiredDate).isSameOrBefore(moment(new Date()))) {
+            if (!stringNullOrEmpty(itPro.expiredDate) && moment(itPro.expiredDate).isSameOrBefore(moment(new Date()), 'day')) {
               itPro.documentNumber = item.documentNumber;
               lstProductNotPrinted.push(itPro);
             }

@@ -1,184 +1,381 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useStyles } from '../../styles/makeTheme';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { numberWithCommas } from '../../utils/utils';
-import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridEditCellValueParams,
+  GridRenderCellParams,
+  GridRowData,
+  GridRowId,
+  GridValueGetterParams,
+  useGridApiRef,
+} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { Item } from '../../models/stock-transfer-model';
+import { Item, ItemGroups } from '../../models/stock-transfer-model';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
+import { updateAddItemSkuGroupState, updateBTSkuSlice } from '../../store/slices/stock-transfer-bt-sku-slice';
+import { updateAddItemsGroupState } from '../../store/slices/stock-transfer-bt-product-slice';
 
-function BranchTransferListItem() {
-  const classes = useStyles();
-
-  const dispatch = useAppDispatch();
-  const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
-  const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
-  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const payloadSearch = useAppSelector((state) => state.saveSearchStock.searchStockTransfer);
-
-  const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
-  const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
-    branchTransferInfo.items ? branchTransferInfo.items : []
-  );
-  const [isDraft, setIsDraft] = React.useState(false);
-
-  const [pageSize, setPageSize] = React.useState<number>(10);
-
-  const columns: GridColDef[] = [
-    {
-      field: 'index',
-      headerName: 'ลำดับ',
-      minWidth: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: 'barcode',
-      headerName: 'บาร์โค้ด',
-      minWidth: 200,
-      flex: 0.7,
-      headerAlign: 'center',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-    {
-      field: 'productName',
-      headerName: 'รายละเอียดสินค้า',
-      headerAlign: 'center',
-      minWidth: 220,
-      flex: 1,
-      sortable: false,
-      renderCell: (params) => (
-        <div>
-          <Typography variant='body2'>{params.value}</Typography>
-        </div>
-      ),
-    },
-    {
-      field: 'qty',
-      headerName: 'จำนวนที่สั่ง',
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'right',
-      sortable: false,
-      renderCell: (params) => numberWithCommas(params.value),
-    },
-    {
-      field: 'unitName',
-      headerName: 'หน่วย',
-      minWidth: 110,
-      headerAlign: 'center',
-      sortable: false,
-    },
-    {
-      field: 'actualQty',
-      headerName: 'จำนวนโอนจริง',
-      minWidth: 120,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <div>
-          <TextField
-            variant='outlined'
-            name='txnActualQty'
-            type='number'
-            inputProps={{ style: { textAlign: 'right' } }}
-            value={params.value}
-            onChange={(e) => {
-              var qty: any =
-                params.getValue(params.id, 'qty') &&
-                params.getValue(params.id, 'qty') !== null &&
-                params.getValue(params.id, 'qty') != undefined
-                  ? params.getValue(params.id, 'qty')
-                  : 0;
-              var value = e.target.value ? parseInt(e.target.value, 10) : '0';
-              var returnQty = Number(params.getValue(params.id, 'actualQty'));
-              if (returnQty === 0) value = chkReturnQty(value);
-              if (value < 0) value = 0;
-              params.api.updateRows([{ ...params.row, actualQty: value }]);
-            }}
-            disabled={params.getValue(params.id, 'isDraft') ? false : true}
-            autoComplete='off'
-          />
-        </div>
-      ),
-    },
-    {
-      field: 'toteCode',
-      headerName: 'เลข Tote/ลัง',
-      minWidth: 120,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) => (
+interface Props {
+  skuCodeSelect: string;
+}
+const columns: GridColDef[] = [
+  {
+    field: 'index',
+    headerName: 'ลำดับ',
+    minWidth: 70,
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params) => (
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
+        {params.value}
+      </Box>
+    ),
+  },
+  {
+    field: 'barcode',
+    headerName: 'บาร์โค้ด',
+    minWidth: 200,
+    flex: 0.7,
+    headerAlign: 'center',
+    disableColumnMenu: true,
+    sortable: false,
+  },
+  {
+    field: 'barcodeName',
+    headerName: 'รายละเอียดสินค้า',
+    headerAlign: 'center',
+    minWidth: 220,
+    flex: 1,
+    sortable: false,
+    renderCell: (params) => (
+      <div>
+        <Typography variant='body2'>{params.value}</Typography>
+        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+          {params.getValue(params.id, 'skuCode') || ''}
+        </Typography>
+      </div>
+    ),
+  },
+  {
+    field: 'orderQty',
+    headerName: 'จำนวนที่สั่ง',
+    minWidth: 120,
+    headerAlign: 'center',
+    align: 'right',
+    sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
+  },
+  {
+    field: 'unitName',
+    headerName: 'หน่วย',
+    minWidth: 110,
+    headerAlign: 'center',
+    sortable: false,
+  },
+  {
+    field: 'actualQty',
+    headerName: 'จำนวนโอนจริง',
+    minWidth: 120,
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <div>
         <TextField
           variant='outlined'
-          name='txbToteCode'
+          name='txnActualQty'
+          type='number'
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
-          onClick={(e) => e.stopPropagation()}
           onChange={(e) => {
-            const cursorStart = e.target.selectionStart;
-            const cursorEnd = e.target.selectionEnd;
-            params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
-            e.target.setSelectionRange(cursorStart, cursorEnd);
+            // e.persist();
+            // const caretStart = e.target.selectionStart;
+            // const caretEnd = e.target.selectionEnd;
+            var qty: any =
+              params.getValue(params.id, 'qty') &&
+              params.getValue(params.id, 'qty') !== null &&
+              params.getValue(params.id, 'qty') != undefined
+                ? params.getValue(params.id, 'qty')
+                : 0;
+            var value = e.target.value ? parseInt(e.target.value, 10) : '0';
+            var returnQty = Number(params.getValue(params.id, 'actualQty'));
+            if (returnQty === 0) value = chkReturnQty(value);
+            if (value < 0) value = 0;
+            params.api.updateRows([{ ...params.row, actualQty: value }]);
+
+            // update the state and reset the caret
+            // e.target.setSelectionRange(caretStart, caretEnd);
           }}
           disabled={params.getValue(params.id, 'isDraft') ? false : true}
           autoComplete='off'
         />
-      ),
-    },
-    {
-      field: 'boNo',
-      headerName: 'เลขที่ BO',
-      minWidth: 200,
-      flex: 0.7,
-      headerAlign: 'center',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-  ];
+      </div>
+    ),
+  },
+  {
+    field: 'toteCode',
+    headerName: 'เลข Tote/ลัง',
+    minWidth: 120,
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <TextField
+        variant='outlined'
+        name='txbToteCode'
+        inputProps={{ style: { textAlign: 'right' } }}
+        value={params.value}
+        onChange={(e) => {
+          // e.persist();
+          // const caretStart = e.target.selectionStart;
+          // const caretEnd = e.target.selectionEnd;
+          params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
+          // e.target.setSelectionRange(caretStart, caretEnd);
+        }}
+        disabled={params.getValue(params.id, 'isDraft') ? false : true}
+        autoComplete='off'
+      />
+    ),
+  },
+  {
+    field: 'boNo',
+    headerName: 'เลขที่ BO',
+    minWidth: 200,
+    flex: 0.7,
+    headerAlign: 'center',
+    disableColumnMenu: true,
+    sortable: false,
+  },
+];
 
-  const chkReturnQty = (value: any) => {
-    let v = String(value);
-    if (v.substring(1) === '0') return Number(v.substring(0, 1));
-    return value;
+const chkReturnQty = (value: any) => {
+  let v = String(value);
+  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  return value;
+};
+function useApiRef() {
+  const apiRef = useGridApiRef();
+  const _columns = useMemo(
+    () =>
+      columns.concat({
+        field: '',
+        width: 0,
+        sortable: false,
+        renderCell: (params) => {
+          apiRef.current = params.api;
+          return null;
+        },
+      }),
+    [columns]
+  );
+
+  return { apiRef, columns: _columns };
+}
+
+function BranchTransferListItem({ skuCodeSelect }: Props) {
+  const classes = useStyles();
+  const _ = require('lodash');
+  const { apiRef, columns } = useApiRef();
+  const dispatch = useAppDispatch();
+
+  const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
+  const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
+  const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
+    branchTransferInfo.items ? branchTransferInfo.items : []
+  );
+
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  const skuGroupItems = useAppSelector((state) => state.updateBTSkuSlice.state);
+
+  const [isDraft, setIsDraft] = React.useState(false);
+  const [pageSize, setPageSize] = React.useState<number>(10);
+
+  let rows = branchTransferItems
+    .filter((item: Item, index: number) => {
+      if (skuCodeSelect) {
+        return item.skuCode === skuCodeSelect;
+      } else {
+        return item;
+      }
+    })
+    .map((item: Item, index: number) => {
+      return {
+        id: `${item.barcode}-${index + 1}`,
+        index: index + 1,
+        seqItem: item.seqItem,
+        barcode: item.barcode,
+        barcodeName: item.barcodeName,
+        skuCode: item.skuCode,
+        barFactor: item.barFactor,
+        unitCode: item.unitCode ? item.unitCode : 0,
+        unitName: item.unitName,
+        orderQty: item.orderQty ? item.orderQty : 0,
+        actualQty: item.actualQty ? item.actualQty : 0,
+        toteCode: item.toteCode,
+        isDraft: isDraft,
+        boNo: item.boNo,
+      };
+    });
+
+  React.useEffect(() => {
+    setIsDraft(branchTransferInfo.status === 'CREATED' ? true : false);
+    storeItemAddItem(payloadAddItem);
+  }, [payloadAddItem]);
+
+  const storeItemAddItem = async (_newItem: any) => {
+    let _items = [...branchTransferItems];
+    let _sku = [...skuGroupItems];
+    if (Object.keys(_newItem).length !== 0) {
+      _newItem.map((data: any, index: number) => {
+        const dupItem: any = branchTransferItems.find((item: Item, index: number) => {
+          return item.barcode === data.barcode;
+        });
+        const dupSku: any = skuGroupItems.find((item: ItemGroups, index: number) => {
+          return item.skuCode === data.skuCode;
+        });
+
+        if (dupSku) {
+          const newData: ItemGroups = {
+            skuCode: dupSku.skuCode,
+            productName: dupSku.productName,
+            orderAllQty: dupSku.orderAllQty,
+            actualAllQty: dupSku.actualAllQty + data.baseUnit * data.qty,
+            remainingQty: dupSku.remainingQty,
+          };
+          _.remove(_sku, function (item: ItemGroups) {
+            return item.skuCode === data.skuCode;
+          });
+          _sku = [..._sku, newData];
+        } else {
+          const newData: ItemGroups = {
+            skuCode: data.skuCode,
+            productName: data.skuName,
+            orderAllQty: 0,
+            actualAllQty: 0,
+            remainingQty: 0,
+          };
+          _sku = [..._sku, newData];
+        }
+
+        if (dupItem) {
+          const newData: Item = {
+            seqItem: dupItem.seqItem,
+            barcode: dupItem.barcode,
+            barcodeName: dupItem.barcodeName,
+            skuCode: dupItem.skuCode,
+            barFactor: dupItem.barFactor,
+            unitName: dupItem.unitName,
+            unitCode: dupItem.unitCode,
+            orderQty: dupItem.orderQty ? dupItem.orderQty : 0,
+            actualQty: dupItem.actualQty + data.qty,
+            toteCode: dupItem.toteCode,
+            isDraft: isDraft,
+            boNo: dupItem.boNo,
+          };
+          _.remove(_items, function (item: Item) {
+            return item.barcode === data.barcode;
+          });
+          _items = [..._items, newData];
+        } else {
+          const newData: Item = {
+            seqItem: 0,
+            barcode: data.barcode,
+            barcodeName: data.barcodeName,
+            skuCode: data.skuCode,
+            barFactor: data.baseUnit,
+            unitCode: data.unitCode ? data.unitCode : 0,
+            unitName: data.unitName,
+            orderQty: data.orderQty ? data.orderQty : 0,
+            actualQty: data.qty,
+            toteCode: '',
+            isDraft: isDraft,
+          };
+          _items = [..._items, newData];
+        }
+      });
+    }
+    const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
+    setBranchTransferItems(orderItem);
+    dispatch(updateAddItemSkuGroupState(_.orderBy(_sku, ['skuCode'], ['asc'])));
+    dispatch(updateAddItemsGroupState(orderItem));
   };
 
-  const currentlySelected = () => {};
+  const storeItem = () => {
+    let _sku = [...skuGroupItems];
+    let _newSku: ItemGroups[] = [];
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    const items: Item[] = [];
+    rowsEdit.forEach((data: GridRowData) => {
+      const newData: Item = {
+        seqItem: data.seqItem,
+        barcode: data.barcode,
+        barcodeName: data.barcodeName,
+        skuCode: data.skuCode,
+        unitName: data.unitName,
+        actualQty: data.actualQty,
+        toteCode: data.toteCode,
+        isDraft: isDraft,
+        boNo: data.boNo,
+        barFactor: data.barFactor,
+        unitCode: data.unitCode ? data.unitCode : 0,
+        orderQty: data.orderQty ? data.orderQty : 0,
+      };
+      items.push(newData);
+    });
 
-  let rows = branchTransferItems.map((item: Item, index: number) => {
-    return {
-      id: `${item.barcode}-${index + 1}`,
-      index: index + 1,
-      seqItem: item.seqItem,
-      barcode: item.barcode,
-      productName: item.productName,
-      skuCode: item.skuCode,
-      baseUnit: item.baseUnit ? item.baseUnit : 0,
-      unitName: item.unitName,
-      remainStock: item.remainStock ? item.remainStock : 0,
-      qty: item.qty ? item.qty : 0,
-      actualQty: item.actualQty ? item.actualQty : 0,
-      toteCode: item.toteCode,
-      isDraft: isDraft,
-      boNo: item.boNo,
-    };
-  });
+    _sku.forEach((data: ItemGroups) => {
+      const sum = items
+        .filter((dataItem: Item) => {
+          return data.skuCode === dataItem.skuCode;
+        })
+        .reduce((sum, dataItem: Item) => {
+          return (
+            sum + Number((dataItem.actualQty ? dataItem.actualQty : 0) * (dataItem.barFactor ? dataItem.barFactor : 0))
+          );
+        }, 0);
+
+      const newData: ItemGroups = {
+        skuCode: data.skuCode,
+        productName: data.productName,
+        orderAllQty: data.orderAllQty,
+        actualAllQty: sum,
+        remainingQty: data.remainingQty,
+      };
+      _newSku.push(newData);
+    });
+
+    setBranchTransferItems(items);
+    dispatch(updateAddItemSkuGroupState(_newSku));
+    dispatch(updateAddItemsGroupState(items));
+  };
+
+  let newColumns = [...columns];
+  if (branchTransferInfo.status != 'CREATED') {
+    newColumns[7]['hide'] = false;
+  } else {
+    newColumns[7]['hide'] = true;
+  }
+
+  const handleFocusOut = () => {
+    storeItem();
+  };
+  const handleOnKeyDown = () => {
+    storeItem();
+  };
+  const handleOnCellBlur = () => {
+    storeItem();
+  };
+  const handleOnCellClick = () => {
+    storeItem();
+  };
 
   return (
     <Box mt={2} bgcolor='background.paper'>
-      <Typography>รายการสินค้า: รายการสินค้าทั้งหมด</Typography>
-      <FormGroup>
-        <FormControlLabel control={<Checkbox defaultChecked />} label='รายการสินค้าทั้งหมด' />
-      </FormGroup>
       <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
         <DataGrid
           rows={rows}
@@ -191,7 +388,10 @@ function BranchTransferListItem() {
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          onCellClick={currentlySelected}
+          onCellFocusOut={handleFocusOut}
+          onCellClick={handleOnCellClick}
+          // onCellKeyDown={handleOnKeyDown}
+          // onCellBlur={handleOnCellBlur}
         />
       </div>
     </Box>

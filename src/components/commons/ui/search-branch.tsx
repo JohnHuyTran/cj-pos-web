@@ -139,7 +139,7 @@ export default function SearchBranch(props: Props): ReactElement {
     setChecked(false);
   };
   const handleClickSearch = () => {
-    !disabled && setOpen(true);
+    setOpen(true);
   };
 
   const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {

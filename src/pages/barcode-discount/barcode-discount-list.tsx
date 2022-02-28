@@ -52,6 +52,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
   const [pageSize, setPageSize] = React.useState(limit.toString());
   const payload = useAppSelector((state) => state.barcodeDiscountCriteriaSearchSlice.searchCriteria);
   const [userPermission, setUserPermission] = useState<any[]>([]);
+  const printInDetail = useAppSelector((state) => state.barcodeDiscountPrintSlice.inDetail);
 
   useEffect(() => {
     const lstBarcodeDiscount = bdSearchResponse.data;
@@ -93,11 +94,17 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
   }, [bdSearchResponse]);
 
   useEffect(() => {
-    let lstBarcodeDiscountData = _.cloneDeep(lstBarcodeDiscount);
-    let lstBarcodeDiscountChecked = lstBarcodeDiscountData.filter((it: any) => it.checked);
-    dispatch(updateBarcodeDiscountPrintState(lstBarcodeDiscountChecked));
-    dispatch(updatePrintInDetail(false));
+    handleUpdateBarcodeDiscountPrint(false);
   }, [lstBarcodeDiscount]);
+
+  const handleUpdateBarcodeDiscountPrint = (closeDetail: boolean) => {
+    if (!printInDetail || closeDetail) {
+      let lstBarcodeDiscountData = _.cloneDeep(lstBarcodeDiscount);
+      let lstBarcodeDiscountChecked = lstBarcodeDiscountData.filter((it: any) => it.checked);
+      dispatch(updateBarcodeDiscountPrintState(lstBarcodeDiscountChecked));
+      dispatch(updatePrintInDetail(false));
+    }
+  }
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -105,6 +112,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
 
   const handleCloseDetail = () => {
     setOpenDetail(false);
+    handleUpdateBarcodeDiscountPrint(true);
   };
 
   const handleClosePopup = () => {

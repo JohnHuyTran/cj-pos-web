@@ -37,7 +37,7 @@ function OrderList() {
       field: 'index',
       headerName: 'ลำดับ',
       // minWidth: 75,
-      flex: 0.7,
+      flex: 0.65,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -47,8 +47,8 @@ function OrderList() {
       ),
     },
     {
-      field: 'shipmentNo',
-      headerName: 'เลขที่เอกสาร LD',
+      field: 'docRefNo',
+      headerName: 'เลขที่เอกสาร',
       // minWidth: 161,
       flex: 1.3,
       headerAlign: 'center',
@@ -57,16 +57,46 @@ function OrderList() {
     {
       field: 'sdNo',
       headerName: 'เลขที่เอกสาร SD',
-      minWidth: 160,
-      // flex: 1.3,
+      // minWidth: 160,
       flex: 1.3,
       headerAlign: 'center',
       sortable: false,
     },
     {
+      field: 'shipBranchFromcode',
+      headerName: 'สาขาต้นทาง',
+      // minWidth: 90,
+      flex: 1.1,
+      headerAlign: 'center',
+      sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.value}-{params.getValue(params.id, 'shipBranchFromname') || ''}
+          </Typography>
+        </div>
+      ),
+    },
+    {
+      field: 'shipBranchTocode',
+      headerName: 'สาขาปลายทาง',
+      // minWidth: 205,
+      // width: 195,
+      flex: 1.15,
+      headerAlign: 'center',
+      sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+            {params.value}-{params.getValue(params.id, 'shipBranchToname') || ''}
+          </Typography>
+        </div>
+      ),
+    },
+    {
       field: 'sdType',
       headerName: 'ประเภท',
-      minWidth: 80,
+      // minWidth: 80,
       flex: 0.9,
       // flex: 1.4,
       headerAlign: 'center',
@@ -75,7 +105,7 @@ function OrderList() {
     {
       field: 'sdStatus',
       headerName: 'สถานะ',
-      minWidth: 80,
+      minWidth: 70,
       flex: 0.65,
       headerAlign: 'center',
       align: 'left',
@@ -93,7 +123,7 @@ function OrderList() {
     {
       field: 'toteCnt',
       headerName: 'จำนวนTote',
-      minWidth: 100,
+      minWidth: 99,
       flex: 0.9,
       headerAlign: 'center',
       align: 'right',
@@ -102,7 +132,7 @@ function OrderList() {
     {
       field: 'shipmentDate',
       headerName: 'วันที่รับสินค้า',
-      minWidth: 110,
+      minWidth: 105,
       flex: 1,
       headerAlign: 'center',
       align: 'center',
@@ -111,20 +141,21 @@ function OrderList() {
     {
       field: 'comment',
       headerName: 'อ้างอิง SD โอนลอย',
-      minWidth: 150,
-      flex: 1.4,
+      minWidth: 145,
+      flex: 1.3,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
     },
   ];
 
-  // console.log("res: ", JSON.stringify(res));
+  // console.log('res: ', JSON.stringify(res));
   const rows = res.data.map((data: ShipmentInfo, indexs: number) => {
     return {
-      id: `${data.shipmentNo}_${data.sdNo}`,
+      id: `${data.docRefNo}_${data.sdNo}`,
       index: (cuurentPages - 1) * parseInt(pageSize) + indexs + 1,
       shipmentNo: data.shipmentNo,
+      docRefNo: data.docRefNo,
       sdNo: data.sdNo,
       sdType: getShipmentTypeText(data.sdType),
       boxCnt: data.boxCnt,
@@ -132,13 +163,18 @@ function OrderList() {
       shipmentDate: convertUtcToBkkDate(data.shipmentDate),
       sdStatus: getShipmentStatusText(data.sdStatus),
       comment: data.comment,
+      shipBranchFromcode: data.shipBranchFrom.code,
+      shipBranchFromname: data.shipBranchFrom.name,
+      shipBranchTocode: data.shipBranchTo.code,
+      shipBranchToname: data.shipBranchTo.name,
     };
   });
 
   const currentlySelected = async (params: GridCellParams) => {
     setOpenLoadingModal(true);
     setSdNo(params.row.sdNo);
-    setShipment(params.row.shipmentNo);
+    // setShipment(params.row.shipmentNo);
+    setShipment(params.row.docRefNo);
 
     await dispatch(featchOrderDetailAsync(params.row.sdNo))
       .then(
@@ -252,6 +288,7 @@ function OrderList() {
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           loading={loading}
+          rowHeight={65}
           pagination
         />
       </div>

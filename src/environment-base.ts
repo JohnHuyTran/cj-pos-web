@@ -8,10 +8,10 @@ export const environment = {
   orders: {
     shipment: {
       fetchOrder: {
-        url: '/order/shipment-deliverly',
+        url: '/order/shipment-delivery',
       },
       detail: {
-        url: '/order/shipment-deliverly',
+        url: '/order/shipment-delivery',
       },
       fetchOrderSD: {
         url: '/order/sd',
@@ -87,8 +87,11 @@ export const environment = {
       update: {
         url: '/campaign/sale-limit/{id}',
       },
+      start: {
+        url: '/campaign/sale-limit/start/{id}',
+      },
       cancel: {
-        url: '/campaign/sale-limit/{id}',
+        url: '/campaign/sale-limit/cancel',
       },
     },
   },
@@ -243,6 +246,11 @@ export const environment = {
     },
     stockBalanceCheck: {
       url: '/stock/stock-balance-check',
+    },
+    stockBalance: {
+      stockBalanceBySKU: {
+        url: '/stock/stock-balance/check-by-sku-codes',
+      },
     },
   },
   master: {

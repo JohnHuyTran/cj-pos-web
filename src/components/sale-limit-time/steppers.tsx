@@ -8,17 +8,19 @@ import { ReactElement } from 'react';
 
 interface Props {
   activeStep: number;
-  setActiveStep: (activeStep: number) => void;
 }
 const steps = ['บันทึก', 'เริ่มใช้งาน', 'ครบกำหนด'];
 
-export default function StepperBar({ activeStep, setActiveStep }: Props): ReactElement {
+export default function StepperBar({ activeStep }: Props): ReactElement {
   const [cancel, setCancel] = React.useState<boolean>(false);
+  const [step, setStep] = React.useState(activeStep);
 
   React.useEffect(() => {
     if (activeStep === 4) {
       setCancel(true);
-      setActiveStep(2);
+      setStep(2);
+    } else {
+      setStep(activeStep);
     }
   }, [activeStep, open]);
 
@@ -26,7 +28,7 @@ export default function StepperBar({ activeStep, setActiveStep }: Props): ReactE
   return (
     <div className={classes.MStepper} style={{ paddingBottom: 5 }}>
       <Box sx={{ width: '45%', margin: 'auto', marginTop: '-1em' }}>
-        <Stepper activeStep={activeStep} alternativeLabel>
+        <Stepper activeStep={step} alternativeLabel>
           {steps.map((label, index) => {
             const labelProps: any = {};
             if (index === 1 && cancel) {
