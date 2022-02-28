@@ -9,7 +9,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Typography,
-  FormControl,
+  FormControl, Link,
 } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -109,6 +109,8 @@ export default function ModalCreateBarcodeDiscount({
   const barcodeDiscountPrint = useAppSelector((state) => state.barcodeDiscountPrintSlice.state);
   const printInDetail = useAppSelector((state) => state.barcodeDiscountPrintSlice.inDetail);
   const [valuePrints, setValuePrints] = React.useState<any>({
+    action: Action.INSERT,
+    dialogTitle: 'พิมพ์บาร์โค้ด',
     printNormal: true,
     printInDetail: false,
     ids: '',
@@ -152,8 +154,8 @@ export default function ModalCreateBarcodeDiscount({
   const handleCloseModalReject = (confirm: boolean) => {
     setOpenModalReject(false);
     if (confirm) {
-      setTextPopup('คุณได้ทำการไม่อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
-      setOpenPopupModal(true);
+      setOpenPopup(true);
+      setPopupMsg('คุณได้ทำการไม่อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
       handleClose();
       if (onSearchBD) onSearchBD();
     }
@@ -263,12 +265,14 @@ export default function ModalCreateBarcodeDiscount({
           return {
             id: index,
             index: index + 1,
+            sequence: itemH.sequence,
             printBy: itemH.printBy,
             position: itemH.position,
             printingReason: (1 == itemH.printingTime) ? getReasonForPrintText('1') : getReasonForPrintText(itemH.printingReason),
             printingTime: itemH.printingTime,
             printedTime: moment(itemH.printedTime).format(DateFormat.DATE_TIME_DISPLAY_FORMAT),
-            numberOfPrinting: itemH.numberOfPrinting
+            numberOfPrinting: itemH.numberOfPrinting,
+            listOfProduct: itemH.listOfProduct
           };
         });
         setPrintHistoryRows(rows);
@@ -530,7 +534,7 @@ export default function ModalCreateBarcodeDiscount({
     let products = _.cloneDeep(barcodeDiscountPrint);
     if (Number(BDStatus.BARCODE_PRINTED) == status) {
       for (const itPro of products) {
-        if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isAfter(moment(new Date()))) {
+        if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isAfter(moment(new Date()), 'day')) {
           itPro.barcode = itPro.barCode;
           itPro.productName = itPro.barcodeName;
           lstProductPrintAgain.push(itPro);
@@ -539,7 +543,7 @@ export default function ModalCreateBarcodeDiscount({
     } else {
       if (barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail) {
         for (const itPro of products) {
-          if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isSameOrBefore(moment(new Date()))) {
+          if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isSameOrBefore(moment(new Date()), 'day')) {
             itPro.barcode = itPro.barCode;
             itPro.productName = itPro.barcodeName;
             lstProductNotPrinted.push(itPro);
@@ -551,6 +555,8 @@ export default function ModalCreateBarcodeDiscount({
     ids.push(dataDetail.id);
     await setValuePrints({
       ...valuePrints,
+      action: Action.INSERT,
+      dialogTitle: 'พิมพ์บาร์โค้ด',
       ids: ids,
       printNormal: lstProductNotPrinted.length === 0 && lstProductPrintAgain.length === 0,
       printInDetail: printInDetail,
@@ -571,6 +577,31 @@ export default function ModalCreateBarcodeDiscount({
     if (onSearchBD) onSearchBD();
   };
 
+  const onShowPrintedHistory = async (sequence: any) => {
+    if (printHistoryRows && printHistoryRows.length > 0 && printInDetail) {
+      let lstProductPrintAgain = [];
+      let printHistory = _.cloneDeep(printHistoryRows).find((it: any) => it.sequence === sequence);
+      if (printHistory.listOfProduct && printHistory.listOfProduct.length) {
+        for (const itPro of printHistory.listOfProduct) {
+          itPro.barcode = itPro.productBarcode;
+          lstProductPrintAgain.push(itPro);
+        }
+        let ids = [];
+        ids.push(dataDetail.id);
+        await setValuePrints({
+          ...valuePrints,
+          action: Action.VIEW,
+          dialogTitle: 'รายการส่วนลดที่พิมพ์',
+          ids: ids,
+          printNormal: false,
+          printInDetail: printInDetail,
+          lstProductPrintAgain: lstProductPrintAgain
+        });
+        handleOpenModalPrint();
+      }
+    }
+  }
+
   const printHistoryColumns: GridColDef[] = [
     {
       field: 'index',
@@ -584,36 +615,92 @@ export default function ModalCreateBarcodeDiscount({
           {params.value}
         </Box>
       ),
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{'ลำดับ'}</b>
+            </Typography>
+          </div>
+        );
+      }
     },
     {
       field: 'printBy',
       headerName: 'ชื่อผู้ทำรายการ',
       headerAlign: 'center',
-      flex: 0.8,
+      flex: 0.9,
       disableColumnMenu: false,
-      sortable: false
+      sortable: false,
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{'ชื่อผู้ทำรายการ'}</b>
+            </Typography>
+          </div>
+        );
+      }
     },
     {
       field: 'position',
       headerName: 'ตำแหน่ง',
       headerAlign: 'center',
-      flex: 1,
-      sortable: false
+      flex: 1.1,
+      sortable: false,
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{'ตำแหน่ง'}</b>
+            </Typography>
+          </div>
+        );
+      }
     },
     {
       field: 'printingReason',
       headerName: 'เหตุผลที่ทำการพิมพ์บาร์โค้ด',
       headerAlign: 'center',
       flex: 2,
-      sortable: false
+      sortable: false,
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{'เหตุผลที่ทำการพิมพ์บาร์โค้ด'}</b>
+            </Typography>
+          </div>
+        );
+      }
     },
     {
       field: 'numberOfPrinting',
       headerName: 'รายการส่วนลดที่พิมพ์',
       headerAlign: 'center',
       align: 'center',
-      flex: 1.2,
-      sortable: false
+      flex: 0.8,
+      sortable: false,
+      renderCell: (params) => (
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
+          <Link href="#" underline="always"
+                onClick={() => onShowPrintedHistory(params.getValue(params.id, 'sequence') || '')}>
+            {params.value}
+          </Link>
+        </Box>
+      ),
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{'รายการส่วนลด'}</b>
+            </Typography>
+            <Typography variant="body2" noWrap>
+              <b>{'ที่พิมพ์'}</b>
+            </Typography>
+          </div>
+        );
+      }
     },
     {
       field: 'printingTime',
@@ -621,7 +708,16 @@ export default function ModalCreateBarcodeDiscount({
       headerAlign: 'center',
       align: 'center',
       flex: 0.8,
-      sortable: false
+      sortable: false,
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{'พิมพ์ครั้งที่'}</b>
+            </Typography>
+          </div>
+        );
+      }
     },
     {
       field: 'printedTime',
@@ -629,7 +725,16 @@ export default function ModalCreateBarcodeDiscount({
       headerAlign: 'center',
       align: 'center',
       flex: 1,
-      sortable: false
+      sortable: false,
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{'พิมพ์วันที่/เวลา'}</b>
+            </Typography>
+          </div>
+        );
+      }
     }
   ];
 
