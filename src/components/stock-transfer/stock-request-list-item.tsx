@@ -201,7 +201,7 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
 
   const itemsMap = (items: any) => {
     let edit = false;
-    if (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') edit = true;
+    if (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') edit = true;
 
     rows = items.map((item: any, index: number) => {
       return {
