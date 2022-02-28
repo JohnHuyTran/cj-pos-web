@@ -62,7 +62,9 @@ export default function SearchBranch(props: Props): ReactElement {
     return (
       <li {...props} key={option.code}>
         <Box sx={{ display: 'flex', width: '100%' }}>
-          <Typography variant="body2">{option.code}-{option.name}</Typography>
+          <Typography variant="body2">
+            {option.code}-{option.name}
+          </Typography>
         </Box>
       </li>
     );
@@ -79,8 +81,10 @@ export default function SearchBranch(props: Props): ReactElement {
   };
 
   useEffect(() => {
-    if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
-    dispatch(fetchTotalBranch());
+    if (open) {
+      if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
+      dispatch(fetchTotalBranch());
+    }
   }, []);
 
   useEffect(() => {
@@ -91,7 +95,7 @@ export default function SearchBranch(props: Props): ReactElement {
         limit: '10',
       };
       const params = paramsConvert(payload);
-      dispatch(fetchBranchProvinceListAsync(params));
+      open && dispatch(fetchBranchProvinceListAsync(params));
     } catch (error) {
       console.log(error);
       throw error;
@@ -134,7 +138,7 @@ export default function SearchBranch(props: Props): ReactElement {
     setChecked(false);
   };
   const handleClickSearch = () => {
-    setOpen(true);
+    !disabled && setOpen(true);
   };
 
   const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,6 +164,7 @@ export default function SearchBranch(props: Props): ReactElement {
       try {
         const payload = {
           name: keyword,
+          code: keyword,
           ...(!!province && { province: province.name }),
           limit: '10',
         };
@@ -264,6 +269,7 @@ export default function SearchBranch(props: Props): ReactElement {
           },
         }}
         placeholder="กรุณาเลือก"
+        disabled={disabled}
       />
       <Dialog maxWidth="lg" fullWidth open={open}>
         <Box sx={{ flex: 1, ml: 2 }}>

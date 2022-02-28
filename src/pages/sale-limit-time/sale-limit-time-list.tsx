@@ -1,64 +1,90 @@
-import { Typography } from '@mui/material';
+import { Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useStyles } from '../../styles/makeTheme';
 import { genColumnValue, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, BDStatus, DateFormat } from '../../utils/enum/common-enum';
+import { Action, STStatus, DateFormat } from '../../utils/enum/common-enum';
 import HtmlTooltip from '../../components/commons/ui/html-tooltip';
 import { useTranslation } from 'react-i18next';
-
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { updatePayloadST } from '../../store/slices/sale-limit-time-search-slice';
+import ViewBranch from '../../components/sale-limit-time/view-branch';
+import STCreateModal from '../../components/sale-limit-time/sale-limit-time-create-modal';
+import moment from 'moment';
+import { convertUtcToBkkDate } from '../../utils/date-utill';
+const _ = require('lodash');
 interface StateProps {
   onSearch: () => void;
 }
 const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
-  const { t } = useTranslation(['barcodeDiscount']);
-  const [rows, setRows] = React.useState<any[]>([]);
-  const [currentPage, setCurrentPage] = React.useState<number>(10);
+  const { t } = useTranslation(['saleLimitTime']);
+  const [checkAll, setCheckAll] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [lstST, setListST] = React.useState<any[]>([]);
+  const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
+  const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
+  const currentPage = responveST.page;
+  const limit = responveST.perPage;
+  const [pageSize, setPageSize] = React.useState(limit.toString());
 
-  const genRowStatus = (params: GridValueGetterParams) => {
-    let statusDisplay;
-    let status = params.value ? params.value.toString() : '';
-    const statusLabel = genColumnValue('label', 'value', status, t('lstStatus', { returnObjects: true }));
-    switch (status) {
-      case BDStatus.DRAFT:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#FBA600', backgroundColor: '#FFF0CA' });
-        break;
-      case BDStatus.WAIT_FOR_APPROVAL:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#FBA600', backgroundColor: '#FFF0CA' });
-        break;
-      case BDStatus.APPROVED:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#20AE79', backgroundColor: '#E7FFE9' });
-        break;
-      case BDStatus.BARCODE_PRINTED:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#4465CD', backgroundColor: '#C8E8FF' });
-        break;
-      case BDStatus.REJECT:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#F54949', backgroundColor: '#FFD7D7' });
-        break;
+  const [popupMsg, setPopupMsg] = React.useState<string>('');
+  const [openPopup, setOpenPopup] = React.useState<boolean>(false);
+  const [openCreateModal, setOpenCreateModal] = React.useState(false);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const list: any[] = responveST.data;
+    if (list != null) {
+      let rows = list.map((item: any, index: number) => {
+        return {
+          checked: false,
+          id: item.id,
+          index: index + 1,
+          documentNumber: item.documentNumber,
+          status: item.status,
+          description: item.description,
+          remark: item.remark,
+          stStartTime: item.stStartTime,
+          stEndTime: item.stEndTime,
+          branch: item.stDetail,
+        };
+      });
+      setListST(rows);
     }
-    return statusDisplay;
-  };
-
-  const genRowStatusValue = (statusLabel: string, styleCustom: any) => {
-    return (
-      <HtmlTooltip title={<React.Fragment>{statusLabel}</React.Fragment>}>
-        <Typography className={classes.MLabelBDStatus} sx={styleCustom}>
-          {statusLabel}
-        </Typography>
-      </HtmlTooltip>
-    );
-  };
-
+  }, [responveST]);
   const columns: GridColDef[] = [
+    // {
+    //   field: 'checked',
+    //   headerName: t('numberOrder'),
+    //   width: 100,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    //   sortable: false,
+    //   renderHeader: (params) => (
+    //     <FormControl component="fieldset" sx={{ marginLeft: '-15px' }}>
+    //       <FormGroup aria-label="position" row>
+    //         <FormControlLabel
+    //           className={classes.MFormControlLabel}
+    //           value="top"
+    //           control={<Checkbox checked={checkAll} />}
+    //           label={t('selectAll')}
+    //           labelPlacement="top"
+    //         />
+    //       </FormGroup>
+    //     </FormControl>
+    //   ),
+    //   renderCell: (params) => (
+    //     <Checkbox checked={Boolean(params.value)} disabled={BDStatus.APPROVED != params.row.status} />
+    //   ),
+    // },
     {
       field: 'index',
       headerName: 'ลำดับ',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 170,
+      minWidth: 70,
     },
     {
       field: 'documentNumber',
@@ -88,27 +114,54 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       sortable: false,
       minWidth: 170,
+      renderCell: (params) => genBranch(params),
     },
     {
       field: 'createdAt',
       headerName: 'วันที่สร้าง รายการ',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 170,
+      minWidth: 160,
     },
     {
-      field: 'startDate',
+      field: 'stStartTime',
       headerName: 'วัน/เวลา ที่เริ่ม',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 170,
+      minWidth: 160,
+      renderCell: (params) => {
+        const start = params.value?.toString();
+        return (
+          <div>
+            <Typography variant="body2" noWrap>
+              {moment(start).add(543, 'year').format('DD/MM/YYYY')}
+            </Typography>
+            <Typography variant="body2" noWrap>
+              {moment(start).format('HH:mm ')}
+            </Typography>
+          </div>
+        );
+      },
     },
     {
-      field: 'endDate',
+      field: 'stEndTime',
       headerName: 'วัน/เวลา ที่สิ้นสุด',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 170,
+      minWidth: 160,
+      renderCell: (params) => {
+        const end = params.value?.toString();
+        return (
+          <div>
+            <Typography variant="body2" noWrap>
+              {moment(end).add(543, 'year').format('DD/MM/YYYY')}
+            </Typography>
+            <Typography variant="body2" noWrap>
+              {moment(end).format('HH:mm ')}
+            </Typography>
+          </div>
+        );
+      },
     },
     {
       field: 'remark',
@@ -118,37 +171,96 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       minWidth: 170,
     },
   ];
-  const handlePageChange = () => {};
-  const handlePageSizeChange = () => {};
+
+  const genBranch = (params: GridValueGetterParams) => {
+    const branch = _.cloneDeep(params.value);
+    return <ViewBranch values={branch} />;
+  };
+
+  const genRowStatusValue = (statusLabel: string, styleCustom: any) => {
+    return (
+      <HtmlTooltip title={<React.Fragment>{statusLabel}</React.Fragment>}>
+        <Typography className={classes.MLabelBDStatus} sx={styleCustom}>
+          {statusLabel}
+        </Typography>
+      </HtmlTooltip>
+    );
+  };
+
+  const genRowStatus = (params: GridValueGetterParams) => {
+    let statusDisplay;
+    let status = params.value ? params.value.toString() : '';
+    const statusLabel = genColumnValue('label', 'value', status, t('lstStatus', { returnObjects: true }));
+
+    switch (status) {
+      case STStatus.DRAFT:
+        statusDisplay = genRowStatusValue(statusLabel, { color: '#FBA600', backgroundColor: '#FFF0CA' });
+        break;
+      case STStatus.START:
+        statusDisplay = genRowStatusValue(statusLabel, { color: '#36C690', backgroundColor: '#E7FFE9' });
+        break;
+      case STStatus.END:
+        statusDisplay = genRowStatusValue(statusLabel, { color: '#676767', backgroundColor: '#EAEBEB;' });
+        break;
+      case STStatus.CANCEL:
+        statusDisplay = genRowStatusValue(statusLabel, { color: '#F54949', backgroundColor: '#FFD7D7' });
+        break;
+    }
+    return statusDisplay;
+  };
+  const handlePageChange = (newPage: number) => {
+    let page: string = (newPage + 1).toString();
+    const newPayload = {
+      ...payloadST,
+      page: page,
+    };
+    dispatch(updatePayloadST(newPayload));
+  };
+  const handlePageSizeChange = (pageSize: number) => {
+    setPageSize(pageSize.toString());
+    const newPayload = {
+      ...payloadST,
+      perPage: pageSize,
+    };
+    dispatch(updatePayloadST(newPayload));
+  };
+  const handleCloseCreateModal = () => {
+    setOpenCreateModal(false);
+  };
+  const handleClickCell = () => {
+    // setOpenCreateModal(true);
+  };
+
   return (
-    <div className={classes.MdataGridDetail}>
-      <Box>
+    <>
+      <div
+        className={classes.MdataGridPaginationTop}
+        style={{ height: lstST.length <= 10 ? '60vh' : 'auto', width: '100%' }}
+      >
         <DataGrid
-          rows={rows}
           columns={columns}
-          disableColumnMenu
-          hideFooterSelectedRowCount={true}
-          autoHeight={rows.length < 10}
-          scrollbarSize={10}
+          rows={lstST}
           pagination
           page={currentPage - 1}
-          pageSize={10}
+          pageSize={parseInt(pageSize)}
+          rowCount={responveST.total}
+          rowHeight={45}
           rowsPerPageOptions={[10, 20, 50, 100]}
-          paginationMode="server"
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
-          loading={loading}
-          rowHeight={45}
-          components={{
-            NoRowsOverlay: () => (
-              <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
-                ไม่มีข้อมูล
-              </Typography>
-            ),
-          }}
+          onCellClick={handleClickCell}
         />
-      </Box>
-    </div>
+      </div>
+      {openCreateModal && (
+        <STCreateModal
+          type={'View'}
+          setOpenPopup={setOpenPopup}
+          setPopupMsg={setPopupMsg}
+          isOpen={openCreateModal}
+          onClickClose={handleCloseCreateModal}
+        />
+      )}
+    </>
   );
 };
 export default SaleLimitTimeList;
