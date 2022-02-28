@@ -52,9 +52,13 @@ export default function ViewBranch({ values }: Props) {
   const handleCloseModal = () => {
     setOpen(false);
   };
+
   return (
     <>
-      {values.appliedBranches && values.appliedBranches.branchList && values.appliedBranches.branchList.length == 1 ? (
+      {values.appliedBranches &&
+      values.appliedBranches.branchList &&
+      values.appliedBranches.branchList.length == 1 &&
+      !values.appliedBranches.province ? (
         <Typography variant="body2">
           {values.appliedBranches.branchList[0].code}-{values.appliedBranches.branchList[0].name}
         </Typography>

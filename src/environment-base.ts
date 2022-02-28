@@ -245,15 +245,17 @@ export const environment = {
       url: '/stock/stock-balance-check',
     },
   },
-  branch: {
-    province: {
-      url: '/master/branch/province',
-    },
+  master: {
     branch: {
-      url: '/master/branch/search',
-    },
-    branchTotal: {
-      url: '/master/branch/branch-total',
+      province: {
+        url: '/master/branch/province',
+      },
+      branch: {
+        url: '/master/branch/search',
+      },
+      branchTotal: {
+        url: '/master/branch/branch-total',
+      },
     },
   },
 };
