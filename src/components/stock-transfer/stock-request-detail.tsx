@@ -52,7 +52,13 @@ import {
 } from '../../utils/role-permission';
 import { env } from '../../adapters/environmentConfigs';
 import { getUserInfo } from '../../store/sessionStore';
-import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import {
+  ACTIONS,
+  KEYCLOAK_GROUP_BRANCH_MANAGER,
+  KEYCLOAK_GROUP_OC01,
+  KEYCLOAK_GROUP_SCM01,
+  PERMISSION_GROUP,
+} from '../../utils/enum/permission-enum';
 
 interface State {
   branchCode: string;
@@ -137,7 +143,11 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setDisplayBtnReject(isAllowActionPermission(ACTIONS.STOCK_RT_REJECT));
     setGroupOC(isGroupOC());
     setGroupSCM(isGroupSCM());
-    // console.log('getUserGroup OC :', getUserGroup([KEYCLOAK_GROUP_OC1]));
+
+    console.log(
+      'getUserGroup :',
+      getUserGroup([KEYCLOAK_GROUP_BRANCH_MANAGER, KEYCLOAK_GROUP_OC01, KEYCLOAK_GROUP_SCM01])
+    );
 
     // const OC = isGroupOC();
     // const SCM = isGroupSCM();
@@ -742,7 +752,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              วันที่โอนสินค้า* :
+              วันที่โอนสินค้า{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -755,7 +765,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุด* :
+              วันที่สิ้นสุด{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -775,7 +785,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาขาต้นทาง* :
+              สาขาต้นทาง{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -794,7 +804,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              สาขาปลายทาง* :
+              สาขาปลายทาง{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' ||
@@ -819,7 +829,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาเหตุการโอน* :
+              สาเหตุการโอน{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
