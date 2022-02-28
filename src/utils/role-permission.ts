@@ -64,14 +64,6 @@ export const isGroupDC = () => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   return userInfo.group === PERMISSION_GROUP.DC;
 };
-export const isGroupOC = () => {
-  const userInfo: KeyCloakTokenInfo = getUserInfo();
-  return userInfo.group === PERMISSION_GROUP.OC;
-};
-export const isGroupSCM = () => {
-  const userInfo: KeyCloakTokenInfo = getUserInfo();
-  return userInfo.group === PERMISSION_GROUP.SCM;
-};
 export const isGroupBranch = () => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   return userInfo.group === PERMISSION_GROUP.BRANCH;

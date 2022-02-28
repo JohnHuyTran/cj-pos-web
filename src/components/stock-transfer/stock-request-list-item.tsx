@@ -13,7 +13,7 @@ import {
 import { GridEditCellValueParams } from '@material-ui/data-grid';
 import { Box } from '@material-ui/core';
 import { useStyles } from '../../styles/makeTheme';
-import { Checkbox, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
+import { Checkbox, FormControlLabel, FormGroup, Grid, TextField, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
 import ModelDeleteConfirm from '../commons/ui/modal-delete-confirm';
 import { numberWithCommas } from '../../utils/utils';
@@ -27,6 +27,7 @@ export interface DataGridProps {
   update: boolean;
   status: string;
   skuCode: string;
+  skuName: string;
 }
 
 const columns: GridColDef[] = [
@@ -150,7 +151,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function StockTransferListItem({ type, onChangeItems, update, status, skuCode }: DataGridProps) {
+function StockTransferListItem({ type, onChangeItems, update, status, skuCode, skuName }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
@@ -159,6 +160,26 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode }:
   const stockRequestItems = useAppSelector((state) => state.stockRequestItems.state);
 
   let rows: any = [];
+
+  const [isChecked, setIschecked] = React.useState(true);
+  // const [skuNameDisplay, setSkuNameDisplay] = React.useState(skuName);
+  const [skuCodeSelect, setSkuCodeSelect] = React.useState('ALL');
+
+  const handleCheckboxChange = (e: any) => {
+    const ischeck = e.target.checked;
+
+    if (ischeck) {
+      // setSkuNameDisplay('');
+      setIschecked(true);
+      setSkuCodeSelect('ALL');
+    } else {
+      setIschecked(false);
+      // setSkuCodeSelect(defaultSkuSelected);
+    }
+  };
+
+  console.log('isChecked :', isChecked);
+
   useEffect(() => {
     // if (!update && type !== 'Create') {
     //   if (stockRequestDetail) {
@@ -170,15 +191,12 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode }:
     //   }
     // }
     // console.log('stockRequestItems :', JSON.stringify(stockRequestItems));
-    // if (skuCode !== 'ALL') {
-    //   let itemsOrderBy: any = [];
-    //   let i = stockRequestItems.filter((r: any) => r.skuCode === skuCode);
-    //   i = _.orderBy(i, ['skuCode', 'baseUnit'], ['asc', 'asc']);
-    //   i.forEach((data: any) => {
-    //     itemsOrderBy.push(data);
-    //   });
-    //   dispatch(updatestockRequestItemsState(itemsOrderBy));
-    // }
+
+    if (skuCode !== 'ALL') {
+      setIschecked(false);
+      setSkuCodeSelect(skuCode);
+      console.log('skuName :', skuName);
+    }
   }, [update, skuCode]);
 
   const itemsMap = (items: any) => {
@@ -204,41 +222,60 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode }:
     // return onChangeItems(items ? items : []);
   };
 
-  // if (skuCode === 'ALL') {
-  if (type === 'Create') {
-    if (Object.keys(stockRequestItems).length > 0) itemsMap(stockRequestItems);
-  } else {
-    if (Object.keys(stockRequestItems).length > 0) {
-      itemsMap(stockRequestItems);
-    } else if (stockRequestDetail) {
-      const items = stockRequestDetail.items ? stockRequestDetail.items : [];
-      if (items.length > 0) {
-        //   updateItemsState(items);
-        itemsMap(items);
+  if (skuCodeSelect === 'ALL') {
+    if (type === 'Create') {
+      if (Object.keys(stockRequestItems).length > 0) itemsMap(stockRequestItems);
+    } else {
+      if (Object.keys(stockRequestItems).length > 0) {
+        itemsMap(stockRequestItems);
+      } else if (stockRequestDetail) {
+        const items = stockRequestDetail.items ? stockRequestDetail.items : [];
+        if (items.length > 0) {
+          //   updateItemsState(items);
+          itemsMap(items);
+        }
       }
     }
+  } else {
+    let itemsOrderBy: any = [];
+    let item = stockRequestItems.filter((r: any) => r.skuCode === skuCode);
+    item = _.orderBy(item, ['skuCode', 'baseUnit'], ['asc', 'asc']);
+    item.forEach((data: any) => {
+      itemsOrderBy.push(data);
+    });
+
+    // console.log('i :', JSON.stringify(item));
+    itemsMap(item);
   }
-  // }
 
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   const { apiRef, columns } = useApiRef();
   const handleEditItems = async (params: GridEditCellValueParams) => {
     if (params.field === 'qty') {
+      // console.log('SkuCodeSelect :', skuCodeSelect);
+
       const itemsList: any = [];
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-        await rows.forEach((data: GridRowData) => {
-          itemsList.push(data);
-        });
+        if (skuCodeSelect === 'ALL') {
+          await rows.forEach((data: GridRowData) => {
+            itemsList.push(data);
+          });
+        } else {
+          await stockRequestItems.forEach((data: any) => {
+            if (data.skuCode === skuCodeSelect) {
+              rows.forEach((d: GridRowData) => {
+                if (data.barcode === d.barcode) itemsList.push(d);
+              });
+            } else {
+              itemsList.push(data);
+            }
+          });
+        }
       }
       return onChangeItems(itemsList ? itemsList : []);
     }
-  };
-
-  const updateState = async (items: any) => {
-    await dispatch(updateAddItemsState(items));
-    // await dispatch(updatestockRequestItemsState(itemsList));
   };
 
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
@@ -266,7 +303,23 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode }:
   };
   return (
     <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
-      {/* <Box mb={1}> */}
+      <Box mt={6}>
+        {' '}
+        <Typography>
+          รายการสินค้า: {isChecked && 'รายการสินค้าทั้งหมด'} {!isChecked && `${skuName}`}
+        </Typography>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
+        <FormGroup>
+          <FormControlLabel
+            control={<Checkbox />}
+            checked={isChecked}
+            label="รายการสินค้าทั้งหมด"
+            onChange={handleCheckboxChange}
+          />
+        </FormGroup>
+      </Box>
+
       <DataGrid
         rows={rows}
         columns={columns}
@@ -283,7 +336,6 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode }:
         // onCellOut={handleEditItems}
         onCellKeyDown={handleEditItems}
       />
-      {/* </Box> */}
 
       <ModelDeleteConfirm
         open={openModelDeleteConfirm}

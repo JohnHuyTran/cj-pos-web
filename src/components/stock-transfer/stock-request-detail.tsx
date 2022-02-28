@@ -43,13 +43,7 @@ import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-trans
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 
-import {
-  isAllowActionPermission,
-  isGroupBranch,
-  getUserGroup,
-  isGroupOC,
-  isGroupSCM,
-} from '../../utils/role-permission';
+import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permission';
 import { env } from '../../adapters/environmentConfigs';
 import { getUserInfo } from '../../store/sessionStore';
 import {
@@ -59,6 +53,7 @@ import {
   KEYCLOAK_GROUP_SCM01,
   PERMISSION_GROUP,
 } from '../../utils/enum/permission-enum';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface State {
   branchCode: string;
@@ -141,13 +136,10 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.STOCK_RT_SEND));
     setDisplayBtnApprove(isAllowActionPermission(ACTIONS.STOCK_RT_APPROVE));
     setDisplayBtnReject(isAllowActionPermission(ACTIONS.STOCK_RT_REJECT));
-    setGroupOC(isGroupOC());
-    setGroupSCM(isGroupSCM());
+    setGroupOC(getUserInfo().group === PERMISSION_GROUP.OC);
+    setGroupSCM(getUserInfo().group === PERMISSION_GROUP.SCM);
 
-    console.log(
-      'getUserGroup :',
-      getUserGroup([KEYCLOAK_GROUP_BRANCH_MANAGER, KEYCLOAK_GROUP_OC01, KEYCLOAK_GROUP_SCM01])
-    );
+    // console.log('getUserGroup :', getUserInfo().group);
 
     // const OC = isGroupOC();
     // const SCM = isGroupSCM();
@@ -721,6 +713,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setOpenLoadingModal(false);
   };
 
+  const topFunction = () => {
+    document.getElementById('top-item')?.scrollIntoView({
+      block: 'start',
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -735,7 +734,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
         </BootstrapDialogTitle>
 
         <DialogContent>
-          <Grid container spacing={2} mb={2}>
+          <Grid container spacing={2} mb={2} id="top-item">
             <Grid item xs={2}>
               เลขที่เอกสาร RT :
             </Grid>
@@ -1028,6 +1027,28 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               </Grid>
             </Grid>
           )}
+
+          <Box mt={3}>
+            <Grid container spacing={2} mb={1}>
+              <Grid item xs={10}></Grid>
+              <Grid item xs={2} textAlign="center">
+                <IconButton onClick={topFunction}>
+                  <ArrowForwardIosIcon
+                    sx={{
+                      fontSize: '41px',
+                      padding: '6px',
+                      backgroundColor: '#C8E8FF',
+                      transform: 'rotate(270deg)',
+                      color: '#fff',
+                      borderRadius: '50%',
+                    }}
+                  />
+                </IconButton>
+
+                <Box fontSize="13px">กลับขึ้นด้านบน</Box>
+              </Grid>
+            </Grid>
+          </Box>
         </DialogContent>
       </Dialog>
 

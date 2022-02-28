@@ -106,7 +106,8 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
 
   const [stockBalanceList, setStockBalanceList] = React.useState([]);
   // const [flagCheckStock, setFlagCheckStock] = React.useState(false);
-  const [selectSKU, setSelectSKU] = React.useState('ALL');
+  const [skuCodeSelect, setSkuCodeSelect] = React.useState('ALL');
+  const [skuNameDisplay, setSkuNameDisplay] = React.useState('');
   const [isChecked, setIschecked] = React.useState(true);
 
   const stockBalanceBySKU = async (skuCodes: any) => {
@@ -184,7 +185,7 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
     // if (!stock)
     skuMapStock(items, stockBalanceList);
 
-    console.log('selectSKU :', selectSKU);
+    // console.log('selectSKU :', skuCodeSelect);
     // if (isChecked) {
     itemMap(items);
     // }
@@ -337,7 +338,8 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
 
   const currentlySelected = async (params: GridCellParams) => {
     setIschecked(false);
-    setSelectSKU(params.row.skuCode);
+    setSkuCodeSelect(params.row.skuCode);
+    setSkuNameDisplay(params.row.skuName);
   };
 
   const [flagSave, setFlagSave] = React.useState(false);
@@ -374,46 +376,13 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
         />
       </div>
 
-      <Box mt={4} ml={1} mb={1}>
-        <Typography variant="body1">รายการสินค้า : รายการสินค้าทั้งหมด</Typography>
-        <Grid container spacing={2} mb={2}>
-          <Grid item xs={2}>
-            <FormGroup>
-              <FormControlLabel control={<Checkbox defaultChecked size="small" />} label="แสดงสินค้าทั้งหมด" />
-            </FormGroup>
-
-            {/* {isChecked && (
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox />}
-                  checked={true}
-                  label="รายการสินค้าทั้งหมด"
-                  onChange={handleCheckboxChange}
-                />
-              </FormGroup>
-            )}
-            {!isChecked && (
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox />}
-                  checked={false}
-                  label="รายการสินค้าทั้งหมด"
-                  onChange={handleCheckboxChange}
-                />
-              </FormGroup>
-            )} */}
-          </Grid>
-          <Grid item xs={10}></Grid>
-        </Grid>
-      </Box>
-
       <StockRequestItem
         type={type}
         onChangeItems={handleChangeItems}
-        // changeItems={handleStatusChangeItems}
         update={flagSave}
         status={status}
-        skuCode={selectSKU}
+        skuCode={skuCodeSelect}
+        skuName={skuNameDisplay}
       />
     </div>
   );
