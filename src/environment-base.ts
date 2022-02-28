@@ -8,10 +8,10 @@ export const environment = {
   orders: {
     shipment: {
       fetchOrder: {
-        url: '/order/shipment-deliverly',
+        url: '/order/shipment-delivery',
       },
       detail: {
-        url: '/order/shipment-deliverly',
+        url: '/order/shipment-delivery',
       },
       fetchOrderSD: {
         url: '/order/sd',
@@ -243,6 +243,11 @@ export const environment = {
     },
     stockBalanceCheck: {
       url: '/stock/stock-balance-check',
+    },
+    stockBalance: {
+      stockBalanceBySKU: {
+        url: '/stock/stock-balance/check-by-sku-codes',
+      },
     },
   },
   branch: {

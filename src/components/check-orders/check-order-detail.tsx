@@ -233,7 +233,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
   const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
-  const [action, setAction] = useState<number>(0);
+  const [action, setAction] = useState<string>('');
   const [itemsDiffState, setItemsDiffState] = useState<Entry[]>([]);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
