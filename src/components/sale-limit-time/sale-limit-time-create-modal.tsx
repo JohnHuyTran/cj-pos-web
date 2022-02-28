@@ -769,6 +769,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
                 maxLength={100}
                 onChangeComment={handleChangeComment}
                 isDisable={status > 1 || !isAdmin}
+                rowDisplay={4}
               />
             </Grid>
             <Grid item xs={7}></Grid>
