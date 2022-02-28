@@ -1,6 +1,6 @@
 import { Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
 import { useStyles } from '../../styles/makeTheme';
 import { genColumnValue, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
@@ -13,7 +13,15 @@ import ViewBranch from '../../components/sale-limit-time/view-branch';
 import STCreateModal from '../../components/sale-limit-time/sale-limit-time-create-modal';
 import moment from 'moment';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
+import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
+import { getUserInfo } from '../../store/sessionStore';
+import { getsaleLimitTimeDetail } from '../../store/slices/sale-limit-time-detail-slice';
+import LoadingModal from '../../components/commons/ui/loading-modal';
+
 const _ = require('lodash');
+interface loadingModalState {
+  open: boolean;
+}
 interface StateProps {
   onSearch: () => void;
 }
@@ -25,13 +33,16 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const [lstST, setListST] = React.useState<any[]>([]);
   const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
   const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
+  const saleLimitTimeDetail = useAppSelector((state) => state.saleLimitTimeDetailSlice.saleLimitTimeDetail);
   const currentPage = responveST.page;
   const limit = responveST.perPage;
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
-  const [openCreateModal, setOpenCreateModal] = React.useState(false);
+  const [openDetailModal, setOpenDetailModal] = React.useState(false);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
+  const [isAdmin, setIsAdmin] = React.useState(false);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -54,6 +65,17 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       setListST(rows);
     }
   }, [responveST]);
+
+  useEffect(() => {
+    const userInfo: KeyCloakTokenInfo = getUserInfo();
+    if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
+      setIsAdmin(userInfo.acl['service.posback-campaign'].includes('campaign.st.create'));
+    }
+  }, []);
+
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
   const columns: GridColDef[] = [
     // {
     //   field: 'checked',
@@ -107,6 +129,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       sortable: false,
       minWidth: 170,
+      renderCell: (params) => renderCell(params.value),
     },
     {
       field: 'branch',
@@ -169,8 +192,19 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       sortable: false,
       minWidth: 170,
+      renderCell: (params) => renderCell(params.value),
     },
   ];
+
+  const renderCell = (value: any) => {
+    return (
+      <HtmlTooltip title={<React.Fragment>{value}</React.Fragment>}>
+        <Typography variant="body2" noWrap>
+          {value}
+        </Typography>
+      </HtmlTooltip>
+    );
+  };
 
   const genBranch = (params: GridValueGetterParams) => {
     const branch = _.cloneDeep(params.value);
@@ -225,10 +259,24 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     dispatch(updatePayloadST(newPayload));
   };
   const handleCloseCreateModal = () => {
-    setOpenCreateModal(false);
+    setOpenDetailModal(false);
   };
-  const handleClickCell = () => {
-    // setOpenCreateModal(true);
+
+  const handleClickCell = async (params: GridCellParams) => {
+    // const chkPN = params.colDef.field;
+    handleOpenLoading('open', true);
+    try {
+      await dispatch(getsaleLimitTimeDetail(params.row.id));
+      if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
+        console.log(saleLimitTimeDetail);
+
+        setOpenDetailModal(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  
+    handleOpenLoading('close', false);
   };
 
   return (
@@ -251,15 +299,17 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
           onCellClick={handleClickCell}
         />
       </div>
-      {openCreateModal && (
+      {openDetailModal && (
         <STCreateModal
-          type={'View'}
+          type={'Detail'}
+          isAdmin={isAdmin}
           setOpenPopup={setOpenPopup}
           setPopupMsg={setPopupMsg}
-          isOpen={openCreateModal}
+          isOpen={openDetailModal}
           onClickClose={handleCloseCreateModal}
         />
       )}
+      <LoadingModal open={openLoadingModal.open}/>
     </>
   );
 };

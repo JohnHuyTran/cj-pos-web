@@ -85,7 +85,7 @@ export default function SearchBranch(props: Props): ReactElement {
       if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
       dispatch(fetchTotalBranch());
     }
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     try {
@@ -95,7 +95,7 @@ export default function SearchBranch(props: Props): ReactElement {
         limit: '10',
       };
       const params = paramsConvert(payload);
-      open && dispatch(fetchBranchProvinceListAsync(params));
+      dispatch(fetchBranchProvinceListAsync(params));
     } catch (error) {
       console.log(error);
       throw error;

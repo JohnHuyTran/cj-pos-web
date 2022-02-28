@@ -29,6 +29,7 @@ import {
 import {updateAddTypeAndProductState} from "../../../store/slices/add-type-product-slice";
 import LoadingModal from "./loading-modal";
 import {getAllProductByType} from "../../../services/common";
+import { setCheckEdit } from "../../../store/slices/sale-limit-time-slice";
 
 interface Error {
     productTypeExist: string,
@@ -374,6 +375,26 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     const handleAddProduct = () => {
         setOpenLoadingModal(true);
         let selectedItemEnds = _.cloneDeep(selectedItems);
+        if (selectedItemEnds && selectedItemEnds.length > 0) {
+            let listTypeCodeProducts = new Set(
+                selectedItemEnds.map((item: any) => item.ProductTypeCode).filter((el: any) => el != undefined)
+              );
+            let listCategoryCode = selectedItemEnds
+            .filter((el: any) => el.selectedType === 1)
+            .map((item: any) => item.productTypeCode);
+    
+            let listTypes = Array.from(listTypeCodeProducts);
+            for (let i of listTypes) {
+            if (!listCategoryCode.includes(i)) {
+                const item = selectedItemEnds.find((el: any) => i === el.ProductTypeCode);
+                selectedItemEnds.push({
+                productTypeCode: item.ProductTypeCode,
+                productTypeName: item.ProductTypeName,
+                selectedType: 1,
+                });
+            }
+            }
+        }
         if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0) {
             for (const item of payloadAddTypeProduct) {
                 if (item.selectedType === 1) {
@@ -392,6 +413,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             }
         }
         dispatch(updateAddTypeAndProductState(selectedItemEnds));
+        dispatch(setCheckEdit(false))
         setSelectedItems([]);
         setTimeout(() => {
             setOpenLoadingModal(false);
