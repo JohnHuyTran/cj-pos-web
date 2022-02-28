@@ -43,16 +43,17 @@ import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-trans
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 
-import {
-  isAllowActionPermission,
-  isGroupBranch,
-  getUserGroup,
-  isGroupOC,
-  isGroupSCM,
-} from '../../utils/role-permission';
+import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permission';
 import { env } from '../../adapters/environmentConfigs';
 import { getUserInfo } from '../../store/sessionStore';
-import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import {
+  ACTIONS,
+  KEYCLOAK_GROUP_BRANCH_MANAGER,
+  KEYCLOAK_GROUP_OC01,
+  KEYCLOAK_GROUP_SCM01,
+  PERMISSION_GROUP,
+} from '../../utils/enum/permission-enum';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface State {
   branchCode: string;
@@ -135,9 +136,10 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.STOCK_RT_SEND));
     setDisplayBtnApprove(isAllowActionPermission(ACTIONS.STOCK_RT_APPROVE));
     setDisplayBtnReject(isAllowActionPermission(ACTIONS.STOCK_RT_REJECT));
-    setGroupOC(isGroupOC());
-    setGroupSCM(isGroupSCM());
-    // console.log('getUserGroup OC :', getUserGroup([KEYCLOAK_GROUP_OC1]));
+    setGroupOC(getUserInfo().group === PERMISSION_GROUP.OC);
+    setGroupSCM(getUserInfo().group === PERMISSION_GROUP.SCM);
+
+    // console.log('getUserGroup :', getUserInfo().group);
 
     // const OC = isGroupOC();
     // const SCM = isGroupSCM();
@@ -711,6 +713,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setOpenLoadingModal(false);
   };
 
+  const topFunction = () => {
+    document.getElementById('top-item')?.scrollIntoView({
+      block: 'start',
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -725,7 +734,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
         </BootstrapDialogTitle>
 
         <DialogContent>
-          <Grid container spacing={2} mb={2}>
+          <Grid container spacing={2} mb={2} id="top-item">
             <Grid item xs={2}>
               เลขที่เอกสาร RT :
             </Grid>
@@ -742,7 +751,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              วันที่โอนสินค้า* :
+              วันที่โอนสินค้า{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -755,7 +764,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุด* :
+              วันที่สิ้นสุด{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -775,7 +784,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาขาต้นทาง* :
+              สาขาต้นทาง{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -787,11 +796,14 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   disable={groupBranch}
                 />
               )}
-              {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && valuebranchFrom?.name}
+              {status !== '' &&
+                status !== 'DRAFT' &&
+                status !== 'AWAITING_FOR_REQUESTER' &&
+                `${fromBranch}-${valuebranchFrom?.name}`}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              สาขาปลายทาง* :
+              สาขาปลายทาง{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' ||
@@ -810,13 +822,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                 status !== 'DRAFT' &&
                 status !== 'AWAITING_FOR_REQUESTER' &&
                 status !== 'WAIT_FOR_APPROVAL_2' &&
-                valuebranchTo?.name}
+                `${toBranch}-${valuebranchTo?.name}`}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาเหตุการโอน* :
+              สาเหตุการโอน{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -1015,6 +1027,28 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               </Grid>
             </Grid>
           )}
+
+          <Box mt={3}>
+            <Grid container spacing={2} mb={1}>
+              <Grid item xs={10}></Grid>
+              <Grid item xs={2} textAlign="center">
+                <IconButton onClick={topFunction}>
+                  <ArrowForwardIosIcon
+                    sx={{
+                      fontSize: '41px',
+                      padding: '6px',
+                      backgroundColor: '#C8E8FF',
+                      transform: 'rotate(270deg)',
+                      color: '#fff',
+                      borderRadius: '50%',
+                    }}
+                  />
+                </IconButton>
+
+                <Box fontSize="13px">กลับขึ้นด้านบน</Box>
+              </Grid>
+            </Grid>
+          </Box>
         </DialogContent>
       </Dialog>
 
