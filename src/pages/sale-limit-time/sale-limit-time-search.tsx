@@ -37,17 +37,19 @@ const SaleLimitTimeSearch = () => {
   const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
   const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
   const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
+  const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
+  let checkAdmin = userInfo.acl['service.posback-campaign'].includes('campaign.st.create');
+
   const [values, setValues] = React.useState<State>({
     query: '',
-    branch: userInfo.branch,
-    status: '1',
+    branch: checkAdmin ? '' : userInfo.branch,
+    status: checkAdmin ? 'all' : '1',
     startDate: new Date(),
     endDate: new Date(),
   });
-  let checkAdmin = userInfo.acl['service.posback-campaign'].includes('campaign.st.create');
-
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
+
   useEffect(() => {
     setLstStatus(t('lstStatus', { returnObjects: true }));
     if (!checkAdmin) {
@@ -97,23 +99,43 @@ const SaleLimitTimeSearch = () => {
       setOpenAlert(true);
       setTextError('กรุณากรอกวันที่');
     } else {
-      const params = {
-        page: payloadST.page,
-        perPage: payloadST.perPage,
-        query: values.query,
-        status: values.status,
-        branch: values.branch,
-        startDate: moment(values.startDate).startOf('day').toISOString(),
-        endDate: moment(values.endDate).endOf('day').toISOString(),
-      };
-      const query = paramsConvert(params);
-      dispatch(fetchSaleLimitTimeListAsync(query));
+      if (checkAdmin) {
+        const aProvinces = payloadBranches.appliedBranches.province.map((item: any) => item.code).join();
+        const aBranches = payloadBranches.appliedBranches.branchList.map((item: any) => item.code).join();
+        const params = {
+          page: payloadST.page,
+          perPage: payloadST.perPage,
+          ...(!!values.query && { query: values.query }),
+          ...(!!values.status && values.status != 'all' && { status: values.status }),
+          ...(!!aBranches && !payloadBranches.isAllBranches && { branches: aBranches }),
+          ...(!!aProvinces && !payloadBranches.isAllBranches && { provinces: aProvinces }),
+          startDate: moment(values.startDate).startOf('day').toISOString(),
+          endDate: moment(values.endDate).endOf('day').toISOString(),
+        };
+        const query = paramsConvert(params);
+        dispatch(fetchSaleLimitTimeListAsync(query));
+      } else {
+        const params = {
+          page: payloadST.page,
+          perPage: payloadST.perPage,
+          ...(!!values.query && { query: values.query }),
+          ...(!!values.status && { status: values.status }),
+          branches: values.branch,
+          startDate: moment(values.startDate).startOf('day').toISOString(),
+          endDate: moment(values.endDate).endOf('day').toISOString(),
+        };
+        const query = paramsConvert(params);
+        dispatch(fetchSaleLimitTimeListAsync(query));
+      }
     }
   };
-  const onSearch = () => {};
+  const onSearch = () => {
+    console.log('close');
+  };
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }} mb={3}>
@@ -157,6 +179,9 @@ const SaleLimitTimeSearch = () => {
                 onChange={onChange.bind(this, setValues, values)}
                 disabled={!checkAdmin}
               >
+                <MenuItem value={'all'} selected={true}>
+                  {t('all')}
+                </MenuItem>
                 <MenuItem value={'1'}>{getStatusText('1')}</MenuItem>
                 <MenuItem value={'2'}>{getStatusText('2')}</MenuItem>
                 <MenuItem value={'3'}>{getStatusText('3')}</MenuItem>

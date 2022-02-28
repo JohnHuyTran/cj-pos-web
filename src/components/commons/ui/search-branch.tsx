@@ -2,6 +2,7 @@ import {
   Autocomplete,
   Button,
   Checkbox,
+  createFilterOptions,
   Dialog,
   DialogContent,
   FormControl,
@@ -245,6 +246,10 @@ export default function SearchBranch(props: Props): ReactElement {
     setListBranch({ branches: [], provinces: [] });
   };
 
+  const filterOptions = createFilterOptions({
+    stringify: (option: any) => option.name + option.code,
+  });
+
   return (
     <div>
       <TextField
@@ -380,6 +385,7 @@ export default function SearchBranch(props: Props): ReactElement {
                       onInputChange={onInputChange}
                       disabled={disabled}
                       value={branch}
+                      filterOptions={filterOptions}
                     />
                   </Box>
                   <Box sx={{ textAlign: 'right' }}>

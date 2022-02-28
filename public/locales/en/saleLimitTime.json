@@ -17,5 +17,6 @@
             "label": "Cancel"
         }
     ],
-    "noData": "No data"
+    "noData": "No data",
+    "all": "ALL"
 }

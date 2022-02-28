@@ -260,6 +260,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     dispatch(updatePayloadST(newPayload));
   };
   const handleCloseCreateModal = () => {
+    props.onSearch();
     setOpenDetailModal(false);
   };
   const handleClosePopup = () => {
@@ -273,7 +274,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       await dispatch(getsaleLimitTimeDetail(params.row.id));
       if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
         console.log(saleLimitTimeDetail);
-
+        props.onSearch();
         setOpenDetailModal(true);
       }
     } catch (error) {

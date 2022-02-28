@@ -253,15 +253,17 @@ export const environment = {
       },
     },
   },
-  branch: {
-    province: {
-      url: '/master/branch/province',
-    },
+  master: {
     branch: {
-      url: '/master/branch/search',
-    },
-    branchTotal: {
-      url: '/master/branch/branch-total',
+      province: {
+        url: '/master/branch/province',
+      },
+      branch: {
+        url: '/master/branch/search',
+      },
+      branchTotal: {
+        url: '/master/branch/branch-total',
+      },
     },
   },
 };
