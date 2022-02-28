@@ -4,17 +4,18 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import LoadingModal from '../commons/ui/loading-modal';
-import { Box, DialogTitle, InputLabel, TextField, Typography } from "@mui/material";
+import { Box, InputLabel, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
 import { useStyles } from "../../styles/makeTheme";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import { DateFormat } from "../../utils/enum/common-enum";
+import { Action, DateFormat } from "../../utils/enum/common-enum";
 import moment from 'moment';
 import { numberWithCommas, stringNullOrEmpty } from "../../utils/utils";
 import AlertError from "../commons/ui/alert-error";
 import { printBarcodeDiscount } from "../../services/barcode-discount";
+import { BootstrapDialogTitle } from "../commons/ui/dialog-title";
 
 const _ = require('lodash');
 
@@ -23,6 +24,8 @@ interface Props {
   onClose: () => void;
   onConfirm: () => void;
   values: {
+    action: Action;
+    dialogTitle: string;
     printNormal: boolean;
     printInDetail: boolean;
     ids: any[];
@@ -96,7 +99,6 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
     if (values.lstProductPrintAgain && values.lstProductPrintAgain.length > 0) {
       if (validate()) {
         onConfirmModalPrint(true);
-
       }
     } else {
       onConfirmModalPrint(false);
@@ -154,7 +156,7 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
           skuCode: item.skuCode,
           expiredDate: moment(item.expiredDate).format(DateFormat.DATE_FORMAT),
           numberOfApproved: item.numberOfApproved,
-          numberOfPrinting: 0,
+          numberOfPrinting: item.numberOfPrinting || 0,
           errorNumberOfPrinting: ''
         };
       });
@@ -292,6 +294,7 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
       align: 'center',
       flex: 1,
       sortable: false,
+      hide: Action.VIEW === values.action,
       renderCell: (params) => {
         return (
           <Typography variant="body2"
@@ -326,6 +329,7 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
             error={condition}
             type="text"
             inputProps={{ maxLength: 13, maxWidth: '92px', maxHeight: '20px' }}
+            disabled={Action.VIEW === values.action}
             className={classes.MTextFieldNumberPrint}
             value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
             onChange={(e) => {
@@ -387,9 +391,9 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
             ) :
             (
               <div>
-                <DialogTitle>
-                  <Typography variant="h6">พิมพ์บาร์โค้ด</Typography>
-                </DialogTitle>
+                <BootstrapDialogTitle id={'printed-barcode'} onClose={onClose}>
+                  <Typography variant="h6">{values.dialogTitle}</Typography>
+                </BootstrapDialogTitle>
                 <DialogContent>
                   {
                     (values.lstProductNotPrinted != null && values.lstProductNotPrinted.length > 0)
@@ -436,7 +440,10 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
                     (values.lstProductPrintAgain != null && values.lstProductPrintAgain.length > 0)
                     && (
                       <div>
-                        <Box sx={{ width: '50%' }}>
+                        <Box sx={{
+                          width: '50%',
+                          display: Action.VIEW === values.action ? 'none' : undefined
+                        }}>
                           <Typography align='left' sx={{ display: 'flex', width: '100%' }}>
                             เหตุผลที่ทำการพิมพ์บาร์โค้ดซ้ำ
                             <Typography sx={{
@@ -506,7 +513,10 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
             id="btnCancle"
             variant="contained"
             color="cancelColor"
-            sx={{ borderRadius: 2, width: 80, mr: 4 }}
+            sx={{
+              borderRadius: 2, width: 80, mr: 4,
+              display: Action.VIEW === values.action ? 'none' : undefined
+            }}
             onClick={onClose}
           >
             ยกเลิก
@@ -515,7 +525,10 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
             id="btnConfirm"
             variant="contained"
             color="primary"
-            sx={{ borderRadius: 2, width: 80 }}
+            sx={{
+              borderRadius: 2, width: 80,
+              display: Action.VIEW === values.action ? 'none' : undefined
+            }}
             onClick={handleConfirm}
           >
             ยืนยัน
