@@ -87,8 +87,11 @@ export const environment = {
       update: {
         url: '/campaign/sale-limit/{id}',
       },
+      start: {
+        url: '/campaign/sale-limit/start/{id}',
+      },
       cancel: {
-        url: '/campaign/sale-limit/{id}',
+        url: '/campaign/sale-limit/cancel',
       },
     },
   },

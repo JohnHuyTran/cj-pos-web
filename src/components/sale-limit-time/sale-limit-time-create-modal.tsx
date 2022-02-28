@@ -28,7 +28,7 @@ import { updateAddTypeAndProductState } from '../../store/slices/add-type-produc
 import { updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import { createTheme } from '@material-ui/core/styles';
-import { cancelDraftST, getStartSaleLimitTime, saveDraftST } from '../../services/sale-limit-time';
+import { cancelST, getStartSaleLimitTime, saveDraftST } from '../../services/sale-limit-time';
 import { DateFormat } from '../../utils/enum/common-enum';
 import { setCheckEdit, updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
 import ModelConfirm from './modal-confirm';
@@ -127,6 +127,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
+  const [remarkCancel, setRemarkCancel] = React.useState('');
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const [openModalStart, setOpenModalStart] = React.useState<boolean>(false);
   const handleCloseSnackBar = () => {
@@ -140,13 +141,13 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
 
   useEffect(() => {
     if (type === 'Detail' && !objectNullOrEmpty(saleLimitTimeDetail)) {
+      setStatus(saleLimitTimeDetail.status);
       dispatch(
         updatesaleLimitTimeState({
           ...payLoadSt,
           id: saleLimitTimeDetail.id,
           documentNumber: saleLimitTimeDetail.documentNumber,
-          status: saleLimitTimeDetail.status,
-          createAt: saleLimitTimeDetail.createAt,
+          createAt: saleLimitTimeDetail.createAt ? saleLimitTimeDetail.createAt.split('T')[0] : '',
         })
       );
       setValues({
@@ -196,7 +197,6 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
       );
     }
   }, [saleLimitTimeDetail]);
-
   useEffect(() => {
     setShowModalProduct(!!Object.keys(payloadAddTypeProduct).length);
     if (isAdmin && status <= 1) {
@@ -222,13 +222,13 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
         let stStartTime = compareDateTime(values.startDate, values.startTime);
         let stEndTime = compareDateTime(values.endDate, values.endTime);
         if (stStartTime < moment(new Date(), DateFormat.DATE_TIME_DISPLAY_FORMAT)) {
-          status <= 1 &&
-            isAdmin &&
+          if (status <= 1 && isAdmin) {
             setCheckValue({ ...checkValue, startTimeError: 'เวลาเริ่มต้นต้องสูงกว่าเวลาปัจจุบัน' });
+          }
         } else if (stStartTime >= stEndTime) {
-          status <= 1 &&
-            isAdmin &&
+          if (status <= 1 && isAdmin) {
             setCheckValue({ ...checkValue, endTimeError: 'เวลาสิ้นสุดต้องมากกว่าเวลาเริ่มต้น' });
+          }
         } else {
           setValues({ ...values, stStartTime: stStartTime, stEndTime: stEndTime });
           setCheckValue({ ...checkValue, startTimeError: '', endTimeError: '' });
@@ -236,10 +236,6 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
       }
     }
   }, [values.startDate, values.endDate, values.startTime, values.endTime]);
-
-  useEffect(() => {
-    payLoadSt.status && setStatus(payLoadSt.status);
-  }, [payLoadSt.status]);
 
   const clearData = async () => {
     dispatch(updatesaleLimitTimeState({}));
@@ -422,9 +418,9 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
               ...payLoadSt,
               id: rs.data.id,
               documentNumber: rs.data.documentNumber,
-              status: 1,
             })
           );
+          setStatus(1);
           if (getStart) {
             handleGetStart(rs.data.id);
           }
@@ -443,13 +439,8 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
     try {
       const rs = await getStartSaleLimitTime(id);
 
-      if (rs.code === 200) {
-        dispatch(
-          updatesaleLimitTimeState({
-            ...payLoadSt,
-            // status: Number(BDStatus.WAIT_FOR_APPROVAL),
-          })
-        );
+      if (rs.code === 20000) {
+        setStatus(2);
         setOpenPopup(true);
         setPopupMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
         handleClose();
@@ -467,10 +458,18 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
   const handleDeleteDraft = async () => {
     if (status) {
       try {
-        const rs = await cancelDraftST(payLoadSt.id);
-        if (rs.status === 200) {
+        const body =
+          status > 1
+            ? {
+                id: payLoadSt.id,
+                remark: remarkCancel,
+              }
+            : { id: payLoadSt.id };
+
+        const rs = await cancelST(body);
+        if (rs.code === 20000) {
           setOpenPopup(true);
-          setPopupMsg('คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว');
+          setPopupMsg('คุณได้ยกเลิกกำหนดเวลา (งด) ขายสินค้า เรียบร้อยแล้ว');
           handleClose();
           // if (onSearchBD) onSearchBD();
         } else {
@@ -483,7 +482,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
       }
     } else {
       setOpenPopup(true);
-      setPopupMsg('คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว');
+      setPopupMsg('คุณได้ยกเลิกกำหนดเวลา (งด) ขายสินค้า เรียบร้อยแล้ว');
       handleClose();
     }
   };
@@ -500,7 +499,11 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
   };
 
   const handleOpenStart = () => {
-    setOpenModalStart(true);
+    if (status === 0) {
+      handleCreateSTDetail(true);
+    } else {
+      valiDateData() && setOpenModalStart(true);
+    }
   };
   const handleUnSelectAllType = (showAll: boolean) => {
     setUnSelectAllType(showAll);
@@ -511,7 +514,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleCheckClose}>
           <Typography sx={{ fontSize: '1em', mb: 2 }}>{'สร้างเอกสารกำหนดเวลา (งด) ขายสินค้าใหม่'}</Typography>
-          <StepperBar activeStep={status} setActiveStep={setStatus} />
+          <StepperBar activeStep={status} />
         </BootstrapDialogTitle>
 
         <DialogContent>
@@ -522,7 +525,9 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
             </Grid>
             <Grid item xs={3}>
               <Box mb={2}>{!!payLoadSt.documentNumber ? payLoadSt.documentNumber : '-'}</Box>
-              <Box>{moment(createDate).add(543, 'y').format('DD/MM/YYYY')}</Box>
+              <Box>
+                {payLoadSt.createAt ? payLoadSt.createAt : moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
+              </Box>
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -556,7 +561,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
           </Grid>
           <Grid container spacing={2} mb={2.5}>
             <Grid item xs={2}>
-              วันที่เริ่มงดขาย :
+              วันที่เริ่มงดใช้งาน :
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
@@ -732,15 +737,17 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
                       Copy
                     </Button>
                   )}
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={handleOpenCancel}
-                    startIcon={<HighlightOffIcon />}
-                    className={classes.MbtnSearch}
-                  >
-                    ยกเลิก
-                  </Button>
+                  {status < 3 && (
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={handleOpenCancel}
+                      startIcon={<HighlightOffIcon />}
+                      className={classes.MbtnSearch}
+                    >
+                      ยกเลิก
+                    </Button>
+                  )}
                 </>
               )}
             </Grid>
@@ -788,6 +795,8 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
       <ModelConfirm
         open={openModalCancel}
         status={status}
+        remark={remarkCancel}
+        setRemark={setRemarkCancel}
         onClose={handleCloseModalCancel}
         onConfirm={handleDeleteDraft}
         HQCode={payLoadSt.documentNumber}
@@ -796,6 +805,9 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
 
       <ModelConfirm
         open={openModalStart}
+        remark={remarkCancel}
+        status={status}
+        setRemark={setRemarkCancel}
         onClose={handleCloseModalStart}
         onConfirm={() => handleCreateSTDetail(true)}
         HQCode={payLoadSt.documentNumber}
