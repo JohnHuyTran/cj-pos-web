@@ -60,7 +60,13 @@ export default function ViewBranch({ values }: Props) {
         </Typography>
       ) : (
         <>
-          <Button style={{ color: '#446EF2', textDecoration: 'underline' }} onClick={handleOpenModal}>
+          <Button
+            style={{ color: '#446EF2', textDecoration: 'underline' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpenModal();
+            }}
+          >
             หลายสาขา
           </Button>
           <Dialog maxWidth="lg" fullWidth open={open}>

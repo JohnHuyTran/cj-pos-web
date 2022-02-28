@@ -78,6 +78,9 @@ export const environment = {
       },
     },
     saleLimitTime: {
+      detail: {
+        url: '/campaign/sale-limit',
+      },
       save: {
         url: '/campaign/sale-limit',
       },

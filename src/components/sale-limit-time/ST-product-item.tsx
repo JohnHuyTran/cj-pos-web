@@ -19,6 +19,7 @@ import { useStyles } from '../../styles/makeTheme';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { STProductDetail } from '../../models/sale-limit-time';
+import { setCheckEdit } from '../../store/slices/sale-limit-time-slice';
 
 const _ = require('lodash');
 
@@ -45,7 +46,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
         .filter((el: any) => el.selectedType === 2 && el.showProduct)
         .map((item: any, index: number) => {
           return {
-            id: item.barcode,
+            id: `${index}-${item.barcode}`,
             index: index + 1,
             barcode: item.barcode,
             skuCode: item.skuCode,
@@ -57,6 +58,9 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
       setDtTable(rows);
       if (payloadAddTypeProduct.filter((el: any) => el.selectedType === 2 && !el.showProduct).length !== 0) {
         setShowAll(false);
+        unSelectAllType(false);
+      } else {
+        setShowAll(true);
         unSelectAllType(false);
       }
     } else {
@@ -154,17 +158,15 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
         };
 
         const handleDeleteItem = () => {
-          let newList = payloadAddTypeProduct.filter((r: any) => r.barcode !== params.row.id);
-          let listCodeProductByType = newList
-            .filter((el: any) => el.productByType)
-            .map((el1: any) => el1.ProductTypeCode);
+          let newList = payloadAddTypeProduct.filter((r: any) => r.barcode !== params.row.barcode);
+          let listCodeProductByType = newList.map((el1: any) => el1.ProductTypeCode);
 
           let listAdd = newList.filter((item: any) => {
             if (item.selectedType === 1 && !listCodeProductByType.includes(item.productTypeCode)) {
               return false;
             } else return true;
           });
-
+          dispatch(setCheckEdit(false));
           dispatch(updateAddTypeAndProductState(listAdd));
           setOpenModalDelete(false);
           setShowSnackBar(true);

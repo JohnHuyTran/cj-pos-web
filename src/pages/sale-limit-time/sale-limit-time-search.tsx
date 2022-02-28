@@ -69,7 +69,6 @@ const SaleLimitTimeSearch = () => {
         },
         saved: true,
       };
-      console.log({ branchList });
 
       dispatch(updatePayloadBranches(payloadBranch));
     }
@@ -248,6 +247,7 @@ const SaleLimitTimeSearch = () => {
       {openCreateModal && (
         <STCreateModal
           type={'Create'}
+          isAdmin={checkAdmin}
           setOpenPopup={setOpenPopup}
           setPopupMsg={setPopupMsg}
           isOpen={openCreateModal}

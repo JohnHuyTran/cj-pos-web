@@ -8,6 +8,7 @@ import { useStyles } from '../../styles/makeTheme';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { GridSelectionModel } from '@mui/x-data-grid';
+import { setCheckEdit } from '../../store/slices/sale-limit-time-slice';
 
 const _ = require('lodash');
 
@@ -132,15 +133,21 @@ export default function STProductTypeItems({ unSelectAllType, disabled }: Props)
         };
 
         const handleDeleteItem = () => {
-          let newList = payloadAddTypeProduct
+          let newList = _.cloneDeep(payloadAddTypeProduct)
             .filter((r: any) => r.productTypeCode !== params.row.id)
             .filter((r: any) => {
-              if (r.productByType) {
+              if (r.selectedType === 2) {
                 return r.ProductTypeCode !== params.row.id;
               } else {
                 return true;
               }
             });
+          newList.map((el: any) => {
+            if (el.selectedType === 2) {
+              el.showProduct = true;
+            }
+          });
+          dispatch(setCheckEdit(false));
           dispatch(updateAddTypeAndProductState(newList));
           setOpenModalDelete(false);
           setShowSnackBar(true);
