@@ -94,6 +94,9 @@ const columns: GridColDef[] = [
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           onChange={(e) => {
+            e.persist();
+            const caretStart = e.target.selectionStart;
+            const caretEnd = e.target.selectionEnd;
             var qty: any =
               params.getValue(params.id, 'qty') &&
               params.getValue(params.id, 'qty') !== null &&
@@ -105,6 +108,9 @@ const columns: GridColDef[] = [
             if (returnQty === 0) value = chkReturnQty(value);
             if (value < 0) value = 0;
             params.api.updateRows([{ ...params.row, actualQty: value }]);
+
+            // update the state and reset the caret
+            e.target.setSelectionRange(caretStart, caretEnd);
           }}
           disabled={params.getValue(params.id, 'isDraft') ? false : true}
           autoComplete='off'
@@ -125,7 +131,11 @@ const columns: GridColDef[] = [
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
+          e.persist();
+          const caretStart = e.target.selectionStart;
+          const caretEnd = e.target.selectionEnd;
           params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
+          e.target.setSelectionRange(caretStart, caretEnd);
         }}
         disabled={params.getValue(params.id, 'isDraft') ? false : true}
         autoComplete='off'
