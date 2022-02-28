@@ -365,6 +365,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     storeItem();
   };
   const handleOnKeyDown = () => {
+    console.log('handleOnKeyDown');
     storeItem();
   };
   const handleOnCellBlur = () => {
@@ -388,9 +389,9 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          onCellFocusOut={handleFocusOut}
-          onCellClick={handleOnCellClick}
-          // onCellKeyDown={handleOnKeyDown}
+          // onCellFocusOut={handleFocusOut}
+          // onCellClick={handleOnCellClick}
+          onCellKeyDown={handleOnKeyDown}
           // onCellBlur={handleOnCellBlur}
         />
       </div>
