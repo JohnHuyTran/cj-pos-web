@@ -522,18 +522,18 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   const handleReject = async () => {
     setOpenLoadingModal(true);
     if (status === 'WAIT_FOR_APPROVAL_1') {
-      if (commentOC === '') {
+      if (commentOC === '' || commentOC === undefined) {
         setOpenAlert(true);
-        setTextError('กรุณากรอกหมายเหตุจาก OC');
+        setTextError('กรุณากรอกหมายเหตุจากผู้อนุมัติ 1');
       } else {
         setFlagReject(true);
         setTextHeaderConfirm('ยืนยันไม่อนุมัติรายการโอนสินค้า');
         setOpenModelConfirm(true);
       }
     } else if (status === 'WAIT_FOR_APPROVAL_2') {
-      if (commentSCM === '') {
+      if (commentSCM === '' || commentSCM === undefined) {
         setOpenAlert(true);
-        setTextError('กรุณากรอกหมายเหตุจาก SCM');
+        setTextError('กรุณากรอกหมายเหตุจากผู้อนุมัติ 2');
       } else if (toBranch === '') {
         setOpenAlert(true);
         setTextError('กรุณาเลือกสาขาโอนสินค้าปลายทาง');
