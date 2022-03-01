@@ -142,12 +142,12 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
   useEffect(() => {
     if (type === 'Detail' && !objectNullOrEmpty(saleLimitTimeDetail)) {
       setStatus(saleLimitTimeDetail.status);
+      setCreateDate(saleLimitTimeDetail.createdAt);
       dispatch(
         updatesaleLimitTimeState({
           ...payLoadSt,
           id: saleLimitTimeDetail.id,
           documentNumber: saleLimitTimeDetail.documentNumber,
-          createAt: saleLimitTimeDetail.createAt ? saleLimitTimeDetail.createAt.split('T')[0] : '',
         })
       );
       setValues({
@@ -156,8 +156,8 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
         comment: saleLimitTimeDetail.remark,
         startDate: moment(saleLimitTimeDetail.stStartTime),
         endDate: moment(saleLimitTimeDetail.stEndTime),
-        startTime: compareTime(saleLimitTimeDetail.stStartTime),
-        endTime: compareTime(saleLimitTimeDetail.stEndTime),
+        startTime: moment(saleLimitTimeDetail.stStartTime).format('HH:mm'),
+        endTime: moment(saleLimitTimeDetail.stEndTime).format('HH:mm'),
       });
       let listProducts = saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts
         ? saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts.map((item: any) => {
@@ -525,9 +525,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
             </Grid>
             <Grid item xs={3}>
               <Box mb={2}>{!!payLoadSt.documentNumber ? payLoadSt.documentNumber : '-'}</Box>
-              <Box>
-                {payLoadSt.createAt ? payLoadSt.createAt : moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
-              </Box>
+              <Box>{moment(createDate).add(543, 'y').format('DD/MM/YYYY')}</Box>
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
