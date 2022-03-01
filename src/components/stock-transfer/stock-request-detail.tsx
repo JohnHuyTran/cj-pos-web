@@ -580,41 +580,50 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           });
         }
 
-        // let reason = reasons;
-        // if (reason === 'All') reason = '';
-        const payloadSubmit: SubmitStockTransferRequest = {
-          startDate: moment(startDate).startOf('day').toISOString(),
-          endDate: moment(endDate).startOf('day').toISOString(),
-          branchFrom: fromBranch,
-          branchTo: toBranch,
-          transferReason: reasons,
-          itemGroups: itemGroups,
-          items: itemsList,
-        };
+        if (groupSCM) {
+          const payload2: Approve2StockTransferRequest = {
+            branchTo: toBranch,
+            comment: {
+              by: 'SCM',
+              detail: commentSCM,
+            },
+          };
+          handleApprove2(payload2);
+        } else {
+          const payloadSubmit: SubmitStockTransferRequest = {
+            startDate: moment(startDate).startOf('day').toISOString(),
+            endDate: moment(endDate).startOf('day').toISOString(),
+            branchFrom: fromBranch,
+            branchTo: toBranch,
+            transferReason: reasons,
+            itemGroups: itemGroups,
+            items: itemsList,
+          };
 
-        await submitStockRequest(rtNo, payloadSubmit)
-          .then((value) => {
-            setFlagSave(false);
-            setShowSnackBar(true);
-            setSnackbarIsStatus(true);
-            setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+          await submitStockRequest(rtNo, payloadSubmit)
+            .then((value) => {
+              setFlagSave(false);
+              setShowSnackBar(true);
+              setSnackbarIsStatus(true);
+              setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
 
-            dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+              dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
-            setTimeout(() => {
-              handleClose();
-            }, 500);
-          })
-          .catch((error: ApiError) => {
-            setShowSnackBar(true);
-            if (error.code === 40010) {
-              setContentMsg(
-                'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
-              );
-            } else {
-              setContentMsg(error.message);
-            }
-          });
+              setTimeout(() => {
+                handleClose();
+              }, 500);
+            })
+            .catch((error: ApiError) => {
+              setShowSnackBar(true);
+              if (error.code === 40010) {
+                setContentMsg(
+                  'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+                );
+              } else {
+                setContentMsg(error.message);
+              }
+            });
+        }
       }
     } else if (status === 'WAIT_FOR_APPROVAL_1') {
       const payload1: Approve1StockTransferRequest = {
@@ -688,32 +697,36 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             setContentMsg(error.message);
           });
       } else {
-        await approve2StockRequest(rtNo, payload2)
-          .then((value) => {
-            setFlagSave(false);
-            setShowSnackBar(true);
-            setSnackbarIsStatus(true);
-            setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
-            dispatch(featchSearchStockTransferRtAsync(payloadSearch));
-
-            setTimeout(() => {
-              handleClose();
-            }, 500);
-          })
-          .catch((error: ApiError) => {
-            setShowSnackBar(true);
-            if (error.code === 40010) {
-              setContentMsg(
-                'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
-              );
-            } else {
-              setContentMsg(error.message);
-            }
-          });
+        handleApprove2(payload2);
       }
     }
 
     setOpenLoadingModal(false);
+  };
+
+  const handleApprove2 = async (payload2: any) => {
+    await approve2StockRequest(rtNo, payload2)
+      .then((value) => {
+        setFlagSave(false);
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
+        dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+
+        setTimeout(() => {
+          handleClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        setShowSnackBar(true);
+        if (error.code === 40010) {
+          setContentMsg(
+            'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+          );
+        } else {
+          setContentMsg(error.message);
+        }
+      });
   };
 
   const topFunction = () => {
@@ -754,7 +767,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              วันที่โอนสินค้า{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
+              วันที่โอน{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
               {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
@@ -848,7 +861,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             <Grid item xs={7}></Grid>
           </Grid>
 
-          {!groupOC && !groupSCM && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
+          {!groupOC && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
             <Grid container spacing={2} mt={4} mb={2}>
               <Grid item xs={5}>
                 <Button
@@ -872,7 +885,6 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   className={classes.MbtnSave}
                   onClick={handleSave}
                   startIcon={<SaveIcon />}
-                  // sx={{ width: 140 }}
                   sx={{ width: 140, display: `${displayBtnSave ? 'none' : ''}` }}
                   disabled={rowLength == 0}
                 >
@@ -886,8 +898,20 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   className={classes.MbtnSave}
                   onClick={handleSubmit}
                   startIcon={<CheckCircleOutline />}
-                  // sx={{ width: 140 }}
                   sx={{ width: 140, display: `${displayBtnSubmit ? 'none' : ''}` }}
+                  disabled={rowLength == 0}
+                >
+                  ส่งงาน
+                </Button>
+
+                <Button
+                  id="btnCreateTransfer"
+                  variant="contained"
+                  color="primary"
+                  className={classes.MbtnSave}
+                  onClick={handleSubmit}
+                  startIcon={<CheckCircleOutline />}
+                  sx={{ width: 140, display: `${!groupSCM ? 'none' : ''}` }}
                   disabled={rowLength == 0}
                 >
                   ส่งงาน
@@ -895,42 +919,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               </Grid>
             </Grid>
           )}
-          {/* {(groupOC || groupSCM) &&
-            status !== '' &&
-            status !== 'DRAFT' &&
-            status !== 'AWAITING_FOR_REQUESTER' &&
-            status !== 'APPROVED' &&
-            status !== 'CANCELED' && (
-              <Grid container spacing={2} mt={4} mb={2}>
-                <Grid item xs={5}></Grid>
-                <Grid item xs={7} sx={{ textAlign: 'end' }}>
-                  <Button
-                    id="btnSave"
-                    variant="contained"
-                    color="error"
-                    className={classes.MbtnSave}
-                    onClick={handleReject}
-                    startIcon={<SaveIcon />}
-                    // sx={{ width: 140 }}
-                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
-                  >
-                    ปฎิเสธ
-                  </Button>
-                  <Button
-                    id="btnCreateTransfer"
-                    variant="contained"
-                    color="primary"
-                    className={classes.MbtnSave}
-                    onClick={handleApprove}
-                    startIcon={<CheckCircleOutline />}
-                    // sx={{ width: 140 }}
-                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
-                  >
-                    อนุมัติ
-                  </Button>
-                </Grid>
-              </Grid>
-            )} */}
+
           <Grid container spacing={2} mt={4} mb={2}>
             <Grid item xs={5}></Grid>
             <Grid item xs={7} sx={{ textAlign: 'end' }}>

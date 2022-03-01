@@ -170,30 +170,17 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
   const handleCheckboxChange = (e: any) => {
     const ischeck = e.target.checked;
     if (ischeck) {
-      // setSkuNameDisplay('');
       setIschecked(true);
       setSkuCodeSelect('ALL');
     } else {
       setIschecked(false);
       setSkuCodeSelect('');
-      // setSkuCodeSelect(defaultSkuSelected);
     }
   };
 
   console.log('isChecked :', isChecked);
 
   useEffect(() => {
-    // if (!update && type !== 'Create') {
-    //   if (stockRequestDetail) {
-    //     const items = stockRequestDetail.items ? stockRequestDetail.items : [];
-    //     if (items.length > 0) {
-    //       updateItemsState(items);
-    //       itemsMap(items);
-    //     }
-    //   }
-    // }
-    // console.log('stockRequestItems :', JSON.stringify(stockRequestItems));
-
     if (skuCode !== 'ALL') {
       setIschecked(false);
       setSkuCodeSelect(skuCode);
@@ -206,7 +193,7 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
     const oc = getUserInfo().group === PERMISSION_GROUP.OC;
     const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
 
-    if (!oc && !scm) {
+    if (!oc) {
       if (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') edit = true;
     }
 
