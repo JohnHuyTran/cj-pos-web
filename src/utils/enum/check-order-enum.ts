@@ -24,6 +24,12 @@ const shipmentType = [
   { key: 2, text: 'โอนลอย' },
 ];
 
+const orderReceiveThStatus = [
+  { key: '0', text: 'บันทึก' },
+  { key: '1', text: 'อนุมัติ' },
+  { key: '2', text: 'ปิดงาน' },
+];
+
 export const getShipmentStatusText = (key: string) => shipmentStatus.find((item) => item.key === key)?.text;
 
 export const getShipmentTypeText = (key: number) => shipmentType.find((item) => item.key === key)?.text;
@@ -33,3 +39,5 @@ export const getShipmentStatusTextEn = (key: string) => shipmentEnStatus.find((i
 export const formatFileNam = (sdNo: string, sdStatus: string) => {
   return `${sdNo}-${getShipmentStatusTextEn(sdStatus)}.pdf`;
 };
+
+export const getorderReceiveThStatus = (key: string) => orderReceiveThStatus.find((item) => item.key === key)?.text;

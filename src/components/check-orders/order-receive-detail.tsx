@@ -1,12 +1,33 @@
 import React from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/store';
-import { Box, Button, Dialog, DialogContent, DialogTitle, Grid, IconButton, Typography } from '@mui/material';
-import { HighlightOff, CheckCircleOutline } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { HighlightOff, CheckCircleOutline, SearchOff } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
+import SearchIcon from '@mui/icons-material/Search';
+import {
+  Entries,
+  ItemsInfo,
+  OrderReceiveApproveRequest,
+  OrderReceiveDetailInfo,
+  OrderReceiveDetailResponse,
+} from '../../models/dc-check-order-model';
+import { approveOrderReceive, searchOrderReceive } from '../../services/order-shipment';
+import OrderReceiveDetailList from '../check-orders/order-receive-detail-list';
+import { convertUtcToBkkDate } from '../../utils/date-utill';
+import { getorderReceiveThStatus, getShipmentTypeText } from '../../utils/enum/check-order-enum';
+import OrderReceiveConfirmModel from '../check-orders/order-receive-confirm-model';
 
 export interface OrderReceiveDetailProps {
-  // sdNo: string;
-  // shipmentNo: string;
   defaultOpen: boolean;
   onClickClose: any;
 }
@@ -15,6 +36,10 @@ export interface DialogTitleProps {
   id: string;
   children?: React.ReactNode;
   onClose?: () => void;
+}
+
+interface State {
+  docNo: string;
 }
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
@@ -41,19 +66,97 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-const handleTest = () => {
-  alert('test');
-};
-
 export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderReceiveDetailProps) {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const [open, setOpen] = React.useState(defaultOpen);
 
+  const [values, setValues] = React.useState<State>({
+    docNo: '',
+  });
+
   const handleClose = () => {
     setOpen(false);
     onClickClose();
   };
+
+  const handleChange = (event: any) => {
+    const value = event.target.value;
+    setValues({ ...values, [event.target.name]: value });
+  };
+
+  const [orderReceiveRes, setOrderReceiveRes] = React.useState<Array<Entries>>([]);
+  const [orderReceiveInfo, setOrderReceiveInfo] = React.useState<OrderReceiveDetailInfo>();
+  const [sdNo, setSdNo] = React.useState('');
+  const [docRefNo, setDocRefNo] = React.useState('');
+  const [sdType, setSdtype] = React.useState(0);
+
+  const handleSearch = async () => {
+    setFlagSearch(true);
+    await searchOrderReceive(values.docNo)
+      .then((value) => {
+        setOrderReceiveRes(value.data.entries);
+        setOrderReceiveInfo(value.data);
+        setSdtype(value.data.sdType);
+        setSdNo(value.data.sdNo);
+        setDocRefNo(value.data.docRefNo);
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+  };
+
+  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+
+  const handleApproveBtn = () => {
+    setOpenModelConfirm(true);
+  };
+
+  const handleModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+
+  const handleConfirmStatus = async (status: string) => {
+    if (status === 'ok') {
+      let items: any = [];
+      orderReceiveRes.forEach((data: any) => {
+        const itemsNew: ItemsInfo = {
+          barcode: data.barcode,
+          actualQty: data.actualQty,
+          comment: data.comment,
+        };
+        items.push(itemsNew);
+      });
+
+      const payload: OrderReceiveApproveRequest = {
+        docRefNo: docRefNo,
+        items: items,
+      };
+
+      await approveOrderReceive(payload);
+      setOpen(false);
+    } else {
+      setOpen(false);
+    }
+  };
+
+  let orderReceiveTable;
+  const [flagSearch, setFlagSearch] = React.useState(false);
+  if (flagSearch) {
+    if (orderReceiveRes.length > 0) {
+      orderReceiveTable = <OrderReceiveDetailList entries={orderReceiveRes} />;
+    } else {
+      orderReceiveTable = (
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
+            <h2>
+              ไม่มีข้อมูล <SearchOff fontSize="large" />
+            </h2>
+          </Box>
+        </Grid>
+      );
+    }
+  }
 
   return (
     <div>
@@ -69,7 +172,20 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
                 <Typography variant="body2">เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">-</Typography>
+                {/* <Typography variant="body2">-</Typography> */}
+                <TextField
+                  id="txtDocNo"
+                  name="docNo"
+                  size="small"
+                  value={values.docNo}
+                  onChange={handleChange}
+                  className={classes.MtextField}
+                  placeholder="เลขที่เอกสาร LD/BT"
+                />
+
+                <IconButton color="primary" component="span" onClick={handleSearch}>
+                  <SearchIcon />
+                </IconButton>
               </Grid>
             </Grid>
             <Grid container spacing={1} mb={1}>
@@ -77,13 +193,15 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
                 <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                {/* <Typography variant="body2">{sdNo ? sdNo : '-'}</Typography> */}
+                <Typography variant="body2">{sdNo ? sdNo : '-'}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">-</Typography>
+                <Typography variant="body2">
+                  {orderReceiveInfo?.shipmentDate ? convertUtcToBkkDate(orderReceiveInfo?.shipmentDate) : '-'}
+                </Typography>
               </Grid>
             </Grid>
             <Grid container spacing={1} mb={1}>
@@ -91,13 +209,15 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
                 <Typography variant="body2">สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">-</Typography>
+                <Typography variant="body2">
+                  {orderReceiveInfo?.status ? getorderReceiveThStatus(orderReceiveInfo?.status) : '-'}
+                </Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">-</Typography>
+                <Typography variant="body2">{getShipmentTypeText(sdType)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={1} mb={1}>
@@ -105,44 +225,49 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
                 <Typography variant="body2">สาขาต้นทาง:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">-</Typography>
+                <Typography variant="body2">
+                  {orderReceiveInfo?.shipBranchFrom.name ? orderReceiveInfo?.shipBranchFrom.name : '-'}
+                </Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">สาขาปลายทาง:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">-</Typography>
+                <Typography variant="body2">
+                  {orderReceiveInfo?.shipBranchTo.name ? orderReceiveInfo?.shipBranchTo.name : '-'}
+                </Typography>
               </Grid>
             </Grid>
           </Box>
 
-          <Box sx={{ marginTop: 4 }}>
-            <Grid item container spacing={2} justifyContent="flex-end">
-              <Button
-                id="btnApprove"
-                variant="contained"
-                color="primary"
-                className={classes.MbtnApprove}
-                // onClick={handleApproveBtn}
-                startIcon={<CheckCircleOutline />}
-                sx={{ width: '15%' }}
-              >
-                ยืนยัน
-              </Button>
+          {orderReceiveRes.length > 0 && (
+            <Box sx={{ marginTop: 4 }}>
+              <Grid item container spacing={2} justifyContent="flex-end">
+                <Button
+                  id="btnApprove"
+                  variant="contained"
+                  color="primary"
+                  className={classes.MbtnApprove}
+                  onClick={handleApproveBtn}
+                  startIcon={<CheckCircleOutline />}
+                  sx={{ width: '15%' }}
+                >
+                  ยืนยัน
+                </Button>
+              </Grid>
+            </Box>
+          )}
 
-              <Button
-                id="btnApprove"
-                variant="contained"
-                color="primary"
-                className={classes.MbtnApprove}
-                onClick={handleTest}
-                startIcon={<CheckCircleOutline />}
-                sx={{ width: '15%' }}
-              >
-                test
-              </Button>
-            </Grid>
-          </Box>
+          {orderReceiveTable}
+          {orderReceiveRes.length > 0 && <OrderReceiveDetailList entries={orderReceiveRes} />}
+
+          <OrderReceiveConfirmModel
+            open={openModelConfirm}
+            onClose={handleModelConfirm}
+            onUpdateAction={handleConfirmStatus}
+            sdNo={sdNo}
+            docRefNo={docRefNo}
+          />
         </DialogContent>
       </Dialog>
     </div>
