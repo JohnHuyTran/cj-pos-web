@@ -9,8 +9,16 @@ interface Props {
   maxLength: number;
   onChangeComment: (value: string) => void;
   isDisable: boolean;
+  rowDisplay?: number;
 }
-function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChangeComment }: Props): ReactElement {
+function TextBoxComment({
+  fieldName,
+  defaultValue,
+  maxLength,
+  isDisable,
+  onChangeComment,
+  rowDisplay,
+}: Props): ReactElement {
   const classes = useStyles();
   const [characterCount, setCharacterCount] = React.useState(0);
   const [comment, setComment] = React.useState(defaultValue);
@@ -35,7 +43,7 @@ function TextBoxComment({ fieldName, defaultValue, maxLength, isDisable, onChang
       <TextField
         multiline
         fullWidth
-        rows={2}
+        rows={rowDisplay ? rowDisplay : 2}
         onChange={handleChangeComment}
         defaultValue={defaultValue}
         placeholder={`ความยาวไม่เกิน ${maxLength} ตัวอักษร`}
