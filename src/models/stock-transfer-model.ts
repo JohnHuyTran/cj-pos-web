@@ -154,7 +154,7 @@ export interface Item {
   actualQty?: number;
   toteCode?: string;
   boNo?: boolean;
-  isDraft?: boolean;
+  isDisable?: boolean;
 }
 
 export interface ItemGroups {

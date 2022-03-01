@@ -453,7 +453,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
         orderQty: data.qty,
         actualQty: data.actualQty,
         toteCode: data.toteCode,
-        isDraft: isDraft,
+        // isDraft: isDraft,
         boNo: data.boNo,
       };
       items.push(newData);
@@ -483,7 +483,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             orderQty: dupItem.qty,
             actualQty: dupItem.actualQty + data.qty,
             toteCode: dupItem.toteCode,
-            isDraft: isDraft,
+            // isDraft: isDraft,
             boNo: dupItem.boNo,
           };
           _.remove(_items, function (item: Item) {
@@ -502,7 +502,7 @@ function StockPackChecked({ isOpen, onClickClose }: Props) {
             orderQty: 0,
             actualQty: data.qty,
             toteCode: '',
-            isDraft: isDraft,
+            // isDraft: isDraft,
           };
           _items = [..._items, newData];
         }

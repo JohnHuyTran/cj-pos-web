@@ -128,7 +128,6 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setIsDC(getUserInfo().group === PERMISSION_GROUP.DC);
     setStartDate(new Date(branchTransferInfo.startDate));
     setEndDate(new Date(branchTransferInfo.endDate));
-
     dispatch(updateAddItemSkuGroupState(branchTransferInfo.itemGroups));
   }, [open]);
 
@@ -1000,7 +999,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
                   defaultValue={comment}
                   maxLength={100}
                   onChangeComment={handleChangeComment}
-                  isDisable={!isDraft}
+                  isDisable={isGroupBranch() && isDraft ? false : true}
                   rowDisplay={2}
                 />
               </Grid>
