@@ -24,6 +24,7 @@ import { getBranchName } from '../../utils/utils';
 import { BranchListOptionType } from '../../models/branch-model';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { getUserInfo } from '../../store/sessionStore';
+import { Download } from '@mui/icons-material';
 
 interface State {
   docNo: string;
@@ -350,7 +351,58 @@ export default function StockTransferRt() {
             <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
           </Grid>
 
-          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+          {/* <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+            <Button
+              id="btnCreateStockTransferModal"
+              variant="contained"
+              onClick={handleOpenCreateModal}
+              sx={{ minWidth: '15%', display: `${displayBtnCreate ? 'none' : ''}` }}
+              className={classes.MbtnClear}
+              startIcon={<AddCircleOutlineOutlinedIcon />}
+              color="secondary"
+            >
+              สร้างรายการโอน
+            </Button>
+            <Button
+              id="btnClear"
+              variant="contained"
+              onClick={onClickClearBtn}
+              sx={{ width: '13%', ml: 2 }}
+              className={classes.MbtnClear}
+              color="cancelColor"
+            >
+              เคลียร์
+            </Button>
+            <Button
+              id="btnSearch"
+              variant="contained"
+              color="primary"
+              onClick={onClickValidateForm}
+              sx={{ width: '13%', ml: 2 }}
+              className={classes.MbtnSearch}
+            >
+              ค้นหา
+            </Button>
+          </Grid> */}
+        </Grid>
+      </Box>
+
+      <Box mb={6}>
+        <Grid container spacing={2} mt={4} mb={2}>
+          <Grid item xs={5}>
+            <Button
+              id="btnImport"
+              variant="contained"
+              color="primary"
+              startIcon={<Download />}
+              // onClick={onClickValidateForm}
+              sx={{ width: '25%' }}
+              className={classes.MbtnSearch}
+            >
+              Import
+            </Button>
+          </Grid>
+          <Grid item xs={7} sx={{ textAlign: 'end' }}>
             <Button
               id="btnCreateStockTransferModal"
               variant="contained"
@@ -385,8 +437,6 @@ export default function StockTransferRt() {
           </Grid>
         </Grid>
       </Box>
-
-      <Box mt={6}></Box>
       {orderListData}
 
       <LoadingModal open={openLoadingModal.open} />
