@@ -91,6 +91,7 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => (
       <div>
         <TextField
+          id='txnActualQty'
           variant='outlined'
           name='txnActualQty'
           type='number'
@@ -129,6 +130,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
+        id='txbToteCode'
         variant='outlined'
         name='txbToteCode'
         inputProps={{ style: { textAlign: 'right' } }}
@@ -374,13 +376,12 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     storeItem();
   };
   const handleOnKeyDown = () => {
-    console.log('handleOnKeyDown');
-    storeItem();
-  };
-  const handleOnCellBlur = () => {
     storeItem();
   };
   const handleOnCellClick = () => {
+    storeItem();
+  };
+  const handleOnCellOut = () => {
     storeItem();
   };
 
@@ -398,9 +399,11 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          // onCellFocusOut={handleFocusOut}
-          // onCellClick={handleOnCellClick}
+          onCellFocusOut={handleFocusOut}
+          onCellClick={handleOnCellClick}
           onCellKeyDown={handleOnKeyDown}
+          onCellOut={handleOnCellOut}
+          // onSelectionModelChange={handleOnSelectionModelChange}
           // onCellBlur={handleOnCellBlur}
         />
       </div>
