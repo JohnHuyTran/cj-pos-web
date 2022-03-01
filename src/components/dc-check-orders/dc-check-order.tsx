@@ -233,7 +233,7 @@ function DCCheckOrderSearch() {
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder='เลขที่เอกสาร LD/เลขที่เอกสาร SD'
+              placeholder='เลขที่เอกสาร LD/BT/SD'
             />
           </Grid>
           <Grid item xs={4}>

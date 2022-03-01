@@ -17,6 +17,7 @@ import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-trans
 import { saveSearchStockTransferRt } from '../../store/slices/save-search-stock-transfer-rt-slice';
 import ModalDetailStockTransfer from './stock-request-detail';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 import { removeStockRequest } from '../../services/stock-transfer';
@@ -301,6 +302,7 @@ function StockTransferRtList() {
   const [typeDetailModal, setTypeDetailModal] = React.useState('View');
   const handleOpenDetailModal = async (rtNo: string) => {
     await dispatch(updateAddItemsState({}));
+    await dispatch(updatestockRequestItemsState({}));
     setTypeDetailModal('View');
     await dispatch(featchStockRequestDetailAsync(rtNo));
     setOpenDetailModal(true);

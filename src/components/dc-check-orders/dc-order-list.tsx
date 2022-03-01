@@ -60,7 +60,7 @@ function DCOrderList() {
     },
     {
       field: 'shipmentNo',
-      headerName: 'เลขที่เอกสาร LD',
+      headerName: 'เลขที่เอกสาร',
       minWidth: 140,
       // flex: 1.3,
       headerAlign: 'center',
@@ -85,6 +85,14 @@ function DCOrderList() {
       headerName: 'เลขที่เอกสาร BO',
       minWidth: 128,
       // flex: 1.2,
+      headerAlign: 'center',
+      sortable: false,
+    },
+    {
+      field: 'branchSource',
+      headerName: 'สาขาต้นทาง',
+      minWidth: 150,
+      flex: 0.9,
       headerAlign: 'center',
       sortable: false,
     },

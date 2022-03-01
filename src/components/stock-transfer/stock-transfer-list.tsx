@@ -20,6 +20,7 @@ import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transf
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import StockTransferBT from './stock-transfer-bt';
+import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -274,7 +275,7 @@ function StockTransferList() {
   const currentlySelected = async (params: GridCellParams) => {
     await dispatch(updateAddItemsState({}));
     await dispatch(featchBranchTransferDetailAsync(params.row.btNo));
-
+    dispatch(updateAddItemSkuGroupState([]));
     if (reasonsList === null || reasonsList.length <= 0) await dispatch(featchTransferReasonsListAsync());
     setOpenCreateModal(true);
   };
@@ -302,8 +303,8 @@ function StockTransferList() {
           />
         </div>
       </Box>
-      {openCreateModal && <StockPackChecked isOpen={true} onClickClose={handleCloseCreateModal} />}
-      {/* {openCreateModal && <StockTransferBT isOpen={true} onClickClose={handleCloseCreateModal} />} */}
+      {/* {openCreateModal && <StockPackChecked isOpen={true} onClickClose={handleCloseCreateModal} />} */}
+      {openCreateModal && <StockTransferBT isOpen={true} onClickClose={handleCloseCreateModal} />}
       <LoadingModal open={openLoadingModal.open} />
     </div>
   );
