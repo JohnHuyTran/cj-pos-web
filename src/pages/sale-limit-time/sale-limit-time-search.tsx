@@ -18,6 +18,7 @@ import { paramsConvert } from '../../utils/utils';
 import moment from 'moment';
 import AlertError from '../../components/commons/ui/alert-error';
 import { fetchBranchProvinceListAsync, updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
+import LoadingModal from '../../components/commons/ui/loading-modal';
 interface State {
   query: string;
   branch: string;
@@ -25,6 +26,10 @@ interface State {
   startDate: any | Date | number | string;
   endDate: any | Date | number | string;
 }
+interface loadingModalState {
+  open: boolean;
+}
+
 const SaleLimitTimeSearch = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -37,13 +42,14 @@ const SaleLimitTimeSearch = () => {
   const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
   const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
   const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
   let checkAdmin = userInfo.acl['service.posback-campaign'].includes('campaign.st.create');
 
   const [values, setValues] = React.useState<State>({
     query: '',
     branch: checkAdmin ? '' : userInfo.branch,
-    status: checkAdmin ? 'all' : '1',
+    status: checkAdmin ? 'all' : '2',
     startDate: new Date(),
     endDate: new Date(),
   });
@@ -52,7 +58,7 @@ const SaleLimitTimeSearch = () => {
 
   useEffect(() => {
     setLstStatus(t('lstStatus', { returnObjects: true }));
-    if (!checkAdmin) {
+    if (!checkAdmin && userInfo.branch) {
       const payload = {
         limit: '10',
         code: userInfo.branch,
@@ -94,7 +100,11 @@ const SaleLimitTimeSearch = () => {
   const handleCloseCreateModal = () => {
     setOpenCreateModal(false);
   };
-  const handleSearchST = () => {
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+  const handleSearchST = async () => {
+    handleOpenLoading('open', true);
     if (stringNullOrEmpty(values.startDate) || stringNullOrEmpty(values.endDate)) {
       setOpenAlert(true);
       setTextError('กรุณากรอกวันที่');
@@ -113,7 +123,7 @@ const SaleLimitTimeSearch = () => {
           endDate: moment(values.endDate).endOf('day').toISOString(),
         };
         const query = paramsConvert(params);
-        dispatch(fetchSaleLimitTimeListAsync(query));
+        await dispatch(fetchSaleLimitTimeListAsync(query));
       } else {
         const params = {
           page: payloadST.page,
@@ -125,9 +135,10 @@ const SaleLimitTimeSearch = () => {
           endDate: moment(values.endDate).endOf('day').toISOString(),
         };
         const query = paramsConvert(params);
-        dispatch(fetchSaleLimitTimeListAsync(query));
+        await dispatch(fetchSaleLimitTimeListAsync(query));
       }
     }
+    handleOpenLoading('close', false);
   };
   const onSearch = () => {
     console.log('close');
@@ -158,7 +169,7 @@ const SaleLimitTimeSearch = () => {
               }}
               className={classes.MtextField}
               fullWidth
-              placeholder="สาขา"
+              placeholder="เอกสาร ST / รายละเอียด"
             />
           </Grid>
           <Grid item xs={4}>
@@ -240,7 +251,7 @@ const SaleLimitTimeSearch = () => {
           sx={{ width: '126px' }}
           onClick={handleSearchST}
         >
-          เคลียร์
+          ค้นหา
         </Button>
       </Box>
       {checkAdmin && (
@@ -251,10 +262,17 @@ const SaleLimitTimeSearch = () => {
             className={classes.MbtnSearch}
             sx={{ marginRight: '20px', width: '126px' }}
             onClick={handleSearchST}
+            disabled={values.status != '2'}
           >
             เริ่มต้นใช้งาน
           </Button>
-          <Button variant="contained" color="error" className={classes.MbtnSearch} sx={{ width: '126px' }}>
+          <Button
+            variant="contained"
+            color="error"
+            className={classes.MbtnSearch}
+            sx={{ width: '126px' }}
+            disabled={values.status != '2'}
+          >
             ยกเลิก
           </Button>
         </Box>
@@ -279,6 +297,7 @@ const SaleLimitTimeSearch = () => {
           onClickClose={handleCloseCreateModal}
         />
       )}
+      <LoadingModal open={openLoadingModal.open} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>
