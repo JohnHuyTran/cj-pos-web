@@ -21,6 +21,9 @@ import { Item, ItemGroups } from '../../models/stock-transfer-model';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { updateAddItemSkuGroupState, updateBTSkuSlice } from '../../store/slices/stock-transfer-bt-sku-slice';
 import { updateAddItemsGroupState } from '../../store/slices/stock-transfer-bt-product-slice';
+import { getUserInfo } from '../../store/sessionStore';
+import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import { isGroupBranch } from '../../utils/role-permission';
 
 interface Props {
   skuCodeSelect: string;
@@ -112,7 +115,7 @@ const columns: GridColDef[] = [
             // update the state and reset the caret
             // e.target.setSelectionRange(caretStart, caretEnd);
           }}
-          disabled={params.getValue(params.id, 'isDraft') ? false : true}
+          disabled={params.getValue(params.id, 'isDisable') ? true : false}
           autoComplete='off'
         />
       </div>
@@ -137,7 +140,7 @@ const columns: GridColDef[] = [
           params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
           // e.target.setSelectionRange(caretStart, caretEnd);
         }}
-        disabled={params.getValue(params.id, 'isDraft') ? false : true}
+        disabled={params.getValue(params.id, 'isDisable') ? true : false}
         autoComplete='off'
       />
     ),
@@ -192,7 +195,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const skuGroupItems = useAppSelector((state) => state.updateBTSkuSlice.state);
 
-  const [isDraft, setIsDraft] = React.useState(false);
+  const [isDisable, setIsDisable] = React.useState(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   let rows = branchTransferItems
@@ -217,15 +220,21 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
         orderQty: item.orderQty ? item.orderQty : 0,
         actualQty: item.actualQty ? item.actualQty : 0,
         toteCode: item.toteCode,
-        isDraft: isDraft,
+        isDisable: isDisable,
         boNo: item.boNo,
       };
     });
 
   React.useEffect(() => {
-    setIsDraft(branchTransferInfo.status === 'CREATED' ? true : false);
+    // const isCreate = branchTransferInfo.status === 'CREATED';
+    // setIsDisable(isGroupBranch() && isCreate ? false : true);
     storeItemAddItem(payloadAddItem);
   }, [payloadAddItem]);
+
+  React.useEffect(() => {
+    const isCreate = branchTransferInfo.status === 'CREATED';
+    setIsDisable(isGroupBranch() && isCreate ? false : true);
+  }, []);
 
   const storeItemAddItem = async (_newItem: any) => {
     let _items = [...branchTransferItems];
@@ -274,7 +283,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
             orderQty: dupItem.orderQty ? dupItem.orderQty : 0,
             actualQty: dupItem.actualQty + data.qty,
             toteCode: dupItem.toteCode,
-            isDraft: isDraft,
+            isDisable: isDisable,
             boNo: dupItem.boNo,
           };
           _.remove(_items, function (item: Item) {
@@ -293,7 +302,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
             orderQty: data.orderQty ? data.orderQty : 0,
             actualQty: data.qty,
             toteCode: '',
-            isDraft: isDraft,
+            isDisable: isDisable,
           };
           _items = [..._items, newData];
         }
@@ -319,7 +328,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
         unitName: data.unitName,
         actualQty: data.actualQty,
         toteCode: data.toteCode,
-        isDraft: isDraft,
+        isDisable: isDisable,
         boNo: data.boNo,
         barFactor: data.barFactor,
         unitCode: data.unitCode ? data.unitCode : 0,
