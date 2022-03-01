@@ -238,6 +238,16 @@ function DCCheckOrderSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+              สาขาต้นทาง
+            </Typography>
+            <BranchListDropDown
+              sourceBranchCode={''}
+              onChangeBranch={handleChangeBranch}
+              isClear={clearBranchDropDown}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาขาปลายทาง
             </Typography>
             <BranchListDropDown
@@ -245,65 +255,7 @@ function DCCheckOrderSearch() {
               onChangeBranch={handleChangeBranch}
               isClear={clearBranchDropDown}
             />
-            {/* <Autocomplete
-              {...defaultPropsBranchList}
-              className={classes.Mautocomplete}
-              id="selBranchNo"
-              value={valueBranchList}
-              onChange={handleChangeBranch}
-              renderOption={(props, option) => {
-                return (
-                  <li {...props} key={option.code}>
-                    {option.name}
-                  </li>
-                );
-              }}
-              renderInput={(params) => (
-                <TextField {...params} placeholder="ทั้งหมด" size="small" className={classes.MtextField} fullWidth />
-              )}
-            /> */}
-
-            {/* <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id="selBranchNo"
-                name="branchNo"
-                value={values.branchCode}
-                inputProps={{ "aria-label": "Without label" }}
-                onChange={handleChangeBranch}
-              >
-                <MenuItem value={"ALL"} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                {branchList.branchList.data.map(
-                  (option: BranchInfo, index: number) => (
-                    <MenuItem key={option.code} value={option.code}>
-                      {option.name}
-                    </MenuItem>
-                  )
-                )}
-              </Select>
-            </FormControl> */}
           </Grid>
-          <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-              สถานะการตรวจสอบผลต่าง
-            </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id='selVerifyDCStatus'
-                name='verifyDCStatus'
-                value={values.verifyDCStatus}
-                onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={'ALL'} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem value={'0'}>รอการตรวจสอบ</MenuItem>
-                <MenuItem value={'1'}>ตรวจสอบแล้ว</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-
           <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่รับสินค้า
@@ -327,6 +279,27 @@ function DCCheckOrderSearch() {
             </Box>
           </Grid>
           <Grid item xs={4} container alignItems='flex-end'>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+              สถานะการตรวจสอบผลต่าง
+            </Typography>
+            <FormControl fullWidth className={classes.Mselect}>
+              <Select
+                id='selVerifyDCStatus'
+                name='verifyDCStatus'
+                value={values.verifyDCStatus}
+                onChange={handleChange}
+                inputProps={{ 'aria-label': 'Without label' }}>
+                <MenuItem value={'ALL'} selected={true}>
+                  ทั้งหมด
+                </MenuItem>
+                <MenuItem value={'0'}>รอการตรวจสอบ</MenuItem>
+                <MenuItem value={'1'}>ตรวจสอบแล้ว</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={4} sx={{ pt: 30 }}>
+            {' '}
             <Typography gutterBottom variant='subtitle1' component='div'>
               ประเภท
             </Typography>
@@ -345,26 +318,30 @@ function DCCheckOrderSearch() {
               </Select>
             </FormControl>
           </Grid>
-
-          <Grid item container xs={12} justifyContent='flex-end' direction='row' alignItems='flex-end'>
-            <Button
-              id='btnClear'
-              variant='contained'
-              onClick={onClickClearBtn}
-              sx={{ width: '13%' }}
-              className={classes.MbtnClear}
-              color='cancelColor'>
-              เคลียร์
-            </Button>
-            <Button
-              id='btnSearch'
-              variant='contained'
-              color='primary'
-              onClick={onClickValidateForm}
-              sx={{ width: '13%', ml: 2 }}
-              className={classes.MbtnSearch}>
-              ค้นหา
-            </Button>
+          <Grid item xs={4} container alignItems='flex-end'></Grid>
+          <Grid item xs={4} container alignItems='flex-end'>
+            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
+              <Button
+                id='btnClear'
+                variant='contained'
+                onClick={onClickClearBtn}
+                sx={{ width: '45%' }}
+                className={classes.MbtnClear}
+                color='cancelColor'
+                fullWidth={true}>
+                เคลียร์
+              </Button>
+              <Button
+                id='btnSearch'
+                variant='contained'
+                color='primary'
+                onClick={onClickValidateForm}
+                sx={{ width: '45%', ml: 1 }}
+                className={classes.MbtnSearch}
+                fullWidth={true}>
+                ค้นหา
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
       </Box>
