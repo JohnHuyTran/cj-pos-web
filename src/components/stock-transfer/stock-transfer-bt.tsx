@@ -112,10 +112,10 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   React.useEffect(() => {
-    const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
+    const fromBranch = `${branchTransferInfo.branchFrom}-${getBranchName(branchList, branchTransferInfo.branchFrom)}`;
     setSourceBranch(fromBranch ? fromBranch : '');
 
-    const toBranch = getBranchName(branchList, branchTransferInfo.branchTo);
+    const toBranch = `${branchTransferInfo.branchTo}-${getBranchName(branchList, branchTransferInfo.branchTo)}`;
     setDestinationBranch(toBranch ? toBranch : '');
 
     const reason = getReasonLabel(reasonsList, branchTransferInfo.transferReason);
