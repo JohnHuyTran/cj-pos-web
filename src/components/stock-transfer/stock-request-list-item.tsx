@@ -329,7 +329,7 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
         rowHeight={65}
         onCellClick={currentlySelected}
         onCellFocusOut={handleEditItems}
-        // onCellOut={handleEditItems}
+        onCellOut={handleEditItems}
         onCellKeyDown={handleEditItems}
       />
 
