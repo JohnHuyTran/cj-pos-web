@@ -76,3 +76,63 @@ export interface CheckOrderDetailItims {
 export interface DCOrderApproveRequest {
   dcComment: string;
 }
+
+export interface OrderReceiveDetailResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: OrderReceiveDetailInfo | null;
+}
+export interface OrderReceiveDetailInfo {
+  shipmentNo: string;
+  shipmentDate: string;
+  status: string;
+  sapDocType: string;
+  sdNo: string;
+  sdStatus: number;
+  sdType: number;
+  toteCnt: number;
+  boxCnt: number;
+  comment: string;
+  ItemRefNo: number;
+  entries: Entries[];
+  shipBranchFrom: ShipBranchInfo;
+  shipBranchTo: ShipBranchInfo;
+}
+export interface Entries {
+  deliveryOrderNo: string;
+  productName: string;
+  ItemRefNo: number;
+  barcode: string;
+  skuCode: string;
+  skuType: string;
+  outOfStockStatus: number;
+  toteCode: string;
+  expireDate: string;
+  unitCode: string;
+  unitName: string;
+  unitFactor: number;
+  qty: number;
+  qtyAll: number;
+  qtyAllBefore: number;
+  actualQty: number;
+  qtyDiff: number;
+  comment: string;
+  isTote: boolean;
+}
+
+export interface ShipBranchInfo {
+  code: string;
+  name: string;
+}
+
+export interface OrderReceiveApproveRequest {
+  docRefNo: string;
+  items: ItemsInfo[];
+}
+
+export interface ItemsInfo {
+  barcode: string;
+  actualQty: number;
+  comment: string;
+}

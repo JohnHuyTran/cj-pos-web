@@ -28,6 +28,12 @@ export const environment = {
       printFormShipmentDeliverly: {
         url: '/order/stock-diff/{sdNo}/export',
       },
+      search: {
+        url: '/order/shipment/search',
+      },
+      approveOrderReceive: {
+        url: '/order//shipment/submit',
+      },
     },
     dcCheckOrder: {
       fetchOrder: {

@@ -301,7 +301,7 @@ export default function SupplierCheckOrderSearch() {
 
           <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant="subtitle1" component="div">
-              วันที่โอน
+              วันที่โอนสินค้า
             </Typography>
             <Typography gutterBottom variant="subtitle1" component="div">
               ตั้งแต่*
