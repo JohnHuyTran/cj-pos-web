@@ -579,6 +579,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       flex: 0.2,
       align: 'center',
       sortable: false,
+      hide: Number(BDStatus.DRAFT) < dataDetail.status,
       renderCell: (params: GridRenderCellParams) => {
         const [openModalDelete, setOpenModalDelete] = React.useState<boolean>(false);
 
