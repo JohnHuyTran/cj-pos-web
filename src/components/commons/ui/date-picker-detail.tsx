@@ -58,9 +58,9 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         InputAdornmentProps={{
           position: 'start',
         }}
-        // maxDate={today}
         minDate={props.minDateTo}
         placeholder="กรุณาเลือกวันที่"
+        minDateMessage="วันที่โอน ต้องไม่น้อยกว่าวันที่ปัจจุบัน"
       />
     );
   } else {
@@ -87,9 +87,9 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         InputAdornmentProps={{
           position: 'start',
         }}
-        // maxDate={today}
         minDate={today}
         placeholder="กรุณาเลือกวันที่"
+        minDateMessage="วันที่โอน ต้องไม่น้อยกว่าวันที่ปัจจุบัน"
       />
     );
   }
