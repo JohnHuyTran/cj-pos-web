@@ -46,6 +46,9 @@ const saleLimitTimeSlice = createSlice({
     updatePayloadST: (state, action: PayloadAction<any>) => {
       state.payloadST = action.payload;
     },
+    clearResponse: (state) => {
+      state.responseST = initialState.responseST;
+    },
   },
   extraReducers: (builer) => {
     builer.addCase(fetchSaleLimitTimeListAsync.pending, () => {
@@ -63,5 +66,5 @@ const saleLimitTimeSlice = createSlice({
       });
   },
 });
-export const { updatePayloadST } = saleLimitTimeSlice.actions;
+export const { updatePayloadST, clearResponse } = saleLimitTimeSlice.actions;
 export default saleLimitTimeSlice.reducer;

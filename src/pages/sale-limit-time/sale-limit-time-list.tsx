@@ -24,7 +24,7 @@ interface loadingModalState {
   open: boolean;
 }
 interface StateProps {
-  onSearch: () => void;
+  onSearch: (e: any) => void;
 }
 const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
@@ -79,30 +79,29 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
   const columns: GridColDef[] = [
-    // {
-    //   field: 'checked',
-    //   headerName: t('numberOrder'),
-    //   width: 100,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    //   sortable: false,
-    //   renderHeader: (params) => (
-    //     <FormControl component="fieldset" sx={{ marginLeft: '-15px' }}>
-    //       <FormGroup aria-label="position" row>
-    //         <FormControlLabel
-    //           className={classes.MFormControlLabel}
-    //           value="top"
-    //           control={<Checkbox checked={checkAll} />}
-    //           label={t('selectAll')}
-    //           labelPlacement="top"
-    //         />
-    //       </FormGroup>
-    //     </FormControl>
-    //   ),
-    //   renderCell: (params) => (
-    //     <Checkbox checked={Boolean(params.value)} disabled={BDStatus.APPROVED != params.row.status} />
-    //   ),
-    // },
+    {
+      field: 'checked',
+      headerName: t('numberOrder'),
+      width: 130,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      hide: !isAdmin,
+      renderHeader: (params) => (
+        <FormControl component="fieldset" sx={{ marginLeft: '0px' }}>
+          <FormGroup aria-label="position" row>
+            <FormControlLabel
+              className={classes.MFormControlLabel}
+              value="top"
+              control={<Checkbox checked={checkAll} />}
+              label="เลือกทั้งหมด"
+              labelPlacement="top"
+            />
+          </FormGroup>
+        </FormControl>
+      ),
+      renderCell: (params) => <Checkbox checked={Boolean(params.value)} />,
+    },
     {
       field: 'index',
       headerName: 'ลำดับ',
@@ -261,8 +260,8 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     dispatch(updatePayloadST(newPayload));
   };
   const handleCloseCreateModal = () => {
-    props.onSearch();
     setOpenDetailModal(false);
+    props.onSearch(true);
   };
   const handleClosePopup = () => {
     setOpenPopup(false);
@@ -270,12 +269,12 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
 
   const handleClickCell = async (params: GridCellParams) => {
     // const chkPN = params.colDef.field;
+    props.onSearch(false);
     handleOpenLoading('open', true);
     try {
       await dispatch(getsaleLimitTimeDetail(params.row.id));
       if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
         console.log(saleLimitTimeDetail);
-        props.onSearch();
         setOpenDetailModal(true);
       }
     } catch (error) {

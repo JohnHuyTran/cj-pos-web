@@ -247,16 +247,6 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
   const clearData = async () => {
     dispatch(updatesaleLimitTimeState({}));
     dispatch(updateAddTypeAndProductState([]));
-    dispatch(
-      updatePayloadBranches({
-        isAllBranches: true,
-        appliedBranches: {
-          province: [],
-          branchList: [],
-        },
-        saved: false,
-      })
-    );
   };
   const handleClose = async () => {
     setOpen(false);
