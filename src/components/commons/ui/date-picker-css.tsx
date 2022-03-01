@@ -49,6 +49,9 @@ const useStyles = makeStyles({
     '& .MuiInputBase-input.Mui-disabled': {
       color: 'rgba(0, 0, 0, 0.87) !important',
     },
+    '& .MuiFormHelperText-root.Mui-error': {
+      display: 'none',
+    },
   },
   MdatepickerError: {
     '& .MuiOutlinedInput-input': {

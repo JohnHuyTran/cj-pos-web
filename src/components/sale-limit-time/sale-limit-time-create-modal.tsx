@@ -35,6 +35,9 @@ import ModelConfirm from './modal-confirm';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DatePickerComponent from './date-picker-detail';
 import { objectNullOrEmpty } from '../../utils/utils';
+import ModalConfirmCopy from './modalConfirmCopy';
+import { getAllProductByType } from '../../services/common';
+
 interface State {
   description: string;
   startDate: any | Date | number | string;
@@ -60,6 +63,7 @@ export interface DialogTitleProps {
   children?: React.ReactNode;
   onClose?: () => void;
 }
+const _ = require('lodash');
 
 const defaultMaterialTheme = createTheme({
   palette: {
@@ -133,21 +137,24 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
   };
-  const [showModalProduct, setShowModalProduct] = React.useState(true);
-  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
-  const [unSelectAllType, setUnSelectAllType] = React.useState(false);
+  const [showModalProduct, setShowModalProduct] = React.useState<boolean>(true);
+  const [confirmModelExit, setConfirmModelExit] = React.useState<boolean>(false);
+  const [unSelectAllType, setUnSelectAllType] = React.useState<boolean>(false);
   // detail data
   const saleLimitTimeDetail = useAppSelector((state) => state.saleLimitTimeDetailSlice.saleLimitTimeDetail.data);
+  // modal copy
+  const [openModalCopy, setOpenModalCopy] = React.useState<boolean>(false);
+  const [choiceCopy, setChoiceCopy] = React.useState<boolean>(false);
 
   useEffect(() => {
     if (type === 'Detail' && !objectNullOrEmpty(saleLimitTimeDetail)) {
       setStatus(saleLimitTimeDetail.status);
+      setCreateDate(saleLimitTimeDetail.createdAt);
       dispatch(
         updatesaleLimitTimeState({
           ...payLoadSt,
           id: saleLimitTimeDetail.id,
           documentNumber: saleLimitTimeDetail.documentNumber,
-          createAt: saleLimitTimeDetail.createAt ? saleLimitTimeDetail.createAt.split('T')[0] : '',
         })
       );
       setValues({
@@ -156,8 +163,8 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
         comment: saleLimitTimeDetail.remark,
         startDate: moment(saleLimitTimeDetail.stStartTime),
         endDate: moment(saleLimitTimeDetail.stEndTime),
-        startTime: compareTime(saleLimitTimeDetail.stStartTime),
-        endTime: compareTime(saleLimitTimeDetail.stEndTime),
+        startTime: moment(saleLimitTimeDetail.stStartTime).format('HH:mm'),
+        endTime: moment(saleLimitTimeDetail.stEndTime).format('HH:mm'),
       });
       let listProducts = saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts
         ? saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts.map((item: any) => {
@@ -235,7 +242,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
         }
       }
     }
-  }, [values.startDate, values.endDate, values.startTime, values.endTime]);
+  }, [values.startDate, values.endDate, values.startTime, values.endTime, createDate]);
 
   const clearData = async () => {
     dispatch(updatesaleLimitTimeState({}));
@@ -250,11 +257,6 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
   const compareDateTime = (date: Date, time: string | null) => {
     let dateAppend = moment(date).format(DateFormat.DATE_FORMAT) + ' ' + time;
     return moment(dateAppend, DateFormat.DATE_TIME_DISPLAY_FORMAT);
-  };
-
-  const compareTime = (time: string) => {
-    let timeList = time.split('T')[1].split(':');
-    return `${timeList[0]}:${timeList[1]}`;
   };
 
   const topFunction = () => {
@@ -476,6 +478,53 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
       handleClose();
     }
   };
+  const handleCopy = async () => {
+    setOpenLoadingModal(true);
+    // fist choice copy by all product is the same as the old one
+    setStatus(0);
+    dispatch(updatesaleLimitTimeState({}));
+    setCreateDate(new Date());
+    setOpenModalCopy(false);
+    if (choiceCopy) {
+      // second choice copy by update the information to the current amount
+      let listItem = _.cloneDeep(payloadAddTypeProduct);
+
+      let listTypeItem = listItem.filter((el: any) => el.selectedType === 1);
+
+      for (const el of listTypeItem) {
+        let res = await getAllProductByType(el.productTypeCode);
+        if (res && res.data && res.data.length > 0) {
+          let lstProductByType = res.data;
+          for (const item of lstProductByType) {
+            let productItem: any = _.cloneDeep(item);
+            let productExist = listItem.find((it: any) => it.selectedType === 2 && it.barcode === item.barcode);
+            if (objectNullOrEmpty(productExist)) {
+              productItem.selectedType = 2;
+              productItem.showProduct = true;
+              listItem.push(productItem);
+            }
+          }
+        }
+      }
+      if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0) {
+        for (const item of payloadAddTypeProduct) {
+          if (item.selectedType === 2) {
+            let selectedItemFilter = listItem.filter(
+              (it: any) => it.selectedType === item.selectedType && it.barcode === item.barcode
+            );
+            if (selectedItemFilter && selectedItemFilter.length === 0) {
+              listItem.push(item);
+            }
+          }
+        }
+      }
+      dispatch(updateAddTypeAndProductState(listItem));
+    }
+    setOpenLoadingModal(false);
+  };
+  const handleOpenModalCopy = () => {
+    setOpenModalCopy(true);
+  };
 
   const handleCloseModalCancel = () => {
     setOpenModalCancel(false);
@@ -515,9 +564,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
             </Grid>
             <Grid item xs={3}>
               <Box mb={2}>{!!payLoadSt.documentNumber ? payLoadSt.documentNumber : '-'}</Box>
-              <Box>
-                {payLoadSt.createAt ? payLoadSt.createAt : moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
-              </Box>
+              <Box>{moment(createDate).add(543, 'y').format('DD/MM/YYYY')}</Box>
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -723,6 +770,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
                       sx={{ margin: '0 17px' }}
                       startIcon={<ContentCopyIcon />}
                       className={classes.MbtnSearch}
+                      onClick={handleOpenModalCopy}
                     >
                       Copy
                     </Button>
@@ -803,6 +851,14 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
         onConfirm={() => handleCreateSTDetail(true)}
         HQCode={payLoadSt.documentNumber}
         headerTitle={'ยืนยันเริ่มใช้งานกำหนดเวลา (งด) ขายสินค้า'}
+      />
+
+      <ModalConfirmCopy
+        open={openModalCopy}
+        onClose={() => setOpenModalCopy(false)}
+        onConfirm={handleCopy}
+        choiceCopy={choiceCopy}
+        setChoiceCopy={setChoiceCopy}
       />
 
       <SnackbarStatus open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={true} contentMsg={contentMsg} />
