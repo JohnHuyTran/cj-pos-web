@@ -19,6 +19,9 @@ export default function StepperBar({ activeStep }: Props): ReactElement {
     if (activeStep === 4) {
       setCancel(true);
       setStep(2);
+    } else if (activeStep === 0) {
+      setCancel(false);
+      setStep(activeStep);
     } else {
       setStep(activeStep);
     }
