@@ -26,6 +26,7 @@ import OrderReceiveDetailList from '../check-orders/order-receive-detail-list';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { getorderReceiveThStatus, getShipmentTypeText } from '../../utils/enum/check-order-enum';
 import OrderReceiveConfirmModel from '../check-orders/order-receive-confirm-model';
+import LoadingModal from '../commons/ui/loading-modal';
 
 export interface OrderReceiveDetailProps {
   defaultOpen: boolean;
@@ -40,6 +41,9 @@ export interface DialogTitleProps {
 
 interface State {
   docNo: string;
+}
+interface loadingModalState {
+  open: boolean;
 }
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
@@ -92,6 +96,7 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
   const [sdType, setSdtype] = React.useState(0);
 
   const handleSearch = async () => {
+    handleOpenLoading('open', true);
     setFlagSearch(true);
     await searchOrderReceive(values.docNo)
       .then((value) => {
@@ -104,6 +109,8 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
       .catch((error: any) => {
         console.log(error);
       });
+
+    handleOpenLoading('open', false);
   };
 
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
@@ -138,6 +145,13 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
     } else {
       setOpen(false);
     }
+  };
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
+  });
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
   let orderReceiveTable;
@@ -259,7 +273,6 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
           )}
 
           {orderReceiveTable}
-          {orderReceiveRes.length > 0 && <OrderReceiveDetailList entries={orderReceiveRes} />}
 
           <OrderReceiveConfirmModel
             open={openModelConfirm}
@@ -268,6 +281,8 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
             sdNo={sdNo}
             docRefNo={docRefNo}
           />
+
+          <LoadingModal open={openLoadingModal.open} />
         </DialogContent>
       </Dialog>
     </div>
