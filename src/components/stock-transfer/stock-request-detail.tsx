@@ -105,6 +105,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
   const classes = useStyles();
 
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [displayBtnAddItem, setDisplayBtnAddItem] = React.useState(false);
   const [displayBtnSave, setDisplayBtnSave] = React.useState(false);
   const [displayBtnSubmit, setDisplayBtnSubmit] = React.useState(false);
   const [displayBtnApprove, setDisplayBtnApprove] = React.useState(false);
@@ -136,21 +137,23 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.STOCK_RT_SEND));
     setDisplayBtnApprove(isAllowActionPermission(ACTIONS.STOCK_RT_APPROVE));
     setDisplayBtnReject(isAllowActionPermission(ACTIONS.STOCK_RT_REJECT));
-    setGroupOC(getUserInfo().group === PERMISSION_GROUP.OC);
-    setGroupSCM(getUserInfo().group === PERMISSION_GROUP.SCM);
-
-    // console.log('getUserGroup :', getUserInfo().group);
-
-    // const OC = isGroupOC();
-    // const SCM = isGroupSCM();
-    // console.log('getUserGroup OC :', OC);
-    // console.log('getUserGroup SCM :', SCM);
+    const oc = getUserInfo().group === PERMISSION_GROUP.OC;
+    setGroupOC(oc);
+    const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
+    setGroupSCM(scm);
 
     if (type === 'View' && stockRequestDetail) {
       setStatus(stockRequestDetail.status);
       if (stockRequestDetail.status === 'WAIT_FOR_APPROVAL_1') {
+        if (!oc) {
+          setIsDisableOC(false);
+        }
+
         setIsDisableSCM(false);
       } else if (stockRequestDetail.status === 'WAIT_FOR_APPROVAL_2') {
+        if (!scm) {
+          setIsDisableSCM(false);
+        }
         setIsDisableOC(false);
       } else {
         setIsDisableSCM(false);
@@ -815,6 +818,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   sourceBranchCode={fromBranch}
                   onChangeBranch={handleChangeToBranch}
                   isClear={clearBranchDropDown}
+                  filterOutDC={groupBranch}
                 />
               )}
 
@@ -843,7 +847,8 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
             </Grid>
             <Grid item xs={7}></Grid>
           </Grid>
-          {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
+
+          {!groupOC && !groupSCM && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
             <Grid container spacing={2} mt={4} mb={2}>
               <Grid item xs={5}>
                 <Button
@@ -890,7 +895,6 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               </Grid>
             </Grid>
           )}
-
           {/* {(groupOC || groupSCM) &&
             status !== '' &&
             status !== 'DRAFT' &&
@@ -927,7 +931,6 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                 </Grid>
               </Grid>
             )} */}
-
           <Grid container spacing={2} mt={4} mb={2}>
             <Grid item xs={5}></Grid>
             <Grid item xs={7} sx={{ textAlign: 'end' }}>
@@ -990,7 +993,6 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               )}
             </Grid>
           </Grid>
-
           <Box mb={4}>
             <StockRequestSKU
               type={type}
@@ -1003,7 +1005,6 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               status={status}
             />
           </Box>
-
           {status !== '' && status !== 'DRAFT' && (
             <Grid container spacing={2} mb={2}>
               <Grid item xs={3}>
@@ -1027,7 +1028,6 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
               </Grid>
             </Grid>
           )}
-
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item xs={10}></Grid>
