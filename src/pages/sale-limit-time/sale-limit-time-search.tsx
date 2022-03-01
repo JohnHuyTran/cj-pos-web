@@ -11,7 +11,11 @@ import SaleLimitTimelist from './sale-limit-time-list';
 import SearchBranch from '../../components/commons/ui/search-branch';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
-import { fetchSaleLimitTimeListAsync, updatePayloadST } from '../../store/slices/sale-limit-time-search-slice';
+import {
+  fetchSaleLimitTimeListAsync,
+  updatePayloadST,
+  clearResponse,
+} from '../../store/slices/sale-limit-time-search-slice';
 import { getUserInfo } from '../../store/sessionStore';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { paramsConvert } from '../../utils/utils';
@@ -45,7 +49,7 @@ const SaleLimitTimeSearch = () => {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
   let checkAdmin = userInfo.acl['service.posback-campaign'].includes('campaign.st.create');
-
+  const [payloadBranchesST, setPayloadBranchesST] = React.useState<any>(null);
   const [values, setValues] = React.useState<State>({
     query: '',
     branch: checkAdmin ? '' : userInfo.branch,
@@ -68,7 +72,7 @@ const SaleLimitTimeSearch = () => {
     }
   }, []);
   useEffect(() => {
-    if (!checkAdmin) {
+    if (!checkAdmin && userInfo.branch) {
       const payloadBranch = {
         isAllBranches: false,
         appliedBranches: {
@@ -95,10 +99,22 @@ const SaleLimitTimeSearch = () => {
   };
 
   const handleOpenCreateModal = () => {
+    setPayloadBranchesST(payloadBranches);
+    dispatch(
+      updatePayloadBranches({
+        isAllBranches: true,
+        appliedBranches: {
+          province: [],
+          branchList: [],
+        },
+        saved: false,
+      })
+    );
     setOpenCreateModal(true);
   };
   const handleCloseCreateModal = () => {
     setOpenCreateModal(false);
+    dispatch(updatePayloadBranches(payloadBranchesST));
   };
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -140,11 +156,37 @@ const SaleLimitTimeSearch = () => {
     }
     handleOpenLoading('close', false);
   };
-  const onSearch = () => {
-    console.log('close');
+  const onSearch = (close: any) => {
+    if (close) {
+      dispatch(updatePayloadBranches(payloadBranchesST));
+    } else {
+      setPayloadBranchesST(payloadBranches);
+    }
   };
   const handleCloseAlert = () => {
     setOpenAlert(false);
+  };
+
+  const handleClearSearch = () => {
+    setValues({
+      query: '',
+      branch: checkAdmin ? '' : userInfo.branch,
+      status: checkAdmin ? 'all' : '2',
+      startDate: new Date(),
+      endDate: new Date(),
+    });
+    checkAdmin &&
+      dispatch(
+        updatePayloadBranches({
+          isAllBranches: true,
+          appliedBranches: {
+            province: [],
+            branchList: [],
+          },
+          saved: false,
+        })
+      );
+    dispatch(clearResponse());
   };
 
   return (
@@ -241,6 +283,7 @@ const SaleLimitTimeSearch = () => {
           color="cancelColor"
           className={classes.MbtnSearch}
           sx={{ marginRight: '20px', width: '126px' }}
+          onClick={handleClearSearch}
         >
           เคลียร์
         </Button>
