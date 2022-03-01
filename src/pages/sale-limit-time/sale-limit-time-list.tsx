@@ -61,6 +61,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
           stStartTime: item.stStartTime,
           stEndTime: item.stEndTime,
           branch: item.stDetail,
+          createdAt: convertUtcToBkkDate(item.createdAt),
         };
       });
       setListST(rows);

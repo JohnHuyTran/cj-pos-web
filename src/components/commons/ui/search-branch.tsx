@@ -332,6 +332,7 @@ export default function SearchBranch(props: Props): ReactElement {
                           }}
                           error={!!errorProvince}
                           helperText={errorProvince}
+                          placeholder="รหัสประเภท/ประเภทสินค้า"
                         />
                       )}
                       size="small"
@@ -373,6 +374,7 @@ export default function SearchBranch(props: Props): ReactElement {
                               marginRight: 0,
                             },
                           }}
+                          placeholder="ค้นหาบาร์โค๊ด / รายละเอียดสินค้า"
                         />
                       )}
                       size="small"
