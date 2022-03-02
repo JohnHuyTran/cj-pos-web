@@ -19,6 +19,10 @@ import LoadingModal from '../commons/ui/loading-modal';
 import { SearchOff } from '@mui/icons-material';
 import AlertError from '../commons/ui/alert-error';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
+import { getUserInfo } from '../../store/sessionStore';
+import { getBranchName } from '../../utils/utils';
+import { env } from '../../adapters/environmentConfigs';
+import { BranchListOptionType } from '../../models/branch-model';
 
 moment.locale('th');
 
@@ -30,6 +34,7 @@ interface State {
   dateTo: string;
   sdType: string;
   sortBy: string;
+  branchFrom: string;
 }
 interface loadingModalState {
   open: boolean;
@@ -55,6 +60,7 @@ function DCCheckOrderSearch() {
     dateTo: '',
     sdType: 'ALL',
     sortBy: '',
+    branchFrom: '',
   });
   // const [codeBranch, setCodeBranch] = React.useState('');
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
@@ -68,11 +74,31 @@ function DCCheckOrderSearch() {
   const [textError, setTextError] = React.useState('');
 
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
-
+  const [branchFromCode, setBranchFromCode] = React.useState('');
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [ownBranch, setOwnBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : env.branch.code
+      : env.branch.code
+  );
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
   };
+
+  React.useEffect(() => {
+    setBranchFromCode(ownBranch);
+    setValues({ ...values, branchFrom: ownBranch });
+  }, []);
+
+  const branchFrom = getBranchName(branchList, ownBranch);
+  const branchFromMap: BranchListOptionType = {
+    code: ownBranch,
+    name: branchFrom ? branchFrom : '',
+  };
+  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(branchFromMap);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -148,6 +174,7 @@ function DCCheckOrderSearch() {
       dateTo: '',
       sdType: 'ALL',
       sortBy: '',
+      branchFrom: '',
     });
 
     const payload: CheckOrderRequest = {
@@ -241,9 +268,11 @@ function DCCheckOrderSearch() {
               สาขาต้นทาง
             </Typography>
             <BranchListDropDown
+              valueBranch={valuebranchFrom}
               sourceBranchCode={''}
               onChangeBranch={handleChangeBranch}
               isClear={clearBranchDropDown}
+              disable={true}
             />
           </Grid>
           <Grid item xs={4}>
@@ -251,9 +280,10 @@ function DCCheckOrderSearch() {
               สาขาปลายทาง
             </Typography>
             <BranchListDropDown
-              sourceBranchCode={''}
+              sourceBranchCode={branchFromCode}
               onChangeBranch={handleChangeBranch}
               isClear={clearBranchDropDown}
+              isFilterAuthorizedBranch={true}
             />
           </Grid>
           <Grid item xs={4} sx={{ pt: 30 }}>
