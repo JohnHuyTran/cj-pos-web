@@ -88,8 +88,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
         let numberOfApproved = !!sameItem
           ? sameItem.numberOfApproved
           : item.numberOfApproved
-          ? item.numberOfApproved
-          : 0;
+            ? item.numberOfApproved
+            : 0;
         let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : numberOfApproved * cashDiscount;
 
         return {
@@ -115,9 +115,15 @@ export const ModalTransferItem = (props: DataGridProps) => {
         };
       });
       setDtTable(rows);
-      if (Action.UPDATE === action) {
-        dispatch(updateBarcodeDiscountPrintState(_.cloneDeep(rows)));
-        dispatch(updatePrintInDetail(true));
+      if (Action.UPDATE === action
+        && (Number(BDStatus.APPROVED) == dataDetail.status) || Number(BDStatus.BARCODE_PRINTED) == dataDetail.status) {
+        if (rows && rows.length > 0) {
+          let rowData = _.cloneDeep(rows);
+          let productPrintFilter = rowData.filter((itPro: any) => !stringNullOrEmpty(itPro.expiryDate)
+            && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day'));
+          dispatch(updateBarcodeDiscountPrintState(productPrintFilter));
+          dispatch(updatePrintInDetail(true));
+        }
       }
     } else {
       setDtTable([]);
@@ -181,9 +187,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         errorList.map((item: any, idx: number) => {
           return idx === errorIndex
             ? {
-                ...item,
-                errorDiscount: '',
-              }
+              ...item,
+              errorDiscount: '',
+            }
             : item;
         })
       )
@@ -203,9 +209,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         errorList.map((item: any, idx: number) => {
           return idx === errorIndex
             ? {
-                ...item,
-                errorNumberOfApproved: '',
-              }
+              ...item,
+              errorNumberOfApproved: '',
+            }
             : item;
         })
       )
@@ -244,9 +250,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         errorList.map((item: any, idx: number) => {
           return idx === errorIndex
             ? {
-                ...item,
-                errorNumberOfDiscounted: '',
-              }
+              ...item,
+              errorNumberOfDiscounted: '',
+            }
             : item;
         })
       )
@@ -266,9 +272,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         errorList.map((item: any, idx: number) => {
           return idx === errorIndex
             ? {
-                ...item,
-                errorExpiryDate: '',
-              }
+              ...item,
+              errorExpiryDate: '',
+            }
             : item;
         })
       )
@@ -605,7 +611,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               disabled={dataDetail.status > 1}
               sx={{ opacity: dataDetail.status > 1 ? '0.5' : '1' }}
             >
-              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }}/>
             </Button>
 
             <Dialog
@@ -648,7 +654,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
                     <Grid item xs={8} sx={{ pl: 2 }}>
                       <label style={{ color: '#36C690' }}>
                         <b>{params.row.barcodeName}</b>
-                        <br />
+                        <br/>
                         <label
                           style={{
                             color: '#AEAEAE',
@@ -734,7 +740,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             />
           </Grid>
           <Grid item xs={3}>
-            <Box style={{ display: dataDetail.status > 1 && approvePermission ? undefined : 'none' }}>
+            <Box style={{ display: dataDetail.status > 1 ? undefined : 'none' }}>
               <TextBoxComment
                 fieldName="หมายเหตุจากผู้อนุมัติ :"
                 defaultValue={approveReject ? approveReject.approvalNote : ''}
@@ -745,7 +751,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               />
             </Box>
           </Grid>
-          <Grid item xs={3} />
+          <Grid item xs={3}/>
           <Grid item xs={3}>
             <Box display="flex" justifyContent="space-between" marginTop="25px">
               <Typography fontSize="14px" lineHeight="21px" height="24px">
