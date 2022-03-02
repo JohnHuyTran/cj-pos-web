@@ -501,7 +501,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
               inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
-              disabled={!approvePermission || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)}
+              disabled={!approvePermission || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)
+              || (approvePermission && dataDetail.status < Number(BDStatus.WAIT_FOR_APPROVAL))}
               onChange={(e) => {
                 handleChangeNumberOfApprove(e, params.row.index, index, params.row.barCode);
               }}
@@ -574,7 +575,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 (dataDetail.status > 1 && !approvePermission) || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)
               }
             />
-            {condition && <div className="title">{errorList[index].errorExpiryDate}</div>}
+            {condition && <div className="title" title={errorList[index].errorExpiryDate}>{errorList[index].errorExpiryDate}</div>}
           </div>
         );
       },
