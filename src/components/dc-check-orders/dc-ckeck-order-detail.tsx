@@ -19,6 +19,7 @@ import LoadingModal from '../commons/ui/loading-modal';
 import { useStyles } from '../../styles/makeTheme';
 import { TextField } from '@mui/material';
 import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
+import AccordionHuaweiFile from '../supplier-check-order/accordion-huawei-file';
 
 interface Props {
   isOpen: boolean;
@@ -133,7 +134,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item xs={2}>
-                <Typography variant='body2'>เลขที่เอกสาร LD:</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item xs={4}>
                 <Typography variant='body2'>{detailDC.shipmentNo}</Typography>
@@ -181,21 +182,15 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                 <Typography variant='body2'>{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
               </Grid>
               <Grid item xs={2}>
-                <Typography variant='body2'>
-                  แนบเอกสารใบส่วนต่าง
-                  <br />
-                  หลังเซ็นต์:
-                </Typography>
+                <Typography variant='body2'>แนบเอกสาร:</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Link component='button' variant='body2' onClick={handleLinkDocument}>
-                  ดูเอกสาร
-                </Link>
+                {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item xs={2}>
-                <Typography variant='body2'>หมายเหตุ DC:</Typography>
+                <Typography variant='body2'>หมายเหตุ:</Typography>
               </Grid>
               <Grid item xs={4}>
                 {/* {detailDC.verifyDCStatus === 0 && ( */}
