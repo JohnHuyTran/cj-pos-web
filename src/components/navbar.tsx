@@ -13,6 +13,8 @@ import { changeState } from '../store/slices/nav-slice';
 
 import imgUser from '../assets/images/PP-NoPic.svg';
 import { Dehaze } from '@mui/icons-material';
+import { getUserInfo } from '../store/sessionStore';
+import { getBranchName } from '../utils/utils';
 
 const drawerWidth = 240;
 
@@ -42,11 +44,16 @@ interface Props {}
 export default function Navbar({}: Props): ReactElement {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-
+  const [userId, setUserId] = React.useState('');
+  const [branchName, setBranchName] = React.useState('');
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const navState = useAppSelector((state) => state.navigator.state);
 
   useEffect(() => {
     setOpen(navState);
+    setUserId(getUserInfo().name);
+    const strBranchName = getBranchName(branchList, getUserInfo().branch);
+    setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
   }, [navState]);
 
   const dispatch = useAppDispatch();
@@ -127,20 +134,20 @@ export default function Navbar({}: Props): ReactElement {
             />
           </Box>
         </Box>
-        <Box sx={{ display: 'inline-flex', alignItems: 'center', width: '320px' }}>
+        <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
           <Box
             sx={{
-              width: '320px',
+              //width: '320px',
               height: '48px',
-              border: '2px',
+              border: '0px',
               borderStyle: 'solid',
               borderColor: '#EAEBEB',
               borderRadius: theme.shape.borderRadius,
               color: '#AEAEAE',
               paddingLeft: '20px',
             }}>
-            <Typography sx={{ fontSize: '14px' }}>
-              สาขา : (0223) สาขาที่00236 <br /> สนามจันทร์ (ชุมชนจัทรคามพิทักษ์)
+            <Typography sx={{ fontSize: '14px', textAlign: 'right' }}>
+              รหัสผู้ใช้ : {userId} <br /> สาขา: {branchName}
             </Typography>
           </Box>
           <IconButton
