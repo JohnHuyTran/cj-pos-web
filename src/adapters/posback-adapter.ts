@@ -91,6 +91,37 @@ export function get(path: string, contentType = defaultForJSON) {
     });
 }
 
+export function getFile(path: string, contentType = defaultForJSON) {
+  contentType = contentType;
+
+  return instance
+    .get(path, {
+      responseType: 'blob',
+    })
+    .then((result: any) => {
+      if (result.status == 200) {
+        return result;
+      }
+    })
+    .catch((error: any) => {
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(
+          error.response?.status,
+          ERROR_CODE.TIME_OUT,
+          'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
+        );
+        throw err;
+      }
+
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.error_code,
+        error.response?.data.error_message
+      );
+      throw err;
+    });
+}
+
 export function post(path: string, payload?: any, contentType = defaultForJSON) {
   contentType = contentType;
   return instance

@@ -36,6 +36,17 @@ const useStyles = makeStyles({
       '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
     },
   },
+  MtextUpLoadFile: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      border: '1px dashed #36C690 !important',
+      height: '2.4em !important',
+      // maxWidth: '90% !important',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      fontSize: '14px',
+    },
+  },
   Mselect: {
     '& .css-y4ygc1-MuiInputBase-root-MuiOutlinedInput-root': {
       borderRadius: '5px !important',

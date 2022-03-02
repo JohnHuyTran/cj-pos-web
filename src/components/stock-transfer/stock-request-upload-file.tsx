@@ -1,14 +1,15 @@
 import React, { ReactElement, useEffect } from 'react';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
-import { Button, DialogTitle, Grid, IconButton, Typography } from '@mui/material';
+import { Button, DialogTitle, Grid, IconButton, TextField, Typography } from '@mui/material';
 import { Download, HighlightOff } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
 import { useAppDispatch } from '../../store/store';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
 import ReasonsListDropDown from './transfer-reasons-list-dropdown';
 import { fetchDownloadTemplateRT } from '../../services/stock-transfer';
-import axios from 'axios';
+import moment from 'moment';
+import LoadingModal from '../commons/ui/loading-modal';
 
 interface Props {
   isOpen: boolean;
@@ -22,12 +23,10 @@ export interface DialogTitleProps {
 }
 
 interface State {
-  docNo: string;
   branchFrom: string;
   branchTo: string;
   dateFrom: string;
   dateTo: string;
-  statuses: string;
   transferReason: string;
 }
 
@@ -59,14 +58,13 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
   const classes = useStyles();
 
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [values, setValues] = React.useState<State>({
-    docNo: '',
     branchFrom: '',
     branchTo: '',
     dateFrom: '',
     dateTo: '',
-    statuses: 'ALL',
     transferReason: '',
   });
 
@@ -100,32 +98,25 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleDownloadTemplate = async () => {
+    setOpenLoadingModal(true);
     await fetchDownloadTemplateRT()
       .then((value) => {
-        // var a = document.createElement('a');
-        // // var blob = new Blob(value);
-        // a.href = window.URL.createObjectURL(value);
-        // a.download = 'RT_TEMPLATE_20220302165030.xlsx';
-        // a.click();
-        // const url = window.URL.createObjectURL(new Blob([value]));
-        // const link = document.createElement('a');
-        // console.log('url :', url);
-        // console.log('link :', link);
-        //Convert the Byte Data to BLOB object.
-        // var blob = new Blob([value], { type: 'application/octetstream' });
-        // console.log('blob :', blob);
-        // const url = window.URL.createObjectURL(blob);
-        // const link = document.createElement('a');
-        // console.log('url :', url);
-        // console.log('link :', link);
-        // link.href = url;
-        // link.setAttribute('download', 'file.xlsx'); //or any other extension
-        // document.body.appendChild(link);
-        // link.click();
+        console.log('value:', value);
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(value.data);
+        a.download = `RT_TEMPLATE_${moment(new Date()).format('YYYYMMDDhhmmss')}.xlsx`;
+        a.click();
       })
       .catch((error: any) => {
         console.log('fetchDownloadTemplateRT:', error);
       });
+
+    // console.log('fetchDownloadTemplateRT response headers: ', (await response).headers['content-disposition']);
+    // // const headerval = (await response).headers['content-disposition'])
+    // // var filename = headerval.split(';')[1].split('=')[1].replace('"', '').replace('"', '');
+    // console.log('fetchDownloadTemplateRT response data: ', (await response).data);
+
+    setOpenLoadingModal(false);
   };
 
   return (
@@ -177,23 +168,32 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
               <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
             </Grid>
 
-            <Grid item xs={9}>
-              xxxxx
+            <Grid item xs={10} mt={2}>
+              <TextField
+                id="txtDocNo"
+                name="docNo"
+                size="small"
+                // value={values.docNo}
+                // onChange={handleChange}
+                className={classes.MtextUpLoadFile}
+                fullWidth
+                placeholder="เอกสารแนบ"
+              />
             </Grid>
-            <Grid item xs={3} sx={{ textAlign: 'end' }}>
+            <Grid item xs={2} mt={2} sx={{ paddingLeft: '10px !important' }}>
               <Button
                 id="btnImport"
                 variant="contained"
                 color="primary"
                 // onClick={handleOpenUploadFileModal}
                 className={classes.MbtnSearch}
-                sx={{ width: '50%' }}
+                sx={{ width: '100%' }}
               >
                 แนบไฟล์
               </Button>
             </Grid>
 
-            <Grid item xs={12} sx={{ textAlign: 'center' }}>
+            <Grid item xs={12} mt={2} sx={{ textAlign: 'center' }}>
               <Button
                 id="btnImport"
                 variant="contained"
@@ -219,6 +219,8 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
           </Grid>
         </DialogContent>
       </Dialog>
+
+      <LoadingModal open={openLoadingModal} />
     </div>
   );
 }
