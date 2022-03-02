@@ -56,6 +56,7 @@ interface Props {
   setOpenPopup: (openPopup: boolean) => void;
   setPopupMsg?: any;
   onClickClose: () => void;
+  onSearch: () => void;
 }
 
 export interface DialogTitleProps {
@@ -99,7 +100,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setPopupMsg }: Props): ReactElement {
+function STCreateModal({
+  type,
+  onSearch,
+  isAdmin,
+  isOpen,
+  onClickClose,
+  setOpenPopup,
+  setPopupMsg,
+}: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const dispatch = useAppDispatch();
   const classes = useStyles();
@@ -436,7 +445,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
         setOpenPopup(true);
         setPopupMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
         handleClose();
-        // if (onSearchBD) onSearchBD();
+        if (onSearch) onSearch();
       } else {
         setOpenAlert(true);
         setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
@@ -463,7 +472,7 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
           setOpenPopup(true);
           setPopupMsg('คุณได้ยกเลิกกำหนดเวลา (งด) ขายสินค้า เรียบร้อยแล้ว');
           handleClose();
-          // if (onSearchBD) onSearchBD();
+          if (onSearch) onSearch();
         } else {
           setOpenAlert(true);
           setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');

@@ -156,7 +156,7 @@ const SaleLimitTimeSearch = () => {
     }
     handleOpenLoading('close', false);
   };
-  const onSearch = (close: any) => {
+  const handleSetBranch = (close: any) => {
     if (close) {
       dispatch(updatePayloadBranches(payloadBranchesST));
     } else {
@@ -297,31 +297,8 @@ const SaleLimitTimeSearch = () => {
           ค้นหา
         </Button>
       </Box>
-      {checkAdmin && (
-        <Box sx={{ marginBottom: '20px' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.MbtnSearch}
-            sx={{ marginRight: '20px', width: '126px' }}
-            onClick={handleSearchST}
-            disabled={values.status != '2'}
-          >
-            เริ่มต้นใช้งาน
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            className={classes.MbtnSearch}
-            sx={{ width: '126px' }}
-            disabled={values.status != '2'}
-          >
-            ยกเลิก
-          </Button>
-        </Box>
-      )}
       {responveST && responveST.data && responveST.data.length > 0 ? (
-        <SaleLimitTimelist onSearch={onSearch} />
+        <SaleLimitTimelist handleSetBranch={handleSetBranch} onSearch={handleSearchST} checkAdmin={checkAdmin} />
       ) : (
         <Grid item container xs={12} justifyContent="center">
           <Box color="#CBD4DB">
@@ -338,6 +315,7 @@ const SaleLimitTimeSearch = () => {
           setPopupMsg={setPopupMsg}
           isOpen={openCreateModal}
           onClickClose={handleCloseCreateModal}
+          onSearch={handleSearchST}
         />
       )}
       <LoadingModal open={openLoadingModal.open} />
