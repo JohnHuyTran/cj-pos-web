@@ -1,6 +1,6 @@
-import { Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
+import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
 import { useStyles } from '../../styles/makeTheme';
 import { genColumnValue, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
@@ -24,13 +24,14 @@ interface loadingModalState {
   open: boolean;
 }
 interface StateProps {
-  onSearch: (e: any) => void;
+  handleSetBranch: (e: any) => void;
+  onSearch: () => void;
+  checkAdmin: boolean;
 }
 const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
   const { t } = useTranslation(['saleLimitTime']);
   const [checkAll, setCheckAll] = React.useState<boolean>(false);
-  const [loading, setLoading] = React.useState<boolean>(false);
   const [lstST, setListST] = React.useState<any[]>([]);
   const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
   const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
@@ -78,6 +79,29 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+
+  const onCheckCell = async (params: GridRenderCellParams, event: any) => {
+    await setListST((prevData: any[]) => {
+      const data = [...prevData];
+      data[params.row.index - 1].checked = event.target.checked;
+      return data;
+    });
+    let lstUnCheck = lstST.filter((it: any) => !it.checked && STStatus.DRAFT == it.status);
+    if (lstUnCheck != null && lstUnCheck.length > 0) setCheckAll(false);
+    else setCheckAll(true);
+  };
+
+  const onCheckAll = async (event: any) => {
+    setCheckAll(event.target.checked);
+    let lstSTHandle = _.cloneDeep(lstST);
+    for (let item of lstSTHandle) {
+      if (STStatus.DRAFT == item.status) {
+        item.checked = event.target.checked;
+      }
+    }
+    setListST(lstSTHandle);
+  };
+
   const columns: GridColDef[] = [
     {
       field: 'checked',
@@ -93,14 +117,20 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
             <FormControlLabel
               className={classes.MFormControlLabel}
               value="top"
-              control={<Checkbox checked={checkAll} />}
+              control={<Checkbox checked={checkAll} onClick={onCheckAll.bind(this)} />}
               label="เลือกทั้งหมด"
               labelPlacement="top"
             />
           </FormGroup>
         </FormControl>
       ),
-      renderCell: (params) => <Checkbox checked={Boolean(params.value)} />,
+      renderCell: (params) => (
+        <Checkbox
+          checked={Boolean(params.value)}
+          disabled={STStatus.DRAFT != params.row.status}
+          onClick={onCheckCell.bind(this, params)}
+        />
+      ),
     },
     {
       field: 'index',
@@ -261,31 +291,50 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   };
   const handleCloseCreateModal = () => {
     setOpenDetailModal(false);
-    props.onSearch(true);
+    props.handleSetBranch(true);
   };
   const handleClosePopup = () => {
     setOpenPopup(false);
   };
 
   const handleClickCell = async (params: GridCellParams) => {
-    // const chkPN = params.colDef.field;
-    props.onSearch(false);
-    handleOpenLoading('open', true);
-    try {
-      await dispatch(getsaleLimitTimeDetail(params.row.id));
-      if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
-        console.log(saleLimitTimeDetail);
-        setOpenDetailModal(true);
+    const chkPN = params.colDef.field;
+    if (chkPN !== 'checked') {
+      props.handleSetBranch(false);
+      handleOpenLoading('open', true);
+      try {
+        await dispatch(getsaleLimitTimeDetail(params.row.id));
+        if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
+          console.log(saleLimitTimeDetail);
+          setOpenDetailModal(true);
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
-    }
 
-    handleOpenLoading('close', false);
+      handleOpenLoading('close', false);
+    }
+  };
+  const handleStartAll = () => {
+    const listID = lstST.filter((el: any) => !!el.checked).map((item: any) => item.id);
   };
 
   return (
     <>
+      {props.checkAdmin && (
+        <Box sx={{ marginBottom: '20px' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.MbtnSearch}
+            sx={{ marginRight: '20px', width: '126px' }}
+            onClick={handleStartAll}
+            disabled={!lstST.find((item: any) => !!item.checked)}
+          >
+            เริ่มต้นใช้งาน
+          </Button>
+        </Box>
+      )}
       <div
         className={classes.MdataGridPaginationTop}
         style={{ height: lstST.length <= 10 ? '60vh' : 'auto', width: '100%' }}
@@ -312,6 +361,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
           setPopupMsg={setPopupMsg}
           isOpen={openDetailModal}
           onClickClose={handleCloseCreateModal}
+          onSearch={props.onSearch}
         />
       )}
       <LoadingModal open={openLoadingModal.open} />

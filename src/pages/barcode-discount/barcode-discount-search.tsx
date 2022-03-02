@@ -201,7 +201,7 @@ const BarcodeDiscountSearch = () => {
         let products = item.products;
         if (products && products.length > 0) {
           for (const itPro of products) {
-            if (!stringNullOrEmpty(itPro.expiredDate) && moment(itPro.expiredDate).isSameOrBefore(moment(new Date()), 'day')) {
+            if (!stringNullOrEmpty(itPro.expiredDate) && moment(itPro.expiredDate).isBefore(moment(new Date()), 'day')) {
               itPro.documentNumber = item.documentNumber;
               lstProductNotPrinted.push(itPro);
             }

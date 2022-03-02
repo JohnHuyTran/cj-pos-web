@@ -401,22 +401,15 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
                       <div>
                         <Box sx={{ width: '50%' }}>
                           <Typography>เหตุผลที่ทำการพิมพ์บาร์โค้ด : </Typography>
-                          <FormControl fullWidth className={classes.Mselect}>
-                            <Select
-                              id="reasonForReprint"
-                              name="reasonForReprint"
-                              value={reasonForReprint}
-                              onChange={(e) => {
-                                setReasonForReprint(e.target.value)
-                              }}
-                              disabled
-                              inputProps={{ 'aria-label': 'Without label' }}
-                            >
-                              <MenuItem
-                                value={'1'}>{'พิมพ์บาร์โค้ดส่วนลดสินค้าใกล้หมดอายุตามเกณฑ์'}
-                              </MenuItem>
-                            </Select>
-                          </FormControl>
+                          <Typography
+                            sx={{
+                              marginTop: '5px',
+                              padding: '15px',
+                              backgroundColor: '#EAEBEB',
+                              borderRadius: '8px'
+                            }}>
+                            พิมพ์บาร์โค้ดส่วนลดสินค้าใกล้หมดอายุตามเกณฑ์
+                          </Typography>
                         </Box>
                         <Box mt={4} sx={{ width: '800px' }}>
                           <Box>
