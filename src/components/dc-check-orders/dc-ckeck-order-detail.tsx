@@ -241,7 +241,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                       width: '200px',
                       padding: '8px',
                     }}>
-                    ตรวจสอบแล้ว
+                    ยืนยันยอด
                   </Button>
                 )}
               </Grid>
