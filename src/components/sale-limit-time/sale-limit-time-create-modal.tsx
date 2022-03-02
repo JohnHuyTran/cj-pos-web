@@ -28,7 +28,7 @@ import { updateAddTypeAndProductState } from '../../store/slices/add-type-produc
 import { updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import { createTheme } from '@material-ui/core/styles';
-import { cancelST, getStartSaleLimitTime, saveDraftST } from '../../services/sale-limit-time';
+import { cancelST, getStartSaleLimitTime, saveDraftST, importST } from '../../services/sale-limit-time';
 import { DateFormat } from '../../utils/enum/common-enum';
 import { setCheckEdit, updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
 import ModelConfirm from './modal-confirm';
@@ -37,7 +37,8 @@ import DatePickerComponent from './date-picker-detail';
 import { objectNullOrEmpty } from '../../utils/utils';
 import ModalConfirmCopy from './modalConfirmCopy';
 import { getAllProductByType } from '../../services/common';
-
+import { styled } from '@mui/material/styles';
+import ModalValidateImport from './modal-validate-import';
 interface State {
   description: string;
   startDate: any | Date | number | string;
@@ -75,6 +76,10 @@ const defaultMaterialTheme = createTheme({
   typography: {
     fontFamily: 'Kanit',
   },
+});
+
+const Input = styled('input')({
+  display: 'none',
 });
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
@@ -154,7 +159,10 @@ function STCreateModal({
   // modal copy
   const [openModalCopy, setOpenModalCopy] = React.useState<boolean>(false);
   const [choiceCopy, setChoiceCopy] = React.useState<boolean>(false);
-
+  //modal vaildate
+  const [openModalValidate, setOpenModalValidate] = React.useState<boolean>(false);
+  const [msgModalValidate, setMsgModalValidate] = React.useState<string>('');
+  const [urlModalValidate, setUrlModalValidate] = React.useState<string>('https://www.google.com/');
   useEffect(() => {
     if (type === 'Detail' && !objectNullOrEmpty(saleLimitTimeDetail)) {
       setStatus(saleLimitTimeDetail.status);
@@ -557,6 +565,23 @@ function STCreateModal({
     setUnSelectAllType(showAll);
   };
 
+  const handleImportFile = async (e: any) => {
+    setOpenModalValidate(true);
+    try {
+      if (e.target.files[0]) {
+        const formData = new FormData();
+        formData.append('barcode', e.target.files[0]);
+        const rs = await importST(formData);
+        if (rs.code == 20000) {
+        }
+        if (rs.code === 40001 || rs.code === 40003) {
+          setMsgModalValidate(rs.message);
+          setUrlModalValidate('');
+        }
+      }
+    } catch (error) {}
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -728,17 +753,21 @@ function STCreateModal({
                       >
                         เพิ่มสินค้า
                       </Button>
-                      <Button
-                        id="btnImport"
-                        variant="contained"
-                        color="primary"
-                        className={classes.MbtnPrint}
-                        startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
-                        sx={{ width: 126, ml: '19px' }}
-                        disabled={status === 1}
-                      >
-                        Import
-                      </Button>
+                      <label htmlFor="import-st-button-file">
+                        <Input id="import-st-button-file" type="file" onChange={handleImportFile} />
+                        <Button
+                          id="btnImport"
+                          variant="contained"
+                          color="primary"
+                          className={classes.MbtnPrint}
+                          startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
+                          sx={{ width: 126, ml: '19px' }}
+                          disabled={status === 1}
+                          component="span"
+                        >
+                          Import
+                        </Button>
+                      </label>
                     </>
                   )}
                 </>
@@ -882,6 +911,29 @@ function STCreateModal({
         onClose={handleNotExitModelConfirm}
         onConfirm={handleExitModelConfirm}
       />
+      <ModalValidateImport isOpen={openModalValidate} title="ไม่สามารถ import file ได้ ">
+        <Box sx={{ textAlign: 'center' }}>
+          {!!urlModalValidate ? (
+            <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>
+              <a href={urlModalValidate} target="_blank">
+                ดาวน์โหลดผลการ import file คลิ๊กที่ link นี้{' '}
+              </a>
+            </Typography>
+          ) : (
+            <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>{msgModalValidate}</Typography>
+          )}
+          <Button
+            id="btnClose"
+            variant="contained"
+            color="error"
+            onClick={() => {
+              setOpenModalValidate(false);
+            }}
+          >
+            ปิด
+          </Button>
+        </Box>
+      </ModalValidateImport>
     </div>
   );
 }
