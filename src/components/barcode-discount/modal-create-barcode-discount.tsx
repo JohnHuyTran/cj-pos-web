@@ -534,7 +534,7 @@ export default function ModalCreateBarcodeDiscount({
     let products = _.cloneDeep(barcodeDiscountPrint);
     if (Number(BDStatus.BARCODE_PRINTED) == status) {
       for (const itPro of products) {
-        if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isAfter(moment(new Date()), 'day')) {
+        if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day')) {
           itPro.barcode = itPro.barCode;
           itPro.productName = itPro.barcodeName;
           lstProductPrintAgain.push(itPro);
@@ -543,7 +543,7 @@ export default function ModalCreateBarcodeDiscount({
     } else {
       if (barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail) {
         for (const itPro of products) {
-          if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isSameOrBefore(moment(new Date()), 'day')) {
+          if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isBefore(moment(new Date()), 'day')) {
             itPro.barcode = itPro.barCode;
             itPro.productName = itPro.barcodeName;
             lstProductNotPrinted.push(itPro);
@@ -817,6 +817,7 @@ export default function ModalCreateBarcodeDiscount({
                   color='info'
                   className={classes.MbtnSearch}
                   onClick={onPrintedBarcode}
+                  disabled={!(barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail)}
                   startIcon={<PrintSharp/>}
                   sx={{ width: '208px' }}
                   style={{ display: (status >= Number(BDStatus.APPROVED) && status != Number(BDStatus.REJECT) && printPermission) ? undefined : 'none' }}
