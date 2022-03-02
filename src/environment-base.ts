@@ -90,6 +90,9 @@ export const environment = {
       start: {
         url: '/campaign/sale-limit/start/{id}',
       },
+      startMultipe: {
+        url: '/campaign/sale-limit/start',
+      },
       cancel: {
         url: '/campaign/sale-limit/cancel',
       },

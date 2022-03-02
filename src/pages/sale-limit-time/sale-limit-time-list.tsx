@@ -18,6 +18,8 @@ import { getUserInfo } from '../../store/sessionStore';
 import { getsaleLimitTimeDetail } from '../../store/slices/sale-limit-time-detail-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
+import { getStartMultipeSaleLimitTime } from '../../services/sale-limit-time';
+import AlertError from '../../components/commons/ui/alert-error';
 
 const _ = require('lodash');
 interface loadingModalState {
@@ -45,6 +47,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const [isAdmin, setIsAdmin] = React.useState(false);
+  const [openAlert, setOpenAlert] = React.useState(false);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -315,8 +318,24 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       handleOpenLoading('close', false);
     }
   };
-  const handleStartAll = () => {
+  const handleStartAll = async () => {
     const listID = lstST.filter((el: any) => !!el.checked).map((item: any) => item.id);
+    try {
+      const body = {
+        stIds: listID,
+      };
+      const rs = await getStartMultipeSaleLimitTime(body);
+
+      if (rs.code === 20000) {
+        setOpenPopup(true);
+        setPopupMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+        props.onSearch();
+      } else {
+        setOpenAlert(true);
+      }
+    } catch (error) {
+      setOpenAlert(true);
+    }
   };
 
   return (
@@ -365,6 +384,11 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
         />
       )}
       <LoadingModal open={openLoadingModal.open} />
+      <AlertError
+        open={openAlert}
+        onClose={() => setOpenAlert(false)}
+        textError={'กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง'}
+      />
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>
   );

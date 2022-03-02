@@ -30,6 +30,9 @@ export interface PayloadCancel {
   id: string;
   remark?: string;
 }
+export interface PayloadStart {
+  stIds: string[];
+}
 export interface SaleLimitTimeDetailResponse {
   ref: string;
   code: number;
