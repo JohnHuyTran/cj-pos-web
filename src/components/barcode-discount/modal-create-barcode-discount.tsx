@@ -346,9 +346,14 @@ export default function ModalCreateBarcodeDiscount({
             isValid = false;
             item.errorNumberOfDiscounted = 'จำนวนที่ขอลดต้องมากกว่า 0';
           }
-          if (!preData.expiredDate) {
+          if (stringNullOrEmpty(preData.expiredDate)) {
             isValid = false;
             item.errorExpiryDate = 'กรุณาระบุวันหมดอายุ';
+          } else {
+            if (moment(preData.expiredDate).isSameOrBefore(moment(new Date()), 'day')) {
+              isValid = false;
+              item.errorExpiryDate = 'วันที่หมดอายุต้องใหญ่กว่านี้วันนี้';
+            }
           }
         }
         if (!isValid) {
@@ -832,7 +837,7 @@ export default function ModalCreateBarcodeDiscount({
                   startIcon={<AddCircleOutlineOutlinedIcon/>}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
-                  style={{ display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) ? 'none' : undefined }}
+                  style={{ display: (status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission) ? 'none' : undefined }}
                   disabled={status > 1}>
                   เพิ่มสินค้า
                 </Button>
@@ -844,7 +849,7 @@ export default function ModalCreateBarcodeDiscount({
                   color='warning'
                   startIcon={<SaveIcon/>}
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
-                  style={{ display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) ? 'none' : undefined }}
+                  style={{ display: (status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission) ? 'none' : undefined }}
                   onClick={() => handleCreateDraft(false)}
                   className={classes.MbtnSearch}>
                   บันทึก
@@ -855,7 +860,7 @@ export default function ModalCreateBarcodeDiscount({
                   color='primary'
                   sx={{ margin: '0 17px' }}
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
-                  style={{ display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) ? 'none' : undefined }}
+                  style={{ display: (status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission) ? 'none' : undefined }}
                   startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleSendRequest}
                   className={classes.MbtnSearch}>
@@ -866,13 +871,14 @@ export default function ModalCreateBarcodeDiscount({
                   variant='contained'
                   color='error'
                   disabled={status > 1}
-                  style={{ display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) ? 'none' : undefined }}
+                  style={{ display: (status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission) ? 'none' : undefined }}
                   startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
                   ยกเลิก
                 </Button>
                 <Button
+                  id='btnApprove'
                   sx={{ margin: '0 17px' }}
                   style={{ display: (status == Number(BDStatus.WAIT_FOR_APPROVAL) && approvePermission) ? undefined : 'none' }}
                   variant='contained'
@@ -883,6 +889,7 @@ export default function ModalCreateBarcodeDiscount({
                   อนุมัติ
                 </Button>
                 <Button
+                  id='btnReject'
                   variant='contained'
                   style={{ display: (status == Number(BDStatus.WAIT_FOR_APPROVAL) && approvePermission) ? undefined : 'none' }}
                   color='error'
