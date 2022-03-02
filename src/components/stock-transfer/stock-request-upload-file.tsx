@@ -121,7 +121,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
 
   return (
     <div>
-      <Dialog open={open} maxWidth="md" fullWidth={true}>
+      <Dialog open={open} maxWidth="sm" fullWidth={true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={onClickClose}></BootstrapDialogTitle>
 
         <DialogContent>
@@ -133,14 +133,13 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
                 color="primary"
                 startIcon={<Download />}
                 onClick={handleDownloadTemplate}
-                sx={{ width: '25%' }}
                 className={classes.MbtnSearch}
               >
                 Download Template
               </Button>
             </Grid>
           </Grid>
-          <Grid container rowSpacing={2} columnSpacing={{ xs: 7 }}>
+          <Grid container rowSpacing={2} columnSpacing={{ xs: 4 }}>
             <Grid item xs={6}>
               <Typography gutterBottom variant="subtitle1" component="div">
                 วันที่โอน
@@ -199,7 +198,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
                 variant="contained"
                 color="cancelColor"
                 // onClick={handleOpenUploadFileModal}
-                sx={{ width: '18%', mr: 2 }}
+                sx={{ width: '20%', mr: 2 }}
                 className={classes.MbtnClear}
               >
                 ยกเลิก
@@ -211,7 +210,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
                 startIcon={<Download />}
                 // onClick={handleOpenUploadFileModal}
                 className={classes.MbtnSearch}
-                sx={{ width: '18%' }}
+                sx={{ width: '27%' }}
               >
                 อัพโหลดเอกสาร
               </Button>

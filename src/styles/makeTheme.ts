@@ -40,7 +40,7 @@ const useStyles = makeStyles({
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
       border: '1px dashed #36C690 !important',
-      height: '2.4em !important',
+      height: '2.3em !important',
       // maxWidth: '90% !important',
     },
     '& .MuiOutlinedInput-root input::placeholder': {
