@@ -15,6 +15,8 @@ import imgUser from '../assets/images/PP-NoPic.svg';
 import { Dehaze } from '@mui/icons-material';
 import { getUserInfo } from '../store/sessionStore';
 import { getBranchName } from '../utils/utils';
+import { Menu, MenuItem } from '@mui/material';
+import { logout } from '../adapters/keycloak-adapter';
 
 const drawerWidth = 240;
 
@@ -63,6 +65,36 @@ export default function Navbar({}: Props): ReactElement {
     dispatch(changeState(true));
   };
 
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const isMenuOpen = Boolean(anchorEl);
+  const handleMenuClose = async () => {
+    setAnchorEl(null);
+    await logout();
+    window.location.reload();
+  };
+  const menuId = 'primary-search-account-menu';
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'left',
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'left',
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}>
+      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+    </Menu>
+  );
   return (
     <AppBar position='fixed' open={open}>
       <Toolbar
@@ -156,11 +188,13 @@ export default function Navbar({}: Props): ReactElement {
             aria-haspopup='true'
             color='primary'
             edge='end'
-            sx={{ marginLeft: 3 }}>
+            sx={{ marginLeft: 3 }}
+            onClick={handleProfileMenuOpen}>
             <img src={imgUser} alt='' />
           </IconButton>
         </Box>
       </Toolbar>
+      {renderMenu}
     </AppBar>
   );
 }

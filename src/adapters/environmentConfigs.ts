@@ -5,7 +5,11 @@ export const env: any = {
   },
 
   keycloak: {
-    url: process.env.REACT_APP_KEYCLOAK_URL,
+    url: {
+      authentication: process.env.REACT_APP_KEYCLOAK_AUTHENTICATION_URL,
+      refreshToken: process.env.REACT_APP_KEYCLOAK_REFRESH_TOKEN_URL,
+      logout: process.env.REACT_APP_KEYCLOAK_LOGOUT_URL,
+    },
     grantType: process.env.REACT_APP_KEYCLOAK_GRANT_TYPE,
     clientId: process.env.REACT_APP_KEYCLOAK_CLIENT_ID,
     clientSecret: process.env.REACT_APP_KEYCLOAK_CLIENT_SECRET,
