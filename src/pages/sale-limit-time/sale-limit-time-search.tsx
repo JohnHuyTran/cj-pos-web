@@ -6,7 +6,7 @@ import STCreateModal from '../../components/sale-limit-time/sale-limit-time-crea
 import SearchIcon from '@mui/icons-material/Search';
 import { objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../utils/utils';
 import { useTranslation } from 'react-i18next';
-import DatePickerComponent from '../../components/commons/ui/date-picker';
+import DatePickerComponent from '../../components/commons/ui/date-picker-all';
 import SaleLimitTimelist from './sale-limit-time-list';
 import SearchBranch from '../../components/commons/ui/search-branch';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -257,8 +257,6 @@ const SaleLimitTimeSearch = () => {
             </Typography>
             <DatePickerComponent
               onClickDate={onChangeDate.bind(this, setValues, values, 'endDate')}
-              type={'TO'}
-              minDateTo={values.startDate}
               value={values.endDate}
             />
           </Grid>

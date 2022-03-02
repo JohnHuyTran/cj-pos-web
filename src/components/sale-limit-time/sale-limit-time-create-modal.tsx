@@ -159,7 +159,10 @@ function STCreateModal({
   // modal copy
   const [openModalCopy, setOpenModalCopy] = React.useState<boolean>(false);
   const [choiceCopy, setChoiceCopy] = React.useState<boolean>(false);
-
+  //modal vaildate
+  const [openModalValidate, setOpenModalValidate] = React.useState<boolean>(false);
+  const [msgModalValidate, setMsgModalValidate] = React.useState<string>('');
+  const [urlModalValidate, setUrlModalValidate] = React.useState<string>('https://www.google.com/');
   useEffect(() => {
     if (type === 'Detail' && !objectNullOrEmpty(saleLimitTimeDetail)) {
       setStatus(saleLimitTimeDetail.status);
@@ -563,11 +566,18 @@ function STCreateModal({
   };
 
   const handleImportFile = async (e: any) => {
+    setOpenModalValidate(true);
     try {
       if (e.target.files[0]) {
         const formData = new FormData();
         formData.append('barcode', e.target.files[0]);
         const rs = await importST(formData);
+        if (rs.code == 20000) {
+        }
+        if (rs.code === 40001 || rs.code === 40003) {
+          setMsgModalValidate(rs.message);
+          setUrlModalValidate('');
+        }
       }
     } catch (error) {}
   };
@@ -901,13 +911,25 @@ function STCreateModal({
         onClose={handleNotExitModelConfirm}
         onConfirm={handleExitModelConfirm}
       />
-
-      <ModalValidateImport isOpen={true} title="ไม่สามารถ import file ได้ ">
+      <ModalValidateImport isOpen={openModalValidate} title="ไม่สามารถ import file ได้ ">
         <Box sx={{ textAlign: 'center' }}>
-          <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>
-            รูปแบบไฟล์ต้องเป็น excel format (.xlsx)
-          </Typography>
-          <Button id="btnClose" variant="contained" color="error">
+          {!!urlModalValidate ? (
+            <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>
+              <a href={urlModalValidate} target="_blank">
+                ดาวน์โหลดผลการ import file คลิ๊กที่ link นี้{' '}
+              </a>
+            </Typography>
+          ) : (
+            <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>{msgModalValidate}</Typography>
+          )}
+          <Button
+            id="btnClose"
+            variant="contained"
+            color="error"
+            onClick={() => {
+              setOpenModalValidate(false);
+            }}
+          >
             ปิด
           </Button>
         </Box>
