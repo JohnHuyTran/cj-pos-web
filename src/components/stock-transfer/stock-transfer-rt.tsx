@@ -25,6 +25,7 @@ import { BranchListOptionType } from '../../models/branch-model';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { getUserInfo } from '../../store/sessionStore';
 import { Download } from '@mui/icons-material';
+import ModalUploadFile from './stock-request-upload-file';
 
 interface State {
   docNo: string;
@@ -259,6 +260,14 @@ export default function StockTransferRt() {
     setOpenCreateModal(false);
   }
 
+  const [openUploadFileModal, setOpenUploadFileModal] = React.useState(false);
+  const handleOpenUploadFileModal = async () => {
+    setOpenUploadFileModal(true);
+  };
+  const handleCloseUploadFileModal = async () => {
+    setOpenUploadFileModal(false);
+  };
+
   return (
     <>
       <Box>
@@ -350,40 +359,6 @@ export default function StockTransferRt() {
             </Typography>
             <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
           </Grid>
-
-          {/* <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
-            <Button
-              id="btnCreateStockTransferModal"
-              variant="contained"
-              onClick={handleOpenCreateModal}
-              sx={{ minWidth: '15%', display: `${displayBtnCreate ? 'none' : ''}` }}
-              className={classes.MbtnClear}
-              startIcon={<AddCircleOutlineOutlinedIcon />}
-              color="secondary"
-            >
-              สร้างรายการโอน
-            </Button>
-            <Button
-              id="btnClear"
-              variant="contained"
-              onClick={onClickClearBtn}
-              sx={{ width: '13%', ml: 2 }}
-              className={classes.MbtnClear}
-              color="cancelColor"
-            >
-              เคลียร์
-            </Button>
-            <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
-              onClick={onClickValidateForm}
-              sx={{ width: '13%', ml: 2 }}
-              className={classes.MbtnSearch}
-            >
-              ค้นหา
-            </Button>
-          </Grid> */}
         </Grid>
       </Box>
 
@@ -395,7 +370,7 @@ export default function StockTransferRt() {
               variant="contained"
               color="primary"
               startIcon={<Download />}
-              // onClick={onClickValidateForm}
+              onClick={handleOpenUploadFileModal}
               sx={{ width: '25%' }}
               className={classes.MbtnSearch}
             >
@@ -444,6 +419,10 @@ export default function StockTransferRt() {
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       {openCreateModal && (
         <ModalCreateStockTransfer type={typeModal} isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />
+      )}
+
+      {openUploadFileModal && (
+        <ModalUploadFile isOpen={openUploadFileModal} onClickClose={handleCloseUploadFileModal} />
       )}
     </>
   );

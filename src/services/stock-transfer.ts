@@ -1,4 +1,4 @@
-import { post, put } from '../adapters/posback-adapter';
+import { post, put, get } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { ContentType } from '../utils/enum/common-enum';
 import {
@@ -199,4 +199,14 @@ export async function removeStockRequest(rtNo: string) {
       throw error;
     });
   return response;
+}
+
+export async function fetchDownloadTemplateRT() {
+  try {
+    const response = await get(environment.stock.stockRequest.downloadTemplate.url).then((result: any) => result);
+    return response;
+  } catch (error) {
+    console.log('error = ', error);
+    throw error;
+  }
 }
