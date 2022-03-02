@@ -3,6 +3,16 @@ import { environment } from '../environment-base';
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
 import { Payload, PayloadCancel } from '../models/sale-limit-time';
+import { ContentType } from '../utils/enum/common-enum';
+
+export async function importST(payload: any) {
+  try {
+    const response = await post(`${env.backEnd.url}${environment.sell.saleLimitTime.upload.url}`, payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export async function saveDraftST(payload: Payload) {
   try {

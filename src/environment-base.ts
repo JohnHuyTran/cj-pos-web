@@ -93,6 +93,9 @@ export const environment = {
       cancel: {
         url: '/campaign/sale-limit/cancel',
       },
+      upload: {
+        url: '/campaign/sale-limit/upload',
+      },
     },
   },
   purchase: {

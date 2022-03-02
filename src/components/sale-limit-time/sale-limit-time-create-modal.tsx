@@ -28,7 +28,7 @@ import { updateAddTypeAndProductState } from '../../store/slices/add-type-produc
 import { updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import { createTheme } from '@material-ui/core/styles';
-import { cancelST, getStartSaleLimitTime, saveDraftST } from '../../services/sale-limit-time';
+import { cancelST, getStartSaleLimitTime, saveDraftST, importST } from '../../services/sale-limit-time';
 import { DateFormat } from '../../utils/enum/common-enum';
 import { setCheckEdit, updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
 import ModelConfirm from './modal-confirm';
@@ -37,7 +37,8 @@ import DatePickerComponent from './date-picker-detail';
 import { objectNullOrEmpty } from '../../utils/utils';
 import ModalConfirmCopy from './modalConfirmCopy';
 import { getAllProductByType } from '../../services/common';
-
+import { styled } from '@mui/material/styles';
+import ModalValidateImport from './modal-validate-import';
 interface State {
   description: string;
   startDate: any | Date | number | string;
@@ -74,6 +75,10 @@ const defaultMaterialTheme = createTheme({
   typography: {
     fontFamily: 'Kanit',
   },
+});
+
+const Input = styled('input')({
+  display: 'none',
 });
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
@@ -548,6 +553,16 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
     setUnSelectAllType(showAll);
   };
 
+  const handleImportFile = async (e: any) => {
+    try {
+      if (e.target.files[0]) {
+        const formData = new FormData();
+        formData.append('barcode', e.target.files[0]);
+        const rs = await importST(formData);
+      }
+    } catch (error) {}
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -719,17 +734,21 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
                       >
                         เพิ่มสินค้า
                       </Button>
-                      <Button
-                        id="btnImport"
-                        variant="contained"
-                        color="primary"
-                        className={classes.MbtnPrint}
-                        startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
-                        sx={{ width: 126, ml: '19px' }}
-                        disabled={status === 1}
-                      >
-                        Import
-                      </Button>
+                      <label htmlFor="import-st-button-file">
+                        <Input id="import-st-button-file" type="file" onChange={handleImportFile} />
+                        <Button
+                          id="btnImport"
+                          variant="contained"
+                          color="primary"
+                          className={classes.MbtnPrint}
+                          startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
+                          sx={{ width: 126, ml: '19px' }}
+                          disabled={status === 1}
+                          component="span"
+                        >
+                          Import
+                        </Button>
+                      </label>
                     </>
                   )}
                 </>
@@ -873,6 +892,17 @@ function STCreateModal({ type, isAdmin, isOpen, onClickClose, setOpenPopup, setP
         onClose={handleNotExitModelConfirm}
         onConfirm={handleExitModelConfirm}
       />
+
+      <ModalValidateImport isOpen={true} title="ไม่สามารถ import file ได้ ">
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>
+            รูปแบบไฟล์ต้องเป็น excel format (.xlsx)
+          </Typography>
+          <Button id="btnClose" variant="contained" color="error">
+            ปิด
+          </Button>
+        </Box>
+      </ModalValidateImport>
     </div>
   );
 }
