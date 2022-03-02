@@ -11,8 +11,6 @@ import Steppers from './steppers';
 import { useStyles } from '../../styles/makeTheme';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
-// import StockRequestItem from './stock-request-item';
-// import StockRequestCreateItem from './stock-request-create-item';
 import StockRequestSKU from './stock-request-list-sku';
 import { useAppDispatch } from '../../store/store';
 import ModalAddItems from '../commons/ui/modal-add-items';
