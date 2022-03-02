@@ -2,7 +2,7 @@ import { deleteDataBody, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
-import { Payload, PayloadCancel } from '../models/sale-limit-time';
+import { Payload, PayloadCancel, PayloadStart } from '../models/sale-limit-time';
 
 export async function saveDraftST(payload: Payload) {
   try {
@@ -29,6 +29,14 @@ export async function getStartSaleLimitTime(id: string) {
     throw error;
   }
 }
+export async function getStartMultipeSaleLimitTime(payload: PayloadStart) {
+  try {
+    const response = await post(`${env.backEnd.url}${environment.sell.saleLimitTime.startMultipe.url}`, payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export async function cancelST(payload: PayloadCancel) {
   try {
@@ -44,5 +52,9 @@ export const getPathUpdateDraftST = (id: string) => {
 };
 
 export const getPathGetStart = (id: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.sell.saleLimitTime.start.url}`, { id: id });
+};
+
+export const getPathGetStartMultipe = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.sell.saleLimitTime.start.url}`, { id: id });
 };
