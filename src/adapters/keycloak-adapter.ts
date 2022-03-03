@@ -9,6 +9,8 @@ import {
   getAccessToken,
   getRefreshToken,
   setUserInfo,
+  removeRefreshToken,
+  removeAccessToken,
 } from '../store/sessionStore';
 import { getDecodedAccessToken, objectNullOrEmpty, stringNullOrEmpty } from '../utils/utils';
 import { getUserGroup } from '../utils/role-permission';
@@ -34,7 +36,7 @@ export function authentication(payload: loginForm): Promise<Response> {
   // params.append("client_secret", env.keycloak.clientSecret);
   branchCode = payload.branchCode;
   return instance
-    .post(env.keycloak.url, params)
+    .post(env.keycloak.url.authentication, params)
     .then((response: AxiosResponse) => {
       if (response.status == 200) {
         setAccessToken(response.data.access_token);
@@ -79,7 +81,7 @@ export function refreshToken(): Promise<Response> {
     params.append('refresh_token', refreshToken ? refreshToken : '');
     params.append('client_id', env.keycloak.clientId);
     return instance
-      .post(env.keycloak.url, params)
+      .post(env.keycloak.url.refreshToken, params)
       .then((response: any) => {
         if (response.status === 200) {
           setRefreshToken(response.data.refresh_token);
@@ -98,6 +100,29 @@ export function refreshToken(): Promise<Response> {
   } catch (error) {
     throw new Error('refresh token failed');
   }
+}
+
+export function logout(): Promise<Response> {
+  const refreshToken = getRefreshToken();
+  const params = new URLSearchParams();
+  params.append('client_id', env.keycloak.clientId);
+  params.append('refresh_token', refreshToken ? refreshToken : '');
+
+  return instance
+    .post(env.keycloak.url.logout, params)
+    .then((response: AxiosResponse) => {
+      removeAccessToken();
+      removeRefreshToken();
+      if (response.status === 200) {
+        return response.data;
+      }
+    })
+    .catch((error: any) => {
+      removeAccessToken();
+      removeRefreshToken();
+      // throw new Error('error');
+      // throw new KeyCloakError(error.response.status,error.response.data.error_description);
+    });
 }
 
 instance.interceptors.request.use(function (config: AxiosRequestConfig) {
