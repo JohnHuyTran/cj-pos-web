@@ -91,7 +91,9 @@ export default function Navbar({}: Props): ReactElement {
       }}
       open={isMenuOpen}
       onClose={handleMenuClose}>
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleMenuClose} disabled={true}>
+        Profile
+      </MenuItem>
       <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
     </Menu>
   );

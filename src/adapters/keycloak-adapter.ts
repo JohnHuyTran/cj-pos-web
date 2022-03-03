@@ -11,6 +11,8 @@ import {
   setUserInfo,
   removeRefreshToken,
   removeAccessToken,
+  removeSessionId,
+  removeUserInfo,
 } from '../store/sessionStore';
 import { getDecodedAccessToken, objectNullOrEmpty, stringNullOrEmpty } from '../utils/utils';
 import { getUserGroup } from '../utils/role-permission';
@@ -113,6 +115,8 @@ export function logout(): Promise<Response> {
     .then((response: AxiosResponse) => {
       removeAccessToken();
       removeRefreshToken();
+      removeSessionId();
+      removeUserInfo();
       if (response.status === 200) {
         return response.data;
       }
@@ -120,6 +124,8 @@ export function logout(): Promise<Response> {
     .catch((error: any) => {
       removeAccessToken();
       removeRefreshToken();
+      removeSessionId();
+      removeUserInfo();
       // throw new Error('error');
       // throw new KeyCloakError(error.response.status,error.response.data.error_description);
     });
