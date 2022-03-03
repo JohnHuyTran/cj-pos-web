@@ -23,18 +23,19 @@ import { getUserInfo } from '../../store/sessionStore';
 import { getBranchName } from '../../utils/utils';
 import { env } from '../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../models/branch-model';
+import { isGroupDC } from '../../utils/role-permission';
 
 moment.locale('th');
 
 interface State {
   docNo: string;
-  branchCode: string;
+  shipBranchFrom: string;
   verifyDCStatus: string;
   dateFrom: string;
   dateTo: string;
   sdType: string;
   sortBy: string;
-  branchFrom: string;
+  shipBranchTo: string;
 }
 interface loadingModalState {
   open: boolean;
@@ -54,13 +55,13 @@ function DCCheckOrderSearch() {
   const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
   const [values, setValues] = React.useState<State>({
     docNo: '',
-    branchCode: '',
+    shipBranchFrom: '',
+    shipBranchTo: '',
     verifyDCStatus: 'ALL',
     dateFrom: '',
     dateTo: '',
     sdType: 'ALL',
     sortBy: '',
-    branchFrom: '',
   });
   // const [codeBranch, setCodeBranch] = React.useState('');
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
@@ -90,7 +91,7 @@ function DCCheckOrderSearch() {
 
   React.useEffect(() => {
     setBranchFromCode(ownBranch);
-    setValues({ ...values, branchFrom: ownBranch });
+    setValues({ ...values, shipBranchFrom: ownBranch });
   }, []);
 
   const branchFrom = getBranchName(branchList, ownBranch);
@@ -116,7 +117,8 @@ function DCCheckOrderSearch() {
       limit: limits,
       page: page,
       docNo: values.docNo,
-      branchCode: values.branchCode,
+      shipBranchFrom: values.shipBranchFrom,
+      shipBranchTo: values.shipBranchTo,
       verifyDCStatus: values.verifyDCStatus,
       dateFrom: moment(startDate).startOf('day').toISOString(),
       dateTo: moment(endDate).endOf('day').toISOString(),
@@ -168,20 +170,21 @@ function DCCheckOrderSearch() {
     setClearBranchDropDown(!clearBranchDropDown);
     setValues({
       docNo: '',
-      branchCode: '',
+      shipBranchFrom: '',
+      shipBranchTo: '',
       verifyDCStatus: 'ALL',
       dateFrom: '',
       dateTo: '',
       sdType: 'ALL',
       sortBy: '',
-      branchFrom: '',
     });
 
     const payload: CheckOrderRequest = {
       limit: limit ? limit.toString() : '10',
       page: page,
       docNo: values.docNo,
-      branchCode: values.branchCode,
+      shipBranchFrom: values.shipBranchFrom,
+      shipBranchTo: values.shipBranchTo,
       verifyDCStatus: values.verifyDCStatus,
       dateFrom: moment(startDate).startOf('day').toISOString(),
       dateTo: moment(endDate).endOf('day').toISOString(),
@@ -204,15 +207,23 @@ function DCCheckOrderSearch() {
     setEndDate(value);
   };
 
-  const handleChangeBranch = (branchCode: string) => {
+  const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
-      setValues({ ...values, branchCode: JSON.parse(codes) });
+      setValues({ ...values, shipBranchFrom: JSON.parse(codes) });
     } else {
-      setValues({ ...values, branchCode: '' });
+      setValues({ ...values, shipBranchFrom: '' });
     }
   };
 
+  const handleChangeBranchTo = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setValues({ ...values, shipBranchTo: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, shipBranchTo: '' });
+    }
+  };
   let orderListData;
   const orderListDatas = items.orderList.data ? items.orderList.data : [];
   const [flagSearch, setFlagSearch] = React.useState(false);
@@ -270,7 +281,7 @@ function DCCheckOrderSearch() {
             <BranchListDropDown
               valueBranch={valuebranchFrom}
               sourceBranchCode={''}
-              onChangeBranch={handleChangeBranch}
+              onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
               disable={true}
             />
@@ -281,9 +292,9 @@ function DCCheckOrderSearch() {
             </Typography>
             <BranchListDropDown
               sourceBranchCode={branchFromCode}
-              onChangeBranch={handleChangeBranch}
+              onChangeBranch={handleChangeBranchTo}
               isClear={clearBranchDropDown}
-              isFilterAuthorizedBranch={true}
+              isFilterAuthorizedBranch={isGroupDC() ? true : false}
             />
           </Grid>
           <Grid item xs={4} sx={{ pt: 30 }}>

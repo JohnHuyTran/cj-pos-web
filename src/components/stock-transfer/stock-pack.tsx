@@ -22,7 +22,6 @@ import {
   formatFileStockTransfer,
   getBranchName,
   getReasonLabel,
-  isBranchDC,
   isOwnBranch,
   numberWithCommas,
 } from '../../utils/utils';
