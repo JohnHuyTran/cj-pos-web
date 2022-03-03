@@ -316,7 +316,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     dispatch(updateAddItemsGroupState(orderItem));
   };
 
-  const storeItem = () => {
+  const storeItem = async () => {
     let _sku = [...skuGroupItems];
     let _newSku: ItemGroups[] = [];
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -360,9 +360,9 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
       _newSku.push(newData);
     });
 
-    setBranchTransferItems(items);
-    dispatch(updateAddItemSkuGroupState(_newSku));
-    dispatch(updateAddItemsGroupState(items));
+    await setBranchTransferItems(items);
+    await dispatch(updateAddItemSkuGroupState(_newSku));
+    await dispatch(updateAddItemsGroupState(items));
   };
 
   let newColumns = [...columns];
@@ -400,8 +400,8 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           scrollbarSize={10}
           rowHeight={65}
           onCellFocusOut={handleFocusOut}
-          // onCellClick={handleOnCellClick}
-          onCellKeyDown={handleOnKeyDown}
+          onCellClick={handleOnCellClick}
+          // onCellKeyDown={handleOnKeyDown}
           onCellOut={handleOnCellOut}
           // onSelectionModelChange={handleOnSelectionModelChange}
           // onCellBlur={handleOnCellBlur}
