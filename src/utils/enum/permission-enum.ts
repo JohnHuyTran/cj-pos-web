@@ -41,6 +41,9 @@ export enum ACTIONS {
   ORDER_DC_VERIFY = 'order.dc.verify',
   ORDER_DC_VIEW = 'order.dc.view',
   PRODUCT_SEARCH = 'product.search',
+
+  ORDER_VER_VIEW = 'order.ver.view',
+  ORDER_VER_MANAGE = 'order.ver.manage',
 }
 
 export enum MAINMENU {

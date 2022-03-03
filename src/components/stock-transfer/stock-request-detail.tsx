@@ -66,6 +66,7 @@ interface BranchListOptionType {
 
 interface Props {
   type: string;
+  edit: boolean;
   isOpen: boolean;
   onClickClose: () => void;
 }
@@ -99,7 +100,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement {
+function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const dispatch = useAppDispatch();
   const classes = useStyles();
@@ -138,8 +139,8 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setDisplayBtnApprove(isAllowActionPermission(ACTIONS.STOCK_RT_APPROVE));
     setDisplayBtnReject(isAllowActionPermission(ACTIONS.STOCK_RT_REJECT));
     const oc = getUserInfo().group === PERMISSION_GROUP.OC;
-    setGroupOC(oc);
     const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
+    setGroupOC(oc);
     setGroupSCM(scm);
 
     if (type === 'View' && stockRequestDetail) {
@@ -558,7 +559,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
     setOpenModelConfirm(false);
     setOpenLoadingModal(true);
 
-    if (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') {
+    if (edit && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) {
       const itemsList: any = [];
       if (Object.keys(payloadAddItem).length > 0) {
         await payloadAddItem.forEach((data: any) => {
@@ -767,23 +768,26 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              วันที่โอน{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
+              วันที่โอน{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
-              {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
+              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
                 <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
               )}
-              {status !== '' &&
+
+              {!edit && moment(startDate).add(543, 'y').format('DD/MM/YYYY')}
+              {/* {status !== '' &&
                 status !== 'DRAFT' &&
                 status !== 'AWAITING_FOR_REQUESTER' &&
-                moment(startDate).add(543, 'y').format('DD/MM/YYYY')}
+                moment(startDate).add(543, 'y').format('DD/MM/YYYY')} */}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุด{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
+              วันที่สิ้นสุด{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'}{' '}
+              :
             </Grid>
             <Grid item xs={3}>
-              {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
+              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
                 <DatePickerComponent
                   onClickDate={handleEndDatePicker}
                   value={endDate}
@@ -791,19 +795,20 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   minDateTo={startDate}
                 />
               )}
-              {status !== '' &&
+              {!edit && moment(endDate).add(543, 'y').format('DD/MM/YYYY')}
+              {/* {status !== '' &&
                 status !== 'DRAFT' &&
                 status !== 'AWAITING_FOR_REQUESTER' &&
-                moment(endDate).add(543, 'y').format('DD/MM/YYYY')}
+                moment(endDate).add(543, 'y').format('DD/MM/YYYY')} */}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาขาต้นทาง{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
+              สาขาต้นทาง{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
-              {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
+              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
                 <BranchListDropDown
                   valueBranch={valuebranchFrom}
                   sourceBranchCode={toBranch}
@@ -812,20 +817,27 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   disable={groupBranch}
                 />
               )}
-              {status !== '' &&
+              {!edit && `${fromBranch}-${valuebranchFrom?.name}`}
+              {/* {status !== '' &&
                 status !== 'DRAFT' &&
                 status !== 'AWAITING_FOR_REQUESTER' &&
-                `${fromBranch}-${valuebranchFrom?.name}`}
+                `${fromBranch}-${valuebranchFrom?.name}`} */}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              สาขาปลายทาง{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
+              สาขาปลายทาง{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
             </Grid>
             <Grid item xs={3}>
-              {(status === '' ||
-                status === 'DRAFT' ||
-                status === 'AWAITING_FOR_REQUESTER' ||
-                status === 'WAIT_FOR_APPROVAL_2') && (
+              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
+                <BranchListDropDown
+                  valueBranch={valuebranchTo}
+                  sourceBranchCode={fromBranch}
+                  onChangeBranch={handleChangeToBranch}
+                  isClear={clearBranchDropDown}
+                  filterOutDC={groupBranch}
+                />
+              )}
+              {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
                 <BranchListDropDown
                   valueBranch={valuebranchTo}
                   sourceBranchCode={fromBranch}
@@ -835,20 +847,22 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                 />
               )}
 
-              {status !== '' &&
+              {!edit && !groupSCM && `${toBranch}-${valuebranchTo?.name}`}
+              {/* {status !== '' &&
                 status !== 'DRAFT' &&
                 status !== 'AWAITING_FOR_REQUESTER' &&
                 status !== 'WAIT_FOR_APPROVAL_2' &&
-                `${toBranch}-${valuebranchTo?.name}`}
+                `${toBranch}-${valuebranchTo?.name}`} */}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาเหตุการโอน{(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
+              สาเหตุการโอน{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'}{' '}
+              :
             </Grid>
             <Grid item xs={3}>
-              {(status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
+              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
                 <TransferReasonsListDropDown
                   reasonsValue={reasons}
                   onChangeReasons={handleChangeReasons}
@@ -856,12 +870,13 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
                   isDetail={true}
                 />
               )}
-              {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && reasonText}
+              {!edit && reasonText}
+              {/* {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && reasonText} */}
             </Grid>
             <Grid item xs={7}></Grid>
           </Grid>
 
-          {!groupOC && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
+          {edit && !groupOC && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
             <Grid container spacing={2} mt={4} mb={2}>
               <Grid item xs={5}>
                 <Button
@@ -985,6 +1000,7 @@ function stockRequestDetail({ type, isOpen, onClickClose }: Props): ReactElement
           <Box mb={4}>
             <StockRequestSKU
               type={type}
+              edit={edit}
               onMapSKU={handleMapSKU}
               // onChangeItems={handleChangeItems}
               changeItems={handleStatusChangeItems}

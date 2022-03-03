@@ -19,6 +19,9 @@ import LoadingModal from '../commons/ui/loading-modal';
 import { useStyles } from '../../styles/makeTheme';
 import { TextField } from '@mui/material';
 import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
+import AccordionHuaweiFile from '../supplier-check-order/accordion-huawei-file';
+import { isAllowActionPermission } from '../../utils/role-permission';
+import { ACTIONS } from '../../utils/enum/permission-enum';
 
 interface Props {
   isOpen: boolean;
@@ -52,8 +55,9 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const [approveDCStatus, setApproveDCStatus] = React.useState(false);
 
   const [characterCount, setCharacterCount] = React.useState(0);
-
+  const [disableCheckBtn, setDisableCheckBtn] = React.useState(true);
   useEffect(() => {
+    setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
     setOpen(isOpen);
     setValueCommentDC(detailDC.dcComment);
   }, [open]);
@@ -125,65 +129,73 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
   return (
     <div>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+      <Dialog open={open} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>ตรวจสอบผลต่าง (DC)</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
-              <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร LD:</Typography>
+              <Grid item xs={2}>
+                <Typography variant='body2'>เลขที่เอกสาร:</Typography>
               </Grid>
-              <Grid item lg={4}>
-                <Typography variant="body2">{detailDC.shipmentNo}</Typography>
+              <Grid item xs={4}>
+                <Typography variant='body2'>{detailDC.shipmentNo}</Typography>
               </Grid>
-              <Grid item lg={2}>
-                <Typography variant="body2">สถานะการตรวจสอบผลต่าง:</Typography>
+              <Grid item xs={2}>
+                <Typography variant='body2'>สถานะการตรวจสอบผลต่าง:</Typography>
               </Grid>
-              <Grid item lg={4}>
-                <Typography variant="body2">{getDCStatus(detailDC.verifyDCStatus)}</Typography>
-              </Grid>
-            </Grid>
-            <Grid container spacing={2} mb={1}>
-              <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
-              </Grid>
-              <Grid item lg={4}>
-                <Typography variant="body2">{detailDC.sdNo}</Typography>
-              </Grid>
-              <Grid item lg={2}>
-                <Typography variant="body2">ประเภท:</Typography>
-              </Grid>
-              <Grid item lg={4}>
-                <Typography variant="body2">{getSdType(detailDC.sdType)}</Typography>
+              <Grid item xs={4}>
+                <Typography variant='body2'>{getDCStatus(detailDC.verifyDCStatus)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
-              <Grid item lg={2}>
-                <Typography variant="body2">วันที่:</Typography>
+              <Grid item xs={2}>
+                <Typography variant='body2'>เลขที่เอกสาร SD:</Typography>
               </Grid>
-              <Grid item lg={4}>
-                <Typography variant="body2">{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
+              <Grid item xs={4}>
+                <Typography variant='body2'>{detailDC.sdNo}</Typography>
               </Grid>
-              <Grid item lg={2}>
-                <Typography variant="body2">
-                  แนบเอกสารใบส่วนต่าง
-                  <br />
-                  หลังเซ็นต์:
-                </Typography>
+              <Grid item xs={2}>
+                <Typography variant='body2'>ประเภท:</Typography>
               </Grid>
-              <Grid item lg={4}>
-                <Link component="button" variant="body2" onClick={handleLinkDocument}>
-                  ดูเอกสาร
-                </Link>
+              <Grid item xs={4}>
+                <Typography variant='body2'>{getSdType(detailDC.sdType)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
-              <Grid item lg={2}>
-                <Typography variant="body2">หมายเหตุ DC:</Typography>
+              <Grid item xs={2}>
+                <Typography variant='body2'>สาขาต้นทาง:</Typography>
               </Grid>
-              <Grid item lg={4}>
+              <Grid item xs={4}>
+                <Typography variant='body2'>{detailDC.sdNo}</Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <Typography variant='body2'>สาขาปลายทาง:</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant='body2'>{getSdType(detailDC.sdType)}</Typography>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} mb={1}>
+              <Grid item xs={2}>
+                <Typography variant='body2'>วันที่:</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant='body2'>{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <Typography variant='body2'>แนบเอกสาร:</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} mb={1}>
+              <Grid item xs={2}>
+                <Typography variant='body2'>หมายเหตุ:</Typography>
+              </Grid>
+              <Grid item xs={4}>
                 {/* {detailDC.verifyDCStatus === 0 && ( */}
                 <div>
                   <TextField
@@ -192,7 +204,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     rows={4}
                     onChange={handleChangeCommentDC}
                     defaultValue={valueCommentDC}
-                    placeholder="ความยาวไม่เกิน 100 ตัวอักษร"
+                    placeholder='ความยาวไม่เกิน 100 ตัวอักษร'
                     className={classes.MtextFieldRemark}
                     inputProps={{ maxLength: 100 }}
                     error={errorCommentDC === true}
@@ -210,8 +222,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                         maxWidth: 300,
                         textAlign: 'right',
                         marginTop: '-1.5em',
-                      }}
-                    >
+                      }}>
                       {characterCount}/100
                     </div>
                   )}
@@ -219,22 +230,22 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
               </Grid>
             </Grid>
 
-            <Grid container spacing={2} justifyContent="right" sx={{ mt: 1 }}>
+            <Grid container spacing={2} justifyContent='right' sx={{ mt: 1 }}>
               <Grid item>
                 {detailDC.verifyDCStatus === 0 && (
                   <Button
-                    id="btnChecked"
-                    variant="contained"
-                    color="primary"
+                    id='btnChecked'
+                    variant='contained'
+                    color='primary'
                     startIcon={<ContentPaste />}
                     onClick={handlCheckedButton}
                     sx={{
                       borderRadius: '5px',
                       width: '200px',
                       padding: '8px',
-                    }}
-                  >
-                    ตรวจสอบแล้ว
+                      display: `${disableCheckBtn ? 'none' : ''}`,
+                    }}>
+                    ยืนยันยอด
                   </Button>
                 )}
               </Grid>
@@ -270,11 +281,11 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
-        url=""
+        url=''
         statusFile={statusFile}
         sdImageFile={detailDC.sdImageFile}
-        fileName=""
-        btnPrintName=""
+        fileName=''
+        btnPrintName=''
       />
 
       <LoadingModal open={openLoadingModal.open} />

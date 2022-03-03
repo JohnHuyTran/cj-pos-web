@@ -261,4 +261,9 @@ export const environment = {
       url: '/branch/branch-total',
     },
   },
+  authority: {
+    authorizedBranch: {
+      url: '/authority/authorized-branches',
+    },
+  },
 };

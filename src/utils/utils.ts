@@ -81,19 +81,19 @@ export function isOwnBranch(branch: any): boolean {
   return env.branch.code === branch;
 }
 
-export function isBranchDC(userInfo: KeyCloakTokenInfo): boolean {
-  const group = env.branch.default.dc.group;
-  const location = env.branch.default.dc.location;
-  if (!userInfo) {
-    return false;
-  }
-  return (
-    userInfo.azp === location &&
-    userInfo.groups.some((item: string) => {
-      return item === group;
-    })
-  );
-}
+// export function isBranchDC(userInfo: KeyCloakTokenInfo): boolean {
+//   const group = env.branch.default.dc.group;
+//   const location = env.branch.default.dc.location;
+//   if (!userInfo) {
+//     return false;
+//   }
+//   return (
+//     userInfo.azp === location &&
+//     userInfo.groups.some((item: string) => {
+//       return item === group;
+//     })
+//   );
+// }
 
 export const getReasonLabel = (reasons: TransferReasonsInfo[], key: string) => {
   return reasons.find((reason: TransferReasonsInfo) => reason.code === key)?.name;
