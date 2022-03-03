@@ -23,6 +23,7 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { useTranslation } from 'react-i18next';
 import { featchBranchListAsync } from '../../store/slices/search-branches-slice';
 import logoImage from '../../assets/images/CJlogo.jpeg';
+import { featchAuthorizedBranchListAsync } from '../../store/slices/authorized-branch-slice';
 
 interface State {
   branch: string;
@@ -67,6 +68,7 @@ function LoginForm() {
     };
     dispatch(loginKeyCloakAsync(form));
     dispatch(featchBranchListAsync());
+    dispatch(featchAuthorizedBranchListAsync());
   };
 
   return (

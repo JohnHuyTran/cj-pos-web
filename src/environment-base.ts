@@ -28,6 +28,12 @@ export const environment = {
       printFormShipmentDeliverly: {
         url: '/order/stock-diff/{sdNo}/export',
       },
+      search: {
+        url: '/order/shipment/search',
+      },
+      approveOrderReceive: {
+        url: '/order//shipment/submit',
+      },
     },
     dcCheckOrder: {
       fetchOrder: {
@@ -220,6 +226,11 @@ export const environment = {
       stockBalanceBySKU: {
         url: '/stock/stock-balance/check-by-sku-codes',
       },
+    },
+  },
+  authority: {
+    authorizedBranch: {
+      url: '/authority/authorized-branches',
     },
   },
 };

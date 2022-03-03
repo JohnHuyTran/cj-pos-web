@@ -14,6 +14,7 @@ import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 
 export interface DataGridProps {
   type: string;
+  edit: boolean;
   onMapSKU: (SKU: Array<any>) => void;
   // onChangeItems: (items: Array<any>) => void;
   changeItems: (chang: Boolean) => void;
@@ -63,23 +64,23 @@ const columnsSKU: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'baseUnit',
+    field: 'orderAllQty',
     headerName: 'สั่ง(ชิ้น)',
     minWidth: 120,
     headerAlign: 'center',
     align: 'right',
     disableColumnMenu: true,
     sortable: false,
-    renderCell: (params) => calBaseUnit(params),
+    // renderCell: (params) => calBaseUnit(params),
   },
 ];
 
-var calBaseUnit = function (params: GridValueGetterParams) {
-  let cal = Number(params.getValue(params.id, 'qty')) * Number(params.getValue(params.id, 'baseUnit'));
-  return numberWithCommas(cal);
-};
+// var calBaseUnit = function (params: GridValueGetterParams) {
+//   let cal = Number(params.getValue(params.id, 'qty')) * Number(params.getValue(params.id, 'baseUnit'));
+//   return numberWithCommas(cal);
+// };
 
-function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, status }: DataGridProps) {
+function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, branch, status }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
@@ -138,14 +139,40 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
         });
       }
 
-      const x = resultSKU.filter((r: any) => r.skuCode === a.skuCode);
-      if (x.length == 0) {
+      const chkduplicate: any = resultSKU.find((r: any) => r.skuCode === a.skuCode);
+
+      if (chkduplicate) {
+        let duplicateSKU: any = [];
+        resultSKU.forEach((dup: any) => {
+          if (dup.skuCode === a.skuCode) {
+            let orderAllQtyDup = dup.orderAllQty ? dup.orderAllQty : 0;
+            let sumQty = a.qty * a.baseUnit;
+            const itemsDup: any = {
+              skuCode: a.skuCode,
+              skuName: a.skuName,
+              qty: a.qty,
+              baseUnit: a.baseUnit,
+              stock: stockRemain,
+              orderAllQty: orderAllQtyDup + sumQty,
+            };
+            duplicateSKU.push(itemsDup);
+          } else {
+            duplicateSKU.push(dup);
+          }
+        });
+
+        resultSKU = duplicateSKU;
+      } else {
+        let sumQty = a.qty * a.baseUnit;
+        let orderAllQty = a.orderAllQty ? a.orderAllQty : 0;
+
         const item: any = {
           skuCode: a.skuCode,
           skuName: a.skuName,
           qty: a.qty,
           baseUnit: a.baseUnit,
           stock: stockRemain,
+          orderAllQty: orderAllQty + sumQty,
         };
         resultSKU.push(item);
       }
@@ -159,7 +186,7 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
         skuCode: item.skuCode,
         skuName: item.skuName ? item.skuName : '',
         stock: item.stock,
-        baseUnit: item.baseUnit ? item.baseUnit : 0,
+        orderAllQty: item.orderAllQty ? item.orderAllQty : 0,
         qty: item.qty ? item.qty : 0,
       };
     });
@@ -182,13 +209,8 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
   };
 
   const itemsMap = async (items: any) => {
-    // if (!stock)
     skuMapStock(items, stockBalanceList);
-
-    // console.log('selectSKU :', skuCodeSelect);
-    // if (isChecked) {
     itemMap(items);
-    // }
   };
 
   const updateItemsState = async (items: any) => {
@@ -206,11 +228,13 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
         items.map((item: any) => {
           let productName: any = '';
           let remainingQty: any = 0;
+          let orderAllQty: any = 0;
           if (itemGroups.length > 0) {
             itemGroups.forEach((i: any) => {
               if (i.skuCode === item.skuCode) {
                 productName = i.productName;
                 remainingQty = i.remainingQty;
+                orderAllQty = i.orderAllQty;
               }
             });
           }
@@ -225,6 +249,7 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
             unitCode: item.unitCode,
             unitName: item.unitName,
             stock: remainingQty,
+            // orderAllQty: orderAllQty,
           };
 
           _item.push(_i);
@@ -233,10 +258,6 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
 
       updateItemsState(_item);
 
-      // itemsMap(_item);
-      // skuMapStock(_item, skuCodes);
-      // console.log('useEffect _item :', JSON.stringify(_item));
-
       rowsSKU = _item.map((item: any, index: number) => {
         return {
           id: `${item.skuCode}-${index + 1}`,
@@ -244,91 +265,12 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
           skuCode: item.skuCode,
           skuName: item.skuName ? item.skuName : '',
           stock: item.stock,
-          baseUnit: item.baseUnit ? item.baseUnit : 0,
+          orderAllQty: item.orderAllQty ? item.orderAllQty : 0,
           qty: item.qty ? item.qty : 0,
         };
       });
     }
   }
-
-  // if (!update && type !== 'Create') {
-  // if (stockRequestDetail) {
-
-  // if (Object.keys(payloadAddItem).length == 0 && stockRequestDetail && stock) {
-  //   let _item: any = [];
-  //   let skuCodes: any = [];
-
-  //   const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
-  //   const items = stockRequestDetail.items ? stockRequestDetail.items : [];
-
-  //   if (itemGroups.length > 0) {
-  //     console.log('itemGroups view :', JSON.stringify(itemGroups));
-  //   }
-  //   if (items.length > 0) {
-  //     // itemsMap(items);
-  //     console.log('items view :', JSON.stringify(items));
-  //   }
-
-  //   items.map((item: any) => {
-  //     let productName: any = '';
-  //     itemGroups.forEach((i: any) => {
-  //       if (i.skuCode === item.skuCode) {
-  //         productName = i.productName;
-  //       }
-  //     });
-
-  //     const _i: any = {
-  //       barcode: item.barcode,
-  //       barcodeName: item.productName,
-  //       baseUnit: item.barFactor,
-  //       qty: item.orderQty,
-  //       skuCode: item.skuCode,
-  //       skuName: productName,
-  //       unitCode: item.unitCode,
-  //       unitName: item.unitName,
-  //     };
-
-  //     _item.push(_i);
-  //   });
-
-  //   updateItemsState(_item);
-
-  //   _item.map((item: any) => {
-  //     //chk duplicates sku
-  //     const sku = skuCodes.filter((r: any) => r === item.skuCode);
-  //     if (sku.length == 0) {
-  //       skuCodes.push(item.skuCode);
-  //     }
-  //   });
-  //   stockBalanceBySKU(skuCodes);
-
-  //   itemsMap(_item);
-  //   console.log('useEffect _item :', JSON.stringify(_item));
-  //   stock = true;
-  // }
-
-  // if (type === 'Create') {
-  //   if (Object.keys(payloadAddItem).length > 0) {
-  //     itemsMap(payloadAddItem);
-  //   }
-  // } else {
-  //   if (Object.keys(payloadAddItem).length > 0) {
-  //     itemsMap(payloadAddItem);
-  //   } else if (stockRequestDetail) {
-  //     const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
-  //     const items = stockRequestDetail.items ? stockRequestDetail.items : [];
-
-  //     if (itemGroups.length > 0) {
-  //       console.log('itemGroups view :', JSON.stringify(itemGroups));
-  //     }
-  //     if (items.length > 0) {
-  //       //   updateItemsState(items);
-  //       // itemsMap(items);
-
-  //       console.log('items view :', JSON.stringify(items));
-  //     }
-  //   }
-  // }
 
   const [pageSizeSKU, setPageSizeSKU] = React.useState<number>(10);
   const handleChangeItems = async (items: any) => {
@@ -349,14 +291,6 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
 
   const handleCheckboxChange = (e: any) => {
     const ischeck = e.target.checked;
-
-    // if (ischeck) {
-    //   setIschecked(false);
-    // } else {
-    //   setIschecked(true);
-    //   setSelectSKU('ALL');
-    //   // itemMap(payloadAddItem);
-    // }
   };
   return (
     <div>
@@ -378,6 +312,7 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
 
       <StockRequestItem
         type={type}
+        edit={edit}
         onChangeItems={handleChangeItems}
         update={flagSave}
         status={status}

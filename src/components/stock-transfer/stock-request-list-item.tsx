@@ -24,6 +24,7 @@ import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 
 export interface DataGridProps {
   type: string;
+  edit: boolean;
   onChangeItems: (items: Array<any>) => void;
   // changeItems: (chang: Boolean) => void;
   update: boolean;
@@ -153,7 +154,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function StockTransferListItem({ type, onChangeItems, update, status, skuCode, skuName }: DataGridProps) {
+function StockTransferListItem({ type, edit, onChangeItems, update, status, skuCode, skuName }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
@@ -170,44 +171,28 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
   const handleCheckboxChange = (e: any) => {
     const ischeck = e.target.checked;
     if (ischeck) {
-      // setSkuNameDisplay('');
       setIschecked(true);
       setSkuCodeSelect('ALL');
     } else {
       setIschecked(false);
       setSkuCodeSelect('');
-      // setSkuCodeSelect(defaultSkuSelected);
     }
   };
 
-  console.log('isChecked :', isChecked);
-
   useEffect(() => {
-    // if (!update && type !== 'Create') {
-    //   if (stockRequestDetail) {
-    //     const items = stockRequestDetail.items ? stockRequestDetail.items : [];
-    //     if (items.length > 0) {
-    //       updateItemsState(items);
-    //       itemsMap(items);
-    //     }
-    //   }
-    // }
-    // console.log('stockRequestItems :', JSON.stringify(stockRequestItems));
-
     if (skuCode !== 'ALL') {
       setIschecked(false);
       setSkuCodeSelect(skuCode);
-      console.log('skuName :', skuName);
     }
   }, [update, skuCode]);
 
   const itemsMap = (items: any) => {
-    let edit = false;
+    let editM = false;
     const oc = getUserInfo().group === PERMISSION_GROUP.OC;
     const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
 
-    if (!oc && !scm) {
-      if (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') edit = true;
+    if (!oc) {
+      if (edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) editM = true;
     }
 
     rows = items.map((item: any, index: number) => {
@@ -222,7 +207,7 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
         unitName: item.unitName,
         baseUnit: item.baseUnit ? item.baseUnit : 0,
         qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
-        editMode: edit,
+        editMode: editM,
       };
     });
 
@@ -342,7 +327,7 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
         rowHeight={65}
         onCellClick={currentlySelected}
         onCellFocusOut={handleEditItems}
-        // onCellOut={handleEditItems}
+        onCellOut={handleEditItems}
         onCellKeyDown={handleEditItems}
       />
 

@@ -112,10 +112,10 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   React.useEffect(() => {
-    const fromBranch = getBranchName(branchList, branchTransferInfo.branchFrom);
+    const fromBranch = `${branchTransferInfo.branchFrom}-${getBranchName(branchList, branchTransferInfo.branchFrom)}`;
     setSourceBranch(fromBranch ? fromBranch : '');
 
-    const toBranch = getBranchName(branchList, branchTransferInfo.branchTo);
+    const toBranch = `${branchTransferInfo.branchTo}-${getBranchName(branchList, branchTransferInfo.branchTo)}`;
     setDestinationBranch(toBranch ? toBranch : '');
 
     const reason = getReasonLabel(reasonsList, branchTransferInfo.transferReason);
@@ -128,7 +128,6 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setIsDC(getUserInfo().group === PERMISSION_GROUP.DC);
     setStartDate(new Date(branchTransferInfo.startDate));
     setEndDate(new Date(branchTransferInfo.endDate));
-
     dispatch(updateAddItemSkuGroupState(branchTransferInfo.itemGroups));
   }, [open]);
 
@@ -1000,7 +999,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
                   defaultValue={comment}
                   maxLength={100}
                   onChangeComment={handleChangeComment}
-                  isDisable={!isDraft}
+                  isDisable={isGroupBranch() && isDraft ? false : true}
                   rowDisplay={2}
                 />
               </Grid>
