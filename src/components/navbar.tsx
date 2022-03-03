@@ -72,7 +72,7 @@ export default function Navbar({}: Props): ReactElement {
   const isMenuOpen = Boolean(anchorEl);
   const handleMenuClose = async () => {
     setAnchorEl(null);
-    await logout();
+    logout();
     window.location.reload();
   };
   const menuId = 'primary-search-account-menu';

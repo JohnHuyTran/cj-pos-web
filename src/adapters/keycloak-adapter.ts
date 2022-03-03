@@ -27,8 +27,10 @@ const instance = axios.create({
   },
 });
 let branchCode = '';
+let action = '';
 
 export function authentication(payload: loginForm): Promise<Response> {
+  action = 'authentication';
   const params = new URLSearchParams();
   params.append('username', payload.userId);
   params.append('password', payload.password);
@@ -77,6 +79,7 @@ export function authentication(payload: loginForm): Promise<Response> {
 
 export function refreshToken(): Promise<Response> {
   try {
+    action = 'refreshToken';
     const refreshToken = getRefreshToken();
     const params = new URLSearchParams();
     params.append('grant_type', 'refresh_token');
@@ -105,6 +108,7 @@ export function refreshToken(): Promise<Response> {
 }
 
 export function logout(): Promise<Response> {
+  action = 'logout';
   const refreshToken = getRefreshToken();
   const params = new URLSearchParams();
   params.append('client_id', env.keycloak.clientId);
@@ -132,6 +136,9 @@ export function logout(): Promise<Response> {
 }
 
 instance.interceptors.request.use(function (config: AxiosRequestConfig) {
-  config.headers.common['X-Requested-With'] = branchCode;
+  if (action !== 'logout') {
+    config.headers.common['X-Requested-With'] = branchCode;
+  }
+
   return config;
 });
