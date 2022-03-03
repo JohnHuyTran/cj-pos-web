@@ -8,6 +8,9 @@
 # find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_KEYCLOAK_PATH_REFRESH_ACCESS_TOKEN_VALUE,$REACT_APP_KEYCLOAK_PATH_REFRESH_ACCESS_TOKEN,g" {} \;
 
 find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_KEYCLOAK_URL_VALUE,$REACT_APP_KEYCLOAK_URL,g" {} \;
+find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_KEYCLOAK_AUTHENTICATION_URL_VALUE,$REACT_APP_KEYCLOAK_AUTHENTICATION_URL,g" {} \;
+find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_KEYCLOAK_REFRESH_TOKEN_URL_VALUE,$REACT_APP_KEYCLOAK_REFRESH_TOKEN_URL,g" {} \;
+find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_KEYCLOAK_LOGOUT_URL_VALUE,$REACT_APP_KEYCLOAK_LOGOUT_URL,g" {} \;
 find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_KEYCLOAK_GRANT_TYPE_VALUE,$REACT_APP_KEYCLOAK_GRANT_TYPE,g" {} \;
 find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_KEYCLOAK_CLIENT_ID_VALUE,$REACT_APP_KEYCLOAK_CLIENT_ID,g" {} \;
 find /usr/share/nginx/html/ -type f -exec sed -i "s,REACT_APP_KEYCLOAK_CLIENT_SECRET_VALUE,$REACT_APP_KEYCLOAK_CLIENT_SECRET,g" {} \;
