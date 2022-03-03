@@ -56,7 +56,7 @@ export default function Navbar({}: Props): ReactElement {
     setUserId(getUserInfo().name);
     const strBranchName = getBranchName(branchList, getUserInfo().branch);
     setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
-  }, [navState]);
+  }, [navState, branchList]);
 
   const dispatch = useAppDispatch();
 
