@@ -12,14 +12,14 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
-import { DeleteForever, ErrorOutline } from '@mui/icons-material';
+import { DeleteForever } from '@mui/icons-material';
 import { DataGrid, GridColDef } from '@material-ui/data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { STProductDetail } from '../../models/sale-limit-time';
-import { setCheckEdit } from '../../store/slices/sale-limit-time-slice';
+import { setCheckEdit, setProductList } from '../../store/slices/sale-limit-time-slice';
 
 const _ = require('lodash');
 
@@ -34,6 +34,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
+  const productList = useAppSelector((state) => state.saleLimitTime.productList);
   const [showAll, setShowAll] = React.useState(true);
   const dispatch = useAppDispatch();
 
@@ -84,6 +85,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
       setDtTable([]);
     }
     unSelectAllType(e.target.checked);
+    dispatch(setProductList('รายการสินค้าทั้งหมด'));
   };
   const columns: GridColDef[] = [
     {
@@ -250,7 +252,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
   return (
     <>
       <Typography sx={{ fontSize: '24px' }}>
-        <b>{'รายการสินค้า : รายการสินค้าทั้งหมด'}</b>
+        <b>รายการสินค้า : {productList}</b>
       </Typography>
       <FormGroup>
         <FormControlLabel

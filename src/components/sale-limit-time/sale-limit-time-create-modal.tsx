@@ -30,7 +30,7 @@ import TextBoxComment from '../commons/ui/textbox-comment';
 import { createTheme } from '@material-ui/core/styles';
 import { cancelST, getStartSaleLimitTime, saveDraftST, importST } from '../../services/sale-limit-time';
 import { DateFormat } from '../../utils/enum/common-enum';
-import { setCheckEdit, updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
+import { setCheckEdit, setProductList, updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
 import ModelConfirm from './modal-confirm';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DatePickerComponent from './date-picker-detail';
@@ -263,6 +263,7 @@ function STCreateModal({
   const clearData = async () => {
     dispatch(updatesaleLimitTimeState({}));
     dispatch(updateAddTypeAndProductState([]));
+    dispatch(setProductList('รายการสินค้าทั้งหมด'));
   };
   const handleClose = async () => {
     setOpen(false);
@@ -566,10 +567,17 @@ function STCreateModal({
 
   const handleAddProduct = (list: any) => {
     let selectList = list.map((item: any) => {
-      return { ...item, selectedType: 2, showProduct: true };
+      return {
+        ProductTypeCode: item.categoryTypeCode,
+        ProductTypeName: item.categoryName,
+        barcode: item.barcode,
+        unitName: item.unitFactor,
+        barcodeName: item.name,
+        selectedType: 2,
+        showProduct: true,
+      };
     });
     let selectedItemEnds = _.cloneDeep(selectList);
-    console.log({ selectedItemEnds });
 
     if (selectedItemEnds && selectedItemEnds.length > 0) {
       let listTypeCodeProducts = new Set(
@@ -591,25 +599,6 @@ function STCreateModal({
         }
       }
     }
-    if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0) {
-      for (const item of payloadAddTypeProduct) {
-        if (item.selectedType === 1) {
-          let selectedItemFilter = list.filter(
-            (it: any) => it.selectedType === item.selectedType && it.productTypeCode === item.productTypeCode
-          );
-          if (selectedItemFilter && selectedItemFilter.length === 0) {
-            selectedItemEnds.push(item);
-          }
-        } else if (item.selectedType === 2) {
-          let selectedItemFilter = list.filter(
-            (it: any) => it.selectedType === item.selectedType && it.barcode === item.barcode
-          );
-          if (selectedItemFilter && selectedItemFilter.length === 0) {
-            selectedItemEnds.push(item);
-          }
-        }
-      }
-    }
     dispatch(updateAddTypeAndProductState(selectedItemEnds));
   };
 
@@ -620,6 +609,8 @@ function STCreateModal({
         formData.append('barcode', e.target.files[0]);
         const rs = await importST(formData);
         if (rs.code == 20000) {
+          console.log(rs.data.appliedProducts);
+
           handleAddProduct(rs.data.appliedProducts);
         }
       }
@@ -800,7 +791,9 @@ function STCreateModal({
                         เพิ่มสินค้า
                       </Button>
                       <label htmlFor="import-st-button-file">
-                        <Input id="import-st-button-file" type="file" onChange={handleImportFile} />
+                        {Object.keys(payloadAddTypeProduct).length === 0 && (
+                          <Input id="import-st-button-file" type="file" onChange={handleImportFile} />
+                        )}
                         <Button
                           id="btnImport"
                           variant="contained"
@@ -808,8 +801,8 @@ function STCreateModal({
                           className={classes.MbtnPrint}
                           startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
                           sx={{ width: 126, ml: '19px' }}
-                          disabled={status === 1}
                           component="span"
+                          disabled={!!Object.keys(payloadAddTypeProduct).length}
                         >
                           Import
                         </Button>
