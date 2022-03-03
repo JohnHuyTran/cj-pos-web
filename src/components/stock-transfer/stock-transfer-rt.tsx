@@ -393,7 +393,12 @@ export default function StockTransferRt() {
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       {openCreateModal && (
-        <ModalCreateStockTransfer type={typeModal} isOpen={openCreateModal} onClickClose={handleCloseCreateModal} />
+        <ModalCreateStockTransfer
+          type={typeModal}
+          edit={true}
+          isOpen={openCreateModal}
+          onClickClose={handleCloseCreateModal}
+        />
       )}
     </>
   );

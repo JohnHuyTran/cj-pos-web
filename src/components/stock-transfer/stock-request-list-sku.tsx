@@ -14,6 +14,7 @@ import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 
 export interface DataGridProps {
   type: string;
+  edit: boolean;
   onMapSKU: (SKU: Array<any>) => void;
   // onChangeItems: (items: Array<any>) => void;
   changeItems: (chang: Boolean) => void;
@@ -79,7 +80,7 @@ var calBaseUnit = function (params: GridValueGetterParams) {
   return numberWithCommas(cal);
 };
 
-function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, status }: DataGridProps) {
+function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, branch, status }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
@@ -378,6 +379,7 @@ function StockRequestSKU({ type, onMapSKU, changeItems, update, stock, branch, s
 
       <StockRequestItem
         type={type}
+        edit={edit}
         onChangeItems={handleChangeItems}
         update={flagSave}
         status={status}
