@@ -38,8 +38,8 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
   const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
   const saleLimitTimeDetail = useAppSelector((state) => state.saleLimitTimeDetailSlice.saleLimitTimeDetail);
-  const currentPage = responveST.page;
-  const limit = responveST.perPage;
+  const currentPage = useAppSelector((state) => state.searchSaleLimitTime.responseST.page);
+  const limit = useAppSelector((state) => state.searchSaleLimitTime.responseST.perPage);
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const [popupMsg, setPopupMsg] = React.useState<string>('');
@@ -52,6 +52,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
 
   useEffect(() => {
     const list: any[] = responveST.data;
+
     if (list != null) {
       let rows = list.map((item: any, index: number) => {
         return {
@@ -276,21 +277,22 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     }
     return statusDisplay;
   };
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = async (newPage: number) => {
     let page: string = (newPage + 1).toString();
     const newPayload = {
       ...payloadST,
       page: page,
     };
-    dispatch(updatePayloadST(newPayload));
+    await dispatch(updatePayloadST(newPayload));
   };
-  const handlePageSizeChange = (pageSize: number) => {
-    setPageSize(pageSize.toString());
+  const handlePageSizeChange = async (cPageSize: number) => {
+    setPageSize(cPageSize.toString());
     const newPayload = {
       ...payloadST,
-      perPage: pageSize,
+      perPage: cPageSize.toString(),
+      page: '1',
     };
-    dispatch(updatePayloadST(newPayload));
+    await dispatch(updatePayloadST(newPayload));
   };
   const handleCloseCreateModal = () => {
     setOpenDetailModal(false);
@@ -356,7 +358,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       )}
       <div
         className={classes.MdataGridPaginationTop}
-        style={{ height: lstST.length <= 10 ? '60vh' : 'auto', width: '100%' }}
+        style={{ height: lstST.length >= 10 ? '60vh' : 'auto', width: '100%' }}
       >
         <DataGrid
           columns={columns}
@@ -365,7 +367,9 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
           page={currentPage - 1}
           pageSize={parseInt(pageSize)}
           rowCount={responveST.total}
+          paginationMode="server"
           rowHeight={45}
+          autoHeight={lstST.length < 10}
           rowsPerPageOptions={[10, 20, 50, 100]}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}

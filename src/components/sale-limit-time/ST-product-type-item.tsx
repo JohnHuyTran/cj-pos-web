@@ -8,7 +8,7 @@ import { useStyles } from '../../styles/makeTheme';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { GridSelectionModel } from '@mui/x-data-grid';
-import { setCheckEdit } from '../../store/slices/sale-limit-time-slice';
+import { setCheckEdit, setProductList } from '../../store/slices/sale-limit-time-slice';
 
 const _ = require('lodash');
 
@@ -65,6 +65,7 @@ export default function STProductTypeItems({ unSelectAllType, disabled }: Props)
       }
     });
     dispatch(updateAddTypeAndProductState(newList));
+    dispatch(setProductList(value.productTypeName));
   };
 
   const columns: GridColDef[] = [

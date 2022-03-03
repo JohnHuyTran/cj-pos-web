@@ -59,6 +59,7 @@ const SaleLimitTimeSearch = () => {
   });
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
+  const [flagSearch, setFlagSearch] = React.useState(false);
 
   useEffect(() => {
     setLstStatus(t('lstStatus', { returnObjects: true }));
@@ -85,6 +86,12 @@ const SaleLimitTimeSearch = () => {
       dispatch(updatePayloadBranches(payloadBranch));
     }
   }, [branchList]);
+
+  useEffect(() => {
+    if (responveST && responveST.data && responveST.data.length > 0) {
+      handleSearchST(payloadST.page, payloadST.perPage);
+    }
+  }, [payloadST]);
 
   const getStatusText = (key: string) => {
     if (lstStatus === null || lstStatus.length === 0) {
@@ -119,8 +126,9 @@ const SaleLimitTimeSearch = () => {
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
-  const handleSearchST = async () => {
+  const handleSearchST = async (paramsPage?: string, paramsPerPage?: string) => {
     handleOpenLoading('open', true);
+    setFlagSearch(true);
     if (stringNullOrEmpty(values.startDate) || stringNullOrEmpty(values.endDate)) {
       setOpenAlert(true);
       setTextError('กรุณากรอกวันที่');
@@ -129,8 +137,8 @@ const SaleLimitTimeSearch = () => {
         const aProvinces = payloadBranches.appliedBranches.province.map((item: any) => item.code).join();
         const aBranches = payloadBranches.appliedBranches.branchList.map((item: any) => item.code).join();
         const params = {
-          page: payloadST.page,
-          perPage: payloadST.perPage,
+          page: paramsPage || '1',
+          perPage: paramsPerPage || '10',
           ...(!!values.query && { query: values.query }),
           ...(!!values.status && values.status != 'all' && { status: values.status }),
           ...(!!aBranches && !payloadBranches.isAllBranches && { branches: aBranches }),
@@ -142,8 +150,8 @@ const SaleLimitTimeSearch = () => {
         await dispatch(fetchSaleLimitTimeListAsync(query));
       } else {
         const params = {
-          page: payloadST.page,
-          perPage: payloadST.perPage,
+          page: paramsPage || '1',
+          perPage: paramsPerPage || '10',
           ...(!!values.query && { query: values.query }),
           ...(!!values.status && { status: values.status }),
           branches: values.branch,
@@ -187,6 +195,7 @@ const SaleLimitTimeSearch = () => {
         })
       );
     dispatch(clearResponse());
+    setFlagSearch(false);
   };
 
   return (
@@ -290,20 +299,23 @@ const SaleLimitTimeSearch = () => {
           color="primary"
           className={classes.MbtnSearch}
           sx={{ width: '126px' }}
-          onClick={handleSearchST}
+          onClick={() => {
+            handleSearchST();
+          }}
         >
           ค้นหา
         </Button>
       </Box>
-      {responveST && responveST.data && responveST.data.length > 0 ? (
-        <SaleLimitTimelist handleSetBranch={handleSetBranch} onSearch={handleSearchST} checkAdmin={checkAdmin} />
-      ) : (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
-            <h2>{t('noData')}</h2>
-          </Box>
-        </Grid>
-      )}
+      {flagSearch &&
+        (responveST && responveST.data && responveST.data.length > 0 ? (
+          <SaleLimitTimelist handleSetBranch={handleSetBranch} onSearch={handleSearchST} checkAdmin={checkAdmin} />
+        ) : (
+          <Grid item container xs={12} justifyContent="center">
+            <Box color="#CBD4DB">
+              <h2>{t('noData')}</h2>
+            </Box>
+          </Grid>
+        ))}
 
       {openCreateModal && (
         <STCreateModal

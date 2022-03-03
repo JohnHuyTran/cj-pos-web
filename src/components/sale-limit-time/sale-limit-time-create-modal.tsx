@@ -30,7 +30,7 @@ import TextBoxComment from '../commons/ui/textbox-comment';
 import { createTheme } from '@material-ui/core/styles';
 import { cancelST, getStartSaleLimitTime, saveDraftST, importST } from '../../services/sale-limit-time';
 import { DateFormat } from '../../utils/enum/common-enum';
-import { setCheckEdit, updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
+import { setCheckEdit, setProductList, updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
 import ModelConfirm from './modal-confirm';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DatePickerComponent from './date-picker-detail';
@@ -59,7 +59,6 @@ interface Props {
   onClickClose: () => void;
   onSearch: () => void;
 }
-
 export interface DialogTitleProps {
   id: string;
   children?: React.ReactNode;
@@ -162,7 +161,7 @@ function STCreateModal({
   //modal vaildate
   const [openModalValidate, setOpenModalValidate] = React.useState<boolean>(false);
   const [msgModalValidate, setMsgModalValidate] = React.useState<string>('');
-  const [urlModalValidate, setUrlModalValidate] = React.useState<string>('https://www.google.com/');
+  const [urlModalValidate, setUrlModalValidate] = React.useState<string>('');
   useEffect(() => {
     if (type === 'Detail' && !objectNullOrEmpty(saleLimitTimeDetail)) {
       setStatus(saleLimitTimeDetail.status);
@@ -264,6 +263,7 @@ function STCreateModal({
   const clearData = async () => {
     dispatch(updatesaleLimitTimeState({}));
     dispatch(updateAddTypeAndProductState([]));
+    dispatch(setProductList('รายการสินค้าทั้งหมด'));
   };
   const handleClose = async () => {
     setOpen(false);
@@ -565,21 +565,62 @@ function STCreateModal({
     setUnSelectAllType(showAll);
   };
 
+  const handleAddProduct = (list: any) => {
+    let selectList = list.map((item: any) => {
+      return {
+        ProductTypeCode: item.categoryTypeCode,
+        ProductTypeName: item.categoryName,
+        barcode: item.barcode,
+        unitName: item.unitFactor,
+        barcodeName: item.name,
+        selectedType: 2,
+        showProduct: true,
+      };
+    });
+    let selectedItemEnds = _.cloneDeep(selectList);
+
+    if (selectedItemEnds && selectedItemEnds.length > 0) {
+      let listTypeCodeProducts = new Set(
+        selectedItemEnds.map((item: any) => item.ProductTypeCode).filter((el: any) => el != undefined)
+      );
+      let listCategoryCode = selectedItemEnds
+        .filter((el: any) => el.selectedType === 1)
+        .map((item: any) => item.productTypeCode);
+
+      let listTypes = Array.from(listTypeCodeProducts);
+      for (let i of listTypes) {
+        if (!listCategoryCode.includes(i)) {
+          const item = selectedItemEnds.find((el: any) => i === el.ProductTypeCode);
+          selectedItemEnds.push({
+            productTypeCode: item.ProductTypeCode,
+            productTypeName: item.ProductTypeName,
+            selectedType: 1,
+          });
+        }
+      }
+    }
+    dispatch(updateAddTypeAndProductState(selectedItemEnds));
+  };
+
   const handleImportFile = async (e: any) => {
-    setOpenModalValidate(true);
     try {
       if (e.target.files[0]) {
         const formData = new FormData();
         formData.append('barcode', e.target.files[0]);
         const rs = await importST(formData);
         if (rs.code == 20000) {
-        }
-        if (rs.code === 40001 || rs.code === 40003) {
-          setMsgModalValidate(rs.message);
-          setUrlModalValidate('');
+          handleAddProduct(rs.data.appliedProducts);
         }
       }
-    } catch (error) {}
+      throw new Error('');
+    } catch (error) {
+      let e: any = error;
+      if (e.code === 40002) {
+        setMsgModalValidate(e.message);
+      } else {
+        setMsgModalValidate(e.message);
+      }
+    }
   };
 
   return (
@@ -754,7 +795,9 @@ function STCreateModal({
                         เพิ่มสินค้า
                       </Button>
                       <label htmlFor="import-st-button-file">
-                        <Input id="import-st-button-file" type="file" onChange={handleImportFile} />
+                        {Object.keys(payloadAddTypeProduct).length === 0 && (
+                          <Input id="import-st-button-file" type="file" onChange={handleImportFile} />
+                        )}
                         <Button
                           id="btnImport"
                           variant="contained"
@@ -762,8 +805,8 @@ function STCreateModal({
                           className={classes.MbtnPrint}
                           startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
                           sx={{ width: 126, ml: '19px' }}
-                          disabled={status === 1}
                           component="span"
+                          disabled={!!Object.keys(payloadAddTypeProduct).length}
                         >
                           Import
                         </Button>

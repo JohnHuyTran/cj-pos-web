@@ -3,11 +3,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 type ItemsState = {
   state: any;
   checkEdit: boolean;
+  productList: string;
 };
 
 const initialState: ItemsState = {
   state: {},
-  checkEdit: false
+  checkEdit: false,
+  productList: 'รายการสินค้าทั้งหมด',
 };
 
 export const saleLimitTime = createSlice({
@@ -18,11 +20,14 @@ export const saleLimitTime = createSlice({
       state.state = action.payload;
     },
     setCheckEdit: (state, action) => {
-      state.checkEdit = action.payload
-    }
+      state.checkEdit = action.payload;
+    },
+    setProductList: (state, action) => {
+      state.productList = action.payload;
+    },
   },
 });
 
-export const { updatesaleLimitTimeState, setCheckEdit } = saleLimitTime.actions;
+export const { updatesaleLimitTimeState, setCheckEdit, setProductList } = saleLimitTime.actions;
 
 export default saleLimitTime.reducer;
