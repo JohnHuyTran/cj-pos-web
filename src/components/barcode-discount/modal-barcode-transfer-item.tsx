@@ -198,6 +198,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfApprove = (event: any, index: number, errorIndex: number, barcode: string) => {
+    if (stringNullOrEmpty(event.target.value)
+      || stringNullOrEmpty(event.target.value.trim())
+      || isNaN(event.target.value.replace(/,/g, ''))) {
+      return;
+    }
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       data[index - 1].numberOfApproved = event.target.value ? parseInt(event.target.value.replace(/,/g, '')) : 0;
@@ -221,6 +226,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfDiscount = (event: any, index: number, errorIndex: number, barcode: string) => {
+    if (stringNullOrEmpty(event.target.value)
+      || stringNullOrEmpty(event.target.value.trim())
+      || isNaN(event.target.value.replace(/,/g, ''))) {
+      return;
+    }
     let currentData: any;
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
@@ -575,7 +585,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 (dataDetail.status > 1 && !approvePermission) || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)
               }
             />
-            {condition && <div className="title" title={errorList[index].errorExpiryDate}>{errorList[index].errorExpiryDate}</div>}
+            {condition &&
+            <div className="title" title={errorList[index].errorExpiryDate}>{errorList[index].errorExpiryDate}</div>}
           </div>
         );
       },
