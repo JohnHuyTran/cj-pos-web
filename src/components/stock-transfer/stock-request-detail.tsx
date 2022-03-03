@@ -846,7 +846,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                   filterOutDC={groupBranch}
                 />
               )}
-              {(!edit || !groupSCM) && `${toBranch}-${valuebranchTo?.name}`}
+
+              {!edit && !groupSCM && `${toBranch}-${valuebranchTo?.name}`}
               {/* {status !== '' &&
                 status !== 'DRAFT' &&
                 status !== 'AWAITING_FOR_REQUESTER' &&
