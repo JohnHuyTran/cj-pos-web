@@ -59,7 +59,6 @@ interface Props {
   onClickClose: () => void;
   onSearch: () => void;
 }
-
 export interface DialogTitleProps {
   id: string;
   children?: React.ReactNode;
@@ -565,21 +564,68 @@ function STCreateModal({
     setUnSelectAllType(showAll);
   };
 
+  const handleAddProduct = (list: any) => {
+    let selectList = list.map((item: any) => {
+      return { ...item, selectedType: 2, showProduct: true };
+    });
+    let selectedItemEnds = _.cloneDeep(selectList);
+    console.log({ selectedItemEnds });
+
+    if (selectedItemEnds && selectedItemEnds.length > 0) {
+      let listTypeCodeProducts = new Set(
+        selectedItemEnds.map((item: any) => item.ProductTypeCode).filter((el: any) => el != undefined)
+      );
+      let listCategoryCode = selectedItemEnds
+        .filter((el: any) => el.selectedType === 1)
+        .map((item: any) => item.productTypeCode);
+
+      let listTypes = Array.from(listTypeCodeProducts);
+      for (let i of listTypes) {
+        if (!listCategoryCode.includes(i)) {
+          const item = selectedItemEnds.find((el: any) => i === el.ProductTypeCode);
+          selectedItemEnds.push({
+            productTypeCode: item.ProductTypeCode,
+            productTypeName: item.ProductTypeName,
+            selectedType: 1,
+          });
+        }
+      }
+    }
+    if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0) {
+      for (const item of payloadAddTypeProduct) {
+        if (item.selectedType === 1) {
+          let selectedItemFilter = list.filter(
+            (it: any) => it.selectedType === item.selectedType && it.productTypeCode === item.productTypeCode
+          );
+          if (selectedItemFilter && selectedItemFilter.length === 0) {
+            selectedItemEnds.push(item);
+          }
+        } else if (item.selectedType === 2) {
+          let selectedItemFilter = list.filter(
+            (it: any) => it.selectedType === item.selectedType && it.barcode === item.barcode
+          );
+          if (selectedItemFilter && selectedItemFilter.length === 0) {
+            selectedItemEnds.push(item);
+          }
+        }
+      }
+    }
+    dispatch(updateAddTypeAndProductState(selectedItemEnds));
+  };
+
   const handleImportFile = async (e: any) => {
-    setOpenModalValidate(true);
     try {
       if (e.target.files[0]) {
         const formData = new FormData();
         formData.append('barcode', e.target.files[0]);
         const rs = await importST(formData);
         if (rs.code == 20000) {
-        }
-        if (rs.code === 40001 || rs.code === 40003) {
-          setMsgModalValidate(rs.message);
-          setUrlModalValidate('');
+          handleAddProduct(rs.data.appliedProducts);
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      setOpenModalValidate(true);
+    }
   };
 
   return (

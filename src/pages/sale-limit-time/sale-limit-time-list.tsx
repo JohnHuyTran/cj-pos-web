@@ -38,8 +38,8 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
   const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
   const saleLimitTimeDetail = useAppSelector((state) => state.saleLimitTimeDetailSlice.saleLimitTimeDetail);
-  const currentPage = responveST.page;
-  const limit = responveST.perPage;
+  const currentPage = useAppSelector((state) => state.searchSaleLimitTime.responseST.page);
+  const limit = useAppSelector((state) => state.searchSaleLimitTime.responseST.perPage);
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const [popupMsg, setPopupMsg] = React.useState<string>('');
@@ -52,6 +52,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
 
   useEffect(() => {
     const list: any[] = responveST.data;
+
     if (list != null) {
       let rows = list.map((item: any, index: number) => {
         return {
@@ -77,6 +78,8 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
       setIsAdmin(userInfo.acl['service.posback-campaign'].includes('campaign.st.create'));
     }
+
+    setPageSize(limit.toString());
   }, []);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -356,7 +359,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       )}
       <div
         className={classes.MdataGridPaginationTop}
-        style={{ height: lstST.length <= 10 ? '60vh' : 'auto', width: '100%' }}
+        style={{ height: lstST.length >= 10 ? '60vh' : 'auto', width: '100%' }}
       >
         <DataGrid
           columns={columns}
@@ -365,7 +368,9 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
           page={currentPage - 1}
           pageSize={parseInt(pageSize)}
           rowCount={responveST.total}
+          paginationMode="server"
           rowHeight={45}
+          autoHeight={lstST.length < 10}
           rowsPerPageOptions={[10, 20, 50, 100]}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
