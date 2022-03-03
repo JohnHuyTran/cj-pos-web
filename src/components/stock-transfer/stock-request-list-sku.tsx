@@ -133,10 +133,12 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
     let resultSKU: any = [];
     items.map((a: any) => {
       let stockRemain = 0;
-      if (stockBalance.length > 0) {
-        stockBalance.forEach((s: any) => {
-          if (s.skuCode === a.skuCode) stockRemain = s.stockRemain;
-        });
+      if (stockBalance) {
+        if (stockBalance.length > 0) {
+          stockBalance.forEach((s: any) => {
+            if (s.skuCode === a.skuCode) stockRemain = s.stockRemain;
+          });
+        }
       }
 
       const chkduplicate: any = resultSKU.find((r: any) => r.skuCode === a.skuCode);
