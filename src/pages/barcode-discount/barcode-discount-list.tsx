@@ -71,10 +71,9 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
           sumOfPriceAfterDiscount: genTotalPriceAfterDiscount(data.percentDiscount, data.products),
           branch: data.branchName,
           createdDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
-          approvedDate:
-            BDStatus.APPROVED == data.status || BDStatus.BARCODE_PRINTED == data.status
-              ? convertUtcToBkkDate(data.approvedDate, DateFormat.DATE_FORMAT)
-              : '',
+          approvedDate: stringNullOrEmpty(data.approvedDate)
+            ? ''
+            : convertUtcToBkkDate(data.approvedDate, DateFormat.DATE_FORMAT),
           requesterNote: stringNullOrEmpty(data.requesterNote) ? '' : data.requesterNote,
           products: data.products
         };

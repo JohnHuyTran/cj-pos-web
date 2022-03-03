@@ -241,10 +241,10 @@ export default function ModalCreateBarcodeDiscount({
             barcode: item.barcode,
             barcodeName: item.productName,
             unitName: item.unitFactor,
-            unitPrice: item.price,
-            discount: item.requestedDiscount,
-            qty: item.numberOfDiscounted,
-            numberOfApproved: item.numberOfApproved,
+            unitPrice: item.price || 0,
+            discount: item.requestedDiscount || 0,
+            qty: item.numberOfDiscounted || 0,
+            numberOfApproved: item.numberOfApproved || 0,
             expiryDate: item.expiredDate,
             skuCode: item.skuCode,
           });
@@ -315,9 +315,9 @@ export default function ModalCreateBarcodeDiscount({
         };
 
         if (checkApprove) {
-          if (stringNullOrEmpty(preData.numberOfApproved) || preData.numberOfApproved <= 0) {
+          if (stringNullOrEmpty(preData.numberOfApproved)) {
             isValid = false;
-            item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องมากกว่า 0';
+            item.errorNumberOfApproved = 'กรุณาระบุจำนวนที่อนุมัติ';
           } else {
             if (preData.numberOfApproved > preData.numberOfDiscounted) {
               isValid = false;
