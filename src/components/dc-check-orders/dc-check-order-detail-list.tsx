@@ -6,6 +6,7 @@ import { useAppSelector } from '../../store/store';
 import { CheckOrderDetailInfo, CheckOrderDetailItims } from '../../models/dc-check-order-model';
 
 import { useStyles } from '../../styles/makeTheme';
+import Typography from '@mui/material/Typography';
 
 interface Props {
   //   sdNo: string;
@@ -25,14 +26,6 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'productId',
-    headerName: 'รหัสสินค้า',
-    minWidth: 185,
-    // flex: 0.5,
-    sortable: false,
-    headerAlign: 'center',
-  },
-  {
     field: 'productBarCode',
     headerName: 'บาร์โค้ด',
     minWidth: 130,
@@ -47,6 +40,14 @@ const columns: GridColDef[] = [
     flex: 1,
     sortable: false,
     headerAlign: 'center',
+    renderCell: (params) => (
+      <div>
+        <Typography variant='body2'>{params.value}</Typography>
+        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+          {params.getValue(params.id, 'productId') || ''}
+        </Typography>
+      </div>
+    ),
   },
   {
     field: 'productUnit',
@@ -122,8 +123,7 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
     <Box mt={2} bgcolor='background.paper'>
       <div
         className={classes.MdataGridDetail}
-        style={{ width: '100%', marginBottom: '1em', height: rows.length >= 8 ? '70vh' : 'auto' }}
-      >
+        style={{ width: '100%', marginBottom: '1em', height: rows.length >= 8 ? '70vh' : 'auto' }}>
         <DataGrid
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

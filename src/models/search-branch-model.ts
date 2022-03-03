@@ -10,3 +10,15 @@ export interface BranchInfo {
   name: string;
   isDC: boolean;
 }
+
+export interface AuthorizedBranchResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: Data | null;
+}
+
+export interface Data {
+  branches: BranchInfo[];
+}

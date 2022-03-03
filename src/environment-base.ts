@@ -225,4 +225,9 @@ export const environment = {
       },
     },
   },
+  authority: {
+    authorizedBranch: {
+      url: '/authority/authorized-branches',
+    },
+  },
 };

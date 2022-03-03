@@ -9,6 +9,10 @@ import {
   getAccessToken,
   getRefreshToken,
   setUserInfo,
+  removeRefreshToken,
+  removeAccessToken,
+  removeSessionId,
+  removeUserInfo,
 } from '../store/sessionStore';
 import { getDecodedAccessToken, objectNullOrEmpty, stringNullOrEmpty } from '../utils/utils';
 import { getUserGroup } from '../utils/role-permission';
@@ -23,8 +27,10 @@ const instance = axios.create({
   },
 });
 let branchCode = '';
+let action = '';
 
 export function authentication(payload: loginForm): Promise<Response> {
+  action = 'authentication';
   const params = new URLSearchParams();
   params.append('username', payload.userId);
   params.append('password', payload.password);
@@ -34,7 +40,7 @@ export function authentication(payload: loginForm): Promise<Response> {
   // params.append("client_secret", env.keycloak.clientSecret);
   branchCode = payload.branchCode;
   return instance
-    .post(env.keycloak.url, params)
+    .post(env.keycloak.url.authentication, params)
     .then((response: AxiosResponse) => {
       if (response.status == 200) {
         setAccessToken(response.data.access_token);
@@ -73,13 +79,14 @@ export function authentication(payload: loginForm): Promise<Response> {
 
 export function refreshToken(): Promise<Response> {
   try {
+    action = 'refreshToken';
     const refreshToken = getRefreshToken();
     const params = new URLSearchParams();
     params.append('grant_type', 'refresh_token');
     params.append('refresh_token', refreshToken ? refreshToken : '');
     params.append('client_id', env.keycloak.clientId);
     return instance
-      .post(env.keycloak.url, params)
+      .post(env.keycloak.url.refreshToken, params)
       .then((response: any) => {
         if (response.status === 200) {
           setRefreshToken(response.data.refresh_token);
@@ -100,7 +107,38 @@ export function refreshToken(): Promise<Response> {
   }
 }
 
+export function logout(): Promise<Response> {
+  action = 'logout';
+  const refreshToken = getRefreshToken();
+  const params = new URLSearchParams();
+  params.append('client_id', env.keycloak.clientId);
+  params.append('refresh_token', refreshToken ? refreshToken : '');
+
+  return instance
+    .post(env.keycloak.url.logout, params)
+    .then((response: AxiosResponse) => {
+      removeAccessToken();
+      removeRefreshToken();
+      removeSessionId();
+      removeUserInfo();
+      if (response.status === 200) {
+        return response.data;
+      }
+    })
+    .catch((error: any) => {
+      removeAccessToken();
+      removeRefreshToken();
+      removeSessionId();
+      removeUserInfo();
+      // throw new Error('error');
+      // throw new KeyCloakError(error.response.status,error.response.data.error_description);
+    });
+}
+
 instance.interceptors.request.use(function (config: AxiosRequestConfig) {
-  config.headers.common['X-Requested-With'] = branchCode;
+  if (action !== 'logout') {
+    config.headers.common['X-Requested-With'] = branchCode;
+  }
+
   return config;
 });
