@@ -78,8 +78,6 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
       setIsAdmin(userInfo.acl['service.posback-campaign'].includes('campaign.st.create'));
     }
-
-    setPageSize(limit.toString());
   }, []);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -279,21 +277,22 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     }
     return statusDisplay;
   };
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = async (newPage: number) => {
     let page: string = (newPage + 1).toString();
     const newPayload = {
       ...payloadST,
       page: page,
     };
-    dispatch(updatePayloadST(newPayload));
+    await dispatch(updatePayloadST(newPayload));
   };
-  const handlePageSizeChange = (pageSize: number) => {
-    setPageSize(pageSize.toString());
+  const handlePageSizeChange = async (cPageSize: number) => {
+    setPageSize(cPageSize.toString());
     const newPayload = {
       ...payloadST,
-      perPage: pageSize,
+      perPage: cPageSize.toString(),
+      page: '1',
     };
-    dispatch(updatePayloadST(newPayload));
+    await dispatch(updatePayloadST(newPayload));
   };
   const handleCloseCreateModal = () => {
     setOpenDetailModal(false);

@@ -161,7 +161,7 @@ function STCreateModal({
   //modal vaildate
   const [openModalValidate, setOpenModalValidate] = React.useState<boolean>(false);
   const [msgModalValidate, setMsgModalValidate] = React.useState<string>('');
-  const [urlModalValidate, setUrlModalValidate] = React.useState<string>('https://www.google.com/');
+  const [urlModalValidate, setUrlModalValidate] = React.useState<string>('');
   useEffect(() => {
     if (type === 'Detail' && !objectNullOrEmpty(saleLimitTimeDetail)) {
       setStatus(saleLimitTimeDetail.status);
@@ -609,13 +609,17 @@ function STCreateModal({
         formData.append('barcode', e.target.files[0]);
         const rs = await importST(formData);
         if (rs.code == 20000) {
-          console.log(rs.data.appliedProducts);
-
           handleAddProduct(rs.data.appliedProducts);
         }
       }
+      throw new Error('');
     } catch (error) {
-      setOpenModalValidate(true);
+      let e: any = error;
+      if (e.code === 40002) {
+        setMsgModalValidate(e.message);
+      } else {
+        setMsgModalValidate(e.message);
+      }
     }
   };
 
