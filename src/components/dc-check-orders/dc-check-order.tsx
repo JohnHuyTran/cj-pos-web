@@ -23,7 +23,8 @@ import { getUserInfo } from '../../store/sessionStore';
 import { getBranchName } from '../../utils/utils';
 import { env } from '../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../models/branch-model';
-import { isGroupDC } from '../../utils/role-permission';
+import { isAllowActionPermission, isGroupDC } from '../../utils/role-permission';
+import { ACTIONS } from '../../utils/enum/permission-enum';
 
 moment.locale('th');
 
@@ -48,6 +49,7 @@ interface branchListOptionType {
 
 function DCCheckOrderSearch() {
   // const limit = "10";
+  const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const page = '1';
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -90,6 +92,7 @@ function DCCheckOrderSearch() {
   };
 
   React.useEffect(() => {
+    setDisableSearchBtn(isAllowActionPermission(ACTIONS.ORDER_VER_VIEW));
     setBranchFromCode(ownBranch);
     setValues({ ...values, shipBranchFrom: ownBranch });
   }, []);
@@ -377,7 +380,7 @@ function DCCheckOrderSearch() {
                 variant='contained'
                 color='primary'
                 onClick={onClickValidateForm}
-                sx={{ width: '45%', ml: 1 }}
+                sx={{ width: '45%', ml: 1, display: `${disableSearchBtn ? 'none' : ''}` }}
                 className={classes.MbtnSearch}
                 fullWidth={true}>
                 ค้นหา

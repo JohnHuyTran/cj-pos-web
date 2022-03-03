@@ -20,6 +20,8 @@ import { useStyles } from '../../styles/makeTheme';
 import { TextField } from '@mui/material';
 import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
 import AccordionHuaweiFile from '../supplier-check-order/accordion-huawei-file';
+import { isAllowActionPermission } from '../../utils/role-permission';
+import { ACTIONS } from '../../utils/enum/permission-enum';
 
 interface Props {
   isOpen: boolean;
@@ -53,8 +55,9 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const [approveDCStatus, setApproveDCStatus] = React.useState(false);
 
   const [characterCount, setCharacterCount] = React.useState(0);
-
+  const [disableCheckBtn, setDisableCheckBtn] = React.useState(true);
   useEffect(() => {
+    setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
     setOpen(isOpen);
     setValueCommentDC(detailDC.dcComment);
   }, [open]);
@@ -240,6 +243,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                       borderRadius: '5px',
                       width: '200px',
                       padding: '8px',
+                      display: `${disableCheckBtn ? 'none' : ''}`,
                     }}>
                     ยืนยันยอด
                   </Button>
