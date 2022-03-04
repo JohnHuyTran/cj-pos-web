@@ -131,7 +131,7 @@ const SaleLimitTimeSearch = () => {
     setFlagSearch(true);
     if (stringNullOrEmpty(values.startDate) || stringNullOrEmpty(values.endDate)) {
       setOpenAlert(true);
-      setTextError('กรุณากรอกวันที่');
+      setTextError('กรุณาระบุวันที่');
     } else {
       if (checkAdmin) {
         const aProvinces = payloadBranches.appliedBranches.province.map((item: any) => item.code).join();
