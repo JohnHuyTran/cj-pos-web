@@ -149,6 +149,7 @@ export default function STProductTypeItems({ unSelectAllType, disabled }: Props)
             }
           });
           dispatch(setCheckEdit(false));
+          dispatch(setProductList('รายการสินค้าทั้งหมด'));
           dispatch(updateAddTypeAndProductState(newList));
           setOpenModalDelete(false);
           setShowSnackBar(true);
