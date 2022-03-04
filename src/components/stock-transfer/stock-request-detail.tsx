@@ -113,6 +113,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   const [displayBtnReject, setDisplayBtnReject] = React.useState(false);
   const [groupOC, setGroupOC] = React.useState(false);
   const [groupSCM, setGroupSCM] = React.useState(false);
+  const [groupBranchSCM, setGroupBranchSCM] = React.useState<boolean>(false);
+  const [isAuthorizedBranch, setIsAuthorizedBranch] = React.useState<boolean>(false);
 
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
@@ -142,6 +144,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
     setGroupOC(oc);
     setGroupSCM(scm);
+    setGroupBranchSCM(scm);
+    setIsAuthorizedBranch(scm);
 
     if (type === 'View' && stockRequestDetail) {
       setStatus(stockRequestDetail.status);
@@ -174,6 +178,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
         code: stockRequestDetail.branchFrom,
         name: branchFrom ? branchFrom : '',
       };
+
       setValuebranchFrom(branchFromMap);
       setFromBranch(stockRequestDetail.branchFrom);
 
@@ -273,18 +278,17 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     }
   }
 
-  // const [fromBranch, setFromBranch] = React.useState('');
-  // const [valuebranchFrom, setValuebranchFrom] = React.useState<branchListOptionType | null>(null);
-  const [fromBranch, setFromBranch] = React.useState(
+  const [fromBranch, setFromBranch] = React.useState('');
+  const [ownBranch, setOwnBranch] = React.useState(
     getUserInfo().branch
       ? getBranchName(branchList, getUserInfo().branch)
         ? getUserInfo().branch
         : env.branch.code
       : env.branch.code
   );
-  const branchFrom = getBranchName(branchList, fromBranch);
+  const branchFrom = getBranchName(branchList, ownBranch);
   const branchFromMap: BranchListOptionType = {
-    code: fromBranch,
+    code: ownBranch,
     name: branchFrom ? branchFrom : '',
   };
   const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
@@ -337,15 +341,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     setOpenModelAddItems(false);
   };
 
-  // const handleChangeItems = async (items: any) => {
-  //   // setFlagSave(true);
-  //   await dispatch(updateAddItemsState(items));
-  // };
-
-  // const [skuList, setSkuList] = React.useState([]);
   let skuList: any = [];
   const handleMapSKU = async (sku: any) => {
-    // setSkuList(sku);
     skuList = sku;
   };
 
@@ -776,10 +773,6 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               )}
 
               {!edit && moment(startDate).add(543, 'y').format('DD/MM/YYYY')}
-              {/* {status !== '' &&
-                status !== 'DRAFT' &&
-                status !== 'AWAITING_FOR_REQUESTER' &&
-                moment(startDate).add(543, 'y').format('DD/MM/YYYY')} */}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -796,10 +789,6 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                 />
               )}
               {!edit && moment(endDate).add(543, 'y').format('DD/MM/YYYY')}
-              {/* {status !== '' &&
-                status !== 'DRAFT' &&
-                status !== 'AWAITING_FOR_REQUESTER' &&
-                moment(endDate).add(543, 'y').format('DD/MM/YYYY')} */}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
@@ -814,14 +803,12 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                   sourceBranchCode={toBranch}
                   onChangeBranch={handleChangeFromBranch}
                   isClear={clearBranchDropDown}
+                  isFilterAuthorizedBranch={isAuthorizedBranch}
                   disable={groupBranch}
+                  filterOutDC={groupBranchSCM}
                 />
               )}
               {!edit && `${fromBranch}-${valuebranchFrom?.name}`}
-              {/* {status !== '' &&
-                status !== 'DRAFT' &&
-                status !== 'AWAITING_FOR_REQUESTER' &&
-                `${fromBranch}-${valuebranchFrom?.name}`} */}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
@@ -830,29 +817,26 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             <Grid item xs={3}>
               {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
                 <BranchListDropDown
-                  valueBranch={valuebranchTo}
                   sourceBranchCode={fromBranch}
                   onChangeBranch={handleChangeToBranch}
                   isClear={clearBranchDropDown}
+                  isFilterAuthorizedBranch={isAuthorizedBranch}
                   filterOutDC={groupBranch}
                 />
               )}
+
               {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
                 <BranchListDropDown
                   valueBranch={valuebranchTo}
                   sourceBranchCode={fromBranch}
                   onChangeBranch={handleChangeToBranch}
                   isClear={clearBranchDropDown}
+                  isFilterAuthorizedBranch={isAuthorizedBranch}
                   filterOutDC={groupBranch}
                 />
               )}
 
               {!edit && !groupSCM && `${toBranch}-${valuebranchTo?.name}`}
-              {/* {status !== '' &&
-                status !== 'DRAFT' &&
-                status !== 'AWAITING_FOR_REQUESTER' &&
-                status !== 'WAIT_FOR_APPROVAL_2' &&
-                `${toBranch}-${valuebranchTo?.name}`} */}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
@@ -871,7 +855,6 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                 />
               )}
               {!edit && reasonText}
-              {/* {status !== '' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && reasonText} */}
             </Grid>
             <Grid item xs={7}></Grid>
           </Grid>
@@ -947,7 +930,6 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     className={classes.MbtnSave}
                     onClick={handleReject}
                     startIcon={<SaveIcon />}
-                    // sx={{ width: 140 }}
                     sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
                   >
                     ปฎิเสธ
@@ -959,7 +941,6 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     className={classes.MbtnSave}
                     onClick={handleApprove}
                     startIcon={<CheckCircleOutline />}
-                    // sx={{ width: 140 }}
                     sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
                   >
                     อนุมัติ
@@ -976,7 +957,6 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     className={classes.MbtnSave}
                     onClick={handleReject}
                     startIcon={<SaveIcon />}
-                    // sx={{ width: 140 }}
                     sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
                   >
                     ปฎิเสธ
@@ -988,7 +968,6 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     className={classes.MbtnSave}
                     onClick={handleApprove}
                     startIcon={<CheckCircleOutline />}
-                    // sx={{ width: 140 }}
                     sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
                   >
                     อนุมัติ
@@ -1002,7 +981,6 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               type={type}
               edit={edit}
               onMapSKU={handleMapSKU}
-              // onChangeItems={handleChangeItems}
               changeItems={handleStatusChangeItems}
               update={flagSave}
               stock={flagStock}
