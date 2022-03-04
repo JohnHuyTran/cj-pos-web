@@ -817,6 +817,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             <Grid item xs={3}>
               {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
                 <BranchListDropDown
+                  valueBranch={valuebranchTo}
                   sourceBranchCode={fromBranch}
                   onChangeBranch={handleChangeToBranch}
                   isClear={clearBranchDropDown}

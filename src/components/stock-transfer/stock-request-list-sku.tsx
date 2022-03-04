@@ -130,15 +130,19 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
   const skuMapStock = async (items: any, stockBalance: any) => {
     //orderBy skuCode
     items = _.orderBy(items, ['skuCode'], ['asc']);
+
     let resultSKU: any = [];
     items.map((a: any) => {
       let stockRemain = 0;
-      if (stockBalance) {
+
+      if ((a.stock === 0 || a.stock === undefined) && stockBalance) {
         if (stockBalance.length > 0) {
           stockBalance.forEach((s: any) => {
             if (s.skuCode === a.skuCode) stockRemain = s.stockRemain;
           });
         }
+      } else if (a.stock !== 0) {
+        stockRemain = a.stock;
       }
 
       const chkduplicate: any = resultSKU.find((r: any) => r.skuCode === a.skuCode);
@@ -243,7 +247,7 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
 
           const _i: any = {
             barcode: item.barcode,
-            barcodeName: item.productName,
+            barcodeName: item.barcodeName,
             baseUnit: item.barFactor,
             qty: item.orderQty,
             skuCode: item.skuCode,
@@ -260,17 +264,20 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
 
       updateItemsState(_item);
 
-      rowsSKU = _item.map((item: any, index: number) => {
-        return {
-          id: `${item.skuCode}-${index + 1}`,
-          index: index + 1,
-          skuCode: item.skuCode,
-          skuName: item.skuName ? item.skuName : '',
-          stock: item.stock,
-          orderAllQty: item.orderAllQty ? item.orderAllQty : 0,
-          qty: item.qty ? item.qty : 0,
-        };
-      });
+      itemsMap(_item);
+
+      // rowsSKU = _item.map((item: any, index: number) => {
+      //   console.log('_item :', _item);
+      //   return {
+      //     id: `${item.skuCode}-${index + 1}`,
+      //     index: index + 1,
+      //     skuCode: item.skuCode,
+      //     skuName: item.skuName ? item.skuName : '',
+      //     stock: item.stock,
+      //     orderAllQty: item.orderAllQty ? item.orderAllQty : 0,
+      //     qty: item.qty ? item.qty : 0,
+      //   };
+      // });
     }
   }
 
