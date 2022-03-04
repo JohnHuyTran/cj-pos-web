@@ -298,6 +298,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     groupBranch ? branchFromMap : null
   );
 
+  if (valuebranchFrom?.code && !displayBtnAddItem) {
+    setDisplayBtnAddItem(true);
+  }
+
   const [valuebranchTo, setValuebranchTo] = React.useState<BranchListOptionType | null>(null);
   const [toBranch, setToBranch] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
