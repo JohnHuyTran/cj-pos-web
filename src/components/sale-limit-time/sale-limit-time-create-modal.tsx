@@ -571,7 +571,7 @@ function STCreateModal({
         ProductTypeCode: item.categoryTypeCode,
         ProductTypeName: item.categoryName,
         barcode: item.barcode,
-        unitName: item.unitFactor,
+        unitName: item.unitName,
         barcodeName: item.name,
         selectedType: 2,
         showProduct: true,
@@ -608,18 +608,24 @@ function STCreateModal({
         const formData = new FormData();
         formData.append('barcode', e.target.files[0]);
         const rs = await importST(formData);
-        if (rs.code == 20000) {
-          handleAddProduct(rs.data.appliedProducts);
+        if (!!rs.data) {
+          if (rs.code == 20000) {
+            handleAddProduct(rs.data.appliedProducts);
+            setUrlModalValidate('');
+            setOpenModalValidate(false);
+          }
+          if (rs.code == 40002) {
+            setUrlModalValidate(rs.data.link);
+            setOpenModalValidate(true);
+          }
+        } else {
+          setMsgModalValidate(rs.message);
+          setUrlModalValidate('');
+          setOpenModalValidate(true);
         }
       }
-      throw new Error('');
     } catch (error) {
-      let e: any = error;
-      if (e.code === 40002) {
-        setMsgModalValidate(e.message);
-      } else {
-        setMsgModalValidate(e.message);
-      }
+      throw error;
     }
   };
 

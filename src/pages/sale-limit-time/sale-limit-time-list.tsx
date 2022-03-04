@@ -282,6 +282,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     const newPayload = {
       ...payloadST,
       page: page,
+      perPage: pageSize,
     };
     await dispatch(updatePayloadST(newPayload));
   };
@@ -292,7 +293,9 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       perPage: cPageSize.toString(),
       page: '1',
     };
-    await dispatch(updatePayloadST(newPayload));
+    setTimeout(async () => {
+      await dispatch(updatePayloadST(newPayload));
+    }, 1000);
   };
   const handleCloseCreateModal = () => {
     setOpenDetailModal(false);
@@ -374,6 +377,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           onCellClick={handleClickCell}
+          scrollbarSize={10}
         />
       </div>
       {openDetailModal && (
