@@ -344,9 +344,18 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
   ];
 
   const handleChangePrintedDiscount = (event: any, index: number, errorIndex: number) => {
+    let currentValue = event.target.value;
+    if (stringNullOrEmpty(event.target.value)
+      || stringNullOrEmpty(event.target.value.trim())
+    ) {
+      currentValue = '0';
+    }
+    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
+      return;
+    }
     setPrintAgainRows((preData: Array<any>) => {
       const data = [...preData];
-      data[index - 1].numberOfPrinting = event.target.value ? parseInt(event.target.value.replace(/,/g, '')) : 0;
+      data[index - 1].numberOfPrinting = currentValue ? parseInt(currentValue.replace(/,/g, '')) : 0;
       return data;
     });
     if (errorList && errorList.length > 0) {
