@@ -298,8 +298,9 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     groupBranch ? branchFromMap : null
   );
 
-  if (valuebranchFrom?.code && !displayBtnAddItem) {
-    setDisplayBtnAddItem(true);
+  if (valuebranchFrom?.code) {
+    if (!displayBtnAddItem) setDisplayBtnAddItem(true);
+    if (fromBranch === '') setFromBranch(valuebranchFrom?.code);
   }
 
   const [valuebranchTo, setValuebranchTo] = React.useState<BranchListOptionType | null>(null);
@@ -313,11 +314,13 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       setFromBranch(branchCode);
 
       setDisplayBtnAddItem(true);
+      setFromBranch(branchCode);
     } else {
       setValues({ ...values, branchCode: '' });
       setFromBranch('');
     }
   };
+
   const handleChangeToBranch = (branchCode: string) => {
     setFlagSave(true);
     if (branchCode !== null) {
