@@ -198,14 +198,18 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfApprove = (event: any, index: number, errorIndex: number, barcode: string) => {
+    let currentValue = event.target.value;
     if (stringNullOrEmpty(event.target.value)
       || stringNullOrEmpty(event.target.value.trim())
-      || isNaN(event.target.value.replace(/,/g, ''))) {
+    ) {
+      currentValue = '0';
+    }
+    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
       return;
     }
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      data[index - 1].numberOfApproved = event.target.value ? parseInt(event.target.value.replace(/,/g, '')) : 0;
+      data[index - 1].numberOfApproved = currentValue ? parseInt(currentValue.replace(/,/g, '')) : 0;
       data[index - 1].approvedDiscount = data[index - 1].numberOfApproved * data[index - 1].cashDiscount;
       return data;
     });
@@ -226,21 +230,24 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfDiscount = (event: any, index: number, errorIndex: number, barcode: string) => {
+    let currentValue = event.target.value;
     if (stringNullOrEmpty(event.target.value)
       || stringNullOrEmpty(event.target.value.trim())
-      || isNaN(event.target.value.replace(/,/g, ''))) {
+    ) {
+      currentValue = '0';
+    }
+    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
       return;
     }
     let currentData: any;
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       currentData = data[index - 1];
-      data[index - 1].numberOfDiscounted = event.target.value
-        ? parseInt(event.target.value.replace(/,/g, '')) < 10000000000
-          ? parseInt(event.target.value.replace(/,/g, ''))
+      data[index - 1].numberOfDiscounted = currentValue
+        ? parseInt(currentValue.replace(/,/g, '')) < 10000000000
+          ? parseInt(currentValue.replace(/,/g, ''))
           : 0
         : 0;
-
       return data;
     });
     if (Object.keys(payloadAddItem).length !== 0) {
@@ -248,8 +255,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
       updateList.map((item: any) => {
         if (item.barcode === currentData.barCode) {
           item.qty =
-            parseInt(event.target.value.replace(/,/g, '')) < 10000000000
-              ? parseInt(event.target.value.replace(/,/g, ''))
+            parseInt(currentValue.replace(/,/g, '')) < 10000000000
+              ? parseInt(currentValue.replace(/,/g, ''))
               : 0;
         }
       });
