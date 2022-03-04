@@ -148,6 +148,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     setIsAuthorizedBranch(scm);
 
     if (type === 'View' && stockRequestDetail) {
+      setDisplayBtnAddItem(true);
       setStatus(stockRequestDetail.status);
       if (stockRequestDetail.status === 'WAIT_FOR_APPROVAL_1') {
         if (!oc) {
@@ -212,6 +213,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
       setCommentOC(commentOC[commentOC.length - 1]);
       setCommentSCM(commentSCM[commentSCM.length - 1]);
+    } else {
+      setDisplayBtnAddItem(false);
     }
   }, [open]);
 
@@ -304,6 +307,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       let codes = JSON.stringify(branchCode);
       setValues({ ...values, branchCode: JSON.parse(codes) });
       setFromBranch(branchCode);
+
+      setDisplayBtnAddItem(true);
     } else {
       setValues({ ...values, branchCode: '' });
       setFromBranch('');
@@ -870,8 +875,9 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                   className={classes.MbtnPrint}
                   onClick={handleOpenAddItems}
                   startIcon={<ControlPoint />}
+                  // sx={{ width: 200, display: `${!displayBtnAddItem ? 'none' : ''}` }}
                   sx={{ width: 200 }}
-                  disabled={fromBranch == ''}
+                  disabled={!displayBtnAddItem}
                 >
                   เพิ่มสินค้า
                 </Button>
