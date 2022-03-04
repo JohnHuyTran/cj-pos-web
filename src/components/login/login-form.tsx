@@ -67,8 +67,6 @@ function LoginForm() {
       branchCode: values.branch,
     };
     dispatch(loginKeyCloakAsync(form));
-    dispatch(featchBranchListAsync());
-    dispatch(featchAuthorizedBranchListAsync());
   };
 
   return (

@@ -15,7 +15,9 @@ import LoginForm from './components/login/login-form';
 import BarcodeDiscount from './pages/barcode-discount/barcode-discount';
 import SaleLimitTime from './pages/sale-limit-time/sale-limit-time';
 
-import { useAppSelector } from './store/store';
+import { useAppDispatch, useAppSelector } from './store/store';
+import { featchBranchListAsync } from './store/slices/search-branches-slice';
+import { featchAuthorizedBranchListAsync } from './store/slices/authorized-branch-slice';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -50,6 +52,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export default function App2() {
   const auth = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -61,6 +64,9 @@ export default function App2() {
 
   if (!auth || !auth.isLogin) {
     return <LoginForm />;
+  } else {
+    dispatch(featchBranchListAsync());
+    dispatch(featchAuthorizedBranchListAsync());
   }
 
   return (
@@ -71,14 +77,14 @@ export default function App2() {
       <Main open={open}>
         <DrawerHeader />
         <Switch>
-          <Route exact path="/" component={Home} />
-          <Route path="/barcode-discount" component={BarcodeDiscount} />
-          <Route path="/sale-limit-time" component={SaleLimitTime} />
-          <Route path="/check-order" component={CheckOrder} />
-          <Route path="/dc-check-order" component={DCCheckOrder} />
-          <Route path="/supplier-check-order" component={SupplierCheckOrder} />
-          <Route path="/stock-transfer" component={StockTransfer} />
-          <Route path="/stock-transfer-rt" component={StockTransferRt} />
+          <Route exact path='/' component={Home} />
+          <Route path='/barcode-discount' component={BarcodeDiscount} />
+          <Route path='/sale-limit-time' component={SaleLimitTime} />
+          <Route path='/check-order' component={CheckOrder} />
+          <Route path='/dc-check-order' component={DCCheckOrder} />
+          <Route path='/supplier-check-order' component={SupplierCheckOrder} />
+          <Route path='/stock-transfer' component={StockTransfer} />
+          <Route path='/stock-transfer-rt' component={StockTransferRt} />
         </Switch>
       </Main>
     </Box>
