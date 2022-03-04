@@ -158,7 +158,7 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
               skuName: a.skuName,
               qty: a.qty,
               baseUnit: a.baseUnit,
-              stock: stockRemain,
+              stock: stockRemain ? stockRemain : 0,
               orderAllQty: orderAllQtyDup + sumQty,
             };
             duplicateSKU.push(itemsDup);
@@ -177,7 +177,7 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
           skuName: a.skuName,
           qty: a.qty,
           baseUnit: a.baseUnit,
-          stock: stockRemain,
+          stock: stockRemain ? stockRemain : 0,
           orderAllQty: orderAllQty + sumQty,
         };
         resultSKU.push(item);
@@ -191,7 +191,7 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
         index: index + 1,
         skuCode: item.skuCode,
         skuName: item.skuName ? item.skuName : '',
-        stock: item.stock,
+        stock: item.stock ? item.stock : 0,
         orderAllQty: item.orderAllQty ? item.orderAllQty : 0,
         qty: item.qty ? item.qty : 0,
       };
@@ -254,7 +254,7 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
             skuName: productName,
             unitCode: item.unitCode,
             unitName: item.unitName,
-            stock: remainingQty,
+            stock: remainingQty ? remainingQty : 0,
             // orderAllQty: orderAllQty,
           };
 
