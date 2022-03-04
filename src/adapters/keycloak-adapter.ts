@@ -113,14 +113,13 @@ export function logout(): Promise<Response> {
   const params = new URLSearchParams();
   params.append('client_id', env.keycloak.clientId);
   params.append('refresh_token', refreshToken ? refreshToken : '');
-
+  removeAccessToken();
+  removeRefreshToken();
+  removeSessionId();
+  removeUserInfo();
   return instance
     .post(env.keycloak.url.logout, params)
     .then((response: AxiosResponse) => {
-      removeAccessToken();
-      removeRefreshToken();
-      removeSessionId();
-      removeUserInfo();
       if (response.status === 200) {
         return response.data;
       }

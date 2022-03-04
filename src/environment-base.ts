@@ -233,4 +233,9 @@ export const environment = {
       url: '/authority/authorized-branches',
     },
   },
+  master: {
+    branch: {
+      url: '/master/branches',
+    },
+  },
 };
