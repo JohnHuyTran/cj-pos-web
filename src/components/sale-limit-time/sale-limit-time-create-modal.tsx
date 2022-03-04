@@ -144,7 +144,7 @@ function STCreateModal({
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
-  const [remarkCancel, setRemarkCancel] = React.useState('');
+  const [remark, setRemark] = React.useState('');
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const [openModalStart, setOpenModalStart] = React.useState<boolean>(false);
   const handleCloseSnackBar = () => {
@@ -182,6 +182,7 @@ function STCreateModal({
         startTime: moment(saleLimitTimeDetail.stStartTime).format('HH:mm'),
         endTime: moment(saleLimitTimeDetail.stEndTime).format('HH:mm'),
       });
+      setRemark(saleLimitTimeDetail.remark);
       let listProducts = saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts
         ? saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts.map((item: any) => {
             return {
@@ -332,8 +333,8 @@ function STCreateModal({
     setOpenModelAddItems(false);
   };
 
-  const handleChangeComment = (value: any) => {
-    setValues({ ...values, comment: value });
+  const handleChangeRemark = (value: any) => {
+    setRemark(value);
   };
 
   const [openAlert, setOpenAlert] = React.useState(false);
@@ -402,7 +403,7 @@ function STCreateModal({
         const body = {
           stStartTime: values.stStartTime.toISOString(true),
           stEndTime: values.stEndTime.toISOString(true),
-          remark: values.comment,
+          remark: remark,
           description: values.description,
           stDetail: {
             isAllBranches: payloadBranches.isAllBranches,
@@ -471,7 +472,7 @@ function STCreateModal({
           status > 1
             ? {
                 id: payLoadSt.id,
-                remark: remarkCancel,
+                remark: remark,
               }
             : { id: payLoadSt.id };
 
@@ -890,9 +891,9 @@ function STCreateModal({
             <Grid item xs={3}>
               <TextBoxComment
                 fieldName="หมายเหตุ :"
-                defaultValue={values.comment}
+                defaultValue={remark}
                 maxLength={100}
-                onChangeComment={handleChangeComment}
+                onChangeComment={handleChangeRemark}
                 isDisable={status > 1 || !isAdmin}
                 rowDisplay={4}
               />
@@ -921,8 +922,8 @@ function STCreateModal({
       <ModelConfirm
         open={openModalCancel}
         status={status}
-        remark={remarkCancel}
-        setRemark={setRemarkCancel}
+        remark={remark}
+        setRemark={setRemark}
         onClose={handleCloseModalCancel}
         onConfirm={handleDeleteDraft}
         HQCode={payLoadSt.documentNumber}
@@ -931,9 +932,9 @@ function STCreateModal({
 
       <ModelConfirm
         open={openModalStart}
-        remark={remarkCancel}
+        remark={remark}
         status={status}
-        setRemark={setRemarkCancel}
+        setRemark={setRemark}
         onClose={handleCloseModalStart}
         onConfirm={() => handleCreateSTDetail(true)}
         HQCode={payLoadSt.documentNumber}
