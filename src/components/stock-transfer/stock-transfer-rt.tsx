@@ -22,7 +22,7 @@ import { isAllowActionPermission, isAllowMainMenuPermission, isGroupBranch } fro
 import { env } from '../../adapters/environmentConfigs';
 import { getBranchName } from '../../utils/utils';
 import { BranchListOptionType } from '../../models/branch-model';
-import { ACTIONS } from '../../utils/enum/permission-enum';
+import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import { getUserInfo } from '../../store/sessionStore';
 
 interface State {
@@ -72,6 +72,8 @@ export default function StockTransferRt() {
   const [branchFromCode, setBranchFromCode] = React.useState('');
   const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const [isAuthorizedBranch, setIsAuthorizedBranch] = React.useState<boolean>(false);
+  const [groupBranchSCM, setGroupBranchSCM] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [displayBtnCreate, setDisplayBtnCreate] = React.useState(false);
@@ -82,6 +84,7 @@ export default function StockTransferRt() {
         : env.branch.code
       : env.branch.code
   );
+
   const branchFrom = getBranchName(branchList, ownBranch);
   const branchFromMap: BranchListOptionType = {
     code: ownBranch,
@@ -93,6 +96,11 @@ export default function StockTransferRt() {
 
   React.useEffect(() => {
     setDisplayBtnCreate(isAllowActionPermission(ACTIONS.STOCK_RT_MANAGE));
+    const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
+    if (scm) {
+      setIsAuthorizedBranch(scm);
+      setGroupBranchSCM(scm);
+    }
     if (groupBranch) {
       setBranchFromCode(ownBranch);
       setValues({ ...values, branchFrom: ownBranch });
@@ -286,7 +294,9 @@ export default function StockTransferRt() {
               sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
+              isFilterAuthorizedBranch={isAuthorizedBranch}
               disable={groupBranch}
+              filterOutDC={groupBranchSCM}
             />
           </Grid>
           <Grid item xs={4}>
@@ -297,6 +307,7 @@ export default function StockTransferRt() {
               sourceBranchCode={branchFromCode}
               onChangeBranch={handleChangeBranchTo}
               isClear={clearBranchDropDown}
+              isFilterAuthorizedBranch={isAuthorizedBranch}
               filterOutDC={groupBranch}
             />
           </Grid>

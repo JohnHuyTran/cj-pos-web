@@ -17,7 +17,8 @@ import { getUserInfo } from '../store/sessionStore';
 import { getBranchName } from '../utils/utils';
 import { Menu, MenuItem } from '@mui/material';
 import { logout } from '../adapters/keycloak-adapter';
-
+import { Route } from 'react-router-dom';
+import Home from '../pages/home';
 const drawerWidth = 240;
 
 interface AppBarProps extends MuiAppBarProps {
@@ -73,7 +74,7 @@ export default function Navbar({}: Props): ReactElement {
   const handleMenuClose = async () => {
     setAnchorEl(null);
     logout();
-    window.location.reload();
+    window.location.href = '/';
   };
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
