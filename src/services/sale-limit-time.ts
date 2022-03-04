@@ -10,8 +10,6 @@ export async function importST(payload: any) {
     const response = await post(`${env.backEnd.url}${environment.sell.saleLimitTime.upload.url}`, payload);
     return response;
   } catch (error) {
-    console.log({ error });
-
     return error;
   }
 }

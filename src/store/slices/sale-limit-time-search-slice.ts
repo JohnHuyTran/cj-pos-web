@@ -23,8 +23,8 @@ const initialState: State = {
     message: '',
     data: [],
     total: 0,
-    page: 1,
-    perPage: 10,
+    page: 0,
+    perPage: 0,
     totalPage: 0,
   },
 };
