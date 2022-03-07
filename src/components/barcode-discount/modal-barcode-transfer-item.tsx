@@ -119,8 +119,13 @@ export const ModalTransferItem = (props: DataGridProps) => {
         && (Number(BDStatus.APPROVED) == dataDetail.status) || Number(BDStatus.BARCODE_PRINTED) == dataDetail.status) {
         if (rows && rows.length > 0) {
           let rowData = _.cloneDeep(rows);
-          let productPrintFilter = rowData.filter((itPro: any) => !stringNullOrEmpty(itPro.expiryDate)
-            && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day'));
+          let productPrintFilter: any[];
+          if (Number(BDStatus.BARCODE_PRINTED) == dataDetail.status) {
+            productPrintFilter = rowData.filter((itPro: any) => !stringNullOrEmpty(itPro.expiryDate)
+                && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day'));
+          } else {
+            productPrintFilter = rowData;
+          }
           dispatch(updateBarcodeDiscountPrintState(productPrintFilter));
           dispatch(updatePrintInDetail(true));
         }
@@ -724,49 +729,51 @@ export const ModalTransferItem = (props: DataGridProps) => {
   ];
   const [pageSize, setPageSize] = React.useState<number>(10);
   return (
-    <div style={{ width: '100%', height: dtTable.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
-      <DataGrid
-        rows={dtTable}
-        columns={columns}
-        pageSize={pageSize}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        rowsPerPageOptions={[10, 20, 50, 100]}
-        pagination
-        disableColumnMenu
-        autoHeight={dtTable.length < 8}
-        scrollbarSize={10}
-        rowHeight={70}
-        components={{
-          NoRowsOverlay: () => (
-            <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
-              ไม่มีข้อมูล
-            </Typography>
-          ),
-        }}
-        // onCellClick={currentlySelected}
-        // onCellFocusOut={handleCalculateItems}
-      />
+    <div>
+      <div style={{ width: '100%', height: dtTable.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+        <DataGrid
+          rows={dtTable}
+          columns={columns}
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[10, 20, 50, 100]}
+          pagination
+          disableColumnMenu
+          autoHeight={dtTable.length < 8}
+          scrollbarSize={10}
+          rowHeight={70}
+          components={{
+            NoRowsOverlay: () => (
+              <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
+                ไม่มีข้อมูล
+              </Typography>
+            ),
+          }}
+          // onCellClick={currentlySelected}
+          // onCellFocusOut={handleCalculateItems}
+        />
+      </div>
       <Box display="flex" justifyContent="space-between" paddingTop="30px">
         <Grid container spacing={2} mb={2}>
           <Grid item xs={3}>
             <TextBoxComment
-              fieldName="หมายเหตุจากผู้อนุมัติ :"
-              defaultValue={payloadBarcodeDiscount.requesterNote}
-              maxLength={100}
-              onChangeComment={handleChangeNote}
-              isDisable={dataDetail.status > 1}
-              rowDisplay={4}
+                fieldName="หมายเหตุจากผู้อนุมัติ :"
+                defaultValue={payloadBarcodeDiscount.requesterNote}
+                maxLength={100}
+                onChangeComment={handleChangeNote}
+                isDisable={dataDetail.status > 1}
+                rowDisplay={4}
             />
           </Grid>
           <Grid item xs={3}>
             <Box style={{ display: dataDetail.status > 1 ? undefined : 'none' }}>
               <TextBoxComment
-                fieldName="หมายเหตุจากผู้อนุมัติ :"
-                defaultValue={approveReject ? approveReject.approvalNote : ''}
-                maxLength={100}
-                onChangeComment={handleChangeReason}
-                isDisable={dataDetail.status > 2 || !approvePermission}
-                rowDisplay={4}
+                  fieldName="หมายเหตุจากผู้อนุมัติ :"
+                  defaultValue={approveReject ? approveReject.approvalNote : ''}
+                  maxLength={100}
+                  onChangeComment={handleChangeReason}
+                  isDisable={dataDetail.status > 2 || !approvePermission}
+                  rowDisplay={4}
               />
             </Box>
           </Grid>
@@ -777,11 +784,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 ขอส่วนลดทั้งหมด
               </Typography>
               <TextField
-                disabled
-                type="text"
-                sx={{ bgcolor: '#EAEBEB' }}
-                className={classes.MtextFieldNumberNoneArrow}
-                value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
+                  disabled
+                  type="text"
+                  sx={{ bgcolor: '#EAEBEB' }}
+                  className={classes.MtextFieldNumberNoneArrow}
+                  value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
               />
             </Box>
             <Box display="flex" justifyContent="space-between" marginTop="10px">
@@ -789,22 +796,21 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 ส่วนลดที่อนุมัติทั้งหมด
               </Typography>
               <TextField
-                type="text"
-                sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
-                inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
-                className={classes.MtextFieldNumberNoneArrow}
-                value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
+                  type="text"
+                  sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
+                  inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
+                  className={classes.MtextFieldNumberNoneArrow}
+                  value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
               />
             </Box>
           </Grid>
         </Grid>
       </Box>
-
       <SnackbarStatus
-        open={openPopupModal}
-        onClose={handleClosePopup}
-        isSuccess={true}
-        contentMsg={'คุณได้ลบข้อมูลเรียบร้อยแล้ว'}
+          open={openPopupModal}
+          onClose={handleClosePopup}
+          isSuccess={true}
+          contentMsg={'คุณได้ลบข้อมูลเรียบร้อยแล้ว'}
       />
     </div>
   );
