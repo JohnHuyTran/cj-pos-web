@@ -218,6 +218,9 @@ export const environment = {
       downloadTemplate: {
         url: '/stock/stock-request/download/template',
       },
+      importStockRequest: {
+        url: '/stock/stock-request/import',
+      },
     },
     stockBalanceCheck: {
       url: '/stock/stock-balance-check',

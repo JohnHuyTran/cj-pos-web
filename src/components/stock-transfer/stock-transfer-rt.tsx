@@ -75,6 +75,7 @@ export default function StockTransferRt() {
   const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [isAuthorizedBranch, setIsAuthorizedBranch] = React.useState<boolean>(false);
+  const [displayBtnImport, setDisplayBtnImport] = React.useState<boolean>(false);
   const [groupBranchSCM, setGroupBranchSCM] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
@@ -99,6 +100,7 @@ export default function StockTransferRt() {
   React.useEffect(() => {
     setDisplayBtnCreate(isAllowActionPermission(ACTIONS.STOCK_RT_MANAGE));
     const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
+    setDisplayBtnImport(scm);
     if (scm) {
       setIsAuthorizedBranch(scm);
       setGroupBranchSCM(scm);
@@ -382,7 +384,7 @@ export default function StockTransferRt() {
               color="primary"
               startIcon={<Download />}
               onClick={handleOpenUploadFileModal}
-              sx={{ width: '25%' }}
+              sx={{ minWidth: '25%', display: `${!displayBtnImport ? 'none' : ''}` }}
               className={classes.MbtnSearch}
             >
               Import

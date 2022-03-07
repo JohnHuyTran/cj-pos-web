@@ -249,6 +249,19 @@ const useStyles = makeStyles({
       fontSize: '12px',
     },
   },
+  MtextFieldUpload: {
+    '& .MuiOutlinedInput-root': {
+      //input
+      borderRadius: '5px !important',
+      border: '1px dashed #36C690 !important',
+      padding: '0px 4px !important',
+      minWidth: '455px',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      color: '#676767 !important',
+      fontSize: '12px',
+    },
+  },
   MbtnPrint: {
     width: '200px',
     borderRadius: '4px !important',

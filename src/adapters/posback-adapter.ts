@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { env } from './environmentConfigs';
 import store, { useAppDispatch } from '../store/store';
-import { ApiError } from '../models/api-error-model';
+import { ApiError, ApiUploadError } from '../models/api-error-model';
 import { ContentType, ERROR_CODE } from '../utils/enum/common-enum';
 import { refreshToken } from './keycloak-adapter';
 import { logout } from '../store/slices/authSlice';
@@ -122,7 +122,7 @@ export function getFile(path: string, contentType = defaultForJSON) {
     });
 }
 
-export function post(path: string, payload?: any, contentType = defaultForJSON) {
+export function post(path: string, payload?: any, contentType = defaultForJSON, actionType?: string) {
   contentType = contentType;
   return instance
     .post(path, payload)
@@ -132,6 +132,16 @@ export function post(path: string, payload?: any, contentType = defaultForJSON) 
       }
     })
     .catch((error: any) => {
+      if (actionType === 'Upload') {
+        const err = new ApiUploadError(
+          error.response?.status,
+          error.response?.data.code,
+          error.response?.data.message,
+          error.response?.data.data
+        );
+        throw err;
+      }
+
       const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });

@@ -260,3 +260,10 @@ export interface skuType {
 export interface StockBalanceResponseType {
   data: StockBalanceType[];
 }
+
+export interface ImportStockRequest {
+  file?: File;
+  startDate: string;
+  endDate: string;
+  transferReason: string;
+}
