@@ -109,6 +109,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
           deliveryOrderNo: data.deliveryOrderNo,
           actualQty: data.actualQty * 1,
           comment: data.comment,
+          isTote: data.isTote,
         };
 
         itemsApprove.push(item);

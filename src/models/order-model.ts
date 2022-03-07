@@ -177,6 +177,7 @@ export interface ItemsApprove {
   barcode: string;
   actualQty: number;
   comment: string;
+  isTote: boolean;
 }
 
 export interface OrderApproveCloseJobRequest {
