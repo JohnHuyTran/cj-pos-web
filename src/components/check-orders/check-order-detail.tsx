@@ -1,7 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
-import { Box, Button, Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  Grid,
+  Menu,
+  MenuItem,
+  MenuProps,
+  TextField,
+  Typography,
+} from '@mui/material';
 import {
   DataGrid,
   GridColDef,
@@ -38,23 +49,51 @@ import CheckOrderSDRefDetail from './check-order-detail-sd';
 import { featchOrderSDListAsync } from '../../store/slices/check-order-sd-slice';
 import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
 import Snackbar from '../commons/ui/snackbar-status';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { styled } from '@mui/material/styles';
+import AddToteModel from '../check-orders/add-tote-model';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import ModalAddItems from '../commons/ui/modal-add-items';
+import { isGroupBranch } from '../../utils/role-permission';
+import { getUserInfo } from '../../store/sessionStore';
+import { getBranchName } from '../../utils/utils';
+import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 interface loadingModalState {
   open: boolean;
 }
+
+const StyledMenu = styled((props: MenuProps) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'center',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'center',
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiPaper-root': {
+    // marginTop: theme.spacing(1),
+    boxShadow:
+      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+    '& .MuiMenuItem-root': {
+      '& .MuiSvgIcon-root': {
+        marginRight: theme.spacing(1.5),
+      },
+    },
+  },
+}));
 
 const columns: GridColDef[] = [
   {
     field: 'rowOrder',
     headerName: 'ลำดับ',
     width: 80,
-    headerAlign: 'center',
-    disableColumnMenu: true,
-    sortable: false,
-  },
-  {
-    field: 'productId',
-    headerName: 'รหัสสินค้า',
-    width: 180,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -68,12 +107,20 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'productDescription',
+    field: 'productName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
     minWidth: 160,
     flex: 1,
     sortable: false,
+    renderCell: (params) => (
+      <div>
+        <Typography variant="body2">{params.value}</Typography>
+        <Typography variant="body2" color="textSecondary">
+          {params.getValue(params.id, 'productSku') || ''}
+        </Typography>
+      </div>
+    ),
   },
   {
     field: 'productUnit',
@@ -243,6 +290,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   const [snackBarFailMsg, setSnackBarFailMsg] = React.useState('');
   const [openFailAlert, setOpenFailAlert] = React.useState(false);
   const [textFail, setTextFail] = React.useState('');
+  const [toteNo, setToteNo] = React.useState('');
+  const [showSdTypeTote, setShowSdTypeTote] = React.useState(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
@@ -256,20 +305,27 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   const [contentMsg, setContentMsg] = React.useState('');
   const [snackbarStatus, setSnackbarStatus] = React.useState(false);
 
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
+
+  // const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  // const [ownBranch, setOwnBranch] = React.useState(
+  //   getUserInfo().branch
+  //     ? getBranchName(branchList, getUserInfo().branch)
+  //       ? getUserInfo().branch
+  //       : env.branch.code
+  //     : env.branch.code
+  // );
+
+  const [displayBranchGroup, setDisplayBranchGroup] = React.useState(false);
   useEffect(() => {
-    if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
-      setShowSaveBtn(false);
-      setShowApproveBtn(false);
-      setShowCloseJobBtn(true);
-    }
-    if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
-      setShowSaveBtn(true);
-      setShowApproveBtn(true);
-      setShowCloseJobBtn(false);
-    }
-    if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
-      setIsDisplayActBtn('none');
-    }
+    const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
+    setDisplayBranchGroup(branch);
+
+    setShowSaveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
+    setShowApproveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
+    setShowCloseJobBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
+    setShowSdTypeTote(orderDetail.sdType === 0);
+
     setOpen(defaultOpen);
     setShipmentStatusText(getShipmentStatusText(orderDetail.sdStatus));
     setShipmentTypeText(getShipmentTypeText(orderDetail.sdType));
@@ -279,24 +335,34 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     }
   }, [open, openModelConfirm]);
 
+  const updateState = async (items: any) => {
+    await dispatch(updateAddItemsState(items));
+  };
+
   let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
-  let rowsEntries = entries.map((item: itemsDetail, index: number) => {
-    return {
-      rowOrder: index + 1,
-      id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
-      doNo: item.deliveryOrderNo,
-      isTote: item.isTote,
-      isDraftStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
-      productId: item.skuCode,
-      productBarCode: item.barcode,
-      productDescription: item.productName,
-      productUnit: item.unitName,
-      productQuantityRef: item.qty,
-      productQuantityActual: item.actualQty,
-      productDifference: item.qtyDiff,
-      productComment: item.comment,
-    };
-  });
+  if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
+    updateState(entries);
+  }
+  let rowsEntries: any = [];
+  if (Object.keys(payloadAddItem).length !== 0) {
+    rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
+      return {
+        rowOrder: index + 1,
+        id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
+        doNo: item.deliveryOrderNo,
+        isTote: item.isTote ? item.isTote : false,
+        isDraftStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
+        productSku: item.skuCode,
+        productBarCode: item.barcode,
+        productName: item.productName,
+        productUnit: item.unitName,
+        productQuantityRef: item.qty,
+        productQuantityActual: item.actualQty ? item.actualQty : item.qty,
+        productDifference: item.qtyDiff,
+        productComment: item.comment,
+      };
+    });
+  }
 
   if (localStorage.getItem('checkOrderRowsEdit')) {
     let localStorageEdit = JSON.parse(localStorage.getItem('checkOrderRowsEdit') || '');
@@ -356,7 +422,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         isControlStock: 0,
         toteCode: '',
         expireDate: '',
-        isTote: false,
+        isTote: data.isTote,
       };
 
       if (data.isTote === true && !(data.productQuantityActual * 1 >= 0 && data.productQuantityActual * 1 <= 1)) {
@@ -376,6 +442,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         items: itemsList,
       };
 
+      console.log('payload: ', payload);
       await saveOrderShipments(payload, sdNo)
         .then((_value) => {
           setShowSnackBar(true);
@@ -414,7 +481,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         shipmentSAPRef: '',
         skuCode: '',
         skuType: '',
-        productName: data.productDescription,
+        productName: data.productName,
         unitCode: '',
         unitName: '',
         unitFactor: 0,
@@ -426,7 +493,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         isControlStock: 0,
         toteCode: '',
         expireDate: '',
-        isTote: false,
+        isTote: data.isTote,
       };
       setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
       itemsList.push(data);
@@ -609,6 +676,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
       });
 
       if (!exit) {
+        dispatch(updateAddItemsState({}));
         localStorage.removeItem('checkOrderRowsEdit');
         setOpen(false);
         onClickClose();
@@ -620,13 +688,54 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
       if (fileInfo.base64URL) {
         setConfirmModelExit(true);
       } else {
+        dispatch(updateAddItemsState({}));
         setOpen(false);
         onClickClose();
       }
     } else {
+      dispatch(updateAddItemsState({}));
       setOpen(false);
       onClickClose();
     }
+  };
+
+  const [openModelAddTote, setOpenModelAddTote] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const openDropdown = Boolean(anchorEl);
+
+  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+
+  const handleClickAddItem = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseDropdown = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpenTote = () => {
+    setOpenModelAddTote(true);
+    setAnchorEl(null);
+  };
+
+  const handleOpenAddItem = () => {
+    setOpenModelAddItems(true);
+    setAnchorEl(null);
+  };
+
+  const handleCloseModelAddTote = () => {
+    setOpenModelAddTote(false);
+  };
+
+  const handleUpdateToteNo = (toteNo: string) => {
+    setToteNo(toteNo);
+  };
+
+  const handleOpenAddItems = () => {
+    setOpenModelAddItems(true);
+  };
+
+  const handleModelAddItems = async () => {
+    setOpenModelAddItems(false);
   };
 
   return (
@@ -763,7 +872,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           {/* DisplayBtn */}
           <Box sx={{ display: isDisplayActBtn, marginTop: 4 }}>
             <Grid container spacing={2} display="flex" justifyContent="space-between">
-              <Grid item xl={2}>
+              {/* <Grid item xl={2}> */}
+              <Grid item xl={4}>
                 <Button
                   id="btnPrint"
                   variant="contained"
@@ -772,41 +882,79 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                   startIcon={<Print />}
                   className={classes.MbtnPrint}
                   style={{ textTransform: 'none' }}
+                  sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                 >
                   พิมพ์ใบผลต่าง
                 </Button>
+
+                {showSaveBtn && (
+                  <Button
+                    id="btnAddItem"
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleClickAddItem}
+                    className={classes.MbtnAdd}
+                    sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                    // disabled={newAddItemListArray.length === 0}
+                    startIcon={<AddCircleOutlineIcon />}
+                    endIcon={<KeyboardArrowDownIcon />}
+                  >
+                    เพิ่มสินค้า
+                  </Button>
+                )}
+
+                <StyledMenu
+                  id="demo-customized-menu"
+                  MenuListProps={{
+                    'aria-labelledby': 'demo-customized-button',
+                  }}
+                  anchorEl={anchorEl}
+                  open={openDropdown}
+                  onClose={handleCloseDropdown}
+                >
+                  {showSdTypeTote && (
+                    <MenuItem sx={{ color: '#446EF2' }} onClick={handleOpenTote}>
+                      เพิ่ม Tote
+                    </MenuItem>
+                  )}
+                  <MenuItem sx={{ color: '#446EF2' }} onClick={handleOpenAddItem}>
+                    เพิ่มสินค้า
+                  </MenuItem>
+                </StyledMenu>
               </Grid>
 
               <Grid item>
-                {!showSaveBtn && (
-                  <Button
-                    id="btnSave"
-                    variant="contained"
-                    color="warning"
-                    className={classes.MbtnSave}
-                    onClick={handleSaveButton}
-                    startIcon={<SaveIcon />}
-                    style={{ width: 200 }}
-                  >
-                    บันทึก
-                  </Button>
+                {showSaveBtn && (
+                  <div>
+                    <Button
+                      id="btnSave"
+                      variant="contained"
+                      color="warning"
+                      className={classes.MbtnSave}
+                      onClick={handleSaveButton}
+                      startIcon={<SaveIcon />}
+                      style={{ width: 200 }}
+                      sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                    >
+                      บันทึก
+                    </Button>
+
+                    <Button
+                      id="btnApprove"
+                      variant="contained"
+                      color="primary"
+                      className={classes.MbtnApprove}
+                      onClick={handleApproveBtn}
+                      startIcon={<CheckCircleOutline />}
+                      style={{ width: 200 }}
+                      sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                    >
+                      ยืนยัน
+                    </Button>
+                  </div>
                 )}
 
-                {!showApproveBtn && (
-                  <Button
-                    id="btnApprove"
-                    variant="contained"
-                    color="primary"
-                    className={classes.MbtnApprove}
-                    onClick={handleApproveBtn}
-                    startIcon={<CheckCircleOutline />}
-                    style={{ width: 200 }}
-                  >
-                    ยืนยัน
-                  </Button>
-                )}
-
-                {!showCloseJobBtn && (
+                {showApproveBtn && (
                   <Button
                     id="btnClose"
                     variant="contained"
@@ -814,6 +962,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     className={classes.MbtnClose}
                     onClick={handleCloseJobBtn}
                     startIcon={<BookmarkAdded />}
+                    sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                   >
                     ปิดงาน
                   </Button>
@@ -888,6 +1037,16 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
       <Snackbar open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={snackbarStatus} contentMsg={contentMsg} />
 
       <LoadingModal open={openLoadingModal.open} />
+
+      <AddToteModel open={openModelAddTote} onClose={handleCloseModelAddTote} updateToteNo={handleUpdateToteNo} />
+
+      <ModalAddItems
+        open={openModelAddItems}
+        onClose={handleModelAddItems}
+        requestBody={{
+          skuCodes: [],
+        }}
+      ></ModalAddItems>
     </div>
   );
 }

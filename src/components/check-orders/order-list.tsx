@@ -110,6 +110,30 @@ function OrderList() {
       headerAlign: 'center',
       align: 'left',
       sortable: false,
+      // renderCell: (params) => {
+      //   if (
+      //     params.value === 'CREATED' ||
+      //     params.value === 'READY_TO_TRANSFER' ||
+      //     params.value === 'WAIT_FOR_PICKUP' ||
+      //     params.value === 'TRANSFERING'
+      //   ) {
+      //     return (
+      //       <Chip
+      //         label={t(`status.${params.value}`)}
+      //         size='small'
+      //         sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
+      //       />
+      //     );
+      //   } else if (params.value === 'COMPLETED') {
+      //     return (
+      //       <Chip
+      //         label={t(`status.${params.value}`)}
+      //         size='small'
+      //         sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
+      //       />
+      //     );
+      //   }
+      // },
     },
     {
       field: 'boxCnt',
