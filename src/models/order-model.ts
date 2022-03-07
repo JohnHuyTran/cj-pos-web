@@ -159,6 +159,7 @@ export interface itemsReq {
   deliveryOrderNo: string;
   actualQty: number;
   comment: string;
+  isTote: boolean;
 }
 
 export interface OrderSubmitResponse {

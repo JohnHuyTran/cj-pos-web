@@ -265,17 +265,17 @@ const useStyles = makeStyles({
     },
   },
   MbtnSearch: {
-    borderRadius: '5px !important',
+    borderRadius: '4px !important',
   },
   MbtnSave: {
-    width: '125px',
+    width: '100px',
     // backgroundColor: "#FBA600 !important",
     borderRadius: '4px !important',
     marginLeft: '10px !important',
     boxShadow: 'none !important',
   },
   MbtnApprove: {
-    width: '125px',
+    width: '100px',
     borderRadius: '4px !important',
     marginLeft: '10px !important',
     boxShadow: 'none !important',
@@ -283,6 +283,12 @@ const useStyles = makeStyles({
   MbtnBrowse: {
     width: '125px',
     borderRadius: '8px !important',
+    boxShadow: 'none !important',
+  },
+  MbtnAdd: {
+    width: '140px',
+    borderRadius: '4px !important',
+    marginLeft: '10px !important',
     boxShadow: 'none !important',
   },
   MtextFieldRemark: {
@@ -320,7 +326,7 @@ const useStyles = makeStyles({
     },
   },
   MbtnPrint: {
-    width: '200px',
+    width: '155px',
     borderRadius: '4px !important',
   },
   MbtnClose: {
