@@ -55,6 +55,10 @@ import { styled } from '@mui/material/styles';
 import AddToteModel from '../check-orders/add-tote-model';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import ModalAddItems from '../commons/ui/modal-add-items';
+import { isGroupBranch } from '../../utils/role-permission';
+import { getUserInfo } from '../../store/sessionStore';
+import { getBranchName } from '../../utils/utils';
+import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 interface loadingModalState {
   open: boolean;
 }
@@ -286,8 +290,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   const [snackBarFailMsg, setSnackBarFailMsg] = React.useState('');
   const [openFailAlert, setOpenFailAlert] = React.useState(false);
   const [textFail, setTextFail] = React.useState('');
-  const [toteNo, setToteNo] = React.useState({ toteNo: '' });
-  const [toteNo2, setToteNo2] = React.useState('');
+  const [toteNo, setToteNo] = React.useState('');
   const [showSdTypeTote, setShowSdTypeTote] = React.useState(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -304,7 +307,20 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
+  // const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  // const [ownBranch, setOwnBranch] = React.useState(
+  //   getUserInfo().branch
+  //     ? getBranchName(branchList, getUserInfo().branch)
+  //       ? getUserInfo().branch
+  //       : env.branch.code
+  //     : env.branch.code
+  // );
+
+  const [displayBranchGroup, setDisplayBranchGroup] = React.useState(false);
   useEffect(() => {
+    const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
+    setDisplayBranchGroup(branch);
+
     setShowSaveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
     setShowApproveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
     setShowCloseJobBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
@@ -711,8 +727,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   };
 
   const handleUpdateToteNo = (toteNo: string) => {
-    setToteNo({ toteNo: toteNo });
-    setToteNo2(toteNo);
+    setToteNo(toteNo);
   };
 
   const handleOpenAddItems = () => {
@@ -867,6 +882,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                   startIcon={<Print />}
                   className={classes.MbtnPrint}
                   style={{ textTransform: 'none' }}
+                  sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                 >
                   พิมพ์ใบผลต่าง
                 </Button>
@@ -878,7 +894,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     color="secondary"
                     onClick={handleClickAddItem}
                     className={classes.MbtnAdd}
-                    // sx={{ width: '41%', ml: 1 }}
+                    sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                     // disabled={newAddItemListArray.length === 0}
                     startIcon={<AddCircleOutlineIcon />}
                     endIcon={<KeyboardArrowDownIcon />}
@@ -918,6 +934,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                       onClick={handleSaveButton}
                       startIcon={<SaveIcon />}
                       style={{ width: 200 }}
+                      sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                     >
                       บันทึก
                     </Button>
@@ -930,6 +947,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                       onClick={handleApproveBtn}
                       startIcon={<CheckCircleOutline />}
                       style={{ width: 200 }}
+                      sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                     >
                       ยืนยัน
                     </Button>
@@ -944,6 +962,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                     className={classes.MbtnClose}
                     onClick={handleCloseJobBtn}
                     startIcon={<BookmarkAdded />}
+                    sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                   >
                     ปิดงาน
                   </Button>

@@ -317,6 +317,7 @@ function CheckOrderSearch() {
               onChangeBranch={handleChangeBranchTo}
               isClear={clearBranchDropDown}
               disable={groupBranch}
+              isFilterAuthorizedBranch={groupBranch}
             />
           </Grid>
 
