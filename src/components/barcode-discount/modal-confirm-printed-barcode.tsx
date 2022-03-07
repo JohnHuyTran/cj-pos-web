@@ -492,12 +492,12 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
                         </Box>
                         <Box mt={4} sx={{ width: '800px' }}>
                           <Box>
-                            <div style={{ width: '100%' }}
+                            <div style={{ width: '100%',  height: printAgainRows.length >= 5 ? '43vh' : 'auto' }}
                                  className={classes.MdataGridPaginationTop}>
                               <DataGrid rows={printAgainRows} columns={printAgainColumns}
                                         disableColumnMenu
                                         hideFooter
-                                        autoHeight
+                                        autoHeight={printAgainRows.length < 5}
                                         rowHeight={70}/>
                             </div>
                           </Box>

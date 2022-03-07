@@ -813,7 +813,7 @@ export default function ModalCreateBarcodeDiscount({
               </Grid>
             </Grid>
           </Grid>
-          <Box>
+          <Box >
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>
               <Box>
                 <Button
@@ -822,7 +822,7 @@ export default function ModalCreateBarcodeDiscount({
                   color='info'
                   className={classes.MbtnSearch}
                   onClick={onPrintedBarcode}
-                  disabled={!(barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail)}
+                  disabled={barcodeDiscountPrint && barcodeDiscountPrint.length == 0 && printInDetail && status == Number(BDStatus.BARCODE_PRINTED)}
                   startIcon={<PrintSharp/>}
                   sx={{ width: '208px' }}
                   style={{ display: (status >= Number(BDStatus.APPROVED) && status != Number(BDStatus.REJECT) && printPermission) ? undefined : 'none' }}
@@ -900,7 +900,9 @@ export default function ModalCreateBarcodeDiscount({
                 </Button>
               </Box>
             </Box>
-            <ModalBacodeTransferItem id='' typeDiscount={valueRadios} action={action} userPermission={userPermission}/>
+            <Box>
+              <ModalBacodeTransferItem id='' typeDiscount={valueRadios} action={action} userPermission={userPermission}/>
+            </Box>
             <Box hidden={status !== Number(BDStatus.BARCODE_PRINTED)}>
               <Typography>ประวัติการพิมพ์บาร์โค้ด</Typography>
               <DataGrid rows={printHistoryRows}
