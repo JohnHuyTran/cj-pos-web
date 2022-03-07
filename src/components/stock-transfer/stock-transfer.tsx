@@ -51,7 +51,6 @@ interface loadingModalState {
 export default function SupplierCheckOrderSearch() {
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const { t } = useTranslation(['stockTransfer', 'common']);
-  const [displaySearchBtn, setDisplaySearchBtn] = React.useState(true);
   const classes = useStyles();
   const dispatch = useAppDispatch();
   // const limit: number = 0;
@@ -87,7 +86,7 @@ export default function SupplierCheckOrderSearch() {
       : env.branch.code
   );
   React.useEffect(() => {
-    setDisplaySearchBtn(isAllowActionPermission(ACTIONS.STOCK_BT_VIEW));
+    setDisableSearchBtn(isAllowActionPermission(ACTIONS.STOCK_BT_VIEW));
     if (groupBranch) {
       setBranchFromCode(ownBranch);
       setValues({ ...values, branchFrom: ownBranch });
@@ -365,7 +364,7 @@ export default function SupplierCheckOrderSearch() {
               variant="contained"
               color="primary"
               onClick={onClickValidateForm}
-              sx={{ width: '13%', ml: 2, display: `${displaySearchBtn ? 'none' : ''}` }}
+              sx={{ width: '13%', ml: 2, display: `${disableSearchBtn ? 'none' : ''}` }}
               // sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}
             >

@@ -21,6 +21,10 @@ import { updatestockRequestItemsState } from '../../store/slices/stock-request-i
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 import { removeStockRequest } from '../../services/stock-transfer';
+import { isAllowActionPermission, isPreferredUsername } from '../../utils/role-permission';
+import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
+import { getUserInfo } from '../../store/sessionStore';
+import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 
 interface loadingModalState {
   open: boolean;
@@ -36,7 +40,6 @@ function StockTransferRtList() {
   const res: StockTransferResponse = items.orderList;
   const payload = useAppSelector((state) => state.saveSearchStockRt.searchStockTransferRt);
   // const [opensDCOrderDetail, setOpensDCOrderDetail] = React.useState(false);
-
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const columns: GridColDef[] = [
@@ -44,7 +47,6 @@ function StockTransferRtList() {
       field: 'index',
       headerName: 'ลำดับ',
       width: 70,
-      // flex: 0.7,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -64,9 +66,7 @@ function StockTransferRtList() {
     {
       field: 'startDate',
       headerName: 'วันที่โอน',
-      // width: 160,
       minWidth: 150,
-      // flex: 1,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
@@ -82,7 +82,6 @@ function StockTransferRtList() {
       field: 'branchFromName',
       headerName: 'สาขาต้นทาง',
       minWidth: 210,
-      // width: 210,
       flex: 1.2,
       headerAlign: 'center',
       sortable: false,
@@ -98,7 +97,6 @@ function StockTransferRtList() {
       field: 'branchToName',
       headerName: 'สาขาปลายทาง',
       minWidth: 210,
-      // width: 210,
       flex: 1.2,
       headerAlign: 'center',
       sortable: false,
@@ -114,8 +112,6 @@ function StockTransferRtList() {
       field: 'createdBy',
       headerName: 'ผู้สร้างรายการ',
       minWidth: 120,
-      // width: 130,
-      // flex: 1,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
@@ -124,7 +120,6 @@ function StockTransferRtList() {
       field: 'status',
       headerName: 'สถานะ RT',
       minWidth: 80,
-      // flex: 0.7,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
@@ -164,16 +159,11 @@ function StockTransferRtList() {
     {
       field: 'delete',
       headerName: ' ',
-      width: 70,
-      // minWidth: 0,
-      // flex: 0.5,
+      width: 50,
       align: 'center',
       sortable: false,
       renderCell: (params) => {
-        if (
-          params.getValue(params.id, 'status') === 'DRAFT' ||
-          params.getValue(params.id, 'status') === 'AWAITING_FOR_REQUESTER'
-        ) {
+        if (params.getValue(params.id, 'edit')) {
           return (
             <div>
               <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
@@ -186,7 +176,18 @@ function StockTransferRtList() {
     },
   ];
 
+  const [preferredUsername, setPreferredUsername] = React.useState(isPreferredUsername());
+  const [groupOC, setGroupOC] = React.useState(getUserInfo().group === PERMISSION_GROUP.OC);
   const rows = res.data.map((data: StockTransferInfo, indexs: number) => {
+    let editMode = false;
+    if (
+      (data.status === 'DRAFT' || data.status === 'AWAITING_FOR_REQUESTER') &&
+      !groupOC &&
+      data.createdBy === preferredUsername
+    ) {
+      editMode = true;
+    }
+
     return {
       id: data.id,
       index: (cuurentPage - 1) * parseInt(pageSize) + indexs + 1,
@@ -199,6 +200,7 @@ function StockTransferRtList() {
       branchTo: data.branchTo,
       createdBy: data.createdBy,
       status: data.status,
+      edit: editMode,
     };
   });
 
@@ -268,7 +270,7 @@ function StockTransferRtList() {
       setOpenModelDeleteConfirm(true);
     } else {
       handleOpenLoading('open', true);
-      await handleOpenDetailModal(params.row.rtNo);
+      await handleOpenDetailModal(params.row.rtNo, params.row.edit);
       handleOpenLoading('open', false);
     }
   };
@@ -300,10 +302,13 @@ function StockTransferRtList() {
 
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const [typeDetailModal, setTypeDetailModal] = React.useState('View');
-  const handleOpenDetailModal = async (rtNo: string) => {
+  const [editDetailModal, setEditDetailModal] = React.useState(false);
+  const handleOpenDetailModal = async (rtNo: string, edit: boolean) => {
     await dispatch(updateAddItemsState({}));
     await dispatch(updatestockRequestItemsState({}));
     setTypeDetailModal('View');
+    setEditDetailModal(edit);
+
     await dispatch(featchStockRequestDetailAsync(rtNo));
     setOpenDetailModal(true);
   };
@@ -341,6 +346,7 @@ function StockTransferRtList() {
       {openDetailModal && (
         <ModalDetailStockTransfer
           type={typeDetailModal}
+          edit={editDetailModal}
           isOpen={openDetailModal}
           onClickClose={handleCloseDetailModal}
         />

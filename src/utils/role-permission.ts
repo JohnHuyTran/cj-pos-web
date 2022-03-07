@@ -69,6 +69,11 @@ export const isGroupBranch = () => {
   return userInfo.group === PERMISSION_GROUP.BRANCH;
 };
 
+export const isPreferredUsername = () => {
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return userInfo.preferred_username;
+};
+
 const permission = {
   scm: {
     menu: {

@@ -2,6 +2,8 @@ export interface CheckOrderRequest {
   limit: string;
   page: string;
   docNo?: string;
+  shipBranchFrom?: string;
+  shipBranchTo?: string;
   branchCode?: string;
   verifyDCStatus?: string;
   orderType?: string;
@@ -31,14 +33,20 @@ export interface CheckOrderInfo {
   sdNo: string;
   branchOutNo: string;
   branchDesc: string;
-  sdStatus: number;
+  sdStatus: string;
   sdType: number;
   verifyDCStatus: number;
   hasOver: boolean;
   hasBelow: boolean;
   receivedDate: string;
+  docRefNo: string;
+  shipBranchFrom: ShipBranch;
+  shipBranchTo: ShipBranch;
 }
-
+export interface ShipBranch {
+  code: string;
+  name: string;
+}
 export interface CheckOrderDetailResponse {
   ref: string;
   code: number;
