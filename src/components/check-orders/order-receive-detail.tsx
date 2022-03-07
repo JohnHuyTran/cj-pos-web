@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppSelector, useAppDispatch } from '../../store/store';
+import { useAppDispatch } from '../../store/store';
 import {
   Box,
   Button,
@@ -19,7 +19,6 @@ import {
   ItemsInfo,
   OrderReceiveApproveRequest,
   OrderReceiveDetailInfo,
-  OrderReceiveDetailResponse,
 } from '../../models/dc-check-order-model';
 import { approveOrderReceive, searchOrderReceive } from '../../services/order-shipment';
 import OrderReceiveDetailList from '../check-orders/order-receive-detail-list';
