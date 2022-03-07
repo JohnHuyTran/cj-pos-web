@@ -155,6 +155,10 @@ export interface Item {
   toteCode?: string;
   boNo?: boolean;
   isDisable?: boolean;
+
+  orderAllQty?: number;
+  remainingQty?: number;
+  actualAllQty?: number;
 }
 
 export interface ItemGroups {

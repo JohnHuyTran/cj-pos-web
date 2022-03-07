@@ -165,7 +165,7 @@ function StockTransferSKUList({ type, edit, onMapSKU, changeItems, update, stock
   };
 
   const skuMapStock = async (_newItems: any, stockBalance: StockBalanceType[]) => {
-    //orderBy skuCode
+    console.log('_new', _newItems);
     _newItems = _.orderBy(_newItems, ['skuCode'], ['asc']);
     let resultSKU: any = [];
     _newItems.map((_new: any) => {
@@ -185,11 +185,11 @@ function StockTransferSKUList({ type, edit, onMapSKU, changeItems, update, stock
         resultSKU.forEach((dup: ItemGroups) => {
           if (dup.skuCode === _new.skuCode) {
             let orderAllQtyDup = dup.orderAllQty ? dup.orderAllQty : 0;
-            let sumQty = _new.qty * _new.baseUnit;
+            let sumQty = _new.orderAllQty * _new.barFactor;
             const itemsDup: ItemGroups = {
               skuCode: _new.skuCode,
               productName: _new.skuName,
-              orderAllQty: _new.qty,
+              orderAllQty: _new.orderAllQty,
               remainingQty: stockRemain,
               actualAllQty: orderAllQtyDup + sumQty,
             };
@@ -201,15 +201,15 @@ function StockTransferSKUList({ type, edit, onMapSKU, changeItems, update, stock
 
         resultSKU = duplicateSKU;
       } else {
-        let sumQty = _new.qty * _new.baseUnit;
+        let sumQty = _new.orderAllQty * _new.barFactor;
         let orderAllQty = _new.orderAllQty ? _new.orderAllQty : 0;
 
         const item: ItemGroups = {
           skuCode: _new.skuCode,
-          orderAllQty: orderAllQty + sumQty,
-          productName: _new.skuName,
+          productName: _new.productName,
           remainingQty: stockRemain,
-          actualAllQty: 0,
+          orderAllQty: orderAllQty + sumQty,
+          actualAllQty: _new.actualAllQty,
         };
         resultSKU.push(item);
       }
@@ -250,7 +250,7 @@ function StockTransferSKUList({ type, edit, onMapSKU, changeItems, update, stock
     // await dispatch(updatestockRequestItemsState(itemsOrderBy));
   };
 
-  const itemsMap = async (items: any) => {
+  const itemsMap = async (items: Item) => {
     skuMapStock(items, stockBalanceList);
     itemMap(items);
   };
@@ -266,25 +266,26 @@ function StockTransferSKUList({ type, edit, onMapSKU, changeItems, update, stock
     if (branchTransferInfo) {
       const itemGroups = branchTransferInfo.itemGroups ? branchTransferInfo.itemGroups : [];
       const items = branchTransferInfo.items ? branchTransferInfo.items : [];
-      console.log('item ');
       if (items.length > 0) {
         items.map((item: Item) => {
           let productName: any = '';
           let remainingQty: number = 0;
           let orderAllQty: any = 0;
+          let actualAllQty: number = 0;
           if (itemGroups.length > 0) {
             itemGroups.forEach((i: ItemGroups) => {
               if (i.skuCode === item.skuCode) {
                 productName = i.productName;
                 remainingQty = i.remainingQty ? i.remainingQty : 0;
                 orderAllQty = i.orderAllQty;
+                actualAllQty = i.actualAllQty ? i.actualAllQty : 0;
               }
             });
           }
 
           const _i: Item = {
             barcode: item.barcode,
-            barcodeName: item.productName,
+            barcodeName: item.barcodeName,
             skuCode: item.skuCode,
             productName: productName,
             unitCode: item.unitCode,
@@ -296,6 +297,9 @@ function StockTransferSKUList({ type, edit, onMapSKU, changeItems, update, stock
             isDisable: false,
             boNo: item.boNo,
 
+            orderAllQty: orderAllQty,
+            remainingQty: remainingQty,
+            actualAllQty: actualAllQty,
             // orderAllQty: orderAllQty,
           };
 
@@ -304,18 +308,19 @@ function StockTransferSKUList({ type, edit, onMapSKU, changeItems, update, stock
       }
 
       updateItemsState(_item);
+      itemsMap(_item);
 
-      rowsSKU = _item.map((item: ItemGroups, index: number) => {
-        return {
-          id: `${item.skuCode}-${index + 1}`,
-          index: index + 1,
-          skuCode: item.skuCode,
-          productName: item.productName,
-          orderAllQty: item.orderAllQty,
-          actualAllQty: item.actualAllQty,
-          remainingQty: item.remainingQty,
-        };
-      });
+      // rowsSKU = _item.map((item: Item, index: number) => {
+      //   return {
+      //     id: `${item.skuCode}-${index + 1}`,
+      //     index: index + 1,
+      //     skuCode: item.skuCode,
+      //     productName: item.productName,
+      //     orderAllQty: item.orderAllQty,
+      //     actualAllQty: item.actualAllQty,
+      //     remainingQty: item.remainingQty,
+      //   };
+      // });
     }
   }
 

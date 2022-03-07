@@ -278,7 +278,7 @@ function StockTransferItemList({ type, edit, onChangeItems, update, status, skuC
 
   const { apiRef, columns } = useApiRef();
   const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'qty') {
+    if (params.field === 'actualQty' || params.field === 'toteCode') {
       const itemsList: any = [];
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -332,7 +332,7 @@ function StockTransferItemList({ type, edit, onChangeItems, update, status, skuC
         autoHeight={rows.length >= 8 ? false : true}
         scrollbarSize={10}
         rowHeight={65}
-        onCellClick={currentlySelected}
+        // onCellClick={currentlySelected}
         onCellFocusOut={handleEditItems}
         onCellOut={handleEditItems}
         onCellKeyDown={handleEditItems}
