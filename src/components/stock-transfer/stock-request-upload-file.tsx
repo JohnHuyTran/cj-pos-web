@@ -21,8 +21,10 @@ import { fetchDownloadTemplateRT, importStockRequest } from '../../services/stoc
 import moment from 'moment';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ImportStockRequest } from '../../models/stock-transfer-model';
-import { ApiError, ApiUploadError } from '../../models/api-error-model';
+import { ApiUploadError } from '../../models/api-error-model';
 import AlertError from '../commons/ui/alert-error';
+import SnackbarStatus from '../commons/ui/snackbar-status';
+import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 
 interface Props {
   isOpen: boolean;
@@ -68,11 +70,11 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
 function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const classes = useStyles();
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
-  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  // const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [values, setValues] = React.useState<State>({
     branchFrom: '',
     branchTo: '',
@@ -85,13 +87,35 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
     setOpen(isOpen);
   }, [open]);
 
+  const [flagEdit, setFlagEdit] = React.useState(false);
+  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const handleChkEditClose = async () => {
+    if (flagEdit) {
+      setConfirmModelExit(true);
+    } else {
+      handleClose();
+    }
+  };
+
+  const handleClose = async () => {
+    onClickClose();
+  };
+  const handleNotExitModelConfirm = () => {
+    setConfirmModelExit(false);
+  };
+  const handleExitModelConfirm = async () => {
+    handleClose();
+  };
+
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const handleStartDatePicker = (value: any) => {
+    setFlagEdit(true);
     setStartDate(value);
   };
 
   const handleEndDatePicker = (value: Date) => {
+    setFlagEdit(true);
     setEndDate(value);
   };
 
@@ -102,6 +126,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
   }
 
   const handleChangeReasons = (ReasonsCode: string) => {
+    setFlagEdit(true);
     if (ReasonsCode !== null) {
       let codes = JSON.stringify(ReasonsCode);
       setValues({ ...values, transferReason: JSON.parse(codes) });
@@ -133,13 +158,14 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
 
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
   const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
-  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  // const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [validationFile, setValidationFile] = React.useState(false);
 
   const [file, setFile] = React.useState<File>();
   const [fileName, setFileName] = React.useState('');
 
   const handleFileInputChange = (e: any) => {
+    setFlagEdit(true);
     setValidationFile(false);
     setErrorBrowseFile(false);
     setMsgErrorBrowseFile('');
@@ -189,7 +215,16 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
       if (file) {
         await importStockRequest(payload, file)
           .then((value) => {
-            console.log('importStockRequest:', value);
+            // console.log('importStockRequest:', value);
+
+            setFlagEdit(false);
+            setShowSnackBar(true);
+            setSnackbarIsStatus(true);
+            setContentMsg('คุณได้Importข้อมูลเรียบร้อยแล้ว');
+
+            setTimeout(() => {
+              onClickClose();
+            }, 1000);
           })
           .catch((error: ApiUploadError) => {
             if (error.code === 40000) {
@@ -275,10 +310,17 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
     setOpenAlert(false);
   };
 
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="sm" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={onClickClose}></BootstrapDialogTitle>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleChkEditClose}></BootstrapDialogTitle>
 
         <DialogContent>
           <Grid container rowSpacing={2} columnSpacing={{ xs: 7 }}>
@@ -373,7 +415,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
                 id="btnImport"
                 variant="contained"
                 color="cancelColor"
-                // onClick={handleOpenUploadFileModal}
+                onClick={handleChkEditClose}
                 sx={{ width: '20%', mr: 2 }}
                 className={classes.MbtnClear}
               >
@@ -431,6 +473,19 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
           </DialogActions>
         </Dialog>
       )}
+
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={contentMsg}
+      />
+
+      <ConfirmModelExit
+        open={confirmModelExit}
+        onClose={handleNotExitModelConfirm}
+        onConfirm={handleExitModelConfirm}
+      />
     </div>
   );
 }
