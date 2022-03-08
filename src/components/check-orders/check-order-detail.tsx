@@ -263,7 +263,7 @@ interface fileInfoProps {
   base64URL: any;
 }
 
-export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClickClose }: CheckOrderDetailProps) {
+export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickClose }: CheckOrderDetailProps) {
   const classes = useStyles();
   const sdRef = useAppSelector((state) => state.checkOrderSDList.orderList);
   const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
@@ -438,11 +438,11 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
 
     if (qtyIsValid) {
       const payload: SaveDraftSDRequest = {
-        shipmentNo: shipmentNo,
+        shipmentNo: docRefNo,
         items: itemsList,
       };
 
-      console.log('payload: ', payload);
+      // console.log('payload: ', payload);
       await saveOrderShipments(payload, sdNo)
         .then((_value) => {
           setShowSnackBar(true);
@@ -749,10 +749,10 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร LD:</Typography>
+                <Typography variant="body2">เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetail.shipmentNo}</Typography>
+                <Typography variant="body2">{docRefNo}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">สถานะ:</Typography>
@@ -996,7 +996,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         <CheckOrderSDRefDetail
           sdNo={sdNo}
           sdRefNo={orderDetail.Comment}
-          shipmentNo={shipmentNo}
+          shipmentNo={docRefNo}
           defaultOpen={opensSD}
           onClickClose={isClosSDModal}
         />
@@ -1006,7 +1006,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
         onUpdateShipmentStatus={handleShowSnackBar}
-        shipmentNo={shipmentNo}
+        shipmentNo={docRefNo}
         sdNo={sdNo}
         action={action}
         items={itemsDiffState}
