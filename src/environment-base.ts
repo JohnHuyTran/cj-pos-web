@@ -32,7 +32,7 @@ export const environment = {
         url: '/order/shipment/search',
       },
       approveOrderReceive: {
-        url: '/order//shipment/submit',
+        url: '/order/shipment/submit',
       },
     },
     dcCheckOrder: {
