@@ -5,6 +5,7 @@ import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
 import { ApiError } from '../models/api-error-model';
 import { OrderReceiveApproveRequest } from '../models/dc-check-order-model';
+import { ContentType } from '../utils/enum/common-enum';
 
 export async function saveOrderShipments(payload: SaveDraftSDRequest, sdNo: string) {
   try {
@@ -25,14 +26,49 @@ export async function approveOrderShipments(sdNo: string, payload: any) {
   return response;
 }
 
-export async function closeOrderShipments(sdNo: string, payload: any) {
+// export async function closeOrderShipments(sdNo: string, payload: any) {
+//   try {
+//     const response = await put(getPathClose(sdNo), payload).then((result: any) => result);
+//     return response;
+//   } catch (error) {
+//     throw error;
+//   }
+// }
+
+export async function closeOrderShipments(sdNo: string, fileList: File[]) {
+  const bodyFormData = new FormData();
+  // bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  fileList.map((file: File) => {
+    return bodyFormData.append('file[]', file);
+  });
+
   try {
-    const response = await put(getPathClose(sdNo), payload).then((result: any) => result);
+    const response = await put(getPathClose(sdNo), bodyFormData, ContentType.MULTIPART).then((result: any) => result);
     return response;
   } catch (error) {
     throw error;
   }
 }
+
+// export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string, fileList: File[]) {
+//   const bodyFormData = new FormData();
+//   bodyFormData.append('requestBody', JSON.stringify(payload));
+
+//   fileList.map((data: File) => {
+//     return bodyFormData.append('file[]', data);
+//   });
+
+//   try {
+//     const response = await put(getPathSaveDraft(piNo), bodyFormData, ContentType.MULTIPART).then(
+//       (result: any) => result
+//     );
+//     return response;
+//   } catch (error) {
+//     console.log('error = ', error);
+//     throw error;
+//   }
+// }
 
 export async function fetchShipmentDeliverlyPDF(sdNo: string) {
   try {

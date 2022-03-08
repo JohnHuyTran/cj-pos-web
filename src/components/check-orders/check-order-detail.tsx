@@ -59,6 +59,8 @@ import { isGroupBranch } from '../../utils/role-permission';
 import { getUserInfo } from '../../store/sessionStore';
 import { getBranchName } from '../../utils/utils';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import AccordionUploadFile from '../commons/ui/accordion-upload-file';
+import theme from '../../styles/theme';
 interface loadingModalState {
   open: boolean;
 }
@@ -306,15 +308,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   const [snackbarStatus, setSnackbarStatus] = React.useState(false);
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-
-  // const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
-  // const [ownBranch, setOwnBranch] = React.useState(
-  //   getUserInfo().branch
-  //     ? getBranchName(branchList, getUserInfo().branch)
-  //       ? getUserInfo().branch
-  //       : env.branch.code
-  //     : env.branch.code
-  // );
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   const [displayBranchGroup, setDisplayBranchGroup] = React.useState(false);
   useEffect(() => {
@@ -502,20 +496,35 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
   };
 
-  const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
-    file: null,
-    fileName: '',
-    base64URL: '',
-  });
+  // const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
+  //   file: null,
+  //   fileName: '',
+  //   base64URL: '',
+  // });
+
+  const validateFileInfo = () => {
+    const isvalid = fileUploadList.length > 0 ? true : false;
+    if (!isvalid) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาแนบเอกสาร');
+      return false;
+    }
+    return true;
+  };
 
   const handleCloseJobBtn = () => {
-    if (!fileInfo.base64URL) {
-      setErrorBrowseFile(true);
-      setMsgErrorBrowseFile('กรุณาแนบไฟล์เอกสาร');
-    } else if (validationFile === true) {
-      setOpenFailAlert(true);
-      setTextFail('กรุณาตรวจสอบ ไฟล์เอกสาร');
-    } else {
+    // if (!fileInfo.base64URL) {
+    //   setErrorBrowseFile(true);
+    //   setMsgErrorBrowseFile('กรุณาแนบไฟล์เอกสาร');
+    // } else if (validationFile === true) {
+    //   setOpenFailAlert(true);
+    //   setTextFail('กรุณาตรวจสอบ ไฟล์เอกสาร');
+    // } else {
+    //   setOpenModelConfirm(true);
+    //   setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
+    // }
+    const isFileValidate: boolean = validateFileInfo();
+    if (isFileValidate) {
       setOpenModelConfirm(true);
       setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
     }
@@ -552,25 +561,25 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     });
   };
 
-  const handleFileInputChange = (e: any) => {
-    setValidationFile(false);
-    setErrorBrowseFile(false);
-    setMsgErrorBrowseFile('');
-    checkSizeFile(e);
+  // const handleFileInputChange = (e: any) => {
+  //   setValidationFile(false);
+  //   setErrorBrowseFile(false);
+  //   setMsgErrorBrowseFile('');
+  //   checkSizeFile(e);
 
-    let file: File = e.target.files[0];
-    let fileType = file.type.split('/');
-    const fileName = `${sdNo}-01.${fileType[1]}`;
+  //   let file: File = e.target.files[0];
+  //   let fileType = file.type.split('/');
+  //   const fileName = `${sdNo}-01.${fileType[1]}`;
 
-    getBase64(file)
-      .then((result: any) => {
-        file = result;
-        setFileInfo({ ...fileInfo, base64URL: result, fileName: fileName });
-      })
-      .catch((err: any) => {
-        console.log(err);
-      });
-  };
+  //   getBase64(file)
+  //     .then((result: any) => {
+  //       file = result;
+  //       setFileInfo({ ...fileInfo, base64URL: result, fileName: fileName });
+  //     })
+  //     .catch((err: any) => {
+  //       console.log(err);
+  //     });
+  // };
 
   const checkSizeFile = (e: any) => {
     const fileSize = e.target.files[0].size;
@@ -685,7 +694,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         setConfirmModelExit(true);
       }
     } else if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
-      if (fileInfo.base64URL) {
+      // if (fileInfo.base64URL) {
+      if (fileUploadList.length > 0) {
         setConfirmModelExit(true);
       } else {
         dispatch(updateAddItemsState({}));
@@ -730,12 +740,13 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     setToteNo(toteNo);
   };
 
-  const handleOpenAddItems = () => {
-    setOpenModelAddItems(true);
-  };
-
   const handleModelAddItems = async () => {
     setOpenModelAddItems(false);
+  };
+
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
+  const handleOnChangeUploadFile = (status: boolean) => {
+    setUploadFileFlag(status);
   };
 
   return (
@@ -795,6 +806,15 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
               </Grid>
               <Grid item lg={4}>
                 {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
+                  <AccordionUploadFile
+                    files={[]}
+                    docNo=""
+                    docType=""
+                    isStatus={uploadFileFlag}
+                    onChangeUploadFile={handleOnChangeUploadFile}
+                  />
+                )}
+                {/* {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
                   <div>
                     {errorBrowseFile === true && (
                       <TextField
@@ -839,7 +859,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
                       </Button>
                     </label>
                   </div>
-                )}
+                )} */}
 
                 {orderDetail.sdImageFile !== '' &&
                   orderDetail.sdImageFile !== 'temp' &&
@@ -1012,8 +1032,8 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         items={itemsDiffState}
         percentDiffType={false}
         percentDiffValue="0"
-        fileName={fileInfo.fileName}
-        imageContent={fileInfo.base64URL}
+        // fileName={fileInfo.fileName}
+        // imageContent={fileInfo.base64URL}
       />
 
       <ConfirmExitModel

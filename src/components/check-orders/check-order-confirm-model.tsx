@@ -8,13 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
-import {
-  Entry,
-  ItemsApprove,
-  OrderApproveCloseJobRequest,
-  OrderApproveRequest,
-  ShipmentRequest,
-} from '../../models/order-model';
+import { Entry, ItemsApprove, OrderApproveRequest, ShipmentRequest } from '../../models/order-model';
 import { approveOrderShipments, closeOrderShipments } from '../../services/order-shipment';
 import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import DataDiffInfo from './table-diff-info';
@@ -34,8 +28,8 @@ interface ConfirmOrderShipment {
   items: Entry[];
   percentDiffType: boolean;
   percentDiffValue: string;
-  fileName: string;
-  imageContent: string;
+  // fileName?: string ;
+  // imageContent?: string;
 }
 
 interface loadingModalState {
@@ -84,8 +78,8 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     items,
     percentDiffType,
     percentDiffValue,
-    fileName,
-    imageContent,
+    // fileName,
+    // imageContent,
   } = props;
   const searchState = useAppSelector((state) => state.saveSearchOrder);
   const payloadSearchOrder: ShipmentRequest = searchState.searchCriteria;
@@ -93,6 +87,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -133,12 +128,12 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         }
       );
     } else if (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
-      const payload: OrderApproveCloseJobRequest = {
-        imageFileName: fileName,
-        imageFile: imageContent,
-      };
+      // const payload: OrderApproveCloseJobRequest = {
+      //   imageFileName: fileName,
+      //   imageFile: imageContent,
+      // };
 
-      await closeOrderShipments(sdNo, payload)
+      await closeOrderShipments(sdNo, fileUploadList)
         .then(
           async function (value) {
             await updateShipmentOrder();
@@ -209,13 +204,6 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         maxWidth="md"
         sx={{ minWidth: 500 }}
       >
-        {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && items.length > 0 && <DialogContent>
-                <DialogContentText id='alert-dialog-description'>
-                    <Typography variant="body2" gutterBottom>ยืนยันการตรวจสอบ <br /> เลขที่เอกสาร {shipmentNo} show table</Typography>
-                </DialogContentText>
-            </DialogContent>
-            } */}
-
         {action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
           <div>
             <DialogContent>
@@ -256,7 +244,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
           </div>
         )}
 
-        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent && (
+        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && fileUploadList.length > 0 && (
           <div>
             <DialogContent>
               <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
@@ -280,7 +268,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
           </div>
         )}
 
-        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && !imageContent && (
+        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && fileUploadList.length < 0 && (
           <DialogActions sx={{ justifyContent: 'center' }}>
             <Button id="btnAccept" variant="contained" size="small" color="primary" onClick={handleClose}>
               รับทราบ
@@ -289,7 +277,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         )}
 
         {(action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE ||
-          (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent)) && (
+          (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && fileUploadList.length > 0)) && (
           <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
             <Button
               id="btnCancel"
