@@ -420,17 +420,18 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
                             พิมพ์บาร์โค้ดส่วนลดสินค้าใกล้หมดอายุตามเกณฑ์
                           </Typography>
                         </Box>
-                        <Box mt={4} sx={{ width: '800px' }}>
+                        <Box mt={4} sx={{ width: '850px' }}>
                           <Box>
                             <Typography variant="h6">รายการสินค้าที่ไม่สามารถพิมพ์ได้</Typography>
                           </Box>
                           <Box>
-                            <div style={{ width: '100%' }}
+                            <div style={{ width: '100%', height: notPrintColumns.length >= 5 ? '43vh' : 'auto' }}
                                  className={classes.MdataGridPaginationTop}>
                               <DataGrid rows={notPrintRows} columns={notPrintColumns}
                                         disableColumnMenu
                                         hideFooter
-                                        autoHeight
+                                        scrollbarSize={10}
+                                        autoHeight={notPrintColumns.length < 5}
                                         rowHeight={70}/>
                             </div>
                           </Box>
@@ -490,17 +491,16 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
                             </Typography>
                           </FormControl>
                         </Box>
-                        <Box mt={4} sx={{ width: '800px' }}>
-                          <Box>
-                            <div style={{ width: '100%',  height: printAgainRows.length >= 5 ? '43vh' : 'auto' }}
-                                 className={classes.MdataGridPaginationTop}>
-                              <DataGrid rows={printAgainRows} columns={printAgainColumns}
-                                        disableColumnMenu
-                                        hideFooter
-                                        autoHeight={printAgainRows.length < 5}
-                                        rowHeight={70}/>
-                            </div>
-                          </Box>
+                        <Box mt={4} sx={{ width: '850px' }}>
+                          <div style={{ width: '100%', height: printAgainRows.length >= 5 ? '43vh' : 'auto' }}
+                               className={classes.MdataGridPaginationTop}>
+                            <DataGrid rows={printAgainRows} columns={printAgainColumns}
+                                      disableColumnMenu
+                                      hideFooter
+                                      scrollbarSize={10}
+                                      autoHeight={printAgainRows.length < 5}
+                                      rowHeight={70}/>
+                          </div>
                         </Box>
                       </div>
                     )

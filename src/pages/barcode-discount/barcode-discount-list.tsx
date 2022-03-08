@@ -69,7 +69,8 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
           sumOfPrice: genTotalPrice(data.products),
           sumOfCashDiscount: genTotalCashDiscount(data.percentDiscount, data.products),
           sumOfPriceAfterDiscount: genTotalPriceAfterDiscount(data.percentDiscount, data.products),
-          branch: data.branchName,
+          branch: stringNullOrEmpty(data.branchCode) ? (stringNullOrEmpty(data.branchName) ? '' : data.branchName)
+            : (data.branchCode + ' - ' + (stringNullOrEmpty(data.branchName) ? '' : data.branchName)),
           createdDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
           approvedDate: stringNullOrEmpty(data.approvedDate)
             ? ''
@@ -219,7 +220,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
-      minWidth: 120,
+      minWidth: 140,
       renderCell: (params) => genRowStatus(params),
     },
     {
@@ -228,28 +229,17 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       align: 'right',
       sortable: false,
-      minWidth: 115,
-      width: 115,
+      minWidth: 120,
+      width: 120,
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
             <Typography variant="body2" noWrap>
-              <b>{t('headerName.quantity')}</b>
-            </Typography>
-            <Typography variant="body2" noWrap>
-              <b>{t('headerName.total')}</b>
+              <b>{'จำนวน (รายการ)'}</b>
             </Typography>
           </div>
         );
       },
-    },
-    {
-      field: 'unit',
-      headerName: t('unit'),
-      headerAlign: 'center',
-      sortable: false,
-      minWidth: 70,
-      width: 70,
     },
     {
       field: 'sumOfPrice',
@@ -319,7 +309,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       headerName: t('branch'),
       headerAlign: 'center',
       sortable: false,
-      minWidth: 110,
+      minWidth: 150,
       renderCell: (params) => renderCell(params.value),
     },
     {
@@ -355,7 +345,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       headerName: t('remark'),
       headerAlign: 'center',
       sortable: false,
-      minWidth: 105,
+      minWidth: 110,
       renderCell: (params) => renderCell(params.value),
     },
   ];
@@ -480,7 +470,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       <Box mt={2} bgcolor="background.paper">
         <div
           className={classes.MdataGridPaginationTop}
-          style={{ height: lstBarcodeDiscount.length >= 10 ? '60vh' : 'auto' }}
+          style={{ height: lstBarcodeDiscount.length >= 10 ? '62vh' : 'auto' }}
         >
           <DataGrid
             rows={lstBarcodeDiscount}
