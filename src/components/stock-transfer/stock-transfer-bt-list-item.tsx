@@ -228,8 +228,6 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     });
 
   React.useEffect(() => {
-    // const isCreate = branchTransferInfo.status === 'CREATED';
-    // setIsDisable(isGroupBranch() && isCreate ? false : true);
     storeItemAddItem(payloadAddItem);
   }, [payloadAddItem]);
 
@@ -316,31 +314,45 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     dispatch(updateAddItemsGroupState(orderItem));
   };
 
-  const storeItem = async () => {
+  const storeItem = async (params: GridCellParams) => {
+    let _items = [...branchTransferItems];
     let _sku = [...skuGroupItems];
     let _newSku: ItemGroups[] = [];
+
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const items: Item[] = [];
-    rowsEdit.forEach((data: GridRowData) => {
-      const newData: Item = {
-        seqItem: data.seqItem,
-        barcode: data.barcode,
-        barcodeName: data.barcodeName,
-        skuCode: data.skuCode,
-        unitName: data.unitName,
-        actualQty: data.actualQty,
-        toteCode: data.toteCode,
-        isDisable: isDisable,
-        boNo: data.boNo,
-        barFactor: data.barFactor,
-        unitCode: data.unitCode ? data.unitCode : 0,
-        orderQty: data.orderQty ? data.orderQty : 0,
-      };
-      items.push(newData);
+
+    // _items.forEach((dataItem: Item) => {
+    rowsEdit.forEach((dataRow: GridRowData) => {
+      const dupItem: any = branchTransferItems.find((item: Item, index: number) => {
+        return item.barcode === dataRow.barcode;
+      });
+
+      if (dupItem) {
+        const newData: Item = {
+          seqItem: dataRow.seqItem,
+          barcode: dataRow.barcode,
+          barcodeName: dataRow.barcodeName,
+          skuCode: dataRow.skuCode,
+          unitName: dataRow.unitName,
+          actualQty: dataRow.actualQty,
+          toteCode: dataRow.toteCode,
+          isDisable: isDisable,
+          boNo: dataRow.boNo,
+          barFactor: dataRow.barFactor,
+          unitCode: dataRow.unitCode ? dataRow.unitCode : 0,
+          orderQty: dataRow.orderQty ? dataRow.orderQty : 0,
+        };
+
+        _.remove(_items, function (item: Item) {
+          return item.barcode === dataRow.barcode;
+        });
+        _items = [..._items, newData];
+      }
     });
+    // });
 
     _sku.forEach((data: ItemGroups) => {
-      const sum = items
+      const sum = _items
         .filter((dataItem: Item) => {
           return data.skuCode === dataItem.skuCode;
         })
@@ -359,10 +371,10 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
       };
       _newSku.push(newData);
     });
-
-    await setBranchTransferItems(items);
+    // const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
     await dispatch(updateAddItemSkuGroupState(_newSku));
-    await dispatch(updateAddItemsGroupState(items));
+    await dispatch(updateAddItemsGroupState(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc'])));
+    await setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
   };
 
   let newColumns = [...columns];
@@ -372,17 +384,17 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     newColumns[7]['hide'] = true;
   }
 
-  const handleFocusOut = () => {
-    storeItem();
+  const handleFocusOut = (params: GridCellParams) => {
+    storeItem(params);
   };
-  const handleOnKeyDown = () => {
-    storeItem();
+  const handleOnKeyDown = (params: GridCellParams) => {
+    storeItem(params);
   };
-  const handleOnCellClick = () => {
-    storeItem();
+  const handleOnCellClick = (params: GridCellParams) => {
+    storeItem(params);
   };
-  const handleOnCellOut = () => {
-    storeItem();
+  const handleOnCellOut = (params: GridCellParams) => {
+    storeItem(params);
   };
 
   return (
@@ -400,9 +412,9 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           scrollbarSize={10}
           rowHeight={65}
           onCellFocusOut={handleFocusOut}
-          onCellClick={handleOnCellClick}
+          // onCellClick={handleOnCellClick}
           // onCellKeyDown={handleOnKeyDown}
-          onCellOut={handleOnCellOut}
+          // onCellOut={handleOnCellOut}
           // onSelectionModelChange={handleOnSelectionModelChange}
           // onCellBlur={handleOnCellBlur}
         />
