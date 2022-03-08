@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
+import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
@@ -227,7 +227,19 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       sortable: false,
       minWidth: 170,
-      renderCell: (params) => renderCell(params.value),
+      renderCell: (params) => {
+        if (params.value) {
+          let len = String(params.value).length;
+          return (
+            <Tooltip title={params.value ? params.value : ''}>
+              <Typography>
+                {String(params.value).slice(0, 31)}
+                {len > 30 ? '...' : ''}
+              </Typography>
+            </Tooltip>
+          );
+        }
+      },
     },
   ];
 
@@ -333,7 +345,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
 
       if (rs.code === 20000) {
         setOpenPopup(true);
-        setPopupMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว');
         props.onSearch();
       } else {
         setOpenAlert(true);
