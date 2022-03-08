@@ -240,6 +240,12 @@ export const environment = {
       remove: {
         url: '/stock/stock-request/remove/{rtNo}',
       },
+      downloadTemplate: {
+        url: '/stock/stock-request/download/template',
+      },
+      importStockRequest: {
+        url: '/stock/stock-request/import',
+      },
     },
     stockBalanceCheck: {
       url: '/stock/stock-balance-check',

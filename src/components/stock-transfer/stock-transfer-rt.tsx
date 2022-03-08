@@ -24,6 +24,8 @@ import { getBranchName } from '../../utils/utils';
 import { BranchListOptionType } from '../../models/branch-model';
 import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import { getUserInfo } from '../../store/sessionStore';
+import { Download } from '@mui/icons-material';
+import ModalUploadFile from './stock-request-upload-file';
 
 interface State {
   docNo: string;
@@ -73,6 +75,7 @@ export default function StockTransferRt() {
   const [branchToCode, setBranchToCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [isAuthorizedBranch, setIsAuthorizedBranch] = React.useState<boolean>(false);
+  const [displayBtnImport, setDisplayBtnImport] = React.useState<boolean>(false);
   const [groupBranchSCM, setGroupBranchSCM] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
@@ -97,6 +100,7 @@ export default function StockTransferRt() {
   React.useEffect(() => {
     setDisplayBtnCreate(isAllowActionPermission(ACTIONS.STOCK_RT_MANAGE));
     const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
+    setDisplayBtnImport(scm);
     if (scm) {
       setIsAuthorizedBranch(scm);
       setGroupBranchSCM(scm);
@@ -266,6 +270,14 @@ export default function StockTransferRt() {
     setOpenCreateModal(false);
   }
 
+  const [openUploadFileModal, setOpenUploadFileModal] = React.useState(false);
+  const handleOpenUploadFileModal = async () => {
+    setOpenUploadFileModal(true);
+  };
+  const handleCloseUploadFileModal = async () => {
+    setOpenUploadFileModal(false);
+  };
+
   return (
     <>
       <Box>
@@ -360,8 +372,25 @@ export default function StockTransferRt() {
             </Typography>
             <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
           </Grid>
+        </Grid>
+      </Box>
 
-          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+      <Box mb={6}>
+        <Grid container spacing={2} mt={4} mb={2}>
+          <Grid item xs={5}>
+            <Button
+              id="btnImport"
+              variant="contained"
+              color="primary"
+              startIcon={<Download />}
+              onClick={handleOpenUploadFileModal}
+              sx={{ minWidth: '25%', display: `${!displayBtnImport ? 'none' : ''}` }}
+              className={classes.MbtnSearch}
+            >
+              Import
+            </Button>
+          </Grid>
+          <Grid item xs={7} sx={{ textAlign: 'end' }}>
             <Button
               id="btnCreateStockTransferModal"
               variant="contained"
@@ -396,8 +425,6 @@ export default function StockTransferRt() {
           </Grid>
         </Grid>
       </Box>
-
-      <Box mt={6}></Box>
       {orderListData}
 
       <LoadingModal open={openLoadingModal.open} />
@@ -410,6 +437,10 @@ export default function StockTransferRt() {
           isOpen={openCreateModal}
           onClickClose={handleCloseCreateModal}
         />
+      )}
+
+      {openUploadFileModal && (
+        <ModalUploadFile isOpen={openUploadFileModal} onClickClose={handleCloseUploadFileModal} />
       )}
     </>
   );

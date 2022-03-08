@@ -56,6 +56,14 @@ const useStyles = makeStyles({
       '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
     },
   },
+  MtextUpLoadFile: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      border: '1px dashed #36C690 !important',
+      height: '2.3em !important',
+      // maxWidth: '90% !important',
+    },
+  },
   MtimeTextField: {
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
@@ -319,6 +327,19 @@ const useStyles = makeStyles({
       border: '1px dashed #36C690 !important',
       padding: '0px 4px !important',
       minWidth: '235px',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      color: '#676767 !important',
+      fontSize: '12px',
+    },
+  },
+  MtextFieldUpload: {
+    '& .MuiOutlinedInput-root': {
+      //input
+      borderRadius: '5px !important',
+      border: '1px dashed #36C690 !important',
+      padding: '0px 4px !important',
+      minWidth: '455px',
     },
     '& .MuiOutlinedInput-root input::placeholder': {
       color: '#676767 !important',
