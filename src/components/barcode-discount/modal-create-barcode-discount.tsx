@@ -244,7 +244,8 @@ export default function ModalCreateBarcodeDiscount({
             unitPrice: item.price || 0,
             discount: item.requestedDiscount || 0,
             qty: item.numberOfDiscounted || 0,
-            numberOfApproved: item.numberOfApproved || 0,
+            numberOfApproved: (Number(BDStatus.WAIT_FOR_APPROVAL) == barcodeDiscountDetail.status && approvePermission)
+              ? (item.numberOfDiscounted || 0) : (item.numberOfApproved || 0),
             expiryDate: item.expiredDate,
             skuCode: item.skuCode,
           });
@@ -336,7 +337,7 @@ export default function ModalCreateBarcodeDiscount({
               !preData.requestedDiscount
             ) {
               isValid = false;
-              item.errorDiscount = 'ยลดต้องมากกว่า 0';
+              item.errorDiscount = 'ยอดลดต้องมากกว่า 0';
             } else if (preData.requestedDiscount >= preData.price) {
               isValid = false;
               item.errorDiscount = 'ยอดลดต้องไม่เกินราคาปกติ';
@@ -350,9 +351,9 @@ export default function ModalCreateBarcodeDiscount({
             isValid = false;
             item.errorExpiryDate = 'กรุณาระบุวันหมดอายุ';
           } else {
-            if (moment(preData.expiredDate).isSameOrBefore(moment(new Date()), 'day')) {
+            if (moment(preData.expiredDate).isBefore(moment(new Date()), 'day')) {
               isValid = false;
-              item.errorExpiryDate = 'วันที่หมดอายุต้องใหญ่กว่านี้วันนี้';
+              item.errorExpiryDate = 'วันที่หมดอายุต้องมากกว่าหรือเท่ากับวันที่วันนี้';
             }
           }
         }
@@ -781,7 +782,7 @@ export default function ModalCreateBarcodeDiscount({
                 สาขา :
               </Grid>
               <Grid item xs={8}>
-                0223-สาขาที่00236 สนามจันทร์ (ชุมชนจัทรคามพิทักษ์)
+                0002 - สาขาที่00013 ท่าวัด
               </Grid>
             </Grid>
             <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
@@ -813,7 +814,7 @@ export default function ModalCreateBarcodeDiscount({
               </Grid>
             </Grid>
           </Grid>
-          <Box >
+          <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>
               <Box>
                 <Button
@@ -901,7 +902,8 @@ export default function ModalCreateBarcodeDiscount({
               </Box>
             </Box>
             <Box>
-              <ModalBacodeTransferItem id='' typeDiscount={valueRadios} action={action} userPermission={userPermission}/>
+              <ModalBacodeTransferItem id='' typeDiscount={valueRadios} action={action}
+                                       userPermission={userPermission}/>
             </Box>
             <Box hidden={status !== Number(BDStatus.BARCODE_PRINTED)}>
               <Typography>ประวัติการพิมพ์บาร์โค้ด</Typography>

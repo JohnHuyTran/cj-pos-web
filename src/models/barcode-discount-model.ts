@@ -33,6 +33,7 @@ export interface BarcodeDiscount {
     sumOfPrice: number;
     sumOfCashDiscount: number;
     sumOfPriceAfterDiscount: number;
+    branchCode: string;
     branchName: string;
     createdDate: string;
     approvedDate: string;
