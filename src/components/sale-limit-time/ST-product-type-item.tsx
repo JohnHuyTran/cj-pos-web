@@ -8,14 +8,16 @@ import { useStyles } from '../../styles/makeTheme';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { GridSelectionModel } from '@mui/x-data-grid';
+import { setCheckEdit, setProductList } from '../../store/slices/sale-limit-time-slice';
 
 const _ = require('lodash');
 
 interface Props {
   unSelectAllType: boolean;
+  disabled?: boolean;
 }
 
-export default function STProductTypeItems({ unSelectAllType }: Props): ReactElement {
+export default function STProductTypeItems({ unSelectAllType, disabled }: Props): ReactElement {
   const classes = useStyles();
   const [dtTable, setDtTable] = React.useState([]);
   const dispatch = useAppDispatch();
@@ -63,6 +65,7 @@ export default function STProductTypeItems({ unSelectAllType }: Props): ReactEle
       }
     });
     dispatch(updateAddTypeAndProductState(newList));
+    dispatch(setProductList(value.productTypeName));
   };
 
   const columns: GridColDef[] = [
@@ -131,15 +134,22 @@ export default function STProductTypeItems({ unSelectAllType }: Props): ReactEle
         };
 
         const handleDeleteItem = () => {
-          let newList = payloadAddTypeProduct
+          let newList = _.cloneDeep(payloadAddTypeProduct)
             .filter((r: any) => r.productTypeCode !== params.row.id)
             .filter((r: any) => {
-              if (r.productByType) {
+              if (r.selectedType === 2) {
                 return r.ProductTypeCode !== params.row.id;
               } else {
                 return true;
               }
             });
+          newList.map((el: any) => {
+            if (el.selectedType === 2) {
+              el.showProduct = true;
+            }
+          });
+          dispatch(setCheckEdit(false));
+          dispatch(setProductList('รายการสินค้าทั้งหมด'));
           dispatch(updateAddTypeAndProductState(newList));
           setOpenModalDelete(false);
           setShowSnackBar(true);
@@ -147,9 +157,11 @@ export default function STProductTypeItems({ unSelectAllType }: Props): ReactEle
 
         return (
           <>
-            <Button onClick={handleOpenModalDelete}>
-              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
-            </Button>
+            {!disabled && (
+              <Button onClick={handleOpenModalDelete}>
+                <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+              </Button>
+            )}
 
             <Dialog
               open={openModalDelete}

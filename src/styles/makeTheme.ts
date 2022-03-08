@@ -72,10 +72,10 @@ const useStyles = makeStyles({
     '& .MuiOutlinedInput-root input::placeholder': {
       fontSize: '14px',
     },
-    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+    '& .css-ieen6m-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
       // opacity: 0,
-      color: '#263238 !important',
-      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+      color: 'rgba(0, 0, 0, 0.87) !important',
+      '-webkit-text-fill-color': 'rgba(0, 0, 0, 0.87)',
     },
   },
   Mselect: {
@@ -85,6 +85,9 @@ const useStyles = makeStyles({
     },
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
+    },
+    '& .Mui-disabled': {
+      background: '#EAEBEB',
     },
   },
   MdataGridDetail: {
@@ -367,6 +370,19 @@ const useStyles = makeStyles({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+  },
+  MTextFieldNumberPrint: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      fontSize: '14px',
+      textAlignLast: 'end !important',
+      width: '92px',
+      height: '26px'
+    },
+    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+      color: '#263238 !important',
+      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+    },
   },
   MFormControlLabel: {
     '& .MuiFormControlLabel-label': {

@@ -76,19 +76,34 @@ export const environment = {
       reject: {
         url: '/campaign/barcode/reject?id={id}&reason={reason}',
       },
+      print: {
+        url: '/campaign/print-barcode',
+      },
       cancel: {
         url: '/campaign/{id}',
       },
     },
     saleLimitTime: {
+      detail: {
+        url: '/campaign/sale-limit',
+      },
       save: {
         url: '/campaign/sale-limit',
       },
       update: {
         url: '/campaign/sale-limit/{id}',
       },
+      start: {
+        url: '/campaign/sale-limit/start/{id}',
+      },
+      startMultipe: {
+        url: '/campaign/sale-limit/start',
+      },
       cancel: {
-        url: '/campaign/sale-limit/{id}',
+        url: '/campaign/sale-limit/cancel',
+      },
+      upload: {
+        url: '/campaign/sale-limit/upload',
       },
     },
   },
@@ -256,25 +271,25 @@ export const environment = {
       },
     },
   },
-  branch: {
-    province: {
-      url: '/branch/province',
-    },
+  master: {
     branch: {
-      url: '/branch/search',
-    },
-    branchTotal: {
-      url: '/branch/branch-total',
+      province: {
+        url: '/master/branch/province',
+      },
+      searchBranch: {
+        url: '/master/branch/search',
+      },
+      allBranch: {
+        url: '/master/branches',
+      },
+      branchTotal: {
+        url: '/master/branch/branch-total',
+      },
     },
   },
   authority: {
     authorizedBranch: {
       url: '/authority/authorized-branches',
-    },
-  },
-  master: {
-    branch: {
-      url: '/master/branches',
     },
   },
 };

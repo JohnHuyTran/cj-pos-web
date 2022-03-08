@@ -26,6 +26,19 @@ export interface Payload {
     };
   };
 }
+export interface PayloadCancel {
+  id: string;
+  remark?: string;
+}
+export interface PayloadStart {
+  stIds: string[];
+}
+export interface SaleLimitTimeDetailResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: any;
+}
 
 interface branchLists {
   code: string;

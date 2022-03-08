@@ -6,13 +6,14 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
 import LoadingModal from '../commons/ui/loading-modal';
-import {Box, TextField} from "@mui/material";
+import {Box} from "@mui/material";
 import {useStyles} from "../../styles/makeTheme";
 import {useAppDispatch, useAppSelector} from "../../store/store";
 import {stringNullOrEmpty} from "../../utils/utils";
 import {rejectBarcodeDiscount} from "../../services/barcode-discount";
 import {updateDataDetail} from "../../store/slices/barcode-discount-slice";
 import {BDStatus} from "../../utils/enum/common-enum";
+import TextBoxComment from "../commons/ui/textbox-comment";
 
 interface Props {
     open: boolean;
@@ -26,7 +27,6 @@ interface loadingModalState {
 }
 
 export default function ModalReject({open, onClose, barCode, id}: Props): ReactElement {
-    const classes = useStyles();
     const dispatch = useAppDispatch();
     const approveReject = useAppSelector((state) => state.barcodeDiscount.approveReject);
     const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
@@ -65,7 +65,7 @@ export default function ModalReject({open, onClose, barCode, id}: Props): ReactE
 
     useEffect(() => {
         setReason(approveReject ? approveReject.approvalNote : '');
-    }, [approveReject]);
+    }, [open]);
 
     return (
         <div>
@@ -76,7 +76,7 @@ export default function ModalReject({open, onClose, barCode, id}: Props): ReactE
                 maxWidth="lg"
                 PaperProps={{sx: {minWidth: 450, height: 365}}}
             >
-                <DialogContent sx={{mt: 1, mr: 4, ml: 4}}>
+                <DialogContent sx={{mr: 4, ml: 4}}>
                     <DialogContentText id="alert-dialog-description" sx={{color: '#263238'}}>
                         <Typography variant="h6" align="center" sx={{marginBottom: 2}}>
                             ยืนยันยกเลิกขอส่วนลดสินค้า
@@ -110,25 +110,19 @@ export default function ModalReject({open, onClose, barCode, id}: Props): ReactE
                                 {error}
                             </Typography>
                         </Box>
-                        <TextField
-                            placeholder=" ความยาวไม่เกิน 100 ตัวอักษร"
-                            multiline
-                            rows={5}
-                            className={classes.MTextareaBD}
-                            inputProps={{
-                                maxLength: '100',
-                            }}
-                            sx={{width: '345px'}}
-                            variant="outlined"
-                            value={reason}
-                            onChange={(e) => {
-                                setReason(e.target.value);
-                                setError('');
-                            }}
+                        <TextBoxComment
+                          fieldName=''
+                          defaultValue={reason}
+                          maxLength={100}
+                          onChangeComment={(e) => {
+                              setReason(e);
+                              setError('');
+                          }}
+                          isDisable={false}
+                          rowDisplay={4}
                         />
                     </DialogContentText>
                 </DialogContent>
-
                 <DialogActions sx={{justifyContent: 'center', mb: 2, mr: 5, ml: 5}}>
                     <Button
                         id="btnCancle"

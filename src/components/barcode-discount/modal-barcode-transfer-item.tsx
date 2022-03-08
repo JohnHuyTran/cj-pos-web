@@ -33,6 +33,7 @@ import { ACTIONS } from '../../utils/enum/permission-enum';
 import NumberFormat from 'react-number-format';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import HtmlTooltip from '../commons/ui/html-tooltip';
+import { updateBarcodeDiscountPrintState, updatePrintInDetail } from "../../store/slices/barcode-discount-print-slice";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -87,9 +88,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         let numberOfApproved = !!sameItem
           ? sameItem.numberOfApproved
           : item.numberOfApproved
-          ? item.numberOfApproved
-          : 0;
-        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : numberOfApproved * priceAfterDiscount;
+            ? item.numberOfApproved
+            : 0;
+        let approvedDiscount = !!sameItem ? sameItem.approvedDiscount : numberOfApproved * cashDiscount;
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -114,6 +115,21 @@ export const ModalTransferItem = (props: DataGridProps) => {
         };
       });
       setDtTable(rows);
+      if (Action.UPDATE === action
+        && (Number(BDStatus.APPROVED) == dataDetail.status) || Number(BDStatus.BARCODE_PRINTED) == dataDetail.status) {
+        if (rows && rows.length > 0) {
+          let rowData = _.cloneDeep(rows);
+          let productPrintFilter: any[];
+          if (Number(BDStatus.BARCODE_PRINTED) == dataDetail.status) {
+            productPrintFilter = rowData.filter((itPro: any) => !stringNullOrEmpty(itPro.expiryDate)
+                && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day'));
+          } else {
+            productPrintFilter = rowData;
+          }
+          dispatch(updateBarcodeDiscountPrintState(productPrintFilter));
+          dispatch(updatePrintInDetail(true));
+        }
+      }
     } else {
       setDtTable([]);
     }
@@ -176,9 +192,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         errorList.map((item: any, idx: number) => {
           return idx === errorIndex
             ? {
-                ...item,
-                errorDiscount: '',
-              }
+              ...item,
+              errorDiscount: '',
+            }
             : item;
         })
       )
@@ -187,10 +203,19 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfApprove = (event: any, index: number, errorIndex: number, barcode: string) => {
+    let currentValue = event.target.value;
+    if (stringNullOrEmpty(event.target.value)
+      || stringNullOrEmpty(event.target.value.trim())
+    ) {
+      currentValue = '0';
+    }
+    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
+      return;
+    }
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      data[index - 1].numberOfApproved = event.target.value ? parseInt(event.target.value.replace(/,/g, '')) : 0;
-      data[index - 1].approvedDiscount = data[index - 1].numberOfApproved * data[index - 1].priceAfterDiscount;
+      data[index - 1].numberOfApproved = currentValue ? parseInt(currentValue.replace(/,/g, '')) : 0;
+      data[index - 1].approvedDiscount = data[index - 1].numberOfApproved * data[index - 1].cashDiscount;
       return data;
     });
     dispatch(
@@ -198,9 +223,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         errorList.map((item: any, idx: number) => {
           return idx === errorIndex
             ? {
-                ...item,
-                errorNumberOfApproved: '',
-              }
+              ...item,
+              errorNumberOfApproved: '',
+            }
             : item;
         })
       )
@@ -210,16 +235,24 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfDiscount = (event: any, index: number, errorIndex: number, barcode: string) => {
+    let currentValue = event.target.value;
+    if (stringNullOrEmpty(event.target.value)
+      || stringNullOrEmpty(event.target.value.trim())
+    ) {
+      currentValue = '0';
+    }
+    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
+      return;
+    }
     let currentData: any;
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       currentData = data[index - 1];
-      data[index - 1].numberOfDiscounted = event.target.value
-        ? parseInt(event.target.value.replace(/,/g, '')) < 10000000000
-          ? parseInt(event.target.value.replace(/,/g, ''))
+      data[index - 1].numberOfDiscounted = currentValue
+        ? parseInt(currentValue.replace(/,/g, '')) < 10000000000
+          ? parseInt(currentValue.replace(/,/g, ''))
           : 0
         : 0;
-
       return data;
     });
     if (Object.keys(payloadAddItem).length !== 0) {
@@ -227,8 +260,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
       updateList.map((item: any) => {
         if (item.barcode === currentData.barCode) {
           item.qty =
-            parseInt(event.target.value.replace(/,/g, '')) < 10000000000
-              ? parseInt(event.target.value.replace(/,/g, ''))
+            parseInt(currentValue.replace(/,/g, '')) < 10000000000
+              ? parseInt(currentValue.replace(/,/g, ''))
               : 0;
         }
       });
@@ -239,9 +272,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         errorList.map((item: any, idx: number) => {
           return idx === errorIndex
             ? {
-                ...item,
-                errorNumberOfDiscounted: '',
-              }
+              ...item,
+              errorNumberOfDiscounted: '',
+            }
             : item;
         })
       )
@@ -261,9 +294,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         errorList.map((item: any, idx: number) => {
           return idx === errorIndex
             ? {
-                ...item,
-                errorExpiryDate: '',
-              }
+              ...item,
+              errorExpiryDate: '',
+            }
             : item;
         })
       )
@@ -490,7 +523,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
               inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
-              disabled={!approvePermission || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)}
+              disabled={!approvePermission || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)
+              || (approvePermission && dataDetail.status < Number(BDStatus.WAIT_FOR_APPROVAL))}
               onChange={(e) => {
                 handleChangeNumberOfApprove(e, params.row.index, index, params.row.barCode);
               }}
@@ -563,7 +597,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 (dataDetail.status > 1 && !approvePermission) || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)
               }
             />
-            {condition && <div className="title">{errorList[index].errorExpiryDate}</div>}
+            {condition &&
+            <div className="title" title={errorList[index].errorExpiryDate}>{errorList[index].errorExpiryDate}</div>}
           </div>
         );
       },
@@ -574,6 +609,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       flex: 0.2,
       align: 'center',
       sortable: false,
+      hide: Number(BDStatus.DRAFT) < dataDetail.status,
       renderCell: (params: GridRenderCellParams) => {
         const [openModalDelete, setOpenModalDelete] = React.useState<boolean>(false);
 
@@ -599,7 +635,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               disabled={dataDetail.status > 1}
               sx={{ opacity: dataDetail.status > 1 ? '0.5' : '1' }}
             >
-              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }}/>
             </Button>
 
             <Dialog
@@ -642,7 +678,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
                     <Grid item xs={8} sx={{ pl: 2 }}>
                       <label style={{ color: '#36C690' }}>
                         <b>{params.row.barcodeName}</b>
-                        <br />
+                        <br/>
                         <label
                           style={{
                             color: '#AEAEAE',
@@ -693,62 +729,66 @@ export const ModalTransferItem = (props: DataGridProps) => {
   ];
   const [pageSize, setPageSize] = React.useState<number>(10);
   return (
-    <div style={{ width: '100%', height: dtTable.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
-      <DataGrid
-        rows={dtTable}
-        columns={columns}
-        pageSize={pageSize}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        rowsPerPageOptions={[10, 20, 50, 100]}
-        pagination
-        disableColumnMenu
-        autoHeight={dtTable.length < 8}
-        scrollbarSize={10}
-        rowHeight={70}
-        components={{
-          NoRowsOverlay: () => (
-            <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
-              ไม่มีข้อมูล
-            </Typography>
-          ),
-        }}
-        // onCellClick={currentlySelected}
-        // onCellFocusOut={handleCalculateItems}
-      />
+    <div>
+      <div style={{ width: '100%', height: dtTable.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+        <DataGrid
+          rows={dtTable}
+          columns={columns}
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[10, 20, 50, 100]}
+          pagination
+          disableColumnMenu
+          autoHeight={dtTable.length < 8}
+          scrollbarSize={10}
+          rowHeight={70}
+          components={{
+            NoRowsOverlay: () => (
+              <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
+                ไม่มีข้อมูล
+              </Typography>
+            ),
+          }}
+          // onCellClick={currentlySelected}
+          // onCellFocusOut={handleCalculateItems}
+        />
+      </div>
       <Box display="flex" justifyContent="space-between" paddingTop="30px">
         <Grid container spacing={2} mb={2}>
           <Grid item xs={3}>
             <TextBoxComment
-              fieldName="หมายเหตุจากผู้อนุมัติ :"
-              defaultValue={payloadBarcodeDiscount.requesterNote}
-              maxLength={100}
-              onChangeComment={handleChangeNote}
-              isDisable={dataDetail.status > 1}
+                fieldName="หมายเหตุจากผู้อนุมัติ :"
+                defaultValue={payloadBarcodeDiscount.requesterNote}
+                maxLength={100}
+                onChangeComment={handleChangeNote}
+                isDisable={dataDetail.status > 1}
+                rowDisplay={4}
             />
           </Grid>
           <Grid item xs={3}>
-            <Box style={{ display: dataDetail.status > 1 && approvePermission ? undefined : 'none' }}>
+            <Box style={{ display: dataDetail.status > 1 ? undefined : 'none' }}>
               <TextBoxComment
-                fieldName="หมายเหตุจากผู้อนุมัติ :"
-                defaultValue={approveReject ? approveReject.approvalNote : ''}
-                maxLength={100}
-                onChangeComment={handleChangeReason}
-                isDisable={dataDetail.status > 2 || !approvePermission}
+                  fieldName="หมายเหตุจากผู้อนุมัติ :"
+                  defaultValue={approveReject ? approveReject.approvalNote : ''}
+                  maxLength={100}
+                  onChangeComment={handleChangeReason}
+                  isDisable={dataDetail.status > 2 || !approvePermission}
+                  rowDisplay={4}
               />
             </Box>
           </Grid>
-          <Grid item xs={3} />
+          <Grid item xs={3}/>
           <Grid item xs={3}>
             <Box display="flex" justifyContent="space-between" marginTop="25px">
               <Typography fontSize="14px" lineHeight="21px" height="24px">
                 ขอส่วนลดทั้งหมด
               </Typography>
               <TextField
-                disabled
-                type="text"
-                sx={{ bgcolor: '#EAEBEB' }}
-                className={classes.MtextFieldNumberNoneArrow}
-                value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
+                  disabled
+                  type="text"
+                  sx={{ bgcolor: '#EAEBEB' }}
+                  className={classes.MtextFieldNumberNoneArrow}
+                  value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
               />
             </Box>
             <Box display="flex" justifyContent="space-between" marginTop="10px">
@@ -756,22 +796,21 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 ส่วนลดที่อนุมัติทั้งหมด
               </Typography>
               <TextField
-                type="text"
-                sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
-                inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
-                className={classes.MtextFieldNumberNoneArrow}
-                value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
+                  type="text"
+                  sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
+                  inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
+                  className={classes.MtextFieldNumberNoneArrow}
+                  value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
               />
             </Box>
           </Grid>
         </Grid>
       </Box>
-
       <SnackbarStatus
-        open={openPopupModal}
-        onClose={handleClosePopup}
-        isSuccess={true}
-        contentMsg={'คุณได้ลบข้อมูลเรียบร้อยแล้ว'}
+          open={openPopupModal}
+          onClose={handleClosePopup}
+          isSuccess={true}
+          contentMsg={'คุณได้ลบข้อมูลเรียบร้อยแล้ว'}
       />
     </div>
   );

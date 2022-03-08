@@ -1,20 +1,18 @@
 //@ts-nocheck
 import React, { useState } from 'react';
 // npm i @date-io/moment@1.x moment
-import OverwriteMomentBE from './OverwriteMoment'; // choose your lib
-import { useStyles } from './date-picker-css';
-import { MuiPickersUtilsProvider, KeyboardDatePicker, DatePicker } from '@material-ui/pickers';
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
-import moment from 'moment';
+import OverwriteMomentBE from '../commons/ui/OverwriteMoment';
+import { useStyles } from '../commons/ui/date-picker-css';
 
 interface StateProps {
   onClickDate: any;
   value: any | Date | number | string;
   type?: string;
   minDateTo?: any | Date | number | string;
-  placeHolder?: string | 'กรุณาเลือกวันที่';
   error?: boolean;
   disabled?: boolean;
 }
@@ -33,7 +31,6 @@ const defaultMaterialTheme = createTheme({
 const DatePickerComponent: React.FC<StateProps> = (props) => {
   const classes = useStyles();
   const today = new Date();
-  const minDay = moment(today).add(1, 'd');
   const handleDateChange = (date: any) => {
     props.onClickDate(date);
   };
@@ -41,7 +38,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
   let datePicker;
   if (props.type === 'TO') {
     datePicker = (
-      <DatePicker
+      <KeyboardDatePicker
         disableToolbar
         clearable
         autoOk
@@ -49,29 +46,30 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         variant="inline"
         inputVariant="outlined"
         format="DD/MM/YYYY"
-        className={props.error ? classes.MdatepickerError : classes.MdatepickerV2}
+        style={{ backgroundColor: props.disabled ? '#f1f1f1' : 'transparent' }}
+        className={props.error ? classes.MdatepickerError : classes.MdatepickerDetail}
         value={props.value}
-        onChange={handleDateChange}
         disabled={props.disabled}
-        // InputProps={{
-        //   endAdornment: (
-        //     <IconButton size="small" onClick={() => handleDateChange(null)}>
-        //       <CloseIcon fontSize="small" />
-        //     </IconButton>
-        //   ),
-        //   readOnly: true,
-        // }}
+        onChange={handleDateChange}
+        InputProps={{
+          endAdornment: !props.disabled && (
+            <IconButton size="small" onClick={() => handleDateChange(null)}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          ),
+          readOnly: true,
+        }}
         InputAdornmentProps={{
           position: 'start',
         }}
         // maxDate={today}
         minDate={props.minDateTo}
-        placeholder={props.placeHolder}
+        placeholder="กรุณาเลือกวันที่"
       />
     );
   } else {
     datePicker = (
-      <DatePicker
+      <KeyboardDatePicker
         disableToolbar
         clearable
         autoOk
@@ -79,25 +77,25 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         variant="inline"
         inputVariant="outlined"
         format="DD/MM/YYYY"
-        className={props.error ? classes.MdatepickerError : classes.MdatepickerV2}
+        style={{ backgroundColor: props.disabled ? '#f1f1f1' : 'transparent' }}
+        className={props.error ? classes.MdatepickerError : classes.MdatepickerDetail}
         value={props.value}
+        disabled={props.disabled}
         onChange={handleDateChange}
-        // InputProps={{
-        //   endAdornment: (
-        //     <IconButton size="small" onClick={() => handleDateChange(null)}>
-        //       <CloseIcon fontSize="small" />
-        //     </IconButton>
-        //   ),
-        //   readOnly: true,
-        // }}
+        InputProps={{
+          endAdornment: !props.disabled && (
+            <IconButton size="small" onClick={() => handleDateChange(null)}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          ),
+          readOnly: true,
+        }}
         InputAdornmentProps={{
           position: 'start',
         }}
         // maxDate={today}
-        minDate={minDay}
-        minDateMessage={''}
-        placeholder={props.placeHolder}
-        disabled={props.disabled}
+        minDate={today}
+        placeholder="กรุณาเลือกวันที่"
       />
     );
   }

@@ -40,6 +40,10 @@ import searchStockTransferRt from './slices/save-search-stock-transfer-rt-slice'
 import searchBranchProvince from './slices/search-branches-province-slice';
 import searchTypeAndProduct from './slices/search-type-product-slice';
 import addTypeAndProduct from './slices/add-type-product-slice';
+import saleLimitTimeSlice from './slices/sale-limit-time-search-slice';
+import saleLimitTime from './slices/sale-limit-time-slice';
+import barcodeDiscountPrintSlice from './slices/barcode-discount-print-slice';
+import saleLimitTimeDetailSlice from './slices/sale-limit-time-detail-slice';
 import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 import stockRequestItems from './slices/stock-request-items-slice';
@@ -87,6 +91,10 @@ const store = configureStore({
     searchBranchProvince: searchBranchProvince,
     searchTypeAndProduct: searchTypeAndProduct,
     addTypeAndProduct: addTypeAndProduct,
+    searchSaleLimitTime: saleLimitTimeSlice,
+    saleLimitTime: saleLimitTime,
+    barcodeDiscountPrintSlice: barcodeDiscountPrintSlice,
+    saleLimitTimeDetailSlice: saleLimitTimeDetailSlice,
     updateBTSkuSlice: updateBTSkuSlice,
     updateBTProductSlice: updateBTProductSlice,
     stockRequestItems: stockRequestItems,

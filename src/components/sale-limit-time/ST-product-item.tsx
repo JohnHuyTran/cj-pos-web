@@ -12,26 +12,29 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
-import { DeleteForever, ErrorOutline } from '@mui/icons-material';
+import { DeleteForever } from '@mui/icons-material';
 import { DataGrid, GridColDef } from '@material-ui/data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { STProductDetail } from '../../models/sale-limit-time';
+import { setCheckEdit, setProductList } from '../../store/slices/sale-limit-time-slice';
 
 const _ = require('lodash');
 
 interface Props {
   unSelectAllType: (showAll: boolean) => void;
+  disabled?: boolean;
 }
 
-export default function STProductItems({ unSelectAllType }: Props): ReactElement {
+export default function STProductItems({ unSelectAllType, disabled }: Props): ReactElement {
   const classes = useStyles();
   const [dtTable, setDtTable] = React.useState<Array<STProductDetail>>([]);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
+  const productList = useAppSelector((state) => state.saleLimitTime.productList);
   const [showAll, setShowAll] = React.useState(true);
   const dispatch = useAppDispatch();
 
@@ -44,7 +47,7 @@ export default function STProductItems({ unSelectAllType }: Props): ReactElement
         .filter((el: any) => el.selectedType === 2 && el.showProduct)
         .map((item: any, index: number) => {
           return {
-            id: item.barcode,
+            id: `${index}-${item.barcode}`,
             index: index + 1,
             barcode: item.barcode,
             skuCode: item.skuCode,
@@ -56,6 +59,9 @@ export default function STProductItems({ unSelectAllType }: Props): ReactElement
       setDtTable(rows);
       if (payloadAddTypeProduct.filter((el: any) => el.selectedType === 2 && !el.showProduct).length !== 0) {
         setShowAll(false);
+        unSelectAllType(false);
+      } else {
+        setShowAll(true);
         unSelectAllType(false);
       }
     } else {
@@ -79,6 +85,7 @@ export default function STProductItems({ unSelectAllType }: Props): ReactElement
       setDtTable([]);
     }
     unSelectAllType(e.target.checked);
+    dispatch(setProductList('รายการสินค้าทั้งหมด'));
   };
   const columns: GridColDef[] = [
     {
@@ -153,17 +160,15 @@ export default function STProductItems({ unSelectAllType }: Props): ReactElement
         };
 
         const handleDeleteItem = () => {
-          let newList = payloadAddTypeProduct.filter((r: any) => r.barcode !== params.row.id);
-          let listCodeProductByType = newList
-            .filter((el: any) => el.productByType)
-            .map((el1: any) => el1.ProductTypeCode);
+          let newList = payloadAddTypeProduct.filter((r: any) => r.barcode !== params.row.barcode);
+          let listCodeProductByType = newList.map((el1: any) => el1.ProductTypeCode);
 
           let listAdd = newList.filter((item: any) => {
             if (item.selectedType === 1 && !listCodeProductByType.includes(item.productTypeCode)) {
               return false;
             } else return true;
           });
-
+          dispatch(setCheckEdit(false));
           dispatch(updateAddTypeAndProductState(listAdd));
           setOpenModalDelete(false);
           setShowSnackBar(true);
@@ -171,9 +176,11 @@ export default function STProductItems({ unSelectAllType }: Props): ReactElement
 
         return (
           <>
-            <Button onClick={handleOpenModalDelete}>
-              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
-            </Button>
+            {!disabled && (
+              <Button onClick={handleOpenModalDelete}>
+                <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+              </Button>
+            )}
 
             <Dialog
               open={openModalDelete}
@@ -245,7 +252,7 @@ export default function STProductItems({ unSelectAllType }: Props): ReactElement
   return (
     <>
       <Typography sx={{ fontSize: '24px' }}>
-        <b>{'รายการสินค้า : รายการสินค้าทั้งหมด'}</b>
+        <b>รายการสินค้า : {productList}</b>
       </Typography>
       <FormGroup>
         <FormControlLabel

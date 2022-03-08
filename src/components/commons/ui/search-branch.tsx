@@ -2,6 +2,7 @@ import {
   Autocomplete,
   Button,
   Checkbox,
+  createFilterOptions,
   Dialog,
   DialogContent,
   FormControl,
@@ -31,24 +32,14 @@ import {
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { paramsConvert } from '../../../utils/utils';
 const _ = require('lodash');
-
-const BranchItem = (props: ItemProps) => {
-  const { label, onDelete, ...other } = props;
-  return (
-    <div className="wrapper-item">
-      <span>{label}</span>
-      <CloseIcon onClick={onDelete} />
-    </div>
-  );
-};
-
 interface Props {
   error?: boolean;
   helperText?: string;
+  disabled?: boolean;
 }
 
 export default function SearchBranch(props: Props): ReactElement {
-  const { error, helperText } = props;
+  const { error, helperText, disabled } = props;
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const { t } = useTranslation(['common']);
@@ -68,10 +59,34 @@ export default function SearchBranch(props: Props): ReactElement {
 
   const dispatch = useAppDispatch();
 
+  const autocompleteRenderListItem = (props: any, option: any) => {
+    return (
+      <li {...props} key={option.code}>
+        <Box sx={{ display: 'flex', width: '100%' }}>
+          <Typography variant="body2">
+            {option.code}-{option.name}
+          </Typography>
+        </Box>
+      </li>
+    );
+  };
+
+  const BranchItem = (props: ItemProps) => {
+    const { label, onDelete, ...other } = props;
+    return (
+      <div className="wrapper-item">
+        <span>{label}</span>
+        {!disabled && <CloseIcon onClick={onDelete} />}
+      </div>
+    );
+  };
+
   useEffect(() => {
-    if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
-    dispatch(fetchTotalBranch());
-  }, []);
+    if (open) {
+      if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
+      dispatch(fetchTotalBranch());
+    }
+  }, [open]);
 
   useEffect(() => {
     try {
@@ -133,7 +148,26 @@ export default function SearchBranch(props: Props): ReactElement {
 
   const handleCheckBox = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);
-    event.target.checked && setBranch(null);
+    // event.target.checked && setBranch(null);
+    const existProvince = listBranch['provinces'].some((item: any) => item.code == province.code);
+    if (!existProvince) {
+      const preData = [...listBranch['provinces'], province];
+      const newBranches = listBranch['branches'].filter((item: any) => item.province.code !== province.code);
+      const checkArrays = _.difference(listBranch['branches'], newBranches);
+      if (checkArrays.length > 0) {
+        setListBranch({
+          ...listBranch,
+          branches: newBranches,
+          provinces: preData,
+        });
+      } else {
+        setListBranch({
+          ...listBranch,
+          provinces: preData,
+        });
+      }
+    }
+    setChecked(false);
   };
 
   const onInputChange = async (event: any, value: string, reason: string) => {
@@ -150,6 +184,7 @@ export default function SearchBranch(props: Props): ReactElement {
       try {
         const payload = {
           name: keyword,
+          code: keyword,
           ...(!!province && { province: province.name }),
           limit: '10',
         };
@@ -161,47 +196,59 @@ export default function SearchBranch(props: Props): ReactElement {
       }
     }
   };
-  const handleAddBranch = () => {
-    if (checked) {
-      const existProvince = listBranch['provinces'].some((item: any) => item.code == province.code);
-      if (!existProvince) {
-        const preData = [...listBranch['provinces'], province];
-        const newBranches = listBranch['branches'].filter((item: any) => item.province.code !== province.code);
-        const checkArrays = _.difference(listBranch['branches'], newBranches);
-        if (checkArrays.length > 0) {
-          setListBranch({
-            ...listBranch,
-            branches: newBranches,
-            provinces: preData,
-          });
-        } else {
-          setListBranch({
-            ...listBranch,
-            provinces: preData,
-          });
-        }
-        // setErrorProvince(null);
-      }
-      setProvince(null);
-      setChecked(false);
-      // else {
-      //   setErrorProvince('จังหวัดนี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง');
-      // }
-    } else {
-      const existBranch = listBranch['branches'].some((item: any) => item.id == branch.id);
-      const existInProvince = listBranch['provinces'].some((item: any) => item.code == branch.province.code);
+  // const handleAddBranch = () => {
+  //   if (checked) {
+  //     const existProvince = listBranch['provinces'].some((item: any) => item.code == province.code);
+  //     if (!existProvince) {
+  //       const preData = [...listBranch['provinces'], province];
+  //       const newBranches = listBranch['branches'].filter((item: any) => item.province.code !== province.code);
+  //       const checkArrays = _.difference(listBranch['branches'], newBranches);
+  //       if (checkArrays.length > 0) {
+  //         setListBranch({
+  //           ...listBranch,
+  //           branches: newBranches,
+  //           provinces: preData,
+  //         });
+  //       } else {
+  //         setListBranch({
+  //           ...listBranch,
+  //           provinces: preData,
+  //         });
+  //       }
+  //       // setErrorProvince(null);
+  //     }
+  //     setProvince(null);
+  //     setChecked(false);
+  //     // else {
+  //     //   setErrorProvince('จังหวัดนี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง');
+  //     // }
+  //   } else {
+  //     const existBranch = listBranch['branches'].some((item: any) => item.id == branch.id);
+  //     const existInProvince = listBranch['provinces'].some((item: any) => item.code == branch.province.code);
 
+  //     if (!existBranch && !existInProvince) {
+  //       const preData = [...listBranch['branches'], branch];
+  //       setListBranch({ ...listBranch, branches: preData });
+  //     }
+  //     setBranch(null);
+  //     setErrorBranch(null);
+  //     // else {
+  //     //   setErrorBranch('สาขานี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง');
+  //     // }
+  //   }
+  // };
+
+  const handleSelectBranch = (e: any) => {
+    setBranch(e);
+    if (e) {
+      const existBranch = listBranch['branches'].some((item: any) => item.id == e.id);
+      const existInProvince = listBranch['provinces'].some((item: any) => item.code == e.province.code);
       if (!existBranch && !existInProvince) {
-        const preData = [...listBranch['branches'], branch];
+        const preData = [...listBranch['branches'], e];
         setListBranch({ ...listBranch, branches: preData });
       }
-      setProvince(null);
-      setBranch(null);
-      setErrorBranch(null);
-      // else {
-      //   setErrorBranch('สาขานี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง');
-      // }
     }
+    setBranch(null);
   };
 
   const handleDeleteBranch = (code: string) => {
@@ -231,6 +278,10 @@ export default function SearchBranch(props: Props): ReactElement {
     setListBranch({ branches: [], provinces: [] });
   };
 
+  const filterOptions = createFilterOptions({
+    stringify: (option: any) => option.name + option.code,
+  });
+
   return (
     <div>
       <TextField
@@ -243,6 +294,7 @@ export default function SearchBranch(props: Props): ReactElement {
             style: { textAlignLast: 'start' },
           },
         }}
+        style={{ backgroundColor: disabled ? '#f1f1f1' : 'transparent' }}
         onClick={handleClickSearch}
         value={value}
         error={error}
@@ -254,6 +306,7 @@ export default function SearchBranch(props: Props): ReactElement {
           },
         }}
         placeholder="กรุณาเลือก"
+        disabled={disabled}
       />
       <Dialog maxWidth="lg" fullWidth open={open}>
         <Box sx={{ flex: 1, ml: 2 }}>
@@ -285,8 +338,9 @@ export default function SearchBranch(props: Props): ReactElement {
                     value={true}
                     control={<Radio />}
                     label={`เลือกสาขาทั้งหมด (${totalBranches} สาขา)`}
+                    disabled={disabled}
                   />
-                  <FormControlLabel value={false} control={<Radio />} label="เลือกสาขาเอง" />
+                  <FormControlLabel disabled={disabled} value={false} control={<Radio />} label="เลือกสาขาเอง" />
                 </RadioGroup>
               </FormControl>
               {!allBranches && (
@@ -310,9 +364,11 @@ export default function SearchBranch(props: Props): ReactElement {
                           }}
                           error={!!errorProvince}
                           helperText={errorProvince}
+                          placeholder="รหัสประเภท/ประเภทสินค้า"
                         />
                       )}
                       size="small"
+                      disabled={disabled}
                       className={classes.MSearchBranch}
                       getOptionLabel={(option) => option.name}
                       onChange={(event: any, newValue: any) => {
@@ -329,7 +385,9 @@ export default function SearchBranch(props: Props): ReactElement {
                       </Typography>
                       <FormGroup>
                         <FormControlLabel
-                          disabled={!province}
+                          disabled={
+                            !province || listBranch['provinces'].some((item: any) => item.code == province.code)
+                          }
                           control={<Checkbox checked={checked} onChange={handleCheckBox} />}
                           label="เลือกสาขาทั้งหมด"
                         />
@@ -350,20 +408,23 @@ export default function SearchBranch(props: Props): ReactElement {
                               marginRight: 0,
                             },
                           }}
+                          placeholder="ค้นหาบาร์โค๊ด / รายละเอียดสินค้า"
                         />
                       )}
                       size="small"
                       className={classes.MSearchBranch}
                       getOptionLabel={(option) => option.name}
+                      renderOption={autocompleteRenderListItem}
                       onChange={(event: any, newValue: any) => {
-                        setBranch(newValue);
+                        handleSelectBranch(newValue);
                       }}
                       onInputChange={onInputChange}
+                      disabled={disabled}
                       value={branch}
-                      disabled={checked}
+                      filterOptions={filterOptions}
                     />
                   </Box>
-                  <Box sx={{ textAlign: 'right' }}>
+                  {/* <Box sx={{ textAlign: 'right' }}>
                     <Button
                       variant="contained"
                       color="primary"
@@ -373,7 +434,7 @@ export default function SearchBranch(props: Props): ReactElement {
                     >
                       {t('button.add')}
                     </Button>
-                  </Box>
+                  </Box> */}
                 </Box>
               )}
             </Grid>
@@ -422,7 +483,10 @@ export default function SearchBranch(props: Props): ReactElement {
                 className={classes.MbtnSearch}
                 size="large"
                 onClick={handleAddForm}
-                disabled={!allBranches && listBranch['branches'].length === 0 && listBranch['provinces'].length === 0}
+                disabled={
+                  (!allBranches && listBranch['branches'].length === 0 && listBranch['provinces'].length === 0) ||
+                  disabled
+                }
               >
                 เลือกสาขา
               </Button>

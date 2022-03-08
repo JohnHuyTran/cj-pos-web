@@ -38,7 +38,7 @@ const initialState: State = {
 
 export const fetchProvinceListAsync = createAsyncThunk('ProvinceList', async () => {
   try {
-    const path = environment.branch.province.url;
+    const path = environment.master.branch.province.url;
 
     let response = await get(path).then();
 
@@ -50,7 +50,7 @@ export const fetchProvinceListAsync = createAsyncThunk('ProvinceList', async () 
 
 export const fetchBranchProvinceListAsync = createAsyncThunk('BranchList', async (params: string) => {
   try {
-    const path = `${environment.branch.branch.url}?${params}`;
+    const path = `${environment.master.branch.searchBranch.url}?${params}`;
 
     let response = await get(path).then();
 
@@ -62,7 +62,7 @@ export const fetchBranchProvinceListAsync = createAsyncThunk('BranchList', async
 
 export const fetchTotalBranch = createAsyncThunk('TotalBranch', async () => {
   try {
-    const path = environment.branch.branchTotal.url;
+    const path = environment.master.branch.branchTotal.url;
 
     let response = await get(path).then();
 
