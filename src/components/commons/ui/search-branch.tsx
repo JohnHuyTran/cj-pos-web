@@ -85,6 +85,7 @@ export default function SearchBranch(props: Props): ReactElement {
     if (open) {
       if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
       dispatch(fetchTotalBranch());
+      dispatch(fetchBranchProvinceListAsync('limit=10'));
     }
   }, [open]);
 
@@ -96,7 +97,9 @@ export default function SearchBranch(props: Props): ReactElement {
         limit: '10',
       };
       const params = paramsConvert(payload);
-      dispatch(fetchBranchProvinceListAsync(params));
+      if (open) {
+        dispatch(fetchBranchProvinceListAsync(params));
+      }
     } catch (error) {
       console.log(error);
       throw error;
@@ -119,7 +122,7 @@ export default function SearchBranch(props: Props): ReactElement {
           : stringProvince.concat('', stringBranch);
       setValue(stringList);
     }
-  }, [payloadBranches]);
+  }, [payloadBranches, totalBranches]);
 
   const handleCloseModal = () => {
     setOpen(false);
