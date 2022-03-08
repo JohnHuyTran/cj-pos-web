@@ -320,31 +320,36 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     let _newSku: ItemGroups[] = [];
 
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    _items.forEach((dataItem: Item) => {
-      rowsEdit.forEach((dataRow: GridRowData) => {
-        if (dataRow.barcode === dataItem.barcode) {
-          const newData: Item = {
-            seqItem: dataRow.seqItem,
-            barcode: dataRow.barcode,
-            barcodeName: dataRow.barcodeName,
-            skuCode: dataRow.skuCode,
-            unitName: dataRow.unitName,
-            actualQty: dataRow.actualQty,
-            toteCode: dataRow.toteCode,
-            isDisable: isDisable,
-            boNo: dataRow.boNo,
-            barFactor: dataRow.barFactor,
-            unitCode: dataRow.unitCode ? dataRow.unitCode : 0,
-            orderQty: dataRow.orderQty ? dataRow.orderQty : 0,
-          };
-          // items.push(newData);
-          _.remove(_items, function (item: Item) {
-            return item.barcode === dataRow.barcode;
-          });
-          _items = [..._items, newData];
-        }
+
+    // _items.forEach((dataItem: Item) => {
+    rowsEdit.forEach((dataRow: GridRowData) => {
+      const dupItem: any = branchTransferItems.find((item: Item, index: number) => {
+        return item.barcode === dataRow.barcode;
       });
+
+      if (dupItem) {
+        const newData: Item = {
+          seqItem: dataRow.seqItem,
+          barcode: dataRow.barcode,
+          barcodeName: dataRow.barcodeName,
+          skuCode: dataRow.skuCode,
+          unitName: dataRow.unitName,
+          actualQty: dataRow.actualQty,
+          toteCode: dataRow.toteCode,
+          isDisable: isDisable,
+          boNo: dataRow.boNo,
+          barFactor: dataRow.barFactor,
+          unitCode: dataRow.unitCode ? dataRow.unitCode : 0,
+          orderQty: dataRow.orderQty ? dataRow.orderQty : 0,
+        };
+
+        _.remove(_items, function (item: Item) {
+          return item.barcode === dataRow.barcode;
+        });
+        _items = [..._items, newData];
+      }
     });
+    // });
 
     _sku.forEach((data: ItemGroups) => {
       const sum = _items
