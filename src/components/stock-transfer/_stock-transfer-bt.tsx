@@ -20,8 +20,6 @@ import { DOCUMENT_TYPE } from '../../utils/enum/stock-transfer-enum';
 import DatePickerAllComponent from '../commons/ui/date-picker-all';
 import TextBoxComment from '../commons/ui/textbox-comment';
 
-import BranchTransferListItem from './stock-transfer-bt-list-item';
-import BranchTransferListSKU from './stock-transfer-bt-list-sku';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import AlertError from '../commons/ui/alert-error';
@@ -53,6 +51,7 @@ import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt
 import stockRequestDetail from './stock-request-detail';
 import { isGroupBranch } from '../../utils/role-permission';
 import AccordionHuaweiFile from '../supplier-check-order/accordion-huawei-file';
+import StockTransferSKUList from './_stock-transfer-bt-sku-list';
 
 interface Props {
   isOpen: boolean;
@@ -173,7 +172,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     return true;
   };
 
-  const validateItem = (action: string) => {
+  const validateItem = () => {
     const _productSelector: any = store.getState().updateBTProductSlice.state;
     let itemNotValid: boolean = false;
     _productSelector.forEach((data: GridRowData) => {
@@ -191,15 +190,10 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       }
     });
 
-    let isZero = true;
     const _skuSelector = store.getState().updateBTSkuSlice.state;
     _skuSelector.forEach((data: ItemGroups) => {
       const actualQty = data.actualAllQty ? data.actualAllQty : 0;
       const orderQty = data.orderAllQty ? data.orderAllQty : 0;
-      if (actualQty > 0) {
-        isZero = false;
-      }
-
       if (actualQty < orderQty && !comment) {
         itemNotValid = true;
         setTextError('กรุณาระบุสาเหตุการเปลี่ยนจำนวน');
@@ -214,11 +208,6 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       }
     });
     if (itemNotValid) {
-      setOpenAlert(true);
-      return false;
-    } else if (isZero && action === 'sendToDC') {
-      setTextError('กรุณาระบุจำนวนโอนจริง > 0 อย่างน้อย 1 รายการ');
-      setComment(comment);
       setOpenAlert(true);
       return false;
     } else {
@@ -239,22 +228,6 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     if (comment !== branchTransferInfo.comment) {
       showPopup = true;
     }
-
-    const _productSelector: any = store.getState().updateBTProductSlice.state;
-    const btItems: Item[] = branchTransferInfo.items;
-    _productSelector.forEach((data: GridRowData) => {
-      const item = btItems.find((item: Item) => {
-        return item.barcode === data.barcode;
-      });
-      if (!item) {
-        showPopup = true;
-        return;
-      }
-      if (data.actualQty !== (item.actualQty ? item.actualQty : 0) || data.toteCode != item.toteCode) {
-        showPopup = true;
-        return;
-      }
-    });
 
     if (!showPopup) {
       setOpen(false);
@@ -321,7 +294,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     // await storeItem();
     await dispatch(updateAddItemsState({}));
 
-    const isvalidItem = validateItem('save');
+    const isvalidItem = validateItem();
     if (isvalidItem) {
       const payload: BranchTransferRequest = await mappingPayload();
       await saveBranchTransfer(payload)
@@ -350,7 +323,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     // setIsClickBtnApprove(true);
     // await storeItem();
     await dispatch(updateAddItemsState({}));
-    const isvalidItem = validateItem('sendToDC');
+    const isvalidItem = validateItem();
     if (isvalidItem) {
       if (!btNo) {
         const payload: BranchTransferRequest = await mappingPayload();
@@ -914,6 +887,17 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     });
   };
 
+  let skuList: any = [];
+  const handleMapSKU = async (sku: any) => {
+    // setSkuList(sku);
+    skuList = sku;
+  };
+  const [flagStock, setFlagStock] = React.useState(false);
+  const [flagSave, setFlagSave] = React.useState(false);
+  const handleStatusChangeItems = async (items: any) => {
+    setFlagSave(true);
+  };
+
   return (
     <React.Fragment>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -981,25 +965,17 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
           {btStatus === 'TRANSFERING' && componentBranchStatusTransfering}
 
-          <BranchTransferListSKU onSelectSku={onClickSku} />
-          <Box mt={6}>
-            {' '}
-            <Typography>
-              รายการสินค้า: {isChecked && 'รายการสินค้าทั้งหมด'} {!isChecked && `${skuNameDisplay} (${skuCodeSelect})`}
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
-            <FormGroup>
-              <FormControlLabel
-                control={<Checkbox />}
-                checked={isChecked}
-                label='รายการสินค้าทั้งหมด'
-                onChange={handleCheckboxChange}
-              />
-            </FormGroup>
-          </Box>
-
-          <BranchTransferListItem skuCodeSelect={skuCodeSelect} />
+          <StockTransferSKUList
+            type={btStatus}
+            edit={true}
+            onMapSKU={handleMapSKU}
+            // onChangeItems={handleChangeItems}
+            changeItems={handleStatusChangeItems}
+            update={true}
+            stock={true}
+            branch={''}
+            status={status}
+          />
 
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
