@@ -22,6 +22,8 @@ import { getDecodedAccessToken } from '../../utils/utils';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { useTranslation } from 'react-i18next';
 import { featchBranchListAsync } from '../../store/slices/search-branches-slice';
+import logoImage from '../../assets/images/CJlogo.jpeg';
+import { featchAuthorizedBranchListAsync } from '../../store/slices/authorized-branch-slice';
 
 interface State {
   branch: string;
@@ -65,7 +67,6 @@ function LoginForm() {
       branchCode: values.branch,
     };
     dispatch(loginKeyCloakAsync(form));
-    dispatch(featchBranchListAsync());
   };
 
   return (
@@ -76,7 +77,7 @@ function LoginForm() {
 
       <Box className={classes.mainBox}>
         <div id='logo' className={classes.logo}>
-          <img src='images/CJlogo.png' alt='' />
+          <img src={logoImage} alt='' width='50' />
         </div>
 
         <div id='error'> {error && <p style={{ color: 'red', fontSize: '12px' }}>{t(error)}</p>}</div>

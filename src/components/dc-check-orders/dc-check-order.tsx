@@ -19,17 +19,24 @@ import LoadingModal from '../commons/ui/loading-modal';
 import { SearchOff } from '@mui/icons-material';
 import AlertError from '../commons/ui/alert-error';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
+import { getUserInfo } from '../../store/sessionStore';
+import { getBranchName } from '../../utils/utils';
+import { env } from '../../adapters/environmentConfigs';
+import { BranchListOptionType } from '../../models/branch-model';
+import { isAllowActionPermission, isGroupDC } from '../../utils/role-permission';
+import { ACTIONS } from '../../utils/enum/permission-enum';
 
 moment.locale('th');
 
 interface State {
   docNo: string;
-  branchCode: string;
+  shipBranchFrom: string;
   verifyDCStatus: string;
   dateFrom: string;
   dateTo: string;
   sdType: string;
   sortBy: string;
+  shipBranchTo: string;
 }
 interface loadingModalState {
   open: boolean;
@@ -42,6 +49,7 @@ interface branchListOptionType {
 
 function DCCheckOrderSearch() {
   // const limit = "10";
+  const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const page = '1';
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -49,7 +57,8 @@ function DCCheckOrderSearch() {
   const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
   const [values, setValues] = React.useState<State>({
     docNo: '',
-    branchCode: '',
+    shipBranchFrom: '',
+    shipBranchTo: '',
     verifyDCStatus: 'ALL',
     dateFrom: '',
     dateTo: '',
@@ -68,11 +77,32 @@ function DCCheckOrderSearch() {
   const [textError, setTextError] = React.useState('');
 
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
-
+  const [branchFromCode, setBranchFromCode] = React.useState('');
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [ownBranch, setOwnBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : env.branch.code
+      : env.branch.code
+  );
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
   };
+
+  React.useEffect(() => {
+    setDisableSearchBtn(isAllowActionPermission(ACTIONS.ORDER_VER_VIEW));
+    setBranchFromCode(ownBranch);
+    setValues({ ...values, shipBranchFrom: ownBranch });
+  }, []);
+
+  const branchFrom = getBranchName(branchList, ownBranch);
+  const branchFromMap: BranchListOptionType = {
+    code: ownBranch,
+    name: branchFrom ? branchFrom : '',
+  };
+  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(branchFromMap);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -90,7 +120,8 @@ function DCCheckOrderSearch() {
       limit: limits,
       page: page,
       docNo: values.docNo,
-      branchCode: values.branchCode,
+      shipBranchFrom: values.shipBranchFrom,
+      shipBranchTo: values.shipBranchTo,
       verifyDCStatus: values.verifyDCStatus,
       dateFrom: moment(startDate).startOf('day').toISOString(),
       dateTo: moment(endDate).endOf('day').toISOString(),
@@ -142,7 +173,8 @@ function DCCheckOrderSearch() {
     setClearBranchDropDown(!clearBranchDropDown);
     setValues({
       docNo: '',
-      branchCode: '',
+      shipBranchFrom: '',
+      shipBranchTo: '',
       verifyDCStatus: 'ALL',
       dateFrom: '',
       dateTo: '',
@@ -154,7 +186,8 @@ function DCCheckOrderSearch() {
       limit: limit ? limit.toString() : '10',
       page: page,
       docNo: values.docNo,
-      branchCode: values.branchCode,
+      shipBranchFrom: values.shipBranchFrom,
+      shipBranchTo: values.shipBranchTo,
       verifyDCStatus: values.verifyDCStatus,
       dateFrom: moment(startDate).startOf('day').toISOString(),
       dateTo: moment(endDate).endOf('day').toISOString(),
@@ -177,15 +210,23 @@ function DCCheckOrderSearch() {
     setEndDate(value);
   };
 
-  const handleChangeBranch = (branchCode: string) => {
+  const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
-      setValues({ ...values, branchCode: JSON.parse(codes) });
+      setValues({ ...values, shipBranchFrom: JSON.parse(codes) });
     } else {
-      setValues({ ...values, branchCode: '' });
+      setValues({ ...values, shipBranchFrom: '' });
     }
   };
 
+  const handleChangeBranchTo = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setValues({ ...values, shipBranchTo: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, shipBranchTo: '' });
+    }
+  };
   let orderListData;
   const orderListDatas = items.orderList.data ? items.orderList.data : [];
   const [flagSearch, setFlagSearch] = React.useState(false);
@@ -233,7 +274,19 @@ function DCCheckOrderSearch() {
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder='เลขที่เอกสาร LD/เลขที่เอกสาร SD'
+              placeholder='เลขที่เอกสาร LD/BT/SD'
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+              สาขาต้นทาง
+            </Typography>
+            <BranchListDropDown
+              valueBranch={valuebranchFrom}
+              sourceBranchCode={''}
+              onChangeBranch={handleChangeBranchFrom}
+              isClear={clearBranchDropDown}
+              disable={true}
             />
           </Grid>
           <Grid item xs={4}>
@@ -241,69 +294,12 @@ function DCCheckOrderSearch() {
               สาขาปลายทาง
             </Typography>
             <BranchListDropDown
-              sourceBranchCode={''}
-              onChangeBranch={handleChangeBranch}
+              sourceBranchCode={branchFromCode}
+              onChangeBranch={handleChangeBranchTo}
               isClear={clearBranchDropDown}
+              isFilterAuthorizedBranch={isGroupDC() ? true : false}
             />
-            {/* <Autocomplete
-              {...defaultPropsBranchList}
-              className={classes.Mautocomplete}
-              id="selBranchNo"
-              value={valueBranchList}
-              onChange={handleChangeBranch}
-              renderOption={(props, option) => {
-                return (
-                  <li {...props} key={option.code}>
-                    {option.name}
-                  </li>
-                );
-              }}
-              renderInput={(params) => (
-                <TextField {...params} placeholder="ทั้งหมด" size="small" className={classes.MtextField} fullWidth />
-              )}
-            /> */}
-
-            {/* <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id="selBranchNo"
-                name="branchNo"
-                value={values.branchCode}
-                inputProps={{ "aria-label": "Without label" }}
-                onChange={handleChangeBranch}
-              >
-                <MenuItem value={"ALL"} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                {branchList.branchList.data.map(
-                  (option: BranchInfo, index: number) => (
-                    <MenuItem key={option.code} value={option.code}>
-                      {option.name}
-                    </MenuItem>
-                  )
-                )}
-              </Select>
-            </FormControl> */}
           </Grid>
-          <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-              สถานะการตรวจสอบผลต่าง
-            </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id='selVerifyDCStatus'
-                name='verifyDCStatus'
-                value={values.verifyDCStatus}
-                onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={'ALL'} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem value={'0'}>รอการตรวจสอบ</MenuItem>
-                <MenuItem value={'1'}>ตรวจสอบแล้ว</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-
           <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่รับสินค้า
@@ -327,6 +323,27 @@ function DCCheckOrderSearch() {
             </Box>
           </Grid>
           <Grid item xs={4} container alignItems='flex-end'>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+              สถานะการตรวจสอบผลต่าง
+            </Typography>
+            <FormControl fullWidth className={classes.Mselect}>
+              <Select
+                id='selVerifyDCStatus'
+                name='verifyDCStatus'
+                value={values.verifyDCStatus}
+                onChange={handleChange}
+                inputProps={{ 'aria-label': 'Without label' }}>
+                <MenuItem value={'ALL'} selected={true}>
+                  ทั้งหมด
+                </MenuItem>
+                <MenuItem value={'0'}>รอการตรวจสอบ</MenuItem>
+                <MenuItem value={'1'}>ตรวจสอบแล้ว</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={4} sx={{ pt: 30 }}>
+            {' '}
             <Typography gutterBottom variant='subtitle1' component='div'>
               ประเภท
             </Typography>
@@ -345,26 +362,30 @@ function DCCheckOrderSearch() {
               </Select>
             </FormControl>
           </Grid>
-
-          <Grid item container xs={12} justifyContent='flex-end' direction='row' alignItems='flex-end'>
-            <Button
-              id='btnClear'
-              variant='contained'
-              onClick={onClickClearBtn}
-              sx={{ width: '13%' }}
-              className={classes.MbtnClear}
-              color='cancelColor'>
-              เคลียร์
-            </Button>
-            <Button
-              id='btnSearch'
-              variant='contained'
-              color='primary'
-              onClick={onClickValidateForm}
-              sx={{ width: '13%', ml: 2 }}
-              className={classes.MbtnSearch}>
-              ค้นหา
-            </Button>
+          <Grid item xs={4} container alignItems='flex-end'></Grid>
+          <Grid item xs={4} container alignItems='flex-end'>
+            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
+              <Button
+                id='btnClear'
+                variant='contained'
+                onClick={onClickClearBtn}
+                sx={{ width: '45%' }}
+                className={classes.MbtnClear}
+                color='cancelColor'
+                fullWidth={true}>
+                เคลียร์
+              </Button>
+              <Button
+                id='btnSearch'
+                variant='contained'
+                color='primary'
+                onClick={onClickValidateForm}
+                sx={{ width: '45%', ml: 1, display: `${disableSearchBtn ? 'none' : ''}` }}
+                className={classes.MbtnSearch}
+                fullWidth={true}>
+                ค้นหา
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
       </Box>

@@ -69,43 +69,30 @@ export const isGroupBranch = () => {
   return userInfo.group === PERMISSION_GROUP.BRANCH;
 };
 
+export const isPreferredUsername = () => {
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return userInfo.preferred_username;
+};
+
 const permission = {
   scm: {
     menu: {
       mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
-      submenu: [
-        SUBMENU.SALE_DISCOUNT,
-        SUBMENU.OR_ORDER_RECEIVE,
-        SUBMENU.OR_DIFF,
-        SUBMENU.OR_SUPPLIER,
-        SUBMENU.ST_REQUEST,
-      ],
+      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_SUPPLIER, SUBMENU.ST_REQUEST],
     },
     action: [ACTIONS.STOCK_RT_APPROVE, ACTIONS.STOCK_RT_REJECT, ACTIONS.STOCK_RT_VIEW, ACTIONS.STOCK_RT_MANAGE],
   },
   oc: {
     menu: {
       mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
-      submenu: [
-        SUBMENU.SALE_DISCOUNT,
-        SUBMENU.OR_ORDER_RECEIVE,
-        SUBMENU.OR_DIFF,
-        SUBMENU.OR_SUPPLIER,
-        SUBMENU.ST_REQUEST,
-      ],
+      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_ORDER_RECEIVE, SUBMENU.OR_SUPPLIER, SUBMENU.ST_REQUEST],
     },
     action: [ACTIONS.STOCK_RT_VIEW, ACTIONS.STOCK_RT_APPROVE, ACTIONS.STOCK_RT_REJECT],
   },
   dc: {
     menu: {
       mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
-      submenu: [
-        SUBMENU.SALE_DISCOUNT,
-        SUBMENU.OR_ORDER_RECEIVE,
-        SUBMENU.OR_DIFF,
-        SUBMENU.OR_SUPPLIER,
-        SUBMENU.ST_TRANSFER,
-      ],
+      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_DIFF, SUBMENU.OR_SUPPLIER, SUBMENU.ST_TRANSFER],
     },
     action: [ACTIONS.STOCK_BT_VIEW, ACTIONS.STOCK_BT_EXPORT],
   },
@@ -139,7 +126,6 @@ const permission = {
       submenu: [
         SUBMENU.SALE_DISCOUNT,
         SUBMENU.OR_ORDER_RECEIVE,
-        SUBMENU.OR_DIFF,
         SUBMENU.OR_SUPPLIER,
         SUBMENU.ST_REQUEST,
         SUBMENU.ST_TRANSFER,

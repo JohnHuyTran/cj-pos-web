@@ -50,7 +50,7 @@ export const fetchProvinceListAsync = createAsyncThunk('ProvinceList', async () 
 
 export const fetchBranchProvinceListAsync = createAsyncThunk('BranchList', async (params: string) => {
   try {
-    const path = `${environment.master.branch.branch.url}?${params}`;
+    const path = `${environment.master.branch.searchBranch.url}?${params}`;
 
     let response = await get(path).then();
 

@@ -56,6 +56,14 @@ const useStyles = makeStyles({
       '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
     },
   },
+  MtextUpLoadFile: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      border: '1px dashed #36C690 !important',
+      height: '2.3em !important',
+      // maxWidth: '90% !important',
+    },
+  },
   MtimeTextField: {
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
@@ -268,17 +276,17 @@ const useStyles = makeStyles({
     },
   },
   MbtnSearch: {
-    borderRadius: '5px !important',
+    borderRadius: '4px !important',
   },
   MbtnSave: {
-    width: '125px',
+    width: '100px',
     // backgroundColor: "#FBA600 !important",
     borderRadius: '4px !important',
     marginLeft: '10px !important',
     boxShadow: 'none !important',
   },
   MbtnApprove: {
-    width: '125px',
+    width: '100px',
     borderRadius: '4px !important',
     marginLeft: '10px !important',
     boxShadow: 'none !important',
@@ -286,6 +294,12 @@ const useStyles = makeStyles({
   MbtnBrowse: {
     width: '125px',
     borderRadius: '8px !important',
+    boxShadow: 'none !important',
+  },
+  MbtnAdd: {
+    width: '140px',
+    borderRadius: '4px !important',
+    marginLeft: '10px !important',
     boxShadow: 'none !important',
   },
   MtextFieldRemark: {
@@ -322,8 +336,21 @@ const useStyles = makeStyles({
       fontSize: '12px',
     },
   },
+  MtextFieldUpload: {
+    '& .MuiOutlinedInput-root': {
+      //input
+      borderRadius: '5px !important',
+      border: '1px dashed #36C690 !important',
+      padding: '0px 4px !important',
+      minWidth: '455px',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      color: '#676767 !important',
+      fontSize: '12px',
+    },
+  },
   MbtnPrint: {
-    width: '200px',
+    width: '155px',
     borderRadius: '4px !important',
   },
   MbtnClose: {

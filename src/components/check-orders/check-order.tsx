@@ -22,11 +22,13 @@ import AlertError from '../commons/ui/alert-error';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { shipmentStatus } from '../../utils/enum/check-order-enum';
+import OrderReceiveDetail from '../check-orders/order-receive-detail';
 import { isGroupBranch } from '../../utils/role-permission';
 import { getUserInfo } from '../../store/sessionStore';
 import { getBranchName } from '../../utils/utils';
 import { env } from '../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../models/branch-model';
+import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 
 // moment.locale("en");
 moment.locale('th');
@@ -205,11 +207,15 @@ function CheckOrderSearch() {
     groupBranch ? branchToMap : null
   );
 
+  const [displayBtnOrderReceive, setDisplayBtnOrderReceive] = React.useState(false);
   React.useEffect(() => {
     if (groupBranch) {
       setBranchToCode(ownBranch);
       setValues({ ...values, branchTo: ownBranch });
     }
+
+    const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
+    setDisplayBtnOrderReceive(branch);
   }, []);
 
   const handleChangeBranchFrom = (branchCode: string) => {
@@ -249,6 +255,15 @@ function CheckOrderSearch() {
         </Grid>
       );
     }
+  }
+
+  const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
+  const handleOpenOrderReceiveModal = () => {
+    setOpenOrderReceiveModal(true);
+  };
+
+  function handleCloseOrderReceiveModal() {
+    setOpenOrderReceiveModal(false);
   }
 
   //check dateFrom-dateTo
@@ -302,6 +317,7 @@ function CheckOrderSearch() {
               onChangeBranch={handleChangeBranchTo}
               isClear={clearBranchDropDown}
               disable={groupBranch}
+              isFilterAuthorizedBranch={groupBranch}
             />
           </Grid>
 
@@ -370,8 +386,8 @@ function CheckOrderSearch() {
             <Button
               id="btnCreateStockTransferModal"
               variant="contained"
-              // onClick={handleOpenCreateModal}
-              sx={{ minWidth: '15%' }}
+              onClick={handleOpenOrderReceiveModal}
+              sx={{ minWidth: '15%', display: `${!displayBtnOrderReceive ? 'none' : ''}` }}
               className={classes.MbtnClear}
               startIcon={<AddCircleOutlineOutlinedIcon />}
               color="secondary"
@@ -407,6 +423,10 @@ function CheckOrderSearch() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+      {openOrderReceiveModal && (
+        <OrderReceiveDetail defaultOpen={openOrderReceiveModal} onClickClose={handleCloseOrderReceiveModal} />
+      )}
     </>
   );
 }

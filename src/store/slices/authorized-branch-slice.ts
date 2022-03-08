@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { BranchResponse } from '../../models/search-branch-model';
+import { AuthorizedBranchResponse } from '../../models/search-branch-model';
 import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
 
 type State = {
-  branchList: BranchResponse;
+  branchList: AuthorizedBranchResponse;
   error: string;
 };
 
@@ -13,14 +13,15 @@ const initialState: State = {
     ref: '',
     code: 0,
     message: '',
-    data: [],
+    data: null,
+    timestamp: '',
   },
   error: '',
 };
 
-export const featchBranchListAsync = createAsyncThunk('BranchList', async () => {
+export const featchAuthorizedBranchListAsync = createAsyncThunk('authorizedBranch', async () => {
   try {
-    const path = environment.master.branch.allBranch.url;
+    const path = environment.authority.authorizedBranch.url;
 
     let response = await get(path).then();
 
@@ -30,22 +31,22 @@ export const featchBranchListAsync = createAsyncThunk('BranchList', async () => 
   }
 });
 
-const searchBranchSlice = createSlice({
-  name: 'searchBranch',
+const authorizedhBranchSlice = createSlice({
+  name: 'authorizedBranch',
   initialState,
   reducers: {},
   extraReducers: (builer) => {
-    builer.addCase(featchBranchListAsync.pending, () => {
+    builer.addCase(featchAuthorizedBranchListAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchBranchListAsync.fulfilled, (state, action: PayloadAction<any>) => {
+      builer.addCase(featchAuthorizedBranchListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         state.branchList = action.payload;
       }),
-      builer.addCase(featchBranchListAsync.rejected, () => {
+      builer.addCase(featchAuthorizedBranchListAsync.rejected, () => {
         initialState;
       });
   },
 });
 
 // export const { clearDataFilter } = dcCheckOrderSlice.actions;
-export default searchBranchSlice.reducer;
+export default authorizedhBranchSlice.reducer;

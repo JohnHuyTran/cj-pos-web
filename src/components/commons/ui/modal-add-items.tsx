@@ -137,6 +137,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
       barcode: item.barcode,
       unitName: item.unitName,
       barcodeName: item.barcodeName,
+      productName: item.barcodeName,
       qty: item.qty ? item.qty : 1,
       skuCode: item.skuCode,
       skuName: item.skuName,
@@ -251,6 +252,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
             const itemsDup: any = {
               barcode: data.barcode,
               barcodeName: data.barcodeName,
+              productName: data.barcodeName,
               qty: Number(data.qty ? data.qty : 0) + 1,
               skuCode: data.skuCode,
               skuName: data.skuName,

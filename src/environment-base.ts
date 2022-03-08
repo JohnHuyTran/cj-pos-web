@@ -28,6 +28,12 @@ export const environment = {
       printFormShipmentDeliverly: {
         url: '/order/stock-diff/{sdNo}/export',
       },
+      search: {
+        url: '/order/shipment/search',
+      },
+      approveOrderReceive: {
+        url: '/order//shipment/submit',
+      },
     },
     dcCheckOrder: {
       fetchOrder: {
@@ -249,6 +255,12 @@ export const environment = {
       remove: {
         url: '/stock/stock-request/remove/{rtNo}',
       },
+      downloadTemplate: {
+        url: '/stock/stock-request/download/template',
+      },
+      importStockRequest: {
+        url: '/stock/stock-request/import',
+      },
     },
     stockBalanceCheck: {
       url: '/stock/stock-balance-check',
@@ -264,12 +276,20 @@ export const environment = {
       province: {
         url: '/master/branch/province',
       },
-      branch: {
+      searchBranch: {
         url: '/master/branch/search',
+      },
+      allBranch: {
+        url: '/master/branches',
       },
       branchTotal: {
         url: '/master/branch/branch-total',
       },
+    },
+  },
+  authority: {
+    authorizedBranch: {
+      url: '/authority/authorized-branches',
     },
   },
 };

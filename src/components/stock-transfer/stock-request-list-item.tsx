@@ -19,9 +19,12 @@ import ModelDeleteConfirm from '../commons/ui/modal-delete-confirm';
 import { numberWithCommas } from '../../utils/utils';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
+import { getUserInfo } from '../../store/sessionStore';
+import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 
 export interface DataGridProps {
   type: string;
+  edit: boolean;
   onChangeItems: (items: Array<any>) => void;
   // changeItems: (chang: Boolean) => void;
   update: boolean;
@@ -151,7 +154,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function StockTransferListItem({ type, onChangeItems, update, status, skuCode, skuName }: DataGridProps) {
+function StockTransferListItem({ type, edit, onChangeItems, update, status, skuCode, skuName }: DataGridProps) {
   const dispatch = useAppDispatch();
   const _ = require('lodash');
   const classes = useStyles();
@@ -167,41 +170,30 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
 
   const handleCheckboxChange = (e: any) => {
     const ischeck = e.target.checked;
-
     if (ischeck) {
-      // setSkuNameDisplay('');
       setIschecked(true);
       setSkuCodeSelect('ALL');
     } else {
       setIschecked(false);
-      // setSkuCodeSelect(defaultSkuSelected);
+      setSkuCodeSelect('');
     }
   };
 
-  console.log('isChecked :', isChecked);
-
   useEffect(() => {
-    // if (!update && type !== 'Create') {
-    //   if (stockRequestDetail) {
-    //     const items = stockRequestDetail.items ? stockRequestDetail.items : [];
-    //     if (items.length > 0) {
-    //       updateItemsState(items);
-    //       itemsMap(items);
-    //     }
-    //   }
-    // }
-    // console.log('stockRequestItems :', JSON.stringify(stockRequestItems));
-
     if (skuCode !== 'ALL') {
       setIschecked(false);
       setSkuCodeSelect(skuCode);
-      console.log('skuName :', skuName);
     }
   }, [update, skuCode]);
 
   const itemsMap = (items: any) => {
-    let edit = false;
-    if (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') edit = true;
+    let editM = false;
+    const oc = getUserInfo().group === PERMISSION_GROUP.OC;
+    const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
+
+    if (!oc) {
+      if (edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) editM = true;
+    }
 
     rows = items.map((item: any, index: number) => {
       return {
@@ -215,7 +207,7 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
         unitName: item.unitName,
         baseUnit: item.baseUnit ? item.baseUnit : 0,
         qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
-        editMode: edit,
+        editMode: editM,
       };
     });
 
@@ -237,15 +229,19 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
       }
     }
   } else {
-    let itemsOrderBy: any = [];
-    let item = stockRequestItems.filter((r: any) => r.skuCode === skuCode);
-    item = _.orderBy(item, ['skuCode', 'baseUnit'], ['asc', 'asc']);
-    item.forEach((data: any) => {
-      itemsOrderBy.push(data);
-    });
+    if (skuCodeSelect === '') {
+      rows = [];
+      skuName = '';
+    } else {
+      let itemsOrderBy: any = [];
+      let item = stockRequestItems.filter((r: any) => r.skuCode === skuCodeSelect);
+      item = _.orderBy(item, ['skuCode', 'baseUnit'], ['asc', 'asc']);
+      item.forEach((data: any) => {
+        itemsOrderBy.push(data);
+      });
 
-    // console.log('i :', JSON.stringify(item));
-    itemsMap(item);
+      itemsMap(item);
+    }
   }
 
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -253,8 +249,6 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
   const { apiRef, columns } = useApiRef();
   const handleEditItems = async (params: GridEditCellValueParams) => {
     if (params.field === 'qty') {
-      // console.log('SkuCodeSelect :', skuCodeSelect);
-
       const itemsList: any = [];
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -333,7 +327,7 @@ function StockTransferListItem({ type, onChangeItems, update, status, skuCode, s
         rowHeight={65}
         onCellClick={currentlySelected}
         onCellFocusOut={handleEditItems}
-        // onCellOut={handleEditItems}
+        onCellOut={handleEditItems}
         onCellKeyDown={handleEditItems}
       />
 
