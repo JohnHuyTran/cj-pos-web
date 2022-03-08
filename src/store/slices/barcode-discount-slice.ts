@@ -21,7 +21,7 @@ const initialState: ItemsState = {
     id: '',
     documentNumber: '',
     status: 0,
-    createdDate: {},
+    createdDate: new Date(),
     percentDiscount: true,
   },
   errorList: [],
