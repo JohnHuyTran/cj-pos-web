@@ -238,7 +238,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
               setOpenAlertFile(true);
               setOpenAlert(true);
               setTitelError('ไม่สามารถ import file ได้');
-              setTextError('ไม่มี role SCM');
+              setTextError(error.message);
               setBase64EncodeFile('');
               setLinkFileError(false);
             } else if (error.code === 40013) {
