@@ -247,7 +247,7 @@ function STCreateModal({
         let stEndTime = compareDateTime(values.endDate, values.endTime);
         if (stStartTime < moment(new Date(), DateFormat.DATE_TIME_DISPLAY_FORMAT)) {
           if (status <= 1 && isAdmin) {
-            setCheckValue({ ...checkValue, startTimeError: 'เวลาเริ่มต้นต้องสูงกว่าเวลาปัจจุบัน' });
+            setCheckValue({ ...checkValue, startTimeError: 'เวลาเริ่มต้นต้องมากกว่าเวลาปัจจุบัน' });
           }
         } else if (stStartTime >= stEndTime) {
           if (status <= 1 && isAdmin) {

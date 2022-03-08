@@ -29,6 +29,7 @@ interface StateProps {
   handleSetBranch: (e: any) => void;
   onSearch: () => void;
   checkAdmin: boolean;
+  handleChangePagination: (page: any, perPage: any) => void;
 }
 const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
@@ -58,7 +59,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
         return {
           checked: false,
           id: item.id,
-          index: index + 1,
+          index: (currentPage - 1) * parseInt(pageSize) + index + 1,
           documentNumber: item.documentNumber,
           status: item.status,
           description: item.description,
@@ -70,6 +71,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
         };
       });
       setListST(rows);
+      setPageSize(responveST.perPage.toString());
     }
   }, [responveST]);
 
@@ -297,6 +299,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       perPage: pageSize,
     };
     await dispatch(updatePayloadST(newPayload));
+    props.handleChangePagination(page, pageSize);
   };
   const handlePageSizeChange = async (cPageSize: number) => {
     setPageSize(cPageSize.toString());
@@ -305,9 +308,8 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       perPage: cPageSize.toString(),
       page: '1',
     };
-    setTimeout(async () => {
-      await dispatch(updatePayloadST(newPayload));
-    }, 1000);
+    await dispatch(updatePayloadST(newPayload));
+    props.handleChangePagination('1', cPageSize);
   };
   const handleCloseCreateModal = () => {
     setOpenDetailModal(false);
