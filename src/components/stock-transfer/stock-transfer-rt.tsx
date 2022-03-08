@@ -76,6 +76,7 @@ export default function StockTransferRt() {
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [isAuthorizedBranch, setIsAuthorizedBranch] = React.useState<boolean>(false);
   const [displayBtnImport, setDisplayBtnImport] = React.useState<boolean>(false);
+  const [displayBtnSubmit, setDisplayBtnSubmit] = React.useState<boolean>(false);
   const [groupBranchSCM, setGroupBranchSCM] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
@@ -104,6 +105,7 @@ export default function StockTransferRt() {
     if (scm) {
       setIsAuthorizedBranch(scm);
       setGroupBranchSCM(scm);
+      setDisplayBtnSubmit(scm);
     }
     if (groupBranch) {
       setBranchFromCode(ownBranch);
@@ -384,10 +386,20 @@ export default function StockTransferRt() {
               color="primary"
               startIcon={<Download />}
               onClick={handleOpenUploadFileModal}
-              sx={{ minWidth: '25%', display: `${!displayBtnImport ? 'none' : ''}` }}
+              sx={{ minWidth: 100, display: `${!displayBtnImport ? 'none' : ''}` }}
               className={classes.MbtnSearch}
             >
               Import
+            </Button>
+            <Button
+              id="btnImport"
+              variant="contained"
+              color="primary"
+              // onClick={handleOpenUploadFileModal}
+              sx={{ ml: 2, minWidth: 100, display: `${!displayBtnSubmit ? 'none' : ''}` }}
+              className={classes.MbtnSearch}
+            >
+              ส่งงาน
             </Button>
           </Grid>
           <Grid item xs={7} sx={{ textAlign: 'end' }}>
@@ -395,7 +407,7 @@ export default function StockTransferRt() {
               id="btnCreateStockTransferModal"
               variant="contained"
               onClick={handleOpenCreateModal}
-              sx={{ minWidth: '15%', display: `${displayBtnCreate ? 'none' : ''}` }}
+              sx={{ width: 150, display: `${displayBtnCreate ? 'none' : ''}` }}
               className={classes.MbtnClear}
               startIcon={<AddCircleOutlineOutlinedIcon />}
               color="secondary"
@@ -406,7 +418,7 @@ export default function StockTransferRt() {
               id="btnClear"
               variant="contained"
               onClick={onClickClearBtn}
-              sx={{ width: '13%', ml: 2 }}
+              sx={{ width: 110, ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
             >
@@ -417,7 +429,7 @@ export default function StockTransferRt() {
               variant="contained"
               color="primary"
               onClick={onClickValidateForm}
-              sx={{ width: '13%', ml: 2 }}
+              sx={{ width: 110, ml: 2 }}
               className={classes.MbtnSearch}
             >
               ค้นหา

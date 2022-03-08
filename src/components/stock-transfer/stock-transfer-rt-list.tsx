@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../store/store';
-import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRowData,
+  GridRowId,
+  GridRowParams,
+  GridValueGetterParams,
+  useGridApiRef,
+} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 // import { makeStyles } from '@mui/styles';
@@ -34,6 +43,13 @@ function StockTransferRtList() {
   const { t } = useTranslation(['stockTransfer', 'common']);
   const classes = useStyles();
   const dispatch = useAppDispatch();
+
+  const [groupSCM, setGroupSCM] = React.useState(false);
+  useEffect(() => {
+    const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
+    setGroupSCM(scm);
+  }, []);
+
   const items = useAppSelector((state) => state.searchStockTrnasferRt);
   const cuurentPage = useAppSelector((state) => state.searchStockTrnasferRt.orderList.page);
   const limit = useAppSelector((state) => state.searchStockTrnasferRt.orderList.perPage);
@@ -176,6 +192,27 @@ function StockTransferRtList() {
     },
   ];
 
+  // function useApiRef() {
+  //   const apiRef = useGridApiRef();
+  //   const _columns = useMemo(
+  //     () =>
+  //       columns.concat({
+  //         field: '',
+  //         width: 0,
+  //         minWidth: 0,
+  //         sortable: false,
+  //         renderCell: (params) => {
+  //           apiRef.current = params.api;
+  //           return null;
+  //         },
+  //       }),
+  //     [columns]
+  //   );
+
+  //   return { apiRef, columns: _columns };
+  // }
+
+  // const { apiRef, columns } = useApiRef();
   const [preferredUsername, setPreferredUsername] = React.useState(isPreferredUsername());
   const [groupOC, setGroupOC] = React.useState(getUserInfo().group === PERMISSION_GROUP.OC);
   const rows = res.data.map((data: StockTransferInfo, indexs: number) => {
@@ -316,6 +353,19 @@ function StockTransferRtList() {
   function handleCloseDetailModal() {
     setOpenDetailModal(false);
   }
+
+  // const handleSubmitRowSelect = async () => {
+  //   const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+  //   const rowSelect = apiRef.current.getSelectedRows();
+  //   // if (rowSelect.size === rowsEdit.size) {
+  //   //   // setOpenAlert(true);
+  //   //   // setTextError('ไม่สามารถลบรายการทั้งหมดได้');
+  //   //   return;
+  //   // }
+
+  //   // console.log('status :', params.row.status);
+  // };
+
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
@@ -337,6 +387,11 @@ function StockTransferRtList() {
             loading={loading}
             rowHeight={65}
             pagination
+            checkboxSelection={groupSCM ? true : false}
+            // isRowSelectable={handleRowSelect}
+            // checkboxSelection
+            isRowSelectable={(params: GridRowParams) => params.row.edit}
+            // disableSelectionOnClick={false}
           />
         </div>
       </Box>
