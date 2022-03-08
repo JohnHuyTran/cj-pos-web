@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { DataGrid, GridColDef, GridCellParams, GridRowId } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
@@ -14,9 +15,10 @@ import { saveSearchCriteria } from '../../store/slices/save-search-order';
 import checkOrderDetailSlice, { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
-import { Typography } from '@mui/material';
+import { Chip, Typography } from '@mui/material';
 
 function OrderList() {
+  const { t } = useTranslation(['stockTransfer', 'common']);
   const classes = useStyles();
   const items = useAppSelector((state) => state.checkOrderList);
   const cuurentPages = useAppSelector((state) => state.checkOrderList.orderList.page);
@@ -28,7 +30,7 @@ function OrderList() {
   const payload = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
   const dispatch = useAppDispatch();
   const [opens, setOpens] = React.useState(false);
-  const [shipment, setShipment] = React.useState('');
+  const [docRefNo, setDocRefNo] = React.useState('');
   const [sdNo, setSdNo] = React.useState('');
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
@@ -110,30 +112,33 @@ function OrderList() {
       headerAlign: 'center',
       align: 'left',
       sortable: false,
-      // renderCell: (params) => {
-      //   if (
-      //     params.value === 'CREATED' ||
-      //     params.value === 'READY_TO_TRANSFER' ||
-      //     params.value === 'WAIT_FOR_PICKUP' ||
-      //     params.value === 'TRANSFERING'
-      //   ) {
-      //     return (
-      //       <Chip
-      //         label={t(`status.${params.value}`)}
-      //         size='small'
-      //         sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
-      //       />
-      //     );
-      //   } else if (params.value === 'COMPLETED') {
-      //     return (
-      //       <Chip
-      //         label={t(`status.${params.value}`)}
-      //         size='small'
-      //         sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
-      //       />
-      //     );
-      //   }
-      // },
+      renderCell: (params) => {
+        if (params.value === 'DRAFT' || params.value === 'WAIT_FOR_APPROVE_1') {
+          return (
+            <Chip
+              label={t(`status.${params.value}`)}
+              size="small"
+              sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
+            />
+          );
+        } else if (params.value === 'APPROVED') {
+          return (
+            <Chip
+              label={t(`status.${params.value}`)}
+              size="small"
+              sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
+            />
+          );
+        } else if (params.value === 'CLOSED') {
+          return (
+            <Chip
+              label={t(`status.${params.value}`)}
+              size="small"
+              sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
+            />
+          );
+        }
+      },
     },
     {
       field: 'boxCnt',
@@ -185,7 +190,7 @@ function OrderList() {
       boxCnt: data.boxCnt,
       toteCnt: data.toteCnt,
       shipmentDate: convertUtcToBkkDate(data.shipmentDate),
-      sdStatus: getShipmentStatusText(data.sdStatus),
+      sdStatus: data.sdStatus,
       comment: data.comment,
       shipBranchFromcode: data.shipBranchFrom.code,
       shipBranchFromname: data.shipBranchFrom.name,
@@ -197,8 +202,7 @@ function OrderList() {
   const currentlySelected = async (params: GridCellParams) => {
     setOpenLoadingModal(true);
     setSdNo(params.row.sdNo);
-    // setShipment(params.row.shipmentNo);
-    setShipment(params.row.docRefNo);
+    setDocRefNo(params.row.docRefNo);
 
     await dispatch(featchOrderDetailAsync(params.row.sdNo))
       .then(
@@ -317,7 +321,7 @@ function OrderList() {
         />
       </div>
       {/* </Box> */}
-      {opens && <CheckOrderDetail sdNo={sdNo} shipmentNo={shipment} defaultOpen={opens} onClickClose={isClosModal} />}
+      {opens && <CheckOrderDetail sdNo={sdNo} docRefNo={docRefNo} defaultOpen={opens} onClickClose={isClosModal} />}
 
       <LoadingModal open={openLoadingModal} />
     </div>
