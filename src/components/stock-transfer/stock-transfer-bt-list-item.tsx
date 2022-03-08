@@ -366,9 +366,10 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
       };
       _newSku.push(newData);
     });
+    const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
     await dispatch(updateAddItemSkuGroupState(_newSku));
-    await dispatch(updateAddItemsGroupState(_items));
-    await setBranchTransferItems(_items);
+    await dispatch(updateAddItemsGroupState(orderItem));
+    await setBranchTransferItems(orderItem);
   };
 
   let newColumns = [...columns];

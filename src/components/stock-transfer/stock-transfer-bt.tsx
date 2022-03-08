@@ -173,7 +173,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     return true;
   };
 
-  const validateItem = () => {
+  const validateItem = (action: string) => {
     const _productSelector: any = store.getState().updateBTProductSlice.state;
     let itemNotValid: boolean = false;
     _productSelector.forEach((data: GridRowData) => {
@@ -191,10 +191,15 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       }
     });
 
+    let isZero = true;
     const _skuSelector = store.getState().updateBTSkuSlice.state;
     _skuSelector.forEach((data: ItemGroups) => {
       const actualQty = data.actualAllQty ? data.actualAllQty : 0;
       const orderQty = data.orderAllQty ? data.orderAllQty : 0;
+      if (actualQty > 0) {
+        isZero = false;
+      }
+
       if (actualQty < orderQty && !comment) {
         itemNotValid = true;
         setTextError('กรุณาระบุสาเหตุการเปลี่ยนจำนวน');
@@ -209,6 +214,11 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       }
     });
     if (itemNotValid) {
+      setOpenAlert(true);
+      return false;
+    } else if (isZero && action === 'sendToDC') {
+      setTextError('กรุณาระบุจำนวนโอนจริง > 0 อย่างน้อย 1 รายการ');
+      setComment(comment);
       setOpenAlert(true);
       return false;
     } else {
@@ -311,7 +321,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     // await storeItem();
     await dispatch(updateAddItemsState({}));
 
-    const isvalidItem = validateItem();
+    const isvalidItem = validateItem('save');
     if (isvalidItem) {
       const payload: BranchTransferRequest = await mappingPayload();
       await saveBranchTransfer(payload)
@@ -340,7 +350,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     // setIsClickBtnApprove(true);
     // await storeItem();
     await dispatch(updateAddItemsState({}));
-    const isvalidItem = validateItem();
+    const isvalidItem = validateItem('sendToDC');
     if (isvalidItem) {
       if (!btNo) {
         const payload: BranchTransferRequest = await mappingPayload();
