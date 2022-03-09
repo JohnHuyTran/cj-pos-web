@@ -234,7 +234,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                   ปิดงานใบตรวจสอบการรับ-โอนสินค้า
                 </Typography>
                 <Typography variant="body1" align="center">
-                  เลขที่เอกสาร LD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
                   <label style={{ color: '#36C690' }}>
                     <b>{shipmentNo}</b>
                   </label>
