@@ -3,6 +3,7 @@ import { environment } from '../environment-base';
 import { ContentType } from '../utils/enum/common-enum';
 import {
   Approve1StockTransferRequest,
+  Approve2BySCMStockRequest,
   Approve2MultipleStockRequest,
   Approve2StockTransferRequest,
   BranchTransferRequest,
@@ -236,6 +237,21 @@ export async function importStockRequest(payload: ImportStockRequest, files: Fil
 
 export async function approve2MultipleStockRequest(payload: Approve2MultipleStockRequest) {
   const response = await put(environment.stock.stockRequest.approve2MultipleBySCM.url, payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
+export const getPathApprove2BySCMStockRequest = (rtNo: string) => {
+  return getPathUrl(`${environment.stock.stockRequest.approve2BySCM.url}`, {
+    rtNo: rtNo,
+  });
+};
+
+export async function approve2BySCMStockRequest(rtNo: string, payload: Approve2BySCMStockRequest) {
+  const response = await put(getPathApprove2BySCMStockRequest(rtNo), payload, ContentType.JSON)
     .then((result: any) => result)
     .catch((error) => {
       throw error;
