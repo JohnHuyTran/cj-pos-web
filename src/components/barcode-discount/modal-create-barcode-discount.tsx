@@ -347,14 +347,14 @@ export default function ModalCreateBarcodeDiscount({
             isValid = false;
             item.errorNumberOfDiscounted = 'จำนวนที่ขอลดต้องมากกว่า 0';
           }
-          if (stringNullOrEmpty(preData.expiredDate)) {
+        }
+        if (stringNullOrEmpty(preData.expiredDate)) {
+          isValid = false;
+          item.errorExpiryDate = 'กรุณาระบุวันหมดอายุ';
+        } else {
+          if (moment(preData.expiredDate).isBefore(moment(new Date()), 'day')) {
             isValid = false;
-            item.errorExpiryDate = 'กรุณาระบุวันหมดอายุ';
-          } else {
-            if (moment(preData.expiredDate).isBefore(moment(new Date()), 'day')) {
-              isValid = false;
-              item.errorExpiryDate = 'วันที่หมดอายุต้องมากกว่าหรือเท่ากับวันที่วันนี้';
-            }
+            item.errorExpiryDate = 'วันที่หมดอายุต้องมากกว่าหรือเท่ากับวันที่วันนี้';
           }
         }
         if (!isValid) {
@@ -552,6 +552,7 @@ export default function ModalCreateBarcodeDiscount({
           if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isBefore(moment(new Date()), 'day')) {
             itPro.barcode = itPro.barCode;
             itPro.productName = itPro.barcodeName;
+            itPro.expiredDate = itPro.expiryDate;
             lstProductNotPrinted.push(itPro);
           }
         }
@@ -585,12 +586,12 @@ export default function ModalCreateBarcodeDiscount({
 
   const onShowPrintedHistory = async (sequence: any) => {
     if (printHistoryRows && printHistoryRows.length > 0 && printInDetail) {
-      let lstProductPrintAgain = [];
+      let lstProductPrintHistory = [];
       let printHistory = _.cloneDeep(printHistoryRows).find((it: any) => it.sequence === sequence);
       if (printHistory.listOfProduct && printHistory.listOfProduct.length) {
         for (const itPro of printHistory.listOfProduct) {
           itPro.barcode = itPro.productBarcode;
-          lstProductPrintAgain.push(itPro);
+          lstProductPrintHistory.push(itPro);
         }
         let ids = [];
         ids.push(dataDetail.id);
@@ -601,7 +602,8 @@ export default function ModalCreateBarcodeDiscount({
           ids: ids,
           printNormal: false,
           printInDetail: printInDetail,
-          lstProductPrintAgain: lstProductPrintAgain
+          lstProductNotPrinted: [],
+          lstProductPrintAgain: lstProductPrintHistory
         });
         handleOpenModalPrint();
       }
@@ -823,7 +825,7 @@ export default function ModalCreateBarcodeDiscount({
                   color='info'
                   className={classes.MbtnSearch}
                   onClick={onPrintedBarcode}
-                  disabled={barcodeDiscountPrint && barcodeDiscountPrint.length == 0 && printInDetail && status == Number(BDStatus.BARCODE_PRINTED)}
+                  disabled={!(barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail)}
                   startIcon={<PrintSharp/>}
                   sx={{ width: '208px' }}
                   style={{ display: (status >= Number(BDStatus.APPROVED) && status != Number(BDStatus.REJECT) && printPermission) ? undefined : 'none' }}

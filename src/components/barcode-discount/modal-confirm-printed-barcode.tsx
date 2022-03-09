@@ -425,13 +425,13 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
                             <Typography variant="h6">รายการสินค้าที่ไม่สามารถพิมพ์ได้</Typography>
                           </Box>
                           <Box>
-                            <div style={{ width: '100%', height: notPrintColumns.length >= 5 ? '43vh' : 'auto' }}
+                            <div style={{ width: '100%', height: notPrintRows.length >= 5 ? '43vh' : 'auto' }}
                                  className={classes.MdataGridPaginationTop}>
                               <DataGrid rows={notPrintRows} columns={notPrintColumns}
                                         disableColumnMenu
                                         hideFooter
                                         scrollbarSize={10}
-                                        autoHeight={notPrintColumns.length < 5}
+                                        autoHeight={notPrintRows.length < 5}
                                         rowHeight={70}/>
                             </div>
                           </Box>

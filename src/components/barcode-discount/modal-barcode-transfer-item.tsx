@@ -119,13 +119,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         && (Number(BDStatus.APPROVED) == dataDetail.status) || Number(BDStatus.BARCODE_PRINTED) == dataDetail.status) {
         if (rows && rows.length > 0) {
           let rowData = _.cloneDeep(rows);
-          let productPrintFilter: any[];
-          if (Number(BDStatus.BARCODE_PRINTED) == dataDetail.status) {
-            productPrintFilter = rowData.filter((itPro: any) => !stringNullOrEmpty(itPro.expiryDate)
-                && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day'));
-          } else {
-            productPrintFilter = rowData;
-          }
+          let productPrintFilter = rowData.filter((itPro: any) => !stringNullOrEmpty(itPro.expiryDate)
+                && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day')
+                && (itPro.numberOfApproved && itPro.numberOfApproved > 0));
           dispatch(updateBarcodeDiscountPrintState(productPrintFilter));
           dispatch(updatePrintInDetail(true));
         }
