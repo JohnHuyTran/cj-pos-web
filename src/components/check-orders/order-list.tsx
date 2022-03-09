@@ -18,7 +18,7 @@ import { ApiError } from '../../models/api-error-model';
 import { Chip, Typography } from '@mui/material';
 
 function OrderList() {
-  const { t } = useTranslation(['stockTransfer', 'common']);
+  const { t } = useTranslation(['common']);
   const classes = useStyles();
   const items = useAppSelector((state) => state.checkOrderList);
   const cuurentPages = useAppSelector((state) => state.checkOrderList.orderList.page);
