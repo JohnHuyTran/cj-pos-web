@@ -1037,7 +1037,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               )}
             </Grid>
           </Grid>
-          <Box mb={4}>
+          <Box mb={12}>
             <StockRequestSKU
               type={type}
               edit={edit}
