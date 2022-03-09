@@ -142,9 +142,9 @@ export const environment = {
       calculatePI: {
         url: '/purchase/purchase-invoice/calculate',
       },
-      supplierFile: {
-        url: '/purchase/getUrl',
-      },
+      // supplierFile: {
+      //   url: '/purchase/getUrl',
+      // },
       exportFile: {
         url: '/purchase/purchase-invoice/{piNo}/export',
       },
@@ -287,6 +287,13 @@ export const environment = {
       },
       branchTotal: {
         url: '/master/branch/branch-total',
+      },
+    },
+    file: {
+      huawei: {
+        pathFile: {
+          url: '/master/getUrl',
+        },
       },
     },
   },

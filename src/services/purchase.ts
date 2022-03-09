@@ -172,14 +172,6 @@ export async function calculateSupplierPI(payload: CalculatePurchasePIRequest) {
     throw error;
   }
 }
-export async function getFileUrlHuawei(filekey: string) {
-  const response = await get(environment.purchase.supplierOrder.supplierFile.url + `/${filekey}`)
-    .then((result: any) => result)
-    .catch((error: ApiError) => {
-      throw error;
-    });
-  return response;
-}
 
 export async function delFileUrlHuawei(filekey: string, docType: string, docNo: string) {
   const pathUrl = environment.purchase.supplierOrder.delFileHuawei.url + `/${docType}/${docNo}`;
