@@ -21,6 +21,7 @@ import {
   GridValueGetterParams,
   GridRowId,
   GridRowData,
+  GridEditCellValueParams,
 } from '@mui/x-data-grid';
 import DialogTitle from '@mui/material/DialogTitle';
 import Link from '@mui/material/Link';
@@ -738,6 +739,24 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     setOpenModelAddItems(false);
   };
 
+  const handleEditItems = async (params: GridEditCellValueParams) => {
+    if (params.field === 'productQuantityActual' || params.field === 'productComment') {
+      console.log('test');
+      const itemsList: any = [];
+
+      if (rowsEntries.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          console.log('data: ', data);
+          itemsList.push(data);
+        });
+      }
+      if (itemsList.length > 0) {
+        await dispatch(updateAddItemsState(itemsList));
+      }
+    }
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -986,6 +1005,9 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
                 disableColumnMenu
                 autoHeight={rowsEntries.length >= 8 ? false : true}
                 scrollbarSize={10}
+                // onCellFocusOut={handleEditItems}
+                // onCellOut={handleEditItems}
+                onCellKeyDown={handleEditItems}
               />
             </div>
           </Box>
