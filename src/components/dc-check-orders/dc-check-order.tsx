@@ -282,11 +282,11 @@ function DCCheckOrderSearch() {
               สาขาต้นทาง
             </Typography>
             <BranchListDropDown
-              // valueBranch={valuebranchFrom}
+              valueBranch={valuebranchFrom}
               sourceBranchCode={''}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
-              // disable={true}
+              disable={true}
             />
           </Grid>
           <Grid item xs={4}>

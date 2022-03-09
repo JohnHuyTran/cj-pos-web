@@ -168,13 +168,13 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                 <Typography variant='body2'>สาขาต้นทาง:</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant='body2'>{detailDC.sdNo}</Typography>
+                <Typography variant='body2'>{`${detailDC.shipBranchFrom.code}-${detailDC.shipBranchFrom.name}`}</Typography>
               </Grid>
               <Grid item xs={2}>
                 <Typography variant='body2'>สาขาปลายทาง:</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant='body2'>{getSdType(detailDC.sdType)}</Typography>
+                <Typography variant='body2'>{`${detailDC.shipBranchTo.code}-${detailDC.shipBranchTo.name}`}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -184,12 +184,8 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
               <Grid item xs={4}>
                 <Typography variant='body2'>{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
               </Grid>
-              <Grid item xs={2}>
-                <Typography variant='body2'>แนบเอกสาร:</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
-              </Grid>
+              <Grid item xs={2}></Grid>
+              <Grid item xs={4}></Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item xs={2}>
@@ -227,6 +223,12 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     </div>
                   )}
                 </div>
+              </Grid>
+              <Grid item xs={2}>
+                <Typography variant='body2'>แนบเอกสาร:</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
               </Grid>
             </Grid>
 
@@ -278,7 +280,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         file={detailDC.sdImageFile}
       /> */}
 
-      <ModalShowFile
+      {/* <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
         url=''
@@ -286,7 +288,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         sdImageFile={detailDC.sdImageFile}
         fileName=''
         btnPrintName=''
-      />
+      /> */}
 
       <LoadingModal open={openLoadingModal.open} />
     </div>
