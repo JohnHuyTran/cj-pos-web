@@ -239,7 +239,8 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">
-                  {orderReceiveInfo?.shipBranchFrom.name ? orderReceiveInfo?.shipBranchFrom.name : '-'}
+                  {orderReceiveInfo?.shipBranchFrom.code ? orderReceiveInfo?.shipBranchFrom.code : ''}-
+                  {orderReceiveInfo?.shipBranchFrom.name ? orderReceiveInfo?.shipBranchFrom.name : ''}
                 </Typography>
               </Grid>
               <Grid item lg={2}>
@@ -247,7 +248,8 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">
-                  {orderReceiveInfo?.shipBranchTo.name ? orderReceiveInfo?.shipBranchTo.name : '-'}
+                  {orderReceiveInfo?.shipBranchTo.code ? orderReceiveInfo?.shipBranchTo.code : ''}-
+                  {orderReceiveInfo?.shipBranchTo.name ? orderReceiveInfo?.shipBranchTo.name : ''}
                 </Typography>
               </Grid>
             </Grid>
