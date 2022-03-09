@@ -271,3 +271,7 @@ export interface ImportStockRequest {
   endDate: string;
   transferReason: string;
 }
+
+export interface Approve2MultipleStockRequest {
+  rtNos: string[];
+}
