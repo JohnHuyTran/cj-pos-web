@@ -436,7 +436,6 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         items: itemsList,
       };
 
-      console.log('payload: ', payload);
       await saveOrderShipments(payload, sdNo)
         .then((_value) => {
           setShowSnackBar(true);
@@ -656,7 +655,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     handleOpenLoading('open', true);
     setTimeout(() => {
       handleOpenLoading('open', false);
-      console.log('sdRef.data : ', sdRef.data);
+
       if (sdRef.data !== null && sdRef.data !== []) {
         setOpensSD(true);
       } else {

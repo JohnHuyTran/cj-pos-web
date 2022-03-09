@@ -28,8 +28,6 @@ interface ConfirmOrderShipment {
   items: Entry[];
   percentDiffType: boolean;
   percentDiffValue: string;
-  // fileName?: string ;
-  // imageContent?: string;
 }
 
 interface loadingModalState {
@@ -68,19 +66,8 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 };
 
 export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
-  const {
-    open,
-    onClose,
-    onUpdateShipmentStatus,
-    shipmentNo,
-    sdNo,
-    action,
-    items,
-    percentDiffType,
-    percentDiffValue,
-    // fileName,
-    // imageContent,
-  } = props;
+  const { open, onClose, onUpdateShipmentStatus, shipmentNo, sdNo, action, items, percentDiffType, percentDiffValue } =
+    props;
   const searchState = useAppSelector((state) => state.saveSearchOrder);
   const payloadSearchOrder: ShipmentRequest = searchState.searchCriteria;
   const dispatch = useAppDispatch();
@@ -128,11 +115,6 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         }
       );
     } else if (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
-      // const payload: OrderApproveCloseJobRequest = {
-      //   imageFileName: fileName,
-      //   imageFile: imageContent,
-      // };
-
       await closeOrderShipments(sdNo, fileUploadList)
         .then(
           async function (value) {

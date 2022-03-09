@@ -26,18 +26,9 @@ export async function approveOrderShipments(sdNo: string, payload: any) {
   return response;
 }
 
-// export async function closeOrderShipments(sdNo: string, payload: any) {
-//   try {
-//     const response = await put(getPathClose(sdNo), payload).then((result: any) => result);
-//     return response;
-//   } catch (error) {
-//     throw error;
-//   }
-// }
-
 export async function closeOrderShipments(sdNo: string, fileList: File[]) {
   const bodyFormData = new FormData();
-  // bodyFormData.append('requestBody', JSON.stringify(payload));
+  bodyFormData.append('requestBody', JSON.stringify({}));
 
   fileList.map((file: File) => {
     return bodyFormData.append('file[]', file);
@@ -50,25 +41,6 @@ export async function closeOrderShipments(sdNo: string, fileList: File[]) {
     throw error;
   }
 }
-
-// export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string, fileList: File[]) {
-//   const bodyFormData = new FormData();
-//   bodyFormData.append('requestBody', JSON.stringify(payload));
-
-//   fileList.map((data: File) => {
-//     return bodyFormData.append('file[]', data);
-//   });
-
-//   try {
-//     const response = await put(getPathSaveDraft(piNo), bodyFormData, ContentType.MULTIPART).then(
-//       (result: any) => result
-//     );
-//     return response;
-//   } catch (error) {
-//     console.log('error = ', error);
-//     throw error;
-//   }
-// }
 
 export async function fetchShipmentDeliverlyPDF(sdNo: string) {
   try {
@@ -128,7 +100,6 @@ export const getPathGenerateBO = (sdNo: string) => {
 };
 
 export async function approveDCOrderShipments(idDC: string, payload: any) {
-  console.log('approveDCOrderShipments : ' + idDC);
   const response = await put(getPathDCApprove(idDC), payload)
     .then((result: any) => result)
     .catch((error: ApiError) => {
