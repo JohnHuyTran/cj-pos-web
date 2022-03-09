@@ -11,7 +11,8 @@ import { uploadFileState } from '../../../store/slices/upload-file-slice';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { FileType } from '../../../models/supplier-check-order-model';
 import { ApiError } from '../../../models/api-error-model';
-import { delFileUrlHuawei, getFileUrlHuawei } from '../../../services/purchase';
+import { delFileUrlHuawei } from '../../../services/purchase';
+import { getFileUrlHuawei } from '../../../services/master-service';
 import ModalShowHuaweiFile from '../../commons/ui/modal-show-huawei-file';
 
 interface fileDisplayList {
@@ -217,28 +218,27 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
       <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
         <label htmlFor={'btnBrowse'}>
           <Button
-            id="btnPrint"
-            color="primary"
-            variant="contained"
-            component="span"
+            id='btnPrint'
+            color='primary'
+            variant='contained'
+            component='span'
             className={classes.MbtnBrowse}
-            disabled={newFileDisplayList.length === 5}
-          >
+            disabled={newFileDisplayList.length === 5}>
             แนบไฟล์
           </Button>
         </label>
 
-        <Typography variant="overline" sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
+        <Typography variant='overline' sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
           แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
         </Typography>
       </Box>
 
       <input
-        id="btnBrowse"
-        type="file"
+        id='btnBrowse'
+        type='file'
         // multiple
         // onDrop
-        accept=".pdf, .jpg, .jpeg"
+        accept='.pdf, .jpg, .jpeg'
         onChange={handleFileInputChange}
         style={{ display: 'none' }}
       />
@@ -250,18 +250,16 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
           mt: 2,
           borderRadius: '5px',
           border: `1px dashed ${theme.palette.primary.main}`,
-        }}
-      >
+        }}>
         <Box
           sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => {
             if (newFileDisplayList.length > 0) setAccordionFile(!accordionFile);
-          }}
-        >
+          }}>
           <Typography sx={{ fontSize: '14px', color: '#676767' }}>
             เอกสารแนบ จำนวน {newFileDisplayList.length}/5
           </Typography>
-          {accordionFile ? <KeyboardArrowUp color="primary" /> : <KeyboardArrowDown color="primary" />}
+          {accordionFile ? <KeyboardArrowUp color='primary' /> : <KeyboardArrowDown color='primary' />}
         </Box>
 
         <Box sx={{ display: accordionFile ? 'visible' : 'none' }}>
@@ -269,7 +267,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
             newFileDisplayList.map((item: fileDisplayList, index: number) => (
               <Box
                 key={index}
-                component="a"
+                component='a'
                 href={void 0}
                 sx={{
                   color: theme.palette.secondary.main,
@@ -277,26 +275,24 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                }}
-              >
+                }}>
                 {item.status === 'old' && (
                   <Typography
-                    color="secondary"
+                    color='secondary'
                     sx={{ textDecoration: 'underline', fontSize: '13px' }}
-                    onClick={() => getHuaweiFileUrl(item)}
-                  >
+                    onClick={() => getHuaweiFileUrl(item)}>
                     {item.fileName}
                   </Typography>
                 )}
 
                 {item.status === 'new' && (
-                  <Typography color="secondary" sx={{ fontSize: '13px' }}>
+                  <Typography color='secondary' sx={{ fontSize: '13px' }}>
                     {item.fileName}
                   </Typography>
                 )}
 
-                <IconButton onClick={() => handleDelete(item)} size="small">
-                  <CloseIcon fontSize="small" color="error" />
+                <IconButton onClick={() => handleDelete(item)} size='small'>
+                  <CloseIcon fontSize='small' color='error' />
                 </IconButton>
               </Box>
             ))}
