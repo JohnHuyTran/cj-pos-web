@@ -10,7 +10,7 @@ import ReasonsListDropDown from './transfer-reasons-list-dropdown';
 import AlertError from '../commons/ui/alert-error';
 import LoadingModal from '../commons/ui/loading-modal';
 import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
-import { StockTransferRequest } from '../../models/stock-transfer-model';
+import { Approve2MultipleStockRequest, StockTransferRequest } from '../../models/stock-transfer-model';
 import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
 import moment from 'moment';
 import { saveSearchStockTransferRt } from '../../store/slices/save-search-stock-transfer-rt-slice';
@@ -26,6 +26,9 @@ import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import { getUserInfo } from '../../store/sessionStore';
 import { Download } from '@mui/icons-material';
 import ModalUploadFile from './stock-request-upload-file';
+import ModalConfirmTransaction from './modal-confirm-transaction';
+import { approve2MultipleStockRequest } from '../../services/stock-transfer';
+import SnackbarStatus from '../commons/ui/snackbar-status';
 
 interface State {
   docNo: string;
@@ -241,23 +244,10 @@ export default function StockTransferRt() {
   const [flagSearch, setFlagSearch] = React.useState(false);
   const orderListDatas = items.orderList.data ? items.orderList.data : [];
 
-  let orderListData;
-  if (flagSearch) {
-    if (orderListDatas.length > 0) {
-      orderListData = <StockTransferRtList />;
-    } else {
-      orderListData = (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
-            <h2>
-              {/* ไม่มีข้อมูล <SearchOff fontSize='large' /> */}
-              ไม่มีข้อมูล
-            </h2>
-          </Box>
-        </Grid>
-      );
-    }
-  }
+  const [selectRowsList, setSelectRowsList] = React.useState<Array<any>>([]);
+  const handleSelectRows = async (list: any) => {
+    setSelectRowsList(list);
+  };
 
   const [openCreateModal, setOpenCreateModal] = React.useState(false);
   const [typeModal, setTypeModal] = React.useState('Create');
@@ -278,6 +268,44 @@ export default function StockTransferRt() {
   };
   const handleCloseUploadFileModal = async () => {
     setOpenUploadFileModal(false);
+  };
+
+  const handleApprove2Multiple = async () => {
+    setTextHeaderConfirm('ยืนยันส่งงานรายการโอนสินค้า');
+    setOpenModelConfirm(true);
+  };
+
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
+  const handleCloseModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+  const handleConfirm = async () => {
+    handleOpenLoading('open', true);
+    setOpenModelConfirm(false);
+    const payload: Approve2MultipleStockRequest = {
+      rtNos: selectRowsList,
+    };
+
+    await approve2MultipleStockRequest(payload)
+      .then((value) => {
+        onClickSearchBtn();
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+      })
+      .catch((error: any) => {
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+      });
+    handleOpenLoading('open', false);
   };
 
   return (
@@ -395,9 +423,10 @@ export default function StockTransferRt() {
               id="btnImport"
               variant="contained"
               color="primary"
-              // onClick={handleOpenUploadFileModal}
+              onClick={handleApprove2Multiple}
               sx={{ ml: 2, minWidth: 100, display: `${!displayBtnSubmit ? 'none' : ''}` }}
               className={classes.MbtnSearch}
+              disabled={selectRowsList.length === 0}
             >
               ส่งงาน
             </Button>
@@ -437,7 +466,15 @@ export default function StockTransferRt() {
           </Grid>
         </Grid>
       </Box>
-      {orderListData}
+
+      {flagSearch && orderListDatas.length > 0 && <StockTransferRtList onSelectRows={handleSelectRows} />}
+      {orderListDatas.length === 0 && (
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
+            <h2>ไม่มีข้อมูล</h2>
+          </Box>
+        </Grid>
+      )}
 
       <LoadingModal open={openLoadingModal.open} />
 
@@ -454,6 +491,22 @@ export default function StockTransferRt() {
       {openUploadFileModal && (
         <ModalUploadFile isOpen={openUploadFileModal} onClickClose={handleCloseUploadFileModal} />
       )}
+
+      <ModalConfirmTransaction
+        open={openModelConfirm}
+        onClose={handleCloseModelConfirm}
+        handleConfirm={handleConfirm}
+        header={textHeaderConfirm}
+        title="รายการเอกสาร RT"
+        value={`${selectRowsList.length} รายการ`}
+      />
+
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={contentMsg}
+      />
     </>
   );
 }
