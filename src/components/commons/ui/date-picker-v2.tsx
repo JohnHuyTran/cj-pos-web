@@ -95,6 +95,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         }}
         // maxDate={today}
         minDate={minDay}
+        minDateMessage={''}
         placeholder={props.placeHolder}
         disabled={props.disabled}
       />

@@ -21,9 +21,36 @@ export async function updateBarcodeDiscount(payload: Payload, id: string) {
   }
 }
 
-export async function approveBarcodeDiscount(id: string) {
+export async function sendForApprovalBarcodeDiscount(id: string) {
   try {
-    const response = await post(getPathApproveDraft(id));
+    const response = await post(getPathSendForApproval(id));
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function approveBarcodeDiscount(id: string, payload: Payload) {
+  try {
+    const response = await post(getPathApprove(id), payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function rejectBarcodeDiscount(id: string, reason: string) {
+  try {
+    const response = await get(getPathReject(id, reason));
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function printBarcodeDiscount(payload: any) {
+  try {
+    const response = await post(`${env.backEnd.url}${environment.sell.barcodeDiscount.print.url}`, payload);
     return response;
   } catch (error) {
     throw error;
@@ -52,8 +79,16 @@ export const getPathUpdateDraft = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.sell.barcodeDiscount.update.url}`, { id: id });
 };
 
-export const getPathApproveDraft = (id: string) => {
+export const getPathSendForApproval = (id: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.sell.barcodeDiscount.sendForApproval.url}`, { id: id });
+};
+
+export const getPathApprove = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.sell.barcodeDiscount.approve.url}`, { id: id });
+};
+
+export const getPathReject = (id: string, reason: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.sell.barcodeDiscount.reject.url}`, { id: id, reason: reason });
 };
 
 export const getPathCancelDraft = (id: string) => {

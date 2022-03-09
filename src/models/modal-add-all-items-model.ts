@@ -19,3 +19,22 @@ export interface ItemInfo {
   baseUnit?: number;
   qty?: number;
 }
+
+export interface ProductTypeResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  error_details: string;
+  data: ProductTypeInfo[];
+}
+
+export interface ProductTypeInfo {
+  productTypeCode: string;
+  productTypeName: string;
+}
+
+export interface PayloadSearchProduct {
+  search: string;
+  productTypeCodes: any[];
+}

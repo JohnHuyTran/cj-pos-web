@@ -32,7 +32,7 @@ export const environment = {
         url: '/order/shipment/search',
       },
       approveOrderReceive: {
-        url: '/order//shipment/submit',
+        url: '/order/shipment/submit',
       },
     },
     dcCheckOrder: {
@@ -67,11 +67,43 @@ export const environment = {
       update: {
         url: '/campaign/{id}',
       },
-      approve: {
+      sendForApproval: {
         url: '/campaign/{id}/waiting-approve',
+      },
+      approve: {
+        url: '/campaign/approve-barcode/{id}',
+      },
+      reject: {
+        url: '/campaign/barcode/reject?id={id}&reason={reason}',
+      },
+      print: {
+        url: '/campaign/print-barcode',
       },
       cancel: {
         url: '/campaign/{id}',
+      },
+    },
+    saleLimitTime: {
+      detail: {
+        url: '/campaign/sale-limit',
+      },
+      save: {
+        url: '/campaign/sale-limit',
+      },
+      update: {
+        url: '/campaign/sale-limit/{id}',
+      },
+      start: {
+        url: '/campaign/sale-limit/start/{id}',
+      },
+      startMultipe: {
+        url: '/campaign/sale-limit/start',
+      },
+      cancel: {
+        url: '/campaign/sale-limit/cancel',
+      },
+      upload: {
+        url: '/campaign/sale-limit/upload',
       },
     },
   },
@@ -136,6 +168,14 @@ export const environment = {
     },
   },
   products: {
+    type: {
+      search: {
+        url: '/products/type/all',
+      },
+      productByType: {
+        url: '/products/barcode/type',
+      },
+    },
     addItem: {
       allitemsList: {
         url: '/products/barcode/all',
@@ -215,6 +255,12 @@ export const environment = {
       remove: {
         url: '/stock/stock-request/remove/{rtNo}',
       },
+      downloadTemplate: {
+        url: '/stock/stock-request/download/template',
+      },
+      importStockRequest: {
+        url: '/stock/stock-request/import',
+      },
     },
     stockBalanceCheck: {
       url: '/stock/stock-balance-check',
@@ -225,14 +271,25 @@ export const environment = {
       },
     },
   },
+  master: {
+    branch: {
+      province: {
+        url: '/master/branch/province',
+      },
+      searchBranch: {
+        url: '/master/branch/search',
+      },
+      allBranch: {
+        url: '/master/branches',
+      },
+      branchTotal: {
+        url: '/master/branch/branch-total',
+      },
+    },
+  },
   authority: {
     authorizedBranch: {
       url: '/authority/authorized-branches',
-    },
-  },
-  master: {
-    branch: {
-      url: '/master/branches',
     },
   },
 };

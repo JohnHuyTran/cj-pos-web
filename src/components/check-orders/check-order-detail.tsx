@@ -265,7 +265,7 @@ interface fileInfoProps {
   base64URL: any;
 }
 
-export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClickClose }: CheckOrderDetailProps) {
+export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickClose }: CheckOrderDetailProps) {
   const classes = useStyles();
   const sdRef = useAppSelector((state) => state.checkOrderSDList.orderList);
   const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
@@ -432,10 +432,11 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
 
     if (qtyIsValid) {
       const payload: SaveDraftSDRequest = {
-        shipmentNo: shipmentNo,
+        shipmentNo: docRefNo,
         items: itemsList,
       };
 
+      // console.log('payload: ', payload);
       await saveOrderShipments(payload, sdNo)
         .then((_value) => {
           setShowSnackBar(true);
@@ -495,12 +496,6 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
   };
 
-  // const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
-  //   file: null,
-  //   fileName: '',
-  //   base64URL: '',
-  // });
-
   const validateFileInfo = () => {
     const isvalid = fileUploadList.length > 0 ? true : false;
     if (!isvalid) {
@@ -512,16 +507,6 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
   };
 
   const handleCloseJobBtn = () => {
-    // if (!fileInfo.base64URL) {
-    //   setErrorBrowseFile(true);
-    //   setMsgErrorBrowseFile('กรุณาแนบไฟล์เอกสาร');
-    // } else if (validationFile === true) {
-    //   setOpenFailAlert(true);
-    //   setTextFail('กรุณาตรวจสอบ ไฟล์เอกสาร');
-    // } else {
-    //   setOpenModelConfirm(true);
-    //   setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
-    // }
     const isFileValidate: boolean = validateFileInfo();
     if (isFileValidate) {
       setOpenModelConfirm(true);
@@ -541,76 +526,6 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
     setStatusFile(0);
     setOpenModelPreviewDocument(true);
     handleOpenLoading('open', false);
-  };
-
-  const getBase64 = (file: Blob) => {
-    return new Promise((resolve) => {
-      let fileInfo;
-      let baseURL: any = '';
-      // Make new FileReader
-      let reader = new FileReader();
-      // Convert the file to base64 text
-      reader.readAsDataURL(file);
-      // on reader load somthing...
-      reader.onload = () => {
-        // Make a fileInfo Object
-        baseURL = reader.result;
-        resolve(baseURL);
-      };
-    });
-  };
-
-  // const handleFileInputChange = (e: any) => {
-  //   setValidationFile(false);
-  //   setErrorBrowseFile(false);
-  //   setMsgErrorBrowseFile('');
-  //   checkSizeFile(e);
-
-  //   let file: File = e.target.files[0];
-  //   let fileType = file.type.split('/');
-  //   const fileName = `${sdNo}-01.${fileType[1]}`;
-
-  //   getBase64(file)
-  //     .then((result: any) => {
-  //       file = result;
-  //       setFileInfo({ ...fileInfo, base64URL: result, fileName: fileName });
-  //     })
-  //     .catch((err: any) => {
-  //       console.log(err);
-  //     });
-  // };
-
-  const checkSizeFile = (e: any) => {
-    const fileSize = e.target.files[0].size;
-    const fileName = e.target.files[0].name;
-    let parts = fileName.split('.');
-    let length = parts.length - 1;
-    // pdf, .jpg, .jpeg
-    if (
-      parts[length].toLowerCase() !== 'pdf' &&
-      parts[length].toLowerCase() !== 'jpg' &&
-      parts[length].toLowerCase() !== 'jpeg'
-    ) {
-      setValidationFile(true);
-      setErrorBrowseFile(true);
-      setMsgErrorBrowseFile('กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น');
-      return;
-    }
-
-    // 1024 = bytes
-    // 1024*1024*1024 = mb
-    let mb = 1024 * 1024 * 1024;
-    // fileSize = mb unit
-    if (fileSize < mb) {
-      //size > 5MB
-      let size = fileSize / 1024 / 1024;
-      if (size > 5) {
-        setValidationFile(true);
-        setErrorBrowseFile(true);
-        setMsgErrorBrowseFile('ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่');
-        return;
-      }
-    }
   };
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
@@ -759,10 +674,10 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร LD:</Typography>
+                <Typography variant="body2">เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetail.shipmentNo}</Typography>
+                <Typography variant="body2">{docRefNo}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">สถานะ:</Typography>
@@ -1015,7 +930,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         <CheckOrderSDRefDetail
           sdNo={sdNo}
           sdRefNo={orderDetail.Comment}
-          shipmentNo={shipmentNo}
+          shipmentNo={docRefNo}
           defaultOpen={opensSD}
           onClickClose={isClosSDModal}
         />
@@ -1025,7 +940,7 @@ export default function CheckOrderDetail({ sdNo, shipmentNo, defaultOpen, onClic
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
         onUpdateShipmentStatus={handleShowSnackBar}
-        shipmentNo={shipmentNo}
+        shipmentNo={docRefNo}
         sdNo={sdNo}
         action={action}
         items={itemsDiffState}

@@ -11,8 +11,6 @@ import Steppers from './steppers';
 import { useStyles } from '../../styles/makeTheme';
 import DatePickerComponent from '../commons/ui/date-picker-detail';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
-// import StockRequestItem from './stock-request-item';
-// import StockRequestCreateItem from './stock-request-create-item';
 import StockRequestSKU from './stock-request-list-sku';
 import { useAppDispatch } from '../../store/store';
 import ModalAddItems from '../commons/ui/modal-add-items';
@@ -236,7 +234,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   const [flagCreateSave, setFlagCreateSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const handleChkSaveClose = async () => {
-    if (flagSave) {
+    if (flagSave && edit) {
       setConfirmModelExit(true);
     } else if (!flagSave && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) {
       if (type === 'View' && rowLength !== Object.keys(payloadAddItem).length) {
@@ -775,102 +773,135 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               {moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
             </Grid>
           </Grid>
-          <Grid container spacing={2} mb={2}>
-            <Grid item xs={2}>
-              วันที่โอน{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
-            </Grid>
-            <Grid item xs={3}>
-              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-                <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
-              )}
 
-              {!edit && moment(startDate).add(543, 'y').format('DD/MM/YYYY')}
-            </Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={2}>
-              วันที่สิ้นสุด{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'}{' '}
-              :
-            </Grid>
-            <Grid item xs={3}>
-              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-                <DatePickerComponent
-                  onClickDate={handleEndDatePicker}
-                  value={endDate}
-                  type={'TO'}
-                  minDateTo={startDate}
-                />
-              )}
-              {!edit && moment(endDate).add(543, 'y').format('DD/MM/YYYY')}
-            </Grid>
-            <Grid item xs={1}></Grid>
-          </Grid>
-          <Grid container spacing={2} mb={2}>
-            <Grid item xs={2}>
-              สาขาต้นทาง{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
-            </Grid>
-            <Grid item xs={3}>
-              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-                <BranchListDropDown
-                  valueBranch={valuebranchFrom}
-                  sourceBranchCode={toBranch}
-                  onChangeBranch={handleChangeFromBranch}
-                  isClear={clearBranchDropDown}
-                  isFilterAuthorizedBranch={isAuthorizedBranch}
-                  disable={groupBranch}
-                  filterOutDC={groupBranchSCM}
-                />
-              )}
-              {!edit && `${fromBranch}-${valuebranchFrom?.name}`}
-            </Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={2}>
-              สาขาปลายทาง{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
-            </Grid>
-            <Grid item xs={3}>
-              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-                <BranchListDropDown
-                  valueBranch={valuebranchTo}
-                  sourceBranchCode={fromBranch}
-                  onChangeBranch={handleChangeToBranch}
-                  isClear={clearBranchDropDown}
-                  isFilterAuthorizedBranch={isAuthorizedBranch}
-                  filterOutDC={groupBranch}
-                />
-              )}
+          {edit && (
+            <div>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  วันที่โอน* :
+                </Grid>
+                <Grid item xs={3}>
+                  <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+                </Grid>
+                <Grid item xs={1}></Grid>
+                <Grid item xs={2}>
+                  วันที่สิ้นสุด* :
+                </Grid>
+                <Grid item xs={3}>
+                  <DatePickerComponent
+                    onClickDate={handleEndDatePicker}
+                    value={endDate}
+                    type={'TO'}
+                    minDateTo={startDate}
+                  />
+                </Grid>
+                <Grid item xs={1}></Grid>
+              </Grid>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  สาขาต้นทาง* :
+                </Grid>
+                <Grid item xs={3}>
+                  <BranchListDropDown
+                    valueBranch={valuebranchFrom}
+                    sourceBranchCode={toBranch}
+                    onChangeBranch={handleChangeFromBranch}
+                    isClear={clearBranchDropDown}
+                    isFilterAuthorizedBranch={isAuthorizedBranch}
+                    disable={groupBranch}
+                    filterOutDC={groupBranchSCM}
+                  />
+                </Grid>
+                <Grid item xs={1}></Grid>
+                <Grid item xs={2}>
+                  สาขาปลายทาง* :
+                </Grid>
+                <Grid item xs={3}>
+                  <BranchListDropDown
+                    valueBranch={valuebranchTo}
+                    sourceBranchCode={fromBranch}
+                    onChangeBranch={handleChangeToBranch}
+                    isClear={clearBranchDropDown}
+                    isFilterAuthorizedBranch={isAuthorizedBranch}
+                    filterOutDC={groupBranch}
+                  />
+                </Grid>
+                <Grid item xs={1}></Grid>
+              </Grid>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  สาเหตุการโอน* :
+                </Grid>
+                <Grid item xs={3}>
+                  <TransferReasonsListDropDown
+                    reasonsValue={reasons}
+                    onChangeReasons={handleChangeReasons}
+                    isClear={false}
+                    isDetail={true}
+                  />
+                </Grid>
+                <Grid item xs={7}></Grid>
+              </Grid>
+            </div>
+          )}
 
-              {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
-                <BranchListDropDown
-                  valueBranch={valuebranchTo}
-                  sourceBranchCode={fromBranch}
-                  onChangeBranch={handleChangeToBranch}
-                  isClear={clearBranchDropDown}
-                  isFilterAuthorizedBranch={isAuthorizedBranch}
-                  filterOutDC={groupBranch}
-                />
-              )}
+          {!edit && (
+            <div>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  วันที่โอน :
+                </Grid>
+                <Grid item xs={3}>
+                  {moment(startDate).add(543, 'y').format('DD/MM/YYYY')}
+                </Grid>
+                <Grid item xs={1}></Grid>
+                <Grid item xs={2}>
+                  วันที่สิ้นสุด :
+                </Grid>
+                <Grid item xs={3}>
+                  {moment(endDate).add(543, 'y').format('DD/MM/YYYY')}
+                </Grid>
+                <Grid item xs={1}></Grid>
+              </Grid>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  สาขาต้นทาง :
+                </Grid>
+                <Grid item xs={3}>
+                  {fromBranch}-{valuebranchFrom?.name}
+                </Grid>
+                <Grid item xs={1}></Grid>
+                <Grid item xs={2}>
+                  สาขาปลายทาง :
+                </Grid>
+                <Grid item xs={3}>
+                  {status !== 'WAIT_FOR_APPROVAL_2' && `${toBranch}-${valuebranchTo?.name}`}
+                  {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
+                    <BranchListDropDown
+                      valueBranch={valuebranchTo}
+                      sourceBranchCode={fromBranch}
+                      onChangeBranch={handleChangeToBranch}
+                      isClear={clearBranchDropDown}
+                      isFilterAuthorizedBranch={isAuthorizedBranch}
+                      filterOutDC={groupBranch}
+                    />
+                  )}
 
-              {!edit && !groupSCM && `${toBranch}-${valuebranchTo?.name}`}
-            </Grid>
-            <Grid item xs={1}></Grid>
-          </Grid>
-          <Grid container spacing={2} mb={2}>
-            <Grid item xs={2}>
-              สาเหตุการโอน{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'}{' '}
-              :
-            </Grid>
-            <Grid item xs={3}>
-              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-                <TransferReasonsListDropDown
-                  reasonsValue={reasons}
-                  onChangeReasons={handleChangeReasons}
-                  isClear={false}
-                  isDetail={true}
-                />
-              )}
-              {!edit && reasonText}
-            </Grid>
-            <Grid item xs={7}></Grid>
-          </Grid>
+                  {!groupSCM && status === 'WAIT_FOR_APPROVAL_2' && `${toBranch}-${valuebranchTo?.name}`}
+                </Grid>
+                <Grid item xs={1}></Grid>
+              </Grid>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  สาเหตุการโอน :
+                </Grid>
+                <Grid item xs={3}>
+                  {reasonText}
+                </Grid>
+                <Grid item xs={7}></Grid>
+              </Grid>
+            </div>
+          )}
 
           {edit && !groupOC && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
             <Grid container spacing={2} mt={4} mb={2}>

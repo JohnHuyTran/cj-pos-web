@@ -144,7 +144,7 @@ export interface itemsDetail {
 
 export interface CheckOrderDetailProps {
   sdNo: string;
-  shipmentNo: string;
+  docRefNo: string;
   defaultOpen: boolean;
   onClickClose: any;
 }

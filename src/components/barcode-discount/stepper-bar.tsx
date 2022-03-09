@@ -17,11 +17,14 @@ export default function StepperBar({
   setActiveStep,
 }: Props): ReactElement {
   const [rejected, setRejected] = React.useState<boolean>(false);
+  const [activeStepBar, setActiveStepBar] = React.useState(0);
 
   React.useEffect(() => {
     if (activeStep === 5) {
       setRejected(true);
-      setActiveStep(3);
+      setActiveStepBar(3);
+    } else {
+      setActiveStepBar(activeStep);
     }
   }, [activeStep, open]);
 
@@ -29,7 +32,7 @@ export default function StepperBar({
   return (
     <div className={classes.MStepper} style={{ paddingBottom: 5 }}>
       <Box sx={{ width: '45%', margin: 'auto', marginTop: '-1em' }}>
-        <Stepper activeStep={activeStep} alternativeLabel>
+        <Stepper activeStep={activeStepBar} alternativeLabel>
           {steps.map((label, index) => {
             const labelProps: any = {};
             if (index === 2 && rejected) {

@@ -190,6 +190,18 @@ export default function Sidebar({}: Props): ReactElement {
         </ListItemButton>
         <Collapse in={openSellMenu} timeout='auto' unmountOnExit>
           <List component='div' disablePadding>
+            <Link to="/sale-limit-time" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuSaleLimitTime">
+                <ListItemButton
+                  key="SALE LIMIT TINE"
+                  selected={selectedIndex === 4}
+                  onClick={() => handleListItemClick(4)}
+                  sx={{ pl: 7 }}
+                >
+                  <ListItemText primary="กำหนดเวลา (งด) ขายสินค้า" />
+                </ListItemButton>
+              </Link>
+          </List>
+          <List component='div' disablePadding>
             <Link
               to='/barcode-discount'
               style={{ textDecoration: 'none', color: '#676767' }}

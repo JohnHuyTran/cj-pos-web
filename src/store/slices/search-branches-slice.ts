@@ -20,7 +20,7 @@ const initialState: State = {
 
 export const featchBranchListAsync = createAsyncThunk('BranchList', async () => {
   try {
-    const path = environment.master.branch.url;
+    const path = environment.master.branch.allBranch.url;
 
     let response = await get(path).then();
 

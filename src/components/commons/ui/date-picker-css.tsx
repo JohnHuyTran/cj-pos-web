@@ -34,6 +34,25 @@ const useStyles = makeStyles({
       paddingLeft: '0px !important',
     },
   },
+  MdatepickerDetail: {
+    '& .MuiOutlinedInput-input': {
+      padding: '0px !important',
+      fontFamily: 'Kanit',
+    },
+    '& .MuiIconButton-root': {},
+    '& .MuiOutlinedInput-adornedEnd': {
+      paddingRight: '0px !important',
+    },
+    '& .MuiOutlinedInput-adornedStart': {
+      paddingLeft: '0px !important',
+    },
+    '& .MuiInputBase-input.Mui-disabled': {
+      color: 'rgba(0, 0, 0, 0.87) !important',
+    },
+    '& .MuiFormHelperText-root.Mui-error': {
+      display: 'none',
+    },
+  },
   MdatepickerError: {
     '& .MuiOutlinedInput-input': {
       // padding: "6px 0px !important",

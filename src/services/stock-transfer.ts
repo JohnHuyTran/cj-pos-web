@@ -1,10 +1,11 @@
-import { post, put } from '../adapters/posback-adapter';
+import { post, put, getFile } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { ContentType } from '../utils/enum/common-enum';
 import {
   Approve1StockTransferRequest,
   Approve2StockTransferRequest,
   BranchTransferRequest,
+  ImportStockRequest,
   SaveStockTransferRequest,
   StockBalanceType,
   SubmitStockTransferRequest,
@@ -199,4 +200,40 @@ export async function removeStockRequest(rtNo: string) {
       throw error;
     });
   return response;
+}
+
+export async function fetchDownloadTemplateRT() {
+  try {
+    const response = await getFile(environment.stock.stockRequest.downloadTemplate.url).then((result: any) => result);
+    return response;
+  } catch (error) {
+    console.log('error = ', error);
+    throw error;
+  }
+}
+
+export async function importStockRequest(payload: ImportStockRequest, files: File) {
+  try {
+    console.log('payload :', payload);
+    console.log('files :', files);
+
+    const bodyFormData = new FormData();
+    bodyFormData.append('file', files);
+    bodyFormData.append('startDate', payload.startDate);
+    bodyFormData.append('endDate', payload.endDate);
+    bodyFormData.append('transferReason', payload.transferReason);
+
+    console.log('bodyFormData :', bodyFormData);
+
+    const response = await post(
+      environment.stock.stockRequest.importStockRequest.url,
+      bodyFormData,
+      ContentType.MULTIPART,
+      'Upload'
+    ).then((result: any) => result);
+    return response;
+  } catch (error) {
+    console.log('error :', error);
+    throw error;
+  }
 }
