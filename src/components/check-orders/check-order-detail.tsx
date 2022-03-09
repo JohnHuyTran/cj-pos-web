@@ -728,52 +728,6 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
                     onChangeUploadFile={handleOnChangeUploadFile}
                   />
                 )}
-                {/* {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
-                  <div>
-                    {errorBrowseFile === true && (
-                      <TextField
-                        error
-                        name="browserTxf"
-                        className={classes.MtextFieldBrowse}
-                        value={fileInfo.fileName}
-                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
-                        helperText={msgErrorBrowseFile}
-                      />
-                    )}
-
-                    {errorBrowseFile === false && (
-                      <TextField
-                        name="browserTxf"
-                        className={classes.MtextFieldBrowse}
-                        value={fileInfo.fileName}
-                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
-                      />
-                    )}
-
-                    <input
-                      id="btnBrowse"
-                      type="file"
-                      // multiple
-                      // onDrop
-                      accept=".pdf, .jpg, .jpeg"
-                      onChange={handleFileInputChange}
-                      style={{ display: 'none' }}
-                    />
-
-                    <label htmlFor={'btnBrowse'}>
-                      <Button
-                        id="btnPrint"
-                        color="primary"
-                        variant="contained"
-                        component="span"
-                        className={classes.MbtnBrowse}
-                        style={{ marginLeft: 10, textTransform: 'none' }}
-                      >
-                        Browse
-                      </Button>
-                    </label>
-                  </div>
-                )} */}
 
                 {orderDetail.sdImageFile !== '' &&
                   orderDetail.sdImageFile !== 'temp' &&
@@ -961,7 +915,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         onClose={handleModelPreviewDocument}
         url={getPathReportSD(sdNo)}
         statusFile={statusFile}
-        sdImageFile={orderDetail.sdImageFile}
+        sdImageFile={orderDetail.sdImageFile ? orderDetail.sdImageFile : ''}
         fileName={orderDetail.sdImageFilename ? orderDetail.sdImageFilename : formatFileNam(sdNo, orderDetail.sdStatus)}
         btnPrintName="พิมพ์ใบผลต่าง"
       />
