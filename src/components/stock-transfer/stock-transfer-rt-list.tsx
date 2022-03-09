@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../store/store';
-import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRowData,
+  GridRowId,
+  GridRowParams,
+  GridValueGetterParams,
+  useGridApiRef,
+} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 // import { makeStyles } from '@mui/styles';
@@ -30,152 +39,185 @@ interface loadingModalState {
   open: boolean;
 }
 
-function StockTransferRtList() {
+export interface DataGridProps {
+  onSelectRows: (rowsList: Array<any>) => void;
+}
+
+const columns: GridColDef[] = [
+  {
+    field: 'index',
+    headerName: 'ลำดับ',
+    width: 70,
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params) => (
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
+        {params.value}
+      </Box>
+    ),
+  },
+  {
+    field: 'rtNo',
+    headerName: 'เลขที่เอกสารร้องขอ RT',
+    minWidth: 190,
+    flex: 1.2,
+    headerAlign: 'center',
+    sortable: false,
+  },
+  {
+    field: 'startDate',
+    headerName: 'วันที่โอน',
+    minWidth: 150,
+    headerAlign: 'center',
+    align: 'left',
+    sortable: false,
+    renderCell: (params) => (
+      <div>
+        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          {params.value} - {params.getValue(params.id, 'endDate') || ''}
+        </Typography>
+      </div>
+    ),
+  },
+  {
+    field: 'branchFromName',
+    headerName: 'สาขาต้นทาง',
+    minWidth: 210,
+    flex: 1.2,
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params) => (
+      <div>
+        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          {params.getValue(params.id, 'branchFrom') || ''}-{params.value}
+        </Typography>
+      </div>
+    ),
+  },
+  {
+    field: 'branchToName',
+    headerName: 'สาขาปลายทาง',
+    minWidth: 210,
+    flex: 1.2,
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params) => (
+      <div>
+        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          {params.getValue(params.id, 'branchTo') || ''}-{params.value}
+        </Typography>
+      </div>
+    ),
+  },
+  {
+    field: 'createdBy',
+    headerName: 'ผู้สร้างรายการ',
+    minWidth: 120,
+    headerAlign: 'center',
+    align: 'left',
+    sortable: false,
+  },
+  {
+    field: 'status',
+    headerName: 'สถานะ RT',
+    minWidth: 80,
+    headerAlign: 'center',
+    align: 'center',
+    sortable: false,
+    renderCell: (params) => {
+      if (
+        params.value === 'DRAFT' ||
+        params.value === 'WAIT_FOR_APPROVAL_1' ||
+        params.value === 'WAIT_FOR_APPROVAL_2' ||
+        params.value === 'AWAITING_FOR_REQUESTER'
+      ) {
+        return (
+          <Chip
+            label={params.getValue(params.id, 'statusText')}
+            size="small"
+            sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
+          />
+        );
+      } else if (params.value === 'APPROVED') {
+        return (
+          <Chip
+            label={params.getValue(params.id, 'statusText')}
+            size="small"
+            sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
+          />
+        );
+      } else if (params.value === 'CANCELED') {
+        return (
+          <Chip
+            label={params.getValue(params.id, 'statusText')}
+            size="small"
+            sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
+          />
+        );
+      }
+    },
+  },
+  {
+    field: 'delete',
+    headerName: ' ',
+    width: 50,
+    align: 'center',
+    sortable: false,
+    renderCell: (params) => {
+      if (params.getValue(params.id, 'edit')) {
+        return (
+          <div>
+            <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+          </div>
+        );
+      } else {
+        return <div></div>;
+      }
+    },
+  },
+];
+
+function useApiRef() {
+  const apiRef = useGridApiRef();
+  const _columns = useMemo(
+    () =>
+      columns.concat({
+        field: '',
+        width: 0,
+        minWidth: 0,
+        sortable: false,
+        renderCell: (params) => {
+          apiRef.current = params.api;
+          return null;
+        },
+      }),
+    [columns]
+  );
+
+  return { apiRef, columns: _columns };
+}
+
+// function StockTransferRtList() {
+
+function StockTransferRtList({ onSelectRows }: DataGridProps) {
   const { t } = useTranslation(['stockTransfer', 'common']);
   const classes = useStyles();
   const dispatch = useAppDispatch();
+
+  const [groupSCM, setGroupSCM] = React.useState(false);
+  useEffect(() => {
+    const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
+    setGroupSCM(scm);
+  }, []);
+
   const items = useAppSelector((state) => state.searchStockTrnasferRt);
   const cuurentPage = useAppSelector((state) => state.searchStockTrnasferRt.orderList.page);
   const limit = useAppSelector((state) => state.searchStockTrnasferRt.orderList.perPage);
   const res: StockTransferResponse = items.orderList;
   const payload = useAppSelector((state) => state.saveSearchStockRt.searchStockTransferRt);
-  // const [opensDCOrderDetail, setOpensDCOrderDetail] = React.useState(false);
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
-  const columns: GridColDef[] = [
-    {
-      field: 'index',
-      headerName: 'ลำดับ',
-      width: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: 'rtNo',
-      headerName: 'เลขที่เอกสารร้องขอ RT',
-      minWidth: 190,
-      flex: 1.2,
-      headerAlign: 'center',
-      sortable: false,
-    },
-    {
-      field: 'startDate',
-      headerName: 'วันที่โอน',
-      minWidth: 150,
-      headerAlign: 'center',
-      align: 'left',
-      sortable: false,
-      renderCell: (params) => (
-        <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
-            {params.value} - {params.getValue(params.id, 'endDate') || ''}
-          </Typography>
-        </div>
-      ),
-    },
-    {
-      field: 'branchFromName',
-      headerName: 'สาขาต้นทาง',
-      minWidth: 210,
-      flex: 1.2,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
-            {params.getValue(params.id, 'branchFrom') || ''}-{params.value}
-          </Typography>
-        </div>
-      ),
-    },
-    {
-      field: 'branchToName',
-      headerName: 'สาขาปลายทาง',
-      minWidth: 210,
-      flex: 1.2,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
-            {params.getValue(params.id, 'branchTo') || ''}-{params.value}
-          </Typography>
-        </div>
-      ),
-    },
-    {
-      field: 'createdBy',
-      headerName: 'ผู้สร้างรายการ',
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'left',
-      sortable: false,
-    },
-    {
-      field: 'status',
-      headerName: 'สถานะ RT',
-      minWidth: 80,
-      headerAlign: 'center',
-      align: 'center',
-      sortable: false,
-      renderCell: (params) => {
-        if (
-          params.value === 'DRAFT' ||
-          params.value === 'WAIT_FOR_APPROVAL_1' ||
-          params.value === 'WAIT_FOR_APPROVAL_2' ||
-          params.value === 'AWAITING_FOR_REQUESTER'
-        ) {
-          return (
-            <Chip
-              label={t(`status.${params.value}`)}
-              size="small"
-              sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
-            />
-          );
-        } else if (params.value === 'APPROVED') {
-          return (
-            <Chip
-              label={t(`status.${params.value}`)}
-              size="small"
-              sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
-            />
-          );
-        } else if (params.value === 'CANCELED') {
-          return (
-            <Chip
-              label={t(`status.${params.value}`)}
-              size="small"
-              sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
-            />
-          );
-        }
-      },
-    },
-    {
-      field: 'delete',
-      headerName: ' ',
-      width: 50,
-      align: 'center',
-      sortable: false,
-      renderCell: (params) => {
-        if (params.getValue(params.id, 'edit')) {
-          return (
-            <div>
-              <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
-            </div>
-          );
-        } else {
-          return <div></div>;
-        }
-      },
-    },
-  ];
-
+  const { apiRef, columns } = useApiRef();
   const [preferredUsername, setPreferredUsername] = React.useState(isPreferredUsername());
   const [groupOC, setGroupOC] = React.useState(getUserInfo().group === PERMISSION_GROUP.OC);
   const rows = res.data.map((data: StockTransferInfo, indexs: number) => {
@@ -200,6 +242,7 @@ function StockTransferRtList() {
       branchTo: data.branchTo,
       createdBy: data.createdBy,
       status: data.status,
+      statusText: t(`status.${data.status}`),
       edit: editMode,
     };
   });
@@ -316,6 +359,17 @@ function StockTransferRtList() {
   function handleCloseDetailModal() {
     setOpenDetailModal(false);
   }
+
+  const handleSubmitRowSelect = async () => {
+    const rowSelect = apiRef.current.getSelectedRows();
+    let rowSelectList: any = [];
+    rowSelect.forEach((data: GridRowData) => {
+      rowSelectList.push(data.rtNo);
+    });
+
+    return onSelectRows(rowSelectList ? rowSelectList : []);
+  };
+
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
@@ -337,6 +391,10 @@ function StockTransferRtList() {
             loading={loading}
             rowHeight={65}
             pagination
+            checkboxSelection={groupSCM ? true : false}
+            isRowSelectable={(params: GridRowParams) => params.row.edit}
+            onSelectionModelChange={handleSubmitRowSelect}
+            disableSelectionOnClick
           />
         </div>
       </Box>

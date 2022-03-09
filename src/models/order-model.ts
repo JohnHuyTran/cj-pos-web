@@ -144,7 +144,7 @@ export interface itemsDetail {
 
 export interface CheckOrderDetailProps {
   sdNo: string;
-  shipmentNo: string;
+  docRefNo: string;
   defaultOpen: boolean;
   onClickClose: any;
 }
@@ -180,10 +180,10 @@ export interface ItemsApprove {
   isTote: boolean;
 }
 
-export interface OrderApproveCloseJobRequest {
-  imageFileName?: string;
-  imageFile?: string;
-}
+// export interface OrderApproveCloseJobRequest {
+//   imageFileName?: string;
+//   imageFile?: string;
+// }
 
 export interface FeatchDataPDFRequest {
   Symbol: string;

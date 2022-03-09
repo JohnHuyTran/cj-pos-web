@@ -185,6 +185,10 @@ const useStyles = makeStyles({
       color: '#AEAEAE',
     },
 
+    '& .MuiCheckbox-colorPrimary.Mui-checked': {
+      color: '#36C690',
+    },
+
     // '& .MuiDataGrid-renderingZone': {
     //   maxHeight: 'none !important',
     // },
@@ -377,7 +381,7 @@ const useStyles = makeStyles({
       fontSize: '14px',
       textAlignLast: 'end !important',
       width: '92px',
-      height: '26px'
+      height: '26px',
     },
     '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
       color: '#263238 !important',
