@@ -246,6 +246,9 @@ export const environment = {
       approve2: {
         url: '/stock/stock-request/approve2/{rtNo}',
       },
+      approve2BySCM: {
+        url: '/stock/stock-request/submit/approve/{rtNo}',
+      },
       approve2MultipleBySCM: {
         url: '/stock/stock-request/approve2',
       },
