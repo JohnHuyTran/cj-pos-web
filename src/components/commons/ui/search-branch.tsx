@@ -58,7 +58,6 @@ export default function SearchBranch(props: Props): ReactElement {
   const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
 
   const dispatch = useAppDispatch();
-
   const autocompleteRenderListItem = (props: any, option: any) => {
     return (
       <li {...props} key={option.code}>
@@ -106,6 +105,13 @@ export default function SearchBranch(props: Props): ReactElement {
     }
   }, [province]);
 
+  useEffect(() => {
+    setAllBranches(payloadBranches.isAllBranches);
+    setListBranch({
+      provinces: payloadBranches.appliedBranches.province,
+      branches: payloadBranches.appliedBranches.branchList,
+    });
+  }, [payloadBranches]);
   useEffect(() => {
     if (payloadBranches.isAllBranches && payloadBranches.saved) {
       setValue(`สาขาทั้งหมด (${totalBranches} สาขา)`);

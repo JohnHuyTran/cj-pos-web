@@ -74,7 +74,9 @@ const SaleLimitTimeSearch = () => {
       };
       const params = paramsConvert(payload);
       dispatch(fetchBranchProvinceListAsync(params));
-    } else {
+      dispatch(fetchTotalBranch());
+    }
+    if (checkAdmin) {
       const payloadBranch = {
         isAllBranches: true,
         appliedBranches: {
@@ -88,7 +90,8 @@ const SaleLimitTimeSearch = () => {
     }
   }, []);
   useEffect(() => {
-    if (!checkAdmin && userInfo.branch) {
+    const existBranchUser = branchList.data.every((item: any) => item.code == userInfo.branch);
+    if (!checkAdmin && userInfo.branch && existBranchUser) {
       const payloadBranch = {
         isAllBranches: false,
         appliedBranches: {
