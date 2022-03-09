@@ -4,7 +4,7 @@ import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 
 import theme from '../../styles/theme';
 import { ApiError } from '../../models/api-error-model';
-import { getFileUrlHuawei } from '../../services/purchase';
+import { getFileUrlHuawei } from '../../services/master-service';
 import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
 import { FileType } from '../../models/supplier-check-order-model';
 
@@ -43,16 +43,14 @@ const AccordionHuaweiFile = ({ files }: Props) => {
           py: 1,
           borderRadius: '5px',
           border: `1px dashed ${theme.palette.primary.main}`,
-        }}
-      >
+        }}>
         <Box
           sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => {
             if (files && files.length > 0) setAccordionFile(!accordionFile);
-          }}
-        >
+          }}>
           <Typography sx={{ fontSize: '14px', color: '#676767' }}>เอกสารแนบ จำนวน {files.length}/5</Typography>
-          {accordionFile ? <KeyboardArrowUp color="primary" /> : <KeyboardArrowDown color="primary" />}
+          {accordionFile ? <KeyboardArrowUp color='primary' /> : <KeyboardArrowDown color='primary' />}
         </Box>
 
         <Box sx={{ display: accordionFile ? 'visible' : 'none' }}>
@@ -61,12 +59,11 @@ const AccordionHuaweiFile = ({ files }: Props) => {
             files.map((item, index) => (
               <Box
                 key={`item-${index + 1}-${item.fileKey}`}
-                component="a"
+                component='a'
                 href={void 0}
                 sx={{ color: theme.palette.secondary.main, cursor: 'pointer' }}
-                onClick={() => getHuaweiFileUrl(item)}
-              >
-                <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: '13px' }}>
+                onClick={() => getHuaweiFileUrl(item)}>
+                <Typography color='secondary' sx={{ textDecoration: 'underline', fontSize: '13px' }}>
                   {item.fileName}
                 </Typography>
               </Box>
