@@ -1,16 +1,14 @@
+//@ts-nocheck
 import { Dialog, Button, DialogContent } from '@mui/material';
-import React, { ReactElement, useEffect, useRef } from 'react';
+import React, { ReactElement } from 'react';
 import { useState } from 'react';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
-import throttle from 'lodash.throttle';
 import { useReactToPrint } from 'react-to-print';
 import AlertError from './alert-error';
 import { HighlightOff } from '@mui/icons-material';
-import store from '../../../store/store';
 import { getAccessToken } from '../../../store/sessionStore';
 import { getReport } from '../../../adapters/externalApi';
 
@@ -83,7 +81,6 @@ export default function ModalShowPDF({
   landscape,
 }: ModalShowPDFProp): ReactElement {
   const [numPages, setNumPages] = useState(0);
-  // const [pageNumber, setPageNumber] = useState(1);
   const [initialWidth, setInitialWidth] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
   const pdfWrapper = React.useRef<HTMLDivElement>(null);
