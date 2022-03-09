@@ -120,7 +120,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
         if (rows && rows.length > 0) {
           let rowData = _.cloneDeep(rows);
           let productPrintFilter = rowData.filter((itPro: any) => !stringNullOrEmpty(itPro.expiryDate)
-                && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day') && itPro.numberOfApproved > 0);
+                && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day')
+                && (itPro.numberOfApproved && itPro.numberOfApproved > 0));
           dispatch(updateBarcodeDiscountPrintState(productPrintFilter));
           dispatch(updatePrintInDetail(true));
         }
