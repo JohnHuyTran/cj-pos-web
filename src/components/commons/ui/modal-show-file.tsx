@@ -96,9 +96,10 @@ export default function ModalShowPDF({
   const onSourceSuccess = () => {
     if (!initialPageSize) {
       if (pdfWrapper && pdfWrapper.current) {
-        setPageSize(
-          `${pdfWrapper.current.getBoundingClientRect().width}px ${pdfWrapper.current.getBoundingClientRect().height}px`
-        );
+        // setPageSize(
+        //   `${pdfWrapper.current.getBoundingClientRect().width}px ${pdfWrapper.current.getBoundingClientRect().height}px`
+        // );
+        setPageSize('8in 12in');
       } else {
         setPageSize(landscape ? 'A4 landscape' : 'A4 portrait');
       }
