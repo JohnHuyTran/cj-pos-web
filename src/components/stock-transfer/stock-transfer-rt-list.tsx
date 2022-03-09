@@ -367,8 +367,6 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
       rowSelectList.push(data.rtNo);
     });
 
-    console.log('rowSelectList :', JSON.stringify(rowSelectList));
-
     return onSelectRows(rowSelectList ? rowSelectList : []);
   };
 
@@ -395,10 +393,8 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
             pagination
             checkboxSelection={groupSCM ? true : false}
             isRowSelectable={(params: GridRowParams) => params.row.edit}
-            // onSelectionModelChange={(newSelectionModel) => {
-            //   setSelectionModel(newSelectionModel);
-            // }}
             onSelectionModelChange={handleSubmitRowSelect}
+            disableSelectionOnClick
           />
         </div>
       </Box>

@@ -282,6 +282,7 @@ export default function StockTransferRt() {
     setShowSnackBar(false);
   };
 
+  const searchStockTransferRt = useAppSelector((state) => state.saveSearchStockRt.searchStockTransferRt);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
   const handleCloseModelConfirm = () => {
@@ -296,10 +297,15 @@ export default function StockTransferRt() {
 
     await approve2MultipleStockRequest(payload)
       .then((value) => {
-        onClickSearchBtn();
+        dispatch(featchSearchStockTransferRtAsync(searchStockTransferRt));
+
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+
+        setTimeout(() => {
+          handleCloseSnackBar();
+        }, 300);
       })
       .catch((error: any) => {
         setShowSnackBar(true);
@@ -467,13 +473,17 @@ export default function StockTransferRt() {
         </Grid>
       </Box>
 
-      {flagSearch && orderListDatas.length > 0 && <StockTransferRtList onSelectRows={handleSelectRows} />}
-      {orderListDatas.length === 0 && (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
-            <h2>ไม่มีข้อมูล</h2>
-          </Box>
-        </Grid>
+      {flagSearch && (
+        <div>
+          {orderListDatas.length > 0 && <StockTransferRtList onSelectRows={handleSelectRows} />}
+          {orderListDatas.length === 0 && (
+            <Grid item container xs={12} justifyContent="center">
+              <Box color="#CBD4DB">
+                <h2>ไม่มีข้อมูล</h2>
+              </Box>
+            </Grid>
+          )}
+        </div>
       )}
 
       <LoadingModal open={openLoadingModal.open} />
