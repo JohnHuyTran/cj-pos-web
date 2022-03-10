@@ -60,7 +60,9 @@ import { getUserInfo } from '../../store/sessionStore';
 import { getBranchName } from '../../utils/utils';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
+import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import theme from '../../styles/theme';
+
 interface loadingModalState {
   open: boolean;
 }
@@ -729,15 +731,8 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
                   />
                 )}
 
-                {orderDetail.sdImageFile !== '' &&
-                  orderDetail.sdImageFile !== 'temp' &&
-                  orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <div>
-                      <Link component="button" variant="body2" onClick={handleLinkDocument}>
-                        ดูเอกสาร
-                      </Link>
-                    </div>
-                  )}
+                {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
+                  orderDetail.files !== null && <AccordionHuaweiFile files={orderDetail.files} />}
               </Grid>
             </Grid>
             {orderDetail.Comment !== '' && (
