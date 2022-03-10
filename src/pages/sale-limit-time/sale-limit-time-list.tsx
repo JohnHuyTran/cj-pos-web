@@ -108,6 +108,18 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     setListST(lstSTHandle);
   };
 
+  const onCheckDisable = (item: any) => {
+    if (STStatus.DRAFT != item.status) {
+      return true;
+    } else {
+      if (moment(item.stStartTime) < moment(new Date())) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
   const columns: GridColDef[] = [
     {
       field: 'checked',
@@ -133,7 +145,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
-          disabled={STStatus.DRAFT != params.row.status}
+          disabled={onCheckDisable(params.row)}
           onClick={onCheckCell.bind(this, params)}
         />
       ),
@@ -327,7 +339,6 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       try {
         await dispatch(getsaleLimitTimeDetail(params.row.id));
         if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
-          console.log(saleLimitTimeDetail);
           setOpenDetailModal(true);
         }
       } catch (error) {
@@ -382,6 +393,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
           rows={lstST}
           pagination
           page={currentPage - 1}
+          hideFooterSelectedRowCount={true}
           pageSize={parseInt(pageSize)}
           rowCount={responveST.total}
           paginationMode="server"

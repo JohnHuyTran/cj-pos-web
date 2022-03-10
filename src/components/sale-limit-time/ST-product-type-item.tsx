@@ -148,7 +148,7 @@ export default function STProductTypeItems({ unSelectAllType, disabled }: Props)
               el.showProduct = true;
             }
           });
-          dispatch(setCheckEdit(false));
+          dispatch(setCheckEdit(true));
           dispatch(setProductList('รายการสินค้าทั้งหมด'));
           dispatch(updateAddTypeAndProductState(newList));
           setOpenModalDelete(false);
@@ -176,13 +176,13 @@ export default function STProductTypeItems({ unSelectAllType, disabled }: Props)
                   </Typography>
                   <Grid container spacing={1}>
                     <Grid item xs={3}></Grid>
-                    <Grid item xs={5} sx={{ textAlign: 'left' }}>
+                    <Grid item xs={7} sx={{ textAlign: 'left' }}>
                       ประเภท <label style={{ color: '#AEAEAE', margin: '0 10px' }}>|</label>
                       <label style={{ color: '#36C690', paddingLeft: '10px' }}>
                         <b>{params.row.productTypeName}</b>
                       </label>
                     </Grid>
-                    <Grid item xs={4}></Grid>
+                    <Grid item xs={2}></Grid>
                     <Grid item xs={3}></Grid>
                     <Grid item xs={7} sx={{ textAlign: 'left' }}>
                       {'จำนวนสินค้า (รายการ)'} <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>

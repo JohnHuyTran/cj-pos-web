@@ -402,7 +402,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             }
         }
         dispatch(updateAddTypeAndProductState(selectedItemEnds));
-        dispatch(setCheckEdit(false))
+        dispatch(setCheckEdit(true))
         setSelectedItems([]);
         setTimeout(() => {
             setOpenLoadingModal(false);
