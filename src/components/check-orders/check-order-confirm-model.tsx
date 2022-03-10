@@ -16,7 +16,8 @@ import { ApiError } from '../../models/api-error-model';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
 import LoadingModal from '../commons/ui/loading-modal';
-import { GridRowData } from '@mui/x-data-grid';
+import { env } from '../../adapters/environmentConfigs';
+import { Grid } from '@mui/material';
 
 interface ConfirmOrderShipment {
   open: boolean;
@@ -28,6 +29,8 @@ interface ConfirmOrderShipment {
   items: Entry[];
   percentDiffType: boolean;
   percentDiffValue: string;
+  sumActualQty: number;
+  sumQuantityRef: number;
 }
 
 interface loadingModalState {
@@ -40,34 +43,20 @@ export interface DialogTitleProps {
   onClose?: () => void;
 }
 
-const BootstrapDialogTitle = (props: DialogTitleProps) => {
-  const { children, onClose, ...other } = props;
-
-  return (
-    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
-      {children}
-      {onClose ? (
-        <IconButton
-          id="btnClose"
-          aria-label="close"
-          onClick={onClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: (theme: any) => theme.palette.grey[100],
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </DialogTitle>
-  );
-};
-
 export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
-  const { open, onClose, onUpdateShipmentStatus, shipmentNo, sdNo, action, items, percentDiffType, percentDiffValue } =
-    props;
+  const {
+    open,
+    onClose,
+    onUpdateShipmentStatus,
+    shipmentNo,
+    sdNo,
+    action,
+    items,
+    percentDiffType,
+    percentDiffValue,
+    sumActualQty,
+    sumQuantityRef,
+  } = props;
   const searchState = useAppSelector((state) => state.saveSearchOrder);
   const payloadSearchOrder: ShipmentRequest = searchState.searchCriteria;
   const dispatch = useAppDispatch();
@@ -75,6 +64,9 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     open: false,
   });
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+  const DCPercent = env.dc.percent;
+  let sumDCPercent: number = (sumActualQty * 100) / sumQuantityRef;
+  sumDCPercent = Math.trunc(sumDCPercent); //remove decimal
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -207,17 +199,38 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                 </Typography>
                 {itemsDiff.length > 0 && (
                   <div>
-                    <Typography
-                      variant="body1"
-                      align="center"
-                      sx={{
-                        marginTop: 2,
-                        marginBottom: 1,
-                        fontWeight: 600,
-                      }}
-                    >
-                      รายการสินค้าขาด / เกิน
-                    </Typography>
+                    <Grid container spacing={2} mb={1}>
+                      <Grid item xs={7}>
+                        <Typography
+                          variant="body1"
+                          align="right"
+                          sx={{
+                            marginTop: 2,
+                            marginBottom: 1,
+                            fontWeight: 600,
+                          }}
+                        >
+                          รายการสินค้าขาด / เกิน
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={5}>
+                        <Typography
+                          variant="body1"
+                          align="center"
+                          sx={{
+                            marginTop: 2.4,
+                            fontSize: 13,
+                            color: '#FF0000',
+                          }}
+                        >
+                          {sumDCPercent < DCPercent &&
+                            `(จำนวนรับจริง ${sumDCPercent}% น้อยกว่าค่าที่กำหนด ${DCPercent}%)`}
+                          {sumDCPercent > DCPercent &&
+                            `(จำนวนรับจริง ${sumDCPercent}% มากกว่าค่าที่กำหนด ${DCPercent}%)`}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+
                     <DataDiffInfo items={itemsDiff} />
                   </div>
                 )}

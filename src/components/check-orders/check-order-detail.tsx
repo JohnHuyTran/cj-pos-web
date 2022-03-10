@@ -457,14 +457,22 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     handleOpenLoading('open', false);
   };
 
+  const [sumActualQty, setSumActualQty] = React.useState(0);
+  const [sumQuantityRef, setSumQuantityRef] = React.useState(0);
   const handleApproveBtn = async () => {
     setItemsDiffState([]);
     setOpenModelConfirm(true);
     setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const itemsList: any = [];
+
+    let sumActualQtyItems: number = 0;
+    let sumQuantityRefItems: number = 0;
     rowsEdit.forEach((data: GridRowData) => {
       let diffCount: number = data.productQuantityActual - data.productQuantityRef;
+      sumActualQtyItems = Number(sumActualQtyItems) + Number(data.productQuantityActual);
+      sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.productQuantityRef);
+
       const itemDiff: Entry = {
         barcode: data.productBarCode,
         deliveryOrderNo: data.doNo,
@@ -494,6 +502,9 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     });
 
     localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
+
+    setSumActualQty(sumActualQtyItems);
+    setSumQuantityRef(sumQuantityRefItems);
   };
 
   const validateFileInfo = () => {
@@ -900,8 +911,8 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         items={itemsDiffState}
         percentDiffType={false}
         percentDiffValue="0"
-        // fileName={fileInfo.fileName}
-        // imageContent={fileInfo.base64URL}
+        sumActualQty={sumActualQty}
+        sumQuantityRef={sumQuantityRef}
       />
 
       <ConfirmExitModel

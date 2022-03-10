@@ -19,4 +19,7 @@ export const env: any = {
     code: process.env.REACT_APP_OWN_BRANCH_CODE,
     name: process.env.REACT_APP_OWN_BRANCH_NAME,
   },
+  dc: {
+    percent: process.env.REACT_APP_DC_PERCENT_CALCULUS,
+  },
 };

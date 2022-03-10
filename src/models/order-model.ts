@@ -65,6 +65,7 @@ export interface ShipmentInfo {
   sapDocType: string;
   sdNo: string;
   docRefNo: string;
+  docType: string;
   sdStatus: string;
   sdType: number;
   toteCnt: number;
