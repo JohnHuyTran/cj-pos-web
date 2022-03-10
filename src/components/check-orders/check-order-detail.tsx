@@ -353,7 +353,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         productName: item.productName,
         unitName: item.unitName,
         qty: item.qty,
-        actualQty: item.actualQty ? item.actualQty : item.qty,
+        actualQty: item.actualQty !== null ? item.actualQty : item.qty,
         qtyDiff: item.qtyDiff,
         comment: item.comment,
       };
@@ -388,36 +388,43 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     dispatch(featchOrderDetailAsync(sdNo));
   };
 
+  const mapUpdateState = async () => {
+    const itemsList: any = [];
+
+    if (rowsEntries.length > 0) {
+      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      await rows.forEach((data: GridRowData) => {
+        itemsList.push(data);
+      });
+    }
+
+    if (itemsList.length > 0) {
+      updateState(itemsList);
+    }
+  };
+
+  const handleEditItems = async (params: GridEditCellValueParams) => {
+    if (params.field === 'actualQty' || params.field === 'comment') {
+      mapUpdateState();
+    }
+  };
+
   const handleSaveButton = async () => {
     handleOpenLoading('open', true);
+    mapUpdateState();
 
     let qtyIsValid: boolean = true;
     const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
 
     const itemsList: any = [];
+    const itemsListUpdate: any = [];
     rows.forEach((data: GridRowData) => {
-      const item: Entry = {
+      let diffCount: number = data.actualQty - data.qty;
+      const item: any = {
         barcode: data.barcode,
         deliveryOrderNo: data.deliveryOrderNo,
-        actualQty: data.actualQty * 1,
+        actualQty: Number(data.actualQty),
         comment: data.comment,
-        seqItem: 0,
-        itemNo: '',
-        shipmentSAPRef: '',
-        skuCode: '',
-        skuType: '',
-        productName: '',
-        unitCode: '',
-        unitName: '',
-        unitFactor: 0,
-        qty: 0,
-        qtyAll: 0,
-        qtyAllBefore: 0,
-        qtyDiff: 0,
-        price: 0,
-        isControlStock: 0,
-        toteCode: '',
-        expireDate: '',
         isTote: data.isTote,
       };
 
@@ -425,6 +432,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         qtyIsValid = false;
       }
       itemsList.push(item);
+      itemsListUpdate.push(data);
     });
 
     if (!qtyIsValid) {
@@ -444,14 +452,14 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           setSnackbarStatus(true);
           updateShipmentOrder();
-          updateState(itemsList);
+          updateState(itemsListUpdate);
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
           setContentMsg(error.message);
           setSnackbarStatus(false);
           updateShipmentOrder();
-          updateState(itemsList);
+          updateState(itemsListUpdate);
         });
     }
 
@@ -666,23 +674,6 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     setUploadFileFlag(status);
   };
 
-  const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'actualQty' || params.field === 'comment') {
-      const itemsList: any = [];
-
-      if (rowsEntries.length > 0) {
-        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-        await rows.forEach((data: GridRowData) => {
-          itemsList.push(data);
-        });
-      }
-
-      if (itemsList.length > 0) {
-        updateState(itemsList);
-      }
-    }
-  };
-
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -888,8 +879,9 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
                 autoHeight={rowsEntries.length >= 8 ? false : true}
                 scrollbarSize={10}
                 onCellFocusOut={handleEditItems}
-                onCellOut={handleEditItems}
-                onCellKeyDown={handleEditItems}
+                // onCellOut={handleEditItems}
+                // onCellKeyDown={handleEditItems}
+                // onCellBlur={handleEditItems}
               />
             </div>
           </Box>
