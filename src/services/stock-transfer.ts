@@ -3,6 +3,8 @@ import { environment } from '../environment-base';
 import { ContentType } from '../utils/enum/common-enum';
 import {
   Approve1StockTransferRequest,
+  Approve2BySCMStockRequest,
+  Approve2MultipleStockRequest,
   Approve2StockTransferRequest,
   BranchTransferRequest,
   ImportStockRequest,
@@ -214,16 +216,11 @@ export async function fetchDownloadTemplateRT() {
 
 export async function importStockRequest(payload: ImportStockRequest, files: File) {
   try {
-    console.log('payload :', payload);
-    console.log('files :', files);
-
     const bodyFormData = new FormData();
     bodyFormData.append('file', files);
     bodyFormData.append('startDate', payload.startDate);
     bodyFormData.append('endDate', payload.endDate);
     bodyFormData.append('transferReason', payload.transferReason);
-
-    console.log('bodyFormData :', bodyFormData);
 
     const response = await post(
       environment.stock.stockRequest.importStockRequest.url,
@@ -236,4 +233,28 @@ export async function importStockRequest(payload: ImportStockRequest, files: Fil
     console.log('error :', error);
     throw error;
   }
+}
+
+export async function approve2MultipleStockRequest(payload: Approve2MultipleStockRequest) {
+  const response = await put(environment.stock.stockRequest.approve2MultipleBySCM.url, payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
+export const getPathApprove2BySCMStockRequest = (rtNo: string) => {
+  return getPathUrl(`${environment.stock.stockRequest.approve2BySCM.url}`, {
+    rtNo: rtNo,
+  });
+};
+
+export async function approve2BySCMStockRequest(rtNo: string, payload: Approve2BySCMStockRequest) {
+  const response = await put(getPathApprove2BySCMStockRequest(rtNo), payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
 }

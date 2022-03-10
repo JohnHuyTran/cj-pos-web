@@ -60,6 +60,10 @@ import { isGroupBranch } from '../../utils/role-permission';
 import { getUserInfo } from '../../store/sessionStore';
 import { getBranchName } from '../../utils/utils';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import AccordionUploadFile from '../commons/ui/accordion-upload-file';
+import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
+import theme from '../../styles/theme';
+
 interface loadingModalState {
   open: boolean;
 }
@@ -100,7 +104,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'productBarCode',
+    field: 'barcode',
     headerName: 'บาร์โค้ด',
     minWidth: 135,
     headerAlign: 'center',
@@ -118,20 +122,20 @@ const columns: GridColDef[] = [
       <div>
         <Typography variant="body2">{params.value}</Typography>
         <Typography variant="body2" color="textSecondary">
-          {params.getValue(params.id, 'productSku') || ''}
+          {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
     ),
   },
   {
-    field: 'productUnit',
+    field: 'unitName',
     headerName: 'หน่วย',
     width: 90,
     headerAlign: 'center',
     sortable: false,
   },
   {
-    field: 'productQuantityRef',
+    field: 'qty',
     headerName: 'จำนวนอ้างอิง',
     width: 130,
     headerAlign: 'center',
@@ -139,7 +143,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'productQuantityActual',
+    field: 'actualQty',
     headerName: 'จำนวนรับจริง',
     width: 135,
     headerAlign: 'center',
@@ -155,11 +159,11 @@ const columns: GridColDef[] = [
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
 
-          params.api.updateRows([{ ...params.row, productQuantityActual: value }]);
+          params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         onBlur={(e) => {
           // isAllowActualQty(params, parseInt(e.target.value, 10));
-          params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }]);
+          params.api.updateRows([{ ...params.row, actualQty: e.target.value }]);
         }}
         disabled={isDisable(params) ? true : false}
         autoComplete="off"
@@ -167,7 +171,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'productDifference',
+    field: 'qtyDiff',
     headerName: 'ส่วนต่างการรับ',
     width: 140,
     headerAlign: 'center',
@@ -176,7 +180,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => calProductDiff(params),
   },
   {
-    field: 'productComment',
+    field: 'comment',
     headerName: 'หมายเหตุ',
     headerAlign: 'center',
     minWidth: 120,
@@ -187,7 +191,7 @@ const columns: GridColDef[] = [
         variant="outlined"
         name="txnComment"
         value={params.value}
-        onChange={(e) => params.api.updateRows([{ ...params.row, productComment: e.target.value }])}
+        onChange={(e) => params.api.updateRows([{ ...params.row, comment: e.target.value }])}
         disabled={isDisable(params) ? true : false}
         autoComplete="off"
       />
@@ -196,9 +200,7 @@ const columns: GridColDef[] = [
 ];
 
 var calProductDiff = function (params: GridValueGetterParams) {
-  let diff =
-    Number(params.getValue(params.id, 'productQuantityActual')) -
-    Number(params.getValue(params.id, 'productQuantityRef'));
+  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qty'));
 
   if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
   if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
@@ -225,7 +227,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 const isDisable = (params: GridRenderCellParams) => {
-  return params.row.isDraftStatus;
+  return params.row.sdStatus;
 };
 
 export interface DialogTitleProps {
@@ -307,15 +309,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
   const [snackbarStatus, setSnackbarStatus] = React.useState(false);
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-
-  // const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
-  // const [ownBranch, setOwnBranch] = React.useState(
-  //   getUserInfo().branch
-  //     ? getBranchName(branchList, getUserInfo().branch)
-  //       ? getUserInfo().branch
-  //       : env.branch.code
-  //     : env.branch.code
-  // );
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   const [displayBranchGroup, setDisplayBranchGroup] = React.useState(false);
   useEffect(() => {
@@ -344,23 +338,24 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
   if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
     updateState(entries);
   }
+
   let rowsEntries: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
     rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
       return {
         rowOrder: index + 1,
         id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
-        doNo: item.deliveryOrderNo,
+        deliveryOrderNo: item.deliveryOrderNo,
         isTote: item.isTote ? item.isTote : false,
-        isDraftStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
-        productSku: item.skuCode,
-        productBarCode: item.barcode,
+        sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
+        skuCode: item.skuCode,
+        barcode: item.barcode,
         productName: item.productName,
-        productUnit: item.unitName,
-        productQuantityRef: item.qty,
-        productQuantityActual: item.actualQty ? item.actualQty : item.qty,
-        productDifference: item.qtyDiff,
-        productComment: item.comment,
+        unitName: item.unitName,
+        qty: item.qty,
+        actualQty: item.actualQty !== null ? item.actualQty : item.qty,
+        qtyDiff: item.qtyDiff,
+        comment: item.comment,
       };
     });
   }
@@ -393,43 +388,51 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     dispatch(featchOrderDetailAsync(sdNo));
   };
 
+  const mapUpdateState = async () => {
+    const itemsList: any = [];
+
+    if (rowsEntries.length > 0) {
+      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      await rows.forEach((data: GridRowData) => {
+        itemsList.push(data);
+      });
+    }
+
+    if (itemsList.length > 0) {
+      updateState(itemsList);
+    }
+  };
+
+  const handleEditItems = async (params: GridEditCellValueParams) => {
+    if (params.field === 'actualQty' || params.field === 'comment') {
+      mapUpdateState();
+    }
+  };
+
   const handleSaveButton = async () => {
     handleOpenLoading('open', true);
+    mapUpdateState();
 
     let qtyIsValid: boolean = true;
     const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
 
     const itemsList: any = [];
+    const itemsListUpdate: any = [];
     rows.forEach((data: GridRowData) => {
-      const item: Entry = {
-        barcode: data.productBarCode,
-        deliveryOrderNo: data.doNo,
-        actualQty: data.productQuantityActual * 1,
-        comment: data.productComment,
-        seqItem: 0,
-        itemNo: '',
-        shipmentSAPRef: '',
-        skuCode: '',
-        skuType: '',
-        productName: '',
-        unitCode: '',
-        unitName: '',
-        unitFactor: 0,
-        qty: 0,
-        qtyAll: 0,
-        qtyAllBefore: 0,
-        qtyDiff: 0,
-        price: 0,
-        isControlStock: 0,
-        toteCode: '',
-        expireDate: '',
+      let diffCount: number = data.actualQty - data.qty;
+      const item: any = {
+        barcode: data.barcode,
+        deliveryOrderNo: data.deliveryOrderNo,
+        actualQty: Number(data.actualQty),
+        comment: data.comment,
         isTote: data.isTote,
       };
 
-      if (data.isTote === true && !(data.productQuantityActual * 1 >= 0 && data.productQuantityActual * 1 <= 1)) {
+      if (data.isTote === true && !(data.actualQty * 1 >= 0 && data.actualQty * 1 <= 1)) {
         qtyIsValid = false;
       }
       itemsList.push(item);
+      itemsListUpdate.push(data);
     });
 
     if (!qtyIsValid) {
@@ -443,19 +446,20 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         items: itemsList,
       };
 
-      // console.log('payload: ', payload);
       await saveOrderShipments(payload, sdNo)
         .then((_value) => {
           setShowSnackBar(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           setSnackbarStatus(true);
           updateShipmentOrder();
+          updateState(itemsListUpdate);
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
           setContentMsg(error.message);
           setSnackbarStatus(false);
           updateShipmentOrder();
+          updateState(itemsListUpdate);
         });
     }
 
@@ -471,12 +475,12 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const itemsList: any = [];
     rowsEdit.forEach((data: GridRowData) => {
-      let diffCount: number = data.productQuantityActual - data.productQuantityRef;
+      let diffCount: number = data.actualQty - data.qty;
       const itemDiff: Entry = {
-        barcode: data.productBarCode,
-        deliveryOrderNo: data.doNo,
-        actualQty: data.productQuantityActual,
-        comment: data.productComment,
+        barcode: data.barcode,
+        deliveryOrderNo: data.deliveryOrderNo,
+        actualQty: data.actualQty,
+        comment: data.comment,
         seqItem: 0,
         itemNo: '',
         shipmentSAPRef: '',
@@ -503,20 +507,19 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
   };
 
-  const [fileInfo, setFileInfo] = React.useState<fileInfoProps>({
-    file: null,
-    fileName: '',
-    base64URL: '',
-  });
+  const validateFileInfo = () => {
+    const isvalid = fileUploadList.length > 0 ? true : false;
+    if (!isvalid) {
+      setOpenFailAlert(true);
+      setTextFail('กรุณาแนบเอกสาร');
+      return false;
+    }
+    return true;
+  };
 
   const handleCloseJobBtn = () => {
-    if (!fileInfo.base64URL) {
-      setErrorBrowseFile(true);
-      setMsgErrorBrowseFile('กรุณาแนบไฟล์เอกสาร');
-    } else if (validationFile === true) {
-      setOpenFailAlert(true);
-      setTextFail('กรุณาตรวจสอบ ไฟล์เอกสาร');
-    } else {
+    const isFileValidate: boolean = validateFileInfo();
+    if (isFileValidate) {
       setOpenModelConfirm(true);
       setAction(ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
     }
@@ -534,76 +537,6 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     setStatusFile(0);
     setOpenModelPreviewDocument(true);
     handleOpenLoading('open', false);
-  };
-
-  const getBase64 = (file: Blob) => {
-    return new Promise((resolve) => {
-      let fileInfo;
-      let baseURL: any = '';
-      // Make new FileReader
-      let reader = new FileReader();
-      // Convert the file to base64 text
-      reader.readAsDataURL(file);
-      // on reader load somthing...
-      reader.onload = () => {
-        // Make a fileInfo Object
-        baseURL = reader.result;
-        resolve(baseURL);
-      };
-    });
-  };
-
-  const handleFileInputChange = (e: any) => {
-    setValidationFile(false);
-    setErrorBrowseFile(false);
-    setMsgErrorBrowseFile('');
-    checkSizeFile(e);
-
-    let file: File = e.target.files[0];
-    let fileType = file.type.split('/');
-    const fileName = `${sdNo}-01.${fileType[1]}`;
-
-    getBase64(file)
-      .then((result: any) => {
-        file = result;
-        setFileInfo({ ...fileInfo, base64URL: result, fileName: fileName });
-      })
-      .catch((err: any) => {
-        console.log(err);
-      });
-  };
-
-  const checkSizeFile = (e: any) => {
-    const fileSize = e.target.files[0].size;
-    const fileName = e.target.files[0].name;
-    let parts = fileName.split('.');
-    let length = parts.length - 1;
-    // pdf, .jpg, .jpeg
-    if (
-      parts[length].toLowerCase() !== 'pdf' &&
-      parts[length].toLowerCase() !== 'jpg' &&
-      parts[length].toLowerCase() !== 'jpeg'
-    ) {
-      setValidationFile(true);
-      setErrorBrowseFile(true);
-      setMsgErrorBrowseFile('กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น');
-      return;
-    }
-
-    // 1024 = bytes
-    // 1024*1024*1024 = mb
-    let mb = 1024 * 1024 * 1024;
-    // fileSize = mb unit
-    if (fileSize < mb) {
-      //size > 5MB
-      let size = fileSize / 1024 / 1024;
-      if (size > 5) {
-        setValidationFile(true);
-        setErrorBrowseFile(true);
-        setMsgErrorBrowseFile('ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่');
-        return;
-      }
-    }
   };
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
@@ -648,7 +581,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     handleOpenLoading('open', true);
     setTimeout(() => {
       handleOpenLoading('open', false);
-      console.log('sdRef.data : ', sdRef.data);
+
       if (sdRef.data !== null && sdRef.data !== []) {
         setOpensSD(true);
       } else {
@@ -666,9 +599,9 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
 
       const itemsList: any = [];
       rowsEdit.forEach((data: GridRowData) => {
-        if (data.productQuantityActual !== rowsEntries[i].productQuantityActual) {
+        if (data.actualQty !== rowsEntries[i].actualQty) {
           exit = true;
-        } else if (data.productComment !== rowsEntries[i].productComment) {
+        } else if (data.comment !== rowsEntries[i].comment) {
           exit = true;
         }
         i++;
@@ -686,7 +619,8 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         setConfirmModelExit(true);
       }
     } else if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
-      if (fileInfo.base64URL) {
+      // if (fileInfo.base64URL) {
+      if (fileUploadList.length > 0) {
         setConfirmModelExit(true);
       } else {
         dispatch(updateAddItemsState({}));
@@ -731,30 +665,13 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     setToteNo(toteNo);
   };
 
-  const handleOpenAddItems = () => {
-    setOpenModelAddItems(true);
-  };
-
   const handleModelAddItems = async () => {
     setOpenModelAddItems(false);
   };
 
-  const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'productQuantityActual' || params.field === 'productComment') {
-      console.log('test');
-      const itemsList: any = [];
-
-      if (rowsEntries.length > 0) {
-        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-        await rows.forEach((data: GridRowData) => {
-          console.log('data: ', data);
-          itemsList.push(data);
-        });
-      }
-      if (itemsList.length > 0) {
-        await dispatch(updateAddItemsState(itemsList));
-      }
-    }
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
+  const handleOnChangeUploadFile = (status: boolean) => {
+    setUploadFileFlag(status);
   };
 
   return (
@@ -814,61 +731,17 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
               </Grid>
               <Grid item lg={4}>
                 {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
-                  <div>
-                    {errorBrowseFile === true && (
-                      <TextField
-                        error
-                        name="browserTxf"
-                        className={classes.MtextFieldBrowse}
-                        value={fileInfo.fileName}
-                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
-                        helperText={msgErrorBrowseFile}
-                      />
-                    )}
-
-                    {errorBrowseFile === false && (
-                      <TextField
-                        name="browserTxf"
-                        className={classes.MtextFieldBrowse}
-                        value={fileInfo.fileName}
-                        placeholder="แนบไฟล์ .pdf หรือ .jpg ขนาดไฟล์ไม่เกิน 5 MB"
-                      />
-                    )}
-
-                    <input
-                      id="btnBrowse"
-                      type="file"
-                      // multiple
-                      // onDrop
-                      accept=".pdf, .jpg, .jpeg"
-                      onChange={handleFileInputChange}
-                      style={{ display: 'none' }}
-                    />
-
-                    <label htmlFor={'btnBrowse'}>
-                      <Button
-                        id="btnPrint"
-                        color="primary"
-                        variant="contained"
-                        component="span"
-                        className={classes.MbtnBrowse}
-                        style={{ marginLeft: 10, textTransform: 'none' }}
-                      >
-                        Browse
-                      </Button>
-                    </label>
-                  </div>
+                  <AccordionUploadFile
+                    files={[]}
+                    docNo=""
+                    docType=""
+                    isStatus={uploadFileFlag}
+                    onChangeUploadFile={handleOnChangeUploadFile}
+                  />
                 )}
 
-                {orderDetail.sdImageFile !== '' &&
-                  orderDetail.sdImageFile !== 'temp' &&
-                  orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <div>
-                      <Link component="button" variant="body2" onClick={handleLinkDocument}>
-                        ดูเอกสาร
-                      </Link>
-                    </div>
-                  )}
+                {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB &&
+                  orderDetail.files !== null && <AccordionHuaweiFile files={orderDetail.files} />}
               </Grid>
             </Grid>
             {orderDetail.Comment !== '' && (
@@ -1005,9 +878,10 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
                 disableColumnMenu
                 autoHeight={rowsEntries.length >= 8 ? false : true}
                 scrollbarSize={10}
-                // onCellFocusOut={handleEditItems}
+                onCellFocusOut={handleEditItems}
                 // onCellOut={handleEditItems}
-                onCellKeyDown={handleEditItems}
+                // onCellKeyDown={handleEditItems}
+                // onCellBlur={handleEditItems}
               />
             </div>
           </Box>
@@ -1034,8 +908,8 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         items={itemsDiffState}
         percentDiffType={false}
         percentDiffValue="0"
-        fileName={fileInfo.fileName}
-        imageContent={fileInfo.base64URL}
+        // fileName={fileInfo.fileName}
+        // imageContent={fileInfo.base64URL}
       />
 
       <ConfirmExitModel
@@ -1049,7 +923,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         onClose={handleModelPreviewDocument}
         url={getPathReportSD(sdNo)}
         statusFile={statusFile}
-        sdImageFile={orderDetail.sdImageFile}
+        sdImageFile={orderDetail.sdImageFile ? orderDetail.sdImageFile : ''}
         fileName={orderDetail.sdImageFilename ? orderDetail.sdImageFilename : formatFileNam(sdNo, orderDetail.sdStatus)}
         btnPrintName="พิมพ์ใบผลต่าง"
       />

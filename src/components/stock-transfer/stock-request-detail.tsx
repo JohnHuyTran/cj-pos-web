@@ -25,6 +25,7 @@ import {
 import { ApiError } from '../../models/api-error-model';
 import {
   approve1StockRequest,
+  approve2BySCMStockRequest,
   approve2StockRequest,
   reject1StockRequest,
   reject2StockRequest,
@@ -588,26 +589,41 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
           });
         }
 
-        if (groupSCM) {
-          const payload2: Approve2StockTransferRequest = {
-            branchTo: toBranch,
-            comment: {
-              by: 'SCM',
-              detail: commentSCM,
-            },
-          };
-          handleApprove2(payload2);
-        } else {
-          const payloadSubmit: SubmitStockTransferRequest = {
-            startDate: moment(startDate).startOf('day').toISOString(),
-            endDate: moment(endDate).startOf('day').toISOString(),
-            branchFrom: fromBranch,
-            branchTo: toBranch,
-            transferReason: reasons,
-            itemGroups: itemGroups,
-            items: itemsList,
-          };
+        const payloadSubmit: any = {
+          startDate: moment(startDate).startOf('day').toISOString(),
+          endDate: moment(endDate).startOf('day').toISOString(),
+          branchFrom: fromBranch,
+          branchTo: toBranch,
+          transferReason: reasons,
+          itemGroups: itemGroups,
+          items: itemsList,
+        };
 
+        if (groupSCM) {
+          await approve2BySCMStockRequest(rtNo, payloadSubmit)
+            .then((value) => {
+              setFlagSave(false);
+              setShowSnackBar(true);
+              setSnackbarIsStatus(true);
+              setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+
+              dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+
+              setTimeout(() => {
+                handleClose();
+              }, 500);
+            })
+            .catch((error: ApiError) => {
+              setShowSnackBar(true);
+              if (error.code === 40010) {
+                setContentMsg(
+                  'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+                );
+              } else {
+                setContentMsg(error.message);
+              }
+            });
+        } else {
           await submitStockRequest(rtNo, payloadSubmit)
             .then((value) => {
               setFlagSave(false);
@@ -1021,7 +1037,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               )}
             </Grid>
           </Grid>
-          <Box mb={4}>
+          <Box mb={12}>
             <StockRequestSKU
               type={type}
               edit={edit}

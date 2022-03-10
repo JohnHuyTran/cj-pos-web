@@ -271,3 +271,17 @@ export interface ImportStockRequest {
   endDate: string;
   transferReason: string;
 }
+
+export interface Approve2MultipleStockRequest {
+  rtNos: string[];
+}
+
+export interface Approve2BySCMStockRequest {
+  startDate: string;
+  endDate: string;
+  branchFrom: string;
+  branchTo: string;
+  transferReason: string;
+  itemGroups: ItemGroups[];
+  items: Item[];
+}
