@@ -97,6 +97,7 @@ const columns: GridColDef[] = [
           type='number'
           inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
+          onClick={(e) => e.stopPropagation()}
           onChange={(e) => {
             // e.persist();
             // const caretStart = e.target.selectionStart;
@@ -135,6 +136,7 @@ const columns: GridColDef[] = [
         name='txbToteCode'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
+        onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
           // e.persist();
           // const caretStart = e.target.selectionStart;
