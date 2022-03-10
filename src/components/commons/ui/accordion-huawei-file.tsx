@@ -4,7 +4,7 @@ import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 
 import theme from '../../../styles/theme';
 import { ApiError } from '../../../models/api-error-model';
-import { getFileUrlHuawei } from '../../../services/purchase';
+import { getFileUrlHuawei } from '../../../services/master-service';
 import ModalShowHuaweiFile from '../../commons/ui/modal-show-huawei-file';
 import { FileType } from '../../../models/supplier-check-order-model';
 
