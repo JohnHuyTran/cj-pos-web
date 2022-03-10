@@ -150,14 +150,15 @@ const SaleLimitTimeSearch = () => {
   const handleSearchST = async (paramsPage?: string, paramsPerPage?: string) => {
     handleOpenLoading('open', true);
     setFlagSearch(true);
-    if (
-      stringNullOrEmpty(values.startDate) ||
-      stringNullOrEmpty(values.endDate) ||
-      Date.parse(moment(values.endDate).format('DD/MM/YYYY')) <
-        Date.parse(moment(values.startDate).format('DD/MM/YYYY'))
-    ) {
+    if (stringNullOrEmpty(values.startDate) || stringNullOrEmpty(values.endDate)) {
       setOpenAlert(true);
       setTextError('กรุณาระบุวันที่');
+    } else if (
+      Date.parse(moment(values.endDate).format('DD/MM/YYYY')) <
+      Date.parse(moment(values.startDate).format('DD/MM/YYYY'))
+    ) {
+      setOpenAlert(true);
+      setTextError('เวลาเริ่มต้นต้องมากกว่าเวลาปัจจุบัน');
     } else {
       if (checkAdmin) {
         const aProvinces = payloadBranches.appliedBranches.province.map((item: any) => item.code).join();

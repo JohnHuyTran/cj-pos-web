@@ -84,7 +84,7 @@ export default function SearchBranch(props: Props): ReactElement {
     if (open) {
       if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
       dispatch(fetchTotalBranch());
-      dispatch(fetchBranchProvinceListAsync('limit=10'));
+      dispatch(fetchBranchProvinceListAsync('limit=1000'));
     }
   }, [open]);
 
@@ -93,7 +93,7 @@ export default function SearchBranch(props: Props): ReactElement {
       const payload = {
         // ...(!!branch && { name: branch.name }),
         ...(!!province && { province: province.name }),
-        limit: '10',
+        // limit: '10',
       };
       const params = paramsConvert(payload);
       if (open) {
@@ -205,6 +205,19 @@ export default function SearchBranch(props: Props): ReactElement {
       }
     }
   };
+  const handleCloseBranch = (event: React.SyntheticEvent, reason: string) => {
+    try {
+      const payload = {
+        ...(!!province && { province: province.name }),
+        limit: '10',
+      };
+      const params = paramsConvert(payload);
+      dispatch(fetchBranchProvinceListAsync(params));
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
   // const handleAddBranch = () => {
   //   if (checked) {
   //     const existProvince = listBranch['provinces'].some((item: any) => item.code == province.code);
@@ -284,7 +297,16 @@ export default function SearchBranch(props: Props): ReactElement {
   };
 
   const handleClearForm = () => {
-    setListBranch({ branches: [], provinces: [] });
+    const payload = {
+      isAllBranches: true,
+      appliedBranches: {
+        branchList: [],
+        province: [],
+      },
+      saved: false,
+    };
+    dispatch(updatePayloadBranches(payload));
+    setOpen(false);
   };
 
   const filterOptions = createFilterOptions({
@@ -431,6 +453,7 @@ export default function SearchBranch(props: Props): ReactElement {
                       disabled={disabled}
                       value={branch}
                       filterOptions={filterOptions}
+                      onClose={handleCloseBranch}
                     />
                   </Box>
                   {/* <Box sx={{ textAlign: 'right' }}>
@@ -474,18 +497,16 @@ export default function SearchBranch(props: Props): ReactElement {
               </Box>
             </Grid>
             <Grid item xs={12} sx={{ textAlign: 'right', height: '43px', padding: '0 !important', marginTop: '30px' }}>
-              {!allBranches && (
-                <Button
-                  variant="contained"
-                  color="cancelColor"
-                  className={classes.MbtnSearch}
-                  size="large"
-                  onClick={handleClearForm}
-                  sx={{ marginRight: '15px' }}
-                >
-                  เคลียร์
-                </Button>
-              )}
+              <Button
+                variant="contained"
+                color="cancelColor"
+                className={classes.MbtnSearch}
+                size="large"
+                onClick={handleClearForm}
+                sx={{ marginRight: '15px' }}
+              >
+                เคลียร์
+              </Button>
               <Button
                 variant="contained"
                 color="info"
