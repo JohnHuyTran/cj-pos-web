@@ -21,6 +21,7 @@ import {
   GridValueGetterParams,
   GridRowId,
   GridRowData,
+  GridEditCellValueParams,
 } from '@mui/x-data-grid';
 import DialogTitle from '@mui/material/DialogTitle';
 import Link from '@mui/material/Link';
@@ -103,7 +104,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'productBarCode',
+    field: 'barcode',
     headerName: 'บาร์โค้ด',
     minWidth: 135,
     headerAlign: 'center',
@@ -121,20 +122,20 @@ const columns: GridColDef[] = [
       <div>
         <Typography variant="body2">{params.value}</Typography>
         <Typography variant="body2" color="textSecondary">
-          {params.getValue(params.id, 'productSku') || ''}
+          {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
     ),
   },
   {
-    field: 'productUnit',
+    field: 'unitName',
     headerName: 'หน่วย',
     width: 90,
     headerAlign: 'center',
     sortable: false,
   },
   {
-    field: 'productQuantityRef',
+    field: 'qty',
     headerName: 'จำนวนอ้างอิง',
     width: 130,
     headerAlign: 'center',
@@ -142,7 +143,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'productQuantityActual',
+    field: 'actualQty',
     headerName: 'จำนวนรับจริง',
     width: 135,
     headerAlign: 'center',
@@ -158,11 +159,11 @@ const columns: GridColDef[] = [
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (value < 0) value = 0;
 
-          params.api.updateRows([{ ...params.row, productQuantityActual: value }]);
+          params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         onBlur={(e) => {
           // isAllowActualQty(params, parseInt(e.target.value, 10));
-          params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }]);
+          params.api.updateRows([{ ...params.row, actualQty: e.target.value }]);
         }}
         disabled={isDisable(params) ? true : false}
         autoComplete="off"
@@ -170,7 +171,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'productDifference',
+    field: 'qtyDiff',
     headerName: 'ส่วนต่างการรับ',
     width: 140,
     headerAlign: 'center',
@@ -179,7 +180,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => calProductDiff(params),
   },
   {
-    field: 'productComment',
+    field: 'comment',
     headerName: 'หมายเหตุ',
     headerAlign: 'center',
     minWidth: 120,
@@ -190,7 +191,7 @@ const columns: GridColDef[] = [
         variant="outlined"
         name="txnComment"
         value={params.value}
-        onChange={(e) => params.api.updateRows([{ ...params.row, productComment: e.target.value }])}
+        onChange={(e) => params.api.updateRows([{ ...params.row, comment: e.target.value }])}
         disabled={isDisable(params) ? true : false}
         autoComplete="off"
       />
@@ -199,9 +200,7 @@ const columns: GridColDef[] = [
 ];
 
 var calProductDiff = function (params: GridValueGetterParams) {
-  let diff =
-    Number(params.getValue(params.id, 'productQuantityActual')) -
-    Number(params.getValue(params.id, 'productQuantityRef'));
+  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qty'));
 
   if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
   if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
@@ -228,7 +227,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 const isDisable = (params: GridRenderCellParams) => {
-  return params.row.isDraftStatus;
+  return params.row.sdStatus;
 };
 
 export interface DialogTitleProps {
@@ -339,23 +338,24 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
   if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
     updateState(entries);
   }
+
   let rowsEntries: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
     rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
       return {
         rowOrder: index + 1,
         id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
-        doNo: item.deliveryOrderNo,
+        deliveryOrderNo: item.deliveryOrderNo,
         isTote: item.isTote ? item.isTote : false,
-        isDraftStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
-        productSku: item.skuCode,
-        productBarCode: item.barcode,
+        sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
+        skuCode: item.skuCode,
+        barcode: item.barcode,
         productName: item.productName,
-        productUnit: item.unitName,
-        productQuantityRef: item.qty,
-        productQuantityActual: item.actualQty ? item.actualQty : item.qty,
-        productDifference: item.qtyDiff,
-        productComment: item.comment,
+        unitName: item.unitName,
+        qty: item.qty,
+        actualQty: item.actualQty ? item.actualQty : item.qty,
+        qtyDiff: item.qtyDiff,
+        comment: item.comment,
       };
     });
   }
@@ -397,10 +397,10 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     const itemsList: any = [];
     rows.forEach((data: GridRowData) => {
       const item: Entry = {
-        barcode: data.productBarCode,
-        deliveryOrderNo: data.doNo,
-        actualQty: data.productQuantityActual * 1,
-        comment: data.productComment,
+        barcode: data.barcode,
+        deliveryOrderNo: data.deliveryOrderNo,
+        actualQty: data.actualQty * 1,
+        comment: data.comment,
         seqItem: 0,
         itemNo: '',
         shipmentSAPRef: '',
@@ -421,7 +421,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         isTote: data.isTote,
       };
 
-      if (data.isTote === true && !(data.productQuantityActual * 1 >= 0 && data.productQuantityActual * 1 <= 1)) {
+      if (data.isTote === true && !(data.actualQty * 1 >= 0 && data.actualQty * 1 <= 1)) {
         qtyIsValid = false;
       }
       itemsList.push(item);
@@ -438,19 +438,20 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         items: itemsList,
       };
 
-      // console.log('payload: ', payload);
       await saveOrderShipments(payload, sdNo)
         .then((_value) => {
           setShowSnackBar(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           setSnackbarStatus(true);
           updateShipmentOrder();
+          updateState(itemsList);
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
           setContentMsg(error.message);
           setSnackbarStatus(false);
           updateShipmentOrder();
+          updateState(itemsList);
         });
     }
 
@@ -466,12 +467,12 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const itemsList: any = [];
     rowsEdit.forEach((data: GridRowData) => {
-      let diffCount: number = data.productQuantityActual - data.productQuantityRef;
+      let diffCount: number = data.actualQty - data.qty;
       const itemDiff: Entry = {
-        barcode: data.productBarCode,
-        deliveryOrderNo: data.doNo,
-        actualQty: data.productQuantityActual,
-        comment: data.productComment,
+        barcode: data.barcode,
+        deliveryOrderNo: data.deliveryOrderNo,
+        actualQty: data.actualQty,
+        comment: data.comment,
         seqItem: 0,
         itemNo: '',
         shipmentSAPRef: '',
@@ -590,9 +591,9 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
 
       const itemsList: any = [];
       rowsEdit.forEach((data: GridRowData) => {
-        if (data.productQuantityActual !== rowsEntries[i].productQuantityActual) {
+        if (data.actualQty !== rowsEntries[i].actualQty) {
           exit = true;
-        } else if (data.productComment !== rowsEntries[i].productComment) {
+        } else if (data.comment !== rowsEntries[i].comment) {
           exit = true;
         }
         i++;
@@ -663,6 +664,23 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const handleOnChangeUploadFile = (status: boolean) => {
     setUploadFileFlag(status);
+  };
+
+  const handleEditItems = async (params: GridEditCellValueParams) => {
+    if (params.field === 'actualQty' || params.field === 'comment') {
+      const itemsList: any = [];
+
+      if (rowsEntries.length > 0) {
+        const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+        await rows.forEach((data: GridRowData) => {
+          itemsList.push(data);
+        });
+      }
+
+      if (itemsList.length > 0) {
+        updateState(itemsList);
+      }
+    }
   };
 
   return (
@@ -869,6 +887,9 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
                 disableColumnMenu
                 autoHeight={rowsEntries.length >= 8 ? false : true}
                 scrollbarSize={10}
+                onCellFocusOut={handleEditItems}
+                onCellOut={handleEditItems}
+                onCellKeyDown={handleEditItems}
               />
             </div>
           </Box>
