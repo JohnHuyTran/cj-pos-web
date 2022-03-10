@@ -913,6 +913,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         percentDiffValue="0"
         sumActualQty={sumActualQty}
         sumQuantityRef={sumQuantityRef}
+        docType="LD"
       />
 
       <ConfirmExitModel

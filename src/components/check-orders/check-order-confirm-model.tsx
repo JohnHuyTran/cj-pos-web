@@ -31,6 +31,7 @@ interface ConfirmOrderShipment {
   percentDiffValue: string;
   sumActualQty: number;
   sumQuantityRef: number;
+  docType: string;
 }
 
 interface loadingModalState {
@@ -56,6 +57,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     percentDiffValue,
     sumActualQty,
     sumQuantityRef,
+    docType,
   } = props;
   const searchState = useAppSelector((state) => state.saveSearchOrder);
   const payloadSearchOrder: ShipmentRequest = searchState.searchCriteria;
@@ -64,6 +66,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     open: false,
   });
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+
   const DCPercent = env.dc.percent;
   let sumDCPercent: number = (sumActualQty * 100) / sumQuantityRef;
   sumDCPercent = Math.trunc(sumDCPercent); //remove decimal
@@ -199,37 +202,32 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                 </Typography>
                 {itemsDiff.length > 0 && (
                   <div>
-                    <Grid container spacing={2} mb={1}>
-                      <Grid item xs={7}>
-                        <Typography
-                          variant="body1"
-                          align="right"
-                          sx={{
-                            marginTop: 2,
-                            marginBottom: 1,
-                            fontWeight: 600,
-                          }}
-                        >
-                          รายการสินค้าขาด / เกิน
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={5}>
-                        <Typography
-                          variant="body1"
-                          align="center"
-                          sx={{
-                            marginTop: 2.4,
-                            fontSize: 13,
-                            color: '#FF0000',
-                          }}
-                        >
-                          {sumDCPercent < DCPercent &&
-                            `(จำนวนรับจริง ${sumDCPercent}% น้อยกว่าค่าที่กำหนด ${DCPercent}%)`}
-                          {sumDCPercent > DCPercent &&
-                            `(จำนวนรับจริง ${sumDCPercent}% มากกว่าค่าที่กำหนด ${DCPercent}%)`}
-                        </Typography>
-                      </Grid>
-                    </Grid>
+                    <Typography
+                      variant="body1"
+                      align="center"
+                      sx={{
+                        marginTop: 2,
+                        fontWeight: 600,
+                      }}
+                    >
+                      รายการสินค้าขาด / เกิน
+                    </Typography>
+
+                    {docType === 'LD' && (
+                      <Typography
+                        variant="body1"
+                        align="center"
+                        sx={{
+                          marginBottom: 2,
+                          fontSize: 13,
+                          color: '#FF0000',
+                        }}
+                      >
+                        {sumDCPercent < DCPercent &&
+                          `(จำนวนรับจริง ${sumDCPercent}% น้อยกว่าค่าที่กำหนด ${DCPercent}%)`}
+                        {sumDCPercent > DCPercent && `(จำนวนรับจริง ${sumDCPercent}% มากกว่าค่าที่กำหนด ${DCPercent}%)`}
+                      </Typography>
+                    )}
 
                     <DataDiffInfo items={itemsDiff} />
                   </div>
