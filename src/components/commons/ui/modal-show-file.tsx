@@ -96,16 +96,10 @@ export default function ModalShowPDF({
   const onSourceSuccess = () => {
     if (!initialPageSize) {
       if (pdfWrapper && pdfWrapper.current) {
-        // setPageSize(
-        //   `${pdfWrapper.current.getBoundingClientRect().width}px ${pdfWrapper.current.getBoundingClientRect().height}px`
-        // );
         setPageSize(
-          landscape
-            ? `${pdfWrapper.current.getBoundingClientRect().width}px ${
-                pdfWrapper.current.getBoundingClientRect().height
-              }px`
-            : '8in 12in'
+          `${pdfWrapper.current.getBoundingClientRect().width}px ${pdfWrapper.current.getBoundingClientRect().height}px`
         );
+        // setPageSize(landscape ? '12in 8in' : '8in 12in');
       } else {
         setPageSize(landscape ? 'A4 landscape' : 'A4 portrait');
       }
@@ -175,7 +169,7 @@ export default function ModalShowPDF({
           }}>
           {/* <div id="placeholderWrapper" style={{ height: "3000vh" }} /> */}
           {statusFile === 1 && (
-            <div id='pdfWrapper' style={{ width: '50vw' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
               <Document
                 file={{
                   url: url,
@@ -200,7 +194,7 @@ export default function ModalShowPDF({
           {statusFile === 0 && (
             <div>
               {imgFile !== 'image' && (
-                <div id='pdfWrapper' style={{ width: '50vw' }} ref={pdfWrapper}>
+                <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
                   <Document file={sdImageFile} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
                     {Array.from(new Array(numPages), (el, index) => (
                       <Page
