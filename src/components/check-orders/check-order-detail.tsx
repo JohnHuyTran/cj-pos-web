@@ -61,6 +61,8 @@ import { getBranchName } from '../../utils/utils';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 import theme from '../../styles/theme';
+import { env } from '../../adapters/environmentConfigs';
+
 interface loadingModalState {
   open: boolean;
 }
@@ -265,7 +267,13 @@ interface fileInfoProps {
   base64URL: any;
 }
 
-export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickClose }: CheckOrderDetailProps) {
+export default function CheckOrderDetail({
+  sdNo,
+  docRefNo,
+  docType,
+  defaultOpen,
+  onClickClose,
+}: CheckOrderDetailProps) {
   const classes = useStyles();
   const sdRef = useAppSelector((state) => state.checkOrderSDList.orderList);
   const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
@@ -311,6 +319,8 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   const [displayBranchGroup, setDisplayBranchGroup] = React.useState(false);
+  const DCPercent = env.dc.percent;
+
   useEffect(() => {
     const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
     setDisplayBranchGroup(branch);
@@ -457,8 +467,6 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     handleOpenLoading('open', false);
   };
 
-  const [sumActualQty, setSumActualQty] = React.useState(0);
-  const [sumQuantityRef, setSumQuantityRef] = React.useState(0);
   const handleApproveBtn = async () => {
     setItemsDiffState([]);
     setOpenModelConfirm(true);
@@ -470,8 +478,8 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     let sumQuantityRefItems: number = 0;
     rowsEdit.forEach((data: GridRowData) => {
       let diffCount: number = data.productQuantityActual - data.productQuantityRef;
-      sumActualQtyItems = Number(sumActualQtyItems) + Number(data.productQuantityActual);
-      sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.productQuantityRef);
+      sumActualQtyItems = Number(sumActualQtyItems) + Number(data.productQuantityActual); //รวมจำนวนรับจริง
+      sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.productQuantityRef); //รวมจำนวนอ้าง
 
       const itemDiff: Entry = {
         barcode: data.productBarCode,
@@ -503,8 +511,15 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
 
     localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
 
-    setSumActualQty(sumActualQtyItems);
-    setSumQuantityRef(sumQuantityRefItems);
+    handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
+  };
+
+  const [sumDCPercent, setSumDCPercent] = React.useState(0);
+  const handleCalculateDCPercent = async (sumActualQty: number, sumQuantityRef: number) => {
+    let sumPercent: number = (sumActualQty * 100) / sumQuantityRef;
+    sumPercent = Math.trunc(sumPercent); //remove decimal
+
+    setSumDCPercent(sumPercent);
   };
 
   const validateFileInfo = () => {
@@ -911,9 +926,8 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         items={itemsDiffState}
         percentDiffType={false}
         percentDiffValue="0"
-        sumActualQty={sumActualQty}
-        sumQuantityRef={sumQuantityRef}
-        docType="LD"
+        sumDCPercent={sumDCPercent}
+        docType={docType}
       />
 
       <ConfirmExitModel

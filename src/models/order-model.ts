@@ -146,6 +146,7 @@ export interface itemsDetail {
 export interface CheckOrderDetailProps {
   sdNo: string;
   docRefNo: string;
+  docType: string;
   defaultOpen: boolean;
   onClickClose: any;
 }
