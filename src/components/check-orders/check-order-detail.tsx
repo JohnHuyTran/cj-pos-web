@@ -30,7 +30,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import IconButton from '@mui/material/IconButton';
 import { useStyles } from '../../styles/makeTheme';
 
-import { saveOrderShipments, getPathReportSD } from '../../services/order-shipment';
+import { saveOrderShipments, getPathReportSD, approveOrderShipmentsOC } from '../../services/order-shipment';
 import ConfirmOrderShipment from './check-order-confirm-model';
 import ConfirmExitModel from './confirm-model';
 import {
@@ -536,6 +536,23 @@ export default function CheckOrderDetail({
     handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
   };
 
+  const handleApproveOCBtn = async () => {
+    await approveOrderShipmentsOC(orderDetail.sdNo)
+      .then((_value) => {
+        setShowSnackBar(true);
+        setContentMsg('คุณได้อนุมัติเรียบร้อยแล้ว');
+        setSnackbarStatus(true);
+        updateShipmentOrder();
+        updateAddItemsState({});
+        onClickClose();
+      })
+      .catch((error: ApiError) => {
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+        setSnackbarStatus(false);
+      });
+  };
+
   const validateFileInfo = () => {
     const isvalid = fileUploadList.length > 0 ? true : false;
     if (!isvalid) {
@@ -561,12 +578,12 @@ export default function CheckOrderDetail({
     handleOpenLoading('open', false);
   };
 
-  const handleLinkDocument = async () => {
-    handleOpenLoading('open', true);
-    setStatusFile(0);
-    setOpenModelPreviewDocument(true);
-    handleOpenLoading('open', false);
-  };
+  // const handleLinkDocument = async () => {
+  //   handleOpenLoading('open', true);
+  //   setStatusFile(0);
+  //   setOpenModelPreviewDocument(true);
+  //   handleOpenLoading('open', false);
+  // };
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -911,7 +928,7 @@ export default function CheckOrderDetail({
                     variant="contained"
                     color="primary"
                     className={classes.MbtnApprove}
-                    // onClick={handleApproveBtn}
+                    onClick={handleApproveOCBtn}
                     startIcon={<CheckCircleOutline />}
                     style={{ width: 200 }}
                   >
