@@ -20,7 +20,6 @@ import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supp
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import ModalSupplierSelection from './modal-supplier-selection';
 import { SearchOff } from '@mui/icons-material';
-import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 
 interface State {
   paramQuery: string;
@@ -184,10 +183,10 @@ export default function SupplierCheckOrderSearch() {
       orderListData = <SupplierOrderList />;
     } else {
       orderListData = (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
+        <Grid item container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB'>
             <h2>
-              ไม่มีข้อมูล <SearchOff fontSize="large" />
+              ไม่มีข้อมูล <SearchOff fontSize='large' />
             </h2>
           </Box>
         </Grid>
@@ -200,32 +199,31 @@ export default function SupplierCheckOrderSearch() {
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id="txtParamQuery"
-              name="paramQuery"
-              size="small"
+              id='txtParamQuery'
+              name='paramQuery'
+              size='small'
               value={values.paramQuery}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่ใบสั่งซื้อ PO, PI, PN/รหัสผู้จำหน่าย/ชื่อผู้จำหน่าย"
+              placeholder='เลขที่ใบสั่งซื้อ PO, PI, PN/รหัสผู้จำหน่าย/ชื่อผู้จำหน่าย'
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สถานะ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selPiStatus"
-                name="piStatus"
+                id='selPiStatus'
+                name='piStatus'
                 value={values.piStatus}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
                 <MenuItem value={'0'}>บันทึก</MenuItem>
                 <MenuItem value={'1'}>อนุมัติ</MenuItem>
@@ -234,17 +232,16 @@ export default function SupplierCheckOrderSearch() {
             </FormControl>
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               เอกสารใบสั่งซื้อ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selPiType"
-                name="piType"
+                id='selPiType'
+                name='piType'
                 value={values.piType}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
                 <MenuItem value={'0'}>มี PO</MenuItem>
                 <MenuItem value={'1'}>ไม่มี PO</MenuItem>
@@ -253,17 +250,17 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่รับสินค้า
             </Typography>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ตั้งแต่
             </Typography>
             <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
-          <Grid item xs={4} container alignItems="flex-end">
+          <Grid item xs={4} container alignItems='flex-end'>
             <Box sx={{ width: '100%' }}>
-              <Typography gutterBottom variant="subtitle1" component="div">
+              <Typography gutterBottom variant='subtitle1' component='div'>
                 ถึง
               </Typography>
               <DatePickerComponent
@@ -279,36 +276,33 @@ export default function SupplierCheckOrderSearch() {
             <AccordionUploadFile sdNo="1234" />
           </Grid> */}
 
-          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
             <Button
-              id="btnCreateSupplierModal"
-              variant="contained"
+              id='btnCreateSupplierModal'
+              variant='contained'
               onClick={handleOpenModal}
               sx={{ minWidth: '15%' }}
               className={classes.MbtnClear}
               startIcon={<AddCircleOutlineOutlinedIcon />}
-              color="secondary"
-            >
+              color='secondary'>
               สร้างใบรับสินค้า
             </Button>
             <Button
-              id="btnClear"
-              variant="contained"
+              id='btnClear'
+              variant='contained'
               onClick={onClickClearBtn}
               sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
-              color="cancelColor"
-            >
+              color='cancelColor'>
               เคลียร์
             </Button>
             <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
+              id='btnSearch'
+              variant='contained'
+              color='primary'
               onClick={onClickValidateForm}
               sx={{ width: '13%', ml: 2 }}
-              className={classes.MbtnSearch}
-            >
+              className={classes.MbtnSearch}>
               ค้นหา
             </Button>
           </Grid>

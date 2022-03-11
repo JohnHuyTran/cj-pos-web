@@ -16,6 +16,7 @@ import checkOrderDetailSlice, { featchOrderDetailAsync } from '../../store/slice
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
 import { Chip, Typography } from '@mui/material';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 function OrderList() {
   const { t } = useTranslation(['common']);
@@ -207,6 +208,7 @@ function OrderList() {
     setDocRefNo(params.row.docRefNo);
     setDocType(params.row.docType);
 
+    await dispatch(updateAddItemsState({}));
     await dispatch(featchOrderDetailAsync(params.row.sdNo))
       .then(
         async function (value) {
@@ -250,7 +252,7 @@ function OrderList() {
 
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
-    console.log('newPage: ', newPage);
+    // console.log('newPage: ', newPage);
     let page: string = (newPage + 1).toString();
 
     const payloadNewpage: ShipmentRequest = {
