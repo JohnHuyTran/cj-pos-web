@@ -277,6 +277,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
   const { apiRef, columns } = useApiRef();
   const [showSaveBtn, setShowSaveBtn] = React.useState(false);
   const [showApproveBtn, setShowApproveBtn] = React.useState(false);
+  const [statusWaitApprove1, setStatusWaitApprove1] = React.useState(false);
   const [showCloseJobBtn, setShowCloseJobBtn] = React.useState(false);
   const [validationFile, setValidationFile] = React.useState(false);
   const [isDisplayActBtn, setIsDisplayActBtn] = React.useState('');
@@ -317,6 +318,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     setDisplayBranchGroup(branch);
 
     setShowSaveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
+    setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVE_1);
     setShowApproveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
     setShowCloseJobBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
     setShowSdTypeTote(orderDetail.sdType === 0);
@@ -857,6 +859,20 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
                     sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                   >
                     ปิดงาน
+                  </Button>
+                )}
+
+                {statusWaitApprove1 && (
+                  <Button
+                    id="btnApprove"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnApprove}
+                    // onClick={handleApproveBtn}
+                    startIcon={<CheckCircleOutline />}
+                    style={{ width: 200 }}
+                  >
+                    อนุมัติ
                   </Button>
                 )}
               </Grid>
