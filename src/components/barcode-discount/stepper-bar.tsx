@@ -36,7 +36,7 @@ export default function StepperBar({
           {steps.map((label, index) => {
             const labelProps: any = {};
             if (index === 2 && rejected) {
-              label = 'ไม่อนุมัต';
+              label = 'ไม่อนุมัติ';
               labelProps.error = true;
             }
 
