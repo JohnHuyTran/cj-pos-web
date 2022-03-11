@@ -136,7 +136,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'qty',
+    field: 'qtyRef',
     headerName: 'จำนวนอ้างอิง',
     width: 130,
     headerAlign: 'center',
@@ -201,7 +201,7 @@ const columns: GridColDef[] = [
 ];
 
 var calProductDiff = function (params: GridValueGetterParams) {
-  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qty'));
+  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qtyRef'));
 
   if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
   if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
@@ -372,7 +372,18 @@ export default function CheckOrderDetail({
   }
   let rowsEntries: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
-    rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
+    rowsEntries = payloadAddItem.map((item: any, index: number) => {
+      let qtyRef: number = 0;
+      let actualQty: number = 0;
+
+      if (item.id !== null && item.id !== undefined) {
+        qtyRef = Number(item.qtyRef) ? Number(item.qtyRef) : 0;
+        actualQty = Number(item.qty) ? Number(item.qty) : Number(item.actualQty) ? Number(item.actualQty) : 0;
+      } else {
+        qtyRef = Number(item.qty);
+        actualQty = Number(item.actualQty);
+      }
+
       return {
         rowOrder: index + 1,
         id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
@@ -383,8 +394,8 @@ export default function CheckOrderDetail({
         barcode: item.barcode,
         productName: item.productName,
         unitName: item.unitName,
-        qty: item.qty,
-        actualQty: item.actualQty !== null ? item.actualQty : item.qty,
+        qtyRef: qtyRef,
+        actualQty: actualQty,
         qtyDiff: item.qtyDiff,
         comment: item.comment,
       };
@@ -436,7 +447,6 @@ export default function CheckOrderDetail({
 
   const handleSaveButton = async () => {
     handleOpenLoading('open', true);
-    mapUpdateState();
 
     let qtyIsValid: boolean = true;
     const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -444,7 +454,6 @@ export default function CheckOrderDetail({
     const itemsList: any = [];
     const itemsListUpdate: any = [];
     rows.forEach((data: GridRowData) => {
-      let diffCount: number = data.actualQty - data.qty;
       const item: any = {
         barcode: data.barcode,
         deliveryOrderNo: data.deliveryOrderNo,
@@ -477,15 +486,15 @@ export default function CheckOrderDetail({
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           setSnackbarStatus(true);
           updateShipmentOrder();
-          updateState(itemsListUpdate);
         })
         .catch((error: ApiError) => {
           setShowSnackBar(true);
           setContentMsg(error.message);
           setSnackbarStatus(false);
           updateShipmentOrder();
-          updateState(itemsListUpdate);
         });
+
+      updateState(itemsListUpdate);
     }
 
     handleOpenLoading('open', false);
@@ -501,9 +510,9 @@ export default function CheckOrderDetail({
     let sumActualQtyItems: number = 0;
     let sumQuantityRefItems: number = 0;
     rowsEdit.forEach((data: GridRowData) => {
-      let diffCount: number = data.actualQty - data.qty;
+      let diffCount: number = data.actualQty - data.qtyRef;
       sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
-      sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qty); //รวมจำนวนอ้าง
+      sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
 
       const itemDiff: Entry = {
         barcode: data.barcode,
@@ -643,17 +652,17 @@ export default function CheckOrderDetail({
       let i = 0;
       let exit = false;
 
-      const itemsList: any = [];
-      rowsEdit.forEach((data: GridRowData) => {
-        if (data.actualQty !== rowsEntries[i].actualQty) {
-          exit = true;
-        } else if (data.comment !== rowsEntries[i].comment) {
-          exit = true;
-        }
-        i++;
+      // const itemsList: any = [];
+      // rowsEdit.forEach((data: GridRowData) => {
+      //   if (data.actualQty !== rowsEntries[i].actualQty) {
+      //     exit = true;
+      //   } else if (data.comment !== rowsEntries[i].comment) {
+      //     exit = true;
+      //   }
+      //   i++;
 
-        itemsList.push(data);
-      });
+      //   itemsList.push(data);
+      // });
 
       if (!exit) {
         dispatch(updateAddItemsState({}));
