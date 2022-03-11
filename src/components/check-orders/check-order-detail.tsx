@@ -367,16 +367,10 @@ export default function CheckOrderDetail({
     });
   }
 
-  if (localStorage.getItem('checkOrderRowsEdit')) {
-    let localStorageEdit = JSON.parse(localStorage.getItem('checkOrderRowsEdit') || '');
-    rowsEntries = localStorageEdit;
-  }
-
   function handleNotExitModelConfirm() {
     setConfirmModelExit(false);
   }
   function handleExitModelConfirm() {
-    localStorage.removeItem('checkOrderRowsEdit');
     setConfirmModelExit(false);
     setOpen(false);
     onClickClose();
@@ -470,8 +464,6 @@ export default function CheckOrderDetail({
         });
     }
 
-    localStorage.removeItem('checkOrderRowsEdit');
-
     handleOpenLoading('open', false);
   };
 
@@ -516,8 +508,6 @@ export default function CheckOrderDetail({
       setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
       itemsList.push(data);
     });
-
-    localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
 
     handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
   };
@@ -634,11 +624,9 @@ export default function CheckOrderDetail({
 
       if (!exit) {
         dispatch(updateAddItemsState({}));
-        localStorage.removeItem('checkOrderRowsEdit');
         setOpen(false);
         onClickClose();
       } else if (exit) {
-        localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
         setConfirmModelExit(true);
       }
     } else if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
