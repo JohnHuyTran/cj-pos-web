@@ -19,9 +19,9 @@ import LoadingModal from '../commons/ui/loading-modal';
 import { useStyles } from '../../styles/makeTheme';
 import { TextField } from '@mui/material';
 import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
-import AccordionHuaweiFile from '../supplier-check-order/accordion-huawei-file';
 import { isAllowActionPermission } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
+import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 
 interface Props {
   isOpen: boolean;

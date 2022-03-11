@@ -39,7 +39,6 @@ import {
   saveBranchTransfer,
 } from '../../services/stock-transfer';
 import theme from '../../styles/theme';
-import AccordionUploadFile from '../supplier-check-order/accordion-upload-file';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import { FileType } from '../../models/supplier-check-order-model';
 import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
@@ -52,7 +51,8 @@ import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
 import stockRequestDetail from './stock-request-detail';
 import { isGroupBranch } from '../../utils/role-permission';
-import AccordionHuaweiFile from '../supplier-check-order/accordion-huawei-file';
+import AccordionUploadFile from '../commons/ui/accordion-upload-file';
+import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 
 interface Props {
   isOpen: boolean;
