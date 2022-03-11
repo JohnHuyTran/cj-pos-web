@@ -60,7 +60,7 @@ function CheckOrderSearch() {
 
   const [values, setValues] = React.useState<State>({
     orderShipment: '',
-    orderStatus: ocUserInfo ? 'WAIT_FOR_APPROVE_1' : 'ALL',
+    orderStatus: ocUserInfo ? 'WAIT_FOR_APPROVAL_1' : 'ALL',
     orderType: 'ALL',
     dateFrom: '',
     dateTo: '',

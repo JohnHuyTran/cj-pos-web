@@ -114,7 +114,7 @@ function OrderList() {
       align: 'left',
       sortable: false,
       renderCell: (params) => {
-        if (params.value === 'DRAFT' || params.value === 'WAIT_FOR_APPROVEL_1') {
+        if (params.value === 'DRAFT' || params.value === 'WAIT_FOR_APPROVAL_1') {
           return (
             <Chip
               label={t(`status.${params.value}`)}

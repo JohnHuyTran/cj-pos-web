@@ -2,19 +2,19 @@ export enum ShipmentDeliveryStatusCodeEnum {
   STATUS_APPROVE = 'APPROVED',
   STATUS_DRAFT = 'DRAFT',
   STATUS_CLOSEJOB = 'CLOSED',
-  STATUS_WAITAPPROVEL_1 = 'WAIT_FOR_APPROVEL_1',
+  STATUS_WAITAPPROVEL_1 = 'WAIT_FOR_APPROVAL_1',
 }
 
 export const shipmentStatus = [
   { key: 'DRAFT', text: 'บันทึก' },
-  { key: 'WAIT_FOR_APPROVEL_1', text: 'รออนุมัติ1' },
+  { key: 'WAIT_FOR_APPROVAL_1', text: 'รออนุมัติ1' },
   { key: 'APPROVED', text: 'อนุมัติ' },
   { key: 'CLOSED', text: 'ปิดงาน' },
 ];
 
 const shipmentEnStatus = [
   { key: 'DRAFT', text: 'Draft' },
-  { key: 'WAIT_FOR_APPROVEL_1', text: 'WaitForApprove1' },
+  { key: 'WAIT_FOR_APPROVAL_1', text: 'WaitForApproval1' },
   { key: 'APPROVED', text: 'Approved' },
   { key: 'CLOSED', text: 'Close' },
 ];

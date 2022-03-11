@@ -320,13 +320,16 @@ export default function CheckOrderDetail({
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   const [displayBranchGroup, setDisplayBranchGroup] = React.useState(false);
+  const [statusOC, setStatusOC] = React.useState(false);
   const DCPercent = env.dc.percent;
   useEffect(() => {
     const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
+    const oc = getUserInfo().group === PERMISSION_GROUP.OC;
     setDisplayBranchGroup(branch);
+    setStatusOC(oc);
 
     setShowSaveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
-    setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVE_1);
+    setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1);
     setShowApproveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
     setShowCloseJobBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
     setShowSdTypeTote(orderDetail.sdType === 0);
@@ -338,7 +341,26 @@ export default function CheckOrderDetail({
     if (orderDetail.Comment !== '') {
       dispatch(featchOrderSDListAsync(orderDetail.Comment));
     }
+
+    if (docType === 'LD') {
+      let sumActualQtyItems: number = 0;
+      let sumQuantityRefItems: number = 0;
+      rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
+        sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
+      });
+
+      handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
+    }
   }, [open, openModelConfirm]);
+
+  const [sumDCPercent, setSumDCPercent] = React.useState(0);
+  const handleCalculateDCPercent = async (sumActualQty: number, sumQuantityRef: number) => {
+    let sumPercent: number = (sumActualQty * 100) / sumQuantityRef;
+    sumPercent = Math.trunc(sumPercent); //remove decimal
+
+    setSumDCPercent(sumPercent);
+  };
 
   const updateState = async (items: any) => {
     await dispatch(updateAddItemsState(items));
@@ -512,14 +534,6 @@ export default function CheckOrderDetail({
     });
 
     handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
-  };
-
-  const [sumDCPercent, setSumDCPercent] = React.useState(0);
-  const handleCalculateDCPercent = async (sumActualQty: number, sumQuantityRef: number) => {
-    let sumPercent: number = (sumActualQty * 100) / sumQuantityRef;
-    sumPercent = Math.trunc(sumPercent); //remove decimal
-
-    setSumDCPercent(sumPercent);
   };
 
   const validateFileInfo = () => {
@@ -779,18 +793,36 @@ export default function CheckOrderDetail({
             <Grid container spacing={2} display="flex" justifyContent="space-between">
               {/* <Grid item xl={2}> */}
               <Grid item xl={4}>
-                <Button
-                  id="btnPrint"
-                  variant="contained"
-                  color="secondary"
-                  onClick={handlePrintBtn}
-                  startIcon={<Print />}
-                  className={classes.MbtnPrint}
-                  style={{ textTransform: 'none' }}
-                  sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
-                >
-                  พิมพ์ใบผลต่าง
-                </Button>
+                {statusOC && (
+                  <>
+                    <Typography
+                      variant="body1"
+                      align="center"
+                      sx={{
+                        marginBottom: 2,
+                        color: '#FF0000',
+                      }}
+                    >
+                      {sumDCPercent < DCPercent && `*จำนวนรับจริง ${sumDCPercent}% น้อยกว่าค่าที่กำหนด ${DCPercent}%*`}
+                      {sumDCPercent > DCPercent && `*จำนวนรับจริง ${sumDCPercent}% มากกว่าค่าที่กำหนด ${DCPercent}%*`}
+                    </Typography>
+                  </>
+                )}
+
+                {!statusWaitApprove1 && (
+                  <Button
+                    id="btnPrint"
+                    variant="contained"
+                    color="secondary"
+                    onClick={handlePrintBtn}
+                    startIcon={<Print />}
+                    className={classes.MbtnPrint}
+                    style={{ textTransform: 'none' }}
+                    sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                  >
+                    พิมพ์ใบผลต่าง
+                  </Button>
+                )}
 
                 {showSaveBtn && (
                   <Button
@@ -873,7 +905,7 @@ export default function CheckOrderDetail({
                   </Button>
                 )}
 
-                {statusWaitApprove1 && (
+                {statusOC && statusWaitApprove1 && (
                   <Button
                     id="btnApprove"
                     variant="contained"
