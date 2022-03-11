@@ -156,6 +156,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
     setOpenLoadingModal(false);
   };
 
+  const [errorUploadFile, setErrorUploadFile] = React.useState(false);
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
   const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
   // const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
@@ -223,6 +224,8 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
           .then((value) => {
             // console.log('importStockRequest:', value);
 
+            setErrorUploadFile(false);
+
             setFlagEdit(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
@@ -235,6 +238,9 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
           .catch((error: ApiUploadError) => {
             setFile(undefined);
             setFileName('');
+
+            setErrorUploadFile(true);
+
             if (error.code === 40000) {
               setOpenAlertFile(true);
               setOpenAlert(true);
@@ -376,33 +382,52 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
             <Grid item xs={12} mt={2}>
               <div>
                 {errorBrowseFile === true && (
-                  <TextField
-                    error
-                    name="browserTxf"
-                    className={classes.MtextFieldUpload}
-                    value={fileName}
-                    placeholder="แนบไฟล์ .xlsx"
-                    helperText={msgErrorBrowseFile}
-                  />
+                  <>
+                    <TextField
+                      error
+                      name="browserTxf"
+                      className={classes.MtextFieldUpload}
+                      value={fileName}
+                      placeholder="แนบไฟล์ .xlsx"
+                      helperText={msgErrorBrowseFile}
+                    />
+                  </>
                 )}
 
                 {errorBrowseFile === false && (
-                  <TextField
-                    name="browserTxf"
-                    className={classes.MtextFieldUpload}
-                    value={fileName}
-                    placeholder="แนบไฟล์ .xlsx"
-                  />
+                  <>
+                    <TextField
+                      name="browserTxf"
+                      className={classes.MtextFieldUpload}
+                      value={fileName}
+                      placeholder="แนบไฟล์ .xlsx"
+                    />
+                  </>
                 )}
 
-                <input
-                  id="btnBrowse"
-                  type="file"
-                  accept=".xlsx"
-                  onChange={handleFileInputChange}
-                  style={{ display: 'none' }}
-                />
+                {errorUploadFile === true && (
+                  <>
+                    <input
+                      id="btnBrowse"
+                      type="file"
+                      accept=".xlsx"
+                      onChange={handleFileInputChange}
+                      style={{ display: 'none' }}
+                    />
+                  </>
+                )}
 
+                {errorUploadFile === false && (
+                  <>
+                    <input
+                      id="btnBrowse"
+                      type="file"
+                      accept=".xlsx"
+                      onChange={handleFileInputChange}
+                      style={{ display: 'none' }}
+                    />
+                  </>
+                )}
                 <label htmlFor={'btnBrowse'}>
                   <Button
                     id="btnPrint"
