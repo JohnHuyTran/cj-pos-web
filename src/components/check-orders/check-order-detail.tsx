@@ -30,7 +30,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import IconButton from '@mui/material/IconButton';
 import { useStyles } from '../../styles/makeTheme';
 
-import { saveOrderShipments, getPathReportSD } from '../../services/order-shipment';
+import { saveOrderShipments, getPathReportSD, approveOrderShipmentsOC } from '../../services/order-shipment';
 import ConfirmOrderShipment from './check-order-confirm-model';
 import ConfirmExitModel from './confirm-model';
 import {
@@ -63,6 +63,7 @@ import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import theme from '../../styles/theme';
+import { env } from '../../adapters/environmentConfigs';
 
 interface loadingModalState {
   open: boolean;
@@ -266,7 +267,13 @@ interface fileInfoProps {
   base64URL: any;
 }
 
-export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickClose }: CheckOrderDetailProps) {
+export default function CheckOrderDetail({
+  sdNo,
+  docRefNo,
+  docType,
+  defaultOpen,
+  onClickClose,
+}: CheckOrderDetailProps) {
   const classes = useStyles();
   const sdRef = useAppSelector((state) => state.checkOrderSDList.orderList);
   const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
@@ -277,6 +284,7 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
   const { apiRef, columns } = useApiRef();
   const [showSaveBtn, setShowSaveBtn] = React.useState(false);
   const [showApproveBtn, setShowApproveBtn] = React.useState(false);
+  const [statusWaitApprove1, setStatusWaitApprove1] = React.useState(false);
   const [showCloseJobBtn, setShowCloseJobBtn] = React.useState(false);
   const [validationFile, setValidationFile] = React.useState(false);
   const [isDisplayActBtn, setIsDisplayActBtn] = React.useState('');
@@ -312,11 +320,16 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
 
   const [displayBranchGroup, setDisplayBranchGroup] = React.useState(false);
+  const [statusOC, setStatusOC] = React.useState(false);
+  const DCPercent = env.dc.percent;
   useEffect(() => {
     const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
+    const oc = getUserInfo().group === PERMISSION_GROUP.OC;
     setDisplayBranchGroup(branch);
+    setStatusOC(oc);
 
     setShowSaveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
+    setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1);
     setShowApproveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
     setShowCloseJobBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
     setShowSdTypeTote(orderDetail.sdType === 0);
@@ -328,7 +341,26 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     if (orderDetail.Comment !== '') {
       dispatch(featchOrderSDListAsync(orderDetail.Comment));
     }
+
+    if (docType === 'LD') {
+      let sumActualQtyItems: number = 0;
+      let sumQuantityRefItems: number = 0;
+      rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
+        sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
+      });
+
+      handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
+    }
   }, [open, openModelConfirm]);
+
+  const [sumDCPercent, setSumDCPercent] = React.useState(0);
+  const handleCalculateDCPercent = async (sumActualQty: number, sumQuantityRef: number) => {
+    let sumPercent: number = (sumActualQty * 100) / sumQuantityRef;
+    sumPercent = Math.trunc(sumPercent); //remove decimal
+
+    setSumDCPercent(sumPercent);
+  };
 
   const updateState = async (items: any) => {
     await dispatch(updateAddItemsState(items));
@@ -338,7 +370,6 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
   if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
     updateState(entries);
   }
-
   let rowsEntries: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
     rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
@@ -360,16 +391,10 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     });
   }
 
-  if (localStorage.getItem('checkOrderRowsEdit')) {
-    let localStorageEdit = JSON.parse(localStorage.getItem('checkOrderRowsEdit') || '');
-    rowsEntries = localStorageEdit;
-  }
-
   function handleNotExitModelConfirm() {
     setConfirmModelExit(false);
   }
   function handleExitModelConfirm() {
-    localStorage.removeItem('checkOrderRowsEdit');
     setConfirmModelExit(false);
     setOpen(false);
     onClickClose();
@@ -463,8 +488,6 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         });
     }
 
-    localStorage.removeItem('checkOrderRowsEdit');
-
     handleOpenLoading('open', false);
   };
 
@@ -474,8 +497,14 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     const itemsList: any = [];
+
+    let sumActualQtyItems: number = 0;
+    let sumQuantityRefItems: number = 0;
     rowsEdit.forEach((data: GridRowData) => {
       let diffCount: number = data.actualQty - data.qty;
+      sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
+      sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qty); //รวมจำนวนอ้าง
+
       const itemDiff: Entry = {
         barcode: data.barcode,
         deliveryOrderNo: data.deliveryOrderNo,
@@ -504,7 +533,24 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
       itemsList.push(data);
     });
 
-    localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
+    handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
+  };
+
+  const handleApproveOCBtn = async () => {
+    await approveOrderShipmentsOC(orderDetail.sdNo)
+      .then((_value) => {
+        setShowSnackBar(true);
+        setContentMsg('คุณได้อนุมัติเรียบร้อยแล้ว');
+        setSnackbarStatus(true);
+        updateShipmentOrder();
+        updateAddItemsState({});
+        onClickClose();
+      })
+      .catch((error: ApiError) => {
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+        setSnackbarStatus(false);
+      });
   };
 
   const validateFileInfo = () => {
@@ -532,12 +578,12 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
     handleOpenLoading('open', false);
   };
 
-  const handleLinkDocument = async () => {
-    handleOpenLoading('open', true);
-    setStatusFile(0);
-    setOpenModelPreviewDocument(true);
-    handleOpenLoading('open', false);
-  };
+  // const handleLinkDocument = async () => {
+  //   handleOpenLoading('open', true);
+  //   setStatusFile(0);
+  //   setOpenModelPreviewDocument(true);
+  //   handleOpenLoading('open', false);
+  // };
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -611,11 +657,9 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
 
       if (!exit) {
         dispatch(updateAddItemsState({}));
-        localStorage.removeItem('checkOrderRowsEdit');
         setOpen(false);
         onClickClose();
       } else if (exit) {
-        localStorage.setItem('checkOrderRowsEdit', JSON.stringify(itemsList));
         setConfirmModelExit(true);
       }
     } else if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
@@ -766,18 +810,36 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
             <Grid container spacing={2} display="flex" justifyContent="space-between">
               {/* <Grid item xl={2}> */}
               <Grid item xl={4}>
-                <Button
-                  id="btnPrint"
-                  variant="contained"
-                  color="secondary"
-                  onClick={handlePrintBtn}
-                  startIcon={<Print />}
-                  className={classes.MbtnPrint}
-                  style={{ textTransform: 'none' }}
-                  sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
-                >
-                  พิมพ์ใบผลต่าง
-                </Button>
+                {statusOC && (
+                  <>
+                    <Typography
+                      variant="body1"
+                      align="center"
+                      sx={{
+                        marginBottom: 2,
+                        color: '#FF0000',
+                      }}
+                    >
+                      {sumDCPercent < DCPercent && `*จำนวนรับจริง ${sumDCPercent}% น้อยกว่าค่าที่กำหนด ${DCPercent}%*`}
+                      {sumDCPercent > DCPercent && `*จำนวนรับจริง ${sumDCPercent}% มากกว่าค่าที่กำหนด ${DCPercent}%*`}
+                    </Typography>
+                  </>
+                )}
+
+                {!statusWaitApprove1 && (
+                  <Button
+                    id="btnPrint"
+                    variant="contained"
+                    color="secondary"
+                    onClick={handlePrintBtn}
+                    startIcon={<Print />}
+                    className={classes.MbtnPrint}
+                    style={{ textTransform: 'none' }}
+                    sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                  >
+                    พิมพ์ใบผลต่าง
+                  </Button>
+                )}
 
                 {showSaveBtn && (
                   <Button
@@ -859,6 +921,20 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
                     ปิดงาน
                   </Button>
                 )}
+
+                {statusOC && statusWaitApprove1 && (
+                  <Button
+                    id="btnApprove"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnApprove}
+                    onClick={handleApproveOCBtn}
+                    startIcon={<CheckCircleOutline />}
+                    style={{ width: 200 }}
+                  >
+                    อนุมัติ
+                  </Button>
+                )}
               </Grid>
             </Grid>
           </Box>
@@ -908,8 +984,8 @@ export default function CheckOrderDetail({ sdNo, docRefNo, defaultOpen, onClickC
         items={itemsDiffState}
         percentDiffType={false}
         percentDiffValue="0"
-        // fileName={fileInfo.fileName}
-        // imageContent={fileInfo.base64URL}
+        sumDCPercent={sumDCPercent}
+        docType={docType}
       />
 
       <ConfirmExitModel

@@ -22,6 +22,9 @@ export const environment = {
       approve: {
         url: '/order/stock-diff/{sdNo}/approve',
       },
+      approveOC: {
+        url: '/order/stock-diff/{sdNo}/approve-oc',
+      },
       closejob: {
         url: '/order/stock-diff/{sdNo}/close',
       },

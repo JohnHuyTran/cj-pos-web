@@ -164,6 +164,23 @@ export function put(path: string, payload: any, contentType = defaultForJSON) {
     });
 }
 
+export function putData(path: string, contentType = defaultForJSON) {
+  contentType = contentType;
+  return instance
+    .put(path)
+    .then((response: AxiosResponse) => {
+      if (response.status == 200 || response.status == 201) {
+        return response.data;
+      }
+      const err = new ApiError(response.status, response.status, response.statusText);
+      throw err;
+    })
+    .catch((error: any) => {
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      throw err;
+    });
+}
+
 export function deleteData(path: string, contentType = defaultForJSON) {
   contentType = contentType;
   return instance

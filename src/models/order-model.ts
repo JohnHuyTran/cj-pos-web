@@ -65,6 +65,7 @@ export interface ShipmentInfo {
   sapDocType: string;
   sdNo: string;
   docRefNo: string;
+  docType: string;
   sdStatus: string;
   sdType: number;
   toteCnt: number;
@@ -145,6 +146,7 @@ export interface itemsDetail {
 export interface CheckOrderDetailProps {
   sdNo: string;
   docRefNo: string;
+  docType: string;
   defaultOpen: boolean;
   onClickClose: any;
 }
