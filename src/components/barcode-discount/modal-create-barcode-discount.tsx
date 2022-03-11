@@ -97,6 +97,7 @@ export default function ModalCreateBarcodeDiscount({
   const approveReject = useAppSelector((state) => state.barcodeDiscount.approveReject);
   const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
   const checkEdit = useAppSelector((state) => state.barcodeDiscount.checkEdit);
+  const errorList = useAppSelector((state) => state.barcodeDiscount.errorList);
 
   //get detail from search
   const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail.data);
@@ -108,7 +109,7 @@ export default function ModalCreateBarcodeDiscount({
   //print barcode
   const barcodeDiscountPrint = useAppSelector((state) => state.barcodeDiscountPrintSlice.state);
   const printInDetail = useAppSelector((state) => state.barcodeDiscountPrintSlice.inDetail);
-  const [valuePrints, setValuePrints] = React.useState<any>({
+  const [valuePrints, setValuePrints] = React.useState<any>({ 
     action: Action.INSERT,
     dialogTitle: 'พิมพ์บาร์โค้ด',
     printNormal: true,
@@ -282,6 +283,15 @@ export default function ModalCreateBarcodeDiscount({
   }, [barcodeDiscountDetail]);
 
   const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (errorList && errorList.length > 0) {
+      let errorListUpdate = [];
+      let errorListData = _.cloneDeep(errorList);
+      for (const it of errorListData) {
+        it.errorDiscount = '';
+        errorListUpdate.push(it);
+      }
+      dispatch(updateErrorList(errorListUpdate));
+    }
     setValueRadios(event.target.value);
     if (event.target.value === 'percent') {
       dispatch(

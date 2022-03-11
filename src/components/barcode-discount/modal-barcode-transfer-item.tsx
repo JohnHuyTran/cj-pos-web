@@ -753,7 +753,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
         <Grid container spacing={2} mb={2}>
           <Grid item xs={3}>
             <TextBoxComment
-                fieldName="หมายเหตุจากผู้อนุมัติ :"
+                fieldName="หมายเหตุจากสาขา :"
                 defaultValue={payloadBarcodeDiscount.requesterNote}
                 maxLength={100}
                 onChangeComment={handleChangeNote}
