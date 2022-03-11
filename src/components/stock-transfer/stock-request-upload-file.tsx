@@ -222,9 +222,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
       if (file) {
         await importStockRequest(payload, file)
           .then((value) => {
-            // console.log('importStockRequest:', value);
-
-            setErrorUploadFile(false);
+            // setErrorUploadFile(false);
 
             setFlagEdit(false);
             setShowSnackBar(true);
@@ -239,7 +237,8 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
             setFile(undefined);
             setFileName('');
 
-            setErrorUploadFile(true);
+            if (errorUploadFile) setErrorUploadFile(false);
+            else if (!errorUploadFile) setErrorUploadFile(true);
 
             if (error.code === 40000) {
               setOpenAlertFile(true);
