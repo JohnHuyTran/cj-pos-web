@@ -233,6 +233,8 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
             }, 1000);
           })
           .catch((error: ApiUploadError) => {
+            setFile(undefined);
+            setFileName('');
             if (error.code === 40000) {
               setOpenAlertFile(true);
               setOpenAlert(true);

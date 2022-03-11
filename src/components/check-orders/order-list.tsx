@@ -31,6 +31,7 @@ function OrderList() {
   const dispatch = useAppDispatch();
   const [opens, setOpens] = React.useState(false);
   const [docRefNo, setDocRefNo] = React.useState('');
+  const [docType, setDocType] = React.useState('');
   const [sdNo, setSdNo] = React.useState('');
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
@@ -113,7 +114,7 @@ function OrderList() {
       align: 'left',
       sortable: false,
       renderCell: (params) => {
-        if (params.value === 'DRAFT' || params.value === 'WAIT_FOR_APPROVE_1') {
+        if (params.value === 'DRAFT' || params.value === 'WAIT_FOR_APPROVEL_1') {
           return (
             <Chip
               label={t(`status.${params.value}`)}
@@ -185,6 +186,7 @@ function OrderList() {
       index: (cuurentPages - 1) * parseInt(pageSize) + indexs + 1,
       shipmentNo: data.shipmentNo,
       docRefNo: data.docRefNo,
+      docType: data.docType,
       sdNo: data.sdNo,
       sdType: getShipmentTypeText(data.sdType),
       boxCnt: data.boxCnt,
@@ -203,6 +205,7 @@ function OrderList() {
     setOpenLoadingModal(true);
     setSdNo(params.row.sdNo);
     setDocRefNo(params.row.docRefNo);
+    setDocType(params.row.docType);
 
     await dispatch(featchOrderDetailAsync(params.row.sdNo))
       .then(
@@ -321,7 +324,15 @@ function OrderList() {
         />
       </div>
       {/* </Box> */}
-      {opens && <CheckOrderDetail sdNo={sdNo} docRefNo={docRefNo} defaultOpen={opens} onClickClose={isClosModal} />}
+      {opens && (
+        <CheckOrderDetail
+          sdNo={sdNo}
+          docRefNo={docRefNo}
+          docType={docType}
+          defaultOpen={opens}
+          onClickClose={isClosModal}
+        />
+      )}
 
       <LoadingModal open={openLoadingModal} />
     </div>
