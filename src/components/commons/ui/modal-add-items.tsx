@@ -313,7 +313,8 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
         if (!o[id]) {
           return (o[id] = i);
         }
-        var iQty = i.qty ? i.qty : i.orderQty;
+        var iQty = i.qty ? i.qty : i.orderQty ? i.orderQty : i.actualQty ? i.actualQty : 0;
+
         return (o[id].qty = o[id].qty + iQty);
       });
 
