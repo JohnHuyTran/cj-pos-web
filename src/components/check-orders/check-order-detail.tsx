@@ -816,7 +816,6 @@ export default function CheckOrderDetail({
                       variant="body1"
                       align="center"
                       sx={{
-                        marginBottom: 2,
                         color: '#FF0000',
                       }}
                     >
