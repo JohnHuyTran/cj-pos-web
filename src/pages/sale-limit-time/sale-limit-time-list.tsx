@@ -101,7 +101,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     setCheckAll(event.target.checked);
     let lstSTHandle = _.cloneDeep(lstST);
     for (let item of lstSTHandle) {
-      if (STStatus.DRAFT == item.status) {
+      if (STStatus.DRAFT == item.status && moment(item.stStartTime) >= moment(new Date())) {
         item.checked = event.target.checked;
       }
     }
