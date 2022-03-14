@@ -48,6 +48,7 @@ import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 import stockRequestItems from './slices/stock-request-items-slice';
 import authorizedhBranchSlice from './slices/authorized-branch-slice';
+import orderReceiveSlice from './slices/order-receive-slice';
 
 const store = configureStore({
   reducer: {
@@ -99,6 +100,7 @@ const store = configureStore({
     updateBTProductSlice: updateBTProductSlice,
     stockRequestItems: stockRequestItems,
     authorizedhBranchSlice: authorizedhBranchSlice,
+    orderReceiveSlice: orderReceiveSlice,
   },
 });
 
