@@ -1,15 +1,14 @@
 import React, { ReactElement } from 'react';
 import Box from '@mui/material/Box';
 import { DataGrid, GridCellParams, GridColDef, GridRowData, GridValueGetterParams } from '@mui/x-data-grid';
-import { Entry, ShipmentInfo } from '../../models/order-model';
-import { useAppSelector } from '../../store/store';
-import { CheckOrderDetailInfo, CheckOrderDetailItims } from '../../models/dc-check-order-model';
+import { useAppSelector, useAppDispatch } from '../../store/store';
+import { CheckOrderDetailItims } from '../../models/dc-check-order-model';
 
 import { useStyles } from '../../styles/makeTheme';
 import Typography from '@mui/material/Typography';
+import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
 
 interface Props {
-  //   sdNo: string;
   items: [];
 }
 
@@ -94,6 +93,18 @@ const columns: GridColDef[] = [
     flex: 0.5,
     sortable: false,
     headerAlign: 'center',
+    renderCell: (params) => {
+      return (
+        <Typography
+          color='secondary'
+          variant='body2'
+          sx={{ textDecoration: 'underline' }}
+          // onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}>
+        >
+          {params.value}
+        </Typography>
+      );
+    },
   },
 ];
 
@@ -109,6 +120,7 @@ var calProductDiff = function (params: GridValueGetterParams) {
 
 export default function DCOrderEntries({ items }: Props): ReactElement {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const rows = items.map((item: CheckOrderDetailItims, index: number) => {
     return {
       id: `${item.barcode}-${index + 1}`,
@@ -128,8 +140,15 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   const currentlySelected = async (params: GridCellParams) => {
-    const value = params.colDef.field;
-    const isRefPO = params.getValue(params.id, 'docNo');
+    const fieldName = params.colDef.field;
+    const value = params.getValue(params.id, 'docNo');
+    if (fieldName === 'docNo') {
+      try {
+        await dispatch(featchorderDetailDCAsync('623047a0283ab8738c0b6a1e'));
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   return (
