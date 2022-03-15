@@ -9,6 +9,7 @@ import Home from './pages/home';
 import CheckOrder from './pages/check-order';
 import DCCheckOrder from './pages/dc-check-order';
 import SupplierCheckOrder from './pages/supplier-check-order';
+import TaxInvoice from './pages/tax-invoice';
 import StockTransfer from './pages/stock-transfer';
 import StockTransferRt from './pages/stock-transfer-rt';
 import LoginForm from './components/login/login-form';
@@ -77,14 +78,15 @@ export default function App2() {
       <Main open={open}>
         <DrawerHeader />
         <Switch>
-          <Route exact path='/' component={Home} />
-          <Route path='/barcode-discount' component={BarcodeDiscount} />
-          <Route path='/sale-limit-time' component={SaleLimitTime} />
-          <Route path='/check-order' component={CheckOrder} />
-          <Route path='/dc-check-order' component={DCCheckOrder} />
-          <Route path='/supplier-check-order' component={SupplierCheckOrder} />
-          <Route path='/stock-transfer' component={StockTransfer} />
-          <Route path='/stock-transfer-rt' component={StockTransferRt} />
+          <Route exact path="/" component={Home} />
+          <Route path="/barcode-discount" component={BarcodeDiscount} />
+          <Route path="/sale-limit-time" component={SaleLimitTime} />
+          <Route path="/tax-invoice" component={TaxInvoice} />
+          <Route path="/check-order" component={CheckOrder} />
+          <Route path="/dc-check-order" component={DCCheckOrder} />
+          <Route path="/supplier-check-order" component={SupplierCheckOrder} />
+          <Route path="/stock-transfer" component={StockTransfer} />
+          <Route path="/stock-transfer-rt" component={StockTransferRt} />
         </Switch>
       </Main>
     </Box>
