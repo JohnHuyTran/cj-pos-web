@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect } from 'react';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import { useStyles } from '../../styles/makeTheme';
-import { HighlightOff } from '@mui/icons-material';
+import { ContentPaste, HighlightOff, Save, Sync } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import { Box, Button, DialogTitle, FormHelperText, Grid, IconButton, TextField } from '@mui/material';
 
@@ -46,6 +46,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const classes = useStyles();
 
+  const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
+
   useEffect(() => {
     setOpen(isOpen);
   }, [isOpen]);
@@ -59,8 +61,30 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     register,
     formState: { errors },
     handleSubmit,
+    reset,
   } = useForm();
-  const onSubmit = (data: any) => console.log(data);
+
+  const onSave = (data: any) => {
+    if (data) {
+      setDisabledBtnPreview(false);
+      console.log('data: ', data);
+    }
+  };
+
+  const handleClear = () => {
+    reset({
+      taxIdenNo: '',
+      name: '',
+      lastName: '',
+      number: '',
+      building: '',
+      group: '',
+      province: '',
+      district: '',
+      subDistrict: '',
+      postcode: '',
+    });
+  };
 
   return (
     <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -70,8 +94,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
       <DialogContent>
         <Box pl={2} pr={2}>
-          <Grid container spacing={1} mb={2}>
-            <Grid item xs={2} mb={2}>
+          <Grid container spacing={1}>
+            <Grid item xs={2} mb={3}>
               <Typography gutterBottom variant="subtitle1" component="div">
                 เลขที่ใบเสร็จ/ใบกำกับ :
               </Typography>
@@ -81,65 +105,72 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 S222222222-222222
               </Typography>
             </Grid>
+          </Grid>
 
+          <Grid container spacing={1} mb={2}>
             <Grid item xs={12}>
               <Typography sx={{ fontSize: '1em', fontWeight: 600 }}>ข้อมูลลูกค้า</Typography>
             </Grid>
-
             <Grid item xs={2}>
-              <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
                 เลขที่สมาชิก :
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <TextField
-                id="txtFirstName"
+                id="txtMemberId"
                 size="small"
                 className={classes.MtextField}
                 fullWidth
-                placeholder="กรุณากรอก"
-                {...register('firstName')}
+                value="1234567890"
+                sx={{ backgroundColor: '#E5E5E5' }}
               />
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-                เลขประจำตัวผู้เสียภาษี :
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
+                เลขประจำตัวผู้เสียภาษี<span style={{ color: '#FF0000' }}>*</span> :
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <TextField
-                id="txtLastName"
+                id="txtTaxIdenNo"
                 size="small"
                 className={classes.MtextField}
                 fullWidth
-                placeholder="กรุณากรอก"
-                {...register('lastName', { required: true })}
+                placeholder="กรุณากรอกเลขประจำตัวผู้เสียภาษี"
+                {...register('taxIdenNo', { required: true })}
               />
-              {errors.lastName && (
-                <FormHelperText id="component-helper-text">Some important helper text</FormHelperText>
+              {errors.taxIdenNo && (
+                <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
+                  กรุณากรอกรายละเอียด
+                </FormHelperText>
               )}
             </Grid>
             <Grid item xs={1}></Grid>
-
             <Grid item xs={2}>
-              <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-                ชื่อ / ชื่อบริษัท :
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
+                ชื่อ / ชื่อบริษัท<span style={{ color: '#FF0000' }}>*</span> :
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <TextField
-                id="txtFirstName"
+                id="txtName"
                 size="small"
                 className={classes.MtextField}
                 fullWidth
-                placeholder="กรุณากรอก"
-                {...register('firstName')}
+                placeholder="กรุณากรอกชื่อ / ชื่อบริษัท"
+                {...register('name', { required: true })}
               />
+              {errors.name && (
+                <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
+                  กรุณากรอกรายละเอียด
+                </FormHelperText>
+              )}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
                 นามสกุล :
               </Typography>
             </Grid>
@@ -149,31 +180,162 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 size="small"
                 className={classes.MtextField}
                 fullWidth
-                placeholder="กรุณากรอก"
-                {...register('lastName', { required: true })}
+                placeholder="กรุณากรอกนามสกุล"
+                {...register('lastName')}
               />
-              {errors.lastName && (
-                <FormHelperText id="component-helper-text">Some important helper text</FormHelperText>
-              )}
             </Grid>
             <Grid item xs={1}></Grid>
           </Grid>
-        </Box>
 
-        {/* <Grid container spacing={2} mt={4} mb={2}>
-            <Grid item xs={6}>
+          <Grid container spacing={1} mb={2}>
+            <Grid item xs={12}>
+              <Typography sx={{ fontSize: '1em', fontWeight: 600 }}>ที่อยู่</Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
+                เลขที่<span style={{ color: '#FF0000' }}>*</span> :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
               <TextField
-                id="txtAge"
+                id="txtNumber"
                 size="small"
                 className={classes.MtextField}
                 fullWidth
-                placeholder="กรุณากรอก"
-                {...register('age', { pattern: /\d+/ })}
+                placeholder="กรุณากรอกเลขที่"
+                {...register('number', { required: true })}
               />
-              {errors.age && <FormHelperText id="component-helper-text">Please enter number for age.</FormHelperText>}
+
+              {errors.number && (
+                <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
+                  กรุณากรอกรายละเอียด
+                </FormHelperText>
+              )}
             </Grid>
-            <Grid item xs={6}></Grid>
-          </Grid> */}
+            <Grid item xs={1}></Grid>
+            <Grid item xs={2}>
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
+                อาคาร :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id="txtBuilding"
+                size="small"
+                className={classes.MtextField}
+                fullWidth
+                placeholder="กรุณากรอกเลขอาคาร"
+                {...register('building')}
+              />
+            </Grid>
+            <Grid item xs={1}></Grid>
+
+            <Grid item xs={2}>
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
+                หมู่ :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id="txtGroup"
+                size="small"
+                className={classes.MtextField}
+                fullWidth
+                placeholder="กรุณากรอกหมู่"
+                {...register('group')}
+              />
+            </Grid>
+            <Grid item xs={1}></Grid>
+            <Grid item xs={2}>
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
+                จังหวัด<span style={{ color: '#FF0000' }}>*</span> :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id="txtProvince"
+                size="small"
+                className={classes.MtextField}
+                fullWidth
+                placeholder="กรุณากรอกจังหวัด"
+                {...register('province', { required: true })}
+              />
+              {errors.province && (
+                <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
+                  กรุณากรอกรายละเอียด
+                </FormHelperText>
+              )}
+            </Grid>
+            <Grid item xs={1}></Grid>
+
+            <Grid item xs={2}>
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
+                เขต / อำเภอ<span style={{ color: '#FF0000' }}>*</span> :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id="txtDistrict"
+                size="small"
+                className={classes.MtextField}
+                fullWidth
+                placeholder="กรุณากรอกเขต / อำเภอ"
+                {...register('district', { required: true })}
+              />
+              {errors.district && (
+                <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
+                  กรุณากรอกรายละเอียด
+                </FormHelperText>
+              )}
+            </Grid>
+            <Grid item xs={1}></Grid>
+            <Grid item xs={2}>
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
+                แขวง / ตำบล<span style={{ color: '#FF0000' }}>*</span> :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id="txtsubDistrict"
+                size="small"
+                className={classes.MtextField}
+                fullWidth
+                placeholder="กรุณากรอกแขวง / ตำบล"
+                {...register('subDistrict', { required: true })}
+              />
+              {errors.subDistrict && (
+                <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
+                  กรุณากรอกรายละเอียด
+                </FormHelperText>
+              )}
+            </Grid>
+            <Grid item xs={1}></Grid>
+
+            <Grid item xs={2}>
+              <Typography gutterBottom variant="subtitle1" component="div" mb={2}>
+                รหัสไปรษณีย์ :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id="txtpostCode"
+                size="small"
+                type="number"
+                inputProps={{ maxLength: 5 }}
+                className={classes.MtextField}
+                fullWidth
+                placeholder="กรุณากรอกรหัสไปรษณีย์"
+                {...register('postcode', { pattern: /\d+/ })}
+              />
+              {errors.postcode && (
+                <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
+                  กรุณากรอกตัวเลข
+                </FormHelperText>
+              )}
+            </Grid>
+            <Grid item xs={7}></Grid>
+          </Grid>
+        </Box>
 
         <Box pl={2} pr={2}>
           <Grid container spacing={1} mt={4}>
@@ -182,11 +344,12 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 id="btnCreateStockTransferModal"
                 variant="contained"
                 // onClick={handleOpenCreateModal}
-                // sx={{ width: 150, display: `${displayBtnCreate ? 'none' : ''}` }}
-                sx={{ width: 200 }}
+                // sx={{ width: 150, display: `${displayBtnPreview ? 'none' : ''}` }}
+                sx={{ width: 220 }}
                 className={classes.MbtnClear}
-                // startIcon={<AddCircleOutlineOutlinedIcon />}
+                startIcon={<ContentPaste />}
                 color="primary"
+                disabled={disabledBtnPreview}
               >
                 Preview ใบเสร็จ / ใบกำกับ
               </Button>
@@ -195,7 +358,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               <Button
                 id="btnClear"
                 variant="contained"
-                // onClick={onClickClearBtn}
+                startIcon={<Sync />}
+                onClick={handleClear}
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnClear}
                 color="cancelColor"
@@ -207,7 +371,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 id="btnSearch"
                 variant="contained"
                 color="warning"
-                onClick={handleSubmit(onSubmit)}
+                startIcon={<Save />}
+                onClick={handleSubmit(onSave)}
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnSave}
               >
