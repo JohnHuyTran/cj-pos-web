@@ -75,6 +75,15 @@ export async function checkStockBalance(payload: CheckStockPayload) {
   }
 }
 
+export async function uploadAttachFile(payload: any) {
+  try {
+    const response = await post(`${env.backEnd.url}${environment.sell.barcodeDiscount.upload.url}`, payload);
+    return response;
+  } catch (error) {
+    return error;
+  }
+}
+
 export const getPathUpdateDraft = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.sell.barcodeDiscount.update.url}`, { id: id });
 };
