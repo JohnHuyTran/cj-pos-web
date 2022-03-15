@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid, GridColDef, GridRowData, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRowData, GridValueGetterParams } from '@mui/x-data-grid';
 import { Entry, ShipmentInfo } from '../../models/order-model';
 import { useAppSelector } from '../../store/store';
 import { CheckOrderDetailInfo, CheckOrderDetailItims } from '../../models/dc-check-order-model';
@@ -88,6 +88,13 @@ const columns: GridColDef[] = [
     sortable: false,
     headerAlign: 'center',
   },
+  {
+    field: 'docNo',
+    headerName: 'รับสินค้าใน Tote',
+    flex: 0.5,
+    sortable: false,
+    headerAlign: 'center',
+  },
 ];
 
 var calProductDiff = function (params: GridValueGetterParams) {
@@ -114,10 +121,16 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
       productQuantityActual: item.actualQty,
       productDifference: item.qtyDiff,
       productComment: item.comment,
+      docNo: item.docNo ? item.docNo : '111111',
     };
   });
 
   const [pageSize, setPageSize] = React.useState<number>(10);
+
+  const currentlySelected = async (params: GridCellParams) => {
+    const value = params.colDef.field;
+    const isRefPO = params.getValue(params.id, 'docNo');
+  };
 
   return (
     <Box mt={2} bgcolor='background.paper'>
@@ -134,6 +147,7 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
           disableColumnMenu
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
+          onCellClick={currentlySelected}
         />
       </div>
     </Box>

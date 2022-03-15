@@ -79,6 +79,7 @@ export interface CheckOrderDetailItims {
   actualQty: number;
   qtyDiff: number;
   comment: string;
+  docNo?: string;
 }
 
 export interface DCOrderApproveRequest {
