@@ -2,15 +2,15 @@ import React from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { DataGrid, GridColDef, GridCellParams, GridRowId } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import { Entries, OrderReceiveDetailInfo, OrderReceiveDetailResponse } from '../../models/dc-check-order-model';
 import { useStyles } from '../../styles/makeTheme';
+import { OrderReceiveEntry } from '../../models/order-model';
 
-export interface DataGridProps {
-  entries: Array<Entries>;
-}
-
-export default function OrderReceiveDetailList(entries: any) {
+export default function OrderReceiveDetailList() {
   const classes = useStyles();
+  const orderReceiveResp = useAppSelector((state) => state.orderReceiveSlice.orderReceiveList);
+  const orderReceiveData = orderReceiveResp.data ? orderReceiveResp.data : {};
+  const orderReceiveEntries = orderReceiveData.entries;
+
   const columns: GridColDef[] = [
     {
       field: 'index',
@@ -63,7 +63,7 @@ export default function OrderReceiveDetailList(entries: any) {
 
   const [pageSize, setPageSize] = React.useState<number>(10);
 
-  const rows = entries.entries.map((data: Entries, indexs: number) => {
+  const rows = orderReceiveEntries.map((data: OrderReceiveEntry, indexs: number) => {
     return {
       id: `${data.barcode}_${indexs + 1}`,
       index: indexs + 1,
