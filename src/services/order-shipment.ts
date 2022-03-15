@@ -71,17 +71,6 @@ export async function approveDCOrderShipments(idDC: string, payload: any) {
   return response;
 }
 
-export async function searchOrderReceive(docNo: string) {
-  try {
-    const apiRootPath = `${environment.orders.shipment.search.url}/${docNo}`;
-    const response = await get(apiRootPath).then((result: any) => result);
-    // const response = orders;
-    return response;
-  } catch (error) {
-    throw error;
-  }
-}
-
 export async function approveOrderReceive(payload: OrderReceiveApproveRequest) {
   try {
     const apiRootPath = `${environment.orders.shipment.approveOrderReceive.url}`;

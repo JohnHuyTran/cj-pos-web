@@ -224,3 +224,48 @@ export interface CheckOrderSDDetailProps {
   defaultOpen: boolean;
   onClickClose: any;
 }
+
+export interface OrderReceiveResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: OrderReceiveInfo | any;
+}
+
+export interface OrderReceiveInfo {
+  shipmentNo: string;
+  shipmentDate: string;
+  status: string;
+  sapDocType: string;
+  sdNo: string;
+  sdStatus: number;
+  sdType: number;
+  toteCnt: number;
+  boxCnt: number;
+  comment: string;
+  ItemRefNo: number;
+  entries: OrderReceiveEntry[];
+  shipBranchFrom: shipBranchInfo;
+  shipBranchTo: shipBranchInfo;
+}
+export interface OrderReceiveEntry {
+  deliveryOrderNo: string;
+  productName: string;
+  ItemRefNo: number;
+  barcode: string;
+  skuCode: string;
+  skuType: string;
+  outOfStockStatus: number;
+  toteCode: string;
+  expireDate: string;
+  unitCode: string;
+  unitName: string;
+  unitFactor: number;
+  qty: number;
+  qtyAll: number;
+  qtyAllBefore: number;
+  actualQty: number;
+  qtyDiff: number;
+  comment: string;
+  isTote: boolean;
+}
