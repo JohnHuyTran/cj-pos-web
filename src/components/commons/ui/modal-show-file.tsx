@@ -1,16 +1,14 @@
+//@ts-nocheck
 import { Dialog, Button, DialogContent } from '@mui/material';
-import React, { ReactElement, useEffect, useRef } from 'react';
+import React, { ReactElement } from 'react';
 import { useState } from 'react';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
-import throttle from 'lodash.throttle';
 import { useReactToPrint } from 'react-to-print';
 import AlertError from './alert-error';
 import { HighlightOff } from '@mui/icons-material';
-import store from '../../../store/store';
 import { getAccessToken } from '../../../store/sessionStore';
 import { getReport } from '../../../adapters/externalApi';
 
@@ -83,7 +81,6 @@ export default function ModalShowPDF({
   landscape,
 }: ModalShowPDFProp): ReactElement {
   const [numPages, setNumPages] = useState(0);
-  // const [pageNumber, setPageNumber] = useState(1);
   const [initialWidth, setInitialWidth] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
   const pdfWrapper = React.useRef<HTMLDivElement>(null);
@@ -102,6 +99,7 @@ export default function ModalShowPDF({
         setPageSize(
           `${pdfWrapper.current.getBoundingClientRect().width}px ${pdfWrapper.current.getBoundingClientRect().height}px`
         );
+        // setPageSize(landscape ? '12in 8in' : '8in 12in');
       } else {
         setPageSize(landscape ? 'A4 landscape' : 'A4 portrait');
       }
@@ -171,7 +169,7 @@ export default function ModalShowPDF({
           }}>
           {/* <div id="placeholderWrapper" style={{ height: "3000vh" }} /> */}
           {statusFile === 1 && (
-            <div id='pdfWrapper' style={{ width: '50vw' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
               <Document
                 file={{
                   url: url,
@@ -196,7 +194,7 @@ export default function ModalShowPDF({
           {statusFile === 0 && (
             <div>
               {imgFile !== 'image' && (
-                <div id='pdfWrapper' style={{ width: '50vw' }} ref={pdfWrapper}>
+                <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
                   <Document file={sdImageFile} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
                     {Array.from(new Array(numPages), (el, index) => (
                       <Page

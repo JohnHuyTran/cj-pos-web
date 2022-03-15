@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppDispatch } from '../../store/store';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
   Box,
   Button,
@@ -14,18 +14,14 @@ import {
 import { HighlightOff, CheckCircleOutline, SearchOff } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
 import SearchIcon from '@mui/icons-material/Search';
-import {
-  Entries,
-  ItemsInfo,
-  OrderReceiveApproveRequest,
-  OrderReceiveDetailInfo,
-} from '../../models/dc-check-order-model';
-import { approveOrderReceive, searchOrderReceive } from '../../services/order-shipment';
+import { ItemsInfo, OrderReceiveApproveRequest } from '../../models/dc-check-order-model';
+import { approveOrderReceive } from '../../services/order-shipment';
 import OrderReceiveDetailList from '../check-orders/order-receive-detail-list';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { getorderReceiveThStatus, getShipmentTypeText } from '../../utils/enum/check-order-enum';
 import OrderReceiveConfirmModel from '../check-orders/order-receive-confirm-model';
 import LoadingModal from '../commons/ui/loading-modal';
+import { searchOrderReceiveAsync } from '../../store/slices/order-receive-slice';
 
 export interface OrderReceiveDetailProps {
   defaultOpen: boolean;
@@ -72,13 +68,17 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderReceiveDetailProps) {
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const [open, setOpen] = React.useState(defaultOpen);
+  const orderReceiveResp = useAppSelector((state) => state.orderReceiveSlice.orderReceiveList);
+  const orderReceiveData = orderReceiveResp.data ? orderReceiveResp.data : {};
+  const orderReceiveEntries = orderReceiveData.entries;
 
+  const [open, setOpen] = React.useState(defaultOpen);
   const [values, setValues] = React.useState<State>({
     docNo: '',
   });
 
-  const handleClose = () => {
+  const handleClose = async () => {
+    await dispatch(searchOrderReceiveAsync());
     setOpen(false);
     onClickClose();
   };
@@ -88,44 +88,29 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
     setValues({ ...values, [event.target.name]: value });
   };
 
-  const [orderReceiveRes, setOrderReceiveRes] = React.useState<Array<Entries>>([]);
-  const [orderReceiveInfo, setOrderReceiveInfo] = React.useState<OrderReceiveDetailInfo>();
-  const [sdNo, setSdNo] = React.useState('');
-  const [docRefNo, setDocRefNo] = React.useState('');
-  const [sdType, setSdtype] = React.useState(0);
-
   const handleSearch = async () => {
     handleOpenLoading('open', true);
     setFlagSearch(true);
-    await searchOrderReceive(values.docNo)
-      .then((value) => {
-        setOrderReceiveRes(value.data.entries);
-        setOrderReceiveInfo(value.data);
-        setSdtype(value.data.sdType);
-        setSdNo(value.data.sdNo);
-        setDocRefNo(value.data.docRefNo);
-      })
-      .catch((error: any) => {
-        console.log(error);
-      });
 
+    await dispatch(searchOrderReceiveAsync(values.docNo));
     handleOpenLoading('open', false);
   };
 
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
-
   const handleApproveBtn = () => {
     setOpenModelConfirm(true);
   };
 
-  const handleModelConfirm = () => {
+  const handleModelConfirm = async () => {
+    await dispatch(searchOrderReceiveAsync(''));
     setOpenModelConfirm(false);
   };
 
   const handleConfirmStatus = async (status: string) => {
     if (status === 'ok') {
+      handleOpenLoading('open', true);
       let items: any = [];
-      orderReceiveRes.forEach((data: any) => {
+      orderReceiveEntries.forEach((data: any) => {
         const itemsNew: ItemsInfo = {
           barcode: data.barcode,
           actualQty: data.actualQty,
@@ -133,16 +118,20 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
         };
         items.push(itemsNew);
       });
-
       const payload: OrderReceiveApproveRequest = {
-        docRefNo: docRefNo,
+        docRefNo: orderReceiveData.docRefNo,
         items: items,
       };
 
       await approveOrderReceive(payload);
+      await dispatch(searchOrderReceiveAsync());
       setOpen(false);
+      onClickClose();
+      handleOpenLoading('open', false);
     } else {
+      await dispatch(searchOrderReceiveAsync());
       setOpen(false);
+      onClickClose();
     }
   };
 
@@ -156,8 +145,8 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
   let orderReceiveTable;
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
-    if (orderReceiveRes.length > 0) {
-      orderReceiveTable = <OrderReceiveDetailList entries={orderReceiveRes} />;
+    if (Object.keys(orderReceiveData).length > 0) {
+      orderReceiveTable = <OrderReceiveDetailList />;
     } else {
       orderReceiveTable = (
         <Grid item container xs={12} justifyContent="center">
@@ -185,7 +174,6 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
                 <Typography variant="body2">เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item lg={4}>
-                {/* <Typography variant="body2">-</Typography> */}
                 <TextField
                   id="txtDocNo"
                   name="docNo"
@@ -206,14 +194,14 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
                 <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{sdNo ? sdNo : '-'}</Typography>
+                <Typography variant="body2">{orderReceiveData.sdNo ? orderReceiveData.sdNo : '-'}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">
-                  {orderReceiveInfo?.shipmentDate ? convertUtcToBkkDate(orderReceiveInfo?.shipmentDate) : '-'}
+                  {orderReceiveData.shipmentDate ? convertUtcToBkkDate(orderReceiveData.shipmentDate) : '-'}
                 </Typography>
               </Grid>
             </Grid>
@@ -223,14 +211,14 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">
-                  {orderReceiveInfo?.status ? getorderReceiveThStatus(orderReceiveInfo?.status) : '-'}
+                  {orderReceiveData.status ? getorderReceiveThStatus(orderReceiveData.status) : '-'}
                 </Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{getShipmentTypeText(sdType)}</Typography>
+                <Typography variant="body2">{getShipmentTypeText(orderReceiveData.sdType)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={1} mb={1}>
@@ -239,7 +227,8 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">
-                  {orderReceiveInfo?.shipBranchFrom.name ? orderReceiveInfo?.shipBranchFrom.name : '-'}
+                  {orderReceiveData.shipBranchFrom ? orderReceiveData.shipBranchFrom.code : ''}-
+                  {orderReceiveData.shipBranchFrom ? orderReceiveData.shipBranchFrom.name : ''}
                 </Typography>
               </Grid>
               <Grid item lg={2}>
@@ -247,13 +236,14 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">
-                  {orderReceiveInfo?.shipBranchTo.name ? orderReceiveInfo?.shipBranchTo.name : '-'}
+                  {orderReceiveData.shipBranchTo ? orderReceiveData.shipBranchTo.code : ''}-
+                  {orderReceiveData.shipBranchTo ? orderReceiveData.shipBranchTo.name : ''}
                 </Typography>
               </Grid>
             </Grid>
           </Box>
 
-          {orderReceiveRes.length > 0 && (
+          {Object.keys(orderReceiveData).length > 0 && (
             <Box sx={{ marginTop: 4 }}>
               <Grid item container spacing={2} justifyContent="flex-end">
                 <Button
@@ -277,8 +267,8 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
             open={openModelConfirm}
             onClose={handleModelConfirm}
             onUpdateAction={handleConfirmStatus}
-            sdNo={sdNo}
-            docRefNo={docRefNo}
+            sdNo={orderReceiveData.sdNo}
+            docRefNo={orderReceiveData.docRefNo}
           />
 
           <LoadingModal open={openLoadingModal.open} />

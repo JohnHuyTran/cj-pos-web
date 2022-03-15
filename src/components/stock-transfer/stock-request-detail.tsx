@@ -25,6 +25,7 @@ import {
 import { ApiError } from '../../models/api-error-model';
 import {
   approve1StockRequest,
+  approve2BySCMStockRequest,
   approve2StockRequest,
   reject1StockRequest,
   reject2StockRequest,
@@ -234,7 +235,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   const [flagCreateSave, setFlagCreateSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const handleChkSaveClose = async () => {
-    if (flagSave) {
+    if (flagSave && edit) {
       setConfirmModelExit(true);
     } else if (!flagSave && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) {
       if (type === 'View' && rowLength !== Object.keys(payloadAddItem).length) {
@@ -588,26 +589,41 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
           });
         }
 
-        if (groupSCM) {
-          const payload2: Approve2StockTransferRequest = {
-            branchTo: toBranch,
-            comment: {
-              by: 'SCM',
-              detail: commentSCM,
-            },
-          };
-          handleApprove2(payload2);
-        } else {
-          const payloadSubmit: SubmitStockTransferRequest = {
-            startDate: moment(startDate).startOf('day').toISOString(),
-            endDate: moment(endDate).startOf('day').toISOString(),
-            branchFrom: fromBranch,
-            branchTo: toBranch,
-            transferReason: reasons,
-            itemGroups: itemGroups,
-            items: itemsList,
-          };
+        const payloadSubmit: any = {
+          startDate: moment(startDate).startOf('day').toISOString(),
+          endDate: moment(endDate).startOf('day').toISOString(),
+          branchFrom: fromBranch,
+          branchTo: toBranch,
+          transferReason: reasons,
+          itemGroups: itemGroups,
+          items: itemsList,
+        };
 
+        if (groupSCM) {
+          await approve2BySCMStockRequest(rtNo, payloadSubmit)
+            .then((value) => {
+              setFlagSave(false);
+              setShowSnackBar(true);
+              setSnackbarIsStatus(true);
+              setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+
+              dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+
+              setTimeout(() => {
+                handleClose();
+              }, 500);
+            })
+            .catch((error: ApiError) => {
+              setShowSnackBar(true);
+              if (error.code === 40010) {
+                setContentMsg(
+                  'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+                );
+              } else {
+                setContentMsg(error.message);
+              }
+            });
+        } else {
           await submitStockRequest(rtNo, payloadSubmit)
             .then((value) => {
               setFlagSave(false);
@@ -773,102 +789,135 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               {moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
             </Grid>
           </Grid>
-          <Grid container spacing={2} mb={2}>
-            <Grid item xs={2}>
-              วันที่โอน{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
-            </Grid>
-            <Grid item xs={3}>
-              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-                <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
-              )}
 
-              {!edit && moment(startDate).add(543, 'y').format('DD/MM/YYYY')}
-            </Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={2}>
-              วันที่สิ้นสุด{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'}{' '}
-              :
-            </Grid>
-            <Grid item xs={3}>
-              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-                <DatePickerComponent
-                  onClickDate={handleEndDatePicker}
-                  value={endDate}
-                  type={'TO'}
-                  minDateTo={startDate}
-                />
-              )}
-              {!edit && moment(endDate).add(543, 'y').format('DD/MM/YYYY')}
-            </Grid>
-            <Grid item xs={1}></Grid>
-          </Grid>
-          <Grid container spacing={2} mb={2}>
-            <Grid item xs={2}>
-              สาขาต้นทาง{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
-            </Grid>
-            <Grid item xs={3}>
-              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-                <BranchListDropDown
-                  valueBranch={valuebranchFrom}
-                  sourceBranchCode={toBranch}
-                  onChangeBranch={handleChangeFromBranch}
-                  isClear={clearBranchDropDown}
-                  isFilterAuthorizedBranch={isAuthorizedBranch}
-                  disable={groupBranch}
-                  filterOutDC={groupBranchSCM}
-                />
-              )}
-              {!edit && `${fromBranch}-${valuebranchFrom?.name}`}
-            </Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={2}>
-              สาขาปลายทาง{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'} :
-            </Grid>
-            <Grid item xs={3}>
-              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-                <BranchListDropDown
-                  valueBranch={valuebranchTo}
-                  sourceBranchCode={fromBranch}
-                  onChangeBranch={handleChangeToBranch}
-                  isClear={clearBranchDropDown}
-                  isFilterAuthorizedBranch={isAuthorizedBranch}
-                  filterOutDC={groupBranch}
-                />
-              )}
+          {edit && (
+            <div>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  วันที่โอน* :
+                </Grid>
+                <Grid item xs={3}>
+                  <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+                </Grid>
+                <Grid item xs={1}></Grid>
+                <Grid item xs={2}>
+                  วันที่สิ้นสุด* :
+                </Grid>
+                <Grid item xs={3}>
+                  <DatePickerComponent
+                    onClickDate={handleEndDatePicker}
+                    value={endDate}
+                    type={'TO'}
+                    minDateTo={startDate}
+                  />
+                </Grid>
+                <Grid item xs={1}></Grid>
+              </Grid>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  สาขาต้นทาง* :
+                </Grid>
+                <Grid item xs={3}>
+                  <BranchListDropDown
+                    valueBranch={valuebranchFrom}
+                    sourceBranchCode={toBranch}
+                    onChangeBranch={handleChangeFromBranch}
+                    isClear={clearBranchDropDown}
+                    isFilterAuthorizedBranch={isAuthorizedBranch}
+                    disable={groupBranch}
+                    filterOutDC={groupBranchSCM}
+                  />
+                </Grid>
+                <Grid item xs={1}></Grid>
+                <Grid item xs={2}>
+                  สาขาปลายทาง* :
+                </Grid>
+                <Grid item xs={3}>
+                  <BranchListDropDown
+                    valueBranch={valuebranchTo}
+                    sourceBranchCode={fromBranch}
+                    onChangeBranch={handleChangeToBranch}
+                    isClear={clearBranchDropDown}
+                    isFilterAuthorizedBranch={isAuthorizedBranch}
+                    filterOutDC={groupBranch}
+                  />
+                </Grid>
+                <Grid item xs={1}></Grid>
+              </Grid>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  สาเหตุการโอน* :
+                </Grid>
+                <Grid item xs={3}>
+                  <TransferReasonsListDropDown
+                    reasonsValue={reasons}
+                    onChangeReasons={handleChangeReasons}
+                    isClear={false}
+                    isDetail={true}
+                  />
+                </Grid>
+                <Grid item xs={7}></Grid>
+              </Grid>
+            </div>
+          )}
 
-              {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
-                <BranchListDropDown
-                  valueBranch={valuebranchTo}
-                  sourceBranchCode={fromBranch}
-                  onChangeBranch={handleChangeToBranch}
-                  isClear={clearBranchDropDown}
-                  isFilterAuthorizedBranch={isAuthorizedBranch}
-                  filterOutDC={groupBranch}
-                />
-              )}
+          {!edit && (
+            <div>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  วันที่โอน :
+                </Grid>
+                <Grid item xs={3}>
+                  {moment(startDate).add(543, 'y').format('DD/MM/YYYY')}
+                </Grid>
+                <Grid item xs={1}></Grid>
+                <Grid item xs={2}>
+                  วันที่สิ้นสุด :
+                </Grid>
+                <Grid item xs={3}>
+                  {moment(endDate).add(543, 'y').format('DD/MM/YYYY')}
+                </Grid>
+                <Grid item xs={1}></Grid>
+              </Grid>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  สาขาต้นทาง :
+                </Grid>
+                <Grid item xs={3}>
+                  {fromBranch}-{valuebranchFrom?.name}
+                </Grid>
+                <Grid item xs={1}></Grid>
+                <Grid item xs={2}>
+                  สาขาปลายทาง :
+                </Grid>
+                <Grid item xs={3}>
+                  {status !== 'WAIT_FOR_APPROVAL_2' && `${toBranch}-${valuebranchTo?.name}`}
+                  {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
+                    <BranchListDropDown
+                      valueBranch={valuebranchTo}
+                      sourceBranchCode={fromBranch}
+                      onChangeBranch={handleChangeToBranch}
+                      isClear={clearBranchDropDown}
+                      isFilterAuthorizedBranch={isAuthorizedBranch}
+                      filterOutDC={groupBranch}
+                    />
+                  )}
 
-              {!edit && !groupSCM && `${toBranch}-${valuebranchTo?.name}`}
-            </Grid>
-            <Grid item xs={1}></Grid>
-          </Grid>
-          <Grid container spacing={2} mb={2}>
-            <Grid item xs={2}>
-              สาเหตุการโอน{edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && '*'}{' '}
-              :
-            </Grid>
-            <Grid item xs={3}>
-              {edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-                <TransferReasonsListDropDown
-                  reasonsValue={reasons}
-                  onChangeReasons={handleChangeReasons}
-                  isClear={false}
-                  isDetail={true}
-                />
-              )}
-              {!edit && reasonText}
-            </Grid>
-            <Grid item xs={7}></Grid>
-          </Grid>
+                  {!groupSCM && status === 'WAIT_FOR_APPROVAL_2' && `${toBranch}-${valuebranchTo?.name}`}
+                </Grid>
+                <Grid item xs={1}></Grid>
+              </Grid>
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={2}>
+                  สาเหตุการโอน :
+                </Grid>
+                <Grid item xs={3}>
+                  {reasonText}
+                </Grid>
+                <Grid item xs={7}></Grid>
+              </Grid>
+            </div>
+          )}
 
           {edit && !groupOC && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
             <Grid container spacing={2} mt={4} mb={2}>
@@ -988,7 +1037,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               )}
             </Grid>
           </Grid>
-          <Box mb={4}>
+          <Box mb={12}>
             <StockRequestSKU
               type={type}
               edit={edit}

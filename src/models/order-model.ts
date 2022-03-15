@@ -65,6 +65,7 @@ export interface ShipmentInfo {
   sapDocType: string;
   sdNo: string;
   docRefNo: string;
+  docType: string;
   sdStatus: string;
   sdType: number;
   toteCnt: number;
@@ -144,7 +145,8 @@ export interface itemsDetail {
 
 export interface CheckOrderDetailProps {
   sdNo: string;
-  shipmentNo: string;
+  docRefNo: string;
+  docType: string;
   defaultOpen: boolean;
   onClickClose: any;
 }
@@ -180,10 +182,10 @@ export interface ItemsApprove {
   isTote: boolean;
 }
 
-export interface OrderApproveCloseJobRequest {
-  imageFileName?: string;
-  imageFile?: string;
-}
+// export interface OrderApproveCloseJobRequest {
+//   imageFileName?: string;
+//   imageFile?: string;
+// }
 
 export interface FeatchDataPDFRequest {
   Symbol: string;
@@ -221,4 +223,49 @@ export interface CheckOrderSDDetailProps {
   shipmentNo: string;
   defaultOpen: boolean;
   onClickClose: any;
+}
+
+export interface OrderReceiveResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: OrderReceiveInfo | any;
+}
+
+export interface OrderReceiveInfo {
+  shipmentNo: string;
+  shipmentDate: string;
+  status: string;
+  sapDocType: string;
+  sdNo: string;
+  sdStatus: number;
+  sdType: number;
+  toteCnt: number;
+  boxCnt: number;
+  comment: string;
+  ItemRefNo: number;
+  entries: OrderReceiveEntry[];
+  shipBranchFrom: shipBranchInfo;
+  shipBranchTo: shipBranchInfo;
+}
+export interface OrderReceiveEntry {
+  deliveryOrderNo: string;
+  productName: string;
+  ItemRefNo: number;
+  barcode: string;
+  skuCode: string;
+  skuType: string;
+  outOfStockStatus: number;
+  toteCode: string;
+  expireDate: string;
+  unitCode: string;
+  unitName: string;
+  unitFactor: number;
+  qty: number;
+  qtyAll: number;
+  qtyAllBefore: number;
+  actualQty: number;
+  qtyDiff: number;
+  comment: string;
+  isTote: boolean;
 }

@@ -156,6 +156,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
     setOpenLoadingModal(false);
   };
 
+  const [errorUploadFile, setErrorUploadFile] = React.useState(false);
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
   const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
   // const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
@@ -173,9 +174,10 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
 
     let file: File = e.target.files[0];
     // let file: File = e.target.files;
-    setFile(file);
     setFileName(file.name);
-    chkValidationFile(file.name);
+    const chkValidation = chkValidationFile(file.name);
+    if (chkValidation) setFile(file);
+
     // let fileType = file.type.split('/');
     // const fileName = `${sdNo}-01.${fileType[1]}`;
   };
@@ -188,8 +190,13 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
       setValidationFile(true);
       setErrorBrowseFile(true);
       setMsgErrorBrowseFile('กรุณาแนบไฟล์.xlsx เท่านั้น');
-      return;
+      return false;
     }
+
+    setValidationFile(false);
+    setErrorBrowseFile(false);
+    setMsgErrorBrowseFile('');
+    return true;
   };
 
   const handleUpLoadFile = async () => {
@@ -215,7 +222,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
       if (file) {
         await importStockRequest(payload, file)
           .then((value) => {
-            // console.log('importStockRequest:', value);
+            // setErrorUploadFile(false);
 
             setFlagEdit(false);
             setShowSnackBar(true);
@@ -227,6 +234,12 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
             }, 1000);
           })
           .catch((error: ApiUploadError) => {
+            setFile(undefined);
+            setFileName('');
+
+            if (errorUploadFile) setErrorUploadFile(false);
+            else if (!errorUploadFile) setErrorUploadFile(true);
+
             if (error.code === 40000) {
               setOpenAlertFile(true);
               setOpenAlert(true);
@@ -368,33 +381,52 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
             <Grid item xs={12} mt={2}>
               <div>
                 {errorBrowseFile === true && (
-                  <TextField
-                    error
-                    name="browserTxf"
-                    className={classes.MtextFieldUpload}
-                    value={fileName}
-                    placeholder="แนบไฟล์ .xlsx"
-                    helperText={msgErrorBrowseFile}
-                  />
+                  <>
+                    <TextField
+                      error
+                      name="browserTxf"
+                      className={classes.MtextFieldUpload}
+                      value={fileName}
+                      placeholder="แนบไฟล์ .xlsx"
+                      helperText={msgErrorBrowseFile}
+                    />
+                  </>
                 )}
 
                 {errorBrowseFile === false && (
-                  <TextField
-                    name="browserTxf"
-                    className={classes.MtextFieldUpload}
-                    value={fileName}
-                    placeholder="แนบไฟล์ .xlsx"
-                  />
+                  <>
+                    <TextField
+                      name="browserTxf"
+                      className={classes.MtextFieldUpload}
+                      value={fileName}
+                      placeholder="แนบไฟล์ .xlsx"
+                    />
+                  </>
                 )}
 
-                <input
-                  id="btnBrowse"
-                  type="file"
-                  accept=".xlsx"
-                  onChange={handleFileInputChange}
-                  style={{ display: 'none' }}
-                />
+                {errorUploadFile === true && (
+                  <>
+                    <input
+                      id="btnBrowse"
+                      type="file"
+                      accept=".xlsx"
+                      onChange={handleFileInputChange}
+                      style={{ display: 'none' }}
+                    />
+                  </>
+                )}
 
+                {errorUploadFile === false && (
+                  <>
+                    <input
+                      id="btnBrowse"
+                      type="file"
+                      accept=".xlsx"
+                      onChange={handleFileInputChange}
+                      style={{ display: 'none' }}
+                    />
+                  </>
+                )}
                 <label htmlFor={'btnBrowse'}>
                   <Button
                     id="btnPrint"

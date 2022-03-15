@@ -8,13 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
-import {
-  Entry,
-  ItemsApprove,
-  OrderApproveCloseJobRequest,
-  OrderApproveRequest,
-  ShipmentRequest,
-} from '../../models/order-model';
+import { Entry, ItemsApprove, OrderApproveRequest, ShipmentRequest } from '../../models/order-model';
 import { approveOrderShipments, closeOrderShipments } from '../../services/order-shipment';
 import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import DataDiffInfo from './table-diff-info';
@@ -22,7 +16,8 @@ import { ApiError } from '../../models/api-error-model';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
 import LoadingModal from '../commons/ui/loading-modal';
-import { GridRowData } from '@mui/x-data-grid';
+import { env } from '../../adapters/environmentConfigs';
+import { Grid } from '@mui/material';
 
 interface ConfirmOrderShipment {
   open: boolean;
@@ -34,8 +29,8 @@ interface ConfirmOrderShipment {
   items: Entry[];
   percentDiffType: boolean;
   percentDiffValue: string;
-  fileName: string;
-  imageContent: string;
+  sumDCPercent: number;
+  docType: string;
 }
 
 interface loadingModalState {
@@ -48,31 +43,6 @@ export interface DialogTitleProps {
   onClose?: () => void;
 }
 
-const BootstrapDialogTitle = (props: DialogTitleProps) => {
-  const { children, onClose, ...other } = props;
-
-  return (
-    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
-      {children}
-      {onClose ? (
-        <IconButton
-          id="btnClose"
-          aria-label="close"
-          onClick={onClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: (theme: any) => theme.palette.grey[100],
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </DialogTitle>
-  );
-};
-
 export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
   const {
     open,
@@ -84,8 +54,8 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     items,
     percentDiffType,
     percentDiffValue,
-    fileName,
-    imageContent,
+    sumDCPercent,
+    docType,
   } = props;
   const searchState = useAppSelector((state) => state.saveSearchOrder);
   const payloadSearchOrder: ShipmentRequest = searchState.searchCriteria;
@@ -93,6 +63,8 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+  const DCPercent = env.dc.percent;
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -133,12 +105,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         }
       );
     } else if (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
-      const payload: OrderApproveCloseJobRequest = {
-        imageFileName: fileName,
-        imageFile: imageContent,
-      };
-
-      await closeOrderShipments(sdNo, payload)
+      await closeOrderShipments(sdNo, fileUploadList)
         .then(
           async function (value) {
             await updateShipmentOrder();
@@ -209,13 +176,6 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         maxWidth="md"
         sx={{ minWidth: 500 }}
       >
-        {/* {action === CheckOrderEnum.STATUS_APPROVE_VALUE && items.length > 0 && <DialogContent>
-                <DialogContentText id='alert-dialog-description'>
-                    <Typography variant="body2" gutterBottom>ยืนยันการตรวจสอบ <br /> เลขที่เอกสาร {shipmentNo} show table</Typography>
-                </DialogContentText>
-            </DialogContent>
-            } */}
-
         {action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
           <div>
             <DialogContent>
@@ -224,7 +184,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                   ยืนยันอนุมัติใบตรวจสอบการรับ-โอนสินค้า
                 </Typography>
                 <Typography variant="body1" align="center">
-                  เลขที่เอกสาร LD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
                   <label style={{ color: '#36C690' }}>
                     <b>{shipmentNo}</b>
                   </label>
@@ -248,6 +208,23 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                     >
                       รายการสินค้าขาด / เกิน
                     </Typography>
+
+                    {docType === 'LD' && (
+                      <Typography
+                        variant="body1"
+                        align="center"
+                        sx={{
+                          marginBottom: 2,
+                          fontSize: 13,
+                          color: '#FF0000',
+                        }}
+                      >
+                        {sumDCPercent < DCPercent &&
+                          `(จำนวนรับจริง ${sumDCPercent}% น้อยกว่าค่าที่กำหนด ${DCPercent}%)`}
+                        {sumDCPercent > DCPercent && `(จำนวนรับจริง ${sumDCPercent}% มากกว่าค่าที่กำหนด ${DCPercent}%)`}
+                      </Typography>
+                    )}
+
                     <DataDiffInfo items={itemsDiff} />
                   </div>
                 )}
@@ -256,7 +233,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
           </div>
         )}
 
-        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent && (
+        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && fileUploadList.length > 0 && (
           <div>
             <DialogContent>
               <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
@@ -264,7 +241,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                   ปิดงานใบตรวจสอบการรับ-โอนสินค้า
                 </Typography>
                 <Typography variant="body1" align="center">
-                  เลขที่เอกสาร LD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
                   <label style={{ color: '#36C690' }}>
                     <b>{shipmentNo}</b>
                   </label>
@@ -280,7 +257,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
           </div>
         )}
 
-        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && !imageContent && (
+        {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && fileUploadList.length < 0 && (
           <DialogActions sx={{ justifyContent: 'center' }}>
             <Button id="btnAccept" variant="contained" size="small" color="primary" onClick={handleClose}>
               รับทราบ
@@ -289,7 +266,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         )}
 
         {(action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE ||
-          (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && imageContent)) && (
+          (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && fileUploadList.length > 0)) && (
           <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
             <Button
               id="btnCancel"

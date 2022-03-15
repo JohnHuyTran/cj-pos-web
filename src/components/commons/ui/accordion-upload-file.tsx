@@ -2,24 +2,18 @@ import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { Box, Button, IconButton, TextField, Typography } from '@mui/material';
 import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 
-import theme from '../../styles/theme';
-import { useStyles } from '../../styles/makeTheme';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { isConstructorDeclaration } from 'typescript';
+import theme from '../../../styles/theme';
+import { useStyles } from '../../../styles/makeTheme';
 import CloseIcon from '@mui/icons-material/Close';
 
-import ModalAlert from '../modal-alert';
-import { uploadFileState } from '../../store/slices/upload-file-slice';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { FileType } from '../../models/supplier-check-order-model';
-import { ApiError } from '../../models/api-error-model';
-import { delFileUrlHuawei, getFileUrlHuawei } from '../../services/purchase';
-import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
-
-interface fileListProps {
-  file: any;
-  filename: string;
-}
+import ModalAlert from '../../modal-alert';
+import { uploadFileState } from '../../../store/slices/upload-file-slice';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
+import { FileType } from '../../../models/supplier-check-order-model';
+import { ApiError } from '../../../models/api-error-model';
+import { delFileUrlHuawei } from '../../../services/purchase';
+import { getFileUrlHuawei } from '../../../services/master-service';
+import ModalShowHuaweiFile from '../../commons/ui/modal-show-huawei-file';
 
 interface fileDisplayList {
   file?: File;
@@ -31,8 +25,8 @@ interface fileDisplayList {
 
 interface Props {
   files: FileType[];
-  docNo: string;
-  docType: string;
+  docNo?: string | null | undefined | '';
+  docType?: string | null | undefined | '';
   isStatus: boolean;
   onChangeUploadFile: (status: boolean) => void;
 }
@@ -51,11 +45,8 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
 
   const [validationFile, setValidationFile] = React.useState(false);
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
-  const [checkErrorBrowseFile, setCheckErrorBrowseFile] = React.useState(false);
   const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
   const [fileList, setFileList] = React.useState<File[]>([]);
-  const [fileDSList, setFileDSList] = React.useState<any[]>([]);
-  const [fileHueweiList, setFileHueweiList] = React.useState<any[]>([]);
 
   const [statusSaveFile, setStatusSaveFile] = useState<boolean>(false);
   const [statusUpload, setStatusUpload] = useState<boolean>(false);
@@ -84,8 +75,6 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
       parts[length].toLowerCase() !== 'jpg' &&
       parts[length].toLowerCase() !== 'jpeg'
     ) {
-      // setValidationFile(true);
-      // setCheckErrorBrowseFile(true);
       setErrorBrowseFile(true);
       setMsgErrorBrowseFile('ไม่สามารถอัพโหลดไฟล์ได้ กรุณาแนบไฟล์.pdf หรือ .jpg เท่านั้น');
 
@@ -100,8 +89,6 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
       //size > 5MB
       let size = fileSize / 1024 / 1024;
       if (size > 5) {
-        // setValidationFile(true);
-        // setCheckErrorBrowseFile(true);
         setErrorBrowseFile(true);
         setMsgErrorBrowseFile('ไม่สามารถอัพโหลดไฟล์ได้ เนื่องจากขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่');
         return (checkError = true);
@@ -118,15 +105,12 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
     const isCheckError = checkSizeFile(e);
 
     let files: File = e.target.files[0];
-    let fileType = files.type.split('/');
-    // const fileName = `${sdNo}-01.${fileType[1]}`;
 
     if (fileList.length < 5 && !isCheckError) {
       setStatusUpload(true);
       setStatusSaveFile(false);
       setAccordionFile(true);
 
-      // setFileList((fileList) => [...fileList, { file: files, filename: fileType[1] }]);
       setFileList((fileList) => [...fileUploadList, files]);
       return onChangeUploadFile(false);
     } else {
@@ -154,8 +138,6 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
         });
     }
   }
-
-  const [fileKeyDels, setFileKeyDels] = useState<string>('');
   let newFileDisplayList: any = [];
 
   useEffect(() => {
@@ -211,19 +193,19 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
   const handleDelete = (file: any) => {
     const fileNameDel = file.fileName;
     const fileKeyDel = file.fileKey;
-    console.log('fileKeyDel: ', fileKeyDel);
-    setFileKeyDels(fileKeyDel);
 
     if (file.status === 'new') {
       setFileList(fileList.filter((r: any) => r.name !== fileNameDel));
     } else if (file.status === 'old') {
-      delFileUrlHuawei(fileKeyDel, docType, docNo)
-        .then((value) => {
-          return onChangeUploadFile(true);
-        })
-        .catch((error: ApiError) => {
-          return onChangeUploadFile(false);
-        });
+      if (docType && docNo) {
+        delFileUrlHuawei(fileKeyDel, docType, docNo)
+          .then((value) => {
+            return onChangeUploadFile(true);
+          })
+          .catch((error: ApiError) => {
+            return onChangeUploadFile(false);
+          });
+      }
     }
   };
 
@@ -236,28 +218,27 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
       <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
         <label htmlFor={'btnBrowse'}>
           <Button
-            id="btnPrint"
-            color="primary"
-            variant="contained"
-            component="span"
+            id='btnPrint'
+            color='primary'
+            variant='contained'
+            component='span'
             className={classes.MbtnBrowse}
-            disabled={newFileDisplayList.length === 5}
-          >
+            disabled={newFileDisplayList.length === 5}>
             แนบไฟล์
           </Button>
         </label>
 
-        <Typography variant="overline" sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
+        <Typography variant='overline' sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
           แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
         </Typography>
       </Box>
 
       <input
-        id="btnBrowse"
-        type="file"
+        id='btnBrowse'
+        type='file'
         // multiple
         // onDrop
-        accept=".pdf, .jpg, .jpeg"
+        accept='.pdf, .jpg, .jpeg'
         onChange={handleFileInputChange}
         style={{ display: 'none' }}
       />
@@ -269,18 +250,16 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
           mt: 2,
           borderRadius: '5px',
           border: `1px dashed ${theme.palette.primary.main}`,
-        }}
-      >
+        }}>
         <Box
           sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => {
             if (newFileDisplayList.length > 0) setAccordionFile(!accordionFile);
-          }}
-        >
+          }}>
           <Typography sx={{ fontSize: '14px', color: '#676767' }}>
             เอกสารแนบ จำนวน {newFileDisplayList.length}/5
           </Typography>
-          {accordionFile ? <KeyboardArrowUp color="primary" /> : <KeyboardArrowDown color="primary" />}
+          {accordionFile ? <KeyboardArrowUp color='primary' /> : <KeyboardArrowDown color='primary' />}
         </Box>
 
         <Box sx={{ display: accordionFile ? 'visible' : 'none' }}>
@@ -288,7 +267,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
             newFileDisplayList.map((item: fileDisplayList, index: number) => (
               <Box
                 key={index}
-                component="a"
+                component='a'
                 href={void 0}
                 sx={{
                   color: theme.palette.secondary.main,
@@ -296,26 +275,24 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                }}
-              >
+                }}>
                 {item.status === 'old' && (
                   <Typography
-                    color="secondary"
+                    color='secondary'
                     sx={{ textDecoration: 'underline', fontSize: '13px' }}
-                    onClick={() => getHuaweiFileUrl(item)}
-                  >
+                    onClick={() => getHuaweiFileUrl(item)}>
                     {item.fileName}
                   </Typography>
                 )}
 
                 {item.status === 'new' && (
-                  <Typography color="secondary" sx={{ fontSize: '13px' }}>
+                  <Typography color='secondary' sx={{ fontSize: '13px' }}>
                     {item.fileName}
                   </Typography>
                 )}
 
-                <IconButton onClick={() => handleDelete(item)} size="small">
-                  <CloseIcon fontSize="small" color="error" />
+                <IconButton onClick={() => handleDelete(item)} size='small'>
+                  <CloseIcon fontSize='small' color='error' />
                 </IconButton>
               </Box>
             ))}

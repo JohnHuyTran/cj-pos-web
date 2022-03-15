@@ -22,6 +22,9 @@ export const environment = {
       approve: {
         url: '/order/stock-diff/{sdNo}/approve',
       },
+      approveOC: {
+        url: '/order/stock-diff/{sdNo}/approve-oc',
+      },
       closejob: {
         url: '/order/stock-diff/{sdNo}/close',
       },
@@ -32,7 +35,7 @@ export const environment = {
         url: '/order/shipment/search',
       },
       approveOrderReceive: {
-        url: '/order//shipment/submit',
+        url: '/order/shipment/submit',
       },
     },
     dcCheckOrder: {
@@ -142,9 +145,9 @@ export const environment = {
       calculatePI: {
         url: '/purchase/purchase-invoice/calculate',
       },
-      supplierFile: {
-        url: '/purchase/getUrl',
-      },
+      // supplierFile: {
+      //   url: '/purchase/getUrl',
+      // },
       exportFile: {
         url: '/purchase/purchase-invoice/{piNo}/export',
       },
@@ -246,6 +249,12 @@ export const environment = {
       approve2: {
         url: '/stock/stock-request/approve2/{rtNo}',
       },
+      approve2BySCM: {
+        url: '/stock/stock-request/submit/approve/{rtNo}',
+      },
+      approve2MultipleBySCM: {
+        url: '/stock/stock-request/approve2',
+      },
       reject1: {
         url: '/stock/stock-request/reject1/{rtNo}',
       },
@@ -284,6 +293,13 @@ export const environment = {
       },
       branchTotal: {
         url: '/master/branch/branch-total',
+      },
+    },
+    file: {
+      huawei: {
+        pathFile: {
+          url: '/master/getUrl',
+        },
       },
     },
   },

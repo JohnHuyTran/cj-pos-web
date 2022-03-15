@@ -20,8 +20,8 @@ import { DOCUMENT_TYPE } from '../../utils/enum/stock-transfer-enum';
 import DatePickerAllComponent from '../commons/ui/date-picker-all';
 import TextBoxComment from '../commons/ui/textbox-comment';
 
-import BranchTransferListItem from './stock-transfer-bt-list-item';
-import BranchTransferListSKU from './stock-transfer-bt-list-sku';
+import BranchTransferListItem from './new-stock-transfer-bt-list-item';
+import BranchTransferListSKU from './new-stock-transfer-bt-list-sku';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import AlertError from '../commons/ui/alert-error';
@@ -128,12 +128,13 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setIsDC(getUserInfo().group === PERMISSION_GROUP.DC);
     setStartDate(new Date(branchTransferInfo.startDate));
     setEndDate(new Date(branchTransferInfo.endDate));
-    dispatch(updateAddItemSkuGroupState(branchTransferInfo.itemGroups));
+    // dispatch(updateAddItemSkuGroupState(branchTransferInfo.itemGroups));
+    setSkuList(branchTransferInfo.itemGroups);
   }, [open]);
 
   const mappingPayload = () => {
     let items: Item[] = [];
-    const _productSelector: any = store.getState().updateBTProductSlice.state;
+    const _productSelector: any = itemList;
     _productSelector.forEach((data: GridRowData) => {
       const item: Item = {
         seqItem: data.seqItem,
@@ -144,7 +145,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       items.push(item);
     });
 
-    const _skuSelector = store.getState().updateBTSkuSlice.state;
+    const _skuSelector = skuList;
     let sku: ItemGroups[] = [];
     _skuSelector.forEach((data: ItemGroups) => {
       const itemGroup: ItemGroups = {
@@ -174,7 +175,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   };
 
   const validateItem = (action: string) => {
-    const _productSelector: any = store.getState().updateBTProductSlice.state;
+    // const _productSelector: any = store.getState().updateBTProductSlice.state;
+    const _productSelector = itemList;
     let itemNotValid: boolean = false;
     _productSelector.forEach((data: GridRowData) => {
       if (!data.toteCode && data.actualQty > 0) {
@@ -192,7 +194,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     });
 
     let isZero = true;
-    const _skuSelector = store.getState().updateBTSkuSlice.state;
+    const _skuSelector = skuList;
     _skuSelector.forEach((data: ItemGroups) => {
       const actualQty = data.actualAllQty ? data.actualAllQty : 0;
       const orderQty = data.orderAllQty ? data.orderAllQty : 0;
@@ -240,7 +242,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       showPopup = true;
     }
 
-    const _productSelector: any = store.getState().updateBTProductSlice.state;
+    const _productSelector: any = itemList;
     const btItems: Item[] = branchTransferInfo.items;
     _productSelector.forEach((data: GridRowData) => {
       const item = btItems.find((item: Item) => {
@@ -299,7 +301,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   };
 
   const getSkuList = () => {
-    const _skuSlice = store.getState().updateBTSkuSlice.state;
+    const _skuSlice = skuList;
     const list = _.uniqBy(_skuSlice, 'skuCode');
     const skucodeList: string[] = [];
     list.map((i: any) => {
@@ -487,6 +489,16 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     }
     setSkuCodeSelect(skuCode);
     setIschecked(false);
+  };
+
+  const [skuList, setSkuList] = React.useState<ItemGroups[]>([]);
+  const [itemList, setItemList] = React.useState<Item[]>([]);
+  const onUpdateSkuItemsList = (item: ItemGroups[]) => {
+    setSkuList(item);
+  };
+
+  const onUpdateItemsList = (item: Item[]) => {
+    setItemList(item);
   };
 
   const [isChecked, setIschecked] = React.useState(true);
@@ -981,7 +993,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
           {btStatus === 'TRANSFERING' && componentBranchStatusTransfering}
 
-          <BranchTransferListSKU onSelectSku={onClickSku} />
+          <BranchTransferListSKU onSelectSku={onClickSku} skuList={skuList} />
           <Box mt={6}>
             {' '}
             <Typography>
@@ -999,7 +1011,11 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             </FormGroup>
           </Box>
 
-          <BranchTransferListItem skuCodeSelect={skuCodeSelect} />
+          <BranchTransferListItem
+            skuCodeSelect={skuCodeSelect}
+            onUpdateSkuList={onUpdateSkuItemsList}
+            onUpdateItemList={onUpdateItemsList}
+          />
 
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>

@@ -155,6 +155,10 @@ export interface Item {
   toteCode?: string;
   boNo?: boolean;
   isDisable?: boolean;
+
+  orderAllQty?: number;
+  remainingQty?: number;
+  actualAllQty?: number;
 }
 
 export interface ItemGroups {
@@ -266,4 +270,18 @@ export interface ImportStockRequest {
   startDate: string;
   endDate: string;
   transferReason: string;
+}
+
+export interface Approve2MultipleStockRequest {
+  rtNos: string[];
+}
+
+export interface Approve2BySCMStockRequest {
+  startDate: string;
+  endDate: string;
+  branchFrom: string;
+  branchTo: string;
+  transferReason: string;
+  itemGroups: ItemGroups[];
+  items: Item[];
 }

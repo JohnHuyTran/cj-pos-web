@@ -54,10 +54,13 @@ function CheckOrderSearch() {
   const page = '1';
   const items = useAppSelector((state) => state.checkOrderList);
   const limit = useAppSelector((state) => state.checkOrderList.orderList.perPage);
-  // console.log("limit in check page: ", limit);
+  const [displayBtnOrderReceive, setDisplayBtnOrderReceive] = React.useState(false);
+  const [branchOC, setbranchOC] = React.useState(false);
+  const ocUserInfo = getUserInfo().group === PERMISSION_GROUP.OC;
+
   const [values, setValues] = React.useState<State>({
     orderShipment: '',
-    orderStatus: 'ALL',
+    orderStatus: ocUserInfo ? 'WAIT_FOR_APPROVAL_1' : 'ALL',
     orderType: 'ALL',
     dateFrom: '',
     dateTo: '',
@@ -72,6 +75,18 @@ function CheckOrderSearch() {
   });
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
+
+  React.useEffect(() => {
+    if (groupBranch) {
+      setBranchToCode(ownBranch);
+      setValues({ ...values, branchTo: ownBranch });
+    }
+
+    const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
+    const oc = getUserInfo().group === PERMISSION_GROUP.OC;
+    setDisplayBtnOrderReceive(branch);
+    setbranchOC(oc);
+  }, []);
 
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -207,17 +222,6 @@ function CheckOrderSearch() {
     groupBranch ? branchToMap : null
   );
 
-  const [displayBtnOrderReceive, setDisplayBtnOrderReceive] = React.useState(false);
-  React.useEffect(() => {
-    if (groupBranch) {
-      setBranchToCode(ownBranch);
-      setValues({ ...values, branchTo: ownBranch });
-    }
-
-    const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
-    setDisplayBtnOrderReceive(branch);
-  }, []);
-
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
@@ -348,11 +352,33 @@ function CheckOrderSearch() {
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}
               >
-                <MenuItem value={'ALL'} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
+                {/* {branchOC && (
+                  <>
+                    <MenuItem value={'ALL'}>
+                      ทั้งหมด
+                    </MenuItem>
+                    <MenuItem key={shipmentStatus[0].key} value={shipmentStatus[0].key}>
+                      {shipmentStatus[0].text}
+                    </MenuItem>
+                    <MenuItem key={shipmentStatus[1].key} value={shipmentStatus[1].key}>
+                      {shipmentStatus[1].text}
+                    </MenuItem>
+                    <MenuItem key={shipmentStatus[2].key} value={shipmentStatus[2].key}>
+                      {shipmentStatus[2].text}
+                    </MenuItem>
+                    <MenuItem key={shipmentStatus[3].key} value={shipmentStatus[3].key}>
+                      {shipmentStatus[3].text}
+                    </MenuItem>
+                  </>
+                )} */}
+
+                <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
                 {shipmentStatus.map((status) => (
-                  <MenuItem key={status.key} value={status.key}>
+                  <MenuItem
+                    key={status.key}
+                    value={status.key}
+                    // selected={status.key === 'WAIT_FOR_APPROVE_1' ? true : false}
+                  >
                     {status.text}
                   </MenuItem>
                 ))}

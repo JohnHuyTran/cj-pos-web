@@ -21,3 +21,4 @@ COPY . ./
 
 # start app
 CMD ["npm", "start"]
+

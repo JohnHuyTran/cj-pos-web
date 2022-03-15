@@ -18,15 +18,12 @@ import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { Item, ItemGroups } from '../../models/stock-transfer-model';
-import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
-import { updateAddItemSkuGroupState, updateBTSkuSlice } from '../../store/slices/stock-transfer-bt-sku-slice';
-import { updateAddItemsGroupState } from '../../store/slices/stock-transfer-bt-product-slice';
-import { getUserInfo } from '../../store/sessionStore';
-import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import { isGroupBranch } from '../../utils/role-permission';
 
 interface Props {
   skuCodeSelect: string;
+  onUpdateSkuList: (item: ItemGroups[]) => void;
+  onUpdateItemList: (item: Item[]) => void;
 }
 const columns: GridColDef[] = [
   {
@@ -89,38 +86,29 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
-      <div>
-        <TextField
-          id='txnActualQty'
-          variant='outlined'
-          name='txnActualQty'
-          type='number'
-          inputProps={{ style: { textAlign: 'right' } }}
-          value={params.value}
-          onClick={(e) => e.stopPropagation()}
-          onChange={(e) => {
-            // e.persist();
-            // const caretStart = e.target.selectionStart;
-            // const caretEnd = e.target.selectionEnd;
-            var qty: any =
-              params.getValue(params.id, 'qty') &&
-              params.getValue(params.id, 'qty') !== null &&
-              params.getValue(params.id, 'qty') != undefined
-                ? params.getValue(params.id, 'qty')
-                : 0;
-            var value = e.target.value ? parseInt(e.target.value, 10) : '0';
-            var returnQty = Number(params.getValue(params.id, 'actualQty'));
-            if (returnQty === 0) value = chkReturnQty(value);
-            if (value < 0) value = 0;
-            params.api.updateRows([{ ...params.row, actualQty: value }]);
+      <TextField
+        variant='outlined'
+        name='txnActualQty'
+        type='number'
+        inputProps={{ style: { textAlign: 'right' } }}
+        value={params.value}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(e) => {
+          // e.persist();
+          // const caretStart = e.target.selectionStart;
+          // const caretEnd = e.target.selectionEnd;
+          var value = e.target.value ? parseInt(e.target.value, 10) : '0';
+          var returnQty = Number(params.getValue(params.id, 'actualQty'));
+          if (returnQty === 0) value = chkReturnQty(value);
+          if (value < 0) value = 0;
+          params.api.updateRows([{ ...params.row, actualQty: value }]);
 
-            // update the state and reset the caret
-            // e.target.setSelectionRange(caretStart, caretEnd);
-          }}
-          disabled={params.getValue(params.id, 'isDisable') ? true : false}
-          autoComplete='off'
-        />
-      </div>
+          // update the state and reset the caret
+          // e.target.setSelectionRange(caretStart, caretEnd);
+        }}
+        disabled={params.getValue(params.id, 'isDisable') ? true : false}
+        autoComplete='off'
+      />
     ),
   },
   {
@@ -131,16 +119,12 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        id='txbToteCode'
         variant='outlined'
         name='txbToteCode'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
-          // e.persist();
-          // const caretStart = e.target.selectionStart;
-          // const caretEnd = e.target.selectionEnd;
           params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
           // e.target.setSelectionRange(caretStart, caretEnd);
         }}
@@ -184,7 +168,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function BranchTransferListItem({ skuCodeSelect }: Props) {
+function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuList }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const { apiRef, columns } = useApiRef();
@@ -197,7 +181,10 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
   );
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  const skuGroupItems = useAppSelector((state) => state.updateBTSkuSlice.state);
+  // const skuGroupItems = useAppSelector((state) => state.updateBTSkuSlice.state);
+  const [skuGroupItems, setskuGroupItems] = React.useState<ItemGroups[]>(
+    branchTransferInfo.itemGroups ? branchTransferInfo.itemGroups : []
+  );
 
   const [isDisable, setIsDisable] = React.useState(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -236,6 +223,7 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
   React.useEffect(() => {
     const isCreate = branchTransferInfo.status === 'CREATED';
     setIsDisable(isGroupBranch() && isCreate ? false : true);
+    setskuGroupItems(branchTransferInfo.itemGroups);
   }, []);
 
   const storeItemAddItem = async (_newItem: any) => {
@@ -310,20 +298,21 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
         }
       });
     }
-    const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
-    setBranchTransferItems(orderItem);
-    dispatch(updateAddItemSkuGroupState(_.orderBy(_sku, ['skuCode'], ['asc'])));
-    dispatch(updateAddItemsGroupState(orderItem));
+    // const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
+    setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    // dispatch(updateAddItemSkuGroupState(_.orderBy(_sku, ['skuCode'], ['asc'])));
+    // dispatch(updateAddItemsGroupState(orderItem));
+
+    onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    onUpdateSkuList(_sku);
   };
 
-  const storeItem = async (params: GridCellParams) => {
+  const storeItem = async () => {
     let _items = [...branchTransferItems];
     let _sku = [...skuGroupItems];
     let _newSku: ItemGroups[] = [];
 
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-
-    // _items.forEach((dataItem: Item) => {
     rowsEdit.forEach((dataRow: GridRowData) => {
       const dupItem: any = branchTransferItems.find((item: Item, index: number) => {
         return item.barcode === dataRow.barcode;
@@ -374,9 +363,11 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
       _newSku.push(newData);
     });
     // const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
-    await dispatch(updateAddItemSkuGroupState(_newSku));
-    await dispatch(updateAddItemsGroupState(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc'])));
-    await setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    // await dispatch(updateAddItemSkuGroupState(_newSku));
+    // await dispatch(updateAddItemsGroupState(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc'])));
+    setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    onUpdateSkuList(_newSku);
   };
 
   let newColumns = [...columns];
@@ -386,17 +377,8 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
     newColumns[7]['hide'] = true;
   }
 
-  const handleFocusOut = (params: GridCellParams) => {
-    storeItem(params);
-  };
-  const handleOnKeyDown = (params: GridCellParams) => {
-    storeItem(params);
-  };
-  const handleOnCellClick = (params: GridCellParams) => {
-    storeItem(params);
-  };
-  const handleOnCellOut = (params: GridCellParams) => {
-    storeItem(params);
+  const handleEditItems = async (params: GridEditCellValueParams) => {
+    storeItem();
   };
 
   return (
@@ -413,12 +395,9 @@ function BranchTransferListItem({ skuCodeSelect }: Props) {
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          onCellFocusOut={handleFocusOut}
-          // onCellClick={handleOnCellClick}
-          // onCellKeyDown={handleOnKeyDown}
-          // onCellOut={handleOnCellOut}
-          // onSelectionModelChange={handleOnSelectionModelChange}
-          // onCellBlur={handleOnCellBlur}
+          onCellFocusOut={handleEditItems}
+          onCellOut={handleEditItems}
+          // onCellKeyDown={handleEditItems}
         />
       </div>
     </Box>

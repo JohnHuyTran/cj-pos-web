@@ -54,7 +54,7 @@ export default function Navbar({}: Props): ReactElement {
 
   useEffect(() => {
     setOpen(navState);
-    setUserId(getUserInfo().name);
+    setUserId(getUserInfo().preferred_username);
     const strBranchName = getBranchName(branchList, getUserInfo().branch);
     setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
   }, [navState, branchList]);
@@ -73,9 +73,16 @@ export default function Navbar({}: Props): ReactElement {
   const isMenuOpen = Boolean(anchorEl);
   const handleMenuClose = async () => {
     setAnchorEl(null);
+    // logout();
+    // window.location.href = '/';
+  };
+
+  const handleLogout = async () => {
+    setAnchorEl(null);
     logout();
     window.location.href = '/';
   };
+
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -95,7 +102,7 @@ export default function Navbar({}: Props): ReactElement {
       <MenuItem onClick={handleMenuClose} disabled={true}>
         Profile
       </MenuItem>
-      <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+      <MenuItem onClick={handleLogout}>Logout</MenuItem>
     </Menu>
   );
   return (
