@@ -843,7 +843,7 @@ export default function CheckOrderDetail({
                     startIcon={<Print />}
                     className={classes.MbtnPrint}
                     style={{ textTransform: 'none' }}
-                    sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                    sx={{ display: `${showCloseJobBtn ? 'none' : ''}` }}
                   >
                     พิมพ์ใบผลต่าง
                   </Button>
