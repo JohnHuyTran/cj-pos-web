@@ -1,9 +1,17 @@
 import { makeStyles } from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import Task from './task';
+import { useEffect } from 'react';
+import TaskForBarcodeDiscount from './task-for-barcode-discount';
+import TaskForSaleLimitTime from './task-for-sale-limit-time';
 
-export default function Tasklist() {
+interface Props {
+  userPermission: any[];
+  listData: any[];
+  onSearch: () => void;
+}
+
+export default function Tasklist({ userPermission, listData, onSearch }: Props) {
   const useStyles = makeStyles({
     root: {
       minWidth: 275,
@@ -11,22 +19,52 @@ export default function Tasklist() {
     },
   });
 
+  const approver = userPermission.includes('campaign.bd.approve');
+  const requestor = userPermission.includes('campaign.bd.create');
+  const viewer = userPermission.includes('campaign.st.view');
+
+  const listDiscount = listData.filter((item: any) => item.type === 'APPROVE_OR_REJECT_BD');
+  const listST = listData.filter((item: any) => item.type === 'ST_START');
+
+  const listItemTaskDiscount =
+    approver && listDiscount.length > 0
+      ? listDiscount.map((item: any) => {
+          return (
+            <TaskForBarcodeDiscount
+              onSearch={onSearch}
+              payload={item.payload}
+              permission={approver ? 'approver' : requestor ? 'requestor' : ''}
+              userPermission={userPermission}
+            />
+          );
+        })
+      : requestor && listDiscount.length > 0
+      ? listDiscount.map((item: any) => {
+          return (
+            <TaskForBarcodeDiscount
+              onSearch={onSearch}
+              payload={item.payload}
+              permission={approver ? 'approver' : requestor ? 'requestor' : ''}
+              userPermission={userPermission}
+            />
+          );
+        })
+      : null;
+  const listItemTaskST =
+    viewer && listST.length > 0
+      ? listST.map((item: any) => {
+          return (
+            <TaskForSaleLimitTime permission={viewer ? 'viewer' : ''} payload={item.payload} onSearch={onSearch} />
+          );
+        })
+      : null;
+
   const classes = useStyles();
 
   return (
     <div>
-      <Typography variant='h6'> งานของคุณ </Typography>
-      <Divider />
-      <Task
-        functionName='ส่วนลดสินค้า'
-        branchName='สาขาสีลม'
-        transactionDate='24-08-2564 10.40 น.'
-      />
-      <Task
-        functionName='ส่วนลดสินค้า'
-        branchName='สาขาสีบางรัก'
-        transactionDate='24-08-2564 11.20 น.'
-      />
+      {listItemTaskDiscount}
+      {listItemTaskST}
     </div>
   );
 }

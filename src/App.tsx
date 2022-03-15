@@ -18,6 +18,7 @@ import SaleLimitTime from './pages/sale-limit-time/sale-limit-time';
 import { useAppDispatch, useAppSelector } from './store/store';
 import { featchBranchListAsync } from './store/slices/search-branches-slice';
 import { featchAuthorizedBranchListAsync } from './store/slices/authorized-branch-slice';
+import Notification from './pages/notification';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -78,6 +79,7 @@ export default function App2() {
         <DrawerHeader />
         <Switch>
           <Route exact path='/' component={Home} />
+          <Route path='/notification' component={Notification} /> 
           <Route path='/barcode-discount' component={BarcodeDiscount} />
           <Route path='/sale-limit-time' component={SaleLimitTime} />
           <Route path='/check-order' component={CheckOrder} />
