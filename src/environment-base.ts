@@ -308,4 +308,14 @@ export const environment = {
       url: '/authority/authorized-branches',
     },
   },
+  sale: {
+    taxInvoice: {
+      search: {
+        url: 'xxx',
+      },
+      detail: {
+        url: 'xxx',
+      },
+    },
+  },
 };
