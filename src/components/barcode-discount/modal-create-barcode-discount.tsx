@@ -34,11 +34,11 @@ import {
   sendForApprovalBarcodeDiscount,
   cancelBarcodeDiscount,
   saveDraftBarcodeDiscount,
-  checkStockBalance, approveBarcodeDiscount,
+  checkStockBalance, approveBarcodeDiscount, uploadAttachFile,
 } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
-import { objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
+import { getBranchName, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import { Action, BDStatus, DateFormat } from '../../utils/enum/common-enum';
 import ModalCheckStock from './modal-check-stock';
 import ModalCheckPrice from './modal-check-price';
@@ -51,6 +51,9 @@ import ModalConfirmPrintedBarcode from "./modal-confirm-printed-barcode";
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
 import { getReasonForPrintText } from "../../utils/enum/barcode-discount-enum";
 import { getBarcodeDiscountDetail } from "../../store/slices/barcode-discount-detail-slice";
+import { uploadFileState } from "../../store/slices/upload-file-slice";
+import AccordionUploadFile from "../commons/ui/accordion-upload-file";
+import { getUserInfo } from "../../store/sessionStore";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -109,7 +112,7 @@ export default function ModalCreateBarcodeDiscount({
   //print barcode
   const barcodeDiscountPrint = useAppSelector((state) => state.barcodeDiscountPrintSlice.state);
   const printInDetail = useAppSelector((state) => state.barcodeDiscountPrintSlice.inDetail);
-  const [valuePrints, setValuePrints] = React.useState<any>({ 
+  const [valuePrints, setValuePrints] = React.useState<any>({
     action: Action.INSERT,
     dialogTitle: 'พิมพ์บาร์โค้ด',
     printNormal: true,
@@ -120,6 +123,14 @@ export default function ModalCreateBarcodeDiscount({
   });
   const [openModalPrint, setOpenModalPrint] = React.useState(false);
   const [printHistoryRows, setPrintHistoryRows] = React.useState<any>([]);
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
+  const [attachFileOlds, setAttachFileOlds] = React.useState<any>([]);
+  const [attachFileError, setAttachFileError] = React.useState('');
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+  const [alertTextError, setAlertTextError] = React.useState('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
+    ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -144,7 +155,11 @@ export default function ModalCreateBarcodeDiscount({
   const handleCloseModalConfirmApprove = (confirm: boolean) => {
     setOpenModalConfirmApprove(false);
     if (confirm) {
-      handleApprove();
+      if (!payloadBarcodeDiscount.percentDiscount && Number(BDStatus.DRAFT) >= status) {
+        handleSendForApproval(dataDetail.id);
+      } else {
+        handleApprove();
+      }
     }
   };
 
@@ -234,8 +249,23 @@ export default function ModalCreateBarcodeDiscount({
           approvalNote: barcodeDiscountDetail.rejectReason
         })
       );
+      //set value for attach files
+      if (barcodeDiscountDetail.attachFiles && barcodeDiscountDetail.attachFiles.length > 0) {
+        let lstAttachFile: any = [];
+        for (let item of barcodeDiscountDetail.attachFiles) {
+          lstAttachFile.push({
+            file: null,
+            fileKey: item.key,
+            fileName: item.name,
+            status: 'old',
+            mimeType: item.mimeType,
+          });
+        }
+        setAttachFileOlds(lstAttachFile);
+        setUploadFileFlag(true);
+      }
       //set value for products
-      if (barcodeDiscountDetail.products != null && barcodeDiscountDetail.products.length > 0) {
+      if (barcodeDiscountDetail.products && barcodeDiscountDetail.products.length > 0) {
         let lstProductDetail: any = [];
         for (let item of barcodeDiscountDetail.products) {
           lstProductDetail.push({
@@ -376,15 +406,75 @@ export default function ModalCreateBarcodeDiscount({
     return isValid;
   }
 
+  const handleOnChangeUploadFile = (status: boolean) => {
+    setUploadFileFlag(status);
+    setAttachFileError('');
+  };
+
+  const onDeleteAttachFileOld = (item: any) => {
+    let attachFileData = _.cloneDeep(attachFileOlds);
+    let attachFileDataFilter = attachFileData.filter((it: any) => it.fileKey !== item.fileKey);
+    setAttachFileOlds(attachFileDataFilter);
+  };
+
+  const handleUploadAttachFile = async () => {
+    try {
+      const formData = new FormData();
+      for (const it of fileUploadList) {
+        formData.append('attachFile', it);
+      }
+      const rs = await uploadAttachFile(formData);
+      if (rs) {
+        return rs;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   const handleCreateDraft = async (sendRequest: boolean) => {
+    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     if (validate(false)) {
+      let allAttachFile = [];
+      if (fileUploadList && fileUploadList.length > 0) {
+        const rsUploadAttachFile = await handleUploadAttachFile();
+        if (rsUploadAttachFile.data && rsUploadAttachFile.data.length > 0) {
+          allAttachFile.push(...rsUploadAttachFile.data);
+        } else {
+          setAlertTextError(rsUploadAttachFile.message ? rsUploadAttachFile.message : 'อัปโหลดไฟล์แนบไม่สำเร็จ');
+          setOpenModalError(true);
+          return;
+        }
+      }
+      if (attachFileOlds && attachFileOlds.length > 0) {
+        for (const oldFile of attachFileOlds) {
+          let attachFileExist = allAttachFile.find((itAll: any) => itAll.name === oldFile.fileName);
+          if (objectNullOrEmpty(attachFileExist)) {
+            allAttachFile.push({
+              key: oldFile.fileKey,
+              name: oldFile.fileName,
+              mimeType: oldFile.mimeType
+            });
+          }
+        }
+      }
       const rsCheckStock = await handleCheckStock();
       if (rsCheckStock) {
         await dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount }));
         try {
           const body = !!dataDetail.id
-            ? { ...payloadBarcodeDiscount, id: dataDetail.id, documentNumber: dataDetail.documentNumber }
-            : payloadBarcodeDiscount;
+            ? {
+              ...payloadBarcodeDiscount,
+              id: dataDetail.id,
+              documentNumber: dataDetail.documentNumber,
+              attachFiles: allAttachFile
+            }
+            : {
+              ...payloadBarcodeDiscount,
+              attachFiles: allAttachFile
+            };
           const rs = await saveDraftBarcodeDiscount(body);
           if (rs.code === 201) {
             if (!sendRequest) {
@@ -392,6 +482,23 @@ export default function ModalCreateBarcodeDiscount({
               setOpenPopupModal(true);
               setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
               if (onSearchBD) onSearchBD();
+            }
+            if (rs && rs.data) {
+              if (rs.data.attachFiles && rs.data.attachFiles.length > 0) {
+                let lstAttachFile: any = [];
+                for (let item of rs.data.attachFiles) {
+                  lstAttachFile.push({
+                    file: null,
+                    fileKey: item.key,
+                    fileName: item.name,
+                    status: 'old',
+                    mimeType: item.mimeType,
+                  });
+                }
+                await setUploadFileFlag(true);
+                await setAttachFileOlds(lstAttachFile);
+                await dispatch(uploadFileState([]));
+              }
             }
             dispatch(
               updateDataDetail({
@@ -402,7 +509,11 @@ export default function ModalCreateBarcodeDiscount({
               })
             );
             if (sendRequest) {
-              handleSendForApproval(rs.data.id);
+              if (!payloadBarcodeDiscount.percentDiscount && Number(BDStatus.DRAFT) >= status) {
+                handleOpenModalConfirmApprove();
+              } else {
+                handleSendForApproval(rs.data.id);
+              }
             }
           } else if (rs.code === 50004) {
             setListProducts(rs.data);
@@ -425,10 +536,15 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleSendForApproval = async (id: string) => {
+    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    //validate attach file
+    if (fileUploadList.length === 0 && attachFileOlds.length === 0) {
+      setAttachFileError('กรุณาแนบไฟล์เอกสาร');
+      return;
+    }
     try {
       const rs = await sendForApprovalBarcodeDiscount(id);
-
-      if (rs.code === 200) {
+      if (rs.code === 20000) {
         dispatch(
           updateDataDetail({
             ...dataDetail,
@@ -437,6 +553,17 @@ export default function ModalCreateBarcodeDiscount({
         );
         setOpenPopup(true);
         setPopupMsg('คุณได้ส่งอนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
+        handleClose();
+        if (onSearchBD) onSearchBD();
+      } else if (rs.code === 20001) {
+        dispatch(
+          updateDataDetail({
+            ...dataDetail,
+            status: Number(BDStatus.APPROVED),
+          })
+        );
+        setOpenPopup(true);
+        setPopupMsg('คุณได้อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
         handleClose();
         if (onSearchBD) onSearchBD();
       } else if (rs.code === 50004) {
@@ -451,6 +578,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleApprove = async () => {
+    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     if (validate(true)) {
       try {
         const rs = await approveBarcodeDiscount(dataDetail.id, payloadBarcodeDiscount.products);
@@ -484,6 +612,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleDeleteDraft = async () => {
+    setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     if (status) {
       try {
         const rs = await cancelBarcodeDiscount(dataDetail.id);
@@ -794,7 +923,7 @@ export default function ModalCreateBarcodeDiscount({
                 สาขา :
               </Grid>
               <Grid item xs={8}>
-                0002 - สาขาที่00013 ท่าวัด
+                {currentBranch}
               </Grid>
             </Grid>
             <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
@@ -819,10 +948,28 @@ export default function ModalCreateBarcodeDiscount({
                     <FormControlLabel
                       value='amount'
                       control={<Radio disabled={status > 1}/>}
-                      label='ยอดลดเป็นจำนวนเงิน (บาท)'
+                      label='ยอดลดแบบ 5-7 เดือน เป็นจำนวนเงิน(บาท)'
                     />
                   </RadioGroup>
                 </FormControl>
+              </Grid>
+            </Grid>
+            <Grid container item xs={6}
+                  sx={{ marginBottom: '15px'}}>
+              <Grid item xs={4}>
+                แนบรูปสินค้าขอส่วนลด :
+              </Grid>
+              <Grid item xs={8}>
+                <AccordionUploadFile
+                  files={attachFileOlds}
+                  docNo={dataDetail ? dataDetail.documentNumber : ''}
+                  docType='BD'
+                  isStatus={uploadFileFlag}
+                  onChangeUploadFile={handleOnChangeUploadFile}
+                  onDeleteAttachFile={onDeleteAttachFileOld}
+                  enabledControl={Number(BDStatus.DRAFT) === status}
+                  warningMessage={attachFileError}
+                />
               </Grid>
             </Grid>
           </Grid>
@@ -948,7 +1095,7 @@ export default function ModalCreateBarcodeDiscount({
       <AlertError
         open={openModalError}
         onClose={handleCloseModalError}
-        textError={'กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง'}
+        textError={alertTextError}
       />
       <ModalCheckStock
         open={openCheckStock}
