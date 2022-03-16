@@ -27,8 +27,11 @@ export default function Notification() {
     },
   });
   const classes = useStyles();
-  const [listData, setListData] = React.useState([]);
+  const [listData, setListData] = React.useState<any[]>([]);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
+  const [page, setPage] = React.useState(0);
+  const [totalPage, setTotalPage] = React.useState(1);
+  const [isFetching, setIsFetching] = React.useState(false);
 
   const userInfo: KeyCloakTokenInfo = getUserInfo();
 
@@ -41,8 +44,37 @@ export default function Notification() {
       : [];
 
   useEffect(() => {
-    onGetData();
+    moreData();
+    window.addEventListener("scroll", isScrolling);
+    return () => window.removeEventListener("scroll", isScrolling)
   }, []);
+  
+   const moreData = async ()=> {
+    try {
+      if(totalPage > page){
+        setOpenLoadingModal(true);
+        const rs = await get(`${environment.task.notification.url}?page=${page+1}&perPage=10`);
+        if (rs && rs.data) {
+          setListData([...listData, ...rs.data]);
+          setPage(rs.page)
+          setTotalPage(rs.totalPage);
+          setIsFetching(false)
+        }
+        setOpenLoadingModal(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    
+    setIsFetching(false)
+  }
+
+  const isScrolling =()=>{
+    if(window.innerHeight + document.documentElement.scrollTop!==document.documentElement.offsetHeight){
+      return;
+    }
+    setIsFetching(true)
+  }
 
   const onGetData = async () => {
     setOpenLoadingModal(true);
@@ -50,12 +82,19 @@ export default function Notification() {
       const rs = await get(`${environment.task.notification.url}?page=1&perPage=10`);
       if (rs && rs.data) {
         setListData(rs.data);
+        setTotalPage(rs.totalPage);
       }
     } catch (error) {
       console.log(error);
     }
     setOpenLoadingModal(false);
   };
+
+  useEffect(() => {
+    if (isFetching){
+      moreData();
+    }
+  }, [isFetching]);
 
   return (
     <>
