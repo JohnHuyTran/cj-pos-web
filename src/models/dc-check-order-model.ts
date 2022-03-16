@@ -80,6 +80,11 @@ export interface CheckOrderDetailItims {
   qtyDiff: number;
   comment: string;
   docNo?: string;
+  id?: string;
+}
+
+export interface ItemsState {
+  itemId: string;
 }
 
 export interface DCOrderApproveRequest {

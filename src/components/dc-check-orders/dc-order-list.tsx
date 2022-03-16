@@ -10,7 +10,7 @@ import DCOrderDetail from './dc-ckeck-order-detail';
 // import { makeStyles } from '@mui/styles';
 import { useStyles } from '../../styles/makeTheme';
 import Done from '@mui/icons-material/Done';
-import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
+import { featchorderDetailDCAsync, setItemId } from '../../store/slices/dc-check-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 import { PanoramaSharp } from '@mui/icons-material';
 import { saveSearchCriteriaDc } from '../../store/slices/save-search-order-dc-slice';
@@ -202,6 +202,7 @@ function DCOrderList() {
 
     try {
       await dispatch(featchorderDetailDCAsync(params.row.id));
+      await dispatch(setItemId(params.row.id));
       setOpensDCOrderDetail(true);
     } catch (error) {
       console.log(error);

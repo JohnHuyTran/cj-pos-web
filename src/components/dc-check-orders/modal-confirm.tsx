@@ -50,21 +50,23 @@ export default function ModelConfirm({
 
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-    // const payload: DCOrderApproveRequest = {
-    //   dcComment: comment,
-    // };
+    const payload: DCOrderApproveRequest = {
+      dcComment: comment,
+    };
     // await approveDCOrderShipments(idDC, payload).then(
     //   function (value) {
     //     updateDCOrder();
-    //     onUpdateAction(true, "");
+    //     onUpdateAction(true, '');
     //   },
     //   function (error: ApiError) {
-    //     console.log("error : " + JSON.stringify(error));
+    //     console.log('error : ' + JSON.stringify(error));
     //     onUpdateAction(false, error.message);
     //   }
     // );
+
     updateDCOrder();
     onUpdateAction(true, '');
+
     handleOpenLoading('open', false);
     onClose();
   };

@@ -6,10 +6,11 @@ import { CheckOrderDetailItims } from '../../models/dc-check-order-model';
 
 import { useStyles } from '../../styles/makeTheme';
 import Typography from '@mui/material/Typography';
-import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
+import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
 
 interface Props {
   items: [];
+  clearCommment: () => void;
 }
 
 const columns: GridColDef[] = [
@@ -118,7 +119,7 @@ var calProductDiff = function (params: GridValueGetterParams) {
   return diff;
 };
 
-export default function DCOrderEntries({ items }: Props): ReactElement {
+export default function DCOrderEntries({ items, clearCommment }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const rows = items.map((item: CheckOrderDetailItims, index: number) => {
@@ -145,6 +146,8 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
     if (fieldName === 'docNo') {
       try {
         await dispatch(featchorderDetailDCAsync('623047a0283ab8738c0b6a1e'));
+        await dispatch(setReloadScreen(true));
+        clearCommment();
       } catch (error) {
         console.log(error);
       }

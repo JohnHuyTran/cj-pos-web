@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 import ModelConfirm from './modal-confirm';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ContentPaste } from '@mui/icons-material';
-import { useAppDispatch, useAppSelector } from '../../store/store';
+import store, { useAppDispatch, useAppSelector } from '../../store/store';
 import { getDCStatus, getSdType } from '../../utils/utils';
 import DCOrderDetailList from './dc-check-order-detail-list';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
@@ -22,6 +22,7 @@ import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice'
 import { isAllowActionPermission } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
+import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
 
 interface Props {
   isOpen: boolean;
@@ -56,14 +57,13 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
   const [characterCount, setCharacterCount] = React.useState(0);
   const [disableCheckBtn, setDisableCheckBtn] = React.useState(true);
+  const detailDC: any = orderDetailList.data ? orderDetailList.data : null;
+  const detailDCItems = detailDC.items ? detailDC.items : [];
   useEffect(() => {
     setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
     setOpen(isOpen);
     setValueCommentDC(detailDC.dcComment);
   }, [open]);
-
-  const detailDC: any = orderDetailList.data ? orderDetailList.data : null;
-  const detailDCItems = detailDC.items ? detailDC.items : [];
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -76,6 +76,10 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       setCharacterCount(event.target.value.length);
       setValueCommentDC(value);
     }
+  };
+
+  const handleClearComment = () => {
+    setValueCommentDC('');
   };
 
   const handlCheckedButton = () => {
@@ -99,19 +103,27 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const handleModelConfirm = () => {
     setOpenModelConfirm(false);
   };
-
   const payloadSearchDC = useAppSelector((state) => state.saveSearchOrderDc.searchCriteriaDc);
 
   const handleGenerateBOStatus = async (issuccess: boolean, errorMsg: string) => {
     handleOpenLoading('open', true);
+    const isRefreshScreen = store.getState().dcCheckOrderDetail.isReloadScreen;
     const msg = issuccess ? 'ตรวจสอบผลต่าง(DC) สำเร็จ' : errorMsg;
     setShowSnackBar(true);
     setContentMsg(msg);
     setApproveDCStatus(issuccess);
-    if (issuccess) {
+    if (issuccess && !isRefreshScreen) {
       await dispatch(featchOrderListDcAsync(payloadSearchDC));
       setTimeout(() => {
         handleClose();
+      }, 500);
+    } else if (issuccess && isRefreshScreen) {
+      await dispatch(featchOrderListDcAsync(payloadSearchDC));
+      const itemId = store.getState().dcCheckOrderDetail.itemId;
+      await dispatch(featchorderDetailDCAsync(itemId));
+      handleOpenLoading('open', false);
+      setTimeout(() => {
+        handleCloseSnackBar();
       }, 500);
     } else {
       handleOpenLoading('open', false);
@@ -199,7 +211,8 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     fullWidth
                     rows={4}
                     onChange={handleChangeCommentDC}
-                    defaultValue={valueCommentDC}
+                    // defaultValue={valueCommentDC}
+                    value={valueCommentDC}
                     placeholder='ความยาวไม่เกิน 100 ตัวอักษร'
                     className={classes.MtextFieldRemark}
                     inputProps={{ maxLength: 100 }}
@@ -253,7 +266,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
               </Grid>
             </Grid>
           </Box>
-          {detailDCItems !== [] && <DCOrderDetailList items={detailDCItems} />}
+          {detailDCItems !== [] && <DCOrderDetailList items={detailDCItems} clearCommment={handleClearComment} />}
         </DialogContent>
       </Dialog>
 
