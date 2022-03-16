@@ -452,7 +452,7 @@ function STCreateModal({
       if (rs.code === 20000) {
         setStatus(2);
         setOpenPopup(true);
-        setPopupMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว');
         handleClose();
         if (onSearch) onSearch();
       } else {
