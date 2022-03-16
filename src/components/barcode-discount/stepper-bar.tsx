@@ -5,6 +5,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { useStyles } from '../../styles/makeTheme';
 import { ReactElement } from 'react';
+import { BDStatus } from "../../utils/enum/common-enum";
 
 interface Props {
   activeStep: number;
@@ -17,13 +18,17 @@ export default function StepperBar({
   setActiveStep,
 }: Props): ReactElement {
   const [rejected, setRejected] = React.useState<boolean>(false);
+  const [expired, setExpired] = React.useState<boolean>(false);
   const [activeStepBar, setActiveStepBar] = React.useState(0);
 
   React.useEffect(() => {
-    if (activeStep === 5) {
+    if (activeStep === Number(BDStatus.REJECT)) {
       setRejected(true);
       setActiveStepBar(3);
-    } else {
+    } else if (activeStep === Number(BDStatus.ALREADY_EXPIRED)) {
+      setExpired(true);
+      setActiveStepBar(4);
+    } else{
       setActiveStepBar(activeStep);
     }
   }, [activeStep, open]);
@@ -37,6 +42,10 @@ export default function StepperBar({
             const labelProps: any = {};
             if (index === 2 && rejected) {
               label = 'ไม่อนุมัติ';
+              labelProps.error = true;
+            }
+            if (index === 3 && expired){
+              label = 'สินค้าหมดอายุ';
               labelProps.error = true;
             }
 

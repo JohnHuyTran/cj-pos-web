@@ -112,10 +112,12 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
       if (printAgain) {
         let lstOfProduct = [];
         for (const item of printAgainRows) {
-          lstOfProduct.push({
-            productBarcode: item.barcode,
-            numberOfPrinting: item.numberOfPrinting
-          });
+          if (item.numberOfPrinting > 0) {
+            lstOfProduct.push({
+              productBarcode: item.barcode,
+              numberOfPrinting: item.numberOfPrinting
+            });
+          }
         }
         payload.push({
           id: (values.ids && values.ids.length > 0) ? values.ids[0] : '',

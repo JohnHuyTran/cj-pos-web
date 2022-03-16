@@ -362,7 +362,7 @@ const useStyles = makeStyles({
     borderRadius: '4px !important',
   },
   MLabelBDStatus: {
-    padding: '1px 20px 1px 20px',
+    padding: '1px 15px 1px 15px',
     borderRadius: '8px',
     // width: "100px",
     textAlign: 'center',
