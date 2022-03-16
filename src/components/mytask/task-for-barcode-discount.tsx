@@ -30,9 +30,7 @@ export default function TaskForApprover(props: TaskType) {
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail);
-
-  const isApprover = props.permission === 'approver';
-  console.log(isApprover);
+  const status = props.payload.status;
 
   const handleCloseDetail = () => {
     setOpenDetail(false);
@@ -80,16 +78,9 @@ export default function TaskForApprover(props: TaskType) {
             <Grid item xs={1} sx={{}}>
               <Typography
                 sx={{
-                  backgroundColor: isApprover
-                    ? '#FFE9B1'
-                    : !isApprover && props.payload.status === 5
-                    ? '#FFD7D7'
-                    : '#E7FFE9',
-                  color: isApprover
-                    ? 'rgba(251, 166, 0, 1)'
-                    : !isApprover && props.payload.status === 5
-                    ? '#F54949'
-                    : '#36C690',
+                  backgroundColor: status === 3 ? '#FFE9B1' : status === 4 ? '#E7FFE9' : status === 5 ? '#FFD7D7' : '',
+                  color:
+                    status === 3 ? 'rgba(251, 166, 0, 1)' : status === 4 ? '#36C690' : status === 5 ? '#F54949' : '',
                   textAlign: 'center',
                   paddingTop: '4px',
                   paddingBottom: '5px',
@@ -97,8 +88,7 @@ export default function TaskForApprover(props: TaskType) {
                   cursor: 'pointer',
                 }}
               >
-                {isApprover && 'รออนุมัติ'}
-                {!isApprover && props.payload.status === 5 ? 'ไม่อนุมัติ' : 'อนุมัติ'}
+                {status === 3 ? 'รออนุมัติ' : status === 4 ? 'อนุมัติ' : status === 5 ? 'ไม่อนุมัติ' : null}
               </Typography>
             </Grid>
           </Grid>
