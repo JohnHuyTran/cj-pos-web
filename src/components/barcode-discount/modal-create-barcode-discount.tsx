@@ -38,7 +38,7 @@ import {
 } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
-import { objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
+import { getBranchName, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import { Action, BDStatus, DateFormat } from '../../utils/enum/common-enum';
 import ModalCheckStock from './modal-check-stock';
 import ModalCheckPrice from './modal-check-price';
@@ -53,6 +53,7 @@ import { getReasonForPrintText } from "../../utils/enum/barcode-discount-enum";
 import { getBarcodeDiscountDetail } from "../../store/slices/barcode-discount-detail-slice";
 import { uploadFileState } from "../../store/slices/upload-file-slice";
 import AccordionUploadFile from "../commons/ui/accordion-upload-file";
+import { getUserInfo } from "../../store/sessionStore";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -127,6 +128,9 @@ export default function ModalCreateBarcodeDiscount({
   const [attachFileError, setAttachFileError] = React.useState('');
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [alertTextError, setAlertTextError] = React.useState('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
+    ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -152,7 +156,7 @@ export default function ModalCreateBarcodeDiscount({
     setOpenModalConfirmApprove(false);
     if (confirm) {
       if (!payloadBarcodeDiscount.percentDiscount && Number(BDStatus.DRAFT) >= status) {
-        handleCreateDraft(true);
+        handleSendForApproval(dataDetail.id);
       } else {
         handleApprove();
       }
@@ -421,7 +425,7 @@ export default function ModalCreateBarcodeDiscount({
       }
       const rs = await uploadAttachFile(formData);
       if (rs) {
-        return rs.data;
+        return rs;
       } else {
         return null;
       }
@@ -436,10 +440,10 @@ export default function ModalCreateBarcodeDiscount({
       let allAttachFile = [];
       if (fileUploadList && fileUploadList.length > 0) {
         const rsUploadAttachFile = await handleUploadAttachFile();
-        if (rsUploadAttachFile && rsUploadAttachFile.length > 0) {
-          allAttachFile.push(...rsUploadAttachFile);
+        if (rsUploadAttachFile.data && rsUploadAttachFile.data.length > 0) {
+          allAttachFile.push(...rsUploadAttachFile.data);
         } else {
-          setAlertTextError('อัปโหลดไฟล์แนบไม่สำเร็จ');
+          setAlertTextError(rsUploadAttachFile.message ? rsUploadAttachFile.message : 'อัปโหลดไฟล์แนบไม่สำเร็จ');
           setOpenModalError(true);
           return;
         }
@@ -505,7 +509,11 @@ export default function ModalCreateBarcodeDiscount({
               })
             );
             if (sendRequest) {
-              handleSendForApproval(rs.data.id);
+              if (!payloadBarcodeDiscount.percentDiscount && Number(BDStatus.DRAFT) >= status) {
+                handleOpenModalConfirmApprove();
+              } else {
+                handleSendForApproval(rs.data.id);
+              }
             }
           } else if (rs.code === 50004) {
             setListProducts(rs.data);
@@ -524,11 +532,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleSendRequest = () => {
-    if (!payloadBarcodeDiscount.percentDiscount && Number(BDStatus.DRAFT) >= status) {
-      handleOpenModalConfirmApprove();
-    } else {
-      handleCreateDraft(true);
-    }
+    handleCreateDraft(true);
   };
 
   const handleSendForApproval = async (id: string) => {
@@ -919,7 +923,7 @@ export default function ModalCreateBarcodeDiscount({
                 สาขา :
               </Grid>
               <Grid item xs={8}>
-                0002 - สาขาที่00013 ท่าวัด
+                {currentBranch}
               </Grid>
             </Grid>
             <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
@@ -951,7 +955,7 @@ export default function ModalCreateBarcodeDiscount({
               </Grid>
             </Grid>
             <Grid container item xs={6}
-                  sx={{ marginBottom: '15px', display: Number(BDStatus.DRAFT) <= status ? undefined : 'none' }}>
+                  sx={{ marginBottom: '15px'}}>
               <Grid item xs={4}>
                 แนบรูปสินค้าขอส่วนลด :
               </Grid>

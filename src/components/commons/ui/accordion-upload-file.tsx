@@ -215,12 +215,18 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
   };
 
   const handleDeleteAttachFile = (file: any) => {
+    //handle custom delete attach file
     if (file.status === 'new') {
       setFileList(fileList.filter((r: any) => r.name !== file.fileName));
     } else if (file.status === 'old') {
       if (onDeleteAttachFile) onDeleteAttachFile(file);
     }
   };
+
+  const handleFileInputClick = (e: any) => {
+    //handle attach file again after remove this file
+    e.target.value = '';
+  }
 
   const closeDialogConfirm = (value: string) => {
     setErrorBrowseFile(false);
@@ -254,6 +260,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
         // onDrop
         accept='.pdf, .jpg, .jpeg'
         onChange={handleFileInputChange}
+        onClick={handleFileInputClick}
         style={{ display: 'none' }}
         disabled={newFileDisplayList.length === 5 || !enabledControl}
       />
