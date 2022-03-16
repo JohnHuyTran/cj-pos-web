@@ -159,7 +159,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     },
     {
       field: 'documentNumber',
-      headerName: 'เลขที่เอกสาร PI',
+      headerName: 'เลขที่เอกสาร ST',
       headerAlign: 'center',
       sortable: false,
       minWidth: 170,
