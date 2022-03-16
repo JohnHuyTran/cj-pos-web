@@ -47,7 +47,7 @@ export default function Notification() {
   const onGetData = async () => {
     setOpenLoadingModal(true);
     try {
-      const rs = await get(`/task/notifications?page=1&perPage=10`);
+      const rs = await get(`${environment.task.notification.url}?page=1&perPage=10`);
       if (rs && rs.data) {
         setListData(rs.data);
       }

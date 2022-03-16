@@ -56,6 +56,11 @@ export const environment = {
       },
     },
   },
+  task: {
+    notification: {
+      url: '/task/notifications',
+    },
+  },
   sell: {
     barcodeDiscount: {
       search: {
