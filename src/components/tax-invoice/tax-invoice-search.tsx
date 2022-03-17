@@ -41,10 +41,16 @@ export default function TaxInvoiceSearch() {
     setValues({ ...values, [event.target.name]: value });
   };
 
-  const onClickClearBtn = () => {
+  const onClickClearBtn = async () => {
     setValues({
       docNo: '',
     });
+    const payload: TaxInvoiceRequest = {
+      limit: limit ? limit.toString() : '10',
+      page: page,
+      docNo: values.docNo,
+    };
+    await dispatch(savePayloadSearchList(payload));
     setFlagSearch(false);
   };
 

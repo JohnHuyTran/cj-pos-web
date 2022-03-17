@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
-import { TaxInvoiceDetailResponse } from '../../models/tax-invoice-model';
+import { TaxInvoiceDetailResponse, TaxInvoiceRequest } from '../../models/tax-invoice-model';
 
 type State = {
   detail: TaxInvoiceDetailResponse;
@@ -18,7 +18,7 @@ const initialState: State = {
   error: '',
 };
 
-export const featchTaxInvoiceDetailAsync = createAsyncThunk('TaxInvoiceDetail', async () => {
+export const featchTaxInvoiceDetailAsync = createAsyncThunk('TaxInvoiceDetail', async (payload: TaxInvoiceRequest) => {
   try {
     const path = environment.sale.taxInvoice.detail.url;
     let response = await get(path).then();

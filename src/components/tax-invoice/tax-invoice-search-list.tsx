@@ -1,17 +1,23 @@
 import React from 'react';
-import { Grid, TextField, Typography } from '@mui/material';
+import { Chip, Grid, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/material';
 import { useStyles } from '../../styles/makeTheme';
 import { Button } from '@mui/material';
-import { DataGrid, GridColDef, GridRowData } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { CheckOrderResponse } from '../../models/dc-check-order-model';
-import { featchTaxInvoiceListAsync } from '../../store/slices/tax-invoice-search-list-slice';
+import { CheckOrderInfo, CheckOrderResponse } from '../../models/dc-check-order-model';
+import { featchTaxInvoiceListAsync, savePayloadSearchList } from '../../store/slices/tax-invoice-search-list-slice';
 import { TaxInvoiceRequest } from '../../models/tax-invoice-model';
+import { convertUtcToBkkDate } from '../../utils/date-utill';
+import { getSdType } from '../../utils/utils';
+import { featchTaxInvoiceDetailAsync } from '../../store/slices/tax-invoice-search-detail-slice';
+import { useTranslation } from 'react-i18next';
 
 export default function TaxInvoiceSearchList() {
   const classes = useStyles();
+  const { t } = useTranslation(['taxInvoice', 'common']);
   const dispatch = useAppDispatch();
+  const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const items = useAppSelector((state) => state.dcCheckOrderList);
   const cuurentPage = useAppSelector((state) => state.dcCheckOrderList.orderList.page);
   const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
@@ -29,7 +35,7 @@ export default function TaxInvoiceSearchList() {
     {
       field: 'billNo',
       headerName: 'เลขที่ใบเสร็จ(ย่อ)',
-      minWidth: 140,
+      minWidth: 200,
       headerAlign: 'center',
       sortable: false,
     },
@@ -42,17 +48,36 @@ export default function TaxInvoiceSearchList() {
       sortable: false,
     },
     {
-      field: 'billStatus',
+      field: 'billStatusDisplay',
       headerName: 'สถานะ(ย่อ)',
       minWidth: 128,
       // flex: 1.2,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => {
+        if (params.value === 0 || params.value === 1) {
+          return (
+            <Chip
+              label={t(`status.${params.value}`)}
+              size='small'
+              sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
+            />
+          );
+        } else if (params.value === 'COMPLETED') {
+          return (
+            <Chip
+              label={t(`status.${params.value}`)}
+              size='small'
+              sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
+            />
+          );
+        }
+      },
     },
     {
       field: 'taxInvoiceNo',
       headerName: 'เลขที่ใบเสร็จ(เต็ม)',
-      minWidth: 150,
+      minWidth: 200,
       flex: 0.9,
       headerAlign: 'center',
       sortable: false,
@@ -76,25 +101,57 @@ export default function TaxInvoiceSearchList() {
     },
   ];
 
-  const rows: [] = [];
+  const rows = res.data.map((data: CheckOrderInfo, indexs: number) => {
+    return {
+      id: data.id,
+      index: (cuurentPage - 1) * parseInt(pageSize) + indexs + 1,
+      billNo: data.docRefNo,
+      billCreateDate: convertUtcToBkkDate(data.receivedDate),
+      billStatusDisplay: data.sdType,
+      billStatus: data.sdType,
+      taxInvoiceNo: data.docRefNo,
+      taxInvoicePrintedDate: convertUtcToBkkDate(data.receivedDate),
+      taxInvoicePrintedCount: '1',
+    };
+  });
 
   const [loading, setLoading] = React.useState<boolean>(false);
+
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
+    let page: string = (newPage + 1).toString();
+    const payload: TaxInvoiceRequest = {
+      limit: pageSize.toString(),
+      page: page,
+      docNo: payloadSearch.docNo,
+    };
+    await dispatch(featchTaxInvoiceListAsync(payload));
+    await dispatch(savePayloadSearchList(payload));
+    setLoading(false);
   };
+
   const handlePageSizeChange = async (pageSize: number) => {
+    setLoading(true);
     setPageSize(pageSize.toString());
     const payload: TaxInvoiceRequest = {
       limit: pageSize.toString(),
       page: '1',
-      docNo: '',
+      docNo: payloadSearch.docNo,
     };
-    setLoading(true);
-    await featchTaxInvoiceListAsync(payload);
+
+    await dispatch(featchTaxInvoiceListAsync(payload));
+    await dispatch(savePayloadSearchList(payload));
     setLoading(false);
   };
 
-  const currentlySelected = () => {};
+  const currentlySelected = async (params: GridCellParams) => {
+    console.log('param: ', params);
+    console.log('billNo: ', params.row.billNo);
+    if (params.row.billStatus === '') {
+      const payload: TaxInvoiceRequest = {};
+      await dispatch(featchTaxInvoiceDetailAsync(payload));
+    }
+  };
 
   return (
     <div>
