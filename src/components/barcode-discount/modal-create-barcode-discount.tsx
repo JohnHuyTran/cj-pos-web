@@ -239,6 +239,16 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   useEffect(() => {
+    //handle init percentDiscount in payloadBarcodeDiscount
+    dispatch(
+      saveBarcodeDiscount({
+        ...payloadBarcodeDiscount,
+        percentDiscount: valueRadios === 'percent',
+      })
+    );
+  }, []);
+
+  useEffect(() => {
     setStatus(dataDetail.status);
   }, [dataDetail.status]);
 
