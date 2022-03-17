@@ -8,6 +8,8 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { TaxInvoiceRequest } from '../../models/tax-invoice-model';
 import { featchTaxInvoiceListAsync, savePayloadSearchList } from '../../store/slices/tax-invoice-search-list-slice';
 import LoadingModal from '../commons/ui/loading-modal';
+import { ACTIONS } from '../../utils/enum/permission-enum';
+import { isAllowActionPermission } from '../../utils/role-permission';
 
 interface State {
   docNo: string;
@@ -20,7 +22,8 @@ export default function TaxInvoiceSearch() {
   const classes = useStyles();
   const page = '1';
   const dispatch = useAppDispatch();
-  const [disableSearchBtn, setDisableSearchBtn] = React.useState(false);
+  const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
+  const [hideSearchBtn, setHideSearchBtn] = React.useState(true);
   const [values, setValues] = React.useState<State>({
     docNo: '',
   });
@@ -38,7 +41,16 @@ export default function TaxInvoiceSearch() {
 
   const handleChange = (event: any) => {
     const value = event.target.value;
+  };
+
+  const onChangeDocNo = (event: any) => {
+    const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
+    if (value.length >= 6) {
+      setDisableSearchBtn(false);
+    } else {
+      setDisableSearchBtn(true);
+    }
   };
 
   const onClickClearBtn = async () => {
@@ -73,6 +85,9 @@ export default function TaxInvoiceSearch() {
     handleOpenLoading('open', false);
   };
 
+  React.useEffect(() => {
+    setHideSearchBtn(isAllowActionPermission(ACTIONS.SALE_TAX_INVOICE_VIEW));
+  }, []);
   return (
     <>
       <Box>
@@ -86,7 +101,7 @@ export default function TaxInvoiceSearch() {
               name='docNo'
               size='small'
               value={values.docNo}
-              onChange={handleChange}
+              onChange={onChangeDocNo}
               className={classes.MtextField}
               fullWidth
               placeholder='เลขที่ใบเสร็จ/ใบกำกับ'
@@ -112,9 +127,10 @@ export default function TaxInvoiceSearch() {
                 variant='contained'
                 color='primary'
                 onClick={onClickSearchBtn}
-                sx={{ width: '45%', ml: 1, display: `${disableSearchBtn ? 'none' : ''}` }}
+                sx={{ width: '45%', ml: 1, display: `${hideSearchBtn ? 'none' : ''}` }}
                 className={classes.MbtnSearch}
-                fullWidth={true}>
+                fullWidth={true}
+                disabled={disableSearchBtn}>
                 ค้นหา
               </Button>
             </Grid>
