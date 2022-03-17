@@ -95,6 +95,9 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
       }
     }
   };
+  const handleFileInputClick = (e: any) => {
+    e.target.value = '';
+  };
 
   const handleFileInputChange = (e: any) => {
     setStatusUpload(true);
@@ -239,6 +242,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
         // multiple
         // onDrop
         accept='.pdf, .jpg, .jpeg'
+        onClick={handleFileInputClick}
         onChange={handleFileInputChange}
         style={{ display: 'none' }}
       />
