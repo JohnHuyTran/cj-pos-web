@@ -78,9 +78,9 @@ export default function TaskForApprover(props: TaskType) {
             <Grid item xs={1} sx={{}}>
               <Typography
                 sx={{
-                  backgroundColor: status === 3 ? '#FFE9B1' : status === 4 ? '#E7FFE9' : status === 5 ? '#FFD7D7' : '',
+                  backgroundColor: status === 2 ? '#FFE9B1' : status === 3 ? '#E7FFE9' : status === 5 ? '#FFD7D7' : '',
                   color:
-                    status === 3 ? 'rgba(251, 166, 0, 1)' : status === 4 ? '#36C690' : status === 5 ? '#F54949' : '',
+                    status === 2 ? 'rgba(251, 166, 0, 1)' : status === 3 ? '#36C690' : status === 5 ? '#F54949' : '',
                   textAlign: 'center',
                   paddingTop: '4px',
                   paddingBottom: '5px',
@@ -88,7 +88,7 @@ export default function TaskForApprover(props: TaskType) {
                   cursor: 'pointer',
                 }}
               >
-                {status === 3 ? 'รออนุมัติ' : status === 4 ? 'อนุมัติ' : status === 5 ? 'ไม่อนุมัติ' : null}
+                {status === 2 ? 'รออนุมัติ' : status === 3 ? 'อนุมัติ' : status === 5 ? 'ไม่อนุมัติ' : null}
               </Typography>
             </Grid>
           </Grid>

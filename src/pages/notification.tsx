@@ -2,13 +2,12 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import LoadingModal from '../components/commons/ui/loading-modal';
 import Tasklist from '../components/mytask/task-list';
-import { environment } from '../environment-base';
 import React, { useEffect } from 'react';
 import { objectNullOrEmpty } from '../utils/utils';
 import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
 import { getUserInfo } from '../store/sessionStore';
 import { makeStyles } from '@mui/styles';
-import { get } from '../adapters/posback-adapter';
+import { getNotificationData } from '../services/notification';
 
 export default function Notification() {
   const useStyles = makeStyles({
@@ -45,41 +44,41 @@ export default function Notification() {
 
   useEffect(() => {
     moreData();
-    window.addEventListener("scroll", isScrolling);
-    return () => window.removeEventListener("scroll", isScrolling)
+    window.addEventListener('scroll', isScrolling);
+    return () => window.removeEventListener('scroll', isScrolling);
   }, []);
-  
-   const moreData = async ()=> {
+
+  const moreData = async () => {
     try {
-      if(totalPage > page){
+      if (totalPage > page) {
         setOpenLoadingModal(true);
-        const rs = await get(`${environment.task.notification.url}?page=${page+1}&perPage=10`);
+        const rs = await getNotificationData(page);
         if (rs && rs.data) {
           setListData([...listData, ...rs.data]);
-          setPage(rs.page)
+          setPage(rs.page);
           setTotalPage(rs.totalPage);
-          setIsFetching(false)
+          setIsFetching(false);
         }
         setOpenLoadingModal(false);
       }
     } catch (error) {
       console.log(error);
     }
-    
-    setIsFetching(false)
-  }
 
-  const isScrolling =()=>{
-    if(window.innerHeight + document.documentElement.scrollTop!==document.documentElement.offsetHeight){
+    setIsFetching(false);
+  };
+
+  const isScrolling = () => {
+    if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) {
       return;
     }
-    setIsFetching(true)
-  }
+    setIsFetching(true);
+  };
 
   const onGetData = async () => {
     setOpenLoadingModal(true);
     try {
-      const rs = await get(`${environment.task.notification.url}?page=1&perPage=10`);
+      const rs = await getNotificationData(0);
       if (rs && rs.data) {
         setListData(rs.data);
         setTotalPage(rs.totalPage);
@@ -91,7 +90,7 @@ export default function Notification() {
   };
 
   useEffect(() => {
-    if (isFetching){
+    if (isFetching) {
       moreData();
     }
   }, [isFetching]);
