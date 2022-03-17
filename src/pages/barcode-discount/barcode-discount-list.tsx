@@ -488,7 +488,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       <Box mt={2} bgcolor="background.paper">
         <div
           className={classes.MdataGridPaginationTop}
-          style={{ height: lstBarcodeDiscount.length >= 10 ? '62vh' : 'auto' }}
+          style={{ height: lstBarcodeDiscount.length >= 10 ? '60vh' : 'auto' }}
         >
           <DataGrid
             rows={lstBarcodeDiscount}
