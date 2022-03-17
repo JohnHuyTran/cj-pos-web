@@ -10,6 +10,7 @@ import { featchTaxInvoiceListAsync, savePayloadSearchList } from '../../store/sl
 import LoadingModal from '../commons/ui/loading-modal';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { isAllowActionPermission } from '../../utils/role-permission';
+import AlertError from '../commons/ui/alert-error';
 
 interface State {
   docNo: string;
@@ -22,7 +23,6 @@ export default function TaxInvoiceSearch() {
   const classes = useStyles();
   const page = '1';
   const dispatch = useAppDispatch();
-  const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const [hideSearchBtn, setHideSearchBtn] = React.useState(true);
   const [values, setValues] = React.useState<State>({
     docNo: '',
@@ -34,6 +34,13 @@ export default function TaxInvoiceSearch() {
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+  const [openFailAlert, setOpenFailAlert] = React.useState(false);
+  const [textFail, setTextFail] = React.useState('');
+
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail('');
+  };
 
   const items = useAppSelector((state) => state.dcCheckOrderList);
   const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
@@ -41,16 +48,7 @@ export default function TaxInvoiceSearch() {
 
   const handleChange = (event: any) => {
     const value = event.target.value;
-  };
-
-  const onChangeDocNo = (event: any) => {
-    const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
-    if (value.length >= 6) {
-      setDisableSearchBtn(false);
-    } else {
-      setDisableSearchBtn(true);
-    }
   };
 
   const onClickClearBtn = async () => {
@@ -63,26 +61,40 @@ export default function TaxInvoiceSearch() {
       docNo: values.docNo,
     };
     await dispatch(savePayloadSearchList(payload));
-    setDisableSearchBtn(true);
     setFlagSearch(false);
+  };
+
+  const validateForm = () => {
+    if (values.docNo.length < 6) {
+      setTextFail('กรุณาระบุเลขเอกสารอย่างน้อย 6 หลัก');
+      return false;
+    }
+
+    return true;
   };
 
   const onClickSearchBtn = async () => {
     handleOpenLoading('open', true);
-    let limits;
-    if (limit === 0 || limit === undefined) {
-      limits = '10';
+
+    if (validateForm()) {
+      let limits;
+      if (limit === 0 || limit === undefined) {
+        limits = '10';
+      } else {
+        limits = limit.toString();
+      }
+      const payload: TaxInvoiceRequest = {
+        limit: limits,
+        page: page,
+        docNo: values.docNo,
+      };
+      await dispatch(featchTaxInvoiceListAsync(payload));
+      await dispatch(savePayloadSearchList(payload));
+      setFlagSearch(true);
     } else {
-      limits = limit.toString();
+      setOpenFailAlert(true);
     }
-    const payload: TaxInvoiceRequest = {
-      limit: limits,
-      page: page,
-      docNo: values.docNo,
-    };
-    await dispatch(featchTaxInvoiceListAsync(payload));
-    await dispatch(savePayloadSearchList(payload));
-    setFlagSearch(true);
+
     handleOpenLoading('open', false);
   };
 
@@ -102,7 +114,7 @@ export default function TaxInvoiceSearch() {
               name='docNo'
               size='small'
               value={values.docNo}
-              onChange={onChangeDocNo}
+              onChange={handleChange}
               className={classes.MtextField}
               fullWidth
               placeholder='เลขที่ใบเสร็จ/ใบกำกับ'
@@ -130,8 +142,7 @@ export default function TaxInvoiceSearch() {
                 onClick={onClickSearchBtn}
                 sx={{ width: '45%', ml: 1, display: `${hideSearchBtn ? 'none' : ''}` }}
                 className={classes.MbtnSearch}
-                fullWidth={true}
-                disabled={disableSearchBtn}>
+                fullWidth={true}>
                 ค้นหา
               </Button>
             </Grid>
@@ -149,6 +160,7 @@ export default function TaxInvoiceSearch() {
       )}
 
       <LoadingModal open={openLoadingModal.open} />
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
     </>
   );
 }
