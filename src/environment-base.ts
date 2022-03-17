@@ -302,6 +302,15 @@ export const environment = {
         },
       },
     },
+    provinces: {
+      url: '/master/provinces',
+    },
+    districts: {
+      url: '/master/districts',
+    },
+    subDistricts: {
+      url: '/master/sub-districts',
+    },
   },
   authority: {
     authorizedBranch: {

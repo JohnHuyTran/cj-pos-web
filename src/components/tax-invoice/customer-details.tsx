@@ -5,8 +5,11 @@ import { useStyles } from '../../styles/makeTheme';
 import { ContentPaste, HighlightOff, Save, Sync } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import { Box, Button, DialogTitle, FormHelperText, Grid, IconButton, TextField } from '@mui/material';
-
 import { useForm } from 'react-hook-form';
+
+import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
+import { featchProvincesListAsync } from '../../store/slices/search-provinces-slice';
+import { useAppDispatch } from '../../store/store';
 
 interface Props {
   isOpen: boolean;
@@ -45,10 +48,13 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const classes = useStyles();
+  const dispatch = useAppDispatch();
 
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
 
   useEffect(() => {
+    dispatch(featchProvincesListAsync());
+
     setOpen(isOpen);
   }, [isOpen]);
 
@@ -67,7 +73,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const onSave = (data: any) => {
     if (data) {
       setDisabledBtnPreview(false);
-      console.log('data: ', data);
+      console.log('data province: ', data.province);
     }
   };
 
@@ -252,14 +258,18 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              <TextField
+              {/* <TextField
                 id="txtProvince"
                 size="small"
                 className={classes.MtextField}
                 fullWidth
                 placeholder="กรุณากรอกจังหวัด"
                 {...register('province', { required: true })}
-              />
+              /> */}
+
+              <input type="text" {...register('province', { required: true })} style={{ display: 'none' }} />
+
+              <ProvincesDropDown isClear={false} />
               {errors.province && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
                   กรุณากรอกรายละเอียด
