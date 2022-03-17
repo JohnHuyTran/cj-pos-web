@@ -206,7 +206,7 @@ function BranchTransferListSKU({ onSelectSku, skuList }: Props) {
 
   return (
     <Box mt={2} bgcolor='background.paper' id='item-sku'>
-      <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+      <div style={{ width: '100%', height: rows.length >= 4 ? '50vh' : 'auto' }} className={classes.MdataGridDetail}>
         <DataGrid
           rows={rows}
           columns={columns}
