@@ -22,7 +22,7 @@ import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice'
 import { isAllowActionPermission } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
-import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
+import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
 
 interface Props {
   isOpen: boolean;
@@ -134,9 +134,18 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     setShowSnackBar(false);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-    onClickClose();
+  const handleClose = async () => {
+    const isRefreshScreen = store.getState().dcCheckOrderDetail.isReloadScreen;
+    if (isRefreshScreen) {
+      handleOpenLoading('open', true);
+      const itemId = store.getState().dcCheckOrderDetail.itemId;
+      await dispatch(featchorderDetailDCAsync(itemId));
+      await dispatch(setReloadScreen(false));
+      handleOpenLoading('open', false);
+    } else {
+      setOpen(false);
+      onClickClose();
+    }
   };
 
   return (
