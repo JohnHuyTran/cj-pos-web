@@ -5,21 +5,35 @@ import { useStyles } from '../../styles/makeTheme';
 import { Button } from '@mui/material';
 import TaxInvoiceSearchList from './tax-invoice-search-list';
 import { useAppDispatch, useAppSelector } from '../../store/store';
+import { TaxInvoiceRequest } from '../../models/tax-invoice-model';
+import { featchTaxInvoiceListAsync, savePayloadSearchList } from '../../store/slices/tax-invoice-search-list-slice';
+import LoadingModal from '../commons/ui/loading-modal';
 
 interface State {
   docNo: string;
 }
+interface loadingModalState {
+  open: boolean;
+}
 
 export default function TaxInvoiceSearch() {
   const classes = useStyles();
+  const page = '1';
   const dispatch = useAppDispatch();
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(false);
   const [values, setValues] = React.useState<State>({
     docNo: '',
   });
   const [flagSearch, setFlagSearch] = React.useState(false);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
+  });
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
 
   const items = useAppSelector((state) => state.dcCheckOrderList);
+  const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
   const taxInvoiceList = items.orderList.data ? items.orderList.data : [];
 
   const handleChange = (event: any) => {
@@ -31,10 +45,26 @@ export default function TaxInvoiceSearch() {
     setValues({
       docNo: '',
     });
+    setFlagSearch(false);
   };
 
-  const onClickSearchBtn = () => {
+  const onClickSearchBtn = async () => {
+    handleOpenLoading('open', true);
+    let limits;
+    if (limit === 0 || limit === undefined) {
+      limits = '10';
+    } else {
+      limits = limit.toString();
+    }
+    const payload: TaxInvoiceRequest = {
+      limit: limits,
+      page: page,
+      docNo: values.docNo,
+    };
+    await dispatch(featchTaxInvoiceListAsync(payload));
+    await dispatch(savePayloadSearchList(payload));
     setFlagSearch(true);
+    handleOpenLoading('open', false);
   };
 
   return (
@@ -94,6 +124,8 @@ export default function TaxInvoiceSearch() {
           </Box>
         </Grid>
       )}
+
+      <LoadingModal open={openLoadingModal.open} />
     </>
   );
 }

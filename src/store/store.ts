@@ -49,8 +49,8 @@ import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 import stockRequestItems from './slices/stock-request-items-slice';
 import authorizedhBranchSlice from './slices/authorized-branch-slice';
 import orderReceiveSlice from './slices/order-receive-slice';
-import taxInvoiceSearchDetail from './slices/tax-invoice-search-detail';
-import taxInvoiceSearchList from './slices/tax-invoice-search-list';
+import taxInvoiceSearchDetail from './slices/tax-invoice-search-detail-slice';
+import taxInvoiceSearchList from './slices/tax-invoice-search-list-slice';
 
 const store = configureStore({
   reducer: {

@@ -6,6 +6,8 @@ import { Button } from '@mui/material';
 import { DataGrid, GridColDef, GridRowData } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { CheckOrderResponse } from '../../models/dc-check-order-model';
+import { featchTaxInvoiceListAsync } from '../../store/slices/tax-invoice-search-list-slice';
+import { TaxInvoiceRequest } from '../../models/tax-invoice-model';
 
 export default function TaxInvoiceSearchList() {
   const classes = useStyles();
@@ -80,7 +82,17 @@ export default function TaxInvoiceSearchList() {
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
   };
-  const handlePageSizeChange = async (pageSize: number) => {};
+  const handlePageSizeChange = async (pageSize: number) => {
+    setPageSize(pageSize.toString());
+    const payload: TaxInvoiceRequest = {
+      limit: pageSize.toString(),
+      page: '1',
+      docNo: '',
+    };
+    setLoading(true);
+    await featchTaxInvoiceListAsync(payload);
+    setLoading(false);
+  };
 
   const currentlySelected = () => {};
 

@@ -17,3 +17,10 @@ export interface TaxInvoiceDetailResponse {
   message: string;
   data: TaxInvoiceInfo | null;
 }
+
+export interface TaxInvoiceRequest {
+  limit?: string;
+  page?: string;
+  docNo?: string;
+  sortBy?: string;
+}
