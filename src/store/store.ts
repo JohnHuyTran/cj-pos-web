@@ -49,6 +49,8 @@ import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 import stockRequestItems from './slices/stock-request-items-slice';
 import authorizedhBranchSlice from './slices/authorized-branch-slice';
 import orderReceiveSlice from './slices/order-receive-slice';
+import taxInvoiceSearchDetail from './slices/tax-invoice-search-detail-slice';
+import taxInvoiceSearchList from './slices/tax-invoice-search-list-slice';
 import searchProvincesSlice from './slices/search-provinces-slice';
 
 const store = configureStore({
@@ -102,6 +104,8 @@ const store = configureStore({
     stockRequestItems: stockRequestItems,
     authorizedhBranchSlice: authorizedhBranchSlice,
     orderReceiveSlice: orderReceiveSlice,
+    taxInvoiceSearchList: taxInvoiceSearchList,
+    taxInvoiceSearchDetail: taxInvoiceSearchDetail,
     searchProvincesSlice: searchProvincesSlice,
   },
 });
