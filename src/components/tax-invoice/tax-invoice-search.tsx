@@ -63,6 +63,7 @@ export default function TaxInvoiceSearch() {
       docNo: values.docNo,
     };
     await dispatch(savePayloadSearchList(payload));
+    setDisableSearchBtn(true);
     setFlagSearch(false);
   };
 
