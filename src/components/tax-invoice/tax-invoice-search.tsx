@@ -8,6 +8,9 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { TaxInvoiceRequest } from '../../models/tax-invoice-model';
 import { featchTaxInvoiceListAsync, savePayloadSearchList } from '../../store/slices/tax-invoice-search-list-slice';
 import LoadingModal from '../commons/ui/loading-modal';
+import { ACTIONS } from '../../utils/enum/permission-enum';
+import { isAllowActionPermission } from '../../utils/role-permission';
+import AlertError from '../commons/ui/alert-error';
 
 interface State {
   docNo: string;
@@ -20,7 +23,7 @@ export default function TaxInvoiceSearch() {
   const classes = useStyles();
   const page = '1';
   const dispatch = useAppDispatch();
-  const [disableSearchBtn, setDisableSearchBtn] = React.useState(false);
+  const [hideSearchBtn, setHideSearchBtn] = React.useState(true);
   const [values, setValues] = React.useState<State>({
     docNo: '',
   });
@@ -31,10 +34,17 @@ export default function TaxInvoiceSearch() {
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+  const [openFailAlert, setOpenFailAlert] = React.useState(false);
+  const [textFail, setTextFail] = React.useState('');
 
-  const items = useAppSelector((state) => state.dcCheckOrderList);
-  const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
-  const taxInvoiceList = items.orderList.data ? items.orderList.data : [];
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail('');
+  };
+
+  const items = useAppSelector((state) => state.taxInvoiceSearchList.taxInvoiceList);
+  const limit = useAppSelector((state) => state.taxInvoiceSearchList.taxInvoiceList.perPage);
+  const taxInvoiceList = items.data ? items.data : [];
 
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -54,25 +64,43 @@ export default function TaxInvoiceSearch() {
     setFlagSearch(false);
   };
 
+  const validateForm = () => {
+    if (values.docNo.length < 6) {
+      setTextFail('กรุณาระบุเลขเอกสารอย่างน้อย 6 หลัก');
+      return false;
+    }
+
+    return true;
+  };
+
   const onClickSearchBtn = async () => {
     handleOpenLoading('open', true);
-    let limits;
-    if (limit === 0 || limit === undefined) {
-      limits = '10';
+
+    if (validateForm()) {
+      let limits;
+      if (limit === 0 || limit === undefined) {
+        limits = '10';
+      } else {
+        limits = limit.toString();
+      }
+      const payload: TaxInvoiceRequest = {
+        limit: limits,
+        page: page,
+        docNo: values.docNo,
+      };
+      await dispatch(featchTaxInvoiceListAsync(payload));
+      await dispatch(savePayloadSearchList(payload));
+      setFlagSearch(true);
     } else {
-      limits = limit.toString();
+      setOpenFailAlert(true);
     }
-    const payload: TaxInvoiceRequest = {
-      limit: limits,
-      page: page,
-      docNo: values.docNo,
-    };
-    await dispatch(featchTaxInvoiceListAsync(payload));
-    await dispatch(savePayloadSearchList(payload));
-    setFlagSearch(true);
+
     handleOpenLoading('open', false);
   };
 
+  React.useEffect(() => {
+    setHideSearchBtn(isAllowActionPermission(ACTIONS.SALE_TAX_INVOICE_VIEW));
+  }, []);
   return (
     <>
       <Box>
@@ -112,7 +140,7 @@ export default function TaxInvoiceSearch() {
                 variant='contained'
                 color='primary'
                 onClick={onClickSearchBtn}
-                sx={{ width: '45%', ml: 1, display: `${disableSearchBtn ? 'none' : ''}` }}
+                sx={{ width: '45%', ml: 1, display: `${hideSearchBtn ? 'none' : ''}` }}
                 className={classes.MbtnSearch}
                 fullWidth={true}>
                 ค้นหา
@@ -132,6 +160,7 @@ export default function TaxInvoiceSearch() {
       )}
 
       <LoadingModal open={openLoadingModal.open} />
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
     </>
   );
 }

@@ -5,11 +5,9 @@ import { useStyles } from '../../styles/makeTheme';
 import { Button } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { CheckOrderInfo, CheckOrderResponse } from '../../models/dc-check-order-model';
 import { featchTaxInvoiceListAsync, savePayloadSearchList } from '../../store/slices/tax-invoice-search-list-slice';
-import { TaxInvoiceRequest } from '../../models/tax-invoice-model';
+import { TaxInvoiceInfo, TaxInvoiceRequest, TaxInvoiceResponse } from '../../models/tax-invoice-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { getSdType } from '../../utils/utils';
 import { featchTaxInvoiceDetailAsync } from '../../store/slices/tax-invoice-search-detail-slice';
 import { useTranslation } from 'react-i18next';
 
@@ -18,11 +16,11 @@ export default function TaxInvoiceSearchList() {
   const { t } = useTranslation(['taxInvoice', 'common']);
   const dispatch = useAppDispatch();
   const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
-  const items = useAppSelector((state) => state.dcCheckOrderList);
-  const cuurentPage = useAppSelector((state) => state.dcCheckOrderList.orderList.page);
-  const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
+  const items = useAppSelector((state) => state.taxInvoiceSearchList);
+  const cuurentPage = useAppSelector((state) => state.taxInvoiceSearchList.taxInvoiceList.page);
+  const limit = useAppSelector((state) => state.taxInvoiceSearchList.taxInvoiceList.perPage);
 
-  const res: CheckOrderResponse = items.orderList;
+  const res: TaxInvoiceResponse = items.taxInvoiceList;
   const [pageSize, setPageSize] = React.useState(limit.toString());
   const columns: GridColDef[] = [
     {
@@ -36,26 +34,29 @@ export default function TaxInvoiceSearchList() {
       field: 'billNo',
       headerName: 'เลขที่ใบเสร็จ(ย่อ)',
       minWidth: 200,
+      flex: 0.5,
       headerAlign: 'center',
       sortable: false,
     },
     {
-      field: 'billCreateDate',
+      field: 'docDate',
       headerName: 'วันที่ออกใบเสร็จ(ย่อ)',
-      minWidth: 160,
-      // flex: 1.2,
+      flex: 0.4,
+      minWidth: 100,
+      align: 'left',
       headerAlign: 'center',
       sortable: false,
     },
     {
       field: 'billStatusDisplay',
       headerName: 'สถานะ(ย่อ)',
-      minWidth: 128,
+      minWidth: 150,
       // flex: 1.2,
       headerAlign: 'center',
+      align: 'center',
       sortable: false,
       renderCell: (params) => {
-        if (params.value === 0 || params.value === 1) {
+        if (params.value === 'PRINTED') {
           return (
             <Chip
               label={t(`status.${params.value}`)}
@@ -63,7 +64,7 @@ export default function TaxInvoiceSearchList() {
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
-        } else if (params.value === 'COMPLETED') {
+        } else if (params.value === 'CANCELLED') {
           return (
             <Chip
               label={t(`status.${params.value}`)}
@@ -75,43 +76,44 @@ export default function TaxInvoiceSearchList() {
       },
     },
     {
-      field: 'taxInvoiceNo',
+      field: 'invoiceNo',
       headerName: 'เลขที่ใบเสร็จ(เต็ม)',
       minWidth: 200,
-      flex: 0.9,
+      flex: 0.5,
       headerAlign: 'center',
       sortable: false,
     },
     {
-      field: 'taxInvoicePrintedDate',
+      field: 'lastPrintedDate',
       headerName: 'วันที่พิมพ์ใบเสร็จ(เต็ม)',
-      minWidth: 150,
-      flex: 0.9,
-      headerAlign: 'center',
-      sortable: false,
-    },
-    {
-      field: 'taxInvoicePrintedCount',
-      headerName: 'พิมพ์ใบเสร็จ(เต็ม)ครั้งที่',
-      minWidth: 70,
-      flex: 0.75,
+      minWidth: 100,
+      flex: 0.4,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
     },
+    {
+      field: 'totalPrint',
+      headerName: 'พิมพ์ใบเสร็จ(เต็ม)ครั้งที่',
+      minWidth: 70,
+      flex: 0.4,
+      headerAlign: 'center',
+      align: 'right',
+      sortable: false,
+    },
   ];
 
-  const rows = res.data.map((data: CheckOrderInfo, indexs: number) => {
+  const rows = res.data.map((data: TaxInvoiceInfo, indexs: number) => {
     return {
-      id: data.id,
+      id: data.billNo,
       index: (cuurentPage - 1) * parseInt(pageSize) + indexs + 1,
-      billNo: data.docRefNo,
-      billCreateDate: convertUtcToBkkDate(data.receivedDate),
-      billStatusDisplay: data.sdType,
-      billStatus: data.sdType,
-      taxInvoiceNo: data.docRefNo,
-      taxInvoicePrintedDate: convertUtcToBkkDate(data.receivedDate),
-      taxInvoicePrintedCount: '1',
+      billNo: data.billNo,
+      docDate: convertUtcToBkkDate(data.docDate),
+      billStatusDisplay: data.status,
+      billStatus: data.status,
+      invoiceNo: data.invoiceNo,
+      lastPrintedDate: data.lastPrintedDate ? convertUtcToBkkDate(data.lastPrintedDate) : '',
+      totalPrint: data.totalPrint,
     };
   });
 
@@ -145,10 +147,10 @@ export default function TaxInvoiceSearchList() {
   };
 
   const currentlySelected = async (params: GridCellParams) => {
-    console.log('param: ', params);
-    console.log('billNo: ', params.row.billNo);
-    if (params.row.billStatus === '') {
-      const payload: TaxInvoiceRequest = {};
+    if (params.row.billStatus !== 'CANCELLED') {
+      const payload: TaxInvoiceRequest = {
+        billNo: params.row.billNo,
+      };
       await dispatch(featchTaxInvoiceDetailAsync(payload));
     }
   };

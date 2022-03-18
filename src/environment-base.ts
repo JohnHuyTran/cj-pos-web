@@ -314,7 +314,7 @@ export const environment = {
         url: 'xxx',
       },
       detail: {
-        url: 'xxx',
+        url: '/sale/invoice/detail/{billNo}',
       },
     },
   },
