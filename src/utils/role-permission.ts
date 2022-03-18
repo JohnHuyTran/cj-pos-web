@@ -107,6 +107,7 @@ const permission = {
       mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
+        SUBMENU.SALE_TAX_INVOICE,
         SUBMENU.OR_ORDER_RECEIVE,
         SUBMENU.OR_DIFF,
         SUBMENU.OR_SUPPLIER,
@@ -126,6 +127,7 @@ const permission = {
       ACTIONS.STOCK_BT_EXPORT,
       ACTIONS.ORDER_VER_VIEW,
       ACTIONS.ORDER_VER_MANAGE,
+      ACTIONS.SALE_TAX_INVOICE_VIEW,
     ],
   },
   areaManager: {
