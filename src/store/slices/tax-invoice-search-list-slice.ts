@@ -3,6 +3,7 @@ import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
 import { TaxInvoiceRequest, TaxInvoiceResponse } from '../../models/tax-invoice-model';
 import { stat } from 'fs';
+import { getInvoiceList } from '../../mockdata/sale';
 
 type State = {
   taxInvoiceList: TaxInvoiceResponse;
@@ -16,6 +17,9 @@ const initialState: State = {
     code: 0,
     message: '',
     data: [],
+    total: 0,
+    perPage: 0,
+    page: 0,
   },
   error: '',
   payloadSearchList: {},
@@ -34,7 +38,8 @@ export const featchTaxInvoiceListAsync = createAsyncThunk('TaxInvoiceList', asyn
     if (payload.docNo) {
       path = path + `&docNo=${payload.docNo}`;
     }
-    let response = await get(path).then();
+    let response = getInvoiceList().then();
+    // let response = await get(path).then();
     return response;
   } catch (error) {
     throw error;
@@ -56,6 +61,9 @@ const taxInvoiceListSlice = createSlice({
         code: 0,
         message: '',
         data: [],
+        total: 0,
+        perPage: 0,
+        page: 0,
       };
     }),
       builer.addCase(featchTaxInvoiceListAsync.fulfilled, (state, action: PayloadAction<any>) => {
@@ -67,6 +75,9 @@ const taxInvoiceListSlice = createSlice({
           code: 0,
           message: '',
           data: [],
+          total: 0,
+          perPage: 0,
+          page: 0,
         };
       });
   },

@@ -42,9 +42,9 @@ export default function TaxInvoiceSearch() {
     setTextFail('');
   };
 
-  const items = useAppSelector((state) => state.dcCheckOrderList);
-  const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
-  const taxInvoiceList = items.orderList.data ? items.orderList.data : [];
+  const items = useAppSelector((state) => state.taxInvoiceSearchList.taxInvoiceList);
+  const limit = useAppSelector((state) => state.taxInvoiceSearchList.taxInvoiceList.perPage);
+  const taxInvoiceList = items.data ? items.data : [];
 
   const handleChange = (event: any) => {
     const value = event.target.value;
