@@ -3,6 +3,7 @@ export interface TaxInvoiceRequest {
   page?: string;
   docNo?: string;
   sortBy?: string;
+  billNo?: string;
 }
 export interface TaxInvoiceResponse {
   ref: string;

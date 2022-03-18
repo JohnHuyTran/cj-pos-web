@@ -33,7 +33,7 @@ const payloadSearchList: TaxInvoiceRequest = {
 
 export const featchTaxInvoiceListAsync = createAsyncThunk('TaxInvoiceList', async (payload: TaxInvoiceRequest) => {
   try {
-    const apiRootPath = environment.orders.dcCheckOrder.fetchOrder.url;
+    const apiRootPath = environment.sale.taxInvoice.search.url;
     let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}`;
     if (payload.docNo) {
       path = path + `&docNo=${payload.docNo}`;

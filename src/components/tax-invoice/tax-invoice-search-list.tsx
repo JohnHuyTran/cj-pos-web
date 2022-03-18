@@ -22,7 +22,6 @@ export default function TaxInvoiceSearchList() {
 
   const res: TaxInvoiceResponse = items.taxInvoiceList;
   const [pageSize, setPageSize] = React.useState(limit.toString());
-  console.log('rs:', res.data);
   const columns: GridColDef[] = [
     {
       field: 'index',
@@ -54,7 +53,7 @@ export default function TaxInvoiceSearchList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => {
-        if (params.value === 'CANCELLED') {
+        if (params.value === 'PRINTED') {
           return (
             <Chip
               label={t(`status.${params.value}`)}
@@ -62,7 +61,7 @@ export default function TaxInvoiceSearchList() {
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
-        } else if (params.value === 'PRINTED') {
+        } else if (params.value === 'CANCELLED') {
           return (
             <Chip
               label={t(`status.${params.value}`)}
@@ -145,9 +144,13 @@ export default function TaxInvoiceSearchList() {
 
   const currentlySelected = async (params: GridCellParams) => {
     console.log('param: ', params);
-    console.log('billNo: ', params.row.billNo);
-    if (params.row.billStatus === '') {
-      const payload: TaxInvoiceRequest = {};
+
+    console.log('billNo: ', params.row.billStatus);
+    if (params.row.billStatus !== 'CANCELLED') {
+      console.log('billNo: ', params.row.billNo);
+      const payload: TaxInvoiceRequest = {
+        billNo: params.row.billNo,
+      };
       await dispatch(featchTaxInvoiceDetailAsync(payload));
     }
   };

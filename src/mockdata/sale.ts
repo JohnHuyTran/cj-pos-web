@@ -58,6 +58,22 @@ const invoiceDetail = {
   },
 };
 
+const invoiceDetailNoAddress = {
+  billNo: 'S22010022N03-002641',
+  status: 'CANCELLED',
+  customer: {
+    address: {},
+  },
+};
+
+const invoiceDetailIsMember = {
+  billNo: 'S22010022N03-002641',
+  customer: {
+    memberNo: 'Mxxxxx',
+    address: {},
+  },
+};
+
 export function getInvoiceList() {
   return new Promise((resolve, reject) => {
     resolve(invoiceList);
