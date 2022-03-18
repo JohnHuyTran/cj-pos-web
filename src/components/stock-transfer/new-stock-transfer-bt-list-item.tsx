@@ -210,7 +210,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
         unitName: item.unitName,
         orderQty: item.orderQty ? item.orderQty : 0,
         actualQty: item.actualQty ? item.actualQty : 0,
-        toteCode: item.toteCode,
+        toteCode: item.toteCode ? item.toteCode : '',
         isDisable: isDisable,
         boNo: item.boNo,
       };
@@ -377,12 +377,13 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
     newColumns[7]['hide'] = true;
   }
 
-  const handleEditItems = async (params: GridEditCellValueParams) => {
-    storeItem();
+  const handleEditItems = (params: GridCellParams) => {
+    if (params.field === 'actualQty' || params.field === 'toteCode') {
+      storeItem();
+    }
   };
 
   const handleOnFocusOut = async (params: GridEditCellValueParams) => {
-    console.log('handleOnFocusOut');
     storeItem();
   };
 
