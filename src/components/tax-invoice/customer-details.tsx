@@ -6,10 +6,10 @@ import { ContentPaste, HighlightOff, Save, Sync } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import { Box, Button, DialogTitle, FormHelperText, Grid, IconButton, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
-
-import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
-import { featchProvincesListAsync } from '../../store/slices/search-provinces-slice';
 import { useAppDispatch } from '../../store/store';
+import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
+import DistrictsDropDown from '../commons/ui/search-districts-dropdown';
+import SubDistrictsDropDown from '../commons/ui/search-subDistricts-dropdown';
 
 interface Props {
   isOpen: boolean;
@@ -53,8 +53,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
 
   useEffect(() => {
-    dispatch(featchProvincesListAsync());
-
     setOpen(isOpen);
   }, [isOpen]);
 
@@ -90,6 +88,49 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       subDistrict: '',
       postcode: '',
     });
+  };
+
+  const [provincesCode, setProvincesCode] = React.useState('');
+  const [districtsCode, setDistrictsCode] = React.useState('');
+
+  const [disabledSelDistricts, setDisabledSelDistricts] = React.useState(true);
+  const [disabledSelSubDistricts, setDisabledSelSubDistricts] = React.useState(true);
+
+  const handleChangeProvinces = (provincesCode: string) => {
+    console.log('handleChangeProvinces:', provincesCode);
+
+    if (provincesCode !== '') {
+      reset({
+        province: provincesCode,
+      });
+      setProvincesCode(provincesCode);
+      setDisabledSelDistricts(false);
+    }
+  };
+
+  const handleChangeDistricts = (districtsCode: string) => {
+    console.log('handleChangeDistricts:', districtsCode);
+
+    if (districtsCode !== '') {
+      reset({
+        district: districtsCode,
+      });
+      setDistrictsCode(districtsCode);
+      setDisabledSelSubDistricts(false);
+    }
+  };
+
+  const handleChangeSubDistricts = (subDistrictsCode: string, postalCode: string) => {
+    console.log('handleChangeDistricts:', subDistrictsCode, ' / ', postalCode);
+
+    if (subDistrictsCode !== '') {
+      reset({
+        subDistrict: subDistrictsCode,
+        postcode: postalCode,
+      });
+      // setDistrictsCode(subDistrictsCode);
+      // setDisabledSelSubDistricts(false);
+    }
   };
 
   return (
@@ -258,7 +299,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              <ProvincesDropDown isClear={false} />
+              <ProvincesDropDown onChangeProvinces={handleChangeProvinces} isClear={false} />
               <input type="text" {...register('province', { required: true })} style={{ display: 'none' }} />
               {errors.province && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -274,14 +315,14 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              <TextField
-                id="txtDistrict"
-                size="small"
-                className={classes.MtextField}
-                fullWidth
-                placeholder="กรุณากรอกเขต / อำเภอ"
-                {...register('district', { required: true })}
+              <DistrictsDropDown
+                provinceCode={provincesCode}
+                onChangeDistricts={handleChangeDistricts}
+                isClear={false}
+                disable={disabledSelDistricts}
               />
+              <input type="text" {...register('district', { required: true })} style={{ display: 'none' }} />
+
               {errors.district && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
                   กรุณากรอกรายละเอียด
@@ -295,14 +336,14 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              <TextField
-                id="txtsubDistrict"
-                size="small"
-                className={classes.MtextField}
-                fullWidth
-                placeholder="กรุณากรอกแขวง / ตำบล"
-                {...register('subDistrict', { required: true })}
+              <SubDistrictsDropDown
+                districtsCode={districtsCode}
+                onChangeSubDistricts={handleChangeSubDistricts}
+                isClear={false}
+                disable={disabledSelSubDistricts}
               />
+              <input type="text" {...register('subDistrict', { required: true })} style={{ display: 'none' }} />
+
               {errors.subDistrict && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
                   กรุณากรอกรายละเอียด

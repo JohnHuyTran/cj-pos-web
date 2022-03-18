@@ -1,34 +1,45 @@
 import React, { useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import { CircularProgress, InputAdornment } from '@mui/material';
+import { CircularProgress, InputAdornment, Typography } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { featchProvincesListAsync } from '../../../store/slices/search-provinces-slice';
 import SearchIcon from '@mui/icons-material/Search';
+import { featchDistrictsListAsync } from '../../../store/slices/search-districts-slice';
+import { featchsSubDistrictsListAsync } from '../../../store/slices/search-subDistricts-slice';
 
 interface Props {
-  onChangeProvinces: (provincesCode: string) => void;
+  districtsCode: string;
+  onChangeSubDistricts: (subDistrictsCode: string, postalCode: string) => void;
   isClear: boolean;
+  disable?: boolean;
 }
 
-function ProvincesDropDown({ onChangeProvinces, isClear }: Props) {
+function SubDistrictsDropDown({ districtsCode, onChangeSubDistricts, isClear, disable }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    searchProvinces(payload);
-  }, [isClear]);
 
   let payload: any = {
     code: '',
     name: '',
+    districtCode: '',
+    postalCode: '',
   };
-  const searchProvinces = async (payload: any) => {
-    await dispatch(featchProvincesListAsync(payload));
+  useEffect(() => {
+    if (districtsCode !== '') {
+      payload = {
+        districtCode: districtsCode,
+      };
+      searchSubDistricts(payload);
+    }
+  }, [isClear, districtsCode]);
+
+  const searchSubDistricts = async (payload: any) => {
+    await dispatch(featchsSubDistrictsListAsync(payload));
   };
 
-  const provincesList = useAppSelector((state) => state.searchProvincesSlice.provincesList);
+  const subDistrictsList = useAppSelector((state) => state.searchSubDistrictsSlice.subDistrictsList);
 
   const [loading, setLoading] = React.useState(false);
   const autocompleteRenderInput = (params: any) => {
@@ -47,15 +58,17 @@ function ProvincesDropDown({ onChangeProvinces, isClear }: Props) {
             </React.Fragment>
           ),
         }}
-        placeholder="กรุณากรอกจังหวัด"
+        placeholder="กรุณากรอกแขวง / ตำบล"
         className={classes.MtextField}
+        variant="outlined"
         size="small"
         fullWidth
       />
     );
   };
 
-  let options: any = provincesList && provincesList.data && provincesList.data.length > 0 ? provincesList.data : [];
+  let options: any =
+    subDistrictsList && subDistrictsList.data && subDistrictsList.data.length > 0 ? subDistrictsList.data : [];
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.nameTH,
   });
@@ -70,7 +83,7 @@ function ProvincesDropDown({ onChangeProvinces, isClear }: Props) {
 
   const handleChangeItem = async (event: any, option: any, reason: string) => {
     if (option && reason === 'selectOption') {
-      return onChangeProvinces(option?.code ? option?.code : '');
+      return onChangeSubDistricts(option?.code ? option?.code : '', option?.postalCode ? option?.postalCode : '');
     }
   };
 
@@ -88,8 +101,9 @@ function ProvincesDropDown({ onChangeProvinces, isClear }: Props) {
       getOptionLabel={(option) => (option.nameTH ? option.nameTH : '')}
       isOptionEqualToValue={(option, value) => option.nameTH === value.nameTH}
       renderInput={autocompleteRenderInput}
+      disabled={disable ? true : false}
     />
   );
 }
 
-export default ProvincesDropDown;
+export default SubDistrictsDropDown;

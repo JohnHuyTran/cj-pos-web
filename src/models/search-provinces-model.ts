@@ -6,7 +6,12 @@ export interface ProvincesResponse {
 }
 
 export interface ProvincesInfo {
-  code: number;
+  code: string;
   nameTH: string;
   nameEN: string;
+}
+
+export interface SearchProvincesRequest {
+  code?: string;
+  name?: string;
 }

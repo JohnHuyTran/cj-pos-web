@@ -1,16 +1,16 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { environment } from '../../environment-base';
 import { getParamsBody } from '../../adapters/posback-adapter';
-import { ProvincesResponse, SearchProvincesRequest } from '../../models/search-provinces-model';
 import { ContentType } from '../../utils/enum/common-enum';
+import { DistrictsResponse, SearchDistrictsRequest } from '../../models/search-districts-model';
 
 type State = {
-  provincesList: ProvincesResponse;
+  districtsList: DistrictsResponse;
   error: string;
 };
 
 const initialState: State = {
-  provincesList: {
+  districtsList: {
     ref: '',
     code: 0,
     message: '',
@@ -19,9 +19,9 @@ const initialState: State = {
   error: '',
 };
 
-export const featchProvincesListAsync = createAsyncThunk('ProvincesList', async (payload: SearchProvincesRequest) => {
+export const featchDistrictsListAsync = createAsyncThunk('DistrictsList', async (payload: SearchDistrictsRequest) => {
   try {
-    const path = `${environment.master.provinces.url}`;
+    const path = `${environment.master.districts.url}`;
     let response = await getParamsBody(path, payload, ContentType.JSON).then();
 
     if (response === 204) {
@@ -41,21 +41,21 @@ export const featchProvincesListAsync = createAsyncThunk('ProvincesList', async 
   }
 });
 
-const searchProvincesSlice = createSlice({
-  name: 'searchProvinces',
+const searchDistrictsSlice = createSlice({
+  name: 'searchDistricts',
   initialState,
   reducers: {},
   extraReducers: (builer) => {
-    builer.addCase(featchProvincesListAsync.pending, () => {
+    builer.addCase(featchDistrictsListAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchProvincesListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.provincesList = action.payload;
+      builer.addCase(featchDistrictsListAsync.fulfilled, (state, action: PayloadAction<any>) => {
+        state.districtsList = action.payload;
       }),
-      builer.addCase(featchProvincesListAsync.rejected, () => {
+      builer.addCase(featchDistrictsListAsync.rejected, () => {
         initialState;
       });
   },
 });
 
-export default searchProvincesSlice.reducer;
+export default searchDistrictsSlice.reducer;
