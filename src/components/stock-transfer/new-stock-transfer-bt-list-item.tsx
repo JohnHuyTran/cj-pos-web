@@ -19,6 +19,7 @@ import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { Item, ItemGroups } from '../../models/stock-transfer-model';
 import { isGroupBranch } from '../../utils/role-permission';
+import { truncateSync } from 'fs';
 
 interface Props {
   skuCodeSelect: string;
@@ -365,9 +366,9 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
     // const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
     // await dispatch(updateAddItemSkuGroupState(_newSku));
     // await dispatch(updateAddItemsGroupState(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc'])));
-    setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    onUpdateSkuList(_newSku);
+    await setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    await onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    await onUpdateSkuList(_newSku);
   };
 
   let newColumns = [...columns];
@@ -379,6 +380,17 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
 
   const handleEditItems = async (params: GridEditCellValueParams) => {
     storeItem();
+  };
+
+  const handleOnFocusOut = async (params: GridEditCellValueParams) => {
+    console.log('handleOnFocusOut');
+    storeItem();
+  };
+
+  const handleOnCellOut = (params: GridCellParams) => {
+    if (params.field === 'actualQty' || params.field === 'toteCode') {
+      storeItem();
+    }
   };
 
   return (
@@ -395,8 +407,8 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          onCellFocusOut={handleEditItems}
-          onCellOut={handleEditItems}
+          // onCellFocusOut={handleOnFocusOut}
+          onCellOut={handleOnCellOut}
           // onCellKeyDown={handleEditItems}
         />
       </div>

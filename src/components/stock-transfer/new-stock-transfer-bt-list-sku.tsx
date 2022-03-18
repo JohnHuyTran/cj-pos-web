@@ -138,9 +138,9 @@ function BranchTransferListSKU({ onSelectSku, skuList }: Props) {
     };
   });
 
-  React.useEffect(() => {
-    setBtItemGroups(skuList);
-  }, []);
+  // React.useEffect(() => {
+  //   setBtItemGroups(skuList);
+  // }, []);
 
   React.useEffect(() => {
     setBtItemGroups(skuList);
