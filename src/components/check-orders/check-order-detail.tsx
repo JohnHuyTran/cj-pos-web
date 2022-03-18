@@ -64,6 +64,7 @@ import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import theme from '../../styles/theme';
 import { env } from '../../adapters/environmentConfigs';
+import CheckOrderDetailListTote from '../check-orders/check-order-detail-list-tote';
 
 interface loadingModalState {
   open: boolean;
@@ -967,6 +968,10 @@ export default function CheckOrderDetail({
                 // onCellKeyDown={handleEditItems}
                 // onCellBlur={handleEditItems}
               />
+            </div>
+
+            <div>
+              <CheckOrderDetailListTote />
             </div>
           </Box>
         </DialogContent>
