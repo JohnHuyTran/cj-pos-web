@@ -210,7 +210,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
         unitName: item.unitName,
         orderQty: item.orderQty ? item.orderQty : 0,
         actualQty: item.actualQty ? item.actualQty : 0,
-        toteCode: item.toteCode,
+        toteCode: item.toteCode ? item.toteCode : '',
         isDisable: isDisable,
         boNo: item.boNo,
       };
@@ -365,9 +365,9 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
     // const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
     // await dispatch(updateAddItemSkuGroupState(_newSku));
     // await dispatch(updateAddItemsGroupState(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc'])));
-    setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    onUpdateSkuList(_newSku);
+    await setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    await onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    await onUpdateSkuList(_newSku);
   };
 
   let newColumns = [...columns];
@@ -377,8 +377,20 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
     newColumns[7]['hide'] = true;
   }
 
-  const handleEditItems = async (params: GridEditCellValueParams) => {
+  const handleEditItems = (params: GridCellParams) => {
+    if (params.field === 'actualQty' || params.field === 'toteCode') {
+      storeItem();
+    }
+  };
+
+  const handleOnFocusOut = async (params: GridEditCellValueParams) => {
     storeItem();
+  };
+
+  const handleOnCellOut = (params: GridCellParams) => {
+    if (params.field === 'actualQty' || params.field === 'toteCode') {
+      storeItem();
+    }
   };
 
   return (
@@ -395,8 +407,8 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          onCellFocusOut={handleEditItems}
-          onCellOut={handleEditItems}
+          onCellFocusOut={handleOnFocusOut}
+          onCellOut={handleOnCellOut}
           // onCellKeyDown={handleEditItems}
         />
       </div>
