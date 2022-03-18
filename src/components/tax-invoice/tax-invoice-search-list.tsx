@@ -34,23 +34,26 @@ export default function TaxInvoiceSearchList() {
       field: 'billNo',
       headerName: 'เลขที่ใบเสร็จ(ย่อ)',
       minWidth: 200,
+      flex: 0.5,
       headerAlign: 'center',
       sortable: false,
     },
     {
       field: 'docDate',
       headerName: 'วันที่ออกใบเสร็จ(ย่อ)',
+      flex: 0.5,
       minWidth: 160,
-      // flex: 1.2,
+      align: 'left',
       headerAlign: 'center',
       sortable: false,
     },
     {
       field: 'billStatusDisplay',
       headerName: 'สถานะ(ย่อ)',
-      minWidth: 128,
+      minWidth: 150,
       // flex: 1.2,
       headerAlign: 'center',
+      align: 'center',
       sortable: false,
       renderCell: (params) => {
         if (params.value === 'PRINTED') {
@@ -76,23 +79,24 @@ export default function TaxInvoiceSearchList() {
       field: 'invoiceNo',
       headerName: 'เลขที่ใบเสร็จ(เต็ม)',
       minWidth: 200,
-      flex: 0.9,
+      flex: 0.5,
       headerAlign: 'center',
       sortable: false,
     },
     {
       field: 'lastPrintedDate',
       headerName: 'วันที่พิมพ์ใบเสร็จ(เต็ม)',
-      minWidth: 150,
-      flex: 0.9,
+      minWidth: 100,
+      flex: 0.5,
       headerAlign: 'center',
+      align: 'left',
       sortable: false,
     },
     {
       field: 'totalPrint',
       headerName: 'พิมพ์ใบเสร็จ(เต็ม)ครั้งที่',
       minWidth: 70,
-      flex: 0.75,
+      flex: 0.5,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
@@ -143,11 +147,7 @@ export default function TaxInvoiceSearchList() {
   };
 
   const currentlySelected = async (params: GridCellParams) => {
-    console.log('param: ', params);
-
-    console.log('billNo: ', params.row.billStatus);
     if (params.row.billStatus !== 'CANCELLED') {
-      console.log('billNo: ', params.row.billNo);
       const payload: TaxInvoiceRequest = {
         billNo: params.row.billNo,
       };
