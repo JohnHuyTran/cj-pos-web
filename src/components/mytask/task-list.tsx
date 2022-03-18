@@ -33,9 +33,10 @@ export default function Tasklist({ userPermission, listData, onSearch }: Props) 
     !!approver && listDiscount.length > 0
       ? listDiscount
           .filter((el: any) => el.payload.status === 2)
-          .map((item: any) => {
+          .map((item: any, index: any) => { 
             return (
               <TaskForBarcodeDiscount
+                key={index}
                 onSearch={onSearch}
                 payload={item.payload}
                 permission={approver ? 'approver' : requestor ? 'requestor' : ''}
@@ -46,9 +47,10 @@ export default function Tasklist({ userPermission, listData, onSearch }: Props) 
       : !!requestor && listDiscount.length > 0
       ? listDiscount
           .filter((el: any) => el.payload.status > 2)
-          .map((item: any) => {
+          .map((item: any, index: any) => {
             return (
               <TaskForBarcodeDiscount
+                key={index}
                 onSearch={onSearch}
                 payload={item.payload}
                 permission={approver ? 'approver' : requestor ? 'requestor' : ''}
@@ -59,9 +61,14 @@ export default function Tasklist({ userPermission, listData, onSearch }: Props) 
       : null;
   const listItemTaskST =
     !!viewer && listST.length > 0
-      ? listST.map((item: any) => {
+      ? listST.map((item: any, index: any) => {
           return (
-            <TaskForSaleLimitTime permission={viewer ? 'viewer' : ''} payload={item.payload} onSearch={onSearch} />
+            <TaskForSaleLimitTime
+              key={index}
+              permission={viewer ? 'viewer' : ''}
+              payload={item.payload}
+              onSearch={onSearch}
+            />
           );
         })
       : null;
