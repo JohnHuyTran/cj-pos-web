@@ -819,7 +819,7 @@ export default function CheckOrderDetail({
             <Grid container spacing={2} display="flex" justifyContent="space-between">
               {/* <Grid item xl={2}> */}
               <Grid item xl={4}>
-                {statusOC && statusWaitApprove1 && (
+                {statusWaitApprove1 && (
                   <>
                     <Typography
                       variant="body1"
