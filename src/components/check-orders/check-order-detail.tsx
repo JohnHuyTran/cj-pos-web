@@ -500,6 +500,8 @@ export default function CheckOrderDetail({
     handleOpenLoading('open', false);
   };
 
+  const [sumActualQty, setSumActualQty] = React.useState(0);
+  const [sumQuantityRef, setSumQuantityRef] = React.useState(0);
   const handleApproveBtn = async () => {
     setItemsDiffState([]);
     setOpenModelConfirm(true);
@@ -542,7 +544,9 @@ export default function CheckOrderDetail({
       itemsList.push(data);
     });
 
-    handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
+    setSumActualQty(sumActualQtyItems);
+    setSumQuantityRef(sumQuantityRefItems);
+    // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
   };
 
   const handleApproveOCBtn = async () => {
@@ -819,7 +823,7 @@ export default function CheckOrderDetail({
             <Grid container spacing={2} display="flex" justifyContent="space-between">
               {/* <Grid item xl={2}> */}
               <Grid item xl={4}>
-                {statusOC && statusWaitApprove1 && (
+                {statusWaitApprove1 && (
                   <>
                     <Typography
                       variant="body1"
@@ -992,7 +996,9 @@ export default function CheckOrderDetail({
         items={itemsDiffState}
         percentDiffType={false}
         percentDiffValue="0"
-        sumDCPercent={sumDCPercent}
+        // sumDCPercent={sumDCPercent}
+        sumActualQty={sumActualQty}
+        sumQuantityRef={sumQuantityRef}
         docType={docType}
       />
 
