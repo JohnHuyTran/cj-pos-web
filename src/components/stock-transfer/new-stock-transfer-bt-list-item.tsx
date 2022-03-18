@@ -19,7 +19,6 @@ import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { Item, ItemGroups } from '../../models/stock-transfer-model';
 import { isGroupBranch } from '../../utils/role-permission';
-import { truncateSync } from 'fs';
 
 interface Props {
   skuCodeSelect: string;
@@ -407,7 +406,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          // onCellFocusOut={handleOnFocusOut}
+          onCellFocusOut={handleOnFocusOut}
           onCellOut={handleOnCellOut}
           // onCellKeyDown={handleEditItems}
         />
