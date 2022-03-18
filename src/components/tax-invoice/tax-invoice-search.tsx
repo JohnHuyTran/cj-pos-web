@@ -8,6 +8,8 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { TaxInvoiceRequest } from '../../models/tax-invoice-model';
 import { featchTaxInvoiceListAsync, savePayloadSearchList } from '../../store/slices/tax-invoice-search-list-slice';
 import LoadingModal from '../commons/ui/loading-modal';
+import { Search } from '@mui/icons-material';
+import ModalCustomerDetails from './customer-details';
 
 interface State {
   docNo: string;
@@ -73,48 +75,58 @@ export default function TaxInvoiceSearch() {
     handleOpenLoading('open', false);
   };
 
+  const [openDetailModal, setOpenDetailModal] = React.useState(false);
+  const currentlySelected = () => {
+    setOpenDetailModal(true);
+  };
+  const handleCloseDetailModal = () => {
+    setOpenDetailModal(false);
+  };
+
   return (
     <>
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id='txtDocNo'
-              name='docNo'
-              size='small'
+              id="txtDocNo"
+              name="docNo"
+              size="small"
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder='เลขที่ใบเสร็จ/ใบกำกับ'
-              autoComplete='off'
+              placeholder="เลขที่ใบเสร็จ/ใบกำกับ"
+              autoComplete="off"
             />
           </Grid>
-          <Grid item xs={8} container alignItems='flex-end'></Grid>
-          <Grid item xs={8} container alignItems='flex-end'></Grid>
-          <Grid item xs={4} container alignItems='flex-end'>
-            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
+          <Grid item xs={8} container alignItems="flex-end"></Grid>
+          <Grid item xs={8} container alignItems="flex-end"></Grid>
+          <Grid item xs={4} container alignItems="flex-end">
+            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
               <Button
-                id='btnClear'
-                variant='contained'
+                id="btnClear"
+                variant="contained"
                 onClick={onClickClearBtn}
                 sx={{ width: '45%' }}
                 className={classes.MbtnClear}
-                color='cancelColor'
-                fullWidth={true}>
+                color="cancelColor"
+                fullWidth={true}
+              >
                 เคลียร์
               </Button>
               <Button
-                id='btnSearch'
-                variant='contained'
-                color='primary'
+                id="btnSearch"
+                variant="contained"
+                color="primary"
                 onClick={onClickSearchBtn}
                 sx={{ width: '45%', ml: 1, display: `${disableSearchBtn ? 'none' : ''}` }}
                 className={classes.MbtnSearch}
-                fullWidth={true}>
+                fullWidth={true}
+              >
                 ค้นหา
               </Button>
             </Grid>
@@ -123,8 +135,8 @@ export default function TaxInvoiceSearch() {
       </Box>
       {flagSearch && taxInvoiceList.length > 0 && <TaxInvoiceSearchList />}
       {flagSearch && taxInvoiceList.length <= 0 && (
-        <Grid item container xs={12} justifyContent='center'>
-          <Box color='#CBD4DB'>
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
             <br></br>
             <h2>ไม่มีข้อมูล</h2>
           </Box>
@@ -132,6 +144,26 @@ export default function TaxInvoiceSearch() {
       )}
 
       <LoadingModal open={openLoadingModal.open} />
+
+      <Box>
+        <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
+          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+            <Button
+              id="btnCreateSupplierModal"
+              variant="contained"
+              onClick={currentlySelected}
+              sx={{ minWidth: '15%' }}
+              className={classes.MbtnClear}
+              startIcon={<Search />}
+              color="secondary"
+            >
+              view
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+
+      <ModalCustomerDetails isOpen={openDetailModal} onClickClose={handleCloseDetailModal} />
     </>
   );
 }

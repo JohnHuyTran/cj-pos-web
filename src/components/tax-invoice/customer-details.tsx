@@ -258,18 +258,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              {/* <TextField
-                id="txtProvince"
-                size="small"
-                className={classes.MtextField}
-                fullWidth
-                placeholder="กรุณากรอกจังหวัด"
-                {...register('province', { required: true })}
-              /> */}
-
-              <input type="text" {...register('province', { required: true })} style={{ display: 'none' }} />
-
               <ProvincesDropDown isClear={false} />
+              <input type="text" {...register('province', { required: true })} style={{ display: 'none' }} />
               {errors.province && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
                   กรุณากรอกรายละเอียด
