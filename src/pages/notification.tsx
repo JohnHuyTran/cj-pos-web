@@ -8,7 +8,8 @@ import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
 import { getUserInfo } from '../store/sessionStore';
 import { makeStyles } from '@mui/styles';
 import { getNotificationData } from '../services/notification';
-
+import InfiniteScroll from 'react-infinite-scroll-component';
+ 
 export default function Notification() {
   const useStyles = makeStyles({
     root: {
@@ -30,7 +31,6 @@ export default function Notification() {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const [page, setPage] = React.useState(0);
   const [totalPage, setTotalPage] = React.useState(1);
-  const [isFetching, setIsFetching] = React.useState(false);
 
   const userInfo: KeyCloakTokenInfo = getUserInfo();
 
@@ -44,8 +44,6 @@ export default function Notification() {
 
   useEffect(() => {
     moreData();
-    window.addEventListener('scroll', isScrolling);
-    return () => window.removeEventListener('scroll', isScrolling);
   }, []);
 
   const moreData = async () => {
@@ -57,22 +55,13 @@ export default function Notification() {
           setListData([...listData, ...rs.data]);
           setPage(rs.page);
           setTotalPage(rs.totalPage);
-          setIsFetching(false);
         }
         setOpenLoadingModal(false);
       }
     } catch (error) {
       console.log(error);
+      setOpenLoadingModal(false);
     }
-
-    setIsFetching(false);
-  };
-
-  const isScrolling = () => {
-    if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) {
-      return;
-    }
-    setIsFetching(true);
   };
 
   const onGetData = async () => {
@@ -89,12 +78,6 @@ export default function Notification() {
     setOpenLoadingModal(false);
   };
 
-  useEffect(() => {
-    if (isFetching) {
-      moreData();
-    }
-  }, [isFetching]);
-
   return (
     <>
       <Container maxWidth="xl">
@@ -104,7 +87,16 @@ export default function Notification() {
         </Typography>
 
         <div className={classes.myTask}>
-          <Tasklist onSearch={onGetData} listData={listData} userPermission={userPermission} />
+          <InfiniteScroll
+            dataLength={listData.length}
+            refreshFunction={moreData}
+            next={moreData}
+            hasMore={true}
+            loader={null}
+            pullDownToRefresh
+          >
+            <Tasklist onSearch={onGetData} listData={listData} userPermission={userPermission} />
+          </InfiniteScroll>
         </div>
       </Container>
       <LoadingModal open={openLoadingModal} />
