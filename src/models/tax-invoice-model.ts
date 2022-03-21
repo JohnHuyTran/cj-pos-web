@@ -49,8 +49,13 @@ export interface Address {
   houseNo: string;
   building: string;
   moo: string;
-  subDistrictCode: string;
-  districtCode: string;
-  provinceCode: string;
+  subDistrictCode: number;
+  districtCode: number;
+  provinceCode: number;
   postcode: string;
+}
+
+export interface SaveInvoiceRequest {
+  billNo: string;
+  customer: Customer;
 }

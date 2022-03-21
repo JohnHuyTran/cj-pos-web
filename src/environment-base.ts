@@ -325,6 +325,9 @@ export const environment = {
       detail: {
         url: '/sale/invoice/detail/{billNo}',
       },
+      saveInvoice: {
+        url: '/sale/invoices',
+      },
     },
   },
 };

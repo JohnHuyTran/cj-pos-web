@@ -10,6 +10,10 @@ import { useAppDispatch } from '../../store/store';
 import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
 import DistrictsDropDown from '../commons/ui/search-districts-dropdown';
 import SubDistrictsDropDown from '../commons/ui/search-subDistricts-dropdown';
+import { Address, Customer, SaveInvoiceRequest } from '../../models/tax-invoice-model';
+import { saveInvoice } from '../../services/sale';
+import SnackbarStatus from '../commons/ui/snackbar-status';
+import LoadingModal from '../commons/ui/loading-modal';
 
 interface Props {
   isOpen: boolean;
@@ -74,7 +78,56 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     if (data) {
       setDisabledBtnPreview(false);
       console.log('data: ', data);
+
+      const address: any = {
+        houseNo: data.houseNo,
+        building: data.building,
+        moo: data.moo,
+        subDistrictCode: data.subDistrict,
+        districtCode: data.district,
+        provinceCode: data.province,
+        postcode: data.postcode,
+      };
+      const customer: any = {
+        memberNo: '',
+        taxNo: data.taxIdenNo,
+        firstName: data.name,
+        lastName: data.lastName,
+        adddress: address,
+      };
+
+      const payload: SaveInvoiceRequest = {
+        billNo: '',
+        customer: customer,
+      };
+
+      console.log('payload:', JSON.stringify(payload));
+      handleSaveInvoice(payload);
     }
+  };
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+  const handleSaveInvoice = async (payload: SaveInvoiceRequest) => {
+    setOpenLoadingModal(true);
+    await saveInvoice(payload)
+      .then((value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+        // dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+      })
+      .catch((error: any) => {
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+      });
+
+    setOpenLoadingModal(false);
   };
 
   const [isClear, setIsClear] = React.useState(false);
@@ -86,9 +139,9 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       taxIdenNo: '',
       name: '',
       lastName: '',
-      number: '',
+      houseNo: '',
       building: '',
-      group: '',
+      moo: '',
       province: '',
       district: '',
       subDistrict: '',
@@ -114,12 +167,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       setProvincesCode(provincesCode);
       setDisabledSelDistricts(false);
       setIsClear(false);
-
-      // if (searchDistrictsCode !== '') {
-      //   setSearchProvincesCode('');
-      //   setSearchPostalCode('');
-      //   setIsClear(true);
-      // }
     }
   };
 
@@ -230,7 +277,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 className={classes.MtextField}
                 fullWidth
                 placeholder="กรุณากรอกเลขประจำตัวผู้เสียภาษี"
-                {...register('taxIdenNo', { required: true })}
+                inputProps={{ maxLength: 13 }}
+                {...register('taxIdenNo', { required: true, maxLength: 13 })}
               />
               {errors.taxIdenNo && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -294,10 +342,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 className={classes.MtextField}
                 fullWidth
                 placeholder="กรุณากรอกเลขที่"
-                {...register('number', { required: true })}
+                {...register('houseNo', { required: true })}
               />
 
-              {errors.number && (
+              {errors.houseNo && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
                   กรุณากรอกรายละเอียด
                 </FormHelperText>
@@ -333,7 +381,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 className={classes.MtextField}
                 fullWidth
                 placeholder="กรุณากรอกหมู่"
-                {...register('group')}
+                {...register('moo')}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -412,12 +460,12 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               <TextField
                 id="txtpostCode"
                 size="small"
-                type="number"
+                // type="number"
                 inputProps={{ maxLength: 5 }}
                 className={classes.MtextField}
                 fullWidth
                 placeholder="กรุณากรอกรหัสไปรษณีย์"
-                {...register('postcode', { pattern: /\d+/ })}
+                {...register('postcode', { maxLength: 5, pattern: /\d+/ })}
                 onChange={(e) => {
                   handleChangePostalCode(e);
                 }}
@@ -476,6 +524,15 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
           </Grid>
         </Box>
+
+        <SnackbarStatus
+          open={showSnackBar}
+          onClose={handleCloseSnackBar}
+          isSuccess={snackbarIsStatus}
+          contentMsg={contentMsg}
+        />
+
+        <LoadingModal open={openLoadingModal} />
       </DialogContent>
     </Dialog>
   );
