@@ -10,14 +10,18 @@ import SearchIcon from '@mui/icons-material/Search';
 interface Props {
   onChangeProvinces: (provincesCode: string) => void;
   isClear: boolean;
+  disable?: boolean;
 }
 
-function ProvincesDropDown({ onChangeProvinces, isClear }: Props) {
+function ProvincesDropDown({ onChangeProvinces, isClear, disable }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const [values, setValues] = React.useState<string[]>([]);
 
   useEffect(() => {
     searchProvinces(payload);
+
+    if (isClear) setValues([]);
   }, [isClear]);
 
   let payload: any = {
@@ -48,7 +52,7 @@ function ProvincesDropDown({ onChangeProvinces, isClear }: Props) {
           ),
         }}
         placeholder="กรุณากรอกจังหวัด"
-        className={classes.MtextField}
+        className={classes.MtextFieldAutocomplete}
         size="small"
         fullWidth
       />
@@ -77,6 +81,7 @@ function ProvincesDropDown({ onChangeProvinces, isClear }: Props) {
   return (
     <Autocomplete
       id="selAddItem"
+      value={values}
       fullWidth
       freeSolo
       loadingText="กำลังโหลด..."
@@ -88,6 +93,7 @@ function ProvincesDropDown({ onChangeProvinces, isClear }: Props) {
       getOptionLabel={(option) => (option.nameTH ? option.nameTH : '')}
       isOptionEqualToValue={(option, value) => option.nameTH === value.nameTH}
       renderInput={autocompleteRenderInput}
+      disabled={disable ? true : false}
     />
   );
 }

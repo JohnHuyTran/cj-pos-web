@@ -78,6 +78,15 @@ const useStyles = makeStyles({
       '-webkit-text-fill-color': 'rgba(0, 0, 0, 0.87)',
     },
   },
+  MtextFieldAutocomplete: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      padding: '2px 0 2px !important',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      fontSize: '14px',
+    },
+  },
   Mselect: {
     '& .css-y4ygc1-MuiInputBase-root-MuiOutlinedInput-root': {
       borderRadius: '5px !important',

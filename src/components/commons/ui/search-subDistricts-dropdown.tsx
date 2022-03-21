@@ -1,24 +1,24 @@
 import React, { useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import { CircularProgress, InputAdornment, Typography } from '@mui/material';
+import { CircularProgress, InputAdornment } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
-import { featchProvincesListAsync } from '../../../store/slices/search-provinces-slice';
 import SearchIcon from '@mui/icons-material/Search';
-import { featchDistrictsListAsync } from '../../../store/slices/search-districts-slice';
 import { featchsSubDistrictsListAsync } from '../../../store/slices/search-subDistricts-slice';
 
 interface Props {
   districtsCode: string;
-  onChangeSubDistricts: (subDistrictsCode: string, postalCode: string) => void;
+  onChangeSubDistricts: (subDistrictsCode: string, postalCode: string, districtCode: string) => void;
+  searchPostalCode: string;
   isClear: boolean;
   disable?: boolean;
 }
 
-function SubDistrictsDropDown({ districtsCode, onChangeSubDistricts, isClear, disable }: Props) {
+function SubDistrictsDropDown({ districtsCode, onChangeSubDistricts, searchPostalCode, isClear, disable }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const [values, setValues] = React.useState<string[]>([]);
 
   let payload: any = {
     code: '',
@@ -27,13 +27,22 @@ function SubDistrictsDropDown({ districtsCode, onChangeSubDistricts, isClear, di
     postalCode: '',
   };
   useEffect(() => {
+    if (isClear) setValues([]);
+
     if (districtsCode !== '') {
       payload = {
         districtCode: districtsCode,
       };
       searchSubDistricts(payload);
     }
-  }, [isClear, districtsCode]);
+
+    if (searchPostalCode !== '') {
+      payload = {
+        postalCode: searchPostalCode,
+      };
+      searchSubDistricts(payload);
+    }
+  }, [isClear, districtsCode, searchPostalCode]);
 
   const searchSubDistricts = async (payload: any) => {
     await dispatch(featchsSubDistrictsListAsync(payload));
@@ -59,7 +68,7 @@ function SubDistrictsDropDown({ districtsCode, onChangeSubDistricts, isClear, di
           ),
         }}
         placeholder="กรุณากรอกแขวง / ตำบล"
-        className={classes.MtextField}
+        className={classes.MtextFieldAutocomplete}
         variant="outlined"
         size="small"
         fullWidth
@@ -83,13 +92,18 @@ function SubDistrictsDropDown({ districtsCode, onChangeSubDistricts, isClear, di
 
   const handleChangeItem = async (event: any, option: any, reason: string) => {
     if (option && reason === 'selectOption') {
-      return onChangeSubDistricts(option?.code ? option?.code : '', option?.postalCode ? option?.postalCode : '');
+      return onChangeSubDistricts(
+        option?.code ? option?.code : '',
+        option?.postalCode ? option?.postalCode : '',
+        option?.districtCode ? option?.districtCode : ''
+      );
     }
   };
 
   return (
     <Autocomplete
       id="selAddItem"
+      value={values}
       fullWidth
       freeSolo
       loadingText="กำลังโหลด..."

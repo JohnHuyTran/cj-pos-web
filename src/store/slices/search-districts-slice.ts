@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { environment } from '../../environment-base';
-import { getParamsBody } from '../../adapters/posback-adapter';
+import { getParams } from '../../adapters/posback-adapter';
 import { ContentType } from '../../utils/enum/common-enum';
 import { DistrictsResponse, SearchDistrictsRequest } from '../../models/search-districts-model';
 
@@ -22,7 +22,7 @@ const initialState: State = {
 export const featchDistrictsListAsync = createAsyncThunk('DistrictsList', async (payload: SearchDistrictsRequest) => {
   try {
     const path = `${environment.master.districts.url}`;
-    let response = await getParamsBody(path, payload, ContentType.JSON).then();
+    let response = await getParams(path, payload, ContentType.JSON).then();
 
     if (response === 204) {
       let responseCode: any = {

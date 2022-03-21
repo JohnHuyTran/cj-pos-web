@@ -66,16 +66,21 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     formState: { errors },
     handleSubmit,
     reset,
+    setValue,
+    clearErrors,
   } = useForm();
 
   const onSave = (data: any) => {
     if (data) {
       setDisabledBtnPreview(false);
-      console.log('data province: ', data.province);
+      console.log('data: ', data);
     }
   };
 
+  const [isClear, setIsClear] = React.useState(false);
   const handleClear = () => {
+    setIsClear(true);
+
     reset({
       taxIdenNo: '',
       name: '',
@@ -93,43 +98,69 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [provincesCode, setProvincesCode] = React.useState('');
   const [districtsCode, setDistrictsCode] = React.useState('');
 
+  const [searchProvincesCode, setSearchProvincesCode] = React.useState('');
+  const [searchDistrictsCode, setSearchDistrictsCode] = React.useState('');
+  const [searchPostalCode, setSearchPostalCode] = React.useState('');
+
+  const [disabledSelProvinces, setDisabledSelProvinces] = React.useState(false);
   const [disabledSelDistricts, setDisabledSelDistricts] = React.useState(true);
   const [disabledSelSubDistricts, setDisabledSelSubDistricts] = React.useState(true);
-
   const handleChangeProvinces = (provincesCode: string) => {
-    console.log('handleChangeProvinces:', provincesCode);
-
     if (provincesCode !== '') {
-      reset({
-        province: provincesCode,
-      });
+      setValue('province', provincesCode);
+      clearErrors('province');
+
       setProvincesCode(provincesCode);
+      setDisabledSelDistricts(false);
+      setIsClear(false);
+    }
+  };
+
+  const handleChangeDistricts = (districtsCode: string, provincesCode: string) => {
+    if (districtsCode !== '') {
+      setValue('district', districtsCode);
+      clearErrors('district');
+      setDistrictsCode(districtsCode);
+      setDisabledSelSubDistricts(false);
+    }
+
+    if (searchPostalCode != '') {
+      setSearchProvincesCode(provincesCode);
+      setProvincesCode('');
+      setDisabledSelProvinces(false);
+    }
+
+    setIsClear(false);
+  };
+
+  const handleChangeSubDistricts = (subDistrictsCode: string, postalCode: string, districtCode: string) => {
+    if (subDistrictsCode !== '') {
+      setValue('subDistrict', subDistrictsCode);
+      setValue('postcode', postalCode);
+      clearErrors('subDistrict');
+      clearErrors('postcode');
+    }
+
+    if (searchPostalCode != '') {
+      setSearchDistrictsCode(districtCode);
+      setDistrictsCode('');
       setDisabledSelDistricts(false);
     }
   };
 
-  const handleChangeDistricts = (districtsCode: string) => {
-    console.log('handleChangeDistricts:', districtsCode);
+  const handleChangePostalCode = (e: any) => {
+    const keySearch = e.target.value.trim();
 
-    if (districtsCode !== '') {
-      reset({
-        district: districtsCode,
-      });
-      setDistrictsCode(districtsCode);
+    if (keySearch.length >= 5) {
+      setSearchPostalCode(keySearch);
+      setDistrictsCode('');
       setDisabledSelSubDistricts(false);
-    }
-  };
-
-  const handleChangeSubDistricts = (subDistrictsCode: string, postalCode: string) => {
-    console.log('handleChangeDistricts:', subDistrictsCode, ' / ', postalCode);
-
-    if (subDistrictsCode !== '') {
-      reset({
-        subDistrict: subDistrictsCode,
-        postcode: postalCode,
-      });
-      // setDistrictsCode(subDistrictsCode);
-      // setDisabledSelSubDistricts(false);
+      setDisabledSelProvinces(true);
+    } else if (keySearch.length === 0) {
+      setSearchPostalCode('');
+      setDistrictsCode('');
+      setDisabledSelSubDistricts(true);
+      setDisabledSelProvinces(false);
     }
   };
 
@@ -299,7 +330,11 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              <ProvincesDropDown onChangeProvinces={handleChangeProvinces} isClear={false} />
+              <ProvincesDropDown
+                onChangeProvinces={handleChangeProvinces}
+                isClear={isClear}
+                disable={disabledSelProvinces}
+              />
               <input type="text" {...register('province', { required: true })} style={{ display: 'none' }} />
               {errors.province && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -318,7 +353,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               <DistrictsDropDown
                 provinceCode={provincesCode}
                 onChangeDistricts={handleChangeDistricts}
-                isClear={false}
+                searchDistrictsCode={searchDistrictsCode}
+                isClear={isClear}
                 disable={disabledSelDistricts}
               />
               <input type="text" {...register('district', { required: true })} style={{ display: 'none' }} />
@@ -339,7 +375,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               <SubDistrictsDropDown
                 districtsCode={districtsCode}
                 onChangeSubDistricts={handleChangeSubDistricts}
-                isClear={false}
+                searchPostalCode={searchPostalCode}
+                isClear={isClear}
                 disable={disabledSelSubDistricts}
               />
               <input type="text" {...register('subDistrict', { required: true })} style={{ display: 'none' }} />
@@ -367,6 +404,9 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 fullWidth
                 placeholder="กรุณากรอกรหัสไปรษณีย์"
                 {...register('postcode', { pattern: /\d+/ })}
+                onChange={(e) => {
+                  handleChangePostalCode(e);
+                }}
               />
               {errors.postcode && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>

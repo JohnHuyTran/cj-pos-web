@@ -122,7 +122,7 @@ export function getFile(path: string, contentType = defaultForJSON) {
     });
 }
 
-export function getParamsBody(path: string, payload: any, contentType = defaultForJSON) {
+export function getParams(path: string, payload: any, contentType = defaultForJSON) {
   contentType = contentType;
   return instance
     .get(path, {

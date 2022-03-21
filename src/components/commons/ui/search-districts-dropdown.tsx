@@ -9,14 +9,16 @@ import { featchDistrictsListAsync } from '../../../store/slices/search-districts
 
 interface Props {
   provinceCode: string;
-  onChangeDistricts: (districtsCode: string) => void;
+  onChangeDistricts: (districtsCode: string, provincesCode: string) => void;
+  searchDistrictsCode: string;
   isClear: boolean;
   disable?: boolean;
 }
 
-function DistrictsDropDown({ provinceCode, onChangeDistricts, isClear, disable }: Props) {
+function DistrictsDropDown({ provinceCode, onChangeDistricts, searchDistrictsCode, isClear, disable }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const [values, setValues] = React.useState<string[]>([]);
 
   let payload: any = {
     code: '',
@@ -24,13 +26,22 @@ function DistrictsDropDown({ provinceCode, onChangeDistricts, isClear, disable }
     provinceCode: '',
   };
   useEffect(() => {
+    if (isClear) setValues([]);
+
     if (provinceCode !== '') {
       payload = {
         provinceCode: provinceCode,
       };
       searchDistricts(payload);
     }
-  }, [isClear, provinceCode]);
+
+    if (searchDistrictsCode !== '') {
+      payload = {
+        code: searchDistrictsCode,
+      };
+      searchDistricts(payload);
+    }
+  }, [isClear, provinceCode, searchDistrictsCode]);
 
   const searchDistricts = async (payload: any) => {
     await dispatch(featchDistrictsListAsync(payload));
@@ -56,7 +67,7 @@ function DistrictsDropDown({ provinceCode, onChangeDistricts, isClear, disable }
           ),
         }}
         placeholder="กรุณากรอกเขต / อำเภอ"
-        className={classes.MtextField}
+        className={classes.MtextFieldAutocomplete}
         variant="outlined"
         size="small"
         fullWidth
@@ -79,32 +90,14 @@ function DistrictsDropDown({ provinceCode, onChangeDistricts, isClear, disable }
 
   const handleChangeItem = async (event: any, option: any, reason: string) => {
     if (option && reason === 'selectOption') {
-      return onChangeDistricts(option?.code ? option?.code : '');
+      return onChangeDistricts(option?.code ? option?.code : '', option?.provinceCode ? option?.provinceCode : '');
     }
   };
-
-  // const onInputChange = async (event: any, value: string, reason: string) => {
-  //   if (event && event.keyCode && event.keyCode === 13) {
-  //     return false;
-  //   }
-
-  //   const keyword = value.trim();
-  //   if (keyword.length >= 3 && reason !== 'reset') {
-  //     setLoading(true);
-
-  //     payload = {
-  //       code: '',
-  //       name: keyword,
-  //     };
-
-  //     searchDistricts(payload);
-  //     setLoading(false);
-  //   }
-  // };
 
   return (
     <Autocomplete
       id="selAddItem"
+      value={values}
       fullWidth
       freeSolo
       loadingText="กำลังโหลด..."
