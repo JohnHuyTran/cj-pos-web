@@ -311,10 +311,10 @@ export const environment = {
   sale: {
     taxInvoice: {
       search: {
-        url: 'xxx',
+        url: '/sale/tax-invoices',
       },
       detail: {
-        url: '/sale/invoice/detail/{billNo}',
+        url: '/sale/tax-invoices/{billNo}',
       },
     },
   },
