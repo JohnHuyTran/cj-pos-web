@@ -11,6 +11,7 @@ import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc
 interface Props {
   items: [];
   clearCommment: () => void;
+  isTote: boolean;
 }
 
 const columns: GridColDef[] = [
@@ -119,7 +120,7 @@ var calProductDiff = function (params: GridValueGetterParams) {
   return diff;
 };
 
-export default function DCOrderEntries({ items, clearCommment }: Props): ReactElement {
+export default function DCOrderEntries({ items, clearCommment, isTote }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const rows = items.map((item: CheckOrderDetailItims, index: number) => {
@@ -156,6 +157,12 @@ export default function DCOrderEntries({ items, clearCommment }: Props): ReactEl
       }
     }
   };
+
+  if (isTote) {
+    columns[8]['hide'] = false;
+  } else {
+    columns[8]['hide'] = true;
+  }
 
   return (
     <Box mt={2} bgcolor='background.paper'>

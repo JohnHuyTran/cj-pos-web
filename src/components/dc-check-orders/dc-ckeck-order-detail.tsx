@@ -59,10 +59,16 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const [disableCheckBtn, setDisableCheckBtn] = React.useState(true);
   const detailDC: any = orderDetailList.data ? orderDetailList.data : null;
   const detailDCItems = detailDC.items ? detailDC.items : [];
+
+  const [idVerify, setIDVerify] = React.useState(idDC);
+  const [isTote, setIsTote] = React.useState(false);
+
   useEffect(() => {
     setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
     setOpen(isOpen);
     setValueCommentDC(detailDC.dcComment);
+    setIDVerify(detailDC.id);
+    setIsTote(detailDC.sdType === 0 ? true : false);
   }, [open, detailDC]);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -103,6 +109,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const handleModelConfirm = () => {
     setOpenModelConfirm(false);
   };
+
   const payloadSearchDC = useAppSelector((state) => state.saveSearchOrderDc.searchCriteriaDc);
 
   const handleGenerateBOStatus = async (issuccess: boolean, errorMsg: string) => {
@@ -275,7 +282,9 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
               </Grid>
             </Grid>
           </Box>
-          {detailDCItems !== [] && <DCOrderDetailList items={detailDCItems} clearCommment={handleClearComment} />}
+          {detailDCItems !== [] && (
+            <DCOrderDetailList items={detailDCItems} clearCommment={handleClearComment} isTote={isTote} />
+          )}
         </DialogContent>
       </Dialog>
 
@@ -283,7 +292,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         open={openModelConfirm}
         onClose={handleModelConfirm}
         onUpdateAction={handleGenerateBOStatus}
-        idDC={idDC}
+        idDC={idVerify}
         sdNo={detailDC.sdNo}
         shipmentNo={detailDC.shipmentNo}
         comment={valueCommentDC}
