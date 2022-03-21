@@ -1,16 +1,17 @@
 import React, { ReactElement } from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid, GridColDef, GridRowData, GridValueGetterParams } from '@mui/x-data-grid';
-import { Entry, ShipmentInfo } from '../../models/order-model';
-import { useAppSelector } from '../../store/store';
-import { CheckOrderDetailInfo, CheckOrderDetailItims } from '../../models/dc-check-order-model';
+import { DataGrid, GridCellParams, GridColDef, GridRowData, GridValueGetterParams } from '@mui/x-data-grid';
+import { useAppSelector, useAppDispatch } from '../../store/store';
+import { CheckOrderDetailItims } from '../../models/dc-check-order-model';
 
 import { useStyles } from '../../styles/makeTheme';
 import Typography from '@mui/material/Typography';
+import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
 
 interface Props {
-  //   sdNo: string;
   items: [];
+  clearCommment: () => void;
+  isTote: boolean;
 }
 
 const columns: GridColDef[] = [
@@ -88,6 +89,25 @@ const columns: GridColDef[] = [
     sortable: false,
     headerAlign: 'center',
   },
+  {
+    field: 'sdNo',
+    headerName: 'รับสินค้าใน Tote',
+    flex: 0.5,
+    sortable: false,
+    headerAlign: 'center',
+    renderCell: (params) => {
+      return (
+        <Typography
+          color='secondary'
+          variant='body2'
+          sx={{ textDecoration: 'underline' }}
+          // onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}>
+        >
+          {params.value}
+        </Typography>
+      );
+    },
+  },
 ];
 
 var calProductDiff = function (params: GridValueGetterParams) {
@@ -100,8 +120,9 @@ var calProductDiff = function (params: GridValueGetterParams) {
   return diff;
 };
 
-export default function DCOrderEntries({ items }: Props): ReactElement {
+export default function DCOrderEntries({ items, clearCommment, isTote }: Props): ReactElement {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const rows = items.map((item: CheckOrderDetailItims, index: number) => {
     return {
       id: `${item.barcode}-${index + 1}`,
@@ -114,10 +135,34 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
       productQuantityActual: item.actualQty,
       productDifference: item.qtyDiff,
       productComment: item.comment,
+      sdNo: item.sdNo ? item.sdNo : '',
+      sdID: item.sdID ? item.sdID : '',
+      isTote: item.isTote ? item.isTote : false,
     };
   });
 
   const [pageSize, setPageSize] = React.useState<number>(10);
+
+  const currentlySelected = async (params: GridCellParams) => {
+    const fieldName = params.colDef.field;
+    const sdId: any = params.getValue(params.id, 'sdID');
+    const sdNo = params.getValue(params.id, 'sdNo');
+    if (fieldName === 'sdNo' && sdId) {
+      try {
+        await dispatch(featchorderDetailDCAsync(sdId));
+        await dispatch(setReloadScreen(true));
+        clearCommment();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  if (isTote) {
+    columns[8]['hide'] = false;
+  } else {
+    columns[8]['hide'] = true;
+  }
 
   return (
     <Box mt={2} bgcolor='background.paper'>
@@ -134,6 +179,7 @@ export default function DCOrderEntries({ items }: Props): ReactElement {
           disableColumnMenu
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
+          onCellClick={currentlySelected}
         />
       </div>
     </Box>
