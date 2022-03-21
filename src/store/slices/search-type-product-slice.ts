@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { environment } from '../../environment-base';
-import {get, post} from '../../adapters/posback-adapter';
-import {ItemsResponse, PayloadSearchProduct, ProductTypeResponse} from '../../models/modal-add-all-items-model';
+import { get, post } from '../../adapters/posback-adapter';
+import { ItemsResponse, PayloadSearchProduct, ProductTypeResponse } from '../../models/modal-add-all-items-model';
 
 type State = {
   itemList: ItemsResponse;
@@ -38,27 +38,34 @@ const initialState: State = {
   error: '',
 };
 
-export const searchAllProductAsync = createAsyncThunk('searchAllProductAsync', async (payloadSearchProduct: PayloadSearchProduct) => {
-  try {
-    const path = `${environment.products.addItem.allitemsList.url}/${payloadSearchProduct.search}?limit=10`;
-    let response = await post(path, {productTypeCodes: payloadSearchProduct.productTypeCodes}).then();
+export const searchAllProductAsync = createAsyncThunk(
+  'searchAllProductAsync',
+  async (payloadSearchProduct: PayloadSearchProduct) => {
+    try {
+      const path = `${environment.products.addItem.allitemsList.url}/${payloadSearchProduct.search}?limit=10`;
+      let response = await post(path, {
+        productTypeCodes: payloadSearchProduct.productTypeCodes,
+        skuTypes: [2],
+        isSellable: true,
+      }).then();
 
-    if (response === 204) {
-      let responseCode: any = {
-        ref: '',
-        code: response,
-        message: '',
-        data: [],
-      };
+      if (response === 204) {
+        let responseCode: any = {
+          ref: '',
+          code: response,
+          message: '',
+          data: [],
+        };
 
-      return responseCode;
+        return responseCode;
+      }
+
+      return response;
+    } catch (error) {
+      throw error;
     }
-
-    return response;
-  } catch (error) {
-    throw error;
   }
-});
+);
 
 export const searchAllProductTypeAsync = createAsyncThunk('searchAllProductTypeAsync', async (search: string) => {
   try {
@@ -116,30 +123,30 @@ const searchTypeAndProduct = createSlice({
     builer.addCase(searchAllProductAsync.pending, () => {
       initialState;
     }),
-    builer.addCase(searchAllProductAsync.fulfilled, (state, action: PayloadAction<any>) => {
-      state.itemList = action.payload;
-    }),
-    builer.addCase(searchAllProductAsync.rejected, () => {
-      initialState;
-    }),
-    builer.addCase(searchAllProductTypeAsync.pending, () => {
-      initialState;
-    }),
-    builer.addCase(searchAllProductTypeAsync.fulfilled, (state, action: PayloadAction<any>) => {
-      state.productTypeList = action.payload;
-    }),
-    builer.addCase(searchAllProductTypeAsync.rejected, () => {
-      initialState;
-    }),
-    builer.addCase(getAllProductByType.pending, () => {
-      initialState;
-    }),
-    builer.addCase(getAllProductByType.fulfilled, (state, action: PayloadAction<any>) => {
-      state.productByTypeList = action.payload;
-    }),
-    builer.addCase(getAllProductByType.rejected, () => {
-      initialState;
-    });
+      builer.addCase(searchAllProductAsync.fulfilled, (state, action: PayloadAction<any>) => {
+        state.itemList = action.payload;
+      }),
+      builer.addCase(searchAllProductAsync.rejected, () => {
+        initialState;
+      }),
+      builer.addCase(searchAllProductTypeAsync.pending, () => {
+        initialState;
+      }),
+      builer.addCase(searchAllProductTypeAsync.fulfilled, (state, action: PayloadAction<any>) => {
+        state.productTypeList = action.payload;
+      }),
+      builer.addCase(searchAllProductTypeAsync.rejected, () => {
+        initialState;
+      }),
+      builer.addCase(getAllProductByType.pending, () => {
+        initialState;
+      }),
+      builer.addCase(getAllProductByType.fulfilled, (state, action: PayloadAction<any>) => {
+        state.productByTypeList = action.payload;
+      }),
+      builer.addCase(getAllProductByType.rejected, () => {
+        initialState;
+      });
   },
 });
 

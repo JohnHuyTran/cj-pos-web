@@ -14,6 +14,7 @@ import { ApiError } from '../../../models/api-error-model';
 import { delFileUrlHuawei } from '../../../services/purchase';
 import { getFileUrlHuawei } from '../../../services/master-service';
 import ModalShowHuaweiFile from '../../commons/ui/modal-show-huawei-file';
+import { stringNullOrEmpty } from "../../../utils/utils";
 
 interface fileDisplayList {
   file?: File;
@@ -29,9 +30,13 @@ interface Props {
   docType?: string | null | undefined | '';
   isStatus: boolean;
   onChangeUploadFile: (status: boolean) => void;
+  onDeleteAttachFile?: (item: any) => void;
+  enabledControl?: boolean;
+  warningMessage?: string;
 }
 
-function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFile }: Props): ReactElement {
+function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFile,
+                               onDeleteAttachFile, enabledControl, warningMessage}: Props): ReactElement {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
@@ -94,9 +99,6 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
         return (checkError = true);
       }
     }
-  };
-  const handleFileInputClick = (e: any) => {
-    e.target.value = '';
   };
 
   const handleFileInputChange = (e: any) => {
@@ -212,6 +214,20 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
     }
   };
 
+  const handleDeleteAttachFile = (file: any) => {
+    //handle custom delete attach file
+    if (file.status === 'new') {
+      setFileList(fileList.filter((r: any) => r.name !== file.fileName));
+    } else if (file.status === 'old') {
+      if (onDeleteAttachFile) onDeleteAttachFile(file);
+    }
+  };
+
+  const handleFileInputClick = (e: any) => {
+    //handle attach file again after remove this file
+    e.target.value = '';
+  }
+
   const closeDialogConfirm = (value: string) => {
     setErrorBrowseFile(false);
   };
@@ -226,7 +242,8 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
             variant='contained'
             component='span'
             className={classes.MbtnBrowse}
-            disabled={newFileDisplayList.length === 5}>
+            disabled={newFileDisplayList.length === 5 || !enabledControl}
+          >
             แนบไฟล์
           </Button>
         </label>
@@ -245,6 +262,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
         onClick={handleFileInputClick}
         onChange={handleFileInputChange}
         style={{ display: 'none' }}
+        disabled={newFileDisplayList.length === 5 || !enabledControl}
       />
 
       <Box
@@ -253,13 +271,15 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
           py: 1,
           mt: 2,
           borderRadius: '5px',
-          border: `1px dashed ${theme.palette.primary.main}`,
-        }}>
+          border: stringNullOrEmpty(warningMessage) ? `1px dashed ${theme.palette.primary.main}` : `1px dashed #F54949`,
+        }}
+      >
         <Box
           sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => {
             if (newFileDisplayList.length > 0) setAccordionFile(!accordionFile);
-          }}>
+          }}
+        >
           <Typography sx={{ fontSize: '14px', color: '#676767' }}>
             เอกสารแนบ จำนวน {newFileDisplayList.length}/5
           </Typography>
@@ -279,7 +299,8 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                }}>
+                }}
+              >
                 {item.status === 'old' && (
                   <Typography
                     color='secondary'
@@ -295,13 +316,18 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
                   </Typography>
                 )}
 
-                <IconButton onClick={() => handleDelete(item)} size='small'>
-                  <CloseIcon fontSize='small' color='error' />
+                <IconButton sx={{ display: enabledControl ? undefined: 'none'}}
+                            onClick={() => onDeleteAttachFile ? handleDeleteAttachFile(item) : handleDelete(item)} size="small">
+                  <CloseIcon fontSize="small" color="error" />
                 </IconButton>
               </Box>
             ))}
         </Box>
       </Box>
+      <Typography hidden={stringNullOrEmpty(warningMessage)}
+                  sx={{ fontSize: '14px', color: '#F54949', textAlign: 'right' }}>
+        {warningMessage}
+      </Typography>
 
       <ModalShowHuaweiFile
         open={displayFile}

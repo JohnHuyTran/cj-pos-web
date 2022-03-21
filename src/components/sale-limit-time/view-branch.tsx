@@ -15,13 +15,13 @@ import {
   Typography,
 } from '@mui/material';
 import { Box } from '@mui/system';
-import React from 'react';
+import React, { useEffect } from 'react';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { useStyles } from '../../styles/makeTheme';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../store/store';
-
+import { fetchTotalBranch } from '../../store/slices/search-branches-province-slice';
 interface Props {
   values: any;
 }
@@ -37,6 +37,13 @@ export default function ViewBranch({ values }: Props) {
   const provinces = values.appliedBranches.province || [];
   const totalBranches = useAppSelector((state) => state.searchBranchProvince.totalBranches);
   const { t } = useTranslation(['common']);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (open) {
+      dispatch(fetchTotalBranch());
+    }
+  }, [open]);
 
   const BranchItem = (props: ItemProps) => {
     const { label } = props;
@@ -46,6 +53,7 @@ export default function ViewBranch({ values }: Props) {
       </div>
     );
   };
+
   const handleOpenModal = () => {
     setOpen(true);
   };

@@ -79,7 +79,7 @@ export default function ModalReject({open, onClose, barCode, id}: Props): ReactE
                 <DialogContent sx={{mr: 4, ml: 4}}>
                     <DialogContentText id="alert-dialog-description" sx={{color: '#263238'}}>
                         <Typography variant="h6" align="center" sx={{marginBottom: 2}}>
-                            ยืนยันยกเลิกขอส่วนลดสินค้า
+                            ยืนยันไม่อนุมัติส่วนลดสินค้า
                         </Typography>
                         {!!barCode && (
                             <Typography variant="body1" align="left" sx={{marginBottom: 2}}>
