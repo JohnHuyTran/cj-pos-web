@@ -728,6 +728,14 @@ export default function CheckOrderDetail({
     setUploadFileFlag(status);
   };
 
+  const handleStatusCloseModal = (status: boolean) => {
+    console.log('status: ', status);
+    if (status === true) {
+      setOpen(false);
+      onClickClose();
+    }
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -970,9 +978,11 @@ export default function CheckOrderDetail({
               />
             </div>
 
-            <div>
-              <CheckOrderDetailListTote />
-            </div>
+            {showCloseJobBtn && orderDetail.sdType === 0 && (
+              <div>
+                <CheckOrderDetailListTote onCloseCheckOrderDetail={handleStatusCloseModal} />
+              </div>
+            )}
           </Box>
         </DialogContent>
       </Dialog>

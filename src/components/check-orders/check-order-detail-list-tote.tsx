@@ -1,15 +1,32 @@
 import React, { useMemo } from 'react';
-import { Button, TextField, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams, useGridApiRef } from '@mui/x-data-grid';
-import { useAppSelector } from '../../store/store';
+import { Button, Link, TextField, Typography } from '@mui/material';
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRenderCellParams,
+  GridValueGetterParams,
+  useGridApiRef,
+} from '@mui/x-data-grid';
+import { useAppSelector, useAppDispatch } from '../../store/store';
 import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import { useStyles } from '../../styles/makeTheme';
+import OrderReceiveDetail from './order-receive-detail';
+import LoadingModal from '../commons/ui/loading-modal';
+import CheckOrderDetailTote from '../check-orders/check-order-detail-tote';
+import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+interface CheckOrderDetailListToteProps {
+  onCloseCheckOrderDetail: (value: boolean) => void;
+}
 
-function CheckOrderDetailListTote() {
+function CheckOrderDetailListTote({ onCloseCheckOrderDetail }: CheckOrderDetailListToteProps) {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const orderDetails = useAppSelector((state) => state.checkOrderDetail.orderDetail);
   const orderDetail: any = orderDetails.data ? orderDetails.data : null;
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
 
   const columns: GridColDef[] = [
     {
@@ -117,59 +134,32 @@ function CheckOrderDetailListTote() {
     {
       field: 'canAddTote',
       headerName: 'รับสินค้าใน Tote',
-      width: 140,
+      width: 125,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
       renderCell: (params) => {
-        return (
-          <Button
-            variant="contained"
-            size="small"
-            className={classes.MbtnApprove}
-            sx={{ minWidth: 110 }}
-            // onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}
-          >
-            รับสินค้าใน Tote
-          </Button>
-        );
-
-        // if (params.getValue(params.id, 'piStatus') === 1) {
-        //   if (params.getValue(params.id, 'pnState') === 0) {
-        //     //check Create PN
-        //     return (
-        //       <Button
-        //         variant="contained"
-        //         color="warning"
-        //         size="small"
-        //         className={classes.MbtnSearch}
-        //         sx={{ minWidth: 90 }}
-        //         onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}
-        //       >
-        //         คืนสินค้า
-        //       </Button>
-        //     );
-        //   } else {
-        //     //PN Number 'บันทึก pnState=1, อนุมัติpnState=2'
-        //     return (
-        //       <Typography
-        //         color="secondary"
-        //         variant="body2"
-        //         sx={{ textDecoration: 'underline' }}
-        //         onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}
-        //       >
-        //         {params.value}
-        //       </Typography>
-        //     );
-        //   }
-        // } else {
-        //   return (
-        //     <Box
-        //       sx={{ height: '100%', width: '100px' }}
-        //       onClick={() => handleOpenReturnModal(params.row.piNo, 'blank')}
-        //     ></Box>
-        //   );
-        // }
+        if (params.getValue(params.id, 'sdNo')) {
+          return (
+            <Link component="button" variant="caption" onClick={() => handleLinkDetailTote(params.row.sdNo)}>
+              {params.getValue(params.id, 'sdNo')}
+            </Link>
+          );
+        } else if (params.getValue(params.id, 'sdNo') === '' && params.getValue(params.id, 'canAddTote') === true) {
+          return (
+            <Button
+              variant="contained"
+              size="small"
+              className={classes.MbtnApprove}
+              sx={{ minWidth: 110 }}
+              onClick={() => handleOpenOrderReceiveModal()}
+            >
+              รับสินค้าใน Tote
+            </Button>
+          );
+        } else {
+          return <div></div>;
+        }
       },
     },
   ];
@@ -234,10 +224,47 @@ function CheckOrderDetailListTote() {
         actualQty: actualQty,
         qtyDiff: item.qtyDiff,
         comment: item.comment,
-        canAddTote: item.canAddTote ? item.canAddTote : false,
+        canAddTote: item.canAddTote,
         sdNo: item.sdNo ? item.sdNo : '',
       };
     });
+  }
+
+  const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
+  const handleOpenOrderReceiveModal = () => {
+    setOpenOrderReceiveModal(true);
+  };
+
+  function handleCloseOrderReceiveModal() {
+    setOpenOrderReceiveModal(false);
+  }
+
+  const [openDetailToteModal, setOpenDetailToteModal] = React.useState(false);
+  const handleLinkDetailTote = async (sdNo: string) => {
+    console.log('sdNo: ', sdNo);
+    // setOpenLoadingModal(true);
+    await dispatch(featchOrderDetailAsync(sdNo));
+    setOpenDetailToteModal(true);
+    // onCloseCheckOrderDetail(true);
+
+    // await dispatch(featchOrderDetailAsync(params.row.sdNo))
+    //   .then(
+    //     async function (value) {
+    //       setOpens(true);
+    //     },
+    //     function (error: ApiError) {
+    //       console.log('err message : ', error.message);
+    //     }
+    //   )
+    //   .catch((err) => {
+    //     console.log('err : ', err);
+    //   });
+
+    // setOpenLoadingModal(false);
+  };
+
+  function handleCloseDetailToteModal() {
+    setOpenDetailToteModal(false);
   }
 
   return (
@@ -260,6 +287,20 @@ function CheckOrderDetailListTote() {
         // onCellKeyDown={handleEditItems}
         // onCellBlur={handleEditItems}
       />
+
+      {openOrderReceiveModal && (
+        <OrderReceiveDetail
+          defaultOpen={openOrderReceiveModal}
+          onClickClose={handleCloseOrderReceiveModal}
+          isTote={true}
+        />
+      )}
+
+      {openDetailToteModal && (
+        <CheckOrderDetailTote defaultOpen={openDetailToteModal} onClickClose={handleCloseDetailToteModal} />
+      )}
+
+      <LoadingModal open={openLoadingModal} />
     </div>
   );
 }

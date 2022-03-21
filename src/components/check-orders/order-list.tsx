@@ -302,10 +302,7 @@ function OrderList() {
   return (
     <div>
       {/* <Box mt={2} bgcolor="background.paper"> */}
-      <div
-        className={classes.MdataGridPaginationTop}
-        style={{ height: rows.length >= 10 ? '80vh' : 'auto', width: '100%' }}
-      >
+      <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
         <DataGrid
           rows={rows}
           columns={columns}

@@ -26,6 +26,7 @@ import { searchOrderReceiveAsync } from '../../store/slices/order-receive-slice'
 export interface OrderReceiveDetailProps {
   defaultOpen: boolean;
   onClickClose: any;
+  isTote?: boolean;
 }
 
 export interface DialogTitleProps {
@@ -65,13 +66,17 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderReceiveDetailProps) {
+export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }: OrderReceiveDetailProps) {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const orderReceiveResp = useAppSelector((state) => state.orderReceiveSlice.orderReceiveList);
   const orderReceiveData = orderReceiveResp.data ? orderReceiveResp.data : {};
   const orderReceiveEntries = orderReceiveData.entries;
+  const orderDetails = useAppSelector((state) => state.checkOrderDetail.orderDetail);
+  const orderDetail: any = orderDetails.data ? orderDetails.data : null;
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
+  const [isTotes, setIsTotes] = React.useState(isTote);
   const [open, setOpen] = React.useState(defaultOpen);
   const [values, setValues] = React.useState<State>({
     docNo: '',
@@ -164,7 +169,8 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          <Typography sx={{ fontSize: '1em' }}>รับสินค้า</Typography>
+          {isTotes && <Typography sx={{ fontSize: '1em' }}>รับสินค้าใน Tote</Typography>}
+          {!isTotes && <Typography sx={{ fontSize: '1em' }}>รับสินค้า</Typography>}
         </BootstrapDialogTitle>
 
         <DialogContent>
@@ -174,19 +180,26 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose }: OrderR
                 <Typography variant="body2">เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <TextField
-                  id="txtDocNo"
-                  name="docNo"
-                  size="small"
-                  value={values.docNo}
-                  onChange={handleChange}
-                  className={classes.MtextField}
-                  placeholder="เลขที่เอกสาร LD/BT"
-                />
+                {isTotes && (
+                  <Typography variant="body2">{orderDetail.docRefNo ? orderDetail.docRefNo : '-'}</Typography>
+                )}
+                {!isTotes && (
+                  <>
+                    <TextField
+                      id="txtDocNo"
+                      name="docNo"
+                      size="small"
+                      value={values.docNo}
+                      onChange={handleChange}
+                      className={classes.MtextField}
+                      placeholder="เลขที่เอกสาร LD/BT"
+                    />
 
-                <IconButton color="primary" component="span" onClick={handleSearch}>
-                  <SearchIcon />
-                </IconButton>
+                    <IconButton color="primary" component="span" onClick={handleSearch}>
+                      <SearchIcon />
+                    </IconButton>
+                  </>
+                )}
               </Grid>
             </Grid>
             <Grid container spacing={1} mb={1}>
