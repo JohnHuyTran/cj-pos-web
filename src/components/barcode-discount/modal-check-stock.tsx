@@ -59,7 +59,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => {
       return (
         <Typography variant="body2" sx={{ color: 'red', marginRight: '10px' }}>
-          <b>{params.value}</b>
+          <b>{params.value}{' '}{params.row.unitName}</b>
         </Typography>
       );
     },
@@ -78,6 +78,7 @@ export default function ModalCheckStock({ open, onClose }: Props) {
         productName: item.productName,
         stockRemain: item.stockRemain,
         skuCode: item.skuCode,
+        unitName: item.unitName
       };
     });
   }

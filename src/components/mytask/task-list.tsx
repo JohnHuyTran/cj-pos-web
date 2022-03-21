@@ -23,16 +23,20 @@ export default function Tasklist({ userPermission, listData, onSearch }: Props) 
   const requestor = userPermission.includes('campaign.bd.create');
   const viewer = !userPermission.includes('campaign.st.create');
 
-  const listDiscount = listData.filter((item: any) => item.type === 'APPROVE_OR_REJECT_BD');
-  const listST = listData.filter((item: any) => item.type === 'ST_START');
+  const listDiscount = listData.filter(
+    (item: any) =>
+      item.type === 'APPROVE_BARCODE' || item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'REJECT_BARCODE'
+  );
+  const listST = listData.filter((item: any) => item.type === 'SALE_LIMIT_START');
 
   const listItemTaskDiscount =
     !!approver && listDiscount.length > 0
       ? listDiscount
-          .filter((el: any) => el.payload.status === 3)
-          .map((item: any) => {
+          .filter((el: any) => el.payload.status === 2)
+          .map((item: any, index: any) => { 
             return (
               <TaskForBarcodeDiscount
+                key={index}
                 onSearch={onSearch}
                 payload={item.payload}
                 permission={approver ? 'approver' : requestor ? 'requestor' : ''}
@@ -42,10 +46,11 @@ export default function Tasklist({ userPermission, listData, onSearch }: Props) 
           })
       : !!requestor && listDiscount.length > 0
       ? listDiscount
-          .filter((el: any) => el.payload.status != 3)
-          .map((item: any) => {
+          .filter((el: any) => el.payload.status > 2)
+          .map((item: any, index: any) => {
             return (
               <TaskForBarcodeDiscount
+                key={index}
                 onSearch={onSearch}
                 payload={item.payload}
                 permission={approver ? 'approver' : requestor ? 'requestor' : ''}
@@ -56,9 +61,14 @@ export default function Tasklist({ userPermission, listData, onSearch }: Props) 
       : null;
   const listItemTaskST =
     !!viewer && listST.length > 0
-      ? listST.map((item: any) => {
+      ? listST.map((item: any, index: any) => {
           return (
-            <TaskForSaleLimitTime permission={viewer ? 'viewer' : ''} payload={item.payload} onSearch={onSearch} />
+            <TaskForSaleLimitTime
+              key={index}
+              permission={viewer ? 'viewer' : ''}
+              payload={item.payload}
+              onSearch={onSearch}
+            />
           );
         })
       : null;

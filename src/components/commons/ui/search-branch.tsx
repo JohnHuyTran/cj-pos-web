@@ -1,3 +1,4 @@
+import React, { ReactElement, useEffect, useRef } from 'react';
 import {
   Autocomplete,
   Button,
@@ -15,13 +16,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { ReactElement, useEffect } from 'react';
+import { Box } from '@mui/system';
+import { useTranslation } from 'react-i18next';
 import SearchIcon from '@mui/icons-material/Search';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import _ from 'lodash';
+
 import { useStyles } from '../../../styles/makeTheme';
-import { Box } from '@mui/system';
-import { useTranslation } from 'react-i18next';
 import { ItemProps, ListBranches } from '../../../models/search-branch-province-model';
 import {
   fetchProvinceListAsync,
@@ -31,7 +33,6 @@ import {
 } from '../../../store/slices/search-branches-province-slice';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { paramsConvert } from '../../../utils/utils';
-const _ = require('lodash');
 interface Props {
   error?: boolean;
   helperText?: string;
@@ -56,6 +57,7 @@ export default function SearchBranch(props: Props): ReactElement {
   const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
   const totalBranches = useAppSelector((state) => state.searchBranchProvince.totalBranches);
   const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
+  const searchDebouceRef = useRef<any>();
 
   const dispatch = useAppDispatch();
   const autocompleteRenderListItem = (props: any, option: any) => {
@@ -179,32 +181,34 @@ export default function SearchBranch(props: Props): ReactElement {
     setChecked(false);
   };
 
-  const onInputChange = async (event: any, value: string, reason: string) => {
-    if (event && event.keyCode && event.keyCode === 13) {
-      return false;
-    }
-
-    // if (reason == 'reset') {
-    //   clearInput();
-    // }
-
-    const keyword = value.trim();
-    if (keyword.length >= 3 && reason !== 'reset') {
+  const onInputChange = (event: any, value: string) => {
+    searchDebouceRef.current?.cancel();
+    searchDebouceRef.current = _.debounce(() => {
+      if (event?.keyCode === 13) return;
+  
+      const keyword = value.trim();
+      const payload: {[key: string]: any} = {
+        name: keyword,
+        code: keyword,
+        limit: '10',
+      };
+  
+      if(!!province?.name) {
+        payload.province = province.name;
+      }
+      const params = paramsConvert(payload);
+  
       try {
-        const payload = {
-          name: keyword,
-          code: keyword,
-          ...(!!province && { province: province.name }),
-          limit: '10',
-        };
-        const params = paramsConvert(payload);
         dispatch(fetchBranchProvinceListAsync(params));
       } catch (error) {
-        console.log(error);
-        throw error;
+        console.error(error);
       }
-    }
+
+    }, 200);
+    searchDebouceRef.current()
+    
   };
+
   const handleCloseBranch = (event: React.SyntheticEvent, reason: string) => {
     try {
       const payload = {
