@@ -12,12 +12,6 @@ interface Props {
 }
 
 export default function Tasklist({ userPermission, listData, onSearch }: Props) {
-  const useStyles = makeStyles({
-    root: {
-      minWidth: 275,
-      marginTop: '8px',
-    },
-  });
 
   const approver = userPermission.includes('campaign.bd.approve');
   const requestor = userPermission.includes('campaign.bd.create');
