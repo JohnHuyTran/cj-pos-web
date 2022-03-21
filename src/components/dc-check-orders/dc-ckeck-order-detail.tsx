@@ -63,7 +63,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
     setOpen(isOpen);
     setValueCommentDC(detailDC.dcComment);
-  }, [open]);
+  }, [open, detailDC]);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });

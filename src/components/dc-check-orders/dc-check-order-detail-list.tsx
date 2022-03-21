@@ -89,7 +89,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
   },
   {
-    field: 'docNo',
+    field: 'sdNo',
     headerName: 'รับสินค้าใน Tote',
     flex: 0.5,
     sortable: false,
@@ -134,7 +134,9 @@ export default function DCOrderEntries({ items, clearCommment }: Props): ReactEl
       productQuantityActual: item.actualQty,
       productDifference: item.qtyDiff,
       productComment: item.comment,
-      docNo: item.docNo ? item.docNo : '111111',
+      sdNo: item.sdNo ? item.sdNo : '',
+      sdID: item.sdID ? item.sdID : '',
+      isTote: item.isTote ? item.isTote : false,
     };
   });
 
@@ -142,10 +144,11 @@ export default function DCOrderEntries({ items, clearCommment }: Props): ReactEl
 
   const currentlySelected = async (params: GridCellParams) => {
     const fieldName = params.colDef.field;
-    const value = params.getValue(params.id, 'docNo');
-    if (fieldName === 'docNo') {
+    const sdId: any = params.getValue(params.id, 'sdID');
+    const sdNo = params.getValue(params.id, 'sdNo');
+    if (fieldName === 'sdNo' && sdId) {
       try {
-        await dispatch(featchorderDetailDCAsync('623047a0283ab8738c0b6a1e'));
+        await dispatch(featchorderDetailDCAsync(sdId));
         await dispatch(setReloadScreen(true));
         clearCommment();
       } catch (error) {

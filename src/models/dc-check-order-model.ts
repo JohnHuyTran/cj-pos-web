@@ -79,8 +79,11 @@ export interface CheckOrderDetailItims {
   actualQty: number;
   qtyDiff: number;
   comment: string;
-  docNo?: string;
   id?: string;
+  toteCode?: string;
+  sdNo?: string;
+  sdID?: string;
+  isTote?: boolean;
 }
 
 export interface ItemsState {
