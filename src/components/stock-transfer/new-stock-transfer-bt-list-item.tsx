@@ -41,7 +41,7 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    minWidth: 200,
+    minWidth: 150,
     flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
@@ -51,7 +51,7 @@ const columns: GridColDef[] = [
     field: 'barcodeName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
-    minWidth: 220,
+    minWidth: 200,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
@@ -116,6 +116,7 @@ const columns: GridColDef[] = [
     headerName: 'เลข Tote/ลัง',
     minWidth: 120,
     headerAlign: 'center',
+    flex: 0.45,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
@@ -136,8 +137,8 @@ const columns: GridColDef[] = [
   {
     field: 'boNo',
     headerName: 'เลขที่ BO',
-    minWidth: 200,
-    flex: 0.7,
+    minWidth: 150,
+    flex: 0.35,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
