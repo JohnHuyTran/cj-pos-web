@@ -80,6 +80,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [isClear, setIsClear] = React.useState(false);
   const handleClear = () => {
     setIsClear(true);
+    setSearchProvincesCode('');
 
     reset({
       taxIdenNo: '',
@@ -113,6 +114,12 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       setProvincesCode(provincesCode);
       setDisabledSelDistricts(false);
       setIsClear(false);
+
+      // if (searchDistrictsCode !== '') {
+      //   setSearchProvincesCode('');
+      //   setSearchPostalCode('');
+      //   setIsClear(true);
+      // }
     }
   };
 
@@ -146,6 +153,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       setDistrictsCode('');
       setDisabledSelDistricts(false);
     }
+
+    setIsClear(false);
   };
 
   const handleChangePostalCode = (e: any) => {
@@ -153,14 +162,18 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
     if (keySearch.length >= 5) {
       setSearchPostalCode(keySearch);
+      setProvincesCode('');
       setDistrictsCode('');
       setDisabledSelSubDistricts(false);
       setDisabledSelProvinces(true);
     } else if (keySearch.length === 0) {
+      setSearchProvincesCode('');
       setSearchPostalCode('');
       setDistrictsCode('');
+      setDisabledSelDistricts(true);
       setDisabledSelSubDistricts(true);
       setDisabledSelProvinces(false);
+      setIsClear(true);
     }
   };
 
@@ -332,6 +345,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
             <Grid item xs={3}>
               <ProvincesDropDown
                 onChangeProvinces={handleChangeProvinces}
+                searchProvincesCode={searchProvincesCode}
                 isClear={isClear}
                 disable={disabledSelProvinces}
               />

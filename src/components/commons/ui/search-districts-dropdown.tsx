@@ -94,6 +94,11 @@ function DistrictsDropDown({ provinceCode, onChangeDistricts, searchDistrictsCod
     }
   };
 
+  if (options.length === 1 && values.length === 0 && !isClear) {
+    setValues(options[0]);
+    handleChangeItem('', options[0], 'selectOption');
+  }
+
   return (
     <Autocomplete
       id="selAddItem"

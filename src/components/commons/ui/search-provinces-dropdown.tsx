@@ -9,25 +9,33 @@ import SearchIcon from '@mui/icons-material/Search';
 
 interface Props {
   onChangeProvinces: (provincesCode: string) => void;
+  searchProvincesCode: string;
   isClear: boolean;
   disable?: boolean;
 }
 
-function ProvincesDropDown({ onChangeProvinces, isClear, disable }: Props) {
+function ProvincesDropDown({ onChangeProvinces, searchProvincesCode, isClear, disable }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<string[]>([]);
-
-  useEffect(() => {
-    searchProvinces(payload);
-
-    if (isClear) setValues([]);
-  }, [isClear]);
 
   let payload: any = {
     code: '',
     name: '',
   };
+
+  useEffect(() => {
+    if (isClear) setValues([]);
+
+    if (searchProvincesCode !== '') {
+      payload = {
+        code: searchProvincesCode,
+      };
+    }
+
+    searchProvinces(payload);
+  }, [isClear, searchProvincesCode]);
+
   const searchProvinces = async (payload: any) => {
     await dispatch(featchProvincesListAsync(payload));
   };
@@ -77,6 +85,11 @@ function ProvincesDropDown({ onChangeProvinces, isClear, disable }: Props) {
       return onChangeProvinces(option?.code ? option?.code : '');
     }
   };
+
+  if (options.length === 1 && values.length === 0 && !isClear) {
+    setValues(options[0]);
+    handleChangeItem('', options[0], 'selectOption');
+  }
 
   return (
     <Autocomplete
