@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from './store/store';
 import { featchBranchListAsync } from './store/slices/search-branches-slice';
 import { featchAuthorizedBranchListAsync } from './store/slices/authorized-branch-slice';
 import Notification from './pages/notification';
+import TransferOut from './pages/transfer-out/transfer-out';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -87,6 +88,7 @@ export default function App2() {
           <Route path='/supplier-check-order' component={SupplierCheckOrder} />
           <Route path='/stock-transfer' component={StockTransfer} />
           <Route path='/stock-transfer-rt' component={StockTransferRt} />
+          <Route path='/transfer-out' component={TransferOut} />
         </Switch>
       </Main>
     </Box>

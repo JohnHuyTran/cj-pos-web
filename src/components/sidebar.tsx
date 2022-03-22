@@ -19,6 +19,7 @@ import LoyaltyOutlinedIcon from '@mui/icons-material/LoyaltyOutlined';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import StarBorder from '@mui/icons-material/StarBorder';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
+import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { useAppSelector, useAppDispatch } from '../store/store';
@@ -78,6 +79,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [openSellMenu, setOpenSellMenu] = React.useState(false);
   const [openPickUpMenu, setOpenPickUpMenu] = React.useState(false);
   const [openTransferMenu, setOpenTransferMenu] = React.useState(false);
+  const [openTransferOutMenu, setOpenTransferOutMenu] = React.useState(false);
 
   const navState = useAppSelector((state) => state.navigator.state);
 
@@ -135,6 +137,9 @@ export default function Sidebar({}: Props): ReactElement {
 
   const handleClickTransfer = () => {
     setOpenTransferMenu(!openTransferMenu);
+  };
+  const handleClickTransferOut = () => {
+    setOpenTransferOutMenu(!openTransferOutMenu);
   };
   return (
     <Drawer
@@ -313,6 +318,32 @@ export default function Sidebar({}: Props): ReactElement {
                 onClick={() => handleListItemClick(9)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='โอนสินค้าระหว่างสาขา/คลัง' />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        <ListItemButton onClick={handleClickTransferOut} id='mainMenuTransferOut'>
+          <ListItemIcon>
+            <PresentToAllIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary='เบิก'
+            style={{ marginLeft: -15}}
+          />
+          {openTransferOutMenu ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openTransferOutMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
+            <Link
+              to='/transfer-out'
+              style={{ textDecoration: 'none', color: '#676767'}}
+              id='subMenuTransferOut'>
+              <ListItemButton
+                key='TransferOut'
+                selected={selectedIndex === 10}
+                onClick={() => handleListItemClick(10)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ใช้ในการทำกิจกรรม' />
               </ListItemButton>
             </Link>
           </List>

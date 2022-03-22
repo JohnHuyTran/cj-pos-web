@@ -68,10 +68,14 @@ export default function Notification() {
     setOpenLoadingModal(true);
     try {
       const rs = await getNotificationData(0);
-      if (rs && rs.data) {
-        setListData(rs.data);
-        setTotalPage(rs.totalPage);
-      }
+      if (rs) {
+        if (rs.data){
+          setListData(rs.data);
+          setTotalPage(rs.totalPage);
+        } else {
+          setListData([])
+        }
+      } 
     } catch (error) {
       console.log(error);
     }
