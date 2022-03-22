@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
+import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
@@ -29,6 +29,7 @@ interface StateProps {
   handleSetBranch: (e: any) => void;
   onSearch: () => void;
   checkAdmin: boolean;
+  handleChangePagination: (page: any, perPage: any) => void;
 }
 const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
@@ -58,7 +59,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
         return {
           checked: false,
           id: item.id,
-          index: index + 1,
+          index: (currentPage - 1) * parseInt(pageSize) + index + 1,
           documentNumber: item.documentNumber,
           status: item.status,
           description: item.description,
@@ -70,6 +71,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
         };
       });
       setListST(rows);
+      setPageSize(responveST.perPage.toString());
     }
   }, [responveST]);
 
@@ -99,11 +101,23 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     setCheckAll(event.target.checked);
     let lstSTHandle = _.cloneDeep(lstST);
     for (let item of lstSTHandle) {
-      if (STStatus.DRAFT == item.status) {
+      if (STStatus.DRAFT == item.status && moment(item.stStartTime) >= moment(new Date())) {
         item.checked = event.target.checked;
       }
     }
     setListST(lstSTHandle);
+  };
+
+  const onCheckDisable = (item: any) => {
+    if (STStatus.DRAFT != item.status) {
+      return true;
+    } else {
+      if (moment(item.stStartTime) < moment(new Date())) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   };
 
   const columns: GridColDef[] = [
@@ -131,7 +145,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
-          disabled={STStatus.DRAFT != params.row.status}
+          disabled={onCheckDisable(params.row)}
           onClick={onCheckCell.bind(this, params)}
         />
       ),
@@ -145,7 +159,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     },
     {
       field: 'documentNumber',
-      headerName: 'เลขที่เอกสาร PI',
+      headerName: 'เลขที่เอกสาร ST',
       headerAlign: 'center',
       sortable: false,
       minWidth: 170,
@@ -227,7 +241,19 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       sortable: false,
       minWidth: 170,
-      renderCell: (params) => renderCell(params.value),
+      renderCell: (params) => {
+        if (params.value) {
+          let len = String(params.value).length;
+          return (
+            <Tooltip title={params.value ? params.value : ''}>
+              <Typography>
+                {String(params.value).slice(0, 31)}
+                {len > 30 ? '...' : ''}
+              </Typography>
+            </Tooltip>
+          );
+        }
+      },
     },
   ];
 
@@ -285,6 +311,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       perPage: pageSize,
     };
     await dispatch(updatePayloadST(newPayload));
+    props.handleChangePagination(page, pageSize);
   };
   const handlePageSizeChange = async (cPageSize: number) => {
     setPageSize(cPageSize.toString());
@@ -293,9 +320,8 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       perPage: cPageSize.toString(),
       page: '1',
     };
-    setTimeout(async () => {
-      await dispatch(updatePayloadST(newPayload));
-    }, 1000);
+    await dispatch(updatePayloadST(newPayload));
+    props.handleChangePagination('1', cPageSize);
   };
   const handleCloseCreateModal = () => {
     setOpenDetailModal(false);
@@ -313,7 +339,6 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       try {
         await dispatch(getsaleLimitTimeDetail(params.row.id));
         if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
-          console.log(saleLimitTimeDetail);
           setOpenDetailModal(true);
         }
       } catch (error) {
@@ -333,7 +358,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
 
       if (rs.code === 20000) {
         setOpenPopup(true);
-        setPopupMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว');
         props.onSearch();
       } else {
         setOpenAlert(true);
@@ -368,6 +393,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
           rows={lstST}
           pagination
           page={currentPage - 1}
+          hideFooterSelectedRowCount={true}
           pageSize={parseInt(pageSize)}
           rowCount={responveST.total}
           paginationMode="server"

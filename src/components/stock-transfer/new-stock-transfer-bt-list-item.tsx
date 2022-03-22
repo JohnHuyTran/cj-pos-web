@@ -41,7 +41,7 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    minWidth: 200,
+    minWidth: 150,
     flex: 0.7,
     headerAlign: 'center',
     disableColumnMenu: true,
@@ -51,7 +51,7 @@ const columns: GridColDef[] = [
     field: 'barcodeName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
-    minWidth: 220,
+    minWidth: 200,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
@@ -116,6 +116,7 @@ const columns: GridColDef[] = [
     headerName: 'เลข Tote/ลัง',
     minWidth: 120,
     headerAlign: 'center',
+    flex: 0.45,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
@@ -136,8 +137,8 @@ const columns: GridColDef[] = [
   {
     field: 'boNo',
     headerName: 'เลขที่ BO',
-    minWidth: 200,
-    flex: 0.7,
+    minWidth: 150,
+    flex: 0.35,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -210,7 +211,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
         unitName: item.unitName,
         orderQty: item.orderQty ? item.orderQty : 0,
         actualQty: item.actualQty ? item.actualQty : 0,
-        toteCode: item.toteCode,
+        toteCode: item.toteCode ? item.toteCode : '',
         isDisable: isDisable,
         boNo: item.boNo,
       };
@@ -365,9 +366,9 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
     // const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
     // await dispatch(updateAddItemSkuGroupState(_newSku));
     // await dispatch(updateAddItemsGroupState(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc'])));
-    setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    onUpdateSkuList(_newSku);
+    await setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    await onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    await onUpdateSkuList(_newSku);
   };
 
   let newColumns = [...columns];
@@ -377,8 +378,20 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
     newColumns[7]['hide'] = true;
   }
 
-  const handleEditItems = async (params: GridEditCellValueParams) => {
+  const handleEditItems = (params: GridCellParams) => {
+    if (params.field === 'actualQty' || params.field === 'toteCode') {
+      storeItem();
+    }
+  };
+
+  const handleOnFocusOut = async (params: GridEditCellValueParams) => {
     storeItem();
+  };
+
+  const handleOnCellOut = (params: GridCellParams) => {
+    if (params.field === 'actualQty' || params.field === 'toteCode') {
+      storeItem();
+    }
   };
 
   return (
@@ -395,8 +408,8 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
-          onCellFocusOut={handleEditItems}
-          onCellOut={handleEditItems}
+          onCellFocusOut={handleOnFocusOut}
+          onCellOut={handleOnCellOut}
           // onCellKeyDown={handleEditItems}
         />
       </div>

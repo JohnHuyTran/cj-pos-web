@@ -1,3 +1,4 @@
+import React, { ReactElement, useEffect, useRef } from 'react';
 import {
   Autocomplete,
   Button,
@@ -15,13 +16,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { ReactElement, useEffect } from 'react';
+import { Box } from '@mui/system';
+import { useTranslation } from 'react-i18next';
 import SearchIcon from '@mui/icons-material/Search';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import _ from 'lodash';
+
 import { useStyles } from '../../../styles/makeTheme';
-import { Box } from '@mui/system';
-import { useTranslation } from 'react-i18next';
 import { ItemProps, ListBranches } from '../../../models/search-branch-province-model';
 import {
   fetchProvinceListAsync,
@@ -31,7 +33,6 @@ import {
 } from '../../../store/slices/search-branches-province-slice';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { paramsConvert } from '../../../utils/utils';
-const _ = require('lodash');
 interface Props {
   error?: boolean;
   helperText?: string;
@@ -56,9 +57,9 @@ export default function SearchBranch(props: Props): ReactElement {
   const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
   const totalBranches = useAppSelector((state) => state.searchBranchProvince.totalBranches);
   const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
+  const searchDebouceRef = useRef<any>();
 
   const dispatch = useAppDispatch();
-
   const autocompleteRenderListItem = (props: any, option: any) => {
     return (
       <li {...props} key={option.code}>
@@ -85,6 +86,7 @@ export default function SearchBranch(props: Props): ReactElement {
     if (open) {
       if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
       dispatch(fetchTotalBranch());
+      dispatch(fetchBranchProvinceListAsync('limit=1000'));
     }
   }, [open]);
 
@@ -93,16 +95,25 @@ export default function SearchBranch(props: Props): ReactElement {
       const payload = {
         // ...(!!branch && { name: branch.name }),
         ...(!!province && { province: province.name }),
-        limit: '10',
+        // limit: '10',
       };
       const params = paramsConvert(payload);
-      dispatch(fetchBranchProvinceListAsync(params));
+      if (open) {
+        dispatch(fetchBranchProvinceListAsync(params));
+      }
     } catch (error) {
       console.log(error);
       throw error;
     }
   }, [province]);
 
+  useEffect(() => {
+    setAllBranches(payloadBranches.isAllBranches);
+    setListBranch({
+      provinces: payloadBranches.appliedBranches.province,
+      branches: payloadBranches.appliedBranches.branchList,
+    });
+  }, [payloadBranches]);
   useEffect(() => {
     if (payloadBranches.isAllBranches && payloadBranches.saved) {
       setValue(`สาขาทั้งหมด (${totalBranches} สาขา)`);
@@ -119,7 +130,7 @@ export default function SearchBranch(props: Props): ReactElement {
           : stringProvince.concat('', stringBranch);
       setValue(stringList);
     }
-  }, [payloadBranches]);
+  }, [payloadBranches, totalBranches]);
 
   const handleCloseModal = () => {
     setOpen(false);
@@ -170,30 +181,45 @@ export default function SearchBranch(props: Props): ReactElement {
     setChecked(false);
   };
 
-  const onInputChange = async (event: any, value: string, reason: string) => {
-    if (event && event.keyCode && event.keyCode === 13) {
-      return false;
-    }
-
-    // if (reason == 'reset') {
-    //   clearInput();
-    // }
-
-    const keyword = value.trim();
-    if (keyword.length >= 3 && reason !== 'reset') {
+  const onInputChange = (event: any, value: string) => {
+    searchDebouceRef.current?.cancel();
+    searchDebouceRef.current = _.debounce(() => {
+      if (event?.keyCode === 13) return;
+  
+      const keyword = value.trim();
+      const payload: {[key: string]: any} = {
+        name: keyword,
+        code: keyword,
+        limit: '10',
+      };
+  
+      if(!!province?.name) {
+        payload.province = province.name;
+      }
+      const params = paramsConvert(payload);
+  
       try {
-        const payload = {
-          name: keyword,
-          code: keyword,
-          ...(!!province && { province: province.name }),
-          limit: '10',
-        };
-        const params = paramsConvert(payload);
         dispatch(fetchBranchProvinceListAsync(params));
       } catch (error) {
-        console.log(error);
-        throw error;
+        console.error(error);
       }
+
+    }, 200);
+    searchDebouceRef.current()
+    
+  };
+
+  const handleCloseBranch = (event: React.SyntheticEvent, reason: string) => {
+    try {
+      const payload = {
+        ...(!!province && { province: province.name }),
+        limit: '10',
+      };
+      const params = paramsConvert(payload);
+      dispatch(fetchBranchProvinceListAsync(params));
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
   };
   // const handleAddBranch = () => {
@@ -275,7 +301,16 @@ export default function SearchBranch(props: Props): ReactElement {
   };
 
   const handleClearForm = () => {
-    setListBranch({ branches: [], provinces: [] });
+    const payload = {
+      isAllBranches: true,
+      appliedBranches: {
+        branchList: [],
+        province: [],
+      },
+      saved: false,
+    };
+    dispatch(updatePayloadBranches(payload));
+    setOpen(false);
   };
 
   const filterOptions = createFilterOptions({
@@ -422,6 +457,7 @@ export default function SearchBranch(props: Props): ReactElement {
                       disabled={disabled}
                       value={branch}
                       filterOptions={filterOptions}
+                      onClose={handleCloseBranch}
                     />
                   </Box>
                   {/* <Box sx={{ textAlign: 'right' }}>
@@ -465,18 +501,16 @@ export default function SearchBranch(props: Props): ReactElement {
               </Box>
             </Grid>
             <Grid item xs={12} sx={{ textAlign: 'right', height: '43px', padding: '0 !important', marginTop: '30px' }}>
-              {!allBranches && (
-                <Button
-                  variant="contained"
-                  color="cancelColor"
-                  className={classes.MbtnSearch}
-                  size="large"
-                  onClick={handleClearForm}
-                  sx={{ marginRight: '15px' }}
-                >
-                  เคลียร์
-                </Button>
-              )}
+              <Button
+                variant="contained"
+                color="cancelColor"
+                className={classes.MbtnSearch}
+                size="large"
+                onClick={handleClearForm}
+                sx={{ marginRight: '15px' }}
+              >
+                เคลียร์
+              </Button>
               <Button
                 variant="contained"
                 color="info"

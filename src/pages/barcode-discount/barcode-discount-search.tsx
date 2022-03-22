@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import TextField from '@mui/material/TextField';
 import React, { useEffect, useState } from 'react';
 import { useStyles } from '../../styles/makeTheme';
-import { objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../utils/utils';
+import { getBranchName, objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../utils/utils';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -25,6 +25,9 @@ import { KeyCloakTokenInfo } from "../../models/keycolak-token-info";
 import { getUserInfo } from "../../store/sessionStore";
 import { ACTIONS } from "../../utils/enum/permission-enum";
 import ModalConfirmPrintedBarcode from "../../components/barcode-discount/modal-confirm-printed-barcode";
+import BranchListDropDown from "../../components/commons/ui/branch-list-dropdown";
+import { BranchListOptionType } from "../../models/branch-model";
+import { isGroupBranch } from "../../utils/role-permission";
 
 const _ = require('lodash');
 
@@ -48,6 +51,22 @@ const BarcodeDiscountSearch = () => {
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [lstStatus, setLstStatus] = React.useState([]);
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [ownBranch, setOwnBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : ''
+      : ''
+  );
+  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const branchName = getBranchName(branchList, ownBranch);
+  const branchMap: BranchListOptionType = {
+    code: ownBranch,
+    name: branchName ? branchName : '',
+  };
+  const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
+  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
     branch: 'ALL',
@@ -82,6 +101,20 @@ const BarcodeDiscountSearch = () => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
   const [openModalPrint, setOpenModalPrint] = React.useState(false);
+
+  useEffect(() => {
+    if (groupBranch) {
+      setOwnBranch(getUserInfo().branch
+        ? getBranchName(branchList, getUserInfo().branch)
+          ? getUserInfo().branch
+          : ''
+        : '');
+      setBranchOptions({
+        code: ownBranch,
+        name: branchName ? branchName : '',
+      });
+    }
+  }, [branchList]);
 
   useEffect(() => {
     setLstStatus(t('lstStatus', { returnObjects: true }));
@@ -130,7 +163,17 @@ const BarcodeDiscountSearch = () => {
     setOpenModalPrint(false);
   };
 
+  const handleChangeBranch = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setValues({ ...values, branch: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branch: '' });
+    }
+  };
+
   const onClear = async () => {
+    setClearBranchDropDown(!clearBranchDropDown);
     setFlagSearch(false);
     setValues({
       documentNumber: '',
@@ -265,19 +308,14 @@ const BarcodeDiscountSearch = () => {
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('branch')}
             </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id="branch"
-                name="branch"
-                value={values.branch}
-                onChange={onChange.bind(this, setValues, values)}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
-                <MenuItem value={'ALL'} selected={true}>
-                  {t('all')}
-                </MenuItem>
-              </Select>
-            </FormControl>
+            <BranchListDropDown
+              valueBranch={branchOptions}
+              sourceBranchCode={ownBranch}
+              onChangeBranch={handleChangeBranch}
+              isClear={clearBranchDropDown}
+              disable={groupBranch}
+              isFilterAuthorizedBranch={true}
+            />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>

@@ -182,13 +182,13 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       if (!data.toteCode && data.actualQty > 0) {
         itemNotValid = true;
         setTextError('กรุณาระบุเลขที่ Tote/ลัง');
-        setComment(comment);
+        // setComment(comment);
         return;
       }
       if (data.toteCode && data.actualQty <= 0) {
         itemNotValid = true;
         setTextError('จำนวนโอนจริงเป็น 0 ไม่ต้องระบุเลขที่ Tote/ลัง ');
-        setComment(comment);
+        // setComment(comment);
         return;
       }
     });
@@ -205,13 +205,13 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       if (actualQty < orderQty && !comment) {
         itemNotValid = true;
         setTextError('กรุณาระบุสาเหตุการเปลี่ยนจำนวน');
-        setComment(comment);
+        // setComment(comment);
         return;
       }
       if (actualQty > orderQty) {
         itemNotValid = true;
         setTextError(`สินค้า :${data.productName}\nกรุณาแก้ไขจำนวนโอน ต้องไม่มากกว่า จำนวนสั่ง`);
-        setComment(comment);
+        // setComment(comment);
         return;
       }
     });
@@ -220,7 +220,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       return false;
     } else if (isZero && action === 'sendToDC') {
       setTextError('กรุณาระบุจำนวนโอนจริง > 0 อย่างน้อย 1 รายการ');
-      setComment(comment);
+      // setComment(comment);
       setOpenAlert(true);
       return false;
     } else {
@@ -244,6 +244,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
     const _productSelector: any = itemList;
     const btItems: Item[] = branchTransferInfo.items;
+
     _productSelector.forEach((data: GridRowData) => {
       const item = btItems.find((item: Item) => {
         return item.barcode === data.barcode;
@@ -252,7 +253,10 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         showPopup = true;
         return;
       }
-      if (data.actualQty !== (item.actualQty ? item.actualQty : 0) || data.toteCode != item.toteCode) {
+      if (
+        data.actualQty !== (item.actualQty ? item.actualQty : 0) ||
+        ((data.toteCode || item.toteCode) && data.toteCode != item.toteCode)
+      ) {
         showPopup = true;
         return;
       }

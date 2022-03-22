@@ -247,7 +247,7 @@ function STCreateModal({
         let stEndTime = compareDateTime(values.endDate, values.endTime);
         if (stStartTime < moment(new Date(), DateFormat.DATE_TIME_DISPLAY_FORMAT)) {
           if (status <= 1 && isAdmin) {
-            setCheckValue({ ...checkValue, startTimeError: 'เวลาเริ่มต้นต้องสูงกว่าเวลาปัจจุบัน' });
+            setCheckValue({ ...checkValue, startTimeError: 'เวลาเริ่มต้นต้องมากกว่าเวลาปัจจุบัน' });
           }
         } else if (stStartTime >= stEndTime) {
           if (status <= 1 && isAdmin) {
@@ -452,7 +452,7 @@ function STCreateModal({
       if (rs.code === 20000) {
         setStatus(2);
         setOpenPopup(true);
-        setPopupMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว');
         handleClose();
         if (onSearch) onSearch();
       } else {

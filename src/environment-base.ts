@@ -56,6 +56,11 @@ export const environment = {
       },
     },
   },
+  task: {
+    notification: {
+      url: '/task/notifications',
+    },
+  },
   sell: {
     barcodeDiscount: {
       search: {
@@ -85,6 +90,9 @@ export const environment = {
       cancel: {
         url: '/campaign/{id}',
       },
+      upload: {
+        url: '/campaign/upload'
+      }
     },
     saleLimitTime: {
       detail: {
@@ -145,9 +153,9 @@ export const environment = {
       calculatePI: {
         url: '/purchase/purchase-invoice/calculate',
       },
-      // supplierFile: {
-      //   url: '/purchase/getUrl',
-      // },
+      supplierFile: {
+        url: '/purchase/getUrl',
+      },
       exportFile: {
         url: '/purchase/purchase-invoice/{piNo}/export',
       },
