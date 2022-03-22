@@ -31,7 +31,7 @@ interface Props {
   isStatus: boolean;
   onChangeUploadFile: (status: boolean) => void;
   onDeleteAttachFile?: (item: any) => void;
-  enabledControl?: boolean;
+  enabledControl: boolean;
   warningMessage?: string;
 }
 

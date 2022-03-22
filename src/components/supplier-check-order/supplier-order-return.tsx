@@ -645,6 +645,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                     docType='PN'
                     isStatus={uploadFileFlag}
                     onChangeUploadFile={handleOnChangeUploadFile}
+                    enabledControl={true}
                   />
                 )}
               </Grid>
