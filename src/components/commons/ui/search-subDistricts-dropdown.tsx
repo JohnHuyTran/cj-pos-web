@@ -8,6 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { featchsSubDistrictsListAsync } from '../../../store/slices/search-subDistricts-slice';
 
 interface Props {
+  valueSubDistricts: string;
   districtsCode: string;
   onChangeSubDistricts: (subDistrictsCode: string, postalCode: string, districtCode: string) => void;
   searchPostalCode: string;
@@ -15,7 +16,14 @@ interface Props {
   disable?: boolean;
 }
 
-function SubDistrictsDropDown({ districtsCode, onChangeSubDistricts, searchPostalCode, isClear, disable }: Props) {
+function SubDistrictsDropDown({
+  valueSubDistricts,
+  districtsCode,
+  onChangeSubDistricts,
+  searchPostalCode,
+  isClear,
+  disable,
+}: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<string[]>([]);
@@ -41,6 +49,13 @@ function SubDistrictsDropDown({ districtsCode, onChangeSubDistricts, searchPosta
         postalCode: searchPostalCode,
       };
       searchSubDistricts(payload);
+    }
+
+    if (valueSubDistricts !== '' && districtsCode === '' && searchPostalCode === '') {
+      const value: any = subDistrictsList.data.filter((r: any) => r.code === Number(valueSubDistricts));
+      if (value) {
+        setValues(value[0]);
+      }
     }
   }, [isClear, districtsCode, searchPostalCode]);
 
@@ -99,6 +114,11 @@ function SubDistrictsDropDown({ districtsCode, onChangeSubDistricts, searchPosta
       );
     }
   };
+
+  // if (options.length === 1 && values.length === 0 && !isClear) {
+  //   setValues(options[0]);
+  //   handleChangeItem('', options[0], 'selectOption');
+  // }
 
   return (
     <Autocomplete

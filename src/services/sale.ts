@@ -5,7 +5,7 @@ import { ContentType } from '../utils/enum/common-enum';
 import { SaveInvoiceRequest } from '../models/tax-invoice-model';
 
 export const getPathInvoiceDetail = (billNo: string) => {
-  return getPathUrl(`${environment.sale.taxInvoice.detail}`, {
+  return getPathUrl(`${environment.sale.taxInvoice.detail.url}`, {
     billNo: billNo,
   });
 };

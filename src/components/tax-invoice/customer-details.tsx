@@ -6,7 +6,7 @@ import { ContentPaste, HighlightOff, Save, Sync } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import { Box, Button, DialogTitle, FormHelperText, Grid, IconButton, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { useAppDispatch } from '../../store/store';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
 import DistrictsDropDown from '../commons/ui/search-districts-dropdown';
 import SubDistrictsDropDown from '../commons/ui/search-subDistricts-dropdown';
@@ -54,10 +54,41 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
+  const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
+  console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
+
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
 
   useEffect(() => {
     setOpen(isOpen);
+
+    if (taxInvoiceDetail) {
+      if (taxInvoiceDetail.invoiceNo) setInvoiceNo(taxInvoiceDetail.invoiceNo);
+      else setInvoiceNo(taxInvoiceDetail.billNo);
+      setMemberNo(taxInvoiceDetail.customer.memberNo);
+      setStatus(taxInvoiceDetail.status);
+
+      setValue('taxNo', taxInvoiceDetail.customer.taxNo);
+      setValue('firstName', taxInvoiceDetail.customer.firstName);
+      setValue('lastName', taxInvoiceDetail.customer.lastName);
+
+      setValue('houseNo', taxInvoiceDetail.customer.address.houseNo);
+      setValue('building', taxInvoiceDetail.customer.address.building);
+      setValue('moo', taxInvoiceDetail.customer.address.moo);
+
+      setValue('province', taxInvoiceDetail.customer.address.provinceCode);
+      setValue('district', taxInvoiceDetail.customer.address.districtCode);
+      setValue('subDistrict', taxInvoiceDetail.customer.address.subDistrictCode);
+
+      setValue('postcode', taxInvoiceDetail.customer.address.postcode);
+      setSearchPostalCode(taxInvoiceDetail.customer.address.postcode);
+      setSubDistrictsCode(String(taxInvoiceDetail.customer.address.subDistrictCode));
+      setDisabledSelSubDistricts(false);
+
+      setSearchDistrictsCode(String(taxInvoiceDetail.customer.address.districtCode));
+      setDistrictsCode(String(taxInvoiceDetail.customer.address.districtCode));
+      setDisabledSelDistricts(false);
+    }
   }, [isOpen]);
 
   const handleClose = async () => {
@@ -65,6 +96,9 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     onClickClose();
   };
 
+  const [invoiceNo, setInvoiceNo] = React.useState('');
+  const [memberNo, setMemberNo] = React.useState('');
+  const [status, setStatus] = React.useState('');
   const {
     register,
     formState: { errors },
@@ -77,8 +111,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const onSave = (data: any) => {
     if (data) {
       setDisabledBtnPreview(false);
-      console.log('data: ', data);
-
       const address: any = {
         houseNo: data.houseNo,
         building: data.building,
@@ -90,10 +122,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       };
       const customer: any = {
         memberNo: '',
-        taxNo: data.taxIdenNo,
-        firstName: data.name,
+        taxNo: data.taxNo,
+        firstName: data.firstName,
         lastName: data.lastName,
-        adddress: address,
+        address: address,
       };
 
       const payload: SaveInvoiceRequest = {
@@ -136,8 +168,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     setSearchProvincesCode('');
 
     reset({
-      taxIdenNo: '',
-      name: '',
+      taxNo: '',
+      firstName: '',
       lastName: '',
       houseNo: '',
       building: '',
@@ -151,6 +183,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
   const [provincesCode, setProvincesCode] = React.useState('');
   const [districtsCode, setDistrictsCode] = React.useState('');
+  const [subDistrictsCode, setSubDistrictsCode] = React.useState('');
 
   const [searchProvincesCode, setSearchProvincesCode] = React.useState('');
   const [searchDistrictsCode, setSearchDistrictsCode] = React.useState('');
@@ -240,7 +273,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid item xs={10} mb={2}>
               <Typography gutterBottom variant="subtitle1" component="div">
-                S222222222-222222
+                {invoiceNo}
               </Typography>
             </Grid>
           </Grid>
@@ -260,7 +293,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 size="small"
                 className={classes.MtextField}
                 fullWidth
-                value="1234567890"
+                value={memberNo}
                 sx={{ backgroundColor: '#E5E5E5' }}
               />
             </Grid>
@@ -272,15 +305,15 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid item xs={3}>
               <TextField
-                id="txtTaxIdenNo"
+                id="txtTaxNo"
                 size="small"
                 className={classes.MtextField}
                 fullWidth
                 placeholder="กรุณากรอกเลขประจำตัวผู้เสียภาษี"
                 inputProps={{ maxLength: 13 }}
-                {...register('taxIdenNo', { required: true, maxLength: 13 })}
+                {...register('taxNo', { required: true, maxLength: 13 })}
               />
-              {errors.taxIdenNo && (
+              {errors.taxNo && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
                   กรุณากรอกรายละเอียด
                 </FormHelperText>
@@ -294,14 +327,14 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid item xs={3}>
               <TextField
-                id="txtName"
+                id="txtFirstName"
                 size="small"
                 className={classes.MtextField}
                 fullWidth
                 placeholder="กรุณากรอกชื่อ / ชื่อบริษัท"
-                {...register('name', { required: true })}
+                {...register('firstName', { required: true })}
               />
-              {errors.name && (
+              {errors.firstName && (
                 <FormHelperText id="component-helper-text" style={{ color: '#FF0000', textAlign: 'right' }}>
                   กรุณากรอกรายละเอียด
                 </FormHelperText>
@@ -435,6 +468,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid item xs={3}>
               <SubDistrictsDropDown
+                valueSubDistricts={subDistrictsCode}
                 districtsCode={districtsCode}
                 onChangeSubDistricts={handleChangeSubDistricts}
                 searchPostalCode={searchPostalCode}

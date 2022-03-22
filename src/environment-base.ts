@@ -323,10 +323,10 @@ export const environment = {
         url: 'xxx',
       },
       detail: {
-        url: '/sale/invoice/detail/{billNo}',
+        url: '/sale/tax-invoices/{billNo}',
       },
       saveInvoice: {
-        url: '/sale/invoices',
+        url: '/sale/tax-invoices',
       },
     },
   },
