@@ -38,8 +38,7 @@ export const featchTaxInvoiceListAsync = createAsyncThunk('TaxInvoiceList', asyn
     if (payload.docNo) {
       path = path + `&docNo=${payload.docNo}`;
     }
-    let response = getInvoiceList().then();
-    // let response = await get(path).then();
+    let response = await get(path).then();
     return response;
   } catch (error) {
     throw error;

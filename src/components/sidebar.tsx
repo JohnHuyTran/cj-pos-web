@@ -182,6 +182,18 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemText primary='หน้าหลัก' style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
+        <Link to='/notification' style={{ textDecoration: 'none', color: '#676767' }}>
+          <ListItemButton
+            key='NOTIFICATION'
+            selected={selectedIndex === 1}
+            onClick={() => handleListItemClick(1)}
+            id='notification'>
+            <ListItemIcon>
+              <NotificationsNoneOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText primary='แจ้งเตือน' style={{ marginLeft: -15 }} />
+          </ListItemButton>
+        </Link>
         {/*sell menu start*/}
         {/* <ListItemButton key='SELL' onClick={handleClickSell} sx={{ display: disableSellMainMenu ? 'none' : '' }}></ListItemButton> */}
         <ListItemButton key='SELL' onClick={handleClickSell}>
@@ -227,7 +239,7 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='ใบเสร็จ/ใบกำกับฉบับเต็ม' />
               </ListItemButton>
             </Link>
-          </List>
+          </List> 
         </Collapse>
         <ListItemButton onClick={handleClickPickUp} id='mainMenuPickUp'>
           <ListItemIcon>

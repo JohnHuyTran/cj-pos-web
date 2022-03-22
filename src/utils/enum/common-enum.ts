@@ -24,6 +24,7 @@ export enum BDStatus {
   APPROVED = '3',
   BARCODE_PRINTED = '4',
   REJECT = '5',
+  ALREADY_EXPIRED = '10',
 }
 
 export enum STStatus {

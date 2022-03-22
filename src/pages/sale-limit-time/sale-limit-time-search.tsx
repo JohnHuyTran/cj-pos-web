@@ -21,7 +21,11 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { paramsConvert } from '../../utils/utils';
 import moment from 'moment';
 import AlertError from '../../components/commons/ui/alert-error';
-import { fetchBranchProvinceListAsync, updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
+import {
+  fetchBranchProvinceListAsync,
+  updatePayloadBranches,
+  fetchTotalBranch,
+} from '../../store/slices/search-branches-province-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
 interface State {
   query: string;
@@ -53,7 +57,7 @@ const SaleLimitTimeSearch = () => {
   const [values, setValues] = React.useState<State>({
     query: '',
     branch: checkAdmin ? '' : userInfo.branch,
-    status: checkAdmin ? 'all' : '2',
+    status: checkAdmin ? '1' : '2',
     startDate: new Date(),
     endDate: new Date(),
   });
@@ -70,10 +74,24 @@ const SaleLimitTimeSearch = () => {
       };
       const params = paramsConvert(payload);
       dispatch(fetchBranchProvinceListAsync(params));
+      dispatch(fetchTotalBranch());
+    }
+    if (checkAdmin) {
+      const payloadBranch = {
+        isAllBranches: true,
+        appliedBranches: {
+          branchList: [],
+          province: [],
+        },
+        saved: true,
+      };
+      dispatch(fetchTotalBranch());
+      dispatch(updatePayloadBranches(payloadBranch));
     }
   }, []);
   useEffect(() => {
-    if (!checkAdmin && userInfo.branch) {
+    const existBranchUser = branchList.data.every((item: any) => item.code == userInfo.branch);
+    if (!checkAdmin && userInfo.branch && existBranchUser) {
       const payloadBranch = {
         isAllBranches: false,
         appliedBranches: {
@@ -87,11 +105,14 @@ const SaleLimitTimeSearch = () => {
     }
   }, [branchList]);
 
-  useEffect(() => {
-    if (responveST && responveST.data && responveST.data.length > 0) {
-      handleSearchST(payloadST.page, payloadST.perPage);
-    }
-  }, [payloadST]);
+  // useEffect(() => {
+  //   if (responveST && responveST.data && responveST.data.length > 0) {
+  //     handleSearchST(payloadST.page, payloadST.perPage);
+  //   }
+  // }, [payloadST]);
+  const handleChangePagination = (page: any, perPage: any) => {
+    handleSearchST(page, perPage);
+  };
 
   const getStatusText = (key: string) => {
     if (lstStatus === null || lstStatus.length === 0) {
@@ -132,6 +153,12 @@ const SaleLimitTimeSearch = () => {
     if (stringNullOrEmpty(values.startDate) || stringNullOrEmpty(values.endDate)) {
       setOpenAlert(true);
       setTextError('กรุณาระบุวันที่');
+    } else if (
+      Date.parse(moment(values.endDate).format('DD/MM/YYYY')) <
+      Date.parse(moment(values.startDate).format('DD/MM/YYYY'))
+    ) {
+      setOpenAlert(true);
+      setTextError('เวลาเริ่มต้นต้องมากกว่าเวลาปัจจุบัน');
     } else {
       if (checkAdmin) {
         const aProvinces = payloadBranches.appliedBranches.province.map((item: any) => item.code).join();
@@ -246,8 +273,8 @@ const SaleLimitTimeSearch = () => {
                 </MenuItem>
                 <MenuItem value={'1'}>{getStatusText('1')}</MenuItem>
                 <MenuItem value={'2'}>{getStatusText('2')}</MenuItem>
-                <MenuItem value={'3'}>{getStatusText('3')}</MenuItem>
                 <MenuItem value={'4'}>{getStatusText('4')}</MenuItem>
+                <MenuItem value={'3'}>{getStatusText('3')}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -308,7 +335,14 @@ const SaleLimitTimeSearch = () => {
       </Box>
       {flagSearch &&
         (responveST && responveST.data && responveST.data.length > 0 ? (
-          <SaleLimitTimelist handleSetBranch={handleSetBranch} onSearch={handleSearchST} checkAdmin={checkAdmin} />
+          <SaleLimitTimelist
+            handleSetBranch={handleSetBranch}
+            onSearch={handleSearchST}
+            checkAdmin={checkAdmin}
+            handleChangePagination={(page, perPage) => {
+              handleChangePagination(page, perPage);
+            }}
+          />
         ) : (
           <Grid item container xs={12} justifyContent="center">
             <Box color="#CBD4DB">

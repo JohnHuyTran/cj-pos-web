@@ -22,6 +22,7 @@ import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import { updateBarcodeDiscountPrintState, updatePrintInDetail } from "../../store/slices/barcode-discount-print-slice";
+import moment from "moment";
 
 const _ = require('lodash');
 
@@ -63,13 +64,14 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
           id: data.id,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
           documentNumber: data.documentNumber,
-          status: data.status,
+          status: genStatusIncludeExpiredCase(data),
           totalAmount: data.products.length,
           unit: t('list'),
           sumOfPrice: genTotalPrice(data.products),
           sumOfCashDiscount: genTotalCashDiscount(data.percentDiscount, data.products),
           sumOfPriceAfterDiscount: genTotalPriceAfterDiscount(data.percentDiscount, data.products),
-          branch: data.branchName,
+          branch: stringNullOrEmpty(data.branchCode) ? (stringNullOrEmpty(data.branchName) ? '' : data.branchName)
+            : (data.branchCode + ' - ' + (stringNullOrEmpty(data.branchName) ? '' : data.branchName)),
           createdDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
           approvedDate: stringNullOrEmpty(data.approvedDate)
             ? ''
@@ -95,6 +97,19 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
   useEffect(() => {
     handleUpdateBarcodeDiscountPrint(false);
   }, [lstBarcodeDiscount]);
+
+  const genStatusIncludeExpiredCase = (rowData: any) => {
+    let status = rowData.status;
+    if (rowData.products && rowData.products.length > 0
+      && (Number(BDStatus.APPROVED) == rowData.status || Number(BDStatus.BARCODE_PRINTED) == rowData.status)) {
+      let productPassValidation = rowData.products.filter((itPro: any) => itPro.numberOfApproved > 0
+        && !stringNullOrEmpty(itPro.expiredDate) && moment(itPro.expiredDate).isSameOrAfter(moment(new Date()), 'day'));
+      if (productPassValidation.length === 0) {
+        status = Number(BDStatus.ALREADY_EXPIRED);
+      }
+    }
+    return status;
+  }
 
   const handleUpdateBarcodeDiscountPrint = (closeDetail: boolean) => {
     if (!printInDetail || closeDetail) {
@@ -219,7 +234,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
-      minWidth: 120,
+      minWidth: 140,
       renderCell: (params) => genRowStatus(params),
     },
     {
@@ -228,28 +243,17 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       align: 'right',
       sortable: false,
-      minWidth: 115,
-      width: 115,
+      minWidth: 120,
+      width: 120,
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
             <Typography variant="body2" noWrap>
-              <b>{t('headerName.quantity')}</b>
-            </Typography>
-            <Typography variant="body2" noWrap>
-              <b>{t('headerName.total')}</b>
+              <b>{'จำนวน (รายการ)'}</b>
             </Typography>
           </div>
         );
       },
-    },
-    {
-      field: 'unit',
-      headerName: t('unit'),
-      headerAlign: 'center',
-      sortable: false,
-      minWidth: 70,
-      width: 70,
     },
     {
       field: 'sumOfPrice',
@@ -319,7 +323,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       headerName: t('branch'),
       headerAlign: 'center',
       sortable: false,
-      minWidth: 110,
+      minWidth: 150,
       renderCell: (params) => renderCell(params.value),
     },
     {
@@ -355,14 +359,14 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       headerName: t('remark'),
       headerAlign: 'center',
       sortable: false,
-      minWidth: 105,
+      minWidth: 110,
       renderCell: (params) => renderCell(params.value),
     },
   ];
   const genRowStatus = (params: GridValueGetterParams) => {
     let statusDisplay;
     let status = params.value ? params.value.toString() : '';
-    const statusLabel = genColumnValue('label', 'value', status, t('lstStatus', { returnObjects: true }));
+    let statusLabel = genColumnValue('label', 'value', status, t('lstStatus', { returnObjects: true }));
     switch (status) {
       case BDStatus.DRAFT:
         statusDisplay = genRowStatusValue(statusLabel, { color: '#FBA600', backgroundColor: '#FFF0CA' });
@@ -377,6 +381,10 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
         statusDisplay = genRowStatusValue(statusLabel, { color: '#4465CD', backgroundColor: '#C8E8FF' });
         break;
       case BDStatus.REJECT:
+        statusDisplay = genRowStatusValue(statusLabel, { color: '#F54949', backgroundColor: '#FFD7D7' });
+        break;
+      case BDStatus.ALREADY_EXPIRED:
+        statusLabel = 'สินค้าหมดอายุ';
         statusDisplay = genRowStatusValue(statusLabel, { color: '#F54949', backgroundColor: '#FFD7D7' });
         break;
     }

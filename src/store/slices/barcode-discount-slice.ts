@@ -18,6 +18,7 @@ const initialState: ItemsState = {
     percentDiscount: true,
     requesterNote: '',
     products: [],
+    attachFiles: []
   },
   validate: false,
   dataDetail: {

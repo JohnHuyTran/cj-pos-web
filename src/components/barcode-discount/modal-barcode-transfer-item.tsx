@@ -119,13 +119,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         && (Number(BDStatus.APPROVED) == dataDetail.status) || Number(BDStatus.BARCODE_PRINTED) == dataDetail.status) {
         if (rows && rows.length > 0) {
           let rowData = _.cloneDeep(rows);
-          let productPrintFilter: any[];
-          if (Number(BDStatus.BARCODE_PRINTED) == dataDetail.status) {
-            productPrintFilter = rowData.filter((itPro: any) => !stringNullOrEmpty(itPro.expiryDate)
-                && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day'));
-          } else {
-            productPrintFilter = rowData;
-          }
+          let productPrintFilter = rowData.filter((itPro: any) => !stringNullOrEmpty(itPro.expiryDate)
+                && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day')
+                && (itPro.numberOfApproved && itPro.numberOfApproved > 0));
           dispatch(updateBarcodeDiscountPrintState(productPrintFilter));
           dispatch(updatePrintInDetail(true));
         }
@@ -757,7 +753,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
         <Grid container spacing={2} mb={2}>
           <Grid item xs={3}>
             <TextBoxComment
-                fieldName="หมายเหตุจากผู้อนุมัติ :"
+                fieldName="หมายเหตุจากสาขา :"
                 defaultValue={payloadBarcodeDiscount.requesterNote}
                 maxLength={100}
                 onChangeComment={handleChangeNote}
