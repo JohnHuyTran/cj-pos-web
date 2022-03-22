@@ -44,6 +44,8 @@ export enum ACTIONS {
 
   ORDER_VER_VIEW = 'order.ver.view',
   ORDER_VER_MANAGE = 'order.ver.manage',
+
+  SALE_TAX_INVOICE_VIEW = 'sale.tax.view',
 }
 
 export enum MAINMENU {
@@ -54,6 +56,7 @@ export enum MAINMENU {
 
 export enum SUBMENU {
   SALE_DISCOUNT = 'sale.discount',
+  SALE_TAX_INVOICE = 'sale.taxinvoice',
   OR_ORDER_RECEIVE = 'orderReceive.orderReceive',
   OR_DIFF = 'orderReceive.stockDiff',
   OR_SUPPLIER = 'orderReceive.supplier',
