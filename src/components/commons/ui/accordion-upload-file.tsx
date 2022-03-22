@@ -259,8 +259,8 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
         // multiple
         // onDrop
         accept='.pdf, .jpg, .jpeg'
-        onClick={handleFileInputClick}
         onChange={handleFileInputChange}
+        onClick={handleFileInputClick}
         style={{ display: 'none' }}
         disabled={newFileDisplayList.length === 5 || !enabledControl}
       />
