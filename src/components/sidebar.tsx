@@ -188,7 +188,7 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemIcon>
               <NotificationsNoneOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary='หน้าหลัก' style={{ marginLeft: -15 }} />
+            <ListItemText primary='แจ้งเตือน' style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
         {/*sell menu start*/}
