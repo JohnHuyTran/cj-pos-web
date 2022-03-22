@@ -1,7 +1,3 @@
-import { makeStyles } from '@mui/styles';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import { useEffect } from 'react';
 import TaskForBarcodeDiscount from './task-for-barcode-discount';
 import TaskForSaleLimitTime from './task-for-sale-limit-time';
 
