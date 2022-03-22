@@ -242,7 +242,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
             variant='contained'
             component='span'
             className={classes.MbtnBrowse}
-            disabled={newFileDisplayList.length === 5 || !enabledControl}
+            disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl)}
           >
             แนบไฟล์
           </Button>
@@ -262,7 +262,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
         onChange={handleFileInputChange}
         onClick={handleFileInputClick}
         style={{ display: 'none' }}
-        disabled={newFileDisplayList.length === 5 || !enabledControl}
+        disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl)}
       />
 
       <Box
@@ -316,7 +316,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
                   </Typography>
                 )}
 
-                <IconButton sx={{ display: enabledControl ? undefined: 'none'}}
+                <IconButton sx={{ display: (!stringNullOrEmpty(enabledControl) && enabledControl) ? undefined: 'none'}}
                             onClick={() => onDeleteAttachFile ? handleDeleteAttachFile(item) : handleDelete(item)} size="small">
                   <CloseIcon fontSize="small" color="error" />
                 </IconButton>
