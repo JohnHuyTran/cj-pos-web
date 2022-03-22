@@ -51,10 +51,11 @@ function SubDistrictsDropDown({
       searchSubDistricts(payload);
     }
 
-    if (valueSubDistricts !== '' && districtsCode === '' && searchPostalCode === '') {
+    if (valueSubDistricts !== '') {
       const value: any = subDistrictsList.data.filter((r: any) => r.code === Number(valueSubDistricts));
       if (value) {
         setValues(value[0]);
+        handleChangeItem('', value[0], 'selectOption');
       }
     }
   }, [isClear, districtsCode, searchPostalCode]);

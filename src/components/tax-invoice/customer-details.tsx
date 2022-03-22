@@ -58,6 +58,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
 
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
+  const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
+  const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
 
   useEffect(() => {
     setOpen(isOpen);
@@ -65,40 +67,46 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     if (taxInvoiceDetail) {
       if (taxInvoiceDetail.invoiceNo) setInvoiceNo(taxInvoiceDetail.invoiceNo);
       else setInvoiceNo(taxInvoiceDetail.billNo);
-      setMemberNo(taxInvoiceDetail.customer.memberNo);
-      setStatus(taxInvoiceDetail.status);
+      if(taxInvoiceDetail.customer.memberNo) {
+        setMemberNo(taxInvoiceDetail.customer.memberNo);
+        if(taxInvoiceDetail.status === 'PRINTED') {
+          setDisabledBtnPreview(false)
+          setDisabledBtnClear(true)
+          setDisabledBtnSave(true)
+        }
 
-      setValue('taxNo', taxInvoiceDetail.customer.taxNo);
-      setValue('firstName', taxInvoiceDetail.customer.firstName);
-      setValue('lastName', taxInvoiceDetail.customer.lastName);
+        setValue('taxNo', taxInvoiceDetail.customer.taxNo);
+        setValue('firstName', taxInvoiceDetail.customer.firstName);
+        setValue('lastName', taxInvoiceDetail.customer.lastName);
 
-      setValue('houseNo', taxInvoiceDetail.customer.address.houseNo);
-      setValue('building', taxInvoiceDetail.customer.address.building);
-      setValue('moo', taxInvoiceDetail.customer.address.moo);
+        setValue('houseNo', taxInvoiceDetail.customer.address.houseNo);
+        setValue('building', taxInvoiceDetail.customer.address.building);
+        setValue('moo', taxInvoiceDetail.customer.address.moo);
 
-      setValue('province', taxInvoiceDetail.customer.address.provinceCode);
-      setValue('district', taxInvoiceDetail.customer.address.districtCode);
-      setValue('subDistrict', taxInvoiceDetail.customer.address.subDistrictCode);
+        setValue('province', taxInvoiceDetail.customer.address.provinceCode);
+        setValue('district', taxInvoiceDetail.customer.address.districtCode);
+        setValue('subDistrict', taxInvoiceDetail.customer.address.subDistrictCode);
 
-      setValue('postcode', taxInvoiceDetail.customer.address.postcode);
-      setSearchPostalCode(taxInvoiceDetail.customer.address.postcode);
-      setSubDistrictsCode(String(taxInvoiceDetail.customer.address.subDistrictCode));
-      setDisabledSelSubDistricts(false);
+        setValue('postcode', taxInvoiceDetail.customer.address.postcode);
+        setSearchPostalCode(taxInvoiceDetail.customer.address.postcode);
+        setSubDistrictsCode(String(taxInvoiceDetail.customer.address.subDistrictCode));
+        setDisabledSelSubDistricts(false);
 
-      setSearchDistrictsCode(String(taxInvoiceDetail.customer.address.districtCode));
-      setDistrictsCode(String(taxInvoiceDetail.customer.address.districtCode));
-      setDisabledSelDistricts(false);
+        setSearchDistrictsCode(String(taxInvoiceDetail.customer.address.districtCode));
+        setDistrictsCode(String(taxInvoiceDetail.customer.address.districtCode));
+        setDisabledSelDistricts(false);
+      }
     }
   }, [isOpen]);
 
   const handleClose = async () => {
+    handleClear();
     setOpen(false);
     onClickClose();
   };
 
   const [invoiceNo, setInvoiceNo] = React.useState('');
   const [memberNo, setMemberNo] = React.useState('');
-  const [status, setStatus] = React.useState('');
   const {
     register,
     formState: { errors },
@@ -165,7 +173,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [isClear, setIsClear] = React.useState(false);
   const handleClear = () => {
     setIsClear(true);
+
     setSearchProvincesCode('');
+    setSearchDistrictsCode('');
+    setSearchPostalCode('');
 
     reset({
       taxNo: '',
@@ -234,6 +245,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       setDisabledSelDistricts(false);
     }
 
+    setSubDistrictsCode('')
     setIsClear(false);
   };
 
@@ -540,6 +552,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnClear}
                 color="cancelColor"
+                disabled={disabledBtnClear}
               >
                 เคลียร์
               </Button>
@@ -552,6 +565,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 onClick={handleSubmit(onSave)}
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnSave}
+                disabled={disabledBtnSave}
               >
                 บันทึก
               </Button>
