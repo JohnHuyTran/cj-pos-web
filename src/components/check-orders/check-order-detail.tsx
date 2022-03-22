@@ -794,6 +794,7 @@ export default function CheckOrderDetail({
                     docType=""
                     isStatus={uploadFileFlag}
                     onChangeUploadFile={handleOnChangeUploadFile}
+                    enabledControl={true}
                   />
                 )}
 
