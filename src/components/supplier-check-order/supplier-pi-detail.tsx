@@ -795,6 +795,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     docType='PI'
                     isStatus={uploadFileFlag}
                     onChangeUploadFile={handleOnChangeUploadFile}
+                    enabledControl={true}
                   />
                 )}
                 {piNo === '' && (
@@ -804,6 +805,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     docType='PI'
                     isStatus={uploadFileFlag}
                     onChangeUploadFile={handleOnChangeUploadFile}
+                    enabledControl={true}
                   />
                 )}
               </Grid>
