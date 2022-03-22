@@ -32,7 +32,12 @@ export const featchTaxInvoiceDetailAsync = createAsyncThunk('TaxInvoiceDetail', 
       data: null,
     };
 
-    response = await get(apiRootPath).then();
+    await get(apiRootPath) .then((value) => {
+      response = value
+    }).catch((error: any) => {
+      console.log("response error :", JSON.stringify(error))
+    })
+
     return response;
   } catch (error) {
     throw error;
