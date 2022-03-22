@@ -8,16 +8,19 @@ import { featchProvincesListAsync } from '../../../store/slices/search-provinces
 import SearchIcon from '@mui/icons-material/Search';
 
 interface Props {
+  valueProvinces: string;
   onChangeProvinces: (provincesCode: string) => void;
   searchProvincesCode: string;
   isClear: boolean;
   disable?: boolean;
 }
 
-function ProvincesDropDown({ onChangeProvinces, searchProvincesCode, isClear, disable }: Props) {
+function ProvincesDropDown({ valueProvinces, onChangeProvinces, searchProvincesCode, isClear, disable }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<string[]>([]);
+
+  const provincesList = useAppSelector((state) => state.searchProvincesSlice.provincesList);
 
   let payload: any = {
     code: '',
@@ -27,20 +30,23 @@ function ProvincesDropDown({ onChangeProvinces, searchProvincesCode, isClear, di
   useEffect(() => {
     if (isClear) setValues([]);
 
-    if (searchProvincesCode !== '') {
-      payload = {
-        code: searchProvincesCode,
-      };
+    if (valueProvinces) {
+      const provincesFilter: any = provincesList.data.filter((r: any) => r.code === Number(valueProvinces));
+      setValues(provincesFilter[0]);
     }
 
+    // if (searchProvincesCode !== '') {
+    //   payload = {
+    //     code: searchProvincesCode,
+    //   };
+    // }
+
     searchProvinces(payload);
-  }, [isClear, searchProvincesCode]);
+  }, [isClear, searchProvincesCode, provincesList]);
 
   const searchProvinces = async (payload: any) => {
     await dispatch(featchProvincesListAsync(payload));
   };
-
-  const provincesList = useAppSelector((state) => state.searchProvincesSlice.provincesList);
 
   const [loading, setLoading] = React.useState(false);
   const autocompleteRenderInput = (params: any) => {
@@ -51,17 +57,17 @@ function ProvincesDropDown({ onChangeProvinces, searchProvincesCode, isClear, di
           ...params.InputProps,
           endAdornment: (
             <React.Fragment>
-              {loading ? <CircularProgress color="inherit" size={20} /> : null}
+              {loading ? <CircularProgress color='inherit' size={20} /> : null}
               {/* {params.InputProps.endAdornment} */}
-              <InputAdornment position="start">
+              <InputAdornment position='start'>
                 <SearchIcon />
               </InputAdornment>
             </React.Fragment>
           ),
         }}
-        placeholder="กรุณากรอกจังหวัด"
+        placeholder='กรุณากรอกจังหวัด'
         className={classes.MtextFieldAutocomplete}
-        size="small"
+        size='small'
         fullWidth
       />
     );
@@ -93,11 +99,11 @@ function ProvincesDropDown({ onChangeProvinces, searchProvincesCode, isClear, di
 
   return (
     <Autocomplete
-      id="selAddItem"
+      id='selAddItem'
       value={values}
       fullWidth
       freeSolo
-      loadingText="กำลังโหลด..."
+      loadingText='กำลังโหลด...'
       loading={loading}
       options={options}
       filterOptions={filterOptions}

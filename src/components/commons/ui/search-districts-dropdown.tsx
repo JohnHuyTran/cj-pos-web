@@ -8,6 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { featchDistrictsListAsync } from '../../../store/slices/search-districts-slice';
 
 interface Props {
+  valueDistricts: string;
   provinceCode: string;
   onChangeDistricts: (districtsCode: string, provincesCode: string) => void;
   searchDistrictsCode: string;
@@ -15,18 +16,32 @@ interface Props {
   disable?: boolean;
 }
 
-function DistrictsDropDown({ provinceCode, onChangeDistricts, searchDistrictsCode, isClear, disable }: Props) {
+function DistrictsDropDown({
+  valueDistricts,
+  provinceCode,
+  onChangeDistricts,
+  searchDistrictsCode,
+  isClear,
+  disable,
+}: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<string[]>([]);
+  const districtsList = useAppSelector((state) => state.searchDistrictsSlice.districtsList);
 
   let payload: any = {
     code: '',
     name: '',
     provinceCode: '',
   };
+
   useEffect(() => {
     if (isClear) setValues([]);
+
+    if (valueDistricts) {
+      const districtsFilter: any = districtsList.data.filter((r: any) => r.code === Number(valueDistricts));
+      setValues(districtsFilter[0]);
+    }
 
     if (provinceCode !== '') {
       payload = {
@@ -41,13 +56,11 @@ function DistrictsDropDown({ provinceCode, onChangeDistricts, searchDistrictsCod
       };
       searchDistricts(payload);
     }
-  }, [isClear, provinceCode, searchDistrictsCode]);
+  }, [isClear, provinceCode, searchDistrictsCode, districtsList]);
 
   const searchDistricts = async (payload: any) => {
     await dispatch(featchDistrictsListAsync(payload));
   };
-
-  const districtsList = useAppSelector((state) => state.searchDistrictsSlice.districtsList);
 
   const [loading, setLoading] = React.useState(false);
   const autocompleteRenderInput = (params: any) => {
@@ -58,18 +71,18 @@ function DistrictsDropDown({ provinceCode, onChangeDistricts, searchDistrictsCod
           ...params.InputProps,
           endAdornment: (
             <React.Fragment>
-              {loading ? <CircularProgress color="inherit" size={20} /> : null}
+              {loading ? <CircularProgress color='inherit' size={20} /> : null}
               {/* {params.InputProps.endAdornment} */}
-              <InputAdornment position="start">
+              <InputAdornment position='start'>
                 <SearchIcon />
               </InputAdornment>
             </React.Fragment>
           ),
         }}
-        placeholder="กรุณากรอกเขต / อำเภอ"
+        placeholder='กรุณากรอกเขต / อำเภอ'
         className={classes.MtextFieldAutocomplete}
-        variant="outlined"
-        size="small"
+        variant='outlined'
+        size='small'
         fullWidth
       />
     );
@@ -101,11 +114,11 @@ function DistrictsDropDown({ provinceCode, onChangeDistricts, searchDistrictsCod
 
   return (
     <Autocomplete
-      id="selAddItem"
+      id='selAddItem'
       value={values}
       fullWidth
       freeSolo
-      loadingText="กำลังโหลด..."
+      loadingText='กำลังโหลด...'
       loading={loading}
       options={options}
       filterOptions={filterOptions}

@@ -27,6 +27,7 @@ function SubDistrictsDropDown({
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<string[]>([]);
+  const subDistrictsList = useAppSelector((state) => state.searchSubDistrictsSlice.subDistrictsList);
 
   let payload: any = {
     code: '',
@@ -37,34 +38,29 @@ function SubDistrictsDropDown({
   useEffect(() => {
     if (isClear) setValues([]);
 
-    if (districtsCode !== '') {
+    if (searchPostalCode !== '') {
+      payload = {
+        postalCode: searchPostalCode,
+      };
+      searchSubDistricts(payload);
+    } else if (districtsCode !== '') {
       payload = {
         districtCode: districtsCode,
       };
       searchSubDistricts(payload);
     }
 
-    if (searchPostalCode !== '') {
-      payload = {
-        postalCode: searchPostalCode,
-      };
-      searchSubDistricts(payload);
-    }
-
     if (valueSubDistricts !== '') {
-      const value: any = subDistrictsList.data.filter((r: any) => r.code === Number(valueSubDistricts));
-      if (value) {
-        setValues(value[0]);
-        handleChangeItem('', value[0], 'selectOption');
+      const valueFilter: any = subDistrictsList.data.filter((r: any) => r.code === Number(valueSubDistricts));
+      if (valueFilter) {
+        setValues(valueFilter[0]);
       }
     }
-  }, [isClear, districtsCode, searchPostalCode]);
+  }, [isClear, districtsCode, searchPostalCode, subDistrictsList]);
 
   const searchSubDistricts = async (payload: any) => {
     await dispatch(featchsSubDistrictsListAsync(payload));
   };
-
-  const subDistrictsList = useAppSelector((state) => state.searchSubDistrictsSlice.subDistrictsList);
 
   const [loading, setLoading] = React.useState(false);
   const autocompleteRenderInput = (params: any) => {
@@ -75,18 +71,18 @@ function SubDistrictsDropDown({
           ...params.InputProps,
           endAdornment: (
             <React.Fragment>
-              {loading ? <CircularProgress color="inherit" size={20} /> : null}
+              {loading ? <CircularProgress color='inherit' size={20} /> : null}
               {/* {params.InputProps.endAdornment} */}
-              <InputAdornment position="start">
+              <InputAdornment position='start'>
                 <SearchIcon />
               </InputAdornment>
             </React.Fragment>
           ),
         }}
-        placeholder="กรุณากรอกแขวง / ตำบล"
+        placeholder='กรุณากรอกแขวง / ตำบล'
         className={classes.MtextFieldAutocomplete}
-        variant="outlined"
-        size="small"
+        variant='outlined'
+        size='small'
         fullWidth
       />
     );
@@ -123,11 +119,11 @@ function SubDistrictsDropDown({
 
   return (
     <Autocomplete
-      id="selAddItem"
+      id='selAddItem'
       value={values}
       fullWidth
       freeSolo
-      loadingText="กำลังโหลด..."
+      loadingText='กำลังโหลด...'
       loading={loading}
       options={options}
       filterOptions={filterOptions}
