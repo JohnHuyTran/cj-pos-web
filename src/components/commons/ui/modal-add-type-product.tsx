@@ -39,7 +39,6 @@ interface Error {
 interface State {
     productType: any,
     product: any,
-    btnAddStatus: boolean,
     selectAllProduct: boolean,
     error: Error
 }
@@ -64,7 +63,6 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     const [values, setValues] = useState<State>({
         productType: {},
         product: {},
-        btnAddStatus: false,
         selectAllProduct: false,
         error: {
             productTypeExist: '',
@@ -211,10 +209,30 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     };
 
     const handleChangeProduct = async (event: any, option: any) => {
+        let selectedAddItems = _.cloneDeep(selectedItems);
+        if (option) {
+            let productExist = (selectedItems && selectedItems.length > 0) ?
+                selectedItems.filter((it: any) => it.selectedType === 2 && it.barcode === option.barcode) : [];
+            if (productExist != null && productExist.length > 0) {
+                let error = {...values.error};
+                error.productExist = 'สินค้านี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง';
+                setValues({
+                        ...values,
+                        error: error
+                    }
+                );
+                return;
+            }
+            let productItem: any = _.cloneDeep(option);
+            productItem.selectedType = 2
+            productItem.productByType = false;
+            productItem.showProduct = true;
+            selectedAddItems.push(productItem);
+        }
+        setSelectedItems(selectedAddItems);
         setValues({
                 ...values,
-                product: objectNullOrEmpty(option) ? {} : option,
-                btnAddStatus: !objectNullOrEmpty(option),
+                product:{},
                 error: {
                     productTypeExist: '',
                     productExist: ''
@@ -230,7 +248,6 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         setValues({
                 ...values,
                 productType: objectNullOrEmpty(option) ? {} : option,
-                btnAddStatus: (!objectNullOrEmpty(option) && values.selectAllProduct) || !objectNullOrEmpty(values.product),
                 error: {
                     productTypeExist: '',
                     productExist: ''
@@ -242,7 +259,6 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                     ...values,
                     productType: objectNullOrEmpty(option) ? {} : option,
                     selectAllProduct: false,
-                    btnAddStatus: false,
                     error: {
                         productTypeExist: '',
                         productExist: ''
@@ -253,13 +269,56 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         }
     }
 
-    const onChangeSelectAllProduct = (event: any) => {
+    const onChangeSelectAllProduct = async (event: any) => {
         if (event) {
+            let selectedAddItems = _.cloneDeep(selectedItems);
+            if (!objectNullOrEmpty(values.productType)) {
+                let productTypeExist = (selectedItems && selectedItems.length > 0)
+                    ? selectedItems.filter((it: any) => it.selectedType === 1 && it.productTypeCode === values.productType.productTypeCode) : [];
+                if (productTypeExist != null && productTypeExist.length > 0) {
+                    let error = {...values.error};
+                    error.productTypeExist = 'ประเภทสินค้านี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง';
+                    setValues({
+                            ...values,
+                            error: error
+                        }
+                    );
+                    return;
+                }
+                //add type to selectedAddItems
+                let productTypeItem: any = _.cloneDeep(values.productType);
+                productTypeItem.selectedType = 1;
+                selectedAddItems.push(productTypeItem);
+                //add product by type to selectedAddItems
+                let productTypeCode = '';
+                if (!objectNullOrEmpty(values.productType)) {
+                    productTypeCode = values.productType.productTypeCode;
+                }
+                setOpenLoadingModal(true);
+                let res = await getAllProductByType(productTypeCode);
+                if (res && res.data && res.data.length > 0) {
+                    let lstProductByType = res.data;
+                    for (const item of lstProductByType) {
+                        let productItem: any = _.cloneDeep(item);
+                        let productExist = selectedItems.find((it: any) => it.selectedType === 2 && it.barcode === item.barcode);
+                        if (objectNullOrEmpty(productExist)) {
+                            productItem.productByType = true;
+                            productItem.selectedType = 2;
+                            productItem.showProduct = true;
+                            selectedAddItems.push(productItem);
+                        }
+                    }
+                }
+                setOpenLoadingModal(false);
+            }
+            setSelectedItems(selectedAddItems);
             setValues({
                 ...values,
-                selectAllProduct: event.target.checked,
-                btnAddStatus: (event.target.checked && !objectNullOrEmpty(values.productType)) || !objectNullOrEmpty(values.product)
-            });
+                selectAllProduct: false,
+                product: {},
+                productType: {}
+            }
+        );
         }
     };
 
@@ -300,76 +359,6 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             selectedItemFilter = selectedItems.filter((it: any) => it.selectedType === 1 || it.barcode !== data.barcode);
         }
         setSelectedItems(selectedItemFilter);
-    };
-
-    const handleAddItem = async () => {
-        let selectedAddItems = _.cloneDeep(selectedItems);
-        if (!objectNullOrEmpty(values.productType) && values.selectAllProduct) {
-            let productTypeExist = (selectedItems && selectedItems.length > 0)
-                ? selectedItems.filter((it: any) => it.selectedType === 1 && it.productTypeCode === values.productType.productTypeCode) : [];
-            if (productTypeExist != null && productTypeExist.length > 0) {
-                let error = {...values.error};
-                error.productTypeExist = 'ประเภทสินค้านี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง';
-                setValues({
-                        ...values,
-                        error: error
-                    }
-                );
-                return;
-            }
-            //add type to selectedAddItems
-            let productTypeItem: any = _.cloneDeep(values.productType);
-            productTypeItem.selectedType = 1;
-            selectedAddItems.push(productTypeItem);
-            //add product by type to selectedAddItems
-            let productTypeCode = '';
-            if (!objectNullOrEmpty(values.productType)) {
-                productTypeCode = values.productType.productTypeCode;
-            }
-            setOpenLoadingModal(true);
-            let res = await getAllProductByType(productTypeCode);
-            if (res && res.data && res.data.length > 0) {
-                let lstProductByType = res.data;
-                for (const item of lstProductByType) {
-                    let productItem: any = _.cloneDeep(item);
-                    let productExist = selectedItems.find((it: any) => it.selectedType === 2 && it.barcode === item.barcode);
-                    if (objectNullOrEmpty(productExist)) {
-                        productItem.productByType = true;
-                        productItem.selectedType = 2;
-                        productItem.showProduct = true;
-                        selectedAddItems.push(productItem);
-                    }
-                }
-            }
-            setOpenLoadingModal(false);
-        } else if (!objectNullOrEmpty(values.product)) {
-            let productExist = (selectedItems && selectedItems.length > 0) ?
-                selectedItems.filter((it: any) => it.selectedType === 2 && it.barcode === values.product.barcode) : [];
-            if (productExist != null && productExist.length > 0) {
-                let error = {...values.error};
-                error.productExist = 'สินค้านี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง';
-                setValues({
-                        ...values,
-                        error: error
-                    }
-                );
-                return;
-            }
-            let productItem: any = _.cloneDeep(values.product);
-            productItem.selectedType = 2
-            productItem.productByType = false;
-            productItem.showProduct = true;
-            selectedAddItems.push(productItem);
-        }
-        setSelectedItems(selectedAddItems);
-        setValues({
-                ...values,
-                btnAddStatus: false,
-                selectAllProduct: false,
-                product: {},
-                productType: {}
-            }
-        );
     };
 
     const handleAddProduct = () => {
@@ -413,7 +402,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             }
         }
         dispatch(updateAddTypeAndProductState(selectedItemEnds));
-        dispatch(setCheckEdit(false))
+        dispatch(setCheckEdit(true))
         setSelectedItems([]);
         setTimeout(() => {
             setOpenLoadingModal(false);
@@ -501,7 +490,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                                 value={values.product}
                             />
                         </Box>
-                        <Box sx={{textAlign: 'right', mt: 3}}>
+                        {/* <Box sx={{textAlign: 'right', mt: 3}}>
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -511,7 +500,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                             >
                                 เพิ่ม
                             </Button>
-                        </Box>
+                        </Box> */}
                     </Grid>
                     <Grid item xs={7}>
                         <Box className={classes.MWrapperListBranch}

@@ -168,7 +168,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
               return false;
             } else return true;
           });
-          dispatch(setCheckEdit(false));
+          dispatch(setCheckEdit(true));
           dispatch(updateAddTypeAndProductState(listAdd));
           setOpenModalDelete(false);
           setShowSnackBar(true);

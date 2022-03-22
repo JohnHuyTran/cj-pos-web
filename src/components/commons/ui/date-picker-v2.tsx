@@ -33,7 +33,7 @@ const defaultMaterialTheme = createTheme({
 const DatePickerComponent: React.FC<StateProps> = (props) => {
   const classes = useStyles();
   const today = new Date();
-  const minDay = moment(today).add(1, 'd');
+  const minDay = moment(today);
   const handleDateChange = (date: any) => {
     props.onClickDate(date);
   };

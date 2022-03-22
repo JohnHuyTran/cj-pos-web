@@ -14,7 +14,7 @@ import { ApiError } from '../../../models/api-error-model';
 import { delFileUrlHuawei } from '../../../services/purchase';
 import { getFileUrlHuawei } from '../../../services/master-service';
 import ModalShowHuaweiFile from '../../commons/ui/modal-show-huawei-file';
-import { stringNullOrEmpty } from '../../../utils/utils';
+import { stringNullOrEmpty } from "../../../utils/utils";
 
 interface fileDisplayList {
   file?: File;
@@ -35,16 +35,8 @@ interface Props {
   warningMessage?: string;
 }
 
-function AccordionUploadFile({
-  files,
-  docNo,
-  docType,
-  isStatus,
-  onChangeUploadFile,
-  onDeleteAttachFile,
-  enabledControl,
-  warningMessage,
-}: Props): ReactElement {
+function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFile,
+                               onDeleteAttachFile, enabledControl, warningMessage}: Props): ReactElement {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
@@ -234,7 +226,7 @@ function AccordionUploadFile({
   const handleFileInputClick = (e: any) => {
     //handle attach file again after remove this file
     e.target.value = '';
-  };
+  }
 
   const closeDialogConfirm = (value: string) => {
     setErrorBrowseFile(false);
@@ -250,7 +242,8 @@ function AccordionUploadFile({
             variant='contained'
             component='span'
             className={classes.MbtnBrowse}
-            disabled={newFileDisplayList.length === 5 || !enabledControl}>
+            disabled={newFileDisplayList.length === 5 || !enabledControl}
+          >
             แนบไฟล์
           </Button>
         </label>
@@ -279,12 +272,14 @@ function AccordionUploadFile({
           mt: 2,
           borderRadius: '5px',
           border: stringNullOrEmpty(warningMessage) ? `1px dashed ${theme.palette.primary.main}` : `1px dashed #F54949`,
-        }}>
+        }}
+      >
         <Box
           sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => {
             if (newFileDisplayList.length > 0) setAccordionFile(!accordionFile);
-          }}>
+          }}
+        >
           <Typography sx={{ fontSize: '14px', color: '#676767' }}>
             เอกสารแนบ จำนวน {newFileDisplayList.length}/5
           </Typography>
@@ -304,7 +299,8 @@ function AccordionUploadFile({
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                }}>
+                }}
+              >
                 {item.status === 'old' && (
                   <Typography
                     color='secondary'
@@ -320,19 +316,16 @@ function AccordionUploadFile({
                   </Typography>
                 )}
 
-                <IconButton
-                  sx={{ display: enabledControl ? undefined : 'none' }}
-                  onClick={() => (onDeleteAttachFile ? handleDeleteAttachFile(item) : handleDelete(item))}
-                  size='small'>
-                  <CloseIcon fontSize='small' color='error' />
+                <IconButton sx={{ display: enabledControl ? undefined: 'none'}}
+                            onClick={() => onDeleteAttachFile ? handleDeleteAttachFile(item) : handleDelete(item)} size="small">
+                  <CloseIcon fontSize="small" color="error" />
                 </IconButton>
               </Box>
             ))}
         </Box>
       </Box>
-      <Typography
-        hidden={stringNullOrEmpty(warningMessage)}
-        sx={{ fontSize: '14px', color: '#F54949', textAlign: 'right' }}>
+      <Typography hidden={stringNullOrEmpty(warningMessage)}
+                  sx={{ fontSize: '14px', color: '#F54949', textAlign: 'right' }}>
         {warningMessage}
       </Typography>
 
