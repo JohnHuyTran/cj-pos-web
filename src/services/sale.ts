@@ -11,7 +11,7 @@ export const getPathInvoiceDetail = (billNo: string) => {
 };
 
 export async function saveInvoice(payload: SaveInvoiceRequest) {
-  const response = await put(environment.sale.taxInvoice.detail.url, payload, ContentType.JSON)
+  const response = await put(environment.sale.taxInvoice.saveInvoice.url, payload, ContentType.JSON)
     .then((result: any) => result)
     .catch((error) => {
       throw error;

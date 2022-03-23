@@ -15,6 +15,8 @@ import { saveInvoice, searchMemberInformation } from '../../services/sale';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import LoadingModal from '../commons/ui/loading-modal';
 import AlertError from '../commons/ui/alert-warning';
+import { featchTaxInvoiceListAsync } from '../../store/slices/tax-invoice-search-list-slice';
+import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 
 interface Props {
   isOpen: boolean;
@@ -55,10 +57,37 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
+  const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
+  const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
+  console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
+
+  const [flagSave, setFlagSave] = React.useState(false);
+  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const handleExitModelConfirm = async () => {
+    setFlagSave(false);
+    handleClose();
+  };
+
+  const handleChange = async () => {
+    if (!flagSave) setFlagSave(true);
+    console.log('handleChange:', flagSave);
+  };
+
+  const handleChkEditClose = async () => {
+    if (flagSave) {
+      setConfirmModelExit(true);
+    } else {
+      handleClose();
+    }
+  };
+
   const handleClose = async () => {
-    setInvoiceNo('');
+    setBillNo('');
     setMemberNo('');
     handleClear();
+
+    dispatch(featchTaxInvoiceListAsync(payloadSearch));
+
     setOpen(false);
     onClickClose();
   };
@@ -74,7 +103,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
   const onSave = (data: any) => {
     if (data) {
-      setDisabledBtnPreview(false);
       const address: any = {
         houseNo: data.houseNo,
         building: data.building,
@@ -93,7 +121,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       };
 
       const payload: SaveInvoiceRequest = {
-        billNo: '',
+        billNo: billNo,
         customer: customer,
       };
 
@@ -102,12 +130,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
-  const [invoiceNo, setInvoiceNo] = React.useState('');
+  const [billNo, setBillNo] = React.useState('');
   const [memberNo, setMemberNo] = React.useState('');
-
-  const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
-  console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
-
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
   const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
   const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
@@ -117,17 +141,19 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     handleClear();
 
     if (isOpen && taxInvoiceDetail) {
-      if (taxInvoiceDetail.invoiceNo) setInvoiceNo(taxInvoiceDetail.invoiceNo);
-      else setInvoiceNo(taxInvoiceDetail.billNo);
+      setBillNo(taxInvoiceDetail.billNo);
+      if (taxInvoiceDetail.invoiceNo) setDisabledBtnPreview(false);
+
+      if (taxInvoiceDetail.status === 'PRINTED') {
+        setDisabledBtnClear(true);
+        setDisabledBtnSave(true);
+      }
+
       if (taxInvoiceDetail.customer.memberNo) {
         setMemberNo(taxInvoiceDetail.customer.memberNo);
-        if (taxInvoiceDetail.status === 'PRINTED') {
-          setDisabledBtnPreview(false);
-          setDisabledBtnClear(true);
-          setDisabledBtnSave(true);
-        }
-
         handleSearchMember(taxInvoiceDetail.customer.memberNo);
+      } else {
+        setDefaultData(taxInvoiceDetail);
       }
     }
   }, [isOpen]);
@@ -151,7 +177,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     setOpenLoadingModal(true);
     await searchMemberInformation(memberNo)
       .then((value) => {
-        setValue('taxNo', '');
+        setValue('taxNo', value.data.taxNo);
         setValue('firstName', value.data.firstName);
         setValue('lastName', value.data.lastName);
         setValue('houseNo', value.data.address.houseNo);
@@ -204,7 +230,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-        // dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+
+        setDisabledBtnPreview(false);
+        setDisabledBtnClear(true);
+        setDisabledBtnSave(true);
       })
       .catch((error: any) => {
         setShowSnackBar(true);
@@ -349,7 +378,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
   return (
     <Dialog open={open} maxWidth='xl' fullWidth={true}>
-      <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
+      <BootstrapDialogTitle id='customized-dialog-title' onClose={handleChkEditClose}>
         <Typography sx={{ fontSize: '1em' }}>รายละเอียดข้อมูลลูกค้า</Typography>
       </BootstrapDialogTitle>
 
@@ -363,7 +392,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid item xs={10} mb={2}>
               <Typography gutterBottom variant='subtitle1' component='div'>
-                {invoiceNo}
+                {billNo}
               </Typography>
             </Grid>
           </Grid>
@@ -384,6 +413,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 className={classes.MtextField}
                 fullWidth
                 value={memberNo}
+                disabled={true}
                 sx={{ backgroundColor: '#E5E5E5' }}
               />
             </Grid>
@@ -402,6 +432,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกเลขประจำตัวผู้เสียภาษี'
                 inputProps={{ maxLength: 13 }}
                 {...register('taxNo', { required: true, maxLength: 13 })}
+                onChange={handleChange}
               />
               {errors.taxNo && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -662,6 +693,14 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         <LoadingModal open={openLoadingModal} />
 
         <AlertError open={openFailAlert} onClose={handleCloseFailAlert} text={textFail} />
+
+        <ConfirmModelExit
+          open={confirmModelExit}
+          onClose={() => {
+            setConfirmModelExit(false);
+          }}
+          onConfirm={handleExitModelConfirm}
+        />
       </DialogContent>
     </Dialog>
   );

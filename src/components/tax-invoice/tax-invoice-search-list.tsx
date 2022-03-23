@@ -11,6 +11,7 @@ import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { featchTaxInvoiceDetailAsync } from '../../store/slices/tax-invoice-search-detail-slice';
 import { useTranslation } from 'react-i18next';
 import ModalCustomerDetails from './customer-details';
+import LoadingModal from '../commons/ui/loading-modal';
 
 export default function TaxInvoiceSearchList() {
   const classes = useStyles();
@@ -61,7 +62,7 @@ export default function TaxInvoiceSearchList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
@@ -69,7 +70,7 @@ export default function TaxInvoiceSearchList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
@@ -147,15 +148,18 @@ export default function TaxInvoiceSearchList() {
     setLoading(false);
   };
 
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const currentlySelected = async (params: GridCellParams) => {
     if (params.row.billStatus !== 'CANCELLED') {
+      setOpenLoadingModal(true);
       const payload: TaxInvoiceRequest = {
         billNo: params.row.billNo,
       };
-      await dispatch(featchTaxInvoiceDetailAsync(payload));
-
-      setOpenDetailModal(true);
+      await dispatch(featchTaxInvoiceDetailAsync(payload)).then(() => {
+        setOpenDetailModal(true);
+      });
+      setOpenLoadingModal(false);
     }
   };
 
@@ -165,7 +169,7 @@ export default function TaxInvoiceSearchList() {
 
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -179,7 +183,7 @@ export default function TaxInvoiceSearchList() {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
@@ -188,6 +192,7 @@ export default function TaxInvoiceSearchList() {
         </div>
       </Box>
 
+      <LoadingModal open={openLoadingModal} />
       <ModalCustomerDetails isOpen={openDetailModal} onClickClose={handleCloseDetailModal} />
     </div>
   );
