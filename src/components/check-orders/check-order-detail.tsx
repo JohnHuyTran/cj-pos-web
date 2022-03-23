@@ -161,7 +161,6 @@ const columns: GridColDef[] = [
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (actualQty === 0) value = chkActualQty(value);
           if (value < 0) value = 0;
-          console.log("value: ", params.row)
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         // onBlur={(e) => {
