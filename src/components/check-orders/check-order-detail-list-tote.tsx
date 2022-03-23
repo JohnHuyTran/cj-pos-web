@@ -15,11 +15,13 @@ import OrderReceiveDetail from './order-receive-detail';
 import LoadingModal from '../commons/ui/loading-modal';
 import CheckOrderDetailTote from '../check-orders/check-order-detail-tote';
 import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+import { itemsDetail } from '../../models/order-model';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
 interface CheckOrderDetailListToteProps {
-  onCloseCheckOrderDetail: (value: boolean) => void;
+  onOpenToteDetail: (value: string, isAddItem: boolean) => void;
 }
 
-function CheckOrderDetailListTote({ onCloseCheckOrderDetail }: CheckOrderDetailListToteProps) {
+function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListToteProps) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
@@ -139,24 +141,32 @@ function CheckOrderDetailListTote({ onCloseCheckOrderDetail }: CheckOrderDetailL
       align: 'right',
       sortable: false,
       renderCell: (params) => {
-        if (params.getValue(params.id, 'sdNo')) {
-          return (
-            <Link component="button" variant="caption" onClick={() => handleLinkDetailTote(params.row.sdNo)}>
-              {params.getValue(params.id, 'sdNo')}
-            </Link>
-          );
-        } else if (params.getValue(params.id, 'sdNo') === '' && params.getValue(params.id, 'canAddTote') === true) {
-          return (
-            <Button
-              variant="contained"
-              size="small"
-              className={classes.MbtnApprove}
-              sx={{ minWidth: 110 }}
-              onClick={() => handleOpenOrderReceiveModal()}
-            >
-              รับสินค้าใน Tote
-            </Button>
-          );
+        if (params.getValue(params.id, 'isTote')) {
+          if (params.getValue(params.id, 'sdNo')) {
+            return (
+              <Link component="button" variant="caption" onClick={() => handleLinkDetailTote(params)}>
+                {params.getValue(params.id, 'sdNo')}
+              </Link>
+            );
+          } else if (params.getValue(params.id, 'canAddTote') === true) {
+            return (
+              <Button
+                variant="contained"
+                size="small"
+                className={classes.MbtnApprove}
+                sx={{ minWidth: 110 }}
+                onClick={() => handleOpenOrderReceiveModal(params)}
+              >
+                รับสินค้าใน Tote
+              </Button>
+            );
+          } else if (params.getValue(params.id, 'canAddTote') === false && params.getValue(params.id, 'sdNo') === '') {
+            return (
+              <Button variant="contained" size="small" className={classes.MbtnApprove} sx={{ minWidth: 110 }} disabled>
+                รับสินค้าใน Tote
+              </Button>
+            );
+          }
         } else {
           return <div></div>;
         }
@@ -196,6 +206,15 @@ function CheckOrderDetailListTote({ onCloseCheckOrderDetail }: CheckOrderDetailL
     return params.row.sdStatus;
   };
 
+  const updateState = async (items: any) => {
+    await dispatch(updateAddItemsState(items));
+  };
+
+  let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
+  if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
+    updateState(entries);
+  }
+
   let rowsEntries: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
     rowsEntries = payloadAddItem.map((item: any, index: number) => {
@@ -226,13 +245,18 @@ function CheckOrderDetailListTote({ onCloseCheckOrderDetail }: CheckOrderDetailL
         comment: item.comment,
         canAddTote: item.canAddTote,
         sdNo: item.sdNo ? item.sdNo : '',
+        docType: item.docType,
+        docRefNo: item.docRefNo,
+        toteCode: item.toteCode,
       };
     });
   }
 
   const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
-  const handleOpenOrderReceiveModal = () => {
-    setOpenOrderReceiveModal(true);
+  const handleOpenOrderReceiveModal = async (params: GridRenderCellParams) => {
+    await dispatch(updateAddItemsState({}));
+    // setOpenOrderReceiveModal(true);
+    return onOpenToteDetail(params.row.toteCode, true);
   };
 
   function handleCloseOrderReceiveModal() {
@@ -240,32 +264,21 @@ function CheckOrderDetailListTote({ onCloseCheckOrderDetail }: CheckOrderDetailL
   }
 
   const [openDetailToteModal, setOpenDetailToteModal] = React.useState(false);
-  const handleLinkDetailTote = async (sdNo: string) => {
-    console.log('sdNo: ', sdNo);
-    // setOpenLoadingModal(true);
-    await dispatch(featchOrderDetailAsync(sdNo));
-    setOpenDetailToteModal(true);
-    // onCloseCheckOrderDetail(true);
+  const [sdNo, setSdNo] = React.useState('');
+  const handleLinkDetailTote = async (params: GridCellParams) => {
+    await dispatch(updateAddItemsState({}));
+    const sdNo = params.row.sdNo;
+    setSdNo(sdNo);
 
-    // await dispatch(featchOrderDetailAsync(params.row.sdNo))
-    //   .then(
-    //     async function (value) {
-    //       setOpens(true);
-    //     },
-    //     function (error: ApiError) {
-    //       console.log('err message : ', error.message);
-    //     }
-    //   )
-    //   .catch((err) => {
-    //     console.log('err : ', err);
-    //   });
+    // setOpenLoadingModal(true);
 
     // setOpenLoadingModal(false);
+    return onOpenToteDetail(sdNo, false);
   };
 
-  function handleCloseDetailToteModal() {
-    setOpenDetailToteModal(false);
-  }
+  //   function handleCloseDetailToteModal() {
+  //     setOpenDetailToteModal(false);
+  //   }
 
   return (
     <div
@@ -294,10 +307,6 @@ function CheckOrderDetailListTote({ onCloseCheckOrderDetail }: CheckOrderDetailL
           onClickClose={handleCloseOrderReceiveModal}
           isTote={true}
         />
-      )}
-
-      {openDetailToteModal && (
-        <CheckOrderDetailTote defaultOpen={openDetailToteModal} onClickClose={handleCloseDetailToteModal} />
       )}
 
       <LoadingModal open={openLoadingModal} />

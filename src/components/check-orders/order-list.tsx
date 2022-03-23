@@ -211,12 +211,16 @@ function OrderList() {
     await dispatch(updateAddItemsState({}));
     await dispatch(featchOrderDetailAsync(params.row.sdNo))
       .then(
-        async function (value) {
+        () => {
           setOpens(true);
-        },
-        function (error: ApiError) {
-          console.log('err message : ', error.message);
         }
+
+        // async function (value) {
+        //   setOpens(true);
+        // },
+        // function (error: ApiError) {
+        //   console.log('err message : ', error.message);
+        // }
       )
       .catch((err) => {
         console.log('err : ', err);

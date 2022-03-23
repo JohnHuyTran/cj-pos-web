@@ -8,10 +8,13 @@ import {
   DialogTitle,
   Grid,
   IconButton,
+  MenuItem,
+  Menu,
+  MenuProps,
   TextField,
   Typography,
 } from '@mui/material';
-import { HighlightOff } from '@mui/icons-material';
+import { HighlightOff, Print } from '@mui/icons-material';
 import {
   getShipmentStatusText,
   getShipmentTypeText,
@@ -31,6 +34,15 @@ import {
 import { itemsDetail } from '../../models/order-model';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { useStyles } from '../../styles/makeTheme';
+import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+import LoadingModal from '../commons/ui/loading-modal';
+import ModalShowFile from '../commons/ui/modal-show-file';
+import { getPathReportSD } from '../../services/order-shipment';
+import { formatFileNam } from '../../utils/enum/check-order-enum';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ModalAddItems from '../commons/ui/modal-add-items';
+import { styled } from '@mui/material/styles';
 
 export interface CheckOrderDetailToteProps {
   defaultOpen: boolean;
@@ -41,6 +53,10 @@ export interface DialogTitleProps {
   id: string;
   children?: React.ReactNode;
   onClose?: () => void;
+}
+
+interface loadingModalState {
+  open: boolean;
 }
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
@@ -66,6 +82,32 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
     </DialogTitle>
   );
 };
+
+const StyledMenu = styled((props: MenuProps) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'center',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'center',
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiPaper-root': {
+    // marginTop: theme.spacing(1),
+    boxShadow:
+      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+    '& .MuiMenuItem-root': {
+      '& .MuiSvgIcon-root': {
+        marginRight: theme.spacing(1.5),
+      },
+    },
+  },
+}));
 
 const columns: GridColDef[] = [
   {
@@ -212,24 +254,33 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
   const orderDetails = useAppSelector((state) => state.checkOrderDetail.orderDetail);
   const orderDetail: any = orderDetails.data ? orderDetails.data : null;
 
-  const [open, setOpen] = React.useState(defaultOpen);
+  const [openTote, setOpenTote] = React.useState(defaultOpen);
   const [pageSize, setPageSize] = React.useState<number>(10);
-  const [shipmentStatusText, setShipmentStatusText] = useState<string | undefined>('');
-  const [shipmentTypeText, setShipmentTypeText] = useState<string | undefined>('');
-  const [shipmentDateFormat, setShipmentDateFormat] = useState<string | undefined>('');
+  const [statusFile, setStatusFile] = React.useState(0);
   const [statusClosed, setStatusClosed] = useState<boolean>(false);
+  const [statusWaitApprove1, setStatusWaitApprove1] = React.useState(false);
+  const [statusDraft, setStatusDraft] = React.useState(false);
+  const [showSdTypeTote, setShowSdTypeTote] = React.useState(false);
+  const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
 
-  console.log('orderDetail: ', orderDetail);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
+  });
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
 
   useEffect(() => {
-    setShipmentStatusText(getShipmentStatusText(orderDetail.sdStatus));
-    setShipmentTypeText(getShipmentTypeText(orderDetail.sdType));
-    setShipmentDateFormat(convertUtcToBkkDate(orderDetail.receivedDate));
+    console.log('orderDetail: ', orderDetail);
+    setStatusDraft(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
     setStatusClosed(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
-  }, [open]);
+    setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1);
+    setShowSdTypeTote(orderDetail.sdType === 0);
+  }, [openTote, orderDetail]);
 
   const handleClose = async () => {
-    setOpen(false);
+    dispatch(updateAddItemsState({}));
+    setOpenTote(false);
     onClickClose();
   };
 
@@ -238,11 +289,15 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
   };
 
   let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
+  //   console.log('entries: ', entries);
+  //   console.log('payloadAddItem: ', payloadAddItem);
   if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
+    console.log('entries lenght > 0 && payloadadditem = 0');
     updateState(entries);
   }
   let rowsEntries: any = [];
   if (Object.keys(payloadAddItem).length !== 0) {
+    console.log('payloadadditem > 0');
     rowsEntries = payloadAddItem.map((item: any, index: number) => {
       let qtyRef: number = 0;
       let actualQty: number = 0;
@@ -294,9 +349,47 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
     }
   };
 
+  const handlePrintBtn = async () => {
+    handleOpenLoading('open', true);
+    setStatusFile(1);
+    setOpenModelPreviewDocument(true);
+    handleOpenLoading('open', false);
+  };
+
+  function handleModelPreviewDocument() {
+    setOpenModelPreviewDocument(false);
+  }
+
+  const [openModelAddTote, setOpenModelAddTote] = React.useState(false);
+  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const openDropdown = Boolean(anchorEl);
+
+  const handleClickAddItem = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseDropdown = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpenTote = () => {
+    setOpenModelAddTote(true);
+    setAnchorEl(null);
+  };
+
+  const handleOpenAddItem = () => {
+    setOpenModelAddItems(true);
+    setAnchorEl(null);
+  };
+
+  const handleModelAddItems = async () => {
+    setOpenModelAddItems(false);
+  };
+
   return (
     <div>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+      <Dialog open={openTote} maxWidth="xl" fullWidth={true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>รายละเอียดตรวจสอบการรับ-โอนสินค้า</Typography>
         </BootstrapDialogTitle>
@@ -314,7 +407,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                 <Typography variant="body2">เลข Tote:</Typography>
               </Grid>
               <Grid item lg={4}>
-                {/* <Typography variant="body2">{shipmentStatusText}</Typography> */}
+                <Typography variant="body2">{orderDetail.toteCode}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -328,7 +421,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                 <Typography variant="body2">สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentStatusText}</Typography>
+                <Typography variant="body2">{getShipmentStatusText(orderDetail.sdStatus)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -336,13 +429,13 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                 <Typography variant="body2">วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentDateFormat}</Typography>
+                <Typography variant="body2">{convertUtcToBkkDate(orderDetail.receivedDate)}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentTypeText}</Typography>
+                <Typography variant="body2">{getShipmentTypeText(orderDetail.sdType)}</Typography>
               </Grid>
             </Grid>
           </Box>
@@ -351,7 +444,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
           <Box sx={{ marginTop: 4 }}>
             <Grid container spacing={2} display="flex" justifyContent="space-between">
               <Grid item xl={4}>
-                {/* {!statusWaitApprove1 && (
+                {!statusWaitApprove1 && (
                   <Button
                     id="btnPrint"
                     variant="contained"
@@ -360,29 +453,29 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                     startIcon={<Print />}
                     className={classes.MbtnPrint}
                     style={{ textTransform: 'none' }}
-                    sx={{ display: `${showCloseJobBtn ? 'none' : ''}` }}
+                    sx={{ display: `${statusClosed ? 'none' : ''}` }}
                   >
                     พิมพ์ใบผลต่าง
                   </Button>
-                )} */}
+                )}
 
-                {/* {showSaveBtn && (
+                {statusDraft && (
                   <Button
                     id="btnAddItem"
                     variant="contained"
                     color="secondary"
                     onClick={handleClickAddItem}
                     className={classes.MbtnAdd}
-                    sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                    // sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                     // disabled={newAddItemListArray.length === 0}
                     startIcon={<AddCircleOutlineIcon />}
                     endIcon={<KeyboardArrowDownIcon />}
                   >
                     เพิ่มสินค้า
                   </Button>
-                )} */}
+                )}
 
-                {/* <StyledMenu
+                <StyledMenu
                   id="demo-customized-menu"
                   MenuListProps={{
                     'aria-labelledby': 'demo-customized-button',
@@ -399,7 +492,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                   <MenuItem sx={{ color: '#446EF2' }} onClick={handleOpenAddItem}>
                     เพิ่มสินค้า
                   </MenuItem>
-                </StyledMenu> */}
+                </StyledMenu>
               </Grid>
 
               {/* <Grid item>
@@ -488,6 +581,30 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
           </Box>
         </DialogContent>
       </Dialog>
+
+      <ModalShowFile
+        open={openModelPreviewDocument}
+        onClose={handleModelPreviewDocument}
+        url={getPathReportSD(orderDetail.sdNo)}
+        statusFile={statusFile}
+        sdImageFile={orderDetail.sdImageFile ? orderDetail.sdImageFile : ''}
+        fileName={
+          orderDetail.sdImageFilename
+            ? orderDetail.sdImageFilename
+            : formatFileNam(orderDetail.sdNo, orderDetail.sdStatus)
+        }
+        btnPrintName="พิมพ์ใบผลต่าง"
+      />
+
+      <LoadingModal open={openLoadingModal.open} />
+
+      <ModalAddItems
+        open={openModelAddItems}
+        onClose={handleModelAddItems}
+        requestBody={{
+          skuCodes: [],
+        }}
+      ></ModalAddItems>
     </div>
   );
 }

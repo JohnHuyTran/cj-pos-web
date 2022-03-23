@@ -4,12 +4,29 @@ import { DataGrid, GridColDef, GridCellParams, GridRowId } from '@mui/x-data-gri
 import Box from '@mui/material/Box';
 import { useStyles } from '../../styles/makeTheme';
 import { OrderReceiveEntry } from '../../models/order-model';
+export interface OrderReceiveDetailListProps {
+  isTote?: boolean;
+}
 
-export default function OrderReceiveDetailList() {
+export default function OrderReceiveDetailList({ isTote }: OrderReceiveDetailListProps) {
   const classes = useStyles();
   const orderReceiveResp = useAppSelector((state) => state.orderReceiveSlice.orderReceiveList);
   const orderReceiveData = orderReceiveResp.data ? orderReceiveResp.data : {};
-  const orderReceiveEntries = orderReceiveData.entries;
+  const orderReceiveEntrie = orderReceiveData.entries;
+
+  const searchToteResp = useAppSelector((state) => state.searchToteSlice.tote);
+  const searchToteData = searchToteResp.data ? searchToteResp.data : null;
+  let searchToteEntries: any = [];
+  if (searchToteData !== null) {
+    searchToteEntries = searchToteData.entries ? searchToteData.entries : [];
+  }
+
+  let orderReceiveEntries: any;
+  if (isTote === true) {
+    orderReceiveEntries = searchToteEntries;
+  } else {
+    orderReceiveEntries = orderReceiveEntrie;
+  }
 
   const columns: GridColDef[] = [
     {

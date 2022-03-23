@@ -13,6 +13,7 @@ export const AddItemsSlice = createSlice({
   initialState,
   reducers: {
     updateAddItemsState: (state, action: PayloadAction<any>) => {
+      console.log('update state', action.payload);
       state.state = action.payload;
     },
   },

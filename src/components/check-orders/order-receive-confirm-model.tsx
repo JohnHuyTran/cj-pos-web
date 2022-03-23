@@ -12,6 +12,8 @@ interface Props {
   onUpdateAction: (status: string) => void;
   sdNo: string;
   docRefNo: string;
+  isTote?: boolean;
+  toteCode?: string;
 }
 
 export default function OrderReceiveConfirmModel({
@@ -20,6 +22,8 @@ export default function OrderReceiveConfirmModel({
   onUpdateAction,
   sdNo,
   docRefNo,
+  isTote,
+  toteCode,
 }: Props): ReactElement {
   const handleConfirm = () => {
     onUpdateAction('ok');
@@ -40,26 +44,55 @@ export default function OrderReceiveConfirmModel({
         maxWidth="md"
         sx={{ minWidth: 500 }}
       >
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-            <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
-              ยืนยันการรับ-โอนสินค้า
-            </Typography>
-            <Typography variant="body1" align="center">
-              เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
-                <b>{docRefNo}</b>
-              </label>
-            </Typography>
+        {isTote && (
+          <>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
+                <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+                  ยืนยันการรับ-โอนสินค้า(Tote)
+                </Typography>
+                <Typography variant="body1" align="center">
+                  เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  <label style={{ color: '#36C690' }}>
+                    <b>{docRefNo}</b>
+                  </label>
+                </Typography>
 
-            <Typography variant="body1" align="center">
-              เลขที่เอกสาร SD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
-                <b>{sdNo}</b>
-              </label>
-            </Typography>
-          </DialogContentText>
-        </DialogContent>
+                <Typography variant="body1" align="center">
+                  เลข Tote <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  <label style={{ color: '#36C690' }}>
+                    <b>{toteCode}</b>
+                  </label>
+                </Typography>
+              </DialogContentText>
+            </DialogContent>
+          </>
+        )}
+
+        {!isTote && (
+          <>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
+                <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+                  ยืนยันการรับ-โอนสินค้า
+                </Typography>
+                <Typography variant="body1" align="center">
+                  เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  <label style={{ color: '#36C690' }}>
+                    <b>{docRefNo}</b>
+                  </label>
+                </Typography>
+
+                <Typography variant="body1" align="center">
+                  เลขที่เอกสาร SD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+                  <label style={{ color: '#36C690' }}>
+                    <b>{sdNo}</b>
+                  </label>
+                </Typography>
+              </DialogContentText>
+            </DialogContent>
+          </>
+        )}
 
         <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
           <Button

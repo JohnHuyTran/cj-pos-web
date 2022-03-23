@@ -40,7 +40,7 @@ import {
   formatFileNam,
 } from '../../utils/enum/check-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
-import { SaveDraftSDRequest, CheckOrderDetailProps, Entry, itemsDetail } from '../../models/order-model';
+import { SaveDraftSDRequest, CheckOrderDetailProps, Entry, itemsDetail, ToteRequest } from '../../models/order-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { ApiError } from '../../models/api-error-model';
 import AlertError from '../commons/ui/alert-error';
@@ -65,6 +65,10 @@ import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import theme from '../../styles/theme';
 import { env } from '../../adapters/environmentConfigs';
 import CheckOrderDetailListTote from '../check-orders/check-order-detail-list-tote';
+import CheckOrderDetailTote from './check-order-detail-tote';
+import { couldStartTrivia } from 'typescript';
+import OrderReceiveDetail from './order-receive-detail';
+import { searchToteAsync } from '../../store/slices/search-tote-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -287,6 +291,7 @@ export default function CheckOrderDetail({
   const [showApproveBtn, setShowApproveBtn] = React.useState(false);
   const [statusWaitApprove1, setStatusWaitApprove1] = React.useState(false);
   const [showCloseJobBtn, setShowCloseJobBtn] = React.useState(false);
+  const [closeJobTote, setCloseJobTote] = React.useState(false);
   const [validationFile, setValidationFile] = React.useState(false);
   const [isDisplayActBtn, setIsDisplayActBtn] = React.useState('');
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
@@ -323,6 +328,7 @@ export default function CheckOrderDetail({
   const [displayBranchGroup, setDisplayBranchGroup] = React.useState(false);
   const [statusOC, setStatusOC] = React.useState(false);
   const DCPercent = env.dc.percent;
+
   useEffect(() => {
     const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
     const oc = getUserInfo().group === PERMISSION_GROUP.OC;
@@ -334,8 +340,11 @@ export default function CheckOrderDetail({
     setShowApproveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
     setShowCloseJobBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
     setShowSdTypeTote(orderDetail.sdType === 0);
+    setCloseJobTote(
+      orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && orderDetail.sdType === 0
+    );
 
-    setOpen(defaultOpen);
+    // setOpen(defaultOpen);
     setShipmentStatusText(getShipmentStatusText(orderDetail.sdStatus));
     setShipmentTypeText(getShipmentTypeText(orderDetail.sdType));
     setShipmentDateFormat(convertUtcToBkkDate(orderDetail.receivedDate));
@@ -353,7 +362,8 @@ export default function CheckOrderDetail({
 
       handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
     }
-  }, [open, openModelConfirm]);
+    // }, [open, openModelConfirm]);
+  }, [open]);
 
   const [sumDCPercent, setSumDCPercent] = React.useState(0);
   const handleCalculateDCPercent = async (sumActualQty: number, sumQuantityRef: number) => {
@@ -369,6 +379,7 @@ export default function CheckOrderDetail({
 
   let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
   if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
+    console.log('update state order detail 1');
     updateState(entries);
   }
   let rowsEntries: any = [];
@@ -728,13 +739,36 @@ export default function CheckOrderDetail({
     setUploadFileFlag(status);
   };
 
-  const handleStatusCloseModal = (status: boolean) => {
-    console.log('status: ', status);
-    if (status === true) {
-      setOpen(false);
-      onClickClose();
+  const [openTote, setOpenTote] = React.useState(false);
+  const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
+
+  const handleOpenModalTote = async (value: string, isAddItem: boolean) => {
+    if (isAddItem === false) {
+      setOpenTote(true);
+      await dispatch(updateAddItemsState({}));
+      await dispatch(featchOrderDetailAsync(value));
+    } else if (isAddItem === true) {
+      handleOpenLoading('open', true);
+      const payload: ToteRequest = {
+        docRefNo: docRefNo,
+        toteCode: value,
+      };
+      await dispatch(updateAddItemsState({}));
+      await dispatch(searchToteAsync(payload));
+      await setOpenOrderReceiveModal(true);
+      handleOpenLoading('open', false);
     }
   };
+
+  function handleCloseDetailToteModal() {
+    setOpenTote(false);
+    onClickClose();
+  }
+
+  function handleCloseOrderReceiveModal() {
+    setOpenOrderReceiveModal(false);
+    onClickClose();
+  }
 
   return (
     <div>
@@ -957,30 +991,32 @@ export default function CheckOrderDetail({
           </Box>
 
           <Box mt={2} bgcolor="background.paper">
-            <div
-              style={{ width: '100%', height: rowsEntries.length >= 8 ? '70vh' : 'auto' }}
-              className={classes.MdataGridDetail}
-            >
-              <DataGrid
-                rows={rowsEntries}
-                columns={columns}
-                pageSize={pageSize}
-                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                rowsPerPageOptions={[10, 20, 50, 100]}
-                pagination
-                disableColumnMenu
-                autoHeight={rowsEntries.length >= 8 ? false : true}
-                scrollbarSize={10}
-                onCellFocusOut={handleEditItems}
-                // onCellOut={handleEditItems}
-                // onCellKeyDown={handleEditItems}
-                // onCellBlur={handleEditItems}
-              />
-            </div>
+            {!closeJobTote && (
+              <div
+                style={{ width: '100%', height: rowsEntries.length >= 8 ? '70vh' : 'auto' }}
+                className={classes.MdataGridDetail}
+              >
+                <DataGrid
+                  rows={rowsEntries}
+                  columns={columns}
+                  pageSize={pageSize}
+                  onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                  rowsPerPageOptions={[10, 20, 50, 100]}
+                  pagination
+                  disableColumnMenu
+                  autoHeight={rowsEntries.length >= 8 ? false : true}
+                  scrollbarSize={10}
+                  onCellFocusOut={handleEditItems}
+                  // onCellOut={handleEditItems}
+                  // onCellKeyDown={handleEditItems}
+                  // onCellBlur={handleEditItems}
+                />
+              </div>
+            )}
 
-            {showCloseJobBtn && orderDetail.sdType === 0 && (
+            {closeJobTote && (
               <div>
-                <CheckOrderDetailListTote onCloseCheckOrderDetail={handleStatusCloseModal} />
+                <CheckOrderDetailListTote onOpenToteDetail={handleOpenModalTote} />
               </div>
             )}
           </Box>
@@ -994,6 +1030,16 @@ export default function CheckOrderDetail({
           shipmentNo={docRefNo}
           defaultOpen={opensSD}
           onClickClose={isClosSDModal}
+        />
+      )}
+
+      {openTote && <CheckOrderDetailTote defaultOpen={openTote} onClickClose={handleCloseDetailToteModal} />}
+
+      {openOrderReceiveModal && (
+        <OrderReceiveDetail
+          defaultOpen={openOrderReceiveModal}
+          onClickClose={handleCloseOrderReceiveModal}
+          isTote={true}
         />
       )}
 
