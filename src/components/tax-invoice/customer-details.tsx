@@ -70,7 +70,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
   const handleChange = async () => {
     if (!flagSave) setFlagSave(true);
-    console.log('handleChange:', flagSave);
   };
 
   const handleChkEditClose = async () => {
@@ -97,6 +96,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     formState: { errors },
     handleSubmit,
     reset,
+    getValues,
     setValue,
     clearErrors,
   } = useForm();
@@ -130,6 +130,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const [status, setStatus] = React.useState('');
   const [billNo, setBillNo] = React.useState('');
   const [memberNo, setMemberNo] = React.useState('');
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
@@ -144,16 +145,20 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       setBillNo(taxInvoiceDetail.billNo);
       if (taxInvoiceDetail.invoiceNo) setDisabledBtnPreview(false);
 
+      setStatus(taxInvoiceDetail.status);
+      setMemberNo(taxInvoiceDetail.customer.memberNo);
+
       if (taxInvoiceDetail.status === 'PRINTED') {
         setDisabledBtnClear(true);
         setDisabledBtnSave(true);
-      }
-
-      if (taxInvoiceDetail.customer.memberNo) {
-        setMemberNo(taxInvoiceDetail.customer.memberNo);
-        handleSearchMember(taxInvoiceDetail.customer.memberNo);
-      } else {
         setDefaultData(taxInvoiceDetail);
+
+        setDisabledSelProvinces(true);
+        setDisabledSelDistricts(true);
+        setDisabledSelSubDistricts(true);
+      } else {
+        if (taxInvoiceDetail.customer.memberNo) handleSearchMember(taxInvoiceDetail.customer.memberNo);
+        else setDefaultData(taxInvoiceDetail);
       }
     }
   }, [isOpen]);
@@ -219,6 +224,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     setProvincesCode(String(data.customer.address.provinceCode));
     setDistrictsCode(String(data.customer.address.districtCode));
     setSubDistrictsCode(String(data.customer.address.subDistrictCode));
+
     setDisabledSelDistricts(false);
     setDisabledSelSubDistricts(false);
   };
@@ -276,6 +282,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [provincesCode, setProvincesCode] = React.useState('');
   const [districtsCode, setDistrictsCode] = React.useState('');
   const [subDistrictsCode, setSubDistrictsCode] = React.useState('');
+
+  const [provincesName, setProvincesName] = React.useState('');
+  const [districtsName, setDistrictsName] = React.useState('');
+  const [subDistrictsName, setSubDistrictsName] = React.useState('');
 
   // const [searchProvincesCode, setSearchProvincesCode] = React.useState('');
   const [searchDistrictsCode, setSearchDistrictsCode] = React.useState('');
@@ -350,6 +360,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
   const handleChangePostalCode = (e: any) => {
     const keySearch = e.target.value.trim();
+    setFlagSave(true);
 
     if (keySearch.length >= 5) {
       setSearchPostalCode(keySearch);
@@ -433,6 +444,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 inputProps={{ maxLength: 13 }}
                 {...register('taxNo', { required: true, maxLength: 13 })}
                 onChange={handleChange}
+                disabled={status === 'PRINTED'}
               />
               {errors.taxNo && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -454,6 +466,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 fullWidth
                 placeholder='กรุณากรอกชื่อ / ชื่อบริษัท'
                 {...register('firstName', { required: true })}
+                onChange={handleChange}
+                disabled={status === 'PRINTED'}
               />
               {errors.firstName && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -475,6 +489,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 fullWidth
                 placeholder='กรุณากรอกนามสกุล'
                 {...register('lastName')}
+                onChange={handleChange}
+                disabled={status === 'PRINTED'}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -497,6 +513,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 fullWidth
                 placeholder='กรุณากรอกเลขที่'
                 {...register('houseNo', { required: true })}
+                onChange={handleChange}
+                disabled={status === 'PRINTED'}
               />
 
               {errors.houseNo && (
@@ -519,6 +537,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 fullWidth
                 placeholder='กรุณากรอกเลขอาคาร'
                 {...register('building')}
+                onChange={handleChange}
+                disabled={status === 'PRINTED'}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -536,6 +556,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 fullWidth
                 placeholder='กรุณากรอกหมู่'
                 {...register('moo')}
+                onChange={handleChange}
+                disabled={status === 'PRINTED'}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -625,6 +647,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 onChange={(e) => {
                   handleChangePostalCode(e);
                 }}
+                disabled={status === 'PRINTED'}
               />
               {errors.postcode && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
