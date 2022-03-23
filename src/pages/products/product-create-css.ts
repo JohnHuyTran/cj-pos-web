@@ -1,6 +1,7 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
+import theme from '../../styles/theme';
 
-export const createProductStyles = makeStyles((theme) => ({
+export const createProductStyles = makeStyles({
   root: {},
   cartContainer: {
     maxWidth: 550,
@@ -63,4 +64,4 @@ export const createProductStyles = makeStyles((theme) => ({
     align: "center",
     background: "rgba(0, 0, 0, 0.5)",
   },
-}));
+});

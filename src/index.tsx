@@ -6,22 +6,28 @@ import './index.css';
 import './locales/i18n';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
+import { StylesProvider, createGenerateClassName } from '@mui/styles';
 import theme from './styles/theme';
 import reportWebVitals from './reportWebVitals';
 import store from './store/store';
 import App from './App';
 
+const generateClassName = createGenerateClassName({
+  productionPrefix: 'pos',
+});
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <BrowserRouter>
-          <Suspense fallback="">
-              <CssBaseline />
-              <App />
-          </Suspense>
-        </BrowserRouter>
-      </ThemeProvider>
+      <StylesProvider generateClassName={generateClassName}>
+        <ThemeProvider theme={theme}>
+          <BrowserRouter>
+            <Suspense fallback="">
+                <CssBaseline />
+                <App />
+            </Suspense>
+          </BrowserRouter>
+        </ThemeProvider>
+      </StylesProvider>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')
