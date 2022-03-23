@@ -784,6 +784,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             docType='PN'
             isStatus={uploadFileFlag}
             onChangeUploadFile={handleOnChangeUploadFile}
+            enabledControl={true}
           />
           <Box>
             <Link

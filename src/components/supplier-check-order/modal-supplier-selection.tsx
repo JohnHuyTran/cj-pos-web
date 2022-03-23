@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles } from '@mui/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -28,6 +28,7 @@ import { updateState } from '../../store/slices/supplier-selection-slice';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import SupplierOrderDetail from './supplier-pi-detail';
 import LoadingModal from '../commons/ui/loading-modal';
+import theme from '../../styles/theme';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -35,7 +36,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles({
   MTextField: {
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
@@ -53,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
   textItemList: {
     fontSize: 14,
   },
-}));
+});
 
 interface StyledFormControlLabelProps extends FormControlLabelProps {
   checked: boolean;

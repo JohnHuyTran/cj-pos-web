@@ -132,6 +132,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       setTimeout(() => {
         handleCloseSnackBar();
       }, 500);
+      await dispatch(setReloadScreen(false));
     } else {
       handleOpenLoading('open', false);
     }
