@@ -60,6 +60,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
     if (lstBarcodeDiscount != null && lstBarcodeDiscount.length > 0) {
       let rows = lstBarcodeDiscount.map((data: BarcodeDiscount, index: number) => {
         return {
+          ...data,
           checked: false,
           id: data.id,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
