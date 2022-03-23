@@ -62,6 +62,14 @@ export const environment = {
     },
   },
   sell: {
+    transferOut: {
+      save: {
+        url: '/campaign/transfer-out',
+      },
+      detail: {
+        url: '/campaign/transfer-out',
+      }
+    },
     barcodeDiscount: {
       search: {
         url: '/campaign',

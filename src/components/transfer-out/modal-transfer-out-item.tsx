@@ -15,13 +15,13 @@ import {
 import { DeleteForever } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
 import {
-  saveBarcodeDiscount,
+  save,
   updateApproveReject,
   updateCheckEdit,
   updateCheckStock,
   updateDataDetail,
   updateErrorList,
-} from '../../store/slices/barcode-discount-slice';
+} from '../../store/slices/transfer-out-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
@@ -29,7 +29,6 @@ import { Action, BDStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import HtmlTooltip from '../commons/ui/html-tooltip';
-import { updateBarcodeDiscountPrintState, updatePrintInDetail } from "../../store/slices/barcode-discount-print-slice";
 import { TransferOutDetail } from "../../models/transfer-out";
 
 export interface DataGridProps {
@@ -48,16 +47,16 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  const payloadTransferOut = useAppSelector((state) => state.barcodeDiscount.createDraft);
-  const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
-  const approveReject = useAppSelector((state) => state.barcodeDiscount.approveReject);
-  const errorList = useAppSelector((state) => state.barcodeDiscount.errorList);
+  const payloadTransferOut = useAppSelector((state) => state.transferOutSlice.createDraft);
+  const dataDetail = useAppSelector((state) => state.transferOutSlice.dataDetail);
+  const approveReject = useAppSelector((state) => state.transferOutSlice.approveReject);
+  const errorList = useAppSelector((state) => state.transferOutSlice.errorList);
 
   const [dtTable, setDtTable] = React.useState<Array<TransferOutDetail>>([]);
   const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
-  const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
+  const checkStocks = useAppSelector((state) => state.transferOutSlice.checkStock);
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>(
     userPermission != null && userPermission.length > 0 ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false
@@ -67,11 +66,11 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let rows = payloadAddItem.map((item: any, index: number) => {
         let sameItem = dtTable.find((el) => el.barCode === item.barcode);
-        let numberOfDiscounted = item.qty ? item.qty : 0;
+        let numberOfRequested = item.qty ? item.qty : 0;
         let remark = !!sameItem ? sameItem.remark : '';
         if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
           remark = stringNullOrEmpty(item.remark) ? '' : item.remark;
-          numberOfDiscounted = stringNullOrEmpty(item.qty) ? null : item.qty;
+          numberOfRequested = stringNullOrEmpty(item.qty) ? null : item.qty;
         }
         let numberOfApproved = !!sameItem
           ? sameItem.numberOfApproved
@@ -85,9 +84,9 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
           barCode: item.barcode,
           barcodeName: item.barcodeName,
           unit: item.unitName,
-          qty: numberOfDiscounted,
+          qty: numberOfRequested,
           errorQty: '',
-          numberOfDiscounted: numberOfDiscounted,
+          numberOfRequested: numberOfRequested,
           numberOfApproved: numberOfApproved,
           errorNumberOfApproved: '',
           skuCode: item.skuCode,
@@ -102,12 +101,12 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
 
   useEffect(() => {
     if (dtTable.length !== 0) {
-      updateSumOfDiscount(dtTable.reduce((acc, val) => acc + Number(val.numberOfDiscounted), 0));
+      updateSumOfDiscount(dtTable.reduce((acc, val) => acc + Number(val.numberOfRequested), 0));
       updateSumOfApprovedDiscount(dtTable.reduce((acc, val) => acc + Number(val.numberOfApproved), 0));
       const products = dtTable.map((item) => {
         return {
           barcode: item.barCode,
-          numberOfDiscounted: parseInt(String(item.numberOfDiscounted).replace(/,/g, '')),
+          numberOfRequested: parseInt(String(item.numberOfRequested).replace(/,/g, '')),
           numberOfApproved: parseInt(String(item.numberOfApproved).replace(/,/g, '')),
           unitName: item.unit,
           productName: item.barcodeName,
@@ -115,7 +114,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
           remark: item.remark
         };
       });
-      dispatch(saveBarcodeDiscount({ ...payloadTransferOut, products: products }));
+      dispatch(save({ ...payloadTransferOut, products: products }));
       dispatch(
         updateDataDetail({
           ...dataDetail,
@@ -126,7 +125,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     } else {
       updateSumOfApprovedDiscount(0);
       updateSumOfDiscount(0);
-      dispatch(saveBarcodeDiscount({ ...payloadTransferOut, products: [] }));
+      dispatch(save({ ...payloadTransferOut, products: [] }));
     }
   }, [dtTable]);
 
@@ -187,7 +186,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     setDtTable((preData: Array<TransferOutDetail>) => {
       const data = [...preData];
       currentData = data[index - 1];
-      data[index - 1].numberOfDiscounted = currentValue
+      data[index - 1].numberOfRequested = currentValue
         ? parseInt(currentValue.replace(/,/g, '')) < 10000000000
           ? parseInt(currentValue.replace(/,/g, ''))
           : 0
@@ -212,7 +211,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
           return idx === errorIndex
             ? {
               ...item,
-              errorNumberOfDiscounted: '',
+              errorNumberOfRequested: '',
             }
             : item;
         })
@@ -275,7 +274,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
       sortable: false,
     },
     {
-      field: 'numberOfDiscounted',
+      field: 'numberOfRequested',
       headerName: 'จำนวน',
       flex: 1,
       headerAlign: 'center',
@@ -288,7 +287,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
           checkStocks && checkStocks.length > 0
             ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode)
             : -1;
-        const condition = (index != -1 && errorList[index].errorNumberOfDiscounted) || indexStock !== -1;
+        const condition = (index != -1 && errorList[index].errorNumberOfRequested) || indexStock !== -1;
         return (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
@@ -303,7 +302,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
               }}
               disabled={dataDetail.status > 1}
             />
-            {condition && <div className="title">{errorList[index]?.errorNumberOfDiscounted}</div>}
+            {condition && <div className="title">{errorList[index]?.errorNumberOfRequested}</div>}
           </div>
         );
       },

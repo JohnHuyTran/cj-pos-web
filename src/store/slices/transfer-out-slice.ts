@@ -16,7 +16,9 @@ const initialState: ItemsState = {
     regionId: '61de9ddab10bfe85dfab22e9',
     requesterId: '61de9ddab10bfe85dfab22e9',
     products: [],
-    attachFiles: []
+    attachFiles: [],
+    transferOutReason: '',
+    store: ''
   },
   validate: false,
   dataDetail: {

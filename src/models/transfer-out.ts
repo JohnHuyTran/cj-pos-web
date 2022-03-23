@@ -12,7 +12,7 @@ export interface TransferOutDetail {
   barcodeName: string;
   skuCode: string;
   unit: string;
-  numberOfDiscounted: number;
+  numberOfRequested: number;
   numberOfApproved: number;
   remark: string;
 }
@@ -24,4 +24,11 @@ interface Product {
 export interface CheckStockPayload {
   branchCode: string;
   products: Product[];
+}
+
+export interface TransferOutDetailResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: any;
 }

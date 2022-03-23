@@ -68,7 +68,7 @@ const columns: GridColDef[] = [
 
 export default function ModalCheckStock({ open, onClose }: Props) {
   const classes = useStyles();
-  const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
+  const checkStocks = useAppSelector((state) => state.stockBalanceCheckSlice.checkStock);
   let rows: any = [];
   if (checkStocks && checkStocks.length > 0) {
     rows = checkStocks.map((item: any, index: number) => {

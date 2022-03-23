@@ -22,14 +22,12 @@ import {
   save,
   updateDataDetail,
   updateErrorList,
-  updateCheckStock,
   updateCheckEdit, updateApproveReject,
 } from '../../store/slices/transfer-out-slice';
 import {
   sendForApprovalBarcodeDiscount,
   cancelBarcodeDiscount,
-  saveDraftBarcodeDiscount,
-  checkStockBalance, approveBarcodeDiscount, uploadAttachFile,
+  approveBarcodeDiscount, uploadAttachFile,
 } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
@@ -47,6 +45,9 @@ import ModalReject from "../barcode-discount/modal-reject";
 import ModalCheckStock from "../barcode-discount/modal-check-stock";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { saveDraftTransferOut } from "../../services/transfer-out";
+import { updateCheckStock } from "../../store/slices/stock-balance-check-slice";
+import { checkStockBalance } from "../../services/common";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -69,14 +70,14 @@ export default function ModalCreateTransferOut({
                                                  onSearchBD,
                                                  userPermission,
                                                }: Props): ReactElement {
+  const classes = useStyles();
+  const dispatch = useAppDispatch();
+  let errorListProduct: any = [];
   const [open, setOpen] = React.useState(isOpen);
-
   const [valueRadios, setValueRadios] = React.useState<string>('percent');
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const [openModalConfirmApprove, setOpenModalConfirmApprove] = React.useState<boolean>(false);
   const [openModalReject, setOpenModalReject] = React.useState<boolean>(false);
-  const classes = useStyles();
-
   const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const [openModalCheck, setOpenModalCheck] = React.useState<boolean>(false);
@@ -86,17 +87,16 @@ export default function ModalCreateTransferOut({
   const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<string>('');
   const [listProducts, setListProducts] = React.useState<object[]>([]);
-  const dispatch = useAppDispatch();
-  let dataAfterValidate: any = [];
+  const [errors, setErrors] = React.useState<any>([]);
+
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const payloadTransferOut = useAppSelector((state) => state.transferOutSlice.createDraft);
   const dataDetail = useAppSelector((state) => state.transferOutSlice.dataDetail);
   const approveReject = useAppSelector((state) => state.transferOutSlice.approveReject);
   const checkEdit = useAppSelector((state) => state.transferOutSlice.checkEdit);
-  const errorList = useAppSelector((state) => state.transferOutSlice.errorList);
-
+  const checkStocks = useAppSelector((state) => state.transferOutSlice.checkStock);
   //get detail from search
-  const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail.data);
+  const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail.data);
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false);
@@ -135,7 +135,7 @@ export default function ModalCreateTransferOut({
     } else {
       setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
       if (!validate(true)) {
-        dispatch(updateErrorList(dataAfterValidate));
+        dispatch(updateErrorList(errorListProduct));
         setOpenModalError(true);
         return;
       }
@@ -196,7 +196,7 @@ export default function ModalCreateTransferOut({
   };
 
   const handleCloseModalCreate = () => {
-    if (dataDetail.status === '' && Object.keys(payloadAddItem).length) {
+    if ((dataDetail.status === '' && Object.keys(payloadAddItem).length) || checkEdit) {
       setOpenModalClose(true);
     } else if (dataDetail.status === TOStatus.DRAFT && checkEdit) {
       setOpenModalClose(true);
@@ -211,30 +211,31 @@ export default function ModalCreateTransferOut({
 
   useEffect(() => {
     //set value detail from search
-    if (Action.UPDATE === action && !objectNullOrEmpty(barcodeDiscountDetail)) {
+    if (Action.UPDATE === action && !objectNullOrEmpty(transferOutDetail)) {
       //set value for data detail
-      setValueRadios(barcodeDiscountDetail.percentDiscount ? 'percent' : 'amount');
+      setValueRadios(transferOutDetail.percentDiscount ? 'percent' : 'amount');
       dispatch(
         updateDataDetail({
-          id: barcodeDiscountDetail.id,
-          documentNumber: barcodeDiscountDetail.documentNumber,
-          status: barcodeDiscountDetail.status,
-          createdDate: barcodeDiscountDetail.createdDate,
-          approvedDate: barcodeDiscountDetail.approvedDate,
-          percentDiscount: barcodeDiscountDetail.percentDiscount,
+          id: transferOutDetail.id,
+          documentNumber: transferOutDetail.documentNumber,
+          status: transferOutDetail.status,
+          createdDate: transferOutDetail.createdDate,
+          approvedDate: transferOutDetail.approvedDate,
+          transferOutReason: transferOutDetail.transferOutReason,
+          store: transferOutDetail.store
         })
       );
       //set value for approve/reject
       dispatch(
         updateApproveReject({
           ...approveReject,
-          approvalNote: barcodeDiscountDetail.rejectReason
+          approvalNote: transferOutDetail.rejectReason
         })
       );
       //set value for attach files
-      if (barcodeDiscountDetail.attachFiles && barcodeDiscountDetail.attachFiles.length > 0) {
+      if (transferOutDetail.attachFiles && transferOutDetail.attachFiles.length > 0) {
         let lstAttachFile: any = [];
-        for (let item of barcodeDiscountDetail.attachFiles) {
+        for (let item of transferOutDetail.attachFiles) {
           lstAttachFile.push({
             file: null,
             fileKey: item.key,
@@ -247,46 +248,58 @@ export default function ModalCreateTransferOut({
         setUploadFileFlag(true);
       }
       //set value for products
-      if (barcodeDiscountDetail.products && barcodeDiscountDetail.products.length > 0) {
+      if (transferOutDetail.products && transferOutDetail.products.length > 0) {
         let lstProductDetail: any = [];
-        for (let item of barcodeDiscountDetail.products) {
+        for (let item of transferOutDetail.products) {
           lstProductDetail.push({
             barcode: item.barcode,
             barcodeName: item.productName,
-            unitName: item.unitFactor,
+            unitName: item.unitName,
             unitPrice: item.price || 0,
             discount: item.requestedDiscount || 0,
-            qty: item.numberOfDiscounted || 0,
-            numberOfApproved: (TOStatus.WAIT_FOR_APPROVAL == barcodeDiscountDetail.status && approvePermission)
-              ? (item.numberOfDiscounted || 0) : (item.numberOfApproved || 0),
+            qty: item.numberOfRequested || 0,
+            numberOfApproved: (TOStatus.WAIT_FOR_APPROVAL == transferOutDetail.status && approvePermission)
+              ? (item.numberOfRequested || 0) : (item.numberOfApproved || 0),
             expiryDate: item.expiredDate,
-            skuCode: item.skuCode,
+            skuCode: item.sku,
+            remark: item.remark
           });
         }
         dispatch(updateAddItemsState(lstProductDetail));
       }
-      //set value for requesterNote
-      dispatch(
-        save({
-          ...payloadTransferOut,
-          requesterNote: barcodeDiscountDetail.requesterNote,
-        })
-      );
     }
-  }, [barcodeDiscountDetail]);
+  }, [transferOutDetail]);
 
   const validate = (checkApprove: boolean) => {
     let isValid = true;
+    //validate data detail
+    if (stringNullOrEmpty(dataDetail.transferOutReason)) {
+      isValid = false;
+      setErrors({
+        ...errors,
+        transferOutReason: 'กรุณาระบุรายละเอียด'
+      });
+    }
+    if (stringNullOrEmpty(dataDetail.store)) {
+      isValid = false;
+      setErrors({
+        ...errors,
+        store: 'กรุณาระบุรายละเอียด'
+      });
+    }
+    if (!isValid) {
+      return;
+    }
+
+    //validate product
     const data = [...payloadTransferOut.products];
     if (data.length > 0) {
       let dt: any = [];
       for (let preData of data) {
         const item = {
           id: preData.barcode,
-          errorDiscount: '',
-          errorNumberOfDiscounted: '',
+          errorNumberOfRequested: '',
           errorNumberOfApproved: '',
-          errorExpiryDate: '',
         };
 
         if (checkApprove) {
@@ -294,48 +307,26 @@ export default function ModalCreateTransferOut({
             isValid = false;
             item.errorNumberOfApproved = 'กรุณาระบุจำนวนที่อนุมัติ';
           } else {
-            if (preData.numberOfApproved > preData.numberOfDiscounted) {
+            if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
               item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่เกินจำนวนที่ขอลด';
             }
           }
         } else {
-          if (payloadTransferOut.percentDiscount) {
-            if (preData.requestedDiscount <= 0 || preData.requestedDiscount >= 100 || !preData.requestedDiscount) {
-              isValid = false;
-              item.errorDiscount = 'ยอดลดต้องไม่เกิน 100%';
-            }
-          } else {
-            if (
-              preData.requestedDiscount <= 0 ||
-              !preData.requestedDiscount
-            ) {
-              isValid = false;
-              item.errorDiscount = 'ยอดลดต้องมากกว่า 0';
-            } else if (preData.requestedDiscount >= preData.price) {
-              isValid = false;
-              item.errorDiscount = 'ยอดลดต้องไม่เกินราคาปกติ';
-            }
-          }
-          if (preData.numberOfDiscounted <= 0 || !preData.numberOfDiscounted) {
+          if (preData.numberOfRequested <= 0 || !preData.numberOfRequested) {
             isValid = false;
-            item.errorNumberOfDiscounted = 'จำนวนที่ขอลดต้องมากกว่า 0';
-          }
-        }
-        if (stringNullOrEmpty(preData.expiredDate)) {
-          isValid = false;
-          item.errorExpiryDate = 'กรุณาระบุวันหมดอายุ';
-        } else {
-          if (moment(preData.expiredDate).isBefore(moment(new Date()), 'day')) {
-            isValid = false;
-            item.errorExpiryDate = 'วันที่หมดอายุต้องมากกว่าหรือเท่ากับวันที่วันนี้';
+            item.errorNumberOfRequested = 'จำนวนที่ขอลดต้องมากกว่า 0';
           }
         }
         if (!isValid) {
           dt.push(item);
         }
       }
-      dataAfterValidate = dt;
+      errorListProduct = dt;
+      if (!isValid) {
+        dispatch(updateErrorList(errorListProduct));
+        setOpenModalError(true);
+      }
     }
     return isValid;
   }
@@ -403,13 +394,17 @@ export default function ModalCreateTransferOut({
               ...payloadTransferOut,
               id: dataDetail.id,
               documentNumber: dataDetail.documentNumber,
-              attachFiles: allAttachFile
+              attachFiles: allAttachFile,
+              transferOutReason: dataDetail.transferOutReason,
+              store: dataDetail.store
             }
             : {
               ...payloadTransferOut,
-              attachFiles: allAttachFile
+              attachFiles: allAttachFile,
+              transferOutReason: dataDetail.transferOutReason,
+              store: dataDetail.store
             };
-          const rs = await saveDraftBarcodeDiscount(body);
+          const rs = await saveDraftTransferOut(body);
           if (rs.code === 201) {
             if (!sendRequest) {
               dispatch(updateCheckEdit(false));
@@ -459,9 +454,6 @@ export default function ModalCreateTransferOut({
           setOpenModalError(true);
         }
       }
-    } else {
-      dispatch(updateErrorList(dataAfterValidate));
-      setOpenModalError(true);
     }
   };
 
@@ -570,7 +562,7 @@ export default function ModalCreateTransferOut({
       const products = payloadTransferOut.products.map((item: any) => {
         return {
           barcode: item.barcode,
-          numberOfDiscounted: item.numberOfDiscounted,
+          numberOfDiscounted: item.numberOfRequested,
         };
       });
       const payload = {
@@ -578,9 +570,8 @@ export default function ModalCreateTransferOut({
         products: products,
       };
       const rs = await checkStockBalance(payload);
-
       if (rs.data && rs.data.length > 0) {
-        dispatch(updateCheckStock(rs.data));
+        await dispatch(updateCheckStock(rs.data));
         setOpenCheckStock(true);
       } else {
         dispatch(updateCheckStock([]));
@@ -639,10 +630,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={4}>
               <Grid item xs={4}>
-                <Typography align='left' sx={{display: 'flex', width: '100%'}}>
-                  เหตุผลการเบิก
-                  <Typography sx={{color: '#F54949', marginRight: '5px'}}> * </Typography> :
-                </Typography>
+                เหตุผลการเบิก
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
@@ -652,21 +640,28 @@ export default function ModalCreateTransferOut({
                     value={dataDetail.transferOutReason}
                     onChange={(e) => {
                       dispatch(updateDataDetail({ ...dataDetail, transferOutReason: e.target.value }));
+                      setErrors({
+                        ...errors,
+                        transferOutReason: ''
+                      });
+                      dispatch(updateCheckEdit(true));
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
                   >
                     <MenuItem value={'1'}>{'เบิกเพื่อแจกลูกค้า'}</MenuItem>
                     <MenuItem value={'2'}>{'เบิกเพื่อทำกิจกรรม'}</MenuItem>
                   </Select>
+                  <Typography hidden={stringNullOrEmpty(errors['transferOutReason'])}
+                              display={'flex'} justifyContent={'flex-end'}
+                              sx={{ color: '#F54949' }}>
+                    {errors['transferOutReason']}
+                  </Typography>
                 </FormControl>
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={4} pl={2}>
               <Grid item xs={4}>
-                <Typography align='left' sx={{display: 'flex', width: '100%'}}>
-                  คลัง
-                  <Typography sx={{color: '#F54949', marginRight: '5px'}}> * </Typography> :
-                </Typography>
+                คลัง
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
@@ -676,12 +671,22 @@ export default function ModalCreateTransferOut({
                     value={dataDetail.store}
                     onChange={(e) => {
                       dispatch(updateDataDetail({ ...dataDetail, store: e.target.value }));
+                      setErrors({
+                        ...errors,
+                        store: ''
+                      });
+                      dispatch(updateCheckEdit(true));
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
                   >
                     <MenuItem value={'1'}>{'คลังหน้าร้าน'}</MenuItem>
                     <MenuItem value={'2'}>{'คลังหลังร้าน'}</MenuItem>
                   </Select>
+                  <Typography hidden={stringNullOrEmpty(errors['store'])}
+                              display={'flex'} justifyContent={'flex-end'}
+                              sx={{ color: '#F54949' }}>
+                    {errors['store']}
+                  </Typography>
                 </FormControl>
               </Grid>
             </Grid>
@@ -698,7 +703,9 @@ export default function ModalCreateTransferOut({
                   isStatus={uploadFileFlag}
                   onChangeUploadFile={handleOnChangeUploadFile}
                   onDeleteAttachFile={onDeleteAttachFileOld}
-                  // enabledControl={TOStatus.DRAFT === status}
+                  enabledControl={TOStatus.DRAFT === status
+                    || TOStatus.WAIT_FOR_APPROVAL === status
+                    || TOStatus.APPROVED === status}
                   warningMessage={attachFileError}
                 />
               </Grid>
@@ -740,7 +747,7 @@ export default function ModalCreateTransferOut({
                   disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || (payloadTransferOut.products && payloadTransferOut.products.length === 0)}
                   style={{ display: ((!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission) ? 'none' : undefined }}
                   startIcon={<CheckCircleOutlineIcon/>}
-                  onClick={handleSendRequest}
+                  // onClick={handleSendRequest}
                   className={classes.MbtnSearch}>
                   ขออนุมัติ
                 </Button>
@@ -751,7 +758,7 @@ export default function ModalCreateTransferOut({
                   disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
                   style={{ display: ((!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission) ? 'none' : undefined }}
                   startIcon={<HighlightOffIcon/>}
-                  onClick={handleOpenCancel}
+                  // onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
                   ยกเลิก
                 </Button>
@@ -762,7 +769,7 @@ export default function ModalCreateTransferOut({
                   variant='contained'
                   color='primary'
                   startIcon={<CheckCircleOutlineIcon/>}
-                  onClick={() => handleOpenModalConfirmApprove(false)}
+                  // onClick={() => handleOpenModalConfirmApprove(false)}
                   className={classes.MbtnSearch}>
                   อนุมัติ
                 </Button>
@@ -772,7 +779,7 @@ export default function ModalCreateTransferOut({
                   style={{ display: (status == TOStatus.WAIT_FOR_APPROVAL && approvePermission) ? undefined : 'none' }}
                   color='error'
                   startIcon={<HighlightOffIcon/>}
-                  onClick={handleReject}
+                  // onClick={handleReject}
                   className={classes.MbtnSearch}>
                   ไม่อนุมัติ
                 </Button>

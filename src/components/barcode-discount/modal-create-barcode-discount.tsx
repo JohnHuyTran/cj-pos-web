@@ -27,14 +27,13 @@ import {
   saveBarcodeDiscount,
   updateDataDetail,
   updateErrorList,
-  updateCheckStock,
   updateCheckEdit, updateApproveReject,
 } from '../../store/slices/barcode-discount-slice';
 import {
   sendForApprovalBarcodeDiscount,
   cancelBarcodeDiscount,
   saveDraftBarcodeDiscount,
-  checkStockBalance, approveBarcodeDiscount, uploadAttachFile,
+  approveBarcodeDiscount, uploadAttachFile,
 } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
@@ -54,6 +53,8 @@ import { getBarcodeDiscountDetail } from "../../store/slices/barcode-discount-de
 import { uploadFileState } from "../../store/slices/upload-file-slice";
 import AccordionUploadFile from "../commons/ui/accordion-upload-file";
 import { getUserInfo } from "../../store/sessionStore";
+import { checkStockBalance } from "../../services/common";
+import { updateCheckStock } from "../../store/slices/stock-balance-check-slice";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -99,7 +100,6 @@ export default function ModalCreateBarcodeDiscount({
   const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
   const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
   const approveReject = useAppSelector((state) => state.barcodeDiscount.approveReject);
-  const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
   const checkEdit = useAppSelector((state) => state.barcodeDiscount.checkEdit);
   const errorList = useAppSelector((state) => state.barcodeDiscount.errorList);
 
