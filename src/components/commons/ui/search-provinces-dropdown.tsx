@@ -10,16 +10,16 @@ import SearchIcon from '@mui/icons-material/Search';
 interface Props {
   valueProvinces: string;
   onChangeProvinces: (provincesCode: string) => void;
-  searchProvincesCode: string;
   isClear: boolean;
   disable?: boolean;
 }
 
-function ProvincesDropDown({ valueProvinces, onChangeProvinces, searchProvincesCode, isClear, disable }: Props) {
+function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<string[]>([]);
 
+  const [flagSearchProvinces, setFlagSearchProvinces] = React.useState(false);
   const provincesList = useAppSelector((state) => state.searchProvincesSlice.provincesList);
 
   let payload: any = {
@@ -28,24 +28,21 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, searchProvincesC
   };
 
   useEffect(() => {
+    console.log('isClear provinces :', isClear, disable);
     if (isClear) setValues([]);
 
-    if (valueProvinces) {
+    if (valueProvinces !== '') {
       const provincesFilter: any = provincesList.data.filter((r: any) => r.code === Number(valueProvinces));
       setValues(provincesFilter[0]);
     }
 
-    // if (searchProvincesCode !== '') {
-    //   payload = {
-    //     code: searchProvincesCode,
-    //   };
-    // }
-
     searchProvinces(payload);
-  }, [isClear, searchProvincesCode, provincesList]);
+  }, [isClear, flagSearchProvinces]);
 
   const searchProvinces = async (payload: any) => {
-    await dispatch(featchProvincesListAsync(payload));
+    await dispatch(featchProvincesListAsync(payload)).then(() => {
+      setFlagSearchProvinces(true);
+    });
   };
 
   const [loading, setLoading] = React.useState(false);

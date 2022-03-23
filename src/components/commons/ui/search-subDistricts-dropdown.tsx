@@ -27,6 +27,7 @@ function SubDistrictsDropDown({
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<string[]>([]);
+  const [flagSearchSubDistricts, setFlagSearchSubDistricts] = React.useState(false);
   const subDistrictsList = useAppSelector((state) => state.searchSubDistrictsSlice.subDistrictsList);
 
   let payload: any = {
@@ -36,6 +37,7 @@ function SubDistrictsDropDown({
     postalCode: '',
   };
   useEffect(() => {
+    console.log('isClear SubDis :', isClear);
     if (isClear) setValues([]);
 
     if (searchPostalCode !== '') {
@@ -56,10 +58,12 @@ function SubDistrictsDropDown({
         setValues(valueFilter[0]);
       }
     }
-  }, [isClear, districtsCode, searchPostalCode, subDistrictsList]);
+  }, [isClear, districtsCode, searchPostalCode, flagSearchSubDistricts]); //subDistrictsList
 
   const searchSubDistricts = async (payload: any) => {
-    await dispatch(featchsSubDistrictsListAsync(payload));
+    await dispatch(featchsSubDistrictsListAsync(payload)).then(() => {
+      setFlagSearchSubDistricts(true);
+    });
   };
 
   const [loading, setLoading] = React.useState(false);

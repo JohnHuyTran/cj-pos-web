@@ -27,6 +27,7 @@ function DistrictsDropDown({
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<string[]>([]);
+  const [flagSearchDistricts, setFlagSearchDistricts] = React.useState(false);
   const districtsList = useAppSelector((state) => state.searchDistrictsSlice.districtsList);
 
   let payload: any = {
@@ -36,12 +37,8 @@ function DistrictsDropDown({
   };
 
   useEffect(() => {
+    console.log('isClear districts :', isClear);
     if (isClear) setValues([]);
-
-    if (valueDistricts) {
-      const districtsFilter: any = districtsList.data.filter((r: any) => r.code === Number(valueDistricts));
-      setValues(districtsFilter[0]);
-    }
 
     if (provinceCode !== '') {
       payload = {
@@ -56,10 +53,19 @@ function DistrictsDropDown({
       };
       searchDistricts(payload);
     }
-  }, [isClear, provinceCode, searchDistrictsCode, districtsList]);
+
+    if (valueDistricts) {
+      const districtsFilter: any = districtsList.data.filter((r: any) => r.code === Number(valueDistricts));
+      setValues(districtsFilter[0]);
+    }
+
+    // if (districtsList.data.length === 0) searchDistricts(payload);
+  }, [isClear, provinceCode, searchDistrictsCode, flagSearchDistricts]); //districtsList
 
   const searchDistricts = async (payload: any) => {
-    await dispatch(featchDistrictsListAsync(payload));
+    await dispatch(featchDistrictsListAsync(payload)).then(() => {
+      setFlagSearchDistricts(true);
+    });
   };
 
   const [loading, setLoading] = React.useState(false);

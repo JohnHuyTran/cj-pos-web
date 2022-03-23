@@ -14,7 +14,6 @@ import { Address, Customer, SaveInvoiceRequest } from '../../models/tax-invoice-
 import { saveInvoice } from '../../services/sale';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import LoadingModal from '../commons/ui/loading-modal';
-import { featchsSubDistrictsListAsync } from '../../store/slices/search-subDistricts-slice';
 
 interface Props {
   isOpen: boolean;
@@ -56,7 +55,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
 
   const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
-  console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
+  // console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
 
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
   const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
@@ -192,7 +191,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     setProvincesCode('');
     setDistrictsCode('');
     setSubDistrictsCode('');
-    setSearchProvincesCode('');
+    // setSearchProvincesCode('');
     setSearchDistrictsCode('');
     setSearchPostalCode('');
 
@@ -214,7 +213,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [districtsCode, setDistrictsCode] = React.useState('');
   const [subDistrictsCode, setSubDistrictsCode] = React.useState('');
 
-  const [searchProvincesCode, setSearchProvincesCode] = React.useState('');
+  // const [searchProvincesCode, setSearchProvincesCode] = React.useState('');
   const [searchDistrictsCode, setSearchDistrictsCode] = React.useState('');
   const [searchPostalCode, setSearchPostalCode] = React.useState('');
 
@@ -230,21 +229,23 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       setDisabledSelDistricts(false);
       setIsClearProvinces(false);
 
-      setDistrictsCode('');
-      setSubDistrictsCode('');
-      setSearchDistrictsCode('');
-      setSearchPostalCode('');
-      setSearchPostalCode('');
+      if (searchPostalCode === '') {
+        setDistrictsCode('');
+        setSubDistrictsCode('');
+        setSearchDistrictsCode('');
+        setSearchPostalCode('');
+        setSearchPostalCode('');
 
-      // setDisabledSelDistricts(true);
-      setDisabledSelSubDistricts(true);
+        // setDisabledSelDistricts(true);
+        setDisabledSelSubDistricts(true);
 
-      setValue('district', '');
-      setValue('subDistrict', '');
-      setValue('postcode', '');
+        setValue('district', '');
+        setValue('subDistrict', '');
+        setValue('postcode', '');
 
-      setIsClearDistricts(true);
-      setIsClearSubDistricts(true);
+        setIsClearDistricts(true);
+        setIsClearSubDistricts(true);
+      }
     }
   };
 
@@ -257,7 +258,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     }
 
     if (searchPostalCode != '') {
-      setSearchProvincesCode(provincesCode);
+      // setSearchProvincesCode(provincesCode);
       setProvincesCode('');
       setDisabledSelProvinces(false);
     }
@@ -293,12 +294,18 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       setDisabledSelSubDistricts(false);
       setDisabledSelProvinces(true);
     } else if (keySearch.length === 0) {
-      setSearchProvincesCode('');
-      setSearchPostalCode('');
+      setProvincesCode('');
       setDistrictsCode('');
+      setSubDistrictsCode('');
+
+      // setSearchProvincesCode('');
+      setSearchPostalCode('');
+      setSearchDistrictsCode('');
+
       setDisabledSelDistricts(true);
       setDisabledSelSubDistricts(true);
       setDisabledSelProvinces(false);
+
       setIsClearProvinces(true);
       setIsClearDistricts(true);
       setIsClearSubDistricts(true);
@@ -475,7 +482,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               <ProvincesDropDown
                 valueProvinces={provincesCode}
                 onChangeProvinces={handleChangeProvinces}
-                searchProvincesCode={searchProvincesCode}
                 isClear={isClearProvinces}
                 disable={disabledSelProvinces}
               />
