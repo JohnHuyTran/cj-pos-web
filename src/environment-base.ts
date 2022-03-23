@@ -91,8 +91,8 @@ export const environment = {
         url: '/campaign/{id}',
       },
       upload: {
-        url: '/campaign/upload'
-      }
+        url: '/campaign/upload',
+      },
     },
     saleLimitTime: {
       detail: {
@@ -335,6 +335,11 @@ export const environment = {
       },
       saveInvoice: {
         url: '/sale/tax-invoices',
+      },
+    },
+    member: {
+      searchMemberInformation: {
+        url: '/sale/members/{memberNo}',
       },
     },
   },

@@ -37,7 +37,7 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
     }
 
     searchProvinces(payload);
-  }, [isClear, flagSearchProvinces]);
+  }, [isClear, valueProvinces, flagSearchProvinces]);
 
   const searchProvinces = async (payload: any) => {
     await dispatch(featchProvincesListAsync(payload)).then(() => {

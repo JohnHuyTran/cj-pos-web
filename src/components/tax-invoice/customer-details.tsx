@@ -11,9 +11,10 @@ import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
 import DistrictsDropDown from '../commons/ui/search-districts-dropdown';
 import SubDistrictsDropDown from '../commons/ui/search-subDistricts-dropdown';
 import { Address, Customer, SaveInvoiceRequest } from '../../models/tax-invoice-model';
-import { saveInvoice } from '../../services/sale';
+import { saveInvoice, searchMemberInformation } from '../../services/sale';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import LoadingModal from '../commons/ui/loading-modal';
+import AlertError from '../commons/ui/alert-warning';
 
 interface Props {
   isOpen: boolean;
@@ -54,68 +55,14 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
-  const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
-  // console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
-
-  const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
-  const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
-  const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
-
-  useEffect(() => {
-    setOpen(isOpen);
-    handleClear();
-
-    if (taxInvoiceDetail) {
-      if (taxInvoiceDetail.invoiceNo) setInvoiceNo(taxInvoiceDetail.invoiceNo);
-      else setInvoiceNo(taxInvoiceDetail.billNo);
-      if (taxInvoiceDetail.customer.memberNo) {
-        setMemberNo(taxInvoiceDetail.customer.memberNo);
-        if (taxInvoiceDetail.status === 'PRINTED') {
-          setDisabledBtnPreview(false);
-          setDisabledBtnClear(true);
-          setDisabledBtnSave(true);
-        }
-        setValue('taxNo', taxInvoiceDetail.customer.taxNo);
-        setValue('firstName', taxInvoiceDetail.customer.firstName);
-        setValue('lastName', taxInvoiceDetail.customer.lastName);
-        setValue('houseNo', taxInvoiceDetail.customer.address.houseNo);
-        setValue('building', taxInvoiceDetail.customer.address.building);
-        setValue('moo', taxInvoiceDetail.customer.address.moo);
-        setValue('province', taxInvoiceDetail.customer.address.provinceCode);
-        setValue('district', taxInvoiceDetail.customer.address.districtCode);
-        setValue('subDistrict', taxInvoiceDetail.customer.address.subDistrictCode);
-        setValue('postcode', taxInvoiceDetail.customer.address.postcode);
-
-        setProvincesCode(String(taxInvoiceDetail.customer.address.provinceCode));
-        setDistrictsCode(String(taxInvoiceDetail.customer.address.districtCode));
-        setSubDistrictsCode(String(taxInvoiceDetail.customer.address.subDistrictCode));
-        setDisabledSelDistricts(false);
-        setDisabledSelSubDistricts(false);
-
-        // setSearchPostalCode(taxInvoiceDetail.customer.address.postcode);
-        // setSubDistrictsCode(String(taxInvoiceDetail.customer.address.subDistrictCode));
-        // setDisabledSelSubDistricts(false);
-
-        // setSearchDistrictsCode(String(taxInvoiceDetail.customer.address.districtCode));
-        // setDistrictsCode(String(taxInvoiceDetail.customer.address.districtCode));
-        // setDisabledSelDistricts(false);
-
-        // const payload :any = {
-        //   postalCode: taxInvoiceDetail.customer.address.postcode,
-        // };
-        // dispatch(featchsSubDistrictsListAsync(payload));
-      }
-    }
-  }, [isOpen]);
-
   const handleClose = async () => {
+    setInvoiceNo('');
+    setMemberNo('');
     handleClear();
     setOpen(false);
     onClickClose();
   };
 
-  const [invoiceNo, setInvoiceNo] = React.useState('');
-  const [memberNo, setMemberNo] = React.useState('');
   const {
     register,
     formState: { errors },
@@ -155,6 +102,36 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const [invoiceNo, setInvoiceNo] = React.useState('');
+  const [memberNo, setMemberNo] = React.useState('');
+
+  const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
+  console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
+
+  const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
+  const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
+  const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
+
+  useEffect(() => {
+    setOpen(isOpen);
+    handleClear();
+
+    if (isOpen && taxInvoiceDetail) {
+      if (taxInvoiceDetail.invoiceNo) setInvoiceNo(taxInvoiceDetail.invoiceNo);
+      else setInvoiceNo(taxInvoiceDetail.billNo);
+      if (taxInvoiceDetail.customer.memberNo) {
+        setMemberNo(taxInvoiceDetail.customer.memberNo);
+        if (taxInvoiceDetail.status === 'PRINTED') {
+          setDisabledBtnPreview(false);
+          setDisabledBtnClear(true);
+          setDisabledBtnSave(true);
+        }
+
+        handleSearchMember(taxInvoiceDetail.customer.memberNo);
+      }
+    }
+  }, [isOpen]);
+
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
@@ -162,6 +139,64 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
   };
+
+  const [openFailAlert, setOpenFailAlert] = React.useState(false);
+  const [textFail, setTextFail] = React.useState('');
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail('');
+  };
+
+  const handleSearchMember = async (memberNo: string) => {
+    setOpenLoadingModal(true);
+    await searchMemberInformation(memberNo)
+      .then((value) => {
+        setValue('taxNo', '');
+        setValue('firstName', value.data.firstName);
+        setValue('lastName', value.data.lastName);
+        setValue('houseNo', value.data.address.houseNo);
+        setValue('building', value.data.address.building);
+        setValue('moo', value.data.address.moo);
+        setValue('province', value.data.address.provinceCode);
+        setValue('district', value.data.address.districtCode);
+        setValue('subDistrict', value.data.address.subDistrictCode);
+        setValue('postcode', value.data.address.postcode);
+
+        setProvincesCode(String(value.data.address.provinceCode));
+        setDistrictsCode(String(value.data.address.districtCode));
+        setSubDistrictsCode(String(value.data.address.subDistrictCode));
+        setDisabledSelDistricts(false);
+        setDisabledSelSubDistricts(false);
+      })
+      .catch((error: any) => {
+        setOpenFailAlert(true);
+        setTextFail(`ไม่พบข้อมูลลูกค้า เลขที่สมาชิก: ${memberNo}`);
+
+        if (taxInvoiceDetail) setDefaultData(taxInvoiceDetail);
+      });
+
+    setOpenLoadingModal(false);
+  };
+
+  const setDefaultData = (data: any) => {
+    setValue('taxNo', data.customer.taxNo);
+    setValue('firstName', data.customer.firstName);
+    setValue('lastName', data.customer.lastName);
+    setValue('houseNo', data.customer.address.houseNo);
+    setValue('building', data.customer.address.building);
+    setValue('moo', data.customer.address.moo);
+    setValue('province', data.customer.address.provinceCode);
+    setValue('district', data.customer.address.districtCode);
+    setValue('subDistrict', data.customer.address.subDistrictCode);
+    setValue('postcode', data.customer.address.postcode);
+
+    setProvincesCode(String(data.customer.address.provinceCode));
+    setDistrictsCode(String(data.customer.address.districtCode));
+    setSubDistrictsCode(String(data.customer.address.subDistrictCode));
+    setDisabledSelDistricts(false);
+    setDisabledSelSubDistricts(false);
+  };
+
   const handleSaveInvoice = async (payload: SaveInvoiceRequest) => {
     setOpenLoadingModal(true);
     await saveInvoice(payload)
@@ -625,6 +660,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         />
 
         <LoadingModal open={openLoadingModal} />
+
+        <AlertError open={openFailAlert} onClose={handleCloseFailAlert} text={textFail} />
       </DialogContent>
     </Dialog>
   );
