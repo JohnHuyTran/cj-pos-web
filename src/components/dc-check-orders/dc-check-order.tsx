@@ -328,7 +328,7 @@ function DCCheckOrderSearch() {
             </Box>
           </Grid>
           <Grid item xs={4} container alignItems='flex-end'>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
               สถานะการตรวจสอบผลต่าง
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>

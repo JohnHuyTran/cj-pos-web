@@ -229,7 +229,7 @@ export default function Sidebar({}: Props): ReactElement {
               </ListItemButton>
             </Link>
           </List>
-          <List component='div' disablePadding>
+          {/* <List component='div' disablePadding>
             <Link to='/tax-invoice' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTaxInvoice'>
               <ListItemButton
                 key='TAX INVOICE'
@@ -239,7 +239,7 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='ใบเสร็จ/ใบกำกับฉบับเต็ม' />
               </ListItemButton>
             </Link>
-          </List> 
+          </List>  */}
         </Collapse>
         <ListItemButton onClick={handleClickPickUp} id='mainMenuPickUp'>
           <ListItemIcon>
