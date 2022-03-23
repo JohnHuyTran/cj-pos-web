@@ -157,15 +157,16 @@ const columns: GridColDef[] = [
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
+          let actualQty = Number(params.getValue(params.id, 'actualQty'));
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
+          if (actualQty === 0) value = chkActualQty(value);
           if (value < 0) value = 0;
-
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
-        onBlur={(e) => {
-          // isAllowActualQty(params, parseInt(e.target.value, 10));
-          params.api.updateRows([{ ...params.row, actualQty: e.target.value }]);
-        }}
+        // onBlur={(e) => {
+        //   // isAllowActualQty(params, parseInt(e.target.value, 10));
+        //   params.api.updateRows([{ ...params.row, actualQty: e.target.value }]);
+        // }}
         disabled={isDisable(params) ? true : false}
         autoComplete="off"
       />
@@ -206,6 +207,12 @@ var calProductDiff = function (params: GridValueGetterParams) {
   if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
   if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
   return diff;
+};
+
+var chkActualQty = (value: any) => {
+  let v = String(value);
+  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  return value;
 };
 
 function useApiRef() {
