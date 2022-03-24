@@ -81,7 +81,8 @@ const BarcodeDiscountSearch = () => {
     printInDetail: false,
     ids: '',
     lstProductNotPrinted: [],
-    lstProductPrintAgain: []
+    lstProductPrintAgain: [],
+    lstProductPrint: []
   });
 
   const dispatch = useAppDispatch();
@@ -252,12 +253,29 @@ const BarcodeDiscountSearch = () => {
         }
       }
     }
+
     await setValuePrints({
       ...valuePrints,
       ids: ids,
       printNormal: !(lstProductNotPrinted && lstProductNotPrinted.length > 0),
       printInDetail: printInDetail,
-      lstProductNotPrinted: lstProductNotPrinted
+      lstProductNotPrinted: lstProductNotPrinted,
+      lstProductPrint: (barcodeDiscountPrint || []).reduce((s: any, c:any) => [
+        ...s,
+        ...c.products.map((p: any) => ({
+          ...p, percentDiscount: c.percentDiscount
+        }))
+      ], [])
+      .filter((product: any) => moment(product?.expiredDate).isSameOrAfter(moment(new Date()), 'day'))
+      .map((product: any) => ({
+        ...product, 
+        numberOfPrinting: product.numberOfApproved,
+        unit: product.unitFactor,
+        priceAfterDiscount: product.percentDiscount ? Number(product.price  - 
+          Math.floor(Number(product.requestedDiscount || 0) * (product.price / 100)))
+        .toFixed(2)
+        : Number(product.price - Number(String(product.requestedDiscount).replace(/,/g, '') || 0)).toFixed(2)
+      }))
     });
     handleOpenModalPrint();
   };
