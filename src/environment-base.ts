@@ -55,6 +55,14 @@ export const environment = {
         url: '/order/stock-diff/verify/{idDC}',
       },
     },
+    tote: {
+      searchTote: {
+        url: '/order/tote/',
+      },
+      submitTote: {
+        url: '/order/submitTote',
+      },
+    },
   },
   task: {
     notification: {
