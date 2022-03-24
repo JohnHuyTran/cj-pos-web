@@ -79,7 +79,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [openSellMenu, setOpenSellMenu] = React.useState(false);
   const [openPickUpMenu, setOpenPickUpMenu] = React.useState(false);
   const [openTransferMenu, setOpenTransferMenu] = React.useState(false);
-  const [openTransferOutMenu, setOpenTransferOutMenu] = React.useState(false);
+  const [openWithDrawMenu, setOpenWithDrawMenu] = React.useState(false);
 
   const navState = useAppSelector((state) => state.navigator.state);
 
@@ -138,8 +138,8 @@ export default function Sidebar({}: Props): ReactElement {
   const handleClickTransfer = () => {
     setOpenTransferMenu(!openTransferMenu);
   };
-  const handleClickTransferOut = () => {
-    setOpenTransferOutMenu(!openTransferOutMenu);
+  const handleClickWithDraw = () => {
+    setOpenWithDrawMenu(!openWithDrawMenu);
   };
   return (
     <Drawer
@@ -322,7 +322,7 @@ export default function Sidebar({}: Props): ReactElement {
             </Link>
           </List>
         </Collapse>
-        <ListItemButton onClick={handleClickTransferOut} id='mainMenuTransferOut'>
+        <ListItemButton onClick={handleClickWithDraw} id='mainMenuWithDraw'>
           <ListItemIcon>
             <PresentToAllIcon />
           </ListItemIcon>
@@ -330,9 +330,9 @@ export default function Sidebar({}: Props): ReactElement {
             primary='เบิก'
             style={{ marginLeft: -15}}
           />
-          {openTransferOutMenu ? <ExpandLess /> : <ExpandMore />}
+          {openWithDrawMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openTransferOutMenu} timeout='auto' unmountOnExit>
+        <Collapse in={openWithDrawMenu} timeout='auto' unmountOnExit>
           <List component='div' disablePadding>
             <Link
               to='/transfer-out'
