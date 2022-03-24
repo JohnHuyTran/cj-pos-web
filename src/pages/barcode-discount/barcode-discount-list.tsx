@@ -136,9 +136,13 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
 
   const onCheckCell = async (params: GridRenderCellParams, event: any) => {
     await setLstBarcodeDiscount((prevData: any[]) => {
-      const data = [...prevData];
-      data[params.row.index - 1].checked = event.target.checked;
-      return data;
+      return prevData.map((d: any )=> {
+        if(!params.row?.id || d?.id !== params.row?.id) return d;
+        return {
+          ...d, 
+          checked: event?.target?.checked || d.checked,
+        };
+      });
     });
     let lstUnCheck = lstBarcodeDiscount.filter((it) => !it.checked && BDStatus.APPROVED == it.status);
     if (lstUnCheck != null && lstUnCheck.length > 0) setCheckAll(false);
