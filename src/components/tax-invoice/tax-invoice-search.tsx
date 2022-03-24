@@ -12,6 +12,8 @@ import { ACTIONS } from '../../utils/enum/permission-enum';
 import { isAllowActionPermission } from '../../utils/role-permission';
 import AlertError from '../commons/ui/alert-error';
 
+import { Search } from '@mui/icons-material';
+
 interface State {
   docNo: string;
 }
@@ -106,43 +108,45 @@ export default function TaxInvoiceSearch() {
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id='txtDocNo'
-              name='docNo'
-              size='small'
+              id="txtDocNo"
+              name="docNo"
+              size="small"
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder='เลขที่ใบเสร็จ/ใบกำกับ'
-              autoComplete='off'
+              placeholder="เลขที่ใบเสร็จ/ใบกำกับ"
+              autoComplete="off"
             />
           </Grid>
-          <Grid item xs={8} container alignItems='flex-end'></Grid>
-          <Grid item xs={8} container alignItems='flex-end'></Grid>
-          <Grid item xs={4} container alignItems='flex-end'>
-            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
+          <Grid item xs={8} container alignItems="flex-end"></Grid>
+          <Grid item xs={8} container alignItems="flex-end"></Grid>
+          <Grid item xs={4} container alignItems="flex-end">
+            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
               <Button
-                id='btnClear'
-                variant='contained'
+                id="btnClear"
+                variant="contained"
                 onClick={onClickClearBtn}
                 sx={{ width: '45%' }}
                 className={classes.MbtnClear}
-                color='cancelColor'
-                fullWidth={true}>
+                color="cancelColor"
+                fullWidth={true}
+              >
                 เคลียร์
               </Button>
               <Button
-                id='btnSearch'
-                variant='contained'
-                color='primary'
+                id="btnSearch"
+                variant="contained"
+                color="primary"
                 onClick={onClickSearchBtn}
                 sx={{ width: '45%', ml: 1, display: `${hideSearchBtn ? 'none' : ''}` }}
                 className={classes.MbtnSearch}
-                fullWidth={true}>
+                fullWidth={true}
+              >
                 ค้นหา
               </Button>
             </Grid>
@@ -151,8 +155,8 @@ export default function TaxInvoiceSearch() {
       </Box>
       {flagSearch && taxInvoiceList.length > 0 && <TaxInvoiceSearchList />}
       {flagSearch && taxInvoiceList.length <= 0 && (
-        <Grid item container xs={12} justifyContent='center'>
-          <Box color='#CBD4DB'>
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
             <br></br>
             <h2>ไม่มีข้อมูล</h2>
           </Box>

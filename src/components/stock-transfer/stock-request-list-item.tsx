@@ -11,7 +11,7 @@ import {
   GridCellParams,
 } from '@mui/x-data-grid';
 import { GridEditCellValueParams } from '@material-ui/data-grid';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/system';
 import { useStyles } from '../../styles/makeTheme';
 import { Checkbox, FormControlLabel, FormGroup, Grid, TextField, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';

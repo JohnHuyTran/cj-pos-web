@@ -1,23 +1,22 @@
-# pull official base image
-ARG BUILDER_IMAGE=node:16-alpine3.11
-################Builder Image###################
-FROM $BUILDER_IMAGE AS builder
-#FROM node:13.12.0-alpine
-ENV NODE_OPTIONS=--max_old_space_size=1500
-# set working directory
+ARG BUILDER_IMAGE=node:lts-alpine
+ARG BASE_IMAGE=nginx:stable-alpine
+# build stage
+FROM $BUILDER_IMAGE as build-stage
 WORKDIR /app
-
-# add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
-
-# install app dependencies
-COPY package.json ./
-COPY package-lock.json ./
-RUN npm install --silent
-RUN npm install react-scripts@3.4.1 -g --silent
-
-# add app
-COPY . ./
-
-# start app
-CMD ["npm", "start"]
+COPY . .
+RUN npm install \
+&& npm run build
+# production stage
+FROM $BASE_IMAGE as production-stage
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build-stage /app/build /usr/share/nginx/html
+COPY replace.sh /usr/share/nginx/html/
+RUN chmod 755 /usr/share/nginx/html/replace.sh
+RUN mkdir -p /etc/nginx/templates
+#COPY default.conf.template /etc/nginx/templates/
+#COPY scripts/docker-entrypoint.sh /
+EXPOSE 80
+ENTRYPOINT ["/docker-entrypoint.sh"]
+#CMD ["nginx", "-g", "daemon off;"]
+#CMD ["/bin/sh", "-c", nginx -g \"daemon off;\""]
+CMD ["/bin/sh", "-c", "/usr/share/nginx/html/replace.sh && nginx -g \"daemon off;\""]

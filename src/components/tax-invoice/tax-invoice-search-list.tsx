@@ -10,6 +10,8 @@ import { TaxInvoiceInfo, TaxInvoiceRequest, TaxInvoiceResponse } from '../../mod
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { featchTaxInvoiceDetailAsync } from '../../store/slices/tax-invoice-search-detail-slice';
 import { useTranslation } from 'react-i18next';
+import ModalCustomerDetails from './customer-details';
+import LoadingModal from '../commons/ui/loading-modal';
 
 export default function TaxInvoiceSearchList() {
   const classes = useStyles();
@@ -146,13 +148,23 @@ export default function TaxInvoiceSearchList() {
     setLoading(false);
   };
 
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const currentlySelected = async (params: GridCellParams) => {
     if (params.row.billStatus !== 'CANCELLED') {
+      setOpenLoadingModal(true);
       const payload: TaxInvoiceRequest = {
         billNo: params.row.billNo,
       };
-      await dispatch(featchTaxInvoiceDetailAsync(payload));
+      await dispatch(featchTaxInvoiceDetailAsync(payload)).then(() => {
+        setOpenDetailModal(true);
+      });
+      setOpenLoadingModal(false);
     }
+  };
+
+  const handleCloseDetailModal = () => {
+    setOpenDetailModal(false);
   };
 
   return (
@@ -179,6 +191,9 @@ export default function TaxInvoiceSearchList() {
           />
         </div>
       </Box>
+
+      <LoadingModal open={openLoadingModal} />
+      <ModalCustomerDetails isOpen={openDetailModal} onClickClose={handleCloseDetailModal} />
     </div>
   );
 }

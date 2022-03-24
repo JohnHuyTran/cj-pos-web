@@ -4,17 +4,32 @@ import logoImage from '../../assets/images/CJlogo.jpeg';
 import theme from '../../styles/theme';
 
 const loginFormStyle = makeStyles({
-  root: {
+  wrapLogin: {
+    minWidth: '100vw',
+    minHeight: '100vh'
+  },
+  bgLogin: {
     textAlign: 'center',
     backgroundImage: `url(${bgImage})`,
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center',
-    'background-size': 'cover',
+    backgroundSize: 'cover',
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    justifyContent: 'center',
     height: '100vh',
-    paddingTop: '5%',
   },
   textField: {
     width: '25ch',
+    '& .MuiIconButton-root': {
+      marginRight: 0,
+    },
+    '& .MuiInputBase-root input': {
+      '-webkit-box-shadow': '0 0 0 30px white inset !important',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderRadius: '5px',
+    },
   },
   welcomeLabel: {
     fontStyle: 'normal',
@@ -23,13 +38,16 @@ const loginFormStyle = makeStyles({
   },
   mainBox: {
     padding: '20px',
-    margin: 'auto',
+    margin: '0 auto',
     minWidth: 400,
     maxWidth: 400,
-    height: 450,
+    minHeight: 450,
     background: theme.palette.background.default,
     boxShadow: '-15px -15px 15px rgba(130, 158, 201, 0.05), 15px 15px 15px rgba(130, 158, 201, 0.05)',
     borderRadius: '8px',
+    '& div>.MuiFormControl-root': {
+      marginBottom: 0,
+    },
   },
   logo: {
     // backgroundImage: `url(${logoImage})`,
@@ -44,10 +62,12 @@ const loginFormStyle = makeStyles({
     color: 'white',
   },
   loginBtn: {
-    position: 'absolute',
+    '&.MuiButton-root': {
+    // position: 'absolute',
     // width: "textField",
     height: '40px',
     borderRadius: '5px',
+    }
   },
 });
 

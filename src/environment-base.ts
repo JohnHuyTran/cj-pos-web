@@ -91,8 +91,8 @@ export const environment = {
         url: '/campaign/{id}',
       },
       upload: {
-        url: '/campaign/upload'
-      }
+        url: '/campaign/upload',
+      },
     },
     saleLimitTime: {
       detail: {
@@ -310,6 +310,15 @@ export const environment = {
         },
       },
     },
+    provinces: {
+      url: '/master/provinces',
+    },
+    districts: {
+      url: '/master/districts',
+    },
+    subDistricts: {
+      url: '/master/sub-districts',
+    },
   },
   authority: {
     authorizedBranch: {
@@ -323,6 +332,14 @@ export const environment = {
       },
       detail: {
         url: '/sale/tax-invoices/{billNo}',
+      },
+      saveInvoice: {
+        url: '/sale/tax-invoices',
+      },
+    },
+    member: {
+      searchMemberInformation: {
+        url: '/sale/members/{memberNo}',
       },
     },
   },
