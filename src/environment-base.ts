@@ -66,6 +66,18 @@ export const environment = {
       search: {
         url: '/campaign/transfer-out',
       },
+      save: {
+        url: '/campaign/transfer-out',
+      },
+      sendForApproval: {
+        url: '/campaign/transfer-out/{id}/waiting-approve',
+      },
+      cancel: {
+        url: '/campaign/transfer-out/{id}',
+      },
+      detail: {
+        url: '/campaign/transfer-out',
+      }
     },
   },
   sell: {

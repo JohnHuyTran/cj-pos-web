@@ -75,15 +75,6 @@ export async function cancelBarcodeDiscount(id: string) {
   }
 }
 
-export async function checkStockBalance(payload: CheckStockPayload) {
-  try {
-    const response = await post(`${env.backEnd.url}${environment.stock.stockBalanceCheck.url}`, payload);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-}
-
 export async function uploadAttachFile(payload: any) {
   try {
     const response = await post(`${env.backEnd.url}${environment.sell.barcodeDiscount.upload.url}`, payload);
