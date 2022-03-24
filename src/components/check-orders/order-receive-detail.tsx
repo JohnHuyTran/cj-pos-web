@@ -187,14 +187,16 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
     };
 
     await submitTote(data)
-      .then((resp) => {
-        dispatch(updateAddItemsState({}));
+      .then((resp: any) => {
+        // dispatch(updateAddItemsState({}));
         dispatch(updateItemsToteState({}));
-        dispatch(featchOrderDetailToteAsync(resp.sdNo));
-        setOpenTote(true);
+        dispatch(featchOrderDetailToteAsync(resp.sdNo)).then(() => {
+          setOpenTote(true);
+        });
+
         setOpen(false);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.log(error);
       });
 

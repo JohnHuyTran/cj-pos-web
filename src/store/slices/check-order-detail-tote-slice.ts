@@ -30,6 +30,7 @@ export const featchOrderDetailToteAsync = createAsyncThunk('orderDetail', async 
     };
 
     response = await get(path).then();
+
     return response;
   } catch (error) {
     throw error;

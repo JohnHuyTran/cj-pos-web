@@ -328,16 +328,12 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
   }, [openTote, orderDetailTote]);
 
   let entries: itemsDetail[] = orderDetailTote.items ? orderDetailTote.items : [];
-  //   console.log('entries: ', entries);
-  //   console.log('itemsTote: ', itemsTote);
 
   if (entries.length > 0 && Object.keys(itemsTote).length === 0) {
-    console.log('1');
     updateState(entries);
   }
   let rowsEntriesTote: any = [];
   if (Object.keys(itemsTote).length !== 0) {
-    console.log('2');
     rowsEntriesTote = itemsTote.map((item: any, index: number) => {
       let qtyRef: number = 0;
       let actualQty: number = 0;
@@ -449,48 +445,50 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
   };
 
   const handleApproveBtn = async () => {
-    setItemsDiffState([]);
-    setOpenModelConfirm(true);
-    setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const itemsList: any = [];
+    mapUpdateState().then(() => {
+      setItemsDiffState([]);
+      setOpenModelConfirm(true);
+      setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
 
-    let sumActualQtyItems: number = 0;
-    let sumQuantityRefItems: number = 0;
-    rowsEdit.forEach((data: GridRowData) => {
-      let diffCount: number = data.actualQty - data.qtyRef;
-      sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
-      sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
+      let sumActualQtyItems: number = 0;
+      let sumQuantityRefItems: number = 0;
+      rowsEdit.forEach((data: GridRowData) => {
+        let diffCount: number = data.actualQty - data.qtyRef;
+        sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
 
-      const itemDiff: Entry = {
-        barcode: data.barcode,
-        deliveryOrderNo: data.deliveryOrderNo,
-        actualQty: data.actualQty,
-        comment: data.comment,
-        seqItem: 0,
-        itemNo: '',
-        shipmentSAPRef: '',
-        skuCode: '',
-        skuType: '',
-        productName: data.productName,
-        unitCode: '',
-        unitName: '',
-        unitFactor: 0,
-        qty: 0,
-        qtyAll: 0,
-        qtyAllBefore: 0,
-        qtyDiff: diffCount,
-        price: 0,
-        isControlStock: 0,
-        toteCode: '',
-        expireDate: '',
-        isTote: data.isTote,
-      };
-      setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
-      itemsList.push(data);
+        const itemDiff: Entry = {
+          barcode: data.barcode,
+          deliveryOrderNo: data.deliveryOrderNo,
+          actualQty: data.actualQty,
+          comment: data.comment,
+          seqItem: 0,
+          itemNo: '',
+          shipmentSAPRef: '',
+          skuCode: '',
+          skuType: '',
+          productName: data.productName,
+          unitCode: '',
+          unitName: '',
+          unitFactor: 0,
+          qty: 0,
+          qtyAll: 0,
+          qtyAllBefore: 0,
+          qtyDiff: diffCount,
+          price: 0,
+          isControlStock: 0,
+          toteCode: '',
+          expireDate: '',
+          isTote: data.isTote,
+        };
+        setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
+        itemsList.push(data);
+      });
+
+      handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
     });
-
-    handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
   };
 
   const handlePrintBtn = async () => {
