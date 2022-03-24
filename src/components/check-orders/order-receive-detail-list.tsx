@@ -4,6 +4,7 @@ import { DataGrid, GridColDef, GridCellParams, GridRowId } from '@mui/x-data-gri
 import Box from '@mui/material/Box';
 import { useStyles } from '../../styles/makeTheme';
 import { OrderReceiveEntry } from '../../models/order-model';
+import { Typography } from '@mui/material';
 
 export default function OrderReceiveDetailList() {
   const classes = useStyles();
@@ -40,6 +41,14 @@ export default function OrderReceiveDetailList() {
       flex: 1.3,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => (
+        <div>
+          <Typography variant="body2">{params.value}</Typography>
+          <Typography variant="body2" color="textSecondary">
+            {params.getValue(params.id, 'skuCode') || ''}
+          </Typography>
+        </div>
+      ),
     },
     {
       field: 'unitName',
@@ -71,6 +80,7 @@ export default function OrderReceiveDetailList() {
       productName: data.productName,
       unitName: data.unitName,
       qty: data.qty,
+      skuCode: data.skuCode,
     };
   });
 

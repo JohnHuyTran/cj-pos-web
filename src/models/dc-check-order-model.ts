@@ -79,6 +79,15 @@ export interface CheckOrderDetailItims {
   actualQty: number;
   qtyDiff: number;
   comment: string;
+  id?: string;
+  toteCode?: string;
+  sdNo?: string;
+  sdID?: string;
+  isTote?: boolean;
+}
+
+export interface ItemsState {
+  itemId: string;
 }
 
 export interface DCOrderApproveRequest {

@@ -9,6 +9,7 @@ import Home from './pages/home';
 import CheckOrder from './pages/check-order';
 import DCCheckOrder from './pages/dc-check-order';
 import SupplierCheckOrder from './pages/supplier-check-order';
+import TaxInvoice from './pages/tax-invoice';
 import StockTransfer from './pages/stock-transfer';
 import StockTransferRt from './pages/stock-transfer-rt';
 import LoginForm from './components/login/login-form';
@@ -79,9 +80,10 @@ export default function App2() {
       <Main open={open}>
         <DrawerHeader />
         <Switch>
-          <Route exact path='/' component={Home} />
+          <Route exact path="/" component={Home} />
           <Route path='/notification' component={Notification} /> 
           <Route path='/barcode-discount' component={BarcodeDiscount} />
+          <Route path="/tax-invoice" component={TaxInvoice} />
           <Route path='/sale-limit-time' component={SaleLimitTime} />
           <Route path='/check-order' component={CheckOrder} />
           <Route path='/dc-check-order' component={DCCheckOrder} />
