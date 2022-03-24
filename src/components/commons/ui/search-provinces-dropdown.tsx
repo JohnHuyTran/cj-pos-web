@@ -6,6 +6,7 @@ import { useStyles } from '../../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { featchProvincesListAsync } from '../../../store/slices/search-provinces-slice';
 import SearchIcon from '@mui/icons-material/Search';
+import dateFormat from 'dateformat';
 
 interface Props {
   valueProvinces: string;
@@ -36,12 +37,40 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
       setValues(provincesFilter[0]);
     }
 
-    searchProvinces(payload);
+    if (!localStorage.getItem('provinces')) searchProvinces(payload);
+    else getProvincesList();
   }, [isClear, valueProvinces, flagSearchProvinces]);
 
+  function getProvincesList() {
+    const key = 'provinces';
+    const itemStr = localStorage.getItem(key);
+    if (!itemStr) {
+      return [];
+    }
+    const item = JSON.parse(itemStr);
+    const strDate = new Date(item.expiry);
+    const now = new Date(dateFormat(new Date(), 'yyyy-mm-dd'));
+
+    if (now > strDate) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return item.value;
+  }
+
+  function setProvincesList(value: any) {
+    const now = new Date();
+    const item = {
+      value: value,
+      expiry: dateFormat(now, 'yyyy-mm-dd'),
+    };
+    localStorage.setItem('provinces', JSON.stringify(item));
+  }
+
   const searchProvinces = async (payload: any) => {
-    await dispatch(featchProvincesListAsync(payload)).then(() => {
+    await dispatch(featchProvincesListAsync(payload)).then((value) => {
       setFlagSearchProvinces(true);
+      setProvincesList(value.payload);
     });
   };
 

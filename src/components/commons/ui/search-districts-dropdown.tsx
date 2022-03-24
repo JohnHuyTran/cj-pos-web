@@ -113,9 +113,11 @@ function DistrictsDropDown({
     }
   };
 
-  if (options.length === 1 && values.length === 0 && !isClear) {
-    setValues(options[0]);
-    handleChangeItem('', options[0], 'selectOption');
+  if (options !== undefined && values !== undefined) {
+    if (options.length === 1 && values.length === 0 && !isClear) {
+      setValues(options[0]);
+      handleChangeItem('', options[0], 'selectOption');
+    }
   }
 
   return (
