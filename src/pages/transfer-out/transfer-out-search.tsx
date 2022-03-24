@@ -17,14 +17,14 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
-import { Action } from '../../utils/enum/common-enum';
+import { Action, DateFormat, TOStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { BranchListOptionType } from '../../models/branch-model';
 import { isGroupBranch } from '../../utils/role-permission';
-// import TransferOutList from './transfer-out-list';
+import TransferOutList from './transfer-out-list';
 import SelectBranch from './transfer-out-branch';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
@@ -107,13 +107,19 @@ const TransferOutSearch = () => {
       setValues({
         ...values,
         status: userPermission.includes('campaign.to.approve')
-          ? '2'
+          ? TOStatus.WAIT_FOR_APPROVAL
           : userPermission.includes('campaign.to.create')
-          ? '1'
+          ? TOStatus.DRAFT
           : 'ALL',
       });
     }
   }, []);
+  useEffect(() => {
+    if (listBranchSelect.length > 0) {
+      let branches = listBranchSelect.map((item: any) => item.code).join(',');
+      setValues({ ...values, branch: branches });
+    }
+  }, [listBranchSelect]);
 
   const handleCloseAlert = () => {
     setOpenAlert(false);
@@ -137,7 +143,7 @@ const TransferOutSearch = () => {
     setValues({
       documentNumber: '',
       branch: '',
-      status: approvePermission ? '2' : requestPermission ? '1' : 'ALL',
+      status: approvePermission ? 'รออนุมัติ' : requestPermission ? 'บันทึก' : 'ALL',
       fromDate: new Date(),
       approveDate: new Date(),
     });
@@ -174,7 +180,6 @@ const TransferOutSearch = () => {
     if (!validateSearch()) {
       return;
     }
-
     let limits;
     if (limit === 0) {
       limits = '10';
@@ -190,6 +195,7 @@ const TransferOutSearch = () => {
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
     };
+    console.log(payload);
 
     handleOpenLoading('open', true);
     await dispatch(transferOutGetSearch(payload));
@@ -203,7 +209,7 @@ const TransferOutSearch = () => {
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      // dataTable = <TransferOutList onSearch={onSearch} />;
+      dataTable = <TransferOutList onSearch={onSearch} />;
     } else {
       dataTable = (
         <Grid item container xs={12} justifyContent="center">
@@ -259,11 +265,11 @@ const TransferOutSearch = () => {
                 inputProps={{ 'aria-label': 'Without label' }}
               >
                 <MenuItem value={'ALL'}>{t('all')}</MenuItem>
-                <MenuItem value={'1'}>บันทึก</MenuItem>
-                <MenuItem value={'2'}>รออนุมัติ</MenuItem>
-                <MenuItem value={'3'}>อนุมัติ</MenuItem>
-                <MenuItem value={'4'}>ไม่อนุมัติ</MenuItem>
-                <MenuItem value={'5'}>ปิดงาน</MenuItem>
+                {!approvePermission && <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>}
+                <MenuItem value={TOStatus.WAIT_FOR_APPROVAL}>รออนุมัติ</MenuItem>
+                <MenuItem value={TOStatus.APPROVED}>อนุมัติ</MenuItem>
+                <MenuItem value={TOStatus.REJECTED}>ไม่อนุมัติ</MenuItem>
+                <MenuItem value={TOStatus.CLOSED}>ปิดงาน</MenuItem>
               </Select>
             </FormControl>
           </Grid>

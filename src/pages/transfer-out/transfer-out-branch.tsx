@@ -247,7 +247,7 @@ export default function SelectBranch(props: Props): ReactElement {
                 className={classes.MbtnSearch}
                 size="large"
                 onClick={handleAddForm}
-                disabled={listBranchSelect.length === 0 || disabled}
+                disabled={listBranchSelect.length === 0 && props.listSelect.length === 0}
               >
                 เลือกสาขา
               </Button>

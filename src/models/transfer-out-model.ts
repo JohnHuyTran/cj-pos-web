@@ -22,25 +22,28 @@ export interface TransferOutSearchResponse {
 
 export interface TransferOut {
   id: string;
-  branchId: string;
+  branch: string;
   regionId: string;
   requester: string;
   requesterId: string;
   documentNumber: string;
   status: string;
-  branchCode: string;
-  branchName: string;
+  transferOutReason: string;
+  store: string;
   createdDate: string;
   approvedDate: string;
-  requesterNote: string;
+  attachFiles: attachFile[];
   products: TransferOutProductDetail[];
 }
 
 export interface TransferOutProductDetail {
-  productObjectId: string;
-  requestedDiscount: number;
-  expiredDate: string;
-  price: number;
+  barcode: string;
+  productName: string;
+  sku: string;
+  numberOfRequested: number;
+  numberOfApproved: number;
+  remark: string;
+  unitName: string;
 }
 
 export interface TransferOutDetailResponse {
@@ -48,4 +51,10 @@ export interface TransferOutDetailResponse {
   code: number;
   message: string;
   data: any;
+}
+
+export interface attachFile {
+  name: string;
+  key: string;
+  mimeType: string;
 }
