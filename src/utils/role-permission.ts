@@ -87,9 +87,7 @@ const permission = {
       mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
-        SUBMENU.OR_DIFF,
         SUBMENU.OR_ORDER_RECEIVE,
-        SUBMENU.OR_SUPPLIER,
         SUBMENU.ST_REQUEST,
       ],
     },

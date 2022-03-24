@@ -182,7 +182,7 @@ function DCOrderList() {
       hasBelow: data.hasBelow,
       hasOver: data.hasOver,
       receivedDate: convertUtcToBkkDate(data.receivedDate),
-
+      branchOutNo: data.branchOutNo,
       // sdType: getSdType(data.sdType),
       // sdStatus: getSdStatus(data.sdStatus),
     };
