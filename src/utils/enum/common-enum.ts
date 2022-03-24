@@ -37,3 +37,11 @@ export enum ERROR_CODE {
   TIME_OUT = 'timeout',
   NOT_AUTHORIZE = 'authentication.notauthorize',
 }
+
+export enum TOStatus {
+  DRAFT = 'DRAFT',
+  WAIT_FOR_APPROVAL = 'WAIT_FOR_APPROVAL',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  CLOSED = 'CLOSED',
+}

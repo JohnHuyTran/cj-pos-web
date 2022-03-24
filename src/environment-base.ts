@@ -61,6 +61,13 @@ export const environment = {
       url: '/task/notifications',
     },
   },
+  withDraw: {
+    transferOut: {
+      search: {
+        url: '/campaign/transfer-out',
+      },
+    },
+  },
   sell: {
     barcodeDiscount: {
       search: {
@@ -85,14 +92,15 @@ export const environment = {
         url: '/campaign/barcode/reject?id={id}&reason={reason}',
       },
       print: {
-        url: '/campaign/print-barcode',
+        url: '/print/bd-barcode',
+        saveLogPrintBarcodeDiscountHistoryURL: '/campaign/print-barcode',
       },
       cancel: {
         url: '/campaign/{id}',
       },
       upload: {
-        url: '/campaign/upload'
-      }
+        url: '/campaign/upload',
+      },
     },
     saleLimitTime: {
       detail: {
