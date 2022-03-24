@@ -29,7 +29,8 @@ interface ConfirmOrderShipment {
   items: Entry[];
   percentDiffType: boolean;
   percentDiffValue: string;
-  sumDCPercent: number;
+  sumActualQty: number;
+  sumQuantityRef: number;
   docType: string;
 }
 
@@ -54,7 +55,8 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     items,
     percentDiffType,
     percentDiffValue,
-    sumDCPercent,
+    sumActualQty,
+    sumQuantityRef,
     docType,
   } = props;
   const searchState = useAppSelector((state) => state.saveSearchOrder);
@@ -65,6 +67,9 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
   });
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const DCPercent = env.dc.percent;
+
+  let sumDCPercent: number = (sumActualQty * 100) / sumQuantityRef;
+  sumDCPercent = Math.trunc(sumDCPercent); //remove decimal
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });

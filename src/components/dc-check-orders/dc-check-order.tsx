@@ -25,6 +25,7 @@ import { env } from '../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../models/branch-model';
 import { isAllowActionPermission, isGroupDC } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
+import { setItemId, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
 
 moment.locale('th');
 
@@ -138,6 +139,8 @@ function DCCheckOrderSearch() {
   };
 
   const onClickValidateForm = () => {
+    dispatch(setReloadScreen(false));
+    dispatch(setItemId(''));
     if (
       values.docNo === '' &&
       // valueBranchList === null &&
@@ -197,6 +200,8 @@ function DCCheckOrderSearch() {
     };
 
     dispatch(featchOrderListDcAsync(payload));
+    dispatch(setReloadScreen(false));
+    dispatch(setItemId(''));
     setTimeout(() => {
       handleOpenLoading('open', false);
     }, 300);
