@@ -57,6 +57,15 @@ export async function printBarcodeDiscount(payload: any) {
   }
 }
 
+export async function saveLogPrintBarcodeDiscountHistory(payload: any) {
+  try {
+    const response = await post(`${env.backEnd.url}${environment.sell.barcodeDiscount.print.saveLogPrintBarcodeDiscountHistoryURL}`, payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function cancelBarcodeDiscount(id: string) {
   try {
     const response = await deleteData(getPathCancelDraft(id));

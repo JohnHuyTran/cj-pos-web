@@ -12,9 +12,9 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import { Action, DateFormat } from "../../utils/enum/common-enum";
 import moment from 'moment';
-import { numberWithCommas, stringNullOrEmpty } from "../../utils/utils";
+import { getEncodeBarcode, numberWithCommas, stringNullOrEmpty } from "../../utils/utils";
 import AlertError from "../commons/ui/alert-error";
-import { printBarcodeDiscount } from "../../services/barcode-discount";
+import { printBarcodeDiscount, saveLogPrintBarcodeDiscountHistory } from "../../services/barcode-discount";
 import { BootstrapDialogTitle } from "../commons/ui/dialog-title";
 
 const _ = require('lodash');
@@ -31,6 +31,7 @@ interface Props {
     ids: any[];
     lstProductNotPrinted: any[];
     lstProductPrintAgain: any[];
+    lstProductPrint: any[];
   };
 }
 
@@ -106,42 +107,47 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
   };
 
   const onConfirmModalPrint = async (printAgain: boolean) => {
-    setTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+    setTextError("เกิดข้อผิดพลาดระหว่างการดำเนินการ");
     try {
-      let payload = [];
-      if (printAgain) {
-        let lstOfProduct = [];
-        for (const item of printAgainRows) {
-          if (item.numberOfPrinting > 0) {
-            lstOfProduct.push({
-              productBarcode: item.barcode,
-              numberOfPrinting: item.numberOfPrinting
-            });
-          }
-        }
-        payload.push({
-          id: (values.ids && values.ids.length > 0) ? values.ids[0] : '',
+      if (!values.ids?.length) return;
+       
+      const rs = await printBarcodeDiscount({
+        template_code: "BD",
+        bd_barcodes: (
+          (printAgain ? printAgainRows : values?.lstProductPrint) || []
+        )
+          .filter((print: any) => print.numberOfPrinting > 0)
+          .map((item: any) => ({
+            quantity: item.numberOfPrinting,
+            discounted_barcode: getEncodeBarcode({
+              barcode: item.barcode,
+              price: item.price,
+            }),
+            product_name: item.productName,
+            unit_factor: item.unit,
+            price_then: item.priceAfterDiscount,
+            price_now: Number(item.price).toFixed(2),
+            currency: item.currency || "บาท",
+          })),
+      });
+      if (rs.code === 20000) {
+        let payload = printAgain ? [{
+          id: (values.ids?.length > 0) ? values.ids[0] : '',
           printReason: reasonForReprint,
-          listOfProduct: lstOfProduct
-        });
-      } else {
-        if (values.ids && values.ids.length > 0) {
-          for (const id of values.ids) {
-            payload.push({
-              id: id
-            });
-          }
-        }
-      }
-      const rs = await printBarcodeDiscount(payload);
-      if (rs.code === 200) {
+          listOfProduct: printAgainRows.filter((item: any) => item.numberOfPrinting > 0).map((item: any) => ({
+            productBarcode: item.barcode,
+            numberOfPrinting: item.numberOfPrinting
+          }))
+        }] : (values.ids || []).map(id => ({id}));
+        
+        await saveLogPrintBarcodeDiscountHistory(payload);
         onConfirm();
         onClose();
       } else {
         setOpenModalError(true);
       }
     } catch (error) {
-      setTextError('ไม่มีผลิตภัณฑ์การตรวจสอบความถูกต้อง');
+      setTextError("ไม่มีผลิตภัณฑ์การตรวจสอบความถูกต้อง");
       setOpenModalError(true);
     }
   };
@@ -150,14 +156,11 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
     if (values.lstProductPrintAgain && values.lstProductPrintAgain.length > 0) {
       let rows = values.lstProductPrintAgain.map((item: any, index: number) => {
         return {
+          ...item,
           id: index,
           index: index + 1,
-          documentNumber: item.documentNumber,
-          barcode: item.barcode,
           barcodeName: item.productName,
-          skuCode: item.skuCode,
           expiredDate: moment(item.expiredDate).format(DateFormat.DATE_FORMAT),
-          numberOfApproved: item.numberOfApproved,
           numberOfPrinting: item.numberOfPrinting || 0,
           errorNumberOfPrinting: ''
         };
@@ -172,12 +175,10 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
   if (values.lstProductNotPrinted && values.lstProductNotPrinted.length > 0) {
     notPrintRows = values.lstProductNotPrinted.map((item: any, index: number) => {
       return {
+        ...item,
         id: index,
         index: index + 1,
-        documentNumber: item.documentNumber,
-        barcode: item.barcode,
         barcodeName: item.productName,
-        skuCode: item.skuCode,
         expiredDate: moment(item.expiredDate).format(DateFormat.DATE_FORMAT)
       };
     });

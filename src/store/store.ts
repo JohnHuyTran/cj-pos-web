@@ -52,6 +52,8 @@ import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 import stockRequestItems from './slices/stock-request-items-slice';
 import authorizedhBranchSlice from './slices/authorized-branch-slice';
 import orderReceiveSlice from './slices/order-receive-slice';
+import transferOutSearchSlice from './slices/transfer-out-search-slice';
+import transferOutCriterSearchSlice from './slices/transfer-out-criteria-search-slice';
 
 const store = configureStore({
   reducer: {
@@ -107,6 +109,8 @@ const store = configureStore({
     stockRequestItems: stockRequestItems,
     authorizedhBranchSlice: authorizedhBranchSlice,
     orderReceiveSlice: orderReceiveSlice,
+    transferOutSearchSlice: transferOutSearchSlice,
+    transferOutCriterSearchSlice: transferOutCriterSearchSlice,
   },
 });
 

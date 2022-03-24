@@ -120,7 +120,8 @@ export default function ModalCreateBarcodeDiscount({
     printInDetail: false,
     ids: '',
     lstProductNotPrinted: [],
-    lstProductPrintAgain: []
+    lstProductPrintAgain: [],
+    lstProductPrint: []
   });
   const [openModalPrint, setOpenModalPrint] = React.useState(false);
   const [printHistoryRows, setPrintHistoryRows] = React.useState<any>([]);
@@ -708,8 +709,10 @@ export default function ModalCreateBarcodeDiscount({
   const onPrintedBarcode = async () => {
     let lstProductNotPrinted = [];
     let lstProductPrintAgain = [];
+    let lstProductPrint = [];
+
     let products = _.cloneDeep(barcodeDiscountPrint);
-    if (Number(BDStatus.BARCODE_PRINTED) == status) {
+    if (Number(BDStatus.BARCODE_PRINTED) == status ) {
       for (const itPro of products) {
         if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day')) {
           itPro.barcode = itPro.barCode;
@@ -717,8 +720,7 @@ export default function ModalCreateBarcodeDiscount({
           lstProductPrintAgain.push(itPro);
         }
       }
-    } else {
-      if (barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail) {
+    } else if (Number(BDStatus.BARCODE_PRINTED) == status && barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail) {
         for (const itPro of products) {
           if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isBefore(moment(new Date()), 'day')) {
             itPro.barcode = itPro.barCode;
@@ -727,8 +729,16 @@ export default function ModalCreateBarcodeDiscount({
             lstProductNotPrinted.push(itPro);
           }
         }
+      } else if(Number(BDStatus.APPROVED) == status){
+        lstProductPrint = (products || [])
+        .filter((product: any) => moment(product?.expiryDate).isSameOrAfter(moment(new Date()), 'day'))
+        .map((product: any) => ({
+          ...product, 
+          barcode: product.barCode,
+          productName: product.barcodeName,
+        }))
       }
-    }
+    
     let ids = [];
     ids.push(dataDetail.id);
     await setValuePrints({
@@ -739,7 +749,8 @@ export default function ModalCreateBarcodeDiscount({
       printNormal: lstProductNotPrinted.length === 0 && lstProductPrintAgain.length === 0,
       printInDetail: printInDetail,
       lstProductNotPrinted: lstProductNotPrinted,
-      lstProductPrintAgain: lstProductPrintAgain
+      lstProductPrintAgain: lstProductPrintAgain,
+      lstProductPrint: lstProductPrint
     });
     handleOpenModalPrint();
   };
