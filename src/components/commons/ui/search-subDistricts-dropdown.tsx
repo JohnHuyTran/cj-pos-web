@@ -37,7 +37,7 @@ function SubDistrictsDropDown({
     postalCode: '',
   };
   useEffect(() => {
-    console.log('isClear SubDis :', isClear);
+    // console.log('isClear SubDis :', isClear);
     if (isClear) setValues([]);
 
     if (searchPostalCode !== '') {

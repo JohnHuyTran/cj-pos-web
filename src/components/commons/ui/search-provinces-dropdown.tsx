@@ -29,7 +29,7 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
   };
 
   useEffect(() => {
-    console.log('isClear provinces :', isClear, disable);
+    // console.log('isClear provinces :', isClear, disable);
     if (isClear) setValues([]);
 
     if (valueProvinces !== '') {

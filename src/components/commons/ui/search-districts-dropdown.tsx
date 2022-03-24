@@ -37,7 +37,7 @@ function DistrictsDropDown({
   };
 
   useEffect(() => {
-    console.log('isClear districts :', isClear);
+    // console.log('isClear districts :', isClear);
     if (isClear) setValues([]);
 
     if (provinceCode !== '') {

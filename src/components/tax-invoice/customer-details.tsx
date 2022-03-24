@@ -59,7 +59,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
   const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
-  console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
+  // console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
 
   const [flagSave, setFlagSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
@@ -125,7 +125,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         customer: customer,
       };
 
-      console.log('payload:', JSON.stringify(payload));
+      // console.log('payload:', JSON.stringify(payload));
       handleSaveInvoice(payload);
     }
   };
