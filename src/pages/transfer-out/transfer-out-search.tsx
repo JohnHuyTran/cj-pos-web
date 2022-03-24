@@ -341,7 +341,7 @@ const TransferOutSearch = () => {
           setOpenPopup={setOpenPopup}
           setPopupMsg={setPopupMsg}
           action={Action.INSERT}
-          // onSearchBD={onSearch}
+          onSearchBD={onSearch}
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
