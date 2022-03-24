@@ -316,7 +316,8 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
                   </Typography>
                 )}
 
-                <IconButton sx={{ display: (!stringNullOrEmpty(enabledControl) && enabledControl) ? undefined: 'none'}}
+                <IconButton sx={{ display: ((!stringNullOrEmpty(enabledControl) && !enabledControl)
+                                        || (onDeleteAttachFile && item.status === 'old')) ? 'none' : undefined}}
                             onClick={() => onDeleteAttachFile ? handleDeleteAttachFile(item) : handleDelete(item)} size="small">
                   <CloseIcon fontSize="small" color="error" />
                 </IconButton>

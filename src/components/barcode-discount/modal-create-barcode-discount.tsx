@@ -256,8 +256,12 @@ export default function ModalCreateBarcodeDiscount({
   useEffect(() => {
     //set value detail from search
     if (Action.UPDATE === action && !objectNullOrEmpty(barcodeDiscountDetail)) {
-      //set value for data detail
       setValueRadios(barcodeDiscountDetail.percentDiscount ? 'percent' : 'amount');
+      //set current branch
+      let currentBranch = stringNullOrEmpty(barcodeDiscountDetail.branchCode) ? '' : (barcodeDiscountDetail.branchCode);
+      currentBranch += (stringNullOrEmpty(barcodeDiscountDetail.branchName) ? '' : (' - ' + barcodeDiscountDetail.branchName));
+      setCurrentBranch(currentBranch);
+      //set value for data detail
       dispatch(
         updateDataDetail({
           id: barcodeDiscountDetail.id,
@@ -733,12 +737,12 @@ export default function ModalCreateBarcodeDiscount({
         lstProductPrint = (products || [])
         .filter((product: any) => moment(product?.expiryDate).isSameOrAfter(moment(new Date()), 'day'))
         .map((product: any) => ({
-          ...product, 
+          ...product,
           barcode: product.barCode,
           productName: product.barcodeName,
         }))
       }
-    
+
     let ids = [];
     ids.push(dataDetail.id);
     await setValuePrints({

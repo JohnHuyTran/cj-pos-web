@@ -35,14 +35,13 @@ export interface DataGridProps {
   action: Action | Action.INSERT;
   userPermission?: any[];
   id: string;
-  typeDiscount: string;
   // onClose?: () => void;
 }
 
 const _ = require('lodash');
 
 export const ModalTransferOutItem = (props: DataGridProps) => {
-  const { typeDiscount, action, userPermission } = props;
+  const { action, userPermission } = props;
 
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -97,7 +96,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     } else {
       setDtTable([]);
     }
-  }, [payloadAddItem, typeDiscount]);
+  }, [payloadAddItem]);
 
   useEffect(() => {
     if (dtTable.length !== 0) {

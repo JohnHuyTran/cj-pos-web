@@ -11,7 +11,6 @@ import DatePickerComponent from '../../components/commons/ui/date-picker';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { SearchOff } from '@mui/icons-material';
 import AlertError from '../../components/commons/ui/alert-error';
-import ModalCreateBarcodeDiscount from '../../components/barcode-discount/modal-create-barcode-discount';
 import moment from 'moment';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
@@ -21,13 +20,13 @@ import { Action } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
-import { ACTIONS } from '../../utils/enum/permission-enum';
 import { BranchListOptionType } from '../../models/branch-model';
 import { isGroupBranch } from '../../utils/role-permission';
 // import TransferOutList from './transfer-out-list';
 import SelectBranch from './transfer-out-branch';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
+import ModalCreateTransferOut from "../../components/transfer-out/modal-create-transfer-out";
 
 const _ = require('lodash');
 
@@ -304,7 +303,7 @@ const TransferOutSearch = () => {
                 className={classes.MbtnSearch}
                 color="secondary"
                 startIcon={<AddCircleOutlineOutlinedIcon />}
-                // onClick={handleOpenModal}
+                onClick={handleOpenModal}
               >
                 {'เบิก'}
               </Button>
@@ -336,13 +335,13 @@ const TransferOutSearch = () => {
       <LoadingModal open={openLoadingModal.open} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       {openModal && (
-        <ModalCreateBarcodeDiscount
+        <ModalCreateTransferOut
           isOpen={openModal}
           onClickClose={handleCloseModal}
           setOpenPopup={setOpenPopup}
           setPopupMsg={setPopupMsg}
           action={Action.INSERT}
-          onSearchBD={onSearch}
+          // onSearchBD={onSearch}
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
