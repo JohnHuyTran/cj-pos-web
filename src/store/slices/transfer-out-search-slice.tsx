@@ -33,7 +33,7 @@ export const transferOutGetSearch = createAsyncThunk(
         path = path + `&query=${payload.query}`;
       }
       if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
-        path = path + `&branch=${payload.branch}`;
+        path = path + `&branches=${payload.branch}`;
       }
       if (!stringNullOrEmpty(payload.status) && 'ALL' !== payload.status) {
         path = path + `&status=${payload.status}`;
