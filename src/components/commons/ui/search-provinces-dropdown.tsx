@@ -37,8 +37,9 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
       setValues(provincesFilter[0]);
     }
 
-    if (!localStorage.getItem('provinces')) searchProvinces(payload);
-    else getProvincesList();
+    // if (!localStorage.getItem('provinces')) searchProvinces(payload);
+    // else getProvincesList();
+    searchProvinces(payload);
   }, [isClear, valueProvinces, flagSearchProvinces]);
 
   function getProvincesList() {
