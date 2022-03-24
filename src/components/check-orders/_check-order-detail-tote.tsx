@@ -14,8 +14,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { HighlightOff, Print, CheckCircleOutline } from '@mui/icons-material';
-import SaveIcon from '@mui/icons-material/Save';
+import { HighlightOff, Print } from '@mui/icons-material';
 import {
   getShipmentStatusText,
   getShipmentTypeText,
@@ -32,27 +31,21 @@ import {
   GridValueGetterParams,
   useGridApiRef,
 } from '@mui/x-data-grid';
-import { Entry, itemsDetail, SaveDraftSDRequest } from '../../models/order-model';
+import { itemsDetail } from '../../models/order-model';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { useStyles } from '../../styles/makeTheme';
 import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 import ModalShowFile from '../commons/ui/modal-show-file';
-import { getPathReportSD, saveOrderShipments } from '../../services/order-shipment';
+import { getPathReportSD } from '../../services/order-shipment';
 import { formatFileNam } from '../../utils/enum/check-order-enum';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import ModalAddItemsTote from '../commons/ui/modal-add-items-tote';
+import ModalAddItems from '../commons/ui/modal-add-items';
 import { styled } from '@mui/material/styles';
 import { updateItemsToteState } from '../../store/slices/items-tote-slice';
 import { gridColumnsTotalWidthSelector } from '@material-ui/data-grid';
 import CheckOrderDetailItems from '../check-orders/check-order-detail-items';
-import AlertError from '../commons/ui/alert-error';
-import { featchOrderListAsync } from '../../store/slices/check-order-slice';
-import { ApiError } from '../../models/api-error-model';
-import ConfirmOrderShipment from './check-order-confirm-model';
-import Snackbar from '../commons/ui/snackbar-status';
-import ConfirmExitModel from './confirm-model';
 
 export interface CheckOrderDetailToteProps {
   defaultOpen: boolean;
@@ -260,14 +253,13 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
   const { apiRef, columns } = useApiRef();
   const dispatch = useAppDispatch();
   const classes = useStyles();
-
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const itemsTote = useAppSelector((state) => state.itemsToteSlice.state);
 
   //   const orderDetails = useAppSelector((state) => state.checkOrderDetail.orderDetail);
   //   const orderDetail: any = orderDetails.data ? orderDetails.data : null;
-  const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
   const orderDetails = useAppSelector((state) => state.checkOrderToteSlice.orderDetail);
-  const orderDetailTote: any = orderDetails.data ? orderDetails.data : null;
+  const orderDetail: any = orderDetails.data ? orderDetails.data : null;
 
   const [openTote, setOpenTote] = React.useState(defaultOpen);
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -277,16 +269,6 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
   const [statusDraft, setStatusDraft] = React.useState(false);
   const [showSdTypeTote, setShowSdTypeTote] = React.useState(false);
   const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
-  const [openFailAlert, setOpenFailAlert] = React.useState(false);
-  const [textFail, setTextFail] = React.useState('');
-  const [showSnackBar, setShowSnackBar] = React.useState(false);
-  const [contentMsg, setContentMsg] = React.useState('');
-  const [snackbarStatus, setSnackbarStatus] = React.useState(false);
-  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
-  const [action, setAction] = useState<string>('');
-  const [statusOC, setStatusOC] = React.useState(false);
-  const [itemsDiffState, setItemsDiffState] = useState<Entry[]>([]);
-  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -295,50 +277,44 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  //   console.log('itemsTote: ', itemsTote);
+  let rowsEntriesTote: any = [];
+
+  useEffect(() => {
+    if (openTote === true) {
+      let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
+      console.log('entries: ', entries);
+
+      if (entries.length > 0) {
+        console.log('use effec');
+        //   updateState(entries);
+        mapRowEntries(entries);
+        dispatch(updateItemsToteState(entries));
+      }
+
+      dispatch(updateAddItemsState({}));
+
+      setStatusDraft(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
+      setStatusClosed(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
+      setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1);
+      setShowSdTypeTote(orderDetail.sdType === 0);
+    }
+  }, [openTote]);
+  console.log('itemsTote: ', itemsTote);
 
   const handleClose = async () => {
-    dispatch(updateItemsToteState({}));
+    dispatch(updateAddItemsState({}));
     setOpenTote(false);
     onClickClose();
   };
 
-  const [sumDCPercent, setSumDCPercent] = React.useState(0);
-  const handleCalculateDCPercent = async (sumActualQty: number, sumQuantityRef: number) => {
-    let sumPercent: number = (sumActualQty * 100) / sumQuantityRef;
-    sumPercent = Math.trunc(sumPercent); //remove decimal
+  //   const updateState = async (items: any) => {
+  //     await dispatch(updateAddItemsState(items));
+  //   };
 
-    setSumDCPercent(sumPercent);
-  };
-
-  const updateState = async (items: any) => {
-    await dispatch(updateItemsToteState(items));
-  };
-
-  useEffect(() => {
-    // const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
-    // const oc = getUserInfo().group === PERMISSION_GROUP.OC;
-    // setDisplayBranchGroup(branch);
-    // setStatusOC(oc);
-
-    setStatusDraft(orderDetailTote.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
-    setStatusClosed(orderDetailTote.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
-    setStatusWaitApprove1(orderDetailTote.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1);
-    setShowSdTypeTote(orderDetailTote.sdType === 0);
-  }, [openTote, orderDetailTote]);
-
-  let entries: itemsDetail[] = orderDetailTote.items ? orderDetailTote.items : [];
-  //   console.log('entries: ', entries);
-  //   console.log('itemsTote: ', itemsTote);
-
-  if (entries.length > 0 && Object.keys(itemsTote).length === 0) {
-    console.log('1');
-    updateState(entries);
-  }
-  let rowsEntriesTote: any = [];
-  if (Object.keys(itemsTote).length !== 0) {
-    console.log('2');
-    rowsEntriesTote = itemsTote.map((item: any, index: number) => {
+  const mapRowEntries = (itemData: any) => {
+    console.log('map row');
+    console.log('map row item: ', itemData);
+    rowsEntriesTote = itemData.map((item: any, index: number) => {
       let qtyRef: number = 0;
       let actualQty: number = 0;
 
@@ -355,7 +331,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
         id: `${item.barcode}_${index}`,
         deliveryOrderNo: item.deliveryOrderNo,
         isTote: item.isTote ? item.isTote : false,
-        sdStatus: orderDetailTote.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
+        sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
         skuCode: item.skuCode,
         barcode: item.barcode,
         productName: item.productName,
@@ -366,132 +342,35 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
         comment: item.comment,
       };
     });
+  };
+
+  //   if (Object.keys(payloadAddItem).length !== 0) {
+  //     rowsEntries = payloadAddItem.map((item: any, index: number) => {
+  //       let qtyRef: number = 0;
+  if (Object.keys(itemsTote).length !== 0) {
+    mapRowEntries(itemsTote);
   }
-  const updateShipmentOrder = () => {
-    dispatch(featchOrderListAsync(payloadSearchOrder));
-    dispatch(featchOrderDetailAsync(orderDetailTote.sdNo));
-  };
 
-  const mapUpdateState = async () => {
-    const itemsList: any = [];
+  //   const mapUpdateState = async () => {
+  //     const itemsList: any = [];
 
-    if (rowsEntriesTote.length > 0) {
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      await rows.forEach((data: GridRowData) => {
-        itemsList.push(data);
-      });
-    }
+  //     if (rowsEntriesTote.length > 0) {
+  //       const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+  //       await rows.forEach((data: GridRowData) => {
+  //         itemsList.push(data);
+  //       });
+  //     }
 
-    if (itemsList.length > 0) {
-      updateState(itemsList);
-    }
-  };
+  //     if (itemsList.length > 0) {
+  //       updateState(itemsList);
+  //     }
+  //   };
 
-  const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'actualQty' || params.field === 'comment') {
-      mapUpdateState();
-    }
-  };
-
-  const handleSaveButton = async () => {
-    handleOpenLoading('open', true);
-
-    let qtyIsValid: boolean = true;
-    const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-
-    const itemsList: any = [];
-    const itemsListUpdate: any = [];
-    rows.forEach((data: GridRowData) => {
-      const item: any = {
-        barcode: data.barcode,
-        deliveryOrderNo: data.deliveryOrderNo,
-        actualQty: Number(data.actualQty),
-        comment: data.comment,
-        isTote: data.isTote,
-      };
-
-      if (data.isTote === true && !(data.actualQty * 1 >= 0 && data.actualQty * 1 <= 1)) {
-        qtyIsValid = false;
-      }
-      itemsList.push(item);
-      itemsListUpdate.push(data);
-    });
-
-    if (!qtyIsValid) {
-      setOpenFailAlert(!qtyIsValid);
-      setTextFail('จำนวนรับจริงของTote ต้องเป็น 0 หรือ 1 เท่านั้น');
-    }
-
-    if (qtyIsValid) {
-      const payload: SaveDraftSDRequest = {
-        shipmentNo: orderDetailTote.docRefNo,
-        items: itemsList,
-      };
-
-      await saveOrderShipments(payload, orderDetailTote.sdNo)
-        .then((_value) => {
-          setShowSnackBar(true);
-          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          setSnackbarStatus(true);
-          updateShipmentOrder();
-        })
-        .catch((error: ApiError) => {
-          setShowSnackBar(true);
-          setContentMsg(error.message);
-          setSnackbarStatus(false);
-          updateShipmentOrder();
-        });
-
-      updateState(itemsListUpdate);
-    }
-
-    handleOpenLoading('open', false);
-  };
-
-  const handleApproveBtn = async () => {
-    setItemsDiffState([]);
-    setOpenModelConfirm(true);
-    setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const itemsList: any = [];
-
-    let sumActualQtyItems: number = 0;
-    let sumQuantityRefItems: number = 0;
-    rowsEdit.forEach((data: GridRowData) => {
-      let diffCount: number = data.actualQty - data.qtyRef;
-      sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
-      sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
-
-      const itemDiff: Entry = {
-        barcode: data.barcode,
-        deliveryOrderNo: data.deliveryOrderNo,
-        actualQty: data.actualQty,
-        comment: data.comment,
-        seqItem: 0,
-        itemNo: '',
-        shipmentSAPRef: '',
-        skuCode: '',
-        skuType: '',
-        productName: data.productName,
-        unitCode: '',
-        unitName: '',
-        unitFactor: 0,
-        qty: 0,
-        qtyAll: 0,
-        qtyAllBefore: 0,
-        qtyDiff: diffCount,
-        price: 0,
-        isControlStock: 0,
-        toteCode: '',
-        expireDate: '',
-        isTote: data.isTote,
-      };
-      setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
-      itemsList.push(data);
-    });
-
-    handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
-  };
+  //   const handleEditItems = async (params: GridEditCellValueParams) => {
+  //     if (params.field === 'actualQty' || params.field === 'comment') {
+  //       mapUpdateState();
+  //     }
+  //   };
 
   const handlePrintBtn = async () => {
     handleOpenLoading('open', true);
@@ -531,52 +410,11 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
     setOpenModelAddItems(false);
   };
 
-  const handleCloseSnackBar = () => {
-    setShowSnackBar(false);
-    setContentMsg('');
-    setSnackbarStatus(false);
-  };
-
-  const handleShowSnackBar = async (issuccess: boolean, errorMsg: string) => {
-    handleOpenLoading('open', true);
-    const msg = issuccess ? 'คุณได้ทำรายการเรียบร้อยแล้ว' : errorMsg;
-    setShowSnackBar(true);
-    setContentMsg(msg);
-    setSnackbarStatus(issuccess);
-
-    if (issuccess) {
-      updateShipmentOrder();
-      setTimeout(() => {
-        setOpenTote(false);
-        onClickClose();
-      }, 1000);
-    }
-    handleOpenLoading('open', false);
-  };
-
-  const handleCloseFailAlert = () => {
-    setOpenFailAlert(false);
-    setTextFail('');
-  };
-
-  function handleCloseModelConfirm() {
-    setOpenModelConfirm(false);
-  }
-
-  function handleNotExitModelConfirm() {
-    setConfirmModelExit(false);
-  }
-  function handleExitModelConfirm() {
-    setConfirmModelExit(false);
-    setOpenTote(false);
-    onClickClose();
-  }
-
   return (
     <div>
       <Dialog open={openTote} maxWidth="xl" fullWidth={true}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          <Typography sx={{ fontSize: '1em' }}>รายละเอียดตรวจสอบการรับ-โอนสินค้า</Typography>
+          <Typography sx={{ fontSize: '1em' }}>รายละเอียดตรวจสอบการรับ-โอนสินค้าxxxxxx</Typography>
         </BootstrapDialogTitle>
 
         <DialogContent>
@@ -586,13 +424,13 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                 <Typography variant="body2">เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetailTote.docRefNo ? orderDetailTote.docRefNo : '-'}</Typography>
+                <Typography variant="body2">{orderDetail.docRefNo ? orderDetail.docRefNo : '-'}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">เลข Tote:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetailTote.toteCode}</Typography>
+                <Typography variant="body2">{orderDetail.toteCode}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -600,13 +438,13 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                 <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetailTote.sdNo}</Typography>
+                <Typography variant="body2">{orderDetail.sdNo}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{getShipmentStatusText(orderDetailTote.sdStatus)}</Typography>
+                <Typography variant="body2">{getShipmentStatusText(orderDetail.sdStatus)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -614,13 +452,13 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                 <Typography variant="body2">วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{convertUtcToBkkDate(orderDetailTote.receivedDate)}</Typography>
+                <Typography variant="body2">{convertUtcToBkkDate(orderDetail.receivedDate)}</Typography>
               </Grid>
               <Grid item lg={2}>
                 <Typography variant="body2">ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{getShipmentTypeText(orderDetailTote.sdType)}</Typography>
+                <Typography variant="body2">{getShipmentTypeText(orderDetail.sdType)}</Typography>
               </Grid>
             </Grid>
           </Box>
@@ -675,8 +513,8 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                 </StyledMenu>
               </Grid>
 
-              <Grid item>
-                {statusDraft && (
+              {/* <Grid item>
+                {showSaveBtn && (
                   <div>
                     <Button
                       id="btnSave"
@@ -686,7 +524,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                       onClick={handleSaveButton}
                       startIcon={<SaveIcon />}
                       style={{ width: 200 }}
-                      //   sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                      sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                     >
                       บันทึก
                     </Button>
@@ -699,14 +537,14 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                       onClick={handleApproveBtn}
                       startIcon={<CheckCircleOutline />}
                       style={{ width: 200 }}
-                      //   sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                      sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                     >
                       ยืนยัน
                     </Button>
                   </div>
                 )}
 
-                {/* {showApproveBtn && (
+                {showApproveBtn && (
                   <Button
                     id="btnClose"
                     variant="contained"
@@ -718,9 +556,9 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                   >
                     ปิดงาน
                   </Button>
-                )} */}
+                )}
 
-                {/* {statusOC && statusWaitApprove1 && (
+                {statusOC && statusWaitApprove1 && (
                   <Button
                     id="btnApprove"
                     variant="contained"
@@ -732,8 +570,8 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                   >
                     อนุมัติ
                   </Button>
-                )} */}
-              </Grid>
+                )}
+              </Grid> */}
             </Grid>
           </Box>
 
@@ -752,7 +590,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                 disableColumnMenu
                 autoHeight={rowsEntriesTote.length >= 8 ? false : true}
                 scrollbarSize={10}
-                onCellFocusOut={handleEditItems}
+                // onCellFocusOut={handleEditItems}
                 // onCellOut={handleEditItems}
                 // onCellKeyDown={handleEditItems}
                 // onCellBlur={handleEditItems}
@@ -763,53 +601,29 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
         </DialogContent>
       </Dialog>
 
-      <ConfirmOrderShipment
-        open={openModelConfirm}
-        onClose={handleCloseModelConfirm}
-        onUpdateShipmentStatus={handleShowSnackBar}
-        shipmentNo={orderDetailTote.docRefNo}
-        sdNo={orderDetailTote.sdNo}
-        action={action}
-        items={itemsDiffState}
-        percentDiffType={false}
-        percentDiffValue="0"
-        sumDCPercent={sumDCPercent}
-        docType={orderDetailTote.docType}
-      />
-
-      <ConfirmExitModel
-        open={confirmModelExit}
-        onClose={handleNotExitModelConfirm}
-        onConfirm={handleExitModelConfirm}
-      />
-
       <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
-        url={getPathReportSD(orderDetailTote.sdNo)}
+        url={getPathReportSD(orderDetail.sdNo)}
         statusFile={statusFile}
-        sdImageFile={orderDetailTote.sdImageFile ? orderDetailTote.sdImageFile : ''}
+        sdImageFile={orderDetail.sdImageFile ? orderDetail.sdImageFile : ''}
         fileName={
-          orderDetailTote.sdImageFilename
-            ? orderDetailTote.sdImageFilename
-            : formatFileNam(orderDetailTote.sdNo, orderDetailTote.sdStatus)
+          orderDetail.sdImageFilename
+            ? orderDetail.sdImageFilename
+            : formatFileNam(orderDetail.sdNo, orderDetail.sdStatus)
         }
         btnPrintName="พิมพ์ใบผลต่าง"
       />
 
-      <ModalAddItemsTote
+      <LoadingModal open={openLoadingModal.open} />
+
+      <ModalAddItems
         open={openModelAddItems}
         onClose={handleModelAddItems}
         requestBody={{
           skuCodes: [],
         }}
-      ></ModalAddItemsTote>
-
-      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
-
-      <Snackbar open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={snackbarStatus} contentMsg={contentMsg} />
-
-      <LoadingModal open={openLoadingModal.open} />
+      ></ModalAddItems>
     </div>
   );
 }

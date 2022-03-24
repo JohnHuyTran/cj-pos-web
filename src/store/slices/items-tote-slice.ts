@@ -8,16 +8,16 @@ const initialState: ItemsState = {
   state: {},
 };
 
-export const AddItemsSlice = createSlice({
-  name: 'addItems',
+export const itemsToteSlice = createSlice({
+  name: 'itemsTote',
   initialState,
   reducers: {
-    updateAddItemsState: (state, action: PayloadAction<any>) => {
+    updateItemsToteState: (state, action: PayloadAction<any>) => {
       state.state = action.payload;
     },
   },
 });
 
-export const { updateAddItemsState } = AddItemsSlice.actions;
+export const { updateItemsToteState } = itemsToteSlice.actions;
 
-export default AddItemsSlice.reducer;
+export default itemsToteSlice.reducer;

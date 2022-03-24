@@ -69,6 +69,8 @@ import CheckOrderDetailTote from './check-order-detail-tote';
 import { couldStartTrivia } from 'typescript';
 import OrderReceiveDetail from './order-receive-detail';
 import { searchToteAsync } from '../../store/slices/search-tote-slice';
+import CheckOrderDetailItems from '../check-orders/check-order-detail-items';
+import { featchOrderDetailToteAsync } from '../../store/slices/check-order-detail-tote-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -377,41 +379,76 @@ export default function CheckOrderDetail({
     await dispatch(updateAddItemsState(items));
   };
 
-  let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
-  if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
-    console.log('update state order detail 1');
-    updateState(entries);
-  }
+  const [openTote, setOpenTote] = React.useState(false);
+  const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
+
   let rowsEntries: any = [];
-  if (Object.keys(payloadAddItem).length !== 0) {
-    rowsEntries = payloadAddItem.map((item: any, index: number) => {
-      let qtyRef: number = 0;
-      let actualQty: number = 0;
 
-      if (item.id !== null && item.id !== undefined) {
-        qtyRef = Number(item.qtyRef) ? Number(item.qtyRef) : 0;
-        actualQty = Number(item.qty) ? Number(item.qty) : Number(item.actualQty) ? Number(item.actualQty) : 0;
-      } else {
-        qtyRef = Number(item.qty);
-        actualQty = Number(item.actualQty);
-      }
-
-      return {
-        rowOrder: index + 1,
-        id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
-        deliveryOrderNo: item.deliveryOrderNo,
-        isTote: item.isTote ? item.isTote : false,
-        sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
-        skuCode: item.skuCode,
-        barcode: item.barcode,
-        productName: item.productName,
-        unitName: item.unitName,
-        qtyRef: qtyRef,
-        actualQty: actualQty,
-        qtyDiff: item.qtyDiff,
-        comment: item.comment,
+  const handleOpenModalTote = async (value: string, isAddItem: boolean) => {
+    rowsEntries = [];
+    if (isAddItem === false) {
+      // await dispatch(updateAddItemsState({}));
+      await dispatch(featchOrderDetailToteAsync(value)).then(() => {});
+      await setOpenTote(true);
+    } else if (isAddItem === true) {
+      handleOpenLoading('open', true);
+      const payload: ToteRequest = {
+        docRefNo: docRefNo,
+        toteCode: value,
       };
-    });
+      // await dispatch(updateAddItemsState({}));
+      await dispatch(searchToteAsync(payload));
+      await setOpenOrderReceiveModal(true);
+      handleOpenLoading('open', false);
+    }
+  };
+
+  function handleCloseDetailToteModal() {
+    setOpenTote(false);
+    onClickClose();
+  }
+
+  function handleCloseOrderReceiveModal() {
+    setOpenOrderReceiveModal(false);
+    onClickClose();
+  }
+
+  if (openTote === false) {
+    let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
+    if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
+      updateState(entries);
+    }
+
+    if (Object.keys(payloadAddItem).length !== 0) {
+      rowsEntries = payloadAddItem.map((item: any, index: number) => {
+        let qtyRef: number = 0;
+        let actualQty: number = 0;
+
+        if (item.id !== null && item.id !== undefined) {
+          qtyRef = Number(item.qtyRef) ? Number(item.qtyRef) : 0;
+          actualQty = Number(item.qty) ? Number(item.qty) : Number(item.actualQty) ? Number(item.actualQty) : 0;
+        } else {
+          qtyRef = Number(item.qty);
+          actualQty = Number(item.actualQty);
+        }
+
+        return {
+          rowOrder: index + 1,
+          id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
+          deliveryOrderNo: item.deliveryOrderNo,
+          isTote: item.isTote ? item.isTote : false,
+          sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
+          skuCode: item.skuCode,
+          barcode: item.barcode,
+          productName: item.productName,
+          unitName: item.unitName,
+          qtyRef: qtyRef,
+          actualQty: actualQty,
+          qtyDiff: item.qtyDiff,
+          comment: item.comment,
+        };
+      });
+    }
   }
 
   function handleNotExitModelConfirm() {
@@ -739,37 +776,6 @@ export default function CheckOrderDetail({
     setUploadFileFlag(status);
   };
 
-  const [openTote, setOpenTote] = React.useState(false);
-  const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
-
-  const handleOpenModalTote = async (value: string, isAddItem: boolean) => {
-    if (isAddItem === false) {
-      setOpenTote(true);
-      await dispatch(updateAddItemsState({}));
-      await dispatch(featchOrderDetailAsync(value));
-    } else if (isAddItem === true) {
-      handleOpenLoading('open', true);
-      const payload: ToteRequest = {
-        docRefNo: docRefNo,
-        toteCode: value,
-      };
-      await dispatch(updateAddItemsState({}));
-      await dispatch(searchToteAsync(payload));
-      await setOpenOrderReceiveModal(true);
-      handleOpenLoading('open', false);
-    }
-  };
-
-  function handleCloseDetailToteModal() {
-    setOpenTote(false);
-    onClickClose();
-  }
-
-  function handleCloseOrderReceiveModal() {
-    setOpenOrderReceiveModal(false);
-    onClickClose();
-  }
-
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -996,6 +1002,7 @@ export default function CheckOrderDetail({
                 style={{ width: '100%', height: rowsEntries.length >= 8 ? '70vh' : 'auto' }}
                 className={classes.MdataGridDetail}
               >
+                {/* {!openTote && <CheckOrderDetailItems rowList={rowsEntries} />} */}
                 <DataGrid
                   rows={rowsEntries}
                   columns={columns}

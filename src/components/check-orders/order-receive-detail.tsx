@@ -27,6 +27,8 @@ import { EntryTote } from '../../models/order-model';
 import CheckOrderDetailTote from './check-order-detail-tote';
 import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { updateItemsToteState } from '../../store/slices/items-tote-slice';
+import { featchOrderDetailToteAsync } from '../../store/slices/check-order-detail-tote-slice';
 
 export interface OrderReceiveDetailProps {
   defaultOpen: boolean;
@@ -187,7 +189,8 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
     await submitTote(data)
       .then((resp) => {
         dispatch(updateAddItemsState({}));
-        dispatch(featchOrderDetailAsync(resp.sdNo));
+        dispatch(updateItemsToteState({}));
+        dispatch(featchOrderDetailToteAsync(resp.sdNo));
         setOpenTote(true);
         setOpen(false);
       })
