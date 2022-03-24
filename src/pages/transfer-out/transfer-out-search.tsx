@@ -24,7 +24,7 @@ import { getUserInfo } from '../../store/sessionStore';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { BranchListOptionType } from '../../models/branch-model';
 import { isGroupBranch } from '../../utils/role-permission';
-import TransferOutList from './transfer-out-list';
+// import TransferOutList from './transfer-out-list';
 import SelectBranch from './transfer-out-branch';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
