@@ -157,8 +157,10 @@ const columns: GridColDef[] = [
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
+          
           let actualQty = Number(params.getValue(params.id, 'actualQty'));
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
+          
           if (actualQty === 0) value = chkActualQty(value);
           if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, actualQty: value }]);
@@ -510,7 +512,8 @@ export default function CheckOrderDetail({
   const [sumActualQty, setSumActualQty] = React.useState(0);
   const [sumQuantityRef, setSumQuantityRef] = React.useState(0);
   const handleApproveBtn = async () => {
-    setItemsDiffState([]);
+    mapUpdateState().then(() => {
+      setItemsDiffState([]);
     setOpenModelConfirm(true);
     setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -554,6 +557,8 @@ export default function CheckOrderDetail({
     setSumActualQty(sumActualQtyItems);
     setSumQuantityRef(sumQuantityRefItems);
     // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
+    })
+    
   };
 
   const handleApproveOCBtn = async () => {
@@ -794,7 +799,7 @@ export default function CheckOrderDetail({
                   )}
               </Grid>
               <Grid item lg={4}>
-                {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
+                {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && !statusOC && (
                   <AccordionUploadFile
                     files={[]}
                     docNo=""
