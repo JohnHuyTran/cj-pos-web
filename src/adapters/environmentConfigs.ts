@@ -3,7 +3,10 @@ export const env: any = {
     url: process.env.REACT_APP_POS_BACK_BE_URL,
     timeout: process.env.REACT_APP_POS_BACK_BE_TIME_OUT,
   },
-
+  printer: {
+    url: process.env.REACT_APP_POS_BACK_PRINTER,
+    timeout: process.env.REACT_APP_POS_BACK_BE_TIME_OUT,
+  },
   keycloak: {
     url: {
       authentication: process.env.REACT_APP_KEYCLOAK_AUTHENTICATION_URL,
