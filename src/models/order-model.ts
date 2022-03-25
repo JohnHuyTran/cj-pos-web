@@ -269,3 +269,72 @@ export interface OrderReceiveEntry {
   comment: string;
   isTote: boolean;
 }
+
+export interface ToteResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: ToteInfo | null;
+}
+
+export interface ToteInfo {
+  boxCnt: number;
+  comment: string;
+  docRefNo: string;
+  docType: string;
+  entries: EntryTote[];
+  id: string;
+  sapDocType: string;
+  sdNo: string;
+  sdStatus: string;
+  sdType: string;
+  shipBranchFrom: shipBranchInfo;
+  shipBranchTo: shipBranchInfo;
+  shipmentDate: string;
+  shipmentNo: string;
+  status: string;
+  toteCnt: number;
+  toteCode: number;
+}
+
+export interface EntryTote {
+  actualQty: number;
+  barcode: string;
+  comment: string;
+  deliveryOrderNo: string;
+  expireDate: string;
+  isControlStock: number;
+  isTote: boolean;
+  itemNo: string;
+  price: number;
+  productName: string;
+  qty: number;
+  qtyAll: number;
+  qtyAllBefore: number;
+  qtyDiff: number;
+  seqItem: number;
+  shipmentSAPRef: string;
+  skuCode: string;
+  skuType: string;
+  toteCode: string;
+  unitCode: string;
+  unitFactor: number;
+  unitName: string;
+}
+
+export interface ToteRequest {
+  docRefNo: string;
+  toteCode: string;
+}
+
+export interface ItemSubmitToteRequst {
+  shipmentNo: string;
+  toteCode: string;
+  items: ItemRequest[];
+}
+
+export interface ItemRequest {
+  barcode: string;
+  actualQty: number;
+  comment?: string;
+}

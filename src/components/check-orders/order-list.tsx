@@ -211,12 +211,16 @@ function OrderList() {
     await dispatch(updateAddItemsState({}));
     await dispatch(featchOrderDetailAsync(params.row.sdNo))
       .then(
-        async function (value) {
+        () => {
           setOpens(true);
-        },
-        function (error: ApiError) {
-          console.log('err message : ', error.message);
         }
+
+        // async function (value) {
+        //   setOpens(true);
+        // },
+        // function (error: ApiError) {
+        //   console.log('err message : ', error.message);
+        // }
       )
       .catch((err) => {
         console.log('err : ', err);
@@ -302,10 +306,7 @@ function OrderList() {
   return (
     <div>
       {/* <Box mt={2} bgcolor="background.paper"> */}
-      <div
-        className={classes.MdataGridPaginationTop}
-        style={{ height: rows.length >= 10 ? '80vh' : 'auto', width: '100%' }}
-      >
+      <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
         <DataGrid
           rows={rows}
           columns={columns}

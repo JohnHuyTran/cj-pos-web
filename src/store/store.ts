@@ -54,6 +54,9 @@ import taxInvoiceSearchList from './slices/tax-invoice-search-list-slice';
 import searchProvincesSlice from './slices/search-provinces-slice';
 import searchDistrictsSlice from './slices/search-districts-slice';
 import searchSubDistrictsSlice from './slices/search-subDistricts-slice';
+import searchToteSlice from './slices/search-tote-slice';
+import itemsToteSlice from './slices/items-tote-slice';
+import checkOrderToteSlice from './slices/check-order-detail-tote-slice';
 
 const store = configureStore({
   reducer: {
@@ -111,6 +114,9 @@ const store = configureStore({
     searchProvincesSlice: searchProvincesSlice,
     searchDistrictsSlice: searchDistrictsSlice,
     searchSubDistrictsSlice: searchSubDistrictsSlice,
+    searchToteSlice: searchToteSlice,
+    itemsToteSlice: itemsToteSlice,
+    checkOrderToteSlice: checkOrderToteSlice,
   },
 });
 
