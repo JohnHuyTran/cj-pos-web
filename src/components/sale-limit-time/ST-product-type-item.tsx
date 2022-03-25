@@ -2,12 +2,11 @@ import React, { ReactElement, useEffect } from 'react';
 import Dialog from '@mui/material/Dialog';
 import { Box, Button, DialogActions, DialogContent, DialogContentText, Grid, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
-import { DataGrid, GridColDef } from '@material-ui/data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
-import { GridSelectionModel } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridSelectionModel } from '@mui/x-data-grid';
 import { setCheckEdit, setProductList } from '../../store/slices/sale-limit-time-slice';
 
 const _ = require('lodash');
