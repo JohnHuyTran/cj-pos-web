@@ -3,27 +3,20 @@ import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mu
 import React, { useEffect, useState } from 'react';
 import { useStyles } from '../../styles/makeTheme';
 import { useTranslation } from 'react-i18next';
-import {
-  BarcodeDiscount,
-  BarcodeDiscountProductDetail,
-  BarcodeDiscountSearchRequest,
-  BarcodeDiscountSearchResponse,
-} from '../../models/barcode-discount-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { Action, BDStatus, DateFormat, TOStatus } from '../../utils/enum/common-enum';
-import { genColumnValue, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
+import { objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import HtmlTooltip from '../../components/commons/ui/html-tooltip';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
-import ModalCreateBarcodeDiscount from '../../components/barcode-discount/modal-create-barcode-discount';
-import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-detail-slice';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
-import { updateBarcodeDiscountPrintState, updatePrintInDetail } from '../../store/slices/barcode-discount-print-slice';
 import moment from 'moment';
-import { TransferOut, TransferOutSearchResponse } from '../../models/transfer-out-model';
+import { TransferOut, TransferOutSearchRequest, TransferOutSearchResponse } from '../../models/transfer-out-model';
+import ModalCreateTransferOut from "../../components/transfer-out/modal-create-transfer-out";
+import { getTransferOutDetail } from "../../store/slices/transfer-out-detail-slice";
 
 const _ = require('lodash');
 
@@ -244,7 +237,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
     setLoading(true);
     let page: string = (newPage + 1).toString();
 
-    const payloadNewPage: BarcodeDiscountSearchRequest = {
+    const payloadNewPage: TransferOutSearchRequest = {
       perPage: pageSize,
       page: page,
       query: payload.query,
@@ -262,7 +255,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
   const handlePageSizeChange = async (pageSize: number) => {
     setPageSize(pageSize.toString());
     setLoading(true);
-    const payloadNewPage: BarcodeDiscountSearchRequest = {
+    const payloadNewPage: TransferOutSearchRequest = {
       perPage: pageSize.toString(),
       page: '1',
       query: payload.query,
@@ -277,14 +270,14 @@ const TransferOutList: React.FC<StateProps> = (props) => {
     setLoading(false);
   };
 
-  const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail);
+  const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail);
   const currentlySelected = async (params: GridCellParams) => {
     const chkPN = params.colDef.field;
     handleOpenLoading('open', true);
     if (chkPN !== 'checked') {
       try {
-        await dispatch(getBarcodeDiscountDetail(params.row.id));
-        if (barcodeDiscountDetail.data.length > 0 || barcodeDiscountDetail.data) {
+        await dispatch(getTransferOutDetail(params.row.id));
+        if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
           setOpenDetail(true);
         }
       } catch (error) {
@@ -306,7 +299,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
             columns={columns}
             disableColumnMenu
             hideFooterSelectedRowCount={true}
-            // onCellClick={currentlySelected}
+            onCellClick={currentlySelected}
             autoHeight={lstTransferOut.length < 10}
             scrollbarSize={10}
             pagination
@@ -323,7 +316,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
         </div>
       </Box>
       {openDetail && (
-        <ModalCreateBarcodeDiscount
+        <ModalCreateTransferOut
           isOpen={openDetail}
           onClickClose={handleCloseDetail}
           action={Action.UPDATE}

@@ -142,13 +142,13 @@ const TransferOutSearch = () => {
     setValues({
       documentNumber: '',
       branch: '',
-      status: approvePermission ? 'รออนุมัติ' : requestPermission ? 'บันทึก' : 'ALL',
+      status: approvePermission ? TOStatus.WAIT_FOR_APPROVAL : requestPermission ? TOStatus.DRAFT : 'ALL',
       fromDate: new Date(),
       approveDate: new Date(),
     });
 
     const payload: TransferOutSearchRequest = {
-      perPage: limit.toString(),
+      perPage: (limit ? limit : 10).toString(),
       page: page,
       query: values.documentNumber,
       branch: values.branch,
@@ -194,7 +194,6 @@ const TransferOutSearch = () => {
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
     };
-    console.log(payload);
 
     handleOpenLoading('open', true);
     await dispatch(transferOutGetSearch(payload));

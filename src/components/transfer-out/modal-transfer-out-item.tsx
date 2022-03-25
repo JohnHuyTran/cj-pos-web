@@ -22,10 +22,9 @@ import {
   updateDataDetail,
   updateErrorList,
 } from '../../store/slices/transfer-out-slice';
-import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, BDStatus } from '../../utils/enum/common-enum';
+import { Action, BDStatus, TOStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import HtmlTooltip from '../commons/ui/html-tooltip';
@@ -229,7 +228,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     {
       field: 'index',
       headerName: 'ลำดับ',
-      flex: 0.5,
+      flex: 0.4,
       headerAlign: 'center',
       align: 'center',
       disableColumnMenu: false,
@@ -251,7 +250,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     {
       field: 'barcodeName',
       headerName: 'รายละเอียด',
-      flex: 1.5,
+      flex: 1.4,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -267,7 +266,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     {
       field: 'unit',
       headerName: 'หน่วย',
-      flex: 0.6,
+      flex: 0.5,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -343,7 +342,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     {
       field: 'remark',
       headerName: 'หมายเหตุ',
-      flex: 1.3,
+      flex: 1.2,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -372,7 +371,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
       flex: 0.3,
       align: 'center',
       sortable: false,
-      hide: Number(BDStatus.DRAFT) < dataDetail.status,
+      hide: (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT),
       renderCell: (params: GridRenderCellParams) => {
         const [openModalDelete, setOpenModalDelete] = React.useState<boolean>(false);
 

@@ -185,7 +185,7 @@ const BarcodeDiscountSearch = () => {
     });
 
     const payload: BarcodeDiscountSearchRequest = {
-      perPage: limit.toString(),
+      perPage: (limit ? limit : 10).toString(),
       page: page,
       query: values.documentNumber,
       branch: values.branch,

@@ -564,9 +564,9 @@ export default function ModalCreateTransferOut({
           <StepperBar activeStep={status} setActiveStep={setStatus}/>
         </BootstrapDialogTitle>
         <DialogContent>
-          <Grid container mt={1}>
+          <Grid container mt={1} mb={-1}>
             {/*line 1*/}
-            <Grid item container xs={4} mb={4}>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 สาขา :
               </Grid>
@@ -574,7 +574,7 @@ export default function ModalCreateTransferOut({
                 {currentBranch}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={4}>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 เลขที่เอกสารเบิก :
               </Grid>
@@ -582,7 +582,7 @@ export default function ModalCreateTransferOut({
                 {!!dataDetail.documentNumber ? dataDetail.documentNumber : '_'}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={4} pl={2}>
+            <Grid item container xs={4} mb={5} pl={2}>
               <Grid item xs={4}>
                 วันที่ทำรายการ :
               </Grid>
@@ -591,7 +591,7 @@ export default function ModalCreateTransferOut({
               </Grid>
             </Grid>
             {/*line 2*/}
-            <Grid item container xs={4} mb={4}>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 วันที่อนุมัติ :
               </Grid>
@@ -599,7 +599,7 @@ export default function ModalCreateTransferOut({
                 {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={4}>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 เหตุผลการเบิก
               </Grid>
@@ -630,7 +630,7 @@ export default function ModalCreateTransferOut({
                 </FormControl>
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={4} pl={2}>
+            <Grid item container xs={4} mb={5} pl={2}>
               <Grid item xs={4}>
                 คลัง
               </Grid>
@@ -662,7 +662,7 @@ export default function ModalCreateTransferOut({
               </Grid>
             </Grid>
             {/*line 3*/}
-            <Grid container item xs={4} mb={4} mt={-1}>
+            <Grid container item xs={4} mb={5} mt={-1}>
               <Grid item xs={4}>
                 แนบรูปสินค้าขอส่วนลด :
               </Grid>
