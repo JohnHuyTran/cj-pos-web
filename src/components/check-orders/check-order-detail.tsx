@@ -337,33 +337,38 @@ export default function CheckOrderDetail({
     setDisplayBranchGroup(branch);
     setStatusOC(oc);
 
-    setShowSaveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
-    setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1);
-    setShowApproveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
-    setShowCloseJobBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
-    setShowSdTypeTote(orderDetail.sdType === 0);
-    setCloseJobTote(
-      orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && orderDetail.sdType === 0
-    );
+    if (orderDetail) {
+      setShowSaveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
+      setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1);
+      setShowApproveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
+      setShowCloseJobBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
+      setShowSdTypeTote(orderDetail.sdType === 0);
+      setCloseJobTote(
+        orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && orderDetail.sdType === 0
+      );
 
-    // setOpen(defaultOpen);
-    setShipmentStatusText(getShipmentStatusText(orderDetail.sdStatus));
-    setShipmentTypeText(getShipmentTypeText(orderDetail.sdType));
-    setShipmentDateFormat(convertUtcToBkkDate(orderDetail.receivedDate));
-    if (orderDetail.Comment !== '') {
-      dispatch(featchOrderSDListAsync(orderDetail.Comment));
+      // setOpen(defaultOpen);
+      setShipmentStatusText(getShipmentStatusText(orderDetail.sdStatus));
+      setShipmentTypeText(getShipmentTypeText(orderDetail.sdType));
+      if (orderDetail.receivedDate) setShipmentDateFormat(convertUtcToBkkDate(orderDetail.receivedDate));
+      if (orderDetail.Comment !== '') {
+        dispatch(featchOrderSDListAsync(orderDetail.Comment));
+      }
+
+      if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
+        let sumActualQtyItems: number = 0;
+        let sumQuantityRefItems: number = 0;
+        if (Object.keys(payloadAddItem).length > 0) {
+          rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
+            sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
+            sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
+          });
+
+          handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
+        }
+      }
     }
 
-    if (docType === 'LD') {
-      let sumActualQtyItems: number = 0;
-      let sumQuantityRefItems: number = 0;
-      rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
-        sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
-        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
-      });
-
-      handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
-    }
     // }, [open, openModelConfirm]);
   }, [open]);
 
