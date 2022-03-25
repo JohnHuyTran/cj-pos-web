@@ -140,7 +140,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
         if(!params.row?.id || d?.id !== params.row?.id) return d;
         return {
           ...d, 
-          checked: event?.target?.checked || d.checked,
+          checked: event?.target?.checked,
         };
       });
     });
