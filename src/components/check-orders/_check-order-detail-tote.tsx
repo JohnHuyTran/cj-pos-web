@@ -44,7 +44,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import { styled } from '@mui/material/styles';
 import { updateItemsToteState } from '../../store/slices/items-tote-slice';
-import { gridColumnsTotalWidthSelector } from '@material-ui/data-grid';
 import CheckOrderDetailItems from '../check-orders/check-order-detail-items';
 
 export interface CheckOrderDetailToteProps {

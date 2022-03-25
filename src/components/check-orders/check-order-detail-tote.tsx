@@ -45,7 +45,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ModalAddItemsTote from '../commons/ui/modal-add-items-tote';
 import { styled } from '@mui/material/styles';
 import { updateItemsToteState } from '../../store/slices/items-tote-slice';
-import { gridColumnsTotalWidthSelector } from '@material-ui/data-grid';
 import CheckOrderDetailItems from '../check-orders/check-order-detail-items';
 import AlertError from '../commons/ui/alert-error';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
