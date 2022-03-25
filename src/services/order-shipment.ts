@@ -1,6 +1,6 @@
 import { get, post, put, putData } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
-import { SaveDraftSDRequest, GenerateBORequest, ItemsApprove } from '../models/order-model';
+import { SaveDraftSDRequest, GenerateBORequest, ItemsApprove, ItemSubmitToteRequst } from '../models/order-model';
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
 import { ApiError } from '../models/api-error-model';
@@ -88,6 +88,15 @@ export async function approveOrderShipmentsOC(sdNo: string) {
     return response;
   } catch (error) {
     console.log('error = ', error);
+    throw error;
+  }
+}
+
+export async function submitTote(payload: ItemSubmitToteRequst) {
+  try {
+    const response = await post(environment.orders.tote.submitTote.url, payload).then((result: any) => result);
+    return response;
+  } catch (error) {
     throw error;
   }
 }

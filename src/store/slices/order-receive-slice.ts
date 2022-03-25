@@ -38,8 +38,6 @@ export const searchOrderReceiveAsync = createAsyncThunk('searchOrderReceive', as
     } else {
       return response;
     }
-
-    console.log('response: ', response);
   } catch (error) {
     throw error;
   }
