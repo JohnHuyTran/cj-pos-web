@@ -17,7 +17,6 @@ import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import ReasonsListDropDown from '../stock-transfer/transfer-reasons-list-dropdown';
-import { gridColumnsTotalWidthSelector } from '@material-ui/data-grid';
 import LoadingModal from '../commons/ui/loading-modal';
 import AlertError from '../../components/commons/ui/alert-error';
 import { StockTransferRequest } from '../../models/stock-transfer-model';

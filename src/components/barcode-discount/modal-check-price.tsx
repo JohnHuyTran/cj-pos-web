@@ -2,10 +2,10 @@ import { ReactElement } from 'react';
 import Dialog from '@mui/material/Dialog';
 import { Box, Button, DialogActions, DialogContent, DialogContentText, TextField, Typography } from '@mui/material';
 import { ErrorOutline } from '@mui/icons-material';
-import { DataGrid, GridColDef } from '@material-ui/data-grid';
 import { useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { numberWithCommas } from '../../utils/utils';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 interface Props {
   open: boolean;

@@ -9,9 +9,7 @@ import { useStyles } from './date-picker-css';
 import { DatePicker, MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import CalendarToday from '@mui/icons-material/CalendarToday';
 import IconButton from '@mui/material/IconButton';
-
 interface StateProps {
   onClickDate: any;
   value: any | Date | number | string;
