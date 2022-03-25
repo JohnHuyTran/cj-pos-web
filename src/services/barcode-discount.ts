@@ -1,4 +1,5 @@
 import { deleteData, get, post, put } from '../adapters/posback-adapter';
+import {  post as postPrinter } from '../adapters/posback-printer-adapter';
 import { environment } from '../environment-base';
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
@@ -50,7 +51,7 @@ export async function rejectBarcodeDiscount(id: string, reason: string) {
 
 export async function printBarcodeDiscount(payload: any) {
   try {
-    const response = await post(`${env.backEnd.url}${environment.sell.barcodeDiscount.print.url}`, payload);
+    const response = await postPrinter(`${env.printer.url}${environment.sell.barcodeDiscount.print.url}`, payload);
     return response;
   } catch (error) {
     throw error;
