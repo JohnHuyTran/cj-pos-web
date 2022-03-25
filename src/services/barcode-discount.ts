@@ -51,7 +51,7 @@ export async function rejectBarcodeDiscount(id: string, reason: string) {
 
 export async function printBarcodeDiscount(payload: any) {
   try {
-    const response = await postPrinter(`${env.printer.url}${environment.sell.barcodeDiscount.print.url}`, payload);
+    const response = await postPrinter(`${environment.sell.barcodeDiscount.print.url}`, payload);
     return response;
   } catch (error) {
     throw error;

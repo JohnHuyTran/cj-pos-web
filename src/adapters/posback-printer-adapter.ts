@@ -61,67 +61,6 @@ instance.interceptors.response.use(
   }
 );
 
-export function get(path: string, contentType = defaultForJSON) {
-  contentType = contentType;
-  return instance
-    .get(path)
-    .then((result: any) => {
-      if (result.status == 200) {
-        return result.data;
-      } else if (result.status == 204) {
-        return result.status;
-      }
-    })
-    .catch((error: any) => {
-      if (error.code === 'ECONNABORTED') {
-        const err = new ApiError(
-          error.response?.status,
-          ERROR_CODE.TIME_OUT,
-          'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
-        );
-        throw err;
-      }
-
-      const err = new ApiError(
-        error.response?.status,
-        error.response?.data.error_code,
-        error.response?.data.error_message
-      );
-      throw err;
-    });
-}
-
-export function getFile(path: string, contentType = defaultForJSON) {
-  contentType = contentType;
-
-  return instance
-    .get(path, {
-      responseType: 'blob',
-    })
-    .then((result: any) => {
-      if (result.status == 200) {
-        return result;
-      }
-    })
-    .catch((error: any) => {
-      if (error.code === 'ECONNABORTED') {
-        const err = new ApiError(
-          error.response?.status,
-          ERROR_CODE.TIME_OUT,
-          'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
-        );
-        throw err;
-      }
-
-      const err = new ApiError(
-        error.response?.status,
-        error.response?.data.error_code,
-        error.response?.data.error_message
-      );
-      throw err;
-    });
-}
-
 export function post(path: string, payload?: any, contentType = defaultForJSON, actionType?: string) {
   contentType = contentType;
   return instance
@@ -142,66 +81,6 @@ export function post(path: string, payload?: any, contentType = defaultForJSON, 
         throw err;
       }
 
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
-      throw err;
-    });
-}
-
-export function put(path: string, payload: any, contentType = defaultForJSON) {
-  contentType = contentType;
-  return instance
-    .put(path, payload)
-    .then((response: AxiosResponse) => {
-      if (response.status == 200 || response.status == 201) {
-        return response.data;
-      }
-      const err = new ApiError(response.status, response.status, response.statusText);
-      throw err;
-    })
-    .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
-      throw err;
-    });
-}
-
-export function putData(path: string, contentType = defaultForJSON) {
-  contentType = contentType;
-  return instance
-    .put(path)
-    .then((response: AxiosResponse) => {
-      if (response.status == 200 || response.status == 201) {
-        return response.data;
-      }
-      const err = new ApiError(response.status, response.status, response.statusText);
-      throw err;
-    })
-    .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
-      throw err;
-    });
-}
-
-export function deleteData(path: string, contentType = defaultForJSON) {
-  contentType = contentType;
-  return instance
-    .delete(path)
-    .then((result: any) => {
-      return result;
-    })
-    .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
-      throw err;
-    });
-}
-
-export function deleteDataBody(path: string, payload: any, contentType = defaultForJSON) {
-  contentType = contentType;
-  return instance
-    .delete(path, { data: payload })
-    .then((response: AxiosResponse) => {
-      return response;
-    })
-    .catch((error: any) => {
       const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
