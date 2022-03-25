@@ -577,7 +577,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             id='btnApprove'
             variant='contained'
             color='primary'
-            className={classes.MbtnApprove}
+            className={classes.MbtnSendDC}
             onClick={handleConfirmBtn}
             startIcon={<CheckCircleOutline />}
             sx={{ width: 200 }}>

@@ -13,13 +13,13 @@ import {
   Typography,
 } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
-import { DataGrid, GridColDef } from '@material-ui/data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { STProductDetail } from '../../models/sale-limit-time';
 import { setCheckEdit, setProductList } from '../../store/slices/sale-limit-time-slice';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 const _ = require('lodash');
 

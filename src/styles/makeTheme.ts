@@ -308,6 +308,14 @@ const useStyles = makeStyles({
     boxShadow: 'none !important',
     }
   },
+  MbtnSendDC: {
+    '&.MuiButton-root': {
+    width: '150px',
+    borderRadius: '4px !important',
+    marginLeft: '10px !important',
+    boxShadow: 'none !important',
+    }
+  },
   MbtnBrowse: {
     '&.MuiButton-root': {
     width: '125px',

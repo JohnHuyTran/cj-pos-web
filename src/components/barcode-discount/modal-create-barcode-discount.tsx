@@ -48,12 +48,13 @@ import { ACTIONS } from "../../utils/enum/permission-enum";
 import ModalReject from "./modal-reject";
 import { PrintSharp } from "@mui/icons-material";
 import ModalConfirmPrintedBarcode from "./modal-confirm-printed-barcode";
-import { DataGrid, GridColDef } from "@material-ui/data-grid";
+
 import { getReasonForPrintText } from "../../utils/enum/barcode-discount-enum";
 import { getBarcodeDiscountDetail } from "../../store/slices/barcode-discount-detail-slice";
 import { uploadFileState } from "../../store/slices/upload-file-slice";
 import AccordionUploadFile from "../commons/ui/accordion-upload-file";
 import { getUserInfo } from "../../store/sessionStore";
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 interface Props {
   action: Action | Action.INSERT;
