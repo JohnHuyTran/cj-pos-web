@@ -31,7 +31,7 @@ interface Props {
   isStatus: boolean;
   onChangeUploadFile: (status: boolean) => void;
   onDeleteAttachFile?: (item: any) => void;
-  enabledControl: boolean;
+  enabledControl?: boolean;
   warningMessage?: string;
 }
 
@@ -242,7 +242,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
             variant='contained'
             component='span'
             className={classes.MbtnBrowse}
-            disabled={newFileDisplayList.length === 5 || !enabledControl}
+            disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl)}
           >
             แนบไฟล์
           </Button>
@@ -259,10 +259,10 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
         // multiple
         // onDrop
         accept='.pdf, .jpg, .jpeg'
-        onChange={handleFileInputChange}
         onClick={handleFileInputClick}
+        onChange={handleFileInputChange}
         style={{ display: 'none' }}
-        disabled={newFileDisplayList.length === 5 || !enabledControl}
+        disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl)}
       />
 
       <Box
@@ -316,7 +316,8 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
                   </Typography>
                 )}
 
-                <IconButton sx={{ display: enabledControl ? undefined: 'none'}}
+                <IconButton sx={{ display: ((!stringNullOrEmpty(enabledControl) && !enabledControl)
+                                        || (onDeleteAttachFile && item.status === 'old')) ? 'none' : undefined}}
                             onClick={() => onDeleteAttachFile ? handleDeleteAttachFile(item) : handleDelete(item)} size="small">
                   <CloseIcon fontSize="small" color="error" />
                 </IconButton>
