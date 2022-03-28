@@ -26,7 +26,6 @@ import logoImage from '../../assets/images/CJlogo.jpeg';
 import { featchAuthorizedBranchListAsync } from '../../store/slices/authorized-branch-slice';
 
 interface State {
-  branch: string;
   userId: string;
   password: string;
   showPassword: boolean;
@@ -38,8 +37,7 @@ function LoginForm() {
   const [values, setValues] = React.useState<State>({
     password: '',
     userId: '',
-    showPassword: false,
-    branch: '',
+    showPassword: false
   });
   // console.log(isAllowPermission('FEATURE.ADMIN.SEARCH.DATA'));
   const dispatch = useAppDispatch();
@@ -64,7 +62,6 @@ function LoginForm() {
     const form: loginForm = {
       userId: values.userId,
       password: values.password,
-      branchCode: values.branch,
     };
     dispatch(loginKeyCloakAsync(form));
   };
@@ -83,7 +80,7 @@ function LoginForm() {
 
           <div id='error'> {error && <p style={{ color: 'red', fontSize: '12px' }}>{t(error)}</p>}</div>
           <div>
-            <FormControl sx={{ m: 3, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
+            <FormControl sx={{ m: 5, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
               <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>
                 รหัสผู้ใช้งาน
               </FormHelperText>
@@ -99,7 +96,7 @@ function LoginForm() {
             </FormControl>
           </div>
           <div>
-            <FormControl sx={{ m: 3, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
+            <FormControl sx={{ m: 5, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
               <FormHelperText id='outlined-password-text' sx={{ ml: 0 }}>
                 รหัสผ่าน
               </FormHelperText>
@@ -126,19 +123,8 @@ function LoginForm() {
             </FormControl>
           </div>
           <div>
-            <FormControl sx={{ m: 3, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
-              <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>
-                สาขา
-              </FormHelperText>
-              <OutlinedInput
-                id='txtBranchCoce'
-                value={values.branch}
-                onChange={handleChange('branch')}
-                aria-describedby='outlined-user-id-text'
-                inputProps={{
-                  'aria-label': 'weight',
-                }}
-              />
+            <FormControl sx={{ m: 15, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
+
             </FormControl>
           </div>
           <div>
