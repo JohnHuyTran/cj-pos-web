@@ -787,7 +787,7 @@ function STCreateModal({
                       </Button>
                       <label htmlFor="import-st-button-file">
                         {Object.keys(payloadAddTypeProduct).length === 0 && (
-                          <Input id="import-st-button-file" type="file" onChange={handleImportFile} />
+                          <Input id="import-st-button-file" type="file" onChange={handleImportFile}  style={{ display: 'none' }}/>
                         )}
                         <Button
                           id="btnImport"
