@@ -33,10 +33,11 @@ interface Props {
   onDeleteAttachFile?: (item: any) => void;
   enabledControl?: boolean;
   warningMessage?: string;
+  deletePermission?: boolean;
 }
 
 function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFile,
-                               onDeleteAttachFile, enabledControl, warningMessage}: Props): ReactElement {
+                               onDeleteAttachFile, enabledControl, warningMessage, deletePermission}: Props): ReactElement {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
@@ -317,7 +318,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
                 )}
 
                 <IconButton sx={{ display: ((!stringNullOrEmpty(enabledControl) && !enabledControl)
-                                        || (onDeleteAttachFile && item.status === 'old')) ? 'none' : undefined}}
+                                        || (!stringNullOrEmpty(deletePermission) && !deletePermission && item.status === 'old')) ? 'none' : undefined}}
                             onClick={() => onDeleteAttachFile ? handleDeleteAttachFile(item) : handleDelete(item)} size="small">
                   <CloseIcon fontSize="small" color="error" />
                 </IconButton>

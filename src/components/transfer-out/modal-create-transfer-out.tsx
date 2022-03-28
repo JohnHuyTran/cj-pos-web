@@ -714,6 +714,7 @@ export default function ModalCreateTransferOut({
                     || TOStatus.WAIT_FOR_APPROVAL === status
                     || TOStatus.APPROVED === status}
                   warningMessage={attachFileError}
+                  deletePermission={TOStatus.DRAFT === status}
                 />
               </Grid>
             </Grid>
