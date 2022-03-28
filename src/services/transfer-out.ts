@@ -31,7 +31,7 @@ export async function cancelTransferOut(id: string) {
   }
 }
 
-export async function approveTransferOut(id: string, payload: Payload) {
+export async function approveTransferOut(id: string, payload: any) {
   try {
     const response = await post(getPathApprove(id), payload);
     return response;

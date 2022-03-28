@@ -341,36 +341,41 @@ export default function ModalCreateTransferOut({
     }
   }
 
+  const handleAllAttachFile = async () => {
+    let allAttachFile = [];
+    if (fileUploadList && fileUploadList.length > 0) {
+      const rsUploadAttachFile = await handleUploadAttachFile();
+      if (rsUploadAttachFile.data && rsUploadAttachFile.data.length > 0) {
+        allAttachFile.push(...rsUploadAttachFile.data);
+      } else {
+        setAlertTextError(rsUploadAttachFile.message ? rsUploadAttachFile.message : 'อัปโหลดไฟล์แนบไม่สำเร็จ');
+        setOpenModalError(true);
+        return;
+      }
+    }
+    if (attachFileOlds && attachFileOlds.length > 0) {
+      for (const oldFile of attachFileOlds) {
+        let attachFileExist = allAttachFile.find((itAll: any) => itAll.name === oldFile.fileName);
+        if (objectNullOrEmpty(attachFileExist)) {
+          allAttachFile.push({
+            key: oldFile.fileKey,
+            name: oldFile.fileName,
+            mimeType: oldFile.mimeType
+          });
+        }
+      }
+    }
+    return allAttachFile;
+  };
+
   const handleCreateDraft = async (sendRequest: boolean) => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     if (validate(false)) {
-      let allAttachFile = [];
-      if (fileUploadList && fileUploadList.length > 0) {
-        const rsUploadAttachFile = await handleUploadAttachFile();
-        if (rsUploadAttachFile.data && rsUploadAttachFile.data.length > 0) {
-          allAttachFile.push(...rsUploadAttachFile.data);
-        } else {
-          setAlertTextError(rsUploadAttachFile.message ? rsUploadAttachFile.message : 'อัปโหลดไฟล์แนบไม่สำเร็จ');
-          setOpenModalError(true);
-          return;
-        }
-      }
-      if (attachFileOlds && attachFileOlds.length > 0) {
-        for (const oldFile of attachFileOlds) {
-          let attachFileExist = allAttachFile.find((itAll: any) => itAll.name === oldFile.fileName);
-          if (objectNullOrEmpty(attachFileExist)) {
-            allAttachFile.push({
-              key: oldFile.fileKey,
-              name: oldFile.fileName,
-              mimeType: oldFile.mimeType
-            });
-          }
-        }
-      }
       const rsCheckStock = await handleCheckStock();
       if (rsCheckStock) {
         await dispatch(save({ ...payloadTransferOut }));
         try {
+          const allAttachFile = await handleAllAttachFile();
           const body = !!dataDetail.id
             ? {
               ...payloadTransferOut,
@@ -477,7 +482,12 @@ export default function ModalCreateTransferOut({
   const handleApprove = async () => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     try {
-      const rs = await approveTransferOut(dataDetail.id, payloadTransferOut.products);
+      const allAttachFile = await handleAllAttachFile();
+      const payload = {
+        products: payloadTransferOut.products,
+        attachFiles: allAttachFile
+      };
+      const rs = await approveTransferOut(dataDetail.id, payload);
       if (rs.code === 20000) {
         dispatch(
           updateDataDetail({
