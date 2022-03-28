@@ -25,6 +25,8 @@ export interface TransferOut {
   branch: string;
   regionId: string;
   requester: string;
+  requestor: string;
+  approver: string;
   requesterId: string;
   documentNumber: string;
   status: string;

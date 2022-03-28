@@ -16,7 +16,6 @@ import { DeleteForever } from '@mui/icons-material';
 import { useStyles } from '../../styles/makeTheme';
 import {
   save,
-  updateApproveReject,
   updateCheckEdit,
   updateCheckStock,
   updateDataDetail,
@@ -47,7 +46,6 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const payloadTransferOut = useAppSelector((state) => state.transferOutSlice.createDraft);
   const dataDetail = useAppSelector((state) => state.transferOutSlice.dataDetail);
-  const approveReject = useAppSelector((state) => state.transferOutSlice.approveReject);
   const errorList = useAppSelector((state) => state.transferOutSlice.errorList);
 
   const [dtTable, setDtTable] = React.useState<Array<TransferOutDetail>>([]);

@@ -1,4 +1,4 @@
-import { deleteData, post } from '../adapters/posback-adapter';
+import { deleteData, get, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { env } from '../adapters/environmentConfigs';
 import { Payload } from '../models/barcode-discount';
@@ -31,6 +31,24 @@ export async function cancelTransferOut(id: string) {
   }
 }
 
+export async function approveTransferOut(id: string, payload: Payload) {
+  try {
+    const response = await post(getPathApprove(id), payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function rejectTransferOut(id: string) {
+  try {
+    const response = await get(getPathReject(id));
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const getPathSendForApproval = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.sendForApproval.url}`, { id: id });
 };
@@ -38,4 +56,13 @@ export const getPathSendForApproval = (id: string) => {
 export const getPathCancelDraft = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.cancel.url}`, { id: id });
 };
+
+export const getPathApprove = (id: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.approve.url}`, { id: id });
+};
+
+export const getPathReject = (id: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.reject.url}`, { id: id });
+};
+
 

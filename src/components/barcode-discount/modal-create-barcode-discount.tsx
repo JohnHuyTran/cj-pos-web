@@ -1137,6 +1137,7 @@ export default function ModalCreateBarcodeDiscount({
         onConfirm={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
         headerTitle={'ยืนยันยกเลิกขอส่วนลดสินค้า'}
+        documentField={'เลขที่เอกสาร BD'}
       />
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
       <AlertError
@@ -1158,6 +1159,7 @@ export default function ModalCreateBarcodeDiscount({
         onConfirm={() => handleCloseModalConfirmApprove(true)}
         barCode={dataDetail.documentNumber}
         headerTitle={'ยืนยันอนุมัติส่วนลดสินค้า'}
+        documentField={'เลขที่เอกสาร BD'}
       />
       <ModalReject
         open={openModalReject}

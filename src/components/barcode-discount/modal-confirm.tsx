@@ -13,12 +13,13 @@ interface Props {
   onConfirm: () => void;
   barCode: string;
   headerTitle: string;
+  documentField: string;
 }
 interface loadingModalState {
   open: boolean;
 }
 
-export default function ModelConfirm({ open, onClose, onConfirm, barCode, headerTitle }: Props): ReactElement {
+export default function ModelConfirm({ open, onClose, onConfirm, barCode, headerTitle, documentField }: Props): ReactElement {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
@@ -50,7 +51,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, barCode, header
             </Typography>
             {!!barCode && (
               <Typography variant="body1" align="center">
-                เลขที่เอกสาร BD{' '}
+                {documentField}{' '}
                 <label
                   style={{
                     color: '#AEAEAE',
