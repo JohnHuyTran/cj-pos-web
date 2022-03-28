@@ -77,7 +77,13 @@ export const environment = {
       },
       detail: {
         url: '/campaign/transfer-out',
-      }
+      },
+      approve: {
+        url: '/campaign/transfer-out/approve-transfer/{id}',
+      },
+      reject: {
+        url: '/campaign/transfer-out/reject/{id}',
+      },
     },
   },
   sell: {

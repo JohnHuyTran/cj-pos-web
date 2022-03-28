@@ -62,8 +62,8 @@ const TransferOutList: React.FC<StateProps> = (props) => {
             ? ''
             : convertUtcToBkkDate(data.approvedDate, DateFormat.DATE_FORMAT),
           products: data.products,
-          requestorName: '',
-          approverName: '',
+          requestorName: data.requestor,
+          approverName: data.approver,
         };
       });
       setLstTransferOut(rows);
@@ -322,7 +322,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
-          onSearchBD={props.onSearch}
+          onSearchMain={props.onSearch}
           userPermission={userPermission}
         />
       )}

@@ -25,12 +25,12 @@ import {
   updateCheckEdit, updateApproveReject,
 } from '../../store/slices/transfer-out-slice';
 import {
-  approveBarcodeDiscount, uploadAttachFile,
+  uploadAttachFile,
 } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { getBranchName, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, TOStatus } from '../../utils/enum/common-enum';
+import { Action, BDStatus, TOStatus } from '../../utils/enum/common-enum';
 import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from "../../utils/enum/permission-enum";
@@ -39,11 +39,15 @@ import AccordionUploadFile from "../commons/ui/accordion-upload-file";
 import { getUserInfo } from "../../store/sessionStore";
 import ModalTransferOutItem from "./modal-transfer-out-item";
 import ModelConfirm from "../barcode-discount/modal-confirm";
-import ModalReject from "../barcode-discount/modal-reject";
 import ModalCheckStock from "../barcode-discount/modal-check-stock";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { cancelTransferOut, saveDraftTransferOut, sendForApprovalTransferOut } from "../../services/transfer-out";
+import {
+  approveTransferOut,
+  cancelTransferOut, rejectTransferOut,
+  saveDraftTransferOut,
+  sendForApprovalTransferOut
+} from "../../services/transfer-out";
 import { updateCheckStock } from "../../store/slices/stock-balance-check-slice";
 import { checkStockBalance } from "../../services/common";
 
@@ -53,7 +57,7 @@ interface Props {
   setOpenPopup: (openPopup: boolean) => void;
   onClickClose: () => void;
   setPopupMsg?: any;
-  onSearchBD?: () => void;
+  onSearchMain?: () => void;
   userPermission?: any[];
 }
 
@@ -65,7 +69,7 @@ export default function ModalCreateTransferOut({
                                                  setOpenPopup,
                                                  action,
                                                  setPopupMsg,
-                                                 onSearchBD,
+                                                 onSearchMain,
                                                  userPermission,
                                                }: Props): ReactElement {
   const classes = useStyles();
@@ -78,13 +82,11 @@ export default function ModalCreateTransferOut({
   const [openModalReject, setOpenModalReject] = React.useState<boolean>(false);
   const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
-  const [openModalCheck, setOpenModalCheck] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const [openCheckStock, setOpenCheckStock] = React.useState<boolean>(false);
   const [openModalClose, setOpenModalClose] = React.useState<boolean>(false);
   const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<string>('');
-  const [listProducts, setListProducts] = React.useState<object[]>([]);
   const [errors, setErrors] = React.useState<any>([]);
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
@@ -106,6 +108,7 @@ export default function ModalCreateTransferOut({
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
     ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
+  const [branchCodeCheckStock, setBranchCodeCheckStock] = React.useState(getUserInfo().branch);
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -139,16 +142,6 @@ export default function ModalCreateTransferOut({
 
   const handleOpenModalReject = () => {
     setOpenModalReject(true);
-  };
-
-  const handleCloseModalReject = (confirm: boolean) => {
-    setOpenModalReject(false);
-    if (confirm) {
-      setOpenPopup(true);
-      setPopupMsg('คุณได้ทำการไม่อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
-      handleClose();
-      if (onSearchBD) onSearchBD();
-    }
   };
 
   const handleClosePopup = () => {
@@ -199,6 +192,9 @@ export default function ModalCreateTransferOut({
       let currentBranch = stringNullOrEmpty(transferOutDetail.branch) ? '' : (transferOutDetail.branch);
       currentBranch += (stringNullOrEmpty(transferOutDetail.branchName) ? '' : (' - ' + transferOutDetail.branchName));
       setCurrentBranch(currentBranch);
+      if (!stringNullOrEmpty(transferOutDetail.branch)) {
+        setBranchCodeCheckStock(transferOutDetail.branch);
+      }
       //set value for data detail
       dispatch(
         updateDataDetail({
@@ -345,36 +341,41 @@ export default function ModalCreateTransferOut({
     }
   }
 
+  const handleAllAttachFile = async () => {
+    let allAttachFile = [];
+    if (fileUploadList && fileUploadList.length > 0) {
+      const rsUploadAttachFile = await handleUploadAttachFile();
+      if (rsUploadAttachFile.data && rsUploadAttachFile.data.length > 0) {
+        allAttachFile.push(...rsUploadAttachFile.data);
+      } else {
+        setAlertTextError(rsUploadAttachFile.message ? rsUploadAttachFile.message : 'อัปโหลดไฟล์แนบไม่สำเร็จ');
+        setOpenModalError(true);
+        return;
+      }
+    }
+    if (attachFileOlds && attachFileOlds.length > 0) {
+      for (const oldFile of attachFileOlds) {
+        let attachFileExist = allAttachFile.find((itAll: any) => itAll.name === oldFile.fileName);
+        if (objectNullOrEmpty(attachFileExist)) {
+          allAttachFile.push({
+            key: oldFile.fileKey,
+            name: oldFile.fileName,
+            mimeType: oldFile.mimeType
+          });
+        }
+      }
+    }
+    return allAttachFile;
+  };
+
   const handleCreateDraft = async (sendRequest: boolean) => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     if (validate(false)) {
-      let allAttachFile = [];
-      if (fileUploadList && fileUploadList.length > 0) {
-        const rsUploadAttachFile = await handleUploadAttachFile();
-        if (rsUploadAttachFile.data && rsUploadAttachFile.data.length > 0) {
-          allAttachFile.push(...rsUploadAttachFile.data);
-        } else {
-          setAlertTextError(rsUploadAttachFile.message ? rsUploadAttachFile.message : 'อัปโหลดไฟล์แนบไม่สำเร็จ');
-          setOpenModalError(true);
-          return;
-        }
-      }
-      if (attachFileOlds && attachFileOlds.length > 0) {
-        for (const oldFile of attachFileOlds) {
-          let attachFileExist = allAttachFile.find((itAll: any) => itAll.name === oldFile.fileName);
-          if (objectNullOrEmpty(attachFileExist)) {
-            allAttachFile.push({
-              key: oldFile.fileKey,
-              name: oldFile.fileName,
-              mimeType: oldFile.mimeType
-            });
-          }
-        }
-      }
       const rsCheckStock = await handleCheckStock();
       if (rsCheckStock) {
         await dispatch(save({ ...payloadTransferOut }));
         try {
+          const allAttachFile = await handleAllAttachFile();
           const body = !!dataDetail.id
             ? {
               ...payloadTransferOut,
@@ -396,7 +397,7 @@ export default function ModalCreateTransferOut({
               dispatch(updateCheckEdit(false));
               setOpenPopupModal(true);
               setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-              if (onSearchBD) onSearchBD();
+              if (onSearchMain) onSearchMain();
             }
             if (rs && rs.data) {
               if (rs.data.attachFiles && rs.data.attachFiles.length > 0) {
@@ -420,15 +421,12 @@ export default function ModalCreateTransferOut({
                 ...dataDetail,
                 id: rs.data.id,
                 documentNumber: rs.data.documentNumber,
-                status: TOStatus.DRAFT,
+                status: TOStatus.DRAFT
               })
             );
             if (sendRequest) {
               setOpenModalConfirmSendForApproval(true);
             }
-          } else if (rs.code === 50004) {
-            setListProducts(rs.data);
-            setOpenModalCheck(true);
           } else {
             setOpenModalError(true);
           }
@@ -462,10 +460,7 @@ export default function ModalCreateTransferOut({
         setOpenPopup(true);
         setPopupMsg('คุณได้ส่งขออนุมัติเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
         handleClose();
-        if (onSearchBD) onSearchBD();
-      } else if (rs.code === 50004) {
-        setListProducts(rs.data);
-        setOpenModalCheck(true);
+        if (onSearchMain) onSearchMain();
       } else {
         setOpenModalError(true);
       }
@@ -474,10 +469,25 @@ export default function ModalCreateTransferOut({
     }
   };
 
+  const handleOpenModalConfirmApprove = () => {
+    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    if (validate(true)) {
+      setOpenModalConfirmApprove(true);
+    } else {
+      dispatch(updateErrorList(errorListProduct));
+      setOpenModalError(true);
+    }
+  };
+
   const handleApprove = async () => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     try {
-      const rs = await approveBarcodeDiscount(dataDetail.id, payloadTransferOut.products);
+      const allAttachFile = await handleAllAttachFile();
+      const payload = {
+        products: payloadTransferOut.products,
+        attachFiles: allAttachFile
+      };
+      const rs = await approveTransferOut(dataDetail.id, payload);
       if (rs.code === 20000) {
         dispatch(
           updateDataDetail({
@@ -486,15 +496,12 @@ export default function ModalCreateTransferOut({
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้อนุมัติส่วนลดสินค้าเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการอนุมัติเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
         handleClose();
-        if (onSearchBD) onSearchBD();
+        if (onSearchMain) onSearchMain();
       } else if (rs.code === 50003) {
         dispatch(updateCheckStock(rs.data));
         setOpenCheckStock(true);
-      } else if (rs.code === 50004) {
-        setListProducts(rs.data);
-        setOpenModalCheck(true);
       } else {
         setOpenModalError(true);
       }
@@ -512,7 +519,7 @@ export default function ModalCreateTransferOut({
           setOpenPopup(true);
           setPopupMsg('คุณได้ยกเลิกเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
           handleClose();
-          if (onSearchBD) onSearchBD();
+          if (onSearchMain) onSearchMain();
         } else {
           setOpenModalError(true);
           setOpenModalCancel(false);
@@ -537,7 +544,7 @@ export default function ModalCreateTransferOut({
         };
       });
       const payload = {
-        branchCode: '0002',
+        branchCode: branchCodeCheckStock,
         products: products,
       };
       const rs = await checkStockBalance(payload);
@@ -549,11 +556,40 @@ export default function ModalCreateTransferOut({
       }
       return rs.data ? !rs.data.length : true;
     } catch (error) {
+      setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+      setOpenModalError(true);
     }
   };
 
-  const handleReject = () => {
-    handleOpenModalReject();
+  const handleCloseModalConfirmReject = async (confirm: boolean) => {
+    setOpenModalReject(false);
+    if (confirm) {
+      handleReject();
+    }
+  };
+
+  const handleReject = async () => {
+    try {
+      let res = await rejectTransferOut(dataDetail.id);
+      if (res && res.code === 20000) {
+        dispatch(
+          updateDataDetail({
+            ...dataDetail,
+            status: Number(TOStatus.CLOSED),
+          })
+        );
+        setOpenPopup(true);
+        setPopupMsg('คุณได้ทำการไม่อนุมัติเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
+        handleClose();
+        if (onSearchMain) onSearchMain();
+      } else {
+        setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+        setOpenModalError(true);
+      }
+    } catch (error) {
+      setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+      setOpenModalError(true);
+    }
   };
 
   return (
@@ -601,7 +637,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
-                เหตุผลการเบิก
+                เหตุผลการเบิก :
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
@@ -632,7 +668,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5} pl={2}>
               <Grid item xs={4}>
-                คลัง
+                คลัง :
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
@@ -678,6 +714,7 @@ export default function ModalCreateTransferOut({
                     || TOStatus.WAIT_FOR_APPROVAL === status
                     || TOStatus.APPROVED === status}
                   warningMessage={attachFileError}
+                  deletePermission={TOStatus.DRAFT === status}
                 />
               </Grid>
             </Grid>
@@ -740,7 +777,7 @@ export default function ModalCreateTransferOut({
                   variant='contained'
                   color='primary'
                   startIcon={<CheckCircleOutlineIcon/>}
-                  // onClick={() => handleOpenModalConfirmApprove(false)}
+                  onClick={handleOpenModalConfirmApprove}
                   className={classes.MbtnSearch}>
                   อนุมัติ
                 </Button>
@@ -750,7 +787,7 @@ export default function ModalCreateTransferOut({
                   style={{ display: (status == TOStatus.WAIT_FOR_APPROVAL && approvePermission) ? undefined : 'none' }}
                   color='error'
                   startIcon={<HighlightOffIcon/>}
-                  // onClick={handleReject}
+                  onClick={handleOpenModalReject}
                   className={classes.MbtnSearch}>
                   ไม่อนุมัติ
                 </Button>
@@ -775,6 +812,7 @@ export default function ModalCreateTransferOut({
         onConfirm={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
         headerTitle={'ยืนยันส่งขอเบิกใช้ในการทำกิจกรรม'}
+        documentField={'เลขที่เอกสารเบิก'}
       />
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
       <AlertError
@@ -794,7 +832,16 @@ export default function ModalCreateTransferOut({
         onClose={() => handleCloseModalConfirmApprove(false)}
         onConfirm={() => handleCloseModalConfirmApprove(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันอนุมัติส่วนลดสินค้า'}
+        headerTitle={'ยืนยันอนุมัติเบิกใช้ในการทำกิจกรรม'}
+        documentField={'เลขที่เอกสารเบิก'}
+      />
+      <ModelConfirm
+        open={openModalReject}
+        onClose={() => handleCloseModalConfirmReject(false)}
+        onConfirm={() => handleCloseModalConfirmReject(true)}
+        barCode={dataDetail.documentNumber}
+        headerTitle={'ยืนยันไม่อนุมัติเบิกใช้ในการทำกิจกรรม'}
+        documentField={'เลขที่เอกสารเบิก'}
       />
       <ModelConfirm
         open={openModalConfirmSendForApproval}
@@ -802,12 +849,7 @@ export default function ModalCreateTransferOut({
         onConfirm={() => handleCloseModalConfirmSendForApproval(true)}
         barCode={dataDetail.documentNumber}
         headerTitle={'ยืนยันส่งขอเบิกใช้ในการทำกิจกรรม'}
-      />
-      <ModalReject
-        open={openModalReject}
-        onClose={(confirm) => handleCloseModalReject(confirm)}
-        barCode={dataDetail.documentNumber}
-        id={dataDetail.id}
+        documentField={'เลขที่เอกสารเบิก'}
       />
     </div>
   );
