@@ -169,7 +169,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                 <Typography variant='body2'>เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant='body2'>{detailDC.shipmentNo}</Typography>
+                <Typography variant='body2'>{detailDC.docRefNo}</Typography>
               </Grid>
               <Grid item xs={2}>
                 <Typography variant='body2'>สถานะการตรวจสอบผลต่าง:</Typography>
@@ -295,7 +295,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         onUpdateAction={handleGenerateBOStatus}
         idDC={idVerify}
         sdNo={detailDC.sdNo}
-        shipmentNo={detailDC.shipmentNo}
+        docRefNo={detailDC.docRefNo}
         comment={valueCommentDC}
       />
 

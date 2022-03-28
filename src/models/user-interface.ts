@@ -12,7 +12,6 @@ export type Response = {
 export type loginForm = {
   userId: string;
   password: string;
-  branchCode: string;
 };
 
 export class KeyCloakError {

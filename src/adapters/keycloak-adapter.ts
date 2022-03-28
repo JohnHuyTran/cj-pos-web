@@ -26,7 +26,6 @@ const instance = axios.create({
     'Content-Type': 'application/x-www-form-urlencoded',
   },
 });
-let branchCode = '';
 let action = '';
 
 export function authentication(payload: loginForm): Promise<Response> {
@@ -36,9 +35,7 @@ export function authentication(payload: loginForm): Promise<Response> {
   params.append('password', payload.password);
   params.append('grant_type', env.keycloak.grantType);
   params.append('client_id', env.keycloak.clientId);
-  params.append('branchCode', payload.branchCode);
-  // params.append("client_secret", env.keycloak.clientSecret);
-  branchCode = payload.branchCode;
+  params.append('branchCode', env.branch.code);
   return instance
     .post(env.keycloak.url.authentication, params)
     .then((response: AxiosResponse) => {
@@ -136,7 +133,7 @@ export function logout(): Promise<Response> {
 
 instance.interceptors.request.use(function (config: AxiosRequestConfig) {
   if (action !== 'logout') {
-    config.headers.common['X-Requested-With'] = branchCode;
+    config.headers.common['X-Requested-With'] =  env.branch.code;
   }
 
   return config;

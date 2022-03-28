@@ -17,7 +17,7 @@ interface Props {
   onClose: () => void;
   onUpdateAction: (value: boolean, errorMsg: any) => void;
   idDC: string;
-  shipmentNo: string;
+  docRefNo: string;
   sdNo: string;
   comment: string;
 }
@@ -30,7 +30,7 @@ export default function ModelConfirm({
   onClose,
   onUpdateAction,
   idDC,
-  shipmentNo,
+  docRefNo,
   sdNo,
   comment,
 }: Props): ReactElement {
@@ -81,9 +81,9 @@ export default function ModelConfirm({
               ยืนยันการตรวจสอบผลต่าง (DC)
             </Typography>
             <Typography variant='body1' align='center'>
-              เลขที่เอกสาร LD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
+              เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
               <label style={{ color: '#36C690' }}>
-                <b>{shipmentNo}</b>
+                <b>{docRefNo}</b>
               </label>
             </Typography>
 
