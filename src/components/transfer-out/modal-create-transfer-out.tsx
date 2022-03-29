@@ -108,7 +108,7 @@ export default function ModalCreateTransferOut({
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
     ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
-  const [branchCodeCheckStock, setBranchCodeCheckStock] = React.useState(getUserInfo().branch);
+  const [branchCodeCheckStock, setBranchCodeCheckStock] = React.useState(getUserInfo().branch ? getUserInfo().branch : '');
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
