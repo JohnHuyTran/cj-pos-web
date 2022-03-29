@@ -26,7 +26,6 @@ import logoImage from '../../assets/images/CJlogo.jpeg';
 import { featchAuthorizedBranchListAsync } from '../../store/slices/authorized-branch-slice';
 
 interface State {
-  branch: string;
   userId: string;
   password: string;
   showPassword: boolean;
@@ -38,8 +37,7 @@ function LoginForm() {
   const [values, setValues] = React.useState<State>({
     password: '',
     userId: '',
-    showPassword: false,
-    branch: '',
+    showPassword: false
   });
   // console.log(isAllowPermission('FEATURE.ADMIN.SEARCH.DATA'));
   const dispatch = useAppDispatch();
@@ -64,106 +62,97 @@ function LoginForm() {
     const form: loginForm = {
       userId: values.userId,
       password: values.password,
-      branchCode: values.branch,
     };
     dispatch(loginKeyCloakAsync(form));
   };
 
   return (
-    <div className={classes.root}>
-      <Typography variant='h5' className={classes.welcomeLabel}>
-        ยินดีต้อนรับ
-      </Typography>
+    <div className={classes.wrapLogin}>
+      <div className={classes.bgLogin}>
+        <Typography variant='h5' className={classes.welcomeLabel}>
+          ยินดีต้อนรับ
+        </Typography>
 
-      <Box className={classes.mainBox}>
-        <div id='logo' className={classes.logo}>
-          <img src={logoImage} alt='' width='50' />
-        </div>
+        <Box className={classes.mainBox}>
+          <div id='logo' className={classes.logo}>
+            <img src={logoImage} alt='' width='50' />
+          </div>
 
-        <div id='error'> {error && <p style={{ color: 'red', fontSize: '12px' }}>{t(error)}</p>}</div>
-        <div>
-          <FormControl sx={{ m: 3 }} className={clsx(classes.textField)} variant='outlined'>
-            <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>
-              รหัสผู้ใช้งาน
-            </FormHelperText>
-            <OutlinedInput
-              id='txtUserid'
-              value={values.userId}
-              onChange={handleChange('userId')}
-              aria-describedby='outlined-user-id-text'
-              inputProps={{
-                'aria-label': 'weight',
-              }}
-            />
-          </FormControl>
-        </div>
-        <div>
-          <FormControl sx={{ m: 3 }} className={clsx(classes.textField)} variant='outlined'>
-            <FormHelperText id='outlined-password-text' sx={{ ml: 0 }}>
-              รหัสผ่าน
-            </FormHelperText>
-            {/* <InputLabel htmlFor="outlined-adornment-password">
-                  กรุณป้อนรหัสผ่าน
-                </InputLabel> */}
-            <OutlinedInput
-              id='txtPassword'
-              type={values.showPassword ? 'text' : 'password'}
-              value={values.password}
-              onChange={handleChange('password')}
-              endAdornment={
-                <InputAdornment position='end'>
-                  <IconButton
-                    aria-label='toggle password visibility'
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    edge='end'>
-                    {values.showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-          </FormControl>
-        </div>
-        <div>
-          <FormControl sx={{ m: 3 }} className={clsx(classes.textField)} variant='outlined'>
-            <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>
-              สาขา
-            </FormHelperText>
-            <OutlinedInput
-              id='txtBranchCoce'
-              value={values.branch}
-              onChange={handleChange('branch')}
-              aria-describedby='outlined-user-id-text'
-              inputProps={{
-                'aria-label': 'weight',
-              }}
-            />
-          </FormControl>
-        </div>
-        <div>
-          <Button
-            sx={{ m: 3 }}
-            id='btnLogin'
-            variant='contained'
-            color='primary'
-            onClick={onClickLogin}
-            className={classes.loginBtn}>
-            <Typography variant='button' display='block' className={clsx(classes.labelLoginBtn, classes.textField)}>
-              เข้าสู่ระบบ
-            </Typography>
-          </Button>
-        </div>
-        <Box
-          sx={{
-            width: '350px',
-            height: '10px',
-            display: 'flex',
-            justifyContent: 'center',
-            color: '#AEAEAE',
-          }}>
-          <Typography sx={{ fontSize: '10px', position: 'relative', top: '60px' }}>version: {version}</Typography>
+          <div id='error'> {error && <p style={{ color: 'red', fontSize: '12px' }}>{t(error)}</p>}</div>
+          <div>
+            <FormControl sx={{ m: 5, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
+              <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>
+                รหัสผู้ใช้งาน
+              </FormHelperText>
+              <OutlinedInput
+                id='txtUserid'
+                value={values.userId}
+                onChange={handleChange('userId')}
+                aria-describedby='outlined-user-id-text'
+                inputProps={{
+                  'aria-label': 'weight',
+                }}
+              />
+            </FormControl>
+          </div>
+          <div>
+            <FormControl sx={{ m: 5, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
+              <FormHelperText id='outlined-password-text' sx={{ ml: 0 }}>
+                รหัสผ่าน
+              </FormHelperText>
+              {/* <InputLabel htmlFor="outlined-adornment-password">
+                    กรุณป้อนรหัสผ่าน
+                  </InputLabel> */}
+              <OutlinedInput
+                id='txtPassword'
+                type={values.showPassword ? 'text' : 'password'}
+                value={values.password}
+                onChange={handleChange('password')}
+                endAdornment={
+                  <InputAdornment position='end'>
+                    <IconButton
+                      aria-label='toggle password visibility'
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge='end'>
+                      {values.showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+          </div>
+          <div>
+            <FormControl sx={{ m: 15, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
+
+            </FormControl>
+          </div>
+          <div>
+            <Button
+              sx={{ m: 3, mb: 0 }}
+              id='btnLogin'
+              variant='contained'
+              color='primary'
+              onClick={onClickLogin}
+              className={classes.loginBtn}>
+              <Typography variant='button' display='block' className={clsx(classes.labelLoginBtn, classes.textField)}>
+                เข้าสู่ระบบ
+              </Typography>
+            </Button>
+          </div>
+          <Box
+            sx={{
+              width: '350px',
+              minHeight: '10px',
+              marginTop: '20px',
+              display: 'flex',
+              justifyContent: 'center',
+              color: '#AEAEAE',
+            }}>
+            <Typography sx={{ fontSize: '10px', position: 'relative' }}>version: {version}</Typography>
+          </Box>
         </Box>
-      </Box>
+      </div>
     </div>
   );
 }

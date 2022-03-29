@@ -54,6 +54,14 @@ import authorizedhBranchSlice from './slices/authorized-branch-slice';
 import orderReceiveSlice from './slices/order-receive-slice';
 import transferOutSearchSlice from './slices/transfer-out-search-slice';
 import transferOutCriterSearchSlice from './slices/transfer-out-criteria-search-slice';
+import taxInvoiceSearchDetail from './slices/tax-invoice-search-detail-slice';
+import taxInvoiceSearchList from './slices/tax-invoice-search-list-slice';
+import searchProvincesSlice from './slices/search-provinces-slice';
+import searchDistrictsSlice from './slices/search-districts-slice';
+import searchSubDistrictsSlice from './slices/search-subDistricts-slice';
+import searchToteSlice from './slices/search-tote-slice';
+import itemsToteSlice from './slices/items-tote-slice';
+import checkOrderToteSlice from './slices/check-order-detail-tote-slice';
 
 const store = configureStore({
   reducer: {
@@ -111,6 +119,14 @@ const store = configureStore({
     orderReceiveSlice: orderReceiveSlice,
     transferOutSearchSlice: transferOutSearchSlice,
     transferOutCriterSearchSlice: transferOutCriterSearchSlice,
+    taxInvoiceSearchList: taxInvoiceSearchList,
+    taxInvoiceSearchDetail: taxInvoiceSearchDetail,
+    searchProvincesSlice: searchProvincesSlice,
+    searchDistrictsSlice: searchDistrictsSlice,
+    searchSubDistrictsSlice: searchSubDistrictsSlice,
+    searchToteSlice: searchToteSlice,
+    itemsToteSlice: itemsToteSlice,
+    checkOrderToteSlice: checkOrderToteSlice,
   },
 });
 

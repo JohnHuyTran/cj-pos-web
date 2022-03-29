@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridValueGetterParams, GridCellParams } from '@mui/x-data-grid';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/system';
 import { useStyles } from '../../styles/makeTheme';
 import { Checkbox, FormControlLabel, FormGroup, Grid, TextField, Typography } from '@mui/material';
 import { numberWithCommas } from '../../utils/utils';

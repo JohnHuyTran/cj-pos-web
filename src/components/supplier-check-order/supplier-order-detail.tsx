@@ -17,6 +17,7 @@ import {
   GridRowData,
   GridValueGetterParams,
   GridCellParams,
+  GridEditCellValueParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { SavePurchaseRequest, FileType, CalculatePurchasePIRequest } from '../../models/supplier-check-order-model';
@@ -33,7 +34,6 @@ import ModalAddItem from './modal-add-items';
 import ModelDeleteConfirm from './modal-delete-confirm';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
 import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
-import { GridEditCellValueParams } from '@material-ui/data-grid';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { formatFileNam } from '../../utils/enum/supplier-order-enum';
 import AlertError from '../commons/ui/alert-error';
@@ -856,6 +856,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     docType='PI'
                     isStatus={uploadFileFlag}
                     onChangeUploadFile={handleOnChangeUploadFile}
+                    enabledControl={true}
                   />
                 )}
               </Grid>

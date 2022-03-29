@@ -55,6 +55,14 @@ export const environment = {
         url: '/order/stock-diff/verify/{idDC}',
       },
     },
+    tote: {
+      searchTote: {
+        url: '/order/tote/',
+      },
+      submitTote: {
+        url: '/order/submitTote',
+      },
+    },
   },
   task: {
     notification: {
@@ -336,10 +344,37 @@ export const environment = {
         },
       },
     },
+    provinces: {
+      url: '/master/provinces',
+    },
+    districts: {
+      url: '/master/districts',
+    },
+    subDistricts: {
+      url: '/master/sub-districts',
+    },
   },
   authority: {
     authorizedBranch: {
       url: '/authority/authorized-branches',
+    },
+  },
+  sale: {
+    taxInvoice: {
+      search: {
+        url: '/sale/tax-invoices',
+      },
+      detail: {
+        url: '/sale/tax-invoices/{billNo}',
+      },
+      saveInvoice: {
+        url: '/sale/tax-invoices',
+      },
+    },
+    member: {
+      searchMemberInformation: {
+        url: '/sale/members/{memberNo}',
+      },
     },
   },
 };

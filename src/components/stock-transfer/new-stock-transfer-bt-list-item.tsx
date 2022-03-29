@@ -320,6 +320,9 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
       });
 
       if (dupItem) {
+        let _toteCode: string = dataRow.toteCode;
+        _toteCode= _toteCode.trim();
+
         const newData: Item = {
           seqItem: dataRow.seqItem,
           barcode: dataRow.barcode,
@@ -327,7 +330,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
           skuCode: dataRow.skuCode,
           unitName: dataRow.unitName,
           actualQty: dataRow.actualQty,
-          toteCode: dataRow.toteCode,
+          toteCode: _toteCode,
           isDisable: isDisable,
           boNo: dataRow.boNo,
           barFactor: dataRow.barFactor,

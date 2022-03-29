@@ -122,6 +122,25 @@ export function getFile(path: string, contentType = defaultForJSON) {
     });
 }
 
+export function getParams(path: string, payload: any, contentType = defaultForJSON) {
+  contentType = contentType;
+  return instance
+    .get(path, {
+      params: payload,
+    })
+    .then((response: AxiosResponse) => {
+      if (response.status == 200 || response.status == 201) {
+        return response.data;
+      }
+      const err = new ApiError(response.status, response.status, response.statusText);
+      throw err;
+    })
+    .catch((error: any) => {
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      throw err;
+    });
+}
+
 export function post(path: string, payload?: any, contentType = defaultForJSON, actionType?: string) {
   contentType = contentType;
   return instance

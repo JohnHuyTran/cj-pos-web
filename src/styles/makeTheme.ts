@@ -78,6 +78,15 @@ const useStyles = makeStyles({
       '-webkit-text-fill-color': 'rgba(0, 0, 0, 0.87)',
     },
   },
+  MtextFieldAutocomplete: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      padding: '2px 0 2px !important',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      fontSize: '14px',
+    },
+  },
   Mselect: {
     '& .css-y4ygc1-MuiInputBase-root-MuiOutlinedInput-root': {
       borderRadius: '5px !important',
@@ -283,28 +292,44 @@ const useStyles = makeStyles({
     borderRadius: '4px !important',
   },
   MbtnSave: {
+    '&.MuiButton-root': {
     width: '100px',
     // backgroundColor: "#FBA600 !important",
     borderRadius: '4px !important',
     marginLeft: '10px !important',
     boxShadow: 'none !important',
+    }
   },
   MbtnApprove: {
+    '&.MuiButton-root': {
     width: '100px',
     borderRadius: '4px !important',
     marginLeft: '10px !important',
     boxShadow: 'none !important',
+    }
+  },
+  MbtnSendDC: {
+    '&.MuiButton-root': {
+    width: '150px',
+    borderRadius: '4px !important',
+    marginLeft: '10px !important',
+    boxShadow: 'none !important',
+    }
   },
   MbtnBrowse: {
+    '&.MuiButton-root': {
     width: '125px',
     borderRadius: '8px !important',
     boxShadow: 'none !important',
+    }
   },
   MbtnAdd: {
+    '&.MuiButton-root': {
     width: '140px',
     borderRadius: '4px !important',
     marginLeft: '10px !important',
     boxShadow: 'none !important',
+    }
   },
   MtextFieldRemark: {
     '& .MuiOutlinedInput-root': {
@@ -354,12 +379,16 @@ const useStyles = makeStyles({
     },
   },
   MbtnPrint: {
+    '&.MuiButton-root': {
     width: '155px',
     borderRadius: '4px !important',
+    }
   },
   MbtnClose: {
+    '&.MuiButton-root': {
     width: '200px',
     borderRadius: '4px !important',
+    }
   },
   MLabelBDStatus: {
     padding: '1px 15px 1px 15px',

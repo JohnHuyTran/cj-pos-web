@@ -4,7 +4,7 @@ import { useAppSelector } from '../../store/store';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
-import { Box, Button, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
+import { Box, Button, DialogTitle, Grid, IconButton, Input, TextField } from '@mui/material';
 import { ControlPoint, HighlightOff, Tune } from '@mui/icons-material';
 import SaveIcon from '@mui/icons-material/Save';
 
@@ -27,7 +27,6 @@ import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import { updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 import TextBoxComment from '../commons/ui/textbox-comment';
-import { createTheme } from '@material-ui/core/styles';
 import { cancelST, getStartSaleLimitTime, saveDraftST, importST } from '../../services/sale-limit-time';
 import { DateFormat } from '../../utils/enum/common-enum';
 import { setCheckEdit, setProductList, updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
@@ -65,21 +64,6 @@ export interface DialogTitleProps {
   onClose?: () => void;
 }
 const _ = require('lodash');
-
-const defaultMaterialTheme = createTheme({
-  palette: {
-    primary: {
-      main: '#36C690',
-    },
-  },
-  typography: {
-    fontFamily: 'Kanit',
-  },
-});
-
-const Input = styled('input')({
-  display: 'none',
-});
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
   const { children, onClose, ...other } = props;
@@ -803,7 +787,7 @@ function STCreateModal({
                       </Button>
                       <label htmlFor="import-st-button-file">
                         {Object.keys(payloadAddTypeProduct).length === 0 && (
-                          <Input id="import-st-button-file" type="file" onChange={handleImportFile} />
+                          <Input id="import-st-button-file" type="file" onChange={handleImportFile}  style={{ display: 'none' }}/>
                         )}
                         <Button
                           id="btnImport"

@@ -5,7 +5,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import LoadingModal from '../commons/ui/loading-modal';
 import { Box, InputLabel, TextField, Typography } from "@mui/material";
-import { DataGrid, GridColDef } from "@material-ui/data-grid";
 import { useStyles } from "../../styles/makeTheme";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -16,6 +15,7 @@ import { getEncodeBarcode, numberWithCommas, stringNullOrEmpty } from "../../uti
 import AlertError from "../commons/ui/alert-error";
 import { printBarcodeDiscount, saveLogPrintBarcodeDiscountHistory } from "../../services/barcode-discount";
 import { BootstrapDialogTitle } from "../commons/ui/dialog-title";
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 const _ = require('lodash');
 
