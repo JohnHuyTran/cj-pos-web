@@ -6,13 +6,20 @@ import { Button } from '@mui/material';
 import TaxInvoiceSearchList from './tax-invoice-search-list';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { TaxInvoiceRequest } from '../../models/tax-invoice-model';
-import { featchTaxInvoiceListAsync, savePayloadSearchList } from '../../store/slices/tax-invoice-search-list-slice';
+import {
+  featchTaxInvoiceListAsync,
+  savePayloadSearchList,
+  saveTaxInvoiceList,
+} from '../../store/slices/tax-invoice-search-list-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { isAllowActionPermission } from '../../utils/role-permission';
 import AlertError from '../commons/ui/alert-error';
 
 import { Search } from '@mui/icons-material';
+import RequestTaxInvoice from './request-tax-invoice';
+import { requestTaxInvoice } from '../../services/sale';
+import { ApiError } from '../../models/api-error-model';
 
 interface State {
   docNo: string;
@@ -26,6 +33,7 @@ export default function TaxInvoiceSearch() {
   const classes = useStyles();
   const page = '1';
   const dispatch = useAppDispatch();
+  const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const [hideSearchBtn, setHideSearchBtn] = React.useState(true);
   const [values, setValues] = React.useState<State>({
     docNo: '',
@@ -40,7 +48,8 @@ export default function TaxInvoiceSearch() {
   };
   const [openFailAlert, setOpenFailAlert] = React.useState(false);
   const [textFail, setTextFail] = React.useState('');
-
+  const [billNo, setBillNo] = React.useState('');
+  const [openRequestTax, setOpenRequestTax] = React.useState(false);
   const handleCloseFailAlert = () => {
     setOpenFailAlert(false);
     setTextFail('');
@@ -58,7 +67,7 @@ export default function TaxInvoiceSearch() {
   const onClickClearBtn = async () => {
     setValues({
       docNo: '',
-      citizenId:''
+      citizenId: '',
     });
     const payload: TaxInvoiceRequest = {
       limit: limit ? limit.toString() : '10',
@@ -72,21 +81,21 @@ export default function TaxInvoiceSearch() {
   const validateForm = () => {
     let errText = '';
     let isNoError = true;
-    if(!values.docNo && !values.citizenId){
+    if (!values.docNo && !values.citizenId) {
       errText = 'กรุณาระบุเลขเอกสารหรือเลขที่บัตรประชาชน';
-      isNoError= false;
+      isNoError = false;
     }
     if (values.docNo && values.docNo.length < 6) {
-      errText ='กรุณาระบุเลขเอกสารอย่างน้อย 6 หลัก';
-      isNoError =  false;
-    }
-
-    if (values.citizenId && values.citizenId.length != 13) {
-      errText  = errText ? `${errText}\n กรุณาระบุเลขที่บัตรประชาชน 13 หลัก `: 'กรุณาระบุเลขที่บัตรประชาชน 13 หลัก';
+      errText = 'กรุณาระบุเลขเอกสารอย่างน้อย 6 หลัก';
       isNoError = false;
     }
 
-    setTextFail(errText)
+    if (values.citizenId && values.citizenId.length != 13) {
+      errText = errText ? `${errText}\n กรุณาระบุเลขที่บัตรประชาชน 13 หลัก ` : 'กรุณาระบุเลขที่บัตรประชาชน 13 หลัก';
+      isNoError = false;
+    }
+
+    setTextFail(errText);
     return isNoError;
   };
 
@@ -106,7 +115,7 @@ export default function TaxInvoiceSearch() {
         docNo: values.docNo,
         citizenId: values.citizenId,
       };
-      await dispatch(featchTaxInvoiceListAsync(payload));
+      await dispatch(saveTaxInvoiceList(payload));
       await dispatch(savePayloadSearchList(payload));
       setFlagSearch(true);
     } else {
@@ -116,79 +125,142 @@ export default function TaxInvoiceSearch() {
     handleOpenLoading('open', false);
   };
 
+  const handleChangeBillNo = (value: string) => {
+    setBillNo(value);
+  };
+
+  const onClickRequestBtn = () => {
+    setOpenRequestTax(true);
+  };
+
+  const onCloseRequestBtn = () => {
+    setOpenRequestTax(false);
+  };
+
+  const callRequestTaxInvoice = async () => {
+    onCloseRequestBtn();
+    handleOpenLoading('open', true);
+    const payload: TaxInvoiceRequest = {
+      docNo: billNo,
+    };
+
+    await requestTaxInvoice(payload)
+      .then(async (value) => {
+        console.log('value: ', value);
+        await dispatch(saveTaxInvoiceList(value));
+        await dispatch(savePayloadSearchList(payload));
+        setFlagSearch(true);
+      })
+      .catch((error: ApiError) => {
+        console.log('error: ', error);
+      });
+
+    handleOpenLoading('open', false);
+  };
+
+  const reloadRequestTaxInvoice = async () => {
+    const payload: TaxInvoiceRequest = {
+      docNo: payloadSearch.billNo,
+    };
+
+    await requestTaxInvoice(payload)
+      .then(async (value) => {
+        console.log('value: ', value);
+        await dispatch(saveTaxInvoiceList(value));
+        // await dispatch(savePayloadSearchList(payload));
+        setFlagSearch(true);
+      })
+      .catch((error: ApiError) => {
+        console.log('error: ', error);
+      });
+  };
+
   React.useEffect(() => {
     setHideSearchBtn(isAllowActionPermission(ACTIONS.SALE_TAX_INVOICE_VIEW));
   }, []);
+
   return (
     <>
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id="txtDocNo"
-              name="docNo"
-              size="small"
+              id='txtDocNo'
+              name='docNo'
+              size='small'
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่ใบเสร็จ/ใบกำกับ"
-              autoComplete="off"
+              placeholder='เลขที่ใบเสร็จ/ใบกำกับ'
+              autoComplete='off'
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               เลขที่บัตรประชาชน
             </Typography>
             <TextField
-              id="txtCitizenId"
-              name="citizenId"
-              size="small"
+              id='txtCitizenId'
+              name='citizenId'
+              size='small'
               value={values.citizenId}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder=""
-              autoComplete="off"
+              placeholder=''
+              autoComplete='off'
             />
           </Grid>
-          <Grid item xs={4} container alignItems="flex-end"></Grid>
-          <Grid item xs={8} container alignItems="flex-end"></Grid>
-          <Grid item xs={4} container alignItems="flex-end">
-            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
-              <Button
-                id="btnClear"
-                variant="contained"
-                onClick={onClickClearBtn}
-                sx={{ width: '45%' }}
-                className={classes.MbtnClear}
-                color="cancelColor"
-                fullWidth={true}
-              >
-                เคลียร์
-              </Button>
-              <Button
-                id="btnSearch"
-                variant="contained"
-                color="primary"
-                onClick={onClickSearchBtn}
-                sx={{ width: '45%', ml: 1, display: `${hideSearchBtn ? 'none' : ''}` }}
-                className={classes.MbtnSearch}
-                fullWidth={true}
-              >
-                ค้นหา
-              </Button>
-            </Grid>
+          <Grid item xs={4} container alignItems='flex-end'></Grid>
+        </Grid>
+      </Box>
+      <Box mb={3}>
+        <Grid container spacing={2} mt={4} mb={2}>
+          <Grid item xs={5}>
+            {' '}
+            <Button
+              id='btnSearch'
+              variant='contained'
+              onClick={onClickRequestBtn}
+              sx={{ width: '200', ml: 1, display: `${hideSearchBtn ? 'none' : ''}` }}
+              className={classes.MbtnPrint}
+              fullWidth={true}
+              color='info'>
+              ขอเลขที่ใบเสร็จ
+            </Button>
+          </Grid>
+          <Grid item xs={7} sx={{ textAlign: 'end' }}>
+            {' '}
+            <Button
+              id='btnClear'
+              variant='contained'
+              onClick={onClickClearBtn}
+              sx={{ width: 110, ml: 2 }}
+              className={classes.MbtnClear}
+              color='cancelColor'>
+              เคลียร์
+            </Button>
+            <Button
+              id='btnSearch'
+              variant='contained'
+              color='primary'
+              onClick={onClickSearchBtn}
+              sx={{ width: '200', ml: 2, display: `${hideSearchBtn ? 'none' : ''}` }}
+              className={classes.MbtnSearch}>
+              ค้นหา
+            </Button>
           </Grid>
         </Grid>
       </Box>
+
       {flagSearch && taxInvoiceList.length > 0 && <TaxInvoiceSearchList />}
       {flagSearch && taxInvoiceList.length <= 0 && (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
+        <Grid item container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB'>
             <br></br>
             <h2>ไม่มีข้อมูล</h2>
           </Box>
@@ -197,6 +269,12 @@ export default function TaxInvoiceSearch() {
 
       <LoadingModal open={openLoadingModal.open} />
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
+      <RequestTaxInvoice
+        isOpen={openRequestTax}
+        onChangeTaxNo={handleChangeBillNo}
+        onClose={onCloseRequestBtn}
+        onRequest={callRequestTaxInvoice}
+      />
     </>
   );
 }

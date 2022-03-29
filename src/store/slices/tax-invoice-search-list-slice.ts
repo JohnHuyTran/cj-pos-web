@@ -56,6 +56,19 @@ const taxInvoiceListSlice = createSlice({
     savePayloadSearchList: (state, action: PayloadAction<any>) => {
       state.payloadSearchList = action.payload;
     },
+    saveTaxInvoiceList: (state, action: PayloadAction<any>) => {
+      let resposeData = [];
+      resposeData.push(action.payload.data);
+      state.taxInvoiceList = {
+        data: resposeData,
+        ref: '',
+        code: 0,
+        message: '',
+        total: 1,
+        perPage: 10,
+        page: 1,
+      };
+    },
   },
   extraReducers: (builer) => {
     builer.addCase(featchTaxInvoiceListAsync.pending, (state, action) => {
@@ -86,5 +99,5 @@ const taxInvoiceListSlice = createSlice({
   },
 });
 
-export const { savePayloadSearchList } = taxInvoiceListSlice.actions;
+export const { savePayloadSearchList, saveTaxInvoiceList } = taxInvoiceListSlice.actions;
 export default taxInvoiceListSlice.reducer;
