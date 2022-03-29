@@ -2,11 +2,9 @@ import Typography from '@mui/material/Typography';
 import LoyaltyOutlinedIcon from '@mui/icons-material/LoyaltyOutlined';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import { makeStyles } from '@mui/styles';
 import { useTheme } from '@mui/material/styles';
 import moment from 'moment';
-import { Grid, ListItemIcon } from '@mui/material';
-import { ShoppingCartSharp } from '@mui/icons-material';
+import { Grid } from '@mui/material';
 import React from 'react';
 import ModalCreateBarcodeDiscount from '../barcode-discount/modal-create-barcode-discount';
 import { Action } from '../../utils/enum/common-enum';
@@ -22,7 +20,7 @@ type TaskType = {
   onSearch: () => void;
 };
 
-export default function TaskForApprover(props: TaskType) {
+export default function TaskForBarcodeDiscount(props: TaskType) {
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const [openDetail, setOpenDetail] = React.useState(false);
