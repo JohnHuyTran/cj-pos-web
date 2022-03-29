@@ -62,7 +62,7 @@ export default function SelectBranch(props: Props): ReactElement {
         getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
       );
     }
-    if (props.disabled && branchName && ownBranch) {
+    if (!!(props.disabled && branchName && ownBranch)) {
       setValue(`${ownBranch} - ${branchName}`);
     }
   }, [branchList]);
@@ -70,7 +70,10 @@ export default function SelectBranch(props: Props): ReactElement {
     if (open) {
       setBranchListSelect(props.listSelect);
     }
-  }, [open]);
+    if (!!(props.disabled && branchName && ownBranch)) {
+      setValue(`${ownBranch} - ${branchName}`);
+    }
+  }, [open, props.disabled]);
 
   useEffect(() => {
     if (props.listSelect.length === 0) {
@@ -78,7 +81,6 @@ export default function SelectBranch(props: Props): ReactElement {
       setValue(text);
     }
   }, [props.listSelect]);
-
   const filterAuthorizedBranch = (branch: BranchInfo) => {
     authorizedBranchList.branchList.data?.branches.some((item: BranchInfo) => {
       return branch.code === item.code;
