@@ -44,7 +44,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import {
   approveTransferOut,
-  cancelTransferOut, rejectTransferOut,
+  cancelTransferOut, endTransferOut, rejectTransferOut,
   saveDraftTransferOut,
   sendForApprovalTransferOut
 } from "../../services/transfer-out";
@@ -80,6 +80,7 @@ export default function ModalCreateTransferOut({
   const [openModalConfirmApprove, setOpenModalConfirmApprove] = React.useState<boolean>(false);
   const [openModalConfirmSendForApproval, setOpenModalConfirmSendForApproval] = React.useState<boolean>(false);
   const [openModalReject, setOpenModalReject] = React.useState<boolean>(false);
+  const [openModalConfirmEnd, setOpenModalConfirmEnd] = React.useState<boolean>(false);
   const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
@@ -575,11 +576,47 @@ export default function ModalCreateTransferOut({
         dispatch(
           updateDataDetail({
             ...dataDetail,
-            status: Number(TOStatus.CLOSED),
+            status: Number(TOStatus.REJECTED),
           })
         );
         setOpenPopup(true);
         setPopupMsg('คุณได้ทำการไม่อนุมัติเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
+        handleClose();
+        if (onSearchMain) onSearchMain();
+      } else {
+        setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+        setOpenModalError(true);
+      }
+    } catch (error) {
+      setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+      setOpenModalError(true);
+    }
+  };
+
+  const handleOpenModalConfirmEnd = () => {
+    setOpenModalConfirmEnd(true);
+  };
+
+  const handleCloseModalConfirmEnd = async (confirm: boolean) => {
+    setOpenModalConfirmEnd(false);
+    if (confirm) {
+      handleEnd();
+    }
+  };
+
+  const handleEnd = async () => {
+    try {
+      const allAttachFile = await handleAllAttachFile();
+      let res = await endTransferOut(dataDetail.id, allAttachFile);
+      if (res && res.code === 20000) {
+        dispatch(
+          updateDataDetail({
+            ...dataDetail,
+            status: Number(TOStatus.CLOSED),
+          })
+        );
+        setOpenPopup(true);
+        setPopupMsg('คุณได้ทำการปิดงานเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
       } else {
@@ -654,6 +691,7 @@ export default function ModalCreateTransferOut({
                       dispatch(updateCheckEdit(true));
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
+                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL}
                   >
                     <MenuItem value={'1'}>{'เบิกเพื่อแจกลูกค้า'}</MenuItem>
                     <MenuItem value={'2'}>{'เบิกเพื่อทำกิจกรรม'}</MenuItem>
@@ -685,6 +723,7 @@ export default function ModalCreateTransferOut({
                       dispatch(updateCheckEdit(true));
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
+                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL}
                   >
                     <MenuItem value={'1'}>{'คลังหน้าร้าน'}</MenuItem>
                     <MenuItem value={'2'}>{'คลังหลังร้าน'}</MenuItem>
@@ -791,6 +830,16 @@ export default function ModalCreateTransferOut({
                   className={classes.MbtnSearch}>
                   ไม่อนุมัติ
                 </Button>
+                <Button
+                  id='btnEnd'
+                  variant='contained'
+                  style={{ display: status == TOStatus.APPROVED ? undefined : 'none' }}
+                  color='info'
+                  startIcon={<CheckCircleOutlineIcon/>}
+                  onClick={handleOpenModalConfirmEnd}
+                  className={classes.MbtnSearch}>
+                  ปิดงาน
+                </Button>
               </Box>
             </Box>
             <Box>
@@ -849,6 +898,14 @@ export default function ModalCreateTransferOut({
         onConfirm={() => handleCloseModalConfirmSendForApproval(true)}
         barCode={dataDetail.documentNumber}
         headerTitle={'ยืนยันส่งขอเบิกใช้ในการทำกิจกรรม'}
+        documentField={'เลขที่เอกสารเบิก'}
+      />
+      <ModelConfirm
+        open={openModalConfirmEnd}
+        onClose={() => handleCloseModalConfirmEnd(false)}
+        onConfirm={() => handleCloseModalConfirmEnd(true)}
+        barCode={dataDetail.documentNumber}
+        headerTitle={'ยืนยันปิดงานเบิกใช้ในการทำกิจกรรม'}
         documentField={'เลขที่เอกสารเบิก'}
       />
     </div>
