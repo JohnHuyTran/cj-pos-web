@@ -115,7 +115,7 @@ export default function TaxInvoiceSearch() {
         docNo: values.docNo,
         citizenId: values.citizenId,
       };
-      await dispatch(saveTaxInvoiceList(payload));
+      await dispatch(featchTaxInvoiceListAsync(payload));
       await dispatch(savePayloadSearchList(payload));
       setFlagSearch(true);
     } else {
