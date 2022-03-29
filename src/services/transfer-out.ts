@@ -49,6 +49,15 @@ export async function rejectTransferOut(id: string) {
   }
 }
 
+export async function endTransferOut(id: string, payload: any) {
+  try {
+    const response = await post(getPathEnd(id), payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const getPathSendForApproval = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.sendForApproval.url}`, { id: id });
 };
@@ -63,6 +72,10 @@ export const getPathApprove = (id: string) => {
 
 export const getPathReject = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.reject.url}`, { id: id });
+};
+
+export const getPathEnd = (id: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.end.url}`, { id: id });
 };
 
 

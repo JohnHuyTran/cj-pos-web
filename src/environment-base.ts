@@ -92,6 +92,9 @@ export const environment = {
       reject: {
         url: '/campaign/transfer-out/reject/{id}',
       },
+      end: {
+        url: '/campaign/transfer-out/close/{id}',
+      },
     },
   },
   sell: {

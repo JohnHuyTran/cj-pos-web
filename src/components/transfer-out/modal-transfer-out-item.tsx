@@ -296,7 +296,8 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
               onChange={(e) => {
                 handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barCode);
               }}
-              disabled={dataDetail.status > 1}
+              disabled={(!stringNullOrEmpty(dataDetail.status)
+                && dataDetail.status != TOStatus.DRAFT && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL)}
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfRequested}</div>}
           </div>
@@ -326,8 +327,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
               inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
-              disabled={!approvePermission || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)
-                || (approvePermission && dataDetail.status < Number(BDStatus.WAIT_FOR_APPROVAL))}
+              disabled={!approvePermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status == TOStatus.DRAFT}
               onChange={(e) => {
                 handleChangeNumberOfApprove(e, params.row.index, index, params.row.barCode);
               }}
