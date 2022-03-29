@@ -35,6 +35,7 @@ export default function TaxInvoiceSearch() {
   const dispatch = useAppDispatch();
   const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const [hideSearchBtn, setHideSearchBtn] = React.useState(true);
+  const [hideRequesthBtn, setHideRequestBtn] = React.useState(true);
   const [values, setValues] = React.useState<State>({
     docNo: '',
     citizenId: '',
@@ -177,6 +178,7 @@ export default function TaxInvoiceSearch() {
 
   React.useEffect(() => {
     setHideSearchBtn(isAllowActionPermission(ACTIONS.SALE_TAX_INVOICE_VIEW));
+    setHideRequestBtn(isAllowActionPermission(ACTIONS.SALE_TAX_INVOICE_REQUEST));
   }, []);
 
   return (
@@ -226,7 +228,7 @@ export default function TaxInvoiceSearch() {
               id='btnSearch'
               variant='contained'
               onClick={onClickRequestBtn}
-              sx={{ width: '200', ml: 1, display: `${hideSearchBtn ? 'none' : ''}` }}
+              sx={{ width: '200', ml: 1, display: `${hideRequesthBtn ? 'none' : ''}` }}
               className={classes.MbtnPrint}
               fullWidth={true}
               color='info'>
@@ -239,7 +241,7 @@ export default function TaxInvoiceSearch() {
               id='btnClear'
               variant='contained'
               onClick={onClickClearBtn}
-              sx={{ width: 110, ml: 2 }}
+              sx={{ width: 150, ml: 2 }}
               className={classes.MbtnClear}
               color='cancelColor'>
               เคลียร์
@@ -249,7 +251,7 @@ export default function TaxInvoiceSearch() {
               variant='contained'
               color='primary'
               onClick={onClickSearchBtn}
-              sx={{ width: '200', ml: 2, display: `${hideSearchBtn ? 'none' : ''}` }}
+              sx={{ width: 150, ml: 2, display: `${hideSearchBtn ? 'none' : ''}` }}
               className={classes.MbtnSearch}>
               ค้นหา
             </Button>

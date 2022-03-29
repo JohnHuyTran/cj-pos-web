@@ -38,7 +38,7 @@ function RequestTaxInvoice({ isOpen, onChangeTaxNo, onClose, onRequest }: Props)
     <React.Fragment>
       <Dialog open={open} maxWidth='sm' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={onClose}>
-          <Typography>ขอออกใบกำกับภาษีจากสำนักงานใหญ่</Typography>
+          <Typography sx={{ fontWeight: 'bold' }}>ขอออกใบกำกับภาษีจากสำนักงานใหญ่</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container rowSpacing={1} columnSpacing={{ xs: 4 }}>
