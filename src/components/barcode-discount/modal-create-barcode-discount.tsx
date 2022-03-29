@@ -134,6 +134,7 @@ export default function ModalCreateBarcodeDiscount({
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
     ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
+  const [branchCodeCheckStock, setBranchCodeCheckStock] = React.useState(getUserInfo().branch ? getUserInfo().branch : '');
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -262,6 +263,9 @@ export default function ModalCreateBarcodeDiscount({
       let currentBranch = stringNullOrEmpty(barcodeDiscountDetail.branchCode) ? '' : (barcodeDiscountDetail.branchCode);
       currentBranch += (stringNullOrEmpty(barcodeDiscountDetail.branchName) ? '' : (' - ' + barcodeDiscountDetail.branchName));
       setCurrentBranch(currentBranch);
+      if (!stringNullOrEmpty(barcodeDiscountDetail.branchCode)) {
+        setBranchCodeCheckStock(barcodeDiscountDetail.branchCode);
+      }
       //set value for data detail
       dispatch(
         updateDataDetail({
@@ -683,7 +687,7 @@ export default function ModalCreateBarcodeDiscount({
         };
       });
       const payload = {
-        branchCode: '0002',
+        branchCode: branchCodeCheckStock,
         products: products,
       };
       const rs = await checkStockBalance(payload);
@@ -696,6 +700,8 @@ export default function ModalCreateBarcodeDiscount({
       }
       return rs.data ? !rs.data.length : true;
     } catch (error) {
+      setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+      setOpenModalError(true);
     }
   };
 
