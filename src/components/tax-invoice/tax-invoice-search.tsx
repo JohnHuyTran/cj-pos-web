@@ -16,6 +16,7 @@ import { Search } from '@mui/icons-material';
 
 interface State {
   docNo: string;
+  citizenId: string;
 }
 interface loadingModalState {
   open: boolean;
@@ -28,6 +29,7 @@ export default function TaxInvoiceSearch() {
   const [hideSearchBtn, setHideSearchBtn] = React.useState(true);
   const [values, setValues] = React.useState<State>({
     docNo: '',
+    citizenId: '',
   });
   const [flagSearch, setFlagSearch] = React.useState(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
@@ -56,6 +58,7 @@ export default function TaxInvoiceSearch() {
   const onClickClearBtn = async () => {
     setValues({
       docNo: '',
+      citizenId:''
     });
     const payload: TaxInvoiceRequest = {
       limit: limit ? limit.toString() : '10',
@@ -67,12 +70,24 @@ export default function TaxInvoiceSearch() {
   };
 
   const validateForm = () => {
-    if (values.docNo.length < 6) {
-      setTextFail('กรุณาระบุเลขเอกสารอย่างน้อย 6 หลัก');
-      return false;
+    let errText = '';
+    let isNoError = true;
+    if(!values.docNo && !values.citizenId){
+      errText = 'กรุณาระบุเลขเอกสารหรือเลขที่บัตรประชาชน';
+      isNoError= false;
+    }
+    if (values.docNo && values.docNo.length < 6) {
+      errText ='กรุณาระบุเลขเอกสารอย่างน้อย 6 หลัก';
+      isNoError =  false;
     }
 
-    return true;
+    if (values.citizenId && values.citizenId.length != 13) {
+      errText  = errText ? `${errText}\n กรุณาระบุเลขที่บัตรประชาชน 13 หลัก `: 'กรุณาระบุเลขที่บัตรประชาชน 13 หลัก';
+      isNoError = false;
+    }
+
+    setTextFail(errText)
+    return isNoError;
   };
 
   const onClickSearchBtn = async () => {
@@ -89,6 +104,7 @@ export default function TaxInvoiceSearch() {
         limit: limits,
         page: page,
         docNo: values.docNo,
+        citizenId: values.citizenId,
       };
       await dispatch(featchTaxInvoiceListAsync(payload));
       await dispatch(savePayloadSearchList(payload));
@@ -123,7 +139,23 @@ export default function TaxInvoiceSearch() {
               autoComplete="off"
             />
           </Grid>
-          <Grid item xs={8} container alignItems="flex-end"></Grid>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              เลขที่บัตรประชาชน
+            </Typography>
+            <TextField
+              id="txtCitizenId"
+              name="citizenId"
+              size="small"
+              value={values.citizenId}
+              onChange={handleChange}
+              className={classes.MtextField}
+              fullWidth
+              placeholder=""
+              autoComplete="off"
+            />
+          </Grid>
+          <Grid item xs={4} container alignItems="flex-end"></Grid>
           <Grid item xs={8} container alignItems="flex-end"></Grid>
           <Grid item xs={4} container alignItems="flex-end">
             <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">

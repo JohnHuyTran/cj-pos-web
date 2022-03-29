@@ -38,6 +38,10 @@ export const featchTaxInvoiceListAsync = createAsyncThunk('TaxInvoiceList', asyn
     if (payload.docNo) {
       path = path + `&docNo=${payload.docNo}`;
     }
+    if (payload.citizenId) {
+      path = path + `&citizenId=${payload.citizenId}`;
+    }
+
     let response = await get(path).then();
     return response;
   } catch (error) {

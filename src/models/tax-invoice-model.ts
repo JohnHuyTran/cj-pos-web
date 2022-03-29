@@ -2,6 +2,7 @@ export interface TaxInvoiceRequest {
   limit?: string;
   page?: string;
   docNo?: string;
+  citizenId? : string;
   sortBy?: string;
   billNo?: string;
 }
