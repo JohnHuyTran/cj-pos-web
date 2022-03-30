@@ -19,6 +19,7 @@ import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { Item, ItemGroups } from '../../models/stock-transfer-model';
 import { isGroupBranch } from '../../utils/role-permission';
+import { DeleteForever } from '@mui/icons-material';
 
 interface Props {
   skuCodeSelect: string;
@@ -143,6 +144,24 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
   },
+  {
+    field: 'delete',
+    headerName: ' ',
+    width: 50,
+    align: 'center',
+    sortable: false,
+    renderCell: (params) => {
+      if (params.getValue(params.id, 'edit')) {
+        return (
+          <div>
+            <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
+          </div>
+        );
+      } else {
+        return <div></div>;
+      }
+    },
+  },
 ];
 
 const chkReturnQty = (value: any) => {
@@ -214,6 +233,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
         toteCode: item.toteCode ? item.toteCode : '',
         isDisable: isDisable,
         boNo: item.boNo,
+        edit: true,
       };
     });
 
@@ -321,7 +341,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
 
       if (dupItem) {
         let _toteCode: string = dataRow.toteCode;
-        _toteCode= _toteCode.trim();
+        _toteCode = _toteCode.trim();
 
         const newData: Item = {
           seqItem: dataRow.seqItem,
