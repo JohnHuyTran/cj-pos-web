@@ -344,6 +344,9 @@ export const environment = {
       saveInvoice: {
         url: '/sale/tax-invoices',
       },
+      requestTaxInvoice: {
+        url: '/sale/request/{billNo}',
+      },
       printHistory: {
         url: '/sale/tax-invoices/{billNo}/print-history',
       },

@@ -5,15 +5,25 @@ import { useStyles } from '../../styles/makeTheme';
 import { Button } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { featchTaxInvoiceListAsync, savePayloadSearchList } from '../../store/slices/tax-invoice-search-list-slice';
+import {
+  featchTaxInvoiceListAsync,
+  savePayloadSearchList,
+  saveTaxInvoiceList,
+} from '../../store/slices/tax-invoice-search-list-slice';
 import { TaxInvoiceInfo, TaxInvoiceRequest, TaxInvoiceResponse } from '../../models/tax-invoice-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { featchTaxInvoiceDetailAsync } from '../../store/slices/tax-invoice-search-detail-slice';
 import { useTranslation } from 'react-i18next';
 import ModalTaxInvoiceDetails from './tax-invoice-details';
 import LoadingModal from '../commons/ui/loading-modal';
+import { requestTaxInvoice } from '../../services/sale';
+import { ApiError } from '../../models/api-error-model';
 
-export default function TaxInvoiceSearchList() {
+interface Props {
+  actionType: string;
+}
+
+export default function TaxInvoiceSearchList({ actionType }: Props) {
   const classes = useStyles();
   const { t } = useTranslation(['taxInvoice', 'common']);
   const dispatch = useAppDispatch();
@@ -128,6 +138,7 @@ export default function TaxInvoiceSearchList() {
       limit: pageSize.toString(),
       page: page,
       docNo: payloadSearch.docNo,
+      citizenId: payloadSearch.citizenId,
     };
     await dispatch(featchTaxInvoiceListAsync(payload));
     await dispatch(savePayloadSearchList(payload));
@@ -141,6 +152,7 @@ export default function TaxInvoiceSearchList() {
       limit: pageSize.toString(),
       page: '1',
       docNo: payloadSearch.docNo,
+      citizenId: payloadSearch.citizenId,
     };
 
     await dispatch(featchTaxInvoiceListAsync(payload));
@@ -154,7 +166,7 @@ export default function TaxInvoiceSearchList() {
     if (params.row.billStatus !== 'CANCELLED') {
       setOpenLoadingModal(true);
       const payload: TaxInvoiceRequest = {
-        billNo: params.row.billNo,
+        docNo: params.row.billNo,
       };
       await dispatch(featchTaxInvoiceDetailAsync(payload)).then(() => {
         setOpenDetailModal(true);
@@ -165,6 +177,20 @@ export default function TaxInvoiceSearchList() {
 
   const handleCloseDetailModal = () => {
     setOpenDetailModal(false);
+  };
+
+  const reloadRequestTaxInvoice = async () => {
+    if (actionType === 'search') {
+      await dispatch(featchTaxInvoiceListAsync(payloadSearch));
+    } else if (actionType === 'request') {
+      await requestTaxInvoice(payloadSearch)
+        .then(async (value) => {
+          await dispatch(saveTaxInvoiceList(value));
+        })
+        .catch((error: ApiError) => {
+          console.log('error: ', error);
+        });
+    }
   };
 
   return (

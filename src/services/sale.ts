@@ -2,7 +2,8 @@ import { environment } from '../environment-base';
 import { getPathUrl } from './base-service';
 import { get, put } from '../adapters/posback-adapter';
 import { ContentType } from '../utils/enum/common-enum';
-import { SaveInvoiceRequest } from '../models/tax-invoice-model';
+import { SaveInvoiceRequest, TaxInvoiceRequest } from '../models/tax-invoice-model';
+import { getInvoiceRequest } from '../mockdata/sale';
 
 export const getPathInvoiceDetail = (billNo: string) => {
   return getPathUrl(`${environment.sale.taxInvoice.detail.url}`, {
@@ -39,3 +40,19 @@ export async function searchMemberInformation(memberNo: string) {
     });
   return response;
 }
+
+export async function requestTaxInvoice(payload: TaxInvoiceRequest) {
+  // const response = await get(getPathRequestTaxInvoice(billNo), ContentType.JSON)
+  //   .then((result: any) => result)
+  //   .catch((error) => {
+  //     throw error;
+  //   });
+  const response = getInvoiceRequest().then((result: any) => result);
+  return response;
+}
+
+export const getPathRequestTaxInvoice = (billNo: string) => {
+  return getPathUrl(`${environment.sale.taxInvoice.requestTaxInvoice.url}`, {
+    billNo: billNo,
+  });
+};
