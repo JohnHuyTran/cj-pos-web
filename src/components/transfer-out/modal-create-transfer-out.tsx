@@ -270,9 +270,6 @@ export default function ModalCreateTransferOut({
         store: 'กรุณาระบุรายละเอียด'
       });
     }
-    if (!isValid) {
-      return;
-    }
 
     //validate product
     const data = [...payloadTransferOut.products];
@@ -292,13 +289,13 @@ export default function ModalCreateTransferOut({
           } else {
             if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
-              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่เกินจำนวนที่ขอลด';
+              item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องไม่เกินจำนวนคำขอ';
             }
           }
         } else {
           if (preData.numberOfRequested <= 0 || !preData.numberOfRequested) {
             isValid = false;
-            item.errorNumberOfRequested = 'จำนวนที่ขอลดต้องมากกว่า 0';
+            item.errorNumberOfRequested = 'จำนวนคำขอต้องมากกว่า 0';
           }
         }
         if (!isValid) {
@@ -306,10 +303,10 @@ export default function ModalCreateTransferOut({
         }
       }
       errorListProduct = dt;
-      if (!isValid) {
-        dispatch(updateErrorList(errorListProduct));
-        setOpenModalError(true);
-      }
+    }
+    if (!isValid) {
+      dispatch(updateErrorList(errorListProduct));
+      setOpenModalError(true);
     }
     return isValid;
   }
@@ -692,6 +689,7 @@ export default function ModalCreateTransferOut({
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
                     disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL}
+                    error={!stringNullOrEmpty(errors['transferOutReason'])}
                   >
                     <MenuItem value={'1'}>{'เบิกเพื่อแจกลูกค้า'}</MenuItem>
                     <MenuItem value={'2'}>{'เบิกเพื่อทำกิจกรรม'}</MenuItem>
@@ -724,6 +722,7 @@ export default function ModalCreateTransferOut({
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
                     disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL}
+                    error={!stringNullOrEmpty(errors['store'])}
                   >
                     <MenuItem value={'1'}>{'คลังหน้าร้าน'}</MenuItem>
                     <MenuItem value={'2'}>{'คลังหลังร้าน'}</MenuItem>
