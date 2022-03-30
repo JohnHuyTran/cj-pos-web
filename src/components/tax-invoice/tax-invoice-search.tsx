@@ -24,6 +24,7 @@ import { ApiError } from '../../models/api-error-model';
 interface State {
   docNo: string;
   citizenId: string;
+  actionType: string;
 }
 interface loadingModalState {
   open: boolean;
@@ -33,13 +34,14 @@ export default function TaxInvoiceSearch() {
   const classes = useStyles();
   const page = '1';
   const dispatch = useAppDispatch();
-  const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const [hideSearchBtn, setHideSearchBtn] = React.useState(true);
   const [hideRequesthBtn, setHideRequestBtn] = React.useState(true);
-  const [values, setValues] = React.useState<State>({
+  const [values, setValues] = React.useState<TaxInvoiceRequest>({
     docNo: '',
     citizenId: '',
+    actionType: '',
   });
+  const [actionType, setActionType] = React.useState('');
   const [flagSearch, setFlagSearch] = React.useState(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -69,11 +71,14 @@ export default function TaxInvoiceSearch() {
     setValues({
       docNo: '',
       citizenId: '',
+      actionType: '',
     });
     const payload: TaxInvoiceRequest = {
       limit: limit ? limit.toString() : '10',
       page: page,
       docNo: values.docNo,
+      citizenId: values.citizenId,
+      actionType: values.actionType,
     };
     await dispatch(savePayloadSearchList(payload));
     setFlagSearch(false);
@@ -102,7 +107,7 @@ export default function TaxInvoiceSearch() {
 
   const onClickSearchBtn = async () => {
     handleOpenLoading('open', true);
-
+    setActionType('search');
     if (validateForm()) {
       let limits;
       if (limit === 0 || limit === undefined) {
@@ -141,6 +146,7 @@ export default function TaxInvoiceSearch() {
   const callRequestTaxInvoice = async () => {
     onCloseRequestBtn();
     handleOpenLoading('open', true);
+    setActionType('request');
     const payload: TaxInvoiceRequest = {
       docNo: billNo,
     };
@@ -157,23 +163,6 @@ export default function TaxInvoiceSearch() {
       });
 
     handleOpenLoading('open', false);
-  };
-
-  const reloadRequestTaxInvoice = async () => {
-    const payload: TaxInvoiceRequest = {
-      docNo: payloadSearch.billNo,
-    };
-
-    await requestTaxInvoice(payload)
-      .then(async (value) => {
-        console.log('value: ', value);
-        await dispatch(saveTaxInvoiceList(value));
-        // await dispatch(savePayloadSearchList(payload));
-        setFlagSearch(true);
-      })
-      .catch((error: ApiError) => {
-        console.log('error: ', error);
-      });
   };
 
   React.useEffect(() => {
@@ -259,7 +248,7 @@ export default function TaxInvoiceSearch() {
         </Grid>
       </Box>
 
-      {flagSearch && taxInvoiceList.length > 0 && <TaxInvoiceSearchList />}
+      {flagSearch && taxInvoiceList.length > 0 && <TaxInvoiceSearchList actionType={actionType} />}
       {flagSearch && taxInvoiceList.length <= 0 && (
         <Grid item container xs={12} justifyContent='center'>
           <Box color='#CBD4DB'>

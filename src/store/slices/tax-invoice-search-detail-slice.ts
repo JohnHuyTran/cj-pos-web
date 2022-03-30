@@ -22,7 +22,7 @@ const initialState: State = {
 
 export const featchTaxInvoiceDetailAsync = createAsyncThunk('TaxInvoiceDetail', async (payload: TaxInvoiceRequest) => {
   try {
-    const billNo = String(payload.billNo);
+    const billNo = String(payload.docNo);
     const apiRootPath = getPathInvoiceDetail(billNo);
 
     let response: TaxInvoiceDetailResponse = {
@@ -32,11 +32,13 @@ export const featchTaxInvoiceDetailAsync = createAsyncThunk('TaxInvoiceDetail', 
       data: null,
     };
 
-    await get(apiRootPath) .then((value) => {
-      response = value
-    }).catch((error: any) => {
-      console.log("response error :", JSON.stringify(error))
-    })
+    await get(apiRootPath)
+      .then((value) => {
+        response = value;
+      })
+      .catch((error: any) => {
+        console.log('response error :', JSON.stringify(error));
+      });
 
     return response;
   } catch (error) {

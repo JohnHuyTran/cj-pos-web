@@ -2,9 +2,9 @@ export interface TaxInvoiceRequest {
   limit?: string;
   page?: string;
   docNo?: string;
-  citizenId? : string;
+  citizenId?: string;
   sortBy?: string;
-  billNo?: string;
+  actionType?: string;
 }
 export interface TaxInvoiceResponse {
   ref: string;
