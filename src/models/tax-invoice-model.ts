@@ -59,3 +59,24 @@ export interface SaveInvoiceRequest {
   billNo: string;
   customer: Customer;
 }
+
+export interface TaxInvoicePrintHistoryResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: TaxInvoicePrintHistory | null;
+}
+export interface TaxInvoicePrintHistory {
+  type: string;
+  edition: string;
+  printedBy: string;
+  printedByName: string;
+  printedByPosition: string;
+  printedDate: Date;
+  files: TaxInvoiceFiles | null;
+}
+export interface TaxInvoiceFiles {
+  fileKey: string;
+  fileName: string;
+  mimeType: string;
+}

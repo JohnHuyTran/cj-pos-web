@@ -18,6 +18,7 @@ import AlertError from '../commons/ui/alert-warning';
 import { featchTaxInvoiceListAsync } from '../../store/slices/tax-invoice-search-list-slice';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import TaxInvoiceHistory from './tax-invoice-history';
+import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
 
 interface Props {
   isOpen: boolean;
@@ -145,6 +146,9 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
     if (isOpen && taxInvoiceDetail) {
       setBillNo(taxInvoiceDetail.billNo);
+
+      dispatch(featchTaxInvoicePrintHistoryAsync(taxInvoiceDetail.billNo));
+
       if (taxInvoiceDetail.invoiceNo) {
         setDisabledBtnPreview(false);
         setInvoiceNo(taxInvoiceDetail.invoiceNo);

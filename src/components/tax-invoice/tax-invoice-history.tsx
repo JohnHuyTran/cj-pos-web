@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
-import { useAppDispatch } from '../../store/store';
-import { DataGrid, GridApi, GridCellValue, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { useAppSelector } from '../../store/store';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
 import { useStyles } from '../../styles/makeTheme';
 import moment from 'moment';
 import { DateFormat } from '../../utils/enum/common-enum';
 import { Button, Divider, Menu, MenuItem, MenuList, Typography } from '@mui/material';
 import { MoreVertOutlined } from '@mui/icons-material';
+import { FileType } from '../../models/supplier-check-order-model';
+import { getFileUrlHuawei } from '../../services/master-service';
+import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
 
 export interface DataGridProps {
   billNo: string;
@@ -80,11 +83,11 @@ const columns: GridColDef[] = [
     width: 40,
     align: 'center',
     sortable: false,
-    renderCell: () => handleModelAction(),
+    renderCell: (params) => handleModelAction(params),
   },
 ];
 
-const handleModelAction = () => {
+const handleModelAction = (params: GridRenderCellParams) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
   const handleMenuClose = async () => {
@@ -94,37 +97,71 @@ const handleModelAction = () => {
     setAnchorEl(event.currentTarget);
   };
 
+  const [displayFile, setDisplayFile] = React.useState(false);
+  const [fileUrl, setFileUrl] = React.useState<string>('');
+  const [newFilename, setNewFilename] = React.useState<string>('test-rename');
+  const [isImage, setIsImage] = React.useState(false);
+  async function getHuaweiFileUrl(item: FileType) {
+    await getFileUrlHuawei(item.fileKey)
+      .then((resp) => {
+        if (resp && resp.data) {
+          setFileUrl(resp.data);
+          setIsImage(item.mimeType === 'image/jpeg');
+          setNewFilename(item.fileName);
+          setDisplayFile(true);
+        }
+      })
+      .catch((error: any) => {
+        console.log('getFileUrlHuawei error', error);
+      });
+  }
+
+  const fileList: any = params.getValue(params.id, 'files');
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'left',
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'left',
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuList sx={{ width: 200 }}>
-        <MenuItem>
-          <Typography variant='body1'>เอกสารแนบ</Typography>
-        </MenuItem>
-        <Divider />
+    <>
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        id={menuId}
+        keepMounted
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        open={isMenuOpen}
+        onClose={handleMenuClose}
+      >
+        <MenuList sx={{ width: 300 }}>
+          <MenuItem>
+            <Typography variant='body1'>เอกสารแนบ</Typography>
+          </MenuItem>
+          <Divider />
 
-        <MenuItem>
-          <Typography variant='body2'>format_number.jpg</Typography>
-        </MenuItem>
-        <MenuItem>
-          <Typography variant='body2'>format_number.jpg</Typography>
-        </MenuItem>
-      </MenuList>
-    </Menu>
+          {fileList &&
+            fileList.length > 0 &&
+            fileList.map((item: any, index: number) => (
+              <MenuItem key={`item-${index + 1}-${item.fileKey}`} onClick={() => getHuaweiFileUrl(item)}>
+                <Typography color='secondary' sx={{ textDecoration: 'underline', fontSize: '13px' }}>
+                  {item.fileName}
+                </Typography>
+              </MenuItem>
+            ))}
+        </MenuList>
+      </Menu>
+
+      <ModalShowHuaweiFile
+        open={displayFile}
+        onClose={() => setDisplayFile(false)}
+        fileName={newFilename}
+        url={fileUrl}
+        isImage={isImage}
+        isPrint={false}
+      />
+    </>
   );
 
   return (
@@ -139,26 +176,24 @@ const handleModelAction = () => {
 };
 
 export default function TaxInvoiceHistory({ billNo }: DataGridProps) {
-  const dispatch = useAppDispatch();
-  const _ = require('lodash');
   const classes = useStyles();
+  const taxInvoicePrintHistory = useAppSelector((state) => state.taxInvoicePrintHistory.detail);
+  const historyDetail: any = taxInvoicePrintHistory.data ? taxInvoicePrintHistory.data : [];
+
   let rows: any = [];
-
-  for (let i = 0; i < 20; i++) {
-    console.log('i === ', i);
-    let item: any = {
-      id: `index-${i}`,
-      index: i,
-      name: `ซีเจ-${i}`,
-      position: 'ผู้จัดการสาขา',
-      type: 'ต้นฉบับ',
-      printNo: '1',
-      date: moment(new Date()).format(DateFormat.DATE_TIME_DISPLAY_FORMAT),
+  rows = historyDetail.map((item: any, index: number) => {
+    return {
+      id: `${item.skuCode}-${index + 1}`,
+      index: index + 1,
+      name: item.printedByName,
+      position: item.printedByPosition,
+      type: item.type,
+      printNo: item.edition,
+      date: moment(item.printedDate).format(DateFormat.DATE_TIME_DISPLAY_FORMAT),
       action: '',
+      files: item.files,
     };
-
-    rows.push(item);
-  }
+  });
 
   useEffect(() => {}, []);
 
