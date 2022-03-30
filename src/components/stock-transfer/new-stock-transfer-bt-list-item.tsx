@@ -417,6 +417,19 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
     }
   };
 
+  const currentlySelected = async (params: GridCellParams) => {
+    const value = params.colDef.field;
+
+    if (value === 'delete') {
+      setRtNoDel(params.row.rtNo);
+      setOpenModelDeleteConfirm(true);
+    } else {
+      handleOpenLoading('open', true);
+      await handleOpenDetailModal(params.row.rtNo, params.row.edit);
+      handleOpenLoading('open', false);
+    }
+  };
+
   return (
     <Box mt={2} bgcolor='background.paper'>
       <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
