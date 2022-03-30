@@ -132,6 +132,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
   const [status, setStatus] = React.useState('');
   const [billNo, setBillNo] = React.useState('');
+  const [invoiceNo, setInvoiceNo] = React.useState('-');
   const [memberNo, setMemberNo] = React.useState('');
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
   const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
@@ -143,7 +144,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
     if (isOpen && taxInvoiceDetail) {
       setBillNo(taxInvoiceDetail.billNo);
-      if (taxInvoiceDetail.invoiceNo) setDisabledBtnPreview(false);
+      if (taxInvoiceDetail.invoiceNo) {
+        setDisabledBtnPreview(false);
+        setInvoiceNo(taxInvoiceDetail.invoiceNo);
+      }
 
       setStatus(taxInvoiceDetail.status);
       setMemberNo(taxInvoiceDetail.customer.memberNo);
@@ -398,12 +402,22 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
           <Grid container spacing={1}>
             <Grid item xs={2} mb={3}>
               <Typography gutterBottom variant='subtitle1' component='div'>
-                เลขที่ใบเสร็จ/ใบกำกับ :
+                เลขที่ใบเสร็จ(ย่อ) :
               </Typography>
             </Grid>
-            <Grid item xs={10} mb={2}>
+            <Grid item xs={4} mb={2}>
               <Typography gutterBottom variant='subtitle1' component='div'>
                 {billNo}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} mb={3}>
+              <Typography gutterBottom variant='subtitle1' component='div'>
+                เลขที่ใบเสร็จ(เต็ม) :
+              </Typography>
+            </Grid>
+            <Grid item xs={4} mb={2}>
+              <Typography gutterBottom variant='subtitle1' component='div'>
+                {invoiceNo}
               </Typography>
             </Grid>
           </Grid>

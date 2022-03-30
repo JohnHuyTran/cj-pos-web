@@ -74,6 +74,31 @@ const invoiceDetailIsMember = {
   },
 };
 
+const invoiceRequest = {
+  ref: '1',
+  code: '20000',
+  message: 'success',
+  // total: 3,
+  // page: 1,
+  // perPage: 10,
+  // prev: 0,
+  // next: 0,
+  // totalPage: 3,
+  data: {
+    billNo: 'S22010022N01-000012',
+    docDate: '2022-03-08T17:00:00Z',
+    status: 'PRINTED',
+    invoiceNo: 'SI22030022N01-000016',
+    totalPrint: 1,
+    lastPrintedDate: '2022-03-08T17:00:00Z',
+  },
+};
+
+export function getInvoiceRequest() {
+  return new Promise((resolve, reject) => {
+    resolve(invoiceRequest);
+  });
+}
 export function getInvoiceList() {
   return new Promise((resolve, reject) => {
     resolve(invoiceList);
