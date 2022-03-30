@@ -8,15 +8,15 @@ import { Action, BDStatus, DateFormat, TOStatus } from '../../utils/enum/common-
 import { objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import HtmlTooltip from '../../components/commons/ui/html-tooltip';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { saveSearchCriteriaSup } from '../../store/slices/save-search-order-supplier-slice';
-import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import moment from 'moment';
 import { TransferOut, TransferOutSearchRequest, TransferOutSearchResponse } from '../../models/transfer-out-model';
-import ModalCreateTransferOut from "../../components/transfer-out/modal-create-transfer-out";
-import { getTransferOutDetail } from "../../store/slices/transfer-out-detail-slice";
+import ModalCreateTransferOut from '../../components/transfer-out/modal-create-transfer-out';
+import { getTransferOutDetail } from '../../store/slices/transfer-out-detail-slice';
+import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
+import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
 
 const _ = require('lodash');
 
@@ -112,23 +112,13 @@ const TransferOutList: React.FC<StateProps> = (props) => {
     setOpenPopup(false);
   };
 
-  const renderCell = (value: any) => {
-    return (
-      <HtmlTooltip title={<React.Fragment>{value}</React.Fragment>}>
-        <Typography variant="body2" noWrap>
-          {value}
-        </Typography>
-      </HtmlTooltip>
-    );
-  };
-
   const columns: GridColDef[] = [
     {
       field: 'index',
       headerName: t('numberOrder'),
       headerAlign: 'center',
       sortable: false,
-      flex: 0.5,
+      minWidth: 50,
       renderCell: (params) => (
         <Box component="div" sx={{ margin: '0 auto' }}>
           {params.value}
@@ -140,14 +130,14 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: 'เอกสารเบิก',
       headerAlign: 'center',
       sortable: false,
-      flex: 1.5,
+      minWidth: 260,
     },
     {
       field: 'transactionDate',
       headerName: 'วันที่ทำรายการ',
       headerAlign: 'center',
       sortable: false,
-      flex: 0.9,
+      minWidth: 200,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '1rem' }}>
           {params.value}
@@ -159,7 +149,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: 'วันที่อนุมัติ',
       headerAlign: 'center',
       sortable: false,
-      flex: 0.9,
+      minWidth: 200,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '1rem' }}>
           {params.value}
@@ -172,7 +162,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
-      flex: 0.8,
+      minWidth: 200,
       renderCell: (params) => genRowStatus(params),
     },
     {
@@ -180,7 +170,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: 'ผู้บันทึก',
       headerAlign: 'center',
       sortable: false,
-      flex: 1,
+      minWidth: 250,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '1rem' }}>
           {params.value}
@@ -192,7 +182,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: 'ผู้อนุมัติ',
       headerAlign: 'center',
       sortable: false,
-      flex: 1,
+      minWidth: 250,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '1rem' }}>
           {params.value}
@@ -247,8 +237,8 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       endDate: payload.endDate,
     };
 
-    await dispatch(barcodeDiscountSearch(payloadNewPage));
-    await dispatch(saveSearchCriteriaSup(payloadNewPage));
+    await dispatch(transferOutGetSearch(payloadNewPage));
+    await dispatch(saveSearchCriteriaTO(payloadNewPage));
     setLoading(false);
   };
 
@@ -265,8 +255,8 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       endDate: payload.endDate,
     };
 
-    await dispatch(barcodeDiscountSearch(payloadNewPage));
-    await dispatch(saveSearchCriteriaSup(payloadNewPage));
+    await dispatch(transferOutGetSearch(payloadNewPage));
+    await dispatch(saveSearchCriteriaTO(payloadNewPage));
     setLoading(false);
   };
 
