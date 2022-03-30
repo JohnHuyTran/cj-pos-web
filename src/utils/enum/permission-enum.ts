@@ -46,6 +46,7 @@ export enum ACTIONS {
   ORDER_VER_MANAGE = 'order.ver.manage',
 
   SALE_TAX_INVOICE_VIEW = 'sale.tax.view',
+  SALE_TAX_INVOICE_REQUEST = 'sale.tax.view',
 }
 
 export enum MAINMENU {
