@@ -833,7 +833,7 @@ export default function ModalCreateTransferOut({
                 <Button
                   id='btnEnd'
                   variant='contained'
-                  style={{ display: status == TOStatus.APPROVED ? undefined : 'none' }}
+                  style={{ display: (status != TOStatus.APPROVED || approvePermission) ? 'none' : undefined}}
                   color='info'
                   startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirmEnd}
