@@ -322,7 +322,7 @@ function OrderList() {
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           loading={loading}
-          rowHeight={65}
+          rowHeight={85}
           pagination
         />
       </div>
