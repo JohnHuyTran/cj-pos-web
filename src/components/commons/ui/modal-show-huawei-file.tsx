@@ -116,6 +116,9 @@ export default function ModalShowHuaweiFile({
         {isPrint !== false && (
           <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose} onPrint={showPrint} />
         )}
+
+        {isPrint === false && <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose} />}
+
         <DialogContent
           sx={{
             minWidth: 600,
