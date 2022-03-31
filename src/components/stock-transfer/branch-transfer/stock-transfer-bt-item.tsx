@@ -299,13 +299,8 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
         }
       });
     }
-    // const orderItem = _.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']);
     setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    // dispatch(updateAddItemSkuGroupState(_.orderBy(_sku, ['skuCode'], ['asc'])));
-    // dispatch(updateAddItemsGroupState(orderItem));
-
     onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    // onUpdateSkuList(_sku);
   };
 
   const storeItem = async () => {
@@ -321,7 +316,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
 
       if (dupItem) {
         let _toteCode: string = dataRow.toteCode;
-        _toteCode= _toteCode.trim();
+        _toteCode = _toteCode.trim();
         const newData: Item = {
           seqItem: dataRow.seqItem,
           barcode: dataRow.barcode,
@@ -365,9 +360,8 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
       };
       _newSku.push(newData);
     });
-     setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-     onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    //  onUpdateSkuList(_newSku);
+    setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
   };
 
   let newColumns = [...columns];

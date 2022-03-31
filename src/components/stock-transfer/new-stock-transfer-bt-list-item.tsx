@@ -402,8 +402,10 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
   let newColumns = [...columns];
   if (branchTransferInfo.status != 'CREATED') {
     newColumns[7]['hide'] = false;
+    newColumns[8]['hide'] = true;
   } else {
     newColumns[7]['hide'] = true;
+    newColumns[8]['hide'] = false;
   }
 
   const handleEditItems = (params: GridCellParams) => {

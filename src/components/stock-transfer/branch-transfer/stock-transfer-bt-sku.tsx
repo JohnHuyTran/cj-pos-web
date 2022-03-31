@@ -16,81 +16,80 @@ interface Props {
   onSelectSku: (value: any) => void;
   skuList: ItemGroups[];
   onUpdateItemList: (item: Item[]) => void;
-  
 }
-  const columns: GridColDef[] = [
-    {
-      field: 'index',
-      headerName: 'ลำดับ',
-      minWidth: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: 'productName',
-      headerName: 'รายละเอียดสินค้า',
-      headerAlign: 'center',
-      minWidth: 220,
-      flex: 1,
-      sortable: false,
-      renderCell: (params) => (
-        <div>
-          <Typography variant='body2'>{params.value}</Typography>
-          <Typography color='textSecondary' sx={{ fontSize: 12 }}>
-            {params.getValue(params.id, 'skuCode') || ''}
-          </Typography>
-        </div>
-      ),
-    },
-    {
-      field: 'remainingQty',
-      headerName: 'สต๊อกสินค้าคงเหลือ',
-      minWidth: 200,
-      headerAlign: 'center',
-      align: 'right',
-      sortable: false,
-      renderCell: (params) => numberWithCommas(params.value),
-    },
-    {
-      field: 'orderAllQty',
-      headerName: 'สั่ง(ชิ้น)',
-      minWidth: 200,
-      headerAlign: 'center',
-      sortable: false,
-      align: 'right',
-      renderCell: (params) => params.value,
-    },
-    {
-      field: 'actualAllQty',
-      headerName: 'จัด(ชิ้น)',
-      minWidth: 200,
-      headerAlign: 'center',
-      sortable: false,
-      align: 'right',
-      renderCell: (params) => params.value,
-    },
-    {
-      field: 'unitDiff',
-      headerName: 'ส่วนต่าง',
-      minWidth: 200,
-      headerAlign: 'center',
-      sortable: false,
-      align: 'right',
-      renderCell: (params: GridRenderCellParams) => calProductDiff(params),
-    },
-  ];  
-  var calProductDiff = function (params: GridValueGetterParams) {
-    let diff = Number(params.getValue(params.id, 'actualAllQty')) - Number(params.getValue(params.id, 'orderAllQty'));
+const columns: GridColDef[] = [
+  {
+    field: 'index',
+    headerName: 'ลำดับ',
+    minWidth: 70,
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params) => (
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
+        {params.value}
+      </Box>
+    ),
+  },
+  {
+    field: 'productName',
+    headerName: 'รายละเอียดสินค้า',
+    headerAlign: 'center',
+    minWidth: 220,
+    flex: 1,
+    sortable: false,
+    renderCell: (params) => (
+      <div>
+        <Typography variant='body2'>{params.value}</Typography>
+        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+          {params.getValue(params.id, 'skuCode') || ''}
+        </Typography>
+      </div>
+    ),
+  },
+  {
+    field: 'remainingQty',
+    headerName: 'สต๊อกสินค้าคงเหลือ',
+    minWidth: 200,
+    headerAlign: 'center',
+    align: 'right',
+    sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
+  },
+  {
+    field: 'orderAllQty',
+    headerName: 'สั่ง(ชิ้น)',
+    minWidth: 200,
+    headerAlign: 'center',
+    sortable: false,
+    align: 'right',
+    renderCell: (params) => params.value,
+  },
+  {
+    field: 'actualAllQty',
+    headerName: 'จัด(ชิ้น)',
+    minWidth: 200,
+    headerAlign: 'center',
+    sortable: false,
+    align: 'right',
+    renderCell: (params) => params.value,
+  },
+  {
+    field: 'unitDiff',
+    headerName: 'ส่วนต่าง',
+    minWidth: 200,
+    headerAlign: 'center',
+    sortable: false,
+    align: 'right',
+    renderCell: (params: GridRenderCellParams) => calProductDiff(params),
+  },
+];
+var calProductDiff = function (params: GridValueGetterParams) {
+  let diff = Number(params.getValue(params.id, 'actualAllQty')) - Number(params.getValue(params.id, 'orderAllQty'));
 
-    if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
-    if (diff > 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> +{diff} </label>;
-    return diff;
-  };
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  if (diff > 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> +{diff} </label>;
+  return diff;
+};
 function BranchTransferListSKU({ onSelectSku, skuList }: Props) {
   const classes = useStyles();
 
@@ -106,13 +105,14 @@ function BranchTransferListSKU({ onSelectSku, skuList }: Props) {
   const [isDraft, setIsDraft] = React.useState(false);
 
   const [pageSize, setPageSize] = React.useState<number>(5);
-const [selectSKU, setSelectSKU] = React.useState('');
+  const [selectSKU, setSelectSKU] = React.useState('');
   const currentlySelected = async (params: GridCellParams) => {
-    const skuCode = objectNullOrEmpty(params.getValue(params.id, 'skuCode'))? '': params.getValue(params.id, 'skuCode')?.toString();
-    setSelectSKU(skuCode? skuCode:'')
+    const skuCode = objectNullOrEmpty(params.getValue(params.id, 'skuCode'))
+      ? ''
+      : params.getValue(params.id, 'skuCode')?.toString();
+    setSelectSKU(skuCode ? skuCode : '');
     onSelectSku(skuCode);
   };
-  
 
   let rows = btItemGroups.map((item: ItemGroups, index: number) => {
     return {
@@ -126,7 +126,6 @@ const [selectSKU, setSelectSKU] = React.useState('');
       isDraft: isDraft,
     };
   });
-
 
   React.useEffect(() => {
     setBtItemGroups(skuList);
@@ -190,37 +189,36 @@ const [selectSKU, setSelectSKU] = React.useState('');
     // dispatch(updateAddItemSkuGroupState(_newSku));
   };
 
-const updateSKUList = (_newItem: Item[])=>{
+  const updateSKUList = (_items: Item[]) => {
     let _sku = [...btItemGroups];
     let _newSku: ItemGroups[] = [];
-    if (Object.keys(_newItem).length !== 0) {
-        _newItem.map((data: any, index: number) => {
-            const dupSku: any = btItemGroups.find((item: ItemGroups, index: number) => {
-                return item.skuCode === data.skuCode;
-              });
-      
-                const newData: ItemGroups = {
-                  skuCode: dupSku.skuCode,
-                  productName: dupSku.productName,
-                  orderAllQty: dupSku.orderAllQty,
-                  actualAllQty: dupSku.actualAllQty + data.baseUnit * data.qty,
-                  remainingQty: dupSku.remainingQty,
-                };
-                _.remove(_sku, function (item: ItemGroups) {
-                  return item.skuCode === data.skuCode;
-                });
-                _sku = [..._sku, newData];
-  
-        _newSku.push(newData);
-      });
-    }
-      setBtItemGroups(_newSku);
-}
 
+    _sku.forEach((data: ItemGroups) => {
+      const sum = _items
+        .filter((dataItem: Item) => {
+          return data.skuCode === dataItem.skuCode;
+        })
+        .reduce((sum, dataItem: Item) => {
+          return (
+            sum + Number((dataItem.actualQty ? dataItem.actualQty : 0) * (dataItem.barFactor ? dataItem.barFactor : 0))
+          );
+        }, 0);
 
-  return (<>
-    <Box mt={2} bgcolor='background.paper' id='item-sku'>
-      <div style={{ width: '100%', height: rows.length >= 5 ? '45vh' : 'auto' }} className={classes.MdataGridDetail}>
+      const newData: ItemGroups = {
+        skuCode: data.skuCode,
+        productName: data.productName,
+        orderAllQty: data.orderAllQty,
+        actualAllQty: sum,
+        remainingQty: data.remainingQty,
+      };
+      _newSku.push(newData);
+    });
+    setBtItemGroups(_newSku);
+  };
+
+  return (
+    <>
+      <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
         <DataGrid
           rows={rows}
           columns={columns}
@@ -235,8 +233,8 @@ const updateSKUList = (_newItem: Item[])=>{
           onCellClick={currentlySelected}
         />
       </div>
-    </Box>
-    <BranchTransferListItem skuCodeSelect={selectSKU} onUpdateItemList={updateSKUList } />
+
+      <BranchTransferListItem skuCodeSelect={selectSKU} onUpdateItemList={updateSKUList} />
     </>
   );
 }
