@@ -20,6 +20,7 @@ import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import TaxInvoiceHistory from './tax-invoice-history';
 import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
+import { clearUploadFileState, uploadFileState } from '../../store/slices/upload-file-slice';
 
 interface Props {
   isOpen: boolean;
@@ -60,10 +61,11 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
-  const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
+  // const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
   // console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
 
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [flagSave, setFlagSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const handleExitModelConfirm = async () => {
@@ -76,7 +78,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleChkEditClose = async () => {
-    if (flagSave) {
+    if (flagSave || fileUploadList.length > 0) {
       setConfirmModelExit(true);
     } else {
       handleClose();
@@ -88,7 +90,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     setMemberNo('');
     handleClear();
 
-    dispatch(featchTaxInvoiceListAsync(payloadSearch));
+    // dispatch(featchTaxInvoiceListAsync(payloadSearch));
+
+    // if (fileUploadList.length > 0)
+    // await dispatch(clearUploadFileState());
 
     setOpen(false);
     onClickClose();
@@ -155,7 +160,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       dispatch(featchTaxInvoicePrintHistoryAsync(taxInvoiceDetail.billNo));
 
       if (taxInvoiceDetail.invoiceNo) {
-        setDisabledBtnPreview(false);
         setInvoiceNo(taxInvoiceDetail.invoiceNo);
       }
 
@@ -178,7 +182,11 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         else setDefaultData(taxInvoiceDetail);
       }
     }
-  }, [isOpen]);
+
+    if (fileUploadList.length > 0) setDisabledBtnPreview(false);
+    else if (fileUploadList.length == 0) setDisabledBtnPreview(true);
+    setConfirmModelExit(false);
+  }, [isOpen, fileUploadList]);
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
@@ -418,6 +426,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const handleOnChangeUploadFile = (status: boolean) => {
     setUploadFileFlag(status);
+    // console.log('handleOnChangeUploadFile xxx ------>', uploadFileFlag);
   };
 
   return (
@@ -714,15 +723,23 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
 
             <Grid item xs={1}></Grid>
-            <Grid item xs={5}>
-              <AccordionUploadFile
-                files={[]}
-                docNo=''
-                docType='PN'
-                isStatus={uploadFileFlag}
-                onChangeUploadFile={handleOnChangeUploadFile}
-                enabledControl={true}
-              />
+            <Grid item xs={1}>
+              <Typography gutterBottom variant='subtitle1' component='div' mb={2}>
+                แนบไฟล์ :
+              </Typography>
+            </Grid>
+            <Grid item xs={4}>
+              {status === 'PRINTED' && (
+                <Box ml={2}>
+                  <AccordionUploadFile
+                    files={[]}
+                    isStatus={uploadFileFlag}
+                    onChangeUploadFile={handleOnChangeUploadFile}
+                    enabledControl={true}
+                    reMark='แนบไฟล์ใบแทน / สำเนาบัตรประชาชน .pdf/.jpg ขนาดไม่เกิน 5 mb'
+                  />
+                </Box>
+              )}
             </Grid>
 
             <Grid item xs={1}></Grid>
