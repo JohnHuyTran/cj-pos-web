@@ -389,7 +389,7 @@ export default function CheckOrderDetail({
   const handleCalculateDCPercent = async () => {
     let sumPercent: number = (sumActualQtyApprove1 * 100) / sumQuantityRefApprove1;
     sumPercent = Math.trunc(sumPercent); //remove decimal
-
+    console.log('sumPercent: ', sumPercent);
     if (sumPercent >= 0) {
       setSumDCPercent(sumPercent);
     }
