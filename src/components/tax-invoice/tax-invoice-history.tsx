@@ -12,10 +12,6 @@ import { getFileUrlHuawei } from '../../services/master-service';
 import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
 import { useTranslation } from 'react-i18next';
 
-export interface DataGridProps {
-  billNo: string;
-}
-
 const columns: GridColDef[] = [
   {
     field: 'index',
@@ -176,7 +172,7 @@ const handleModelAction = (params: GridRenderCellParams) => {
   );
 };
 
-export default function TaxInvoiceHistory({ billNo }: DataGridProps) {
+export default function TaxInvoiceHistory() {
   const classes = useStyles();
   const { t } = useTranslation(['taxInvoice', 'common']);
   const taxInvoicePrintHistory = useAppSelector((state) => state.taxInvoicePrintHistory.detail);

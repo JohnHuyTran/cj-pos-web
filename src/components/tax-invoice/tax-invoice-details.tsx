@@ -4,7 +4,7 @@ import Dialog from '@mui/material/Dialog';
 import { useStyles } from '../../styles/makeTheme';
 import { ContentPaste, HighlightOff, Save, Sync } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
-import { Box, Button, DialogTitle, FormHelperText, Grid, IconButton, TextField } from '@mui/material';
+import { Box, Button, DialogTitle, FormHelperText, Grid, IconButton, TextField, Link } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
@@ -19,6 +19,7 @@ import { featchTaxInvoiceListAsync } from '../../store/slices/tax-invoice-search
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import TaxInvoiceHistory from './tax-invoice-history';
 import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
+import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 
 interface Props {
   isOpen: boolean;
@@ -138,6 +139,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [memberNo, setMemberNo] = React.useState('');
 
   const [disabledBtnEdit, setDisabledBtnEdit] = React.useState(true);
+  const [editMode, setEditMode] = React.useState(false);
+
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
   const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
   const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
@@ -161,6 +164,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
       if (taxInvoiceDetail.status === 'PRINTED') {
         setDisabledBtnEdit(false);
+        setEditMode(true);
         setDisabledBtnClear(true);
         setDisabledBtnSave(true);
         setDefaultData(taxInvoiceDetail);
@@ -169,6 +173,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         setDisabledSelDistricts(true);
         setDisabledSelSubDistricts(true);
       } else {
+        setEditMode(false);
         if (taxInvoiceDetail.customer.memberNo) handleSearchMember(taxInvoiceDetail.customer.memberNo);
         else setDefaultData(taxInvoiceDetail);
       }
@@ -395,6 +400,26 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const handleEditMode = () => {
+    if (editMode) {
+      setOpenLoadingModal(true);
+      setTimeout(() => {
+        setOpenLoadingModal(false);
+
+        setEditMode(false);
+        setDisabledBtnClear(false);
+        setDisabledSelProvinces(false);
+        setDisabledSelDistricts(false);
+        setDisabledSelSubDistricts(false);
+      }, 300);
+    }
+  };
+
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
+  const handleOnChangeUploadFile = (status: boolean) => {
+    setUploadFileFlag(status);
+  };
+
   return (
     <Dialog open={open} maxWidth='xl' fullWidth={true}>
       <BootstrapDialogTitle id='customized-dialog-title' onClose={handleChkEditClose}>
@@ -430,7 +455,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               <Button
                 id='btnCreateStockTransferModal'
                 variant='contained'
-                // onClick={handleOpenCreateModal}
+                onClick={handleEditMode}
                 className={classes.MbtnClear}
                 color='secondary'
                 sx={{ width: 120, display: `${disabledBtnEdit ? 'none' : ''}` }}
@@ -476,7 +501,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 inputProps={{ maxLength: 13 }}
                 {...register('taxNo', { required: true, maxLength: 13 })}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
               {errors.taxNo && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -499,7 +524,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกชื่อ / ชื่อบริษัท'
                 {...register('firstName', { required: true })}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
               {errors.firstName && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -522,7 +547,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกนามสกุล'
                 {...register('lastName')}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -546,7 +571,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกเลขที่'
                 {...register('houseNo', { required: true })}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
 
               {errors.houseNo && (
@@ -570,7 +595,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกเลขอาคาร'
                 {...register('building')}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -589,7 +614,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกหมู่'
                 {...register('moo')}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -679,7 +704,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 onChange={(e) => {
                   handleChangePostalCode(e);
                 }}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
               {errors.postcode && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -687,7 +712,20 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 </FormHelperText>
               )}
             </Grid>
-            <Grid item xs={7}></Grid>
+
+            <Grid item xs={1}></Grid>
+            <Grid item xs={5}>
+              <AccordionUploadFile
+                files={[]}
+                docNo=''
+                docType='PN'
+                isStatus={uploadFileFlag}
+                onChangeUploadFile={handleOnChangeUploadFile}
+                enabledControl={true}
+              />
+            </Grid>
+
+            <Grid item xs={1}></Grid>
           </Grid>
         </Box>
 
@@ -721,24 +759,26 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 เคลียร์
               </Button>
 
-              <Button
-                id='btnSearch'
-                variant='contained'
-                color='warning'
-                startIcon={<Save />}
-                onClick={handleSubmit(onSave)}
-                sx={{ width: 110, ml: 2 }}
-                className={classes.MbtnSave}
-                disabled={disabledBtnSave}
-              >
-                บันทึก
-              </Button>
+              {disabledBtnEdit && (
+                <Button
+                  id='btnSearch'
+                  variant='contained'
+                  color='warning'
+                  startIcon={<Save />}
+                  onClick={handleSubmit(onSave)}
+                  sx={{ width: 110, ml: 2 }}
+                  className={classes.MbtnSave}
+                  disabled={disabledBtnSave}
+                >
+                  บันทึก
+                </Button>
+              )}
             </Grid>
           </Grid>
         </Box>
 
         <Box mt={5} mb={5}>
-          <TaxInvoiceHistory billNo='' />
+          <TaxInvoiceHistory />
         </Box>
 
         <SnackbarStatus
