@@ -164,10 +164,9 @@ const columns: GridColDef[] = [
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
-          
           let actualQty = Number(params.getValue(params.id, 'actualQty'));
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
-          
+
           if (actualQty === 0) value = chkActualQty(value);
           if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, actualQty: value }]);
@@ -373,7 +372,10 @@ export default function CheckOrderDetail({
             sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
           });
 
-          handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
+          setSumActualQtyApprove1(Number(sumActualQtyItems));
+          setSumQuantityRefApprove1(Number(sumQuantityRefItems));
+
+          // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
         }
       }
     }
@@ -381,13 +383,21 @@ export default function CheckOrderDetail({
     // }, [open, openModelConfirm]);
   }, [open]);
 
+  const [sumActualQtyApprove1, setSumActualQtyApprove1] = React.useState(0);
+  const [sumQuantityRefApprove1, setSumQuantityRefApprove1] = React.useState(0);
   const [sumDCPercent, setSumDCPercent] = React.useState(0);
-  const handleCalculateDCPercent = async (sumActualQty: number, sumQuantityRef: number) => {
-    let sumPercent: number = (sumActualQty * 100) / sumQuantityRef;
+  const handleCalculateDCPercent = async () => {
+    let sumPercent: number = (sumActualQtyApprove1 * 100) / sumQuantityRefApprove1;
     sumPercent = Math.trunc(sumPercent); //remove decimal
 
-    setSumDCPercent(sumPercent);
+    if (sumPercent >= 0) {
+      setSumDCPercent(sumPercent);
+    }
   };
+
+  if (sumDCPercent === 0) {
+    handleCalculateDCPercent();
+  }
 
   const updateState = async (items: any) => {
     await dispatch(updateAddItemsState(items));
@@ -568,51 +578,50 @@ export default function CheckOrderDetail({
   const handleApproveBtn = async () => {
     mapUpdateState().then(() => {
       setItemsDiffState([]);
-    setOpenModelConfirm(true);
-    setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const itemsList: any = [];
+      setOpenModelConfirm(true);
+      setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
 
-    let sumActualQtyItems: number = 0;
-    let sumQuantityRefItems: number = 0;
-    rowsEdit.forEach((data: GridRowData) => {
-      let diffCount: number = data.actualQty - data.qtyRef;
-      sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
-      sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
+      let sumActualQtyItems: number = 0;
+      let sumQuantityRefItems: number = 0;
+      rowsEdit.forEach((data: GridRowData) => {
+        let diffCount: number = data.actualQty - data.qtyRef;
+        sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
 
-      const itemDiff: Entry = {
-        barcode: data.barcode,
-        deliveryOrderNo: data.deliveryOrderNo,
-        actualQty: data.actualQty,
-        comment: data.comment,
-        seqItem: 0,
-        itemNo: '',
-        shipmentSAPRef: '',
-        skuCode: '',
-        skuType: '',
-        productName: data.productName,
-        unitCode: '',
-        unitName: '',
-        unitFactor: 0,
-        qty: 0,
-        qtyAll: 0,
-        qtyAllBefore: 0,
-        qtyDiff: diffCount,
-        price: 0,
-        isControlStock: 0,
-        toteCode: '',
-        expireDate: '',
-        isTote: data.isTote,
-      };
-      setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
-      itemsList.push(data);
+        const itemDiff: Entry = {
+          barcode: data.barcode,
+          deliveryOrderNo: data.deliveryOrderNo,
+          actualQty: data.actualQty,
+          comment: data.comment,
+          seqItem: 0,
+          itemNo: '',
+          shipmentSAPRef: '',
+          skuCode: '',
+          skuType: '',
+          productName: data.productName,
+          unitCode: '',
+          unitName: '',
+          unitFactor: 0,
+          qty: 0,
+          qtyAll: 0,
+          qtyAllBefore: 0,
+          qtyDiff: diffCount,
+          price: 0,
+          isControlStock: 0,
+          toteCode: '',
+          expireDate: '',
+          isTote: data.isTote,
+        };
+        setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
+        itemsList.push(data);
+      });
+
+      setSumActualQty(sumActualQtyItems);
+      setSumQuantityRef(sumQuantityRefItems);
+      // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
     });
-
-    setSumActualQty(sumActualQtyItems);
-    setSumQuantityRef(sumQuantityRefItems);
-    // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
-    })
-    
   };
 
   const handleApproveOCBtn = async () => {
@@ -797,6 +806,20 @@ export default function CheckOrderDetail({
     setUploadFileFlag(status);
   };
 
+  const onDeleteAttachFileOld = (item: any) => {
+    const fileKeyDel = item.fileKey;
+    // console.log('item delete: ', item);
+    // if (docType && docNo) {
+    //         delFileUrlHuawei(fileKeyDel, docType, docNo)
+    //           .then((value) => {
+    //             return setUploadFileFlag(true);
+    //           })
+    //           .catch((error: ApiError) => {
+    //             return setUploadFileFlag(false);
+    //           });
+    //       }
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -861,6 +884,7 @@ export default function CheckOrderDetail({
                     isStatus={uploadFileFlag}
                     onChangeUploadFile={handleOnChangeUploadFile}
                     enabledControl={true}
+                    onDeleteAttachFile={onDeleteAttachFileOld}
                   />
                 )}
 
