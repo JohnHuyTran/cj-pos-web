@@ -14,7 +14,7 @@ import { ApiError } from '../../../models/api-error-model';
 import { delFileUrlHuawei } from '../../../services/purchase';
 import { getFileUrlHuawei } from '../../../services/master-service';
 import ModalShowHuaweiFile from '../../commons/ui/modal-show-huawei-file';
-import { stringNullOrEmpty } from "../../../utils/utils";
+import { stringNullOrEmpty } from '../../../utils/utils';
 
 interface fileDisplayList {
   file?: File;
@@ -34,10 +34,21 @@ interface Props {
   enabledControl?: boolean;
   warningMessage?: string;
   deletePermission?: boolean;
+  reMark?: string;
 }
 
-function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFile,
-                               onDeleteAttachFile, enabledControl, warningMessage, deletePermission}: Props): ReactElement {
+function AccordionUploadFile({
+  files,
+  docNo,
+  docType,
+  isStatus,
+  onChangeUploadFile,
+  onDeleteAttachFile,
+  enabledControl,
+  warningMessage,
+  deletePermission,
+  reMark,
+}: Props): ReactElement {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
@@ -196,24 +207,24 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
     }
   }
 
-  const handleDelete = (file: any) => {
-    const fileNameDel = file.fileName;
-    const fileKeyDel = file.fileKey;
+  // const handleDelete = (file: any) => {
+  //   const fileNameDel = file.fileName;
+  //   const fileKeyDel = file.fileKey;
 
-    if (file.status === 'new') {
-      setFileList(fileList.filter((r: any) => r.name !== fileNameDel));
-    } else if (file.status === 'old') {
-      if (docType && docNo) {
-        delFileUrlHuawei(fileKeyDel, docType, docNo)
-          .then((value) => {
-            return onChangeUploadFile(true);
-          })
-          .catch((error: ApiError) => {
-            return onChangeUploadFile(false);
-          });
-      }
-    }
-  };
+  //   if (file.status === 'new') {
+  //     setFileList(fileList.filter((r: any) => r.name !== fileNameDel));
+  //   } else if (file.status === 'old') {
+  //     if (docType && docNo) {
+  //       delFileUrlHuawei(fileKeyDel, docType, docNo)
+  //         .then((value) => {
+  //           return onChangeUploadFile(true);
+  //         })
+  //         .catch((error: ApiError) => {
+  //           return onChangeUploadFile(false);
+  //         });
+  //     }
+  //   }
+  // };
 
   const handleDeleteAttachFile = (file: any) => {
     //handle custom delete attach file
@@ -227,7 +238,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
   const handleFileInputClick = (e: any) => {
     //handle attach file again after remove this file
     e.target.value = '';
-  }
+  };
 
   const closeDialogConfirm = (value: string) => {
     setErrorBrowseFile(false);
@@ -238,10 +249,10 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
       <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
         <label htmlFor={'btnBrowse'}>
           <Button
-            id='btnPrint'
-            color='primary'
-            variant='contained'
-            component='span'
+            id="btnPrint"
+            color="primary"
+            variant="contained"
+            component="span"
             className={classes.MbtnBrowse}
             disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl)}
           >
@@ -249,17 +260,19 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
           </Button>
         </label>
 
-        <Typography variant='overline' sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
-          แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
+        <Typography variant="overline" sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
+          {reMark && reMark}
+
+          {!reMark && 'แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb'}
         </Typography>
       </Box>
 
       <input
-        id='btnBrowse'
-        type='file'
+        id="btnBrowse"
+        type="file"
         // multiple
         // onDrop
-        accept='.pdf, .jpg, .jpeg'
+        accept=".pdf, .jpg, .jpeg"
         onClick={handleFileInputClick}
         onChange={handleFileInputChange}
         style={{ display: 'none' }}
@@ -284,7 +297,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
           <Typography sx={{ fontSize: '14px', color: '#676767' }}>
             เอกสารแนบ จำนวน {newFileDisplayList.length}/5
           </Typography>
-          {accordionFile ? <KeyboardArrowUp color='primary' /> : <KeyboardArrowDown color='primary' />}
+          {accordionFile ? <KeyboardArrowUp color="primary" /> : <KeyboardArrowDown color="primary" />}
         </Box>
 
         <Box sx={{ display: accordionFile ? 'visible' : 'none' }}>
@@ -292,7 +305,7 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
             newFileDisplayList.map((item: fileDisplayList, index: number) => (
               <Box
                 key={index}
-                component='a'
+                component="a"
                 href={void 0}
                 sx={{
                   color: theme.palette.secondary.main,
@@ -304,30 +317,42 @@ function AccordionUploadFile({ files, docNo, docType, isStatus, onChangeUploadFi
               >
                 {item.status === 'old' && (
                   <Typography
-                    color='secondary'
+                    color="secondary"
                     sx={{ textDecoration: 'underline', fontSize: '13px' }}
-                    onClick={() => getHuaweiFileUrl(item)}>
+                    onClick={() => getHuaweiFileUrl(item)}
+                  >
                     {item.fileName}
                   </Typography>
                 )}
 
                 {item.status === 'new' && (
-                  <Typography color='secondary' sx={{ fontSize: '13px' }}>
+                  <Typography color="secondary" sx={{ fontSize: '13px' }}>
                     {item.fileName}
                   </Typography>
                 )}
 
-                <IconButton sx={{ display: ((!stringNullOrEmpty(enabledControl) && !enabledControl)
-                                        || (!stringNullOrEmpty(deletePermission) && !deletePermission && item.status === 'old')) ? 'none' : undefined}}
-                            onClick={() => onDeleteAttachFile ? handleDeleteAttachFile(item) : handleDelete(item)} size="small">
+                <IconButton
+                  sx={{
+                    display:
+                      (!stringNullOrEmpty(enabledControl) && !enabledControl) ||
+                      (!stringNullOrEmpty(deletePermission) && !deletePermission && item.status === 'old')
+                        ? 'none'
+                        : undefined,
+                  }}
+                  // onClick={() => onDeleteAttachFile ? handleDeleteAttachFile(item) : handleDelete(item)}
+                  onClick={() => handleDeleteAttachFile(item)}
+                  size="small"
+                >
                   <CloseIcon fontSize="small" color="error" />
                 </IconButton>
               </Box>
             ))}
         </Box>
       </Box>
-      <Typography hidden={stringNullOrEmpty(warningMessage)}
-                  sx={{ fontSize: '14px', color: '#F54949', textAlign: 'right' }}>
+      <Typography
+        hidden={stringNullOrEmpty(warningMessage)}
+        sx={{ fontSize: '14px', color: '#F54949', textAlign: 'right' }}
+      >
         {warningMessage}
       </Typography>
 
