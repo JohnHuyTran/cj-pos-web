@@ -296,8 +296,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
               onChange={(e) => {
                 handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barCode);
               }}
-              disabled={(!stringNullOrEmpty(dataDetail.status)
-                && dataDetail.status != TOStatus.DRAFT && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL)}
+              disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT)}
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfRequested}</div>}
           </div>
@@ -327,7 +326,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
               inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
-              disabled={!approvePermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status == TOStatus.DRAFT}
+              disabled={!approvePermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
               onChange={(e) => {
                 handleChangeNumberOfApprove(e, params.row.index, index, params.row.barCode);
               }}
@@ -359,8 +358,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
             onChange={(e) => {
               handleChangeRemark(e, params.row.index);
             }}
-            disabled={(!stringNullOrEmpty(dataDetail.status)
-              && dataDetail.status != TOStatus.DRAFT && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL)}
+            disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT)}
           />
         </HtmlTooltip>
       )

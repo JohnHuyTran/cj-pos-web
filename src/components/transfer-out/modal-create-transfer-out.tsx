@@ -528,7 +528,7 @@ export default function ModalCreateTransferOut({
       }
     } else {
       setOpenPopup(true);
-      setPopupMsg('คุณได้ยกเลิกส่วนลดสินค้าเรียบร้อยแล้ว');
+      setPopupMsg('คุณได้ยกเลิกเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
       handleClose();
     }
   };
@@ -688,7 +688,7 @@ export default function ModalCreateTransferOut({
                       dispatch(updateCheckEdit(true));
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
-                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL}
+                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT}
                     error={!stringNullOrEmpty(errors['transferOutReason'])}
                   >
                     <MenuItem value={'1'}>{'เบิกเพื่อแจกลูกค้า'}</MenuItem>
@@ -721,7 +721,7 @@ export default function ModalCreateTransferOut({
                       dispatch(updateCheckEdit(true));
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
-                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL}
+                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT}
                     error={!stringNullOrEmpty(errors['store'])}
                   >
                     <MenuItem value={'1'}>{'คลังหน้าร้าน'}</MenuItem>
