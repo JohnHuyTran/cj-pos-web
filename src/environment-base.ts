@@ -347,6 +347,9 @@ export const environment = {
       requestTaxInvoice: {
         url: '/sale/request/{billNo}',
       },
+      printHistory: {
+        url: '/sale/tax-invoices/{billNo}/print-history',
+      },
     },
     member: {
       searchMemberInformation: {

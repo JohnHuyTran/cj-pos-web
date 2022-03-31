@@ -4,7 +4,7 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import { CircularProgress, InputAdornment } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
-import { featchProvincesListAsync } from '../../../store/slices/search-provinces-slice';
+import { featchProvincesListAsync } from '../../../store/slices/master/search-provinces-slice';
 import SearchIcon from '@mui/icons-material/Search';
 import dateFormat from 'dateformat';
 
