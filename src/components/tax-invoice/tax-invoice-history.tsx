@@ -10,6 +10,7 @@ import { MoreVertOutlined } from '@mui/icons-material';
 import { FileType } from '../../models/supplier-check-order-model';
 import { getFileUrlHuawei } from '../../services/master-service';
 import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
+import { useTranslation } from 'react-i18next';
 
 export interface DataGridProps {
   billNo: string;
@@ -177,6 +178,7 @@ const handleModelAction = (params: GridRenderCellParams) => {
 
 export default function TaxInvoiceHistory({ billNo }: DataGridProps) {
   const classes = useStyles();
+  const { t } = useTranslation(['taxInvoice', 'common']);
   const taxInvoicePrintHistory = useAppSelector((state) => state.taxInvoicePrintHistory.detail);
   const historyDetail: any = taxInvoicePrintHistory.data ? taxInvoicePrintHistory.data : [];
 
@@ -187,7 +189,7 @@ export default function TaxInvoiceHistory({ billNo }: DataGridProps) {
       index: index + 1,
       name: item.printedByName,
       position: item.printedByPosition,
-      type: item.type,
+      type: t(`type.${item.type}`),
       printNo: item.edition,
       date: moment(item.printedDate).format(DateFormat.DATE_TIME_DISPLAY_FORMAT),
       action: '',
