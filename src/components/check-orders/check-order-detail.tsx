@@ -389,12 +389,13 @@ export default function CheckOrderDetail({
   const handleCalculateDCPercent = async () => {
     let sumPercent: number = (sumActualQtyApprove1 * 100) / sumQuantityRefApprove1;
     sumPercent = Math.trunc(sumPercent); //remove decimal
-    console.log('sumPercent: ', sumPercent);
+    console.log('sumPercent in : ', sumPercent);
     if (sumPercent >= 0) {
+      console.log('if sumPercent >= 0');
       setSumDCPercent(sumPercent);
     }
   };
-
+  console.log('sumDCPercent out : ', sumDCPercent);
   if (sumDCPercent === 0) {
     handleCalculateDCPercent();
   }
@@ -914,7 +915,7 @@ export default function CheckOrderDetail({
             <Grid container spacing={2} display="flex" justifyContent="space-between">
               {/* <Grid item xl={2}> */}
               <Grid item xl={4}>
-                {statusWaitApprove1 && (
+                {statusWaitApprove1 && sumDCPercent !== 0 && (
                   <>
                     <Typography
                       variant="body1"
