@@ -11,6 +11,12 @@ export const getPathInvoiceDetail = (billNo: string) => {
   });
 };
 
+export const getPathInvoicePrintHistory = (billNo: string) => {
+  return getPathUrl(`${environment.sale.taxInvoice.printHistory.url}`, {
+    billNo: billNo,
+  });
+};
+
 export async function saveInvoice(payload: SaveInvoiceRequest) {
   const response = await put(environment.sale.taxInvoice.saveInvoice.url, payload, ContentType.JSON)
     .then((result: any) => result)
