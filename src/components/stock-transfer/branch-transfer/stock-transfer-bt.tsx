@@ -116,7 +116,19 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     onClickClose();
   };
   const handleChangeComment = () => {};
-  const handleCheckboxChange = () => {};
+  const handleCheckboxChange = (e: any) => {
+    const ischeck = e.target.checked;
+
+    if (ischeck) {
+      setSkuCodeSelect('');
+      onClickSku('');
+      setIschecked(true);
+    } else {
+      setIschecked(false);
+      setSkuCodeSelect(defaultSkuSelected);
+      onClickSku(defaultSkuSelected);
+    }
+  };
   const onUpdateItemsList = (item: Item[]) => {
     setItemList(item);
   };
