@@ -136,6 +136,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [billNo, setBillNo] = React.useState('');
   const [invoiceNo, setInvoiceNo] = React.useState('-');
   const [memberNo, setMemberNo] = React.useState('');
+
+  const [disabledBtnEdit, setDisabledBtnEdit] = React.useState(true);
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
   const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
   const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
@@ -158,6 +160,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       setMemberNo(taxInvoiceDetail.customer.memberNo);
 
       if (taxInvoiceDetail.status === 'PRINTED') {
+        setDisabledBtnEdit(false);
         setDisabledBtnClear(true);
         setDisabledBtnSave(true);
         setDefaultData(taxInvoiceDetail);
@@ -292,10 +295,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [districtsCode, setDistrictsCode] = React.useState('');
   const [subDistrictsCode, setSubDistrictsCode] = React.useState('');
 
-  const [provincesName, setProvincesName] = React.useState('');
-  const [districtsName, setDistrictsName] = React.useState('');
-  const [subDistrictsName, setSubDistrictsName] = React.useState('');
-
   // const [searchProvincesCode, setSearchProvincesCode] = React.useState('');
   const [searchDistrictsCode, setSearchDistrictsCode] = React.useState('');
   const [searchPostalCode, setSearchPostalCode] = React.useState('');
@@ -403,27 +402,41 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       </BootstrapDialogTitle>
 
       <DialogContent>
-        <Box pl={2} pr={2}>
+        <Box pl={2} pr={2} mt={2}>
           <Grid container spacing={1}>
-            <Grid item xs={2} mb={3}>
+            <Grid item xs={2} mb={4}>
               <Typography gutterBottom variant='subtitle1' component='div'>
                 เลขที่ใบเสร็จ(ย่อ) :
               </Typography>
             </Grid>
-            <Grid item xs={4} mb={2}>
+            <Grid item xs={3}>
               <Typography gutterBottom variant='subtitle1' component='div'>
                 {billNo}
               </Typography>
             </Grid>
-            <Grid item xs={2} mb={3}>
+            <Grid item xs={1}></Grid>
+            <Grid item xs={2} mb={4}>
               <Typography gutterBottom variant='subtitle1' component='div'>
                 เลขที่ใบเสร็จ(เต็ม) :
               </Typography>
             </Grid>
-            <Grid item xs={4} mb={2}>
+            <Grid item xs={2} mb={4}>
               <Typography gutterBottom variant='subtitle1' component='div'>
                 {invoiceNo}
               </Typography>
+            </Grid>
+
+            <Grid item xs={2} mb={4} sx={{ textAlign: 'end' }}>
+              <Button
+                id='btnCreateStockTransferModal'
+                variant='contained'
+                // onClick={handleOpenCreateModal}
+                className={classes.MbtnClear}
+                color='secondary'
+                sx={{ width: 120, display: `${disabledBtnEdit ? 'none' : ''}` }}
+              >
+                แก้ไขข้อมูล
+              </Button>
             </Grid>
           </Grid>
 
@@ -678,14 +691,13 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
           </Grid>
         </Box>
 
-        <Box pl={2} pr={2}>
+        <Box pr={2}>
           <Grid container spacing={1} mt={4}>
             <Grid item xs={2} mb={2}>
               <Button
                 id='btnCreateStockTransferModal'
                 variant='contained'
                 // onClick={handleOpenCreateModal}
-                // sx={{ width: 150, display: `${displayBtnPreview ? 'none' : ''}` }}
                 sx={{ width: 220 }}
                 className={classes.MbtnClear}
                 startIcon={<ContentPaste />}
