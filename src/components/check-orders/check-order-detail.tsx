@@ -362,43 +362,10 @@ export default function CheckOrderDetail({
       if (orderDetail.Comment !== '') {
         dispatch(featchOrderSDListAsync(orderDetail.Comment));
       }
-
-      if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
-        let sumActualQtyItems: number = 0;
-        let sumQuantityRefItems: number = 0;
-        if (Object.keys(payloadAddItem).length > 0) {
-          rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
-            sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
-            sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
-          });
-
-          setSumActualQtyApprove1(Number(sumActualQtyItems));
-          setSumQuantityRefApprove1(Number(sumQuantityRefItems));
-
-          // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
-        }
-      }
     }
 
     // }, [open, openModelConfirm]);
   }, [open]);
-
-  const [sumActualQtyApprove1, setSumActualQtyApprove1] = React.useState(0);
-  const [sumQuantityRefApprove1, setSumQuantityRefApprove1] = React.useState(0);
-  const [sumDCPercent, setSumDCPercent] = React.useState(0);
-  const handleCalculateDCPercent = async () => {
-    let sumPercent: number = (sumActualQtyApprove1 * 100) / sumQuantityRefApprove1;
-    sumPercent = Math.trunc(sumPercent); //remove decimal
-    console.log('sumPercent in : ', sumPercent);
-    if (sumPercent >= 0) {
-      console.log('if sumPercent >= 0');
-      setSumDCPercent(sumPercent);
-    }
-  };
-  console.log('sumDCPercent out : ', sumDCPercent);
-  if (sumDCPercent === 0) {
-    handleCalculateDCPercent();
-  }
 
   const updateState = async (items: any) => {
     await dispatch(updateAddItemsState(items));
@@ -406,8 +373,6 @@ export default function CheckOrderDetail({
 
   const [openTote, setOpenTote] = React.useState(false);
   const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
-
-  let rowsEntries: any = [];
 
   const handleOpenModalTote = async (value: string, isAddItem: boolean) => {
     rowsEntries = [];
@@ -437,6 +402,8 @@ export default function CheckOrderDetail({
     setOpenOrderReceiveModal(false);
     onClickClose();
   }
+
+  let rowsEntries: any = [];
 
   if (openTote === false) {
     let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
@@ -474,6 +441,37 @@ export default function CheckOrderDetail({
         };
       });
     }
+  }
+
+  const [sumDCPercent, setSumDCPercent] = React.useState(0);
+  const handleCalculateDCPercent = async () => {
+    if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
+      let sumActualQtyItems: number = 0;
+      let sumQuantityRefItems: number = 0;
+      if (Object.keys(payloadAddItem).length > 0) {
+        rowsEntries = payloadAddItem.map((item: itemsDetail) => {
+          sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
+          sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
+        });
+
+        let sumPercent: number = (sumActualQtyItems * 100) / sumQuantityRefItems;
+        sumPercent = Math.trunc(sumPercent); //remove decimal
+
+        if (sumPercent >= 0) {
+          console.log('sumPercent: ', sumPercent);
+          setSumDCPercent(sumPercent);
+        }
+
+        // setSumActualQtyApprove1(Number(sumActualQtyItems));
+        // setSumQuantityRefApprove1(Number(sumQuantityRefItems));
+
+        // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
+      }
+    }
+  };
+  console.log('sumDCPercent out : ', sumDCPercent);
+  if (sumDCPercent === 0) {
+    handleCalculateDCPercent();
   }
 
   function handleNotExitModelConfirm() {
@@ -915,7 +913,7 @@ export default function CheckOrderDetail({
             <Grid container spacing={2} display="flex" justifyContent="space-between">
               {/* <Grid item xl={2}> */}
               <Grid item xl={4}>
-                {statusWaitApprove1 && sumDCPercent !== 0 && (
+                {statusWaitApprove1 && (
                   <>
                     <Typography
                       variant="body1"
