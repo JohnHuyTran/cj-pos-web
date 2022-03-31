@@ -5,7 +5,7 @@ import { CircularProgress, InputAdornment } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import SearchIcon from '@mui/icons-material/Search';
-import { featchsSubDistrictsListAsync } from '../../../store/slices/search-subDistricts-slice';
+import { featchsSubDistrictsListAsync } from '../../../store/slices/master/search-subDistricts-slice';
 
 interface Props {
   valueSubDistricts: string;
