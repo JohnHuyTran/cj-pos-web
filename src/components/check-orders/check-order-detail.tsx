@@ -445,33 +445,29 @@ export default function CheckOrderDetail({
 
   const [sumDCPercent, setSumDCPercent] = React.useState(0);
   const handleCalculateDCPercent = async () => {
-    if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
-      let sumActualQtyItems: number = 0;
-      let sumQuantityRefItems: number = 0;
-      if (Object.keys(payloadAddItem).length > 0) {
-        rowsEntries = payloadAddItem.map((item: itemsDetail) => {
-          sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
-          sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
-        });
+    // if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
+    let sumActualQtyItems: number = 0;
+    let sumQuantityRefItems: number = 0;
+    if (Object.keys(payloadAddItem).length > 0) {
+      rowsEntries = payloadAddItem.map((item: itemsDetail) => {
+        sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
+      });
 
-        let sumPercent: number = (sumActualQtyItems * 100) / sumQuantityRefItems;
-        sumPercent = Math.trunc(sumPercent); //remove decimal
+      let sumPercent: number = (sumActualQtyItems * 100) / sumQuantityRefItems;
+      sumPercent = Math.trunc(sumPercent); //remove decimal
 
-        if (sumPercent >= 0) {
-          console.log('sumPercent: ', sumPercent);
-          setSumDCPercent(sumPercent);
-        }
-
-        // setSumActualQtyApprove1(Number(sumActualQtyItems));
-        // setSumQuantityRefApprove1(Number(sumQuantityRefItems));
-
-        // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
+      if (sumPercent >= 0) {
+        setSumDCPercent(sumPercent);
       }
     }
+    // }
   };
-  console.log('sumDCPercent out : ', sumDCPercent);
-  if (sumDCPercent === 0) {
-    handleCalculateDCPercent();
+
+  if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
+    if (sumDCPercent === 0) {
+      handleCalculateDCPercent();
+    }
   }
 
   function handleNotExitModelConfirm() {
@@ -493,7 +489,7 @@ export default function CheckOrderDetail({
 
   const updateShipmentOrder = () => {
     dispatch(featchOrderListAsync(payloadSearchOrder));
-    dispatch(featchOrderDetailAsync(sdNo));
+    // dispatch(featchOrderDetailAsync(sdNo));
   };
 
   const mapUpdateState = async () => {
