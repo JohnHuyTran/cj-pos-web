@@ -73,11 +73,11 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     handleClose();
   };
 
-  const handleChange = async () => {
+  const handleChange = () => {
     if (!flagSave) setFlagSave(true);
   };
 
-  const handleChkEditClose = async () => {
+  const handleChkEditClose = () => {
     if (flagSave || fileUploadList.length > 0) {
       setConfirmModelExit(true);
     } else {
@@ -85,15 +85,12 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
-  const handleClose = async () => {
+  const handleClose = () => {
     setBillNo('');
     setMemberNo('');
     handleClear();
 
     // dispatch(featchTaxInvoiceListAsync(payloadSearch));
-
-    // if (fileUploadList.length > 0)
-    // await dispatch(clearUploadFileState());
 
     setOpen(false);
     onClickClose();
@@ -183,10 +180,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       }
     }
 
-    if (fileUploadList.length > 0) setDisabledBtnPreview(false);
-    else if (fileUploadList.length == 0) setDisabledBtnPreview(true);
     setConfirmModelExit(false);
-  }, [isOpen, fileUploadList]);
+  }, [isOpen]);
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
@@ -426,8 +421,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const handleOnChangeUploadFile = (status: boolean) => {
     setUploadFileFlag(status);
-    // console.log('handleOnChangeUploadFile xxx ------>', uploadFileFlag);
   };
+
+  if (fileUploadList.length > 0 && disabledBtnPreview) setDisabledBtnPreview(false);
+  else if (fileUploadList.length == 0 && !disabledBtnPreview) setDisabledBtnPreview(true);
 
   return (
     <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -467,6 +464,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 onClick={handleEditMode}
                 className={classes.MbtnClear}
                 color='secondary'
+                // disabled={!editMode}
                 sx={{ width: 120, display: `${disabledBtnEdit ? 'none' : ''}` }}
               >
                 แก้ไขข้อมูล
