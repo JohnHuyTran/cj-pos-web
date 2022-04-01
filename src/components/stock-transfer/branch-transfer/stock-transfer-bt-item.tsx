@@ -20,10 +20,13 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { Item, ItemGroups } from '../../../models/stock-transfer-model';
 import { isGroupBranch } from '../../../utils/role-permission';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
+import { DeleteForever } from '@mui/icons-material';
+import ModalDeleteItem from '../modal-delete-item-confirm';
 
 interface Props {
   skuCodeSelect: string;
-  // onUpdateSkuList: (item: ItemGroups[]) => void;
+  skuNameSelect: string;
+  isClickSKU: boolean;
   onUpdateItemList: (item: Item[]) => void;
 }
 const columns: GridColDef[] = [
@@ -144,6 +147,25 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
   },
+  {
+    field: 'delete',
+    headerName: ' ',
+    width: 50,
+    align: 'center',
+    sortable: false,
+    renderCell: (params) => {
+      var orderQty = Number(params.getValue(params.id, 'orderQty'));
+      if (params.getValue(params.id, 'edit') || orderQty <= 0) {
+        return (
+          <div>
+            <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
+          </div>
+        );
+      } else {
+        return <div></div>;
+      }
+    },
+  },
 ];
 
 const chkReturnQty = (value: any) => {
@@ -170,7 +192,7 @@ function useApiRef() {
   return { apiRef, columns: _columns };
 }
 
-function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
+function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUpdateItemList }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const { apiRef, columns } = useApiRef();
@@ -220,12 +242,21 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
         toteCode: item.toteCode ? item.toteCode : '',
         isDisable: isDisable,
         boNo: item.boNo,
+        edit: item.edit ? item.edit : false,
       };
     });
 
   React.useEffect(() => {
     storeItemAddItem(payloadAddItem);
   }, [payloadAddItem]);
+
+  React.useEffect(() => {
+    if (!skuCodeSelect) {
+      setIschecked(true);
+    } else {
+      setIschecked(false);
+    }
+  }, [isClickSKU]);
 
   React.useEffect(() => {
     const isCreate = branchTransferInfo.status === 'CREATED';
@@ -282,6 +313,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
             toteCode: dupItem.toteCode,
             isDisable: isDisable,
             boNo: dupItem.boNo,
+            edit: dupItem.edit,
           };
           _.remove(_items, function (item: Item) {
             return item.barcode === data.barcode;
@@ -300,6 +332,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
             actualQty: data.qty,
             toteCode: '',
             isDisable: isDisable,
+            edit: true,
           };
           _items = [..._items, newData];
         }
@@ -336,6 +369,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
           barFactor: dataRow.barFactor,
           unitCode: dataRow.unitCode ? dataRow.unitCode : 0,
           orderQty: dataRow.orderQty ? dataRow.orderQty : 0,
+          edit: dataRow.edit,
         };
 
         _.remove(_items, function (item: Item) {
@@ -370,18 +404,32 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
     onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
   };
 
+  const deleteItem = async () => {
+    let _items = [...branchTransferItems];
+    let _sku = [...skuGroupItems];
+    let _newSku: ItemGroups[] = [];
+
+    _.remove(_items, function (item: Item) {
+      return item.barcode === itemDelete.barcode;
+    });
+    setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+  };
+
   let newColumns = [...columns];
   if (branchTransferInfo.status != 'CREATED') {
     newColumns[7]['hide'] = false;
+    newColumns[8]['hide'] = true;
   } else {
     newColumns[7]['hide'] = true;
+    newColumns[8]['hide'] = false;
   }
 
-  const handleEditItems = (params: GridCellParams) => {
-    if (params.field === 'actualQty' || params.field === 'toteCode') {
-      storeItem();
-    }
-  };
+  // const handleEditItems = async (params: GridEditCellValueParams) => {
+  //   if (params.field === 'actualQty' || params.field === 'toteCode') {
+  //     storeItem();
+  //   }
+  // };
 
   const handleOnFocusOut = async (params: GridEditCellValueParams) => {
     storeItem();
@@ -398,46 +446,76 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
 
     if (ischeck) {
       setIschecked(true);
+      skuCodeSelect = '';
     } else {
       setIschecked(false);
     }
   };
+
+  const [itemDelete, setItemDelete] = React.useState<Item>({
+    barcode: '',
+    barcodeName: '',
+  });
+  const [openModalDeleteConfirm, setOpenModalDeleteConfirm] = React.useState(false);
+  const currentlySelected = async (params: GridCellParams) => {
+    const value = params.colDef.field;
+
+    if (value === 'delete') {
+      const _item: Item = {
+        barcode: params.row.barcode,
+        barcodeName: params.row.barcodeName,
+      };
+      setItemDelete(_item);
+      setOpenModalDeleteConfirm(true);
+    }
+  };
+
+  const handleDeleteIterm = (isDelete: boolean) => {
+    if (isDelete) {
+      deleteItem();
+    }
+    setOpenModalDeleteConfirm(false);
+  };
+
   return (
-    <Box mt={2} bgcolor='background.paper'>
-      <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
-        <Box mt={6}>
-          {' '}
-          <Typography>
-            รายการสินค้า: {isChecked && 'รายการสินค้าทั้งหมด'} {!isChecked && `${skuNameDisplay} (${skuCodeSelect})`}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
-          <FormGroup>
-            <FormControlLabel
-              control={<Checkbox />}
-              checked={isChecked}
-              label='รายการสินค้าทั้งหมด'
-              onChange={handleCheckboxChange}
-            />
-          </FormGroup>
-        </Box>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
-          pagination
-          disableColumnMenu
-          autoHeight={rows.length >= 8 ? false : true}
-          scrollbarSize={10}
-          rowHeight={65}
-          onCellFocusOut={handleOnFocusOut}
-          onCellOut={handleOnCellOut}
-          // onCellKeyDown={handleEditItems}
-        />
-      </div>
-    </Box>
+    <React.Fragment>
+      <Box mt={2} bgcolor='background.paper'>
+        <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+          <Box mt={3}>
+            <Typography>
+              รายการสินค้า: {isChecked && 'รายการสินค้าทั้งหมด'} {!isChecked && `${skuNameSelect} (${skuCodeSelect})`}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox />}
+                checked={isChecked}
+                label='รายการสินค้าทั้งหมด'
+                onChange={handleCheckboxChange}
+              />
+            </FormGroup>
+          </Box>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={pageSize}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            rowsPerPageOptions={[10, 20, 50, 100]}
+            pagination
+            disableColumnMenu
+            autoHeight={rows.length >= 8 ? false : true}
+            scrollbarSize={10}
+            rowHeight={65}
+            onCellFocusOut={handleOnFocusOut}
+            onCellOut={handleOnCellOut}
+            // onCellKeyDown={handleEditItems}
+            onCellClick={currentlySelected}
+          />
+        </div>
+        <ModalDeleteItem open={openModalDeleteConfirm} itemInfo={itemDelete} onClose={handleDeleteIterm} />
+      </Box>
+    </React.Fragment>
   );
 }
 export default BranchTransferListItem;

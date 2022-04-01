@@ -90,7 +90,7 @@ var calProductDiff = function (params: GridValueGetterParams) {
   if (diff > 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> +{diff} </label>;
   return diff;
 };
-function BranchTransferListSKU({ onSelectSku, skuList }: Props) {
+function BranchTransferListSKU({ onSelectSku, skuList, onUpdateItemList }: Props) {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
@@ -106,12 +106,19 @@ function BranchTransferListSKU({ onSelectSku, skuList }: Props) {
 
   const [pageSize, setPageSize] = React.useState<number>(5);
   const [selectSKU, setSelectSKU] = React.useState('');
+  const [selectSKUName, setSelectSKUName] = React.useState('');
+  const [isClickCell, setIsClickCell] = React.useState(false);
   const currentlySelected = async (params: GridCellParams) => {
     const skuCode = objectNullOrEmpty(params.getValue(params.id, 'skuCode'))
       ? ''
       : params.getValue(params.id, 'skuCode')?.toString();
+    const skuName = objectNullOrEmpty(params.getValue(params.id, 'productName'))
+      ? ''
+      : params.getValue(params.id, 'productName')?.toString();
     setSelectSKU(skuCode ? skuCode : '');
+    setSelectSKUName(skuName ? skuName : '');
     onSelectSku(skuCode);
+    setIsClickCell(!isClickCell);
   };
 
   let rows = btItemGroups.map((item: ItemGroups, index: number) => {
@@ -214,11 +221,12 @@ function BranchTransferListSKU({ onSelectSku, skuList }: Props) {
       _newSku.push(newData);
     });
     setBtItemGroups(_newSku);
+    onUpdateItemList(_items);
   };
 
   return (
     <>
-      <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+      <div style={{ width: '100%', height: rows.length >= 5 ? '45vh' : 'auto' }} className={classes.MdataGridDetail}>
         <DataGrid
           rows={rows}
           columns={columns}
@@ -234,7 +242,12 @@ function BranchTransferListSKU({ onSelectSku, skuList }: Props) {
         />
       </div>
 
-      <BranchTransferListItem skuCodeSelect={selectSKU} onUpdateItemList={updateSKUList} />
+      <BranchTransferListItem
+        skuCodeSelect={selectSKU}
+        skuNameSelect={selectSKUName}
+        onUpdateItemList={updateSKUList}
+        isClickSKU={isClickCell}
+      />
     </>
   );
 }
