@@ -688,7 +688,7 @@ export default function ModalCreateTransferOut({
                       dispatch(updateCheckEdit(true));
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
-                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT}
+                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL}
                     error={!stringNullOrEmpty(errors['transferOutReason'])}
                   >
                     <MenuItem value={'1'}>{'เบิกเพื่อแจกลูกค้า'}</MenuItem>
@@ -721,7 +721,7 @@ export default function ModalCreateTransferOut({
                       dispatch(updateCheckEdit(true));
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
-                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT}
+                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL}
                     error={!stringNullOrEmpty(errors['store'])}
                   >
                     <MenuItem value={'1'}>{'คลังหน้าร้าน'}</MenuItem>
