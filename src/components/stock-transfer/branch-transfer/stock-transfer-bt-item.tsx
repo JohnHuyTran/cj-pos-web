@@ -19,6 +19,7 @@ import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { Item, ItemGroups } from '../../../models/stock-transfer-model';
 import { isGroupBranch } from '../../../utils/role-permission';
+import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 
 interface Props {
   skuCodeSelect: string;
@@ -190,9 +191,14 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
   const [isDisable, setIsDisable] = React.useState(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
 
+  const [isChecked, setIschecked] = React.useState(true);
+  const [skuNameDisplay, setSkuNameDisplay] = React.useState<string>(branchTransferInfo.itemGroups[0].productName);
+  // const [skuCodeSelect, setSkuCodeSelect] = React.useState<string>('');
+  const [defaultSkuSelected, setDefaultSkuSelected] = React.useState<string>(branchTransferInfo.itemGroups[0].skuCode);
+
   let rows = branchTransferItems
     .filter((item: Item, index: number) => {
-      if (skuCodeSelect) {
+      if (skuCodeSelect && !isChecked) {
         return item.skuCode === skuCodeSelect;
       } else {
         return item;
@@ -387,9 +393,34 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList }: Props) {
     }
   };
 
+  const handleCheckboxChange = (e: any) => {
+    const ischeck = e.target.checked;
+
+    if (ischeck) {
+      setIschecked(true);
+    } else {
+      setIschecked(false);
+    }
+  };
   return (
     <Box mt={2} bgcolor='background.paper'>
       <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+        <Box mt={6}>
+          {' '}
+          <Typography>
+            รายการสินค้า: {isChecked && 'รายการสินค้าทั้งหมด'} {!isChecked && `${skuNameDisplay} (${skuCodeSelect})`}
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
+          <FormGroup>
+            <FormControlLabel
+              control={<Checkbox />}
+              checked={isChecked}
+              label='รายการสินค้าทั้งหมด'
+              onChange={handleCheckboxChange}
+            />
+          </FormGroup>
+        </Box>
         <DataGrid
           rows={rows}
           columns={columns}
