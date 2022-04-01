@@ -803,16 +803,6 @@ export default function CheckOrderDetail({
 
   const onDeleteAttachFileOld = (item: any) => {
     const fileKeyDel = item.fileKey;
-    // console.log('item delete: ', item);
-    // if (docType && docNo) {
-    //         delFileUrlHuawei(fileKeyDel, docType, docNo)
-    //           .then((value) => {
-    //             return setUploadFileFlag(true);
-    //           })
-    //           .catch((error: ApiError) => {
-    //             return setUploadFileFlag(false);
-    //           });
-    //       }
   };
 
   return (
