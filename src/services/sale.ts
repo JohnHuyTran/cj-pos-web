@@ -63,9 +63,10 @@ export const getPathPrintInvoice = (billNo: string) => {
   });
 };
 
-export async function savePrintInvoice(payload: SaveInvoiceRequest, fileList: File[]) {
+export async function savePrintInvoice(payload: SaveInvoiceRequest, fileList: File[], edit: boolean) {
   const bodyFormData = new FormData();
-  bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  if (edit) bodyFormData.append('requestBody', JSON.stringify(payload));
 
   fileList.map((data: File) => {
     return bodyFormData.append('file[]', data);

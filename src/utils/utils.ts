@@ -115,6 +115,6 @@ export const formatFileStockTransfer = (docNo: string, status: string, suffix: s
   }
 };
 
-export const formatFileInvoice = (invoiceNo: string, counter: string) => {
+export const formatFileInvoice = (invoiceNo: string, counter: number) => {
   return `${invoiceNo}-${counter}.pdf`;
 };

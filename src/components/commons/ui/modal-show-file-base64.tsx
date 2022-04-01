@@ -9,14 +9,10 @@ import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlin
 import { useReactToPrint } from 'react-to-print';
 import AlertError from './alert-error';
 import { HighlightOff } from '@mui/icons-material';
-import { getAccessToken } from '../../../store/sessionStore';
-import { getReport } from '../../../adapters/externalApi';
 
 interface ModalShowPDFProp {
   open: boolean;
   url: string;
-  sdImageFile: string;
-  statusFile: number;
   fileName: string;
   btnPrintName: string;
   onClose: () => void;
@@ -53,19 +49,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       ) : null}
       {onPrint ? (
         <div>
-          {status === 1 && (
-            <Button
-              id='btnPrint'
-              variant='contained'
-              color='secondary'
-              onClick={onPrint}
-              endIcon={<LocalPrintshopOutlinedIcon />}
-            >
-              {/* {text && 'พิมพ์เอกสาร'}
-              {!text && 'พิมพ์ใบผลต่าง'} */}
-              {text}
-            </Button>
-          )}
+          <Button
+            id='btnPrint'
+            variant='contained'
+            color='secondary'
+            onClick={onPrint}
+            endIcon={<LocalPrintshopOutlinedIcon />}
+          >
+            {text}
+          </Button>
         </div>
       ) : null}
     </DialogTitle>
@@ -75,8 +67,6 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 export default function ModalShowPDF({
   open,
   url,
-  sdImageFile,
-  statusFile,
   fileName,
   btnPrintName,
   onClose,
@@ -86,8 +76,6 @@ export default function ModalShowPDF({
   const [initialWidth, setInitialWidth] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
   const pdfWrapper = React.useRef<HTMLDivElement>(null);
-  let token = getAccessToken();
-  token = token ? `Bearer ${token}` : '';
   const [initialPageSize, setInitialPageSize] = React.useState(false);
   const setPdfSize = () => {
     if (pdfWrapper && pdfWrapper.current) {
@@ -144,9 +132,6 @@ export default function ModalShowPDF({
   });
 
   React.useEffect(() => {
-    if (statusFile === 1 && url) {
-      getReport(url);
-    }
     setInitialPageSize(false);
   }, [open]);
 
@@ -157,7 +142,6 @@ export default function ModalShowPDF({
           id='customized-dialog-title'
           onClose={handleClose}
           onPrint={showPrint}
-          status={statusFile}
           text={btnPrintName}
         />
         <DialogContent

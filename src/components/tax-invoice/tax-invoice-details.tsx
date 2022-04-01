@@ -63,11 +63,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const classes = useStyles();
   const dispatch = useAppDispatch();
-
-  // const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
-  // console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
-
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [flagSave, setFlagSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
@@ -134,11 +130,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         customer: customer,
       };
 
-      // console.log('payload:', JSON.stringify(payload));
-
       if (status === 'PRINTED') {
-        console.log('payload:', JSON.stringify(payload));
-        console.log('fileUploadList:', fileUploadList);
         handleSavePrintInvoice(payload);
       } else {
         handleSaveInvoice(payload);
@@ -281,21 +273,30 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
-  const [pathReport, setPathReport] = React.useState<string>('');
   const [docLayoutLandscape, setDocLayoutLandscape] = React.useState(false);
+  const [pathReport, setPathReport] = React.useState<string>('');
+  const [counter, setCounter] = React.useState(0);
 
   function handleModelPreviewDocument() {
     setOpenModelPreviewDocument(false);
   }
 
+  const taxInvoicePrintHistory = useAppSelector((state) => state.taxInvoicePrintHistory.detail);
+  const historyDetail: any = taxInvoicePrintHistory.data ? taxInvoicePrintHistory.data : [];
   const handleSavePrintInvoice = async (payload: SaveInvoiceRequest) => {
     setOpenLoadingModal(true);
-    await savePrintInvoice(payload, fileUploadList)
-      .then((value) => {
-        setOpenModelPreviewDocument(true);
-        setPathReport(value.data);
 
-        dispatch(featchTaxInvoicePrintHistoryAsync(payload.billNo));
+    let edit = false;
+    if (!editMode) edit = true;
+
+    await savePrintInvoice(payload, fileUploadList, edit)
+      .then((value) => {
+        dispatch(featchTaxInvoicePrintHistoryAsync(payload.billNo)).then(() => {
+          setCounter(historyDetail.length + 1);
+          setOpenModelPreviewDocument(true);
+          setPathReport(value.data);
+          setFlagSave(false);
+        });
       })
       .catch((error: any) => {
         setShowSnackBar(true);
@@ -856,9 +857,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
           open={openModelPreviewDocument}
           onClose={handleModelPreviewDocument}
           url={pathReport}
-          statusFile={1}
-          sdImageFile={''}
-          fileName={formatFileInvoice(invoiceNo, '1')}
+          fileName={formatFileInvoice(invoiceNo, counter)}
           btnPrintName='พิมพ์เอกสาร'
           landscape={docLayoutLandscape}
         />

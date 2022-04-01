@@ -179,19 +179,21 @@ export default function TaxInvoiceHistory() {
   const historyDetail: any = taxInvoicePrintHistory.data ? taxInvoicePrintHistory.data : [];
 
   let rows: any = [];
-  rows = historyDetail.map((item: any, index: number) => {
-    return {
-      id: `${item.skuCode}-${index + 1}`,
-      index: index + 1,
-      name: item.printedByName,
-      position: item.printedByPosition,
-      type: t(`type.${item.type}`),
-      printNo: item.edition,
-      date: moment(item.printedDate).format(DateFormat.DATE_TIME_DISPLAY_FORMAT),
-      action: '',
-      files: item.files,
-    };
-  });
+  if (historyDetail.length > 0) {
+    rows = historyDetail.map((item: any, index: number) => {
+      return {
+        id: `${item.skuCode}-${index + 1}`,
+        index: index + 1,
+        name: item.printedByName,
+        position: item.printedByPosition,
+        type: t(`type.${item.type}`),
+        printNo: item.edition,
+        date: moment(item.printedDate).format(DateFormat.DATE_TIME_DISPLAY_FORMAT),
+        action: '',
+        files: item.files,
+      };
+    });
+  }
 
   useEffect(() => {}, []);
 
