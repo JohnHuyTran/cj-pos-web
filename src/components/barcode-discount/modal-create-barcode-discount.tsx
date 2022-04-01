@@ -723,7 +723,7 @@ export default function ModalCreateBarcodeDiscount({
     let lstProductPrint = [];
 
     let products = _.cloneDeep(barcodeDiscountPrint);
-    if (Number(BDStatus.BARCODE_PRINTED) == status ) {
+    if (Number(BDStatus.BARCODE_PRINTED) == status) {
       for (const itPro of products) {
         if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day')) {
           itPro.barcode = itPro.barCode;
@@ -732,23 +732,23 @@ export default function ModalCreateBarcodeDiscount({
         }
       }
     } else if (Number(BDStatus.BARCODE_PRINTED) == status && barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail) {
-        for (const itPro of products) {
-          if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isBefore(moment(new Date()), 'day')) {
-            itPro.barcode = itPro.barCode;
-            itPro.productName = itPro.barcodeName;
-            itPro.expiredDate = itPro.expiryDate;
-            lstProductNotPrinted.push(itPro);
-          }
+      for (const itPro of products) {
+        if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isBefore(moment(new Date()), 'day')) {
+          itPro.barcode = itPro.barCode;
+          itPro.productName = itPro.barcodeName;
+          itPro.expiredDate = itPro.expiryDate;
+          lstProductNotPrinted.push(itPro);
         }
-      } else if(Number(BDStatus.APPROVED) == status){
-        lstProductPrint = (products || [])
+      }
+    } else if (Number(BDStatus.APPROVED) == status) {
+      lstProductPrint = (products || [])
         .filter((product: any) => moment(product?.expiryDate).isSameOrAfter(moment(new Date()), 'day'))
         .map((product: any) => ({
           ...product,
           barcode: product.barCode,
           productName: product.barcodeName,
         }))
-      }
+    }
 
     let ids = [];
     ids.push(dataDetail.id);

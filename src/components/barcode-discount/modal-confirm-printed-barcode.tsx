@@ -116,9 +116,9 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
         bd_barcodes: (
           (printAgain ? printAgainRows : values?.lstProductPrint) || []
         )
-          .filter((print: any) => print.numberOfPrinting > 0)
+          .filter((print: any) => printAgain ? (print.numberOfPrinting > 0) : (print.numberOfApproved > 0))
           .map((item: any) => ({
-            quantity: item.numberOfPrinting,
+            quantity: printAgain ? item.numberOfPrinting : item.numberOfApproved,
             discounted_barcode: getEncodeBarcode({
               barcode: item.barcode,
               price: item.price,
