@@ -56,9 +56,10 @@ import transferOutSearchSlice from './slices/transfer-out-search-slice';
 import transferOutCriterSearchSlice from './slices/transfer-out-criteria-search-slice';
 import taxInvoiceSearchDetail from './slices/tax-invoice-search-detail-slice';
 import taxInvoiceSearchList from './slices/tax-invoice-search-list-slice';
-import searchProvincesSlice from './slices/search-provinces-slice';
-import searchDistrictsSlice from './slices/search-districts-slice';
-import searchSubDistrictsSlice from './slices/search-subDistricts-slice';
+import taxInvoicePrintHistory from './slices/sale/tax-invoice-print-history-slice';
+import searchProvincesSlice from './slices/master/search-provinces-slice';
+import searchDistrictsSlice from './slices/master/search-districts-slice';
+import searchSubDistrictsSlice from './slices/master/search-subDistricts-slice';
 import searchToteSlice from './slices/search-tote-slice';
 import itemsToteSlice from './slices/items-tote-slice';
 import checkOrderToteSlice from './slices/check-order-detail-tote-slice';
@@ -121,6 +122,7 @@ const store = configureStore({
     transferOutCriterSearchSlice: transferOutCriterSearchSlice,
     taxInvoiceSearchList: taxInvoiceSearchList,
     taxInvoiceSearchDetail: taxInvoiceSearchDetail,
+    taxInvoicePrintHistory: taxInvoicePrintHistory,
     searchProvincesSlice: searchProvincesSlice,
     searchDistrictsSlice: searchDistrictsSlice,
     searchSubDistrictsSlice: searchSubDistrictsSlice,

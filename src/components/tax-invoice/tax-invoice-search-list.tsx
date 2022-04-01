@@ -14,7 +14,7 @@ import { TaxInvoiceInfo, TaxInvoiceRequest, TaxInvoiceResponse } from '../../mod
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { featchTaxInvoiceDetailAsync } from '../../store/slices/tax-invoice-search-detail-slice';
 import { useTranslation } from 'react-i18next';
-import ModalCustomerDetails from './customer-details';
+import ModalTaxInvoiceDetails from './tax-invoice-details';
 import LoadingModal from '../commons/ui/loading-modal';
 import { requestTaxInvoice } from '../../services/sale';
 import { ApiError } from '../../models/api-error-model';
@@ -219,7 +219,7 @@ export default function TaxInvoiceSearchList({ actionType }: Props) {
       </Box>
 
       <LoadingModal open={openLoadingModal} />
-      <ModalCustomerDetails isOpen={openDetailModal} onClickClose={handleCloseDetailModal} />
+      <ModalTaxInvoiceDetails isOpen={openDetailModal} onClickClose={handleCloseDetailModal} />
     </div>
   );
 }

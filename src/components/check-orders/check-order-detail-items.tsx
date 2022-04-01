@@ -60,8 +60,6 @@ import { isGroupBranch } from '../../utils/role-permission';
 import { getUserInfo } from '../../store/sessionStore';
 import { getBranchName } from '../../utils/utils';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
-import AccordionUploadFile from '../commons/ui/accordion-upload-file';
-import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import theme from '../../styles/theme';
 import { env } from '../../adapters/environmentConfigs';
 import CheckOrderDetailListTote from '../check-orders/check-order-detail-list-tote';
