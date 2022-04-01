@@ -143,9 +143,6 @@ export default function ModalShowPDF({
     onAfterPrint: () => handleClose(),
   });
 
-  const pdfFile = sdImageFile.substr(5, 15);
-  const imgFile = sdImageFile.substr(5, 5);
-
   React.useEffect(() => {
     if (statusFile === 1 && url) {
       getReport(url);
@@ -170,17 +167,9 @@ export default function ModalShowPDF({
             textAlign: 'center',
           }}
         >
-          {/* <div id="placeholderWrapper" style={{ height: "3000vh" }} /> */}
-          {/* {statusFile === 1 && ( */}
           <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
             <Document
-              // file={{
-              //   url: url,
-              //   httpHeaders: {
-              //     Authorization: token,
-              //   },
-              // }}
-              file={url}
+              file={`data:application/pdf;base64,${url}`}
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadFail}
             >
@@ -195,27 +184,6 @@ export default function ModalShowPDF({
               ))}
             </Document>
           </div>
-          {/* )} */}
-          {/* {statusFile === 0 && (
-            <div>
-              {imgFile !== 'image' && (
-                <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
-                  <Document file={sdImageFile} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
-                    {Array.from(new Array(numPages), (el, index) => (
-                      <Page
-                        key={`page_${index + 1}`}
-                        pageNumber={index + 1}
-                        width={initialWidth}
-                        // height={1000}
-                      />
-                    ))}
-                  </Document>
-                </div>
-              )}
-
-              {imgFile === 'image' && <img src={sdImageFile} style={{ minWidth: '200px' }} />}
-            </div>
-          )} */}
         </DialogContent>
       </Dialog>
 
