@@ -11,7 +11,7 @@ import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
 import DistrictsDropDown from '../commons/ui/search-districts-dropdown';
 import SubDistrictsDropDown from '../commons/ui/search-subDistricts-dropdown';
 import { Address, Customer, SaveInvoiceRequest } from '../../models/tax-invoice-model';
-import { saveInvoice, searchMemberInformation } from '../../services/sale';
+import { saveInvoice, savePrintInvoice, searchMemberInformation } from '../../services/sale';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import LoadingModal from '../commons/ui/loading-modal';
 import AlertError from '../commons/ui/alert-warning';
@@ -21,6 +21,9 @@ import TaxInvoiceHistory from './tax-invoice-history';
 import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 import { clearUploadFileState, uploadFileState } from '../../store/slices/upload-file-slice';
+// import ModalShowFile from '../commons/ui/modal-show-file';
+import ModalShowFile from '../commons/ui/modal-show-file-base64';
+import { formatFileInvoice } from '../../utils/utils';
 
 interface Props {
   isOpen: boolean;
@@ -78,7 +81,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleChkEditClose = () => {
-    if (flagSave || fileUploadList.length > 0) {
+    // if (flagSave || fileUploadList.length > 0) {
+    if (flagSave) {
       setConfirmModelExit(true);
     } else {
       handleClose();
@@ -131,7 +135,14 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       };
 
       // console.log('payload:', JSON.stringify(payload));
-      handleSaveInvoice(payload);
+
+      if (status === 'PRINTED') {
+        console.log('payload:', JSON.stringify(payload));
+        console.log('fileUploadList:', fileUploadList);
+        handleSavePrintInvoice(payload);
+      } else {
+        handleSaveInvoice(payload);
+      }
     }
   };
 
@@ -260,6 +271,31 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         setDisabledBtnPreview(false);
         setDisabledBtnClear(true);
         setDisabledBtnSave(true);
+      })
+      .catch((error: any) => {
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+      });
+
+    setOpenLoadingModal(false);
+  };
+
+  const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
+  const [pathReport, setPathReport] = React.useState<string>('');
+  const [docLayoutLandscape, setDocLayoutLandscape] = React.useState(false);
+
+  function handleModelPreviewDocument() {
+    setOpenModelPreviewDocument(false);
+  }
+
+  const handleSavePrintInvoice = async (payload: SaveInvoiceRequest) => {
+    setOpenLoadingModal(true);
+    await savePrintInvoice(payload, fileUploadList)
+      .then((value) => {
+        setOpenModelPreviewDocument(true);
+        setPathReport(value.data);
+
+        dispatch(featchTaxInvoicePrintHistoryAsync(payload.billNo));
       })
       .catch((error: any) => {
         setShowSnackBar(true);
@@ -421,6 +457,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const handleOnChangeUploadFile = (status: boolean) => {
     setUploadFileFlag(status);
+    handleChange();
   };
 
   if (fileUploadList.length > 0 && disabledBtnPreview) setDisabledBtnPreview(false);
@@ -750,7 +787,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
               <Button
                 id='btnCreateStockTransferModal'
                 variant='contained'
-                // onClick={handleOpenCreateModal}
+                onClick={handleSubmit(onSave)}
                 sx={{ width: 220 }}
                 className={classes.MbtnClear}
                 startIcon={<ContentPaste />}
@@ -813,6 +850,17 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
             setConfirmModelExit(false);
           }}
           onConfirm={handleExitModelConfirm}
+        />
+
+        <ModalShowFile
+          open={openModelPreviewDocument}
+          onClose={handleModelPreviewDocument}
+          url={pathReport}
+          statusFile={1}
+          sdImageFile={''}
+          fileName={formatFileInvoice(invoiceNo, '1')}
+          btnPrintName='พิมพ์เอกสาร'
+          landscape={docLayoutLandscape}
         />
       </DialogContent>
     </Dialog>

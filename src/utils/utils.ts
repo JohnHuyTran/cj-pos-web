@@ -66,8 +66,7 @@ export const objectNullOrEmpty = (object: any) => {
     return true;
   } else {
     for (let key in object) {
-      if (object.hasOwnProperty(key))
-        return false;
+      if (object.hasOwnProperty(key)) return false;
     }
     return true;
   }
@@ -114,4 +113,8 @@ export const formatFileStockTransfer = (docNo: string, status: string, suffix: s
   } else {
     return `${docNo}-${getStockTransferStatusInfo(status)?.value}.pdf`;
   }
+};
+
+export const formatFileInvoice = (invoiceNo: string, counter: string) => {
+  return `${invoiceNo}-${counter}.pdf`;
 };
