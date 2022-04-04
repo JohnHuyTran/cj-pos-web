@@ -120,6 +120,17 @@ function DistrictsDropDown({
     }
   }
 
+  const onInputChange = async (event: any, value: string, reason: string) => {
+    if (event && event.keyCode && event.keyCode === 13) {
+      return false;
+    }
+
+    const keyword = value.trim();
+    if (keyword.length === 0 && reason !== 'reset') {
+      return onChangeDistricts('', '');
+    }
+  };
+
   return (
     <Autocomplete
       id='selAddItem'
@@ -132,7 +143,7 @@ function DistrictsDropDown({
       filterOptions={filterOptions}
       renderOption={autocompleteRenderListItem}
       onChange={handleChangeItem}
-      // onInputChange={onInputChange}
+      onInputChange={onInputChange}
       getOptionLabel={(option) => (option.nameTH ? option.nameTH : '')}
       isOptionEqualToValue={(option, value) => option.nameTH === value.nameTH}
       renderInput={autocompleteRenderInput}

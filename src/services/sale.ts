@@ -56,3 +56,26 @@ export const getPathRequestTaxInvoice = (billNo: string) => {
     billNo: billNo,
   });
 };
+
+export const getPathPrintInvoice = (billNo: string) => {
+  return getPathUrl(`${environment.sale.taxInvoice.printInvoice.url}`, {
+    billNo: billNo,
+  });
+};
+
+export async function savePrintInvoice(payload: SaveInvoiceRequest, fileList: File[], edit: boolean) {
+  const bodyFormData = new FormData();
+
+  if (edit) bodyFormData.append('requestBody', JSON.stringify(payload));
+
+  fileList.map((data: File) => {
+    return bodyFormData.append('file[]', data);
+  });
+
+  const response = await put(getPathPrintInvoice(payload.billNo), bodyFormData, ContentType.MULTIPART)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}

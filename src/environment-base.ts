@@ -379,6 +379,9 @@ export const environment = {
       printHistory: {
         url: '/sale/tax-invoices/{billNo}/print-history',
       },
+      printInvoice: {
+        url: '/sale/tax-invoices/{billNo}/print',
+      },
     },
     member: {
       searchMemberInformation: {

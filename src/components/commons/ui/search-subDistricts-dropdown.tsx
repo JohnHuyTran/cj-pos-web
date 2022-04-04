@@ -121,6 +121,17 @@ function SubDistrictsDropDown({
   //   handleChangeItem('', options[0], 'selectOption');
   // }
 
+  const onInputChange = async (event: any, value: string, reason: string) => {
+    if (event && event.keyCode && event.keyCode === 13) {
+      return false;
+    }
+
+    const keyword = value.trim();
+    if (keyword.length === 0 && reason !== 'reset') {
+      return onChangeSubDistricts('', '', '');
+    }
+  };
+
   return (
     <Autocomplete
       id='selAddItem'
@@ -133,6 +144,7 @@ function SubDistrictsDropDown({
       filterOptions={filterOptions}
       renderOption={autocompleteRenderListItem}
       onChange={handleChangeItem}
+      onInputChange={onInputChange}
       getOptionLabel={(option) => (option.nameTH ? option.nameTH : '')}
       isOptionEqualToValue={(option, value) => option.nameTH === value.nameTH}
       renderInput={autocompleteRenderInput}
