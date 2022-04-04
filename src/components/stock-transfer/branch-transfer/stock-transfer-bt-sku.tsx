@@ -221,7 +221,7 @@ function BranchTransferListSKU({ onSelectSku, skuList, onUpdateItemList }: Props
       _newSku.push(newData);
     });
     setBtItemGroups(_newSku);
-    onUpdateItemList(_items);
+    return onUpdateItemList(_items);
   };
 
   return (

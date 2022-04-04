@@ -10,7 +10,17 @@ import {
   ItemGroups,
   StockBalanceType,
 } from '../../../models/stock-transfer-model';
-import { Button, Checkbox, FormControlLabel, FormGroup, Grid, IconButton, Link, Typography } from '@mui/material';
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  IconButton,
+  Link,
+  TextField,
+  Typography,
+} from '@mui/material';
 import Steppers from '../steppers';
 import Box from '@mui/system/Box';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
@@ -193,7 +203,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   };
 
   const handleChangeComment = (value: any) => {
-    // setComment(value);
+    setComment(value);
   };
 
   const onUpdateItemsList = (item: Item[]) => {
@@ -384,7 +394,20 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
   const handleOpenAddItems = async () => {
     await dispatch(updateAddItemsState({}));
+    await getSkuList();
     setOpenModelAddItems(true);
+  };
+  const getSkuList = () => {
+    const _skuSlice = skuList;
+    const list = _.uniqBy(_skuSlice, 'skuCode');
+    const skucodeList: string[] = [];
+    list.map((i: any) => {
+      skucodeList.push(i.skuCode);
+    });
+    const payload: FindProductRequest = {
+      skuCodes: skucodeList,
+    };
+    setBodyRequest(payload);
   };
   const handleConfirmBtn = async () => {
     await dispatch(updateAddItemsState({}));

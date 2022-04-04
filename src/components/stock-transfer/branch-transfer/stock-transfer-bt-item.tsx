@@ -339,7 +339,7 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
       });
     }
     setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    return onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
   };
 
   const storeItem = async () => {
@@ -401,7 +401,7 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
       _newSku.push(newData);
     });
     setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    return onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
   };
 
   const deleteItem = async () => {
@@ -413,7 +413,7 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
       return item.barcode === itemDelete.barcode;
     });
     setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    return onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
   };
 
   let newColumns = [...columns];
