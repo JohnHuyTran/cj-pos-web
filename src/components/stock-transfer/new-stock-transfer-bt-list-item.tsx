@@ -19,12 +19,14 @@ import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { Item, ItemGroups } from '../../models/stock-transfer-model';
 import { isGroupBranch } from '../../utils/role-permission';
-
+import { DeleteForever } from '@mui/icons-material';
+import ModalDeleteItem from './modal-delete-item-confirm';
 interface Props {
   skuCodeSelect: string;
   onUpdateSkuList: (item: ItemGroups[]) => void;
   onUpdateItemList: (item: Item[]) => void;
 }
+
 const columns: GridColDef[] = [
   {
     field: 'index',
@@ -143,6 +145,25 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
   },
+  {
+    field: 'delete',
+    headerName: ' ',
+    width: 50,
+    align: 'center',
+    sortable: false,
+    renderCell: (params) => {
+      var orderQty = Number(params.getValue(params.id, 'orderQty'));
+      if (params.getValue(params.id, 'edit') || orderQty <= 0) {
+        return (
+          <div>
+            <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
+          </div>
+        );
+      } else {
+        return <div></div>;
+      }
+    },
+  },
 ];
 
 const chkReturnQty = (value: any) => {
@@ -214,6 +235,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
         toteCode: item.toteCode ? item.toteCode : '',
         isDisable: isDisable,
         boNo: item.boNo,
+        edit: item.edit ? item.edit : false,
       };
     });
 
@@ -276,6 +298,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
             toteCode: dupItem.toteCode,
             isDisable: isDisable,
             boNo: dupItem.boNo,
+            edit: dupItem.edit,
           };
           _.remove(_items, function (item: Item) {
             return item.barcode === data.barcode;
@@ -294,6 +317,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
             actualQty: data.qty,
             toteCode: '',
             isDisable: isDisable,
+            edit: true,
           };
           _items = [..._items, newData];
         }
@@ -321,7 +345,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
 
       if (dupItem) {
         let _toteCode: string = dataRow.toteCode;
-        _toteCode= _toteCode.trim();
+        _toteCode = _toteCode.trim();
 
         const newData: Item = {
           seqItem: dataRow.seqItem,
@@ -336,6 +360,7 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
           barFactor: dataRow.barFactor,
           unitCode: dataRow.unitCode ? dataRow.unitCode : 0,
           orderQty: dataRow.orderQty ? dataRow.orderQty : 0,
+          edit: dataRow.edit,
         };
 
         _.remove(_items, function (item: Item) {
@@ -377,8 +402,10 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
   let newColumns = [...columns];
   if (branchTransferInfo.status != 'CREATED') {
     newColumns[7]['hide'] = false;
+    newColumns[8]['hide'] = true;
   } else {
     newColumns[7]['hide'] = true;
+    newColumns[8]['hide'] = false;
   }
 
   const handleEditItems = (params: GridCellParams) => {
@@ -397,26 +424,89 @@ function BranchTransferListItem({ skuCodeSelect, onUpdateItemList, onUpdateSkuLi
     }
   };
 
+  const [itemDelete, setItemDelete] = React.useState<Item>({
+    barcode: '',
+    barcodeName: '',
+  });
+  const [openModalDeleteConfirm, setOpenModalDeleteConfirm] = React.useState(false);
+  const currentlySelected = async (params: GridCellParams) => {
+    const value = params.colDef.field;
+
+    if (value === 'delete') {
+      const _item: Item = {
+        barcode: params.row.barcode,
+        barcodeName: params.row.barcodeName,
+      };
+      setItemDelete(_item);
+      setOpenModalDeleteConfirm(true);
+    }
+  };
+
+  const handleDeleteIterm = (isDelete: boolean) => {
+    if (isDelete) {
+      deleteItem();
+    }
+    setOpenModalDeleteConfirm(false);
+  };
+
+  const deleteItem = async () => {
+    let _items = [...branchTransferItems];
+    let _sku = [...skuGroupItems];
+    let _newSku: ItemGroups[] = [];
+
+    _.remove(_items, function (item: Item) {
+      return item.barcode === itemDelete.barcode;
+    });
+
+    _sku.forEach((data: ItemGroups) => {
+      const sum = _items
+        .filter((dataItem: Item) => {
+          return data.skuCode === dataItem.skuCode;
+        })
+        .reduce((sum, dataItem: Item) => {
+          return (
+            sum + Number((dataItem.actualQty ? dataItem.actualQty : 0) * (dataItem.barFactor ? dataItem.barFactor : 0))
+          );
+        }, 0);
+
+      const newData: ItemGroups = {
+        skuCode: data.skuCode,
+        productName: data.productName,
+        orderAllQty: data.orderAllQty,
+        actualAllQty: sum,
+        remainingQty: data.remainingQty,
+      };
+      _newSku.push(newData);
+    });
+    await setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    await onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    await onUpdateSkuList(_newSku);
+  };
+
   return (
-    <Box mt={2} bgcolor='background.paper'>
-      <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
-          pagination
-          disableColumnMenu
-          autoHeight={rows.length >= 8 ? false : true}
-          scrollbarSize={10}
-          rowHeight={65}
-          onCellFocusOut={handleOnFocusOut}
-          onCellOut={handleOnCellOut}
-          // onCellKeyDown={handleEditItems}
-        />
-      </div>
-    </Box>
+    <React.Fragment>
+      <Box mt={2} bgcolor='background.paper'>
+        <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={pageSize}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            rowsPerPageOptions={[10, 20, 50, 100]}
+            pagination
+            disableColumnMenu
+            autoHeight={rows.length >= 8 ? false : true}
+            scrollbarSize={10}
+            rowHeight={65}
+            onCellClick={currentlySelected}
+            onCellFocusOut={handleOnFocusOut}
+            onCellOut={handleOnCellOut}
+            // onCellKeyDown={handleEditItems}
+          />
+        </div>
+      </Box>
+      <ModalDeleteItem open={openModalDeleteConfirm} itemInfo={itemDelete} onClose={handleDeleteIterm} />
+    </React.Fragment>
   );
 }
 export default BranchTransferListItem;
