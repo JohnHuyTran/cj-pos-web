@@ -129,7 +129,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         customer: customer,
       };
 
-      // console.log('payload :', JSON.stringify(payload));
       if (status === 'PRINTED') {
         handleSavePrintInvoice(payload);
       } else {
@@ -301,14 +300,16 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
           setOpenModelPreviewDocument(true);
           setPathReport(value.data);
           setFlagSave(false);
+          setOpenLoadingModal(false);
         });
       })
       .catch((error: any) => {
         setShowSnackBar(true);
         setContentMsg(error.message);
-      });
 
-    setOpenLoadingModal(false);
+        setOpenLoadingModal(false);
+      });
+    // setOpenLoadingModal(false);
   };
 
   const [isClearProvinces, setIsClearProvinces] = React.useState(false);
@@ -353,8 +354,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [disabledSelDistricts, setDisabledSelDistricts] = React.useState(true);
   const [disabledSelSubDistricts, setDisabledSelSubDistricts] = React.useState(true);
   const handleChangeProvinces = (provincesCode: string) => {
-    // console.log('handleChangeProvinces:', provincesCode);
-
     if (provincesCode !== '') {
       setValue('province', provincesCode);
       clearErrors('province');
@@ -380,12 +379,16 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         setIsClearDistricts(true);
         setIsClearSubDistricts(true);
       }
+    } else if (provincesCode === '') {
+      setValue('province', provincesCode);
     }
   };
 
   const handleChangeDistricts = (districtsCode: string, provincesCode: string) => {
+    setValue('district', districtsCode);
+
     if (districtsCode !== '') {
-      setValue('district', districtsCode);
+      // setValue('district', districtsCode);
       clearErrors('district');
       setDistrictsCode(districtsCode);
       setDisabledSelSubDistricts(false);
@@ -401,8 +404,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleChangeSubDistricts = (subDistrictsCode: string, postalCode: string, districtCode: string) => {
+    setValue('subDistrict', subDistrictsCode);
+
     if (subDistrictsCode !== '') {
-      setValue('subDistrict', subDistrictsCode);
+      // setValue('subDistrict', subDistrictsCode);
       setValue('postcode', postalCode);
       clearErrors('subDistrict');
       clearErrors('postcode');
@@ -444,6 +449,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       setIsClearProvinces(true);
       setIsClearDistricts(true);
       setIsClearSubDistricts(true);
+
+      setValue('province', '');
+      setValue('district', '');
+      setValue('subDistrict', '');
     }
   };
 
