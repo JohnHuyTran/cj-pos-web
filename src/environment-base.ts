@@ -345,7 +345,7 @@ export const environment = {
         url: '/sale/tax-invoices',
       },
       requestTaxInvoice: {
-        url: '/sale/request/{billNo}',
+        url: '/sale/transactions/{billNo}',
       },
     },
     member: {
