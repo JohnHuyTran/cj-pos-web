@@ -43,7 +43,8 @@ export default function Tasklist({ userPermission, listData, onSearch }: Props) 
           } else if (
             item.type === 'APPROVE_TRANSFER_OUT' ||
             item.type === 'REJECT_TRANSFER_OUT' ||
-            item.type === 'CLOSE_TRANSFER_OUT'
+            item.type === 'CLOSE_TRANSFER_OUT' ||
+            item.type === 'SEND_TO_FOR_APPROVAL'
           ) {
             return (
               <TaskForTransferOut
