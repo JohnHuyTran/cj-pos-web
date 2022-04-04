@@ -15,14 +15,13 @@ import { saveInvoice, savePrintInvoice, searchMemberInformation } from '../../se
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import LoadingModal from '../commons/ui/loading-modal';
 import AlertError from '../commons/ui/alert-warning';
-import { featchTaxInvoiceListAsync } from '../../store/slices/tax-invoice-search-list-slice';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import TaxInvoiceHistory from './tax-invoice-history';
 import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 import { clearUploadFileState, uploadFileState } from '../../store/slices/upload-file-slice';
-// import ModalShowFile from '../commons/ui/modal-show-file';
-import ModalShowFile from '../commons/ui/modal-show-file-base64';
+import ModalShowFile from '../commons/ui/modal-show-file';
+// import ModalShowFile from '../commons/ui/modal-show-file-base64';
 import { formatFileInvoice } from '../../utils/utils';
 
 interface Props {
@@ -64,7 +63,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
-  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+  let fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [flagSave, setFlagSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const handleExitModelConfirm = async () => {
@@ -130,6 +129,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         customer: customer,
       };
 
+      // console.log('payload :', JSON.stringify(payload));
       if (status === 'PRINTED') {
         handleSavePrintInvoice(payload);
       } else {
@@ -263,6 +263,11 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         setDisabledBtnPreview(false);
         setDisabledBtnClear(true);
         setDisabledBtnSave(true);
+
+        setEditMode(false);
+
+        // dispatch(uploadFileState([]));
+        // fileUploadList = [];
       })
       .catch((error: any) => {
         setShowSnackBar(true);
@@ -348,6 +353,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [disabledSelDistricts, setDisabledSelDistricts] = React.useState(true);
   const [disabledSelSubDistricts, setDisabledSelSubDistricts] = React.useState(true);
   const handleChangeProvinces = (provincesCode: string) => {
+    // console.log('handleChangeProvinces:', provincesCode);
+
     if (provincesCode !== '') {
       setValue('province', provincesCode);
       clearErrors('province');
@@ -857,6 +864,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
           open={openModelPreviewDocument}
           onClose={handleModelPreviewDocument}
           url={pathReport}
+          sdImageFile=''
+          statusFile={2}
           fileName={formatFileInvoice(invoiceNo, counter)}
           btnPrintName='พิมพ์เอกสาร'
           landscape={docLayoutLandscape}
