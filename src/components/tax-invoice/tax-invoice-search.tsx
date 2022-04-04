@@ -63,8 +63,15 @@ export default function TaxInvoiceSearch() {
   const taxInvoiceList = items.data ? items.data : [];
 
   const handleChange = (event: any) => {
-    const value = event.target.value;
-    setValues({ ...values, [event.target.name]: value });
+    const name = event.target.name;
+    if (name === 'citizenId') {
+      let value = event.target.value.replace(/[^0-9]/g, '');
+      value = value.length > 13 ? value.substring(0, 13) : value;
+      setValues({ ...values, [event.target.name]: value });
+    } else {
+      const value = event.target.value;
+      setValues({ ...values, [event.target.name]: value });
+    }
   };
 
   const onClickClearBtn = async () => {

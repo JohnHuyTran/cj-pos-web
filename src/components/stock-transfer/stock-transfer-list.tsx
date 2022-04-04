@@ -19,7 +19,8 @@ import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-retur
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
-import StockTransferBT from './new-stock-transfer-bt';
+// import StockTransferBT from './new-stock-transfer-bt';
+import StockTransferBT from './branch-transfer/stock-transfer-bt';
 import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
 
 interface loadingModalState {
