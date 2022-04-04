@@ -211,8 +211,10 @@ function OrderList() {
     await dispatch(updateAddItemsState({}));
     await dispatch(featchOrderDetailAsync(params.row.sdNo))
       .then(
-        () => {
-          setOpens(true);
+        (value) => {
+          if (value) {
+            setOpens(true);
+          }
         }
 
         // async function (value) {

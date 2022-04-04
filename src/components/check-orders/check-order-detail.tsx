@@ -404,6 +404,26 @@ export default function CheckOrderDetail({
   }
 
   let rowsEntries: any = [];
+  let sumDCPercent: number = 0;
+  const handleCalculateDCPercent = async () => {
+    // if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
+    let sumActualQtyItems: number = 0;
+    let sumQuantityRefItems: number = 0;
+
+    if (Object.keys(payloadAddItem).length > 0) {
+      payloadAddItem.forEach((item: itemsDetail) => {
+        sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
+      });
+
+      let sumPercent: number = (sumActualQtyItems * 100) / sumQuantityRefItems;
+      sumPercent = Math.trunc(sumPercent); //remove decimal
+
+      if (sumPercent >= 0) {
+        sumDCPercent = sumPercent;
+      }
+    }
+  };
 
   if (openTote === false) {
     let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
@@ -441,37 +461,12 @@ export default function CheckOrderDetail({
         };
       });
     }
-  }
 
-  const [sumDCPercent, setSumDCPercent] = React.useState(0);
-  const handleCalculateDCPercent = async () => {
     if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
-      let sumActualQtyItems: number = 0;
-      let sumQuantityRefItems: number = 0;
-      if (Object.keys(payloadAddItem).length > 0) {
-        rowsEntries = payloadAddItem.map((item: itemsDetail) => {
-          sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
-          sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
-        });
-
-        let sumPercent: number = (sumActualQtyItems * 100) / sumQuantityRefItems;
-        sumPercent = Math.trunc(sumPercent); //remove decimal
-
-        if (sumPercent >= 0) {
-          console.log('sumPercent: ', sumPercent);
-          setSumDCPercent(sumPercent);
-        }
-
-        // setSumActualQtyApprove1(Number(sumActualQtyItems));
-        // setSumQuantityRefApprove1(Number(sumQuantityRefItems));
-
-        // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
+      if (sumDCPercent === 0) {
+        handleCalculateDCPercent();
       }
     }
-  };
-  console.log('sumDCPercent out : ', sumDCPercent);
-  if (sumDCPercent === 0) {
-    handleCalculateDCPercent();
   }
 
   function handleNotExitModelConfirm() {
@@ -493,7 +488,7 @@ export default function CheckOrderDetail({
 
   const updateShipmentOrder = () => {
     dispatch(featchOrderListAsync(payloadSearchOrder));
-    dispatch(featchOrderDetailAsync(sdNo));
+    // dispatch(featchOrderDetailAsync(sdNo));
   };
 
   const mapUpdateState = async () => {
@@ -807,16 +802,6 @@ export default function CheckOrderDetail({
 
   const onDeleteAttachFileOld = (item: any) => {
     const fileKeyDel = item.fileKey;
-    // console.log('item delete: ', item);
-    // if (docType && docNo) {
-    //         delFileUrlHuawei(fileKeyDel, docType, docNo)
-    //           .then((value) => {
-    //             return setUploadFileFlag(true);
-    //           })
-    //           .catch((error: ApiError) => {
-    //             return setUploadFileFlag(false);
-    //           });
-    //       }
   };
 
   return (
