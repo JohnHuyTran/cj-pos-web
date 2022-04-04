@@ -165,7 +165,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     if (isOpen && taxInvoiceDetail) {
       setBillNo(taxInvoiceDetail.billNo);
 
-      dispatch(featchTaxInvoicePrintHistoryAsync(taxInvoiceDetail.billNo));
+      // dispatch(featchTaxInvoicePrintHistoryAsync(taxInvoiceDetail.billNo));
 
       if (taxInvoiceDetail.invoiceNo) {
         setInvoiceNo(taxInvoiceDetail.invoiceNo);
@@ -498,7 +498,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     handleChange();
   };
 
-  if (status === 'PRINTED' && historyDetail.length > 0) {
+  if (status === 'PRINTED' && historyDetail.length >= 1) {
     if (fileUploadList.length > 0 && disabledBtnPreview) setDisabledBtnPreview(false);
     else if (fileUploadList.length == 0 && !disabledBtnPreview) setDisabledBtnPreview(true);
   }

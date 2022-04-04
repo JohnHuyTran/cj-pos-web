@@ -19,6 +19,7 @@ import LoadingModal from '../commons/ui/loading-modal';
 import { requestTaxInvoice } from '../../services/sale';
 import { ApiError } from '../../models/api-error-model';
 import { uploadFileState } from '../../store/slices/upload-file-slice';
+import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
 
 interface Props {
   actionType: string;
@@ -171,7 +172,9 @@ export default function TaxInvoiceSearchList({ actionType }: Props) {
       };
       await dispatch(uploadFileState([]));
       await dispatch(featchTaxInvoiceDetailAsync(payload)).then(() => {
-        setOpenDetailModal(true);
+        dispatch(featchTaxInvoicePrintHistoryAsync(params.row.billNo)).then(() => {
+          setOpenDetailModal(true);
+        });
       });
       setOpenLoadingModal(false);
     }
