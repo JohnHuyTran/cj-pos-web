@@ -358,7 +358,8 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
             onChange={(e) => {
               handleChangeRemark(e, params.row.index);
             }}
-            disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT)}
+            disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT
+              && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
           />
         </HtmlTooltip>
       )

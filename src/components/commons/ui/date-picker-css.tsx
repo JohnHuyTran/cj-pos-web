@@ -33,6 +33,9 @@ const useStyles = makeStyles({
     '& .MuiOutlinedInput-adornedStart': {
       paddingLeft: '0px !important',
     },
+    '& .MuiInputBase-root.MuiOutlinedInput-root': {
+      height: '38px !important',
+    }
   },
   MdatepickerDetail: {
     '& .MuiOutlinedInput-input': {
@@ -74,6 +77,9 @@ const useStyles = makeStyles({
     '&:hover .MuiOutlinedInput-notchedOutline': {
       borderColor: 'red !important',
     },
+    '& .MuiInputBase-root.MuiOutlinedInput-root': {
+      height: '38px !important',
+    }
   },
 
   // MkeyboardDatePicker: {
