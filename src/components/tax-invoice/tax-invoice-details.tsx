@@ -4,7 +4,7 @@ import Dialog from '@mui/material/Dialog';
 import { useStyles } from '../../styles/makeTheme';
 import { ContentPaste, HighlightOff, Save, Sync } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
-import { Box, Button, DialogTitle, FormHelperText, Grid, IconButton, TextField, Link } from '@mui/material';
+import { Box, Button, DialogTitle, FormHelperText, Grid, IconButton, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
@@ -19,10 +19,10 @@ import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import TaxInvoiceHistory from './tax-invoice-history';
 import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
-import { clearUploadFileState, uploadFileState } from '../../store/slices/upload-file-slice';
+// import { clearUploadFileState, uploadFileState } from '../../store/slices/upload-file-slice';
 import ModalShowFile from '../commons/ui/modal-show-file';
-// import ModalShowFile from '../commons/ui/modal-show-file-base64';
 import { formatFileInvoice } from '../../utils/utils';
+import { featchTaxInvoiceListAsync } from '../../store/slices/tax-invoice-search-list-slice';
 
 interface Props {
   isOpen: boolean;
@@ -64,6 +64,22 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
   const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
   let fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+
+  const taxInvoicePrintHistory = useAppSelector((state) => state.taxInvoicePrintHistory.detail);
+  const historyDetail: any = taxInvoicePrintHistory.data ? taxInvoicePrintHistory.data : [];
+
+  const [status, setStatus] = React.useState('');
+  const [billNo, setBillNo] = React.useState('');
+  const [invoiceNo, setInvoiceNo] = React.useState('-');
+  const [memberNo, setMemberNo] = React.useState('');
+
+  const [disabledBtnEdit, setDisabledBtnEdit] = React.useState(true);
+  const [editMode, setEditMode] = React.useState(false);
+
+  const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
+  const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
+  const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
+
   const [flagSave, setFlagSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
   const handleExitModelConfirm = async () => {
@@ -84,17 +100,19 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
+  const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const handleClose = () => {
     setBillNo('');
     setMemberNo('');
     handleClear();
 
-    // dispatch(featchTaxInvoiceListAsync(payloadSearch));
+    dispatch(featchTaxInvoiceListAsync(payloadSearch));
 
     setOpen(false);
     onClickClose();
   };
 
+  const [onSaveEvent, setOnSaveEvent] = React.useState(false);
   const {
     register,
     formState: { errors },
@@ -117,7 +135,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         postcode: data.postcode,
       };
       const customer: any = {
-        memberNo: '',
+        memberNo: memberNo,
         taxNo: data.taxNo,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -131,23 +149,14 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
       if (status === 'PRINTED') {
         handleSavePrintInvoice(payload);
+      } else if (onSaveEvent) {
+        setEditMode(true);
+        handleSavePrintInvoice(payload);
       } else {
         handleSaveInvoice(payload);
       }
     }
   };
-
-  const [status, setStatus] = React.useState('');
-  const [billNo, setBillNo] = React.useState('');
-  const [invoiceNo, setInvoiceNo] = React.useState('-');
-  const [memberNo, setMemberNo] = React.useState('');
-
-  const [disabledBtnEdit, setDisabledBtnEdit] = React.useState(true);
-  const [editMode, setEditMode] = React.useState(false);
-
-  const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
-  const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
-  const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
 
   useEffect(() => {
     setOpen(isOpen);
@@ -163,10 +172,12 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       }
 
       setStatus(taxInvoiceDetail.status);
-      setMemberNo(taxInvoiceDetail.customer.memberNo);
+      if (taxInvoiceDetail.customer.memberNo) setMemberNo(taxInvoiceDetail.customer.memberNo);
 
       if (taxInvoiceDetail.status === 'PRINTED') {
-        setDisabledBtnEdit(false);
+        if (historyDetail.length > 0) setDisabledBtnEdit(false);
+        else setDisabledBtnPreview(false);
+
         setEditMode(true);
         setDisabledBtnClear(true);
         setDisabledBtnSave(true);
@@ -263,10 +274,11 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         setDisabledBtnClear(true);
         setDisabledBtnSave(true);
 
-        setEditMode(false);
+        setOnSaveEvent(true);
 
-        // dispatch(uploadFileState([]));
-        // fileUploadList = [];
+        if (value.data) {
+          setInvoiceNo(value.data);
+        }
       })
       .catch((error: any) => {
         setShowSnackBar(true);
@@ -281,12 +293,16 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [pathReport, setPathReport] = React.useState<string>('');
   const [counter, setCounter] = React.useState(0);
 
-  function handleModelPreviewDocument() {
+  const handleModelPreviewDocument = async () => {
     setOpenModelPreviewDocument(false);
-  }
 
-  const taxInvoicePrintHistory = useAppSelector((state) => state.taxInvoicePrintHistory.detail);
-  const historyDetail: any = taxInvoicePrintHistory.data ? taxInvoicePrintHistory.data : [];
+    if (status !== 'PRINTED') {
+      // await setStatus('PRINTED');
+      // await setDisabledBtnEdit(false);
+      handleClose();
+    }
+  };
+
   const handleSavePrintInvoice = async (payload: SaveInvoiceRequest) => {
     setOpenLoadingModal(true);
 
@@ -301,6 +317,11 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
           setPathReport(value.data);
           setFlagSave(false);
           setOpenLoadingModal(false);
+
+          setEditMode(false);
+
+          // dispatch(uploadFileState([]));
+          // fileUploadList = [];
         });
       })
       .catch((error: any) => {
@@ -477,8 +498,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     handleChange();
   };
 
-  if (fileUploadList.length > 0 && disabledBtnPreview) setDisabledBtnPreview(false);
-  else if (fileUploadList.length == 0 && !disabledBtnPreview) setDisabledBtnPreview(true);
+  if (status === 'PRINTED' && historyDetail.length > 0) {
+    if (fileUploadList.length > 0 && disabledBtnPreview) setDisabledBtnPreview(false);
+    else if (fileUploadList.length == 0 && !disabledBtnPreview) setDisabledBtnPreview(true);
+  }
 
   return (
     <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -776,12 +799,14 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
             <Grid item xs={1}></Grid>
             <Grid item xs={1}>
-              <Typography gutterBottom variant='subtitle1' component='div' mb={2}>
-                แนบไฟล์ :
-              </Typography>
+              {status === 'PRINTED' && historyDetail.length > 0 && (
+                <Typography gutterBottom variant='subtitle1' component='div' mb={2}>
+                  แนบไฟล์ :
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={4}>
-              {status === 'PRINTED' && (
+              {status === 'PRINTED' && historyDetail.length > 0 && (
                 <Box ml={2}>
                   <AccordionUploadFile
                     files={[]}

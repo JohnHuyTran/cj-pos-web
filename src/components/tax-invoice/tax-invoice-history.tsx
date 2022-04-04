@@ -113,6 +113,7 @@ const handleModelAction = (params: GridRenderCellParams) => {
       });
   }
 
+  const printNo: any = params.getValue(params.id, 'printNo');
   const fileList: any = params.getValue(params.id, 'files');
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -160,6 +161,10 @@ const handleModelAction = (params: GridRenderCellParams) => {
       />
     </>
   );
+
+  if (printNo === 1) {
+    return '';
+  }
 
   return (
     <>
