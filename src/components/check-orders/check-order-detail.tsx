@@ -404,6 +404,26 @@ export default function CheckOrderDetail({
   }
 
   let rowsEntries: any = [];
+  let sumDCPercent: number = 0;
+  const handleCalculateDCPercent = async () => {
+    // if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
+    let sumActualQtyItems: number = 0;
+    let sumQuantityRefItems: number = 0;
+
+    if (Object.keys(payloadAddItem).length > 0) {
+      payloadAddItem.forEach((item: itemsDetail) => {
+        sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
+      });
+
+      let sumPercent: number = (sumActualQtyItems * 100) / sumQuantityRefItems;
+      sumPercent = Math.trunc(sumPercent); //remove decimal
+
+      if (sumPercent >= 0) {
+        sumDCPercent = sumPercent;
+      }
+    }
+  };
 
   if (openTote === false) {
     let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
@@ -441,32 +461,11 @@ export default function CheckOrderDetail({
         };
       });
     }
-  }
 
-  const [sumDCPercent, setSumDCPercent] = React.useState(0);
-  const handleCalculateDCPercent = async () => {
-    // if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
-    let sumActualQtyItems: number = 0;
-    let sumQuantityRefItems: number = 0;
-    if (Object.keys(payloadAddItem).length > 0) {
-      rowsEntries = payloadAddItem.map((item: itemsDetail) => {
-        sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
-        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
-      });
-
-      let sumPercent: number = (sumActualQtyItems * 100) / sumQuantityRefItems;
-      sumPercent = Math.trunc(sumPercent); //remove decimal
-
-      if (sumPercent >= 0) {
-        setSumDCPercent(sumPercent);
+    if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
+      if (sumDCPercent === 0) {
+        handleCalculateDCPercent();
       }
-    }
-    // }
-  };
-
-  if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
-    if (sumDCPercent === 0) {
-      handleCalculateDCPercent();
     }
   }
 
