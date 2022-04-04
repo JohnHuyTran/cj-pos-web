@@ -42,12 +42,13 @@ export async function searchMemberInformation(memberNo: string) {
 }
 
 export async function requestTaxInvoice(payload: TaxInvoiceRequest) {
-  // const response = await get(getPathRequestTaxInvoice(billNo), ContentType.JSON)
-  //   .then((result: any) => result)
-  //   .catch((error) => {
-  //     throw error;
-  //   });
-  const response = getInvoiceRequest().then((result: any) => result);
+  const value = payload.docNo ? payload.docNo : '';
+  const response = await get(getPathRequestTaxInvoice(value), ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  // const response = getInvoiceRequest().then((result: any) => result);
   return response;
 }
 
