@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
-import { getParams } from '../../adapters/posback-adapter';
-import { ContentType } from '../../utils/enum/common-enum';
-import { DistrictsResponse, SearchDistrictsRequest } from '../../models/search-districts-model';
+import { environment } from '../../../environment-base';
+import { getParams } from '../../../adapters/posback-adapter';
+import { ContentType } from '../../../utils/enum/common-enum';
+import { DistrictsResponse, SearchDistrictsRequest } from '../../../models/search-districts-model';
 
 type State = {
   districtsList: DistrictsResponse;

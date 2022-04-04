@@ -159,6 +159,7 @@ export interface Item {
   orderAllQty?: number;
   remainingQty?: number;
   actualAllQty?: number;
+  edit?: boolean;
 }
 
 export interface ItemGroups {

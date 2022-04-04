@@ -164,10 +164,9 @@ const columns: GridColDef[] = [
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
-          
           let actualQty = Number(params.getValue(params.id, 'actualQty'));
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
-          
+
           if (actualQty === 0) value = chkActualQty(value);
           if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, actualQty: value }]);
@@ -363,31 +362,10 @@ export default function CheckOrderDetail({
       if (orderDetail.Comment !== '') {
         dispatch(featchOrderSDListAsync(orderDetail.Comment));
       }
-
-      if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
-        let sumActualQtyItems: number = 0;
-        let sumQuantityRefItems: number = 0;
-        if (Object.keys(payloadAddItem).length > 0) {
-          rowsEntries = payloadAddItem.map((item: itemsDetail, index: number) => {
-            sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
-            sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
-          });
-
-          handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems);
-        }
-      }
     }
 
     // }, [open, openModelConfirm]);
   }, [open]);
-
-  const [sumDCPercent, setSumDCPercent] = React.useState(0);
-  const handleCalculateDCPercent = async (sumActualQty: number, sumQuantityRef: number) => {
-    let sumPercent: number = (sumActualQty * 100) / sumQuantityRef;
-    sumPercent = Math.trunc(sumPercent); //remove decimal
-
-    setSumDCPercent(sumPercent);
-  };
 
   const updateState = async (items: any) => {
     await dispatch(updateAddItemsState(items));
@@ -395,8 +373,6 @@ export default function CheckOrderDetail({
 
   const [openTote, setOpenTote] = React.useState(false);
   const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
-
-  let rowsEntries: any = [];
 
   const handleOpenModalTote = async (value: string, isAddItem: boolean) => {
     rowsEntries = [];
@@ -426,6 +402,28 @@ export default function CheckOrderDetail({
     setOpenOrderReceiveModal(false);
     onClickClose();
   }
+
+  let rowsEntries: any = [];
+  let sumDCPercent: number = 0;
+  const handleCalculateDCPercent = async () => {
+    // if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
+    let sumActualQtyItems: number = 0;
+    let sumQuantityRefItems: number = 0;
+
+    if (Object.keys(payloadAddItem).length > 0) {
+      payloadAddItem.forEach((item: itemsDetail) => {
+        sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
+      });
+
+      let sumPercent: number = (sumActualQtyItems * 100) / sumQuantityRefItems;
+      sumPercent = Math.trunc(sumPercent); //remove decimal
+
+      if (sumPercent >= 0) {
+        sumDCPercent = sumPercent;
+      }
+    }
+  };
 
   if (openTote === false) {
     let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
@@ -463,6 +461,12 @@ export default function CheckOrderDetail({
         };
       });
     }
+
+    if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
+      if (sumDCPercent === 0) {
+        handleCalculateDCPercent();
+      }
+    }
   }
 
   function handleNotExitModelConfirm() {
@@ -484,7 +488,7 @@ export default function CheckOrderDetail({
 
   const updateShipmentOrder = () => {
     dispatch(featchOrderListAsync(payloadSearchOrder));
-    dispatch(featchOrderDetailAsync(sdNo));
+    // dispatch(featchOrderDetailAsync(sdNo));
   };
 
   const mapUpdateState = async () => {
@@ -568,51 +572,50 @@ export default function CheckOrderDetail({
   const handleApproveBtn = async () => {
     mapUpdateState().then(() => {
       setItemsDiffState([]);
-    setOpenModelConfirm(true);
-    setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
-    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-    const itemsList: any = [];
+      setOpenModelConfirm(true);
+      setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
+      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      const itemsList: any = [];
 
-    let sumActualQtyItems: number = 0;
-    let sumQuantityRefItems: number = 0;
-    rowsEdit.forEach((data: GridRowData) => {
-      let diffCount: number = data.actualQty - data.qtyRef;
-      sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
-      sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
+      let sumActualQtyItems: number = 0;
+      let sumQuantityRefItems: number = 0;
+      rowsEdit.forEach((data: GridRowData) => {
+        let diffCount: number = data.actualQty - data.qtyRef;
+        sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
 
-      const itemDiff: Entry = {
-        barcode: data.barcode,
-        deliveryOrderNo: data.deliveryOrderNo,
-        actualQty: data.actualQty,
-        comment: data.comment,
-        seqItem: 0,
-        itemNo: '',
-        shipmentSAPRef: '',
-        skuCode: '',
-        skuType: '',
-        productName: data.productName,
-        unitCode: '',
-        unitName: '',
-        unitFactor: 0,
-        qty: 0,
-        qtyAll: 0,
-        qtyAllBefore: 0,
-        qtyDiff: diffCount,
-        price: 0,
-        isControlStock: 0,
-        toteCode: '',
-        expireDate: '',
-        isTote: data.isTote,
-      };
-      setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
-      itemsList.push(data);
+        const itemDiff: Entry = {
+          barcode: data.barcode,
+          deliveryOrderNo: data.deliveryOrderNo,
+          actualQty: data.actualQty,
+          comment: data.comment,
+          seqItem: 0,
+          itemNo: '',
+          shipmentSAPRef: '',
+          skuCode: '',
+          skuType: '',
+          productName: data.productName,
+          unitCode: '',
+          unitName: '',
+          unitFactor: 0,
+          qty: 0,
+          qtyAll: 0,
+          qtyAllBefore: 0,
+          qtyDiff: diffCount,
+          price: 0,
+          isControlStock: 0,
+          toteCode: '',
+          expireDate: '',
+          isTote: data.isTote,
+        };
+        setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
+        itemsList.push(data);
+      });
+
+      setSumActualQty(sumActualQtyItems);
+      setSumQuantityRef(sumQuantityRefItems);
+      // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
     });
-
-    setSumActualQty(sumActualQtyItems);
-    setSumQuantityRef(sumQuantityRefItems);
-    // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
-    })
-    
   };
 
   const handleApproveOCBtn = async () => {
@@ -797,6 +800,10 @@ export default function CheckOrderDetail({
     setUploadFileFlag(status);
   };
 
+  const onDeleteAttachFileOld = (item: any) => {
+    const fileKeyDel = item.fileKey;
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -861,6 +868,7 @@ export default function CheckOrderDetail({
                     isStatus={uploadFileFlag}
                     onChangeUploadFile={handleOnChangeUploadFile}
                     enabledControl={true}
+                    onDeleteAttachFile={onDeleteAttachFileOld}
                   />
                 )}
 

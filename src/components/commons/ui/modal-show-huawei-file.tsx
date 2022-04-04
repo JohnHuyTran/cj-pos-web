@@ -14,6 +14,7 @@ interface ModalShowHuaweiFilerop {
   open: boolean;
   url: string;
   isImage: boolean;
+  isPrint?: boolean;
   fileName: string;
   onClose: () => void;
   onPrint?: () => void;
@@ -34,7 +35,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
@@ -43,15 +44,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             color: (theme: any) => theme.palette.grey[400],
           }}
         >
-          <HighlightOff fontSize="large" />
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
 
       {onPrint ? (
         <Button
-          id="btnPrint"
-          variant="contained"
-          color="secondary"
+          id='btnPrint'
+          variant='contained'
+          color='secondary'
           onClick={onPrint}
           endIcon={<LocalPrintshopOutlinedIcon />}
         >
@@ -66,6 +67,7 @@ export default function ModalShowHuaweiFile({
   open,
   url,
   isImage,
+  isPrint,
   fileName,
   onClose,
 }: ModalShowHuaweiFilerop): ReactElement {
@@ -111,7 +113,12 @@ export default function ModalShowHuaweiFile({
   return (
     <div>
       <Dialog open={open} maxWidth={false}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} onPrint={showPrint} />
+        {isPrint !== false && (
+          <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose} onPrint={showPrint} />
+        )}
+
+        {isPrint === false && <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose} />}
+
         <DialogContent
           sx={{
             minWidth: 600,
@@ -120,7 +127,7 @@ export default function ModalShowHuaweiFile({
           }}
         >
           {!isImage && (
-            <div id="pdfWrapper" style={{ width: '50vw' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ width: '50vw' }} ref={pdfWrapper}>
               <Document file={{ url }} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page key={`page_${index + 1}`} pageNumber={index + 1} width={initialWidth} />
@@ -130,14 +137,14 @@ export default function ModalShowHuaweiFile({
           )}
 
           {isImage && (
-            <div id="pdfWrapper" style={{ minWidth: '200px' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ minWidth: '200px' }} ref={pdfWrapper}>
               <img src={url} style={{ minWidth: '200px' }} />
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError="Failed to load PDF" />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError='Failed to load PDF' />
     </div>
   );
 }
