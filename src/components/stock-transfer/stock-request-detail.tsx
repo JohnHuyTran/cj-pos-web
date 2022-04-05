@@ -138,7 +138,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   }
 
   // let deleteMode = false;
-  const [deleteMode, setDeleteMode] = React.useState(false);
+  const [canCleMode, setCanCleMode] = React.useState(false);
   const [preferredUsername, setPreferredUsername] = React.useState(isPreferredUsername());
 
   useEffect(() => {
@@ -230,7 +230,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       !groupOC &&
       stockRequestDetail?.createdBy === preferredUsername
     ) {
-      setDeleteMode(true);
+      setCanCleMode(true);
     }
   }, [open]);
 
@@ -779,7 +779,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
 
-  const handleDelete = () => {
+  const handleCancle = () => {
     setOpenModelDeleteConfirm(true);
   };
 
@@ -1019,8 +1019,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                   variant="contained"
                   color="error"
                   className={classes.MbtnSave}
-                  onClick={handleDelete}
-                  sx={{ width: 140, display: `${!deleteMode ? 'none' : ''}` }}
+                  onClick={handleCancle}
+                  sx={{ width: 140, display: `${!canCleMode ? 'none' : ''}` }}
                   disabled={rowLength == 0}
                 >
                   ยกเลิก
