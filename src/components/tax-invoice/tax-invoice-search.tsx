@@ -174,7 +174,7 @@ export default function TaxInvoiceSearch() {
 
   React.useEffect(() => {
     setHideSearchBtn(isAllowActionPermission(ACTIONS.SALE_TAX_INVOICE_VIEW));
-    setHideRequestBtn(isAllowActionPermission(''));
+    setHideRequestBtn(isAllowActionPermission(ACTIONS.SALE_TAX_INVOICE_REQUEST));
   }, []);
 
   return (
