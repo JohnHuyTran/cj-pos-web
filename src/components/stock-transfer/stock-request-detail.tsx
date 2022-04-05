@@ -20,6 +20,7 @@ import {
   Approve1StockTransferRequest,
   Approve2StockTransferRequest,
   SaveStockTransferRequest,
+  StockTransferRequest,
   SubmitStockTransferRequest,
 } from '../../models/stock-transfer-model';
 import { ApiError } from '../../models/api-error-model';
@@ -29,6 +30,7 @@ import {
   approve2StockRequest,
   reject1StockRequest,
   reject2StockRequest,
+  removeStockRequest,
   saveStockRequest,
   submitStockRequest,
 } from '../../services/stock-transfer';
@@ -53,6 +55,8 @@ import {
   PERMISSION_GROUP,
 } from '../../utils/enum/permission-enum';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { isPreferredUsername } from '../../utils/role-permission';
+import ModelDeleteConfirm from './modal-delete-confirm';
 
 interface State {
   branchCode: string;
@@ -114,6 +118,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   const [groupSCM, setGroupSCM] = React.useState(false);
   const [groupBranchSCM, setGroupBranchSCM] = React.useState<boolean>(false);
   const [isAuthorizedBranch, setIsAuthorizedBranch] = React.useState<boolean>(false);
+  // const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
@@ -131,6 +136,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       if (items.length > 0) rowLength = items.length;
     }
   }
+
+  // let deleteMode = false;
+  const [deleteMode, setDeleteMode] = React.useState(false);
+  const [preferredUsername, setPreferredUsername] = React.useState(isPreferredUsername());
 
   useEffect(() => {
     setOpen(isOpen);
@@ -214,6 +223,14 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       setCommentSCM(commentSCM[commentSCM.length - 1]);
     } else {
       setDisplayBtnAddItem(false);
+    }
+
+    if (
+      (stockRequestDetail?.status === 'DRAFT' || stockRequestDetail?.status === 'AWAITING_FOR_REQUESTER') &&
+      !groupOC &&
+      stockRequestDetail?.createdBy === preferredUsername
+    ) {
+      setDeleteMode(true);
     }
   }, [open]);
 
@@ -760,6 +777,27 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     });
   };
 
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+
+  const handleDelete = () => {
+    setOpenModelDeleteConfirm(true);
+  };
+
+  const handleModelDeleteConfirm = async (confirm: boolean) => {
+    if (confirm === true) {
+      console.log('rtNo: ', rtNo);
+      await removeStockRequest(rtNo)
+        .then((value) => {
+          dispatch(featchSearchStockTransferRtAsync(payloadSearch));
+          setOpenModelDeleteConfirm(false);
+          handleClose();
+        })
+        .catch((error) => {});
+    } else {
+      setOpenModelDeleteConfirm(false);
+    }
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
@@ -975,6 +1013,18 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                 >
                   ส่งงาน
                 </Button>
+
+                <Button
+                  id="btnCancle"
+                  variant="contained"
+                  color="error"
+                  className={classes.MbtnSave}
+                  onClick={handleDelete}
+                  sx={{ width: 140, display: `${!deleteMode ? 'none' : ''}` }}
+                  disabled={rowLength == 0}
+                >
+                  ยกเลิก
+                </Button>
               </Grid>
             </Grid>
           )}
@@ -1128,6 +1178,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
         onClose={handleNotExitModelConfirm}
         onConfirm={handleExitModelConfirm}
       />
+
+      <ModelDeleteConfirm open={openModelDeleteConfirm} onClose={handleModelDeleteConfirm} rtNo={rtNo} />
     </div>
   );
 }
