@@ -288,6 +288,19 @@ const useStyles = makeStyles({
       backgroundColor: '#676767',
     },
   },
+  MbtnRefresh: {
+    width: '126px',
+    height: '40px',
+    '&.MuiButton-root': {
+      border: '1px solid #AEAEAE !important',
+      color: '#AEAEAE !important',
+      backgroundColor: '#FFFFFF !important',
+      marginLeft: '10px !important',
+      borderRadius: '3px !important',
+      boxShadow: 'none !important',
+      textTransform: 'none',
+    },
+  },
   MbtnSearch: {
     borderRadius: '4px !important',
   },
