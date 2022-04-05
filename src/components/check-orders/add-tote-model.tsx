@@ -42,50 +42,32 @@ export default function AddToteModel({ open, onClose, updateToteNo }: Props): Re
     updateToteNo(values);
 
     if (Object.keys(payloadAddItem).length !== 0) {
-      let result: any = [];
+      const chkduplicate: any = payloadAddItem.find((r: any) => r.barcode === values);
+      if (!chkduplicate) {
+        const tote: any = [
+          {
+            skuCode: '',
+            skuType: '',
+            barcode: values,
+            productName: '',
+            unitCode: '',
+            unitName: '',
+            unitFactor: 0,
+            qty: 0,
+            actualQty: 1,
+            qtyDiff: 0,
+            comment: '',
+            isTote: true,
+            toteCode: '',
+            deliveryOrderNo: '',
+          },
+        ];
 
-      const tote: any = [
-        {
-          skuCode: '',
-          skuType: '',
-          barcode: values,
-          productName: '',
-          unitCode: '',
-          unitName: '',
-          unitFactor: 0,
-          qty: 0,
-          actualQty: 1,
-          qtyDiff: 0,
-          comment: '',
-          isTote: true,
-          toteCode: '',
-          deliveryOrderNo: '',
-        },
-      ];
-
-      if (payloadAddItem.length > 0) {
-        const sumAddToteList = [...tote, ...payloadAddItem];
-        var o: any = {};
-        sumAddToteList.forEach((i: any) => {
-          var id = i.barcode;
-          if (!o[id]) {
-            return (o[id] = i);
-          }
-          var iActualQty = i.actualQty ? i.actualQty : 0;
-
-          return (o[id].actualQty = o[id].actualQty + iActualQty);
-        });
-
-        var itemResult: any = [];
-        Object.keys(o).forEach((key) => {
-          itemResult.push(o[key]);
-        });
-        result = itemResult;
-      } else {
-        result = tote;
+        if (payloadAddItem.length > 0) {
+          const sumAddToteList = [...tote, ...payloadAddItem];
+          await dispatch(updateAddItemsState(sumAddToteList));
+        }
       }
-
-      await dispatch(updateAddItemsState(result));
     }
 
     onClose();
