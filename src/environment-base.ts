@@ -69,6 +69,34 @@ export const environment = {
       url: '/task/notifications',
     },
   },
+  withDraw: {
+    transferOut: {
+      search: {
+        url: '/campaign/transfer-out',
+      },
+      save: {
+        url: '/campaign/transfer-out',
+      },
+      sendForApproval: {
+        url: '/campaign/transfer-out/{id}/waiting-approve',
+      },
+      cancel: {
+        url: '/campaign/transfer-out/{id}',
+      },
+      detail: {
+        url: '/campaign/transfer-out',
+      },
+      approve: {
+        url: '/campaign/transfer-out/approve-transfer/{id}',
+      },
+      reject: {
+        url: '/campaign/transfer-out/reject/{id}',
+      },
+      end: {
+        url: '/campaign/transfer-out/close/{id}',
+      },
+    },
+  },
   sell: {
     barcodeDiscount: {
       search: {
@@ -93,7 +121,8 @@ export const environment = {
         url: '/campaign/barcode/reject?id={id}&reason={reason}',
       },
       print: {
-        url: '/campaign/print-barcode',
+        url: '/print/bd-barcode',
+        saveLogPrintBarcodeDiscountHistoryURL: '/campaign/print-barcode',
       },
       cancel: {
         url: '/campaign/{id}',
@@ -349,6 +378,9 @@ export const environment = {
       },
       printHistory: {
         url: '/sale/tax-invoices/{billNo}/print-history',
+      },
+      printInvoice: {
+        url: '/sale/tax-invoices/{billNo}/print',
       },
     },
     member: {

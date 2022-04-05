@@ -53,6 +53,7 @@ import stockRequestDetail from './stock-request-detail';
 import { isGroupBranch } from '../../utils/role-permission';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
+import { delFileUrlHuawei } from '../../services/purchase';
 
 interface Props {
   isOpen: boolean;
@@ -437,6 +438,23 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     }
   };
 
+  const docType: string = 'PN';
+  const onDeleteAttachFileOld = (item: any) => {
+    const fileKeyDel = item.fileKey;
+    let docNo = btNo;
+    // console.log('item delete: ', item);
+    if (docType && docNo) {
+      delFileUrlHuawei(fileKeyDel, docType, docNo)
+        .then((value) => {
+          setUploadFileFlag(true);
+          dispatch(featchPurchaseNoteAsync(btNo));
+        })
+        .catch((error: ApiError) => {
+          setUploadFileFlag(false);
+        });
+    }
+  };
+
   const handleSubmitTransfer = async () => {
     setOpenLoadingModal(false);
     const isFileValidate: boolean = validateFileInfo();
@@ -509,10 +527,10 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     <>
       <Grid container spacing={2} mb={2}>
         <Grid item lg={2}>
-          <Typography variant='body2'> สาเหตุการโอน :</Typography>
+          <Typography variant="body2"> สาเหตุการโอน :</Typography>
         </Grid>
         <Grid item lg={3}>
-          <Typography variant='body2'>{reasons} </Typography>
+          <Typography variant="body2">{reasons} </Typography>
         </Grid>
         <Grid item lg={1}></Grid>
         <Grid item lg={2}></Grid>
@@ -520,11 +538,12 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           <>
             <Box>
               <Link
-                component='button'
-                variant='body2'
+                component="button"
+                variant="body2"
                 onClick={(e) => {
                   handleLinkDocument(DOCUMENT_TYPE.BT);
-                }}>
+                }}
+              >
                 เรียกดูเอกสารใบโอน BT
               </Link>
             </Box>
@@ -532,39 +551,42 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         </Grid>
         <Grid item lg={1}></Grid>
       </Grid>
-      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
+      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="space-between" direction="row" alignItems="flex-end">
         <Grid item xl={5}>
           <Button
-            id='btnAddItem'
-            variant='contained'
-            color='info'
+            id="btnAddItem"
+            variant="contained"
+            color="info"
             className={classes.MbtnPrint}
             onClick={handleOpenAddItems}
             startIcon={<ControlPoint />}
-            sx={{ width: 200 }}>
+            sx={{ width: 200 }}
+          >
             เพิ่มสินค้า
           </Button>
         </Grid>
         <Grid item>
           <Button
-            id='btnSave'
-            variant='contained'
-            color='warning'
+            id="btnSave"
+            variant="contained"
+            color="warning"
             className={classes.MbtnSave}
             onClick={handleSaveBtn}
             startIcon={<SaveIcon />}
-            sx={{ width: 200 }}>
+            sx={{ width: 200 }}
+          >
             บันทึก
           </Button>
 
           <Button
-            id='btnApprove'
-            variant='contained'
-            color='primary'
+            id="btnApprove"
+            variant="contained"
+            color="primary"
             className={classes.MbtnApprove}
             onClick={handleConfirmBtn}
             startIcon={<CheckCircleOutline />}
-            sx={{ width: 200 }}>
+            sx={{ width: 200 }}
+          >
             ส่งงานให้ DC
           </Button>
         </Grid>
@@ -575,10 +597,10 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   const componentViewReport = (
     <Grid container spacing={2} mb={2}>
       <Grid item lg={2}>
-        <Typography variant='body2'> สาเหตุการโอน :</Typography>
+        <Typography variant="body2"> สาเหตุการโอน :</Typography>
       </Grid>
       <Grid item lg={3}>
-        <Typography variant='body2'>{reasons} </Typography>
+        <Typography variant="body2">{reasons} </Typography>
       </Grid>
       <Grid item lg={1}></Grid>
       <Grid item lg={2}></Grid>
@@ -586,31 +608,34 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         <>
           <Box>
             <Link
-              component='button'
-              variant='body2'
+              component="button"
+              variant="body2"
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BT);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบโอน BT
             </Link>
           </Box>
           <Box>
             <Link
-              component='button'
-              variant='body2'
+              component="button"
+              variant="body2"
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BO);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบ BO
             </Link>
           </Box>
           <Box>
             <Link
-              component='button'
-              variant='body2'
+              component="button"
+              variant="body2"
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BOX);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบปะลัง
             </Link>
           </Box>
@@ -621,11 +646,11 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   );
 
   const componentDCStatusReadyToTransfer = (
-    <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
+    <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="space-between" direction="row" alignItems="flex-end">
       <Grid item xl={8}>
         <Grid container>
           <Grid item>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               รอบรถเข้าต้นทางตั้งแต่
             </Typography>
             <DatePickerAllComponent
@@ -637,7 +662,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               ถึง
             </Typography>
             <DatePickerAllComponent
@@ -651,13 +676,14 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       </Grid>
       <Grid item>
         <Button
-          id='btnSave'
-          variant='contained'
-          color='warning'
+          id="btnSave"
+          variant="contained"
+          color="warning"
           className={classes.MbtnSave}
           onClick={handleSendToPickup}
           startIcon={<SaveIcon />}
-          sx={{ width: 200 }}>
+          sx={{ width: 200 }}
+        >
           บันทึก
         </Button>
       </Grid>
@@ -668,17 +694,17 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     <>
       <Grid container spacing={2} mb={2}>
         <Grid item lg={2}>
-          <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
+          <Typography variant="body2"> รอบรถเข้าต้นทาง :</Typography>
         </Grid>
         <Grid item lg={3}>
-          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
+          <Typography variant="body2">{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
         </Grid>
         <Grid item lg={1}></Grid>
         <Grid item lg={2}>
-          <Typography variant='body2'>ถึง :</Typography>
+          <Typography variant="body2">ถึง :</Typography>
         </Grid>
         <Grid item lg={3}>
-          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
+          <Typography variant="body2">{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
         </Grid>
         <Grid item lg={1}></Grid>
       </Grid>
@@ -721,11 +747,12 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           </Box> */}
           <Box>
             <Link
-              component='button'
-              variant='body2'
+              component="button"
+              variant="body2"
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.RECALL);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบเรียกเก็บ
             </Link>
           </Box>
@@ -739,17 +766,17 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     <>
       <Grid container spacing={2} mb={2}>
         <Grid item lg={2}>
-          <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
+          <Typography variant="body2"> รอบรถเข้าต้นทาง :</Typography>
         </Grid>
         <Grid item lg={3}>
-          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
+          <Typography variant="body2">{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
         </Grid>
         <Grid item lg={1}></Grid>
         <Grid item lg={2}>
-          <Typography variant='body2'>ถึง :</Typography>
+          <Typography variant="body2">ถึง :</Typography>
         </Grid>
         <Grid item lg={3}>
-          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
+          <Typography variant="body2">{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
         </Grid>
         <Grid item lg={1}></Grid>
       </Grid>
@@ -759,61 +786,66 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         <Grid item lg={3}></Grid>
         <Grid item lg={1}></Grid>
         <Grid item lg={2}>
-          <Typography variant='body2'>แนบไฟล์</Typography>
+          <Typography variant="body2">แนบไฟล์</Typography>
         </Grid>
         <Grid item lg={3}>
           <AccordionUploadFile
             files={[]}
             docNo={btNo}
-            docType='PN'
+            docType={docType}
             isStatus={uploadFileFlag}
             onChangeUploadFile={handleOnChangeUploadFile}
             enabledControl={true}
+            onDeleteAttachFile={onDeleteAttachFileOld}
           />
           <Box>
             <Link
-              component='button'
-              variant='body2'
+              component="button"
+              variant="body2"
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BT);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบโอน BT
             </Link>
           </Box>
           <Box>
             <Link
-              component='button'
-              variant='body2'
+              component="button"
+              variant="body2"
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BO);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบ BO
             </Link>
           </Box>
           <Box>
             <Link
-              component='button'
-              variant='body2'
+              component="button"
+              variant="body2"
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BOX);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบปะลัง
             </Link>
           </Box>
         </Grid>
         <Grid item lg={1}></Grid>
       </Grid>
-      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
+      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="space-between" direction="row" alignItems="flex-end">
         <Grid item xl={8}></Grid>
         <Grid item>
           <Button
-            id='btnSave'
-            variant='contained'
-            color='warning'
+            id="btnSave"
+            variant="contained"
+            color="warning"
             className={classes.MbtnSave}
             onClick={handleSubmitTransfer}
             // startIcon={<SaveIcon />}
-            sx={{ width: 200 }}>
+            sx={{ width: 200 }}
+          >
             ส่งงาน
           </Button>
         </Grid>
@@ -825,17 +857,17 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     <>
       <Grid container spacing={2} mb={2}>
         <Grid item lg={2}>
-          <Typography variant='body2'> รอบรถเข้าต้นทาง :</Typography>
+          <Typography variant="body2"> รอบรถเข้าต้นทาง :</Typography>
         </Grid>
         <Grid item lg={3}>
-          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
+          <Typography variant="body2">{convertUtcToBkkDate(branchTransferInfo.delivery.fromDate)} </Typography>
         </Grid>
         <Grid item lg={1}></Grid>
         <Grid item lg={2}>
-          <Typography variant='body2'>ถึง :</Typography>
+          <Typography variant="body2">ถึง :</Typography>
         </Grid>
         <Grid item lg={3}>
-          <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
+          <Typography variant="body2">{convertUtcToBkkDate(branchTransferInfo.delivery.toDate)} </Typography>
         </Grid>
         <Grid item lg={1}></Grid>
       </Grid>
@@ -845,7 +877,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         <Grid item lg={3}></Grid>
         <Grid item lg={1}></Grid>
         <Grid item lg={2}>
-          <Typography variant='body2'>แนบไฟล์</Typography>
+          <Typography variant="body2">แนบไฟล์</Typography>
         </Grid>
         <Grid item lg={3}>
           {branchTransferInfo.files && branchTransferInfo.files.length > 0 && (
@@ -860,38 +892,41 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           /> */}
           <Box>
             <Link
-              component='button'
-              variant='body2'
+              component="button"
+              variant="body2"
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BT);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบโอน BT
             </Link>
           </Box>
           <Box>
             <Link
-              component='button'
-              variant='body2'
+              component="button"
+              variant="body2"
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BO);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบ BO
             </Link>
           </Box>
           <Box>
             <Link
-              component='button'
-              variant='body2'
+              component="button"
+              variant="body2"
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BOX);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบปะลัง
             </Link>
           </Box>
         </Grid>
         <Grid item lg={1}></Grid>
       </Grid>
-      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
+      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="space-between" direction="row" alignItems="flex-end">
         <Grid item xl={8}></Grid>
         <Grid item>
           {/* <Button
@@ -917,59 +952,59 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
   return (
     <React.Fragment>
-      <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
+      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
           <Typography sx={{ fontSize: 24, fontWeight: 400 }}>ตรวจสอบรายการใบโอน</Typography>
-          <Steppers status={branchTransferInfo.status} type='BT'></Steppers>
+          <Steppers status={branchTransferInfo.status} type="BT"></Steppers>
         </BootstrapDialogTitle>
         <DialogContent>
-          <Box mt={4} sx={{ flexGrow: 1 }} id='top-item'>
+          <Box mt={4} sx={{ flexGrow: 1 }} id="top-item">
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร BT</Typography>
+                <Typography variant="body2">เลขที่เอกสาร BT</Typography>
               </Grid>
               <Grid item lg={3}>
-                <Typography variant='body2'>{branchTransferInfo.btNo}</Typography>
+                <Typography variant="body2">{branchTransferInfo.btNo}</Typography>
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร RT</Typography>
+                <Typography variant="body2">เลขที่เอกสาร RT</Typography>
               </Grid>
               <Grid item lg={3}>
-                <Typography variant='body2'>{branchTransferInfo.rtNo}</Typography>
+                <Typography variant="body2">{branchTransferInfo.rtNo}</Typography>
               </Grid>
               <Grid item lg={1}></Grid>
             </Grid>
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่โอน :</Typography>
+                <Typography variant="body2">วันที่โอน :</Typography>
               </Grid>
               <Grid item lg={3}>
-                <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.startDate)}</Typography>
+                <Typography variant="body2">{convertUtcToBkkDate(branchTransferInfo.startDate)}</Typography>
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่สิ้นสุด :</Typography>
+                <Typography variant="body2">วันที่สิ้นสุด :</Typography>
               </Grid>
               <Grid item lg={3}>
-                <Typography variant='body2'>{convertUtcToBkkDate(branchTransferInfo.endDate)}</Typography>
+                <Typography variant="body2">{convertUtcToBkkDate(branchTransferInfo.endDate)}</Typography>
               </Grid>
               <Grid item lg={1}></Grid>
             </Grid>
 
             <Grid container spacing={2} mb={2}>
               <Grid item lg={2}>
-                <Typography variant='body2'> สาขาต้นทาง :</Typography>
+                <Typography variant="body2"> สาขาต้นทาง :</Typography>
               </Grid>
               <Grid item lg={3}>
-                <Typography variant='body2'>{sourceBranch} </Typography>
+                <Typography variant="body2">{sourceBranch} </Typography>
               </Grid>
               <Grid item lg={1}></Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>สาขาปลายทาง :</Typography>
+                <Typography variant="body2">สาขาปลายทาง :</Typography>
               </Grid>
               <Grid item lg={3}>
-                <Typography variant='body2'>{destinationBranch} </Typography>
+                <Typography variant="body2">{destinationBranch} </Typography>
               </Grid>
               <Grid item lg={1}></Grid>
             </Grid>
@@ -994,7 +1029,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               <FormControlLabel
                 control={<Checkbox />}
                 checked={isChecked}
-                label='รายการสินค้าทั้งหมด'
+                label="รายการสินค้าทั้งหมด"
                 onChange={handleCheckboxChange}
               />
             </FormGroup>
@@ -1006,7 +1041,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             <Grid container spacing={2} mb={1}>
               <Grid item lg={3}>
                 <TextBoxComment
-                  fieldName='สาเหตุการเปลี่ยนจำนวน:'
+                  fieldName="สาเหตุการเปลี่ยนจำนวน:"
                   defaultValue={comment}
                   maxLength={100}
                   onChangeComment={handleChangeComment}
@@ -1015,7 +1050,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
                 />
               </Grid>
               <Grid item xs={7}></Grid>
-              <Grid item xs={2} textAlign='center'>
+              <Grid item xs={2} textAlign="center">
                 <IconButton onClick={topFunction}>
                   <ArrowForwardIosIcon
                     sx={{
@@ -1029,7 +1064,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
                   />
                 </IconButton>
 
-                <Box fontSize='13px'>กลับขึ้นด้านบน</Box>
+                <Box fontSize="13px">กลับขึ้นด้านบน</Box>
               </Grid>
             </Grid>
           </Box>
@@ -1053,15 +1088,16 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         open={openModelConfirmTransaction}
         onClose={handleOnCloseModalConfirm}
         handleConfirm={sendTransactionToDC}
-        header='ยืนยันส่งรายการให้ DC'
-        title='เลขที่เอกสาร BT'
+        header="ยืนยันส่งรายการให้ DC"
+        title="เลขที่เอกสาร BT"
         value={btNo}
       />
 
       <ModalAddItems
         open={openModelAddItems}
         onClose={handleCloseModelAddItems}
-        requestBody={bodyRequest ? bodyRequest : { skuCodes: [] }}></ModalAddItems>
+        requestBody={bodyRequest ? bodyRequest : { skuCodes: [] }}
+      ></ModalAddItems>
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       <ModalShowFile
@@ -1071,7 +1107,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         statusFile={1}
         sdImageFile={''}
         fileName={formatFileStockTransfer(btNo, btStatus, suffixDocType)}
-        btnPrintName='พิมพ์เอกสาร'
+        btnPrintName="พิมพ์เอกสาร"
         landscape={docLayoutLandscape}
       />
     </React.Fragment>

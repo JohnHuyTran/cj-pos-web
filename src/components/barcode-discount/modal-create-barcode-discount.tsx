@@ -27,14 +27,13 @@ import {
   saveBarcodeDiscount,
   updateDataDetail,
   updateErrorList,
-  updateCheckStock,
   updateCheckEdit, updateApproveReject,
 } from '../../store/slices/barcode-discount-slice';
 import {
   sendForApprovalBarcodeDiscount,
   cancelBarcodeDiscount,
   saveDraftBarcodeDiscount,
-  checkStockBalance, approveBarcodeDiscount, uploadAttachFile,
+  approveBarcodeDiscount, uploadAttachFile,
 } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
@@ -54,6 +53,8 @@ import { getBarcodeDiscountDetail } from "../../store/slices/barcode-discount-de
 import { uploadFileState } from "../../store/slices/upload-file-slice";
 import AccordionUploadFile from "../commons/ui/accordion-upload-file";
 import { getUserInfo } from "../../store/sessionStore";
+import { checkStockBalance } from "../../services/common";
+import { updateCheckStock } from "../../store/slices/stock-balance-check-slice";
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 interface Props {
@@ -100,7 +101,6 @@ export default function ModalCreateBarcodeDiscount({
   const payloadBarcodeDiscount = useAppSelector((state) => state.barcodeDiscount.createDraft);
   const dataDetail = useAppSelector((state) => state.barcodeDiscount.dataDetail);
   const approveReject = useAppSelector((state) => state.barcodeDiscount.approveReject);
-  const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
   const checkEdit = useAppSelector((state) => state.barcodeDiscount.checkEdit);
   const errorList = useAppSelector((state) => state.barcodeDiscount.errorList);
 
@@ -121,7 +121,8 @@ export default function ModalCreateBarcodeDiscount({
     printInDetail: false,
     ids: '',
     lstProductNotPrinted: [],
-    lstProductPrintAgain: []
+    lstProductPrintAgain: [],
+    lstProductPrint: []
   });
   const [openModalPrint, setOpenModalPrint] = React.useState(false);
   const [printHistoryRows, setPrintHistoryRows] = React.useState<any>([]);
@@ -133,6 +134,7 @@ export default function ModalCreateBarcodeDiscount({
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
     ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
+  const [branchCodeCheckStock, setBranchCodeCheckStock] = React.useState(getUserInfo().branch ? getUserInfo().branch : '');
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -256,8 +258,15 @@ export default function ModalCreateBarcodeDiscount({
   useEffect(() => {
     //set value detail from search
     if (Action.UPDATE === action && !objectNullOrEmpty(barcodeDiscountDetail)) {
-      //set value for data detail
       setValueRadios(barcodeDiscountDetail.percentDiscount ? 'percent' : 'amount');
+      //set current branch
+      let currentBranch = stringNullOrEmpty(barcodeDiscountDetail.branchCode) ? '' : (barcodeDiscountDetail.branchCode);
+      currentBranch += (stringNullOrEmpty(barcodeDiscountDetail.branchName) ? '' : (' - ' + barcodeDiscountDetail.branchName));
+      setCurrentBranch(currentBranch);
+      if (!stringNullOrEmpty(barcodeDiscountDetail.branchCode)) {
+        setBranchCodeCheckStock(barcodeDiscountDetail.branchCode);
+      }
+      //set value for data detail
       dispatch(
         updateDataDetail({
           id: barcodeDiscountDetail.id,
@@ -678,7 +687,7 @@ export default function ModalCreateBarcodeDiscount({
         };
       });
       const payload = {
-        branchCode: '0002',
+        branchCode: branchCodeCheckStock,
         products: products,
       };
       const rs = await checkStockBalance(payload);
@@ -691,6 +700,8 @@ export default function ModalCreateBarcodeDiscount({
       }
       return rs.data ? !rs.data.length : true;
     } catch (error) {
+      setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+      setOpenModalError(true);
     }
   };
 
@@ -709,6 +720,8 @@ export default function ModalCreateBarcodeDiscount({
   const onPrintedBarcode = async () => {
     let lstProductNotPrinted = [];
     let lstProductPrintAgain = [];
+    let lstProductPrint = [];
+
     let products = _.cloneDeep(barcodeDiscountPrint);
     if (Number(BDStatus.BARCODE_PRINTED) == status) {
       for (const itPro of products) {
@@ -718,18 +731,25 @@ export default function ModalCreateBarcodeDiscount({
           lstProductPrintAgain.push(itPro);
         }
       }
-    } else {
-      if (barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail) {
-        for (const itPro of products) {
-          if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isBefore(moment(new Date()), 'day')) {
-            itPro.barcode = itPro.barCode;
-            itPro.productName = itPro.barcodeName;
-            itPro.expiredDate = itPro.expiryDate;
-            lstProductNotPrinted.push(itPro);
-          }
+    } else if (Number(BDStatus.BARCODE_PRINTED) == status && barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail) {
+      for (const itPro of products) {
+        if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isBefore(moment(new Date()), 'day')) {
+          itPro.barcode = itPro.barCode;
+          itPro.productName = itPro.barcodeName;
+          itPro.expiredDate = itPro.expiryDate;
+          lstProductNotPrinted.push(itPro);
         }
       }
+    } else if (Number(BDStatus.APPROVED) == status) {
+      lstProductPrint = (products || [])
+        .filter((product: any) => moment(product?.expiryDate).isSameOrAfter(moment(new Date()), 'day'))
+        .map((product: any) => ({
+          ...product,
+          barcode: product.barCode,
+          productName: product.barcodeName,
+        }))
     }
+
     let ids = [];
     ids.push(dataDetail.id);
     await setValuePrints({
@@ -740,7 +760,8 @@ export default function ModalCreateBarcodeDiscount({
       printNormal: lstProductNotPrinted.length === 0 && lstProductPrintAgain.length === 0,
       printInDetail: printInDetail,
       lstProductNotPrinted: lstProductNotPrinted,
-      lstProductPrintAgain: lstProductPrintAgain
+      lstProductPrintAgain: lstProductPrintAgain,
+      lstProductPrint: lstProductPrint
     });
     handleOpenModalPrint();
   };
@@ -1123,6 +1144,7 @@ export default function ModalCreateBarcodeDiscount({
         onConfirm={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
         headerTitle={'ยืนยันยกเลิกขอส่วนลดสินค้า'}
+        documentField={'เลขที่เอกสาร BD'}
       />
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
       <AlertError
@@ -1144,6 +1166,7 @@ export default function ModalCreateBarcodeDiscount({
         onConfirm={() => handleCloseModalConfirmApprove(true)}
         barCode={dataDetail.documentNumber}
         headerTitle={'ยืนยันอนุมัติส่วนลดสินค้า'}
+        documentField={'เลขที่เอกสาร BD'}
       />
       <ModalReject
         open={openModalReject}

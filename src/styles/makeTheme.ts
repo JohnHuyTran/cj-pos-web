@@ -348,6 +348,9 @@ const useStyles = makeStyles({
     '& .MuiSvgIcon-root.Mui-active': {
       color: '#DDDDDD',
     },
+    // '& .MuiSvgIcon-root.Mui-active': {
+    //   color: '#DDDDDD',
+    // },
   },
   MtextFieldBrowse: {
     '& .MuiOutlinedInput-root': {

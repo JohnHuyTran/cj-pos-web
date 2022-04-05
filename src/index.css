@@ -41,18 +41,27 @@ code {
 /*fix search*/
 [class*='MtextField'] .MuiOutlinedInput-input,
 .MuiTextField-root[class*='pos'] .MuiOutlinedInput-input {
-   min-height: 30px;
- }
+  min-height: 30px;
+}
 [class*='Mselect'] .MuiOutlinedInput-input.MuiInputBase-input,
 [class*='pos'] .MuiSelect-root .MuiOutlinedInput-input.MuiInputBase-input {
-   height: 30px;
-   line-height: 30px;
-   padding-left: 5px;
- }
+  height: 30px;
+  line-height: 30px;
+  padding-left: 5px;
+}
+/* [class*='Mdatepicker'] .MuiInputBase-root.MuiOutlinedInput-root,
+[class*='pos'] .MuiInputBase-root.MuiOutlinedInput-root {
+  height: 38px;
+} */
+
 [class*='Mdatepicker'] .MuiInputBase-root.MuiOutlinedInput-root,
-[class*='pos'] .MuiOutlinedInput-adornedStart {
-   height: 38px;
- }
+[class*='MuiGrid-root']
+  > div:not(.MuiGrid-root)
+  > [class*='pos']
+  .MuiInputBase-root.MuiOutlinedInput-root.MuiOutlinedInput-adornedStart,
+[class*='pos'] > div > [class*='pos'] .MuiInputBase-root.MuiOutlinedInput-root {
+  height: 38px;
+}
 
 /* @media print {
   html,

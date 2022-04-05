@@ -1,9 +1,6 @@
-import { makeStyles } from '@mui/styles';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import { useEffect } from 'react';
 import TaskForBarcodeDiscount from './task-for-barcode-discount';
 import TaskForSaleLimitTime from './task-for-sale-limit-time';
+import TaskForTransferOut from './task-for-transfer-out';
 
 interface Props {
   userPermission: any[];
@@ -12,22 +9,19 @@ interface Props {
 }
 
 export default function Tasklist({ userPermission, listData, onSearch }: Props) {
-
   const approver = userPermission.includes('campaign.bd.approve');
   const requestor = userPermission.includes('campaign.bd.create');
   const viewer = !userPermission.includes('campaign.st.create');
+  console.log(listData);
 
-  const listDiscount = listData.filter(
-    (item: any) =>
-      item.type === 'APPROVE_BARCODE' || item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'REJECT_BARCODE'
-  );
-  const listST = listData.filter((item: any) => item.type === 'SALE_LIMIT_START');
-
-  const listItemTaskDiscount =
-    !!approver && listDiscount.length > 0
-      ? listDiscount
-          .filter((el: any) => el.payload.status === 2)
-          .map((item: any, index: any) => { 
+  const listItemTask =
+    listData.length > 0
+      ? listData.map((item: any, index: any) => {
+          if (
+            item.type === 'APPROVE_BARCODE' ||
+            item.type === 'SEND_BD_FOR_APPROVAL' ||
+            item.type === 'REJECT_BARCODE'
+          ) {
             return (
               <TaskForBarcodeDiscount
                 key={index}
@@ -37,13 +31,23 @@ export default function Tasklist({ userPermission, listData, onSearch }: Props) 
                 userPermission={userPermission}
               />
             );
-          })
-      : !!requestor && listDiscount.length > 0
-      ? listDiscount
-          .filter((el: any) => el.payload.status > 2)
-          .map((item: any, index: any) => {
+          } else if (item.type === 'SALE_LIMIT_START' || item.type === 'SALE_LIMIT_END') {
             return (
-              <TaskForBarcodeDiscount
+              <TaskForSaleLimitTime
+                key={index}
+                onSearch={onSearch}
+                payload={item.payload}
+                permission={approver ? 'approver' : requestor ? 'requestor' : ''}
+              />
+            );
+          } else if (
+            item.type === 'APPROVE_TRANSFER_OUT' ||
+            item.type === 'REJECT_TRANSFER_OUT' ||
+            item.type === 'CLOSE_TRANSFER_OUT' ||
+            item.type === 'SEND_TO_FOR_APPROVAL'
+          ) {
+            return (
+              <TaskForTransferOut
                 key={index}
                 onSearch={onSearch}
                 payload={item.payload}
@@ -51,26 +55,11 @@ export default function Tasklist({ userPermission, listData, onSearch }: Props) 
                 userPermission={userPermission}
               />
             );
-          })
-      : null;
-  const listItemTaskST =
-    !!viewer && listST.length > 0
-      ? listST.map((item: any, index: any) => {
-          return (
-            <TaskForSaleLimitTime
-              key={index}
-              permission={viewer ? 'viewer' : ''}
-              payload={item.payload}
-              onSearch={onSearch}
-            />
-          );
+          } else {
+            return null;
+          }
         })
       : null;
 
-  return (
-    <div>
-      {listItemTaskDiscount}
-      {listItemTaskST}
-    </div>
-  );
+  return <>{listItemTask}</>;
 }

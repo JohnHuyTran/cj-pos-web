@@ -66,8 +66,7 @@ export const objectNullOrEmpty = (object: any) => {
     return true;
   } else {
     for (let key in object) {
-      if (object.hasOwnProperty(key))
-        return false;
+      if (object.hasOwnProperty(key)) return false;
     }
     return true;
   }
@@ -114,4 +113,35 @@ export const formatFileStockTransfer = (docNo: string, status: string, suffix: s
   } else {
     return `${docNo}-${getStockTransferStatusInfo(status)?.value}.pdf`;
   }
+};
+
+export const formatFileInvoice = (invoiceNo: string, counter: number) => {
+  return `${invoiceNo}-${counter}.pdf`;
+};
+
+export const getEncodeBarcode = ({
+  price = '',
+  barcode = '',
+  priceDigitMax = 4, //the wholeNumber of price
+  prefix = 'A4',
+}: {
+  price: string | number;
+  barcode: string;
+  priceDigitMax?: number;
+  prefix?: string;
+}): string => {
+  const [wholeNumberPrice, decimalNumberPrice] = Number(price).toFixed(2).split('.');
+  let priceDigit = wholeNumberPrice + decimalNumberPrice;
+  for (let i = priceDigitMax - wholeNumberPrice.length; i > 0; i--) {
+    priceDigit = '0' + priceDigit;
+  }
+
+  let nSum = 0;
+  const length = priceDigit.length + 1;
+
+  for (let i = 0; i < priceDigit.length; i++) {
+    nSum += Number(priceDigit[i]) * (length - i);
+  }
+
+  return prefix + priceDigit + ((length - 2 - (nSum % (length - 2))) % 8) + barcode;
 };

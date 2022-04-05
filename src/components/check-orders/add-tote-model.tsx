@@ -66,6 +66,7 @@ export default function AddToteModel({ open, onClose, updateToteNo }: Props): Re
         if (payloadAddItem.length > 0) {
           const sumAddToteList = [...tote, ...payloadAddItem];
           await dispatch(updateAddItemsState(sumAddToteList));
+          setValues('');
         }
       }
     }
@@ -75,6 +76,7 @@ export default function AddToteModel({ open, onClose, updateToteNo }: Props): Re
 
   const handleClose = () => {
     updateToteNo('');
+    setValues('');
     onClose();
   };
 
