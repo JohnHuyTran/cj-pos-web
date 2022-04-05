@@ -10,6 +10,7 @@ import {
   featchTaxInvoiceListAsync,
   savePayloadSearchList,
   saveTaxInvoiceList,
+  saveTaxInvoiceListIsFailed,
 } from '../../store/slices/tax-invoice-search-list-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ACTIONS } from '../../utils/enum/permission-enum';
@@ -152,8 +153,13 @@ export default function TaxInvoiceSearch() {
 
   const callRequestTaxInvoice = async () => {
     onCloseRequestBtn();
+    setValues({
+      docNo: '',
+      citizenId: '',
+    });
     handleOpenLoading('open', true);
     setActionType('request');
+    setFlagSearch(true);
     const payload: TaxInvoiceRequest = {
       docNo: billNo,
     };
@@ -163,10 +169,9 @@ export default function TaxInvoiceSearch() {
         console.log('value: ', value);
         await dispatch(saveTaxInvoiceList(value));
         await dispatch(savePayloadSearchList(payload));
-        setFlagSearch(true);
       })
-      .catch((error: ApiError) => {
-        console.log('error: ', error);
+      .catch(async (error: ApiError) => {
+        await dispatch(saveTaxInvoiceListIsFailed(error));
       });
 
     handleOpenLoading('open', false);
@@ -174,7 +179,7 @@ export default function TaxInvoiceSearch() {
 
   React.useEffect(() => {
     setHideSearchBtn(isAllowActionPermission(ACTIONS.SALE_TAX_INVOICE_VIEW));
-    setHideRequestBtn(isAllowActionPermission(''));
+    setHideRequestBtn(isAllowActionPermission(ACTIONS.SALE_TAX_INVOICE_REQUEST));
   }, []);
 
   return (

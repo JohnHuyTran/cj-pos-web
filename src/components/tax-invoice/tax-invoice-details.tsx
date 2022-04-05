@@ -22,11 +22,11 @@ import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 // import { clearUploadFileState, uploadFileState } from '../../store/slices/upload-file-slice';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { formatFileInvoice } from '../../utils/utils';
-import { featchTaxInvoiceListAsync } from '../../store/slices/tax-invoice-search-list-slice';
 
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
+  reloadRequestTaxInvoice: () => void;
 }
 
 export interface DialogTitleProps {
@@ -58,7 +58,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
+function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -100,13 +100,12 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
-  const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const handleClose = () => {
     setBillNo('');
     setMemberNo('');
     handleClear();
 
-    dispatch(featchTaxInvoiceListAsync(payloadSearch));
+    reloadRequestTaxInvoice();
 
     setOpen(false);
     onClickClose();
