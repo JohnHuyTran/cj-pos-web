@@ -157,24 +157,24 @@ const columns: GridColDef[] = [
       }
     },
   },
-  {
-    field: 'delete',
-    headerName: ' ',
-    width: 50,
-    align: 'center',
-    sortable: false,
-    renderCell: (params) => {
-      if (params.getValue(params.id, 'edit')) {
-        return (
-          <div>
-            <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
-          </div>
-        );
-      } else {
-        return <div></div>;
-      }
-    },
-  },
+  // {
+  //   field: 'delete',
+  //   headerName: ' ',
+  //   width: 50,
+  //   align: 'center',
+  //   sortable: false,
+  //   renderCell: (params) => {
+  //     if (params.getValue(params.id, 'edit')) {
+  //       return (
+  //         <div>
+  //           <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+  //         </div>
+  //       );
+  //     } else {
+  //       return <div></div>;
+  //     }
+  //   },
+  // },
 ];
 
 function useApiRef() {
@@ -302,46 +302,50 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  const [rtNoDel, setRtNoDel] = React.useState('');
-  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+  // const [rtNoDel, setRtNoDel] = React.useState('');
+  // const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
 
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
 
-    if (value === 'delete') {
-      setRtNoDel(params.row.rtNo);
-      setOpenModelDeleteConfirm(true);
-    } else {
-      handleOpenLoading('open', true);
-      await handleOpenDetailModal(params.row.rtNo, params.row.edit);
-      handleOpenLoading('open', false);
-    }
+    handleOpenLoading('open', true);
+    await handleOpenDetailModal(params.row.rtNo, params.row.edit);
+    handleOpenLoading('open', false);
+
+    // if (value === 'delete') {
+    //   setRtNoDel(params.row.rtNo);
+    //   setOpenModelDeleteConfirm(true);
+    // } else {
+    //   handleOpenLoading('open', true);
+    //   await handleOpenDetailModal(params.row.rtNo, params.row.edit);
+    //   handleOpenLoading('open', false);
+    // }
   };
 
-  const handleModelDeleteConfirm = async (confirm: boolean) => {
-    if (confirm === true) {
-      await removeStockRequest(rtNoDel)
-        .then((value) => {
-          const payloadNewpage: StockTransferRequest = {
-            limit: pageSize,
-            page: cuurentPage.toString(),
-            docNo: payload.docNo,
-            branchFrom: payload.branchFrom,
-            branchTo: payload.branchTo,
-            dateFrom: payload.dateFrom,
-            dateTo: payload.dateTo,
-            statuses: payload.statuses,
-            transferReason: payload.transferReason,
-          };
-          dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
-          dispatch(saveSearchStockTransferRt(payloadNewpage));
-          setOpenModelDeleteConfirm(false);
-        })
-        .catch((error) => {});
-    } else {
-      setOpenModelDeleteConfirm(false);
-    }
-  };
+  // const handleModelDeleteConfirm = async (confirm: boolean) => {
+  //   if (confirm === true) {
+  //     await removeStockRequest(rtNoDel)
+  //       .then((value) => {
+  //         const payloadNewpage: StockTransferRequest = {
+  //           limit: pageSize,
+  //           page: cuurentPage.toString(),
+  //           docNo: payload.docNo,
+  //           branchFrom: payload.branchFrom,
+  //           branchTo: payload.branchTo,
+  //           dateFrom: payload.dateFrom,
+  //           dateTo: payload.dateTo,
+  //           statuses: payload.statuses,
+  //           transferReason: payload.transferReason,
+  //         };
+  //         dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
+  //         dispatch(saveSearchStockTransferRt(payloadNewpage));
+  //         setOpenModelDeleteConfirm(false);
+  //       })
+  //       .catch((error) => {});
+  //   } else {
+  //     setOpenModelDeleteConfirm(false);
+  //   }
+  // };
 
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const [typeDetailModal, setTypeDetailModal] = React.useState('View');
@@ -410,7 +414,7 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
         />
       )}
 
-      <ModelDeleteConfirm open={openModelDeleteConfirm} onClose={handleModelDeleteConfirm} rtNo={rtNoDel} />
+      {/* <ModelDeleteConfirm open={openModelDeleteConfirm} onClose={handleModelDeleteConfirm} rtNo={rtNoDel} /> */}
     </div>
   );
 }
