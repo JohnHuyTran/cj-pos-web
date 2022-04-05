@@ -1,7 +1,9 @@
 import { Card, CardContent, Grid, TablePagination, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import moment from 'moment';
 import React, { useEffect } from 'react';
 import { getNotificationData } from '../../services/notification';
+import { useStyles } from '../../styles/makeTheme';
 import theme from '../../styles/theme';
 
 // interface Props {
@@ -19,6 +21,7 @@ export default function NotificationTask() {
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
+  const classes = useStyles();
   useEffect(() => {
     moreData();
   }, []);
@@ -30,7 +33,6 @@ export default function NotificationTask() {
         const rs = await getNotificationData(page);
         if (rs && rs.data) {
           setListData(rs.data);
-          setPage(rs.page);
           setTotalPage(rs.totalPage);
           setTotal(rs.total);
         }
@@ -40,7 +42,6 @@ export default function NotificationTask() {
       setOpenLoadingModal(false);
     }
   };
-  console.log(listData.length);
 
   const listTask = listData.map((item: any) => {
     return (
@@ -88,7 +89,9 @@ export default function NotificationTask() {
           rowsPerPage={10}
           rowsPerPageOptions={[]}
         />
-        <CardContent sx={{ height: '100%' }}>{listTask}</CardContent>
+        <CardContent className={classes.MScrollBar} sx={{ height: '100%', overflowY: 'auto' }}>
+          {listTask}
+        </CardContent>
       </Card>
     </>
   );

@@ -23,7 +23,7 @@ export default function Notification() {
   const [listData, setListData] = React.useState<any[]>([]);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const [page, setPage] = React.useState(0);
-  const [totalPage, setTotalPage] = React.useState(1);
+  const [totalPage, setTotalPage] = React.useState(0);
 
   const userInfo: KeyCloakTokenInfo = getUserInfo();
 
@@ -46,7 +46,6 @@ export default function Notification() {
         const rs = await getNotificationData(page);
         if (rs && rs.data) {
           setListData([...listData, ...rs.data]);
-          setPage(rs.page);
           setTotalPage(rs.totalPage);
         }
         setOpenLoadingModal(false);

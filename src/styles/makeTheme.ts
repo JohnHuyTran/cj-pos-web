@@ -509,6 +509,25 @@ const useStyles = makeStyles({
       },
     },
   },
+  MScrollBar: {
+    '&::-webkit-scrollbar': {
+      width: '4px',
+    },
+
+    '&::-webkit-scrollbar-track': {
+      boxShadow: 'inset 0 0 5px rgb(255, 251, 251)',
+      borderRadius: '10px',
+    },
+
+    '&::-webkit-scrollbar-thumb': {
+      background: '#AEAEAE',
+      borderRadius: '10px',
+    },
+
+    '&::-webkit-scrollbar-thumb:hover': {
+      background: 'rgb(255, 251, 251)',
+    },
+  },
 });
 
 export { useStyles };
