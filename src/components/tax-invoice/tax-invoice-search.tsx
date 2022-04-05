@@ -153,6 +153,10 @@ export default function TaxInvoiceSearch() {
 
   const callRequestTaxInvoice = async () => {
     onCloseRequestBtn();
+    setValues({
+      docNo: '',
+      citizenId: '',
+    });
     handleOpenLoading('open', true);
     setActionType('request');
     setFlagSearch(true);
