@@ -49,8 +49,17 @@ code {
   line-height: 30px;
   padding-left: 5px;
 }
-[class*='Mdatepicker'] .MuiInputBase-root.MuiOutlinedInput-root,
+/* [class*='Mdatepicker'] .MuiInputBase-root.MuiOutlinedInput-root,
 [class*='pos'] .MuiInputBase-root.MuiOutlinedInput-root {
+  height: 38px;
+} */
+
+[class*='Mdatepicker'] .MuiInputBase-root.MuiOutlinedInput-root,
+[class*='MuiGrid-root']
+  > div:not(.MuiGrid-root)
+  > [class*='pos']
+  .MuiInputBase-root.MuiOutlinedInput-root.MuiOutlinedInput-adornedStart,
+[class*='pos'] > div > [class*='pos'] .MuiInputBase-root.MuiOutlinedInput-root {
   height: 38px;
 }
 
