@@ -224,7 +224,11 @@ export default function TaxInvoiceSearchList({ actionType }: Props) {
       </Box>
 
       <LoadingModal open={openLoadingModal} />
-      <ModalTaxInvoiceDetails isOpen={openDetailModal} onClickClose={handleCloseDetailModal} />
+      <ModalTaxInvoiceDetails
+        isOpen={openDetailModal}
+        onClickClose={handleCloseDetailModal}
+        reloadRequestTaxInvoice={reloadRequestTaxInvoice}
+      />
     </div>
   );
 }
