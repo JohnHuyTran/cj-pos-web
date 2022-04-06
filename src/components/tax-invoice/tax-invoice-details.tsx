@@ -164,8 +164,6 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
     if (isOpen && taxInvoiceDetail) {
       setBillNo(taxInvoiceDetail.billNo);
 
-      // dispatch(featchTaxInvoicePrintHistoryAsync(taxInvoiceDetail.billNo));
-
       if (taxInvoiceDetail.invoiceNo) {
         setInvoiceNo(taxInvoiceDetail.invoiceNo);
       }
@@ -581,8 +579,9 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 className={classes.MtextField}
                 fullWidth
                 placeholder='กรุณากรอกเลขประจำตัวผู้เสียภาษี'
+                // type='number'
                 inputProps={{ maxLength: 13 }}
-                {...register('taxNo', { required: true, maxLength: 13 })}
+                {...register('taxNo', { required: true, pattern: /^[0-9]*$/, maxLength: 13, minLength: 13 })}
                 onChange={handleChange}
                 disabled={editMode}
               />
