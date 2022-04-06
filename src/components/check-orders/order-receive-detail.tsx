@@ -352,7 +352,7 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
             </Grid>
           </Box>
 
-          {Object.keys(orderReceiveData).length > 0 && (
+          {isTotes && (
             <Box sx={{ marginTop: 4 }}>
               <Grid item container spacing={2} justifyContent="flex-end">
                 <Button
