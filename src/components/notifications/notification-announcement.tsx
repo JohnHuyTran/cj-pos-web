@@ -4,75 +4,84 @@ import React, { useEffect } from 'react';
 import { getNotificationData } from '../../services/notification';
 import { useStyles } from '../../styles/makeTheme';
 import theme from '../../styles/theme';
+import { ShoppingCartSharp } from '@mui/icons-material';
+import { Box } from '@mui/system';
+import LoadingModal from '../commons/ui/loading-modal';
 
-// interface Props {
-//   userPermission: any[];
-//   listData: any[];
-//   onSearch: () => void;
-// }
+interface Props {
+  refresh: boolean;
+  // onSearch: () => void;
+}
 
-export default function NotificationAnnouncement() {
+export default function NotificationAnnouncement(props: Props) {
   const [page, setPage] = React.useState(0);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const [total, setTotal] = React.useState(0);
-  const [totalPage, setTotalPage] = React.useState(1);
   const [listData, setListData] = React.useState<any[]>([]);
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
   const classes = useStyles();
   useEffect(() => {
-    moreData();
+    handleGetData();
   }, []);
+  useEffect(() => {
+    handleGetData();
+  }, [page]);
+  useEffect(() => {
+    setPage(0);
+  }, [props.refresh]);
 
-  const moreData = async () => {
+  const handleGetData = async () => {
     try {
-      if (totalPage > page) {
-        setOpenLoadingModal(true);
-        const rs = await getNotificationData(page);
-        if (rs && rs.data) {
-          setListData(rs.data);
-          setTotalPage(rs.totalPage);
-          setTotal(rs.total);
-        }
-        setOpenLoadingModal(false);
+      setOpenLoadingModal(true);
+      const rs = await getNotificationData(page);
+      if (rs && rs.data) {
+        setListData(rs.data);
+        setTotal(rs.total);
       }
+      setOpenLoadingModal(false);
     } catch (error) {
       setOpenLoadingModal(false);
     }
   };
 
-  const listTask = listData.map((item: any) => {
+  const listTask = listData.map((item: any, index: number) => {
     return (
       <>
-        <Grid container spacing={2} mb={1} sx={{ borderTop: '1px solid #EAEBEB', height: '80px' }}>
-          <Grid item xs={11} sx={{ display: 'flex', marginTop: '8px' }}>
-            <span style={{ fontSize: '16px' }}>[งานของฉัน]</span>
-            <span style={{ marginLeft: 15, marginRight: 5, color: theme.palette.primary.main }}>ส่วนลดสินค้า</span>
-            {'|'}
-            <span style={{ marginLeft: 5 }}>{item.payload.documentNumber}</span>{' '}
-            <span style={{ marginLeft: '15px', color: theme.palette.primary.main }}>กำหนดดำเนินการ วันนี้</span>
-          </Grid>
-          <Grid item xs={1} sx={{}}>
-            <Typography
-              sx={{
-                backgroundColor: '#E7FFE9',
-                color: '#36C690',
-                textAlign: 'center',
-                paddingTop: '4px',
-                paddingBottom: '5px',
-                borderRadius: '8px',
-                cursor: 'pointer',
-              }}
-            >
-              test
+        <Box key={index} sx={{ borderTop: '1px solid #EAEBEB', minHeight: '80px' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <Box display={'flex'} mt={1}>
+              <ShoppingCartSharp sx={{ color: theme.palette.primary.main }} />
+              <span style={{ marginLeft: 15, color: theme.palette.primary.main }}>กำหนด (งด) ขายสินค้า</span>
+              <span style={{ marginLeft: 5, marginRight: 3 }}>: {item.payload.documentNumber}</span> {'|'}
+            </Box>
+            <Box sx={{ textAlign: 'right', mt: '3px' }}>
+              <Typography
+                sx={{
+                  backgroundColor: '#E7FFE9',
+                  color: '#36C690',
+                  textAlign: 'center',
+                  marginTop: '5px',
+                  padding: '2px 25px 3px 25px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                }}
+              >
+                อนุมัติ
+              </Typography>
+            </Box>
+          </Box>
+          <Box ml={5}>
+            {item.payload.branch}-{item.payload.branchName}
+          </Box>
+          <Box ml={5} mt={2}>
+            <Typography style={{ color: theme.palette.grey[500], marginBottom: '11px' }}>
+              วันที่ทำรายการ {moment(item.payload.transactionDate).add(543, 'y').format('DD/MM/YYYY')}{' '}
+              {moment(item.payload.transactionDate).format('HH.mm')} น.
             </Typography>
-          </Grid>
-        </Grid>
-        <Typography style={{ color: theme.palette.grey[500], textAlign: 'right' }}>
-          วันที่ทำรายการ {moment(item.payload.transactionDate).add(543, 'y').format('DD/MM/YYYY')}{' '}
-          {moment(item.payload.transactionDate).format('HH.mm')} น.
-        </Typography>
+          </Box>
+        </Box>
       </>
     );
   });
@@ -91,6 +100,7 @@ export default function NotificationAnnouncement() {
           {listTask}
         </CardContent>
       </Card>
+      <LoadingModal open={openLoadingModal} />
     </>
   );
 }

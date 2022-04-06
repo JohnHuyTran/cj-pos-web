@@ -292,9 +292,7 @@ const useStyles = makeStyles({
     width: '126px',
     height: '40px',
     '&.MuiButton-root': {
-      border: '1px solid #AEAEAE !important',
-      color: '#AEAEAE !important',
-      backgroundColor: '#FFFFFF !important',
+      backgroundColor: '#36C690 !important',
       marginLeft: '10px !important',
       borderRadius: '3px !important',
       boxShadow: 'none !important',

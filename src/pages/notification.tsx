@@ -24,6 +24,7 @@ export default function Notification() {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const [page, setPage] = React.useState(0);
   const [totalPage, setTotalPage] = React.useState(0);
+  const [refresh, setRefresh] = React.useState(false);
 
   const userInfo: KeyCloakTokenInfo = getUserInfo();
 
@@ -55,7 +56,9 @@ export default function Notification() {
     }
   };
 
-  const handleRefresh = () => {};
+  const handleRefresh = () => {
+    setRefresh(!refresh);
+  };
 
   return (
     <>
@@ -77,13 +80,13 @@ export default function Notification() {
           </Button>
         </Box>
 
-        <Grid container spacing={2}>
-          <Grid item xs={5} height={'75vh'}>
+        <Grid container spacing={6}>
+          <Grid item xs={5} height={'78vh'}>
             <Typography sx={{ borderBottom: '1px solid #EAEBEB', mb: 1 }}>
               <span style={{ fontWeight: 700, fontSize: '17px' }}>ประกาศ </span>{' '}
               <FeedbackIcon sx={{ color: '#F54949', fontSize: '20px', ml: '3px' }} />
             </Typography>
-            <NotificationTask />
+            <NotificationAnnouncement refresh={refresh} />
           </Grid>
           {/* <Grid item xs={1}></Grid> */}
           <Grid item xs={7} height={'75vh'}>
@@ -93,13 +96,13 @@ export default function Notification() {
               >
                 งานของฉัน
               </Typography>
-              <NotificationReminder />
+              <NotificationTask refresh={refresh} />
             </Box>
-            <Box height={'35vh'} mt={5}>
+            <Box height={'34vh'} mt={6}>
               <Typography sx={{ borderBottom: '1px solid #EAEBEB', fontWeight: 700, fontSize: '17px', mb: 1 }}>
                 แจ้งเตือน
               </Typography>
-              <NotificationAnnouncement />
+              <NotificationReminder refresh={refresh} />
             </Box>
           </Grid>
         </Grid>

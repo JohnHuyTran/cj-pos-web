@@ -64,6 +64,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
           products: data.products,
           requestorName: data.requestor,
           approverName: data.approver,
+          branch: `${data.branch}-${data.branchName}`,
         };
       });
       setLstTransferOut(rows);
@@ -126,18 +127,25 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       ),
     },
     {
+      field: 'branch',
+      headerName: 'สาขา',
+      headerAlign: 'center',
+      sortable: false,
+      minWidth: 250,
+    },
+    {
       field: 'documentNumber',
       headerName: 'เอกสารเบิก',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 260,
+      minWidth: 220,
     },
     {
       field: 'transactionDate',
       headerName: 'วันที่ทำรายการ',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 200,
+      minWidth: 160,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '1rem' }}>
           {params.value}
@@ -149,7 +157,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: 'วันที่อนุมัติ',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 200,
+      minWidth: 160,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '1rem' }}>
           {params.value}
@@ -162,7 +170,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
-      minWidth: 200,
+      minWidth: 180,
       renderCell: (params) => genRowStatus(params),
     },
     {
@@ -170,7 +178,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: 'ผู้บันทึก',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 250,
+      minWidth: 200,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '1rem' }}>
           {params.value}
@@ -182,7 +190,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: 'ผู้อนุมัติ',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 250,
+      minWidth: 200,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '1rem' }}>
           {params.value}

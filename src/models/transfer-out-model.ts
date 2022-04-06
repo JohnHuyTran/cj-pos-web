@@ -23,6 +23,7 @@ export interface TransferOutSearchResponse {
 export interface TransferOut {
   id: string;
   branch: string;
+  branchName: string;
   regionId: string;
   requester: string;
   requestor: string;
