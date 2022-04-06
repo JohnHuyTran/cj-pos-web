@@ -579,8 +579,9 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 className={classes.MtextField}
                 fullWidth
                 placeholder='กรุณากรอกเลขประจำตัวผู้เสียภาษี'
+                // type='number'
                 inputProps={{ maxLength: 13 }}
-                {...register('taxNo', { required: true, pattern: /[0-9]{4}/, maxLength: 13, minLength: 13 })}
+                {...register('taxNo', { required: true, pattern: /^[0-9]*$/, maxLength: 13, minLength: 13 })}
                 onChange={handleChange}
                 disabled={editMode}
               />
