@@ -34,6 +34,7 @@ export interface OrderReceiveDetailProps {
   defaultOpen: boolean;
   onClickClose: any;
   isTote?: boolean;
+  toteCodeNew?: string;
 }
 
 export interface DialogTitleProps {
@@ -73,7 +74,12 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }: OrderReceiveDetailProps) {
+export default function OrderReceiveDetail({
+  defaultOpen,
+  onClickClose,
+  isTote,
+  toteCodeNew,
+}: OrderReceiveDetailProps) {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const orderReceiveResp = useAppSelector((state) => state.orderReceiveSlice.orderReceiveList);
@@ -182,7 +188,7 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
 
     let data = {
       shipmentNo: orderDetail.docRefNo,
-      toteCode: orderReceiveData.toteCode,
+      toteCode: orderReceiveData.toteCode ? orderReceiveData.toteCode : toteCodeNew,
       items: items,
     };
 
@@ -292,7 +298,7 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
                   </Grid>
                   <Grid item lg={4}>
                     <Typography variant="body2">
-                      {orderReceiveData.toteCode ? orderReceiveData.toteCode : '-'}
+                      {orderReceiveData.toteCode ? orderReceiveData.toteCode : toteCodeNew ? toteCodeNew : '-'}
                     </Typography>
                   </Grid>
                 </>
@@ -379,7 +385,7 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
             sdNo={orderReceiveData.sdNo}
             docRefNo={!isTote ? orderReceiveData.docRefNo : orderDetail.docRefNo}
             isTote={isTote}
-            toteCode={orderReceiveData.toteCode}
+            toteCode={orderReceiveData.toteCode ? orderReceiveData.toteCode : toteCodeNew}
           />
 
           <LoadingModal open={openLoadingModal.open} />
