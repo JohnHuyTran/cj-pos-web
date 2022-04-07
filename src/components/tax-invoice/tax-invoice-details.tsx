@@ -5,7 +5,7 @@ import { useStyles } from '../../styles/makeTheme';
 import { ContentPaste, HighlightOff, Save, Sync } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import { Box, Button, DialogTitle, FormHelperText, Grid, IconButton, TextField } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
 import DistrictsDropDown from '../commons/ui/search-districts-dropdown';
@@ -91,6 +91,17 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
     if (!flagSave) setFlagSave(true);
   };
 
+  const handleInputChange = (e: any) => {
+    const { value } = e.target;
+    if (value.length > 13) {
+      let taxNoSub = value.substring(0, 13);
+      setValue('taxNo', taxNoSub);
+    }
+    // const p = value.replace(/\+|-/gi, '');
+
+    handleChange();
+  };
+
   const handleChkEditClose = () => {
     // if (flagSave || fileUploadList.length > 0) {
     if (flagSave) {
@@ -120,6 +131,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
     getValues,
     setValue,
     clearErrors,
+    control,
   } = useForm();
 
   const onSave = (data: any) => {
@@ -163,8 +175,6 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
 
     if (isOpen && taxInvoiceDetail) {
       setBillNo(taxInvoiceDetail.billNo);
-
-      // dispatch(featchTaxInvoicePrintHistoryAsync(taxInvoiceDetail.billNo));
 
       if (taxInvoiceDetail.invoiceNo) {
         setInvoiceNo(taxInvoiceDetail.invoiceNo);
@@ -581,14 +591,35 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 className={classes.MtextField}
                 fullWidth
                 placeholder='กรุณากรอกเลขประจำตัวผู้เสียภาษี'
+                type='number'
                 inputProps={{ maxLength: 13 }}
-                {...register('taxNo', { required: true, maxLength: 13 })}
-                onChange={handleChange}
+                {...register('taxNo', { required: true, pattern: /^[0-9]*$/, maxLength: 13, minLength: 13 })}
+                // onChange={handleChange}
+                onChange={(e) => handleInputChange(e)}
                 disabled={editMode}
               />
+
+              {/* <Controller
+                control={control}
+                {...register('taxNo', { required: true, pattern: /^[0-9]*$/, maxLength: 13, minLength: 13 })}
+                render={({ field: { onChange } }) => (
+                  <TextField
+                    id='txtTaxNo'
+                    size='small'
+                    className={classes.MtextField}
+                    fullWidth
+                    placeholder='กรุณากรอกเลขประจำตัวผู้เสียภาษี'
+                    type='number'
+                    inputProps={{ maxLength: 13 }}
+                    onChange={handleChange}
+                    disabled={editMode}
+                  />
+                )}
+              /> */}
+
               {errors.taxNo && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
-                  กรุณากรอกรายละเอียด
+                  กรุณากรอกตัวเลข 13 หลัก
                 </FormHelperText>
               )}
             </Grid>
