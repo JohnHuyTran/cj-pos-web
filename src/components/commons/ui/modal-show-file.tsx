@@ -46,8 +46,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
+          }}>
           <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
@@ -59,8 +58,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
               variant='contained'
               color='secondary'
               onClick={onPrint}
-              endIcon={<LocalPrintshopOutlinedIcon />}
-            >
+              endIcon={<LocalPrintshopOutlinedIcon />}>
               {/* {text && 'พิมพ์เอกสาร'}
               {!text && 'พิมพ์ใบผลต่าง'} */}
               {text}
@@ -168,8 +166,7 @@ export default function ModalShowPDF({
             minWidth: 600,
             minHeight: 600,
             textAlign: 'center',
-          }}
-        >
+          }}>
           {/* <div id="placeholderWrapper" style={{ height: "3000vh" }} /> */}
           {statusFile === 1 && (
             <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
@@ -181,8 +178,7 @@ export default function ModalShowPDF({
                   },
                 }}
                 onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadFail}
-              >
+                onLoadError={onDocumentLoadFail}>
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page
                     onLoadSuccess={onSourceSuccess}
@@ -195,7 +191,7 @@ export default function ModalShowPDF({
               </Document>
             </div>
           )}
-          {statusFile === 0 && (
+          {/* {statusFile === 0 && (
             <div>
               {imgFile !== 'image' && (
                 <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
@@ -214,15 +210,14 @@ export default function ModalShowPDF({
 
               {imgFile === 'image' && <img src={sdImageFile} style={{ minWidth: '200px' }} />}
             </div>
-          )}
+          )} */}
           {/* file Base64 */}
           {statusFile === 2 && (
             <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
               <Document
                 file={`data:application/pdf;base64,${url}`}
                 onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadFail}
-              >
+                onLoadError={onDocumentLoadFail}>
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page
                     onLoadSuccess={onSourceSuccess}
