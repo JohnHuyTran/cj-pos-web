@@ -18,7 +18,8 @@ const initialState: ItemsState = {
     products: [],
     attachFiles: [],
     transferOutReason: '',
-    store: ''
+    store: '',
+    type: 0,
   },
   validate: false,
   dataDetail: {

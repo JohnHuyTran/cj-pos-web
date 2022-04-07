@@ -12,9 +12,9 @@ import { convertUtcToBkkDate } from "../../utils/date-utill";
 import {
   Action,
   BDStatus,
-  DateFormat,
+  DateFormat, TO_TYPE,
   TOStatus,
-} from "../../utils/enum/common-enum";
+} from '../../utils/enum/common-enum';
 import { objectNullOrEmpty, stringNullOrEmpty } from "../../utils/utils";
 import HtmlTooltip from "../../components/commons/ui/html-tooltip";
 import { useAppDispatch, useAppSelector } from "../../store/store";
@@ -279,6 +279,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
+      type: TO_TYPE.TO_ACTIVITY + '',
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));
@@ -297,6 +298,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
+      type: TO_TYPE.TO_ACTIVITY + '',
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));

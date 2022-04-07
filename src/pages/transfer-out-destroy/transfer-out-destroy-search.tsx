@@ -302,19 +302,19 @@ const TransferOutSearch = () => {
         </Grid>
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
           <Grid item xs={12} style={{ textAlign: 'right' }}>
-            {requestPermission && (
-              <Button
-                id="btnCreate"
-                variant="contained"
-                sx={{ width: '120px', height: '40px' }}
-                className={classes.MbtnSearch}
-                color="warning"
-                startIcon={<AddCircleOutlineOutlinedIcon/>}
-                onClick={handleOpenModal}
-              >
-                {'ทำลาย'}
-              </Button>
-            )}
+            {/*{requestPermission && (*/}
+            {/*  <Button*/}
+            {/*    id="btnCreate"*/}
+            {/*    variant="contained"*/}
+            {/*    sx={{ width: '120px', height: '40px' }}*/}
+            {/*    className={classes.MbtnSearch}*/}
+            {/*    color="warning"*/}
+            {/*    startIcon={<AddCircleOutlineOutlinedIcon/>}*/}
+            {/*    onClick={handleOpenModal}*/}
+            {/*  >*/}
+            {/*    {'ทำลาย'}*/}
+            {/*  </Button>*/}
+            {/*)}*/}
             <Button
               id="btnClear"
               variant="contained"

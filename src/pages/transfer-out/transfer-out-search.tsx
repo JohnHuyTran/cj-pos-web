@@ -16,7 +16,7 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
-import { Action, DateFormat, TOStatus } from '../../utils/enum/common-enum';
+import { Action, DateFormat, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
@@ -156,6 +156,7 @@ const TransferOutSearch = () => {
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
       clearSearch: true,
+      type: TO_TYPE.TO_ACTIVITY + '',
     };
     dispatch(barcodeDiscountSearch(payload));
     if (!requestPermission) {
@@ -193,6 +194,7 @@ const TransferOutSearch = () => {
       status: values.status,
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
+      type: TO_TYPE.TO_ACTIVITY + '',
     };
 
     handleOpenLoading('open', true);

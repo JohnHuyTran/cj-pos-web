@@ -30,7 +30,7 @@ import {
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { getBranchName, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, BDStatus, TOStatus } from '../../utils/enum/common-enum';
+import { Action, BDStatus, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
 import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from "../../utils/enum/permission-enum";
@@ -381,13 +381,15 @@ export default function ModalCreateTransferOut({
               documentNumber: dataDetail.documentNumber,
               attachFiles: allAttachFile,
               transferOutReason: dataDetail.transferOutReason,
-              store: dataDetail.store
+              store: dataDetail.store,
+              type: TO_TYPE.TO_ACTIVITY
             }
             : {
               ...payloadTransferOut,
               attachFiles: allAttachFile,
               transferOutReason: dataDetail.transferOutReason,
-              store: dataDetail.store
+              store: dataDetail.store,
+              type: TO_TYPE.TO_ACTIVITY
             };
           const rs = await saveDraftTransferOut(body);
           if (rs.code === 201) {
