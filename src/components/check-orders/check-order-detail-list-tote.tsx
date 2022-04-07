@@ -254,9 +254,10 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
 
   const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
   const handleOpenOrderReceiveModal = async (params: GridRenderCellParams) => {
+    let toteCode = params.row.toteCode ? params.row.toteCode : params.row.barcode;
     await dispatch(updateAddItemsState({}));
     // setOpenOrderReceiveModal(true);
-    return onOpenToteDetail(params.row.toteCode, true);
+    return onOpenToteDetail(toteCode, true);
   };
 
   function handleCloseOrderReceiveModal() {
