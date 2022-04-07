@@ -124,6 +124,17 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
     handleChangeItem('', options[0], 'selectOption');
   }
 
+  const onInputChange = async (event: any, value: string, reason: string) => {
+    if (event && event.keyCode && event.keyCode === 13) {
+      return false;
+    }
+
+    const keyword = value.trim();
+    if (keyword.length === 0 && reason !== 'reset') {
+      return onChangeProvinces('');
+    }
+  };
+
   return (
     <Autocomplete
       id='selAddItem'
@@ -136,6 +147,7 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
       filterOptions={filterOptions}
       renderOption={autocompleteRenderListItem}
       onChange={handleChangeItem}
+      onInputChange={onInputChange}
       getOptionLabel={(option) => (option.nameTH ? option.nameTH : '')}
       isOptionEqualToValue={(option, value) => option.nameTH === value.nameTH}
       renderInput={autocompleteRenderInput}

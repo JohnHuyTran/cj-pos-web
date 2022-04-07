@@ -11,18 +11,22 @@ import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
 import DistrictsDropDown from '../commons/ui/search-districts-dropdown';
 import SubDistrictsDropDown from '../commons/ui/search-subDistricts-dropdown';
 import { Address, Customer, SaveInvoiceRequest } from '../../models/tax-invoice-model';
-import { saveInvoice, searchMemberInformation } from '../../services/sale';
+import { saveInvoice, savePrintInvoice, searchMemberInformation } from '../../services/sale';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import LoadingModal from '../commons/ui/loading-modal';
 import AlertError from '../commons/ui/alert-warning';
-import { featchTaxInvoiceListAsync } from '../../store/slices/tax-invoice-search-list-slice';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import TaxInvoiceHistory from './tax-invoice-history';
 import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
+import AccordionUploadFile from '../commons/ui/accordion-upload-file';
+// import { clearUploadFileState, uploadFileState } from '../../store/slices/upload-file-slice';
+import ModalShowFile from '../commons/ui/modal-show-file';
+import { formatFileInvoice } from '../../utils/utils';
 
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
+  reloadRequestTaxInvoice: () => void;
 }
 
 export interface DialogTitleProps {
@@ -54,14 +58,27 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
+function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const classes = useStyles();
   const dispatch = useAppDispatch();
-
-  const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const taxInvoiceDetail = useAppSelector((state) => state.taxInvoiceSearchDetail.detail.data);
-  // console.log('taxInvoiceDetail:', JSON.stringify(taxInvoiceDetail));
+  let fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+
+  const taxInvoicePrintHistory = useAppSelector((state) => state.taxInvoicePrintHistory.detail);
+  const historyDetail: any = taxInvoicePrintHistory.data ? taxInvoicePrintHistory.data : [];
+
+  const [status, setStatus] = React.useState('');
+  const [billNo, setBillNo] = React.useState('');
+  const [invoiceNo, setInvoiceNo] = React.useState('-');
+  const [memberNo, setMemberNo] = React.useState('');
+
+  const [disabledBtnEdit, setDisabledBtnEdit] = React.useState(true);
+  const [editMode, setEditMode] = React.useState(false);
+
+  const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
+  const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
+  const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
 
   const [flagSave, setFlagSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
@@ -70,11 +87,12 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     handleClose();
   };
 
-  const handleChange = async () => {
+  const handleChange = () => {
     if (!flagSave) setFlagSave(true);
   };
 
-  const handleChkEditClose = async () => {
+  const handleChkEditClose = () => {
+    // if (flagSave || fileUploadList.length > 0) {
     if (flagSave) {
       setConfirmModelExit(true);
     } else {
@@ -82,17 +100,18 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
-  const handleClose = async () => {
+  const handleClose = () => {
     setBillNo('');
     setMemberNo('');
     handleClear();
 
-    dispatch(featchTaxInvoiceListAsync(payloadSearch));
+    reloadRequestTaxInvoice();
 
     setOpen(false);
     onClickClose();
   };
 
+  const [onSaveEvent, setOnSaveEvent] = React.useState(false);
   const {
     register,
     formState: { errors },
@@ -115,7 +134,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         postcode: data.postcode,
       };
       const customer: any = {
-        memberNo: '',
+        memberNo: memberNo,
         taxNo: data.taxNo,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -127,18 +146,16 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         customer: customer,
       };
 
-      // console.log('payload:', JSON.stringify(payload));
-      handleSaveInvoice(payload);
+      if (status === 'PRINTED') {
+        handleSavePrintInvoice(payload);
+      } else if (onSaveEvent) {
+        setEditMode(true);
+        handleSavePrintInvoice(payload);
+      } else {
+        handleSaveInvoice(payload);
+      }
     }
   };
-
-  const [status, setStatus] = React.useState('');
-  const [billNo, setBillNo] = React.useState('');
-  const [invoiceNo, setInvoiceNo] = React.useState('-');
-  const [memberNo, setMemberNo] = React.useState('');
-  const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
-  const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
-  const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
 
   useEffect(() => {
     setOpen(isOpen);
@@ -147,17 +164,20 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     if (isOpen && taxInvoiceDetail) {
       setBillNo(taxInvoiceDetail.billNo);
 
-      dispatch(featchTaxInvoicePrintHistoryAsync(taxInvoiceDetail.billNo));
+      // dispatch(featchTaxInvoicePrintHistoryAsync(taxInvoiceDetail.billNo));
 
       if (taxInvoiceDetail.invoiceNo) {
-        setDisabledBtnPreview(false);
         setInvoiceNo(taxInvoiceDetail.invoiceNo);
       }
 
       setStatus(taxInvoiceDetail.status);
-      setMemberNo(taxInvoiceDetail.customer.memberNo);
+      if (taxInvoiceDetail.customer.memberNo) setMemberNo(taxInvoiceDetail.customer.memberNo);
 
       if (taxInvoiceDetail.status === 'PRINTED') {
+        if (historyDetail.length > 0) setDisabledBtnEdit(false);
+        else setDisabledBtnPreview(false);
+
+        setEditMode(true);
         setDisabledBtnClear(true);
         setDisabledBtnSave(true);
         setDefaultData(taxInvoiceDetail);
@@ -166,10 +186,13 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         setDisabledSelDistricts(true);
         setDisabledSelSubDistricts(true);
       } else {
+        setEditMode(false);
         if (taxInvoiceDetail.customer.memberNo) handleSearchMember(taxInvoiceDetail.customer.memberNo);
         else setDefaultData(taxInvoiceDetail);
       }
     }
+
+    setConfirmModelExit(false);
   }, [isOpen]);
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
@@ -249,6 +272,12 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         setDisabledBtnPreview(false);
         setDisabledBtnClear(true);
         setDisabledBtnSave(true);
+
+        setOnSaveEvent(true);
+
+        if (value.data) {
+          setInvoiceNo(value.data);
+        }
       })
       .catch((error: any) => {
         setShowSnackBar(true);
@@ -256,6 +285,51 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       });
 
     setOpenLoadingModal(false);
+  };
+
+  const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
+  const [docLayoutLandscape, setDocLayoutLandscape] = React.useState(false);
+  const [pathReport, setPathReport] = React.useState<string>('');
+  const [counter, setCounter] = React.useState(0);
+
+  const handleModelPreviewDocument = async () => {
+    setOpenModelPreviewDocument(false);
+
+    if (status !== 'PRINTED') {
+      // await setStatus('PRINTED');
+      // await setDisabledBtnEdit(false);
+      handleClose();
+    }
+  };
+
+  const handleSavePrintInvoice = async (payload: SaveInvoiceRequest) => {
+    setOpenLoadingModal(true);
+
+    let edit = false;
+    if (!editMode) edit = true;
+
+    await savePrintInvoice(payload, fileUploadList, edit)
+      .then((value) => {
+        dispatch(featchTaxInvoicePrintHistoryAsync(payload.billNo)).then(() => {
+          setCounter(historyDetail.length + 1);
+          setOpenModelPreviewDocument(true);
+          setPathReport(value.data);
+          setFlagSave(false);
+          setOpenLoadingModal(false);
+
+          setEditMode(false);
+
+          // dispatch(uploadFileState([]));
+          // fileUploadList = [];
+        });
+      })
+      .catch((error: any) => {
+        setShowSnackBar(true);
+        setContentMsg(error.message);
+
+        setOpenLoadingModal(false);
+      });
+    // setOpenLoadingModal(false);
   };
 
   const [isClearProvinces, setIsClearProvinces] = React.useState(false);
@@ -292,10 +366,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   const [districtsCode, setDistrictsCode] = React.useState('');
   const [subDistrictsCode, setSubDistrictsCode] = React.useState('');
 
-  const [provincesName, setProvincesName] = React.useState('');
-  const [districtsName, setDistrictsName] = React.useState('');
-  const [subDistrictsName, setSubDistrictsName] = React.useState('');
-
   // const [searchProvincesCode, setSearchProvincesCode] = React.useState('');
   const [searchDistrictsCode, setSearchDistrictsCode] = React.useState('');
   const [searchPostalCode, setSearchPostalCode] = React.useState('');
@@ -329,12 +399,16 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         setIsClearDistricts(true);
         setIsClearSubDistricts(true);
       }
+    } else if (provincesCode === '') {
+      setValue('province', provincesCode);
     }
   };
 
   const handleChangeDistricts = (districtsCode: string, provincesCode: string) => {
+    setValue('district', districtsCode);
+
     if (districtsCode !== '') {
-      setValue('district', districtsCode);
+      // setValue('district', districtsCode);
       clearErrors('district');
       setDistrictsCode(districtsCode);
       setDisabledSelSubDistricts(false);
@@ -350,8 +424,10 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleChangeSubDistricts = (subDistrictsCode: string, postalCode: string, districtCode: string) => {
+    setValue('subDistrict', subDistrictsCode);
+
     if (subDistrictsCode !== '') {
-      setValue('subDistrict', subDistrictsCode);
+      // setValue('subDistrict', subDistrictsCode);
       setValue('postcode', postalCode);
       clearErrors('subDistrict');
       clearErrors('postcode');
@@ -393,8 +469,38 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       setIsClearProvinces(true);
       setIsClearDistricts(true);
       setIsClearSubDistricts(true);
+
+      setValue('province', '');
+      setValue('district', '');
+      setValue('subDistrict', '');
     }
   };
+
+  const handleEditMode = () => {
+    if (editMode) {
+      setOpenLoadingModal(true);
+      setTimeout(() => {
+        setOpenLoadingModal(false);
+
+        setEditMode(false);
+        setDisabledBtnClear(false);
+        setDisabledSelProvinces(false);
+        setDisabledSelDistricts(false);
+        setDisabledSelSubDistricts(false);
+      }, 300);
+    }
+  };
+
+  const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
+  const handleOnChangeUploadFile = (status: boolean) => {
+    setUploadFileFlag(status);
+    handleChange();
+  };
+
+  if (status === 'PRINTED' && historyDetail.length >= 1) {
+    if (fileUploadList.length > 0 && disabledBtnPreview) setDisabledBtnPreview(false);
+    else if (fileUploadList.length == 0 && !disabledBtnPreview) setDisabledBtnPreview(true);
+  }
 
   return (
     <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -403,27 +509,42 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       </BootstrapDialogTitle>
 
       <DialogContent>
-        <Box pl={2} pr={2}>
+        <Box pl={2} pr={2} mt={2}>
           <Grid container spacing={1}>
-            <Grid item xs={2} mb={3}>
+            <Grid item xs={2} mb={4}>
               <Typography gutterBottom variant='subtitle1' component='div'>
                 เลขที่ใบเสร็จ(ย่อ) :
               </Typography>
             </Grid>
-            <Grid item xs={4} mb={2}>
+            <Grid item xs={3}>
               <Typography gutterBottom variant='subtitle1' component='div'>
                 {billNo}
               </Typography>
             </Grid>
-            <Grid item xs={2} mb={3}>
+            <Grid item xs={1}></Grid>
+            <Grid item xs={2} mb={4}>
               <Typography gutterBottom variant='subtitle1' component='div'>
                 เลขที่ใบเสร็จ(เต็ม) :
               </Typography>
             </Grid>
-            <Grid item xs={4} mb={2}>
+            <Grid item xs={2} mb={4}>
               <Typography gutterBottom variant='subtitle1' component='div'>
                 {invoiceNo}
               </Typography>
+            </Grid>
+
+            <Grid item xs={2} mb={4} sx={{ textAlign: 'end' }}>
+              <Button
+                id='btnCreateStockTransferModal'
+                variant='contained'
+                onClick={handleEditMode}
+                className={classes.MbtnClear}
+                color='secondary'
+                // disabled={!editMode}
+                sx={{ width: 120, display: `${disabledBtnEdit ? 'none' : ''}` }}
+              >
+                แก้ไขข้อมูล
+              </Button>
             </Grid>
           </Grid>
 
@@ -463,7 +584,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 inputProps={{ maxLength: 13 }}
                 {...register('taxNo', { required: true, maxLength: 13 })}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
               {errors.taxNo && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -486,7 +607,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกชื่อ / ชื่อบริษัท'
                 {...register('firstName', { required: true })}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
               {errors.firstName && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -509,7 +630,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกนามสกุล'
                 {...register('lastName')}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -533,7 +654,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกเลขที่'
                 {...register('houseNo', { required: true })}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
 
               {errors.houseNo && (
@@ -557,7 +678,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกเลขอาคาร'
                 {...register('building')}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -576,7 +697,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 placeholder='กรุณากรอกหมู่'
                 {...register('moo')}
                 onChange={handleChange}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -666,7 +787,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 onChange={(e) => {
                   handleChangePostalCode(e);
                 }}
-                disabled={status === 'PRINTED'}
+                disabled={editMode}
               />
               {errors.postcode && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -674,18 +795,40 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 </FormHelperText>
               )}
             </Grid>
-            <Grid item xs={7}></Grid>
+
+            <Grid item xs={1}></Grid>
+            <Grid item xs={1}>
+              {status === 'PRINTED' && historyDetail.length > 0 && (
+                <Typography gutterBottom variant='subtitle1' component='div' mb={2}>
+                  แนบไฟล์ :
+                </Typography>
+              )}
+            </Grid>
+            <Grid item xs={4}>
+              {status === 'PRINTED' && historyDetail.length > 0 && (
+                <Box ml={2}>
+                  <AccordionUploadFile
+                    files={[]}
+                    isStatus={uploadFileFlag}
+                    onChangeUploadFile={handleOnChangeUploadFile}
+                    enabledControl={true}
+                    reMark='แนบไฟล์ใบแทน / สำเนาบัตรประชาชน .pdf/.jpg ขนาดไม่เกิน 5 mb'
+                  />
+                </Box>
+              )}
+            </Grid>
+
+            <Grid item xs={1}></Grid>
           </Grid>
         </Box>
 
-        <Box pl={2} pr={2}>
+        <Box pr={2}>
           <Grid container spacing={1} mt={4}>
             <Grid item xs={2} mb={2}>
               <Button
                 id='btnCreateStockTransferModal'
                 variant='contained'
-                // onClick={handleOpenCreateModal}
-                // sx={{ width: 150, display: `${displayBtnPreview ? 'none' : ''}` }}
+                onClick={handleSubmit(onSave)}
                 sx={{ width: 220 }}
                 className={classes.MbtnClear}
                 startIcon={<ContentPaste />}
@@ -709,24 +852,26 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 เคลียร์
               </Button>
 
-              <Button
-                id='btnSearch'
-                variant='contained'
-                color='warning'
-                startIcon={<Save />}
-                onClick={handleSubmit(onSave)}
-                sx={{ width: 110, ml: 2 }}
-                className={classes.MbtnSave}
-                disabled={disabledBtnSave}
-              >
-                บันทึก
-              </Button>
+              {disabledBtnEdit && (
+                <Button
+                  id='btnSearch'
+                  variant='contained'
+                  color='warning'
+                  startIcon={<Save />}
+                  onClick={handleSubmit(onSave)}
+                  sx={{ width: 110, ml: 2 }}
+                  className={classes.MbtnSave}
+                  disabled={disabledBtnSave}
+                >
+                  บันทึก
+                </Button>
+              )}
             </Grid>
           </Grid>
         </Box>
 
         <Box mt={5} mb={5}>
-          <TaxInvoiceHistory billNo='' />
+          <TaxInvoiceHistory />
         </Box>
 
         <SnackbarStatus
@@ -746,6 +891,17 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
             setConfirmModelExit(false);
           }}
           onConfirm={handleExitModelConfirm}
+        />
+
+        <ModalShowFile
+          open={openModelPreviewDocument}
+          onClose={handleModelPreviewDocument}
+          url={pathReport}
+          sdImageFile=''
+          statusFile={2}
+          fileName={formatFileInvoice(invoiceNo, counter)}
+          btnPrintName='พิมพ์เอกสาร'
+          landscape={docLayoutLandscape}
         />
       </DialogContent>
     </Dialog>

@@ -1,42 +1,43 @@
-import React, { useEffect } from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import { Switch, Route } from 'react-router-dom';
-import CssBaseline from '@mui/material/CssBaseline';
-import Navbar from './components/navbar';
-import Sidebar from './components/sidebar';
-import Home from './pages/home';
-import CheckOrder from './pages/check-order';
-import DCCheckOrder from './pages/dc-check-order';
-import SupplierCheckOrder from './pages/supplier-check-order';
-import TaxInvoice from './pages/tax-invoice';
-import StockTransfer from './pages/stock-transfer';
-import StockTransferRt from './pages/stock-transfer-rt';
-import LoginForm from './components/login/login-form';
-import BarcodeDiscount from './pages/barcode-discount/barcode-discount';
-import SaleLimitTime from './pages/sale-limit-time/sale-limit-time';
+import React, { useEffect } from "react";
+import { styled, useTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import { Switch, Route } from "react-router-dom";
+import CssBaseline from "@mui/material/CssBaseline";
+import Navbar from "./components/navbar";
+import Sidebar from "./components/sidebar";
+import Home from "./pages/home";
+import CheckOrder from "./pages/check-order";
+import DCCheckOrder from "./pages/dc-check-order";
+import SupplierCheckOrder from "./pages/supplier-check-order";
+import TaxInvoice from "./pages/tax-invoice";
+import StockTransfer from "./pages/stock-transfer";
+import StockTransferRt from "./pages/stock-transfer-rt";
+import LoginForm from "./components/login/login-form";
+import BarcodeDiscount from "./pages/barcode-discount/barcode-discount";
+import SaleLimitTime from "./pages/sale-limit-time/sale-limit-time";
 
-import { useAppDispatch, useAppSelector } from './store/store';
-import { featchBranchListAsync } from './store/slices/search-branches-slice';
-import { featchAuthorizedBranchListAsync } from './store/slices/authorized-branch-slice';
-import Notification from './pages/notification';
-import TransferOut from './pages/transfer-out/transfer-out';
+import { useAppDispatch, useAppSelector } from "./store/store";
+import { featchBranchListAsync } from "./store/slices/search-branches-slice";
+import { featchAuthorizedBranchListAsync } from "./store/slices/authorized-branch-slice";
+import Notification from "./pages/notification";
+import TransferOut from "./pages/transfer-out/transfer-out";
+import TransferOutDestroy from "./pages/transfer-out-destroy/transfer-out-destroy";
 const drawerWidth = 240;
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme, open }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
-  paddingLeft: '5px',
-  paddingRight: '5px',
-  transition: theme.transitions.create('margin', {
+  paddingLeft: "5px",
+  paddingRight: "5px",
+  transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   marginLeft: `-${drawerWidth}px`,
   ...(open && {
-    transition: theme.transitions.create('margin', {
+    transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
@@ -44,13 +45,13 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   }),
 }));
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
+  justifyContent: "flex-end",
 }));
 
 export default function App2() {
@@ -73,7 +74,7 @@ export default function App2() {
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <Navbar />
       <Sidebar />
@@ -81,16 +82,17 @@ export default function App2() {
         <DrawerHeader />
         <Switch>
           <Route exact path="/" component={Home} />
-          <Route path='/notification' component={Notification} /> 
-          <Route path='/barcode-discount' component={BarcodeDiscount} />
+          <Route path="/notification" component={Notification} />
+          <Route path="/barcode-discount" component={BarcodeDiscount} />
           <Route path="/tax-invoice" component={TaxInvoice} />
-          <Route path='/sale-limit-time' component={SaleLimitTime} />
-          <Route path='/check-order' component={CheckOrder} />
-          <Route path='/dc-check-order' component={DCCheckOrder} />
-          <Route path='/supplier-check-order' component={SupplierCheckOrder} />
-          <Route path='/stock-transfer' component={StockTransfer} />
-          <Route path='/stock-transfer-rt' component={StockTransferRt} />
-          <Route path='/transfer-out' component={TransferOut} />
+          <Route path="/sale-limit-time" component={SaleLimitTime} />
+          <Route path="/check-order" component={CheckOrder} />
+          <Route path="/dc-check-order" component={DCCheckOrder} />
+          <Route path="/supplier-check-order" component={SupplierCheckOrder} />
+          <Route path="/stock-transfer" component={StockTransfer} />
+          <Route path="/stock-transfer-rt" component={StockTransferRt} />
+          <Route path="/transfer-out" component={TransferOut} />
+          <Route path="/transfer-out-destroy" component={TransferOutDestroy} />
         </Switch>
       </Main>
     </Box>

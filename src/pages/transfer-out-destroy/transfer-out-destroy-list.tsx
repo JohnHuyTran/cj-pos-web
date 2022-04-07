@@ -14,6 +14,7 @@ import {
   BDStatus,
   DateFormat,
   TOStatus,
+  TO_TYPE,
 } from "../../utils/enum/common-enum";
 import { objectNullOrEmpty, stringNullOrEmpty } from "../../utils/utils";
 import HtmlTooltip from "../../components/commons/ui/html-tooltip";
@@ -42,7 +43,7 @@ interface StateProps {
   onSearch: () => void;
 }
 
-const TransferOutList: React.FC<StateProps> = (props) => {
+const TransferOutDestroyList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
   const { t } = useTranslation(["barcodeDiscount"]);
   const [lstTransferOut, setLstTransferOut] = React.useState<any[]>([]);
@@ -79,6 +80,13 @@ const TransferOutList: React.FC<StateProps> = (props) => {
         return {
           id: data.id,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
+          branch: stringNullOrEmpty(data.branch)
+            ? stringNullOrEmpty(data.branchName)
+              ? ""
+              : data.branchName
+            : data.branch +
+              " - " +
+              (stringNullOrEmpty(data.branchName) ? "" : data.branchName),
           documentNumber: data.documentNumber,
           status: genStatusIncludeExpiredCase(data),
           transactionDate: convertUtcToBkkDate(
@@ -91,6 +99,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
           products: data.products,
           requestorName: data.requestor,
           approverName: data.approver,
+          type: data.type == "2" ? "ไม่มีส่วนลด" : "มีส่วนลด",
         };
       });
       setLstTransferOut(rows);
@@ -155,6 +164,18 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       ),
     },
     {
+      field: "branch",
+      headerName: t("branch"),
+      headerAlign: "center",
+      sortable: false,
+      minWidth: 250,
+      renderCell: (params) => (
+        <Box component="div" sx={{ marginLeft: "0 auto" }}>
+          {params.value}
+        </Box>
+      ),
+    },
+    {
       field: "documentNumber",
       headerName: "เอกสารเบิก",
       headerAlign: "center",
@@ -166,7 +187,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: "วันที่ทำรายการ",
       headerAlign: "center",
       sortable: false,
-      minWidth: 200,
+      minWidth: 150,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
@@ -175,10 +196,22 @@ const TransferOutList: React.FC<StateProps> = (props) => {
     },
     {
       field: "approvalDate",
-      headerName: "วันที่อนุมัติ",
+      headerName: "วันที่ทำลาย",
       headerAlign: "center",
       sortable: false,
-      minWidth: 200,
+      minWidth: 150,
+      renderCell: (params) => (
+        <Box component="div" sx={{ marginLeft: "1rem" }}>
+          {params.value}
+        </Box>
+      ),
+    },
+    {
+      field: "type",
+      headerName: "ประเภท",
+      headerAlign: "center",
+      sortable: false,
+      minWidth: 50,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
@@ -279,6 +312,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
+      type: TO_TYPE.TO_WITHOUT_DISCOUNT + "," + TO_TYPE.TO_WITH_DISCOUNT,
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));
@@ -297,6 +331,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
+      type: TO_TYPE.TO_WITHOUT_DISCOUNT + "," + TO_TYPE.TO_WITH_DISCOUNT,
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));
@@ -335,7 +370,6 @@ const TransferOutList: React.FC<StateProps> = (props) => {
             columns={columns}
             disableColumnMenu
             hideFooterSelectedRowCount={true}
-            onCellClick={currentlySelected}
             autoHeight={lstTransferOut.length < 10}
             scrollbarSize={10}
             pagination
@@ -372,4 +406,4 @@ const TransferOutList: React.FC<StateProps> = (props) => {
   );
 };
 
-export default TransferOutList;
+export default TransferOutDestroyList;

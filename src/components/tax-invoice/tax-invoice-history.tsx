@@ -12,10 +12,6 @@ import { getFileUrlHuawei } from '../../services/master-service';
 import ModalShowHuaweiFile from '../commons/ui/modal-show-huawei-file';
 import { useTranslation } from 'react-i18next';
 
-export interface DataGridProps {
-  billNo: string;
-}
-
 const columns: GridColDef[] = [
   {
     field: 'index',
@@ -117,6 +113,7 @@ const handleModelAction = (params: GridRenderCellParams) => {
       });
   }
 
+  const printNo: any = params.getValue(params.id, 'printNo');
   const fileList: any = params.getValue(params.id, 'files');
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -165,6 +162,10 @@ const handleModelAction = (params: GridRenderCellParams) => {
     </>
   );
 
+  if (printNo === 1) {
+    return '';
+  }
+
   return (
     <>
       <Button onClick={handleMenuOpen}>
@@ -176,26 +177,28 @@ const handleModelAction = (params: GridRenderCellParams) => {
   );
 };
 
-export default function TaxInvoiceHistory({ billNo }: DataGridProps) {
+export default function TaxInvoiceHistory() {
   const classes = useStyles();
   const { t } = useTranslation(['taxInvoice', 'common']);
   const taxInvoicePrintHistory = useAppSelector((state) => state.taxInvoicePrintHistory.detail);
   const historyDetail: any = taxInvoicePrintHistory.data ? taxInvoicePrintHistory.data : [];
 
   let rows: any = [];
-  rows = historyDetail.map((item: any, index: number) => {
-    return {
-      id: `${item.skuCode}-${index + 1}`,
-      index: index + 1,
-      name: item.printedByName,
-      position: item.printedByPosition,
-      type: t(`type.${item.type}`),
-      printNo: item.edition,
-      date: moment(item.printedDate).format(DateFormat.DATE_TIME_DISPLAY_FORMAT),
-      action: '',
-      files: item.files,
-    };
-  });
+  if (historyDetail.length > 0) {
+    rows = historyDetail.map((item: any, index: number) => {
+      return {
+        id: `${item.skuCode}-${index + 1}`,
+        index: index + 1,
+        name: item.printedByName,
+        position: item.printedByPosition,
+        type: t(`type.${item.type}`),
+        printNo: item.edition,
+        date: moment(item.printedDate).format(DateFormat.DATE_TIME_DISPLAY_FORMAT),
+        action: '',
+        files: item.files,
+      };
+    });
+  }
 
   useEffect(() => {}, []);
 

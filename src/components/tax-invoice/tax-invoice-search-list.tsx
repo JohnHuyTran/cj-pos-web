@@ -18,6 +18,8 @@ import ModalTaxInvoiceDetails from './tax-invoice-details';
 import LoadingModal from '../commons/ui/loading-modal';
 import { requestTaxInvoice } from '../../services/sale';
 import { ApiError } from '../../models/api-error-model';
+import { uploadFileState } from '../../store/slices/upload-file-slice';
+import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
 
 interface Props {
   actionType: string;
@@ -168,8 +170,11 @@ export default function TaxInvoiceSearchList({ actionType }: Props) {
       const payload: TaxInvoiceRequest = {
         docNo: params.row.billNo,
       };
+      await dispatch(uploadFileState([]));
       await dispatch(featchTaxInvoiceDetailAsync(payload)).then(() => {
-        setOpenDetailModal(true);
+        dispatch(featchTaxInvoicePrintHistoryAsync(params.row.billNo)).then(() => {
+          setOpenDetailModal(true);
+        });
       });
       setOpenLoadingModal(false);
     }
@@ -219,7 +224,11 @@ export default function TaxInvoiceSearchList({ actionType }: Props) {
       </Box>
 
       <LoadingModal open={openLoadingModal} />
-      <ModalTaxInvoiceDetails isOpen={openDetailModal} onClickClose={handleCloseDetailModal} />
+      <ModalTaxInvoiceDetails
+        isOpen={openDetailModal}
+        onClickClose={handleCloseDetailModal}
+        reloadRequestTaxInvoice={reloadRequestTaxInvoice}
+      />
     </div>
   );
 }

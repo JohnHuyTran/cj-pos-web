@@ -41,7 +41,7 @@ export enum ACTIONS {
   ORDER_RO_CLOSE = 'order.ro.close',
   ORDER_RO_EDIT = 'order.ro.edit',
   ORDER_RO_VIEW = 'order.ro.view',
-  ORDER_RO_EXPORT = 'order.ro.export',
+  ORDER_SD_EXPORT = 'order.sd.export',
   ORDER_DC_VERIFY = 'order.dc.verify',
   ORDER_DC_VIEW = 'order.dc.view',
   PRODUCT_SEARCH = 'product.search',
