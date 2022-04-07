@@ -154,7 +154,6 @@ export default function OrderReceiveDetail({
           docRefNo: orderReceiveData.docRefNo,
           items: items,
         };
-
         await approveOrderReceive(payload);
         await dispatch(searchOrderReceiveAsync());
         setOpen(false);
@@ -358,23 +357,21 @@ export default function OrderReceiveDetail({
             </Grid>
           </Box>
 
-          {isTotes && (
-            <Box sx={{ marginTop: 4 }}>
-              <Grid item container spacing={2} justifyContent="flex-end">
-                <Button
-                  id="btnApprove"
-                  variant="contained"
-                  color="primary"
-                  className={classes.MbtnApprove}
-                  onClick={handleApproveBtn}
-                  startIcon={<CheckCircleOutline />}
-                  sx={{ width: '15%' }}
-                >
-                  ยืนยัน
-                </Button>
-              </Grid>
-            </Box>
-          )}
+          <Box sx={{ marginTop: 4 }}>
+            <Grid item container spacing={2} justifyContent="flex-end">
+              <Button
+                id="btnApprove"
+                variant="contained"
+                color="primary"
+                className={classes.MbtnApprove}
+                onClick={handleApproveBtn}
+                startIcon={<CheckCircleOutline />}
+                sx={{ width: '15%' }}
+              >
+                ยืนยัน
+              </Button>
+            </Grid>
+          </Box>
 
           {orderReceiveTable}
 
