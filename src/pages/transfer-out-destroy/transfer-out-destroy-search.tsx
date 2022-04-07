@@ -1,45 +1,34 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
-import { useTranslation } from "react-i18next";
-import TextField from "@mui/material/TextField";
-import React, { useEffect, useState } from "react";
-import { useStyles } from "../../styles/makeTheme";
-import {
-  getBranchName,
-  objectNullOrEmpty,
-  onChange,
-  onChangeDate,
-  stringNullOrEmpty,
-} from "../../utils/utils";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import DatePickerComponent from "../../components/commons/ui/date-picker";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import { SearchOff } from "@mui/icons-material";
-import AlertError from "../../components/commons/ui/alert-error";
-import moment from "moment";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { barcodeDiscountSearch } from "../../store/slices/barcode-discount-search-slice";
-import { saveSearchCriteriaTO } from "../../store/slices/transfer-out-criteria-search-slice";
-import LoadingModal from "../../components/commons/ui/loading-modal";
-import {
-  Action,
-  DateFormat,
-  TOStatus,
-  TO_TYPE,
-} from "../../utils/enum/common-enum";
-import SnackbarStatus from "../../components/commons/ui/snackbar-status";
-import { KeyCloakTokenInfo } from "../../models/keycolak-token-info";
-import { getUserInfo } from "../../store/sessionStore";
-import { BranchListOptionType } from "../../models/branch-model";
-import { isGroupBranch } from "../../utils/role-permission";
-import TransferOutList from "./transfer-out-destroy-list";
-import SelectBranch from "./transfer-out-destroy-branch";
-import { TransferOutSearchRequest } from "../../models/transfer-out-model";
-import { transferOutGetSearch } from "../../store/slices/transfer-out-search-slice";
-import ModalCreateTransferOut from "../../components/transfer-out/modal-create-transfer-out";
+import { Box, Button, Grid, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import TextField from '@mui/material/TextField';
+import React, { useEffect, useState } from 'react';
+import { useStyles } from '../../styles/makeTheme';
+import { getBranchName, objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../utils/utils';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import DatePickerComponent from '../../components/commons/ui/date-picker';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import { SearchOff } from '@mui/icons-material';
+import AlertError from '../../components/commons/ui/alert-error';
+import moment from 'moment';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
+import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
+import LoadingModal from '../../components/commons/ui/loading-modal';
+import { Action, DateFormat, TOStatus, TO_TYPE } from '../../utils/enum/common-enum';
+import SnackbarStatus from '../../components/commons/ui/snackbar-status';
+import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
+import { getUserInfo } from '../../store/sessionStore';
+import { BranchListOptionType } from '../../models/branch-model';
+import { isGroupBranch } from '../../utils/role-permission';
+import TransferOutList from './transfer-out-destroy-list';
+import SelectBranch from './transfer-out-destroy-branch';
+import { TransferOutSearchRequest } from '../../models/transfer-out-model';
+import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
+import ModalCreateTransferOut from '../../components/transfer-out/modal-create-transfer-out';
 
-const _ = require("lodash");
+const _ = require('lodash');
 
 interface State {
   documentNumber: string;
@@ -55,51 +44,38 @@ interface loadingModalState {
 
 const TransferOutSearch = () => {
   const classes = useStyles();
-  const { t } = useTranslation(["barcodeDiscount", "common"]);
+  const { t } = useTranslation(['barcodeDiscount', 'common']);
   const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState("");
-  const [popupMsg, setPopupMsg] = React.useState<string>("");
+  const [textError, setTextError] = React.useState('');
+  const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [lstStatus, setLstStatus] = React.useState([]);
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
-  const branchList = useAppSelector((state) => state.searchBranchSlice)
-    .branchList.data;
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [ownBranch, setOwnBranch] = React.useState(
-    getUserInfo().branch
-      ? getBranchName(branchList, getUserInfo().branch)
-        ? getUserInfo().branch
-        : ""
-      : ""
+    getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
   );
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
-  const [clearBranchDropDown, setClearBranchDropDown] =
-    React.useState<boolean>(false);
+  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
 
   const dispatch = useAppDispatch();
-  const page = "1";
-  const limit = useAppSelector(
-    (state) => state.transferOutSearchSlice.toSearchResponse.perPage
-  );
-  const barcodeDiscountSearchSlice = useAppSelector(
-    (state) => state.transferOutSearchSlice
-  );
+  const page = '1';
+  const limit = useAppSelector((state) => state.transferOutSearchSlice.toSearchResponse.perPage);
+  const barcodeDiscountSearchSlice = useAppSelector((state) => state.transferOutSearchSlice);
   const [userPermission, setUserPermission] = useState<any[]>([]);
   const [approvePermission, setApprovePermission] = useState<boolean>(false);
   const [requestPermission, setRequestPermission] = useState<boolean>(false);
-  const [openLoadingModal, setOpenLoadingModal] =
-    React.useState<loadingModalState>({
-      open: false,
-    });
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
+  });
   const [openModal, setOpenModal] = React.useState(false);
-  const [listBranchSelect, setListBranchSelect] = React.useState<
-    BranchListOptionType[]
-  >([]);
+  const [listBranchSelect, setListBranchSelect] = React.useState<BranchListOptionType[]>([]);
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
   const [values, setValues] = React.useState<State>({
-    documentNumber: "",
-    branch: "ALL",
-    status: "",
+    documentNumber: '',
+    branch: 'ALL',
+    status: '',
     fromDate: new Date(),
     approveDate: new Date(),
   });
@@ -107,48 +83,39 @@ const TransferOutSearch = () => {
   useEffect(() => {
     if (groupBranch) {
       setOwnBranch(
-        getUserInfo().branch
-          ? getBranchName(branchList, getUserInfo().branch)
-            ? getUserInfo().branch
-            : ""
-          : ""
+        getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
       );
     }
   }, [branchList]);
   useEffect(() => {
-    setLstStatus(t("lstStatus", { returnObjects: true }));
+    setLstStatus(t('lstStatus', { returnObjects: true }));
     //permission
     const userInfo: KeyCloakTokenInfo = getUserInfo();
     if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
       let userPermission =
-        userInfo.acl["service.posback-campaign"] != null &&
-        userInfo.acl["service.posback-campaign"].length > 0
-          ? userInfo.acl["service.posback-campaign"]
+        userInfo.acl['service.posback-campaign'] != null && userInfo.acl['service.posback-campaign'].length > 0
+          ? userInfo.acl['service.posback-campaign']
           : [];
       setUserPermission(userPermission);
       setApprovePermission(
-        userPermission != null && userPermission.length > 0
-          ? userPermission.includes("campaign.to.approve")
-          : false
+        userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.approve') : false
       );
       setRequestPermission(
-        userPermission != null && userPermission.length > 0
-          ? userPermission.includes("campaign.to.create")
-          : false
+        userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.create') : false
       );
       setValues({
         ...values,
-        status: userPermission.includes("campaign.to.approve")
+        status: userPermission.includes('campaign.to.approve')
           ? TOStatus.WAIT_FOR_APPROVAL
-          : userPermission.includes("campaign.to.create")
+          : userPermission.includes('campaign.to.create')
           ? TOStatus.DRAFT
-          : "ALL",
+          : 'ALL',
       });
     }
   }, []);
   useEffect(() => {
     if (listBranchSelect.length > 0) {
-      let branches = listBranchSelect.map((item: any) => item.code).join(",");
+      let branches = listBranchSelect.map((item: any) => item.code).join(',');
       setValues({ ...values, branch: branches });
     }
   }, [listBranchSelect]);
@@ -173,13 +140,9 @@ const TransferOutSearch = () => {
     setClearBranchDropDown(!clearBranchDropDown);
     setFlagSearch(false);
     setValues({
-      documentNumber: "",
-      branch: "",
-      status: approvePermission
-        ? TOStatus.WAIT_FOR_APPROVAL
-        : requestPermission
-        ? TOStatus.DRAFT
-        : "ALL",
+      documentNumber: '',
+      branch: '',
+      status: approvePermission ? TOStatus.WAIT_FOR_APPROVAL : requestPermission ? TOStatus.DRAFT : 'ALL',
       fromDate: new Date(),
       approveDate: new Date(),
     });
@@ -190,10 +153,10 @@ const TransferOutSearch = () => {
       query: values.documentNumber,
       branch: values.branch,
       status: values.status,
-      startDate: moment(values.fromDate).startOf("day").toISOString(),
-      endDate: moment(values.approveDate).endOf("day").toISOString(),
+      startDate: moment(values.fromDate).startOf('day').toISOString(),
+      endDate: moment(values.approveDate).endOf('day').toISOString(),
       clearSearch: true,
-      type: TO_TYPE.TO_WITHOUT_DISCOUNT + "," + TO_TYPE.TO_WITH_DISCOUNT,
+      type: TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT,
     };
     dispatch(barcodeDiscountSearch(payload));
     if (!requestPermission) {
@@ -203,14 +166,11 @@ const TransferOutSearch = () => {
 
   const validateSearch = () => {
     let isValid = true;
-    if (values.status == "ALL") {
-      if (
-        stringNullOrEmpty(values.fromDate) ||
-        stringNullOrEmpty(values.approveDate)
-      ) {
+    if (values.status == 'ALL') {
+      if (stringNullOrEmpty(values.fromDate) || stringNullOrEmpty(values.approveDate)) {
         isValid = false;
         setOpenAlert(true);
-        setTextError("กรุณากรอกวันที่");
+        setTextError('กรุณากรอกวันที่');
       }
     }
     return isValid;
@@ -222,9 +182,9 @@ const TransferOutSearch = () => {
     }
     let limits;
     if (limit === 0) {
-      limits = "10";
+      limits = '10';
     } else {
-      limits = limit ? limit.toString() : "10";
+      limits = limit ? limit.toString() : '10';
     }
     const payload: TransferOutSearchRequest = {
       perPage: limits,
@@ -232,16 +192,16 @@ const TransferOutSearch = () => {
       query: values.documentNumber.trim(),
       branch: values.branch,
       status: values.status,
-      startDate: moment(values.fromDate).startOf("day").toISOString(),
-      endDate: moment(values.approveDate).endOf("day").toISOString(),
-      type: TO_TYPE.TO_WITHOUT_DISCOUNT + "," + TO_TYPE.TO_WITH_DISCOUNT,
+      startDate: moment(values.fromDate).startOf('day').toISOString(),
+      endDate: moment(values.approveDate).endOf('day').toISOString(),
+      type: TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT,
     };
 
-    handleOpenLoading("open", true);
+    handleOpenLoading('open', true);
     await dispatch(transferOutGetSearch(payload));
     await dispatch(saveSearchCriteriaTO(payload));
     setFlagSearch(true);
-    handleOpenLoading("open", false);
+    handleOpenLoading('open', false);
   };
 
   let dataTable;
@@ -255,7 +215,7 @@ const TransferOutSearch = () => {
         <Grid item container xs={12} justifyContent="center">
           <Box color="#CBD4DB">
             <h2>
-              {t("noData")} <SearchOff fontSize="large" />
+              {t('noData')} <SearchOff fontSize="large" />
             </h2>
           </Box>
         </Grid>
@@ -269,7 +229,7 @@ const TransferOutSearch = () => {
         <Grid container rowSpacing={3} columnSpacing={6} mt={0.1}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {"เลขที่เอกสารเบิก"}
+              {'เลขที่เอกสารเบิก'}
             </Typography>
             <TextField
               id="documentNumber"
@@ -279,12 +239,12 @@ const TransferOutSearch = () => {
               onChange={onChange.bind(this, setValues, values)}
               className={classes.MtextField}
               fullWidth
-              placeholder={"เลขที่เอกสารเบิก"}
+              placeholder={'เลขที่เอกสารเบิก'}
             />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t("branch")}
+              {t('branch')}
             </Typography>
             <SelectBranch
               disabled={requestPermission}
@@ -294,7 +254,7 @@ const TransferOutSearch = () => {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t("status")}
+              {t('status')}
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
@@ -302,15 +262,11 @@ const TransferOutSearch = () => {
                 name="status"
                 value={values.status}
                 onChange={onChange.bind(this, setValues, values)}
-                inputProps={{ "aria-label": "Without label" }}
+                inputProps={{ 'aria-label': 'Without label' }}
               >
-                <MenuItem value={"ALL"}>{t("all")}</MenuItem>
-                {!approvePermission && (
-                  <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>
-                )}
-                <MenuItem value={TOStatus.WAIT_FOR_APPROVAL}>
-                  รออนุมัติ
-                </MenuItem>
+                <MenuItem value={'ALL'}>{t('all')}</MenuItem>
+                {!approvePermission && <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>}
+                <MenuItem value={TOStatus.WAIT_FOR_APPROVAL}>รออนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.APPROVED}>อนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.REJECTED}>ไม่อนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.CLOSED}>ปิดงาน</MenuItem>
@@ -322,30 +278,20 @@ const TransferOutSearch = () => {
         <Grid container rowSpacing={3} columnSpacing={6}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {"ตั้งแต่"}
+              {'ตั้งแต่'}
             </Typography>
             <DatePickerComponent
-              onClickDate={onChangeDate.bind(
-                this,
-                setValues,
-                values,
-                "fromDate"
-              )}
+              onClickDate={onChangeDate.bind(this, setValues, values, 'fromDate')}
               value={values.fromDate}
             />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {"ถึง"}
+              {'ถึง'}
             </Typography>
             <DatePickerComponent
-              onClickDate={onChangeDate.bind(
-                this,
-                setValues,
-                values,
-                "approveDate"
-              )}
-              type={"TO"}
+              onClickDate={onChangeDate.bind(this, setValues, values, 'approveDate')}
+              type={'TO'}
               minDateTo={values.fromDate}
               value={values.approveDate}
             />
@@ -355,37 +301,33 @@ const TransferOutSearch = () => {
           </Grid>
         </Grid>
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
-          <Grid item xs={12} style={{ textAlign: "right" }}>
+          <Grid item xs={12} style={{ textAlign: 'right' }}>
             <Button
               id="btnClear"
               variant="contained"
-              sx={{ width: "126px", height: "40px", ml: 2 }}
+              sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
               onClick={onClear}
             >
-              {t("common:button.clear")}
+              {t('common:button.clear')}
             </Button>
             <Button
               id="btnSearch"
               variant="contained"
               color="primary"
-              sx={{ width: "126px", height: "40px", ml: 2 }}
+              sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnSearch}
               onClick={onSearch}
             >
-              {t("common:button.search")}
+              {t('common:button.search')}
             </Button>
           </Grid>
         </Grid>
       </Box>
       {dataTable}
       <LoadingModal open={openLoadingModal.open} />
-      <AlertError
-        open={openAlert}
-        onClose={handleCloseAlert}
-        textError={textError}
-      />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       {openModal && (
         <ModalCreateTransferOut
           isOpen={openModal}
@@ -396,12 +338,7 @@ const TransferOutSearch = () => {
           onSearchMain={onSearch}
         />
       )}
-      <SnackbarStatus
-        open={openPopup}
-        onClose={handleClosePopup}
-        isSuccess={true}
-        contentMsg={popupMsg}
-      />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>
   );
 };

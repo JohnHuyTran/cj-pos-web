@@ -1,11 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { environment } from "../../environment-base";
-import { get } from "../../adapters/posback-adapter";
-import { stringNullOrEmpty } from "../../utils/utils";
-import {
-  TransferOutSearchRequest,
-  TransferOutSearchResponse,
-} from "../../models/transfer-out-model";
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { environment } from '../../environment-base';
+import { get } from '../../adapters/posback-adapter';
+import { stringNullOrEmpty } from '../../utils/utils';
+import { TransferOutSearchRequest, TransferOutSearchResponse } from '../../models/transfer-out-model';
 
 type State = {
   toSearchResponse: TransferOutSearchResponse;
@@ -14,32 +11,31 @@ type State = {
 
 const initialState: State = {
   toSearchResponse: {
-    ref: "",
+    ref: '',
     code: 0,
-    message: "",
+    message: '',
     data: [],
     total: 0,
     page: 0,
     perPage: 0,
     totalPage: 0,
   },
-  error: "",
+  error: '',
 };
 
 export const transferOutGetSearch = createAsyncThunk(
-  "transferOutGetSearch",
+  'transferOutGetSearch',
   async (payload: TransferOutSearchRequest) => {
     try {
-      //   const apiRootPath = environment.withDraw.transferOut.search.url;
-      const apiRootPath = "http://192.168.110.135:8000/transfer-out";
+      const apiRootPath = environment.withDraw.transferOut.search.url;
       let path = `${apiRootPath}?perPage=${payload.perPage}&page=${payload.page}`;
       if (!stringNullOrEmpty(payload.query)) {
         path = path + `&query=${payload.query}`;
       }
-      if (!stringNullOrEmpty(payload.branch) && "ALL" !== payload.branch) {
+      if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
         path = path + `&branches=${payload.branch}`;
       }
-      if (!stringNullOrEmpty(payload.status) && "ALL" !== payload.status) {
+      if (!stringNullOrEmpty(payload.status) && 'ALL' !== payload.status) {
         path = path + `&status=${payload.status}`;
       }
       if (!stringNullOrEmpty(payload.startDate)) {
@@ -52,9 +48,9 @@ export const transferOutGetSearch = createAsyncThunk(
         path = path + `&type=${payload.type}`;
       }
       let response: TransferOutSearchResponse = {
-        ref: "",
+        ref: '',
         code: 0,
-        message: "",
+        message: '',
         data: [],
         total: 0,
         page: 0,
@@ -72,7 +68,7 @@ export const transferOutGetSearch = createAsyncThunk(
 );
 
 const TransferOutSearchSlice = createSlice({
-  name: "supplierCheckOrder",
+  name: 'supplierCheckOrder',
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -81,12 +77,9 @@ const TransferOutSearchSlice = createSlice({
     builer.addCase(transferOutGetSearch.pending, () => {
       initialState;
     }),
-      builer.addCase(
-        transferOutGetSearch.fulfilled,
-        (state, action: PayloadAction<any>) => {
-          state.toSearchResponse = action.payload;
-        }
-      ),
+      builer.addCase(transferOutGetSearch.fulfilled, (state, action: PayloadAction<any>) => {
+        state.toSearchResponse = action.payload;
+      }),
       builer.addCase(transferOutGetSearch.rejected, () => {
         initialState;
       });
