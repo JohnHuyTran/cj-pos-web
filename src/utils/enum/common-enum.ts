@@ -51,9 +51,3 @@ export enum TO_TYPE {
   TO_WITHOUT_DISCOUNT = 2,
   TO_WITH_DISCOUNT = 3,
 }
-
-export enum TO_TYPE {
-  TO_ACTIVITY = 1,
-  TO_WITHOUT_DISCOUNT = 2,
-  TO_WITH_DISCOUNT = 3,
-}
