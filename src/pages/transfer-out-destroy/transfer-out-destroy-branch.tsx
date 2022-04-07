@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef } from "react";
+import React, { ReactElement, useEffect, useRef } from 'react';
 import {
   Autocomplete,
   Button,
@@ -10,22 +10,22 @@ import {
   InputAdornment,
   TextField,
   Typography,
-} from "@mui/material";
-import { Box } from "@mui/system";
-import SearchIcon from "@mui/icons-material/Search";
-import CloseIcon from "@mui/icons-material/Close";
-import _ from "lodash";
-import { useStyles } from "../../styles/makeTheme";
-import { ItemProps } from "../../models/search-branch-province-model";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
-import { BranchListOptionType } from "../../models/branch-model";
-import { isGroupBranch } from "../../utils/role-permission";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { getUserInfo } from "../../store/sessionStore";
-import { getBranchName } from "../../utils/utils";
-import { BranchInfo } from "../../models/search-branch-model";
-import { featchBranchListAsync } from "../../store/slices/search-branches-slice";
-import { featchAuthorizedBranchListAsync } from "../../store/slices/authorized-branch-slice";
+} from '@mui/material';
+import { Box } from '@mui/system';
+import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
+import _ from 'lodash';
+import { useStyles } from '../../styles/makeTheme';
+import { ItemProps } from '../../models/search-branch-province-model';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import { BranchListOptionType } from '../../models/branch-model';
+import { isGroupBranch } from '../../utils/role-permission';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { getUserInfo } from '../../store/sessionStore';
+import { getBranchName } from '../../utils/utils';
+import { BranchInfo } from '../../models/search-branch-model';
+import { featchBranchListAsync } from '../../store/slices/search-branches-slice';
+import { featchAuthorizedBranchListAsync } from '../../store/slices/authorized-branch-slice';
 
 interface Props {
   disabled?: boolean;
@@ -37,28 +37,18 @@ export default function SelectBranch(props: Props): ReactElement {
   const { disabled } = props;
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const [value, setValue] = React.useState<string>("");
+  const [value, setValue] = React.useState<string>('');
   const [open, setOpen] = React.useState(false);
-  const branchList = useAppSelector((state) => state.searchBranchSlice)
-    .branchList.data;
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [ownBranch, setOwnBranch] = React.useState(
-    getUserInfo().branch
-      ? getBranchName(branchList, getUserInfo().branch)
-        ? getUserInfo().branch
-        : ""
-      : ""
+    getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
   );
 
-  const [listBranchSelect, setBranchListSelect] = React.useState<
-    BranchListOptionType[]
-  >([]);
+  const [listBranchSelect, setBranchListSelect] = React.useState<BranchListOptionType[]>([]);
   const branchName = getBranchName(branchList, ownBranch);
-  let authorizedBranchList = useAppSelector(
-    (state) => state.authorizedhBranchSlice
-  );
+  let authorizedBranchList = useAppSelector((state) => state.authorizedhBranchSlice);
   useEffect(() => {
-    if (branchList === null || branchList.length <= 0)
-      dispatch(featchBranchListAsync());
+    if (branchList === null || branchList.length <= 0) dispatch(featchBranchListAsync());
     if (
       authorizedBranchList === null ||
       authorizedBranchList.branchList.data?.branches === null ||
@@ -69,11 +59,7 @@ export default function SelectBranch(props: Props): ReactElement {
     }
     if (isGroupBranch()) {
       setOwnBranch(
-        getUserInfo().branch
-          ? getBranchName(branchList, getUserInfo().branch)
-            ? getUserInfo().branch
-            : ""
-          : ""
+        getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
       );
     }
     if (!!(props.disabled && branchName && ownBranch)) {
@@ -91,9 +77,7 @@ export default function SelectBranch(props: Props): ReactElement {
 
   useEffect(() => {
     if (props.listSelect.length === 0) {
-      let text = listBranchSelect
-        .map((item: any) => `${item.code}-${item.name}`)
-        .join(", ");
+      let text = listBranchSelect.map((item: any) => `${item.code}-${item.name}`).join(', ');
       setValue(text);
     }
   }, [props.listSelect]);
@@ -122,9 +106,7 @@ export default function SelectBranch(props: Props): ReactElement {
 
   const handleAddForm = () => {
     setOpen(false);
-    let text = listBranchSelect
-      .map((item: any) => `${item.code}-${item.name}`)
-      .join(", ");
+    let text = listBranchSelect.map((item: any) => `${item.code}-${item.name}`).join(', ');
     setValue(text);
     props.setListSelect(listBranchSelect);
     setBranchListSelect([]);
@@ -134,10 +116,7 @@ export default function SelectBranch(props: Props): ReactElement {
     setBranchListSelect([]);
   };
 
-  const handleChangeBranch = (
-    event: any,
-    newValue: BranchListOptionType | null
-  ) => {
+  const handleChangeBranch = (event: any, newValue: BranchListOptionType | null) => {
     if (newValue != null && !listBranchSelect.includes(newValue)) {
       let list = [...listBranchSelect];
       list.push(newValue);
@@ -146,9 +125,7 @@ export default function SelectBranch(props: Props): ReactElement {
   };
 
   const handleDeleteBranch = (itemCode: any) => {
-    let newList = listBranchSelect.filter(
-      (item: any) => item.code !== itemCode
-    );
+    let newList = listBranchSelect.filter((item: any) => item.code !== itemCode);
     setBranchListSelect(newList);
   };
   const filterDC = (branch: BranchInfo) => {
@@ -158,16 +135,12 @@ export default function SelectBranch(props: Props): ReactElement {
   const defaultPropsBranchList = {
     options: ownBranch
       ? branchList.filter((branch: BranchInfo) => {
-          return (
-            branch.code !== ownBranch &&
-            filterAuthorizedBranch(branch) &&
-            filterDC(branch)
-          );
+          return branch.code !== ownBranch && filterAuthorizedBranch(branch) && filterDC(branch);
         })
       : authorizedBranchList.branchList.data?.branches
       ? authorizedBranchList.branchList.data?.branches
       : [],
-    getOptionLabel: (option: BranchListOptionType) => "",
+    getOptionLabel: (option: BranchListOptionType) => '',
   };
 
   return (
@@ -175,19 +148,19 @@ export default function SelectBranch(props: Props): ReactElement {
       <TextField
         fullWidth
         className={`${classes.MtextFieldNumber} ${classes.MSearchBranchInput}`}
-        sx={{ textAlign: "left" }}
+        sx={{ textAlign: 'left' }}
         InputProps={{
-          endAdornment: <SearchIcon sx={{ marginRight: "12px" }} />,
+          endAdornment: <SearchIcon sx={{ marginRight: '12px' }} />,
           inputProps: {
-            style: { textAlignLast: "start" },
+            style: { textAlignLast: 'start' },
           },
         }}
-        style={{ backgroundColor: disabled ? "#f1f1f1" : "transparent" }}
+        style={{ backgroundColor: disabled ? '#f1f1f1' : 'transparent' }}
         onClick={handleClickSearch}
         value={value}
         FormHelperTextProps={{
           style: {
-            textAlign: "right",
+            textAlign: 'right',
             marginRight: 0,
           },
         }}
@@ -199,21 +172,17 @@ export default function SelectBranch(props: Props): ReactElement {
           <IconButton
             onClick={handleCloseModal}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme: any) => theme.palette.grey[400],
             }}
           >
-            <CancelOutlinedIcon
-              fontSize="large"
-              stroke={"white"}
-              strokeWidth={1}
-            />
+            <CancelOutlinedIcon fontSize="large" stroke={'white'} strokeWidth={1} />
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ padding: "45px 24px 32px 100px" }}>
+        <DialogContent sx={{ padding: '45px 24px 32px 100px' }}>
           <Grid container spacing={2}>
             <Grid item xs={5} pr={4} mt={3}>
               <Typography>ค้นหาสาขา</Typography>
@@ -252,7 +221,7 @@ export default function SelectBranch(props: Props): ReactElement {
             </Grid>
             <Grid item xs={7} pr={5} mt={5}>
               <Box className={classes.MWrapperListBranch}>
-                <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                   {listBranchSelect.map((item: any, index: number) => (
                     <BranchItem
                       label={`${item.code}-${item.name}`}
@@ -267,10 +236,10 @@ export default function SelectBranch(props: Props): ReactElement {
               item
               xs={12}
               sx={{
-                textAlign: "right",
-                height: "43px",
-                padding: "0 !important",
-                marginTop: "30px",
+                textAlign: 'right',
+                height: '43px',
+                padding: '0 !important',
+                marginTop: '30px',
               }}
             >
               <Button
@@ -279,7 +248,7 @@ export default function SelectBranch(props: Props): ReactElement {
                 className={classes.MbtnSearch}
                 size="large"
                 onClick={handleClearForm}
-                sx={{ marginRight: "15px" }}
+                sx={{ marginRight: '15px' }}
               >
                 เคลียร์
               </Button>
@@ -289,9 +258,7 @@ export default function SelectBranch(props: Props): ReactElement {
                 className={classes.MbtnSearch}
                 size="large"
                 onClick={handleAddForm}
-                disabled={
-                  listBranchSelect.length === 0 && props.listSelect.length === 0
-                }
+                disabled={listBranchSelect.length === 0 && props.listSelect.length === 0}
               >
                 เลือกสาขา
               </Button>
