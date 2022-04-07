@@ -45,3 +45,9 @@ export enum TOStatus {
   REJECTED = 'REJECTED',
   CLOSED = 'CLOSED',
 }
+
+export enum TO_TYPE {
+  TO_ACTIVITY = 1,
+  TO_WITHOUT_DISCOUNT = 2,
+  TO_WITH_DISCOUNT = 3,
+}
