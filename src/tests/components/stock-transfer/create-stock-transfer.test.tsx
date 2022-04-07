@@ -22,8 +22,8 @@ import AlertError from '../../../components/commons/ui/alert-error';
 // });
 // });
 
-test('reader learn link', () => {
-  const { getByText } = render(<AlertError open={false} onClose={function (): void {}} textError={''} />);
-  const linkElement = getByText('/stock-transfer');
-  expect(linkElement).toBeInTheDocument();
-});
+// test('reader learn link', () => {
+//   const { getByText } = render(<AlertError open={false} onClose={function (): void {}} textError={''} />);
+//   const linkElement = getByText('/stock-transfer');
+//   expect(linkElement).toBeInTheDocument();
+// });
