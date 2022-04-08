@@ -48,7 +48,7 @@ import { BookmarkAdded, CheckCircleOutline, HighlightOff, Print } from '@mui/ico
 import LoadingModal from '../commons/ui/loading-modal';
 import CheckOrderSDRefDetail from './check-order-detail-sd';
 import { featchOrderSDListAsync } from '../../store/slices/check-order-sd-slice';
-import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+import { featchOrderDetailAsync, setReloadScreen } from '../../store/slices/check-order-detail-slice';
 import Snackbar from '../commons/ui/snackbar-status';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -303,7 +303,6 @@ export default function CheckOrderDetail({
   const [showCloseJobBtn, setShowCloseJobBtn] = React.useState(false);
   const [closeJobTote, setCloseJobTote] = React.useState(false);
   const [validationFile, setValidationFile] = React.useState(false);
-  const [isDisplayActBtn, setIsDisplayActBtn] = React.useState('');
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
   const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
@@ -366,7 +365,7 @@ export default function CheckOrderDetail({
     }
 
     // }, [open, openModelConfirm]);
-  }, [open]);
+  }, [open, orderDetail]);
 
   const updateState = async (items: any) => {
     await dispatch(updateAddItemsState(items));
@@ -379,9 +378,16 @@ export default function CheckOrderDetail({
   const handleOpenModalTote = async (value: string, isAddItem: boolean) => {
     rowsEntries = [];
     if (isAddItem === false) {
-      // await dispatch(updateAddItemsState({}));
-      await dispatch(featchOrderDetailToteAsync(value)).then(() => {});
-      await setOpenTote(true);
+      try {
+        await dispatch(featchOrderDetailAsync(value));
+        await dispatch(setReloadScreen(true));
+        await dispatch(updateAddItemsState({}));
+      } catch (error) {
+        console.log(error);
+      }
+
+      // await dispatch(featchOrderDetailToteAsync(value)).then(() => {});
+      // await setOpenTote(true);
     } else if (isAddItem === true) {
       setToteCode(value);
       handleOpenLoading('open', true);
@@ -396,10 +402,10 @@ export default function CheckOrderDetail({
     }
   };
 
-  function handleCloseDetailToteModal() {
-    setOpenTote(false);
-    onClickClose();
-  }
+  // function handleCloseDetailToteModal() {
+  //   setOpenTote(false);
+  //   onClickClose();
+  // }
 
   function handleCloseOrderReceiveModal() {
     setOpenOrderReceiveModal(false);
@@ -824,10 +830,10 @@ export default function CheckOrderDetail({
                 <Typography variant="body2">{docRefNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">สถานะ:</Typography>
+                <Typography variant="body2">เลข Tote:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentStatusText}</Typography>
+                <Typography variant="body2">{orderDetail.toteCode ? orderDetail.toteCode : '-'}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -838,10 +844,11 @@ export default function CheckOrderDetail({
                 <Typography variant="body2">{orderDetail.sdNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">ประเภท:</Typography>
+                <Typography variant="body2">สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentTypeText}</Typography>
+                {/* <Typography variant="body2">{shipmentStatusText}</Typography> */}
+                <Typography variant="body2">{getShipmentStatusText(orderDetail.sdStatus)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -851,6 +858,16 @@ export default function CheckOrderDetail({
               <Grid item lg={4}>
                 <Typography variant="body2">{shipmentDateFormat}</Typography>
               </Grid>
+              <Grid item lg={2}>
+                <Typography variant="body2">ประเภท:</Typography>
+              </Grid>
+              <Grid item lg={4}>
+                <Typography variant="body2">{getShipmentTypeText(orderDetail.sdType)}</Typography>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} mb={1}>
+              <Grid item lg={6}></Grid>
               <Grid item lg={2}>
                 {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
                   <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
@@ -879,6 +896,7 @@ export default function CheckOrderDetail({
                   orderDetail.files !== null && <AccordionHuaweiFile files={orderDetail.files} />}
               </Grid>
             </Grid>
+
             {orderDetail.Comment !== '' && (
               <Grid container spacing={2} mb={1}>
                 <Grid item lg={2}>
@@ -897,7 +915,7 @@ export default function CheckOrderDetail({
           </Box>
 
           {/* DisplayBtn */}
-          <Box sx={{ display: isDisplayActBtn, marginTop: 4 }}>
+          <Box sx={{ marginTop: 4 }}>
             <Grid container spacing={2} display="flex" justifyContent="space-between">
               {/* <Grid item xl={2}> */}
               <Grid item xl={4}>
@@ -1073,7 +1091,7 @@ export default function CheckOrderDetail({
         />
       )}
 
-      {openTote && <CheckOrderDetailTote defaultOpen={openTote} onClickClose={handleCloseDetailToteModal} />}
+      {/* {openTote && <CheckOrderDetailTote defaultOpen={openTote} onClickClose={handleCloseDetailToteModal} />} */}
 
       {openOrderReceiveModal && (
         <OrderReceiveDetail
