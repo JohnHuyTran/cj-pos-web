@@ -16,10 +16,9 @@ const initialState: ItemsState = {
     regionId: '61de9ddab10bfe85dfab22e9',
     requesterId: '61de9ddab10bfe85dfab22e9',
     products: [],
-    attachFiles: [],
-    transferOutReason: '',
-    store: '',
-    type: 0,
+    beforeAttachFiles: [],
+    afterAttachFiles: [],
+    type: 0
   },
   validate: false,
   dataDetail: {
@@ -28,8 +27,6 @@ const initialState: ItemsState = {
     status: '',
     approvedDate: null,
     createdDate: moment(new Date()).toISOString(),
-    transferOutReason: '',
-    store: '2'
   },
   approveReject: {
     branchId: '61dffd619bfc3701dce4eda4',
@@ -45,8 +42,8 @@ const initialState: ItemsState = {
   checkEdit: false,
 };
 
-const transferOutSlice = createSlice({
-  name: 'transferOutSlice',
+const transferOutDestroySlice = createSlice({
+  name: 'transferOutDestroySlice',
   initialState,
   reducers: {
     save: (state, action: PayloadAction<any>) => {
@@ -80,5 +77,5 @@ export const {
   updateCheckStock,
   updateCheckEdit,
   updateApproveReject
-} = transferOutSlice.actions;
-export default transferOutSlice.reducer;
+} = transferOutDestroySlice.actions;
+export default transferOutDestroySlice.reducer;

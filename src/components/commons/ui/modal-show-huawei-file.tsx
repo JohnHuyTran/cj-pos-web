@@ -42,8 +42,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
+          }}>
           <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
@@ -54,8 +53,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
           variant='contained'
           color='secondary'
           onClick={onPrint}
-          endIcon={<LocalPrintshopOutlinedIcon />}
-        >
+          endIcon={<LocalPrintshopOutlinedIcon />}>
           พิมพ์
         </Button>
       ) : null}
@@ -75,6 +73,7 @@ export default function ModalShowHuaweiFile({
   const [initialWidth, setInitialWidth] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
   const pdfWrapper = React.useRef<HTMLDivElement>(null);
+  const [initialPageSize, setInitialPageSize] = React.useState(false);
 
   const setPdfSize = () => {
     if (pdfWrapper && pdfWrapper.current) {
@@ -84,10 +83,10 @@ export default function ModalShowHuaweiFile({
 
   function onDocumentLoadSuccess(pdf: any) {
     setNumPages(pdf.numPages);
-    window.addEventListener('resize', throttle(setPdfSize, 300));
+    // window.addEventListener('resize', throttle(setPdfSize, 300));
     setPdfSize();
     return () => {
-      window.removeEventListener('resize', throttle(setPdfSize, 300));
+      // window.removeEventListener('resize', throttle(setPdfSize, 300));
     };
   }
 
@@ -104,12 +103,36 @@ export default function ModalShowHuaweiFile({
     onClose();
   };
 
+  const onSourceSuccess = () => {
+    if (!initialPageSize) {
+      if (pdfWrapper && pdfWrapper.current) {
+        setStyle(
+          `${pdfWrapper.current.getBoundingClientRect().width}px ${pdfWrapper.current.getBoundingClientRect().height}px`
+        );
+      } else {
+        setStyle('A4 landscape');
+      }
+    }
+    setInitialPageSize(true);
+  };
+
+  const setStyle = (cssPageSize: string) => {
+    const style = document.createElement('style');
+    style.innerHTML = `@page {size: ${cssPageSize}}`;
+    style.id = 'page-orientation';
+    document.head.appendChild(style);
+  };
+
   const showPrint = useReactToPrint({
     documentTitle: fileName,
+    onBeforeGetContent: onSourceSuccess,
     content: () => pdfWrapper.current,
     onAfterPrint: () => handleClose(),
   });
 
+  React.useEffect(() => {
+    setInitialPageSize(false);
+  }, [open]);
   return (
     <div>
       <Dialog open={open} maxWidth={false}>
@@ -124,13 +147,17 @@ export default function ModalShowHuaweiFile({
             minWidth: 600,
             minHeight: 600,
             textAlign: 'center',
-          }}
-        >
+          }}>
           {!isImage && (
-            <div id='pdfWrapper' style={{ width: '50vw' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
               <Document file={{ url }} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
                 {Array.from(new Array(numPages), (el, index) => (
-                  <Page key={`page_${index + 1}`} pageNumber={index + 1} width={initialWidth} />
+                  <Page
+                    onLoadSuccess={onSourceSuccess}
+                    key={`page_${index + 1}`}
+                    pageNumber={index + 1}
+                    width={initialWidth}
+                  />
                 ))}
               </Document>
             </div>
@@ -138,7 +165,7 @@ export default function ModalShowHuaweiFile({
 
           {isImage && (
             <div id='pdfWrapper' style={{ minWidth: '200px' }} ref={pdfWrapper}>
-              <img src={url} style={{ minWidth: '200px' }} />
+              <img src={url} style={{ width: '-webkit-fill-available', height: '-webkit-fill-available' }} />
             </div>
           )}
         </DialogContent>

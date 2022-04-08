@@ -56,10 +56,10 @@ import { styled } from '@mui/material/styles';
 import AddToteModel from '../check-orders/add-tote-model';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import ModalAddItems from '../commons/ui/modal-add-items';
-import { isGroupBranch } from '../../utils/role-permission';
+import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permission';
 import { getUserInfo } from '../../store/sessionStore';
 import { getBranchName } from '../../utils/utils';
-import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import theme from '../../styles/theme';
@@ -338,13 +338,14 @@ export default function CheckOrderDetail({
   const [displayBranchGroup, setDisplayBranchGroup] = React.useState(false);
   const [statusOC, setStatusOC] = React.useState(false);
   const DCPercent = env.dc.percent;
+  const [isAllowExportBtn, setIsAllowExportBtn] = React.useState(true);
 
   useEffect(() => {
     const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
     const oc = getUserInfo().group === PERMISSION_GROUP.OC;
     setDisplayBranchGroup(branch);
     setStatusOC(oc);
-
+    setIsAllowExportBtn(isAllowActionPermission(ACTIONS.ORDER_SD_EXPORT));
     if (orderDetail) {
       setShowSaveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
       setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1);
@@ -373,6 +374,7 @@ export default function CheckOrderDetail({
 
   const [openTote, setOpenTote] = React.useState(false);
   const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
+  const [toteCode, setToteCode] = React.useState('');
 
   const handleOpenModalTote = async (value: string, isAddItem: boolean) => {
     rowsEntries = [];
@@ -381,6 +383,7 @@ export default function CheckOrderDetail({
       await dispatch(featchOrderDetailToteAsync(value)).then(() => {});
       await setOpenTote(true);
     } else if (isAddItem === true) {
+      setToteCode(value);
       handleOpenLoading('open', true);
       const payload: ToteRequest = {
         docRefNo: docRefNo,
@@ -922,7 +925,7 @@ export default function CheckOrderDetail({
                     startIcon={<Print />}
                     className={classes.MbtnPrint}
                     style={{ textTransform: 'none' }}
-                    sx={{ display: `${showCloseJobBtn ? 'none' : ''}` }}
+                    sx={{ display: `${showCloseJobBtn || isAllowExportBtn ? 'none' : ''}` }}
                   >
                     พิมพ์ใบผลต่าง
                   </Button>
@@ -1077,6 +1080,7 @@ export default function CheckOrderDetail({
           defaultOpen={openOrderReceiveModal}
           onClickClose={handleCloseOrderReceiveModal}
           isTote={true}
+          toteCodeNew={toteCode}
         />
       )}
 

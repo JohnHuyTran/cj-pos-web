@@ -562,7 +562,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
                 variant='body2'
                 onClick={(e) => {
                   handleLinkDocument(DOCUMENT_TYPE.BT);
-                }}>
+                }}
+              >
                 เรียกดูเอกสารใบโอน BT
               </Link>
             </Box>
@@ -579,7 +580,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             className={classes.MbtnPrint}
             onClick={handleOpenAddItems}
             startIcon={<ControlPoint />}
-            sx={{ width: 200 }}>
+            sx={{ width: 200 }}
+          >
             เพิ่มสินค้า
           </Button>
         </Grid>
@@ -591,7 +593,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             className={classes.MbtnSave}
             onClick={handleSaveBtn}
             startIcon={<SaveIcon />}
-            sx={{ width: 200 }}>
+            sx={{ width: 200 }}
+          >
             บันทึก
           </Button>
 
@@ -602,7 +605,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             className={classes.MbtnSendDC}
             onClick={handleConfirmBtn}
             startIcon={<CheckCircleOutline />}
-            sx={{ width: 200 }}>
+            sx={{ width: 200 }}
+          >
             ส่งงานให้ DC
           </Button>
         </Grid>
@@ -628,7 +632,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BT);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบโอน BT
             </Link>
           </Box>
@@ -638,7 +643,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BO);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบ BO
             </Link>
           </Box>
@@ -648,7 +654,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BOX);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบปะลัง
             </Link>
           </Box>
@@ -695,7 +702,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           className={classes.MbtnSave}
           onClick={handleSendToPickup}
           startIcon={<SaveIcon />}
-          sx={{ width: 200 }}>
+          sx={{ width: 200 }}
+        >
           บันทึก
         </Button>
       </Grid>
@@ -763,7 +771,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.RECALL);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบเรียกเก็บ
             </Link>
           </Box>
@@ -814,7 +823,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BT);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบโอน BT
             </Link>
           </Box>
@@ -824,7 +834,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BO);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบ BO
             </Link>
           </Box>
@@ -834,7 +845,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BOX);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบปะลัง
             </Link>
           </Box>
@@ -851,7 +863,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             className={classes.MbtnSave}
             onClick={handleSubmitTransfer}
             // startIcon={<SaveIcon />}
-            sx={{ width: 200 }}>
+            sx={{ width: 200 }}
+          >
             ส่งงาน
           </Button>
         </Grid>
@@ -902,7 +915,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BT);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบโอน BT
             </Link>
           </Box>
@@ -912,7 +926,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BO);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบ BO
             </Link>
           </Box>
@@ -922,7 +937,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BOX);
-              }}>
+              }}
+            >
               เรียกดูเอกสารใบปะลัง
             </Link>
           </Box>
@@ -1016,7 +1032,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           <Box mb={3} mt={3}>
             <BranchTransferListSKU onSelectSku={onClickSku} skuList={skuList} onUpdateItemList={onUpdateItemsList} />
           </Box>
-          <Box mt={3}>
+          <Box mt={12}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={3}>
                 <TextBoxComment
@@ -1075,7 +1091,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       <ModalAddItems
         open={openModelAddItems}
         onClose={handleCloseModelAddItems}
-        requestBody={bodyRequest ? bodyRequest : { skuCodes: [] }}></ModalAddItems>
+        requestBody={bodyRequest ? bodyRequest : { skuCodes: [] }}
+      ></ModalAddItems>
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       <ModalShowFile

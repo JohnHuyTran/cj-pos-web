@@ -16,17 +16,17 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
-import { Action, DateFormat, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
+import { Action, TOStatus, TO_TYPE } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import { BranchListOptionType } from '../../models/branch-model';
 import { isGroupBranch } from '../../utils/role-permission';
-import TransferOutList from './transfer-out-list';
-import SelectBranch from './transfer-out-branch';
+import TransferOutList from './transfer-out-destroy-list';
+import SelectBranch from './transfer-out-destroy-branch';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
-import ModalCreateTransferOut from "../../components/transfer-out/modal-create-transfer-out";
+import ModalCreateTransferOutDestroy from '../../components/transfer-out-destroy/modal-create-transfer-out-destroy';
 
 const _ = require('lodash');
 
@@ -108,8 +108,8 @@ const TransferOutSearch = () => {
         status: userPermission.includes('campaign.to.approve')
           ? TOStatus.WAIT_FOR_APPROVAL
           : userPermission.includes('campaign.to.create')
-          ? TOStatus.DRAFT
-          : 'ALL',
+            ? TOStatus.DRAFT
+            : 'ALL',
       });
     }
   }, []);
@@ -156,7 +156,7 @@ const TransferOutSearch = () => {
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
       clearSearch: true,
-      type: TO_TYPE.TO_ACTIVITY + '',
+      type: TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT,
     };
     dispatch(barcodeDiscountSearch(payload));
     if (!requestPermission) {
@@ -194,7 +194,7 @@ const TransferOutSearch = () => {
       status: values.status,
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
-      type: TO_TYPE.TO_ACTIVITY + '',
+      type: TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT,
     };
 
     handleOpenLoading('open', true);
@@ -209,13 +209,13 @@ const TransferOutSearch = () => {
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      dataTable = <TransferOutList onSearch={onSearch} />;
+      dataTable = <TransferOutList onSearch={onSearch}/>;
     } else {
       dataTable = (
         <Grid item container xs={12} justifyContent="center">
           <Box color="#CBD4DB">
             <h2>
-              {t('noData')} <SearchOff fontSize="large" />
+              {t('noData')} <SearchOff fontSize="large"/>
             </h2>
           </Box>
         </Grid>
@@ -302,19 +302,19 @@ const TransferOutSearch = () => {
         </Grid>
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
           <Grid item xs={12} style={{ textAlign: 'right' }}>
-            {requestPermission && (
-              <Button
-                id="btnCreate"
-                variant="contained"
-                sx={{ width: '120px', height: '40px' }}
-                className={classes.MbtnSearch}
-                color="secondary"
-                startIcon={<AddCircleOutlineOutlinedIcon />}
-                onClick={handleOpenModal}
-              >
-                {'เบิก'}
-              </Button>
-            )}
+            {/*{requestPermission && (*/}
+            {/*  <Button*/}
+            {/*    id="btnCreate"*/}
+            {/*    variant="contained"*/}
+            {/*    sx={{ width: '120px', height: '40px' }}*/}
+            {/*    className={classes.MbtnSearch}*/}
+            {/*    color="warning"*/}
+            {/*    startIcon={<AddCircleOutlineOutlinedIcon/>}*/}
+            {/*    onClick={handleOpenModal}*/}
+            {/*  >*/}
+            {/*    {'ทำลาย'}*/}
+            {/*  </Button>*/}
+            {/*)}*/}
             <Button
               id="btnClear"
               variant="contained"
@@ -339,10 +339,10 @@ const TransferOutSearch = () => {
         </Grid>
       </Box>
       {dataTable}
-      <LoadingModal open={openLoadingModal.open} />
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <LoadingModal open={openLoadingModal.open}/>
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
       {openModal && (
-        <ModalCreateTransferOut
+        <ModalCreateTransferOutDestroy
           isOpen={openModal}
           onClickClose={handleCloseModal}
           setOpenPopup={setOpenPopup}
@@ -351,7 +351,7 @@ const TransferOutSearch = () => {
           onSearchMain={onSearch}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
     </>
   );
 };

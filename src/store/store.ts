@@ -45,7 +45,8 @@ import saleLimitTime from './slices/sale-limit-time-slice';
 import barcodeDiscountPrintSlice from './slices/barcode-discount-print-slice';
 import saleLimitTimeDetailSlice from './slices/sale-limit-time-detail-slice';
 import transferOutSlice from './slices/transfer-out-slice';
-import transferOutDetailSlice from  './slices/transfer-out-detail-slice';
+import transferOutDetailSlice from './slices/transfer-out-detail-slice';
+import transferOutDestroySlice from './slices/transfer-out-destroy-slice';
 import stockBalanceCheckSlice from './slices/stock-balance-check-slice';
 import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
@@ -112,6 +113,7 @@ const store = configureStore({
     saleLimitTimeDetailSlice: saleLimitTimeDetailSlice,
     transferOutSlice: transferOutSlice,
     transferOutDetailSlice: transferOutDetailSlice,
+    transferOutDestroySlice: transferOutDestroySlice,
     stockBalanceCheckSlice: stockBalanceCheckSlice,
     updateBTSkuSlice: updateBTSkuSlice,
     updateBTProductSlice: updateBTProductSlice,
