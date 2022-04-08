@@ -52,7 +52,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
   const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
-  const checkStocks = useAppSelector((state) => state.transferOutSlice.checkStock);
+  const checkStocks = useAppSelector((state) => state.stockBalanceCheckSlice.checkStock);
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>(
     userPermission != null && userPermission.length > 0 ? userPermission.includes(ACTIONS.CAMPAIGN_TO_APPROVE) : false
@@ -358,8 +358,9 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
             onChange={(e) => {
               handleChangeRemark(e, params.row.index);
             }}
-            disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT
-              && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
+            disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT
+              && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL)
+              || (TOStatus.WAIT_FOR_APPROVAL == dataDetail.status && !approvePermission)}
           />
         </HtmlTooltip>
       )
@@ -497,7 +498,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
           <Grid item xs={3}/>
           <Grid item xs={3}>
             <Box display="flex" justifyContent="space-between" marginTop="25px">
-              <Typography fontSize="14px" lineHeight="30px" height="24px">
+              <Typography fontSize="14px" fontWeight="700" lineHeight="30px" height="24px">
                 จำนวนทั้งหมด
               </Typography>
               <TextField
