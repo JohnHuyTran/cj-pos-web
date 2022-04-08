@@ -25,7 +25,7 @@ import { searchOrderReceiveAsync } from '../../store/slices/order-receive-slice'
 import { searchToteAsync } from '../../store/slices/search-tote-slice';
 import { EntryTote } from '../../models/order-model';
 import CheckOrderDetailTote from './check-order-detail-tote';
-import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+import { featchOrderDetailAsync, setReloadScreen } from '../../store/slices/check-order-detail-slice';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updateItemsToteState } from '../../store/slices/items-tote-slice';
 import { featchOrderDetailToteAsync } from '../../store/slices/check-order-detail-tote-slice';
@@ -160,6 +160,7 @@ export default function OrderReceiveDetail({
         onClickClose();
         handleOpenLoading('open', false);
       } else if (isTote === true) {
+        await dispatch(featchOrderDetailAsync());
         handleConfirmTote();
       }
     } else {
@@ -193,11 +194,14 @@ export default function OrderReceiveDetail({
 
     await submitTote(data)
       .then((resp: any) => {
-        // dispatch(updateAddItemsState({}));
-        dispatch(updateItemsToteState({}));
-        dispatch(featchOrderDetailToteAsync(resp.sdNo)).then(() => {
-          setOpenTote(true);
-        });
+        dispatch(updateAddItemsState({}));
+        dispatch(featchOrderDetailAsync(resp.sdNo));
+        // dispatch(setReloadScreen(true));
+
+        // dispatch(updateItemsToteState({}));
+        // dispatch(featchOrderDetailToteAsync(resp.sdNo)).then(() => {
+        //   setOpenTote(true);
+        // });
 
         setOpen(false);
       })
@@ -208,11 +212,11 @@ export default function OrderReceiveDetail({
     handleOpenLoading('open', false);
   };
 
-  function handleCloseDetailToteModal() {
-    setOpenTote(false);
-    setOpen(false);
-    onClickClose();
-  }
+  // function handleCloseDetailToteModal() {
+  //   setOpenTote(false);
+  //   setOpen(false);
+  //   onClickClose();
+  // }
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -389,7 +393,7 @@ export default function OrderReceiveDetail({
         </DialogContent>
       </Dialog>
 
-      {openTote && <CheckOrderDetailTote defaultOpen={openTote} onClickClose={handleCloseDetailToteModal} />}
+      {/* {openTote && <CheckOrderDetailTote defaultOpen={openTote} onClickClose={handleCloseDetailToteModal} />} */}
     </div>
   );
 }
