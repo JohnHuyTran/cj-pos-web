@@ -235,7 +235,7 @@ const TransferOutSearch = () => {
               onChange={onChange.bind(this, setValues, values)}
               className={classes.MtextField}
               fullWidth
-              placeholder={'เลขที่เอกสารเบิก'}
+              placeholder={'เลขที่เอกสาร TO'}
             />
           </Grid>
           <Grid item xs={4}>
