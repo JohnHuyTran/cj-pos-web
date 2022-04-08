@@ -36,26 +36,6 @@ export default function Notification() {
       ? userInfo.acl['service.posback-campaign']
       : [];
 
-  useEffect(() => {
-    moreData();
-  }, []);
-
-  const moreData = async () => {
-    try {
-      if (totalPage > page) {
-        setOpenLoadingModal(true);
-        const rs = await getNotificationData(page);
-        if (rs && rs.data) {
-          setListData([...listData, ...rs.data]);
-          setTotalPage(rs.totalPage);
-        }
-        setOpenLoadingModal(false);
-      }
-    } catch (error) {
-      setOpenLoadingModal(false);
-    }
-  };
-
   const handleRefresh = () => {
     setRefresh(!refresh);
   };

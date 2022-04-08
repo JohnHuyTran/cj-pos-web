@@ -7,6 +7,10 @@ import theme from '../../styles/theme';
 import { ShoppingCartSharp } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import LoadingModal from '../commons/ui/loading-modal';
+import STCreateModal from '../sale-limit-time/sale-limit-time-create-modal';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { getsaleLimitTimeDetail } from '../../store/slices/sale-limit-time-detail-slice';
+import SnackbarStatus from '../commons/ui/snackbar-status';
 
 interface Props {
   refresh: boolean;
@@ -14,10 +18,15 @@ interface Props {
 }
 
 export default function NotificationAnnouncement(props: Props) {
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = React.useState<number>(0);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const [total, setTotal] = React.useState(0);
   const [listData, setListData] = React.useState<any[]>([]);
+  const [openDetail, setOpenDetail] = React.useState(false);
+  const [openPopup, setOpenPopup] = React.useState<boolean>(false);
+  const [popupMsg, setPopupMsg] = React.useState<string>('');
+  const dispatch = useAppDispatch();
+  const saleLimitTimeDetail = useAppSelector((state) => state.saleLimitTimeDetailSlice.saleLimitTimeDetail);
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
@@ -31,6 +40,13 @@ export default function NotificationAnnouncement(props: Props) {
   useEffect(() => {
     setPage(0);
   }, [props.refresh]);
+
+  const handleCloseDetail = () => {
+    setOpenDetail(false);
+  };
+  const handleClosePopup = () => {
+    setOpenPopup(false);
+  };
 
   const handleGetData = async () => {
     try {
@@ -46,10 +62,27 @@ export default function NotificationAnnouncement(props: Props) {
     }
   };
 
+  const currentlySelected = async (item:any) => {
+    console.log(item);
+    
+    setOpenLoadingModal(true);
+    try {
+      await dispatch(getsaleLimitTimeDetail(item.payload._id));
+      if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
+        setOpenDetail(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    setOpenLoadingModal(false);
+  };
+
+
   const listTask = listData.map((item: any, index: number) => {
     return (
       <>
-        <Box key={index} sx={{ borderTop: '1px solid #EAEBEB', minHeight: '80px' }}>
+        <Box key={index} sx={{ borderTop: '1px solid #EAEBEB', minHeight: '80px', cursor: 'pointer' }} onClick={() => currentlySelected(item)}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
             <Box display={'flex'} mt={1}>
               <ShoppingCartSharp sx={{ color: theme.palette.primary.main }} />
@@ -100,6 +133,19 @@ export default function NotificationAnnouncement(props: Props) {
           {listTask}
         </CardContent>
       </Card>
+      {openDetail && (
+        <STCreateModal
+          type={'Detail'}
+          isAdmin={false}
+          setOpenPopup={setOpenPopup}
+          setPopupMsg={setPopupMsg}
+          isOpen={openDetail}
+          onClickClose={handleCloseDetail}
+          onSearch={handleGetData}
+        />
+      )}
+
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
       <LoadingModal open={openLoadingModal} />
     </>
   );

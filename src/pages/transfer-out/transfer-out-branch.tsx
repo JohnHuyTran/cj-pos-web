@@ -22,10 +22,12 @@ import { BranchListOptionType } from '../../models/branch-model';
 import { isGroupBranch } from '../../utils/role-permission';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { getUserInfo } from '../../store/sessionStore';
-import { getBranchName } from '../../utils/utils';
+import { getBranchName, objectNullOrEmpty } from '../../utils/utils';
 import { BranchInfo } from '../../models/search-branch-model';
 import { featchBranchListAsync } from '../../store/slices/search-branches-slice';
 import { featchAuthorizedBranchListAsync } from '../../store/slices/authorized-branch-slice';
+import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
+
 
 interface Props {
   disabled?: boolean;
@@ -40,9 +42,18 @@ export default function SelectBranch(props: Props): ReactElement {
   const [value, setValue] = React.useState<string>('');
   const [open, setOpen] = React.useState(false);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
   const [ownBranch, setOwnBranch] = React.useState(
     getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
   );
+  const userPermission =
+    !objectNullOrEmpty(userInfo) &&
+    !objectNullOrEmpty(userInfo.acl) &&
+    userInfo.acl['service.posback-campaign'] != null &&
+    userInfo.acl['service.posback-campaign'].length > 0
+      ? userInfo.acl['service.posback-campaign']
+      : [];
+  
 
   const [listBranchSelect, setBranchListSelect] = React.useState<BranchListOptionType[]>([]);
   const branchName = getBranchName(branchList, ownBranch);
@@ -59,7 +70,7 @@ export default function SelectBranch(props: Props): ReactElement {
     }
     if (isGroupBranch()) {
       setOwnBranch(
-        getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
+        userInfo.branch ? (getBranchName(branchList, userInfo.branch) ? userInfo.branch : '') : ''
       );
     }
     if (!!(props.disabled && branchName && ownBranch)) {
@@ -131,18 +142,17 @@ export default function SelectBranch(props: Props): ReactElement {
   const filterDC = (branch: BranchInfo) => {
     return branch.isDC ? false : true;
   };
-
+  
   const defaultPropsBranchList = {
-    options: ownBranch
+    options: userPermission.includes("campaign.to.create")
       ? branchList.filter((branch: BranchInfo) => {
           return branch.code !== ownBranch && filterAuthorizedBranch(branch) && filterDC(branch);
         })
-      : authorizedBranchList.branchList.data?.branches
+      : !!authorizedBranchList.branchList.data?.branches
       ? authorizedBranchList.branchList.data?.branches
       : [],
     getOptionLabel: (option: BranchListOptionType) => '',
   };
-
   return (
     <div>
       <TextField

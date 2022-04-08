@@ -23,6 +23,7 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import { updateBarcodeDiscountPrintState, updatePrintInDetail } from "../../store/slices/barcode-discount-print-slice";
 import moment from "moment";
+import { env } from '../../adapters/environmentConfigs';
 
 const _ = require('lodash');
 
@@ -253,8 +254,11 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
-              <b>{'จำนวน (รายการ)'}</b>
+            <Typography variant="body2" textAlign={'center'} noWrap>
+              <b>{'จำนวน'}</b>
+            </Typography>
+            <Typography variant="body2" textAlign={'center'} noWrap>
+              <b>{' (รายการ)'}</b>
             </Typography>
           </div>
         );
@@ -271,11 +275,11 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
+            <Typography variant="body2" textAlign={'center'} noWrap>
               <b>{t('headerName.price')}</b>
             </Typography>
             <Typography variant="body2" noWrap>
-              <b>{t('headerName.total')}</b>
+              <b>{t('headerName.total')}{env.currency && ` (${env.currency})`}</b>
             </Typography>
           </div>
         );
@@ -292,11 +296,11 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
+            <Typography variant="body2" textAlign={'center'} noWrap>
               <b>{t('headerName.discount')}</b>
             </Typography>
             <Typography variant="body2" noWrap>
-              <b>{t('headerName.total')}</b>
+              <b>{t('headerName.total')}{env.currency && ` (${env.currency})`}</b>
             </Typography>
           </div>
         );
@@ -313,11 +317,11 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
+            <Typography variant="body2" textAlign={'center'} noWrap>
               <b>{t('headerName.priceAfterDiscount')}</b>
             </Typography>
             <Typography variant="body2" noWrap>
-              <b>{t('headerName.total')}</b>
+              <b>{t('headerName.total')}{env.currency && ` (${env.currency})`}</b>
             </Typography>
           </div>
         );
