@@ -13,10 +13,10 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import moment from 'moment';
 import { TransferOut, TransferOutSearchRequest, TransferOutSearchResponse } from '../../models/transfer-out-model';
-import ModalCreateTransferOut from '../../components/transfer-out/modal-create-transfer-out';
 import { getTransferOutDetail } from '../../store/slices/transfer-out-detail-slice';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
+import ModalCreateTransferOutDestroy from '../../components/transfer-out-destroy/modal-create-transfer-out-destroy';
 
 const _ = require('lodash');
 
@@ -337,6 +337,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
             disableColumnMenu
             hideFooterSelectedRowCount={true}
             autoHeight={lstTransferOut.length < 10}
+            onCellClick={currentlySelected}
             scrollbarSize={10}
             pagination
             page={currentPage - 1}
@@ -352,7 +353,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
         </div>
       </Box>
       {openDetail && (
-        <ModalCreateTransferOut
+        <ModalCreateTransferOutDestroy
           isOpen={openDetail}
           onClickClose={handleCloseDetail}
           action={Action.UPDATE}
@@ -362,7 +363,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
           userPermission={userPermission}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
     </div>
   );
 };
