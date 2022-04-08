@@ -75,7 +75,7 @@ const TransferOutSearch = () => {
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
     branch: 'ALL',
-    status: '',
+    status: 'ALL',
     fromDate: new Date(),
     approveDate: new Date(),
   });
@@ -105,11 +105,7 @@ const TransferOutSearch = () => {
       );
       setValues({
         ...values,
-        status: userPermission.includes('campaign.to.approve')
-          ? TOStatus.WAIT_FOR_APPROVAL
-          : userPermission.includes('campaign.to.create')
-          ? TOStatus.DRAFT
-          : 'ALL',
+        status: 'ALL',
       });
     }
   }, []);
@@ -142,7 +138,7 @@ const TransferOutSearch = () => {
     setValues({
       documentNumber: '',
       branch: '',
-      status: approvePermission ? TOStatus.WAIT_FOR_APPROVAL : requestPermission ? TOStatus.DRAFT : 'ALL',
+      status: 'ALL',
       fromDate: new Date(),
       approveDate: new Date(),
     });
@@ -264,8 +260,11 @@ const TransferOutSearch = () => {
                 onChange={onChange.bind(this, setValues, values)}
                 inputProps={{ 'aria-label': 'Without label' }}
               >
-                <MenuItem value={'ALL'}>{t('all')}</MenuItem>
-                {!approvePermission && <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>}
+                <MenuItem value={'ALL'} selected={true}>
+                  {t('all')}
+                </MenuItem>
+
+                <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>
                 <MenuItem value={TOStatus.WAIT_FOR_APPROVAL}>รออนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.APPROVED}>อนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.REJECTED}>ไม่อนุมัติ</MenuItem>
