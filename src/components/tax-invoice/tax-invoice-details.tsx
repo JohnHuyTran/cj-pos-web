@@ -49,8 +49,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
+          }}>
           <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
@@ -230,6 +229,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
         setValue('houseNo', value.data.address.houseNo);
         setValue('building', value.data.address.building);
         setValue('moo', value.data.address.moo);
+        setValue('soi', '');
+        setValue('road', '');
         setValue('province', value.data.address.provinceCode);
         setValue('district', value.data.address.districtCode);
         setValue('subDistrict', value.data.address.subDistrictCode);
@@ -258,6 +259,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
     setValue('houseNo', data.customer.address.houseNo);
     setValue('building', data.customer.address.building);
     setValue('moo', data.customer.address.moo);
+    setValue('soi', '');
+    setValue('road', '');
     setValue('province', data.customer.address.provinceCode);
     setValue('district', data.customer.address.districtCode);
     setValue('subDistrict', data.customer.address.subDistrictCode);
@@ -365,6 +368,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
       houseNo: '',
       building: '',
       moo: '',
+      soi: '',
+      road: '',
       province: '',
       district: '',
       subDistrict: '',
@@ -551,8 +556,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 className={classes.MbtnClear}
                 color='secondary'
                 // disabled={!editMode}
-                sx={{ width: 120, display: `${disabledBtnEdit ? 'none' : ''}` }}
-              >
+                sx={{ width: 120, display: `${disabledBtnEdit ? 'none' : ''}` }}>
                 แก้ไขข้อมูล
               </Button>
             </Grid>
@@ -598,25 +602,6 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 onChange={(e) => handleInputChange(e)}
                 disabled={editMode}
               />
-
-              {/* <Controller
-                control={control}
-                {...register('taxNo', { required: true, pattern: /^[0-9]*$/, maxLength: 13, minLength: 13 })}
-                render={({ field: { onChange } }) => (
-                  <TextField
-                    id='txtTaxNo'
-                    size='small'
-                    className={classes.MtextField}
-                    fullWidth
-                    placeholder='กรุณากรอกเลขประจำตัวผู้เสียภาษี'
-                    type='number'
-                    inputProps={{ maxLength: 13 }}
-                    onChange={handleChange}
-                    disabled={editMode}
-                  />
-                )}
-              /> */}
-
               {errors.taxNo && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
                   กรุณากรอกตัวเลข 13 หลัก
@@ -727,6 +712,43 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 fullWidth
                 placeholder='กรุณากรอกหมู่'
                 {...register('moo')}
+                onChange={handleChange}
+                disabled={editMode}
+              />
+            </Grid>
+            <Grid item xs={1}></Grid>
+            <Grid item xs={2}>
+              <Typography gutterBottom variant='subtitle1' component='div' mb={2}>
+                ซอย :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id='txtSoi'
+                size='small'
+                className={classes.MtextField}
+                fullWidth
+                placeholder='กรุณากรอกซอย'
+                {...register('soi')}
+                onChange={handleChange}
+                disabled={editMode}
+              />
+            </Grid>
+            <Grid item xs={1}></Grid>
+
+            <Grid item xs={2}>
+              <Typography gutterBottom variant='subtitle1' component='div' mb={2}>
+                ถนน :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id='txtRoad'
+                size='small'
+                className={classes.MtextField}
+                fullWidth
+                placeholder='กรุณากรอกถนน'
+                {...register('road')}
                 onChange={handleChange}
                 disabled={editMode}
               />
@@ -864,8 +886,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 className={classes.MbtnClear}
                 startIcon={<ContentPaste />}
                 color='primary'
-                disabled={disabledBtnPreview}
-              >
+                disabled={disabledBtnPreview}>
                 Preview ใบเสร็จ / ใบกำกับ
               </Button>
             </Grid>
@@ -878,8 +899,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnClear}
                 color='cancelColor'
-                disabled={disabledBtnClear}
-              >
+                disabled={disabledBtnClear}>
                 เคลียร์
               </Button>
 
@@ -892,8 +912,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                   onClick={handleSubmit(onSave)}
                   sx={{ width: 110, ml: 2 }}
                   className={classes.MbtnSave}
-                  disabled={disabledBtnSave}
-                >
+                  disabled={disabledBtnSave}>
                   บันทึก
                 </Button>
               )}
