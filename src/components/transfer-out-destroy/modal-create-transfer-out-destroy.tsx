@@ -92,7 +92,6 @@ export default function ModalCreateTransferOutDestroy({
   const dataDetail = useAppSelector((state) => state.transferOutDestroySlice.dataDetail);
   const approveReject = useAppSelector((state) => state.transferOutDestroySlice.approveReject);
   const checkEdit = useAppSelector((state) => state.transferOutDestroySlice.checkEdit);
-  const checkStocks = useAppSelector((state) => state.transferOutDestroySlice.checkStock);
   //get detail from search
   const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail.data);
   //permission
@@ -861,6 +860,7 @@ export default function ModalCreateTransferOutDestroy({
         onClose={() => {
           setOpenCheckStock(false);
         }}
+        headerTitle={'เบิกสินค้ามากกว่าที่มีในคลัง โปรดตรวจสอบ'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm

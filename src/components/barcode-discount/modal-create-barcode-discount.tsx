@@ -693,7 +693,7 @@ export default function ModalCreateBarcodeDiscount({
       const rs = await checkStockBalance(payload);
 
       if (rs.data && rs.data.length > 0) {
-        dispatch(updateCheckStock(rs.data));
+        await dispatch(updateCheckStock(rs.data));
         setOpenCheckStock(true);
       } else {
         dispatch(updateCheckStock([]));
@@ -1157,6 +1157,7 @@ export default function ModalCreateBarcodeDiscount({
         onClose={() => {
           setOpenCheckStock(false);
         }}
+        headerTitle={'จำนวนที่ขอลดเกินจำนวนสินค้าในสต๊อก'}
       />
       <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts}/>
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>

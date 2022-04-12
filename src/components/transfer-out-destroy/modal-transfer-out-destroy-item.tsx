@@ -52,7 +52,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
   const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
-  const checkStocks = useAppSelector((state) => state.transferOutDestroySlice.checkStock);
+  const checkStocks = useAppSelector((state) => state.stockBalanceCheckSlice.checkStock);
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>(
     userPermission != null && userPermission.length > 0 ? userPermission.includes(ACTIONS.CAMPAIGN_TO_APPROVE) : false

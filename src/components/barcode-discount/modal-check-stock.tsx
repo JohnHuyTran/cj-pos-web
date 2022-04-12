@@ -3,18 +3,19 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useStyles } from '../../styles/makeTheme';
 import { ErrorOutline } from '@mui/icons-material';
-import { useAppDispatch, useAppSelector } from '../../store/store';
+import { useAppSelector } from '../../store/store';
+import { numberWithCommas } from '../../utils/utils';
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  headerTitle: string;
 }
 const columns: GridColDef[] = [
   {
@@ -59,14 +60,14 @@ const columns: GridColDef[] = [
     renderCell: (params) => {
       return (
         <Typography variant="body2" sx={{ color: 'red', marginRight: '10px' }}>
-          <b>{params.value}{' '}{params.row.unitName}</b>
+          <b>{numberWithCommas(params.value)}{' '}{params.row.unitName}</b>
         </Typography>
       );
     },
   },
 ];
 
-export default function ModalCheckStock({ open, onClose }: Props) {
+export default function ModalCheckStock({ open, onClose, headerTitle }: Props) {
   const classes = useStyles();
   const checkStocks = useAppSelector((state) => state.stockBalanceCheckSlice.checkStock);
   let rows: any = [];
@@ -93,7 +94,7 @@ export default function ModalCheckStock({ open, onClose }: Props) {
           <ErrorOutline sx={{ color: '#F54949', fontSize: '3em' }} />
           <br />
           <Typography sx={{ color: 'red', fontSize: '18px', marginBottom: '8px' }}>
-            จำนวนที่ขอลดเกินจำนวนสินค้าในสต๊อก
+            {headerTitle}
           </Typography>
           <Typography sx={{ fontSize: '18px', color: '#000000', marginBottom: '8px' }}>รายการสินค้าในสต๊อก</Typography>
         </DialogTitle>
