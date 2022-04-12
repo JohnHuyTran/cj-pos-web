@@ -288,7 +288,10 @@ export default function ModalCreateTransferOutDestroy({
             isValid = false;
             item.errorNumberOfApproved = 'กรุณาระบุจำนวนที่อนุมัติ';
           } else {
-            if (preData.numberOfApproved > preData.numberOfRequested) {
+            if (preData.numberOfApproved < 0) {
+              isValid = false;
+              item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องมากกว่า 0';
+            } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
               item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องไม่เกินจำนวนคำขอ';
             }
@@ -718,7 +721,7 @@ export default function ModalCreateTransferOutDestroy({
                   onDeleteAttachFile={onDeleteAttachFileBeforeOld}
                   idControl={'AttachFileBefore'}
                   enabledControl={TOStatus.DRAFT === status
-                    || TOStatus.WAIT_FOR_APPROVAL === status}
+                    || (TOStatus.WAIT_FOR_APPROVAL === status && approvePermission)}
                   warningMessage={attachFileError}
                   deletePermission={TOStatus.DRAFT === status}
                 />
@@ -737,7 +740,7 @@ export default function ModalCreateTransferOutDestroy({
                   onChangeUploadFile={handleOnChangeUploadFileAfter}
                   onDeleteAttachFile={onDeleteAttachFileAfterOld}
                   idControl={'AttachFileAfter'}
-                  enabledControl={TOStatus.APPROVED === status}
+                  enabledControl={(TOStatus.APPROVED === status && !approvePermission)}
                   warningMessage={attachFileError}
                   deletePermission={TOStatus.DRAFT === status}
                 />

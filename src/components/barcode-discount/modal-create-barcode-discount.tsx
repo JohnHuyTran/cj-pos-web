@@ -407,7 +407,10 @@ export default function ModalCreateBarcodeDiscount({
             isValid = false;
             item.errorNumberOfApproved = 'กรุณาระบุจำนวนที่อนุมัติ';
           } else {
-            if (preData.numberOfApproved > preData.numberOfDiscounted) {
+            if (preData.numberOfApproved < 0) {
+              isValid = false;
+              item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องมากกว่า 0';
+            } else if (preData.numberOfApproved > preData.numberOfDiscounted) {
               isValid = false;
               item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่เกินจำนวนที่ขอลด';
             }
