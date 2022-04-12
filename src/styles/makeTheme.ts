@@ -288,6 +288,17 @@ const useStyles = makeStyles({
       backgroundColor: '#676767',
     },
   },
+  MbtnRefresh: {
+    width: '126px',
+    height: '40px',
+    '&.MuiButton-root': {
+      backgroundColor: '#36C690 !important',
+      marginLeft: '10px !important',
+      borderRadius: '3px !important',
+      boxShadow: 'none !important',
+      textTransform: 'none',
+    },
+  },
   MbtnSearch: {
     borderRadius: '4px !important',
   },
@@ -494,6 +505,25 @@ const useStyles = makeStyles({
         fontSize: '14px',
         marginLeft: '5px',
       },
+    },
+  },
+  MScrollBar: {
+    '&::-webkit-scrollbar': {
+      width: '4px',
+    },
+
+    '&::-webkit-scrollbar-track': {
+      boxShadow: 'inset 0 0 5px rgb(255, 251, 251)',
+      borderRadius: '10px',
+    },
+
+    '&::-webkit-scrollbar-thumb': {
+      background: '#AEAEAE',
+      borderRadius: '10px',
+    },
+
+    '&::-webkit-scrollbar-thumb:hover': {
+      background: 'rgb(255, 251, 251)',
     },
   },
 });
