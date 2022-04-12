@@ -7,7 +7,6 @@ import { objectNullOrEmpty } from '../utils/utils';
 import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
 import { getUserInfo } from '../store/sessionStore';
 import { makeStyles } from '@mui/styles';
-import { getNotificationData } from '../services/notification';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { Button, Grid } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -42,7 +41,7 @@ export default function Notification() {
 
   return (
     <>
-      <Container maxWidth="xl" sx={{ height: '80vh' }}>
+      <Container maxWidth="xl" sx={{ height: '80vh', minWidth: '1056px' }}>
         <Box display={'flex'} mt={3} justifyContent={'space-between'}>
           <Typography variant="h6" paddingBottom="40px">
             {' '}
