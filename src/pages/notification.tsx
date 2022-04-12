@@ -1,7 +1,6 @@
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import LoadingModal from '../components/commons/ui/loading-modal';
-import Tasklist from '../components/notifications/task-list';
 import React, { useEffect } from 'react';
 import { objectNullOrEmpty } from '../utils/utils';
 import { KeyCloakTokenInfo } from '../models/keycolak-token-info';

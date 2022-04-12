@@ -7,9 +7,7 @@ import { ContentType } from '../utils/enum/common-enum';
 
 export async function importST(payload: any) {
   try {
-    // const response = await post(`${env.backEnd.url}${environment.sell.saleLimitTime.upload.url}`, payload);
-    const response = await post('http://192.168.110.135:8000/sale-limit/upload', payload);
-    
+    const response = await post(`${env.backEnd.url}${environment.sell.saleLimitTime.upload.url}`, payload);
     return response;
   } catch (error) {
     return error;
