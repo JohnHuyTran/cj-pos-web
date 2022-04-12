@@ -556,7 +556,7 @@ export default function CheckOrderDetail({
         items: itemsList,
       };
 
-      await saveOrderShipments(payload, sdNo)
+      await saveOrderShipments(payload, orderDetail.sdNo)
         .then((_value) => {
           setShowSnackBar(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
