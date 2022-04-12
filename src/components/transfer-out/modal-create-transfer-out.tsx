@@ -286,7 +286,10 @@ export default function ModalCreateTransferOut({
             isValid = false;
             item.errorNumberOfApproved = 'กรุณาระบุจำนวนที่อนุมัติ';
           } else {
-            if (preData.numberOfApproved > preData.numberOfRequested) {
+            if (preData.numberOfApproved < 0) {
+              isValid = false;
+              item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องมากกว่า 0';
+            } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
               item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องไม่เกินจำนวนคำขอ';
             }
@@ -719,7 +722,7 @@ export default function ModalCreateTransferOut({
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
                     disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL)
-                              || (TOStatus.WAIT_FOR_APPROVAL == status && !approvePermission)}
+                      || (TOStatus.WAIT_FOR_APPROVAL == status && !approvePermission)}
                     error={!stringNullOrEmpty(errors['store'])}
                   >
                     <MenuItem value={'1'}>{'คลังหน้าร้าน'}</MenuItem>
@@ -830,7 +833,7 @@ export default function ModalCreateTransferOut({
                 <Button
                   id='btnEnd'
                   variant='contained'
-                  style={{ display: (status != TOStatus.APPROVED || approvePermission) ? 'none' : undefined}}
+                  style={{ display: (status != TOStatus.APPROVED || approvePermission) ? 'none' : undefined }}
                   color='info'
                   startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirmEnd}
