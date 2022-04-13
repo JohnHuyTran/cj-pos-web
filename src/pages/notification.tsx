@@ -1,12 +1,6 @@
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import LoadingModal from '../components/commons/ui/loading-modal';
-import React, { useEffect } from 'react';
-import { objectNullOrEmpty } from '../utils/utils';
-import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
-import { getUserInfo } from '../store/sessionStore';
-import { makeStyles } from '@mui/styles';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import React from 'react';
 import { Button, Grid } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useStyles } from '../styles/makeTheme';
@@ -18,29 +12,14 @@ import NotificationAnnouncement from '../components/notifications/notification-a
 
 export default function Notification() {
   const classes = useStyles();
-  const [listData, setListData] = React.useState<any[]>([]);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
-  const [page, setPage] = React.useState(0);
-  const [totalPage, setTotalPage] = React.useState(0);
   const [refresh, setRefresh] = React.useState(false);
-
-  const userInfo: KeyCloakTokenInfo = getUserInfo();
-
-  const userPermission =
-    !objectNullOrEmpty(userInfo) &&
-    !objectNullOrEmpty(userInfo.acl) &&
-    userInfo.acl['service.posback-campaign'] != null &&
-    userInfo.acl['service.posback-campaign'].length > 0
-      ? userInfo.acl['service.posback-campaign']
-      : [];
-
   const handleRefresh = () => {
     setRefresh(!refresh);
   };
 
   return (
     <>
-      <Container maxWidth="xl" sx={{ height: '80vh', minWidth: '1056px' }}>
+      <Container maxWidth="xl" sx={{ height: '80vh', minWidth: '1100px' }}>
         <Box display={'flex'} mt={3} justifyContent={'space-between'}>
           <Typography variant="h6" paddingBottom="40px">
             {' '}
@@ -85,7 +64,6 @@ export default function Notification() {
           </Grid>
         </Grid>
       </Container>
-      <LoadingModal open={openLoadingModal} />
     </>
   );
 }

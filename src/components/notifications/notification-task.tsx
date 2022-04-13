@@ -6,13 +6,13 @@ import theme from '../../styles/theme';
 import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import { Box } from '@mui/system';
 import LoadingModal from '../commons/ui/loading-modal';
-import { getNotificationTasks } from '../../services/notification';
+import { getNotificationTasks, updateNotificationItem } from '../../services/notification';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { getUserInfo } from '../../store/sessionStore';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { objectNullOrEmpty } from '../../utils/utils';
 import ModalCreateBarcodeDiscount from '../barcode-discount/modal-create-barcode-discount';
-import { Action, BDStatus, TOStatus } from '../../utils/enum/common-enum';
+import { Action, BDStatus, DateFormat, TOStatus } from '../../utils/enum/common-enum';
 import ModalCreateTransferOutDestroy from '../transfer-out-destroy/modal-create-transfer-out-destroy';
 import ModalCreateTransferOut from '../transfer-out/modal-create-transfer-out';
 import SnackbarStatus from '../commons/ui/snackbar-status';
@@ -21,7 +21,6 @@ import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-de
 
 interface Props {
   refresh: boolean;
-  // onSearch: () => void;
 }
 
 export default function NotificationTask(props: Props) {
@@ -56,7 +55,11 @@ export default function NotificationTask(props: Props) {
     handleGetData();
   }, [page]);
   useEffect(() => {
-    setPage(0);
+    if (page === 0) {
+      handleGetData();
+    } else {
+      setPage(0);
+    }
   }, [props.refresh]);
   const handleCloseTODetail = () => {
     setOpenTransferOutDetail(false);
@@ -86,6 +89,7 @@ export default function NotificationTask(props: Props) {
   const currentlySelected = async (item: any) => {
     try {
       setOpenLoadingModal(true);
+      handleUpdateRead(item.id);
       if (item.type === 'SEND_TO_FOR_APPROVAL' || item.type === 'APPROVE_TRANSFER_OUT') {
         if (item.payload.type === 1) {
           await dispatch(getTransferOutDetail(item.payload._id));
@@ -107,7 +111,19 @@ export default function NotificationTask(props: Props) {
       setOpenLoadingModal(false);
     } catch (error) {
       console.log(error);
+      setOpenLoadingModal(false);
     }
+  };
+
+  const handleUpdateRead = async (id: string) => {
+    let newList = listData.map((el: any) => {
+      if (el.id === id) {
+        el.read = true;
+        return el;
+      } else return el;
+    });
+    setListData(newList);
+    await updateNotificationItem(id);
   };
 
   const listTask = listData.map((item: any, index: number) => {
@@ -116,11 +132,18 @@ export default function NotificationTask(props: Props) {
     return (
       <Box
         key={index}
-        sx={{ borderTop: '1px solid #EAEBEB', minHeight: '60px', minWidth: '600px' }}
+        sx={{
+          borderTop: '1px solid #EAEBEB',
+          minHeight: '60px',
+          minWidth: '600px',
+          cursor: 'pointer',
+          backgroundColor: item.read ? 'transparent' : '#F6FFF3',
+          fontSize: '14px',
+        }}
         onClick={() => currentlySelected(item)}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-          <Box display={'flex'} mt={1}>
+          <Box display={'flex'} mt={1} ml={1}>
             <PresentToAllIcon sx={{ color: theme.palette.primary.main }} />
             <span style={{ marginLeft: 15, color: theme.palette.primary.main }}>
               {item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE'
@@ -139,19 +162,18 @@ export default function NotificationTask(props: Props) {
                 color: '#36C690',
                 textAlign: 'center',
                 marginTop: '5px',
-                padding: '2px 25px 3px 25px',
+                padding: '2px 20px 3px 20px',
                 borderRadius: '8px',
-                cursor: 'pointer',
+                fontSize: '15px',
               }}
             >
               {statusText}
             </Typography>
           </Box>
         </Box>
-        <Box ml={5}>
-          <Typography style={{ color: theme.palette.grey[500] }}>
-            กำหนดดำเนินการ {moment(item.payload.transactionDate).add(543, 'y').format('DD/MM/YYYY')}{' '}
-            {moment(item.payload.transactionDate).format('HH.mm')} น.
+        <Box ml={6}>
+          <Typography style={{ color: theme.palette.grey[500], fontSize: '14px' }}>
+            กำหนดดำเนินการ {moment(item.payload.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
           </Typography>
         </Box>
       </Box>
