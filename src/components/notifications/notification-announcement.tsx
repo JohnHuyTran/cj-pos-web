@@ -10,13 +10,11 @@ import STCreateModal from '../sale-limit-time/sale-limit-time-create-modal';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { getsaleLimitTimeDetail } from '../../store/slices/sale-limit-time-detail-slice';
 import SnackbarStatus from '../commons/ui/snackbar-status';
-import { getNotificationAnnouncements } from '../../services/notification';
-import { getUserInfo } from '../../store/sessionStore';
+import { getNotificationAnnouncements, updateNotificationItem } from '../../services/notification';
 import { DateFormat } from '../../utils/enum/common-enum';
 
 interface Props {
   refresh: boolean;
-  // onSearch: () => void;
 }
 
 export default function NotificationAnnouncement(props: Props) {
@@ -40,7 +38,11 @@ export default function NotificationAnnouncement(props: Props) {
     handleGetData();
   }, [page]);
   useEffect(() => {
-    setPage(0);
+    if (page === 0) {
+      handleGetData();
+    } else {
+      setPage(0);
+    }
   }, [props.refresh]);
 
   const handleCloseDetail = () => {
@@ -65,19 +67,28 @@ export default function NotificationAnnouncement(props: Props) {
   };
 
   const currentlySelected = async (item: any) => {
-    console.log(item);
-
-    setOpenLoadingModal(true);
     try {
+      setOpenLoadingModal(true);
+      handleUpdateRead(item.id);
       await dispatch(getsaleLimitTimeDetail(item.payload._id));
       if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
         setOpenDetail(true);
       }
+      setOpenLoadingModal(false);
     } catch (error) {
       console.log(error);
+      setOpenLoadingModal(false);
     }
-
-    setOpenLoadingModal(false);
+  };
+  const handleUpdateRead = async (id: string) => {
+    let newList = listData.map((el: any) => {
+      if (el.id === id) {
+        el.read = true;
+        return el;
+      } else return el;
+    });
+    setListData(newList);
+    await updateNotificationItem(id);
   };
 
   const listTask = listData.map((item: any, index: number) => {
@@ -90,6 +101,7 @@ export default function NotificationAnnouncement(props: Props) {
             minHeight: '80px',
             cursor: 'pointer',
             backgroundColor: item.read ? 'transparent' : '#F6FFF3',
+            fontSize: '14px',
           }}
           onClick={() => currentlySelected(item)}
         >
@@ -106,18 +118,18 @@ export default function NotificationAnnouncement(props: Props) {
                   color: '#36C690',
                   textAlign: 'center',
                   marginTop: '5px',
-                  padding: '2px 25px 3px 25px',
+                  padding: '2px 17px 3px 17px',
                   borderRadius: '8px',
-                  cursor: 'pointer',
+                  fontSize: '15px',
                 }}
               >
                 เริ่มใช้งาน
               </Typography>
             </Box>
           </Box>
-          <Box ml={5}>{item.payload.description}</Box>
-          <Box ml={5} mt={2}>
-            <Typography style={{ color: theme.palette.grey[500], marginBottom: '41px' }}>
+          <Box ml={6}>{item.payload.description}</Box>
+          <Box ml={6} mt={1}>
+            <Typography style={{ color: theme.palette.grey[500], fontSize: '14px' }}>
               มีผลตั้งแต่ {moment(item.payload.stStartTime).add(543, 'y').format(DateFormat.DATE_TIME_DISPLAY_FORMAT)}{' '}
               น. - {moment(item.payload.stEndTime).format(DateFormat.DATE_TIME_DISPLAY_FORMAT)} น.
             </Typography>

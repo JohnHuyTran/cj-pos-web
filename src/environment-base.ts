@@ -75,6 +75,9 @@ export const environment = {
       announcements: {
         url: '/task/notifications/announcements',
       },
+      read: {
+        url: '/task/notifications/{id}',
+      },
     },
   },
   withDraw: {

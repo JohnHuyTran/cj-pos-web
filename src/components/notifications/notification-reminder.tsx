@@ -1,7 +1,7 @@
 import { Card, CardContent, Grid, TablePagination, Typography } from '@mui/material';
 import moment from 'moment';
 import React, { useEffect } from 'react';
-import { getNotificationReminders } from '../../services/notification';
+import { getNotificationReminders, updateNotificationItem } from '../../services/notification';
 import { useStyles } from '../../styles/makeTheme';
 import theme from '../../styles/theme';
 import PresentToAllIcon from '@mui/icons-material/PresentToAll';
@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { getTransferOutDetail } from '../../store/slices/transfer-out-detail-slice';
 import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-detail-slice';
 import ModalCreateBarcodeDiscount from '../barcode-discount/modal-create-barcode-discount';
-import { Action } from '../../utils/enum/common-enum';
+import { Action, DateFormat } from '../../utils/enum/common-enum';
 import { objectNullOrEmpty } from '../../utils/utils';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
@@ -21,7 +21,6 @@ import ModalCreateTransferOut from '../transfer-out/modal-create-transfer-out';
 
 interface Props {
   refresh: boolean;
-  // onSearch: () => void;
 }
 
 export default function NotificationReminder(props: Props) {
@@ -56,7 +55,11 @@ export default function NotificationReminder(props: Props) {
     handleGetData();
   }, [page]);
   useEffect(() => {
-    setPage(0);
+    if (page === 0) {
+      handleGetData();
+    } else {
+      setPage(0);
+    }
   }, [props.refresh]);
   const handleCloseTODetail = () => {
     setOpenTransferOutDetail(false);
@@ -87,6 +90,7 @@ export default function NotificationReminder(props: Props) {
   const currentlySelected = async (item: any) => {
     try {
       setOpenLoadingModal(true);
+      handleUpdateRead(item.id);
       if (item.type === 'REJECT_TRANSFER_OUT' || item.type === 'CLOSE_TRANSFER_OUT') {
         if (item.payload.type === 1) {
           await dispatch(getTransferOutDetail(item.payload._id));
@@ -108,6 +112,15 @@ export default function NotificationReminder(props: Props) {
       setOpenLoadingModal(false);
     } catch (error) {
       console.log(error);
+      setOpenLoadingModal(false);
+    }
+  };
+  const handleUpdateRead = async (id: string) => {
+    await updateNotificationItem(id);
+    const rs = await getNotificationReminders(page);
+    if (rs && rs.data) {
+      setListData(rs.data);
+      setTotal(rs.total);
     }
   };
 
@@ -115,11 +128,18 @@ export default function NotificationReminder(props: Props) {
     return (
       <Box
         key={index}
-        sx={{ borderTop: '2px solid #EAEBEB', minHeight: '60px', backgroundColor: '#F6FFF3', minWidth: '600px' }}
+        sx={{
+          borderTop: '2px solid #EAEBEB',
+          minHeight: '60px',
+          backgroundColor: '#F6FFF3',
+          minWidth: '600px',
+          cursor: 'pointer',
+          fontSize: '14px',
+        }}
         onClick={() => currentlySelected(item)}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-          <Box display={'flex'} mt={1}>
+          <Box display={'flex'} mt={1} ml={1}>
             <PresentToAllIcon sx={{ color: theme.palette.primary.main }} />
             <span style={{ marginLeft: 15, color: theme.palette.primary.main }}>
               {item.type === 'REJECT_BARCODE' ? 'ส่วนลดสินค้า' : 'เบิก-ใช้ในการทำกิจกรรม'}
@@ -138,17 +158,16 @@ export default function NotificationReminder(props: Props) {
                 marginTop: '5px',
                 padding: '2px 20px 3px 20px',
                 borderRadius: '8px',
-                cursor: 'pointer',
+                fontSize: '15px',
               }}
             >
               {item.type === 'CLOSE_TRANSFER_OUT' ? 'ปิดงาน' : 'ไม่อนุมัติ'}
             </Typography>
           </Box>
         </Box>
-        <Box ml={5}>
-          <Typography style={{ color: theme.palette.grey[500] }}>
-            วันที่ทำรายการ {moment(item.payload.transactionDate).add(543, 'y').format('DD/MM/YYYY')}{' '}
-            {moment(item.payload.transactionDate).format('HH.mm')} น.
+        <Box ml={6}>
+          <Typography style={{ color: theme.palette.grey[500], fontSize: '14px' }}>
+            กำหนดดำเนินการ {moment(item.payload.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
           </Typography>
         </Box>
       </Box>
