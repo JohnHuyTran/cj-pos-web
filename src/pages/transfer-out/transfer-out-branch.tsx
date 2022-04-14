@@ -147,7 +147,7 @@ export default function SelectBranch(props: Props): ReactElement {
       : !!authorizedBranchList.branchList.data?.branches
       ? authorizedBranchList.branchList.data?.branches
       : [],
-    getOptionLabel: (option: BranchListOptionType) => '',
+    getOptionLabel: (option: BranchListOptionType) => `${option.code}-${option.name}`,
   };
   return (
     <div>

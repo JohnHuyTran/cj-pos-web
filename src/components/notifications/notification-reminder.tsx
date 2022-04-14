@@ -18,6 +18,7 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import ModalCreateTransferOutDestroy from '../transfer-out-destroy/modal-create-transfer-out-destroy';
 import ModalCreateTransferOut from '../transfer-out/modal-create-transfer-out';
+import { ShoppingCartSharp } from '@mui/icons-material';
 
 interface Props {
   refresh: boolean;
@@ -140,13 +141,17 @@ export default function NotificationReminder(props: Props) {
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
           <Box display={'flex'} mt={1} ml={1}>
-            <PresentToAllIcon sx={{ color: theme.palette.primary.main }} />
+            {item.type == 'REJECT_BARCODE' ? (
+              <ShoppingCartSharp sx={{ color: theme.palette.primary.main }} />
+            ) : (
+              <PresentToAllIcon sx={{ color: theme.palette.primary.main }} />
+            )}
             <span style={{ marginLeft: 15, color: theme.palette.primary.main }}>
               {item.type === 'REJECT_BARCODE' ? 'ส่วนลดสินค้า' : 'เบิก-ใช้ในการทำกิจกรรม'}
             </span>
             <span style={{ marginLeft: 5, marginRight: 3 }}>: {item.payload.documentNumber}</span> {'|'}
             <span style={{ marginLeft: 3 }}>
-              {item.payload.branch}-{item.payload.branchName}
+              {item.branchCode}-{item.payload.branchName}
             </span>
           </Box>
           <Box sx={{ textAlign: 'right', mt: '3px' }}>
