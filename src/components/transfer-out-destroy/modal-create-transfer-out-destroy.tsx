@@ -707,7 +707,7 @@ export default function ModalCreateTransferOutDestroy({
                 {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5}>
+            <Grid item container xs={4} mb={2}>
               <Grid item xs={4}>
                 รูปก่อนทำลาย :
               </Grid>
