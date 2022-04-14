@@ -1,6 +1,8 @@
 import { getegid } from 'process';
+import { env } from '../adapters/environmentConfigs';
 import { get, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
+import { getPathUrl } from './base-service';
 
 export async function getNotificationTasks(page: number) {
   try {
@@ -30,9 +32,13 @@ export async function getNotificationAnnouncements(page: number) {
 
 export async function updateNotificationItem(id: string) {
   try {
-    const response = await post(environment.task.notification.read.url, { id: id });
+    const response = await post(getPathNotificationRead(id));
     return response;
   } catch (error) {
     throw error;
   }
 }
+
+export const getPathNotificationRead = (id: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.task.notification.read.url}`, { id: id });
+};
