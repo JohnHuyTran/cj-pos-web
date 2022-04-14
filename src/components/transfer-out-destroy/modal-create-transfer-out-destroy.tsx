@@ -727,7 +727,7 @@ export default function ModalCreateTransferOutDestroy({
                 />
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5} pl={3}>
+            <Grid item container xs={4} mb={2} pl={3}>
               <Grid item xs={4}>
                 รูปหลังทำลาย :
               </Grid>
