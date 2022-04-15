@@ -23,7 +23,7 @@ export default function Notification() {
         <Box display={'flex'} mt={3} justifyContent={'space-between'}>
           <Typography variant="h6" paddingBottom="40px">
             {' '}
-            หน้าหลัก{' '}
+            แจ้งเตือน{' '}
           </Typography>
           <Button
             id="btnRefresh"

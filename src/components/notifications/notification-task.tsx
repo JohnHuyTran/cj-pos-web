@@ -129,7 +129,7 @@ export default function NotificationTask(props: Props) {
 
   const listTask = listData.map((item: any, index: number) => {
     const statusText =
-      item.payload.status === TOStatus.APPROVED || item.payload.status === BDStatus.APPROVED ? 'อนุมัติ' : 'รออนุมัติ';
+      item.payload.status === TOStatus.APPROVED || item.payload.status == BDStatus.APPROVED ? 'อนุมัติ' : 'รออนุมัติ';
     return (
       <Box
         key={index}
@@ -178,7 +178,7 @@ export default function NotificationTask(props: Props) {
         </Box>
         <Box ml={6}>
           <Typography style={{ color: theme.palette.grey[500], fontSize: '14px' }}>
-            กำหนดดำเนินการ {moment(item.payload.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
+            กำหนดดำเนินการ {moment(item.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
           </Typography>
         </Box>
       </Box>
@@ -195,7 +195,7 @@ export default function NotificationTask(props: Props) {
           rowsPerPage={10}
           rowsPerPageOptions={[]}
         />
-        <CardContent className={classes.MScrollBar} sx={{ height: '100%', overflowY: 'auto' }}>
+        <CardContent className={classes.MScrollBar} sx={{ height: '90%', overflowY: 'auto', mb: 1 }}>
           {listTask}
         </CardContent>
       </Card>
