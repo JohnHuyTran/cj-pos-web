@@ -172,7 +172,7 @@ export default function NotificationReminder(props: Props) {
         </Box>
         <Box ml={6}>
           <Typography style={{ color: theme.palette.grey[500], fontSize: '14px' }}>
-            กำหนดดำเนินการ {moment(item.payload.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
+            กำหนดดำเนินการ {moment(item.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
           </Typography>
         </Box>
       </Box>
@@ -189,7 +189,7 @@ export default function NotificationReminder(props: Props) {
           rowsPerPage={10}
           rowsPerPageOptions={[]}
         />
-        <CardContent className={classes.MScrollBar} sx={{ height: '100%', overflowY: 'auto' }}>
+        <CardContent className={classes.MScrollBar} sx={{ height: '90%', overflowY: 'auto' }}>
           {listTask}
         </CardContent>
       </Card>

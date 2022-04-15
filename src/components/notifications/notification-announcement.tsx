@@ -149,7 +149,7 @@ export default function NotificationAnnouncement(props: Props) {
           rowsPerPage={10}
           rowsPerPageOptions={[]}
         />
-        <CardContent className={classes.MScrollBar} sx={{ height: '100%', overflowY: 'auto' }}>
+        <CardContent className={classes.MScrollBar} sx={{ height: '95%', overflowY: 'auto' }}>
           {listTask}
         </CardContent>
       </Card>
