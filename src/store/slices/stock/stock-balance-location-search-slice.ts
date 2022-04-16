@@ -37,7 +37,7 @@ export const featchStockBalanceLocationSearchAsync = createAsyncThunk(
         path = path + `&product=${payload.productList}`;
       }
       if (payload.locationId) {
-        path = path + `&locattion=${payload.locationId}`;
+        path = path + `&location=${payload.locationId}`;
       }
       if (payload.dateFrom) {
         path = path + `&dateFrom=${payload.dateFrom}`;

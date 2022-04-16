@@ -20,6 +20,7 @@ import {
 } from '../../store/slices/stock/stock-balance-search-slice';
 import { OutstandingRequest } from '../../models/stock-model';
 import moment from 'moment';
+import { featchStockBalanceLocationSearchAsync } from '../../store/slices/stock/stock-balance-location-search-slice';
 interface State {
   storeId: string;
   locationId: string;
@@ -121,11 +122,18 @@ function StockSearch() {
     } else {
       limits = limit.toString();
     }
+    const productList: string[] = [];
+    payloadAddTypeProduct
+      .filter((el: any) => el.selectedType === 2 && el.showProduct)
+      .map((item: any, index: number) => {
+        productList.push(item.skuCode);
+      });
+
     const payload: OutstandingRequest = {
       limit: limits,
       page: page,
       stockId: values.storeId,
-      productList: [],
+      productList: productList,
       locationId: values.locationId,
       branchId: values.branchId,
       dateFrom: moment(startDate).startOf('day').toISOString(),
@@ -133,6 +141,7 @@ function StockSearch() {
 
     handleOpenLoading('open', true);
     await dispatch(featchStockBalanceSearchAsync(payload));
+    await dispatch(featchStockBalanceLocationSearchAsync(payload));
     await dispatch(savePayloadSearch(payload));
     handleOpenLoading('open', false);
   };
@@ -175,6 +184,8 @@ function StockSearch() {
         .join(', ');
 
       setValues({ ...values, productId: strProducts });
+    } else {
+      setValues({ ...values, productId: '' });
     }
   }, [payloadAddTypeProduct]);
 
