@@ -88,6 +88,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableMainMenuOrderReceive, setDisableMainMenuOrderReceive] = React.useState(true);
   const [disableMainMenuStockTransfer, setDisableMainMenuStockTransfer] = React.useState(true);
   const [disableMainMenuSell, setDisableMainMenuSell] = React.useState(true);
+  const [disableMainMenuProductInfo, setDisableMainMenuProductInfo] = React.useState(true);
 
   const [disableSubMenuOROrderReceive, setDisableSubMenuOROrderReceive] = React.useState(true);
   const [disableSubMenuORStockDiff, setDisableSubMenuORStockDiff] = React.useState(true);
@@ -96,12 +97,14 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuSTStockRequest, setDisableSubMenuSTStockRequest] = React.useState(true);
   const [disableSubMenuSTStockTransfer, setDisableSubMenuSTStockTransfer] = React.useState(true);
   const [disableSubMenuTaxInvoice, setDisableSubMenuTaxInvoice] = React.useState(true);
+  const [disableSubMenuStockBalance, setDisableSubMenuStockBalance] = React.useState(true);
 
   useEffect(() => {
     setOpen(navState);
     setDisableMainMenuOrderReceive(isAllowMainMenuPermission(MAINMENU.ORDER_RECEIVE));
     setDisableMainMenuStockTransfer(isAllowMainMenuPermission(MAINMENU.STOCK_TRANSFER));
     setDisableMainMenuSell(isAllowMainMenuPermission(MAINMENU.SALE));
+    setDisableMainMenuProductInfo(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO));
 
     setDisableSubMenuTaxInvoice(isAllowSubMenuPermission(SUBMENU.SALE_TAX_INVOICE));
 
@@ -111,6 +114,8 @@ export default function Sidebar({}: Props): ReactElement {
 
     setDisableSubMenuSTStockRequest(isAllowSubMenuPermission(SUBMENU.ST_REQUEST));
     setDisableSubMenuSTStockTransfer(isAllowSubMenuPermission(SUBMENU.ST_TRANSFER));
+
+    setDisableSubMenuStockBalance(isAllowSubMenuPermission(SUBMENU.PI_STOCK_BALANCE));
   }, [navState]);
 
   const dispatch = useAppDispatch();
@@ -365,12 +370,18 @@ export default function Sidebar({}: Props): ReactElement {
           <ListItemIcon>
             <StoreMallDirectoryIcon />
           </ListItemIcon>
-          <ListItemText primary='ข้อมูลสินค้า' style={{ marginLeft: -15 }} />
+          <ListItemText
+            primary='ข้อมูลสินค้า'
+            style={{ marginLeft: -15, display: disableMainMenuProductInfo ? 'none' : '' }}
+          />
           {openProductInfoMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openProductInfoMenu} timeout='auto' unmountOnExit>
           <List component='div' disablePadding>
-            <Link to='/stock-balance' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuStockBalance'>
+            <Link
+              to='/stock-balance'
+              style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuStockBalance ? 'none' : '' }}
+              id='subMenuStockBalance'>
               <ListItemButton
                 key='StockBalance'
                 selected={selectedIndex === 11}

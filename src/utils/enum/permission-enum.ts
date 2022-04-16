@@ -30,6 +30,8 @@ export enum ACTIONS {
   STOCK_BT_SAVEDC = 'stock.bt.save_dc',
   STOCK_BT_EXPORT = 'stock.bt.export',
   STOCK_BT_WAITDC = 'stock.bt.wait_dc',
+  STOCK_BL_SKU = 'stock.bl.sku',
+  STOCK_BL_LOCATION = 'stock.bl.location',
 
   AUTHORITY_CHECK = 'authority.check',
   ORDER_RO_DRAFT = 'order.ro.draft',
@@ -53,6 +55,7 @@ export enum MAINMENU {
   SALE = 'sale',
   ORDER_RECEIVE = 'orderReceive',
   STOCK_TRANSFER = 'stockTransfer',
+  PRODUCT_INFO = 'productInfo',
 }
 
 export enum SUBMENU {
@@ -63,6 +66,7 @@ export enum SUBMENU {
   OR_SUPPLIER = 'orderReceive.supplier',
   ST_REQUEST = 'stockTransfer.stockRequest',
   ST_TRANSFER = 'stockTransfer.stockTransfer',
+  PI_STOCK_BALANCE = 'productInfo.outstanding',
 }
 
 export enum PERMISSION_GROUP {
