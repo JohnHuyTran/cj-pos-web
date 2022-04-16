@@ -324,6 +324,16 @@ export const environment = {
         url: '/stock/stock-balance/check-by-sku-codes',
       },
     },
+    outStanding: {
+      stockBalance: {
+        search: {
+          url: '/stock',
+        },
+        searchByLocation: {
+          url: '/stock/location',
+        },
+      },
+    },
   },
   master: {
     branch: {

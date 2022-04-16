@@ -13,6 +13,13 @@ import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
 import StockBalance from './stock-balance';
 import StockBalanceLocation from './stock-balance-location';
 import SearchIcon from '@mui/icons-material/Search';
+import {
+  clearDataFilter,
+  featchStockBalanceSearchAsync,
+  savePayloadSearch,
+} from '../../store/slices/stock/stock-balance-search-slice';
+import { OutstandingRequest } from '../../models/stock-model';
+import moment from 'moment';
 interface State {
   storeId: string;
   locationId: string;
@@ -61,8 +68,12 @@ function StockSearch() {
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [values, setValues] = React.useState<State>({ storeId: 'ALL', locationId: 'ALL', productId: '', branchId: '' });
   const handleChange = (event: any) => {
+    const name = event.target.name;
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
+    if (name === 'storeId' && value != values.storeId) {
+      setValues({ ...values, productId: '' });
+    }
   };
   const [value, setValue] = React.useState(0);
 
@@ -87,12 +98,46 @@ function StockSearch() {
   const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
     groupBranch ? branchFromMap : null
   );
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<{ open: boolean }>({
+    open: false,
+  });
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
+  const page = '1';
+  const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
 
-  const onClickClearBtn = () => {};
+  const onClickClearBtn = async () => {
+    handleOpenLoading('open', true);
+    setValues({ storeId: 'ALL', locationId: 'ALL', productId: '', branchId: '' });
+    await dispatch(clearDataFilter());
+    setTimeout(() => {
+      handleOpenLoading('open', false);
+    }, 300);
+  };
 
-  const onClickValidateForm = () => {
-    console.log('value: ', values);
+  const onClickSearchBtn = async () => {
+    let limits;
+    if (limit === 0 || limit === undefined) {
+      limits = '10';
+    } else {
+      limits = limit.toString();
+    }
+    const payload: OutstandingRequest = {
+      limit: limits,
+      page: page,
+      stockId: values.storeId,
+      productList: [],
+      locationId: values.locationId,
+      branchId: values.branchId,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+    };
+
+    handleOpenLoading('open', true);
+    await dispatch(featchStockBalanceSearchAsync(payload));
+    await dispatch(savePayloadSearch(payload));
+    handleOpenLoading('open', false);
+  };
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
   const handleChangeBranchFrom = (branchCode: string) => {
@@ -234,7 +279,7 @@ function StockSearch() {
               id='btnSearch'
               variant='contained'
               color='primary'
-              onClick={onClickValidateForm}
+              onClick={onClickSearchBtn}
               sx={{ width: '13%', ml: 2, display: `${disableSearchBtn ? 'none' : ''}` }}
               // sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}>
