@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { get } from '../../../adapters/posback-adapter';
+import { get, put } from '../../../adapters/posback-adapter';
 import { environment } from '../../../environment-base';
 import { OutstandingRequest, OutstandingResponse } from '../../../models/stock-model';
+import { ContentType } from '../../../utils/enum/common-enum';
 
 type State = {
   stockList: OutstandingResponse;
@@ -30,25 +31,9 @@ export const featchStockBalanceSearchAsync = createAsyncThunk(
   'stockBalanceList',
   async (payload: OutstandingRequest) => {
     try {
-      const apiRootPath = environment.stock.outStanding.stockBalance.search.url;
-      let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}`;
-      if (payload.stockId) {
-        path = path + `&stockId=${payload.stockId}`;
-      }
-      if (payload.productList) {
-        path = path + `&product=${payload.productList}`;
-      }
-      if (payload.locationId) {
-        path = path + `&location=${payload.locationId}`;
-      }
-      if (payload.dateFrom) {
-        path = path + `&dateFrom=${payload.dateFrom}`;
-      }
-      if (payload.branchId) {
-        path = path + `&branch=${payload.branchId}`;
-      }
-      const response = await get(path).then();
+      const apiRootPath = environment.stock.outStanding.stockBalance.searchByStore.url;
 
+      const response = await put(apiRootPath, payload, ContentType.JSON).then((result: any) => result);
       return response;
     } catch (error) {
       throw error;

@@ -326,8 +326,8 @@ export const environment = {
     },
     outStanding: {
       stockBalance: {
-        search: {
-          url: '/stock/sku',
+        searchByStore: {
+          url: '/stock/stock-balance/search-by-store',
         },
         searchByLocation: {
           url: '/stock/location',
