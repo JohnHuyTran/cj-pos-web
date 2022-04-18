@@ -56,9 +56,14 @@ export default function NotificationAnnouncement(props: Props) {
     try {
       setOpenLoadingModal(true);
       const rs = await getNotificationAnnouncements(page);
-      if (rs && rs.data) {
-        setListData(rs.data);
-        setTotal(rs.total);
+      if (rs) {
+        if (rs.data) {
+          setListData(rs.data);
+          setTotal(rs.total);
+        } else {
+          setListData([]);
+          setTotal(0);
+        }
       }
       setOpenLoadingModal(false);
     } catch (error) {

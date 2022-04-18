@@ -78,9 +78,14 @@ export default function NotificationTask(props: Props) {
     try {
       setOpenLoadingModal(true);
       const rs = await getNotificationTasks(page);
-      if (rs && rs.data) {
-        setListData(rs.data);
-        setTotal(rs.total);
+      if (rs) {
+        if (rs.data !== null) {
+          setListData(rs.data);
+          setTotal(rs.total);
+        } else {
+          setListData([]);
+          setTotal(0);
+        }
       }
       setOpenLoadingModal(false);
     } catch (error) {
@@ -130,6 +135,16 @@ export default function NotificationTask(props: Props) {
   const listTask = listData.map((item: any, index: number) => {
     const statusText =
       item.payload.status === TOStatus.APPROVED || item.payload.status == BDStatus.APPROVED ? 'อนุมัติ' : 'รออนุมัติ';
+    let content;
+    if (item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE') {
+      content = 'ส่วนลดสินค้า';
+    } else {
+      if (item.payload.type === 1) {
+        content = 'เบิก-ใช้ในการทำกิจกรรม';
+      } else {
+        content = 'เบิก-ทำลายไม่มีส่วนลด';
+      }
+    }
     return (
       <Box
         key={index}
@@ -150,11 +165,7 @@ export default function NotificationTask(props: Props) {
             ) : (
               <PresentToAllIcon sx={{ color: theme.palette.primary.main }} />
             )}
-            <span style={{ marginLeft: 15, color: theme.palette.primary.main }}>
-              {item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE'
-                ? 'ส่วนลดสินค้า'
-                : 'เบิก-ใช้ในการทำกิจกรรม'}
-            </span>
+            <span style={{ marginLeft: 15, color: theme.palette.primary.main }}>{content}</span>
             <span style={{ marginLeft: 5, marginRight: 3 }}>: {item.payload.documentNumber}</span> {'|'}
             <span style={{ marginLeft: 3 }}>
               {item.branchCode}-{item.payload.branchName}
