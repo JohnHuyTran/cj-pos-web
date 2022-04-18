@@ -15,7 +15,7 @@ import {
   removeUserInfo,
 } from '../store/sessionStore';
 import { getDecodedAccessToken, objectNullOrEmpty, stringNullOrEmpty } from '../utils/utils';
-import { getUserGroup } from '../utils/role-permission';
+import { getUserGroup, isChannelBranch, isGroupBranch, isGroupBranchParam } from '../utils/role-permission';
 import { POSException } from '../utils/exception/pos-exception';
 import { ERROR_CODE } from '../utils/enum/common-enum';
 
@@ -45,10 +45,24 @@ export function authentication(payload: loginForm): Promise<Response> {
         setSessionId(response.data.session_state);
         let userInfo = getDecodedAccessToken(response.data.access_token ? response.data.access_token : '');
         const _group = getUserGroup(userInfo.groups);
+
         if (stringNullOrEmpty(_group)) {
           const err = new POSException(401, ERROR_CODE.NOT_AUTHORIZE, 'ผู้ใช้งานไม่สิทธิ์');
           throw err;
         }
+
+        if (isChannelBranch() && !isGroupBranchParam(_group)) {
+          const err = new POSException(401, 'invalid_channel_hq', 'กรุณาใช้งาน channel Head Quarter');
+          throw err;
+        } else if (!isChannelBranch() && isGroupBranchParam(_group)) {
+          const err = new POSException(401, 'invalid_channel_branch', 'กรุณาใช้งาน channel branch');
+          throw err;
+        }
+
+        // if (!isChannelBranch() && isGroupBranch()) {
+        //   const err = new POSException(401, 'invalid_channel_hq', 'กรุณาใช้งาน channel Branch');
+        //   throw err;
+        // }
 
         userInfo = { ...userInfo, group: _group ? _group : '' };
         setUserInfo(userInfo);
@@ -133,7 +147,7 @@ export function logout(): Promise<Response> {
 
 instance.interceptors.request.use(function (config: AxiosRequestConfig) {
   if (action !== 'logout') {
-    config.headers.common['X-Requested-With'] =  env.branch.code;
+    config.headers.common['X-Requested-With'] = env.branch.code;
   }
 
   return config;

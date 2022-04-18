@@ -13,7 +13,6 @@ import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enu
 import { useStyles } from '../../styles/makeTheme';
 import OrderReceiveDetail from './order-receive-detail';
 import LoadingModal from '../commons/ui/loading-modal';
-import CheckOrderDetailTote from '../check-orders/check-order-detail-tote';
 import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
 import { itemsDetail } from '../../models/order-model';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
@@ -253,6 +252,7 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
   }
 
   const [openOrderReceiveModal, setOpenOrderReceiveModal] = React.useState(false);
+
   const handleOpenOrderReceiveModal = async (params: GridRenderCellParams) => {
     let toteCode = params.row.toteCode ? params.row.toteCode : params.row.barcode;
     await dispatch(updateAddItemsState({}));
@@ -266,8 +266,9 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
 
   const [openDetailToteModal, setOpenDetailToteModal] = React.useState(false);
   const [sdNo, setSdNo] = React.useState('');
+
   const handleLinkDetailTote = async (params: GridCellParams) => {
-    await dispatch(updateAddItemsState({}));
+    // await dispatch(updateAddItemsState({}));
     const sdNo = params.row.sdNo;
     setSdNo(sdNo);
 
