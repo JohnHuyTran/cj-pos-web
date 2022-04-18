@@ -72,7 +72,7 @@ const stockBalanceLocationSearchSlice = createSlice({
   name: 'stockBalanceSearch',
   initialState,
   reducers: {
-    clearDataFilter: (state) => initialState,
+    clearDataLocationFilter: (state) => initialState,
   },
   extraReducers: (builer) => {
     builer.addCase(featchStockBalanceLocationSearchAsync.pending, () => {
@@ -87,5 +87,5 @@ const stockBalanceLocationSearchSlice = createSlice({
   },
 });
 
-export const { clearDataFilter } = stockBalanceLocationSearchSlice.actions;
+export const { clearDataLocationFilter } = stockBalanceLocationSearchSlice.actions;
 export default stockBalanceLocationSearchSlice.reducer;

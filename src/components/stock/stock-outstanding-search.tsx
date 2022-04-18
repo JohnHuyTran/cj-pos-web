@@ -20,7 +20,10 @@ import {
 } from '../../store/slices/stock/stock-balance-search-slice';
 import { OutstandingRequest } from '../../models/stock-model';
 import moment from 'moment';
-import { featchStockBalanceLocationSearchAsync } from '../../store/slices/stock/stock-balance-location-search-slice';
+import {
+  featchStockBalanceLocationSearchAsync,
+  clearDataLocationFilter,
+} from '../../store/slices/stock/stock-balance-location-search-slice';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 interface State {
@@ -74,9 +77,12 @@ function StockSearch() {
     const name = event.target.name;
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
-    // if (name === 'storeId' && value != values.storeId) {
-    //   setValues({ ...values, productId: '' });
-    // }
+    if (name === 'storeId' && value != values.storeId) {
+      setValues({ ...values, [event.target.name]: value });
+      dispatch(updateAddTypeAndProductState([]));
+    } else {
+      setValues({ ...values, [event.target.name]: value });
+    }
   };
   const [value, setValue] = React.useState(0);
 
@@ -112,6 +118,7 @@ function StockSearch() {
     handleOpenLoading('open', true);
     setValues({ storeId: 'ALL', locationId: 'ALL', productId: '', branchId: '' });
     await dispatch(clearDataFilter());
+    await dispatch(clearDataLocationFilter());
     setTimeout(() => {
       handleOpenLoading('open', false);
     }, 300);
