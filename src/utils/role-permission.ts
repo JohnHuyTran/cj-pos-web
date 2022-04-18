@@ -1,3 +1,4 @@
+import { env } from '../adapters/environmentConfigs';
 import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
 import { getUserInfo } from '../store/sessionStore';
 import {
@@ -69,9 +70,17 @@ export const isGroupBranch = () => {
   return userInfo.group === PERMISSION_GROUP.BRANCH;
 };
 
+export const isGroupBranchParam = (group: string) => {
+  return group === PERMISSION_GROUP.BRANCH;
+};
+
 export const isPreferredUsername = () => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   return userInfo.preferred_username;
+};
+
+export const isChannelBranch = () => {
+  return env.branch.channel === 'branch' ? true : false;
 };
 
 const permission = {
