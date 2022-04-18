@@ -206,7 +206,7 @@ const SaleLimitTimeSearch = () => {
     setValues({
       query: '',
       branch: checkAdmin ? '' : userInfo.branch,
-      status: checkAdmin ? 'all' : '2',
+      status: checkAdmin ? '1' : '2',
       startDate: new Date(),
       endDate: new Date(),
     });

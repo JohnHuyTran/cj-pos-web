@@ -66,7 +66,18 @@ export const environment = {
   },
   task: {
     notification: {
-      url: '/task/notifications',
+      tasks: {
+        url: '/task/notifications/tasks',
+      },
+      reminders: {
+        url: '/task/notifications/reminders',
+      },
+      announcements: {
+        url: '/task/notifications/announcements',
+      },
+      read: {
+        url: '/task/notifications/{id}',
+      },
     },
   },
   withDraw: {

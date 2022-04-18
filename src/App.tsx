@@ -21,6 +21,7 @@ import { featchBranchListAsync } from './store/slices/search-branches-slice';
 import { featchAuthorizedBranchListAsync } from './store/slices/authorized-branch-slice';
 import Notification from './pages/notification';
 import TransferOut from './pages/transfer-out/transfer-out';
+import TransferOutDestroy from './pages/transfer-out-destroy/transfer-out-destroy';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -81,16 +82,17 @@ export default function App2() {
         <DrawerHeader />
         <Switch>
           <Route exact path="/" component={Home} />
-          <Route path='/notification' component={Notification} /> 
-          <Route path='/barcode-discount' component={BarcodeDiscount} />
+          <Route path="/notification" component={Notification} />
+          <Route path="/barcode-discount" component={BarcodeDiscount} />
           <Route path="/tax-invoice" component={TaxInvoice} />
-          <Route path='/sale-limit-time' component={SaleLimitTime} />
-          <Route path='/check-order' component={CheckOrder} />
-          <Route path='/dc-check-order' component={DCCheckOrder} />
-          <Route path='/supplier-check-order' component={SupplierCheckOrder} />
-          <Route path='/stock-transfer' component={StockTransfer} />
-          <Route path='/stock-transfer-rt' component={StockTransferRt} />
-          <Route path='/transfer-out' component={TransferOut} />
+          <Route path="/sale-limit-time" component={SaleLimitTime} />
+          <Route path="/check-order" component={CheckOrder} />
+          <Route path="/dc-check-order" component={DCCheckOrder} />
+          <Route path="/supplier-check-order" component={SupplierCheckOrder} />
+          <Route path="/stock-transfer" component={StockTransfer} />
+          <Route path="/stock-transfer-rt" component={StockTransferRt} />
+          <Route path="/transfer-out" component={TransferOut} />
+          <Route path="/transfer-out-destroy" component={TransferOutDestroy} />
         </Switch>
       </Main>
     </Box>

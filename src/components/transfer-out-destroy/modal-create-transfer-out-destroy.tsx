@@ -6,7 +6,6 @@ import {
   DialogContent,
   Grid,
   Typography,
-  FormControl,
 } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -23,25 +22,23 @@ import {
   updateDataDetail,
   updateErrorList,
   updateCheckEdit, updateApproveReject,
-} from '../../store/slices/transfer-out-slice';
+} from '../../store/slices/transfer-out-destroy-slice';
 import {
   uploadAttachFile,
 } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { getBranchName, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, BDStatus, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
+import { Action, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
 import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from "../../utils/enum/permission-enum";
 import { uploadFileState } from "../../store/slices/upload-file-slice";
 import AccordionUploadFile from "../commons/ui/accordion-upload-file";
 import { getUserInfo } from "../../store/sessionStore";
-import ModalTransferOutItem from "./modal-transfer-out-item";
+import ModalTransferOutDestroyItem from "./modal-transfer-out-destroy-item";
 import ModelConfirm from "../barcode-discount/modal-confirm";
 import ModalCheckStock from "../barcode-discount/modal-check-stock";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
 import {
   approveTransferOut,
   cancelTransferOut, endTransferOut, rejectTransferOut,
@@ -63,15 +60,15 @@ interface Props {
 
 const _ = require('lodash');
 
-export default function ModalCreateTransferOut({
-                                                 isOpen,
-                                                 onClickClose,
-                                                 setOpenPopup,
-                                                 action,
-                                                 setPopupMsg,
-                                                 onSearchMain,
-                                                 userPermission,
-                                               }: Props): ReactElement {
+export default function ModalCreateTransferOutDestroy({
+                                                        isOpen,
+                                                        onClickClose,
+                                                        setOpenPopup,
+                                                        action,
+                                                        setPopupMsg,
+                                                        onSearchMain,
+                                                        userPermission,
+                                                      }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   let errorListProduct: any = [];
@@ -91,17 +88,18 @@ export default function ModalCreateTransferOut({
   const [errors, setErrors] = React.useState<any>([]);
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  const payloadTransferOut = useAppSelector((state) => state.transferOutSlice.createDraft);
-  const dataDetail = useAppSelector((state) => state.transferOutSlice.dataDetail);
-  const approveReject = useAppSelector((state) => state.transferOutSlice.approveReject);
-  const checkEdit = useAppSelector((state) => state.transferOutSlice.checkEdit);
+  const payloadTransferOut = useAppSelector((state) => state.transferOutDestroySlice.createDraft);
+  const dataDetail = useAppSelector((state) => state.transferOutDestroySlice.dataDetail);
+  const approveReject = useAppSelector((state) => state.transferOutDestroySlice.approveReject);
+  const checkEdit = useAppSelector((state) => state.transferOutDestroySlice.checkEdit);
   //get detail from search
   const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail.data);
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.CAMPAIGN_TO_APPROVE) : false);
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
-  const [attachFileOlds, setAttachFileOlds] = React.useState<any>([]);
+  const [attachFileBeforeOlds, setAttachFileBeforeOlds] = React.useState<any>([]);
+  const [attachFileAfterOlds, setAttachFileAfterOlds] = React.useState<any>([]);
   const [attachFileError, setAttachFileError] = React.useState('');
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [alertTextError, setAlertTextError] = React.useState('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
@@ -215,10 +213,10 @@ export default function ModalCreateTransferOut({
         })
       );
       //set value for attach files
-      if (transferOutDetail.attachFiles && transferOutDetail.attachFiles.length > 0) {
-        let lstAttachFile: any = [];
-        for (let item of transferOutDetail.attachFiles) {
-          lstAttachFile.push({
+      if (transferOutDetail.beforeAttachFiles && transferOutDetail.beforeAttachFiles.length > 0) {
+        let lstAttachFileBefore: any = [];
+        for (let item of transferOutDetail.beforeAttachFiles) {
+          lstAttachFileBefore.push({
             file: null,
             fileKey: item.key,
             fileName: item.name,
@@ -226,8 +224,22 @@ export default function ModalCreateTransferOut({
             mimeType: item.mimeType,
           });
         }
-        setAttachFileOlds(lstAttachFile);
-        setUploadFileFlag(true);
+        setAttachFileBeforeOlds(lstAttachFileBefore);
+        // setUploadFileFlag(true);
+      }
+      if (transferOutDetail.afterAttachFiles && transferOutDetail.afterAttachFiles.length > 0) {
+        let lstAttachFileAfter: any = [];
+        for (let item of transferOutDetail.afterAttachFiles) {
+          lstAttachFileAfter.push({
+            file: null,
+            fileKey: item.key,
+            fileName: item.name,
+            status: 'old',
+            mimeType: item.mimeType,
+          });
+        }
+        setAttachFileAfterOlds(lstAttachFileAfter);
+        // setUploadFileFlag(true);
       }
       //set value for products
       if (transferOutDetail.products && transferOutDetail.products.length > 0) {
@@ -255,19 +267,9 @@ export default function ModalCreateTransferOut({
   const validate = (checkApprove: boolean) => {
     let isValid = true;
     //validate data detail
-    if (stringNullOrEmpty(dataDetail.transferOutReason)) {
+    if (TOStatus.DRAFT == status && fileUploadList.length === 0 && attachFileBeforeOlds.length === 0) {
+      setAttachFileError('AttachFileBefore__กรุณาแนบไฟล์เอกสาร');
       isValid = false;
-      setErrors({
-        ...errors,
-        transferOutReason: 'กรุณาระบุรายละเอียด'
-      });
-    }
-    if (stringNullOrEmpty(dataDetail.store)) {
-      isValid = false;
-      setErrors({
-        ...errors,
-        store: 'กรุณาระบุรายละเอียด'
-      });
     }
 
     //validate product
@@ -313,15 +315,26 @@ export default function ModalCreateTransferOut({
     return isValid;
   }
 
-  const handleOnChangeUploadFile = (status: boolean) => {
+  const handleOnChangeUploadFileBefore = (status: boolean) => {
     setUploadFileFlag(status);
     setAttachFileError('');
   };
 
-  const onDeleteAttachFileOld = (item: any) => {
-    let attachFileData = _.cloneDeep(attachFileOlds);
+  const handleOnChangeUploadFileAfter = (status: boolean) => {
+    setUploadFileFlag(status);
+    setAttachFileError('');
+  };
+
+  const onDeleteAttachFileBeforeOld = (item: any) => {
+    let attachFileData = _.cloneDeep(attachFileBeforeOlds);
     let attachFileDataFilter = attachFileData.filter((it: any) => it.fileKey !== item.fileKey);
-    setAttachFileOlds(attachFileDataFilter);
+    setAttachFileBeforeOlds(attachFileDataFilter);
+  };
+
+  const onDeleteAttachFileAfterOld = (item: any) => {
+    let attachFileData = _.cloneDeep(attachFileAfterOlds);
+    let attachFileDataFilter = attachFileData.filter((it: any) => it.fileKey !== item.fileKey);
+    setAttachFileAfterOlds(attachFileDataFilter);
   };
 
   const handleUploadAttachFile = async () => {
@@ -341,7 +354,7 @@ export default function ModalCreateTransferOut({
     }
   }
 
-  const handleAllAttachFile = async () => {
+  const handleAllAttachFile = async (_isBefore: boolean) => {
     let allAttachFile = [];
     if (fileUploadList && fileUploadList.length > 0) {
       const rsUploadAttachFile = await handleUploadAttachFile();
@@ -353,15 +366,30 @@ export default function ModalCreateTransferOut({
         return;
       }
     }
-    if (attachFileOlds && attachFileOlds.length > 0) {
-      for (const oldFile of attachFileOlds) {
-        let attachFileExist = allAttachFile.find((itAll: any) => itAll.name === oldFile.fileName);
-        if (objectNullOrEmpty(attachFileExist)) {
-          allAttachFile.push({
-            key: oldFile.fileKey,
-            name: oldFile.fileName,
-            mimeType: oldFile.mimeType
-          });
+    if (_isBefore) {
+      if (attachFileBeforeOlds && attachFileBeforeOlds.length > 0) {
+        for (const oldFile of attachFileBeforeOlds) {
+          let attachFileExist = allAttachFile.find((itAll: any) => itAll.name === oldFile.fileName);
+          if (objectNullOrEmpty(attachFileExist)) {
+            allAttachFile.push({
+              key: oldFile.fileKey,
+              name: oldFile.fileName,
+              mimeType: oldFile.mimeType
+            });
+          }
+        }
+      }
+    } else {
+      if (attachFileAfterOlds && attachFileAfterOlds.length > 0) {
+        for (const oldFile of attachFileAfterOlds) {
+          let attachFileExist = allAttachFile.find((itAll: any) => itAll.name === oldFile.fileName);
+          if (objectNullOrEmpty(attachFileExist)) {
+            allAttachFile.push({
+              key: oldFile.fileKey,
+              name: oldFile.fileName,
+              mimeType: oldFile.mimeType
+            });
+          }
         }
       }
     }
@@ -375,23 +403,19 @@ export default function ModalCreateTransferOut({
       if (rsCheckStock) {
         await dispatch(save({ ...payloadTransferOut }));
         try {
-          const allAttachFile = await handleAllAttachFile();
+          const allAttachFileBefore = await handleAllAttachFile(true);
           const body = !!dataDetail.id
             ? {
               ...payloadTransferOut,
               id: dataDetail.id,
               documentNumber: dataDetail.documentNumber,
-              attachFiles: allAttachFile,
-              transferOutReason: dataDetail.transferOutReason,
-              store: dataDetail.store,
-              type: TO_TYPE.TO_ACTIVITY
+              beforeAttachFiles: allAttachFileBefore,
+              type: TO_TYPE.TO_WITHOUT_DISCOUNT
             }
             : {
               ...payloadTransferOut,
-              attachFiles: allAttachFile,
-              transferOutReason: dataDetail.transferOutReason,
-              store: dataDetail.store,
-              type: TO_TYPE.TO_ACTIVITY
+              beforeAttachFiles: allAttachFileBefore,
+              type: TO_TYPE.TO_WITHOUT_DISCOUNT
             };
           const rs = await saveDraftTransferOut(body);
           if (rs.code === 201) {
@@ -402,10 +426,10 @@ export default function ModalCreateTransferOut({
               if (onSearchMain) onSearchMain();
             }
             if (rs && rs.data) {
-              if (rs.data.attachFiles && rs.data.attachFiles.length > 0) {
-                let lstAttachFile: any = [];
-                for (let item of rs.data.attachFiles) {
-                  lstAttachFile.push({
+              if (rs.data.beforeAttachFiles && rs.data.beforeAttachFiles.length > 0) {
+                let beforeAttachFiles: any = [];
+                for (let item of rs.data.beforeAttachFiles) {
+                  beforeAttachFiles.push({
                     file: null,
                     fileKey: item.key,
                     fileName: item.name,
@@ -414,7 +438,7 @@ export default function ModalCreateTransferOut({
                   });
                 }
                 await setUploadFileFlag(true);
-                await setAttachFileOlds(lstAttachFile);
+                await setAttachFileBeforeOlds(beforeAttachFiles);
                 await dispatch(uploadFileState([]));
               }
             }
@@ -427,6 +451,11 @@ export default function ModalCreateTransferOut({
               })
             );
             if (sendRequest) {
+              //validate attach file
+              if (fileUploadList.length === 0 && attachFileBeforeOlds.length === 0) {
+                setAttachFileError('AttachFileBefore__กรุณาแนบไฟล์เอกสาร');
+                return;
+              }
               setOpenModalConfirmSendForApproval(true);
             }
           } else {
@@ -445,6 +474,11 @@ export default function ModalCreateTransferOut({
 
   const handleSendForApproval = async (id: string) => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    //validate attach file
+    if (fileUploadList.length === 0 && attachFileBeforeOlds.length === 0) {
+      setAttachFileError('AttachFileBefore__กรุณาแนบไฟล์เอกสาร');
+      return;
+    }
     try {
       const rs = await sendForApprovalTransferOut(id);
       if (rs.code === 20000) {
@@ -455,7 +489,7 @@ export default function ModalCreateTransferOut({
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ส่งขออนุมัติเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการส่งขออนุมัติเบิกทำลายมีส่วนลดเรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
       } else {
@@ -479,10 +513,10 @@ export default function ModalCreateTransferOut({
   const handleApprove = async () => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     try {
-      const allAttachFile = await handleAllAttachFile();
+      const allAttachFile = await handleAllAttachFile(true);
       const payload = {
         products: payloadTransferOut.products,
-        attachFiles: allAttachFile
+        beforeAttachFiles: allAttachFile
       };
       const rs = await approveTransferOut(dataDetail.id, payload);
       if (rs.code === 20000) {
@@ -493,7 +527,7 @@ export default function ModalCreateTransferOut({
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ทำการอนุมัติเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการอนุมัติเบิกทำลายไม่มีส่วนลดเรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
       } else if (rs.code === 50003) {
@@ -514,7 +548,7 @@ export default function ModalCreateTransferOut({
         const rs = await cancelTransferOut(dataDetail.id);
         if (rs.status === 200) {
           setOpenPopup(true);
-          setPopupMsg('คุณได้ยกเลิกเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
+          setPopupMsg('คุณได้ยกเลิกเบิกทำลายไม่มีส่วนลดเรียบร้อยแล้ว');
           handleClose();
           if (onSearchMain) onSearchMain();
         } else {
@@ -527,7 +561,7 @@ export default function ModalCreateTransferOut({
       }
     } else {
       setOpenPopup(true);
-      setPopupMsg('คุณได้ยกเลิกเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
+      setPopupMsg('คุณได้ยกเลิกเบิกทำลายไม่มีส่วนลดเรียบร้อยแล้ว');
       handleClose();
     }
   };
@@ -576,7 +610,7 @@ export default function ModalCreateTransferOut({
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ทำการไม่อนุมัติเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการไม่อนุมัติเบิกทำลายไม่มีส่วนลดเรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
       } else {
@@ -590,6 +624,11 @@ export default function ModalCreateTransferOut({
   };
 
   const handleOpenModalConfirmEnd = () => {
+    //validate attach file
+    if (fileUploadList.length === 0 && attachFileAfterOlds.length === 0) {
+      setAttachFileError('AttachFileAfter__กรุณาแนบไฟล์เอกสาร');
+      return;
+    }
     setOpenModalConfirmEnd(true);
   };
 
@@ -602,8 +641,8 @@ export default function ModalCreateTransferOut({
 
   const handleEnd = async () => {
     try {
-      const allAttachFile = await handleAllAttachFile();
-      let res = await endTransferOut(dataDetail.id, allAttachFile);
+      const allAttachFileAfter = await handleAllAttachFile(false);
+      let res = await endTransferOut(dataDetail.id, allAttachFileAfter);
       if (res && res.code === 20000) {
         dispatch(
           updateDataDetail({
@@ -612,7 +651,7 @@ export default function ModalCreateTransferOut({
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ทำการปิดงานเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการปิดงานเบิกทำลายไม่มีส่วนลดเรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
       } else {
@@ -629,13 +668,13 @@ export default function ModalCreateTransferOut({
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCloseModalCreate}>
-          <Typography sx={{ fontSize: '1em' }}>สร้างเอกสารเบิกใช้ในการทำกิจกรรม</Typography>
+          <Typography sx={{ fontSize: '1em' }}>สร้างเอกสารทำลายไม่มีส่วนลด</Typography>
           <StepperBar activeStep={status} setActiveStep={setStatus}/>
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container mt={1} mb={-1}>
             {/*line 1*/}
-            <Grid item container xs={4} mb={5}>
+            <Grid item container xs={4} mb={5} mr={-3}>
               <Grid item xs={4}>
                 สาขา :
               </Grid>
@@ -645,13 +684,13 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
-                เลขที่เอกสารเบิก :
+                เลขที่เอกสารทำลาย :
               </Grid>
               <Grid item xs={8}>
                 {!!dataDetail.documentNumber ? dataDetail.documentNumber : '_'}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5} pl={2}>
+            <Grid item container xs={4} mb={5} pl={3}>
               <Grid item xs={4}>
                 วันที่ทำรายการ :
               </Grid>
@@ -660,7 +699,7 @@ export default function ModalCreateTransferOut({
               </Grid>
             </Grid>
             {/*line 2*/}
-            <Grid item container xs={4} mb={5}>
+            <Grid item container xs={4} mb={5} mr={-3}>
               <Grid item xs={4}>
                 วันที่อนุมัติ :
               </Grid>
@@ -668,90 +707,40 @@ export default function ModalCreateTransferOut({
                 {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5}>
+            <Grid item container xs={4} mb={2}>
               <Grid item xs={4}>
-                เหตุผลการเบิก :
-              </Grid>
-              <Grid item xs={8}>
-                <FormControl fullWidth className={classes.Mselect}>
-                  <Select
-                    id="transferOutReason"
-                    name="transferOutReason"
-                    value={dataDetail.transferOutReason}
-                    onChange={(e) => {
-                      dispatch(updateDataDetail({ ...dataDetail, transferOutReason: e.target.value }));
-                      setErrors({
-                        ...errors,
-                        transferOutReason: ''
-                      });
-                      dispatch(updateCheckEdit(true));
-                    }}
-                    inputProps={{ 'aria-label': 'Without label' }}
-                    disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL)
-                      || (TOStatus.WAIT_FOR_APPROVAL == status && !approvePermission)}
-                    error={!stringNullOrEmpty(errors['transferOutReason'])}
-                  >
-                    <MenuItem value={'1'}>{'เบิกเพื่อแจกลูกค้า'}</MenuItem>
-                    <MenuItem value={'2'}>{'เบิกเพื่อทำกิจกรรม'}</MenuItem>
-                  </Select>
-                  <Typography hidden={stringNullOrEmpty(errors['transferOutReason'])}
-                              display={'flex'} justifyContent={'flex-end'}
-                              sx={{ color: '#F54949' }}>
-                    {errors['transferOutReason']}
-                  </Typography>
-                </FormControl>
-              </Grid>
-            </Grid>
-            <Grid item container xs={4} mb={5} pl={2}>
-              <Grid item xs={4}>
-                คลัง :
-              </Grid>
-              <Grid item xs={8}>
-                <FormControl fullWidth className={classes.Mselect}>
-                  <Select
-                    id="store"
-                    name="store"
-                    value={dataDetail.store}
-                    onChange={(e) => {
-                      dispatch(updateDataDetail({ ...dataDetail, store: e.target.value }));
-                      setErrors({
-                        ...errors,
-                        store: ''
-                      });
-                      dispatch(updateCheckEdit(true));
-                    }}
-                    inputProps={{ 'aria-label': 'Without label' }}
-                    disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL)
-                      || (TOStatus.WAIT_FOR_APPROVAL == status && !approvePermission)}
-                    error={!stringNullOrEmpty(errors['store'])}
-                  >
-                    <MenuItem value={'1'}>{'คลังหน้าร้าน'}</MenuItem>
-                    <MenuItem value={'2'}>{'คลังหลังร้าน'}</MenuItem>
-                  </Select>
-                  <Typography hidden={stringNullOrEmpty(errors['store'])}
-                              display={'flex'} justifyContent={'flex-end'}
-                              sx={{ color: '#F54949' }}>
-                    {errors['store']}
-                  </Typography>
-                </FormControl>
-              </Grid>
-            </Grid>
-            {/*line 3*/}
-            <Grid container item xs={4} mb={5} mt={-1}>
-              <Grid item xs={4}>
-                รูปภาพ :
+                รูปก่อนทำลาย :
               </Grid>
               <Grid item xs={8}>
                 <AccordionUploadFile
-                  files={attachFileOlds}
+                  files={attachFileBeforeOlds}
                   docNo={dataDetail ? dataDetail.documentNumber : ''}
                   docType='TO'
                   isStatus={uploadFileFlag}
-                  onChangeUploadFile={handleOnChangeUploadFile}
-                  onDeleteAttachFile={onDeleteAttachFileOld}
+                  onChangeUploadFile={handleOnChangeUploadFileBefore}
+                  onDeleteAttachFile={onDeleteAttachFileBeforeOld}
+                  idControl={'AttachFileBefore'}
                   enabledControl={TOStatus.DRAFT === status
-                    || (TOStatus.WAIT_FOR_APPROVAL === status && approvePermission)
-                    || TOStatus.APPROVED === status}
+                    || (TOStatus.WAIT_FOR_APPROVAL === status && approvePermission)}
+                  warningMessage={attachFileError}
+                  deletePermission={TOStatus.DRAFT === status}
+                />
+              </Grid>
+            </Grid>
+            <Grid item container xs={4} mb={2} pl={3}>
+              <Grid item xs={4}>
+                รูปหลังทำลาย :
+              </Grid>
+              <Grid item xs={8}>
+                <AccordionUploadFile
+                  files={attachFileAfterOlds}
+                  docNo={dataDetail ? dataDetail.documentNumber : ''}
+                  docType='TO'
+                  isStatus={uploadFileFlag}
+                  onChangeUploadFile={handleOnChangeUploadFileAfter}
+                  onDeleteAttachFile={onDeleteAttachFileAfterOld}
+                  idControl={'AttachFileAfter'}
+                  enabledControl={(TOStatus.APPROVED === status && !approvePermission)}
                   warningMessage={attachFileError}
                   deletePermission={TOStatus.DRAFT === status}
                 />
@@ -843,7 +832,7 @@ export default function ModalCreateTransferOut({
               </Box>
             </Box>
             <Box>
-              <ModalTransferOutItem id='' action={action} userPermission={userPermission}/>
+              <ModalTransferOutDestroyItem id='' action={action} userPermission={userPermission}/>
             </Box>
           </Box>
         </DialogContent>
@@ -860,7 +849,7 @@ export default function ModalCreateTransferOut({
         onClose={handleCloseModalCancel}
         onConfirm={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันยกเลิกเบิกใช้ในการทำกิจกรรม'}
+        headerTitle={'ยืนยันยกเลิกเบิกทำลายไม่มีส่วนลด'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
@@ -874,7 +863,7 @@ export default function ModalCreateTransferOut({
         onClose={() => {
           setOpenCheckStock(false);
         }}
-        headerTitle={'จำนวนที่ขอเกินจำนวนสินค้าสต๊อก'}
+        headerTitle={'เบิกสินค้ามากกว่าที่มีในคลัง โปรดตรวจสอบ'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm
@@ -882,7 +871,7 @@ export default function ModalCreateTransferOut({
         onClose={() => handleCloseModalConfirmApprove(false)}
         onConfirm={() => handleCloseModalConfirmApprove(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันอนุมัติเบิกใช้ในการทำกิจกรรม'}
+        headerTitle={'ยืนยันอนุมัติเบิกทำลายไม่มีส่วนลด'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <ModelConfirm
@@ -890,7 +879,7 @@ export default function ModalCreateTransferOut({
         onClose={() => handleCloseModalConfirmReject(false)}
         onConfirm={() => handleCloseModalConfirmReject(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันไม่อนุมัติเบิกใช้ในการทำกิจกรรม'}
+        headerTitle={'ยืนยันไม่อนุมัติเบิกทำลายไม่มีส่วนลด'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <ModelConfirm
@@ -898,7 +887,7 @@ export default function ModalCreateTransferOut({
         onClose={() => handleCloseModalConfirmSendForApproval(false)}
         onConfirm={() => handleCloseModalConfirmSendForApproval(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันส่งขอเบิกใช้ในการทำกิจกรรม'}
+        headerTitle={'ยืนยันส่งขอเบิกทำลายไม่มีส่วนลด'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <ModelConfirm
@@ -906,7 +895,7 @@ export default function ModalCreateTransferOut({
         onClose={() => handleCloseModalConfirmEnd(false)}
         onConfirm={() => handleCloseModalConfirmEnd(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันปิดงานเบิกใช้ในการทำกิจกรรม'}
+        headerTitle={'ยืนยันปิดงานเบิกทำลายไม่มีส่วนลด'}
         documentField={'เลขที่เอกสารเบิก'}
       />
     </div>
