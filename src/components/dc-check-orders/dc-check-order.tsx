@@ -26,6 +26,7 @@ import { BranchListOptionType } from '../../models/branch-model';
 import { isAllowActionPermission, isGroupDC } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { setItemId, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
+import { BranchInfo } from '../../models/search-branch-model';
 
 moment.locale('th');
 
@@ -80,13 +81,25 @@ function DCCheckOrderSearch() {
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [branchFromCode, setBranchFromCode] = React.useState('');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const [ownBranch, setOwnBranch] = React.useState(
-    getUserInfo().branch
-      ? getBranchName(branchList, getUserInfo().branch)
-        ? getUserInfo().branch
-        : env.branch.code
-      : env.branch.code
-  );
+  const authorizedBranchList = useAppSelector((state) => state.authorizedhBranchSlice);
+
+  const filterAuthorizedBranch = () => {
+    return authorizedBranchList.branchList.data?.branches.find((item: BranchInfo) => item.isDC === true);
+  };
+
+  const defaultBranch = () => {
+    if (isGroupDC()) {
+      const branch = filterAuthorizedBranch();
+      return branch ? branch.code : env.branch.code;
+    } else {
+      return getUserInfo().branch
+        ? getBranchName(branchList, getUserInfo().branch)
+          ? getUserInfo().branch
+          : env.branch.code
+        : env.branch.code;
+    }
+  };
+  const [ownBranch, setOwnBranch] = React.useState(defaultBranch());
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
@@ -94,6 +107,7 @@ function DCCheckOrderSearch() {
 
   React.useEffect(() => {
     setDisableSearchBtn(isAllowActionPermission(ACTIONS.ORDER_VER_VIEW));
+
     setBranchFromCode(ownBranch);
     setValues({ ...values, shipBranchFrom: ownBranch });
   }, []);
