@@ -26,6 +26,7 @@ import {
 } from '../../store/slices/stock/stock-balance-location-search-slice';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
+import AlertError from '../commons/ui/alert-error';
 interface State {
   storeId: string;
   locationId: string;
@@ -113,10 +114,16 @@ function StockSearch() {
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const page = '1';
   const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
 
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
   const onClickClearBtn = async () => {
     handleOpenLoading('open', true);
     setValues({ storeId: 'ALL', locationId: 'ALL', productId: '', branchId: '' });
+    await dispatch(updateAddTypeAndProductState([]));
     await dispatch(clearDataFilter());
     await dispatch(clearDataLocationFilter());
     setTimeout(() => {
@@ -125,33 +132,40 @@ function StockSearch() {
   };
 
   const onClickSearchBtn = async () => {
-    let limits;
-    if (limit === 0 || limit === undefined) {
-      limits = '10';
-    } else {
-      limits = limit.toString();
-    }
-    const productList: string[] = [];
-    payloadAddTypeProduct
-      .filter((el: any) => el.selectedType === 2 && el.showProduct)
-      .map((item: any, index: number) => {
-        productList.push(item.skuCode);
-      });
-
-    const payload: OutstandingRequest = {
-      limit: limits,
-      page: page,
-      stockId: values.storeId,
-      productList: productList,
-      locationId: values.locationId,
-      branchId: values.branchId,
-      dateFrom: moment(startDate).startOf('day').toISOString(),
-    };
-
     handleOpenLoading('open', true);
-    await dispatch(featchStockBalanceSearchAsync(payload));
-    await dispatch(featchStockBalanceLocationSearchAsync(payload));
-    await dispatch(savePayloadSearch(payload));
+    console.log('payloadAddTypeProduct: ', payloadAddTypeProduct);
+    if (Object.keys(payloadAddTypeProduct).length <= 0) {
+      setOpenAlert(true);
+      setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
+    } else {
+      let limits;
+      if (limit === 0 || limit === undefined) {
+        limits = '10';
+      } else {
+        limits = limit.toString();
+      }
+      const productList: string[] = [];
+      payloadAddTypeProduct
+        .filter((el: any) => el.selectedType === 2 && el.showProduct)
+        .map((item: any, index: number) => {
+          productList.push(item.skuCode);
+        });
+
+      const payload: OutstandingRequest = {
+        limit: limits,
+        page: page,
+        stockId: values.storeId,
+        productList: productList,
+        locationId: values.locationId,
+        branchId: values.branchId,
+        dateFrom: moment(startDate).startOf('day').toISOString(),
+      };
+
+      await dispatch(featchStockBalanceSearchAsync(payload));
+      await dispatch(featchStockBalanceLocationSearchAsync(payload));
+      await dispatch(savePayloadSearch(payload));
+    }
+
     handleOpenLoading('open', false);
   };
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -329,6 +343,7 @@ function StockSearch() {
         <StockBalanceLocation />
       </TabPanel>
       <ModalAddTypeProduct open={openModelAddItems} onClose={handleCloseModalAddItems} />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
   );
 }
