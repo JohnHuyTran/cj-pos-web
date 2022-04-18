@@ -139,6 +139,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
         houseNo: data.houseNo,
         building: data.building,
         moo: data.moo,
+        soi: data.soi,
+        road: data.road,
         subDistrictCode: data.subDistrict,
         districtCode: data.district,
         provinceCode: data.province,
@@ -229,8 +231,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
         setValue('houseNo', value.data.address.houseNo);
         setValue('building', value.data.address.building);
         setValue('moo', value.data.address.moo);
-        setValue('soi', '');
-        setValue('road', '');
+        setValue('soi', value.data.address.soi);
+        setValue('road', value.data.address.road);
         setValue('province', value.data.address.provinceCode);
         setValue('district', value.data.address.districtCode);
         setValue('subDistrict', value.data.address.subDistrictCode);
@@ -259,8 +261,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
     setValue('houseNo', data.customer.address.houseNo);
     setValue('building', data.customer.address.building);
     setValue('moo', data.customer.address.moo);
-    setValue('soi', '');
-    setValue('road', '');
+    setValue('soi', data.customer.address.soi);
+    setValue('road', data.customer.address.road);
     setValue('province', data.customer.address.provinceCode);
     setValue('district', data.customer.address.districtCode);
     setValue('subDistrict', data.customer.address.subDistrictCode);
