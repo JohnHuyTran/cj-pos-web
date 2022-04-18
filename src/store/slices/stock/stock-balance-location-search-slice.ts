@@ -28,7 +28,7 @@ export const featchStockBalanceLocationSearchAsync = createAsyncThunk(
   'stockBalanceLocationList',
   async (payload: OutstandingRequest) => {
     try {
-      const apiRootPath = environment.stock.outStanding.stockBalance.searchByLocation;
+      const apiRootPath = environment.stock.outStanding.stockBalance.searchByLocation.url;
       let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}`;
       if (payload.stockId) {
         path = path + `&stockId=${payload.stockId}`;

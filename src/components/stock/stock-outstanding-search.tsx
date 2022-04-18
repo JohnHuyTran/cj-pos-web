@@ -5,7 +5,7 @@ import { BranchListOptionType } from '../../models/branch-model';
 import { getUserInfo } from '../../store/sessionStore';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
-import { isGroupBranch } from '../../utils/role-permission';
+import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permission';
 import { getBranchName } from '../../utils/utils';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import DatePickerAllComponent from '../commons/ui/date-picker-all';
@@ -21,6 +21,8 @@ import {
 import { OutstandingRequest } from '../../models/stock-model';
 import moment from 'moment';
 import { featchStockBalanceLocationSearchAsync } from '../../store/slices/stock/stock-balance-location-search-slice';
+import { ACTIONS } from '../../utils/enum/permission-enum';
+import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 interface State {
   storeId: string;
   locationId: string;
@@ -72,9 +74,9 @@ function StockSearch() {
     const name = event.target.name;
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
-    if (name === 'storeId' && value != values.storeId) {
-      setValues({ ...values, productId: '' });
-    }
+    // if (name === 'storeId' && value != values.storeId) {
+    //   setValues({ ...values, productId: '' });
+    // }
   };
   const [value, setValue] = React.useState(0);
 
@@ -172,8 +174,9 @@ function StockSearch() {
   };
 
   React.useEffect(() => {
-    setDisableSearchBtn(false);
+    setDisableSearchBtn(isAllowActionPermission(ACTIONS.STOCK_BL_SKU));
     setValues({ ...values, branchId: valuebranchFrom ? valuebranchFrom.code : '' });
+    dispatch(updateAddTypeAndProductState([]));
   }, []);
 
   React.useEffect(() => {

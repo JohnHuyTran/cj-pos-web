@@ -257,14 +257,14 @@ export default function Sidebar({}: Props): ReactElement {
             </Link>
           </List>
         </Collapse>
-        <ListItemButton onClick={handleClickPickUp} id='mainMenuPickUp'>
+        <ListItemButton
+          onClick={handleClickPickUp}
+          id='mainMenuPickUp'
+          style={{ display: disableMainMenuOrderReceive ? 'none' : '' }}>
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText
-            primary='รับสินค้า'
-            style={{ marginLeft: -15, display: disableMainMenuOrderReceive ? 'none' : '' }}
-          />
+          <ListItemText primary='รับสินค้า' style={{ marginLeft: -15 }} />
           {openPickUpMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openPickUpMenu} timeout='auto' unmountOnExit>
@@ -308,14 +308,14 @@ export default function Sidebar({}: Props): ReactElement {
           </List>
         </Collapse>
 
-        <ListItemButton onClick={handleClickTransfer} id='mainMenuTransfer'>
+        <ListItemButton
+          onClick={handleClickTransfer}
+          id='mainMenuTransfer'
+          style={{ display: disableMainMenuStockTransfer ? 'none' : '' }}>
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText
-            primary='โอนสินค้า'
-            style={{ marginLeft: -15, display: disableMainMenuStockTransfer ? 'none' : '' }}
-          />
+          <ListItemText primary='โอนสินค้า' style={{ marginLeft: -15 }} />
           {openTransferMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openTransferMenu} timeout='auto' unmountOnExit>
@@ -366,14 +366,14 @@ export default function Sidebar({}: Props): ReactElement {
             </Link>
           </List>
         </Collapse>
-        <ListItemButton onClick={handleClickProductInfo} id='mainMenuProductInfo'>
+        <ListItemButton
+          onClick={handleClickProductInfo}
+          id='mainMenuProductInfo'
+          style={{ display: disableMainMenuProductInfo ? 'none' : '' }}>
           <ListItemIcon>
             <StoreMallDirectoryIcon />
           </ListItemIcon>
-          <ListItemText
-            primary='ข้อมูลสินค้า'
-            style={{ marginLeft: -15, display: disableMainMenuProductInfo ? 'none' : '' }}
-          />
+          <ListItemText primary='ข้อมูลสินค้า' style={{ marginLeft: -15 }} />
           {openProductInfoMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openProductInfoMenu} timeout='auto' unmountOnExit>
