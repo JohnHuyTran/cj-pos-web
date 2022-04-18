@@ -31,4 +31,8 @@ module.exports = {
 
   // Module file extensions for importing
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  moduleNameMapper: {
+    'react-pdf/dist/esm/entry.webpack': 'react-pdf',
+  },
+  collectCoverageFrom: ['src/test/*.{js,jsx,ts,tsx,mjs}'],
 };

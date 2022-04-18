@@ -3,12 +3,13 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { idText } from 'typescript';
-import { UnitTestComponent } from '../../../pages/unit-test-component';
+import DCCheckOrderSearch from '../../../components/dc-check-orders/dc-check-order';
 
 // let wrapper:any = render(<UnitTestComponent name="Test Name" />);
 let wrapper;
 beforeEach(() => {
-  wrapper = render(<UnitTestComponent name="Test Name" />);
+  // wrapper = render(<UnitTestComponent name="Test Name" />);
+  wrapper = render(<DCCheckOrderSearch />);
 });
 
 describe('when rendered with a `name` prop', () => {
