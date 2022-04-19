@@ -47,7 +47,7 @@ interface State {
 interface Props {
   open: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   skuType?: any[];
 }
 
@@ -447,7 +447,8 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
           <Grid item xs={5} pr={5.5}>
             <Box>
               <Typography gutterBottom variant='subtitle1' component='div' mb={1} mt={-1.9}>
-                {props.title}
+                {props.title && props.title}
+                {!props.title && 'เพิ่มรายการสินค้า (งด) ขาย'}
               </Typography>
             </Box>
             <Box>

@@ -204,6 +204,7 @@ function StockSearch() {
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const [skuTypes, setSkuTypes] = React.useState<any[]>([1, 2]);
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
   };
@@ -357,7 +358,7 @@ function StockSearch() {
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
         title='ระบุสินค้าที่ต้องการค้นหา*'
-        skuType={[1, 2]}
+        skuType={skuTypes}
       />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
