@@ -78,6 +78,7 @@ export enum PERMISSION_GROUP {
 }
 
 export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
+export const KEYCLOAK_GROUP_DC02 = '/service.posback/dc02';
 export const KEYCLOAK_GROUP_SCM01 = '/service.posback/scm01';
 export const KEYCLOAK_GROUP_OC01 = '/service.posback/oc01';
 export const KEYCLOAK_GROUP_BRANCH_MANAGER01 = '/service.posback/branch-manager';
