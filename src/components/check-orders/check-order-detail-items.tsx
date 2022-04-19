@@ -63,7 +63,6 @@ import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import theme from '../../styles/theme';
 import { env } from '../../adapters/environmentConfigs';
 import CheckOrderDetailListTote from '../check-orders/check-order-detail-list-tote';
-import CheckOrderDetailTote from './check-order-detail-tote';
 import { couldStartTrivia } from 'typescript';
 import OrderReceiveDetail from './order-receive-detail';
 import { searchToteAsync } from '../../store/slices/search-tote-slice';

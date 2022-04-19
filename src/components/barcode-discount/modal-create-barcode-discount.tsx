@@ -407,7 +407,10 @@ export default function ModalCreateBarcodeDiscount({
             isValid = false;
             item.errorNumberOfApproved = 'กรุณาระบุจำนวนที่อนุมัติ';
           } else {
-            if (preData.numberOfApproved > preData.numberOfDiscounted) {
+            if (preData.numberOfApproved < 0) {
+              isValid = false;
+              item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องมากกว่า 0';
+            } else if (preData.numberOfApproved > preData.numberOfDiscounted) {
               isValid = false;
               item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่เกินจำนวนที่ขอลด';
             }
@@ -693,7 +696,7 @@ export default function ModalCreateBarcodeDiscount({
       const rs = await checkStockBalance(payload);
 
       if (rs.data && rs.data.length > 0) {
-        dispatch(updateCheckStock(rs.data));
+        await dispatch(updateCheckStock(rs.data));
         setOpenCheckStock(true);
       } else {
         dispatch(updateCheckStock([]));
@@ -1157,6 +1160,7 @@ export default function ModalCreateBarcodeDiscount({
         onClose={() => {
           setOpenCheckStock(false);
         }}
+        headerTitle={'จำนวนที่ขอลดเกินจำนวนสินค้าในสต๊อก'}
       />
       <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts}/>
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>

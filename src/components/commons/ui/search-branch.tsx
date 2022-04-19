@@ -185,28 +185,26 @@ export default function SearchBranch(props: Props): ReactElement {
     searchDebouceRef.current?.cancel();
     searchDebouceRef.current = _.debounce(() => {
       if (event?.keyCode === 13) return;
-  
+
       const keyword = value.trim();
-      const payload: {[key: string]: any} = {
+      const payload: { [key: string]: any } = {
         name: keyword,
         code: keyword,
         limit: '10',
       };
-  
-      if(!!province?.name) {
+
+      if (!!province?.name) {
         payload.province = province.name;
       }
       const params = paramsConvert(payload);
-  
+
       try {
         dispatch(fetchBranchProvinceListAsync(params));
       } catch (error) {
         console.error(error);
       }
-
     }, 200);
-    searchDebouceRef.current()
-    
+    searchDebouceRef.current();
   };
 
   const handleCloseBranch = (event: React.SyntheticEvent, reason: string) => {
@@ -301,6 +299,7 @@ export default function SearchBranch(props: Props): ReactElement {
   };
 
   const handleClearForm = () => {
+    if (props.disabled) return;
     const payload = {
       isAllBranches: true,
       appliedBranches: {
@@ -399,7 +398,7 @@ export default function SearchBranch(props: Props): ReactElement {
                           }}
                           error={!!errorProvince}
                           helperText={errorProvince}
-                          placeholder="รหัสประเภท/ประเภทสินค้า"
+                          placeholder="ค้นหาจังหวัด"
                         />
                       )}
                       size="small"
@@ -443,7 +442,7 @@ export default function SearchBranch(props: Props): ReactElement {
                               marginRight: 0,
                             },
                           }}
-                          placeholder="ค้นหาบาร์โค๊ด / รายละเอียดสินค้า"
+                          placeholder="ค้นหาจากรหัสสาขา / ชื่อสาขา"
                         />
                       )}
                       size="small"

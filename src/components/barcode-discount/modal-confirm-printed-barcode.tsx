@@ -125,8 +125,8 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
             }),
             product_name: item.productName,
             unit_factor: item.unit,
-            price_then: item.priceAfterDiscount,
-            price_now: Number(item.price).toFixed(2),
+            price_then: stringNullOrEmpty(item.price) ? '0' : numberWithCommas(Number(item.price).toFixed(2)),
+            price_now: stringNullOrEmpty(item.priceAfterDiscount) ? '0' : numberWithCommas(Number(item.priceAfterDiscount).toFixed(2)),
             currency: item.currency || "บาท",
           })),
       });
