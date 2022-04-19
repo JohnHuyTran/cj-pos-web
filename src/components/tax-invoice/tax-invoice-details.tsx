@@ -603,6 +603,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 // onChange={handleChange}
                 onChange={(e) => handleInputChange(e)}
                 disabled={editMode}
+                autoComplete='off'
               />
               {errors.taxNo && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -626,6 +627,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 {...register('firstName', { required: true })}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
               {errors.firstName && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -649,6 +651,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 {...register('lastName')}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -673,6 +676,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 {...register('houseNo', { required: true })}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
 
               {errors.houseNo && (
@@ -697,6 +701,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 {...register('building')}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -716,6 +721,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 {...register('moo')}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -734,6 +740,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 {...register('soi')}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -753,6 +760,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 {...register('road')}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
             </Grid>
             <Grid item xs={1}></Grid>
