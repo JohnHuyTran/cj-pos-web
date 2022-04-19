@@ -184,7 +184,7 @@ const permission = {
     },
     action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
   },
-  salemanager: {
+  districtManager: {
     menu: {
       mainmenu: [MAINMENU.PRODUCT_INFO],
       submenu: [SUBMENU.PI_STOCK_BALANCE],

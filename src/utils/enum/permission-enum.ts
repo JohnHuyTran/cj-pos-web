@@ -80,8 +80,8 @@ export enum PERMISSION_GROUP {
   BRANCH = 'branch',
   AREA_MANAGER = 'areaManager',
   AUDIT = 'audit',
-  DISTRICT_MANAGER = 'audit',
-  SM = 'sm',
+  DISTRICT_MANAGER = 'districtManager',
+  SM = 'storeManagement',
 }
 
 export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
