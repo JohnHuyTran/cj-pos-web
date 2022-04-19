@@ -77,6 +77,10 @@
     {
       "value": "5",
       "label": "Reject"
+    },
+    {
+      "value": "10",
+      "label": "Expired product"
     }
   ]
 }

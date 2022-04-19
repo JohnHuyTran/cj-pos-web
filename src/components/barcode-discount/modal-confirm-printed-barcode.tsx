@@ -147,7 +147,7 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
         setOpenModalError(true);
       }
     } catch (error) {
-      setTextError("ไม่มีผลิตภัณฑ์การตรวจสอบความถูกต้อง");
+      setTextError("ไม่สามารถติดต่อเครื่องพิมพ์");
       setOpenModalError(true);
     }
   };

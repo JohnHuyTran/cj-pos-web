@@ -271,7 +271,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
     },
     {
       field: 'numberOfRequested',
-      headerName: 'จำนวนทำลาย',
+      headerName: 'จำนวนทำลาย *',
       flex: 1,
       headerAlign: 'center',
       disableColumnMenu: true,
@@ -305,7 +305,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
     },
     {
       field: 'numberOfApproved',
-      headerName: 'จำนวนที่อนุมัติ',
+      headerName: 'จำนวนที่อนุมัติ *',
       flex: 1,
       headerAlign: 'center',
       disableColumnMenu: true,

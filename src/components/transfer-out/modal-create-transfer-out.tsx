@@ -670,7 +670,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
-                เหตุผลการเบิก :
+                เหตุผลการเบิก<b style={{ fontSize:'18px' }}> *</b> :
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
@@ -704,7 +704,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5} pl={2}>
               <Grid item xs={4}>
-                คลัง :
+                คลัง<b style={{ fontSize:'18px' }}> *</b> :
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
