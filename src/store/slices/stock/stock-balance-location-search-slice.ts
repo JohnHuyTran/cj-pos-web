@@ -6,6 +6,7 @@ import { ContentType } from '../../../utils/enum/common-enum';
 
 type State = {
   stockList: OutstandingResponse;
+  savePayloadSearch: OutstandingRequest;
   error: string;
 };
 
@@ -23,6 +24,7 @@ const initialState: State = {
     totalPage: 0,
   },
   error: '',
+  savePayloadSearch: {},
 };
 
 export const featchStockBalanceLocationSearchAsync = createAsyncThunk(
@@ -44,6 +46,9 @@ const stockBalanceLocationSearchSlice = createSlice({
   initialState,
   reducers: {
     clearDataLocationFilter: (state) => initialState,
+    savePayloadSearchLocation: (state, action: PayloadAction<any>) => {
+      state.savePayloadSearch = action.payload;
+    },
   },
   extraReducers: (builer) => {
     builer.addCase(featchStockBalanceLocationSearchAsync.pending, () => {
@@ -58,5 +63,5 @@ const stockBalanceLocationSearchSlice = createSlice({
   },
 });
 
-export const { clearDataLocationFilter } = stockBalanceLocationSearchSlice.actions;
+export const { clearDataLocationFilter, savePayloadSearchLocation } = stockBalanceLocationSearchSlice.actions;
 export default stockBalanceLocationSearchSlice.reducer;

@@ -23,6 +23,7 @@ import moment from 'moment';
 import {
   featchStockBalanceLocationSearchAsync,
   clearDataLocationFilter,
+  savePayloadSearchLocation,
 } from '../../store/slices/stock/stock-balance-location-search-slice';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
@@ -179,6 +180,7 @@ function StockSearch() {
       await dispatch(featchStockBalanceSearchAsync(payload));
       await dispatch(featchStockBalanceLocationSearchAsync(payload));
       await dispatch(savePayloadSearch(payload));
+      await dispatch(savePayloadSearchLocation(payload));
     }
 
     handleOpenLoading('open', false);
