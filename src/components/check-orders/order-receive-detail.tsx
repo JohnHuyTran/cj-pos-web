@@ -329,7 +329,7 @@ export default function OrderReceiveDetail({
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">
-                  {orderReceiveData.status ? getorderReceiveThStatus(orderReceiveData.status) : '-'}
+                  {orderReceiveData.sdStatus ? getorderReceiveThStatus(orderReceiveData.sdStatus) : '-'}
                 </Typography>
               </Grid>
               <Grid item lg={2}>
