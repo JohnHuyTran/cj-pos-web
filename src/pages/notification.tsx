@@ -1,109 +1,69 @@
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import LoadingModal from '../components/commons/ui/loading-modal';
-import Tasklist from '../components/mytask/task-list';
-import React, { useEffect } from 'react';
-import { objectNullOrEmpty } from '../utils/utils';
-import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
-import { getUserInfo } from '../store/sessionStore';
-import { makeStyles } from '@mui/styles';
-import { getNotificationData } from '../services/notification';
-import InfiniteScroll from 'react-infinite-scroll-component';
- 
+import React from 'react';
+import { Button, Grid } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { useStyles } from '../styles/makeTheme';
+import { Box } from '@mui/system';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import NotificationTask from '../components/notifications/notification-task';
+import NotificationReminder from '../components/notifications/notification-reminder';
+import NotificationAnnouncement from '../components/notifications/notification-announcement';
+
 export default function Notification() {
-  const useStyles = makeStyles({
-    root: {
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    greeting: {
-      alignSelf: 'center',
-    },
-    myTask: {
-      marginTop: '16px',
-    },
-    news: {
-      marginTop: '16px',
-    },
-  });
   const classes = useStyles();
-  const [listData, setListData] = React.useState<any[]>([]);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
-  const [page, setPage] = React.useState(0);
-  const [totalPage, setTotalPage] = React.useState(1);
-
-  const userInfo: KeyCloakTokenInfo = getUserInfo();
-
-  const userPermission =
-    !objectNullOrEmpty(userInfo) &&
-    !objectNullOrEmpty(userInfo.acl) &&
-    userInfo.acl['service.posback-campaign'] != null &&
-    userInfo.acl['service.posback-campaign'].length > 0
-      ? userInfo.acl['service.posback-campaign']
-      : [];
-
-  useEffect(() => {
-    moreData();
-  }, []);
-
-  const moreData = async () => {
-    try {
-      if (totalPage > page) {
-        setOpenLoadingModal(true);
-        const rs = await getNotificationData(page);
-        if (rs && rs.data) {
-          setListData([...listData, ...rs.data]);
-          setPage(rs.page);
-          setTotalPage(rs.totalPage);
-        }
-        setOpenLoadingModal(false);
-      }
-    } catch (error) {
-      console.log(error);
-      setOpenLoadingModal(false);
-    }
-  };
-
-  const onGetData = async () => {
-    setOpenLoadingModal(true);
-    try {
-      const rs = await getNotificationData(0);
-      if (rs) {
-        if (rs.data){
-          setListData(rs.data);
-          setTotalPage(rs.totalPage);
-        } else {
-          setListData([])
-        }
-      } 
-    } catch (error) {
-      console.log(error);
-    }
-    setOpenLoadingModal(false);
+  const [refresh, setRefresh] = React.useState(false);
+  const handleRefresh = () => {
+    setRefresh(!refresh);
   };
 
   return (
     <>
-      <Container maxWidth="xl">
-        <Typography variant="h6" paddingBottom="40px" mt={3}>
-          {' '}
-          หน้าหลัก{' '}
-        </Typography>
-
-        <div className={classes.myTask}>
-          <InfiniteScroll
-            dataLength={listData.length}
-            refreshFunction={moreData}
-            next={moreData}
-            hasMore={true}
-            loader={null}
-            pullDownToRefresh
+      <Container maxWidth="xl" sx={{ height: '80vh', minWidth: '1100px' }}>
+        <Box display={'flex'} mt={3} justifyContent={'space-between'}>
+          <Typography variant="h6" paddingBottom="40px">
+            {' '}
+            แจ้งเตือน{' '}
+          </Typography>
+          <Button
+            id="btnRefresh"
+            variant="contained"
+            sx={{ mt: 2 }}
+            className={classes.MbtnRefresh}
+            startIcon={<RefreshIcon />}
+            onClick={handleRefresh}
           >
-            <Tasklist onSearch={onGetData} listData={listData} userPermission={userPermission} />
-          </InfiniteScroll>
-        </div>
+            Refresh
+          </Button>
+        </Box>
+
+        <Grid container spacing={6}>
+          <Grid item xs={5} height={'78vh'}>
+            <Typography sx={{ borderBottom: '1px solid #EAEBEB', mb: 1 }}>
+              <span style={{ fontWeight: 700, fontSize: '17px' }}>ประกาศ </span>{' '}
+              <FeedbackIcon sx={{ color: '#F54949', fontSize: '20px', ml: '3px' }} />
+            </Typography>
+            <NotificationAnnouncement refresh={refresh} />
+          </Grid>
+          {/* <Grid item xs={1}></Grid> */}
+          <Grid item xs={7} height={'75vh'}>
+            <Box height={'34vh'}>
+              <Typography
+                sx={{ borderBottom: '1px solid #EAEBEB', fontWeight: 700, fontSize: '17px', marginTop: '2px', mb: 1 }}
+              >
+                งานของฉัน
+              </Typography>
+              <NotificationTask refresh={refresh} />
+            </Box>
+            <Box height={'34vh'} mt={6}>
+              <Typography sx={{ borderBottom: '1px solid #EAEBEB', fontWeight: 700, fontSize: '17px', mb: 1 }}>
+                แจ้งเตือน
+              </Typography>
+              <NotificationReminder refresh={refresh} />
+            </Box>
+          </Grid>
+        </Grid>
       </Container>
-      <LoadingModal open={openLoadingModal} />
     </>
   );
 }

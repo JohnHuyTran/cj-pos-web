@@ -17,6 +17,10 @@ export enum ACTIONS {
   CAMPAIGN_BD_VIEW = 'campaign.bd.view',
   CAMPAIGN_BD_CREATE = 'campaign.bd.create',
   CAMPAIGN_BD_APPROVE = 'campaign.bd.approve',
+  CAMPAIGN_TO_VIEW = 'campaign.to.view',
+  CAMPAIGN_TO_CREATE = 'campaign.to.create',
+  CAMPAIGN_TO_APPROVE = 'campaign.to.approve',
+  CAMPAIGN_TO_CANCEL = 'campaign.to.cancel',
   SUPPLIER_SEARCH = 'supplier.search',
 
   STOCK_RT_VIEW = 'stock.rt.view',

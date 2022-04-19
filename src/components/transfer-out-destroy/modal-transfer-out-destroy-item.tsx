@@ -20,7 +20,7 @@ import {
   updateCheckStock,
   updateDataDetail,
   updateErrorList,
-} from '../../store/slices/transfer-out-slice';
+} from '../../store/slices/transfer-out-destroy-slice';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import { Action, BDStatus, TOStatus } from '../../utils/enum/common-enum';
@@ -38,15 +38,15 @@ export interface DataGridProps {
 
 const _ = require('lodash');
 
-export const ModalTransferOutItem = (props: DataGridProps) => {
+export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
   const { action, userPermission } = props;
 
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  const payloadTransferOut = useAppSelector((state) => state.transferOutSlice.createDraft);
-  const dataDetail = useAppSelector((state) => state.transferOutSlice.dataDetail);
-  const errorList = useAppSelector((state) => state.transferOutSlice.errorList);
+  const payloadTransferOut = useAppSelector((state) => state.transferOutDestroySlice.createDraft);
+  const dataDetail = useAppSelector((state) => state.transferOutDestroySlice.dataDetail);
+  const errorList = useAppSelector((state) => state.transferOutDestroySlice.errorList);
 
   const [dtTable, setDtTable] = React.useState<Array<TransferOutDetail>>([]);
   const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
@@ -271,7 +271,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     },
     {
       field: 'numberOfRequested',
-      headerName: 'จำนวน',
+      headerName: 'จำนวนทำลาย',
       flex: 1,
       headerAlign: 'center',
       disableColumnMenu: true,
@@ -358,9 +358,8 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
             onChange={(e) => {
               handleChangeRemark(e, params.row.index);
             }}
-            disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT
-              && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL)
-              || (TOStatus.WAIT_FOR_APPROVAL == dataDetail.status && !approvePermission)}
+            disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT
+              && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
           />
         </HtmlTooltip>
       )
@@ -498,8 +497,8 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
           <Grid item xs={3}/>
           <Grid item xs={3}>
             <Box display="flex" justifyContent="space-between" marginTop="25px">
-              <Typography fontSize="14px" fontWeight="700" lineHeight="30px" height="24px">
-                จำนวนทั้งหมด
+              <Typography fontSize="14px" lineHeight="30px" height="24px">
+                จำนวนทำลายทั้งหมด
               </Typography>
               <TextField
                 disabled
@@ -534,4 +533,4 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
   );
 };
 
-export default ModalTransferOutItem;
+export default ModalTransferOutDestroyItem;

@@ -357,6 +357,15 @@ export default function Sidebar({}: Props): ReactElement {
           <List component='div' disablePadding>
             <Link to='/transfer-out' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTransferOut'>
               <ListItemButton
+                key='TransferOutDestroy'
+                selected={selectedIndex === 11}
+                onClick={() => handleListItemClick(11)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ทำลาย' />
+              </ListItemButton>
+            </Link>
+            <Link to='/transfer-out' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTransferOut'>
+              <ListItemButton
                 key='TransferOut'
                 selected={selectedIndex === 10}
                 onClick={() => handleListItemClick(10)}

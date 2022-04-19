@@ -26,4 +26,5 @@ export const env: any = {
   dc: {
     percent: process.env.REACT_APP_DC_PERCENT,
   },
+  currency: process.env.REACT_APP_CURRENCY,
 };

@@ -44,6 +44,9 @@ export const transferOutGetSearch = createAsyncThunk(
       if (!stringNullOrEmpty(payload.endDate)) {
         path = path + `&endDate=${payload.endDate}`;
       }
+      if (!stringNullOrEmpty(payload.type)) {
+        path = path + `&type=${payload.type}`;
+      }
       let response: TransferOutSearchResponse = {
         ref: '',
         code: 0,

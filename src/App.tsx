@@ -22,6 +22,7 @@ import { featchAuthorizedBranchListAsync } from './store/slices/authorized-branc
 import Notification from './pages/notification';
 import TransferOut from './pages/transfer-out/transfer-out';
 import StockBalance from './pages/stock/stock-balance';
+import TransferOutDestroy from './pages/transfer-out-destroy/transfer-out-destroy';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{

@@ -1107,7 +1107,7 @@ export default function CheckOrderDetail({
         onClose={handleCloseModelConfirm}
         onUpdateShipmentStatus={handleShowSnackBar}
         shipmentNo={docRefNo}
-        sdNo={sdNo}
+        sdNo={orderDetail.sdNo}
         action={action}
         items={itemsDiffState}
         percentDiffType={false}
