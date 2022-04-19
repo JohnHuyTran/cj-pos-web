@@ -4,11 +4,15 @@ import { getUserInfo } from '../store/sessionStore';
 import {
   ACTIONS,
   KEYCLOAK_GROUP_AREA_MANAGER01,
+  KEYCLOAK_GROUP_AUDIT,
   KEYCLOAK_GROUP_BRANCH_MANAGER,
   KEYCLOAK_GROUP_BRANCH_MANAGER01,
   KEYCLOAK_GROUP_DC01,
+  KEYCLOAK_GROUP_DC02,
+  KEYCLOAK_GROUP_DISTRICT_MANAGER,
   KEYCLOAK_GROUP_OC01,
   KEYCLOAK_GROUP_SCM01,
+  KEYCLOAK_GROUP_SM,
   MAINMENU,
   PERMISSION_GROUP,
   SUBMENU,
@@ -22,7 +26,7 @@ export const getUserGroup = (groups: string[]) => {
     return '';
   }
 
-  if (group === KEYCLOAK_GROUP_DC01) {
+  if (group === KEYCLOAK_GROUP_DC01 || group === KEYCLOAK_GROUP_DC02) {
     return PERMISSION_GROUP.DC;
   } else if (group === KEYCLOAK_GROUP_BRANCH_MANAGER01 || group === KEYCLOAK_GROUP_BRANCH_MANAGER) {
     return PERMISSION_GROUP.BRANCH;
@@ -32,6 +36,12 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.OC;
   } else if (group === KEYCLOAK_GROUP_AREA_MANAGER01) {
     return PERMISSION_GROUP.AREA_MANAGER;
+  } else if (group === KEYCLOAK_GROUP_AUDIT) {
+    return PERMISSION_GROUP.AUDIT;
+  } else if (group === KEYCLOAK_GROUP_DISTRICT_MANAGER) {
+    return PERMISSION_GROUP.DISTRICT_MANAGER;
+  } else if (group === KEYCLOAK_GROUP_SM) {
+    return PERMISSION_GROUP.SM;
   }
 
   return '';
@@ -183,7 +193,7 @@ const permission = {
     },
     action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
   },
-  salemanager: {
+  saleManager: {
     menu: {
       mainmenu: [MAINMENU.PRODUCT_INFO],
       submenu: [SUBMENU.PI_STOCK_BALANCE],
