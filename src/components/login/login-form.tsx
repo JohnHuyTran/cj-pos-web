@@ -37,7 +37,7 @@ function LoginForm() {
   const [values, setValues] = React.useState<State>({
     password: '',
     userId: '',
-    showPassword: false
+    showPassword: false,
   });
   // console.log(isAllowPermission('FEATURE.ADMIN.SEARCH.DATA'));
   const dispatch = useAppDispatch();
@@ -78,7 +78,7 @@ function LoginForm() {
             <img src={logoImage} alt='' width='50' />
           </div>
 
-          <div id='error'> {error && <p style={{ color: 'red', fontSize: '12px' }}>{t(error)}</p>}</div>
+          <div id='error'> {error && <p style={{ color: 'red', fontSize: '12px' }}>{error}</p>}</div>
           <div>
             <FormControl sx={{ m: 5, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
               <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>
@@ -123,9 +123,7 @@ function LoginForm() {
             </FormControl>
           </div>
           <div>
-            <FormControl sx={{ m: 15, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
-
-            </FormControl>
+            <FormControl sx={{ m: 15, mb: 0 }} className={clsx(classes.textField)} variant='outlined'></FormControl>
           </div>
           <div>
             <Button

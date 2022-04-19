@@ -16,7 +16,7 @@ import {
 } from '../store/sessionStore';
 import { getDecodedAccessToken, objectNullOrEmpty, stringNullOrEmpty } from '../utils/utils';
 import { getUserGroup, isChannelBranch, isGroupBranch, isGroupBranchParam } from '../utils/role-permission';
-import { POSException } from '../utils/exception/pos-exception';
+import { getErrorMessage, getErrorMessageHttp, POSException } from '../utils/exception/pos-exception';
 import { ERROR_CODE } from '../utils/enum/common-enum';
 
 const instance = axios.create({
@@ -52,17 +52,16 @@ export function authentication(payload: loginForm): Promise<Response> {
         }
 
         if (isChannelBranch() && !isGroupBranchParam(_group)) {
-          const err = new POSException(401, 'invalid_channel_hq', 'กรุณาใช้งาน channel Head Quarter');
+          const err = new POSException(401, 'invalid_channel_hq', 'กรุณาใช้งาน channel Head Quarter', {
+            userLogin: payload.userId,
+          });
           throw err;
         } else if (!isChannelBranch() && isGroupBranchParam(_group)) {
-          const err = new POSException(401, 'invalid_channel_branch', 'กรุณาใช้งาน channel branch');
+          const err = new POSException(401, 'invalid_channel_branch', 'กรุณาใช้งาน channel branch', {
+            userLogin: payload.userId,
+          });
           throw err;
         }
-
-        // if (!isChannelBranch() && isGroupBranch()) {
-        //   const err = new POSException(401, 'invalid_channel_hq', 'กรุณาใช้งาน channel Branch');
-        //   throw err;
-        // }
 
         userInfo = { ...userInfo, group: _group ? _group : '' };
         setUserInfo(userInfo);
@@ -72,18 +71,11 @@ export function authentication(payload: loginForm): Promise<Response> {
       throw new Error(response.status.toString());
     })
     .catch((error: any) => {
-      // if (error.code === 'Network Error') {
-      //   const err = new POSException(
-      //     error.response?.status,
-      //     ERROR_CODE.TIME_OUT,
-      //     'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
-      //   );
-      // }
       if (error.code) {
-        throw new Error(error.code);
+        throw new Error(getErrorMessage(error));
       }
       if (error.response.status) {
-        throw new Error(error.response.status);
+        throw new Error(getErrorMessageHttp(error.response));
       }
     });
 }
