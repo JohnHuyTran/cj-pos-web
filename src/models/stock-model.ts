@@ -1,11 +1,10 @@
 export interface OutstandingRequest {
-  stockId?: string;
-  locationId?: string;
-  productList?: string[];
-  branchId?: string;
+  store?: string;
+  skuCodes?: string[];
+  branchCode?: string;
   dateFrom?: string;
-  limit?: string;
-  page?: string;
+  limit?: number;
+  page?: number;
 }
 
 export interface OutstandingResponse {

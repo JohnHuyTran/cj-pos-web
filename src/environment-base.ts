@@ -330,7 +330,7 @@ export const environment = {
           url: '/stock/stock-balance/search-by-store',
         },
         searchByLocation: {
-          url: '/stock/location',
+          url: '/stock/stock-balance/search-by-location',
         },
       },
     },

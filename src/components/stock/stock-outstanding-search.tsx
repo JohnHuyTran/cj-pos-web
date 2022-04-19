@@ -27,11 +27,12 @@ import {
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import AlertError from '../commons/ui/alert-error';
+import _ from 'lodash';
 interface State {
   storeId: string;
   locationId: string;
   productId: string;
-  branchId: string;
+  branchCode: string;
 }
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -73,7 +74,12 @@ function StockSearch() {
 
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const [values, setValues] = React.useState<State>({ storeId: 'ALL', locationId: 'ALL', productId: '', branchId: '' });
+  const [values, setValues] = React.useState<State>({
+    storeId: 'ALL',
+    locationId: 'ALL',
+    productId: '',
+    branchCode: '',
+  });
   const handleChange = (event: any) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -92,6 +98,7 @@ function StockSearch() {
   };
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [branchFromCode, setBranchFromCode] = React.useState('');
   const [ownBranch, setOwnBranch] = React.useState(
     getUserInfo().branch
       ? getBranchName(branchList, getUserInfo().branch)
@@ -99,7 +106,16 @@ function StockSearch() {
         : env.branch.code
       : env.branch.code
   );
-  const [branchFromCode, setBranchFromCode] = React.useState('');
+  React.useEffect(() => {
+    setDisableSearchBtn(isAllowActionPermission(ACTIONS.STOCK_BL_SKU));
+    if (groupBranch) {
+      setBranchFromCode(ownBranch);
+      setValues({ ...values, branchCode: ownBranch });
+    }
+
+    dispatch(updateAddTypeAndProductState([]));
+  }, []);
+
   const branchFrom = getBranchName(branchList, ownBranch);
   const branchFromMap: BranchListOptionType = {
     code: ownBranch,
@@ -112,7 +128,7 @@ function StockSearch() {
     open: false,
   });
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
-  const page = '1';
+  const page = 1;
   const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
@@ -122,7 +138,7 @@ function StockSearch() {
   };
   const onClickClearBtn = async () => {
     handleOpenLoading('open', true);
-    setValues({ storeId: 'ALL', locationId: 'ALL', productId: '', branchId: '' });
+    setValues({ storeId: 'ALL', locationId: 'ALL', productId: '', branchCode: '' });
     await dispatch(updateAddTypeAndProductState([]));
     await dispatch(clearDataFilter());
     await dispatch(clearDataLocationFilter());
@@ -133,16 +149,15 @@ function StockSearch() {
 
   const onClickSearchBtn = async () => {
     handleOpenLoading('open', true);
-    console.log('payloadAddTypeProduct: ', payloadAddTypeProduct);
     if (Object.keys(payloadAddTypeProduct).length <= 0) {
       setOpenAlert(true);
       setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
     } else {
-      let limits;
+      let limits: number;
       if (limit === 0 || limit === undefined) {
-        limits = '10';
+        limits = 10;
       } else {
-        limits = limit.toString();
+        limits = limit;
       }
       const productList: string[] = [];
       payloadAddTypeProduct
@@ -150,14 +165,14 @@ function StockSearch() {
         .map((item: any, index: number) => {
           productList.push(item.skuCode);
         });
-
+      const filterSKU = _.uniq(productList);
       const payload: OutstandingRequest = {
         limit: limits,
         page: page,
-        stockId: values.storeId,
-        productList: productList,
-        locationId: values.locationId,
-        branchId: values.branchId,
+        // stockId: values.storeId,
+        skuCodes: filterSKU,
+        store: values.locationId === 'ALL' ? '' : values.locationId,
+        branchCode: branchFromCode,
         dateFrom: moment(startDate).startOf('day').toISOString(),
       };
 
@@ -176,9 +191,9 @@ function StockSearch() {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
       setBranchFromCode(branchCode);
-      setValues({ ...values, branchId: JSON.parse(codes) });
+      setValues({ ...values, branchCode: JSON.parse(codes) });
     } else {
-      setValues({ ...values, branchId: '' });
+      setValues({ ...values, branchCode: '' });
     }
   };
 
@@ -193,12 +208,6 @@ function StockSearch() {
   const handleCloseModalAddItems = () => {
     setOpenModelAddItems(false);
   };
-
-  React.useEffect(() => {
-    setDisableSearchBtn(isAllowActionPermission(ACTIONS.STOCK_BL_SKU));
-    setValues({ ...values, branchId: valuebranchFrom ? valuebranchFrom.code : '' });
-    dispatch(updateAddTypeAndProductState([]));
-  }, []);
 
   React.useEffect(() => {
     if (Object.keys(payloadAddTypeProduct).length !== 0) {
@@ -272,10 +281,10 @@ function StockSearch() {
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem key={'1'} value={'1'}>
+                <MenuItem key={'1'} value={'001'}>
                   หน้าร้าน
                 </MenuItem>
-                <MenuItem key={'2'} value={'2'}>
+                <MenuItem key={'2'} value={'002'}>
                   หลังร้าน
                 </MenuItem>
               </Select>
