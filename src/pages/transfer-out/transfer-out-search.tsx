@@ -75,7 +75,7 @@ const TransferOutSearch = () => {
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
     branch: 'ALL',
-    status: '',
+    status: 'ALL',
     fromDate: new Date(),
     approveDate: new Date(),
   });
@@ -103,14 +103,14 @@ const TransferOutSearch = () => {
       setRequestPermission(
         userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.create') : false
       );
-      setValues({
-        ...values,
-        status: userPermission.includes('campaign.to.approve')
-          ? TOStatus.WAIT_FOR_APPROVAL
-          : userPermission.includes('campaign.to.create')
-          ? TOStatus.DRAFT
-          : 'ALL',
-      });
+      // setValues({
+      //   ...values,
+      //   status: userPermission.includes('campaign.to.approve')
+      //     ? TOStatus.WAIT_FOR_APPROVAL
+      //     : userPermission.includes('campaign.to.create')
+      //     ? TOStatus.DRAFT
+      //     : 'ALL',
+      // });
     }
   }, []);
   useEffect(() => {
@@ -142,7 +142,7 @@ const TransferOutSearch = () => {
     setValues({
       documentNumber: '',
       branch: '',
-      status: approvePermission ? TOStatus.WAIT_FOR_APPROVAL : requestPermission ? TOStatus.DRAFT : 'ALL',
+      status: 'ALL',
       fromDate: new Date(),
       approveDate: new Date(),
     });
