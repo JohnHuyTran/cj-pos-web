@@ -31,6 +31,7 @@ interface Props {
   isStatus: boolean;
   onChangeUploadFile: (status: boolean) => void;
   onDeleteAttachFile?: (item: any) => void;
+  idControl?: string; //set id for in case use more than 1 upload component in 1 form
   enabledControl?: boolean;
   warningMessage?: string;
   deletePermission?: boolean;
@@ -44,6 +45,7 @@ function AccordionUploadFile({
   isStatus,
   onChangeUploadFile,
   onDeleteAttachFile,
+  idControl,
   enabledControl,
   warningMessage,
   deletePermission,
@@ -247,9 +249,9 @@ function AccordionUploadFile({
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
-        <label htmlFor={'btnBrowse'}>
+        <label htmlFor={'btnBrowse' + (stringNullOrEmpty(idControl) ? '' : idControl)}>
           <Button
-            id="btnPrint"
+            id={"btnPrint" + (stringNullOrEmpty(idControl) ? '' : idControl)}
             color="primary"
             variant="contained"
             component="span"
@@ -268,7 +270,7 @@ function AccordionUploadFile({
       </Box>
 
       <input
-        id="btnBrowse"
+        id={"btnBrowse" + (stringNullOrEmpty(idControl) ? '' : idControl)}
         type="file"
         // multiple
         // onDrop
@@ -285,7 +287,9 @@ function AccordionUploadFile({
           py: 1,
           mt: 2,
           borderRadius: '5px',
-          border: stringNullOrEmpty(warningMessage) ? `1px dashed ${theme.palette.primary.main}` : `1px dashed #F54949`,
+          border: (stringNullOrEmpty(warningMessage)
+            || (!stringNullOrEmpty(warningMessage) && !stringNullOrEmpty(idControl) && warningMessage?.split('__')[0] != idControl))
+            ? `1px dashed ${theme.palette.primary.main}` : `1px dashed #F54949`,
         }}
       >
         <Box
@@ -350,10 +354,12 @@ function AccordionUploadFile({
         </Box>
       </Box>
       <Typography
-        hidden={stringNullOrEmpty(warningMessage)}
+        id={'warningMessage' + (stringNullOrEmpty(idControl) ? '' : idControl)}
+        hidden={stringNullOrEmpty(warningMessage)
+          || (!stringNullOrEmpty(warningMessage) && !stringNullOrEmpty(idControl) && warningMessage?.split('__')[0] != idControl)}
         sx={{ fontSize: '14px', color: '#F54949', textAlign: 'right' }}
       >
-        {warningMessage}
+        {(!stringNullOrEmpty(warningMessage) && !stringNullOrEmpty(idControl)) ? warningMessage?.split('__')[1] : warningMessage}
       </Typography>
 
       <ModalShowHuaweiFile

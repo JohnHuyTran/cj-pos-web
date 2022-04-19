@@ -2,7 +2,7 @@ import { deleteData, get, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { env } from '../adapters/environmentConfigs';
 import { Payload } from '../models/barcode-discount';
-import { getPathUrl } from "./base-service";
+import { getPathUrl } from './base-service';
 
 export async function saveDraftTransferOut(payload: Payload) {
   try {
@@ -77,5 +77,3 @@ export const getPathReject = (id: string) => {
 export const getPathEnd = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.end.url}`, { id: id });
 };
-
-

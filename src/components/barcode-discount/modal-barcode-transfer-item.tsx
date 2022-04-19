@@ -34,6 +34,7 @@ import NumberFormat from 'react-number-format';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import HtmlTooltip from '../commons/ui/html-tooltip';
 import { updateBarcodeDiscountPrintState, updatePrintInDetail } from "../../store/slices/barcode-discount-print-slice";
+import { env } from '../../adapters/environmentConfigs';
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -60,7 +61,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
-  const checkStocks = useAppSelector((state) => state.barcodeDiscount.checkStock);
+  const checkStocks = useAppSelector((state) => state.stockBalanceCheckSlice.checkStock);
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>(
     userPermission != null && userPermission.length > 0 ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false
@@ -384,6 +385,20 @@ export const ModalTransferItem = (props: DataGridProps) => {
           </Typography>
         </HtmlTooltip>
       ),
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{'ราคาปกติ'}</b>
+            </Typography>
+            {env.currency && (
+              <Typography variant="body2" noWrap textAlign={'center'}>
+                <b>{`(${env.currency})`}</b>
+              </Typography>
+            )}
+          </div>
+        );
+      },
     },
     {
       field: 'discount',
@@ -439,6 +454,20 @@ export const ModalTransferItem = (props: DataGridProps) => {
           </Typography>
         </HtmlTooltip>
       ),
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{'ส่วนลด'}</b>
+            </Typography>
+            {env.currency && (
+              <Typography variant="body2" noWrap textAlign={'center'}>
+                <b>{`(${env.currency})`}</b>
+              </Typography>
+            )}
+          </div>
+        );
+      },
     },
     {
       field: 'priceAfterDiscount',
@@ -461,6 +490,20 @@ export const ModalTransferItem = (props: DataGridProps) => {
           </Typography>
         </HtmlTooltip>
       ),
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{'ราคาหลังลด'}</b>
+            </Typography>
+            {env.currency && (
+              <Typography variant="body2" noWrap textAlign={'center'}>
+                <b>{`(${env.currency})`}</b>
+              </Typography>
+            )}
+          </div>
+        );
+      },
     },
     {
       field: 'numberOfDiscounted',
@@ -778,6 +821,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             <Box display="flex" justifyContent="space-between" marginTop="25px">
               <Typography fontSize="14px" lineHeight="21px" height="24px">
                 ขอส่วนลดทั้งหมด
+                {env.currency && ` (${env.currency})`}
               </Typography>
               <TextField
                   disabled
@@ -790,6 +834,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             <Box display="flex" justifyContent="space-between" marginTop="10px">
               <Typography fontSize="14px" fontWeight="700" marginTop="6px">
                 ส่วนลดที่อนุมัติทั้งหมด
+                {env.currency && ` (${env.currency})`}
               </Typography>
               <TextField
                   type="text"

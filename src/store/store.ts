@@ -45,7 +45,8 @@ import saleLimitTime from './slices/sale-limit-time-slice';
 import barcodeDiscountPrintSlice from './slices/barcode-discount-print-slice';
 import saleLimitTimeDetailSlice from './slices/sale-limit-time-detail-slice';
 import transferOutSlice from './slices/transfer-out-slice';
-import transferOutDetailSlice from  './slices/transfer-out-detail-slice';
+import transferOutDetailSlice from './slices/transfer-out-detail-slice';
+import transferOutDestroySlice from './slices/transfer-out-destroy-slice';
 import stockBalanceCheckSlice from './slices/stock-balance-check-slice';
 import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
@@ -63,6 +64,8 @@ import searchSubDistrictsSlice from './slices/master/search-subDistricts-slice';
 import searchToteSlice from './slices/search-tote-slice';
 import itemsToteSlice from './slices/items-tote-slice';
 import checkOrderToteSlice from './slices/check-order-detail-tote-slice';
+import stockBalanceLocationSearchSlice from './slices/stock/stock-balance-location-search-slice';
+import stockBalanceSearchSlice from './slices/stock/stock-balance-search-slice';
 
 const store = configureStore({
   reducer: {
@@ -112,6 +115,7 @@ const store = configureStore({
     saleLimitTimeDetailSlice: saleLimitTimeDetailSlice,
     transferOutSlice: transferOutSlice,
     transferOutDetailSlice: transferOutDetailSlice,
+    transferOutDestroySlice: transferOutDestroySlice,
     stockBalanceCheckSlice: stockBalanceCheckSlice,
     updateBTSkuSlice: updateBTSkuSlice,
     updateBTProductSlice: updateBTProductSlice,
@@ -129,6 +133,8 @@ const store = configureStore({
     searchToteSlice: searchToteSlice,
     itemsToteSlice: itemsToteSlice,
     checkOrderToteSlice: checkOrderToteSlice,
+    stockBalanceLocationSearchSlice: stockBalanceLocationSearchSlice,
+    stockBalanceSearchSlice: stockBalanceSearchSlice,
   },
 });
 

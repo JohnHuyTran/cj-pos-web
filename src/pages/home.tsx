@@ -28,7 +28,7 @@ export default function Home() {
   return (
     <>
       <Container className={classes.root}>
-        <Typography variant="h6"> แจ้งเตือน </Typography>
+        <Typography variant="h6"> หน้าหลัก </Typography>
         <div className={classes.greeting}>
           <Greeting userName={userInfo.given_name} />
         </div>

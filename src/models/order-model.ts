@@ -110,7 +110,7 @@ export interface ShipmentDetailResponse {
   ref: string;
   code: number;
   message: string;
-  data: ShipmentDetailInfo | null;
+  data: ShipmentDetailInfo | null | [];
 }
 export interface ShipmentDetailInfo {
   id: string;

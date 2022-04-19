@@ -17,6 +17,10 @@ export enum ACTIONS {
   CAMPAIGN_BD_VIEW = 'campaign.bd.view',
   CAMPAIGN_BD_CREATE = 'campaign.bd.create',
   CAMPAIGN_BD_APPROVE = 'campaign.bd.approve',
+  CAMPAIGN_TO_VIEW = 'campaign.to.view',
+  CAMPAIGN_TO_CREATE = 'campaign.to.create',
+  CAMPAIGN_TO_APPROVE = 'campaign.to.approve',
+  CAMPAIGN_TO_CANCEL = 'campaign.to.cancel',
   SUPPLIER_SEARCH = 'supplier.search',
 
   STOCK_RT_VIEW = 'stock.rt.view',
@@ -30,6 +34,8 @@ export enum ACTIONS {
   STOCK_BT_SAVEDC = 'stock.bt.save_dc',
   STOCK_BT_EXPORT = 'stock.bt.export',
   STOCK_BT_WAITDC = 'stock.bt.wait_dc',
+  STOCK_BL_SKU = 'stock.bl.sku',
+  STOCK_BL_LOCATION = 'stock.bl.location',
 
   AUTHORITY_CHECK = 'authority.check',
   ORDER_RO_DRAFT = 'order.ro.draft',
@@ -53,6 +59,7 @@ export enum MAINMENU {
   SALE = 'sale',
   ORDER_RECEIVE = 'orderReceive',
   STOCK_TRANSFER = 'stockTransfer',
+  PRODUCT_INFO = 'productInfo',
 }
 
 export enum SUBMENU {
@@ -63,6 +70,7 @@ export enum SUBMENU {
   OR_SUPPLIER = 'orderReceive.supplier',
   ST_REQUEST = 'stockTransfer.stockRequest',
   ST_TRANSFER = 'stockTransfer.stockTransfer',
+  PI_STOCK_BALANCE = 'productInfo.outstanding',
 }
 
 export enum PERMISSION_GROUP {
