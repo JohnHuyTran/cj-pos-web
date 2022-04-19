@@ -7,6 +7,7 @@ import {
   KEYCLOAK_GROUP_BRANCH_MANAGER,
   KEYCLOAK_GROUP_BRANCH_MANAGER01,
   KEYCLOAK_GROUP_DC01,
+  KEYCLOAK_GROUP_DC02,
   KEYCLOAK_GROUP_OC01,
   KEYCLOAK_GROUP_SCM01,
   MAINMENU,
@@ -22,7 +23,7 @@ export const getUserGroup = (groups: string[]) => {
     return '';
   }
 
-  if (group === KEYCLOAK_GROUP_DC01) {
+  if (group === KEYCLOAK_GROUP_DC01 || group === KEYCLOAK_GROUP_DC02) {
     return PERMISSION_GROUP.DC;
   } else if (group === KEYCLOAK_GROUP_BRANCH_MANAGER01 || group === KEYCLOAK_GROUP_BRANCH_MANAGER) {
     return PERMISSION_GROUP.BRANCH;

@@ -71,11 +71,18 @@ export enum PERMISSION_GROUP {
   OC = 'oc',
   BRANCH = 'branch',
   AREA_MANAGER = 'areaManager',
+  AUDIT = 'audit',
+  DISTRICT_MANAGER = 'audit',
+  SM = 'sm',
 }
 
 export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
+export const KEYCLOAK_GROUP_DC02 = '/service.posback/dc02';
 export const KEYCLOAK_GROUP_SCM01 = '/service.posback/scm01';
 export const KEYCLOAK_GROUP_OC01 = '/service.posback/oc01';
 export const KEYCLOAK_GROUP_BRANCH_MANAGER01 = '/service.posback/branch-manager';
 export const KEYCLOAK_GROUP_BRANCH_MANAGER = '/service.posback/manager';
 export const KEYCLOAK_GROUP_AREA_MANAGER01 = '/service.posback/area-manager01';
+export const KEYCLOAK_GROUP_AUDIT = '/service.posback/audit';
+export const KEYCLOAK_GROUP_DISTRICT_MANAGER = '/service.posback/district-manager';
+export const KEYCLOAK_GROUP_SM = '/service.posback/sm';
