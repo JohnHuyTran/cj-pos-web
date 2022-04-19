@@ -12,6 +12,7 @@
   "timeout": "ไม่สามารถเชื่อมต่อระบบได้ในเวลาที่กำหนด",
   "ECONNABORTED": "ไม่สามารถเชื่อมต่อระบบได้ในเวลาที่กำหนด",
   "401": "user is unauthorized",
-  "invalid_channel_branch": "กรุณาใช้งาน channel Branch",
-  "invalid_channel_hq": "กรุณาใช้งาน channel Head Quarter"
+  "invalid_grant": "Invalid user credentials",
+  "invalid_channel_branch": "รหัสผู้ใช้ {userLogin} นี้ไม่สามารถเข้าใช้ด้วยลิงค์นี้ได้ กรุณาเข้าลิงค์สาขา",
+  "invalid_channel_hq": "รหัสผู้ใช้ {userLogin} นี้ไม่สามารถเข้าใช้ด้วยลิงค์นี้ได้ กรุณาเข้าลิงค์ HQ"
 }

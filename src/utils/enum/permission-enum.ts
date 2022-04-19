@@ -34,6 +34,8 @@ export enum ACTIONS {
   STOCK_BT_SAVEDC = 'stock.bt.save_dc',
   STOCK_BT_EXPORT = 'stock.bt.export',
   STOCK_BT_WAITDC = 'stock.bt.wait_dc',
+  STOCK_BL_SKU = 'stock.bl.sku',
+  STOCK_BL_LOCATION = 'stock.bl.location',
 
   AUTHORITY_CHECK = 'authority.check',
   ORDER_RO_DRAFT = 'order.ro.draft',
@@ -57,6 +59,7 @@ export enum MAINMENU {
   SALE = 'sale',
   ORDER_RECEIVE = 'orderReceive',
   STOCK_TRANSFER = 'stockTransfer',
+  PRODUCT_INFO = 'productInfo',
 }
 
 export enum SUBMENU {
@@ -67,6 +70,7 @@ export enum SUBMENU {
   OR_SUPPLIER = 'orderReceive.supplier',
   ST_REQUEST = 'stockTransfer.stockRequest',
   ST_TRANSFER = 'stockTransfer.stockTransfer',
+  PI_STOCK_BALANCE = 'productInfo.outstanding',
 }
 
 export enum PERMISSION_GROUP {
@@ -75,6 +79,9 @@ export enum PERMISSION_GROUP {
   OC = 'oc',
   BRANCH = 'branch',
   AREA_MANAGER = 'areaManager',
+  AUDIT = 'audit',
+  DISTRICT_MANAGER = 'districtManager',
+  SM = 'storeManagement',
 }
 
 export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
@@ -84,3 +91,6 @@ export const KEYCLOAK_GROUP_OC01 = '/service.posback/oc01';
 export const KEYCLOAK_GROUP_BRANCH_MANAGER01 = '/service.posback/branch-manager';
 export const KEYCLOAK_GROUP_BRANCH_MANAGER = '/service.posback/manager';
 export const KEYCLOAK_GROUP_AREA_MANAGER01 = '/service.posback/area-manager01';
+export const KEYCLOAK_GROUP_AUDIT = '/service.posback/audit';
+export const KEYCLOAK_GROUP_DISTRICT_MANAGER = '/service.posback/district-manager';
+export const KEYCLOAK_GROUP_SM = '/service.posback/sm';

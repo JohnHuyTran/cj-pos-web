@@ -64,6 +64,8 @@ import searchSubDistrictsSlice from './slices/master/search-subDistricts-slice';
 import searchToteSlice from './slices/search-tote-slice';
 import itemsToteSlice from './slices/items-tote-slice';
 import checkOrderToteSlice from './slices/check-order-detail-tote-slice';
+import stockBalanceLocationSearchSlice from './slices/stock/stock-balance-location-search-slice';
+import stockBalanceSearchSlice from './slices/stock/stock-balance-search-slice';
 
 const store = configureStore({
   reducer: {
@@ -131,6 +133,8 @@ const store = configureStore({
     searchToteSlice: searchToteSlice,
     itemsToteSlice: itemsToteSlice,
     checkOrderToteSlice: checkOrderToteSlice,
+    stockBalanceLocationSearchSlice: stockBalanceLocationSearchSlice,
+    stockBalanceSearchSlice: stockBalanceSearchSlice,
   },
 });
 
