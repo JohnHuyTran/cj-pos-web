@@ -37,4 +37,5 @@ export interface ProductTypeInfo {
 export interface PayloadSearchProduct {
   search: string;
   productTypeCodes: any[];
+  skuTypes?: any[];
 }

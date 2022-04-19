@@ -48,6 +48,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   title: string;
+  skuType?: any[];
 }
 
 interface SelectedItemProps {
@@ -96,6 +97,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         searchAllProductAsync({
           search: keyword,
           productTypeCodes: productTypeCodes,
+          skuTypes: props.skuType ? props.skuType : [2],
         })
       );
     } else {

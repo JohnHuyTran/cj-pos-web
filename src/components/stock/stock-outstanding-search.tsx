@@ -9,7 +9,7 @@ import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permiss
 import { getBranchName } from '../../utils/utils';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import DatePickerAllComponent from '../commons/ui/date-picker-all';
-import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
+import ModalAddTypeProduct from '../commons/ui/modal-add-type-products';
 import StockBalance from './stock-balance';
 import StockBalanceLocation from './stock-balance-location';
 import SearchIcon from '@mui/icons-material/Search';
@@ -353,7 +353,12 @@ function StockSearch() {
       <TabPanel value={value} index={1}>
         <StockBalanceLocation />
       </TabPanel>
-      <ModalAddTypeProduct open={openModelAddItems} onClose={handleCloseModalAddItems} />
+      <ModalAddTypeProduct
+        open={openModelAddItems}
+        onClose={handleCloseModalAddItems}
+        title='ระบุสินค้าที่ต้องการค้นหา*'
+        skuType={[1, 2]}
+      />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
   );
