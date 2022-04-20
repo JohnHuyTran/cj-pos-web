@@ -20,7 +20,7 @@
   "list": "รายการ",
   "headerName": {
     "quantity": "จำนวน",
-    "total": "รวมทั้งหมด",
+    "total": "ทั้งหมด",
     "price": "ราคาปกติ",
     "discount": "ส่วนลด",
     "priceAfterDiscount": "ราคาหลังลด",
