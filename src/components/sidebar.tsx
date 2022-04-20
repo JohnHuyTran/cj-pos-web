@@ -396,7 +396,7 @@ export default function Sidebar({}: Props): ReactElement {
                 selected={selectedIndex === 11}
                 onClick={() => handleListItemClick(11)}
                 sx={{ pl: 7 }}>
-                <ListItemText primary='สินค้าคงเหลือ' />
+                <ListItemText primary='สินค้าคงคลัง' />
               </ListItemButton>
             </Link>
           </List>
