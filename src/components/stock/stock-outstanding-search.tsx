@@ -9,7 +9,7 @@ import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permiss
 import { getBranchName } from '../../utils/utils';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import DatePickerAllComponent from '../commons/ui/date-picker-all';
-import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
+import ModalAddTypeProduct from '../commons/ui/modal-add-type-products';
 import StockBalance from './stock-balance';
 import StockBalanceLocation from './stock-balance-location';
 import SearchIcon from '@mui/icons-material/Search';
@@ -204,12 +204,12 @@ function StockSearch() {
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
-  const [skyType, setSkuType] = React.useState<number[]>([1, 2]);
+  const [skuTypes, setSkuTypes] = React.useState<number[]>([1, 2]);
   const handleOpenAddItems = () => {
     if (values.storeId === 0) {
-      setSkuType([1, 2]);
+      setSkuTypes([1, 2]);
     } else {
-      setSkuType([values.storeId]);
+      setSkuTypes([values.storeId]);
     }
     setOpenModelAddItems(true);
   };
@@ -360,7 +360,12 @@ function StockSearch() {
       <TabPanel value={value} index={1}>
         <StockBalanceLocation />
       </TabPanel>
-      <ModalAddTypeProduct open={openModelAddItems} onClose={handleCloseModalAddItems} />
+      <ModalAddTypeProduct
+        open={openModelAddItems}
+        onClose={handleCloseModalAddItems}
+        title='ระบุสินค้าที่ต้องการค้นหา*'
+        skuType={skuTypes}
+      />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
   );
