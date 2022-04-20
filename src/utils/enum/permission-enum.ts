@@ -59,17 +59,21 @@ export enum MAINMENU {
   SALE = 'sale',
   ORDER_RECEIVE = 'orderReceive',
   STOCK_TRANSFER = 'stockTransfer',
+  TRANSFER_OUT = 'transferOut',
   PRODUCT_INFO = 'productInfo',
 }
 
 export enum SUBMENU {
   SALE_DISCOUNT = 'sale.discount',
+  SALE_SALE_LIMIT = 'sale.saleLimit',
   SALE_TAX_INVOICE = 'sale.taxinvoice',
   OR_ORDER_RECEIVE = 'orderReceive.orderReceive',
   OR_DIFF = 'orderReceive.stockDiff',
   OR_SUPPLIER = 'orderReceive.supplier',
   ST_REQUEST = 'stockTransfer.stockRequest',
   ST_TRANSFER = 'stockTransfer.stockTransfer',
+  TO_DESTROY = 'transferOut.destroy',
+  TO_STORE_USE = 'transferOut.storeUse',
   PI_STOCK_BALANCE = 'productInfo.outstanding',
 }
 
