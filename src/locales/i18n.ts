@@ -10,7 +10,7 @@ i18n
     fallbackLng: 'th',
     debug: false,
     lng: 'th',
-    ns: 'common',
+    ns: ['common', 'error'],
     defaultNS: 'common',
     backend: {
       // for all available options read the backend's repository readme file
