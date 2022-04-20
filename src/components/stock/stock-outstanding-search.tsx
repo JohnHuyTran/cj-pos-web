@@ -236,7 +236,7 @@ function StockSearch() {
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
-              ร้าน
+              กลุ่มสินค้า (Article)
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
@@ -248,8 +248,8 @@ function StockSearch() {
                 <MenuItem value={0} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={1}>บาวคาเฟ่</MenuItem>
-                <MenuItem value={2}>CJ More</MenuItem>
+                <MenuItem value={1}>วัตถุดิบ</MenuItem>
+                <MenuItem value={2}>สินค้า Trading goods</MenuItem>
               </Select>
             </FormControl>
           </Grid>
