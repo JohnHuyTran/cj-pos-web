@@ -11,10 +11,11 @@ module.exports = {
   transform: {
     // '^.+\\.tsx?$': 'ts-jest',
     '^.+\\.(t|j)sx?$': 'ts-jest',
+    '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
   coveragePathIgnorePatterns: ['/node_modules/'],
   // transformIgnorePatterns: [`node_modules/*`],
-  // transformIgnorePatterns: ['node_modules/(?!(dateformat)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(dateformat)/)'],
   // transformIgnorePatterns: ['node_modules/(?!(react-redux)/)'],
   // transformIgnorePatterns: ['node_modules/(?!(pdfjs-dist)/)'],
 
@@ -33,6 +34,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
     'react-pdf/dist/esm/entry.webpack': 'react-pdf',
+    '\\.(jpg|jpeg|png)$': 'identity-obj-proxy',
   },
   collectCoverageFrom: ['src/test/*.{js,jsx,ts,tsx,mjs}'],
 };
