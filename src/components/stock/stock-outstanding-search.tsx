@@ -9,7 +9,7 @@ import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permiss
 import { getBranchName } from '../../utils/utils';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import DatePickerAllComponent from '../commons/ui/date-picker-all';
-import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
+import ModalAddTypeProduct from '../commons/ui/modal-add-type-products';
 import StockBalance from './stock-balance';
 import StockBalanceLocation from './stock-balance-location';
 import SearchIcon from '@mui/icons-material/Search';
@@ -30,7 +30,7 @@ import { updateAddTypeAndProductState } from '../../store/slices/add-type-produc
 import AlertError from '../commons/ui/alert-error';
 import _ from 'lodash';
 interface State {
-  storeId: string;
+  storeId: number;
   locationId: string;
   productId: string;
   branchCode: string;
@@ -76,7 +76,7 @@ function StockSearch() {
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [values, setValues] = React.useState<State>({
-    storeId: 'ALL',
+    storeId: 0,
     locationId: 'ALL',
     productId: '',
     branchCode: '',
@@ -93,7 +93,7 @@ function StockSearch() {
     }
   };
   const [value, setValue] = React.useState(0);
-
+  const [flagSearch, setFlagSearch] = React.useState(false);
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -139,11 +139,12 @@ function StockSearch() {
   };
   const onClickClearBtn = async () => {
     handleOpenLoading('open', true);
-    setValues({ storeId: 'ALL', locationId: 'ALL', productId: '', branchCode: '' });
+    setValues({ storeId: 0, locationId: 'ALL', productId: '', branchCode: '' });
     await dispatch(updateAddTypeAndProductState([]));
     await dispatch(clearDataFilter());
     await dispatch(clearDataLocationFilter());
     setTimeout(() => {
+      setFlagSearch(false);
       handleOpenLoading('open', false);
     }, 300);
   };
@@ -172,15 +173,16 @@ function StockSearch() {
         page: page,
         // stockId: values.storeId,
         skuCodes: filterSKU,
-        store: values.locationId === 'ALL' ? '' : values.locationId,
+        storeCode: values.locationId === 'ALL' ? '' : values.locationId,
         branchCode: branchFromCode,
-        dateFrom: moment(startDate).startOf('day').toISOString(),
+        // dateFrom: moment(startDate).startOf('day').toISOString(),
       };
 
       await dispatch(featchStockBalanceSearchAsync(payload));
       await dispatch(featchStockBalanceLocationSearchAsync(payload));
       await dispatch(savePayloadSearch(payload));
       await dispatch(savePayloadSearchLocation(payload));
+      setFlagSearch(true);
     }
 
     handleOpenLoading('open', false);
@@ -204,7 +206,13 @@ function StockSearch() {
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const [skuTypes, setSkuTypes] = React.useState<number[]>([1, 2]);
   const handleOpenAddItems = () => {
+    if (values.storeId === 0) {
+      setSkuTypes([1, 2]);
+    } else {
+      setSkuTypes([values.storeId]);
+    }
     setOpenModelAddItems(true);
   };
   const handleCloseModalAddItems = () => {
@@ -230,7 +238,7 @@ function StockSearch() {
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
-              ร้าน
+              กลุ่มสินค้า (Article)
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
@@ -239,11 +247,11 @@ function StockSearch() {
                 value={values.storeId}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={'ALL'} selected={true}>
+                <MenuItem value={0} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={'0'}>ลังกระดาษ/Tote</MenuItem>
-                <MenuItem value={'1'}>สินค้าภายในTote</MenuItem>
+                <MenuItem value={1}>วัตถุดิบ</MenuItem>
+                <MenuItem value={2}>สินค้า Trading goods</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -302,6 +310,7 @@ function StockSearch() {
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
               disable={groupBranch}
+              isFilterAuthorizedBranch={groupBranch ? false : true}
             />
           </Grid>
           <Grid item xs={4}>
@@ -334,26 +343,36 @@ function StockSearch() {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
-          <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
-          <Tab
-            label={
-              <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
-                สินค้าคงคลัง(ตาม Location)
-              </Typography>
-            }
-            {...a11yProps(1)}
-          />
-        </Tabs>
-      </Box>
-      <TabPanel value={value} index={0}>
-        <StockBalance />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <StockBalanceLocation />
-      </TabPanel>
-      <ModalAddTypeProduct open={openModelAddItems} onClose={handleCloseModalAddItems} />
+      {flagSearch && (
+        <>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
+              <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
+              <Tab
+                label={
+                  <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
+                    สินค้าคงคลัง(ตาม Location)
+                  </Typography>
+                }
+                {...a11yProps(1)}
+              />
+            </Tabs>
+          </Box>
+
+          <TabPanel value={value} index={0}>
+            <StockBalance />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <StockBalanceLocation />
+          </TabPanel>
+        </>
+      )}
+      <ModalAddTypeProduct
+        open={openModelAddItems}
+        onClose={handleCloseModalAddItems}
+        title='ระบุสินค้าที่ต้องการค้นหา*'
+        skuType={skuTypes}
+      />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
   );

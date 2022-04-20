@@ -45,7 +45,7 @@ export const searchAllProductAsync = createAsyncThunk(
       const path = `${environment.products.addItem.allitemsList.url}/${payloadSearchProduct.search}?limit=10`;
       let response = await post(path, {
         productTypeCodes: payloadSearchProduct.productTypeCodes,
-        skuTypes: [2],
+        skuTypes: payloadSearchProduct.skuTypes,
         isSellable: true,
       }).then();
 

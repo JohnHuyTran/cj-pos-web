@@ -34,8 +34,8 @@ export enum ACTIONS {
   STOCK_BT_SAVEDC = 'stock.bt.save_dc',
   STOCK_BT_EXPORT = 'stock.bt.export',
   STOCK_BT_WAITDC = 'stock.bt.wait_dc',
-  STOCK_BL_SKU = 'stock.bl.sku',
-  STOCK_BL_LOCATION = 'stock.bl.location',
+  STOCK_BL_SKU = 'stock.balance.view',
+  STOCK_BL_LOCATION = 'stock.balance.view',
 
   AUTHORITY_CHECK = 'authority.check',
   ORDER_RO_DRAFT = 'order.ro.draft',
@@ -91,6 +91,7 @@ export const KEYCLOAK_GROUP_OC01 = '/service.posback/oc01';
 export const KEYCLOAK_GROUP_BRANCH_MANAGER01 = '/service.posback/branch-manager';
 export const KEYCLOAK_GROUP_BRANCH_MANAGER = '/service.posback/manager';
 export const KEYCLOAK_GROUP_AREA_MANAGER01 = '/service.posback/area-manager01';
+export const KEYCLOAK_GROUP_AREA_MANAGER02 = '/service.posback/area-manager02';
 export const KEYCLOAK_GROUP_AUDIT = '/service.posback/audit';
 export const KEYCLOAK_GROUP_DISTRICT_MANAGER = '/service.posback/district-manager';
 export const KEYCLOAK_GROUP_SM = '/service.posback/sm';
