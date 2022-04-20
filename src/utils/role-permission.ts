@@ -3,6 +3,7 @@ import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
 import { getUserInfo } from '../store/sessionStore';
 import {
   ACTIONS,
+  KEYCLOAK_GROUP_ACCOUNTING,
   KEYCLOAK_GROUP_AREA_MANAGER01,
   KEYCLOAK_GROUP_AREA_MANAGER02,
   KEYCLOAK_GROUP_AUDIT,
@@ -43,6 +44,8 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.DISTRICT_MANAGER;
   } else if (group === KEYCLOAK_GROUP_SM) {
     return PERMISSION_GROUP.SM;
+  } else if (group === KEYCLOAK_GROUP_ACCOUNTING) {
+    return PERMISSION_GROUP.ACCOUNTING;
   }
 
   return '';
@@ -208,5 +211,12 @@ const permission = {
       submenu: [SUBMENU.PI_STOCK_BALANCE],
     },
     action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
+  },
+  accounting: {
+    menu: {
+      mainmenu: [MAINMENU.SALE],
+      submenu: [SUBMENU.SALE_SALE_LIMIT],
+    },
+    action: [ACTIONS.CAMPAIGN_TO_VIEW],
   },
 };

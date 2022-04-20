@@ -134,7 +134,7 @@ function StockTransferList() {
       field: 'status',
       headerName: 'สถานะ BT',
       minWidth: 80,
-      // flex: 0.7,
+      flex: 0.7,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
