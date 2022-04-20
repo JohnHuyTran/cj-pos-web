@@ -1,5 +1,5 @@
 export interface OutstandingRequest {
-  store?: string;
+  storeCode?: string;
   skuCodes?: string[];
   branchCode?: string;
   dateFrom?: string;

@@ -172,9 +172,9 @@ function StockSearch() {
         page: page,
         // stockId: values.storeId,
         skuCodes: filterSKU,
-        store: values.locationId === 'ALL' ? '' : values.locationId,
+        storeCode: values.locationId === 'ALL' ? '' : values.locationId,
         branchCode: branchFromCode,
-        dateFrom: moment(startDate).startOf('day').toISOString(),
+        // dateFrom: moment(startDate).startOf('day').toISOString(),
       };
 
       await dispatch(featchStockBalanceSearchAsync(payload));
