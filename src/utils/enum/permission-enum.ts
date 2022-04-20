@@ -91,6 +91,7 @@ export const KEYCLOAK_GROUP_OC01 = '/service.posback/oc01';
 export const KEYCLOAK_GROUP_BRANCH_MANAGER01 = '/service.posback/branch-manager';
 export const KEYCLOAK_GROUP_BRANCH_MANAGER = '/service.posback/manager';
 export const KEYCLOAK_GROUP_AREA_MANAGER01 = '/service.posback/area-manager01';
+export const KEYCLOAK_GROUP_AREA_MANAGER02 = '/service.posback/area-manager02';
 export const KEYCLOAK_GROUP_AUDIT = '/service.posback/audit';
 export const KEYCLOAK_GROUP_DISTRICT_MANAGER = '/service.posback/district-manager';
 export const KEYCLOAK_GROUP_SM = '/service.posback/sm';

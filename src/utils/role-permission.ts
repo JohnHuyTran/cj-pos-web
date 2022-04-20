@@ -4,6 +4,7 @@ import { getUserInfo } from '../store/sessionStore';
 import {
   ACTIONS,
   KEYCLOAK_GROUP_AREA_MANAGER01,
+  KEYCLOAK_GROUP_AREA_MANAGER02,
   KEYCLOAK_GROUP_AUDIT,
   KEYCLOAK_GROUP_BRANCH_MANAGER,
   KEYCLOAK_GROUP_BRANCH_MANAGER01,
@@ -34,7 +35,7 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.SCM;
   } else if (group === KEYCLOAK_GROUP_OC01) {
     return PERMISSION_GROUP.OC;
-  } else if (group === KEYCLOAK_GROUP_AREA_MANAGER01) {
+  } else if (group === KEYCLOAK_GROUP_AREA_MANAGER01 || group === KEYCLOAK_GROUP_AREA_MANAGER02) {
     return PERMISSION_GROUP.AREA_MANAGER;
   } else if (group === KEYCLOAK_GROUP_AUDIT) {
     return PERMISSION_GROUP.AUDIT;
