@@ -371,7 +371,10 @@ export default function Sidebar({}: Props): ReactElement {
         </ListItemButton>
         <Collapse in={openWithDrawMenu} timeout='auto' unmountOnExit>
           <List component='div' disablePadding>
-            <Link to='/transfer-out' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTransferOut'>
+            <Link
+              to='/transfer-out-destroy'
+              style={{ textDecoration: 'none', color: '#676767' }}
+              id='subMenuTransferOut'>
               <ListItemButton
                 key='TransferOutDestroy'
                 selected={selectedIndex === 11}

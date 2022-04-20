@@ -93,6 +93,7 @@ export default function App2() {
           <Route path='/stock-transfer' component={StockTransfer} />
           <Route path='/stock-transfer-rt' component={StockTransferRt} />
           <Route path='/transfer-out' component={TransferOut} />
+          <Route path='/transfer-out-destroy' component={TransferOutDestroy} />
           <Route path='/stock-balance' component={StockBalance} />
         </Switch>
       </Main>
