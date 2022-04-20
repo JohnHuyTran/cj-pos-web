@@ -200,4 +200,11 @@ const permission = {
     },
     action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
   },
+  districtManager: {
+    menu: {
+      mainmenu: [MAINMENU.PRODUCT_INFO],
+      submenu: [SUBMENU.PI_STOCK_BALANCE],
+    },
+    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
+  },
 };

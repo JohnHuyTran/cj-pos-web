@@ -34,8 +34,8 @@ export enum ACTIONS {
   STOCK_BT_SAVEDC = 'stock.bt.save_dc',
   STOCK_BT_EXPORT = 'stock.bt.export',
   STOCK_BT_WAITDC = 'stock.bt.wait_dc',
-  STOCK_BL_SKU = 'stock.bl.sku',
-  STOCK_BL_LOCATION = 'stock.bl.location',
+  STOCK_BL_SKU = 'stock.balance.view',
+  STOCK_BL_LOCATION = 'stock.balance.view',
 
   AUTHORITY_CHECK = 'authority.check',
   ORDER_RO_DRAFT = 'order.ro.draft',

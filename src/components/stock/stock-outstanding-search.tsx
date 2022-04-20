@@ -30,7 +30,7 @@ import { updateAddTypeAndProductState } from '../../store/slices/add-type-produc
 import AlertError from '../commons/ui/alert-error';
 import _ from 'lodash';
 interface State {
-  storeId: string;
+  storeId: number;
   locationId: string;
   productId: string;
   branchCode: string;
@@ -76,7 +76,7 @@ function StockSearch() {
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [values, setValues] = React.useState<State>({
-    storeId: 'ALL',
+    storeId: 0,
     locationId: 'ALL',
     productId: '',
     branchCode: '',
@@ -139,7 +139,7 @@ function StockSearch() {
   };
   const onClickClearBtn = async () => {
     handleOpenLoading('open', true);
-    setValues({ storeId: 'ALL', locationId: 'ALL', productId: '', branchCode: '' });
+    setValues({ storeId: 0, locationId: 'ALL', productId: '', branchCode: '' });
     await dispatch(updateAddTypeAndProductState([]));
     await dispatch(clearDataFilter());
     await dispatch(clearDataLocationFilter());
@@ -172,9 +172,9 @@ function StockSearch() {
         page: page,
         // stockId: values.storeId,
         skuCodes: filterSKU,
-        store: values.locationId === 'ALL' ? '' : values.locationId,
+        storeCode: values.locationId === 'ALL' ? '' : values.locationId,
         branchCode: branchFromCode,
-        dateFrom: moment(startDate).startOf('day').toISOString(),
+        // dateFrom: moment(startDate).startOf('day').toISOString(),
       };
 
       await dispatch(featchStockBalanceSearchAsync(payload));
@@ -204,8 +204,13 @@ function StockSearch() {
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
-  const [skuTypes, setSkuTypes] = React.useState<any[]>([1, 2]);
+  const [skuTypes, setSkuTypes] = React.useState<number[]>([1, 2]);
   const handleOpenAddItems = () => {
+    if (values.storeId === 0) {
+      setSkuTypes([1, 2]);
+    } else {
+      setSkuTypes([values.storeId]);
+    }
     setOpenModelAddItems(true);
   };
   const handleCloseModalAddItems = () => {
@@ -240,11 +245,11 @@ function StockSearch() {
                 value={values.storeId}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={'ALL'} selected={true}>
+                <MenuItem value={0} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={'0'}>ลังกระดาษ/Tote</MenuItem>
-                <MenuItem value={'1'}>สินค้าภายในTote</MenuItem>
+                <MenuItem value={1}>บาวคาเฟ่</MenuItem>
+                <MenuItem value={2}>CJ More</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -303,6 +308,7 @@ function StockSearch() {
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
               disable={groupBranch}
+              isFilterAuthorizedBranch={groupBranch ? false : true}
             />
           </Grid>
           <Grid item xs={4}>
