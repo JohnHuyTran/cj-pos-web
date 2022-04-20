@@ -23,6 +23,7 @@ import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
+import SwapHorizontalCircleIcon from '@mui/icons-material/SwapHorizontalCircle';
 import { useAppSelector, useAppDispatch } from '../store/store';
 import { changeState } from '../store/slices/nav-slice';
 import imgLogo from '../assets/images/CJlogo.jpeg';
@@ -313,7 +314,7 @@ export default function Sidebar({}: Props): ReactElement {
           id='mainMenuTransfer'
           style={{ display: disableMainMenuStockTransfer ? 'none' : '' }}>
           <ListItemIcon>
-            <LoyaltyOutlinedIcon />
+            <SwapHorizontalCircleIcon />
           </ListItemIcon>
           <ListItemText primary='โอนสินค้า' style={{ marginLeft: -15 }} />
           {openTransferMenu ? <ExpandLess /> : <ExpandMore />}
