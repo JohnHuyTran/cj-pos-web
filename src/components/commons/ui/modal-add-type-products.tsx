@@ -49,6 +49,7 @@ interface Props {
   onClose: () => void;
   title?: string;
   skuType?: any[];
+  showSearch?: boolean;
 }
 
 interface SelectedItemProps {
@@ -424,6 +425,27 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       props.onClose();
     }, 300);
   };
+
+  useEffect(() => {
+    setFlag(false);
+  }, [props.onClose]);
+
+  const [flag, setFlag] = React.useState(false);
+  console.log(flag, '=========> payloadAddTypeProduct length:', payloadAddTypeProduct.length);
+  if (props.showSearch) {
+    if (!flag && payloadAddTypeProduct.length > 0) {
+      setSelectedItems(payloadAddTypeProduct);
+      setFlag(true);
+      // renderSelectedItems();
+
+      const strProducts = payloadAddTypeProduct
+        .filter((el: any) => el.selectedType === 2 && el.showProduct)
+        .map((item: any, index: number) => item.skuName)
+        .join(', ');
+
+      console.log('=========> strProducts:', JSON.stringify(strProducts));
+    }
+  }
 
   return (
     <Dialog open={props.open} PaperProps={{ sx: { width: '1132px', maxWidth: '1132px' } }}>
