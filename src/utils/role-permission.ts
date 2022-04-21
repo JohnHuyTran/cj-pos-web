@@ -3,7 +3,9 @@ import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
 import { getUserInfo } from '../store/sessionStore';
 import {
   ACTIONS,
+  KEYCLOAK_GROUP_ACCOUNTING,
   KEYCLOAK_GROUP_AREA_MANAGER01,
+  KEYCLOAK_GROUP_AREA_MANAGER02,
   KEYCLOAK_GROUP_AUDIT,
   KEYCLOAK_GROUP_BRANCH_MANAGER,
   KEYCLOAK_GROUP_BRANCH_MANAGER01,
@@ -34,7 +36,7 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.SCM;
   } else if (group === KEYCLOAK_GROUP_OC01) {
     return PERMISSION_GROUP.OC;
-  } else if (group === KEYCLOAK_GROUP_AREA_MANAGER01) {
+  } else if (group === KEYCLOAK_GROUP_AREA_MANAGER01 || group === KEYCLOAK_GROUP_AREA_MANAGER02) {
     return PERMISSION_GROUP.AREA_MANAGER;
   } else if (group === KEYCLOAK_GROUP_AUDIT) {
     return PERMISSION_GROUP.AUDIT;
@@ -42,6 +44,8 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.DISTRICT_MANAGER;
   } else if (group === KEYCLOAK_GROUP_SM) {
     return PERMISSION_GROUP.SM;
+  } else if (group === KEYCLOAK_GROUP_ACCOUNTING) {
+    return PERMISSION_GROUP.ACCOUNTING;
   }
 
   return '';
@@ -96,15 +100,15 @@ export const isChannelBranch = () => {
 const permission = {
   scm: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_SUPPLIER, SUBMENU.ST_REQUEST],
+      mainmenu: [MAINMENU.STOCK_TRANSFER],
+      submenu: [SUBMENU.ST_REQUEST],
     },
     action: [ACTIONS.STOCK_RT_APPROVE, ACTIONS.STOCK_RT_REJECT, ACTIONS.STOCK_RT_VIEW, ACTIONS.STOCK_RT_MANAGE],
   },
   oc: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE, MAINMENU.PRODUCT_INFO],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_ORDER_RECEIVE, SUBMENU.ST_REQUEST, SUBMENU.PI_STOCK_BALANCE],
+      mainmenu: [MAINMENU.ORDER_RECEIVE, MAINMENU.STOCK_TRANSFER, MAINMENU.PRODUCT_INFO],
+      submenu: [SUBMENU.OR_ORDER_RECEIVE, SUBMENU.ST_REQUEST, SUBMENU.PI_STOCK_BALANCE],
     },
     action: [
       ACTIONS.STOCK_RT_VIEW,
@@ -116,22 +120,31 @@ const permission = {
   },
   dc: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
-      submenu: [SUBMENU.SALE_DISCOUNT, SUBMENU.OR_DIFF, SUBMENU.OR_SUPPLIER, SUBMENU.ST_TRANSFER],
+      mainmenu: [MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
+      submenu: [SUBMENU.OR_DIFF, SUBMENU.OR_ORDER_RECEIVE, SUBMENU.ST_TRANSFER],
     },
     action: [ACTIONS.STOCK_BT_VIEW, ACTIONS.STOCK_BT_EXPORT, ACTIONS.ORDER_VER_VIEW, ACTIONS.ORDER_VER_MANAGE],
   },
   branch: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE, MAINMENU.PRODUCT_INFO],
+      mainmenu: [
+        MAINMENU.SALE,
+        MAINMENU.STOCK_TRANSFER,
+        MAINMENU.ORDER_RECEIVE,
+        MAINMENU.TRANSFER_OUT,
+        MAINMENU.PRODUCT_INFO,
+      ],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
+        SUBMENU.SALE_SALE_LIMIT,
         SUBMENU.SALE_TAX_INVOICE,
         SUBMENU.OR_ORDER_RECEIVE,
         SUBMENU.OR_DIFF,
         SUBMENU.OR_SUPPLIER,
         SUBMENU.ST_REQUEST,
         SUBMENU.ST_TRANSFER,
+        SUBMENU.TO_DESTROY,
+        SUBMENU.TO_STORE_USE,
         SUBMENU.PI_STOCK_BALANCE,
       ],
     },
@@ -155,13 +168,12 @@ const permission = {
   },
   areaManager: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE, MAINMENU.PRODUCT_INFO],
+      mainmenu: [MAINMENU.SALE, MAINMENU.TRANSFER_OUT, MAINMENU.PRODUCT_INFO],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
-        SUBMENU.OR_ORDER_RECEIVE,
-        SUBMENU.OR_SUPPLIER,
-        SUBMENU.ST_REQUEST,
-        SUBMENU.ST_TRANSFER,
+        SUBMENU.SALE_SALE_LIMIT,
+        SUBMENU.TO_DESTROY,
+        SUBMENU.TO_STORE_USE,
         SUBMENU.PI_STOCK_BALANCE,
       ],
     },
@@ -188,15 +200,8 @@ const permission = {
   },
   audit: {
     menu: {
-      mainmenu: [MAINMENU.PRODUCT_INFO],
-      submenu: [SUBMENU.PI_STOCK_BALANCE],
-    },
-    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
-  },
-  saleManager: {
-    menu: {
-      mainmenu: [MAINMENU.PRODUCT_INFO],
-      submenu: [SUBMENU.PI_STOCK_BALANCE],
+      mainmenu: [MAINMENU.TRANSFER_OUT, MAINMENU.PRODUCT_INFO],
+      submenu: [SUBMENU.TO_DESTROY, SUBMENU.TO_STORE_USE, SUBMENU.PI_STOCK_BALANCE],
     },
     action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
   },
@@ -206,5 +211,12 @@ const permission = {
       submenu: [SUBMENU.PI_STOCK_BALANCE],
     },
     action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
+  },
+  accounting: {
+    menu: {
+      mainmenu: [MAINMENU.SALE],
+      submenu: [SUBMENU.SALE_SALE_LIMIT],
+    },
+    action: [ACTIONS.CAMPAIGN_TO_VIEW],
   },
 };

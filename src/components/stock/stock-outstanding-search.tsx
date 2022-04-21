@@ -93,7 +93,7 @@ function StockSearch() {
     }
   };
   const [value, setValue] = React.useState(0);
-
+  const [flagSearch, setFlagSearch] = React.useState(false);
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -144,6 +144,7 @@ function StockSearch() {
     await dispatch(clearDataFilter());
     await dispatch(clearDataLocationFilter());
     setTimeout(() => {
+      setFlagSearch(false);
       handleOpenLoading('open', false);
     }, 300);
   };
@@ -181,6 +182,7 @@ function StockSearch() {
       await dispatch(featchStockBalanceLocationSearchAsync(payload));
       await dispatch(savePayloadSearch(payload));
       await dispatch(savePayloadSearchLocation(payload));
+      setFlagSearch(true);
     }
 
     handleOpenLoading('open', false);
@@ -236,7 +238,7 @@ function StockSearch() {
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
-              ร้าน
+              กลุ่มสินค้า (Article)
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
@@ -248,8 +250,8 @@ function StockSearch() {
                 <MenuItem value={0} selected={true}>
                   ทั้งหมด
                 </MenuItem>
-                <MenuItem value={1}>บาวคาเฟ่</MenuItem>
-                <MenuItem value={2}>CJ More</MenuItem>
+                <MenuItem value={1}>วัตถุดิบ</MenuItem>
+                <MenuItem value={2}>สินค้า Trading goods</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -341,25 +343,30 @@ function StockSearch() {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
-          <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
-          <Tab
-            label={
-              <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
-                สินค้าคงคลัง(ตาม Location)
-              </Typography>
-            }
-            {...a11yProps(1)}
-          />
-        </Tabs>
-      </Box>
-      <TabPanel value={value} index={0}>
-        <StockBalance />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <StockBalanceLocation />
-      </TabPanel>
+      {flagSearch && (
+        <>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
+              <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
+              <Tab
+                label={
+                  <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
+                    สินค้าคงคลัง(ตาม Location)
+                  </Typography>
+                }
+                {...a11yProps(1)}
+              />
+            </Tabs>
+          </Box>
+
+          <TabPanel value={value} index={0}>
+            <StockBalance />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <StockBalanceLocation />
+          </TabPanel>
+        </>
+      )}
       <ModalAddTypeProduct
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
