@@ -15,8 +15,8 @@ import {
   removeUserInfo,
 } from '../store/sessionStore';
 import { getDecodedAccessToken, objectNullOrEmpty, stringNullOrEmpty } from '../utils/utils';
-import { getUserGroup } from '../utils/role-permission';
-import { POSException } from '../utils/exception/pos-exception';
+import { getUserGroup, isChannelBranch, isGroupBranch, isGroupBranchParam } from '../utils/role-permission';
+import { getErrorMessage, getErrorMessageHttp, POSException } from '../utils/exception/pos-exception';
 import { ERROR_CODE } from '../utils/enum/common-enum';
 
 const instance = axios.create({
@@ -45,8 +45,21 @@ export function authentication(payload: loginForm): Promise<Response> {
         setSessionId(response.data.session_state);
         let userInfo = getDecodedAccessToken(response.data.access_token ? response.data.access_token : '');
         const _group = getUserGroup(userInfo.groups);
+
         if (stringNullOrEmpty(_group)) {
           const err = new POSException(401, ERROR_CODE.NOT_AUTHORIZE, 'ผู้ใช้งานไม่สิทธิ์');
+          throw err;
+        }
+
+        if (isChannelBranch() && !isGroupBranchParam(_group)) {
+          const err = new POSException(401, 'invalid_channel_hq', 'กรุณาใช้งาน channel Head Quarter', {
+            userLogin: payload.userId,
+          });
+          throw err;
+        } else if (!isChannelBranch() && isGroupBranchParam(_group)) {
+          const err = new POSException(401, 'invalid_channel_branch', 'กรุณาใช้งาน channel branch', {
+            userLogin: payload.userId,
+          });
           throw err;
         }
 
@@ -58,18 +71,11 @@ export function authentication(payload: loginForm): Promise<Response> {
       throw new Error(response.status.toString());
     })
     .catch((error: any) => {
-      // if (error.code === 'Network Error') {
-      //   const err = new POSException(
-      //     error.response?.status,
-      //     ERROR_CODE.TIME_OUT,
-      //     'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
-      //   );
-      // }
       if (error.code) {
-        throw new Error(error.code);
+        throw new Error(getErrorMessage(error));
       }
       if (error.response.status) {
-        throw new Error(error.response.status);
+        throw new Error(getErrorMessageHttp(error.response));
       }
     });
 }
@@ -133,7 +139,7 @@ export function logout(): Promise<Response> {
 
 instance.interceptors.request.use(function (config: AxiosRequestConfig) {
   if (action !== 'logout') {
-    config.headers.common['X-Requested-With'] =  env.branch.code;
+    config.headers.common['X-Requested-With'] = env.branch.code;
   }
 
   return config;
