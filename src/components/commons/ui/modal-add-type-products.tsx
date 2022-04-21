@@ -398,7 +398,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         }
       }
     }
-    if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0) {
+    if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0 && !props.showSearch) {
       for (const item of payloadAddTypeProduct) {
         if (item.selectedType === 1) {
           let selectedItemFilter = selectedItems.filter(
@@ -427,25 +427,29 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
   };
 
   useEffect(() => {
-    setFlag(false);
-  }, [props.onClose]);
+    if (props.open && props.showSearch) {
+      if (payloadAddTypeProduct.length > 0) {
+        const items: any = [];
+        let productTypeName: any = [];
+        payloadAddTypeProduct.map((item: any) => {
+          let pTypeName = item.ProductTypeName
+            ? item.ProductTypeName
+            : item.productTypeName
+            ? item.productTypeName
+            : '';
 
-  const [flag, setFlag] = React.useState(false);
-  console.log(flag, '=========> payloadAddTypeProduct length:', payloadAddTypeProduct.length);
-  if (props.showSearch) {
-    if (!flag && payloadAddTypeProduct.length > 0) {
-      setSelectedItems(payloadAddTypeProduct);
-      setFlag(true);
-      // renderSelectedItems();
-
-      const strProducts = payloadAddTypeProduct
-        .filter((el: any) => el.selectedType === 2 && el.showProduct)
-        .map((item: any, index: number) => item.skuName)
-        .join(', ');
-
-      console.log('=========> strProducts:', JSON.stringify(strProducts));
+          if (item.selectedType === 2 && !item.productByType) {
+            productTypeName.push(pTypeName);
+            items.push(item);
+          } else if (item.selectedType === 1) {
+            const filterTypeName = productTypeName.filter((r: any) => r === pTypeName);
+            if (filterTypeName.length === 0) items.push(item);
+          }
+        });
+        setSelectedItems(items);
+      }
     }
-  }
+  }, [props.open]);
 
   return (
     <Dialog open={props.open} PaperProps={{ sx: { width: '1132px', maxWidth: '1132px' } }}>
