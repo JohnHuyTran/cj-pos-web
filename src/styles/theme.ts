@@ -5,6 +5,7 @@ import { NoEncryption } from '@mui/icons-material';
 // Create a theme instance.
 const theme = createTheme({
   palette: {
+    mode: 'dark',
     primary: {
       main: '#36C690',
     },

@@ -35,6 +35,7 @@ module.exports = {
   moduleNameMapper: {
     'react-pdf/dist/esm/entry.webpack': 'react-pdf',
     '\\.(jpg|jpeg|png)$': 'identity-obj-proxy',
+    'react-i18next': '<rootDir>/reacti18nextMock.js',
   },
   collectCoverageFrom: ['src/test/*.{js,jsx,ts,tsx,mjs}'],
 };
