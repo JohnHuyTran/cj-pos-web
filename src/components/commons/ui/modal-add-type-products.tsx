@@ -428,28 +428,30 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
 
   useEffect(() => {
     if (props.open && props.showSearch) {
-      if (payloadAddTypeProduct.length > 0) {
-        const items: any = [];
-        let productTypeName: any = [];
-        payloadAddTypeProduct.map((item: any) => {
-          let pTypeName = item.ProductTypeName
-            ? item.ProductTypeName
-            : item.productTypeName
-            ? item.productTypeName
-            : '';
-
-          if (item.selectedType === 2 && !item.productByType) {
-            productTypeName.push(pTypeName);
-            items.push(item);
-          } else if (item.selectedType === 1) {
-            const filterTypeName = productTypeName.filter((r: any) => r === pTypeName);
-            if (filterTypeName.length === 0) items.push(item);
-          }
-        });
-        setSelectedItems(items);
-      }
+      renderOpenItems();
     }
   }, [props.open]);
+
+  const renderOpenItems = () => {
+    if (payloadAddTypeProduct.length > 0) {
+      const items: any = [];
+      let productTypeName: any = [];
+      payloadAddTypeProduct.map((item: any, index: number) => {
+        let pTypeName = item.ProductTypeName ? item.ProductTypeName : item.productTypeName ? item.productTypeName : '';
+
+        if (item.selectedType === 2 && !item.productByType) {
+          productTypeName.push(pTypeName);
+          items.push(item);
+        } else if (item.selectedType === 2 && item.productByType) {
+          items.push(item);
+        } else if (item.selectedType === 1) {
+          const filterTypeName = productTypeName.filter((r: any) => r === pTypeName);
+          if (filterTypeName.length === 0) items.push(item);
+        }
+      });
+      setSelectedItems(items);
+    }
+  };
 
   return (
     <Dialog open={props.open} PaperProps={{ sx: { width: '1132px', maxWidth: '1132px' } }}>
