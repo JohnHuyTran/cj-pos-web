@@ -372,6 +372,7 @@ function StockSearch() {
         onClose={handleCloseModalAddItems}
         title='ระบุสินค้าที่ต้องการค้นหา*'
         skuType={skuTypes}
+        showSearch={true}
       />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
