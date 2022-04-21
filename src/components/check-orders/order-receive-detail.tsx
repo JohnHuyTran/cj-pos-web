@@ -225,8 +225,10 @@ export default function OrderReceiveDetail({
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
+  let orderReceiveDataLength = Object.keys(orderReceiveData).length;
   let orderReceiveTable;
   const [flagSearch, setFlagSearch] = React.useState(false);
+  const [disableButton, setDisableButton] = React.useState(false);
   if (flagSearch) {
     if (Object.keys(orderReceiveData).length > 0) {
       orderReceiveTable = <OrderReceiveDetailList isTote={isTote} />;
@@ -363,17 +365,34 @@ export default function OrderReceiveDetail({
 
           <Box sx={{ marginTop: 4 }}>
             <Grid item container spacing={2} justifyContent="flex-end">
-              <Button
-                id="btnApprove"
-                variant="contained"
-                color="primary"
-                className={classes.MbtnApprove}
-                onClick={handleApproveBtn}
-                startIcon={<CheckCircleOutline />}
-                sx={{ width: '15%' }}
-              >
-                ยืนยัน
-              </Button>
+              {!isTotes && (
+                <Button
+                  id="btnApprove"
+                  variant="contained"
+                  color="primary"
+                  className={classes.MbtnApprove}
+                  onClick={handleApproveBtn}
+                  startIcon={<CheckCircleOutline />}
+                  sx={{ width: '15%' }}
+                  disabled={orderReceiveDataLength === 0}
+                >
+                  ยืนยัน
+                </Button>
+              )}
+
+              {isTotes && (
+                <Button
+                  id="btnApprove"
+                  variant="contained"
+                  color="primary"
+                  className={classes.MbtnApprove}
+                  onClick={handleApproveBtn}
+                  startIcon={<CheckCircleOutline />}
+                  sx={{ width: '15%' }}
+                >
+                  ยืนยัน
+                </Button>
+              )}
             </Grid>
           </Box>
 
