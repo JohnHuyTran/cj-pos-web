@@ -47,6 +47,9 @@ import saleLimitTimeDetailSlice from './slices/sale-limit-time-detail-slice';
 import transferOutSlice from './slices/transfer-out-slice';
 import transferOutDetailSlice from './slices/transfer-out-detail-slice';
 import transferOutDestroySlice from './slices/transfer-out-destroy-slice';
+import transferOutDestroyDiscountSlice from './slices/transfer-out-destroy-discount-slice';
+import toDestroyDiscountAttachAfterSlice from './slices/to-destroy-discount-attach-after-slice';
+import addToDestroyProductSlice from './slices/add-to-destroy-product-slice';
 import stockBalanceCheckSlice from './slices/stock-balance-check-slice';
 import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
@@ -114,6 +117,9 @@ const store = configureStore({
     transferOutSlice: transferOutSlice,
     transferOutDetailSlice: transferOutDetailSlice,
     transferOutDestroySlice: transferOutDestroySlice,
+    transferOutDestroyDiscountSlice: transferOutDestroyDiscountSlice,
+    toDestroyDiscountAttachAfterSlice: toDestroyDiscountAttachAfterSlice,
+    addToDestroyProductSlice: addToDestroyProductSlice,
     stockBalanceCheckSlice: stockBalanceCheckSlice,
     updateBTSkuSlice: updateBTSkuSlice,
     updateBTProductSlice: updateBTProductSlice,
