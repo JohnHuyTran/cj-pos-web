@@ -152,39 +152,40 @@ function StockSearch() {
 
   const onClickSearchBtn = async () => {
     handleOpenLoading('open', true);
-    if (Object.keys(payloadAddTypeProduct).length <= 0) {
-      setOpenAlert(true);
-      setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
+    // if (Object.keys(payloadAddTypeProduct).length <= 0) {
+    //   setOpenAlert(true);
+    //   setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
+    // } else {
+    let limits: number;
+    if (limit === 0 || limit === undefined) {
+      limits = 10;
     } else {
-      let limits: number;
-      if (limit === 0 || limit === undefined) {
-        limits = 10;
-      } else {
-        limits = limit;
-      }
-      const productList: string[] = [];
-      payloadAddTypeProduct
-        .filter((el: any) => el.selectedType === 2 && el.showProduct)
-        .map((item: any, index: number) => {
-          productList.push(item.skuCode);
-        });
-      const filterSKU = _.uniq(productList);
-      const payload: OutstandingRequest = {
-        limit: limits,
-        page: page,
-        // stockId: values.storeId,
-        skuCodes: filterSKU,
-        storeCode: values.locationId === 'ALL' ? '' : values.locationId,
-        branchCode: branchFromCode,
-        // dateFrom: moment(startDate).startOf('day').toISOString(),
-      };
-
-      await dispatch(featchStockBalanceSearchAsync(payload));
-      await dispatch(featchStockBalanceLocationSearchAsync(payload));
-      await dispatch(savePayloadSearch(payload));
-      await dispatch(savePayloadSearchLocation(payload));
-      setFlagSearch(true);
+      limits = limit;
     }
+    const productList: string[] = [];
+    payloadAddTypeProduct
+      .filter((el: any) => el.selectedType === 2 && el.showProduct)
+      .map((item: any, index: number) => {
+        productList.push(item.skuCode);
+      });
+    const filterSKU = _.uniq(productList);
+    const payload: OutstandingRequest = {
+      limit: limits,
+      page: page,
+      // stockId: values.storeId,
+      // skuCodes: filterSKU,
+      skuCodes: ['000000000020034911'],
+      storeCode: values.locationId === 'ALL' ? '' : values.locationId,
+      branchCode: branchFromCode,
+      // dateFrom: moment(startDate).startOf('day').toISOString(),
+    };
+
+    await dispatch(featchStockBalanceSearchAsync(payload));
+    await dispatch(featchStockBalanceLocationSearchAsync(payload));
+    await dispatch(savePayloadSearch(payload));
+    await dispatch(savePayloadSearchLocation(payload));
+    setFlagSearch(true);
+    // }
 
     handleOpenLoading('open', false);
   };
