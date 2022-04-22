@@ -70,7 +70,7 @@ function LoginForm() {
     <div className={classes.wrapLogin}>
       <div className={classes.bgLogin}>
         <Typography variant='h5' className={classes.welcomeLabel}>
-          ยินดีต้อนรับ
+          ยินดีต้อนรับ ^^
         </Typography>
 
         <Box className={classes.mainBox}>
