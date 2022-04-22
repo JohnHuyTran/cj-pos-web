@@ -19,7 +19,6 @@ import {
   savePayloadSearch,
 } from '../../store/slices/stock/stock-balance-search-slice';
 import { OutstandingRequest } from '../../models/stock-model';
-import moment from 'moment';
 import {
   featchStockBalanceLocationSearchAsync,
   clearDataLocationFilter,
@@ -43,15 +42,13 @@ interface TabPanelProps {
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
-
   return (
     <div
-      role="tabpanel"
+      role='tabpanel'
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
+      {...other}>
       {value === index && (
         <Box sx={{ p: 3 }}>
           <Typography>{children}</Typography>
@@ -73,7 +70,6 @@ function StockSearch() {
   const dispatch = useAppDispatch();
 
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
-
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [values, setValues] = React.useState<State>({
@@ -172,11 +168,9 @@ function StockSearch() {
       const payload: OutstandingRequest = {
         limit: limits,
         page: page,
-        // stockId: values.storeId,
         skuCodes: filterSKU,
         storeCode: values.locationId === 'ALL' ? '' : values.locationId,
         branchCode: branchFromCode,
-        // dateFrom: moment(startDate).startOf('day').toISOString(),
       };
 
       await dispatch(featchStockBalanceSearchAsync(payload));
@@ -185,7 +179,6 @@ function StockSearch() {
       await dispatch(savePayloadSearchLocation(payload));
       setFlagSearch(true);
     }
-
     handleOpenLoading('open', false);
   };
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -238,17 +231,16 @@ function StockSearch() {
       <Box sx={{ flexGrow: 1 }}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               กลุ่มสินค้า (Article)
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="tbxstoreId"
-                name="storeId"
+                id='tbxstoreId'
+                name='storeId'
                 value={values.storeId}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={0} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -258,21 +250,21 @@ function StockSearch() {
             </FormControl>
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ค้นหาสินค้า*
             </Typography>
             <TextField
-              id="txtProductList"
-              name="productId"
-              size="small"
+              id='txtProductList'
+              name='productId'
+              size='small'
               value={values.productId}
               onClick={handleOpenAddItems}
               className={`${classes.MtextField} ${classes.MSearchBranchInput}`}
               fullWidth
-              placeholder="กรุณาเลือก"
-              autoComplete="off"
+              placeholder='กรุณาเลือก'
+              autoComplete='off'
               InputProps={{
-                endAdornment: <SearchIcon color="primary" sx={{ marginRight: '12px' }} />,
+                endAdornment: <SearchIcon color='primary' sx={{ marginRight: '12px' }} />,
                 inputProps: {
                   style: { textAlignLast: 'start' },
                 },
@@ -280,17 +272,16 @@ function StockSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               คลัง
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="tbxlocationId"
-                name="locationId"
+                id='tbxlocationId'
+                name='locationId'
                 value={values.locationId}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -304,7 +295,7 @@ function StockSearch() {
             </FormControl>
           </Grid>
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               สาขา
             </Typography>
             <BranchListDropDown
@@ -317,32 +308,29 @@ function StockSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ข้อมูล ณ วันที่
             </Typography>
             <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} disabled={true} />
           </Grid>
           <Grid item xs={4}></Grid>
-          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
             <Button
-              id="btnClear"
-              variant="contained"
+              id='btnClear'
+              variant='contained'
               onClick={onClickClearBtn}
               sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
-              color="cancelColor"
-            >
+              color='cancelColor'>
               เคลียร์
             </Button>
             <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
+              id='btnSearch'
+              variant='contained'
+              color='primary'
               onClick={onClickSearchBtn}
               sx={{ width: '13%', ml: 2, display: `${disableSearchBtn ? 'none' : ''}` }}
-              // sx={{ width: '13%', ml: 2 }}
-              className={classes.MbtnSearch}
-            >
+              className={classes.MbtnSearch}>
               ค้นหา
             </Button>
           </Grid>
@@ -351,7 +339,7 @@ function StockSearch() {
       {flagSearch && (
         <>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={value} onChange={handleChangeTab} aria-label="basic tabs example">
+            <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
               <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
               <Tab
                 label={
@@ -375,7 +363,7 @@ function StockSearch() {
       <ModalAddTypeProduct
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
-        title="ระบุสินค้าที่ต้องการค้นหา*"
+        title='ระบุสินค้าที่ต้องการค้นหา*'
         skuType={skuTypes}
       />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
