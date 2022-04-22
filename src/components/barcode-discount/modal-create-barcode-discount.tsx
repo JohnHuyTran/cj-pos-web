@@ -985,7 +985,7 @@ export default function ModalCreateBarcodeDiscount({
             </Grid>
             <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
-                ยอดลด :
+                ยอดลด<b style={{ fontSize:'18px' }}> *</b> :
               </Grid>
               <Grid item xs={8} sx={{ marginTop: '-8px' }}>
                 <FormControl component='fieldset' disabled={dataDetail.status > 1}>
@@ -1014,7 +1014,7 @@ export default function ModalCreateBarcodeDiscount({
             <Grid container item xs={6}
                   sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
-                แนบรูปสินค้าขอส่วนลด :
+                แนบรูปสินค้าขอส่วนลด<b style={{ fontSize:'18px' }}> *</b> :
               </Grid>
               <Grid item xs={8}>
                 <AccordionUploadFile

@@ -402,7 +402,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     },
     {
       field: 'discount',
-      headerName: typeDiscount === 'percent' ? 'ยอดลด (%)' : 'ยอดลด (บาท)',
+      headerName: typeDiscount === 'percent' ? 'ยอดลด * (%)' : 'ยอดลด * (บาท)',
       minWidth: 150,
       headerAlign: 'center',
       disableColumnMenu: true,
@@ -507,7 +507,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     },
     {
       field: 'numberOfDiscounted',
-      headerName: 'จำนวนที่ขอลด',
+      headerName: 'จำนวนที่ขอลด *',
       minWidth: 125,
       headerAlign: 'center',
       disableColumnMenu: true,
@@ -579,7 +579,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               <b>{'จำนวน'}</b>
             </Typography>
             <Typography variant="body2" noWrap>
-              <b>{'ที่อนุมัติ'}</b>
+              <b>{'ที่อนุมัติ *'}</b>
             </Typography>
           </div>
         );
@@ -614,7 +614,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     },
     {
       field: 'expiryDate',
-      headerName: 'วันที่หมดอายุ',
+      headerName: 'วันที่หมดอายุ *',
       minWidth: 130,
       headerAlign: 'left',
       disableColumnMenu: true,

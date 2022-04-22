@@ -70,6 +70,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         maxDate={today}
         minDate={props.minDateTo}
         placeholder="กรุณาเลือกวันที่"
+        minDateMessage={'วันที่ต้องมากกว่าวันที่เริ่มต้น'}
       />
     );
   } else {

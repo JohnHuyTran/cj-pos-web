@@ -25,7 +25,7 @@ import { searchOrderReceiveAsync } from '../../store/slices/order-receive-slice'
 import { searchToteAsync } from '../../store/slices/search-tote-slice';
 import { EntryTote } from '../../models/order-model';
 import CheckOrderDetailTote from './check-order-detail-tote';
-import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+import { featchOrderDetailAsync, setReloadScreen } from '../../store/slices/check-order-detail-slice';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updateItemsToteState } from '../../store/slices/items-tote-slice';
 import { featchOrderDetailToteAsync } from '../../store/slices/check-order-detail-tote-slice';
@@ -160,6 +160,7 @@ export default function OrderReceiveDetail({
         onClickClose();
         handleOpenLoading('open', false);
       } else if (isTote === true) {
+        await dispatch(featchOrderDetailAsync());
         handleConfirmTote();
       }
     } else {
@@ -193,11 +194,14 @@ export default function OrderReceiveDetail({
 
     await submitTote(data)
       .then((resp: any) => {
-        // dispatch(updateAddItemsState({}));
-        dispatch(updateItemsToteState({}));
-        dispatch(featchOrderDetailToteAsync(resp.sdNo)).then(() => {
-          setOpenTote(true);
-        });
+        dispatch(updateAddItemsState({}));
+        dispatch(featchOrderDetailAsync(resp.sdNo));
+        // dispatch(setReloadScreen(true));
+
+        // dispatch(updateItemsToteState({}));
+        // dispatch(featchOrderDetailToteAsync(resp.sdNo)).then(() => {
+        //   setOpenTote(true);
+        // });
 
         setOpen(false);
       })
@@ -208,11 +212,11 @@ export default function OrderReceiveDetail({
     handleOpenLoading('open', false);
   };
 
-  function handleCloseDetailToteModal() {
-    setOpenTote(false);
-    setOpen(false);
-    onClickClose();
-  }
+  // function handleCloseDetailToteModal() {
+  //   setOpenTote(false);
+  //   setOpen(false);
+  //   onClickClose();
+  // }
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -221,8 +225,10 @@ export default function OrderReceiveDetail({
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
+  let orderReceiveDataLength = Object.keys(orderReceiveData).length;
   let orderReceiveTable;
   const [flagSearch, setFlagSearch] = React.useState(false);
+  const [disableButton, setDisableButton] = React.useState(false);
   if (flagSearch) {
     if (Object.keys(orderReceiveData).length > 0) {
       orderReceiveTable = <OrderReceiveDetailList isTote={isTote} />;
@@ -325,7 +331,7 @@ export default function OrderReceiveDetail({
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">
-                  {orderReceiveData.status ? getorderReceiveThStatus(orderReceiveData.status) : '-'}
+                  {orderReceiveData.sdStatus ? getorderReceiveThStatus(orderReceiveData.sdStatus) : '-'}
                 </Typography>
               </Grid>
               <Grid item lg={2}>
@@ -359,17 +365,34 @@ export default function OrderReceiveDetail({
 
           <Box sx={{ marginTop: 4 }}>
             <Grid item container spacing={2} justifyContent="flex-end">
-              <Button
-                id="btnApprove"
-                variant="contained"
-                color="primary"
-                className={classes.MbtnApprove}
-                onClick={handleApproveBtn}
-                startIcon={<CheckCircleOutline />}
-                sx={{ width: '15%' }}
-              >
-                ยืนยัน
-              </Button>
+              {!isTotes && (
+                <Button
+                  id="btnApprove"
+                  variant="contained"
+                  color="primary"
+                  className={classes.MbtnApprove}
+                  onClick={handleApproveBtn}
+                  startIcon={<CheckCircleOutline />}
+                  sx={{ width: '15%' }}
+                  disabled={orderReceiveDataLength === 0}
+                >
+                  ยืนยัน
+                </Button>
+              )}
+
+              {isTotes && (
+                <Button
+                  id="btnApprove"
+                  variant="contained"
+                  color="primary"
+                  className={classes.MbtnApprove}
+                  onClick={handleApproveBtn}
+                  startIcon={<CheckCircleOutline />}
+                  sx={{ width: '15%' }}
+                >
+                  ยืนยัน
+                </Button>
+              )}
             </Grid>
           </Box>
 
@@ -389,7 +412,7 @@ export default function OrderReceiveDetail({
         </DialogContent>
       </Dialog>
 
-      {openTote && <CheckOrderDetailTote defaultOpen={openTote} onClickClose={handleCloseDetailToteModal} />}
+      {/* {openTote && <CheckOrderDetailTote defaultOpen={openTote} onClickClose={handleCloseDetailToteModal} />} */}
     </div>
   );
 }

@@ -355,6 +355,7 @@ const BarcodeDiscountSearch = () => {
                 <MenuItem value={'3'}>{getStatusText('3')}</MenuItem>
                 <MenuItem value={'4'}>{getStatusText('4')}</MenuItem>
                 <MenuItem value={'5'}>{getStatusText('5')}</MenuItem>
+                <MenuItem value={'10'}>{getStatusText('10')}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -362,7 +363,7 @@ const BarcodeDiscountSearch = () => {
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t('fromDate')}
+              {t('fromDate')}<b style={{ fontSize:'18px' }}> *</b>
             </Typography>
             <DatePickerComponent
               onClickDate={onChangeDate.bind(this, setValues, values, 'fromDate')}
@@ -371,7 +372,7 @@ const BarcodeDiscountSearch = () => {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t('toDate')}
+              {t('toDate')} <b style={{ fontSize:'18px' }}> *</b>
             </Typography>
             <DatePickerComponent
               onClickDate={onChangeDate.bind(this, setValues, values, 'toDate')}
