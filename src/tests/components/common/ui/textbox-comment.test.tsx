@@ -33,7 +33,6 @@ beforeEach(() => {
 });
 
 describe('component text-comment', () => {
-  const inputField = screen.findByTestId(`form-field-firstname`);
   // console.debug('debug:', inputField);
   it('find text box', () => {
     expect(screen.getByTestId(/form-field-tbxComment/)).toBeInTheDocument();
@@ -42,7 +41,9 @@ describe('component text-comment', () => {
     expect(screen.getByText(/comment label/)).toBeInTheDocument();
   });
   it('should show input with initial value set ', () => {
-    expect(inputField).toHaveDisplayValue(/default value to unit test/);
+    // const inputField = screen.getByTestId(`form-field-firstname`);
+    // expect(inputField).toHaveDisplayValue(/default value to unit test/);
+    expect(screen.getByRole('textarea', { name: 'tbxComment' })).toHaveValue('default value to unit test');
     // expect(screen.getByTestId(/form-field-tbxComment/)).toHaveDisplayValue(/default value to unit test/);
   });
 });

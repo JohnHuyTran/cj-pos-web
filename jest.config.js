@@ -38,7 +38,7 @@ module.exports = {
     'react-i18next': '<rootDir>/reacti18nextMock.js',
   },
   // collectCoverageFrom: ['src/**/*.{spec,test}.{js,jsx,ts,tsx}'],
-  // collectCoverageFrom: ['src/tests/components/dc-check-orders/dc-check-order.test.tsx'],
+  collectCoverageFrom: ['src/components/commons/ui/*.tsx'],
   // coverageDirectory: '<rootDir>/src/tests/coverage/',
   collectCoverage: true,
   testMatch: ['**/*.{spec,test}.{js,jsx,ts,tsx}'],
