@@ -68,6 +68,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         }}
         minDate={props.minDateTo}
         placeholder='กรุณาเลือกวันที่'
+        minDateMessage="วันที่โอน ต้องไม่น้อยกว่าวันที่ปัจจุบัน"
         disabled={props.disabled ? props.disabled : false}
       />
     );
