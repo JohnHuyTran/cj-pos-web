@@ -33,7 +33,7 @@ beforeEach(() => {
 });
 
 describe('component text-comment', () => {
-  // const inputField = await screen.findByTestId(`form-field-firstname`);
+  const inputField = screen.findByTestId(`form-field-firstname`);
   // console.debug('debug:', inputField);
   it('find text box', () => {
     expect(screen.getByTestId(/form-field-tbxComment/)).toBeInTheDocument();
@@ -41,7 +41,8 @@ describe('component text-comment', () => {
   it('find label subject', () => {
     expect(screen.getByText(/comment label/)).toBeInTheDocument();
   });
-  // it('should show input with initial value set ', async () => {
-  //   await waitFor(() => expect(inputField).toHaveDisplayValue(/default value to unit test/));
-  // });
+  it('should show input with initial value set ', () => {
+    expect(inputField).toHaveDisplayValue(/default value to unit test/);
+    // expect(screen.getByTestId(/form-field-tbxComment/)).toHaveDisplayValue(/default value to unit test/);
+  });
 });
