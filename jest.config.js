@@ -4,7 +4,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   // The root of your source code, typically /src
   // `<rootDir>` is a token Jest substitutes
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/src', '<rootDir>/src/tests'],
 
   // Jest transformations -- this adds support for TypeScript
   // using ts-jest
@@ -28,7 +28,7 @@ module.exports = {
   // should contain `test` or `spec`.
   // testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
   // testRegex: '.*\\.(test|spec)\\.tsx?$',
-  testRegex: '(/tests/.*|(\\.|/)(test|spec))\\.tsx?$',
+  // testRegex: '(/tests/.*|(\\.|/)(test|spec))\\.tsx?$',
 
   // Module file extensions for importing
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
@@ -37,5 +37,9 @@ module.exports = {
     '\\.(jpg|jpeg|png)$': 'identity-obj-proxy',
     'react-i18next': '<rootDir>/reacti18nextMock.js',
   },
-  collectCoverageFrom: ['src/test/*.{js,jsx,ts,tsx,mjs}'],
+  // collectCoverageFrom: ['src/**/*.{spec,test}.{js,jsx,ts,tsx}'],
+  // collectCoverageFrom: ['src/tests/components/dc-check-orders/dc-check-order.test.tsx'],
+  // coverageDirectory: '<rootDir>/src/tests/coverage/',
+  collectCoverage: true,
+  testMatch: ['**/*.{spec,test}.{js,jsx,ts,tsx}'],
 };

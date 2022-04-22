@@ -41,6 +41,7 @@ function TextBoxComment({
     <>
       <Typography variant='body2'>{fieldName}</Typography>
       <TextField
+        id='tbxComment'
         multiline
         fullWidth
         rows={rowDisplay ? rowDisplay : 2}

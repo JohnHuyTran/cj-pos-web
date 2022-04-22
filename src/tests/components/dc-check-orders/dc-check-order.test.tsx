@@ -9,11 +9,12 @@ import { Store, AnyAction } from '@reduxjs/toolkit';
 import { initialState } from '../../mockStore';
 import { ThemeProvider } from '@mui/material';
 import theme from '../../../styles/theme';
+import { mockUserInfo } from '../../mockData';
 
 let wrapper;
 const mockStore = configureStore();
 let store: Store<any, AnyAction>;
-
+sessionStorage.setItem('user_info', mockUserInfo);
 beforeEach(() => {
   store = mockStore(initialState);
   wrapper = render(
