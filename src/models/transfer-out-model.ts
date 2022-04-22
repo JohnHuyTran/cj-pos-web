@@ -7,6 +7,7 @@ export interface TransferOutSearchRequest {
   startDate: string;
   endDate: string;
   clearSearch?: boolean;
+  type?: string | undefined;
 }
 
 export interface TransferOutSearchResponse {
@@ -23,6 +24,7 @@ export interface TransferOutSearchResponse {
 export interface TransferOut {
   id: string;
   branch: string;
+  branchName: string;
   regionId: string;
   requester: string;
   requestor: string;
@@ -36,6 +38,7 @@ export interface TransferOut {
   approvedDate: string;
   attachFiles: attachFile[];
   products: TransferOutProductDetail[];
+  type?: string | undefined;
 }
 
 export interface TransferOutProductDetail {

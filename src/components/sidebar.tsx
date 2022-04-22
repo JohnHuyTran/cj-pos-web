@@ -23,6 +23,7 @@ import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
+import SwapHorizontalCircleIcon from '@mui/icons-material/SwapHorizontalCircle';
 import { useAppSelector, useAppDispatch } from '../store/store';
 import { changeState } from '../store/slices/nav-slice';
 import imgLogo from '../assets/images/CJlogo.jpeg';
@@ -88,6 +89,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableMainMenuOrderReceive, setDisableMainMenuOrderReceive] = React.useState(true);
   const [disableMainMenuStockTransfer, setDisableMainMenuStockTransfer] = React.useState(true);
   const [disableMainMenuSell, setDisableMainMenuSell] = React.useState(true);
+  const [disableMainMenuTransferOut, setDisableMainMenuTransferOut] = React.useState(true);
   const [disableMainMenuProductInfo, setDisableMainMenuProductInfo] = React.useState(true);
 
   const [disableSubMenuOROrderReceive, setDisableSubMenuOROrderReceive] = React.useState(true);
@@ -99,13 +101,21 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuTaxInvoice, setDisableSubMenuTaxInvoice] = React.useState(true);
   const [disableSubMenuStockBalance, setDisableSubMenuStockBalance] = React.useState(true);
 
+  const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
+  const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
+  const [disableSubMenuTODestroy, setDisableSubMenuTODestroy] = React.useState(true);
+  const [disableSubMenuTOStoreUse, setDisableSubMenuTOStoreUse] = React.useState(true);
+
   useEffect(() => {
     setOpen(navState);
     setDisableMainMenuOrderReceive(isAllowMainMenuPermission(MAINMENU.ORDER_RECEIVE));
     setDisableMainMenuStockTransfer(isAllowMainMenuPermission(MAINMENU.STOCK_TRANSFER));
     setDisableMainMenuSell(isAllowMainMenuPermission(MAINMENU.SALE));
+    setDisableMainMenuTransferOut(isAllowMainMenuPermission(MAINMENU.TRANSFER_OUT));
     setDisableMainMenuProductInfo(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO));
 
+    setDisableSubMenuSaleDiscount(isAllowSubMenuPermission(SUBMENU.SALE_DISCOUNT));
+    setDisableSubMenuSaleSaleLimit(isAllowSubMenuPermission(SUBMENU.SALE_SALE_LIMIT));
     setDisableSubMenuTaxInvoice(isAllowSubMenuPermission(SUBMENU.SALE_TAX_INVOICE));
 
     setDisableSubMenuOROrderReceive(isAllowSubMenuPermission(SUBMENU.OR_ORDER_RECEIVE));
@@ -114,6 +124,9 @@ export default function Sidebar({}: Props): ReactElement {
 
     setDisableSubMenuSTStockRequest(isAllowSubMenuPermission(SUBMENU.ST_REQUEST));
     setDisableSubMenuSTStockTransfer(isAllowSubMenuPermission(SUBMENU.ST_TRANSFER));
+
+    setDisableSubMenuTODestroy(isAllowSubMenuPermission(SUBMENU.TO_DESTROY));
+    setDisableSubMenuTOStoreUse(isAllowSubMenuPermission(SUBMENU.TO_STORE_USE));
 
     setDisableSubMenuStockBalance(isAllowSubMenuPermission(SUBMENU.PI_STOCK_BALANCE));
   }, [navState]);
@@ -212,7 +225,7 @@ export default function Sidebar({}: Props): ReactElement {
         </Link>
         {/*sell menu start*/}
         {/* <ListItemButton key='SELL' onClick={handleClickSell} sx={{ display: disableSellMainMenu ? 'none' : '' }}></ListItemButton> */}
-        <ListItemButton key='SELL' onClick={handleClickSell}>
+        <ListItemButton key='SELL' onClick={handleClickSell} style={{ display: disableMainMenuSell ? 'none' : '' }}>
           <ListItemIcon>
             <ShoppingCartSharp />
           </ListItemIcon>
@@ -226,7 +239,7 @@ export default function Sidebar({}: Props): ReactElement {
                 key='SALE LIMIT TINE'
                 selected={selectedIndex === 2}
                 onClick={() => handleListItemClick(2)}
-                sx={{ pl: 7 }}>
+                sx={{ pl: 7, display: disableSubMenuSaleSaleLimit ? 'none' : '' }}>
                 <ListItemText primary='กำหนดเวลา (งด) ขายสินค้า' />
               </ListItemButton>
             </Link>
@@ -240,7 +253,7 @@ export default function Sidebar({}: Props): ReactElement {
                 key='BARCODE DISCOUNT'
                 selected={selectedIndex === 3}
                 onClick={() => handleListItemClick(3)}
-                sx={{ pl: 7 }}>
+                sx={{ pl: 7, display: disableSubMenuSaleDiscount ? 'none' : '' }}>
                 <ListItemText primary='ส่วนลดสินค้า' />
               </ListItemButton>
             </Link>
@@ -313,7 +326,7 @@ export default function Sidebar({}: Props): ReactElement {
           id='mainMenuTransfer'
           style={{ display: disableMainMenuStockTransfer ? 'none' : '' }}>
           <ListItemIcon>
-            <LoyaltyOutlinedIcon />
+            <SwapHorizontalCircleIcon />
           </ListItemIcon>
           <ListItemText primary='โอนสินค้า' style={{ marginLeft: -15 }} />
           {openTransferMenu ? <ExpandLess /> : <ExpandMore />}
@@ -346,7 +359,10 @@ export default function Sidebar({}: Props): ReactElement {
             </Link>
           </List>
         </Collapse>
-        <ListItemButton onClick={handleClickWithDraw} id='mainMenuWithDraw'>
+        <ListItemButton
+          onClick={handleClickWithDraw}
+          id='mainMenuWithDraw'
+          style={{ display: disableMainMenuTransferOut ? 'none' : '' }}>
           <ListItemIcon>
             <PresentToAllIcon />
           </ListItemIcon>
@@ -355,12 +371,24 @@ export default function Sidebar({}: Props): ReactElement {
         </ListItemButton>
         <Collapse in={openWithDrawMenu} timeout='auto' unmountOnExit>
           <List component='div' disablePadding>
+            <Link
+              to='/transfer-out-destroy'
+              style={{ textDecoration: 'none', color: '#676767' }}
+              id='subMenuTransferOut'>
+              <ListItemButton
+                key='TransferOutDestroy'
+                selected={selectedIndex === 11}
+                onClick={() => handleListItemClick(11)}
+                sx={{ pl: 7, display: disableSubMenuTODestroy ? 'none' : '' }}>
+                <ListItemText primary='ทำลาย' />
+              </ListItemButton>
+            </Link>
             <Link to='/transfer-out' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTransferOut'>
               <ListItemButton
                 key='TransferOut'
                 selected={selectedIndex === 10}
                 onClick={() => handleListItemClick(10)}
-                sx={{ pl: 7 }}>
+                sx={{ pl: 7, display: disableSubMenuTOStoreUse ? 'none' : '' }}>
                 <ListItemText primary='ใช้ในการทำกิจกรรม' />
               </ListItemButton>
             </Link>
@@ -387,7 +415,7 @@ export default function Sidebar({}: Props): ReactElement {
                 selected={selectedIndex === 11}
                 onClick={() => handleListItemClick(11)}
                 sx={{ pl: 7 }}>
-                <ListItemText primary='สินค้าคงเหลือ' />
+                <ListItemText primary='สินค้าคงคลัง' />
               </ListItemButton>
             </Link>
           </List>

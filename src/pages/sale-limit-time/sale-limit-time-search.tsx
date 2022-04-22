@@ -27,6 +27,8 @@ import {
   fetchTotalBranch,
 } from '../../store/slices/search-branches-province-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
+import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
+
 interface State {
   query: string;
   branch: string;
@@ -138,6 +140,7 @@ const SaleLimitTimeSearch = () => {
         saved: false,
       })
     );
+    dispatch(updateAddTypeAndProductState([]));
     setOpenCreateModal(true);
   };
   const handleCloseCreateModal = () => {
@@ -206,7 +209,7 @@ const SaleLimitTimeSearch = () => {
     setValues({
       query: '',
       branch: checkAdmin ? '' : userInfo.branch,
-      status: checkAdmin ? 'all' : '2',
+      status: checkAdmin ? '1' : '2',
       startDate: new Date(),
       endDate: new Date(),
     });
@@ -230,44 +233,43 @@ const SaleLimitTimeSearch = () => {
       <Box sx={{ flexGrow: 1 }} mb={3}>
         <Grid container rowSpacing={3} columnSpacing={6} mt={0.1}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id="query"
-              name="query"
-              size="small"
+              id='query'
+              name='query'
+              size='small'
               value={values.query}
               onChange={onChange.bind(this, setValues, values)}
               InputProps={{
-                endAdornment: <SearchIcon color="primary" sx={{ marginRight: '12px' }} />,
+                endAdornment: <SearchIcon color='primary' sx={{ marginRight: '12px' }} />,
                 inputProps: {
                   style: { textAlignLast: 'start' },
                 },
               }}
               className={classes.MtextField}
               fullWidth
-              placeholder="เอกสาร ST / รายละเอียด"
+              placeholder='เอกสาร ST / รายละเอียด'
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาขา
             </Typography>
             <SearchBranch disabled={!checkAdmin} />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สถานะ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="status"
-                name="status"
+                id='status'
+                name='status'
                 value={values.status}
                 onChange={onChange.bind(this, setValues, values)}
-                disabled={!checkAdmin}
-              >
+                disabled={!checkAdmin}>
                 <MenuItem value={'all'} selected={true}>
                   {t('all')}
                 </MenuItem>
@@ -279,7 +281,7 @@ const SaleLimitTimeSearch = () => {
             </FormControl>
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               วันที่เริ่มงดขายสินค้า ตั้งแต่
             </Typography>
             <DatePickerComponent
@@ -288,7 +290,7 @@ const SaleLimitTimeSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               ถึง
             </Typography>
             <DatePickerComponent
@@ -301,35 +303,32 @@ const SaleLimitTimeSearch = () => {
       <Box sx={{ textAlign: 'right', marginBottom: '20px' }}>
         {checkAdmin && (
           <Button
-            id="btnCreate"
-            variant="contained"
+            id='btnCreate'
+            variant='contained'
             sx={{ width: '172px', marginRight: '20px' }}
             className={classes.MbtnSearch}
-            color="secondary"
+            color='secondary'
             startIcon={<AddCircleOutlineOutlinedIcon />}
-            onClick={handleOpenCreateModal}
-          >
+            onClick={handleOpenCreateModal}>
             {'สร้างเอกสารใหม่'}
           </Button>
         )}
         <Button
-          variant="contained"
-          color="cancelColor"
+          variant='contained'
+          color='cancelColor'
           className={classes.MbtnSearch}
           sx={{ marginRight: '20px', width: '126px' }}
-          onClick={handleClearSearch}
-        >
+          onClick={handleClearSearch}>
           เคลียร์
         </Button>
         <Button
-          variant="contained"
-          color="primary"
+          variant='contained'
+          color='primary'
           className={classes.MbtnSearch}
           sx={{ width: '126px' }}
           onClick={() => {
             handleSearchST();
-          }}
-        >
+          }}>
           ค้นหา
         </Button>
       </Box>
@@ -344,8 +343,8 @@ const SaleLimitTimeSearch = () => {
             }}
           />
         ) : (
-          <Grid item container xs={12} justifyContent="center">
-            <Box color="#CBD4DB">
+          <Grid item container xs={12} justifyContent='center'>
+            <Box color='#CBD4DB'>
               <h2>{t('noData')}</h2>
             </Box>
           </Grid>

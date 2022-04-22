@@ -47,6 +47,9 @@ interface State {
 interface Props {
   open: boolean;
   onClose: () => void;
+  title?: string;
+  skuType?: any[];
+  showSearch?: boolean;
 }
 
 interface SelectedItemProps {
@@ -95,6 +98,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         searchAllProductAsync({
           search: keyword,
           productTypeCodes: productTypeCodes,
+          skuTypes: props.skuType ? props.skuType : [2],
         })
       );
     } else {
@@ -144,13 +148,13 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       <li {...props} key={option.barcode}>
         <Grid container spacing={2}>
           <Grid item xs={8}>
-            <Typography variant="body2">{option.barcodeName}</Typography>
-            <Typography color="textSecondary" variant="caption">
+            <Typography variant='body2'>{option.barcodeName}</Typography>
+            <Typography color='textSecondary' variant='caption'>
               {option.unitName}
             </Typography>
           </Grid>
           <Grid item xs={4} justifyContent={'flex-end'}>
-            <Typography variant="body2">{option.barcode}</Typography>
+            <Typography variant='body2'>{option.barcode}</Typography>
           </Grid>
         </Grid>
       </li>
@@ -169,7 +173,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
   const renderProductTypeListItem = (props: any, option: any) => {
     return (
       <li {...props} key={option.productTypeCode}>
-        <Typography variant="body2">{option.productTypeName}</Typography>
+        <Typography variant='body2'>{option.productTypeName}</Typography>
       </li>
     );
   };
@@ -188,8 +192,8 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         }}
         placeholder={'ค้นหาบาร์โค๊ด / รายละเอียดสินค้า'}
         className={classes.MtextField}
-        variant="outlined"
-        size="small"
+        variant='outlined'
+        size='small'
         fullWidth
       />
     );
@@ -209,8 +213,8 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         }}
         placeholder={'รหัสประเภท/ประเภทสินค้า'}
         className={classes.MtextField}
-        variant="outlined"
-        size="small"
+        variant='outlined'
+        size='small'
         fullWidth
       />
     );
@@ -333,7 +337,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
   const SelectedItem = (props: SelectedItemProps) => {
     const { label, onDelete, ...other } = props;
     return (
-      <div className="wrapper-item">
+      <div className='wrapper-item'>
         <span>{label}</span>
         <CloseIcon onClick={onDelete} />
       </div>
@@ -394,7 +398,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         }
       }
     }
-    if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0) {
+    if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0 && !props.showSearch) {
       for (const item of payloadAddTypeProduct) {
         if (item.selectedType === 1) {
           let selectedItemFilter = selectedItems.filter(
@@ -422,21 +426,47 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     }, 300);
   };
 
+  useEffect(() => {
+    if (props.open && props.showSearch) {
+      renderOpenItems();
+    }
+  }, [props.open]);
+
+  const renderOpenItems = () => {
+    if (payloadAddTypeProduct.length > 0) {
+      const items: any = [];
+      let productTypeName: any = [];
+      payloadAddTypeProduct.map((item: any, index: number) => {
+        let pTypeName = item.ProductTypeName ? item.ProductTypeName : item.productTypeName ? item.productTypeName : '';
+
+        if (item.selectedType === 2 && !item.productByType) {
+          productTypeName.push(pTypeName);
+          items.push(item);
+        } else if (item.selectedType === 2 && item.productByType) {
+          items.push(item);
+        } else if (item.selectedType === 1) {
+          const filterTypeName = productTypeName.filter((r: any) => r === pTypeName);
+          if (filterTypeName.length === 0) items.push(item);
+        }
+      });
+      setSelectedItems(items);
+    }
+  };
+
   return (
     <Dialog open={props.open} PaperProps={{ sx: { width: '1132px', maxWidth: '1132px' } }}>
       <Box sx={{ flex: 1, ml: 2 }}>
         {props.onClose ? (
           <IconButton
-            aria-label="close"
+            aria-label='close'
             onClick={props.onClose}
             sx={{
               position: 'absolute',
               right: 8,
               top: 8,
               color: (theme: any) => theme.palette.grey[400],
-            }}
-          >
-            <CancelOutlinedIcon fontSize="large" stroke={'white'} stroke-width={1} />
+            }}>
+            <CancelOutlinedIcon fontSize='large' stroke={'white'} stroke-width={1} />
           </IconButton>
         ) : null}
       </Box>
@@ -444,19 +474,20 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         <Grid container spacing={2}>
           <Grid item xs={5} pr={5.5}>
             <Box>
-              <Typography gutterBottom variant="subtitle1" component="div" mb={1} mt={-1.9}>
-                เพิ่มรายการสินค้า (งด) ขาย
+              <Typography gutterBottom variant='subtitle1' component='div' mb={1} mt={-1.9}>
+                {props.title && props.title}
+                {!props.title && 'เพิ่มรายการสินค้า (งด) ขาย'}
               </Typography>
             </Box>
             <Box>
-              <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-                ประ<span style={{ color: 'red' }}>เ</span>ภทสินค้า
+              <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+                ประเภทสินค้า
               </Typography>
               <Autocomplete
                 options={productTypeOptions}
-                id="combo-box-type"
-                popupIcon={<SearchIcon color="primary" />}
-                size="small"
+                id='combo-box-type'
+                popupIcon={<SearchIcon color='primary' />}
+                size='small'
                 filterOptions={filterProductTypeOptions}
                 renderOption={renderProductTypeListItem}
                 renderInput={autocompleteProductTypeRenderInput}
@@ -471,7 +502,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             </Box>
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
-                <Typography gutterBottom variant="subtitle1" component="div" mr={3}>
+                <Typography gutterBottom variant='subtitle1' component='div' mr={3}>
                   ค้นหาสินค้า
                 </Typography>
                 <FormGroup>
@@ -486,9 +517,9 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
               </Box>
               <Autocomplete
                 options={productOptions}
-                id="combo-box-product"
-                popupIcon={<SearchIcon color="primary" />}
-                size="small"
+                id='combo-box-product'
+                popupIcon={<SearchIcon color='primary' />}
+                size='small'
                 filterOptions={filterProductOptions}
                 renderOption={renderProductListItem}
                 renderInput={autocompleteProductRenderInput}
@@ -516,8 +547,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
           <Grid item xs={7}>
             <Box
               className={classes.MWrapperListBranch}
-              sx={{ width: '543px', minWidth: '543px', minHeight: '270px', height: '270px' }}
-            >
+              sx={{ width: '543px', minWidth: '543px', minHeight: '270px', height: '270px' }}>
               <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>{renderSelectedItems()}</Box>
             </Box>
           </Grid>
@@ -525,13 +555,12 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       </DialogContent>
       <Grid item xs={12} sx={{ textAlign: 'right' }} mr={3} mb={4}>
         <Button
-          variant="contained"
-          color="info"
+          variant='contained'
+          color='info'
           startIcon={<AddCircleOutlineOutlinedIcon />}
           onClick={handleAddProduct}
           disabled={!(selectedItems && selectedItems.length > 0)}
-          className={classes.MbtnSearch}
-        >
+          className={classes.MbtnSearch}>
           เพิ่มสินค้า
         </Button>
       </Grid>

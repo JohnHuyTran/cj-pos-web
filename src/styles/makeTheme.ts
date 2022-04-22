@@ -217,6 +217,49 @@ const useStyles = makeStyles({
     //   overflow: "unset !important",
     // },
   },
+  MdataGridPaginationTopStock: {
+    '& .MuiDataGrid-columnHeaderTitle': {
+      // color: '#36C690',
+      fontWeight: '600 !important',
+      whiteSpace: 'unset !important',
+      // overflow: "unset !important",
+    },
+    '& .MuiDataGrid-root': {
+      fontFamily: 'Kanit',
+      borderRadius: '10px !important',
+      display: 'flex !important',
+      flexDirection: 'column-reverse',
+      '& .MuiDataGrid-row': {
+        maxHeight: 'none !important',
+        '& .MuiDataGrid-cell': {
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          lineHeight: '120% !important',
+          maxHeight: 'none !important',
+          whiteSpace: 'unset !important',
+          overflow: 'unset !important',
+        },
+        '& .MuiDataGrid-cell--textRight': {
+          justifyContent: 'flex-end',
+        },
+        '& .MuiDataGrid-cell--textLeft': {
+          justifyContent: 'flex-start',
+        },
+      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
+        {
+          outline: 'none',
+        },
+    },
+    '& .MuiDataGrid-footerContainer': {
+      borderBottom: '1px solid #E5E5E5 !important',
+      // height: '50px',
+    },
+    '& .MuiTablePagination-toolbar': {
+      color: '#AEAEAE',
+    },
+  },
   MdataGridChangeColorRow: {
     '& .MuiDataGrid-columnHeaderTitle': {
       color: '#36C690',
@@ -286,6 +329,17 @@ const useStyles = makeStyles({
     color: '#fff',
     '&:hover': {
       backgroundColor: '#676767',
+    },
+  },
+  MbtnRefresh: {
+    width: '126px',
+    height: '40px',
+    '&.MuiButton-root': {
+      backgroundColor: '#36C690 !important',
+      marginLeft: '10px !important',
+      borderRadius: '3px !important',
+      boxShadow: 'none !important',
+      textTransform: 'none',
     },
   },
   MbtnSearch: {
@@ -494,6 +548,25 @@ const useStyles = makeStyles({
         fontSize: '14px',
         marginLeft: '5px',
       },
+    },
+  },
+  MScrollBar: {
+    '&::-webkit-scrollbar': {
+      width: '4px',
+    },
+
+    '&::-webkit-scrollbar-track': {
+      boxShadow: 'inset 0 0 5px rgb(255, 251, 251)',
+      borderRadius: '10px',
+    },
+
+    '&::-webkit-scrollbar-thumb': {
+      background: '#AEAEAE',
+      borderRadius: '10px',
+    },
+
+    '&::-webkit-scrollbar-thumb:hover': {
+      background: 'rgb(255, 251, 251)',
     },
   },
 });

@@ -11,12 +11,8 @@ import React from 'react';
 import DatePickerAllComponent from '../commons/ui/date-picker-all';
 import { useStyles } from '../../styles/makeTheme';
 import { Button } from '@mui/material';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { updateAddItemsState } from '../../store/slices/add-items-slice';
-
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
-import ReasonsListDropDown from '../stock-transfer/transfer-reasons-list-dropdown';
 import LoadingModal from '../commons/ui/loading-modal';
 import AlertError from '../../components/commons/ui/alert-error';
 import { StockTransferRequest } from '../../models/stock-transfer-model';
@@ -24,14 +20,12 @@ import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfe
 import StockTransferList from '../../components/stock-transfer/stock-transfer-list';
 import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
 import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
-import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import { isAllowActionPermission, isGroupBranch, isGroupDC } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { getBranchName } from '../../utils/utils';
 import { env } from '../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../models/branch-model';
 import { getUserInfo } from '../../store/sessionStore';
-import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 
 interface State {
   docNo: string;
@@ -283,6 +277,7 @@ export default function SupplierCheckOrderSearch() {
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
               disable={groupBranch}
+              isFilterAuthorizedBranch={groupBranch ? false : true}
             />
           </Grid>
           <Grid item xs={4}>
@@ -294,6 +289,7 @@ export default function SupplierCheckOrderSearch() {
               onChangeBranch={handleChangeBranchTo}
               isClear={clearBranchDropDown}
               filterOutDC={groupBranch}
+              isFilterAuthorizedBranch={groupBranch ? false : true}
             />
           </Grid>
 
