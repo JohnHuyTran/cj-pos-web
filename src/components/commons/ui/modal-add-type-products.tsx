@@ -49,6 +49,7 @@ interface Props {
   onClose: () => void;
   title?: string;
   skuType?: any[];
+  showSearch?: boolean;
 }
 
 interface SelectedItemProps {
@@ -397,7 +398,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         }
       }
     }
-    if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0) {
+    if (payloadAddTypeProduct && payloadAddTypeProduct.length > 0 && !props.showSearch) {
       for (const item of payloadAddTypeProduct) {
         if (item.selectedType === 1) {
           let selectedItemFilter = selectedItems.filter(
@@ -423,6 +424,33 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       setOpenLoadingModal(false);
       props.onClose();
     }, 300);
+  };
+
+  useEffect(() => {
+    if (props.open && props.showSearch) {
+      renderOpenItems();
+    }
+  }, [props.open]);
+
+  const renderOpenItems = () => {
+    if (payloadAddTypeProduct.length > 0) {
+      const items: any = [];
+      let productTypeName: any = [];
+      payloadAddTypeProduct.map((item: any, index: number) => {
+        let pTypeName = item.ProductTypeName ? item.ProductTypeName : item.productTypeName ? item.productTypeName : '';
+
+        if (item.selectedType === 2 && !item.productByType) {
+          productTypeName.push(pTypeName);
+          items.push(item);
+        } else if (item.selectedType === 2 && item.productByType) {
+          items.push(item);
+        } else if (item.selectedType === 1) {
+          const filterTypeName = productTypeName.filter((r: any) => r === pTypeName);
+          if (filterTypeName.length === 0) items.push(item);
+        }
+      });
+      setSelectedItems(items);
+    }
   };
 
   return (
