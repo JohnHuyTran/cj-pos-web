@@ -26,7 +26,7 @@ import TransferOutList from './transfer-out-list';
 import SelectBranch from './transfer-out-branch';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
-import ModalCreateTransferOut from "../../components/transfer-out/modal-create-transfer-out";
+import ModalCreateTransferOut from '../../components/transfer-out/modal-create-transfer-out';
 
 const _ = require('lodash');
 
@@ -117,6 +117,8 @@ const TransferOutSearch = () => {
     if (listBranchSelect.length > 0) {
       let branches = listBranchSelect.map((item: any) => item.code).join(',');
       setValues({ ...values, branch: branches });
+    } else {
+      setValues({ ...values, branch: '' });
     }
   }, [listBranchSelect]);
 

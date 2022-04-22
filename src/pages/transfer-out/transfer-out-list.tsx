@@ -148,7 +148,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: t("numberOrder"),
       headerAlign: "center",
       sortable: false,
-      minWidth: 50,
+      flex: 0.4,
       renderCell: (params) => (
         <Box component="div" sx={{ margin: "0 auto" }}>
           {params.value}
@@ -160,21 +160,21 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: 'สาขา',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 250,
+      flex: 1,
     },
     {
       field: 'documentNumber',
       headerName: 'เอกสารเบิก',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 220,
+      flex: 0.9,
     },
     {
       field: "transactionDate",
       headerName: "วันที่ทำรายการ",
       headerAlign: "center",
       sortable: false,
-      minWidth: 160,
+      flex: 0.7,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
@@ -186,7 +186,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: "วันที่อนุมัติ",
       headerAlign: "center",
       sortable: false,
-      minWidth: 160,
+      flex: 0.7,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
@@ -199,7 +199,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerAlign: "center",
       align: "center",
       sortable: false,
-      minWidth: 180,
+      flex: 0.6,
       renderCell: (params) => genRowStatus(params),
     },
     {
@@ -207,7 +207,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: "ผู้บันทึก",
       headerAlign: "center",
       sortable: false,
-      minWidth: 200,
+      flex: 1,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
@@ -219,7 +219,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: "ผู้อนุมัติ",
       headerAlign: "center",
       sortable: false,
-      minWidth: 200,
+      flex: 1,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
