@@ -41,6 +41,7 @@ function TextBoxComment({
     <>
       <Typography variant='body2'>{fieldName}</Typography>
       <TextField
+        data-testid='form-field-tbxComment'
         id='tbxComment'
         multiline
         fullWidth
