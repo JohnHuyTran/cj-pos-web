@@ -70,7 +70,6 @@ function StockSearch() {
   const dispatch = useAppDispatch();
 
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
-
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [values, setValues] = React.useState<State>({
