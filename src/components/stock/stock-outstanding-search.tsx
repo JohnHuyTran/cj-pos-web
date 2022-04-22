@@ -333,7 +333,6 @@ function StockSearch() {
               color='primary'
               onClick={onClickSearchBtn}
               sx={{ width: '13%', ml: 2, display: `${disableSearchBtn ? 'none' : ''}` }}
-              // sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnSearch}>
               ค้นหา
             </Button>
