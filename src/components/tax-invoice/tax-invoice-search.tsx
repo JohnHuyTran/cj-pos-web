@@ -71,7 +71,7 @@ export default function TaxInvoiceSearch() {
       setValues({ ...values, [event.target.name]: value });
     } else {
       const value = event.target.value;
-      setValues({ ...values, [event.target.name]: value });
+      setValues({ ...values, [event.target.name]: value.trim() });
     }
   };
 
