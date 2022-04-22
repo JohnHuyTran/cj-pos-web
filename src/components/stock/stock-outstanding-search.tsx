@@ -181,7 +181,6 @@ function StockSearch() {
       await dispatch(savePayloadSearchLocation(payload));
       setFlagSearch(true);
     }
-
     handleOpenLoading('open', false);
   };
   const handleOpenLoading = (prop: any, event: boolean) => {
