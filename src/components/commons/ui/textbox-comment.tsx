@@ -43,7 +43,7 @@ function TextBoxComment({
       <TextField
         data-testid='form-field-tbxComment'
         id='tbxComment'
-        name='tbxComment'
+        label='tbxComment'
         multiline
         fullWidth
         rows={rowDisplay ? rowDisplay : 2}

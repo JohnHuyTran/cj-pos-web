@@ -43,7 +43,7 @@ describe('component text-comment', () => {
   it('should show input with initial value set ', () => {
     // const inputField = screen.getByTestId(`form-field-firstname`);
     // expect(inputField).toHaveDisplayValue(/default value to unit test/);
-    expect(screen.getByRole('textarea', { name: 'tbxComment' })).toHaveValue('default value to unit test');
+    expect(screen.getByRole('textarea', { name: 'tbxComment' })).toHaveDisplayValue('default value to unit test');
     // expect(screen.getByTestId(/form-field-tbxComment/)).toHaveDisplayValue(/default value to unit test/);
   });
 });
