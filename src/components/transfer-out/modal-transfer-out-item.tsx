@@ -271,7 +271,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     },
     {
       field: 'numberOfRequested',
-      headerName: 'จำนวน',
+      headerName: 'จำนวน *',
       flex: 1,
       headerAlign: 'center',
       disableColumnMenu: true,
@@ -305,7 +305,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     },
     {
       field: 'numberOfApproved',
-      headerName: 'จำนวนที่อนุมัติ',
+      headerName: 'จำนวนที่อนุมัติ *',
       flex: 1,
       headerAlign: 'center',
       disableColumnMenu: true,

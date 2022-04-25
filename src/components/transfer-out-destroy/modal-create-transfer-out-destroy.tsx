@@ -709,7 +709,7 @@ export default function ModalCreateTransferOutDestroy({
             </Grid>
             <Grid item container xs={4} mb={2}>
               <Grid item xs={4}>
-                รูปก่อนทำลาย :
+                รูปก่อนทำลาย<b style={{ fontSize:'18px' }}> *</b> :
               </Grid>
               <Grid item xs={8}>
                 <AccordionUploadFile
@@ -729,7 +729,7 @@ export default function ModalCreateTransferOutDestroy({
             </Grid>
             <Grid item container xs={4} mb={2} pl={3}>
               <Grid item xs={4}>
-                รูปหลังทำลาย :
+                รูปหลังทำลาย<b style={{ fontSize:'18px' }}> *</b> :
               </Grid>
               <Grid item xs={8}>
                 <AccordionUploadFile

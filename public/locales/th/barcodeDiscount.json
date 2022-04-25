@@ -20,7 +20,7 @@
   "list": "รายการ",
   "headerName": {
     "quantity": "จำนวน",
-    "total": "รวมทั้งหมด",
+    "total": "ทั้งหมด",
     "price": "ราคาปกติ",
     "discount": "ส่วนลด",
     "priceAfterDiscount": "ราคาหลังลด",
@@ -77,6 +77,10 @@
     {
       "value": "5",
       "label": "ไม่อนุมัติ"
+    },
+    {
+      "value": "10",
+      "label": "สินค้าหมดอายุ"
     }
   ]
 }

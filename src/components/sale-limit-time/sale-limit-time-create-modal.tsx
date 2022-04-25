@@ -634,7 +634,7 @@ function STCreateModal({
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              รายละเอียด :
+              รายละเอียด<b style={{ fontSize:'18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <TextField
@@ -664,7 +664,7 @@ function STCreateModal({
           </Grid>
           <Grid container spacing={2} mb={2.5}>
             <Grid item xs={2}>
-              วันที่เริ่มงดใช้งาน :
+              วันที่เริ่มงดใช้งาน<b style={{ fontSize:'18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
@@ -681,7 +681,7 @@ function STCreateModal({
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุดงดขาย :
+              วันที่สิ้นสุดงดขาย<b style={{ fontSize:'18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
@@ -702,7 +702,7 @@ function STCreateModal({
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              เวลาที่เริ่มงดขาย :
+              เวลาที่เริ่มงดขาย<b style={{ fontSize:'18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <TextField
@@ -728,7 +728,7 @@ function STCreateModal({
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              เวลาที่สิ้นสุดงดขาย :
+              เวลาที่สิ้นสุดงดขาย<b style={{ fontSize:'18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <TextField
@@ -755,7 +755,7 @@ function STCreateModal({
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาขา :
+              สาขา<b style={{ fontSize:'18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <SearchBranch disabled={status > 1 || !isAdmin} error={checkValue.payloadBranchesError} />

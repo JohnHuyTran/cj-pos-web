@@ -26,7 +26,7 @@ import TransferOutList from './transfer-out-list';
 import SelectBranch from './transfer-out-branch';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
-import ModalCreateTransferOut from "../../components/transfer-out/modal-create-transfer-out";
+import ModalCreateTransferOut from '../../components/transfer-out/modal-create-transfer-out';
 
 const _ = require('lodash');
 
@@ -75,7 +75,7 @@ const TransferOutSearch = () => {
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
     branch: 'ALL',
-    status: '',
+    status: 'ALL',
     fromDate: new Date(),
     approveDate: new Date(),
   });
@@ -103,20 +103,22 @@ const TransferOutSearch = () => {
       setRequestPermission(
         userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.create') : false
       );
-      setValues({
-        ...values,
-        status: userPermission.includes('campaign.to.approve')
-          ? TOStatus.WAIT_FOR_APPROVAL
-          : userPermission.includes('campaign.to.create')
-          ? TOStatus.DRAFT
-          : 'ALL',
-      });
+      // setValues({
+      //   ...values,
+      //   status: userPermission.includes('campaign.to.approve')
+      //     ? TOStatus.WAIT_FOR_APPROVAL
+      //     : userPermission.includes('campaign.to.create')
+      //     ? TOStatus.DRAFT
+      //     : 'ALL',
+      // });
     }
   }, []);
   useEffect(() => {
     if (listBranchSelect.length > 0) {
       let branches = listBranchSelect.map((item: any) => item.code).join(',');
       setValues({ ...values, branch: branches });
+    } else {
+      setValues({ ...values, branch: '' });
     }
   }, [listBranchSelect]);
 
@@ -142,7 +144,7 @@ const TransferOutSearch = () => {
     setValues({
       documentNumber: '',
       branch: '',
-      status: approvePermission ? TOStatus.WAIT_FOR_APPROVAL : requestPermission ? TOStatus.DRAFT : 'ALL',
+      status: 'ALL',
       fromDate: new Date(),
       approveDate: new Date(),
     });
