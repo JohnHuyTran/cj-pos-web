@@ -225,7 +225,7 @@ const TransferOutSearch = () => {
         <Grid container rowSpacing={3} columnSpacing={6} mt={0.1}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {'เลขที่เอกสารเบิก'}
+              {'เลขที่เอกสารทำลาย'}
             </Typography>
             <TextField
               id="documentNumber"
