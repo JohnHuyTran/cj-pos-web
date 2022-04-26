@@ -22,6 +22,9 @@ import {
 } from '../../../store/slices/stock/stock-movement-search-slice';
 import moment from 'moment';
 import { calulateDate } from '../../../utils/date-utill';
+import { SearchOff } from '@mui/icons-material';
+import StockMovementSearchList from './stock-movement-search-list';
+import LoadingModal from '../../commons/ui/loading-modal';
 interface State {
   storeId: number;
   locationId: string;
@@ -34,6 +37,7 @@ function StockMovementSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
+  const items = useAppSelector((state) => state.stockBalanceSearchSlice.stockList);
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
 
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
@@ -204,10 +208,10 @@ function StockMovementSearch() {
       return false;
     }
 
-    if (startDate && endDate) {
-      console.log('startDate: ', moment(startDate).startOf('day').toISOString());
-      const diffDate = calulateDate(startDate, endDate);
-    }
+    // if (startDate && endDate) {
+    //   console.log('startDate: ', moment(startDate).startOf('day').toISOString());
+    //   const diffDate = calulateDate(startDate, endDate);
+    // }
 
     return true;
   };
@@ -352,6 +356,18 @@ function StockMovementSearch() {
         </Grid>
       </Box>
 
+      {flagSearch && items.data.length > 0 && <StockMovementSearchList />}
+
+      {flagSearch && items.data.length === 0 && (
+        <Grid container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB' justifyContent='center'>
+            <h2>
+              ไม่มีข้อมูล <SearchOff fontSize='large' />
+            </h2>
+          </Box>
+        </Grid>
+      )}
+      <LoadingModal open={openLoadingModal.open} />
       <ModalAddTypeProduct
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}

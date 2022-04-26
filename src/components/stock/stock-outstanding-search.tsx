@@ -28,6 +28,7 @@ import { ACTIONS } from '../../utils/enum/permission-enum';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import AlertError from '../commons/ui/alert-error';
 import _ from 'lodash';
+import LoadingModal from '../commons/ui/loading-modal';
 interface State {
   storeId: number;
   locationId: string;
@@ -374,6 +375,7 @@ function StockSearch() {
           </TabPanel>
         </>
       )}
+      <LoadingModal open={openLoadingModal.open} />
       <ModalAddTypeProduct
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}

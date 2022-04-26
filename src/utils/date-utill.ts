@@ -119,10 +119,6 @@ export const convertUtcToBkkWithZ = (utcDate: string) => {
 export const calulateDate = (fromDate: any, toDate: any) => {
   console.log(moment(fromDate).startOf('day').toISOString());
   console.log(moment(toDate).endOf('day').toISOString());
-
-  const duration = moment.duration(fromDate.diff(toDate));
-  const days = duration.asDays();
-  console.log(days);
 };
 
 // export const generateDateStringTag = (data: {
