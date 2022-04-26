@@ -1,4 +1,4 @@
-import React, {Suspense}  from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -22,8 +22,8 @@ ReactDOM.render(
         <ThemeProvider theme={theme}>
           <BrowserRouter>
             <Suspense fallback="">
-                <CssBaseline />
-                <App />
+              <CssBaseline />
+              <App />
             </Suspense>
           </BrowserRouter>
         </ThemeProvider>
