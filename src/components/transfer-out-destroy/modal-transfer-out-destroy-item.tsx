@@ -497,7 +497,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
           <Grid item xs={3}/>
           <Grid item xs={3}>
             <Box display="flex" justifyContent="space-between" marginTop="25px">
-              <Typography fontSize="14px" lineHeight="30px" height="24px">
+              <Typography fontSize="14px" fontWeight="700" lineHeight="30px" height="24px">
                 จำนวนทำลายทั้งหมด
               </Typography>
               <TextField
