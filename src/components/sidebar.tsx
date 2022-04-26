@@ -211,7 +211,7 @@ export default function Sidebar({}: Props): ReactElement {
             <ListItemText primary='หน้าหลัก' style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
-        <Link to='/notification' style={{ textDecoration: 'none', color: '#676767' }}>
+        {/* <Link to='/notification' style={{ textDecoration: 'none', color: '#676767' }}>
           <ListItemButton
             key='NOTIFICATION'
             selected={selectedIndex === 1}
@@ -222,7 +222,7 @@ export default function Sidebar({}: Props): ReactElement {
             </ListItemIcon>
             <ListItemText primary='แจ้งเตือน' style={{ marginLeft: -15 }} />
           </ListItemButton>
-        </Link>
+        </Link> */}
         {/*sell menu start*/}
         {/* <ListItemButton key='SELL' onClick={handleClickSell} sx={{ display: disableSellMainMenu ? 'none' : '' }}></ListItemButton> */}
         <ListItemButton key='SELL' onClick={handleClickSell} style={{ display: disableMainMenuSell ? 'none' : '' }}>

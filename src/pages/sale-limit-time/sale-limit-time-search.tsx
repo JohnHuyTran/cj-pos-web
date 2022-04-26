@@ -294,6 +294,8 @@ const SaleLimitTimeSearch = () => {
             <DatePickerComponent
               onClickDate={onChangeDate.bind(this, setValues, values, 'endDate')}
               value={values.endDate}
+              minDateTo={values.startDate}
+              type={'TO'}
             />
           </Grid>
         </Grid>
