@@ -1,82 +1,49 @@
-import { Box, Button, FormControl, Grid, MenuItem, Select, Tab, Tabs, TextField, Typography } from '@mui/material';
 import React from 'react';
-import { env } from '../../adapters/environmentConfigs';
-import { BranchListOptionType } from '../../models/branch-model';
-import { getUserInfo } from '../../store/sessionStore';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { useStyles } from '../../styles/makeTheme';
-import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permission';
-import { getBranchName, stringNullOrEmpty } from '../../utils/utils';
-import BranchListDropDown from '../commons/ui/branch-list-dropdown';
-import DatePickerAllComponent from '../commons/ui/date-picker-all';
-import ModalAddTypeProduct from '../commons/ui/modal-add-type-products';
-import StockBalance from './stock-balance';
-import StockBalanceLocation from './stock-balance-location';
+import { Box, Button, FormControl, Grid, MenuItem, Select, Tab, Tabs, TextField, Typography } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
+import { useStyles } from '../../../styles/makeTheme';
+import AlertError from '../../commons/ui/alert-error';
+import ModalAddTypeProduct from '../../commons/ui/modal-add-type-products';
+import { updateAddTypeAndProductState } from '../../../store/slices/add-type-product-slice';
+import { isAllowActionPermission, isGroupBranch } from '../../../utils/role-permission';
+import { getUserInfo } from '../../../store/sessionStore';
+import { getBranchName, stringNullOrEmpty } from '../../../utils/utils';
+import { ACTIONS } from '../../../utils/enum/permission-enum';
+import { env } from '../../../adapters/environmentConfigs';
 import SearchIcon from '@mui/icons-material/Search';
-import {
-  clearDataFilter,
-  featchStockBalanceSearchAsync,
-  savePayloadSearch,
-} from '../../store/slices/stock/stock-balance-search-slice';
-import { OutstandingRequest } from '../../models/stock-model';
-import {
-  featchStockBalanceLocationSearchAsync,
-  clearDataLocationFilter,
-  savePayloadSearchLocation,
-} from '../../store/slices/stock/stock-balance-location-search-slice';
-import { ACTIONS } from '../../utils/enum/permission-enum';
-import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
-import AlertError from '../commons/ui/alert-error';
+import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
+import { BranchListOptionType } from '../../../models/branch-model';
+import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import _ from 'lodash';
+import { OutstandingRequest } from '../../../models/stock-model';
+import {
+  featchStockMovementeSearchAsync,
+  savePayloadSearch,
+} from '../../../store/slices/stock/stock-movement-search-slice';
+import moment from 'moment';
+import { calulateDate } from '../../../utils/date-utill';
 interface State {
   storeId: number;
   locationId: string;
-  productId: string;
+  skuCodes: string;
   branchCode: string;
+  dateFrom: string;
+  dateTo: string;
 }
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-  return (
-    <div
-      role='tabpanel'
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}>
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
-function StockSearch() {
+function StockMovementSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
+
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [values, setValues] = React.useState<State>({
     storeId: 0,
     locationId: 'ALL',
-    productId: '',
+    skuCodes: '',
     branchCode: '',
+    dateFrom: '',
+    dateTo: '',
   });
   const handleChange = (event: any) => {
     const name = event.target.name;
@@ -89,11 +56,21 @@ function StockSearch() {
       setValues({ ...values, [event.target.name]: value });
     }
   };
-  const [value, setValue] = React.useState(0);
+  const page = 1;
+  const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
   const [flagSearch, setFlagSearch] = React.useState(false);
-  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<{ open: boolean }>({
+    open: false,
+  });
+  const [startDate, setStartDate] = React.useState<Date | null>(new Date());
+  const [endDate, setEndDate] = React.useState<Date | null>(new Date());
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
   };
+
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const [branchFromCode, setBranchFromCode] = React.useState('');
@@ -105,6 +82,9 @@ function StockSearch() {
       : env.branch.code
   );
   React.useEffect(() => {
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() - 7);
+    setStartDate(defaultDate);
     setDisableSearchBtn(isAllowActionPermission(ACTIONS.STOCK_BL_SKU));
     if (groupBranch) {
       setBranchFromCode(ownBranch);
@@ -122,25 +102,51 @@ function StockSearch() {
   const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
     groupBranch ? branchFromMap : null
   );
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<{ open: boolean }>({
-    open: false,
-  });
-  const [startDate, setStartDate] = React.useState<Date | null>(new Date());
-  const page = 1;
-  const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
-  const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState('');
 
-  const handleCloseAlert = () => {
-    setOpenAlert(false);
+  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const [skuTypes, setSkuTypes] = React.useState<number[]>([1, 2]);
+  const handleOpenAddItems = () => {
+    if (values.storeId === 0) {
+      setSkuTypes([1, 2]);
+    } else {
+      setSkuTypes([values.storeId]);
+    }
+    setOpenModelAddItems(true);
   };
+
+  const handleCloseModalAddItems = () => {
+    setOpenModelAddItems(false);
+  };
+
+  const handleChangeBranchFrom = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setBranchFromCode(branchCode);
+      setValues({ ...values, branchCode: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branchCode: '' });
+    }
+  };
+
+  const handleStartDatePicker = (value: any) => {
+    setStartDate(value);
+  };
+  const handleEndDatePicker = (value: Date) => {
+    setEndDate(value);
+  };
+  //check dateFrom-dateTo
+  if (endDate != null && startDate != null) {
+    if (endDate < startDate) {
+      setEndDate(null);
+    }
+  }
   const onClickClearBtn = async () => {
     handleOpenLoading('open', true);
+    setStartDate(null);
+    setEndDate(null);
     setClearBranchDropDown(!clearBranchDropDown);
-    setValues({ storeId: 0, locationId: 'ALL', productId: '', branchCode: '' });
+    setValues({ storeId: 0, locationId: 'ALL', skuCodes: '', branchCode: '', dateFrom: '', dateTo: '' });
     await dispatch(updateAddTypeAndProductState([]));
-    await dispatch(clearDataFilter());
-    await dispatch(clearDataLocationFilter());
     setTimeout(() => {
       setFlagSearch(false);
       handleOpenLoading('open', false);
@@ -169,12 +175,12 @@ function StockSearch() {
         skuCodes: filterSKU,
         storeCode: values.locationId === 'ALL' ? '' : values.locationId,
         branchCode: branchFromCode,
+        dateFrom: moment(startDate).startOf('day').toISOString(),
+        dateTo: moment(endDate).endOf('day').toISOString(),
       };
 
-      await dispatch(featchStockBalanceSearchAsync(payload));
-      await dispatch(featchStockBalanceLocationSearchAsync(payload));
+      await dispatch(featchStockMovementeSearchAsync(payload));
       await dispatch(savePayloadSearch(payload));
-      await dispatch(savePayloadSearchLocation(payload));
       setFlagSearch(true);
     }
     handleOpenLoading('open', false);
@@ -191,39 +197,23 @@ function StockSearch() {
       setTextError('กรุณาระบุสาขา');
       return false;
     }
+
+    if (startDate === null || endDate === null) {
+      setOpenAlert(true);
+      setTextError('กรุณาระบุวันที่เคลื่อนไหวสินค้า');
+      return false;
+    }
+
+    if (startDate && endDate) {
+      console.log('startDate: ', moment(startDate).startOf('day').toISOString());
+      const diffDate = calulateDate(startDate, endDate);
+    }
+
     return true;
   };
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
-  };
-
-  const handleChangeBranchFrom = (branchCode: string) => {
-    if (branchCode !== null) {
-      let codes = JSON.stringify(branchCode);
-      setBranchFromCode(branchCode);
-      setValues({ ...values, branchCode: JSON.parse(codes) });
-    } else {
-      setValues({ ...values, branchCode: '' });
-    }
-  };
-
-  const handleStartDatePicker = (value: any) => {
-    setStartDate(value);
-  };
-
-  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
-  const [skuTypes, setSkuTypes] = React.useState<number[]>([1, 2]);
-  const handleOpenAddItems = () => {
-    if (values.storeId === 0) {
-      setSkuTypes([1, 2]);
-    } else {
-      setSkuTypes([values.storeId]);
-    }
-    setOpenModelAddItems(true);
-  };
-  const handleCloseModalAddItems = () => {
-    setOpenModelAddItems(false);
   };
 
   React.useEffect(() => {
@@ -233,9 +223,9 @@ function StockSearch() {
         .map((item: any, index: number) => item.skuName)
         .join(', ');
 
-      setValues({ ...values, productId: strProducts });
+      setValues({ ...values, skuCodes: strProducts });
     } else {
-      setValues({ ...values, productId: '' });
+      setValues({ ...values, skuCodes: '' });
     }
   }, [payloadAddTypeProduct]);
 
@@ -270,7 +260,7 @@ function StockSearch() {
               id='txtProductList'
               name='productId'
               size='small'
-              value={values.productId}
+              value={values.skuCodes}
               onClick={handleOpenAddItems}
               className={`${classes.MtextField} ${classes.MSearchBranchInput}`}
               fullWidth
@@ -323,9 +313,20 @@ function StockSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
-              ข้อมูล ณ วันที่
+              วันที่เคลื่อนไหวสินค้า ตั้งแต่
             </Typography>
-            <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} disabled={true} />
+            <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
+          </Grid>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant='subtitle1' component='div'>
+              ถึง
+            </Typography>
+            <DatePickerAllComponent
+              onClickDate={handleEndDatePicker}
+              value={endDate}
+              type={'TO'}
+              minDateTo={startDate}
+            />
           </Grid>
           <Grid item xs={4}></Grid>
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
@@ -350,30 +351,7 @@ function StockSearch() {
           </Grid>
         </Grid>
       </Box>
-      {flagSearch && (
-        <>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
-              <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
-              <Tab
-                label={
-                  <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
-                    สินค้าคงคลัง(ตาม Location)
-                  </Typography>
-                }
-                {...a11yProps(1)}
-              />
-            </Tabs>
-          </Box>
 
-          <TabPanel value={value} index={0}>
-            <StockBalance />
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <StockBalanceLocation />
-          </TabPanel>
-        </>
-      )}
       <ModalAddTypeProduct
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
@@ -386,4 +364,4 @@ function StockSearch() {
   );
 }
 
-export default StockSearch;
+export default StockMovementSearch;

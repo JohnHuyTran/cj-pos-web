@@ -418,6 +418,18 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='สินค้าคงคลัง' />
               </ListItemButton>
             </Link>
+            <Link
+              to='/stock-movement'
+              style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuStockBalance ? 'none' : '' }}
+              id='subMenuStockMovement'>
+              <ListItemButton
+                key='StockMovement'
+                selected={selectedIndex === 12}
+                onClick={() => handleListItemClick(12)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ความเคลื่อนไหวของสินค้า' />
+              </ListItemButton>
+            </Link>
           </List>
         </Collapse>
       </List>
