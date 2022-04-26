@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box } from '@material-ui/core';
 import {
   Button,
   Dialog,
@@ -20,6 +19,7 @@ import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOu
 import SnackbarStatus from "../commons/ui/snackbar-status";
 import AlertError from "../commons/ui/alert-error";
 import { updateAddDestroyProductState } from "../../store/slices/add-to-destroy-product-slice";
+import { searchProductDiscount } from "../../store/slices/search-product-discount";
 
 interface Props {
   open: boolean;
@@ -59,15 +59,47 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [dataTable, setDataTable] = React.useState<Array<any>>([]);
+  const [productDiscountListHandle, setProductDiscountListHandle] = React.useState<Array<any>>([]);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const [textError, setTextError] = React.useState('');
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const payloadAddItem = useAppSelector((state) => state.addToDestroyProductSlice.state);
+  const productDiscountList = useAppSelector((state) => state.searchProductDiscountSlice.itemList.data);
 
   useEffect(() => {
-    let dataTableHandle = _.differenceBy(lstProductMock, payloadAddItem, 'barcode');
+    if (productDiscountList && productDiscountList.length > 0) {
+      let rows = productDiscountList.map((item: any, index: number) => {
+        return {
+          id: `${item.detail.barcode}-${index + 1}`,
+          index: index + 1,
+          barcode: item.detail.barcode,
+          barcodeName: item.detail.productName,
+          skuCode: item.detail.skuCode,
+          unit: item.detail.unitFactor,
+          numberOfDiscounted: item.total,
+          numberOfApproved: 0,
+        };
+      });
+      setProductDiscountListHandle(rows);
+    } else {
+      setProductDiscountListHandle([]);
+    }
+  }, [productDiscountList]);
+
+  useEffect(() => {
+    let dataTableFilter = _.differenceBy(productDiscountListHandle, payloadAddItem, 'barcode');
+    let dataTableHandle = _.cloneDeep(dataTableFilter);
+    if (dataTableHandle && dataTableHandle.length > 0) {
+      for (const item of dataTableHandle) {
+        item.numberOfApproved = 0;
+      }
+    }
     setDataTable(dataTableHandle);
-  }, [lstProductMock, payloadAddItem]);
+  }, [productDiscountListHandle, payloadAddItem]);
+
+  useEffect(() => {
+    dispatch(searchProductDiscount());
+  }, [open]);
 
   const handleClosePopup = () => {
     setOpenPopupModal(false);
@@ -75,6 +107,29 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
 
   const handleCloseModalError = () => {
     setOpenModalError(false);
+  };
+
+  const handleChangeNumberOfApprove = (event: any, index: number) => {
+    let currentValue = event.target.value;
+    if (stringNullOrEmpty(event.target.value)
+      || stringNullOrEmpty(event.target.value.trim())
+    ) {
+      currentValue = '0';
+    }
+    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
+      return;
+    }
+    let currentData: any;
+    setDataTable((preData: any) => {
+      const data = [...preData];
+      currentData = data[index - 1];
+      data[index - 1].numberOfApproved = currentValue
+        ? parseInt(currentValue.replace(/,/g, '')) < 10000000000
+          ? parseInt(currentValue.replace(/,/g, ''))
+          : 0
+        : 0;
+      return data;
+    });
   };
 
   const columns: GridColDef[] = [
@@ -117,7 +172,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
       ),
     },
     {
-      field: 'unitName',
+      field: 'unit',
       headerName: 'หน่วย',
       flex: 0.5,
       headerAlign: 'center',
@@ -152,6 +207,9 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
               inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
+              onChange={(e) => {
+                handleChangeNumberOfApprove(e, params.row.index);
+              }}
             />
           </div>
         );
@@ -309,7 +367,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
             <Grid item container xs={12} mb={3}>
               <Grid item xs={6}>
                 <TextField
-                  placeholder={'ค้นหาบาร์โค๊ด / รายละเอียดสินค้า'}
+                  placeholder={'แสกน/ใส่รหัส, บาร์โค้ดส่วนลด'}
                   className={classes.MtextField}
                   variant="outlined"
                   size="small"

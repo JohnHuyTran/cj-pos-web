@@ -129,7 +129,7 @@ export default function ModalCreateToDestroyDiscount({
   const handleCloseModalConfirmApprove = (confirm: boolean) => {
     setOpenModalConfirmApprove(false);
     if (confirm) {
-      handleApprove(dataDetail.id);
+      handleCreateDraft(true);
     }
   };
 
@@ -237,18 +237,16 @@ export default function ModalCreateToDestroyDiscount({
           lstProductDetail.push({
             barcode: item.barcode,
             barcodeName: item.productName,
-            unitName: item.unitName,
+            unit: item.unitName,
             unitPrice: item.price || 0,
-            discount: item.requestedDiscount || 0,
-            qty: item.numberOfRequested || 0,
+            numberOfDiscounted: item.numberOfRequested || 0,
             numberOfApproved: (TOStatus.WAIT_FOR_APPROVAL == transferOutDetail.status && approvePermission)
               ? (item.numberOfRequested || 0) : (item.numberOfApproved || 0),
-            expiryDate: item.expiredDate,
             skuCode: item.sku,
             remark: item.remark
           });
         }
-        dispatch(updateAddItemsState(lstProductDetail));
+        dispatch(updateAddDestroyProductState(lstProductDetail));
       }
     }
   }, [transferOutDetail]);
@@ -382,7 +380,7 @@ export default function ModalCreateToDestroyDiscount({
         await dispatch(save({ ...payloadTransferOut }));
         try {
           const allAttachFileBefore = await handleAllAttachFile(fileUploadList, attachFileBeforeOlds);
-          const allAttachFileAfter = await handleAllAttachFile(fileUploadList, attachFileBeforeOlds);
+          const allAttachFileAfter = await handleAllAttachFile(fileUploadAfterList, attachFileAfterOlds);
           const body = !!dataDetail.id
             ? {
               ...payloadTransferOut,
@@ -446,6 +444,9 @@ export default function ModalCreateToDestroyDiscount({
                 status: TOStatus.DRAFT
               })
             );
+            if (sendRequest) {
+              handleApprove(dataDetail.id);
+            }
           } else {
             setOpenModalError(true);
           }
@@ -475,7 +476,7 @@ export default function ModalCreateToDestroyDiscount({
         dispatch(
           updateDataDetail({
             ...dataDetail,
-            status: TOStatus.WAIT_FOR_APPROVAL,
+            status: TOStatus.APPROVED,
           })
         );
         setOpenPopup(true);
@@ -544,8 +545,8 @@ export default function ModalCreateToDestroyDiscount({
   const genDisabledApproveButton = () => {
     return (!stringNullOrEmpty(status) && status != TOStatus.DRAFT)
       || (payloadTransferOut.products && payloadTransferOut.products.length === 0)
-      || (fileUploadList.length === 0 && attachFileBeforeOlds.length === 0
-        && fileUploadAfterList.length === 0 && attachFileAfterOlds.length === 0)
+      || (fileUploadList.length === 0 && attachFileBeforeOlds.length === 0)
+      || (fileUploadAfterList.length === 0 && attachFileAfterOlds.length === 0)
       || (dataDetail && moment(dataDetail.createdDate).isBefore(moment(new Date), 'day'));
   };
 
@@ -624,8 +625,9 @@ export default function ModalCreateToDestroyDiscount({
                   onChangeUploadFile={handleOnChangeUploadFileAfter}
                   onDeleteAttachFile={onDeleteAttachFileAfterOld}
                   idControl={'AttachFileAfter'}
-                  enabledControl={(attachFileBeforeOlds && attachFileBeforeOlds.length > 0)
-                    || (fileUploadList && fileUploadList.length > 0)}
+                  enabledControl={(TOStatus.DRAFT === status
+                    && (attachFileBeforeOlds && attachFileBeforeOlds.length > 0)
+                    || (fileUploadList && fileUploadList.length > 0))}
                   warningMessage={attachFileAfterError}
                   deletePermission={TOStatus.DRAFT === status}
                 />

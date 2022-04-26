@@ -79,7 +79,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
           index: index + 1,
           barcode: item.barcode,
           barcodeName: item.barcodeName,
-          unit: item.unitName,
+          unit: item.unit,
           qty: numberOfRequested,
           numberOfRequested: numberOfRequested,
           numberOfApproved: numberOfApproved,
@@ -249,7 +249,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
               inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
-              disabled={!approvePermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
+              disabled={stringNullOrEmpty(dataDetail.status) || dataDetail.status != TOStatus.DRAFT}
               onChange={(e) => {
                 handleChangeNumberOfApprove(e, params.row.index, index, params.row.barcode);
               }}
