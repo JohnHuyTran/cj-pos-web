@@ -450,7 +450,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             </Box>
             <Box>
               <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-                ประ<span style={{ color: 'red' }}>เ</span>ภทสินค้า
+                ประเภทสินค้า
               </Typography>
               <Autocomplete
                 options={productTypeOptions}

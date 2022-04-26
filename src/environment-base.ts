@@ -66,7 +66,18 @@ export const environment = {
   },
   task: {
     notification: {
-      url: '/task/notifications',
+      tasks: {
+        url: '/task/notifications/tasks',
+      },
+      reminders: {
+        url: '/task/notifications/reminders',
+      },
+      announcements: {
+        url: '/task/notifications/announcements',
+      },
+      read: {
+        url: '/task/notifications/{id}',
+      },
     },
   },
   withDraw: {
@@ -94,6 +105,9 @@ export const environment = {
       },
       end: {
         url: '/campaign/transfer-out/close/{id}',
+      },
+      getExpiredProduct: {
+        url: '/campaign/expired-products',
       },
     },
   },
@@ -324,6 +338,16 @@ export const environment = {
         url: '/stock/stock-balance/check-by-sku-codes',
       },
     },
+    outStanding: {
+      stockBalance: {
+        searchByStore: {
+          url: '/stock/stock-balance/search-by-store',
+        },
+        searchByLocation: {
+          url: '/stock/stock-balance/search-by-location',
+        },
+      },
+    },
   },
   master: {
     branch: {
@@ -374,7 +398,7 @@ export const environment = {
         url: '/sale/tax-invoices',
       },
       requestTaxInvoice: {
-        url: '/sale/request/{billNo}',
+        url: '/sale/tax-invoices/{billNo}/request-hq',
       },
       printHistory: {
         url: '/sale/tax-invoices/{billNo}/print-history',

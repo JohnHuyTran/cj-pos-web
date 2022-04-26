@@ -38,7 +38,7 @@ export interface TransferOut {
   approvedDate: string;
   attachFiles: attachFile[];
   products: TransferOutProductDetail[];
-  type?: string | undefined;
+  type?: string | number | undefined;
 }
 
 export interface TransferOutProductDetail {

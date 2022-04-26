@@ -16,7 +16,7 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
-import { Action, DateFormat, TOStatus } from '../../utils/enum/common-enum';
+import { Action, DateFormat, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
@@ -26,7 +26,7 @@ import TransferOutList from './transfer-out-list';
 import SelectBranch from './transfer-out-branch';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
-import ModalCreateTransferOut from "../../components/transfer-out/modal-create-transfer-out";
+import ModalCreateTransferOut from '../../components/transfer-out/modal-create-transfer-out';
 
 const _ = require('lodash');
 
@@ -75,7 +75,7 @@ const TransferOutSearch = () => {
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
     branch: 'ALL',
-    status: '',
+    status: 'ALL',
     fromDate: new Date(),
     approveDate: new Date(),
   });
@@ -103,20 +103,22 @@ const TransferOutSearch = () => {
       setRequestPermission(
         userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.create') : false
       );
-      setValues({
-        ...values,
-        status: userPermission.includes('campaign.to.approve')
-          ? TOStatus.WAIT_FOR_APPROVAL
-          : userPermission.includes('campaign.to.create')
-          ? TOStatus.DRAFT
-          : 'ALL',
-      });
+      // setValues({
+      //   ...values,
+      //   status: userPermission.includes('campaign.to.approve')
+      //     ? TOStatus.WAIT_FOR_APPROVAL
+      //     : userPermission.includes('campaign.to.create')
+      //     ? TOStatus.DRAFT
+      //     : 'ALL',
+      // });
     }
   }, []);
   useEffect(() => {
     if (listBranchSelect.length > 0) {
       let branches = listBranchSelect.map((item: any) => item.code).join(',');
       setValues({ ...values, branch: branches });
+    } else {
+      setValues({ ...values, branch: '' });
     }
   }, [listBranchSelect]);
 
@@ -142,7 +144,7 @@ const TransferOutSearch = () => {
     setValues({
       documentNumber: '',
       branch: '',
-      status: approvePermission ? TOStatus.WAIT_FOR_APPROVAL : requestPermission ? TOStatus.DRAFT : 'ALL',
+      status: 'ALL',
       fromDate: new Date(),
       approveDate: new Date(),
     });
@@ -156,6 +158,7 @@ const TransferOutSearch = () => {
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
       clearSearch: true,
+      type: TO_TYPE.TO_ACTIVITY + '',
     };
     dispatch(barcodeDiscountSearch(payload));
     if (!requestPermission) {
@@ -193,6 +196,7 @@ const TransferOutSearch = () => {
       status: values.status,
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
+      type: TO_TYPE.TO_ACTIVITY + '',
     };
 
     handleOpenLoading('open', true);

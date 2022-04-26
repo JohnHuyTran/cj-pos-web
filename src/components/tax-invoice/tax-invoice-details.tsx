@@ -5,7 +5,7 @@ import { useStyles } from '../../styles/makeTheme';
 import { ContentPaste, HighlightOff, Save, Sync } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import { Box, Button, DialogTitle, FormHelperText, Grid, IconButton, TextField } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import ProvincesDropDown from '../commons/ui/search-provinces-dropdown';
 import DistrictsDropDown from '../commons/ui/search-districts-dropdown';
@@ -22,11 +22,11 @@ import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 // import { clearUploadFileState, uploadFileState } from '../../store/slices/upload-file-slice';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { formatFileInvoice } from '../../utils/utils';
-import { featchTaxInvoiceListAsync } from '../../store/slices/tax-invoice-search-list-slice';
 
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
+  reloadRequestTaxInvoice: () => void;
 }
 
 export interface DialogTitleProps {
@@ -49,8 +49,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
+          }}>
           <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
@@ -58,7 +57,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
+function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -91,6 +90,17 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     if (!flagSave) setFlagSave(true);
   };
 
+  const handleInputChange = (e: any) => {
+    const { value } = e.target;
+    if (value.length > 13) {
+      let taxNoSub = value.substring(0, 13);
+      setValue('taxNo', taxNoSub);
+    }
+    // const p = value.replace(/\+|-/gi, '');
+
+    handleChange();
+  };
+
   const handleChkEditClose = () => {
     // if (flagSave || fileUploadList.length > 0) {
     if (flagSave) {
@@ -100,13 +110,12 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     }
   };
 
-  const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
   const handleClose = () => {
     setBillNo('');
     setMemberNo('');
     handleClear();
 
-    dispatch(featchTaxInvoiceListAsync(payloadSearch));
+    reloadRequestTaxInvoice();
 
     setOpen(false);
     onClickClose();
@@ -121,6 +130,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     getValues,
     setValue,
     clearErrors,
+    control,
   } = useForm();
 
   const onSave = (data: any) => {
@@ -129,6 +139,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         houseNo: data.houseNo,
         building: data.building,
         moo: data.moo,
+        soi: data.soi,
+        road: data.road,
         subDistrictCode: data.subDistrict,
         districtCode: data.district,
         provinceCode: data.province,
@@ -164,8 +176,6 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
 
     if (isOpen && taxInvoiceDetail) {
       setBillNo(taxInvoiceDetail.billNo);
-
-      // dispatch(featchTaxInvoicePrintHistoryAsync(taxInvoiceDetail.billNo));
 
       if (taxInvoiceDetail.invoiceNo) {
         setInvoiceNo(taxInvoiceDetail.invoiceNo);
@@ -221,6 +231,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
         setValue('houseNo', value.data.address.houseNo);
         setValue('building', value.data.address.building);
         setValue('moo', value.data.address.moo);
+        setValue('soi', value.data.address.soi);
+        setValue('road', value.data.address.road);
         setValue('province', value.data.address.provinceCode);
         setValue('district', value.data.address.districtCode);
         setValue('subDistrict', value.data.address.subDistrictCode);
@@ -249,6 +261,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
     setValue('houseNo', data.customer.address.houseNo);
     setValue('building', data.customer.address.building);
     setValue('moo', data.customer.address.moo);
+    setValue('soi', data.customer.address.soi);
+    setValue('road', data.customer.address.road);
     setValue('province', data.customer.address.provinceCode);
     setValue('district', data.customer.address.districtCode);
     setValue('subDistrict', data.customer.address.subDistrictCode);
@@ -356,6 +370,8 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
       houseNo: '',
       building: '',
       moo: '',
+      soi: '',
+      road: '',
       province: '',
       district: '',
       subDistrict: '',
@@ -542,8 +558,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 className={classes.MbtnClear}
                 color='secondary'
                 // disabled={!editMode}
-                sx={{ width: 120, display: `${disabledBtnEdit ? 'none' : ''}` }}
-              >
+                sx={{ width: 120, display: `${disabledBtnEdit ? 'none' : ''}` }}>
                 แก้ไขข้อมูล
               </Button>
             </Grid>
@@ -582,14 +597,17 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 className={classes.MtextField}
                 fullWidth
                 placeholder='กรุณากรอกเลขประจำตัวผู้เสียภาษี'
+                type='number'
                 inputProps={{ maxLength: 13 }}
-                {...register('taxNo', { required: true, maxLength: 13 })}
-                onChange={handleChange}
+                {...register('taxNo', { required: true, pattern: /^[0-9]*$/, maxLength: 13, minLength: 13 })}
+                // onChange={handleChange}
+                onChange={(e) => handleInputChange(e)}
                 disabled={editMode}
+                autoComplete='off'
               />
               {errors.taxNo && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
-                  กรุณากรอกรายละเอียด
+                  กรุณากรอกตัวเลข 13 หลัก
                 </FormHelperText>
               )}
             </Grid>
@@ -609,6 +627,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 {...register('firstName', { required: true })}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
               {errors.firstName && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
@@ -632,6 +651,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 {...register('lastName')}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -656,6 +676,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 {...register('houseNo', { required: true })}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
 
               {errors.houseNo && (
@@ -680,6 +701,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 {...register('building')}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -699,6 +721,46 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 {...register('moo')}
                 onChange={handleChange}
                 disabled={editMode}
+                autoComplete='off'
+              />
+            </Grid>
+            <Grid item xs={1}></Grid>
+            <Grid item xs={2}>
+              <Typography gutterBottom variant='subtitle1' component='div' mb={2}>
+                ซอย :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id='txtSoi'
+                size='small'
+                className={classes.MtextField}
+                fullWidth
+                placeholder='กรุณากรอกซอย'
+                {...register('soi')}
+                onChange={handleChange}
+                disabled={editMode}
+                autoComplete='off'
+              />
+            </Grid>
+            <Grid item xs={1}></Grid>
+
+            <Grid item xs={2}>
+              <Typography gutterBottom variant='subtitle1' component='div' mb={2}>
+                ถนน :
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id='txtRoad'
+                size='small'
+                className={classes.MtextField}
+                fullWidth
+                placeholder='กรุณากรอกถนน'
+                {...register('road')}
+                onChange={handleChange}
+                disabled={editMode}
+                autoComplete='off'
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -834,8 +896,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 className={classes.MbtnClear}
                 startIcon={<ContentPaste />}
                 color='primary'
-                disabled={disabledBtnPreview}
-              >
+                disabled={disabledBtnPreview}>
                 Preview ใบเสร็จ / ใบกำกับ
               </Button>
             </Grid>
@@ -848,8 +909,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnClear}
                 color='cancelColor'
-                disabled={disabledBtnClear}
-              >
+                disabled={disabledBtnClear}>
                 เคลียร์
               </Button>
 
@@ -862,8 +922,7 @@ function customerDetails({ isOpen, onClickClose }: Props): ReactElement {
                   onClick={handleSubmit(onSave)}
                   sx={{ width: 110, ml: 2 }}
                   className={classes.MbtnSave}
-                  disabled={disabledBtnSave}
-                >
+                  disabled={disabledBtnSave}>
                   บันทึก
                 </Button>
               )}

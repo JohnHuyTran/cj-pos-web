@@ -39,6 +39,7 @@ import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import {
   approvePurchaseCreditNote,
+  delFileUrlHuawei,
   draftPurchaseCreditNote,
   getPathReportPI,
   getPathReportPN,
@@ -564,6 +565,23 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     }
   };
 
+  const docType: string = 'PN';
+  const onDeleteAttachFileOld = (item: any) => {
+    const fileKeyDel = item.fileKey;
+    let docNo = pnNo;
+    // console.log('item delete: ', item);
+    if (docType && docNo) {
+      delFileUrlHuawei(fileKeyDel, docType, docNo)
+        .then((value) => {
+          setUploadFileFlag(true);
+          dispatch(featchPurchaseNoteAsync(purchaseDetail.piNo));
+        })
+        .catch((error: ApiError) => {
+          setUploadFileFlag(false);
+        });
+    }
+  };
+
   return (
     <div>
       {' '}
@@ -642,10 +660,11 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                   <AccordionUploadFile
                     files={purchaseDetail.files ? purchaseDetail.files : []}
                     docNo={pnNo}
-                    docType='PN'
+                    docType={docType}
                     isStatus={uploadFileFlag}
                     onChangeUploadFile={handleOnChangeUploadFile}
                     enabledControl={true}
+                    onDeleteAttachFile={onDeleteAttachFileOld}
                   />
                 )}
               </Grid>
@@ -665,10 +684,10 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                   id='btnSave'
                   variant='contained'
                   color='secondary'
-                  className={classes.MbtnSave}
+                  className={classes.MbtnSearch}
                   onClick={handleDeleteBtn}
                   startIcon={<DeleteIcon />}
-                  sx={{ width: 200 }}>
+                  sx={{ width: 150 }}>
                   ลบรายการ
                 </Button>
               </Grid>

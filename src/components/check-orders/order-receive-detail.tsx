@@ -25,7 +25,7 @@ import { searchOrderReceiveAsync } from '../../store/slices/order-receive-slice'
 import { searchToteAsync } from '../../store/slices/search-tote-slice';
 import { EntryTote } from '../../models/order-model';
 import CheckOrderDetailTote from './check-order-detail-tote';
-import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+import { featchOrderDetailAsync, setReloadScreen } from '../../store/slices/check-order-detail-slice';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updateItemsToteState } from '../../store/slices/items-tote-slice';
 import { featchOrderDetailToteAsync } from '../../store/slices/check-order-detail-tote-slice';
@@ -34,6 +34,7 @@ export interface OrderReceiveDetailProps {
   defaultOpen: boolean;
   onClickClose: any;
   isTote?: boolean;
+  toteCodeNew?: string;
 }
 
 export interface DialogTitleProps {
@@ -73,7 +74,12 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }: OrderReceiveDetailProps) {
+export default function OrderReceiveDetail({
+  defaultOpen,
+  onClickClose,
+  isTote,
+  toteCodeNew,
+}: OrderReceiveDetailProps) {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const orderReceiveResp = useAppSelector((state) => state.orderReceiveSlice.orderReceiveList);
@@ -148,13 +154,13 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
           docRefNo: orderReceiveData.docRefNo,
           items: items,
         };
-
         await approveOrderReceive(payload);
         await dispatch(searchOrderReceiveAsync());
         setOpen(false);
         onClickClose();
         handleOpenLoading('open', false);
       } else if (isTote === true) {
+        await dispatch(featchOrderDetailAsync());
         handleConfirmTote();
       }
     } else {
@@ -182,17 +188,20 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
 
     let data = {
       shipmentNo: orderDetail.docRefNo,
-      toteCode: orderReceiveData.toteCode,
+      toteCode: orderReceiveData.toteCode ? orderReceiveData.toteCode : toteCodeNew,
       items: items,
     };
 
     await submitTote(data)
       .then((resp: any) => {
-        // dispatch(updateAddItemsState({}));
-        dispatch(updateItemsToteState({}));
-        dispatch(featchOrderDetailToteAsync(resp.sdNo)).then(() => {
-          setOpenTote(true);
-        });
+        dispatch(updateAddItemsState({}));
+        dispatch(featchOrderDetailAsync(resp.sdNo));
+        // dispatch(setReloadScreen(true));
+
+        // dispatch(updateItemsToteState({}));
+        // dispatch(featchOrderDetailToteAsync(resp.sdNo)).then(() => {
+        //   setOpenTote(true);
+        // });
 
         setOpen(false);
       })
@@ -203,11 +212,11 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
     handleOpenLoading('open', false);
   };
 
-  function handleCloseDetailToteModal() {
-    setOpenTote(false);
-    setOpen(false);
-    onClickClose();
-  }
+  // function handleCloseDetailToteModal() {
+  //   setOpenTote(false);
+  //   setOpen(false);
+  //   onClickClose();
+  // }
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -216,8 +225,10 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
+  let orderReceiveDataLength = Object.keys(orderReceiveData).length;
   let orderReceiveTable;
   const [flagSearch, setFlagSearch] = React.useState(false);
+  const [disableButton, setDisableButton] = React.useState(false);
   if (flagSearch) {
     if (Object.keys(orderReceiveData).length > 0) {
       orderReceiveTable = <OrderReceiveDetailList isTote={isTote} />;
@@ -292,7 +303,7 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
                   </Grid>
                   <Grid item lg={4}>
                     <Typography variant="body2">
-                      {orderReceiveData.toteCode ? orderReceiveData.toteCode : '-'}
+                      {orderReceiveData.toteCode ? orderReceiveData.toteCode : toteCodeNew ? toteCodeNew : '-'}
                     </Typography>
                   </Grid>
                 </>
@@ -320,7 +331,7 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
               </Grid>
               <Grid item lg={4}>
                 <Typography variant="body2">
-                  {orderReceiveData.status ? getorderReceiveThStatus(orderReceiveData.status) : '-'}
+                  {orderReceiveData.sdStatus ? getorderReceiveThStatus(orderReceiveData.sdStatus) : '-'}
                 </Typography>
               </Grid>
               <Grid item lg={2}>
@@ -352,9 +363,24 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
             </Grid>
           </Box>
 
-          {Object.keys(orderReceiveData).length > 0 && (
-            <Box sx={{ marginTop: 4 }}>
-              <Grid item container spacing={2} justifyContent="flex-end">
+          <Box sx={{ marginTop: 4 }}>
+            <Grid item container spacing={2} justifyContent="flex-end">
+              {!isTotes && (
+                <Button
+                  id="btnApprove"
+                  variant="contained"
+                  color="primary"
+                  className={classes.MbtnApprove}
+                  onClick={handleApproveBtn}
+                  startIcon={<CheckCircleOutline />}
+                  sx={{ width: '15%' }}
+                  disabled={orderReceiveDataLength === 0}
+                >
+                  ยืนยัน
+                </Button>
+              )}
+
+              {isTotes && (
                 <Button
                   id="btnApprove"
                   variant="contained"
@@ -366,9 +392,9 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
                 >
                   ยืนยัน
                 </Button>
-              </Grid>
-            </Box>
-          )}
+              )}
+            </Grid>
+          </Box>
 
           {orderReceiveTable}
 
@@ -379,14 +405,14 @@ export default function OrderReceiveDetail({ defaultOpen, onClickClose, isTote }
             sdNo={orderReceiveData.sdNo}
             docRefNo={!isTote ? orderReceiveData.docRefNo : orderDetail.docRefNo}
             isTote={isTote}
-            toteCode={orderReceiveData.toteCode}
+            toteCode={orderReceiveData.toteCode ? orderReceiveData.toteCode : toteCodeNew}
           />
 
           <LoadingModal open={openLoadingModal.open} />
         </DialogContent>
       </Dialog>
 
-      {openTote && <CheckOrderDetailTote defaultOpen={openTote} onClickClose={handleCloseDetailToteModal} />}
+      {/* {openTote && <CheckOrderDetailTote defaultOpen={openTote} onClickClose={handleCloseDetailToteModal} />} */}
     </div>
   );
 }

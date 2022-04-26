@@ -30,7 +30,7 @@ import {
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { getBranchName, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, BDStatus, TOStatus } from '../../utils/enum/common-enum';
+import { Action, BDStatus, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
 import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from "../../utils/enum/permission-enum";
@@ -95,12 +95,11 @@ export default function ModalCreateTransferOut({
   const dataDetail = useAppSelector((state) => state.transferOutSlice.dataDetail);
   const approveReject = useAppSelector((state) => state.transferOutSlice.approveReject);
   const checkEdit = useAppSelector((state) => state.transferOutSlice.checkEdit);
-  const checkStocks = useAppSelector((state) => state.transferOutSlice.checkStock);
   //get detail from search
   const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail.data);
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
-    ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false);
+    ? userPermission.includes(ACTIONS.CAMPAIGN_TO_APPROVE) : false);
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const [attachFileOlds, setAttachFileOlds] = React.useState<any>([]);
   const [attachFileError, setAttachFileError] = React.useState('');
@@ -287,7 +286,10 @@ export default function ModalCreateTransferOut({
             isValid = false;
             item.errorNumberOfApproved = 'กรุณาระบุจำนวนที่อนุมัติ';
           } else {
-            if (preData.numberOfApproved > preData.numberOfRequested) {
+            if (preData.numberOfApproved < 0) {
+              isValid = false;
+              item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องมากกว่า 0';
+            } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
               item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องไม่เกินจำนวนคำขอ';
             }
@@ -381,13 +383,15 @@ export default function ModalCreateTransferOut({
               documentNumber: dataDetail.documentNumber,
               attachFiles: allAttachFile,
               transferOutReason: dataDetail.transferOutReason,
-              store: dataDetail.store
+              store: dataDetail.store,
+              type: TO_TYPE.TO_ACTIVITY
             }
             : {
               ...payloadTransferOut,
               attachFiles: allAttachFile,
               transferOutReason: dataDetail.transferOutReason,
-              store: dataDetail.store
+              store: dataDetail.store,
+              type: TO_TYPE.TO_ACTIVITY
             };
           const rs = await saveDraftTransferOut(body);
           if (rs.code === 201) {
@@ -441,11 +445,6 @@ export default function ModalCreateTransferOut({
 
   const handleSendForApproval = async (id: string) => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
-    //validate attach file
-    if (fileUploadList.length === 0 && attachFileOlds.length === 0) {
-      setAttachFileError('กรุณาแนบไฟล์เอกสาร');
-      return;
-    }
     try {
       const rs = await sendForApprovalTransferOut(id);
       if (rs.code === 20000) {
@@ -671,7 +670,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
-                เหตุผลการเบิก :
+                เหตุผลการเบิก<b style={{ fontSize:'18px' }}> *</b> :
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
@@ -688,7 +687,8 @@ export default function ModalCreateTransferOut({
                       dispatch(updateCheckEdit(true));
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
-                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL}
+                    disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL)
+                      || (TOStatus.WAIT_FOR_APPROVAL == status && !approvePermission)}
                     error={!stringNullOrEmpty(errors['transferOutReason'])}
                   >
                     <MenuItem value={'1'}>{'เบิกเพื่อแจกลูกค้า'}</MenuItem>
@@ -704,7 +704,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5} pl={2}>
               <Grid item xs={4}>
-                คลัง :
+                คลัง<b style={{ fontSize:'18px' }}> *</b> :
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
@@ -721,7 +721,8 @@ export default function ModalCreateTransferOut({
                       dispatch(updateCheckEdit(true));
                     }}
                     inputProps={{ 'aria-label': 'Without label' }}
-                    disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL}
+                    disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT && status != TOStatus.WAIT_FOR_APPROVAL)
+                      || (TOStatus.WAIT_FOR_APPROVAL == status && !approvePermission)}
                     error={!stringNullOrEmpty(errors['store'])}
                   >
                     <MenuItem value={'1'}>{'คลังหน้าร้าน'}</MenuItem>
@@ -738,7 +739,7 @@ export default function ModalCreateTransferOut({
             {/*line 3*/}
             <Grid container item xs={4} mb={5} mt={-1}>
               <Grid item xs={4}>
-                แนบรูปสินค้าขอส่วนลด :
+                รูปภาพ :
               </Grid>
               <Grid item xs={8}>
                 <AccordionUploadFile
@@ -749,7 +750,7 @@ export default function ModalCreateTransferOut({
                   onChangeUploadFile={handleOnChangeUploadFile}
                   onDeleteAttachFile={onDeleteAttachFileOld}
                   enabledControl={TOStatus.DRAFT === status
-                    || TOStatus.WAIT_FOR_APPROVAL === status
+                    || (TOStatus.WAIT_FOR_APPROVAL === status && approvePermission)
                     || TOStatus.APPROVED === status}
                   warningMessage={attachFileError}
                   deletePermission={TOStatus.DRAFT === status}
@@ -832,7 +833,7 @@ export default function ModalCreateTransferOut({
                 <Button
                   id='btnEnd'
                   variant='contained'
-                  style={{ display: (status != TOStatus.APPROVED || approvePermission) ? 'none' : undefined}}
+                  style={{ display: (status != TOStatus.APPROVED || approvePermission) ? 'none' : undefined }}
                   color='info'
                   startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirmEnd}
@@ -859,7 +860,7 @@ export default function ModalCreateTransferOut({
         onClose={handleCloseModalCancel}
         onConfirm={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันส่งขอเบิกใช้ในการทำกิจกรรม'}
+        headerTitle={'ยืนยันยกเลิกเบิกใช้ในการทำกิจกรรม'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
@@ -873,6 +874,7 @@ export default function ModalCreateTransferOut({
         onClose={() => {
           setOpenCheckStock(false);
         }}
+        headerTitle={'จำนวนที่ขอเกินจำนวนสินค้าสต๊อก'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm

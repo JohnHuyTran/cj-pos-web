@@ -1,40 +1,67 @@
-import { makeStyles } from '@mui/styles';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import Greeting from '../components/greeting/greeting';
-import Newslist from '../components/news/news-list';
-import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
-import { getUserInfo } from '../store/sessionStore';
+import { Box, Button, Grid } from '@mui/material';
+import NotificationAnnouncement from '../components/notifications/notification-announcement';
+import NotificationTask from '../components/notifications/notification-task';
+import NotificationReminder from '../components/notifications/notification-reminder';
+import { useStyles } from '../styles/makeTheme';
+import React from 'react';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import FeedbackIcon from '@mui/icons-material/Feedback';
 
 export default function Home() {
-  const useStyles = makeStyles({
-    root: {
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    greeting: {
-      alignSelf: 'center',
-    },
-    myTask: {
-      marginTop: '16px',
-    },
-    news: {
-      marginTop: '16px',
-    },
-  });
   const classes = useStyles();
-  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  const [refresh, setRefresh] = React.useState(false);
+  const handleRefresh = () => {
+    setRefresh(!refresh);
+  };
 
   return (
     <>
-      <Container className={classes.root}>
-        <Typography variant="h6"> แจ้งเตือน </Typography>
-        <div className={classes.greeting}>
-          <Greeting userName={userInfo.given_name} />
-        </div>
-        <div className={classes.news}>
-          <Newslist />
-        </div>
+      <Container maxWidth="xl" sx={{ height: '80vh', minWidth: '1100px' }}>
+        <Box display={'flex'} mt={3} justifyContent={'space-between'}>
+          <Typography variant="h6" paddingBottom="40px">
+            {' '}
+            หน้าหลัก{' '}
+          </Typography>
+          <Button
+            id="btnRefresh"
+            variant="contained"
+            sx={{ mt: 2 }}
+            className={classes.MbtnRefresh}
+            startIcon={<RefreshIcon />}
+            onClick={handleRefresh}
+          >
+            Refresh
+          </Button>
+        </Box>
+
+        <Grid container spacing={6}>
+          <Grid item xs={5} height={'78vh'}>
+            <Typography sx={{ borderBottom: '1px solid #EAEBEB', mb: 1 }}>
+              <span style={{ fontWeight: 700, fontSize: '17px' }}>ประกาศ </span>{' '}
+              <FeedbackIcon sx={{ color: '#F54949', fontSize: '20px', ml: '3px' }} />
+            </Typography>
+            <NotificationAnnouncement refresh={refresh} />
+          </Grid>
+          {/* <Grid item xs={1}></Grid> */}
+          <Grid item xs={7} height={'75vh'}>
+            <Box height={'34vh'}>
+              <Typography
+                sx={{ borderBottom: '1px solid #EAEBEB', fontWeight: 700, fontSize: '17px', marginTop: '2px', mb: 1 }}
+              >
+                งานของฉัน
+              </Typography>
+              <NotificationTask refresh={refresh} />
+            </Box>
+            <Box height={'34vh'} mt={6}>
+              <Typography sx={{ borderBottom: '1px solid #EAEBEB', fontWeight: 700, fontSize: '17px', mb: 1 }}>
+                แจ้งเตือน
+              </Typography>
+              <NotificationReminder refresh={refresh} />
+            </Box>
+          </Grid>
+        </Grid>
       </Container>
     </>
   );

@@ -12,9 +12,9 @@ import { convertUtcToBkkDate } from "../../utils/date-utill";
 import {
   Action,
   BDStatus,
-  DateFormat,
+  DateFormat, TO_TYPE,
   TOStatus,
-} from "../../utils/enum/common-enum";
+} from '../../utils/enum/common-enum';
 import { objectNullOrEmpty, stringNullOrEmpty } from "../../utils/utils";
 import HtmlTooltip from "../../components/commons/ui/html-tooltip";
 import { useAppDispatch, useAppSelector } from "../../store/store";
@@ -91,6 +91,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
           products: data.products,
           requestorName: data.requestor,
           approverName: data.approver,
+          branch: `${data.branch}-${data.branchName}`,
         };
       });
       setLstTransferOut(rows);
@@ -147,7 +148,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: t("numberOrder"),
       headerAlign: "center",
       sortable: false,
-      minWidth: 50,
+      flex: 0.4,
       renderCell: (params) => (
         <Box component="div" sx={{ margin: "0 auto" }}>
           {params.value}
@@ -155,18 +156,25 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       ),
     },
     {
-      field: "documentNumber",
-      headerName: "เอกสารเบิก",
-      headerAlign: "center",
+      field: 'branch',
+      headerName: 'สาขา',
+      headerAlign: 'center',
       sortable: false,
-      minWidth: 260,
+      flex: 1,
+    },
+    {
+      field: 'documentNumber',
+      headerName: 'เอกสารเบิก',
+      headerAlign: 'center',
+      sortable: false,
+      flex: 0.9,
     },
     {
       field: "transactionDate",
       headerName: "วันที่ทำรายการ",
       headerAlign: "center",
       sortable: false,
-      minWidth: 200,
+      flex: 0.7,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
@@ -178,7 +186,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: "วันที่อนุมัติ",
       headerAlign: "center",
       sortable: false,
-      minWidth: 200,
+      flex: 0.7,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
@@ -191,7 +199,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerAlign: "center",
       align: "center",
       sortable: false,
-      minWidth: 200,
+      flex: 0.6,
       renderCell: (params) => genRowStatus(params),
     },
     {
@@ -199,7 +207,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: "ผู้บันทึก",
       headerAlign: "center",
       sortable: false,
-      minWidth: 250,
+      flex: 1,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
@@ -211,7 +219,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       headerName: "ผู้อนุมัติ",
       headerAlign: "center",
       sortable: false,
-      minWidth: 250,
+      flex: 1,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
@@ -279,6 +287,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
+      type: TO_TYPE.TO_ACTIVITY + '',
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));
@@ -297,6 +306,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
+      type: TO_TYPE.TO_ACTIVITY + '',
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));

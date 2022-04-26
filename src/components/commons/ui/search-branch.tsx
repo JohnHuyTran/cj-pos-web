@@ -299,6 +299,7 @@ export default function SearchBranch(props: Props): ReactElement {
   };
 
   const handleClearForm = () => {
+    if (props.disabled) return;
     const payload = {
       isAllBranches: true,
       appliedBranches: {

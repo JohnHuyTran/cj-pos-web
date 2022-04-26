@@ -57,7 +57,7 @@ const SaleLimitTimeSearch = () => {
   const [values, setValues] = React.useState<State>({
     query: '',
     branch: checkAdmin ? '' : userInfo.branch,
-    status: checkAdmin ? '1' : '2',
+    status: checkAdmin ? 'all' : '2',
     startDate: new Date(),
     endDate: new Date(),
   });
@@ -280,7 +280,7 @@ const SaleLimitTimeSearch = () => {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              วันที่เริ่มงดขายสินค้า ตั้งแต่
+              วันที่เริ่มงดขายสินค้า ตั้งแต่ <b style={{ fontSize: '18px' }}> *</b>
             </Typography>
             <DatePickerComponent
               onClickDate={onChangeDate.bind(this, setValues, values, 'startDate')}
@@ -289,11 +289,13 @@ const SaleLimitTimeSearch = () => {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              ถึง
+              ถึง<b style={{ fontSize: '18px' }}> *</b>
             </Typography>
             <DatePickerComponent
               onClickDate={onChangeDate.bind(this, setValues, values, 'endDate')}
               value={values.endDate}
+              minDateTo={values.startDate}
+              type={'TO'}
             />
           </Grid>
         </Grid>
