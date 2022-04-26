@@ -20,14 +20,14 @@ import {
   updateCheckStock,
   updateDataDetail,
   updateErrorList,
-} from '../../store/slices/transfer-out-destroy-slice';
-import { updateAddItemsState } from '../../store/slices/add-items-slice';
+} from '../../store/slices/transfer-out-destroy-discount-slice';
 import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, BDStatus, TOStatus } from '../../utils/enum/common-enum';
+import { Action, TOStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import HtmlTooltip from '../commons/ui/html-tooltip';
-import { TransferOutDetail } from "../../models/transfer-out";
+import { TransferOutDestroyDiscountDetail } from "../../models/transfer-out";
+import { updateAddDestroyProductState } from "../../store/slices/add-to-destroy-product-slice";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -43,12 +43,12 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
 
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  const payloadTransferOut = useAppSelector((state) => state.transferOutDestroySlice.createDraft);
-  const dataDetail = useAppSelector((state) => state.transferOutDestroySlice.dataDetail);
-  const errorList = useAppSelector((state) => state.transferOutDestroySlice.errorList);
+  const payloadAddItem = useAppSelector((state) => state.addToDestroyProductSlice.state);
+  const payloadTransferOut = useAppSelector((state) => state.transferOutDestroyDiscountSlice.createDraft);
+  const dataDetail = useAppSelector((state) => state.transferOutDestroyDiscountSlice.dataDetail);
+  const errorList = useAppSelector((state) => state.transferOutDestroyDiscountSlice.errorList);
 
-  const [dtTable, setDtTable] = React.useState<Array<TransferOutDetail>>([]);
+  const [dtTable, setDtTable] = React.useState<Array<TransferOutDestroyDiscountDetail>>([]);
   const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
@@ -61,12 +61,12 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let rows = payloadAddItem.map((item: any, index: number) => {
-        let sameItem = dtTable.find((el) => el.barCode === item.barcode);
-        let numberOfRequested = item.qty ? item.qty : 0;
+        let sameItem = dtTable.find((el) => el.barcode === item.barcode);
+        let numberOfRequested = item.numberOfDiscounted ? item.numberOfDiscounted : 0;
         let remark = !!sameItem ? sameItem.remark : '';
         if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
           remark = stringNullOrEmpty(item.remark) ? '' : item.remark;
-          numberOfRequested = stringNullOrEmpty(item.qty) ? null : item.qty;
+          numberOfRequested = stringNullOrEmpty(item.numberOfDiscounted) ? null : item.numberOfDiscounted;
         }
         let numberOfApproved = !!sameItem
           ? sameItem.numberOfApproved
@@ -77,11 +77,10 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
         return {
           id: `${item.barcode}-${index + 1}`,
           index: index + 1,
-          barCode: item.barcode,
+          barcode: item.barcode,
           barcodeName: item.barcodeName,
-          unit: item.unitName,
+          unit: item.unit,
           qty: numberOfRequested,
-          errorQty: '',
           numberOfRequested: numberOfRequested,
           numberOfApproved: numberOfApproved,
           errorNumberOfApproved: '',
@@ -101,7 +100,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
       updateSumOfApprovedDiscount(dtTable.reduce((acc, val) => acc + Number(val.numberOfApproved), 0));
       const products = dtTable.map((item) => {
         return {
-          barcode: item.barCode,
+          barcode: item.barcode,
           numberOfRequested: parseInt(String(item.numberOfRequested).replace(/,/g, '')),
           numberOfApproved: parseInt(String(item.numberOfApproved).replace(/,/g, '')),
           unitName: item.unit,
@@ -130,7 +129,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
   };
 
   const handleChangeRemark = (event: any, index: number) => {
-    setDtTable((preData: Array<TransferOutDetail>) => {
+    setDtTable((preData: Array<TransferOutDestroyDiscountDetail>) => {
       const data = [...preData];
       data[index - 1].remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
       return data;
@@ -148,7 +147,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
     if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
       return;
     }
-    setDtTable((preData: Array<TransferOutDetail>) => {
+    setDtTable((preData: Array<TransferOutDestroyDiscountDetail>) => {
       const data = [...preData];
       data[index - 1].numberOfApproved = currentValue ? parseInt(currentValue.replace(/,/g, '')) : 0;
       return data;
@@ -168,60 +167,6 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
     dispatch(updateCheckEdit(true));
   };
 
-  const handleChangeNumberOfDiscount = (event: any, index: number, errorIndex: number, barcode: string) => {
-    let currentValue = event.target.value;
-    if (stringNullOrEmpty(event.target.value)
-      || stringNullOrEmpty(event.target.value.trim())
-    ) {
-      currentValue = '0';
-    }
-    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
-      return;
-    }
-    let currentData: any;
-    setDtTable((preData: Array<TransferOutDetail>) => {
-      const data = [...preData];
-      currentData = data[index - 1];
-      data[index - 1].numberOfRequested = currentValue
-        ? parseInt(currentValue.replace(/,/g, '')) < 10000000000
-          ? parseInt(currentValue.replace(/,/g, ''))
-          : 0
-        : 0;
-      return data;
-    });
-    if (Object.keys(payloadAddItem).length !== 0) {
-      let updateList = _.cloneDeep(payloadAddItem);
-      updateList.map((item: any) => {
-        if (item.barcode === currentData.barCode) {
-          item.qty =
-            parseInt(currentValue.replace(/,/g, '')) < 10000000000
-              ? parseInt(currentValue.replace(/,/g, ''))
-              : 0;
-        }
-      });
-      dispatch(updateAddItemsState(updateList));
-    }
-    dispatch(
-      updateErrorList(
-        errorList.map((item: any, idx: number) => {
-          return idx === errorIndex
-            ? {
-              ...item,
-              errorNumberOfRequested: '',
-            }
-            : item;
-        })
-      )
-    );
-    dispatch(updateCheckEdit(true));
-    dispatch(updateCheckStock(checkStocks.filter((el: any) => el.barcode !== barcode)));
-  };
-
-  const addTwoDecimalPlaces = (value: any) => {
-    if (stringNullOrEmpty(value)) return '0.00';
-    else return value.toFixed(2);
-  };
-
   const columns: GridColDef[] = [
     {
       field: 'index',
@@ -238,7 +183,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
       ),
     },
     {
-      field: 'barCode',
+      field: 'barcode',
       headerName: 'บาร์โค้ด',
       flex: 1,
       headerAlign: 'center',
@@ -271,51 +216,29 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
     },
     {
       field: 'numberOfRequested',
-      headerName: 'จำนวนทำลาย *',
+      headerName: 'จำนวนทำลาย',
       flex: 1,
       headerAlign: 'center',
+      align: 'right',
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
-        const index =
-          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
-        const indexStock =
-          checkStocks && checkStocks.length > 0
-            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode)
-            : -1;
-        const condition = (index != -1 && errorList[index].errorNumberOfRequested) || indexStock !== -1;
-        return (
-          <div className={classes.MLabelTooltipWrapper}>
-            <TextField
-              error={condition}
-              type="text"
-              inputProps={{ maxLength: 13 }}
-              value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
-              className={classes.MtextFieldNumber}
-              // inputProps={{ min: 0 }}
-              onChange={(e) => {
-                handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barCode);
-              }}
-              disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT)}
-            />
-            {condition && <div className="title">{errorList[index]?.errorNumberOfRequested}</div>}
-          </div>
-        );
+        return numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value);
       },
     },
     {
       field: 'numberOfApproved',
-      headerName: 'จำนวนที่อนุมัติ *',
+      headerName: 'จำนวนที่อนุมัติ',
       flex: 1,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const index =
-          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barcode) : -1;
         const indexStock =
           checkStocks && checkStocks.length > 0
-            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode)
+            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barcode)
             : -1;
         const condition = (index != -1 && errorList[index].errorNumberOfApproved) || indexStock !== -1;
         return (
@@ -326,9 +249,9 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
               inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
-              disabled={!approvePermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
+              disabled={stringNullOrEmpty(dataDetail.status) || dataDetail.status != TOStatus.DRAFT}
               onChange={(e) => {
-                handleChangeNumberOfApprove(e, params.row.index, index, params.row.barCode);
+                handleChangeNumberOfApprove(e, params.row.index, index, params.row.barcode);
               }}
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfApproved}</div>}
@@ -383,7 +306,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
         };
 
         const handleDeleteItem = () => {
-          dispatch(updateAddItemsState(payloadAddItem.filter((r: any) => r.barcode !== params.row.barCode)));
+          dispatch(updateAddDestroyProductState(payloadAddItem.filter((r: any) => r.barcode !== params.row.barcode)));
           dispatch(updateCheckEdit(true));
           setOpenModalDelete(false);
           setOpenPopupModal(true);
@@ -433,7 +356,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
                     </Grid>
                     <Grid item xs={8} sx={{ pl: 1 }}>
                       <label style={{ color: '#36C690' }}>
-                        <b>{params.row.barCode}</b>
+                        <b>{params.row.barcode}</b>
                       </label>
                     </Grid>
                   </Grid>
@@ -498,7 +421,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
           <Grid item xs={3}>
             <Box display="flex" justifyContent="space-between" marginTop="25px">
               <Typography fontSize="14px" fontWeight="700" lineHeight="30px" height="24px">
-                จำนวนทำลายทั้งหมด
+                จำนวนขอส่วนลดทั้งหมด
               </Typography>
               <TextField
                 disabled
@@ -510,7 +433,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
             </Box>
             <Box display="flex" justifyContent="space-between" marginTop="10px">
               <Typography fontSize="14px" fontWeight="700" marginTop="6px">
-                จำนวนที่อนุมัติทั้งหมด
+                จำนวนทำลายจริงทั้งหมด
               </Typography>
               <TextField
                 type="text"

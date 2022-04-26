@@ -17,6 +17,7 @@ import { getTransferOutDetail } from '../../store/slices/transfer-out-detail-sli
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
 import ModalCreateTransferOutDestroy from '../../components/transfer-out-destroy/modal-create-transfer-out-destroy';
+import ModalCreateToDestroyDiscount from "../../components/transfer-out-destroy/modal-create-to-destroy-discount";
 
 const _ = require('lodash');
 
@@ -36,6 +37,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [openDetail, setOpenDetail] = React.useState(false);
+  const [openDetailDestroyDiscount, setOpenDetailDestroyDiscount] = React.useState(false);
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
   const [checkAll, setCheckAll] = React.useState<boolean>(false);
 
@@ -69,7 +71,8 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
           products: data.products,
           requestorName: data.requestor,
           approverName: data.approver,
-          type: data.type == '2' ? 'ไม่มีส่วนลด' : 'มีส่วนลด',
+          type: data.type == TO_TYPE.TO_WITHOUT_DISCOUNT ? 'ไม่มีส่วนลด' : 'มีส่วนลด',
+          typeValue: data.type,
         };
       });
       setLstTransferOut(rows);
@@ -112,6 +115,10 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
 
   const handleCloseDetail = () => {
     setOpenDetail(false);
+  };
+
+  const handleCloseDetailDestroyDiscount = () => {
+    setOpenDetailDestroyDiscount(false);
   };
 
   const handleClosePopup = () => {
@@ -315,7 +322,11 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
       try {
         await dispatch(getTransferOutDetail(params.row.id));
         if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
-          setOpenDetail(true);
+          if (TO_TYPE.TO_WITHOUT_DISCOUNT === params.row.typeValue) {
+            setOpenDetail(true);
+          } else if (TO_TYPE.TO_WITH_DISCOUNT === params.row.typeValue) {
+            setOpenDetailDestroyDiscount(true);
+          }
         }
       } catch (error) {
         console.log(error);
@@ -356,6 +367,17 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
         <ModalCreateTransferOutDestroy
           isOpen={openDetail}
           onClickClose={handleCloseDetail}
+          action={Action.UPDATE}
+          setPopupMsg={setPopupMsg}
+          setOpenPopup={setOpenPopup}
+          onSearchMain={props.onSearch}
+          userPermission={userPermission}
+        />
+      )}
+      {openDetailDestroyDiscount && (
+        <ModalCreateToDestroyDiscount
+          isOpen={openDetailDestroyDiscount}
+          onClickClose={handleCloseDetailDestroyDiscount}
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}

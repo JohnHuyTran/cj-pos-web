@@ -17,6 +17,18 @@ export interface TransferOutDetail {
   remark: string;
 }
 
+export interface TransferOutDestroyDiscountDetail {
+  id: string;
+  index: number;
+  barcode: string;
+  barcodeName: string;
+  skuCode: string;
+  unit: string;
+  numberOfRequested: number;
+  numberOfApproved: number;
+  remark: string;
+}
+
 interface Product {
   barcode: string;
   NumberOfDiscounted: number;

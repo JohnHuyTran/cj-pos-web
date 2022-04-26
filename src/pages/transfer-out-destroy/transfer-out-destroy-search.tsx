@@ -27,6 +27,7 @@ import SelectBranch from './transfer-out-destroy-branch';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
 import ModalCreateTransferOutDestroy from '../../components/transfer-out-destroy/modal-create-transfer-out-destroy';
+import ModalCreateToDestroyDiscount from "../../components/transfer-out-destroy/modal-create-to-destroy-discount";
 
 const _ = require('lodash');
 
@@ -68,6 +69,7 @@ const TransferOutSearch = () => {
     open: false,
   });
   const [openModal, setOpenModal] = React.useState(false);
+  const [openModalTODestroyDiscount, setOpenModalTODestroyDiscount] = React.useState(false);
   const [listBranchSelect, setListBranchSelect] = React.useState<BranchListOptionType[]>([]);
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -126,6 +128,14 @@ const TransferOutSearch = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+  };
+
+  const handleOpenModalTODestroyDiscount = () => {
+    setOpenModalTODestroyDiscount(true);
+  };
+
+  const handleCloseModalTODestroyDiscount = () => {
+    setOpenModalTODestroyDiscount(false);
   };
 
   const handleClosePopup = () => {
@@ -205,13 +215,13 @@ const TransferOutSearch = () => {
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      dataTable = <TransferOutList onSearch={onSearch} />;
+      dataTable = <TransferOutList onSearch={onSearch}/>;
     } else {
       dataTable = (
         <Grid item container xs={12} justifyContent='center'>
           <Box color='#CBD4DB'>
             <h2>
-              {t('noData')} <SearchOff fontSize='large' />
+              {t('noData')} <SearchOff fontSize='large'/>
             </h2>
           </Box>
         </Grid>
@@ -300,14 +310,25 @@ const TransferOutSearch = () => {
         </Grid>
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
           <Grid item xs={12} style={{ textAlign: 'right' }}>
+            {requestPermission && (<Button
+                id='btnCreateToDestroyDiscount'
+                variant='contained'
+                sx={{ width: '150px', height: '40px' }}
+                className={classes.MbtnSearch}
+                color='secondary'
+                startIcon={<AddCircleOutlineOutlinedIcon/>}
+                onClick={handleOpenModalTODestroyDiscount}>
+                {'ทำลายมีส่วนลด'}
+              </Button>
+            )}
             {requestPermission && (
               <Button
                 id='btnCreate'
                 variant='contained'
-                sx={{ width: '120px', height: '40px' }}
+                sx={{ width: '120px', height: '40px', ml: 2 }}
                 className={classes.MbtnSearch}
                 color='warning'
-                startIcon={<AddCircleOutlineOutlinedIcon />}
+                startIcon={<AddCircleOutlineOutlinedIcon/>}
                 onClick={handleOpenModal}>
                 {'ทำลาย'}
               </Button>
@@ -334,8 +355,8 @@ const TransferOutSearch = () => {
         </Grid>
       </Box>
       {dataTable}
-      <LoadingModal open={openLoadingModal.open} />
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <LoadingModal open={openLoadingModal.open}/>
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
       {openModal && (
         <ModalCreateTransferOutDestroy
           isOpen={openModal}
@@ -346,7 +367,17 @@ const TransferOutSearch = () => {
           onSearchMain={onSearch}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      {openModalTODestroyDiscount && (
+        <ModalCreateToDestroyDiscount
+          isOpen={openModalTODestroyDiscount}
+          onClickClose={handleCloseModalTODestroyDiscount}
+          setOpenPopup={setOpenPopup}
+          setPopupMsg={setPopupMsg}
+          action={Action.INSERT}
+          onSearchMain={onSearch}
+        />
+      )}
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
     </>
   );
 };
