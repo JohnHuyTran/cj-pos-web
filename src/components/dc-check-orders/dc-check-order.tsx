@@ -123,6 +123,10 @@ function DCCheckOrderSearch() {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
+  const removeSpace = (value: string) => {
+    return value.replace(/\s/g, '');
+  };
+
   const onClickSearchBtn = async () => {
     let limits;
     if (limit === 0 || limit === undefined) {
@@ -131,10 +135,12 @@ function DCCheckOrderSearch() {
       limits = limit.toString();
     }
 
+    let newDocNo = removeSpace(values.docNo);
+
     const payload: CheckOrderRequest = {
       limit: limits,
       page: page,
-      docNo: values.docNo,
+      docNo: newDocNo,
       shipBranchFrom: values.shipBranchFrom,
       shipBranchTo: values.shipBranchTo,
       verifyDCStatus: values.verifyDCStatus,
@@ -254,10 +260,10 @@ function DCCheckOrderSearch() {
       orderListData = <DCOrderList />;
     } else {
       orderListData = (
-        <Grid item container xs={12} justifyContent='center'>
-          <Box color='#CBD4DB'>
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
             <h2>
-              ไม่มีข้อมูล <SearchOff fontSize='large' />
+              ไม่มีข้อมูล <SearchOff fontSize="large" />
             </h2>
           </Box>
         </Grid>
@@ -282,22 +288,22 @@ function DCCheckOrderSearch() {
       <Box sx={{ flexGrow: 1 }}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id='txtDocNo'
-              name='docNo'
-              size='small'
+              id="txtDocNo"
+              name="docNo"
+              size="small"
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder='เลขที่เอกสาร LD/BT/SD'
+              placeholder="เลขที่เอกสาร LD/BT/SD"
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาขาต้นทาง
             </Typography>
             <BranchListDropDown
@@ -309,7 +315,7 @@ function DCCheckOrderSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาขาปลายทาง
             </Typography>
             <BranchListDropDown
@@ -320,17 +326,17 @@ function DCCheckOrderSearch() {
             />
           </Grid>
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               วันที่รับสินค้า
             </Typography>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               ตั้งแต่
             </Typography>
             <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
-          <Grid item xs={4} container alignItems='flex-end'>
+          <Grid item xs={4} container alignItems="flex-end">
             <Box sx={{ width: '100%' }}>
-              <Typography gutterBottom variant='subtitle1' component='div'>
+              <Typography gutterBottom variant="subtitle1" component="div">
                 ถึง
               </Typography>
               <DatePickerComponent
@@ -341,17 +347,18 @@ function DCCheckOrderSearch() {
               />
             </Box>
           </Grid>
-          <Grid item xs={4} container alignItems='flex-end'>
-            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
+          <Grid item xs={4} container alignItems="flex-end">
+            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
               สถานะการตรวจสอบผลต่าง
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id='selVerifyDCStatus'
-                name='verifyDCStatus'
+                id="selVerifyDCStatus"
+                name="verifyDCStatus"
                 value={values.verifyDCStatus}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -363,16 +370,17 @@ function DCCheckOrderSearch() {
 
           <Grid item xs={4} sx={{ pt: 30 }}>
             {' '}
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               ประเภท
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id='selSdType'
-                name='sdType'
+                id="selSdType"
+                name="sdType"
                 value={values.sdType}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -381,27 +389,29 @@ function DCCheckOrderSearch() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={4} container alignItems='flex-end'></Grid>
-          <Grid item xs={4} container alignItems='flex-end'>
-            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
+          <Grid item xs={4} container alignItems="flex-end"></Grid>
+          <Grid item xs={4} container alignItems="flex-end">
+            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
               <Button
-                id='btnClear'
-                variant='contained'
+                id="btnClear"
+                variant="contained"
                 onClick={onClickClearBtn}
                 sx={{ width: '45%' }}
                 className={classes.MbtnClear}
-                color='cancelColor'
-                fullWidth={true}>
+                color="cancelColor"
+                fullWidth={true}
+              >
                 เคลียร์
               </Button>
               <Button
-                id='btnSearch'
-                variant='contained'
-                color='primary'
+                id="btnSearch"
+                variant="contained"
+                color="primary"
                 onClick={onClickValidateForm}
                 sx={{ width: '45%', ml: 1, display: `${disableSearchBtn ? 'none' : ''}` }}
                 className={classes.MbtnSearch}
-                fullWidth={true}>
+                fullWidth={true}
+              >
                 ค้นหา
               </Button>
             </Grid>

@@ -173,6 +173,10 @@ export default function StockTransferRt() {
     }
   };
 
+  const removeSpace = (value: string) => {
+    return value.replace(/\s/g, '');
+  };
+
   const onClickSearchBtn = async () => {
     let limits;
     if (limit === 0 || limit === undefined) {
@@ -181,10 +185,12 @@ export default function StockTransferRt() {
       limits = limit.toString();
     }
 
+    let newDocNo = removeSpace(values.docNo);
+
     const payload: StockTransferRequest = {
       limit: limits,
       page: page,
-      docNo: values.docNo,
+      docNo: newDocNo,
       branchFrom: values.branchFrom,
       branchTo: values.branchTo,
       dateFrom: moment(startDate).startOf('day').toISOString(),
@@ -326,22 +332,22 @@ export default function StockTransferRt() {
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('documentSearch')}
             </Typography>
             <TextField
-              id='txtDocNo'
-              name='docNo'
-              size='small'
+              id="txtDocNo"
+              name="docNo"
+              size="small"
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder='เลขที่เอกสาร RT'
+              placeholder="เลขที่เอกสาร RT"
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาขาต้นทาง
             </Typography>
             <BranchListDropDown
@@ -355,7 +361,7 @@ export default function StockTransferRt() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาขาปลายทาง
             </Typography>
             <BranchListDropDown
@@ -368,16 +374,16 @@ export default function StockTransferRt() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               วันที่โอน
             </Typography>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               ตั้งแต่*
             </Typography>
             <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
               ถึง*
             </Typography>
             <DatePickerAllComponent
@@ -388,16 +394,17 @@ export default function StockTransferRt() {
             />
           </Grid>
           <Grid item xs={4} container>
-            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
               สถานะ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id='selPiType'
-                name='statuses'
+                id="selPiType"
+                name="statuses"
                 value={values.statuses}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -409,7 +416,7 @@ export default function StockTransferRt() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               สาเหตุการโอน
             </Typography>
             <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
@@ -421,53 +428,58 @@ export default function StockTransferRt() {
         <Grid container spacing={2} mt={4} mb={2}>
           <Grid item xs={5}>
             <Button
-              id='btnImport'
-              variant='contained'
-              color='primary'
+              id="btnImport"
+              variant="contained"
+              color="primary"
               startIcon={<Download />}
               onClick={handleOpenUploadFileModal}
               sx={{ minWidth: 100, display: `${!displayBtnImport ? 'none' : ''}` }}
-              className={classes.MbtnSearch}>
+              className={classes.MbtnSearch}
+            >
               Import
             </Button>
             <Button
-              id='btnImport'
-              variant='contained'
-              color='primary'
+              id="btnImport"
+              variant="contained"
+              color="primary"
               onClick={handleApprove2Multiple}
               sx={{ ml: 2, minWidth: 100, display: `${!displayBtnSubmit ? 'none' : ''}` }}
               className={classes.MbtnSearch}
-              disabled={selectRowsList.length === 0}>
+              disabled={selectRowsList.length === 0}
+            >
               ส่งงาน
             </Button>
           </Grid>
           <Grid item xs={7} sx={{ textAlign: 'end' }}>
             <Button
-              id='btnCreateStockTransferModal'
-              variant='contained'
+              id="btnCreateStockTransferModal"
+              variant="contained"
               onClick={handleOpenCreateModal}
               sx={{ width: 150, display: `${displayBtnCreate ? 'none' : ''}` }}
               className={classes.MbtnClear}
               startIcon={<AddCircleOutlineOutlinedIcon />}
-              color='secondary'>
+              color="secondary"
+            >
               สร้างรายการโอน
             </Button>
             <Button
-              id='btnClear'
-              variant='contained'
+              id="btnClear"
+              variant="contained"
               onClick={onClickClearBtn}
               sx={{ width: 110, ml: 2 }}
               className={classes.MbtnClear}
-              color='cancelColor'>
+              color="cancelColor"
+            >
               เคลียร์
             </Button>
             <Button
-              id='btnSearch'
-              variant='contained'
-              color='primary'
+              id="btnSearch"
+              variant="contained"
+              color="primary"
               onClick={onClickValidateForm}
               sx={{ width: 110, ml: 2 }}
-              className={classes.MbtnSearch}>
+              className={classes.MbtnSearch}
+            >
               ค้นหา
             </Button>
           </Grid>
@@ -478,8 +490,8 @@ export default function StockTransferRt() {
         <div>
           {orderListDatas.length > 0 && <StockTransferRtList onSelectRows={handleSelectRows} />}
           {orderListDatas.length === 0 && (
-            <Grid item container xs={12} justifyContent='center'>
-              <Box color='#CBD4DB'>
+            <Grid item container xs={12} justifyContent="center">
+              <Box color="#CBD4DB">
                 <h2>ไม่มีข้อมูล</h2>
               </Box>
             </Grid>
@@ -508,7 +520,7 @@ export default function StockTransferRt() {
         onClose={handleCloseModelConfirm}
         handleConfirm={handleConfirm}
         header={textHeaderConfirm}
-        title='รายการเอกสาร RT'
+        title="รายการเอกสาร RT"
         value={`${selectRowsList.length} รายการ`}
       />
 
