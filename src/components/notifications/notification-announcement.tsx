@@ -106,13 +106,13 @@ export default function NotificationAnnouncement(props: Props) {
             minHeight: '80px',
             cursor: 'pointer',
             backgroundColor: item.read ? 'transparent' : '#F6FFF3',
-            fontSize: '14px',
+            fontSize: '12px',
           }}
           onClick={() => currentlySelected(item)}
         >
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '99%' }}>
             <Box display={'flex'} mt={1} ml={1}>
-              <ShoppingCartSharp sx={{ color: theme.palette.primary.main }} />
+              <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px' }} />
               <span style={{ marginLeft: 15, color: theme.palette.primary.main }}>กำหนด (งด) ขายสินค้า</span>
               <span style={{ marginLeft: 5, marginRight: 3 }}>: {item.payload.documentNumber}</span> {'|'}
             </Box>
@@ -123,9 +123,9 @@ export default function NotificationAnnouncement(props: Props) {
                   color: '#36C690',
                   textAlign: 'center',
                   marginTop: '5px',
-                  padding: '2px 17px 3px 17px',
+                  padding: '2px 15px 3px 15px',
                   borderRadius: '8px',
-                  fontSize: '15px',
+                  fontSize: '13px',
                 }}
               >
                 เริ่มใช้งาน
@@ -134,7 +134,7 @@ export default function NotificationAnnouncement(props: Props) {
           </Box>
           <Box ml={6}>{item.payload.description}</Box>
           <Box ml={6} mt={1}>
-            <Typography style={{ color: theme.palette.grey[500], fontSize: '14px' }}>
+            <Typography style={{ color: theme.palette.grey[500], fontSize: '11px' }}>
               มีผลตั้งแต่ {moment(item.payload.stStartTime).add(543, 'y').format(DateFormat.DATE_TIME_DISPLAY_FORMAT)}{' '}
               น. - {moment(item.payload.stEndTime).format(DateFormat.DATE_TIME_DISPLAY_FORMAT)} น.
             </Typography>
@@ -153,8 +153,9 @@ export default function NotificationAnnouncement(props: Props) {
           onPageChange={handleChangePage}
           rowsPerPage={10}
           rowsPerPageOptions={[]}
+          sx={{ height: '40px', overflow: 'hidden' }}
         />
-        <CardContent className={classes.MScrollBar} sx={{ height: '95%', overflowY: 'auto' }}>
+        <CardContent className={classes.MScrollBar} sx={{ height: '98%', overflowY: 'auto' }}>
           {listTask}
         </CardContent>
       </Card>
