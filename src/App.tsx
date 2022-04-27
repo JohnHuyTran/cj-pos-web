@@ -23,6 +23,7 @@ import Notification from './pages/notification';
 import TransferOut from './pages/transfer-out/transfer-out';
 import StockBalance from './pages/stock/stock-balance';
 import TransferOutDestroy from './pages/transfer-out-destroy/transfer-out-destroy';
+import StockMovement from './pages/stock/stock-movement';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -95,6 +96,7 @@ export default function App2() {
           <Route path='/transfer-out' component={TransferOut} />
           <Route path='/transfer-out-destroy' component={TransferOutDestroy} />
           <Route path='/stock-balance' component={StockBalance} />
+          <Route path='/stock-movement' component={StockMovement} />
         </Switch>
       </Main>
     </Box>

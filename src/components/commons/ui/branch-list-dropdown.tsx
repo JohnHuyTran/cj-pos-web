@@ -17,6 +17,7 @@ interface Props {
   disable?: boolean;
   filterOutDC?: boolean;
   isFilterAuthorizedBranch?: boolean;
+  placeHolder?: string;
 }
 
 function BranchListDropDown({
@@ -27,6 +28,7 @@ function BranchListDropDown({
   disable,
   filterOutDC,
   isFilterAuthorizedBranch,
+  placeHolder,
 }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -89,7 +91,7 @@ function BranchListDropDown({
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder='ทั้งหมด'
+          placeholder={placeHolder ? placeHolder : 'ทั้งหมด'}
           size='small'
           className={classes.MtextField}
           fullWidth

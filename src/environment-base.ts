@@ -344,6 +344,11 @@ export const environment = {
           url: '/stock/stock-balance/search-by-location',
         },
       },
+      stockMovement: {
+        search: {
+          url: '/stock/stock-movement/search',
+        },
+      },
     },
   },
   master: {

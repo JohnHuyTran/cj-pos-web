@@ -66,6 +66,7 @@ import itemsToteSlice from './slices/items-tote-slice';
 import checkOrderToteSlice from './slices/check-order-detail-tote-slice';
 import stockBalanceLocationSearchSlice from './slices/stock/stock-balance-location-search-slice';
 import stockBalanceSearchSlice from './slices/stock/stock-balance-search-slice';
+import stockMovementSearchSlice from './slices/stock/stock-movement-search-slice';
 
 const store = configureStore({
   reducer: {
@@ -135,6 +136,7 @@ const store = configureStore({
     checkOrderToteSlice: checkOrderToteSlice,
     stockBalanceLocationSearchSlice: stockBalanceLocationSearchSlice,
     stockBalanceSearchSlice: stockBalanceSearchSlice,
+    stockMovementSearchSlice: stockMovementSearchSlice,
   },
 });
 
