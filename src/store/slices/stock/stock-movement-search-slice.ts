@@ -30,8 +30,8 @@ const initialState: State = {
 export const featchStockMovementeSearchAsync = createAsyncThunk(
   'stockMovementList',
   async (payload: OutstandingRequest) => {
-    const apiRootPath = environment.stock.outStanding.stockMovement.search.url;
-
+    // const apiRootPath = environment.stock.outStanding.stockMovement.search.url;
+    const apiRootPath = environment.stock.outStanding.stockBalance.searchByLocation.url;
     const response = await post(apiRootPath, payload, ContentType.JSON)
       .then((result: any) => result)
       .catch((error) => {

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { Button } from '@mui/material';
+import { MoreVertOutlined } from '@mui/icons-material';
 
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
@@ -10,6 +12,7 @@ import {
   featchStockMovementeSearchAsync,
   savePayloadSearch,
 } from '../../../store/slices/stock/stock-movement-search-slice';
+import StockMovementTransaction from './stock-movement-transaction';
 
 function StockMovementSearchList() {
   const classes = useStyles();
@@ -19,6 +22,28 @@ function StockMovementSearchList() {
   const cuurentPage = useAppSelector((state) => state.stockMovementSearchSlice.stockList.page);
   const limit = useAppSelector((state) => state.stockMovementSearchSlice.stockList.perPage);
   const [pageSize, setPageSize] = React.useState(limit);
+
+  const [openModalTransaction, setOpenModalTransaction] = React.useState(false);
+  const [mockData, setMockData] = React.useState('');
+  const handleModelAction = (params: GridRenderCellParams) => {
+    const printNo: any = params.getValue(params.id, 'skuName');
+
+    const handleOpenModalTransaction = () => {
+      setMockData(printNo);
+      setOpenModalTransaction(true);
+    };
+    return (
+      <>
+        <Button onClick={handleOpenModalTransaction}>
+          <MoreVertOutlined sx={{ color: '#263238' }} />
+        </Button>
+      </>
+    );
+  };
+
+  const handleCloseModalTransaction = () => {
+    setOpenModalTransaction(false);
+  };
 
   const columns: GridColDef[] = [
     {
@@ -38,7 +63,8 @@ function StockMovementSearchList() {
       field: 'createDate',
       headerClassName: 'columnHeaderTitle',
       headerName: 'วันที่ทำรายการ',
-      minWidth: 122,
+      minWidth: 150,
+      flex: 0.5,
       headerAlign: 'center',
       sortable: false,
     },
@@ -47,19 +73,21 @@ function StockMovementSearchList() {
       headerClassName: 'columnHeaderTitle',
       headerName: 'เลขที่เอกสาร',
       headerAlign: 'center',
-      minWidth: 235,
+      flex: 0.5,
+      minWidth: 100,
       sortable: false,
     },
     {
       field: 'docRef',
       headerClassName: 'columnHeaderTitle',
       headerName: 'เลขที่เอกสารอ้างอิง',
-      width: 75,
+      minWidth: 100,
+      flex: 0.5,
       headerAlign: 'center',
       sortable: false,
     },
     {
-      field: 'store',
+      field: 'storeName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'คลัง',
       minWidth: 85,
@@ -68,20 +96,21 @@ function StockMovementSearchList() {
     },
     {
       field: 'transactionType',
-      headerClassName: 'columnHeaderTitle-BG',
-      cellClassName: 'columnFilled-BG',
+      headerClassName: 'columnHeaderTitle',
       headerName: 'ประเภท',
-      width: 111,
+      minWidth: 150,
+      flex: 1,
       headerAlign: 'center',
-      align: 'right',
+      align: 'left',
       sortable: false,
     },
     {
       field: 'qty',
       headerClassName: 'columnHeaderTitle',
       headerName: 'จำนวนที่ทำรายการ',
-      width: 75,
+      width: 100,
       headerAlign: 'center',
+      align: 'right',
       sortable: false,
     },
     {
@@ -89,7 +118,7 @@ function StockMovementSearchList() {
       headerClassName: 'columnHeaderTitle-BG',
       cellClassName: 'columnFilled-BG',
       headerName: 'สินค้าคงเหลือ',
-      minWidth: 150,
+      minWidth: 100,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
@@ -102,19 +131,29 @@ function StockMovementSearchList() {
       headerAlign: 'center',
       sortable: false,
     },
+    {
+      field: 'action',
+      headerName: ' ',
+      width: 40,
+      align: 'center',
+      sortable: false,
+      renderCell: (params) => handleModelAction(params),
+    },
   ];
 
   const rows = items.data.map((data: StockInfo, indexs: number) => {
     return {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
-      skuCode: data.skuCode,
-      skuName: data.skuName,
-      storeCode: data.storeCode,
+      createDate: data.skuCode,
+      docNo: data.barcode,
+      docRef: data.skuCode,
       storeName: data.storeName,
+      transactionType: data.skuName,
+      qty: data.availableQty,
       availableQty: data.availableQty,
-      unitCode: data.unitCode,
       unitName: data.unitName,
+      skuName: data.skuName,
     };
   });
 
@@ -156,8 +195,13 @@ function StockMovementSearchList() {
 
     setLoading(false);
   };
+
+  const currentlySelected = async (params: GridCellParams) => {
+    if (params.field === 'docNo') {
+    }
+  };
   return (
-    <div>
+    <React.Fragment>
       <Box
         mt={2}
         bgcolor='background.paper'
@@ -188,12 +232,14 @@ function StockMovementSearchList() {
             paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
+            onCellClick={currentlySelected}
             loading={loading}
             rowHeight={65}
           />
         </div>
       </Box>
-    </div>
+      <StockMovementTransaction open={openModalTransaction} onClose={handleCloseModalTransaction} mockData={mockData} />
+    </React.Fragment>
   );
 }
 

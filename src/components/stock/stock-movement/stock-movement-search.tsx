@@ -37,7 +37,10 @@ function StockMovementSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
-  const items = useAppSelector((state) => state.stockBalanceSearchSlice.stockList);
+  const items = useAppSelector((state) => state.stockMovementSearchSlice.stockList);
+  const payloadSlice = useAppSelector((state) => state.stockMovementSearchSlice.savePayloadSearch);
+  console.log('items: ', items);
+  console.log('payloadSlice: ', payloadSlice);
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
 
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
