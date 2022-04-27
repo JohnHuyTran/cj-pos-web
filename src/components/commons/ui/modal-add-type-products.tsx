@@ -50,6 +50,7 @@ interface Props {
   title?: string;
   skuType?: any[];
   showSearch?: boolean;
+  textBtn?: string;
 }
 
 interface SelectedItemProps {
@@ -453,22 +454,31 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     }
   };
 
+  const handleOnClose = () => {
+    if (props.showSearch) {
+      if (selectedItems.length === 0) dispatch(updateAddTypeAndProductState([]));
+      if (payloadAddTypeProduct.length === 0) setSelectedItems([]);
+    }
+    props.onClose();
+  };
+
   return (
     <Dialog open={props.open} PaperProps={{ sx: { width: '1132px', maxWidth: '1132px' } }}>
       <Box sx={{ flex: 1, ml: 2 }}>
-        {props.onClose ? (
-          <IconButton
-            aria-label='close'
-            onClick={props.onClose}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: (theme: any) => theme.palette.grey[400],
-            }}>
-            <CancelOutlinedIcon fontSize='large' stroke={'white'} stroke-width={1} />
-          </IconButton>
-        ) : null}
+        {/* {props.onClose ? ( */}
+        <IconButton
+          aria-label='close'
+          // onClick={props.onClose}
+          onClick={handleOnClose}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: (theme: any) => theme.palette.grey[400],
+          }}>
+          <CancelOutlinedIcon fontSize='large' stroke={'white'} stroke-width={1} />
+        </IconButton>
+        {/* ) : null} */}
       </Box>
       <DialogContent sx={{ padding: '52px 28px 42px 100px' }}>
         <Grid container spacing={2}>
@@ -556,12 +566,14 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       <Grid item xs={12} sx={{ textAlign: 'right' }} mr={3} mb={4}>
         <Button
           variant='contained'
-          color='info'
-          startIcon={<AddCircleOutlineOutlinedIcon />}
+          // color='primary'
+          // startIcon={<AddCircleOutlineOutlinedIcon />}
+          color={`${!props.textBtn ? 'primary' : 'info'}`}
           onClick={handleAddProduct}
           disabled={!(selectedItems && selectedItems.length > 0)}
           className={classes.MbtnSearch}>
-          เพิ่มสินค้า
+          {props.textBtn && props.textBtn}
+          {!props.textBtn && 'เพิ่มสินค้า'}
         </Button>
       </Grid>
       <LoadingModal open={openLoadingModal} />
