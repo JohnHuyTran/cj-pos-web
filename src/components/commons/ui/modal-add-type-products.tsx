@@ -84,9 +84,9 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     }
 
     // console.log('onInputChange', { reason, value });
-    if (reason == 'reset') {
-      clearInput();
-    }
+    // if (reason == 'reset') {
+    //   clearInput();
+    // }
 
     const keyword = value.trim();
     if (keyword.length >= 3 && reason !== 'reset') {
@@ -113,9 +113,9 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     }
 
     // console.log('onInputChange', { reason, value });
-    if (reason == 'reset') {
-      clearInput();
-    }
+    // if (reason == 'reset') {
+    //   clearInput();
+    // }
 
     const keyword = value.trim();
     if (keyword.length >= 3 && reason !== 'reset') {
@@ -132,7 +132,15 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
   };
 
   const clearInput = () => {
-    // setValues([]);
+    setValues({
+      productType: {},
+      product: {},
+      selectAllProduct: false,
+      error: {
+        productTypeExist: '',
+        productExist: '',
+      },
+    });
   };
 
   let productOptions: any = [];
@@ -450,12 +458,18 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
           if (filterTypeName.length === 0) items.push(item);
         }
       });
+
+      clearInput();
       setSelectedItems(items);
     }
   };
 
   const handleOnClose = () => {
     if (props.showSearch) {
+      setSearchProductType(null);
+      setSearchItem(null);
+      clearInput();
+
       if (selectedItems.length === 0) dispatch(updateAddTypeAndProductState([]));
       if (payloadAddTypeProduct.length === 0) setSelectedItems([]);
     }
@@ -542,17 +556,6 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 value={values.product}
               />
             </Box>
-            {/* <Box sx={{textAlign: 'right', mt: 3}}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                className={classes.MbtnSearch}
-                                onClick={handleAddItem}
-                                disabled={!values.btnAddStatus}
-                            >
-                                เพิ่ม
-                            </Button>
-                        </Box> */}
           </Grid>
           <Grid item xs={7}>
             <Box
