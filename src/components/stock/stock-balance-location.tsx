@@ -10,7 +10,11 @@ import {
 } from '../../store/slices/stock/stock-balance-location-search-slice';
 import { SearchOff } from '@mui/icons-material';
 
-function StockBalanceLocation() {
+interface Props {
+  flagSearch?: boolean;
+}
+
+function StockBalanceLocation({ flagSearch }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const savePayLoadSearch = useAppSelector((state) => state.stockBalanceLocationSearchSlice.savePayloadSearch);
@@ -28,7 +32,7 @@ function StockBalanceLocation() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -51,8 +55,8 @@ function StockBalanceLocation() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2">{params.value}</Typography>
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant='body2'>{params.value}</Typography>
+          <Typography variant='body2' color='textSecondary'>
             {params.getValue(params.id, 'skuCode') || ''}
           </Typography>
         </div>
@@ -176,7 +180,7 @@ function StockBalanceLocation() {
     <div>
       <Box
         mt={2}
-        bgcolor="background.paper"
+        bgcolor='background.paper'
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -188,9 +192,8 @@ function StockBalanceLocation() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}
-      >
-        {items.data.length > 0 && (
+        }}>
+        {flagSearch && items.data.length > 0 && (
           <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
             <DataGrid
               rows={rows}
@@ -203,7 +206,7 @@ function StockBalanceLocation() {
               pageSize={pageSize}
               rowsPerPageOptions={[10, 20, 50, 100]}
               rowCount={items.total}
-              paginationMode="server"
+              paginationMode='server'
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               loading={loading}
@@ -212,11 +215,11 @@ function StockBalanceLocation() {
           </div>
         )}
 
-        {items.data.length === 0 && (
-          <Grid container xs={12} justifyContent="center">
-            <Box color="#CBD4DB" justifyContent="center">
+        {flagSearch && items.data.length === 0 && (
+          <Grid container xs={12} justifyContent='center'>
+            <Box color='#CBD4DB' justifyContent='center'>
               <h2>
-                ไม่มีข้อมูล <SearchOff fontSize="large" />
+                ไม่มีข้อมูล <SearchOff fontSize='large' />
               </h2>
             </Box>
           </Grid>

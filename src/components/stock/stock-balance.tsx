@@ -7,7 +7,11 @@ import { useStyles } from '../../styles/makeTheme';
 import { SearchOff } from '@mui/icons-material';
 import { featchStockBalanceSearchAsync, savePayloadSearch } from '../../store/slices/stock/stock-balance-search-slice';
 
-function StockBalance() {
+interface Props {
+  flagSearch?: boolean;
+}
+
+function StockBalance({ flagSearch }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const savePayLoadSearch = useAppSelector((state) => state.stockBalanceSearchSlice.savePayloadSearch);
@@ -15,6 +19,9 @@ function StockBalance() {
   const cuurentPage = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.page);
   const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
   const [pageSize, setPageSize] = React.useState(limit);
+
+  console.log('flagSearch :', flagSearch);
+  console.log('items.data.length :', items.data.length);
 
   const columns: GridColDef[] = [
     {
@@ -25,7 +32,7 @@ function StockBalance() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -40,8 +47,8 @@ function StockBalance() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2">{params.value}</Typography>
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant='body2'>{params.value}</Typography>
+          <Typography variant='body2' color='textSecondary'>
             {params.getValue(params.id, 'skuCode') || ''}
           </Typography>
         </div>
@@ -132,7 +139,7 @@ function StockBalance() {
     <div>
       <Box
         mt={2}
-        bgcolor="background.paper"
+        bgcolor='background.paper'
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -144,8 +151,7 @@ function StockBalance() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}
-      >
+        }}>
         {items.data.length > 0 && (
           <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
             <DataGrid
@@ -159,7 +165,7 @@ function StockBalance() {
               pageSize={pageSize}
               rowsPerPageOptions={[10, 20, 50, 100]}
               rowCount={items.total}
-              paginationMode="server"
+              paginationMode='server'
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               loading={loading}
@@ -167,12 +173,11 @@ function StockBalance() {
             />
           </div>
         )}
-
         {items.data.length === 0 && (
-          <Grid container xs={12} justifyContent="center">
-            <Box color="#CBD4DB" justifyContent="center">
+          <Grid container xs={12} justifyContent='center'>
+            <Box color='#CBD4DB' justifyContent='center'>
               <h2>
-                ไม่มีข้อมูล <SearchOff fontSize="large" />
+                ไม่มีข้อมูล <SearchOff fontSize='large' />
               </h2>
             </Box>
           </Grid>

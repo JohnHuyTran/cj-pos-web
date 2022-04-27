@@ -92,8 +92,14 @@ function StockSearch() {
   };
   const [value, setValue] = React.useState(0);
   const [flagSearch, setFlagSearch] = React.useState(false);
+  const [flagSearchLocation, setFlagSearchLocation] = React.useState(false);
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+
+    if (newValue === 0 && flagSearchLocation) {
+      setFlagSearchLocation(false);
+      onClickClearBtn();
+    }
   };
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
@@ -149,6 +155,8 @@ function StockSearch() {
   };
 
   const onClickSearchBtn = async () => {
+    if (value === 1) setFlagSearchLocation(true);
+
     handleOpenLoading('open', true);
     if (isValidateInput()) {
       let limits: number;
@@ -351,30 +359,30 @@ function StockSearch() {
           </Grid>
         </Grid>
       </Box>
-      {flagSearch && (
-        <>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
-              <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
-              <Tab
-                label={
-                  <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
-                    สินค้าคงคลัง(ตาม Location)
-                  </Typography>
-                }
-                {...a11yProps(1)}
-              />
-            </Tabs>
-          </Box>
+      {/* {flagSearch && (
+        <> */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
+          <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
+          <Tab
+            label={
+              <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
+                สินค้าคงคลัง(ตาม Location)
+              </Typography>
+            }
+            {...a11yProps(1)}
+          />
+        </Tabs>
+      </Box>
 
-          <TabPanel value={value} index={0}>
-            <StockBalance />
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <StockBalanceLocation />
-          </TabPanel>
-        </>
-      )}
+      <TabPanel value={value} index={0}>
+        <StockBalance flagSearch={flagSearch} />
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <StockBalanceLocation flagSearch={flagSearch} />
+      </TabPanel>
+      {/* </>
+      )} */}
       <LoadingModal open={openLoadingModal.open} />
       <ModalAddTypeProduct
         open={openModelAddItems}
