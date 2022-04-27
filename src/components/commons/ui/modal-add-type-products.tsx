@@ -459,6 +459,8 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         }
       });
 
+      setSearchProductType(null);
+      setSearchItem(null);
       clearInput();
       setSelectedItems(items);
     }
