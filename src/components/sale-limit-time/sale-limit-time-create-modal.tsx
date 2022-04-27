@@ -25,7 +25,7 @@ import STProductTypeItems from './ST-product-type-item';
 import STProductItems from './ST-product-item';
 import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
-import { updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
+import { fetchTotalBranch, updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import { cancelST, getStartSaleLimitTime, saveDraftST, importST } from '../../services/sale-limit-time';
 import { DateFormat } from '../../utils/enum/common-enum';
@@ -189,6 +189,7 @@ function STCreateModal({
           })
         : [];
       dispatch(updateAddTypeAndProductState(listProducts.concat(listCategories)));
+      dispatch(fetchTotalBranch());
       dispatch(
         updatePayloadBranches({
           isAllBranches: saleLimitTimeDetail.stDetail.isAllBranches,
@@ -634,7 +635,7 @@ function STCreateModal({
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              รายละเอียด<b style={{ fontSize:'18px' }}> *</b> :
+              รายละเอียด<b style={{ fontSize: '18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <TextField
@@ -664,7 +665,7 @@ function STCreateModal({
           </Grid>
           <Grid container spacing={2} mb={2.5}>
             <Grid item xs={2}>
-              วันที่เริ่มงดใช้งาน<b style={{ fontSize:'18px' }}> *</b> :
+              วันที่เริ่มงดใช้งาน<b style={{ fontSize: '18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
@@ -681,7 +682,7 @@ function STCreateModal({
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุดงดขาย<b style={{ fontSize:'18px' }}> *</b> :
+              วันที่สิ้นสุดงดขาย<b style={{ fontSize: '18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
@@ -702,7 +703,7 @@ function STCreateModal({
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              เวลาที่เริ่มงดขาย<b style={{ fontSize:'18px' }}> *</b> :
+              เวลาที่เริ่มงดขาย<b style={{ fontSize: '18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <TextField
@@ -728,7 +729,7 @@ function STCreateModal({
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              เวลาที่สิ้นสุดงดขาย<b style={{ fontSize:'18px' }}> *</b> :
+              เวลาที่สิ้นสุดงดขาย<b style={{ fontSize: '18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <TextField
@@ -755,7 +756,7 @@ function STCreateModal({
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาขา<b style={{ fontSize:'18px' }}> *</b> :
+              สาขา<b style={{ fontSize: '18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <SearchBranch disabled={status > 1 || !isAdmin} error={checkValue.payloadBranchesError} />
@@ -787,7 +788,12 @@ function STCreateModal({
                       </Button>
                       <label htmlFor="import-st-button-file">
                         {Object.keys(payloadAddTypeProduct).length === 0 && (
-                          <Input id="import-st-button-file" type="file" onChange={handleImportFile}  style={{ display: 'none' }}/>
+                          <Input
+                            id="import-st-button-file"
+                            type="file"
+                            onChange={handleImportFile}
+                            style={{ display: 'none' }}
+                          />
                         )}
                         <Button
                           id="btnImport"

@@ -155,16 +155,16 @@ export default function NotificationReminder(props: Props) {
           backgroundColor: '#F6FFF3',
           minWidth: '600px',
           cursor: 'pointer',
-          fontSize: '14px',
+          fontSize: '12px',
         }}
         onClick={() => currentlySelected(item)}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '98%' }}>
           <Box display={'flex'} mt={1} ml={1}>
             {item.type == 'REJECT_BARCODE' ? (
-              <ShoppingCartSharp sx={{ color: theme.palette.primary.main }} />
+              <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px' }} />
             ) : (
-              <PresentToAllIcon sx={{ color: theme.palette.primary.main }} />
+              <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px' }} />
             )}
             <span style={{ marginLeft: 15, color: theme.palette.primary.main }}>{content}</span>
             <span style={{ marginLeft: 5, marginRight: 3 }}>: {item.payload.documentNumber}</span> {'|'}
@@ -179,9 +179,10 @@ export default function NotificationReminder(props: Props) {
                 color: item.type === 'CLOSE_TRANSFER_OUT' ? '#676767' : '#F76C6C',
                 textAlign: 'center',
                 marginTop: '5px',
-                padding: '2px 20px 3px 20px',
+                padding: '2px 15px 3px 15px',
                 borderRadius: '8px',
-                fontSize: '15px',
+                fontSize: '13px',
+                width: '80px',
               }}
             >
               {item.type === 'CLOSE_TRANSFER_OUT' ? 'ปิดงาน' : 'ไม่อนุมัติ'}
@@ -189,7 +190,7 @@ export default function NotificationReminder(props: Props) {
           </Box>
         </Box>
         <Box ml={6}>
-          <Typography style={{ color: theme.palette.grey[500], fontSize: '14px' }}>
+          <Typography style={{ color: theme.palette.grey[500], fontSize: '11px' }}>
             กำหนดดำเนินการ {moment(item.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
           </Typography>
         </Box>
@@ -198,7 +199,7 @@ export default function NotificationReminder(props: Props) {
   });
   return (
     <>
-      <Card sx={{ height: '100%', border: '1px solid #E0E0E0', borderRadius: '10px' }}>
+      <Card sx={{ height: '100%', border: '1px solid #E0E0E0', borderRadius: '10px', minWidth: '600px' }}>
         <TablePagination
           component="div"
           count={total}
@@ -206,8 +207,9 @@ export default function NotificationReminder(props: Props) {
           onPageChange={handleChangePage}
           rowsPerPage={10}
           rowsPerPageOptions={[]}
+          sx={{ height: '40px', overflow: 'hidden' }}
         />
-        <CardContent className={classes.MScrollBar} sx={{ height: '90%', overflowY: 'auto' }}>
+        <CardContent className={classes.MScrollBar} sx={{ height: '97%', overflowY: 'auto' }}>
           {listTask}
         </CardContent>
       </Card>
