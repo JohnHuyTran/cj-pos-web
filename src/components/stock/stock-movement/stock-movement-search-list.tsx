@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Button } from '@mui/material';
 import { MoreVertOutlined } from '@mui/icons-material';
 
@@ -24,7 +24,14 @@ function StockMovementSearchList() {
   const [pageSize, setPageSize] = React.useState(limit);
 
   const [openModalTransaction, setOpenModalTransaction] = React.useState(false);
+  const [mockData, setMockData] = React.useState('');
   const handleModelAction = (params: GridRenderCellParams) => {
+    const printNo: any = params.getValue(params.id, 'skuName');
+
+    const handleOpenModalTransaction = () => {
+      setMockData(printNo);
+      setOpenModalTransaction(true);
+    };
     return (
       <>
         <Button onClick={handleOpenModalTransaction}>
@@ -32,10 +39,6 @@ function StockMovementSearchList() {
         </Button>
       </>
     );
-  };
-
-  const handleOpenModalTransaction = () => {
-    setOpenModalTransaction(true);
   };
 
   const handleCloseModalTransaction = () => {
@@ -150,6 +153,7 @@ function StockMovementSearchList() {
       qty: data.availableQty,
       availableQty: data.availableQty,
       unitName: data.unitName,
+      skuName: data.skuName,
     };
   });
 
@@ -191,6 +195,11 @@ function StockMovementSearchList() {
 
     setLoading(false);
   };
+
+  const currentlySelected = async (params: GridCellParams) => {
+    if (params.field === 'docNo') {
+    }
+  };
   return (
     <React.Fragment>
       <Box
@@ -223,12 +232,13 @@ function StockMovementSearchList() {
             paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
+            onCellClick={currentlySelected}
             loading={loading}
             rowHeight={65}
           />
         </div>
       </Box>
-      <StockMovementTransaction open={openModalTransaction} onClose={handleCloseModalTransaction} />
+      <StockMovementTransaction open={openModalTransaction} onClose={handleCloseModalTransaction} mockData={mockData} />
     </React.Fragment>
   );
 }

@@ -4,8 +4,9 @@ import React, { ReactElement } from 'react';
 interface Props {
   open: boolean;
   onClose: () => void;
+  mockData: string;
 }
-function StockMovementTransaction({ open, onClose }: Props): ReactElement {
+function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElement {
   return (
     <Dialog
       open={open}
@@ -15,7 +16,7 @@ function StockMovementTransaction({ open, onClose }: Props): ReactElement {
       maxWidth='xs'>
       <DialogContent sx={{ padding: '1em' }}>
         <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000' }}>
-          StockMovementTransaction
+          StockMovementTransaction: {mockData}
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 20px 0px' }}>
