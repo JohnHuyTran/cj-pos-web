@@ -21,7 +21,7 @@ import {
   savePayloadSearch,
 } from '../../../store/slices/stock/stock-movement-search-slice';
 import moment from 'moment';
-import { calulateDate } from '../../../utils/date-utill';
+import { isOverDate } from '../../../utils/date-utill';
 import { SearchOff } from '@mui/icons-material';
 import StockMovementSearchList from './stock-movement-search-list';
 import LoadingModal from '../../commons/ui/loading-modal';
@@ -213,11 +213,6 @@ function StockMovementSearch() {
       setTextError('กรุณาระบุวันที่เคลื่อนไหวสินค้า');
       return false;
     }
-
-    // if (startDate && endDate) {
-    //   console.log('startDate: ', moment(startDate).startOf('day').toISOString());
-    //   const diffDate = calulateDate(startDate, endDate);
-    // }
 
     return true;
   };
