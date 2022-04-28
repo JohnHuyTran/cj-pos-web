@@ -84,9 +84,9 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     }
 
     // console.log('onInputChange', { reason, value });
-    if (reason == 'reset') {
-      clearInput();
-    }
+    // if (reason == 'reset') {
+    //   clearInput();
+    // }
 
     const keyword = value.trim();
     if (keyword.length >= 3 && reason !== 'reset') {
@@ -113,9 +113,9 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     }
 
     // console.log('onInputChange', { reason, value });
-    if (reason == 'reset') {
-      clearInput();
-    }
+    // if (reason == 'reset') {
+    //   clearInput();
+    // }
 
     const keyword = value.trim();
     if (keyword.length >= 3 && reason !== 'reset') {
@@ -132,7 +132,15 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
   };
 
   const clearInput = () => {
-    // setValues([]);
+    setValues({
+      productType: {},
+      product: {},
+      selectAllProduct: false,
+      error: {
+        productTypeExist: '',
+        productExist: '',
+      },
+    });
   };
 
   let productOptions: any = [];
@@ -278,8 +286,11 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       });
       clearData();
     }
+
+    setFlagErrType(false);
   };
 
+  const [flagErrType, setFlagErrType] = React.useState(false);
   const onChangeSelectAllProduct = async (event: any) => {
     if (event) {
       let selectedAddItems = _.cloneDeep(selectedItems);
@@ -302,7 +313,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         //add type to selectedAddItems
         let productTypeItem: any = _.cloneDeep(values.productType);
         productTypeItem.selectedType = 1;
-        selectedAddItems.push(productTypeItem);
+        // selectedAddItems.push(productTypeItem);
         //add product by type to selectedAddItems
         let productTypeCode = '';
         if (!objectNullOrEmpty(values.productType)) {
@@ -311,6 +322,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         setOpenLoadingModal(true);
         let res = await getAllProductByType(productTypeCode);
         if (res && res.data && res.data.length > 0) {
+          selectedAddItems.push(productTypeItem);
           let lstProductByType = res.data;
           for (const item of lstProductByType) {
             let productItem: any = _.cloneDeep(item);
@@ -322,6 +334,10 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
               selectedAddItems.push(productItem);
             }
           }
+
+          setFlagErrType(false);
+        } else {
+          setFlagErrType(true);
         }
         setOpenLoadingModal(false);
       }
@@ -431,6 +447,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     if (props.open && props.showSearch) {
       renderOpenItems();
     }
+    setFlagErrType(false);
   }, [props.open]);
 
   const renderOpenItems = () => {
@@ -450,12 +467,20 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
           if (filterTypeName.length === 0) items.push(item);
         }
       });
+
+      setSearchProductType(null);
+      setSearchItem(null);
+      clearInput();
       setSelectedItems(items);
     }
   };
 
   const handleOnClose = () => {
     if (props.showSearch) {
+      setSearchProductType(null);
+      setSearchItem(null);
+      clearInput();
+
       if (selectedItems.length === 0) dispatch(updateAddTypeAndProductState([]));
       if (payloadAddTypeProduct.length === 0) setSelectedItems([]);
     }
@@ -524,7 +549,16 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                     label={'เลือกสินค้าทั้งหมด'}
                   />
                 </FormGroup>
+
+                {flagErrType && (
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', color: '#FF0000', fontSize: 14, marginTop: '4px' }}
+                    ml={1}>
+                    ไม่พบสินค้า
+                  </Box>
+                )}
               </Box>
+
               <Autocomplete
                 options={productOptions}
                 id='combo-box-product'
@@ -542,17 +576,6 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 value={values.product}
               />
             </Box>
-            {/* <Box sx={{textAlign: 'right', mt: 3}}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                className={classes.MbtnSearch}
-                                onClick={handleAddItem}
-                                disabled={!values.btnAddStatus}
-                            >
-                                เพิ่ม
-                            </Button>
-                        </Box> */}
           </Grid>
           <Grid item xs={7}>
             <Box
