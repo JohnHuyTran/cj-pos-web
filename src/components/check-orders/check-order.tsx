@@ -29,6 +29,7 @@ import { getBranchName } from '../../utils/utils';
 import { env } from '../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../models/branch-model';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import { gridColumnsTotalWidthSelector } from '@mui/x-data-grid';
 
 // moment.locale("en");
 moment.locale('th');
@@ -135,10 +136,12 @@ function CheckOrderSearch() {
       limits = limit.toString();
     }
 
+    let newOrderShipment = removeSpace(values.orderShipment);
+
     const payload: ShipmentRequest = {
       limit: limits,
       page: page,
-      paramQuery: values.orderShipment,
+      paramQuery: newOrderShipment,
       dateFrom: moment(startDate).startOf('day').toISOString(),
       dateTo: moment(endDate).endOf('day').toISOString(),
       sdStatus: values.orderStatus,
@@ -280,6 +283,10 @@ function CheckOrderSearch() {
   //alert Errormodel
   const handleCloseAlert = () => {
     setOpenAlert(false);
+  };
+
+  const removeSpace = (value: string) => {
+    return value.replace(/\s/g, '');
   };
 
   return (

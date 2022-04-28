@@ -382,6 +382,7 @@ function StockSearch() {
         title='ระบุสินค้าที่ต้องการค้นหา*'
         skuType={skuTypes}
         showSearch={true}
+        textBtn='เลือกสินค้า'
       />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>

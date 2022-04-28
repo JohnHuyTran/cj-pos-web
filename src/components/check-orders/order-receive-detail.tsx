@@ -119,11 +119,17 @@ export default function OrderReceiveDetail({
     setValues({ ...values, [event.target.name]: value });
   };
 
+  const removeSpace = (value: string) => {
+    return value.replace(/\s/g, '');
+  };
+
   const handleSearch = async () => {
     handleOpenLoading('open', true);
     setFlagSearch(true);
 
-    await dispatch(searchOrderReceiveAsync(values.docNo));
+    let newDocNo = removeSpace(values.docNo);
+
+    await dispatch(searchOrderReceiveAsync(newDocNo));
     handleOpenLoading('open', false);
   };
 

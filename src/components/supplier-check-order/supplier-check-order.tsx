@@ -118,6 +118,10 @@ export default function SupplierCheckOrderSearch() {
     }
   };
 
+  const removeSpace = (value: string) => {
+    return value.replace(/\s/g, '');
+  };
+
   const onClickSearchBtn = async () => {
     let limits;
     if (limit === 0) {
@@ -126,10 +130,12 @@ export default function SupplierCheckOrderSearch() {
       limits = limit.toString();
     }
 
+    let newParamQuery = removeSpace(values.paramQuery);
+
     const payload: PurchaseInvoiceSearchCriteriaRequest = {
       limit: limits,
       page: page,
-      paramQuery: values.paramQuery,
+      paramQuery: newParamQuery,
       piStatus: values.piStatus,
       piType: values.piType,
       dateFrom: moment(startDate).startOf('day').toISOString(),
