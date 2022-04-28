@@ -247,7 +247,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
     },
     {
       field: 'barcodeName',
-      headerName: 'รายละเอียด',
+      headerName: 'รายละเอียดสินค้า',
       flex: 1.4,
       headerAlign: 'center',
       disableColumnMenu: false,

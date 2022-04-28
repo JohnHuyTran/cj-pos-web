@@ -258,10 +258,6 @@ export default function ModalCreateToDestroyDiscount({
       setAttachFileBeforeError('AttachFileBefore__กรุณาแนบไฟล์เอกสาร');
       isValid = false;
     }
-    if (TOStatus.DRAFT == status && fileUploadAfterList.length === 0 && attachFileAfterOlds.length === 0) {
-      setAttachFileAfterError('AttachFileAfter__กรุณาแนบไฟล์เอกสาร');
-      isValid = false;
-    }
 
     //validate product
     const data = [...payloadTransferOut.products];
@@ -281,7 +277,7 @@ export default function ModalCreateToDestroyDiscount({
           } else {
             if (preData.numberOfApproved < 0) {
               isValid = false;
-              item.errorNumberOfApproved = 'จำนวนการทำลายต้องมากกว่า 0';
+              item.errorNumberOfApproved = 'จำนวนการทำลายต้องมากกว่าหรือเท่ากับ 0';
             } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
               item.errorNumberOfApproved = 'จำนวนที่ทำลายต้องน้อยกว่าหรือเท่ากับจำนวนขอส่วนลด';
@@ -374,7 +370,7 @@ export default function ModalCreateToDestroyDiscount({
 
   const handleCreateDraft = async (sendRequest: boolean) => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
-    if (validate(false)) {
+    if (validate(true)) {
       const rsCheckStock = await handleCheckStock();
       if (rsCheckStock) {
         await dispatch(save({ ...payloadTransferOut }));
@@ -458,6 +454,10 @@ export default function ModalCreateToDestroyDiscount({
   };
 
   const handleClickApprove = () => {
+    if (TOStatus.DRAFT == status && fileUploadAfterList.length === 0 && attachFileAfterOlds.length === 0) {
+      setAttachFileAfterError('AttachFileAfter__กรุณาแนบไฟล์เอกสาร');
+      return;
+    }
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     if (validate(true)) {
       setOpenModalConfirmApprove(true);
