@@ -13,7 +13,7 @@ import { env } from '../../../adapters/environmentConfigs';
 import SearchIcon from '@mui/icons-material/Search';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import { BranchListOptionType } from '../../../models/branch-model';
-import DatePickerAllComponent from '../../commons/ui/date-picker-all';
+import DatePickerComponent from '../../commons/ui/date-picker';
 import _ from 'lodash';
 import { OutstandingRequest } from '../../../models/stock-model';
 import {
@@ -21,10 +21,12 @@ import {
   savePayloadSearch,
 } from '../../../store/slices/stock/stock-movement-search-slice';
 import moment from 'moment';
-import { calulateDate } from '../../../utils/date-utill';
+import { isOverDate } from '../../../utils/date-utill';
 import { SearchOff } from '@mui/icons-material';
 import StockMovementSearchList from './stock-movement-search-list';
 import LoadingModal from '../../commons/ui/loading-modal';
+import TextBoxSearchProduct from '../../commons/ui/texbox-search-product';
+import { clearSearchAllProductAsync, searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
 interface State {
   storeId: number;
   locationId: string;
@@ -39,8 +41,6 @@ function StockMovementSearch() {
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const items = useAppSelector((state) => state.stockMovementSearchSlice.stockList);
   const payloadSlice = useAppSelector((state) => state.stockMovementSearchSlice.savePayloadSearch);
-  console.log('items: ', items);
-  console.log('payloadSlice: ', payloadSlice);
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
 
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
@@ -63,12 +63,21 @@ function StockMovementSearch() {
       setValues({ ...values, [event.target.name]: value });
     }
   };
+
+  const handleChangeProduct = (value: any) => {
+    if (value) {
+      setValues({ ...values, skuCodes: value.skuCode });
+    } else {
+      setValues({ ...values, skuCodes: '' });
+    }
+  };
   const page = 1;
   const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
   const [flagSearch, setFlagSearch] = React.useState(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<{ open: boolean }>({
     open: false,
   });
+  const [limitStartDate, setLimitStartDate] = React.useState<Date | null>(new Date());
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const [openAlert, setOpenAlert] = React.useState(false);
@@ -92,6 +101,12 @@ function StockMovementSearch() {
     const defaultDate = new Date();
     defaultDate.setDate(defaultDate.getDate() - 7);
     setStartDate(defaultDate);
+
+    const limitMonths = new Date();
+    limitMonths.setMonth(limitMonths.getMonth() - 5);
+    limitMonths.setDate(1);
+    setLimitStartDate(limitMonths);
+
     setDisableSearchBtn(isAllowActionPermission(ACTIONS.STOCK_BL_SKU));
     if (groupBranch) {
       setBranchFromCode(ownBranch);
@@ -112,15 +127,6 @@ function StockMovementSearch() {
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
   const [skuTypes, setSkuTypes] = React.useState<number[]>([1, 2]);
-  const handleOpenAddItems = () => {
-    if (values.storeId === 0) {
-      setSkuTypes([1, 2]);
-    } else {
-      setSkuTypes([values.storeId]);
-    }
-    setOpenModelAddItems(true);
-  };
-
   const handleCloseModalAddItems = () => {
     setOpenModelAddItems(false);
   };
@@ -154,6 +160,7 @@ function StockMovementSearch() {
     setClearBranchDropDown(!clearBranchDropDown);
     setValues({ storeId: 0, locationId: 'ALL', skuCodes: '', branchCode: '', dateFrom: '', dateTo: '' });
     await dispatch(updateAddTypeAndProductState([]));
+    dispatch(clearSearchAllProductAsync({}));
     setTimeout(() => {
       setFlagSearch(false);
       handleOpenLoading('open', false);
@@ -169,17 +176,11 @@ function StockMovementSearch() {
       } else {
         limits = limit;
       }
-      const productList: string[] = [];
-      payloadAddTypeProduct
-        .filter((el: any) => el.selectedType === 2 && el.showProduct)
-        .map((item: any, index: number) => {
-          productList.push(item.skuCode);
-        });
-      const filterSKU = _.uniq(productList);
+
       const payload: OutstandingRequest = {
         limit: limits,
         page: page,
-        skuCodes: filterSKU,
+        skuCodes: [values.skuCodes],
         storeCode: values.locationId === 'ALL' ? '' : values.locationId,
         branchCode: branchFromCode,
         dateFrom: moment(startDate).startOf('day').toISOString(),
@@ -194,7 +195,7 @@ function StockMovementSearch() {
   };
 
   const isValidateInput = () => {
-    if (Object.keys(payloadAddTypeProduct).length <= 0) {
+    if (!values.skuCodes) {
       setOpenAlert(true);
       setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
       return false;
@@ -211,30 +212,12 @@ function StockMovementSearch() {
       return false;
     }
 
-    // if (startDate && endDate) {
-    //   console.log('startDate: ', moment(startDate).startOf('day').toISOString());
-    //   const diffDate = calulateDate(startDate, endDate);
-    // }
-
     return true;
   };
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
-
-  React.useEffect(() => {
-    if (Object.keys(payloadAddTypeProduct).length !== 0) {
-      const strProducts = payloadAddTypeProduct
-        .filter((el: any) => el.selectedType === 2 && el.showProduct)
-        .map((item: any, index: number) => item.skuName)
-        .join(', ');
-
-      setValues({ ...values, skuCodes: strProducts });
-    } else {
-      setValues({ ...values, skuCodes: '' });
-    }
-  }, [payloadAddTypeProduct]);
 
   return (
     <React.Fragment>
@@ -263,7 +246,7 @@ function StockMovementSearch() {
             <Typography gutterBottom variant='subtitle1' component='div'>
               ค้นหาสินค้า*
             </Typography>
-            <TextField
+            {/* <TextField
               id='txtProductList'
               name='productId'
               size='small'
@@ -279,7 +262,8 @@ function StockMovementSearch() {
                   style: { textAlignLast: 'start' },
                 },
               }}
-            />
+            /> */}
+            <TextBoxSearchProduct skuType={[2]} onSelectItem={handleChangeProduct} isClear={clearBranchDropDown} />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
@@ -322,18 +306,18 @@ function StockMovementSearch() {
             <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่เคลื่อนไหวสินค้า ตั้งแต่
             </Typography>
-            <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
+            <DatePickerComponent
+              onClickDate={handleStartDatePicker}
+              value={startDate}
+              minDateTo={limitStartDate}
+              type={'TO'}
+            />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
               ถึง
             </Typography>
-            <DatePickerAllComponent
-              onClickDate={handleEndDatePicker}
-              value={endDate}
-              type={'TO'}
-              minDateTo={startDate}
-            />
+            <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
           </Grid>
           <Grid item xs={4}></Grid>
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
