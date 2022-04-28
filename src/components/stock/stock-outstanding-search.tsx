@@ -168,7 +168,7 @@ function StockSearch() {
         limit: limits,
         page: page,
         skuCodes: filterSKU,
-        storeCode: values.locationId === 'ALL' ? '' : values.locationId,
+        locationCode: values.locationId === 'ALL' ? '' : values.locationId,
         branchCode: branchFromCode,
       };
 
