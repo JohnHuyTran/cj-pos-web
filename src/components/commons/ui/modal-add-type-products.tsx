@@ -286,8 +286,11 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       });
       clearData();
     }
+
+    setFlagMsgType(false);
   };
 
+  const [flagMsgType, setFlagMsgType] = React.useState(false);
   const onChangeSelectAllProduct = async (event: any) => {
     if (event) {
       let selectedAddItems = _.cloneDeep(selectedItems);
@@ -310,7 +313,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         //add type to selectedAddItems
         let productTypeItem: any = _.cloneDeep(values.productType);
         productTypeItem.selectedType = 1;
-        selectedAddItems.push(productTypeItem);
+        // selectedAddItems.push(productTypeItem);
         //add product by type to selectedAddItems
         let productTypeCode = '';
         if (!objectNullOrEmpty(values.productType)) {
@@ -319,6 +322,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         setOpenLoadingModal(true);
         let res = await getAllProductByType(productTypeCode);
         if (res && res.data && res.data.length > 0) {
+          selectedAddItems.push(productTypeItem);
           let lstProductByType = res.data;
           for (const item of lstProductByType) {
             let productItem: any = _.cloneDeep(item);
@@ -330,6 +334,10 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
               selectedAddItems.push(productItem);
             }
           }
+
+          setFlagMsgType(false);
+        } else {
+          setFlagMsgType(true);
         }
         setOpenLoadingModal(false);
       }
@@ -467,6 +475,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
   };
 
   const handleOnClose = () => {
+    setFlagMsgType(false);
     if (props.showSearch) {
       setSearchProductType(null);
       setSearchItem(null);
@@ -540,7 +549,16 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                     label={'เลือกสินค้าทั้งหมด'}
                   />
                 </FormGroup>
+
+                {flagMsgType && (
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', color: '#FF0000', fontSize: 14, marginTop: '4px' }}
+                    ml={1}>
+                    ไม่พบสินค้า
+                  </Box>
+                )}
               </Box>
+
               <Autocomplete
                 options={productOptions}
                 id='combo-box-product'
