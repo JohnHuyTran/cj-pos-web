@@ -418,7 +418,7 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='สินค้าคงคลัง' />
               </ListItemButton>
             </Link>
-            <Link
+            {/* <Link
               to='/stock-movement'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuStockBalance ? 'none' : '' }}
               id='subMenuStockMovement'>
@@ -429,7 +429,7 @@ export default function Sidebar({}: Props): ReactElement {
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ความเคลื่อนไหวของสินค้า' />
               </ListItemButton>
-            </Link>
+            </Link> */}
           </List>
         </Collapse>
       </List>
