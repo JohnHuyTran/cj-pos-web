@@ -127,15 +127,6 @@ function StockMovementSearch() {
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
   const [skuTypes, setSkuTypes] = React.useState<number[]>([1, 2]);
-  const handleOpenAddItems = () => {
-    if (values.storeId === 0) {
-      setSkuTypes([1, 2]);
-    } else {
-      setSkuTypes([values.storeId]);
-    }
-    setOpenModelAddItems(true);
-  };
-
   const handleCloseModalAddItems = () => {
     setOpenModelAddItems(false);
   };
