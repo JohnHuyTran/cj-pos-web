@@ -13,7 +13,7 @@ import { env } from '../../../adapters/environmentConfigs';
 import SearchIcon from '@mui/icons-material/Search';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import { BranchListOptionType } from '../../../models/branch-model';
-import DatePickerAllComponent from '../../commons/ui/date-picker-all';
+import DatePickerComponent from '../../commons/ui/date-picker';
 import _ from 'lodash';
 import { OutstandingRequest } from '../../../models/stock-model';
 import {
@@ -77,6 +77,7 @@ function StockMovementSearch() {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<{ open: boolean }>({
     open: false,
   });
+  const [limitStartDate, setLimitStartDate] = React.useState<Date | null>(new Date());
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const [openAlert, setOpenAlert] = React.useState(false);
@@ -100,6 +101,12 @@ function StockMovementSearch() {
     const defaultDate = new Date();
     defaultDate.setDate(defaultDate.getDate() - 7);
     setStartDate(defaultDate);
+
+    const limitMonths = new Date();
+    limitMonths.setMonth(limitMonths.getMonth() - 5);
+    limitMonths.setDate(1);
+    setLimitStartDate(limitMonths);
+
     setDisableSearchBtn(isAllowActionPermission(ACTIONS.STOCK_BL_SKU));
     if (groupBranch) {
       setBranchFromCode(ownBranch);
@@ -221,19 +228,6 @@ function StockMovementSearch() {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  React.useEffect(() => {
-    if (Object.keys(payloadAddTypeProduct).length !== 0) {
-      const strProducts = payloadAddTypeProduct
-        .filter((el: any) => el.selectedType === 2 && el.showProduct)
-        .map((item: any, index: number) => item.skuName)
-        .join(', ');
-
-      setValues({ ...values, skuCodes: strProducts });
-    } else {
-      setValues({ ...values, skuCodes: '' });
-    }
-  }, [payloadAddTypeProduct]);
-
   return (
     <React.Fragment>
       <Box sx={{ flexGrow: 1 }}>
@@ -321,18 +315,18 @@ function StockMovementSearch() {
             <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่เคลื่อนไหวสินค้า ตั้งแต่
             </Typography>
-            <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
+            <DatePickerComponent
+              onClickDate={handleStartDatePicker}
+              value={startDate}
+              minDateTo={limitStartDate}
+              type={'TO'}
+            />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
               ถึง
             </Typography>
-            <DatePickerAllComponent
-              onClickDate={handleEndDatePicker}
-              value={endDate}
-              type={'TO'}
-              minDateTo={startDate}
-            />
+            <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
           </Grid>
           <Grid item xs={4}></Grid>
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
