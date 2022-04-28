@@ -25,6 +25,7 @@ import { calulateDate } from '../../../utils/date-utill';
 import { SearchOff } from '@mui/icons-material';
 import StockMovementSearchList from './stock-movement-search-list';
 import LoadingModal from '../../commons/ui/loading-modal';
+import TextBoxSearchProduct from '../../commons/ui/tbx-search-product';
 interface State {
   storeId: number;
   locationId: string;
@@ -39,8 +40,6 @@ function StockMovementSearch() {
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const items = useAppSelector((state) => state.stockMovementSearchSlice.stockList);
   const payloadSlice = useAppSelector((state) => state.stockMovementSearchSlice.savePayloadSearch);
-  console.log('items: ', items);
-  console.log('payloadSlice: ', payloadSlice);
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
 
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
@@ -62,6 +61,10 @@ function StockMovementSearch() {
     } else {
       setValues({ ...values, [event.target.name]: value });
     }
+  };
+
+  const handleChangeProduct = (value: any) => {
+    setValues({ ...values, skuCodes: value.skuCode });
   };
   const page = 1;
   const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
@@ -169,17 +172,11 @@ function StockMovementSearch() {
       } else {
         limits = limit;
       }
-      const productList: string[] = [];
-      payloadAddTypeProduct
-        .filter((el: any) => el.selectedType === 2 && el.showProduct)
-        .map((item: any, index: number) => {
-          productList.push(item.skuCode);
-        });
-      const filterSKU = _.uniq(productList);
+
       const payload: OutstandingRequest = {
         limit: limits,
         page: page,
-        skuCodes: filterSKU,
+        skuCodes: [values.skuCodes],
         storeCode: values.locationId === 'ALL' ? '' : values.locationId,
         branchCode: branchFromCode,
         dateFrom: moment(startDate).startOf('day').toISOString(),
@@ -194,7 +191,7 @@ function StockMovementSearch() {
   };
 
   const isValidateInput = () => {
-    if (Object.keys(payloadAddTypeProduct).length <= 0) {
+    if (!values.skuCodes) {
       setOpenAlert(true);
       setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
       return false;
@@ -263,7 +260,7 @@ function StockMovementSearch() {
             <Typography gutterBottom variant='subtitle1' component='div'>
               ค้นหาสินค้า*
             </Typography>
-            <TextField
+            {/* <TextField
               id='txtProductList'
               name='productId'
               size='small'
@@ -279,7 +276,8 @@ function StockMovementSearch() {
                   style: { textAlignLast: 'start' },
                 },
               }}
-            />
+            /> */}
+            <TextBoxSearchProduct skuType={[2]} onSelectItem={handleChangeProduct} />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>

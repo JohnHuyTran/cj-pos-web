@@ -6,13 +6,14 @@ import { MoreVertOutlined } from '@mui/icons-material';
 
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { SearchOff } from '@mui/icons-material';
 import { OutstandingRequest, StockInfo } from '../../../models/stock-model';
 import {
   featchStockMovementeSearchAsync,
   savePayloadSearch,
 } from '../../../store/slices/stock/stock-movement-search-slice';
 import StockMovementTransaction from './stock-movement-transaction';
+import CheckOrderDetail from '../../check-orders/check-order-detail';
+import { featchOrderDetailAsync } from '../../../store/slices/check-order-detail-slice';
 
 function StockMovementSearchList() {
   const classes = useStyles();
@@ -168,6 +169,7 @@ function StockMovementSearchList() {
       page: page,
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
+      dateTo: savePayLoadSearch.dateTo,
       skuCodes: savePayLoadSearch.skuCodes,
       storeCode: savePayLoadSearch.storeCode,
     };
@@ -186,6 +188,7 @@ function StockMovementSearchList() {
       page: 1,
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
+      dateTo: savePayLoadSearch.dateTo,
       skuCodes: savePayLoadSearch.skuCodes,
       storeCode: savePayLoadSearch.storeCode,
     };
@@ -198,7 +201,24 @@ function StockMovementSearchList() {
 
   const currentlySelected = async (params: GridCellParams) => {
     if (params.field === 'docNo') {
+      await dispatch(featchOrderDetailAsync('SD2204B005-000018'))
+        .then((value) => {
+          if (value) {
+            handleOpenModalDocDetail();
+          }
+        })
+        .catch((err) => {
+          console.log('err : ', err);
+        });
     }
+  };
+
+  const [openModalDocDetail, setOpenModalDocDetail] = React.useState(false);
+  const handleOpenModalDocDetail = () => {
+    setOpenModalDocDetail(true);
+  };
+  const handleCloseModalDocDetail = () => {
+    setOpenModalDocDetail(false);
   };
   return (
     <React.Fragment>
@@ -239,6 +259,15 @@ function StockMovementSearchList() {
         </div>
       </Box>
       <StockMovementTransaction open={openModalTransaction} onClose={handleCloseModalTransaction} mockData={mockData} />
+      {openModalDocDetail && (
+        <CheckOrderDetail
+          sdNo={'SD2204B005-000018'}
+          docRefNo={'2310220419001005'}
+          docType={'LD'}
+          defaultOpen={openModalDocDetail}
+          onClickClose={handleCloseModalDocDetail}
+        />
+      )}
     </React.Fragment>
   );
 }
