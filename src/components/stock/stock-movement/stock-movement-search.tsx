@@ -26,6 +26,7 @@ import { SearchOff } from '@mui/icons-material';
 import StockMovementSearchList from './stock-movement-search-list';
 import LoadingModal from '../../commons/ui/loading-modal';
 import TextBoxSearchProduct from '../../commons/ui/tbx-search-product';
+import { clearSearchAllProductAsync, searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
 interface State {
   storeId: number;
   locationId: string;
@@ -64,7 +65,11 @@ function StockMovementSearch() {
   };
 
   const handleChangeProduct = (value: any) => {
-    setValues({ ...values, skuCodes: value.skuCode });
+    if (value) {
+      setValues({ ...values, skuCodes: value.skuCode });
+    } else {
+      setValues({ ...values, skuCodes: '' });
+    }
   };
   const page = 1;
   const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
@@ -157,6 +162,7 @@ function StockMovementSearch() {
     setClearBranchDropDown(!clearBranchDropDown);
     setValues({ storeId: 0, locationId: 'ALL', skuCodes: '', branchCode: '', dateFrom: '', dateTo: '' });
     await dispatch(updateAddTypeAndProductState([]));
+    dispatch(clearSearchAllProductAsync({}));
     setTimeout(() => {
       setFlagSearch(false);
       handleOpenLoading('open', false);
@@ -277,7 +283,7 @@ function StockMovementSearch() {
                 },
               }}
             /> */}
-            <TextBoxSearchProduct skuType={[2]} onSelectItem={handleChangeProduct} />
+            <TextBoxSearchProduct skuType={[2]} onSelectItem={handleChangeProduct} isClear={clearBranchDropDown} />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>

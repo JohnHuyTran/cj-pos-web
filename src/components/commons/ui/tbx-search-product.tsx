@@ -1,15 +1,17 @@
 import { Autocomplete, CircularProgress, createFilterOptions, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface Props {
   skuType: any[];
   onSelectItem: (value: any) => void;
+  isClear: boolean;
 }
 
-function TextBoxSearchProduct({ skuType, onSelectItem }: Props) {
+function TextBoxSearchProduct({ skuType, onSelectItem, isClear }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [value, setValue] = React.useState('');
@@ -88,6 +90,12 @@ function TextBoxSearchProduct({ skuType, onSelectItem }: Props) {
     }
   };
 
+  useEffect(() => {
+    if (isClear) {
+      setValue('');
+    }
+  }, [isClear]);
+
   return (
     <Autocomplete
       id='selAddItem'
@@ -104,6 +112,8 @@ function TextBoxSearchProduct({ skuType, onSelectItem }: Props) {
       getOptionLabel={(option) => (option.barcodeName ? option.barcodeName : '')}
       isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
       renderInput={autocompleteRenderInput}
+      popupIcon={<SearchIcon color='primary' />}
+      size='small'
     />
   );
 }
