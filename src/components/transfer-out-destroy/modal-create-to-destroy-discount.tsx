@@ -593,7 +593,7 @@ export default function ModalCreateToDestroyDiscount({
                 {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={4}>
+            <Grid item container xs={4} mb={2}>
               <Grid item xs={4}>
                 รูปก่อนทำลาย* :
               </Grid>
@@ -612,7 +612,7 @@ export default function ModalCreateToDestroyDiscount({
                 />
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={4} pl={3}>
+            <Grid item container xs={4} mb={2} pl={3}>
               <Grid item xs={4}>
                 รูปหลังทำลาย* :
               </Grid>
