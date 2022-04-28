@@ -288,7 +288,7 @@ export default function ModalCreateTransferOut({
           } else {
             if (preData.numberOfApproved < 0) {
               isValid = false;
-              item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องมากกว่า 0';
+              item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องมากกว่าหรือเท่ากับ 0';
             } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
               item.errorNumberOfApproved = 'จำนวนการอนุมัติต้องไม่เกินจำนวนคำขอ';

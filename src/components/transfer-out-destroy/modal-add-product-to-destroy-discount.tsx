@@ -109,7 +109,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
     setOpenModalError(false);
   };
 
-  const handleChangeNumberOfApprove = (event: any, index: number) => {
+  const handleChangeNumberOfApprove = (event: any, barcode: any) => {
     let currentValue = event.target.value;
     if (stringNullOrEmpty(event.target.value)
       || stringNullOrEmpty(event.target.value.trim())
@@ -119,15 +119,16 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
     if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
       return;
     }
-    let currentData: any;
     setDataTable((preData: any) => {
       const data = [...preData];
-      currentData = data[index - 1];
-      data[index - 1].numberOfApproved = currentValue
-        ? parseInt(currentValue.replace(/,/g, '')) < 10000000000
-          ? parseInt(currentValue.replace(/,/g, ''))
-          : 0
-        : 0;
+      let currentData = data.find((it: any) => it.barcode === barcode);
+      if (!objectNullOrEmpty(currentData)) {
+        currentData.numberOfApproved = currentValue
+          ? parseInt(currentValue.replace(/,/g, '')) < 10000000000
+            ? parseInt(currentValue.replace(/,/g, ''))
+            : 0
+          : 0;
+      }
       return data;
     });
   };
@@ -208,7 +209,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
               className={classes.MtextFieldNumber}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
               onChange={(e) => {
-                handleChangeNumberOfApprove(e, params.row.index);
+                handleChangeNumberOfApprove(e, params.row.barcode);
               }}
             />
           </div>

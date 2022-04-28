@@ -249,10 +249,10 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
               inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
-              disabled={stringNullOrEmpty(dataDetail.status) || dataDetail.status != TOStatus.DRAFT}
               onChange={(e) => {
                 handleChangeNumberOfApprove(e, params.row.index, index, params.row.barcode);
               }}
+              disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT}
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfApproved}</div>}
           </div>
@@ -281,8 +281,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
             onChange={(e) => {
               handleChangeRemark(e, params.row.index);
             }}
-            disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT
-              && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
+            disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT}
           />
         </HtmlTooltip>
       )
