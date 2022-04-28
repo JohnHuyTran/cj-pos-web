@@ -17,7 +17,7 @@ import { getTransferOutDetail } from '../../store/slices/transfer-out-detail-sli
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
 import ModalCreateTransferOutDestroy from '../../components/transfer-out-destroy/modal-create-transfer-out-destroy';
-import ModalCreateToDestroyDiscount from "../../components/transfer-out-destroy/modal-create-to-destroy-discount";
+import ModalCreateToDestroyDiscount from '../../components/transfer-out-destroy/modal-create-to-destroy-discount';
 
 const _ = require('lodash');
 
@@ -152,7 +152,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
     },
     {
       field: 'documentNumber',
-      headerName: 'เอกสารทำลาย',
+      headerName: 'เลขที่เอกสารทำลาย',
       headerAlign: 'center',
       sortable: false,
       minWidth: 260,
@@ -385,7 +385,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
           userPermission={userPermission}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </div>
   );
 };
