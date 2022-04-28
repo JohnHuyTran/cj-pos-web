@@ -25,7 +25,7 @@ import { isOverDate } from '../../../utils/date-utill';
 import { SearchOff } from '@mui/icons-material';
 import StockMovementSearchList from './stock-movement-search-list';
 import LoadingModal from '../../commons/ui/loading-modal';
-import TextBoxSearchProduct from '../../commons/ui/tbx-search-product';
+import TextBoxSearchProduct from '../../commons/ui/texbox-search-product';
 import { clearSearchAllProductAsync, searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
 interface State {
   storeId: number;
