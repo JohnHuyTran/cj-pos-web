@@ -77,6 +77,19 @@ function StockMovementSearchList() {
       flex: 0.5,
       minWidth: 100,
       sortable: false,
+      renderCell: (params) => {
+        if (params.getValue(params.id, 'index') === 1) {
+          return (
+            <Typography
+              color='secondary'
+              variant='body2'
+              sx={{ textDecoration: 'underline' }}
+              onClick={() => showDocumentDetail('SD2204B005-000018')}>
+              {params.value}
+            </Typography>
+          );
+        }
+      },
     },
     {
       field: 'docRef',
@@ -147,7 +160,7 @@ function StockMovementSearchList() {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
       createDate: data.skuCode,
-      docNo: data.barcode,
+      docNo: data.skuCode,
       docRef: data.skuCode,
       storeName: data.storeName,
       transactionType: data.skuName,
@@ -201,16 +214,19 @@ function StockMovementSearchList() {
 
   const currentlySelected = async (params: GridCellParams) => {
     if (params.field === 'docNo') {
-      await dispatch(featchOrderDetailAsync('SD2204B005-000018'))
-        .then((value) => {
-          if (value) {
-            handleOpenModalDocDetail();
-          }
-        })
-        .catch((err) => {
-          console.log('err : ', err);
-        });
     }
+  };
+
+  const showDocumentDetail = async (docNo: string) => {
+    await dispatch(featchOrderDetailAsync(docNo))
+      .then((value) => {
+        if (value) {
+          handleOpenModalDocDetail();
+        }
+      })
+      .catch((err) => {
+        console.log('err : ', err);
+      });
   };
 
   const [openModalDocDetail, setOpenModalDocDetail] = React.useState(false);
