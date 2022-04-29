@@ -22,6 +22,7 @@ import CheckOrderDetail from '../../check-orders/check-order-detail';
 import { featchOrderDetailAsync } from '../../../store/slices/check-order-detail-slice';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
+import { isShowMovementDetail } from '../../../utils/enum/stock-enum';
 
 function StockMovementSearchList() {
   const classes = useStyles();
@@ -59,8 +60,8 @@ function StockMovementSearchList() {
     setOpenModalTransaction(false);
   };
 
-  const getMovementTypeName = (key: string) =>
-    masterStockMovementType.find((item: StockMovementMasterInfo) => item.code === key)?.nameTH;
+  const getMovementType = (key: string) =>
+    masterStockMovementType.find((item: StockMovementMasterInfo) => item.code === key);
 
   const columns: GridColDef[] = [
     {
@@ -104,13 +105,17 @@ function StockMovementSearchList() {
       minWidth: 100,
       sortable: false,
       renderCell: (params) => {
-        if (params.getValue(params.id, 'index') === 1) {
+        const docNo =
+          params.getValue(params.id, 'docNo') && params.getValue(params.id, 'docNo') !== undefined
+            ? params.getValue(params.id, 'docNo')
+            : '';
+        if (params.getValue(params.id, 'movementAction') === true && docNo) {
           return (
             <Typography
               color='secondary'
               variant='body2'
               sx={{ textDecoration: 'underline' }}
-              onClick={() => showDocumentDetail('SD2204B005-000018')}>
+              onClick={() => showDocumentDetail(docNo)}>
               {params.value}
             </Typography>
           );
@@ -182,20 +187,22 @@ function StockMovementSearchList() {
   ];
 
   const rows = items.data.map((data: StockMomentInfoType, indexs: number) => {
+    const movementType = getMovementType(data.movementTypeCode);
     return {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
       createDate: data.movementDate,
-      docNo: data.docNo,
+      docNo: data.docNo ? data.docNo : 'SD2204B005-000018',
       docRefNo: data.docRefNo,
       locationCode: t(`stock.location.${data.locationCode}`),
-      movementTypeName: getMovementTypeName(data.movementTypeCode),
+      movementTypeName: movementType?.nameTH,
       movementTypeCode: data.movementTypeCode,
       movementQty: data.movementQty,
       balanceQty: data.balanceQty,
       unitName: data.unitName,
-      movementAction: data.skuCode,
+      movementAction: isShowMovementDetail(data.movementTypeCode),
       barcodes: data.barcodes,
+      docType: movementType?.docType,
     };
   });
 
@@ -245,7 +252,7 @@ function StockMovementSearchList() {
     }
   };
 
-  const showDocumentDetail = async (docNo: string) => {
+  const showDocumentDetail = async (docNo: any) => {
     await dispatch(featchOrderDetailAsync(docNo))
       .then((value) => {
         if (value) {
