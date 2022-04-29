@@ -107,7 +107,7 @@ function StockMovementSearch() {
     limitMonths.setDate(1);
     setLimitStartDate(limitMonths);
 
-    setDisableSearchBtn(isAllowActionPermission(ACTIONS.STOCK_BL_SKU));
+    setDisableSearchBtn(isAllowActionPermission(ACTIONS.STOCK_MOVEMENT_VIEW));
     if (groupBranch) {
       setBranchFromCode(ownBranch);
       setValues({ ...values, branchCode: ownBranch });
