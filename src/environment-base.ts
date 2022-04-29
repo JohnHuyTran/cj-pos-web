@@ -106,6 +106,9 @@ export const environment = {
       end: {
         url: '/campaign/transfer-out/close/{id}',
       },
+      getExpiredProduct: {
+        url: '/campaign/expired-products',
+      },
     },
   },
   sell: {

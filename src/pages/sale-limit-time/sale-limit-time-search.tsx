@@ -1,21 +1,17 @@
-import { Autocomplete, Box, Button, FormControl, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, FormControl, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { useStyles } from '../../styles/makeTheme';
 import React, { useEffect } from 'react';
 import STCreateModal from '../../components/sale-limit-time/sale-limit-time-create-modal';
 import SearchIcon from '@mui/icons-material/Search';
-import { objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../utils/utils';
+import { onChange, onChangeDate, stringNullOrEmpty } from '../../utils/utils';
 import { useTranslation } from 'react-i18next';
 import DatePickerComponent from '../../components/commons/ui/date-picker-all';
 import SaleLimitTimelist from './sale-limit-time-list';
 import SearchBranch from '../../components/commons/ui/search-branch';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
-import {
-  fetchSaleLimitTimeListAsync,
-  updatePayloadST,
-  clearResponse,
-} from '../../store/slices/sale-limit-time-search-slice';
+import { fetchSaleLimitTimeListAsync, clearResponse } from '../../store/slices/sale-limit-time-search-slice';
 import { getUserInfo } from '../../store/sessionStore';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { paramsConvert } from '../../utils/utils';
@@ -27,8 +23,8 @@ import {
   fetchTotalBranch,
 } from '../../store/slices/search-branches-province-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
+import { env } from '../../adapters/environmentConfigs';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
-
 interface State {
   query: string;
   branch: string;
@@ -50,11 +46,11 @@ const SaleLimitTimeSearch = () => {
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
   const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
-  const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
   const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
-  let checkAdmin = userInfo.acl['service.posback-campaign'].includes('campaign.st.create');
+  let checkAdmin = env.branch.channel === 'hq';
+  const isChannelCreate = userInfo.acl['service.posback-campaign'].includes('campaign.st.create');
   const [payloadBranchesST, setPayloadBranchesST] = React.useState<any>(null);
   const [values, setValues] = React.useState<State>({
     query: '',
@@ -303,7 +299,7 @@ const SaleLimitTimeSearch = () => {
         </Grid>
       </Box>
       <Box sx={{ textAlign: 'right', marginBottom: '20px' }}>
-        {checkAdmin && (
+        {isChannelCreate && (
           <Button
             id='btnCreate'
             variant='contained'
