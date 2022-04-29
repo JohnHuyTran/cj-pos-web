@@ -108,7 +108,7 @@ const permission = {
   oc: {
     menu: {
       mainmenu: [MAINMENU.ORDER_RECEIVE, MAINMENU.STOCK_TRANSFER, MAINMENU.PRODUCT_INFO],
-      submenu: [SUBMENU.OR_ORDER_RECEIVE, SUBMENU.ST_REQUEST, SUBMENU.PI_STOCK_BALANCE],
+      submenu: [SUBMENU.OR_ORDER_RECEIVE, SUBMENU.ST_REQUEST, SUBMENU.PI_STOCK_BALANCE, SUBMENU.PI_STOCK_MOVEMENT],
     },
     action: [
       ACTIONS.STOCK_RT_VIEW,
@@ -116,6 +116,7 @@ const permission = {
       ACTIONS.STOCK_RT_REJECT,
       ACTIONS.STOCK_BL_LOCATION,
       ACTIONS.STOCK_BL_SKU,
+      ACTIONS.STOCK_MOVEMENT_VIEW,
     ],
   },
   dc: {
@@ -146,6 +147,7 @@ const permission = {
         SUBMENU.TO_DESTROY,
         SUBMENU.TO_STORE_USE,
         SUBMENU.PI_STOCK_BALANCE,
+        SUBMENU.PI_STOCK_MOVEMENT,
       ],
     },
     action: [
@@ -164,6 +166,7 @@ const permission = {
       ACTIONS.SALE_TAX_INVOICE_VIEW,
       ACTIONS.STOCK_BL_LOCATION,
       ACTIONS.STOCK_BL_SKU,
+      ACTIONS.STOCK_MOVEMENT_VIEW,
     ],
   },
   areaManager: {
@@ -175,6 +178,7 @@ const permission = {
         SUBMENU.TO_DESTROY,
         SUBMENU.TO_STORE_USE,
         SUBMENU.PI_STOCK_BALANCE,
+        SUBMENU.PI_STOCK_MOVEMENT,
       ],
     },
     action: [
@@ -189,28 +193,29 @@ const permission = {
       ACTIONS.STOCK_BT_EXPORT,
       ACTIONS.STOCK_BL_LOCATION,
       ACTIONS.STOCK_BL_SKU,
+      ACTIONS.STOCK_MOVEMENT_VIEW,
     ],
   },
   storeManagement: {
     menu: {
       mainmenu: [MAINMENU.PRODUCT_INFO],
-      submenu: [SUBMENU.PI_STOCK_BALANCE],
+      submenu: [SUBMENU.PI_STOCK_BALANCE, SUBMENU.PI_STOCK_MOVEMENT],
     },
-    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
+    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW],
   },
   audit: {
     menu: {
       mainmenu: [MAINMENU.TRANSFER_OUT, MAINMENU.PRODUCT_INFO],
-      submenu: [SUBMENU.TO_DESTROY, SUBMENU.TO_STORE_USE, SUBMENU.PI_STOCK_BALANCE],
+      submenu: [SUBMENU.TO_DESTROY, SUBMENU.TO_STORE_USE, SUBMENU.PI_STOCK_BALANCE, SUBMENU.PI_STOCK_MOVEMENT],
     },
-    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
+    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW],
   },
   districtManager: {
     menu: {
       mainmenu: [MAINMENU.PRODUCT_INFO],
-      submenu: [SUBMENU.PI_STOCK_BALANCE],
+      submenu: [SUBMENU.PI_STOCK_BALANCE, SUBMENU.PI_STOCK_MOVEMENT],
     },
-    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU],
+    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW],
   },
   accounting: {
     menu: {

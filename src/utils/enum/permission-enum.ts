@@ -36,6 +36,7 @@ export enum ACTIONS {
   STOCK_BT_WAITDC = 'stock.bt.wait_dc',
   STOCK_BL_SKU = 'stock.balance.view',
   STOCK_BL_LOCATION = 'stock.balance.view',
+  STOCK_MOVEMENT_VIEW = 'stock.movement.view',
 
   AUTHORITY_CHECK = 'authority.check',
   ORDER_RO_DRAFT = 'order.ro.draft',
@@ -74,7 +75,8 @@ export enum SUBMENU {
   ST_TRANSFER = 'stockTransfer.stockTransfer',
   TO_DESTROY = 'transferOut.destroy',
   TO_STORE_USE = 'transferOut.storeUse',
-  PI_STOCK_BALANCE = 'productInfo.outstanding',
+  PI_STOCK_BALANCE = 'productInfo.stockOutstanding',
+  PI_STOCK_MOVEMENT = 'productInfo.stockMovement',
 }
 
 export enum PERMISSION_GROUP {
