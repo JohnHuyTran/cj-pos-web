@@ -48,7 +48,7 @@ function StockBalanceLocation() {
       headerName: 'รายละเอียดสินค้า',
       headerAlign: 'center',
       minWidth: 235,
-      // flex: 0.3,
+      flex: 0.3,
       sortable: false,
       renderCell: (params) => (
         <div>
