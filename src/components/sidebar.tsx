@@ -112,7 +112,7 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableMainMenuStockTransfer(isAllowMainMenuPermission(MAINMENU.STOCK_TRANSFER));
     setDisableMainMenuSell(isAllowMainMenuPermission(MAINMENU.SALE));
     setDisableMainMenuTransferOut(isAllowMainMenuPermission(MAINMENU.TRANSFER_OUT));
-    setDisableMainMenuProductInfo(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO));
+    // setDisableMainMenuProductInfo(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO));
 
     setDisableSubMenuSaleDiscount(isAllowSubMenuPermission(SUBMENU.SALE_DISCOUNT));
     setDisableSubMenuSaleSaleLimit(isAllowSubMenuPermission(SUBMENU.SALE_SALE_LIMIT));
