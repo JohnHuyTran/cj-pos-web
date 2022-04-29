@@ -25,7 +25,7 @@ function StockBalance() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -40,15 +40,15 @@ function StockBalance() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant='body2'>{params.value}</Typography>
-          <Typography variant='body2' color='textSecondary'>
+          <Typography variant="body2">{params.value}</Typography>
+          <Typography variant="body2" color="textSecondary">
             {params.getValue(params.id, 'skuCode') || ''}
           </Typography>
         </div>
       ),
     },
     {
-      field: 'storeName',
+      field: 'locationName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'คลัง',
       minWidth: 125,
@@ -81,8 +81,8 @@ function StockBalance() {
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
       skuCode: data.skuCode,
       skuName: data.skuName,
-      storeCode: data.storeCode,
-      storeName: data.storeName,
+      locationCode: data.locationCode,
+      locationName: data.locationName,
       availableQty: data.availableQty,
       unitCode: data.unitCode,
       unitName: data.unitName,
@@ -132,7 +132,7 @@ function StockBalance() {
     <div>
       <Box
         mt={2}
-        bgcolor='background.paper'
+        bgcolor="background.paper"
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -144,7 +144,8 @@ function StockBalance() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}>
+        }}
+      >
         {items.data.length > 0 && (
           <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
             <DataGrid
@@ -158,7 +159,7 @@ function StockBalance() {
               pageSize={pageSize}
               rowsPerPageOptions={[10, 20, 50, 100]}
               rowCount={items.total}
-              paginationMode='server'
+              paginationMode="server"
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               loading={loading}
@@ -168,10 +169,10 @@ function StockBalance() {
         )}
 
         {items.data.length === 0 && (
-          <Grid container xs={12} justifyContent='center'>
-            <Box color='#CBD4DB' justifyContent='center'>
+          <Grid container xs={12} justifyContent="center">
+            <Box color="#CBD4DB" justifyContent="center">
               <h2>
-                ไม่มีข้อมูล <SearchOff fontSize='large' />
+                ไม่มีข้อมูล <SearchOff fontSize="large" />
               </h2>
             </Box>
           </Grid>
