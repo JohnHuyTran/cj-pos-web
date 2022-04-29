@@ -54,7 +54,7 @@ function StockMovementSearchList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -169,7 +169,7 @@ function StockMovementSearchList() {
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockMovementeSearchAsync(payloadNewpage));
@@ -187,7 +187,7 @@ function StockMovementSearchList() {
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockMovementeSearchAsync(payloadNewpage));
@@ -204,7 +204,7 @@ function StockMovementSearchList() {
     <React.Fragment>
       <Box
         mt={2}
-        bgcolor="background.paper"
+        bgcolor='background.paper'
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -216,8 +216,7 @@ function StockMovementSearchList() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}
-      >
+        }}>
         <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -230,7 +229,7 @@ function StockMovementSearchList() {
             pageSize={pageSize}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={items.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             onCellClick={currentlySelected}
