@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { get, post, put } from '../../../adapters/posback-adapter';
 import { environment } from '../../../environment-base';
-import { OutstandingRequest, OutstandingResponse } from '../../../models/stock-model';
+import { OutstandingRequest, OutstandingResponse, StockMovementResponse } from '../../../models/stock-model';
 import { ContentType } from '../../../utils/enum/common-enum';
 
 type State = {
-  stockList: OutstandingResponse;
+  stockList: StockMovementResponse;
   savePayloadSearch: OutstandingRequest;
   error: string;
 };
@@ -30,8 +30,7 @@ const initialState: State = {
 export const featchStockMovementeSearchAsync = createAsyncThunk(
   'stockMovementList',
   async (payload: OutstandingRequest) => {
-    // const apiRootPath = environment.stock.outStanding.stockMovement.search.url;
-    const apiRootPath = environment.stock.outStanding.stockBalance.searchByLocation.url;
+    const apiRootPath = environment.stock.outStanding.stockMovement.search.url;
     const response = await post(apiRootPath, payload, ContentType.JSON)
       .then((result: any) => result)
       .catch((error) => {

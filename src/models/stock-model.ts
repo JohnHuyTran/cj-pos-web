@@ -39,18 +39,19 @@ export interface StockInfo {
 }
 
 export interface StockMovementResponse {
-  timestamp: string;
   ref: string;
   code: number;
   message: string;
-  data: StocmMomentInfoType[];
+  data: StockMomentInfoType[];
   total: number;
   page: number;
   perPage: number;
+  prev: number;
+  next: number;
   totalPage: number;
 }
 
-export interface StocmMomentInfoType {
+export interface StockMomentInfoType {
   id: string;
   movementDate: string;
   movementTypeCode: string;
