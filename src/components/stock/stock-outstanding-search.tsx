@@ -170,7 +170,7 @@ function StockSearch() {
       page: page,
       // skuCodes: filterSKU,
       skuCodes: ['000000000020034911'],
-      storeCode: values.locationId === 'ALL' ? '' : values.locationId,
+      locationCode: values.locationId === 'ALL' ? '' : values.locationId,
       branchCode: branchFromCode,
     };
 
@@ -179,6 +179,7 @@ function StockSearch() {
     await dispatch(savePayloadSearch(payload));
     await dispatch(savePayloadSearchLocation(payload));
     setFlagSearch(true);
+
     // }
     handleOpenLoading('open', false);
   };

@@ -100,8 +100,8 @@ function StockBalance() {
       page: page,
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
-      // skuCodes: savePayLoadSearch.skuCodes,
-      // storeCode: savePayLoadSearch.storeCode,
+      skuCodes: savePayLoadSearch.skuCodes,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockBalanceSearchAsync(payloadNewpage));
@@ -119,7 +119,7 @@ function StockBalance() {
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
-      // storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockBalanceSearchAsync(payloadNewpage));
