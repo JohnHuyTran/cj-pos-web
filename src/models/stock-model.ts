@@ -37,3 +37,40 @@ export interface StockInfo {
   maxBeauty?: number;
   barFactor?: number;
 }
+
+export interface StockMovementResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: StocmMomentInfoType[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPage: number;
+}
+
+export interface StocmMomentInfoType {
+  id: string;
+  movementDate: string;
+  movementTypeCode: string;
+  movementTypeName: string;
+  branchCode: string;
+  locationCode: string;
+  skuCode: string;
+  barcodes: Barcode[];
+  unitCode: string;
+  unitName: string;
+  priorQty: number;
+  movementQty: number;
+  balanceQty: number;
+}
+
+export interface Barcode {
+  barcode: string;
+  qty: number;
+  unitCode: string;
+  unitName: string;
+  barFactor: number;
+  baseUnitQty: number;
+}
