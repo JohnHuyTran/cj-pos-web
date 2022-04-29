@@ -36,8 +36,8 @@ export interface StockInfo {
 }
 
 export interface positionInfo {
-  code: string;
   name: string;
+  code: string;
   minBeauty: number;
   maxBeauty: number;
 }
