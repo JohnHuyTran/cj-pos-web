@@ -6,13 +6,14 @@ import { MoreVertOutlined } from '@mui/icons-material';
 
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { SearchOff } from '@mui/icons-material';
-import { OutstandingRequest, StockInfo } from '../../../models/stock-model';
+import { OutstandingRequest, StockInfo, StockMomentInfoType } from '../../../models/stock-model';
 import {
   featchStockMovementeSearchAsync,
   savePayloadSearch,
 } from '../../../store/slices/stock/stock-movement-search-slice';
 import StockMovementTransaction from './stock-movement-transaction';
+import CheckOrderDetail from '../../check-orders/check-order-detail';
+import { featchOrderDetailAsync } from '../../../store/slices/check-order-detail-slice';
 
 function StockMovementSearchList() {
   const classes = useStyles();
@@ -76,9 +77,22 @@ function StockMovementSearchList() {
       flex: 0.5,
       minWidth: 100,
       sortable: false,
+      renderCell: (params) => {
+        if (params.getValue(params.id, 'index') === 1) {
+          return (
+            <Typography
+              color='secondary'
+              variant='body2'
+              sx={{ textDecoration: 'underline' }}
+              onClick={() => showDocumentDetail('SD2204B005-000018')}>
+              {params.value}
+            </Typography>
+          );
+        }
+      },
     },
     {
-      field: 'docRef',
+      field: 'docRefNo',
       headerClassName: 'columnHeaderTitle',
       headerName: 'เลขที่เอกสารอ้างอิง',
       minWidth: 100,
@@ -87,7 +101,7 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'storeName',
+      field: 'locationCode',
       headerClassName: 'columnHeaderTitle',
       headerName: 'คลัง',
       minWidth: 85,
@@ -95,7 +109,7 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'transactionType',
+      field: 'movementTypeName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'ประเภท',
       minWidth: 150,
@@ -105,7 +119,7 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'qty',
+      field: 'movementQty',
       headerClassName: 'columnHeaderTitle',
       headerName: 'จำนวนที่ทำรายการ',
       width: 100,
@@ -114,7 +128,7 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'availableQty',
+      field: 'balanceQty',
       headerClassName: 'columnHeaderTitle-BG',
       cellClassName: 'columnFilled-BG',
       headerName: 'สินค้าคงเหลือ',
@@ -141,19 +155,20 @@ function StockMovementSearchList() {
     },
   ];
 
-  const rows = items.data.map((data: StockInfo, indexs: number) => {
+  const rows = items.data.map((data: StockMomentInfoType, indexs: number) => {
     return {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
-      createDate: data.skuCode,
-      docNo: data.barcode,
-      docRef: data.skuCode,
-      storeName: data.storeName,
-      transactionType: data.skuName,
-      qty: data.availableQty,
-      availableQty: data.availableQty,
+      createDate: data.movementDate,
+      docNo: data.docNo,
+      docRefNo: data.docRefNo,
+      locationCode: data.locationCode,
+      movementTypeName: data.movementTypeName,
+      movementTypeCode: data.movementTypeCode,
+      movementQty: data.movementQty,
+      balanceQty: data.balanceQty,
       unitName: data.unitName,
-      skuName: data.skuName,
+      movementAction: data.skuCode,
     };
   });
 
@@ -168,8 +183,9 @@ function StockMovementSearchList() {
       page: page,
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
+      dateTo: savePayLoadSearch.dateTo,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockMovementeSearchAsync(payloadNewpage));
@@ -186,8 +202,9 @@ function StockMovementSearchList() {
       page: 1,
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
+      dateTo: savePayLoadSearch.dateTo,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockMovementeSearchAsync(payloadNewpage));
@@ -199,6 +216,26 @@ function StockMovementSearchList() {
   const currentlySelected = async (params: GridCellParams) => {
     if (params.field === 'docNo') {
     }
+  };
+
+  const showDocumentDetail = async (docNo: string) => {
+    await dispatch(featchOrderDetailAsync(docNo))
+      .then((value) => {
+        if (value) {
+          handleOpenModalDocDetail();
+        }
+      })
+      .catch((err) => {
+        console.log('err : ', err);
+      });
+  };
+
+  const [openModalDocDetail, setOpenModalDocDetail] = React.useState(false);
+  const handleOpenModalDocDetail = () => {
+    setOpenModalDocDetail(true);
+  };
+  const handleCloseModalDocDetail = () => {
+    setOpenModalDocDetail(false);
   };
   return (
     <React.Fragment>
@@ -239,6 +276,15 @@ function StockMovementSearchList() {
         </div>
       </Box>
       <StockMovementTransaction open={openModalTransaction} onClose={handleCloseModalTransaction} mockData={mockData} />
+      {openModalDocDetail && (
+        <CheckOrderDetail
+          sdNo={'SD2204B005-000018'}
+          docRefNo={'2310220419001005'}
+          docType={'LD'}
+          defaultOpen={openModalDocDetail}
+          onClickClose={handleCloseModalDocDetail}
+        />
+      )}
     </React.Fragment>
   );
 }

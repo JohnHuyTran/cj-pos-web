@@ -346,7 +346,7 @@ export const environment = {
       },
       stockMovement: {
         search: {
-          url: '/stock/stock-movement/search',
+          url: '/stock/stock-movement',
         },
       },
     },
