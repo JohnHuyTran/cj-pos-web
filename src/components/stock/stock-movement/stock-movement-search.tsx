@@ -181,7 +181,7 @@ function StockMovementSearch() {
         limit: limits,
         page: page,
         skuCodes: [values.skuCodes],
-        storeCode: values.locationId === 'ALL' ? '' : values.locationId,
+        locationCode: values.locationId === 'ALL' ? '' : values.locationId,
         branchCode: branchFromCode,
         dateFrom: moment(startDate).startOf('day').toISOString(),
         dateTo: moment(endDate).endOf('day').toISOString(),
