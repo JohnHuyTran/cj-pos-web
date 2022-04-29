@@ -92,7 +92,7 @@ function StockMovementSearchList() {
       },
     },
     {
-      field: 'docRef',
+      field: 'docRefNo',
       headerClassName: 'columnHeaderTitle',
       headerName: 'เลขที่เอกสารอ้างอิง',
       minWidth: 100,
@@ -160,15 +160,15 @@ function StockMovementSearchList() {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
       createDate: data.movementDate,
-      docNo: data.skuCode,
-      docRef: data.skuCode,
+      docNo: data.docNo,
+      docRefNo: data.docRefNo,
       locationCode: data.locationCode,
       movementTypeName: data.movementTypeName,
       movementTypeCode: data.movementTypeCode,
       movementQty: data.movementQty,
       balanceQty: data.balanceQty,
       unitName: data.unitName,
-      skuName: data.skuCode,
+      movementAction: data.skuCode,
     };
   });
 

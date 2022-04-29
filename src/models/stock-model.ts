@@ -69,6 +69,8 @@ export interface StockMomentInfoType {
   priorQty: number;
   movementQty: number;
   balanceQty: number;
+  docNo: string;
+  docRefNo: string;
 }
 
 export interface Barcode {
