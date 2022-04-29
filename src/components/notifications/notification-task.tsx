@@ -158,20 +158,34 @@ export default function NotificationTask(props: Props) {
         }}
         onClick={() => currentlySelected(item)}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '98%' }}>
-          <Box display={'flex'} mt={1} ml={1}>
-            {item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE' ? (
-              <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px' }} />
-            ) : (
-              <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px' }} />
-            )}
-            <span style={{ marginLeft: 15, color: theme.palette.primary.main }}>{content}</span>
-            <span style={{ marginLeft: 5, marginRight: 3 }}>: {item.payload.documentNumber}</span> {'|'}
-            <span style={{ marginLeft: 3 }}>
-              {item.branchCode}-{item.payload.branchName}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          {item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE' ? (
+            <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
+          ) : (
+            <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
+          )}
+          <Box
+            sx={{
+              mt: 1,
+              ml: 1,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              width: '80%',
+            }}
+          >
+            <span style={{ color: theme.palette.primary.main }}>{content}: </span>
+            <span style={{ marginLeft: 5 }}>
+              {item.payload.documentNumber} | {item.branchCode}-{item.payload.branchName}
             </span>
+
+            <Box>
+              <Typography style={{ color: theme.palette.grey[500], fontSize: '11px' }}>
+                กำหนดดำเนินการ {moment(item.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
+              </Typography>
+            </Box>
           </Box>
-          <Box sx={{ textAlign: 'right', mt: '3px' }}>
+          <Box sx={{ textAlign: 'right', mt: '3px', pr: 2.5 }}>
             <Typography
               sx={{
                 backgroundColor: '#E7FFE9',
@@ -188,17 +202,19 @@ export default function NotificationTask(props: Props) {
             </Typography>
           </Box>
         </Box>
-        <Box ml={6}>
-          <Typography style={{ color: theme.palette.grey[500], fontSize: '11px' }}>
-            กำหนดดำเนินการ {moment(item.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
-          </Typography>
-        </Box>
       </Box>
     );
   });
   return (
     <>
-      <Card sx={{ height: '100%', border: '1px solid #E0E0E0', borderRadius: '10px', minWidth: '600px' }}>
+      <Card
+        sx={{
+          height: '100%',
+          border: '1px solid #E0E0E0',
+          borderRadius: '10px',
+          minWidth: '600px',
+        }}
+      >
         <TablePagination
           component="div"
           count={total}
