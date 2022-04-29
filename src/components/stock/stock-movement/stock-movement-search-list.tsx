@@ -6,7 +6,7 @@ import { MoreVertOutlined } from '@mui/icons-material';
 
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { OutstandingRequest, StockInfo } from '../../../models/stock-model';
+import { OutstandingRequest, StockInfo, StockMomentInfoType } from '../../../models/stock-model';
 import {
   featchStockMovementeSearchAsync,
   savePayloadSearch,
@@ -55,7 +55,7 @@ function StockMovementSearchList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -101,7 +101,7 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'storeName',
+      field: 'locationCode',
       headerClassName: 'columnHeaderTitle',
       headerName: 'คลัง',
       minWidth: 85,
@@ -109,7 +109,7 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'transactionType',
+      field: 'movementTypeName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'ประเภท',
       minWidth: 150,
@@ -119,7 +119,7 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'qty',
+      field: 'movementQty',
       headerClassName: 'columnHeaderTitle',
       headerName: 'จำนวนที่ทำรายการ',
       width: 100,
@@ -128,7 +128,7 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'availableQty',
+      field: 'balanceQty',
       headerClassName: 'columnHeaderTitle-BG',
       cellClassName: 'columnFilled-BG',
       headerName: 'สินค้าคงเหลือ',
@@ -155,19 +155,20 @@ function StockMovementSearchList() {
     },
   ];
 
-  const rows = items.data.map((data: StockInfo, indexs: number) => {
+  const rows = items.data.map((data: StockMomentInfoType, indexs: number) => {
     return {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
-      createDate: data.skuCode,
+      createDate: data.movementDate,
       docNo: data.skuCode,
       docRef: data.skuCode,
-      // storeName: data.storeName,
-      transactionType: data.skuName,
-      qty: data.availableQty,
-      availableQty: data.availableQty,
+      locationCode: data.locationCode,
+      movementTypeName: data.movementTypeName,
+      movementTypeCode: data.movementTypeCode,
+      movementQty: data.movementQty,
+      balanceQty: data.balanceQty,
       unitName: data.unitName,
-      skuName: data.skuName,
+      skuName: data.skuCode,
     };
   });
 
@@ -240,7 +241,7 @@ function StockMovementSearchList() {
     <React.Fragment>
       <Box
         mt={2}
-        bgcolor="background.paper"
+        bgcolor='background.paper'
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -252,8 +253,7 @@ function StockMovementSearchList() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}
-      >
+        }}>
         <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -266,7 +266,7 @@ function StockMovementSearchList() {
             pageSize={pageSize}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={items.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             onCellClick={currentlySelected}
