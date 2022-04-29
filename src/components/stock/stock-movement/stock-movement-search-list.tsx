@@ -184,7 +184,7 @@ function StockMovementSearchList() {
       dateFrom: savePayLoadSearch.dateFrom,
       dateTo: savePayLoadSearch.dateTo,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockMovementeSearchAsync(payloadNewpage));
@@ -203,7 +203,7 @@ function StockMovementSearchList() {
       dateFrom: savePayLoadSearch.dateFrom,
       dateTo: savePayLoadSearch.dateTo,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockMovementeSearchAsync(payloadNewpage));
