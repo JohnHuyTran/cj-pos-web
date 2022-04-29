@@ -151,36 +151,34 @@ function StockSearch() {
 
   const onClickSearchBtn = async () => {
     handleOpenLoading('open', true);
-    // if (isValidateInput()) {
-    let limits: number;
-    if (limit === 0 || limit === undefined) {
-      limits = 10;
-    } else {
-      limits = limit;
+    if (isValidateInput()) {
+      let limits: number;
+      if (limit === 0 || limit === undefined) {
+        limits = 10;
+      } else {
+        limits = limit;
+      }
+      const productList: string[] = [];
+      payloadAddTypeProduct
+        .filter((el: any) => el.selectedType === 2 && el.showProduct)
+        .map((item: any, index: number) => {
+          productList.push(item.skuCode);
+        });
+      const filterSKU = _.uniq(productList);
+      const payload: OutstandingRequest = {
+        limit: limits,
+        page: page,
+        skuCodes: filterSKU,
+        locationCode: values.locationId === 'ALL' ? '' : values.locationId,
+        branchCode: branchFromCode,
+      };
+
+      await dispatch(featchStockBalanceSearchAsync(payload));
+      await dispatch(featchStockBalanceLocationSearchAsync(payload));
+      await dispatch(savePayloadSearch(payload));
+      await dispatch(savePayloadSearchLocation(payload));
+      setFlagSearch(true);
     }
-    const productList: string[] = [];
-    payloadAddTypeProduct
-      .filter((el: any) => el.selectedType === 2 && el.showProduct)
-      .map((item: any, index: number) => {
-        productList.push(item.skuCode);
-      });
-    const filterSKU = _.uniq(productList);
-    const payload: OutstandingRequest = {
-      limit: limits,
-      page: page,
-      // skuCodes: filterSKU,
-      skuCodes: ['000000000020034911'],
-      locationCode: values.locationId === 'ALL' ? '' : values.locationId,
-      branchCode: branchFromCode,
-    };
-
-    await dispatch(featchStockBalanceSearchAsync(payload));
-    await dispatch(featchStockBalanceLocationSearchAsync(payload));
-    await dispatch(savePayloadSearch(payload));
-    await dispatch(savePayloadSearchLocation(payload));
-    setFlagSearch(true);
-
-    // }
     handleOpenLoading('open', false);
   };
 
