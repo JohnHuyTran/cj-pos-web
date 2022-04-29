@@ -6,7 +6,13 @@ import { MoreVertOutlined } from '@mui/icons-material';
 
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { OutstandingRequest, StockInfo, StockMomentInfoType } from '../../../models/stock-model';
+import {
+  Barcode,
+  OutstandingRequest,
+  StockInfo,
+  StockMomentInfoType,
+  StockMovementMasterInfo,
+} from '../../../models/stock-model';
 import {
   featchStockMovementeSearchAsync,
   savePayloadSearch,
@@ -14,10 +20,16 @@ import {
 import StockMovementTransaction from './stock-movement-transaction';
 import CheckOrderDetail from '../../check-orders/check-order-detail';
 import { featchOrderDetailAsync } from '../../../store/slices/check-order-detail-slice';
+import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 function StockMovementSearchList() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(['common']);
+  const masterStockMovementType = useAppSelector(
+    (state) => state.masterStockMovementTypeSlice.masterStockMovementType.data
+  );
   const savePayLoadSearch = useAppSelector((state) => state.stockMovementSearchSlice.savePayloadSearch);
   const items = useAppSelector((state) => state.stockMovementSearchSlice.stockList);
   const cuurentPage = useAppSelector((state) => state.stockMovementSearchSlice.stockList.page);
@@ -25,12 +37,13 @@ function StockMovementSearchList() {
   const [pageSize, setPageSize] = React.useState(limit);
 
   const [openModalTransaction, setOpenModalTransaction] = React.useState(false);
-  const [mockData, setMockData] = React.useState('');
+  const [movementTransaction, setMovementTransaction] = React.useState<Barcode[]>([]);
+
   const handleModelAction = (params: GridRenderCellParams) => {
-    const printNo: any = params.getValue(params.id, 'skuName');
+    const barcodes: any = params.getValue(params.id, 'barcodes');
 
     const handleOpenModalTransaction = () => {
-      setMockData(printNo);
+      setMovementTransaction(barcodes);
       setOpenModalTransaction(true);
     };
     return (
@@ -45,6 +58,9 @@ function StockMovementSearchList() {
   const handleCloseModalTransaction = () => {
     setOpenModalTransaction(false);
   };
+
+  const getMovementTypeName = (key: string) =>
+    masterStockMovementType.find((item: StockMovementMasterInfo) => item.code === key)?.nameTH;
 
   const columns: GridColDef[] = [
     {
@@ -68,6 +84,16 @@ function StockMovementSearchList() {
       flex: 0.5,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => {
+        const date = params.value?.toString();
+        return (
+          <div>
+            <Typography variant='body2' noWrap>
+              {`${moment(date).add(543, 'year').format('DD/MM/YYYY')} ${moment(date).format('HH:mm ')}`}
+            </Typography>
+          </div>
+        );
+      },
     },
     {
       field: 'docNo',
@@ -92,7 +118,7 @@ function StockMovementSearchList() {
       },
     },
     {
-      field: 'docRef',
+      field: 'docRefNo',
       headerClassName: 'columnHeaderTitle',
       headerName: 'เลขที่เอกสารอ้างอิง',
       minWidth: 100,
@@ -160,15 +186,16 @@ function StockMovementSearchList() {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
       createDate: data.movementDate,
-      docNo: data.skuCode,
-      docRef: data.skuCode,
-      locationCode: data.locationCode,
-      movementTypeName: data.movementTypeName,
+      docNo: data.docNo,
+      docRefNo: data.docRefNo,
+      locationCode: t(`stock.location.${data.locationCode}`),
+      movementTypeName: getMovementTypeName(data.movementTypeCode),
       movementTypeCode: data.movementTypeCode,
       movementQty: data.movementQty,
       balanceQty: data.balanceQty,
       unitName: data.unitName,
-      skuName: data.skuCode,
+      movementAction: data.skuCode,
+      barcodes: data.barcodes,
     };
   });
 
@@ -275,7 +302,11 @@ function StockMovementSearchList() {
           />
         </div>
       </Box>
-      <StockMovementTransaction open={openModalTransaction} onClose={handleCloseModalTransaction} mockData={mockData} />
+      <StockMovementTransaction
+        open={openModalTransaction}
+        onClose={handleCloseModalTransaction}
+        mockData={movementTransaction}
+      />
       {openModalDocDetail && (
         <CheckOrderDetail
           sdNo={'SD2204B005-000018'}

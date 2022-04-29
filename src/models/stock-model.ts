@@ -65,6 +65,8 @@ export interface StockMomentInfoType {
   priorQty: number;
   movementQty: number;
   balanceQty: number;
+  docNo: string;
+  docRefNo: string;
 }
 
 export interface Barcode {
@@ -74,4 +76,18 @@ export interface Barcode {
   unitName: string;
   barFactor: number;
   baseUnitQty: number;
+}
+
+export interface StockMovementMasterResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: StockMovementMasterInfo[];
+}
+
+export interface StockMovementMasterInfo {
+  code: string;
+  nameTH: string;
+  docType: string;
+  docRefType: string;
 }

@@ -1,10 +1,11 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import React, { ReactElement } from 'react';
+import { Barcode } from '../../../models/stock-model';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  mockData: string;
+  mockData: Barcode[];
 }
 function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElement {
   return (
@@ -16,7 +17,10 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
       maxWidth='xs'>
       <DialogContent sx={{ padding: '1em' }}>
         <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000' }}>
-          StockMovementTransaction: {mockData}
+          StockMovementTransaction:{' '}
+          {mockData.map((data: Barcode) => {
+            return data.barcode;
+          })}
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 20px 0px' }}>
