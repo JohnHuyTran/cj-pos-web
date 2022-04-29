@@ -176,7 +176,7 @@ function StockSearch() {
         limit: limits,
         page: page,
         skuCodes: filterSKU,
-        storeCode: values.locationId === 'ALL' ? '' : values.locationId,
+        locationCode: values.locationId === 'ALL' ? '' : values.locationId,
         branchCode: branchFromCode,
       };
 
@@ -359,30 +359,32 @@ function StockSearch() {
           </Grid>
         </Grid>
       </Box>
-      {/* {flagSearch && (
-        <> */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
-          <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
-          <Tab
-            label={
-              <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
-                สินค้าคงคลัง(ตาม Location)
-              </Typography>
-            }
-            {...a11yProps(1)}
-          />
-        </Tabs>
-      </Box>
 
-      <TabPanel value={value} index={0}>
-        <StockBalance flagSearch={flagSearch} />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <StockBalanceLocation flagSearch={flagSearch} />
-      </TabPanel>
-      {/* </>
-      )} */}
+      {flagSearch && (
+        <>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
+              <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
+              <Tab
+                label={
+                  <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
+                    สินค้าคงคลัง(ตาม Location)
+                  </Typography>
+                }
+                {...a11yProps(1)}
+              />
+            </Tabs>
+          </Box>
+
+          <TabPanel value={value} index={0}>
+            <StockBalance />
+            {/* <StockBalance flagSearch={flagSearch} /> */}
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <StockBalanceLocation flagSearch={flagSearch} />
+          </TabPanel>
+        </>
+      )}
       <LoadingModal open={openLoadingModal.open} />
       <ModalAddTypeProduct
         open={openModelAddItems}

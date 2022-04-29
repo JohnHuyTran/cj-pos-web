@@ -6,13 +6,14 @@ import { MoreVertOutlined } from '@mui/icons-material';
 
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { SearchOff } from '@mui/icons-material';
 import { OutstandingRequest, StockInfo } from '../../../models/stock-model';
 import {
   featchStockMovementeSearchAsync,
   savePayloadSearch,
 } from '../../../store/slices/stock/stock-movement-search-slice';
 import StockMovementTransaction from './stock-movement-transaction';
+import CheckOrderDetail from '../../check-orders/check-order-detail';
+import { featchOrderDetailAsync } from '../../../store/slices/check-order-detail-slice';
 
 function StockMovementSearchList() {
   const classes = useStyles();
@@ -54,7 +55,7 @@ function StockMovementSearchList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -76,6 +77,19 @@ function StockMovementSearchList() {
       flex: 0.5,
       minWidth: 100,
       sortable: false,
+      renderCell: (params) => {
+        if (params.getValue(params.id, 'index') === 1) {
+          return (
+            <Typography
+              color='secondary'
+              variant='body2'
+              sx={{ textDecoration: 'underline' }}
+              onClick={() => showDocumentDetail('SD2204B005-000018')}>
+              {params.value}
+            </Typography>
+          );
+        }
+      },
     },
     {
       field: 'docRef',
@@ -146,9 +160,9 @@ function StockMovementSearchList() {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
       createDate: data.skuCode,
-      docNo: data.barcode,
+      docNo: data.skuCode,
       docRef: data.skuCode,
-      storeName: data.storeName,
+      // storeName: data.storeName,
       transactionType: data.skuName,
       qty: data.availableQty,
       availableQty: data.availableQty,
@@ -168,8 +182,9 @@ function StockMovementSearchList() {
       page: page,
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
+      dateTo: savePayLoadSearch.dateTo,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockMovementeSearchAsync(payloadNewpage));
@@ -186,8 +201,9 @@ function StockMovementSearchList() {
       page: 1,
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
+      dateTo: savePayLoadSearch.dateTo,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockMovementeSearchAsync(payloadNewpage));
@@ -200,11 +216,31 @@ function StockMovementSearchList() {
     if (params.field === 'docNo') {
     }
   };
+
+  const showDocumentDetail = async (docNo: string) => {
+    await dispatch(featchOrderDetailAsync(docNo))
+      .then((value) => {
+        if (value) {
+          handleOpenModalDocDetail();
+        }
+      })
+      .catch((err) => {
+        console.log('err : ', err);
+      });
+  };
+
+  const [openModalDocDetail, setOpenModalDocDetail] = React.useState(false);
+  const handleOpenModalDocDetail = () => {
+    setOpenModalDocDetail(true);
+  };
+  const handleCloseModalDocDetail = () => {
+    setOpenModalDocDetail(false);
+  };
   return (
     <React.Fragment>
       <Box
         mt={2}
-        bgcolor='background.paper'
+        bgcolor="background.paper"
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -216,7 +252,8 @@ function StockMovementSearchList() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}>
+        }}
+      >
         <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -229,7 +266,7 @@ function StockMovementSearchList() {
             pageSize={pageSize}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={items.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             onCellClick={currentlySelected}
@@ -239,6 +276,15 @@ function StockMovementSearchList() {
         </div>
       </Box>
       <StockMovementTransaction open={openModalTransaction} onClose={handleCloseModalTransaction} mockData={mockData} />
+      {openModalDocDetail && (
+        <CheckOrderDetail
+          sdNo={'SD2204B005-000018'}
+          docRefNo={'2310220419001005'}
+          docType={'LD'}
+          defaultOpen={openModalDocDetail}
+          onClickClose={handleCloseModalDocDetail}
+        />
+      )}
     </React.Fragment>
   );
 }

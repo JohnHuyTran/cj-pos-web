@@ -1,8 +1,8 @@
 import { Box, Grid, Typography } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, gridColumnsTotalWidthSelector } from '@mui/x-data-grid';
 import React from 'react';
 import { useStyles } from '../../styles/makeTheme';
-import { OutstandingRequest, StockInfo } from '../../models/stock-model';
+import { OutstandingRequest, positionInfo, StockInfo } from '../../models/stock-model';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import {
   featchStockBalanceLocationSearchAsync,
@@ -17,6 +17,7 @@ interface Props {
 function StockBalanceLocation({ flagSearch }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const _ = require('lodash');
   const savePayLoadSearch = useAppSelector((state) => state.stockBalanceLocationSearchSlice.savePayloadSearch);
   const items = useAppSelector((state) => state.stockBalanceLocationSearchSlice.stockList);
   const cuurentPage = useAppSelector((state) => state.stockBalanceLocationSearchSlice.stockList.page);
@@ -63,7 +64,7 @@ function StockBalanceLocation({ flagSearch }: Props) {
       ),
     },
     {
-      field: 'storeName',
+      field: 'locationName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'คลัง',
       width: 75,
@@ -71,7 +72,7 @@ function StockBalanceLocation({ flagSearch }: Props) {
       sortable: false,
     },
     {
-      field: 'locationName',
+      field: 'positions',
       headerClassName: 'columnHeaderTitle',
       headerName: 'โลเคชั่น',
       minWidth: 85,
@@ -116,7 +117,22 @@ function StockBalanceLocation({ flagSearch }: Props) {
     },
   ];
 
+  const concatName = (value: positionInfo[]) => {
+    let positionNameStr: string = '';
+    value.forEach((data, index) => {
+      if (index === value.length - 1) {
+        positionNameStr += `${data.name}`;
+      } else {
+        positionNameStr += `${data.name} ,`;
+      }
+    });
+    return positionNameStr;
+  };
+
   const rows = items.data.map((data: StockInfo, indexs: number) => {
+    let minValObject = _.maxBy(data.positions, 'minBeauty');
+    let maxValObject = _.maxBy(data.positions, 'maxBeauty');
+
     return {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
@@ -124,16 +140,15 @@ function StockBalanceLocation({ flagSearch }: Props) {
       barcodeName: data.barcodeName,
       skuCode: data.skuCode,
       skuName: data.skuName,
-      storeCode: data.storeCode,
-      storeName: data.storeName,
       locationCode: data.locationCode,
       locationName: data.locationName,
       availableQty: data.availableQty,
       unitCode: data.unitCode,
       unitName: data.unitName,
-      minBeauty: data.minBeauty,
-      maxBeauty: data.maxBeauty,
       barFactor: data.barFactor,
+      positions: data.positions ? concatName(data.positions) : '',
+      minBeauty: minValObject ? minValObject.minBeauty : 0,
+      maxBeauty: maxValObject ? maxValObject.maxBeauty : 0,
     };
   });
 
@@ -149,7 +164,7 @@ function StockBalanceLocation({ flagSearch }: Props) {
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockBalanceLocationSearchAsync(payloadNewpage));
@@ -167,7 +182,7 @@ function StockBalanceLocation({ flagSearch }: Props) {
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockBalanceLocationSearchAsync(payloadNewpage));

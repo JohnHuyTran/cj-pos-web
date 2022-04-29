@@ -55,7 +55,7 @@ function StockBalance({ flagSearch }: Props) {
       ),
     },
     {
-      field: 'storeName',
+      field: 'locationName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'คลัง',
       minWidth: 125,
@@ -88,8 +88,8 @@ function StockBalance({ flagSearch }: Props) {
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
       skuCode: data.skuCode,
       skuName: data.skuName,
-      storeCode: data.storeCode,
-      storeName: data.storeName,
+      locationCode: data.locationCode,
+      locationName: data.locationName,
       availableQty: data.availableQty,
       unitCode: data.unitCode,
       unitName: data.unitName,
@@ -108,7 +108,7 @@ function StockBalance({ flagSearch }: Props) {
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockBalanceSearchAsync(payloadNewpage));
@@ -126,7 +126,7 @@ function StockBalance({ flagSearch }: Props) {
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
-      storeCode: savePayLoadSearch.storeCode,
+      locationCode: savePayLoadSearch.locationCode,
     };
 
     await dispatch(featchStockBalanceSearchAsync(payloadNewpage));
