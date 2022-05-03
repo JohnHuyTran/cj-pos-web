@@ -20,9 +20,6 @@ function StockBalance({ flagSearch }: Props) {
   const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
   const [pageSize, setPageSize] = React.useState(limit);
 
-  console.log('flagSearch :', flagSearch);
-  console.log('items.data.length :', items.data.length);
-
   const columns: GridColDef[] = [
     {
       field: 'index',

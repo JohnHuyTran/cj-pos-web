@@ -218,15 +218,13 @@ function StockSearch() {
         return false;
       }
     } else if (value === 1) {
-      console.log('values.positionName :', values.positionName);
-      console.log('payloadAddTypeProduct L :', Object.keys(payloadAddTypeProduct).length <= 0);
       if (Object.keys(payloadAddTypeProduct).length <= 0 && values.positionName === '') {
         setOpenAlert(true);
         setTextError('กรุณาระบุสินค้าหรือโลเคชั่นสาขาที่ต้องการค้นหา');
         return false;
       }
 
-      if (values.positionName.length <= 2) {
+      if (values.positionName !== '' && values.positionName.length <= 2) {
         setOpenAlert(true);
         setTextError('กรุณาระบุโลเคชั่นสาขาอย่างน้อย 3 หลัก');
         return false;
