@@ -4,32 +4,57 @@ import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from '@mui
 import { Button } from '@mui/material';
 import { MoreVertOutlined } from '@mui/icons-material';
 
-import { useAppSelector, useAppDispatch } from '../../../store/store';
+import store, { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { SearchOff } from '@mui/icons-material';
-import { OutstandingRequest, StockInfo } from '../../../models/stock-model';
+import {
+  Barcode,
+  OutstandingRequest,
+  StockInfo,
+  StockMomentInfoType,
+  StockMovementMasterInfo,
+} from '../../../models/stock-model';
 import {
   featchStockMovementeSearchAsync,
   savePayloadSearch,
 } from '../../../store/slices/stock/stock-movement-search-slice';
 import StockMovementTransaction from './stock-movement-transaction';
+import CheckOrderDetail from '../../check-orders/check-order-detail';
+import { featchOrderDetailAsync } from '../../../store/slices/check-order-detail-slice';
+import moment from 'moment';
+import { useTranslation } from 'react-i18next';
+import { isShowMovementDetail } from '../../../utils/enum/stock-enum';
+import AlertError from '../../commons/ui/alert-error';
+import { isErrorCode } from '../../../utils/exception/pos-exception';
 
 function StockMovementSearchList() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(['common', 'error']);
+  const masterStockMovementType = useAppSelector(
+    (state) => state.masterStockMovementTypeSlice.masterStockMovementType.data
+  );
   const savePayLoadSearch = useAppSelector((state) => state.stockMovementSearchSlice.savePayloadSearch);
   const items = useAppSelector((state) => state.stockMovementSearchSlice.stockList);
   const cuurentPage = useAppSelector((state) => state.stockMovementSearchSlice.stockList.page);
   const limit = useAppSelector((state) => state.stockMovementSearchSlice.stockList.perPage);
   const [pageSize, setPageSize] = React.useState(limit);
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
 
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
   const [openModalTransaction, setOpenModalTransaction] = React.useState(false);
-  const [mockData, setMockData] = React.useState('');
+  const [movementTransaction, setMovementTransaction] = React.useState<Barcode[]>([]);
+  const [docNo, setDocNo] = React.useState<string>('');
+  const [docRefNo, setDocRefNo] = React.useState<string>('');
+  const [docType, setDocType] = React.useState<string>('');
+
   const handleModelAction = (params: GridRenderCellParams) => {
-    const printNo: any = params.getValue(params.id, 'skuName');
+    const barcodes: any = params.getValue(params.id, 'barcodes');
 
     const handleOpenModalTransaction = () => {
-      setMockData(printNo);
+      setMovementTransaction(barcodes);
       setOpenModalTransaction(true);
     };
     return (
@@ -44,6 +69,9 @@ function StockMovementSearchList() {
   const handleCloseModalTransaction = () => {
     setOpenModalTransaction(false);
   };
+
+  const getMovementType = (key: string) =>
+    masterStockMovementType.find((item: StockMovementMasterInfo) => item.code === key);
 
   const columns: GridColDef[] = [
     {
@@ -67,6 +95,16 @@ function StockMovementSearchList() {
       flex: 0.5,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => {
+        const date = params.value?.toString();
+        return (
+          <div>
+            <Typography variant='body2' noWrap>
+              {`${moment(date).add(543, 'year').format('DD/MM/YYYY')} ${moment(date).format('HH:mm ')}`}
+            </Typography>
+          </div>
+        );
+      },
     },
     {
       field: 'docNo',
@@ -74,11 +112,38 @@ function StockMovementSearchList() {
       headerName: 'เลขที่เอกสาร',
       headerAlign: 'center',
       flex: 0.5,
-      minWidth: 100,
+      minWidth: 180,
       sortable: false,
+      renderCell: (params) => {
+        const docNo: string =
+          params.getValue(params.id, 'docNo') && params.getValue(params.id, 'docNo') !== undefined
+            ? String(params.getValue(params.id, 'docNo'))
+            : '';
+        const docRef: string =
+          params.getValue(params.id, 'docRefNo') && params.getValue(params.id, 'docRefNo') !== undefined
+            ? String(params.getValue(params.id, 'docRefNo'))
+            : '';
+        const docType: string =
+          params.getValue(params.id, 'docType') && params.getValue(params.id, 'docType') !== undefined
+            ? String(params.getValue(params.id, 'docType'))
+            : '';
+        if (params.getValue(params.id, 'movementAction') === true && docNo) {
+          return (
+            <Typography
+              color='secondary'
+              variant='body2'
+              sx={{ textDecoration: 'underline' }}
+              onClick={() => showDocumentDetail(docNo, docRef, docType)}>
+              {params.value}
+            </Typography>
+          );
+        } else {
+          return <Typography>{params.value}</Typography>;
+        }
+      },
     },
     {
-      field: 'docRef',
+      field: 'docRefNo',
       headerClassName: 'columnHeaderTitle',
       headerName: 'เลขที่เอกสารอ้างอิง',
       minWidth: 100,
@@ -87,7 +152,7 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'storeName',
+      field: 'locationCode',
       headerClassName: 'columnHeaderTitle',
       headerName: 'คลัง',
       minWidth: 85,
@@ -95,17 +160,17 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'transactionType',
+      field: 'movementTypeName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'ประเภท',
       minWidth: 150,
-      flex: 1,
+      flex: 0.8,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
     },
     {
-      field: 'qty',
+      field: 'movementQty',
       headerClassName: 'columnHeaderTitle',
       headerName: 'จำนวนที่ทำรายการ',
       width: 100,
@@ -114,7 +179,7 @@ function StockMovementSearchList() {
       sortable: false,
     },
     {
-      field: 'availableQty',
+      field: 'balanceQty',
       headerClassName: 'columnHeaderTitle-BG',
       cellClassName: 'columnFilled-BG',
       headerName: 'สินค้าคงเหลือ',
@@ -141,19 +206,23 @@ function StockMovementSearchList() {
     },
   ];
 
-  const rows = items.data.map((data: StockInfo, indexs: number) => {
+  const rows = items.data.map((data: StockMomentInfoType, indexs: number) => {
+    const movementType = getMovementType(data.movementTypeCode);
     return {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
-      createDate: data.skuCode,
-      docNo: data.barcode,
-      docRef: data.skuCode,
-      // storeName: data.storeName,
-      transactionType: data.skuName,
-      qty: data.availableQty,
-      availableQty: data.availableQty,
+      createDate: data.movementDate,
+      docNo: data.docNo ? data.docNo : '',
+      docRefNo: data.docRefNo,
+      locationCode: t(`stock.location.${data.locationCode}`),
+      movementTypeName: movementType?.nameTH,
+      movementTypeCode: data.movementTypeCode,
+      movementQty: data.movementQty,
+      balanceQty: data.balanceQty,
       unitName: data.unitName,
-      skuName: data.skuName,
+      movementAction: isShowMovementDetail(data.movementTypeCode),
+      barcodes: data.barcodes,
+      docType: movementType?.docType,
     };
   });
 
@@ -189,16 +258,45 @@ function StockMovementSearchList() {
       skuCodes: savePayLoadSearch.skuCodes,
       locationCode: savePayLoadSearch.locationCode,
     };
-
     await dispatch(featchStockMovementeSearchAsync(payloadNewpage));
     await dispatch(savePayloadSearch(payloadNewpage));
-
     setLoading(false);
   };
 
   const currentlySelected = async (params: GridCellParams) => {
     if (params.field === 'docNo') {
     }
+  };
+
+  const showDocumentDetail = async (docNo: string, docRefNo: string, docType: string) => {
+    if (docType === 'LD') {
+      setDocNo(docNo);
+      setDocRefNo(docRefNo);
+      setDocType(docType);
+      await dispatch(featchOrderDetailAsync(docNo))
+        .then((value: any) => {
+          if (value) {
+            if (isErrorCode(value.payload.code)) {
+              setOpenAlert(true);
+              setTextError('ไม่พบข้อมูล');
+            } else {
+              handleOpenModalDocDetail();
+            }
+          }
+        })
+        .catch((err) => {
+          setOpenAlert(true);
+          setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
+        });
+    }
+  };
+
+  const [openModalDocDetail, setOpenModalDocDetail] = React.useState(false);
+  const handleOpenModalDocDetail = () => {
+    setOpenModalDocDetail(true);
+  };
+  const handleCloseModalDocDetail = () => {
+    setOpenModalDocDetail(false);
   };
   return (
     <React.Fragment>
@@ -238,7 +336,22 @@ function StockMovementSearchList() {
           />
         </div>
       </Box>
-      <StockMovementTransaction open={openModalTransaction} onClose={handleCloseModalTransaction} mockData={mockData} />
+      <StockMovementTransaction
+        open={openModalTransaction}
+        onClose={handleCloseModalTransaction}
+        movementTransaction={movementTransaction}
+      />
+      {openModalDocDetail && (
+        <CheckOrderDetail
+          sdNo={docNo}
+          docRefNo={docRefNo}
+          docType={docType}
+          defaultOpen={openModalDocDetail}
+          onClickClose={handleCloseModalDocDetail}
+        />
+      )}
+
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
   );
 }

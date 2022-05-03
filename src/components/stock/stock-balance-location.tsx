@@ -10,7 +10,11 @@ import {
 } from '../../store/slices/stock/stock-balance-location-search-slice';
 import { SearchOff } from '@mui/icons-material';
 
-function StockBalanceLocation() {
+interface Props {
+  flagSearch?: boolean;
+}
+
+function StockBalanceLocation({ flagSearch }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const _ = require('lodash');
@@ -204,7 +208,7 @@ function StockBalanceLocation() {
             backgroundColor: '#E7FFE9',
           },
         }}>
-        {items.data.length > 0 && (
+        {flagSearch && items.data.length > 0 && (
           <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
             <DataGrid
               rows={rows}
@@ -226,7 +230,7 @@ function StockBalanceLocation() {
           </div>
         )}
 
-        {items.data.length === 0 && (
+        {flagSearch && items.data.length === 0 && (
           <Grid container xs={12} justifyContent='center'>
             <Box color='#CBD4DB' justifyContent='center'>
               <h2>

@@ -14,5 +14,6 @@
   "401": "user is unauthorized",
   "invalid_grant": "Invalid user credentials",
   "invalid_channel_branch": "รหัสผู้ใช้ {userLogin} นี้ไม่สามารถเข้าใช้ด้วยลิงค์นี้ได้ กรุณาเข้าลิงค์สาขา",
-  "invalid_channel_hq": "รหัสผู้ใช้ {userLogin} นี้ไม่สามารถเข้าใช้ด้วยลิงค์นี้ได้ กรุณาเข้าลิงค์ HQ"
+  "invalid_channel_hq": "รหัสผู้ใช้ {userLogin} นี้ไม่สามารถเข้าใช้ด้วยลิงค์นี้ได้ กรุณาเข้าลิงค์ HQ",
+  "20400": "ไม่พบข้อมูล"
 }
