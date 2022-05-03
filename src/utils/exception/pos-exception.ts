@@ -48,3 +48,7 @@ export function getErrorMessageHttp(error: any) {
   const err_msg = i18n.t(`error:${err}`);
   return err_msg && err_msg != err ? err_msg : i18n.t('error:default');
 }
+
+export const isErrorCode = (code: any) => {
+  return !(code === 20000 || code === 20100);
+};
