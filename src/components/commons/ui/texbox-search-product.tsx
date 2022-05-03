@@ -62,7 +62,9 @@ function TextBoxSearchProduct({ skuType, onSelectItem, isClear }: Props) {
     onSelectItem(option);
   };
 
-  const clearData = async () => {};
+  const clearData = async () => {
+    setValue('');
+  };
 
   const clearInput = () => {};
   const onInputChange = async (event: any, value: string, reason: string) => {

@@ -1,31 +1,107 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import React, { ReactElement } from 'react';
+import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
+import { useStyles } from '../../../styles/makeTheme';
+import { Barcode } from '../../../models/stock-model';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  mockData: string;
+  mockData: Barcode[];
 }
 function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElement {
+  const classes = useStyles();
+  const columns: GridColDef[] = [
+    {
+      field: 'barcode',
+      headerName: 'บาร์โค้ด',
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 150,
+      flex: 0.5,
+      sortable: false,
+    },
+    {
+      field: 'qty',
+      headerName: 'จำนวน',
+      minWidth: 150,
+      // flex: 0.5,
+      headerAlign: 'center',
+      sortable: false,
+    },
+    {
+      field: 'unitName',
+      headerName: 'หน่วย',
+      minWidth: 150,
+      // flex: 0.5,
+      headerAlign: 'center',
+      sortable: false,
+    },
+    {
+      field: 'barFactor',
+      headerName: 'Unit Factor',
+      minWidth: 150,
+      // flex: 0.5,
+      headerAlign: 'center',
+      sortable: false,
+    },
+    {
+      field: 'baseUnitQty',
+      headerName: 'จำนวนที่ทำรายการ(ชิ้น)',
+      minWidth: 200,
+      // flex: 0.5,
+      headerAlign: 'center',
+      sortable: false,
+    },
+  ];
+
+  const rows = mockData.map((data: Barcode, indexs: number) => {
+    return {
+      id: indexs,
+      barFactor: data.barFactor,
+      barcode: data.barcode,
+      baseUnitQty: data.baseUnitQty,
+      qty: data.qty,
+      unitCode: data.unitCode,
+      unitName: data.unitName,
+    };
+  });
+
+  const handleClose = async () => {
+    onClose();
+  };
   return (
     <Dialog
       open={open}
-      aria-labelledby='alert-dialog-title'
-      aria-describedby='alert-dialog-description'
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
       fullWidth={true}
-      maxWidth='xs'>
+      maxWidth="md"
+    >
       <DialogContent sx={{ padding: '1em' }}>
-        <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000' }}>
-          StockMovementTransaction: {mockData}
+        <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000', pt: 3 }}>
+          <div className={classes.MdataGridPaginationTop} style={{ width: '100%' }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              disableColumnMenu={true}
+              hideFooterPagination={true}
+              disableSelectionOnClick={true}
+              hideFooter={true}
+              autoHeight
+            />
+          </div>
         </DialogContentText>
       </DialogContent>
-      <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 20px 0px' }}>
+      <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 10px 0px' }}>
         <Button
-          id='btnClose'
-          variant='contained'
-          color='error'
+          id="btnClose"
+          variant="contained"
+          color="error"
           sx={{ borderRadius: '5px', width: '126px' }}
-          onClick={onClose}>
+          onClick={onClose}
+        >
           ปิด
         </Button>
       </DialogActions>

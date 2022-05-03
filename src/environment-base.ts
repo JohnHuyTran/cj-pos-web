@@ -346,7 +346,7 @@ export const environment = {
       },
       stockMovement: {
         search: {
-          url: '/stock/stock-movement/search',
+          url: '/stock/stock-movement',
         },
       },
     },
@@ -381,6 +381,11 @@ export const environment = {
     },
     subDistricts: {
       url: '/master/sub-districts',
+    },
+    stock: {
+      movementType: {
+        url: '/master/stock-movement-types',
+      },
     },
   },
   authority: {
