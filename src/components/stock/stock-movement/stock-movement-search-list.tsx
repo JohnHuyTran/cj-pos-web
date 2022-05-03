@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { isShowMovementDetail } from '../../../utils/enum/stock-enum';
 import AlertError from '../../commons/ui/alert-error';
 import { isErrorCode } from '../../../utils/exception/pos-exception';
+import LoadingModal from '../../commons/ui/loading-modal';
 
 function StockMovementSearchList() {
   const classes = useStyles();
@@ -43,6 +44,13 @@ function StockMovementSearchList() {
 
   const handleCloseAlert = () => {
     setOpenAlert(false);
+  };
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<{ open: boolean }>({
+    open: false,
+  });
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
   const [openModalTransaction, setOpenModalTransaction] = React.useState(false);
   const [movementTransaction, setMovementTransaction] = React.useState<Barcode[]>([]);
@@ -271,6 +279,7 @@ function StockMovementSearchList() {
   };
 
   const showDocumentDetail = async (docNo: string, docRefNo: string, docType: string) => {
+    handleOpenLoading('open', true);
     if (docType === 'LD') {
       setDocNo(docNo);
       setDocRefNo(docRefNo);
@@ -291,6 +300,7 @@ function StockMovementSearchList() {
           setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
         });
     }
+    handleOpenLoading('open', false);
   };
 
   const [openModalDocDetail, setOpenModalDocDetail] = React.useState(false);
@@ -352,7 +362,7 @@ function StockMovementSearchList() {
           onClickClose={handleCloseModalDocDetail}
         />
       )}
-
+      <LoadingModal open={openLoadingModal.open} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
   );
