@@ -205,7 +205,7 @@ function StockMovementSearchList() {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
       createDate: data.movementDate,
-      docNo: data.docNo ? data.docNo : 'SD2204B005-000018',
+      docNo: data.docNo ? data.docNo : '',
       docRefNo: data.docRefNo,
       locationCode: t(`stock.location.${data.locationCode}`),
       movementTypeName: movementType?.nameTH,
