@@ -382,6 +382,11 @@ export const environment = {
     subDistricts: {
       url: '/master/sub-districts',
     },
+    stock: {
+      movementType: {
+        url: '/master/stock-movement-types',
+      },
+    },
   },
   authority: {
     authorizedBranch: {

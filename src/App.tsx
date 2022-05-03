@@ -24,6 +24,7 @@ import TransferOut from './pages/transfer-out/transfer-out';
 import StockBalance from './pages/stock/stock-balance';
 import TransferOutDestroy from './pages/transfer-out-destroy/transfer-out-destroy';
 import StockMovement from './pages/stock/stock-movement';
+import { featchMasterStockMovementTypeListAsync } from './store/slices/master/stock-movement-type-slice';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -73,6 +74,7 @@ export default function App2() {
   } else {
     dispatch(featchBranchListAsync());
     dispatch(featchAuthorizedBranchListAsync());
+    dispatch(featchMasterStockMovementTypeListAsync());
   }
 
   return (
