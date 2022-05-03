@@ -152,7 +152,7 @@ function StockBalance({ flagSearch }: Props) {
             backgroundColor: '#E7FFE9',
           },
         }}>
-        {items.data.length > 0 && (
+        {flagSearch && items.data.length > 0 && (
           <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
             <DataGrid
               rows={rows}
@@ -173,7 +173,7 @@ function StockBalance({ flagSearch }: Props) {
             />
           </div>
         )}
-        {items.data.length === 0 && (
+        {flagSearch && items.data.length === 0 && (
           <Grid container xs={12} justifyContent='center'>
             <Box color='#CBD4DB' justifyContent='center'>
               <h2>

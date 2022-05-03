@@ -6,6 +6,7 @@ export interface OutstandingRequest {
   limit?: number;
   page?: number;
   dateTo?: string;
+  positionName?: string;
 }
 
 export interface OutstandingResponse {

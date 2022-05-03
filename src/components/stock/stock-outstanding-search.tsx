@@ -34,6 +34,7 @@ interface State {
   locationId: string;
   productId: string;
   branchCode: string;
+  positionName: string;
 }
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -78,6 +79,7 @@ function StockSearch() {
     locationId: 'ALL',
     productId: '',
     branchCode: '',
+    positionName: '',
   });
   const handleChange = (event: any) => {
     const name = event.target.name;
@@ -144,7 +146,7 @@ function StockSearch() {
   const onClickClearBtn = async () => {
     handleOpenLoading('open', true);
     setClearBranchDropDown(!clearBranchDropDown);
-    setValues({ storeId: 0, locationId: 'ALL', productId: '', branchCode: '' });
+    setValues({ storeId: 0, locationId: 'ALL', productId: '', branchCode: '', positionName: '' });
     await dispatch(updateAddTypeAndProductState([]));
     await dispatch(clearDataFilter());
     await dispatch(clearDataLocationFilter());
@@ -155,7 +157,9 @@ function StockSearch() {
   };
 
   const onClickSearchBtn = async () => {
-    if (value === 1) setFlagSearchLocation(true);
+    if (value === 1) {
+      setFlagSearchLocation(true);
+    }
 
     handleOpenLoading('open', true);
     if (isValidateInput()) {
@@ -172,29 +176,63 @@ function StockSearch() {
           productList.push(item.skuCode);
         });
       const filterSKU = _.uniq(productList);
-      const payload: OutstandingRequest = {
-        limit: limits,
-        page: page,
-        skuCodes: filterSKU,
-        locationCode: values.locationId === 'ALL' ? '' : values.locationId,
-        branchCode: branchFromCode,
-      };
 
-      await dispatch(featchStockBalanceSearchAsync(payload));
-      await dispatch(featchStockBalanceLocationSearchAsync(payload));
-      await dispatch(savePayloadSearch(payload));
-      await dispatch(savePayloadSearchLocation(payload));
-      setFlagSearch(true);
+      if (value === 0) {
+        const payload: OutstandingRequest = {
+          limit: limits,
+          page: page,
+          skuCodes: filterSKU,
+          locationCode: values.locationId === 'ALL' ? '' : values.locationId,
+          branchCode: branchFromCode,
+        };
+
+        await dispatch(featchStockBalanceSearchAsync(payload));
+        await dispatch(featchStockBalanceLocationSearchAsync(payload));
+        await dispatch(savePayloadSearch(payload));
+        await dispatch(savePayloadSearchLocation(payload));
+        setFlagSearch(true);
+      } else if (value === 1) {
+        const payload: OutstandingRequest = {
+          limit: limits,
+          page: page,
+          skuCodes: filterSKU,
+          locationCode: values.locationId === 'ALL' ? '' : values.locationId,
+          branchCode: branchFromCode,
+          positionName: values.positionName,
+        };
+
+        await dispatch(featchStockBalanceLocationSearchAsync(payload));
+        await dispatch(savePayloadSearch(payload));
+        await dispatch(savePayloadSearchLocation(payload));
+        setFlagSearch(true);
+      }
     }
     handleOpenLoading('open', false);
   };
 
   const isValidateInput = () => {
-    if (Object.keys(payloadAddTypeProduct).length <= 0) {
-      setOpenAlert(true);
-      setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
-      return false;
+    if (value === 0) {
+      if (Object.keys(payloadAddTypeProduct).length <= 0) {
+        setOpenAlert(true);
+        setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
+        return false;
+      }
+    } else if (value === 1) {
+      console.log('values.positionName :', values.positionName);
+      console.log('payloadAddTypeProduct L :', Object.keys(payloadAddTypeProduct).length <= 0);
+      if (Object.keys(payloadAddTypeProduct).length <= 0 && values.positionName === '') {
+        setOpenAlert(true);
+        setTextError('กรุณาระบุสินค้าหรือโลเคชั่นสาขาที่ต้องการค้นหา');
+        return false;
+      }
+
+      if (values.positionName.length <= 2) {
+        setOpenAlert(true);
+        setTextError('กรุณาระบุโลเคชั่นสาขาอย่างน้อย 3 หลัก');
+        return false;
+      }
     }
+
     if (stringNullOrEmpty(branchFromCode)) {
       setOpenAlert(true);
       setTextError('กรุณาระบุสาขา');
@@ -273,7 +311,7 @@ function StockSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
-              ค้นหาสินค้า*
+              ค้นหาสินค้า{value === 0 && '*'}
             </Typography>
             <TextField
               id='txtProductList'
@@ -336,7 +374,22 @@ function StockSearch() {
             </Typography>
             <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} disabled={true} />
           </Grid>
-          <Grid item xs={4}></Grid>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant='subtitle1' component='div'>
+              โลเคชั่นสาขา
+            </Typography>
+            <TextField
+              id='txtPositionName'
+              name='positionName'
+              size='small'
+              value={values.positionName}
+              onChange={handleChange}
+              className={classes.MtextField}
+              fullWidth
+              placeholder={value === 0 ? '' : 'กรุณาระบุโลเคชั่นสาขา'}
+              disabled={value === 0}
+            />
+          </Grid>
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
             <Button
               id='btnClear'
@@ -360,31 +413,30 @@ function StockSearch() {
         </Grid>
       </Box>
 
-      {flagSearch && (
-        <>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
-              <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
-              <Tab
-                label={
-                  <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
-                    สินค้าคงคลัง(ตาม Location)
-                  </Typography>
-                }
-                {...a11yProps(1)}
-              />
-            </Tabs>
-          </Box>
+      {/* {flagSearch && (
+        <> */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
+          <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
+          <Tab
+            label={
+              <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
+                สินค้าคงคลัง(ตาม Location)
+              </Typography>
+            }
+            {...a11yProps(1)}
+          />
+        </Tabs>
+      </Box>
 
-          <TabPanel value={value} index={0}>
-            <StockBalance />
-            {/* <StockBalance flagSearch={flagSearch} /> */}
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <StockBalanceLocation flagSearch={flagSearch} />
-          </TabPanel>
-        </>
-      )}
+      <TabPanel value={value} index={0}>
+        <StockBalance flagSearch={flagSearch} />
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <StockBalanceLocation flagSearch={flagSearch} />
+      </TabPanel>
+      {/* </>
+      )} */}
       <LoadingModal open={openLoadingModal.open} />
       <ModalAddTypeProduct
         open={openModelAddItems}
