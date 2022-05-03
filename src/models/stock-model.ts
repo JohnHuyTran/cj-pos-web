@@ -26,16 +26,20 @@ export interface StockInfo {
   barcodeName?: string;
   skuCode: string;
   skuName: string;
-  storeCode: string;
-  storeName: string;
-  locationCode?: string;
-  locationName?: string;
+  locationCode: string;
+  locationName: string;
   availableQty: number;
   unitCode: string;
   unitName: string;
-  minBeauty?: number;
-  maxBeauty?: number;
   barFactor?: number;
+  positions?: positionInfo[];
+}
+
+export interface positionInfo {
+  code: string;
+  name: string;
+  minBeauty: number;
+  maxBeauty: number;
 }
 
 export interface StockMovementResponse {

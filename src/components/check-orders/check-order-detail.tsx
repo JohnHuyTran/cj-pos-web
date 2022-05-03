@@ -1127,10 +1127,14 @@ export default function CheckOrderDetail({
       <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}
-        url={getPathReportSD(sdNo)}
+        url={getPathReportSD(orderDetail.sdNo)}
         statusFile={statusFile}
         sdImageFile={orderDetail.sdImageFile ? orderDetail.sdImageFile : ''}
-        fileName={orderDetail.sdImageFilename ? orderDetail.sdImageFilename : formatFileNam(sdNo, orderDetail.sdStatus)}
+        fileName={
+          orderDetail.sdImageFilename
+            ? orderDetail.sdImageFilename
+            : formatFileNam(orderDetail.sdNo, orderDetail.sdStatus)
+        }
         btnPrintName="พิมพ์ใบผลต่าง"
       />
 

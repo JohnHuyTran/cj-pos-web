@@ -1,8 +1,8 @@
 import { Box, Grid, Typography } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, gridColumnsTotalWidthSelector } from '@mui/x-data-grid';
 import React from 'react';
 import { useStyles } from '../../styles/makeTheme';
-import { OutstandingRequest, StockInfo } from '../../models/stock-model';
+import { OutstandingRequest, positionInfo, StockInfo } from '../../models/stock-model';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import {
   featchStockBalanceLocationSearchAsync,
@@ -13,6 +13,7 @@ import { SearchOff } from '@mui/icons-material';
 function StockBalanceLocation() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const _ = require('lodash');
   const savePayLoadSearch = useAppSelector((state) => state.stockBalanceLocationSearchSlice.savePayloadSearch);
   const items = useAppSelector((state) => state.stockBalanceLocationSearchSlice.stockList);
   const cuurentPage = useAppSelector((state) => state.stockBalanceLocationSearchSlice.stockList.page);
@@ -28,7 +29,7 @@ function StockBalanceLocation() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -47,19 +48,19 @@ function StockBalanceLocation() {
       headerName: 'รายละเอียดสินค้า',
       headerAlign: 'center',
       minWidth: 235,
-      // flex: 0.3,
+      flex: 0.3,
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant='body2'>{params.value}</Typography>
-          <Typography variant='body2' color='textSecondary'>
+          <Typography variant="body2">{params.value}</Typography>
+          <Typography variant="body2" color="textSecondary">
             {params.getValue(params.id, 'skuCode') || ''}
           </Typography>
         </div>
       ),
     },
     {
-      field: 'storeName',
+      field: 'locationName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'คลัง',
       width: 75,
@@ -67,7 +68,7 @@ function StockBalanceLocation() {
       sortable: false,
     },
     {
-      field: 'locationName',
+      field: 'positions',
       headerClassName: 'columnHeaderTitle',
       headerName: 'โลเคชั่น',
       minWidth: 85,
@@ -112,7 +113,22 @@ function StockBalanceLocation() {
     },
   ];
 
+  const concatName = (value: positionInfo[]) => {
+    let positionNameStr: string = '';
+    value.forEach((data, index) => {
+      if (index === value.length - 1) {
+        positionNameStr += `${data.name}`;
+      } else {
+        positionNameStr += `${data.name} ,`;
+      }
+    });
+    return positionNameStr;
+  };
+
   const rows = items.data.map((data: StockInfo, indexs: number) => {
+    let minValObject = _.maxBy(data.positions, 'minBeauty');
+    let maxValObject = _.maxBy(data.positions, 'maxBeauty');
+
     return {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
@@ -120,16 +136,15 @@ function StockBalanceLocation() {
       barcodeName: data.barcodeName,
       skuCode: data.skuCode,
       skuName: data.skuName,
-      storeCode: data.storeCode,
-      storeName: data.storeName,
       locationCode: data.locationCode,
       locationName: data.locationName,
       availableQty: data.availableQty,
       unitCode: data.unitCode,
       unitName: data.unitName,
-      minBeauty: data.minBeauty,
-      maxBeauty: data.maxBeauty,
       barFactor: data.barFactor,
+      positions: data.positions ? concatName(data.positions) : '',
+      minBeauty: minValObject ? minValObject.minBeauty : 0,
+      maxBeauty: maxValObject ? maxValObject.maxBeauty : 0,
     };
   });
 
@@ -176,7 +191,7 @@ function StockBalanceLocation() {
     <div>
       <Box
         mt={2}
-        bgcolor='background.paper'
+        bgcolor="background.paper"
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -188,7 +203,8 @@ function StockBalanceLocation() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}>
+        }}
+      >
         {items.data.length > 0 && (
           <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
             <DataGrid
@@ -202,7 +218,7 @@ function StockBalanceLocation() {
               pageSize={pageSize}
               rowsPerPageOptions={[10, 20, 50, 100]}
               rowCount={items.total}
-              paginationMode='server'
+              paginationMode="server"
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               loading={loading}
@@ -212,10 +228,10 @@ function StockBalanceLocation() {
         )}
 
         {items.data.length === 0 && (
-          <Grid container xs={12} justifyContent='center'>
-            <Box color='#CBD4DB' justifyContent='center'>
+          <Grid container xs={12} justifyContent="center">
+            <Box color="#CBD4DB" justifyContent="center">
               <h2>
-                ไม่มีข้อมูล <SearchOff fontSize='large' />
+                ไม่มีข้อมูล <SearchOff fontSize="large" />
               </h2>
             </Box>
           </Grid>
