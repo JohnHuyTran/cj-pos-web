@@ -69,6 +69,9 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
   const DCPercent = env.dc.percent;
 
   let sumDCPercent: number = (sumActualQty * 100) / sumQuantityRef;
+  if (sumQuantityRef === 0) {
+    sumDCPercent = sumActualQty * 100; //sumDCPercent = Infinity, (sumQuantityRef = 0)
+  }
   sumDCPercent = Math.trunc(sumDCPercent); //remove decimal
 
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -176,25 +179,24 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
     <div>
       <Dialog
         open={open}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        sx={{ minWidth: 500 }}
-      >
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+        maxWidth='md'
+        sx={{ minWidth: 500 }}>
         {action === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
           <div>
             <DialogContent>
-              <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-                <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+              <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
+                <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
                   ยืนยันอนุมัติใบตรวจสอบการรับ-โอนสินค้า
                 </Typography>
-                <Typography variant="body1" align="center">
+                <Typography variant='body1' align='center'>
                   เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
                   <label style={{ color: '#36C690' }}>
                     <b>{shipmentNo}</b>
                   </label>
                 </Typography>
-                <Typography variant="body1" align="center">
+                <Typography variant='body1' align='center'>
                   เลขที่เอกสาร SD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
                   <label style={{ color: '#36C690' }}>
                     <b>{sdNo}</b>
@@ -203,27 +205,25 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
                 {itemsDiff.length > 0 && (
                   <div>
                     <Typography
-                      variant="body1"
-                      align="center"
+                      variant='body1'
+                      align='center'
                       sx={{
                         marginTop: 2,
                         marginBottom: 1,
                         fontWeight: 600,
-                      }}
-                    >
+                      }}>
                       รายการสินค้าขาด / เกิน
                     </Typography>
 
                     {docType === 'LD' && (
                       <Typography
-                        variant="body1"
-                        align="center"
+                        variant='body1'
+                        align='center'
                         sx={{
                           marginBottom: 2,
                           fontSize: 13,
                           color: '#FF0000',
-                        }}
-                      >
+                        }}>
                         {sumDCPercent < DCPercent &&
                           `(จำนวนรับจริง ${sumDCPercent}% น้อยกว่าค่าที่กำหนด ${DCPercent}%)`}
                         {sumDCPercent > DCPercent && `(จำนวนรับจริง ${sumDCPercent}% มากกว่าค่าที่กำหนด ${DCPercent}%)`}
@@ -241,17 +241,17 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && fileUploadList.length > 0 && (
           <div>
             <DialogContent>
-              <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-                <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+              <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
+                <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
                   ปิดงานใบตรวจสอบการรับ-โอนสินค้า
                 </Typography>
-                <Typography variant="body1" align="center">
+                <Typography variant='body1' align='center'>
                   เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
                   <label style={{ color: '#36C690' }}>
                     <b>{shipmentNo}</b>
                   </label>
                 </Typography>
-                <Typography variant="body1" align="center">
+                <Typography variant='body1' align='center'>
                   เลขที่เอกสาร SD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
                   <label style={{ color: '#36C690' }}>
                     <b>{sdNo}</b>
@@ -264,7 +264,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
 
         {action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && fileUploadList.length < 0 && (
           <DialogActions sx={{ justifyContent: 'center' }}>
-            <Button id="btnAccept" variant="contained" size="small" color="primary" onClick={handleClose}>
+            <Button id='btnAccept' variant='contained' size='small' color='primary' onClick={handleClose}>
               รับทราบ
             </Button>
           </DialogActions>
@@ -274,23 +274,21 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
           (action === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && fileUploadList.length > 0)) && (
           <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
             <Button
-              id="btnCancel"
-              variant="contained"
-              size="small"
-              color="cancelColor"
+              id='btnCancel'
+              variant='contained'
+              size='small'
+              color='cancelColor'
               sx={{ borderRadius: 2, width: 80, mr: 2 }}
-              onClick={handleClose}
-            >
+              onClick={handleClose}>
               ยกเลิก
             </Button>
             <Button
-              id="btnConfirm"
-              variant="contained"
-              size="small"
-              color="primary"
+              id='btnConfirm'
+              variant='contained'
+              size='small'
+              color='primary'
               sx={{ borderRadius: 2, width: 80 }}
-              onClick={confirmApproveBtn}
-            >
+              onClick={confirmApproveBtn}>
               ยืนยัน
             </Button>
           </DialogActions>
