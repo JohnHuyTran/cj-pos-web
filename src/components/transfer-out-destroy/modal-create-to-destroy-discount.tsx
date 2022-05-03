@@ -521,7 +521,7 @@ export default function ModalCreateToDestroyDiscount({
       const products = payloadTransferOut.products.map((item: any) => {
         return {
           barcode: item.barcode,
-          numberOfDiscounted: item.numberOfRequested,
+          numberOfDiscounted: item.numberOfApproved,
         };
       });
       const payload = {
