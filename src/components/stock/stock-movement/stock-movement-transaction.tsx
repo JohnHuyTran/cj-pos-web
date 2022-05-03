@@ -8,9 +8,9 @@ import { Barcode } from '../../../models/stock-model';
 interface Props {
   open: boolean;
   onClose: () => void;
-  mockData: Barcode[];
+  movementTransaction: Barcode[];
 }
-function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElement {
+function StockMovementTransaction({ open, onClose, movementTransaction }: Props): ReactElement {
   const classes = useStyles();
   const columns: GridColDef[] = [
     {
@@ -56,7 +56,7 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
     },
   ];
 
-  const rows = mockData.map((data: Barcode, indexs: number) => {
+  const rows = movementTransaction.map((data: Barcode, indexs: number) => {
     return {
       id: indexs,
       barFactor: data.barFactor,
@@ -74,11 +74,10 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
   return (
     <Dialog
       open={open}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
+      aria-labelledby='alert-dialog-title'
+      aria-describedby='alert-dialog-description'
       fullWidth={true}
-      maxWidth="md"
-    >
+      maxWidth='md'>
       <DialogContent sx={{ padding: '1em' }}>
         <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000', pt: 3 }}>
           <div className={classes.MdataGridPaginationTop} style={{ width: '100%' }}>
@@ -96,12 +95,11 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 10px 0px' }}>
         <Button
-          id="btnClose"
-          variant="contained"
-          color="error"
+          id='btnClose'
+          variant='contained'
+          color='error'
           sx={{ borderRadius: '5px', width: '126px' }}
-          onClick={onClose}
-        >
+          onClick={onClose}>
           ปิด
         </Button>
       </DialogActions>

@@ -112,7 +112,7 @@ function StockMovementSearchList() {
       headerName: 'เลขที่เอกสาร',
       headerAlign: 'center',
       flex: 0.5,
-      minWidth: 100,
+      minWidth: 180,
       sortable: false,
       renderCell: (params) => {
         const docNo: string =
@@ -164,7 +164,7 @@ function StockMovementSearchList() {
       headerClassName: 'columnHeaderTitle',
       headerName: 'ประเภท',
       minWidth: 150,
-      flex: 1,
+      flex: 0.8,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
@@ -341,7 +341,7 @@ function StockMovementSearchList() {
       <StockMovementTransaction
         open={openModalTransaction}
         onClose={handleCloseModalTransaction}
-        mockData={movementTransaction}
+        movementTransaction={movementTransaction}
       />
       {openModalDocDetail && (
         <CheckOrderDetail
