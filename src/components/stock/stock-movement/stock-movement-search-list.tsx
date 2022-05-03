@@ -4,7 +4,7 @@ import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from '@mui
 import { Button } from '@mui/material';
 import { MoreVertOutlined } from '@mui/icons-material';
 
-import { useAppSelector, useAppDispatch } from '../../../store/store';
+import store, { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import {
   Barcode,
@@ -23,11 +23,13 @@ import { featchOrderDetailAsync } from '../../../store/slices/check-order-detail
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 import { isShowMovementDetail } from '../../../utils/enum/stock-enum';
+import AlertError from '../../commons/ui/alert-error';
+import { isErrorCode } from '../../../utils/exception/pos-exception';
 
 function StockMovementSearchList() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation(['common', 'error']);
   const masterStockMovementType = useAppSelector(
     (state) => state.masterStockMovementTypeSlice.masterStockMovementType.data
   );
@@ -36,7 +38,12 @@ function StockMovementSearchList() {
   const cuurentPage = useAppSelector((state) => state.stockMovementSearchSlice.stockList.page);
   const limit = useAppSelector((state) => state.stockMovementSearchSlice.stockList.perPage);
   const [pageSize, setPageSize] = React.useState(limit);
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
 
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
   const [openModalTransaction, setOpenModalTransaction] = React.useState(false);
   const [movementTransaction, setMovementTransaction] = React.useState<Barcode[]>([]);
   const [docNo, setDocNo] = React.useState<string>('');
@@ -253,10 +260,8 @@ function StockMovementSearchList() {
       skuCodes: savePayLoadSearch.skuCodes,
       locationCode: savePayLoadSearch.locationCode,
     };
-
     await dispatch(featchStockMovementeSearchAsync(payloadNewpage));
     await dispatch(savePayloadSearch(payloadNewpage));
-
     setLoading(false);
   };
 
@@ -271,13 +276,19 @@ function StockMovementSearchList() {
       setDocRefNo(docRefNo);
       setDocType(docType);
       await dispatch(featchOrderDetailAsync(docNo))
-        .then((value) => {
+        .then((value: any) => {
           if (value) {
-            handleOpenModalDocDetail();
+            if (isErrorCode(value.payload.code)) {
+              setOpenAlert(true);
+              setTextError('ไม่พบข้อมูล');
+            } else {
+              handleOpenModalDocDetail();
+            }
           }
         })
         .catch((err) => {
-          console.log('err : ', err);
+          setOpenAlert(true);
+          setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
         });
     }
   };
@@ -341,6 +352,8 @@ function StockMovementSearchList() {
           onClickClose={handleCloseModalDocDetail}
         />
       )}
+
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
   );
 }
