@@ -6,7 +6,13 @@ import { MoreVertOutlined } from '@mui/icons-material';
 
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { OutstandingRequest, StockInfo, StockMomentInfoType } from '../../../models/stock-model';
+import {
+  Barcode,
+  OutstandingRequest,
+  StockInfo,
+  StockMomentInfoType,
+  StockMovementMasterInfo,
+} from '../../../models/stock-model';
 import {
   featchStockMovementeSearchAsync,
   savePayloadSearch,
@@ -14,10 +20,17 @@ import {
 import StockMovementTransaction from './stock-movement-transaction';
 import CheckOrderDetail from '../../check-orders/check-order-detail';
 import { featchOrderDetailAsync } from '../../../store/slices/check-order-detail-slice';
+import moment from 'moment';
+import { useTranslation } from 'react-i18next';
+import { isShowMovementDetail } from '../../../utils/enum/stock-enum';
 
 function StockMovementSearchList() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(['common']);
+  const masterStockMovementType = useAppSelector(
+    (state) => state.masterStockMovementTypeSlice.masterStockMovementType.data
+  );
   const savePayLoadSearch = useAppSelector((state) => state.stockMovementSearchSlice.savePayloadSearch);
   const items = useAppSelector((state) => state.stockMovementSearchSlice.stockList);
   const cuurentPage = useAppSelector((state) => state.stockMovementSearchSlice.stockList.page);
@@ -25,12 +38,16 @@ function StockMovementSearchList() {
   const [pageSize, setPageSize] = React.useState(limit);
 
   const [openModalTransaction, setOpenModalTransaction] = React.useState(false);
-  const [mockData, setMockData] = React.useState('');
+  const [movementTransaction, setMovementTransaction] = React.useState<Barcode[]>([]);
+  const [docNo, setDocNo] = React.useState<string>('');
+  const [docRefNo, setDocRefNo] = React.useState<string>('');
+  const [docType, setDocType] = React.useState<string>('');
+
   const handleModelAction = (params: GridRenderCellParams) => {
-    const printNo: any = params.getValue(params.id, 'skuName');
+    const barcodes: any = params.getValue(params.id, 'barcodes');
 
     const handleOpenModalTransaction = () => {
-      setMockData(printNo);
+      setMovementTransaction(barcodes);
       setOpenModalTransaction(true);
     };
     return (
@@ -45,6 +62,9 @@ function StockMovementSearchList() {
   const handleCloseModalTransaction = () => {
     setOpenModalTransaction(false);
   };
+
+  const getMovementType = (key: string) =>
+    masterStockMovementType.find((item: StockMovementMasterInfo) => item.code === key);
 
   const columns: GridColDef[] = [
     {
@@ -68,6 +88,16 @@ function StockMovementSearchList() {
       flex: 0.5,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => {
+        const date = params.value?.toString();
+        return (
+          <div>
+            <Typography variant='body2' noWrap>
+              {`${moment(date).add(543, 'year').format('DD/MM/YYYY')} ${moment(date).format('HH:mm ')}`}
+            </Typography>
+          </div>
+        );
+      },
     },
     {
       field: 'docNo',
@@ -78,16 +108,30 @@ function StockMovementSearchList() {
       minWidth: 100,
       sortable: false,
       renderCell: (params) => {
-        if (params.getValue(params.id, 'index') === 1) {
+        const docNo: string =
+          params.getValue(params.id, 'docNo') && params.getValue(params.id, 'docNo') !== undefined
+            ? String(params.getValue(params.id, 'docNo'))
+            : '';
+        const docRef: string =
+          params.getValue(params.id, 'docRefNo') && params.getValue(params.id, 'docRefNo') !== undefined
+            ? String(params.getValue(params.id, 'docRefNo'))
+            : '';
+        const docType: string =
+          params.getValue(params.id, 'docType') && params.getValue(params.id, 'docType') !== undefined
+            ? String(params.getValue(params.id, 'docType'))
+            : '';
+        if (params.getValue(params.id, 'movementAction') === true && docNo) {
           return (
             <Typography
               color='secondary'
               variant='body2'
               sx={{ textDecoration: 'underline' }}
-              onClick={() => showDocumentDetail('SD2204B005-000018')}>
+              onClick={() => showDocumentDetail(docNo, docRef, docType)}>
               {params.value}
             </Typography>
           );
+        } else {
+          return <Typography>{params.value}</Typography>;
         }
       },
     },
@@ -156,19 +200,22 @@ function StockMovementSearchList() {
   ];
 
   const rows = items.data.map((data: StockMomentInfoType, indexs: number) => {
+    const movementType = getMovementType(data.movementTypeCode);
     return {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
       createDate: data.movementDate,
-      docNo: data.docNo,
+      docNo: data.docNo ? data.docNo : 'SD2204B005-000018',
       docRefNo: data.docRefNo,
-      locationCode: data.locationCode,
-      movementTypeName: data.movementTypeName,
+      locationCode: t(`stock.location.${data.locationCode}`),
+      movementTypeName: movementType?.nameTH,
       movementTypeCode: data.movementTypeCode,
       movementQty: data.movementQty,
       balanceQty: data.balanceQty,
       unitName: data.unitName,
-      movementAction: data.skuCode,
+      movementAction: isShowMovementDetail(data.movementTypeCode),
+      barcodes: data.barcodes,
+      docType: movementType?.docType,
     };
   });
 
@@ -218,16 +265,21 @@ function StockMovementSearchList() {
     }
   };
 
-  const showDocumentDetail = async (docNo: string) => {
-    await dispatch(featchOrderDetailAsync(docNo))
-      .then((value) => {
-        if (value) {
-          handleOpenModalDocDetail();
-        }
-      })
-      .catch((err) => {
-        console.log('err : ', err);
-      });
+  const showDocumentDetail = async (docNo: string, docRefNo: string, docType: string) => {
+    if (docType === 'LD') {
+      setDocNo(docNo);
+      setDocRefNo(docRefNo);
+      setDocType(docType);
+      await dispatch(featchOrderDetailAsync(docNo))
+        .then((value) => {
+          if (value) {
+            handleOpenModalDocDetail();
+          }
+        })
+        .catch((err) => {
+          console.log('err : ', err);
+        });
+    }
   };
 
   const [openModalDocDetail, setOpenModalDocDetail] = React.useState(false);
@@ -275,12 +327,16 @@ function StockMovementSearchList() {
           />
         </div>
       </Box>
-      <StockMovementTransaction open={openModalTransaction} onClose={handleCloseModalTransaction} mockData={mockData} />
+      <StockMovementTransaction
+        open={openModalTransaction}
+        onClose={handleCloseModalTransaction}
+        mockData={movementTransaction}
+      />
       {openModalDocDetail && (
         <CheckOrderDetail
-          sdNo={'SD2204B005-000018'}
-          docRefNo={'2310220419001005'}
-          docType={'LD'}
+          sdNo={docNo}
+          docRefNo={docRefNo}
+          docType={docType}
           defaultOpen={openModalDocDetail}
           onClickClose={handleCloseModalDocDetail}
         />

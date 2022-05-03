@@ -3,11 +3,12 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import React, { ReactElement } from 'react';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import { useStyles } from '../../../styles/makeTheme';
+import { Barcode } from '../../../models/stock-model';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  mockData: string;
+  mockData: Barcode[];
 }
 function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElement {
   const classes = useStyles();
@@ -30,7 +31,7 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
       sortable: false,
     },
     {
-      field: 'unit',
+      field: 'unitName',
       headerName: 'หน่วย',
       minWidth: 150,
       // flex: 0.5,
@@ -38,7 +39,7 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
       sortable: false,
     },
     {
-      field: 'unitfactor',
+      field: 'barFactor',
       headerName: 'Unit Factor',
       minWidth: 150,
       // flex: 0.5,
@@ -46,7 +47,7 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
       sortable: false,
     },
     {
-      field: 'acQty',
+      field: 'baseUnitQty',
       headerName: 'จำนวนที่ทำรายการ(ชิ้น)',
       minWidth: 200,
       // flex: 0.5,
@@ -55,7 +56,17 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
     },
   ];
 
-  const rows = [{ id: 1, barcode: '123456789', qty: '2', unit: 'ชิ้น', unitfactor: 1, acQty: 1 }];
+  const rows = mockData.map((data: Barcode, indexs: number) => {
+    return {
+      id: indexs,
+      barFactor: data.barFactor,
+      barcode: data.barcode,
+      baseUnitQty: data.baseUnitQty,
+      qty: data.qty,
+      unitCode: data.unitCode,
+      unitName: data.unitName,
+    };
+  });
 
   const handleClose = async () => {
     onClose();
@@ -68,10 +79,8 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
       fullWidth={true}
       maxWidth="md"
     >
-      <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}></BootstrapDialogTitle>
       <DialogContent sx={{ padding: '1em' }}>
         <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000', pt: 3 }}>
-          {/* StockMovementTransaction: {mockData} */}
           <div className={classes.MdataGridPaginationTop} style={{ width: '100%' }}>
             <DataGrid
               rows={rows}
@@ -85,8 +94,7 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
           </div>
         </DialogContentText>
       </DialogContent>
-      {/* <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 20px 0px' }}> */}
-      {/* <DialogActions>
+      <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 10px 0px' }}>
         <Button
           id="btnClose"
           variant="contained"
@@ -96,7 +104,7 @@ function StockMovementTransaction({ open, onClose, mockData }: Props): ReactElem
         >
           ปิด
         </Button>
-      </DialogActions> */}
+      </DialogActions>
     </Dialog>
   );
 }
