@@ -100,6 +100,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuSTStockTransfer, setDisableSubMenuSTStockTransfer] = React.useState(true);
   const [disableSubMenuTaxInvoice, setDisableSubMenuTaxInvoice] = React.useState(true);
   const [disableSubMenuStockBalance, setDisableSubMenuStockBalance] = React.useState(true);
+  const [disableSubMenuStockMovement, setDisableSubMenuStockMovement] = React.useState(true);
 
   const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
   const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
@@ -129,6 +130,7 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableSubMenuTOStoreUse(isAllowSubMenuPermission(SUBMENU.TO_STORE_USE));
 
     setDisableSubMenuStockBalance(isAllowSubMenuPermission(SUBMENU.PI_STOCK_BALANCE));
+    setDisableSubMenuStockMovement(isAllowSubMenuPermission(SUBMENU.PI_STOCK_MOVEMENT));
   }, [navState]);
 
   const dispatch = useAppDispatch();
@@ -420,7 +422,7 @@ export default function Sidebar({}: Props): ReactElement {
             </Link>
             <Link
               to='/stock-movement'
-              style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuStockBalance ? 'none' : '' }}
+              style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuStockMovement ? 'none' : '' }}
               id='subMenuStockMovement'>
               <ListItemButton
                 key='StockMovement'
