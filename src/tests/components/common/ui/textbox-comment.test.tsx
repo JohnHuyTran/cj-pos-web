@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { Store, AnyAction } from '@reduxjs/toolkit';
@@ -33,17 +33,26 @@ beforeEach(() => {
 });
 
 describe('component text-comment', () => {
-  // console.debug('debug:', inputField);
+  const element = screen.getByTestId(/form-field-tbxComment/);
+  // console.debug('debug:', element);
   it('find text box', () => {
     expect(screen.getByTestId(/form-field-tbxComment/)).toBeInTheDocument();
   });
   it('find label subject', () => {
     expect(screen.getByText(/comment label/)).toBeInTheDocument();
   });
+  it('find label warning msg', () => {
+    let txtContent = screen.getByTestId(/div-warning-msg/);
+    expect(screen.getByTestId(/div-warning-msg/)).toBeInTheDocument();
+    expect(txtContent.textContent).toEqual('26/100');
+  });
   it('should show input with initial value set ', () => {
-    // const inputField = screen.getByTestId(`form-field-firstname`);
-    // expect(inputField).toHaveDisplayValue(/default value to unit test/);
-    expect(screen.getByRole('textarea', { name: 'tbxComment' })).toHaveDisplayValue('default value to unit test');
-    // expect(screen.getByTestId(/form-field-tbxComment/)).toHaveDisplayValue(/default value to unit test/);
+    // fireEvent.change(screen.getByTestId(/form-field-tbxComment/));
+
+    expect(screen.getByText(/default value to unit test/)).toBeInTheDocument();
+  });
+  it('test onchange mock', () => {
+    fireEvent.change(screen.getByTestId(/form-field-tbxComment/));
+    expect(screen.getByText(/default value to unit test/)).toBeInTheDocument();
   });
 });

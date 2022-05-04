@@ -58,6 +58,7 @@ function TextBoxComment({
       />
 
       <div
+        data-testid='div-warning-msg'
         style={{
           fontSize: '11px',
           color: '#AEAEAE',
