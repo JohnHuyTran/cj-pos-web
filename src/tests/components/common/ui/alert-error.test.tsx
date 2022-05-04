@@ -7,7 +7,7 @@ import { ThemeProvider } from '@mui/material';
 import theme from '../../../../styles/theme';
 import { mockUserInfo } from '../../../mockData';
 
-import AlertWarning from '../../../../components/commons/ui/alert-warning';
+import AlertError from '../../../../components/commons/ui/alert-error';
 
 let wrapper;
 const mockStore = configureStore();
@@ -18,19 +18,19 @@ beforeEach(() => {
   wrapper = render(
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <AlertWarning
+        <AlertError
           open={true}
           onClose={function (): void {
             throw new Error('Function not implemented.');
           }}
-          text='กรุณารอสักครู่'
+          textError='กรุณาตรวจสอบข้อมูล'
         />
       </ThemeProvider>
     </Provider>
   );
 });
 
-describe('component AlertWarning', () => {
+describe('component AlertError', () => {
   // console.debug('debug:', inputField);
   it('find button close', () => {
     expect(screen.getByTestId(/btnClose/)).toBeInTheDocument();
@@ -38,9 +38,9 @@ describe('component AlertWarning', () => {
     expect(btnClose.textContent).toEqual('ปิด');
   });
 
-  it('find alert text', () => {
+  it('find alert text error', () => {
     expect(screen.getByTestId(/txtContent/)).toBeInTheDocument();
     let txtContent = screen.getByTestId(/txtContent/);
-    expect(txtContent.textContent).toEqual('กรุณารอสักครู่ ');
+    expect(txtContent.textContent).toEqual('กรุณาตรวจสอบข้อมูล ');
   });
 });
