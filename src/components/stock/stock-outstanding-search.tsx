@@ -428,10 +428,10 @@ function StockSearch() {
       </Box>
 
       <TabPanel value={value} index={0}>
-        <StockBalance flagSearch={flagSearch} />
+        {flagSearch && <StockBalance />}
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <StockBalanceLocation flagSearch={flagSearch} />
+        {flagSearch && <StockBalanceLocation />}
       </TabPanel>
       {/* </>
       )} */}
