@@ -7,11 +7,7 @@ import { useStyles } from '../../styles/makeTheme';
 import { SearchOff } from '@mui/icons-material';
 import { featchStockBalanceSearchAsync, savePayloadSearch } from '../../store/slices/stock/stock-balance-search-slice';
 
-interface Props {
-  flagSearch?: boolean;
-}
-
-function StockBalance({ flagSearch }: Props) {
+function StockBalance() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const savePayLoadSearch = useAppSelector((state) => state.stockBalanceSearchSlice.savePayloadSearch);
@@ -149,7 +145,7 @@ function StockBalance({ flagSearch }: Props) {
             backgroundColor: '#E7FFE9',
           },
         }}>
-        {flagSearch && items.data.length > 0 && (
+        {items.data.length > 0 && (
           <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
             <DataGrid
               rows={rows}
@@ -170,7 +166,7 @@ function StockBalance({ flagSearch }: Props) {
             />
           </div>
         )}
-        {flagSearch && items.data.length === 0 && (
+        {items.data.length === 0 && (
           <Grid container xs={12} justifyContent='center'>
             <Box color='#CBD4DB' justifyContent='center'>
               <h2>
