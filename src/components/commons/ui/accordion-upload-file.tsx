@@ -17,6 +17,7 @@ import ModalShowHuaweiFile from '../../commons/ui/modal-show-huawei-file';
 import { stringNullOrEmpty } from '../../../utils/utils';
 
 interface fileDisplayList {
+  branchCode?: string;
   file?: File;
   fileKey?: string;
   fileName?: string;
@@ -140,10 +141,11 @@ function AccordionUploadFile({
 
   function getHuaweiFileUrl(item: fileDisplayList) {
     const keys = item.fileKey ? item.fileKey : '';
+    const branchCode = item.branchCode ? item.branchCode : '';
     const name = item.fileName ? item.fileName : '';
 
     if (item.status === 'old') {
-      getFileUrlHuawei(keys)
+      getFileUrlHuawei(keys, branchCode)
         .then((resp) => {
           if (resp && resp.data) {
             setFileUrl(resp.data);

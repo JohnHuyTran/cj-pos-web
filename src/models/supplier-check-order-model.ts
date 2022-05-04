@@ -115,6 +115,7 @@ export interface PurchaseDetailEntries {
 }
 
 export interface FileType {
+  branchCode: string;
   fileKey: string;
   fileName: string;
   mimeType: string;

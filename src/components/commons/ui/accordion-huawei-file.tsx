@@ -21,7 +21,7 @@ const AccordionHuaweiFile = ({ files }: Props) => {
   const [isImage, setIsImage] = useState(false);
 
   async function getHuaweiFileUrl(item: FileType) {
-    await getFileUrlHuawei(item.fileKey)
+    await getFileUrlHuawei(item.fileKey, item.branchCode)
       .then((resp) => {
         if (resp && resp.data) {
           setFileUrl(resp.data);
