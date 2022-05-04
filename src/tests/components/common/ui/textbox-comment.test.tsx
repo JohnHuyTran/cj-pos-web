@@ -1,16 +1,18 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, RenderResult } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { Store, AnyAction } from '@reduxjs/toolkit';
 import { initialState } from '../../../mockStore';
-import { ThemeProvider } from '@mui/material';
+import { TextField, ThemeProvider } from '@mui/material';
 import theme from '../../../../styles/theme';
 import { mockUserInfo } from '../../../mockData';
 
 import TextBoxComment from '../../../../components/commons/ui/textbox-comment';
+import userEvent from '@testing-library/user-event';
 
-let wrapper;
+let wrapper: RenderResult<typeof import('@testing-library/dom/types/queries'), HTMLElement>;
 const mockStore = configureStore();
+const rowDisplay_value = 2;
 let store: Store<any, AnyAction>;
 sessionStorage.setItem('user_info', mockUserInfo);
 beforeEach(() => {
@@ -22,21 +24,23 @@ beforeEach(() => {
           fieldName={'comment label'}
           defaultValue={'default value to unit test'}
           maxLength={100}
-          onChangeComment={function (value: string): void {
-            throw new Error('Function not implemented.');
-          }}
+          onChangeComment={function (value: string): void {}}
           isDisable={false}
+          rowDisplay={rowDisplay_value}
         />
       </ThemeProvider>
     </Provider>
   );
 });
 
+const handleChangeComment = () => {};
+
 describe('component text-comment', () => {
-  const element = screen.getByTestId(/form-field-tbxComment/);
-  // console.debug('debug:', element);
   it('find text box', () => {
     expect(screen.getByTestId(/form-field-tbxComment/)).toBeInTheDocument();
+  });
+  it('show input with initial value set ', () => {
+    expect(screen.getByDisplayValue(/default value to unit test/)).toBeInTheDocument();
   });
   it('find label subject', () => {
     expect(screen.getByText(/comment label/)).toBeInTheDocument();
@@ -46,13 +50,16 @@ describe('component text-comment', () => {
     expect(screen.getByTestId(/div-warning-msg/)).toBeInTheDocument();
     expect(txtContent.textContent).toEqual('26/100');
   });
-  it('should show input with initial value set ', () => {
-    // fireEvent.change(screen.getByTestId(/form-field-tbxComment/));
 
-    expect(screen.getByText(/default value to unit test/)).toBeInTheDocument();
+  it('onchange value', async () => {
+    const element = screen.getByDisplayValue('default value to unit test') as HTMLInputElement;
+    fireEvent.change(element, { target: { value: 'change value' } });
+    expect(element.value).toBe('change value');
   });
-  it('test onchange mock', () => {
-    fireEvent.change(screen.getByTestId(/form-field-tbxComment/));
-    expect(screen.getByText(/default value to unit test/)).toBeInTheDocument();
+
+  it('onclick value', async () => {
+    const element = screen.getByDisplayValue('default value to unit test') as HTMLInputElement;
+    fireEvent.click(element, { target: { value: 'change value' } });
+    expect(element.value).toBe('change value');
   });
 });
