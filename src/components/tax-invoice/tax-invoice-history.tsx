@@ -21,7 +21,7 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -99,7 +99,7 @@ const handleModelAction = (params: GridRenderCellParams) => {
   const [newFilename, setNewFilename] = React.useState<string>('test-rename');
   const [isImage, setIsImage] = React.useState(false);
   async function getHuaweiFileUrl(item: FileType) {
-    await getFileUrlHuawei(item.fileKey)
+    await getFileUrlHuawei(item.fileKey, item.branchCode)
       .then((resp) => {
         if (resp && resp.data) {
           setFileUrl(resp.data);
@@ -135,7 +135,7 @@ const handleModelAction = (params: GridRenderCellParams) => {
       >
         <MenuList sx={{ width: 300 }}>
           <MenuItem>
-            <Typography variant='body1'>เอกสารแนบ</Typography>
+            <Typography variant="body1">เอกสารแนบ</Typography>
           </MenuItem>
           <Divider />
 
@@ -143,7 +143,7 @@ const handleModelAction = (params: GridRenderCellParams) => {
             fileList.length > 0 &&
             fileList.map((item: any, index: number) => (
               <MenuItem key={`item-${index + 1}-${item.fileKey}`} onClick={() => getHuaweiFileUrl(item)}>
-                <Typography color='secondary' sx={{ textDecoration: 'underline', fontSize: '13px' }}>
+                <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: '13px' }}>
                   {item.fileName}
                 </Typography>
               </MenuItem>
@@ -206,7 +206,7 @@ export default function TaxInvoiceHistory() {
 
   return (
     <>
-      <Typography ml={1} mb={2} variant='h6'>
+      <Typography ml={1} mb={2} variant="h6">
         ประวัติการพิมพ์ใบกำกับภาษี
       </Typography>
       <div style={{ width: '100%', height: rows.length >= 8 ? '80vh' : 'auto' }} className={classes.MdataGridDetail}>
