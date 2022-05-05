@@ -17,49 +17,107 @@ let store: Store<any, AnyAction>;
 sessionStorage.setItem('user_info', mockUserInfo);
 beforeEach(() => {
   store = mockStore(initialState);
-  wrapper = render(
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <TextBoxComment
-          fieldName={'comment label'}
-          defaultValue={'default value to unit test'}
-          maxLength={100}
-          onChangeComment={function (value: string): void {}}
-          isDisable={false}
-          rowDisplay={rowDisplay_value}
-        />
-      </ThemeProvider>
-    </Provider>
-  );
+  // wrapper = render(
+  //   <Provider store={store}>
+  //     <ThemeProvider theme={theme}>
+  //       <TextBoxComment
+  //         fieldName={'comment label'}
+  //         defaultValue={'default value to unit test'}
+  //         maxLength={100}
+  //         onChangeComment={function (value: string): void {}}
+  //         isDisable={false}
+  //         rowDisplay={rowDisplay_value}
+  //       />
+  //     </ThemeProvider>
+  //   </Provider>
+  // );
 });
 
 const handleChangeComment = () => {};
 
+// describe('component text-comment', () => {
+//   it('find text box', () => {
+//     expect(screen.getByTestId(/form-field-tbxComment/)).toBeInTheDocument();
+//   });
+//   it('show input with initial value set ', () => {
+//     expect(screen.getByDisplayValue(/default value to unit test/)).toBeInTheDocument();
+//   });
+//   it('find label subject', () => {
+//     expect(screen.getByText(/comment label/)).toBeInTheDocument();
+//   });
+//   it('find label warning msg', () => {
+//     let txtContent = screen.getByTestId(/div-warning-msg/);
+//     expect(screen.getByTestId(/div-warning-msg/)).toBeInTheDocument();
+//     expect(txtContent.textContent).toEqual('26/100');
+//   });
+
+//   it('onchange value', async () => {
+//     const element = screen.getByDisplayValue('default value to unit test') as HTMLInputElement;
+//     fireEvent.change(element, { target: { value: 'change value' } });
+//     expect(element.value).toBe('change value');
+//   });
+
+//   it('onclick value', async () => {
+//     const element = screen.getByDisplayValue('default value to unit test') as HTMLInputElement;
+//     fireEvent.click(element, { target: { value: 'change value' } });
+//     expect(element.value).toBe('change value');
+//   });
+// });
+
 describe('component text-comment', () => {
-  it('find text box', () => {
+  it('find text box set row display', async () => {
+    await waitFor(() => {
+      const constainer = render(
+        <Provider store={store}>
+          <ThemeProvider theme={theme}>
+            <TextBoxComment
+              fieldName={'comment label'}
+              defaultValue={'default value to unit test'}
+              maxLength={100}
+              onChangeComment={function (value: string): void {}}
+              isDisable={false}
+              rowDisplay={rowDisplay_value}
+            />
+          </ThemeProvider>
+        </Provider>
+      );
+    });
+
     expect(screen.getByTestId(/form-field-tbxComment/)).toBeInTheDocument();
-  });
-  it('show input with initial value set ', () => {
+
     expect(screen.getByDisplayValue(/default value to unit test/)).toBeInTheDocument();
-  });
-  it('find label subject', () => {
+
     expect(screen.getByText(/comment label/)).toBeInTheDocument();
-  });
-  it('find label warning msg', () => {
+
     let txtContent = screen.getByTestId(/div-warning-msg/);
     expect(screen.getByTestId(/div-warning-msg/)).toBeInTheDocument();
     expect(txtContent.textContent).toEqual('26/100');
-  });
 
-  it('onchange value', async () => {
     const element = screen.getByDisplayValue('default value to unit test') as HTMLInputElement;
     fireEvent.change(element, { target: { value: 'change value' } });
     expect(element.value).toBe('change value');
-  });
 
-  it('onclick value', async () => {
-    const element = screen.getByDisplayValue('default value to unit test') as HTMLInputElement;
     fireEvent.click(element, { target: { value: 'change value' } });
     expect(element.value).toBe('change value');
+  });
+
+  it('find text box not set row display', async () => {
+    await waitFor(() => {
+      const constainer = render(
+        <Provider store={store}>
+          <ThemeProvider theme={theme}>
+            <TextBoxComment
+              fieldName={'comment label'}
+              defaultValue={'default value to unit test'}
+              maxLength={100}
+              onChangeComment={function (value: string): void {}}
+              isDisable={false}
+              // rowDisplay={rowDisplay_value}
+            />
+          </ThemeProvider>
+        </Provider>
+      );
+    });
+    expect(screen.getByTestId(/form-field-tbxComment/)).toBeInTheDocument();
   });
 });
