@@ -3,11 +3,12 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { Store, AnyAction } from '@reduxjs/toolkit';
 import { initialState } from '../../../mockStore';
-import { inputAdornmentClasses, TextField, ThemeProvider } from '@mui/material';
+import { inputAdornmentClasses, TextField, ThemeProvider, Typography } from '@mui/material';
 import theme from '../../../../styles/theme';
 import { mockUserInfo } from '../../../mockData';
 
-import { BootstrapDialogTitle } from '../../../../components/commons/ui/dialog-title';
+import HtmlTooltip from '../../../../components/commons/ui/html-tooltip';
+import React from 'react';
 
 let wrapper;
 const mockStore = configureStore();
@@ -17,26 +18,19 @@ beforeEach(() => {
   store = mockStore(initialState);
 });
 
-describe('component dailog title', () => {
-  it('find button close', () => {
+describe('component tooltip', () => {
+  it('find message ', () => {
     const constainer = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <BootstrapDialogTitle id='unit test' onClose={function (): void {}} />
+          <HtmlTooltip title={<React.Fragment>{'tooltip'}</React.Fragment>}>
+            <Typography variant='body2' noWrap>
+              {'Tooltip value'}
+            </Typography>
+          </HtmlTooltip>
         </ThemeProvider>
       </Provider>
     );
-    expect(screen.getByRole('button')).toBeInTheDocument();
-  });
-
-  it('not find button close', () => {
-    const constainer = render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <BootstrapDialogTitle id='unit test' />
-        </ThemeProvider>
-      </Provider>
-    );
-    expect(screen.queryByRole('button')).toBeNull();
+    expect(screen.getByText(/Tooltip value/)).toBeInTheDocument();
   });
 });
