@@ -182,7 +182,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
     },
     {
       field: 'numberOfDiscounted',
-      headerName: 'จำนวนขอลด',
+      headerName: 'จำนวนขอส่วนลด',
       flex: 1,
       headerAlign: 'center',
       align: 'right',
