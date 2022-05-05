@@ -48,16 +48,16 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         clearable
         autoOk
         fullWidth
-        variant="inline"
-        inputVariant="outlined"
-        format="DD/MM/YYYY"
+        variant='inline'
+        inputVariant='outlined'
+        format='DD/MM/YYYY'
         className={classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton size="small" onClick={() => handleDateChange(null)}>
-              <CloseIcon fontSize="small" />
+            <IconButton size='small' onClick={() => handleDateChange(null)} data-testid='endDateIconClose'>
+              <CloseIcon fontSize='small' />
             </IconButton>
           ),
           readOnly: true,
@@ -66,7 +66,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
           position: 'start',
         }}
         minDate={props.minDateTo}
-        placeholder="กรุณาเลือกวันที่"
+        placeholder='กรุณาเลือกวันที่'
       />
     );
   } else {
@@ -76,16 +76,16 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         clearable
         autoOk
         fullWidth
-        variant="inline"
-        inputVariant="outlined"
-        format="DD/MM/YYYY"
+        variant='inline'
+        inputVariant='outlined'
+        format='DD/MM/YYYY'
         className={classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton size="small" onClick={() => handleDateChange(null)}>
-              <CloseIcon fontSize="small" />
+            <IconButton size='small' onClick={() => handleDateChange(null)} data-testid='startDateIconClose'>
+              <CloseIcon fontSize='small' />
             </IconButton>
           ),
           readOnly: true,
@@ -93,14 +93,14 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         InputAdornmentProps={{
           position: 'start',
         }}
-        placeholder="กรุณาเลือกวันที่"
+        placeholder='กรุณาเลือกวันที่'
       />
     );
   }
 
   return (
     <div>
-      <MuiPickersUtilsProvider utils={OverwriteMomentBE} locale="th">
+      <MuiPickersUtilsProvider utils={OverwriteMomentBE} locale='th'>
         <ThemeProvider theme={defaultMaterialTheme}>{datePicker}</ThemeProvider>
       </MuiPickersUtilsProvider>
     </div>
