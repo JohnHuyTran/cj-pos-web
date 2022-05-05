@@ -18,15 +18,18 @@ beforeEach(() => {
 });
 
 describe('component dailog title', () => {
-  it('find button close', () => {
+  it('action close', () => {
+    const handleClose = jest.fn();
     const constainer = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <BootstrapDialogTitle id='unit test' onClose={function (): void {}} />
+          <BootstrapDialogTitle id='unit test' onClose={handleClose} />
         </ThemeProvider>
       </Provider>
     );
-    expect(screen.getByRole('button')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button'));
+    expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
   it('not find button close', () => {
