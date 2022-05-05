@@ -3240,7 +3240,7 @@ export const initialState = {
         },
         {
           id: '61dffd799bfc3701dce4f287',
-          name: 'สาขาที่00253 ตลาดโพธาราม',
+          name: 'สาขาที่0239 ตลาดโพธาราม',
           province: {
             code: 52,
             name: 'ราชบุรี',
@@ -11155,7 +11155,7 @@ export const initialState = {
         },
         {
           id: '61dffd799bfc3701dce4f287',
-          name: 'สาขาที่00253 ตลาดโพธาราม',
+          name: 'สาขาที่0239 ตลาดโพธาราม',
           province: {
             code: 52,
             name: 'ราชบุรี',
@@ -15841,7 +15841,7 @@ export const initialState = {
           },
           {
             code: '0239',
-            name: 'สาขาที่00253 ตลาดโพธาราม',
+            name: 'สาขาที่0239 ตลาดโพธาราม',
             isDC: false,
           },
           {
