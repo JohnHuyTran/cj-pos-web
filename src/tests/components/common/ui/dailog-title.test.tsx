@@ -20,7 +20,7 @@ beforeEach(() => {
 describe('component dailog title', () => {
   it('action close', () => {
     const handleClose = jest.fn();
-    const constainer = render(
+    const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <BootstrapDialogTitle id='unit test' onClose={handleClose} />
@@ -33,7 +33,7 @@ describe('component dailog title', () => {
   });
 
   it('not find button close', () => {
-    const constainer = render(
+    const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <BootstrapDialogTitle id='unit test' />

@@ -26,7 +26,7 @@ describe('component tooltip', () => {
       fileName: 'test.pdf',
       mimeType: 'application/pdf',
     };
-    const constainer = render(
+    const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <AccordionHuaweiFile files={[file]} />
@@ -42,7 +42,7 @@ describe('component tooltip', () => {
       fileName: 'test.pdf',
       mimeType: 'application/pdf',
     };
-    const constainer = render(
+    const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <AccordionHuaweiFile files={[file]} />
@@ -60,7 +60,7 @@ describe('component tooltip', () => {
       fileName: 'test.pdf',
       mimeType: 'application/pdf',
     };
-    const constainer = render(
+    const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <AccordionHuaweiFile files={[]} />
@@ -78,7 +78,7 @@ describe('component tooltip', () => {
       fileName: 'test.pdf',
       mimeType: 'application/pdf',
     };
-    const constainer = render(
+    const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <AccordionHuaweiFile files={[file]} />

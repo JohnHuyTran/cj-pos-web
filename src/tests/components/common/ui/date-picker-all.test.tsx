@@ -21,7 +21,7 @@ beforeEach(() => {
 describe('component date picker all', () => {
   it('on close in start date ', () => {
     const handleOnClick = jest.fn();
-    const constainer = render(
+    const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <DatePickerAllComponent onClickDate={handleOnClick} value={new Date()} />
@@ -34,7 +34,7 @@ describe('component date picker all', () => {
 
   it('on icon close in end date ', () => {
     const handleOnClick = jest.fn();
-    const constainer = render(
+    const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <DatePickerAllComponent onClickDate={handleOnClick} value={new Date()} type='TO' />

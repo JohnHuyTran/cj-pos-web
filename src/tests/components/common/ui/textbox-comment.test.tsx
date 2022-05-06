@@ -67,7 +67,7 @@ const handleChangeComment = () => {};
 describe('component text-comment', () => {
   it('find text box set row display', async () => {
     await waitFor(() => {
-      const constainer = render(
+      const container = render(
         <Provider store={store}>
           <ThemeProvider theme={theme}>
             <TextBoxComment
@@ -103,7 +103,7 @@ describe('component text-comment', () => {
 
   it('find text box not set row display', async () => {
     await waitFor(() => {
-      const constainer = render(
+      const container = render(
         <Provider store={store}>
           <ThemeProvider theme={theme}>
             <TextBoxComment

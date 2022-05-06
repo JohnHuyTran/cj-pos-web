@@ -1,9 +1,9 @@
-import { render, screen, waitFor, fireEvent, RenderResult, getByTestId, within, wait } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { Store, AnyAction } from '@reduxjs/toolkit';
 import { initialState } from '../../../mockStore';
-import { inputAdornmentClasses, TextField, ThemeProvider, Typography } from '@mui/material';
+import { ThemeProvider, Typography } from '@mui/material';
 import theme from '../../../../styles/theme';
 import { mockUserInfo } from '../../../mockData';
 
@@ -20,7 +20,7 @@ beforeEach(() => {
 
 describe('component tooltip', () => {
   it('find message ', () => {
-    const constainer = render(
+    const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <HtmlTooltip title={<React.Fragment>{'tooltip'}</React.Fragment>}>

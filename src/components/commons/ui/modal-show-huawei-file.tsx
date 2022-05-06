@@ -33,7 +33,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
     <DialogTitle sx={{ m: 1, p: 2 }} {...other}>
       {children}
 
-      {onClose ? (
+      {onClose && (
         <IconButton
           aria-label='close'
           onClick={onClose}
@@ -42,20 +42,19 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
+          }}>
           <HighlightOff fontSize='large' />
         </IconButton>
-      ) : null}
+      )}
 
       {onPrint ? (
         <Button
           id='btnPrint'
+          data-testid='btn-print'
           variant='contained'
           color='secondary'
           onClick={onPrint}
-          endIcon={<LocalPrintshopOutlinedIcon />}
-        >
+          endIcon={<LocalPrintshopOutlinedIcon />}>
           พิมพ์
         </Button>
       ) : null}
@@ -124,10 +123,9 @@ export default function ModalShowHuaweiFile({
             minWidth: 600,
             minHeight: 600,
             textAlign: 'center',
-          }}
-        >
+          }}>
           {!isImage && (
-            <div id='pdfWrapper' style={{ width: '50vw' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ width: '50vw' }} ref={pdfWrapper} data-testid='testid-pdfWrapper-document'>
               <Document file={{ url }} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page key={`page_${index + 1}`} pageNumber={index + 1} width={initialWidth} />
@@ -137,7 +135,7 @@ export default function ModalShowHuaweiFile({
           )}
 
           {isImage && (
-            <div id='pdfWrapper' style={{ minWidth: '200px' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ minWidth: '200px' }} ref={pdfWrapper} data-testid='testid-pdfWrapper-image'>
               <img src={url} style={{ minWidth: '200px' }} />
             </div>
           )}
