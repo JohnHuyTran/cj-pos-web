@@ -23,7 +23,7 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -117,29 +117,22 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
-          <HighlightOff fontSize="large" />
+          }}>
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
     </DialogTitle>
   );
 };
 
-export default function CheckOrderDetail({
-  sdNo,
-  sdRefNo,
-  shipmentNo,
-  defaultOpen,
-  onClickClose,
-}: CheckOrderSDDetailProps) {
+export default function CheckOrderDetail({ defaultOpen, onClickClose }: CheckOrderSDDetailProps) {
   const classes = useStyles();
 
   const res = useAppSelector((state) => state.checkOrderSDList.orderList);
@@ -185,8 +178,8 @@ export default function CheckOrderDetail({
 
   return (
     <div>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+      <Dialog open={open} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>รายละเอียด อ้างอิง SD โอนลอย</Typography>
         </BootstrapDialogTitle>
 
@@ -194,48 +187,48 @@ export default function CheckOrderDetail({
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร LD:</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร LD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{SD.shipmentNo}</Typography>
+                <Typography variant='body2'>{SD.docRefNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">สถานะ:</Typography>
+                <Typography variant='body2'>สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentStatusText}</Typography>
+                <Typography variant='body2'>{shipmentStatusText}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{SD.sdNo}</Typography>
+                <Typography variant='body2'>{SD.sdNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">ประเภท:</Typography>
+                <Typography variant='body2'>ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentTypeText}</Typography>
+                <Typography variant='body2'>{shipmentTypeText}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">วันที่:</Typography>
+                <Typography variant='body2'>วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{shipmentDateFormat}</Typography>
+                <Typography variant='body2'>{shipmentDateFormat}</Typography>
               </Grid>
               <Grid item lg={2}>
                 {SD.hasDoc === true && SD.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                  <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
+                  <Typography variant='body2'>ใบผลต่างหลังเซ็นต์:</Typography>
                 )}
               </Grid>
             </Grid>
           </Box>
 
-          <Box mt={6} bgcolor="background.paper">
+          <Box mt={6} bgcolor='background.paper'>
             <div style={{ width: '100%' }} className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rowsEntries}
