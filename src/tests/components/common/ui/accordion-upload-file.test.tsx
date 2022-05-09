@@ -92,25 +92,25 @@ describe('component accordion upload file', () => {
     }, 5000);
   });
 
-  it('should not permission delete icon delete not display', () => {
-    const container = render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <AccordionUploadFile
-            files={[file, file, file, file, file]}
-            isStatus={true}
-            onChangeUploadFile={handleOnChangeUploadFile}
-            reMark={'remark unit test'}
-            enabledControl={false}
-            deletePermission={false}
-          />
-        </ThemeProvider>
-      </Provider>
-    );
-    // setTimeout(() => {
-    expect(screen.queryByTestId('testid-btnDeletefile')).toBeNull();
-    // }, 5000);
-  });
+  // it('should not permission delete icon delete not display', () => {
+  //   const container = render(
+  //     <Provider store={store}>
+  //       <ThemeProvider theme={theme}>
+  //         <AccordionUploadFile
+  //           files={[file, file, file, file, file]}
+  //           isStatus={true}
+  //           onChangeUploadFile={handleOnChangeUploadFile}
+  //           reMark={'remark unit test'}
+  //           enabledControl={false}
+  //           deletePermission={false}
+  //         />
+  //       </ThemeProvider>
+  //     </Provider>
+  //   );
+  //   // setTimeout(() => {
+  //   expect(screen.queryByTestId('testid-btnDeletefile')).toBeNull();
+  //   // }, 5000);
+  // });
 
   it('should remark display to remark unit test ', () => {
     const container = render(

@@ -58,7 +58,11 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton size='small' onClick={() => handleDateChange(null)}>
+            <IconButton
+              size='small'
+              onClick={() => handleDateChange(null)}
+              data-testid='endDateIconClose'
+              id='endDateIconClose'>
               <CloseIcon fontSize='small' />
             </IconButton>
           ),
@@ -87,7 +91,11 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton size='small' onClick={() => handleDateChange(null)}>
+            <IconButton
+              size='small'
+              onClick={() => handleDateChange(null)}
+              data-testid='startDateIconClose'
+              id='startDateIconClose'>
               <CloseIcon fontSize='small' />
             </IconButton>
           ),
