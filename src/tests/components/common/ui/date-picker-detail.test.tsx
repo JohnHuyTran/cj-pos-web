@@ -28,7 +28,8 @@ describe('component date picker all', () => {
         </ThemeProvider>
       </Provider>
     );
-    fireEvent.click(screen.getByTestId(/startDateIconClose/));
+    // fireEvent.click(screen.getByTestId(/startDateIconClose/));
+    fireEvent.click(getById('startDateIconClose')!);
     expect(handleOnClick).toHaveBeenCalledTimes(1);
   });
 
@@ -41,7 +42,7 @@ describe('component date picker all', () => {
         </ThemeProvider>
       </Provider>
     );
-    fireEvent.click(screen.getByTestId(/endDateIconClose/));
+    fireEvent.click(getById('endDateIconClose')!);
     expect(handleOnClick).toHaveBeenCalledTimes(1);
   });
 });
