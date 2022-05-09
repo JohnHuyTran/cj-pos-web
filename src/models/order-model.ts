@@ -203,7 +203,9 @@ export interface SDResponse {
 }
 
 export interface SDInfo {
-  shipmentNo: string;
+  // shipmentNo: string;
+  docRefNo: string;
+  docType: string;
   shipmentDate: string;
   status: string;
   sapDocType: string;

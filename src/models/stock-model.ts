@@ -34,6 +34,8 @@ export interface StockInfo {
   unitName: string;
   barFactor?: number;
   positions?: positionInfo[];
+  qty?: number;
+  baseUnitQty?: number;
 }
 
 export interface positionInfo {
