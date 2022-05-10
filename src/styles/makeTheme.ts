@@ -13,6 +13,7 @@ const useStyles = makeStyles({
       // opacity: 0,
       color: '#263238 !important',
       '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+      backgroundColor: '#EAEBEB',
     },
   },
   MtextFieldDetail: {

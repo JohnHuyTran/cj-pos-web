@@ -12,6 +12,7 @@ import DatePickerAllComponent from '../commons/ui/date-picker-all';
 import ModalAddTypeProduct from '../commons/ui/modal-add-type-products';
 import StockBalance from './stock-balance';
 import StockBalanceLocation from './stock-balance-location';
+import StockBalanceNegative from './stock-balance-negative';
 import SearchIcon from '@mui/icons-material/Search';
 import {
   clearDataFilter,
@@ -157,7 +158,7 @@ function StockSearch() {
   };
 
   const onClickSearchBtn = async () => {
-    if (value === 1) {
+    if (value === 2) {
       setFlagSearchLocation(true);
     }
 
@@ -191,7 +192,7 @@ function StockSearch() {
         await dispatch(savePayloadSearch(payload));
         await dispatch(savePayloadSearchLocation(payload));
         setFlagSearch(true);
-      } else if (value === 1) {
+      } else if (value === 2) {
         const payload: OutstandingRequest = {
           limit: limits,
           page: page,
@@ -217,7 +218,7 @@ function StockSearch() {
         setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
         return false;
       }
-    } else if (value === 1) {
+    } else if (value === 2) {
       if (Object.keys(payloadAddTypeProduct).length <= 0 && values.positionName === '') {
         setOpenAlert(true);
         setTextError('กรุณาระบุสินค้าหรือโลเคชั่นสาขาที่ต้องการค้นหา');
@@ -333,24 +334,27 @@ function StockSearch() {
             <Typography gutterBottom variant='subtitle1' component='div'>
               คลัง
             </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id='tbxlocationId'
-                name='locationId'
-                value={values.locationId}
-                onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={'ALL'} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem key={'1'} value={'001'}>
-                  หน้าร้าน
-                </MenuItem>
-                <MenuItem key={'2'} value={'002'}>
-                  หลังร้าน
-                </MenuItem>
-              </Select>
-            </FormControl>
+            {value !== 1 && (
+              <FormControl fullWidth className={classes.Mselect}>
+                <Select
+                  id='tbxlocationId'
+                  name='locationId'
+                  value={values.locationId}
+                  onChange={handleChange}
+                  inputProps={{ 'aria-label': 'Without label' }}>
+                  <MenuItem value={'ALL'} selected={true}>
+                    ทั้งหมด
+                  </MenuItem>
+                  <MenuItem key={'1'} value={'001'}>
+                    หน้าร้าน
+                  </MenuItem>
+                  <MenuItem key={'2'} value={'002'}>
+                    หลังร้าน
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            )}
+            {value === 1 && <TextField size='small' className={classes.MtextField} fullWidth disabled={value === 1} />}
           </Grid>
           <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant='subtitle1' component='div'>
@@ -384,8 +388,8 @@ function StockSearch() {
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder={value === 0 ? '' : 'กรุณาระบุโลเคชั่นสาขา'}
-              disabled={value === 0}
+              placeholder={value === 0 || value === 1 ? '' : 'กรุณาระบุโลเคชั่นสาขา'}
+              disabled={value === 0 || value === 1}
             />
           </Grid>
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
@@ -411,18 +415,17 @@ function StockSearch() {
         </Grid>
       </Box>
 
-      {/* {flagSearch && (
-        <> */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
           <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
+          <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลังติดลบ</Typography>} {...a11yProps(1)} />
           <Tab
             label={
               <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
                 สินค้าคงคลัง(ตาม Location)
               </Typography>
             }
-            {...a11yProps(1)}
+            {...a11yProps(2)}
           />
         </Tabs>
       </Box>
@@ -431,10 +434,12 @@ function StockSearch() {
         {flagSearch && <StockBalance />}
       </TabPanel>
       <TabPanel value={value} index={1}>
+        {flagSearch && <StockBalanceNegative />}
+      </TabPanel>
+      <TabPanel value={value} index={2}>
         {flagSearch && <StockBalanceLocation />}
       </TabPanel>
-      {/* </>
-      )} */}
+
       <LoadingModal open={openLoadingModal.open} />
       <ModalAddTypeProduct
         open={openModelAddItems}
