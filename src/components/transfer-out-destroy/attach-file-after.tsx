@@ -21,6 +21,7 @@ interface fileDisplayList {
   fileName?: string;
   status?: string;
   mimeType?: string;
+  branchCode?: string;
 }
 
 interface Props {
@@ -140,9 +141,10 @@ function AttachFileAfter({
   function getHuaweiFileUrl(item: fileDisplayList) {
     const keys = item.fileKey ? item.fileKey : '';
     const name = item.fileName ? item.fileName : '';
+    const branchCode = item.branchCode ? item.branchCode : '';
 
     if (item.status === 'old') {
-      getFileUrlHuawei(keys)
+      getFileUrlHuawei(keys, branchCode)
         .then((resp) => {
           if (resp && resp.data) {
             setFileUrl(resp.data);
@@ -175,6 +177,7 @@ function AttachFileAfter({
         fileName: data.fileName,
         status: 'old',
         mimeType: data.mimeType,
+        branchCode: data.branchCode,
       };
     });
   };
@@ -207,25 +210,6 @@ function AttachFileAfter({
       newFileDisplayList = [...newFileHuawei];
     }
   }
-
-  // const handleDelete = (file: any) => {
-  //   const fileNameDel = file.fileName;
-  //   const fileKeyDel = file.fileKey;
-
-  //   if (file.status === 'new') {
-  //     setFileList(fileList.filter((r: any) => r.name !== fileNameDel));
-  //   } else if (file.status === 'old') {
-  //     if (docType && docNo) {
-  //       delFileUrlHuawei(fileKeyDel, docType, docNo)
-  //         .then((value) => {
-  //           return onChangeUploadFile(true);
-  //         })
-  //         .catch((error: ApiError) => {
-  //           return onChangeUploadFile(false);
-  //         });
-  //     }
-  //   }
-  // };
 
   const handleDeleteAttachFile = (file: any) => {
     //handle custom delete attach file

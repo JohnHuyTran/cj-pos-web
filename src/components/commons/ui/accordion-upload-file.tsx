@@ -178,6 +178,7 @@ function AccordionUploadFile({
         fileName: data.fileName,
         status: 'old',
         mimeType: data.mimeType,
+        branchCode: data.branchCode,
       };
     });
   };
