@@ -222,6 +222,7 @@ export default function ModalCreateTransferOutDestroy({
             fileName: item.name,
             status: 'old',
             mimeType: item.mimeType,
+            branchCode: item.branchCode
           });
         }
         setAttachFileBeforeOlds(lstAttachFileBefore);
@@ -236,6 +237,7 @@ export default function ModalCreateTransferOutDestroy({
             fileName: item.name,
             status: 'old',
             mimeType: item.mimeType,
+            branchCode: item.branchCode
           });
         }
         setAttachFileAfterOlds(lstAttachFileAfter);
@@ -374,7 +376,8 @@ export default function ModalCreateTransferOutDestroy({
             allAttachFile.push({
               key: oldFile.fileKey,
               name: oldFile.fileName,
-              mimeType: oldFile.mimeType
+              mimeType: oldFile.mimeType,
+              branchCode: oldFile.branchCode
             });
           }
         }
@@ -387,7 +390,8 @@ export default function ModalCreateTransferOutDestroy({
             allAttachFile.push({
               key: oldFile.fileKey,
               name: oldFile.fileName,
-              mimeType: oldFile.mimeType
+              mimeType: oldFile.mimeType,
+              branchCode: oldFile.branchCode
             });
           }
         }
@@ -435,6 +439,7 @@ export default function ModalCreateTransferOutDestroy({
                     fileName: item.name,
                     status: 'old',
                     mimeType: item.mimeType,
+                    branchCode: item.branchCode
                   });
                 }
                 await setUploadFileFlag(true);
