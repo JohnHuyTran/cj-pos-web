@@ -581,10 +581,12 @@ export default function CheckOrderDetail({
   const handleApproveBtn = async () => {
     mapUpdateState().then(() => {
       setItemsDiffState([]);
-      setOpenModelConfirm(true);
+
       setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
       const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       const itemsList: any = [];
+
+      let qtyIsValid: boolean = true;
 
       let sumActualQtyItems: number = 0;
       let sumQuantityRefItems: number = 0;
@@ -617,6 +619,11 @@ export default function CheckOrderDetail({
           expireDate: '',
           isTote: data.isTote,
         };
+
+        if (data.isTote === true && !(data.actualQty * 1 >= 0 && data.actualQty * 1 <= 1)) {
+          qtyIsValid = false;
+        }
+
         setItemsDiffState((itemsDiffState) => [...itemsDiffState, itemDiff]);
         itemsList.push(data);
       });
@@ -624,6 +631,15 @@ export default function CheckOrderDetail({
       setSumActualQty(sumActualQtyItems);
       setSumQuantityRef(sumQuantityRefItems);
       // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
+
+      if (!qtyIsValid) {
+        setOpenFailAlert(!qtyIsValid);
+        setTextFail('จำนวนรับจริงของTote ต้องเป็น 0 หรือ 1 เท่านั้น');
+      }
+
+      if (qtyIsValid) {
+        setOpenModelConfirm(true);
+      }
     });
   };
 
