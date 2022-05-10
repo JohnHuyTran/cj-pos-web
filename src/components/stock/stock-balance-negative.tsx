@@ -5,16 +5,16 @@ import { OutstandingRequest, StockInfo } from '../../models/stock-model';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { SearchOff } from '@mui/icons-material';
-import { featchStockBalanceSearchAsync, savePayloadSearch } from '../../store/slices/stock/stock-balance-search-slice';
-import { color } from '@mui/system';
+import { savePayloadSearch } from '../../store/slices/stock/stock-balance-search-slice';
+import { featchStockBalanceNegativeSearchAsync } from '../../store/slices/stock/stock-balance-negative-search-slice';
 
 function StockBalance() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const savePayLoadSearch = useAppSelector((state) => state.stockBalanceSearchSlice.savePayloadSearch);
-  const items = useAppSelector((state) => state.stockBalanceSearchSlice.stockList);
-  const cuurentPage = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.page);
-  const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
+  const savePayLoadSearch = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.savePayloadSearch);
+  const items = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.stockList);
+  const cuurentPage = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.stockList.page);
+  const limit = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.stockList.perPage);
   const [pageSize, setPageSize] = React.useState(limit);
 
   const columns: GridColDef[] = [
@@ -49,7 +49,7 @@ function StockBalance() {
       ),
     },
     {
-      field: 'baseUnitQty',
+      field: 'availableQty',
       headerClassName: 'columnHeaderTitle-BG',
       cellClassName: 'columnFilled-BG',
       headerName: 'สินค้าคงเหลือ',
@@ -79,10 +79,7 @@ function StockBalance() {
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
       skuCode: data.skuCode,
       skuName: data.skuName,
-      locationCode: data.locationCode,
-      locationName: data.locationName,
-      baseUnitQty: data.baseUnitQty,
-      unitCode: data.unitCode,
+      availableQty: data.availableQty,
       unitName: data.unitName,
     };
   });
@@ -90,40 +87,28 @@ function StockBalance() {
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
-
     let page: number = newPage + 1;
-
-    const payloadNewpage: OutstandingRequest = {
-      limit: pageSize,
-      page: page,
-      branchCode: savePayLoadSearch.branchCode,
-      dateFrom: savePayLoadSearch.dateFrom,
-      skuCodes: savePayLoadSearch.skuCodes,
-      locationCode: savePayLoadSearch.locationCode,
-    };
-
-    await dispatch(featchStockBalanceSearchAsync(payloadNewpage));
-    await dispatch(savePayloadSearch(payloadNewpage));
+    handleSearchStockBalanceNegative(pageSize, page);
     setLoading(false);
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
     setPageSize(pageSize);
     setLoading(true);
+    handleSearchStockBalanceNegative(pageSize, 1);
+    setLoading(false);
+  };
 
+  const handleSearchStockBalanceNegative = async (pageLimit: number, page: number) => {
     const payloadNewpage: OutstandingRequest = {
-      limit: pageSize,
-      page: 1,
+      limit: pageLimit,
+      page: page,
       branchCode: savePayLoadSearch.branchCode,
-      dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
-      locationCode: savePayLoadSearch.locationCode,
     };
 
-    await dispatch(featchStockBalanceSearchAsync(payloadNewpage));
+    await dispatch(featchStockBalanceNegativeSearchAsync(payloadNewpage));
     await dispatch(savePayloadSearch(payloadNewpage));
-
-    setLoading(false);
   };
 
   return (

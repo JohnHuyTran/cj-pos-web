@@ -343,6 +343,9 @@ export const environment = {
         searchByLocation: {
           url: '/stock/stock-balance/search-by-location',
         },
+        searchByNegative: {
+          url: '/stock/stock-balance/search-negative-balance',
+        },
       },
       stockMovement: {
         search: {

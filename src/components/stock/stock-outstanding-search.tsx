@@ -30,6 +30,7 @@ import { updateAddTypeAndProductState } from '../../store/slices/add-type-produc
 import AlertError from '../commons/ui/alert-error';
 import _ from 'lodash';
 import LoadingModal from '../commons/ui/loading-modal';
+import { featchStockBalanceNegativeSearchAsync } from '../../store/slices/stock/stock-balance-negative-search-slice';
 interface State {
   storeId: number;
   locationId: string;
@@ -163,6 +164,7 @@ function StockSearch() {
     }
 
     handleOpenLoading('open', true);
+
     if (isValidateInput()) {
       let limits: number;
       if (limit === 0 || limit === undefined) {
@@ -188,7 +190,19 @@ function StockSearch() {
         };
 
         await dispatch(featchStockBalanceSearchAsync(payload));
-        await dispatch(featchStockBalanceLocationSearchAsync(payload));
+        // await dispatch(featchStockBalanceLocationSearchAsync(payload));
+        await dispatch(savePayloadSearch(payload));
+        await dispatch(savePayloadSearchLocation(payload));
+        setFlagSearch(true);
+      } else if (value === 1) {
+        const payload: OutstandingRequest = {
+          limit: limits,
+          page: page,
+          skuCodes: filterSKU,
+          branchCode: branchFromCode,
+        };
+
+        await dispatch(featchStockBalanceNegativeSearchAsync(payload));
         await dispatch(savePayloadSearch(payload));
         await dispatch(savePayloadSearchLocation(payload));
         setFlagSearch(true);
@@ -208,6 +222,7 @@ function StockSearch() {
         setFlagSearch(true);
       }
     }
+
     handleOpenLoading('open', false);
   };
 
