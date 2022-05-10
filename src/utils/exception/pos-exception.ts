@@ -50,5 +50,5 @@ export function getErrorMessageHttp(error: any) {
 }
 
 export const isErrorCode = (code: any) => {
-  return !(code === 20000 || code === 20100);
+  return !(code === 20000 || code === 200 || code === 20100);
 };
