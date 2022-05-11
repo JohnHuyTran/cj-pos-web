@@ -935,7 +935,7 @@ export default function CheckOrderDetail({
             <Grid container spacing={2} display="flex" justifyContent="space-between">
               {/* <Grid item xl={2}> */}
               <Grid item xl={4}>
-                {statusWaitApprove1 && (
+                {statusWaitApprove1 && orderDetail.sdType !== 1 && (
                   <>
                     <Typography
                       variant="body1"
@@ -1132,6 +1132,7 @@ export default function CheckOrderDetail({
         sumActualQty={sumActualQty}
         sumQuantityRef={sumQuantityRef}
         docType={docType}
+        sdType={orderDetail.sdType}
       />
 
       <ConfirmExitModel
