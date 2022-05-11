@@ -20,9 +20,9 @@ const initialState: State = {
 
 export const getTransferOutDetail = createAsyncThunk(
     "getTransferOutDetail",
-    async (id: string) => {
+    async (docNO: string) => {
         try {
-            const apiRootPath = `${environment.withDraw.transferOut.detail.url}/${id}`;
+            const apiRootPath = `${environment.withDraw.transferOut.detail.url}/${docNO}`;
             let response: TransferOutDetailResponse = {
                 ref: "",
                 code: 0,

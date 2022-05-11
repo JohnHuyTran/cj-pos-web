@@ -320,7 +320,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
     handleOpenLoading('open', true);
     if (chkPN !== 'checked') {
       try {
-        await dispatch(getTransferOutDetail(params.row.id));
+        await dispatch(getTransferOutDetail(params.row.documentNumber));
         if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
           if (TO_TYPE.TO_WITHOUT_DISCOUNT === params.row.typeValue) {
             setOpenDetail(true);

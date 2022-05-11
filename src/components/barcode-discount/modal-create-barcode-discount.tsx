@@ -294,6 +294,7 @@ export default function ModalCreateBarcodeDiscount({
             fileName: item.name,
             status: 'old',
             mimeType: item.mimeType,
+            branchCode: item.branchCode
           });
         }
         setAttachFileOlds(lstAttachFile);
@@ -505,7 +506,8 @@ export default function ModalCreateBarcodeDiscount({
             allAttachFile.push({
               key: oldFile.fileKey,
               name: oldFile.fileName,
-              mimeType: oldFile.mimeType
+              mimeType: oldFile.mimeType,
+              branchCode: oldFile.branchCode
             });
           }
         }
@@ -543,6 +545,7 @@ export default function ModalCreateBarcodeDiscount({
                     fileName: item.name,
                     status: 'old',
                     mimeType: item.mimeType,
+                    branchCode: item.branchCode
                   });
                 }
                 await setUploadFileFlag(true);

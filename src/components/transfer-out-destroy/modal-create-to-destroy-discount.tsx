@@ -213,6 +213,7 @@ export default function ModalCreateToDestroyDiscount({
             fileName: item.name,
             status: 'old',
             mimeType: item.mimeType,
+            branchCode: item.branchCode
           });
         }
         setAttachFileBeforeOlds(lstAttachFileBefore);
@@ -226,6 +227,7 @@ export default function ModalCreateToDestroyDiscount({
             fileName: item.name,
             status: 'old',
             mimeType: item.mimeType,
+            branchCode: item.branchCode
           });
         }
         setAttachFileAfterOlds(lstAttachFileAfter);
@@ -360,7 +362,8 @@ export default function ModalCreateToDestroyDiscount({
           allAttachFile.push({
             key: oldFile.fileKey,
             name: oldFile.fileName,
-            mimeType: oldFile.mimeType
+            mimeType: oldFile.mimeType,
+            branchCode: oldFile.branchCode
           });
         }
       }
@@ -410,6 +413,7 @@ export default function ModalCreateToDestroyDiscount({
                     fileName: item.name,
                     status: 'old',
                     mimeType: item.mimeType,
+                    branchCode: item.branchCode
                   });
                 }
                 await setUploadFileFlag(true);
@@ -425,6 +429,7 @@ export default function ModalCreateToDestroyDiscount({
                     fileName: item.name,
                     status: 'old',
                     mimeType: item.mimeType,
+                    branchCode: item.branchCode
                   });
                 }
                 await setUploadFileAfterFlag(true);

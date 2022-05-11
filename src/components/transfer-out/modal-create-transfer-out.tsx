@@ -224,6 +224,7 @@ export default function ModalCreateTransferOut({
             fileName: item.name,
             status: 'old',
             mimeType: item.mimeType,
+            branchCode: item.branchCode
           });
         }
         setAttachFileOlds(lstAttachFile);
@@ -360,7 +361,8 @@ export default function ModalCreateTransferOut({
           allAttachFile.push({
             key: oldFile.fileKey,
             name: oldFile.fileName,
-            mimeType: oldFile.mimeType
+            mimeType: oldFile.mimeType,
+            branchCode: oldFile.branchCode
           });
         }
       }
@@ -411,6 +413,7 @@ export default function ModalCreateTransferOut({
                     fileName: item.name,
                     status: 'old',
                     mimeType: item.mimeType,
+                    branchCode: item.branchCode
                   });
                 }
                 await setUploadFileFlag(true);

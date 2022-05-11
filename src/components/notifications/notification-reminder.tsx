@@ -13,12 +13,13 @@ import { getTransferOutDetail } from '../../store/slices/transfer-out-detail-sli
 import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-detail-slice';
 import ModalCreateBarcodeDiscount from '../barcode-discount/modal-create-barcode-discount';
 import { Action, DateFormat } from '../../utils/enum/common-enum';
-import { objectNullOrEmpty } from '../../utils/utils';
+import { getBranchName, objectNullOrEmpty } from '../../utils/utils';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import ModalCreateTransferOutDestroy from '../transfer-out-destroy/modal-create-transfer-out-destroy';
 import ModalCreateTransferOut from '../transfer-out/modal-create-transfer-out';
 import { ShoppingCartSharp } from '@mui/icons-material';
+import HtmlTooltip from '../commons/ui/html-tooltip';
 
 interface Props {
   refresh: boolean;
@@ -37,6 +38,7 @@ export default function NotificationReminder(props: Props) {
   const dispatch = useAppDispatch();
   const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail);
   const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail);
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   const userPermission =
     !objectNullOrEmpty(userInfo) &&
@@ -99,12 +101,12 @@ export default function NotificationReminder(props: Props) {
       handleUpdateRead(item.id);
       if (item.type === 'REJECT_TRANSFER_OUT' || item.type === 'CLOSE_TRANSFER_OUT') {
         if (item.payload.type === 1) {
-          await dispatch(getTransferOutDetail(item.payload._id));
+          await dispatch(getTransferOutDetail(item.payload.documentNumber));
           if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
             setOpenTransferOutDetail(true);
           }
         } else if (item.payload.type === 2) {
-          await dispatch(getTransferOutDetail(item.payload._id));
+          await dispatch(getTransferOutDetail(item.payload.documentNumber));
           if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
             setOpenTransferOutDestroyDetail(true);
           }
@@ -134,17 +136,75 @@ export default function NotificationReminder(props: Props) {
       }
     }
   };
+  const genStatusValue = (statusLabel: any, styleCustom: any) => {
+    return (
+      <HtmlTooltip title={<React.Fragment>{statusLabel}</React.Fragment>}>
+        <Typography className={classes.MLabelBDStatus} sx={styleCustom}>
+          {statusLabel}
+        </Typography>
+      </HtmlTooltip>
+    );
+  };
 
   const listTask = listData.map((item: any, index: number) => {
-    let content;
-    if (item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE') {
-      content = 'ส่วนลดสินค้า';
-    } else {
-      if (item.payload.type === 1) {
-        content = 'เบิก-ใช้ในการทำกิจกรรม';
-      } else {
-        content = 'เบิก-ทำลายไม่มีส่วนลด';
-      }
+    let content, statusDisplay, documentNumber, branchCode;
+    switch (item.type) {
+      case 'REJECT_BARCODE':
+        {
+          content = 'ส่วนลดสินค้า';
+          branchCode = item.payload.branchCode;
+          documentNumber = item.payload.documentNumber;
+          statusDisplay = genStatusValue('ไม่อนุมัติ', {
+            color: '#F76C6C',
+            backgroundColor: '#FFD7D7',
+          });
+        }
+
+        break;
+      case 'CLOSE_TRANSFER_OUT':
+        {
+          if (item.payload.type === 1) {
+            content = 'เบิก-ใช้ในการทำกิจกรรม';
+          } else {
+            content = 'เบิก-ทำลายไม่มีส่วนลด';
+          }
+          documentNumber = item.payload.documentNumber;
+          branchCode = item.payload.branch;
+          statusDisplay = genStatusValue('ปิดงาน', {
+            color: '#676767',
+            backgroundColor: '#EAEBEB',
+          });
+        }
+
+        break;
+      case 'REJECT_TRANSFER_OUT':
+        {
+          if (item.payload.type === 1) {
+            content = 'เบิก-ใช้ในการทำกิจกรรม';
+          } else {
+            content = 'เบิก-ทำลายไม่มีส่วนลด';
+          }
+          documentNumber = item.payload.documentNumber;
+          branchCode = item.payload.branch;
+          statusDisplay = genStatusValue('ไม่อนุมัติ', {
+            color: '#F76C6C',
+            backgroundColor: '#FFD7D7',
+          });
+        }
+
+        break;
+      case 'EVENT_REQUEST_GENERATE_ORDER_SHIPMENT_ORDER_TOTE':
+        {
+          content = 'โอนสินค้าระหว่างสาขา - อยู่ระหว่างขนส่ง';
+          branchCode = item.payload.branchCode;
+          documentNumber = item.payload.docno;
+          statusDisplay = genStatusValue('รับทราบ', {
+            color: '#36C690',
+            backgroundColor: '#E7FFE9',
+          });
+        }
+
+        break;
     }
     return (
       <Box
@@ -176,31 +236,24 @@ export default function NotificationReminder(props: Props) {
             }}
           >
             <span style={{ color: theme.palette.primary.main }}>{content}: </span>
-            <span style={{ marginLeft: 5 }}>
-              {item.payload.documentNumber} | {item.branchCode}-{item.payload.branchName}
-            </span>
+            <HtmlTooltip
+              title={
+                <React.Fragment>
+                  {documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+                </React.Fragment>
+              }
+            >
+              <span style={{ marginLeft: 5 }}>
+                {documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+              </span>
+            </HtmlTooltip>
             <Box>
               <Typography style={{ color: theme.palette.grey[500], fontSize: '11px' }}>
                 กำหนดดำเนินการ {moment(item.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ textAlign: 'right', mt: '3px', pr: 2.5 }}>
-            <Typography
-              sx={{
-                backgroundColor: item.type === 'CLOSE_TRANSFER_OUT' ? '#EAEBEB' : '#FFD7D7',
-                color: item.type === 'CLOSE_TRANSFER_OUT' ? '#676767' : '#F76C6C',
-                textAlign: 'center',
-                marginTop: '5px',
-                padding: '2px 15px 3px 15px',
-                borderRadius: '8px',
-                fontSize: '13px',
-                width: '80px',
-              }}
-            >
-              {item.type === 'CLOSE_TRANSFER_OUT' ? 'ปิดงาน' : 'ไม่อนุมัติ'}
-            </Typography>
-          </Box>
+          <Box sx={{ textAlign: 'right', mt: '3px', pr: 2.5 }}>{statusDisplay}</Box>
         </Box>
       </Box>
     );

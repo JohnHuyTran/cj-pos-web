@@ -96,7 +96,7 @@ export default function SelectBranch(props: Props): ReactElement {
   const BranchItem = (props: ItemProps) => {
     const { label, onDelete, ...other } = props;
     return (
-      <div className='wrapper-item'>
+      <div className="wrapper-item">
         <span>{label}</span>
         {!disabled && <CloseIcon onClick={onDelete} />}
       </div>
@@ -170,10 +170,10 @@ export default function SelectBranch(props: Props): ReactElement {
             marginRight: 0,
           },
         }}
-        placeholder='กรุณาเลือก'
+        placeholder="กรุณาเลือก"
         disabled={disabled}
       />
-      <Dialog maxWidth='lg' fullWidth open={open}>
+      <Dialog maxWidth="lg" fullWidth open={open}>
         <DialogTitle>
           <IconButton
             onClick={handleCloseModal}
@@ -182,8 +182,9 @@ export default function SelectBranch(props: Props): ReactElement {
               right: 8,
               top: 8,
               color: (theme: any) => theme.palette.grey[400],
-            }}>
-            <CancelOutlinedIcon fontSize='large' stroke={'white'} strokeWidth={1} />
+            }}
+          >
+            <CancelOutlinedIcon fontSize="large" stroke={'white'} strokeWidth={1} />
           </IconButton>
         </DialogTitle>
 
@@ -195,8 +196,8 @@ export default function SelectBranch(props: Props): ReactElement {
                 {...defaultPropsBranchList}
                 className={classes.Mautocomplete}
                 popupIcon={<SearchIcon />}
-                noOptionsText='ไม่พอข้อมูล'
-                id='selBranchNo'
+                noOptionsText="ไม่พบข้อมูล"
+                id="selBranchNo"
                 onChange={handleChangeBranch}
                 renderOption={(props, option) => {
                   return (
@@ -208,14 +209,14 @@ export default function SelectBranch(props: Props): ReactElement {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder='ทั้งหมด'
-                    size='small'
+                    placeholder="ทั้งหมด"
+                    size="small"
                     className={classes.MtextField}
                     fullWidth
                     InputProps={{
                       ...params.InputProps,
                       endAdornment: (
-                        <InputAdornment position='start'>
+                        <InputAdornment position="start">
                           <SearchIcon />
                         </InputAdornment>
                       ),
@@ -239,21 +240,23 @@ export default function SelectBranch(props: Props): ReactElement {
             </Grid>
             <Grid item xs={12} sx={{ textAlign: 'right', height: '43px', padding: '0 !important', marginTop: '30px' }}>
               <Button
-                variant='contained'
-                color='cancelColor'
+                variant="contained"
+                color="cancelColor"
                 className={classes.MbtnSearch}
-                size='large'
+                size="large"
                 onClick={handleClearForm}
-                sx={{ marginRight: '15px' }}>
+                sx={{ marginRight: '15px' }}
+              >
                 เคลียร์
               </Button>
               <Button
-                variant='contained'
-                color='info'
+                variant="contained"
+                color="info"
                 className={classes.MbtnSearch}
-                size='large'
+                size="large"
                 onClick={handleAddForm}
-                disabled={listBranchSelect.length === 0 && props.listSelect.length === 0}>
+                disabled={listBranchSelect.length === 0 && props.listSelect.length === 0}
+              >
                 เลือกสาขา
               </Button>
             </Grid>
