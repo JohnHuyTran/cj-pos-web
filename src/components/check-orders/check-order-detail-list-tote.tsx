@@ -148,17 +148,22 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
               </Link>
             );
           } else if (params.getValue(params.id, 'canAddTote') === true) {
-            return (
-              <Button
-                variant="contained"
-                size="small"
-                className={classes.MbtnApprove}
-                sx={{ minWidth: 110 }}
-                onClick={() => handleOpenOrderReceiveModal(params)}
-              >
-                รับสินค้าใน Tote
-              </Button>
-            );
+            let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qtyRef'));
+            if (diff >= 0) {
+              return (
+                <Button
+                  variant="contained"
+                  size="small"
+                  className={classes.MbtnApprove}
+                  sx={{ minWidth: 110 }}
+                  onClick={() => handleOpenOrderReceiveModal(params)}
+                >
+                  รับสินค้าใน Tote
+                </Button>
+              );
+            } else {
+              return <div></div>;
+            }
           } else if (params.getValue(params.id, 'canAddTote') === false && params.getValue(params.id, 'sdNo') === '') {
             return (
               <Button variant="contained" size="small" className={classes.MbtnApprove} sx={{ minWidth: 110 }} disabled>
