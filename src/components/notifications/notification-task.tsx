@@ -122,12 +122,12 @@ export default function NotificationTask(props: Props) {
       handleUpdateRead(item.id);
       if (item.type === 'SEND_TO_FOR_APPROVAL' || item.type === 'APPROVE_TRANSFER_OUT') {
         if (item.payload.type === 1) {
-          await dispatch(getTransferOutDetail(item.payload._id));
+          await dispatch(getTransferOutDetail(item.payload.documentNumber));
           if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
             setOpenTransferOutDetail(true);
           }
         } else if (item.payload.type === 2) {
-          await dispatch(getTransferOutDetail(item.payload._id));
+          await dispatch(getTransferOutDetail(item.payload.documentNumber));
           if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
             setOpenTransferOutDestroyDetail(true);
           }
@@ -153,9 +153,9 @@ export default function NotificationTask(props: Props) {
             console.log('err : ', err);
           });
       } else if (item.type == 'SEND_ORDER_RECEIVE_FOR_VERIFY') {
-        setidDC(item.payload.id);
-        await dispatch(featchorderDetailDCAsync(item.payload.id));
-        await dispatch(setItemId(item.payload.id));
+        setidDC(item.payload._id);
+        await dispatch(featchorderDetailDCAsync(item.payload._id));
+        await dispatch(setItemId(item.payload._id));
         setOpensDCOrderDetail(true);
       } else if (
         item.type == 'EVENT_STOCK_REQUEST_REJECTED' ||
