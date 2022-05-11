@@ -159,7 +159,7 @@ export default function NotificationTask(props: Props) {
         setOpensDCOrderDetail(true);
       } else if (
         item.type == 'EVENT_STOCK_REQUEST_REJECTED' ||
-        item.type == 'EVENT_STOCK_REQUEST_WAIT_FOR_APPROVAL_2' ||
+        item.type == 'STOCK_REQUEST_WAIT_FOR_APPROVAL_2' ||
         item.type == 'SUBMIT_BRANCH_TRANSFER_REQUEST'
       ) {
         await dispatch(updateAddItemsState({}));
@@ -167,11 +167,11 @@ export default function NotificationTask(props: Props) {
         await dispatch(featchStockRequestDetailAsync(item.payload.rtNo));
         setOpenStockRequestDetail(true);
       } else if (item.type == 'STOCK_TRANSFER_CREATED' || item.type == 'EVENT_REQUEST_UPDATE_BT_DOC') {
-        const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
+        // const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
         await dispatch(updateAddItemsState({}));
         await dispatch(featchBranchTransferDetailAsync(item.payload.btNo));
         dispatch(updateAddItemSkuGroupState([]));
-        if (reasonsList === null || reasonsList.length <= 0) await dispatch(featchTransferReasonsListAsync());
+        // if (reasonsList === null || reasonsList.length <= 0) await dispatch(featchTransferReasonsListAsync());
         setOpenStockTransferBT(true);
       }
       setOpenLoadingModal(false);
@@ -278,7 +278,7 @@ export default function NotificationTask(props: Props) {
           backgroundColor: '#E7FFE9',
         });
         break;
-      case 'EVENT_STOCK_REQUEST_WAIT_FOR_APPROVAL_2':
+      case 'STOCK_REQUEST_WAIT_FOR_APPROVAL_2':
         content = 'สร้างแผนโอนสินค้าระหว่างสาขา';
         documentNumber = item.entryId;
         branchCode = item.payload.branchFrom;
