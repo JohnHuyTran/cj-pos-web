@@ -33,6 +33,7 @@ import LoadingModal from '../commons/ui/loading-modal';
 import {
   clearDataNegativeFilter,
   featchStockBalanceNegativeSearchAsync,
+  savePayloadSearchNegative,
 } from '../../store/slices/stock/stock-balance-negative-search-slice';
 interface State {
   storeId: number;
@@ -101,20 +102,22 @@ function StockSearch() {
   const [flagSearch, setFlagSearch] = React.useState(false);
   const [flagSearchNegative, setFlagSearchNegative] = React.useState(false);
   const [flagSearchLocation, setFlagSearchLocation] = React.useState(false);
+
+  const [flagSearchTabNegative, setFlagSearchTabNegative] = React.useState(false);
   const [flagSearchTabLocation, setFlagSearchTabLocation] = React.useState(false);
 
   const handleChangeTab = async (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
 
-    if (newValue === 0 && flagSearchTabLocation) {
-      setFlagSearchTabLocation(false);
-      onClickClearBtn();
-    }
+    // if (newValue === 0 && flagSearchTabLocation) {
+    //   setFlagSearchTabLocation(false);
+    //   onClickClearBtn();
+    // }
 
     handleOpenLoading('open', true);
-    if (newValue === 1 && !flagSearchNegative) {
+    if (newValue === 1 && !flagSearchNegative && !flagSearchTabLocation) {
       await searchStockBalanceNegative(limitsSearch, filterSKUSearch);
-    } else if (newValue === 2 && !flagSearchLocation) {
+    } else if (newValue === 2 && !flagSearchLocation && !flagSearchTabNegative) {
       await searchStockBalanceLocation(limitsSearch, filterSKUSearch);
     }
     handleOpenLoading('open', false);
@@ -171,6 +174,8 @@ function StockSearch() {
       setFlagSearch(false);
       setFlagSearchNegative(false);
       setFlagSearchLocation(false);
+      setFlagSearchTabNegative(false);
+      setFlagSearchTabLocation(false);
 
       handleOpenLoading('open', false);
     }, 300);
@@ -179,10 +184,6 @@ function StockSearch() {
   const [limitsSearch, setLimitsSearch] = React.useState<any>(0);
   const [filterSKUSearch, setFilterSKUSearch] = React.useState<any>([]);
   const onClickSearchBtn = async () => {
-    if (value === 2) {
-      setFlagSearchTabLocation(true);
-    }
-
     if (isValidateInput()) {
       handleOpenLoading('open', true);
       let limits: number;
@@ -204,10 +205,27 @@ function StockSearch() {
 
       if (value === 0) {
         await searchStockBalance(limits, filterSKU);
+
+        setFlagSearchNegative(false);
+        setFlagSearchLocation(false);
+        setFlagSearchTabNegative(false);
+        setFlagSearchTabLocation(false);
       } else if (value === 1) {
         await searchStockBalanceNegative(limits, filterSKU);
+        setFlagSearchTabNegative(true);
+
+        setFlagSearch(false);
+        setFlagSearchLocation(false);
+        await dispatch(clearDataFilter());
+        await dispatch(clearDataLocationFilter());
       } else if (value === 2) {
         await searchStockBalanceLocation(limits, filterSKU);
+        setFlagSearchTabLocation(true);
+
+        setFlagSearch(false);
+        setFlagSearchNegative(false);
+        await dispatch(clearDataFilter());
+        await dispatch(clearDataNegativeFilter());
       }
 
       handleOpenLoading('open', false);
@@ -225,7 +243,7 @@ function StockSearch() {
 
     await dispatch(featchStockBalanceSearchAsync(payload));
     await dispatch(savePayloadSearch(payload));
-    await dispatch(savePayloadSearchLocation(payload));
+    // await dispatch(savePayloadSearchLocation(payload));
     setFlagSearch(true);
   };
 
@@ -237,8 +255,8 @@ function StockSearch() {
       branchCode: branchFromCode,
     };
     await dispatch(featchStockBalanceNegativeSearchAsync(payload));
-    await dispatch(savePayloadSearch(payload));
-    await dispatch(savePayloadSearchLocation(payload));
+    // await dispatch(savePayloadSearch(payload));
+    await dispatch(savePayloadSearchNegative(payload));
     setFlagSearchNegative(true);
   };
 
@@ -253,8 +271,10 @@ function StockSearch() {
     };
 
     await dispatch(featchStockBalanceLocationSearchAsync(payload));
-    await dispatch(savePayloadSearch(payload));
-    await dispatch(savePayloadSearchLocation(payload));
+
+    // await dispatch(savePayloadSearch(payload));
+
+    await dispatch(savePayloadSearchNegative(payload));
     setFlagSearchLocation(true);
   };
 
