@@ -322,7 +322,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
     handleOpenLoading("open", true);
     if (chkPN !== "checked") {
       try {
-        await dispatch(getTransferOutDetail(params.row.id));
+        await dispatch(getTransferOutDetail(params.row.documentNumber));
         if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
           setOpenDetail(true);
         }

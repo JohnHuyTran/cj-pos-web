@@ -101,12 +101,12 @@ export default function NotificationReminder(props: Props) {
       handleUpdateRead(item.id);
       if (item.type === 'REJECT_TRANSFER_OUT' || item.type === 'CLOSE_TRANSFER_OUT') {
         if (item.payload.type === 1) {
-          await dispatch(getTransferOutDetail(item.payload._id));
+          await dispatch(getTransferOutDetail(item.payload.documentNumber));
           if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
             setOpenTransferOutDetail(true);
           }
         } else if (item.payload.type === 2) {
-          await dispatch(getTransferOutDetail(item.payload._id));
+          await dispatch(getTransferOutDetail(item.payload.documentNumber));
           if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
             setOpenTransferOutDestroyDetail(true);
           }
