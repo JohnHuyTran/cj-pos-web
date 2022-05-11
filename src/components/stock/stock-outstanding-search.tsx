@@ -30,7 +30,10 @@ import { updateAddTypeAndProductState } from '../../store/slices/add-type-produc
 import AlertError from '../commons/ui/alert-error';
 import _ from 'lodash';
 import LoadingModal from '../commons/ui/loading-modal';
-import { featchStockBalanceNegativeSearchAsync } from '../../store/slices/stock/stock-balance-negative-search-slice';
+import {
+  clearDataNegativeFilter,
+  featchStockBalanceNegativeSearchAsync,
+} from '../../store/slices/stock/stock-balance-negative-search-slice';
 interface State {
   storeId: number;
   locationId: string;
@@ -96,14 +99,25 @@ function StockSearch() {
   };
   const [value, setValue] = React.useState(0);
   const [flagSearch, setFlagSearch] = React.useState(false);
+  const [flagSearchNegative, setFlagSearchNegative] = React.useState(false);
   const [flagSearchLocation, setFlagSearchLocation] = React.useState(false);
-  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
+  const [flagSearchTabLocation, setFlagSearchTabLocation] = React.useState(false);
+
+  const handleChangeTab = async (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
 
-    if (newValue === 0 && flagSearchLocation) {
-      setFlagSearchLocation(false);
+    if (newValue === 0 && flagSearchTabLocation) {
+      setFlagSearchTabLocation(false);
       onClickClearBtn();
     }
+
+    handleOpenLoading('open', true);
+    if (newValue === 1 && !flagSearchNegative) {
+      await searchStockBalanceNegative(limitsSearch, filterSKUSearch);
+    } else if (newValue === 2 && !flagSearchLocation) {
+      await searchStockBalanceLocation(limitsSearch, filterSKUSearch);
+    }
+    handleOpenLoading('open', false);
   };
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
@@ -152,20 +166,25 @@ function StockSearch() {
     await dispatch(updateAddTypeAndProductState([]));
     await dispatch(clearDataFilter());
     await dispatch(clearDataLocationFilter());
+    await dispatch(clearDataNegativeFilter());
     setTimeout(() => {
       setFlagSearch(false);
+      setFlagSearchNegative(false);
+      setFlagSearchLocation(false);
+
       handleOpenLoading('open', false);
     }, 300);
   };
 
+  const [limitsSearch, setLimitsSearch] = React.useState<any>(0);
+  const [filterSKUSearch, setFilterSKUSearch] = React.useState<any>([]);
   const onClickSearchBtn = async () => {
     if (value === 2) {
-      setFlagSearchLocation(true);
+      setFlagSearchTabLocation(true);
     }
 
-    handleOpenLoading('open', true);
-
     if (isValidateInput()) {
+      handleOpenLoading('open', true);
       let limits: number;
       if (limit === 0 || limit === undefined) {
         limits = 10;
@@ -173,57 +192,70 @@ function StockSearch() {
         limits = limit;
       }
       const productList: string[] = [];
-      payloadAddTypeProduct
+      await payloadAddTypeProduct
         .filter((el: any) => el.selectedType === 2 && el.showProduct)
         .map((item: any, index: number) => {
           productList.push(item.skuCode);
         });
       const filterSKU = _.uniq(productList);
 
+      setLimitsSearch(limits);
+      setFilterSKUSearch(filterSKU);
+
       if (value === 0) {
-        const payload: OutstandingRequest = {
-          limit: limits,
-          page: page,
-          skuCodes: filterSKU,
-          locationCode: values.locationId === 'ALL' ? '' : values.locationId,
-          branchCode: branchFromCode,
-        };
-
-        await dispatch(featchStockBalanceSearchAsync(payload));
-        // await dispatch(featchStockBalanceLocationSearchAsync(payload));
-        await dispatch(savePayloadSearch(payload));
-        await dispatch(savePayloadSearchLocation(payload));
-        setFlagSearch(true);
+        await searchStockBalance(limits, filterSKU);
       } else if (value === 1) {
-        const payload: OutstandingRequest = {
-          limit: limits,
-          page: page,
-          skuCodes: filterSKU,
-          branchCode: branchFromCode,
-        };
-
-        await dispatch(featchStockBalanceNegativeSearchAsync(payload));
-        await dispatch(savePayloadSearch(payload));
-        await dispatch(savePayloadSearchLocation(payload));
-        setFlagSearch(true);
+        await searchStockBalanceNegative(limits, filterSKU);
       } else if (value === 2) {
-        const payload: OutstandingRequest = {
-          limit: limits,
-          page: page,
-          skuCodes: filterSKU,
-          locationCode: values.locationId === 'ALL' ? '' : values.locationId,
-          branchCode: branchFromCode,
-          positionName: values.positionName,
-        };
-
-        await dispatch(featchStockBalanceLocationSearchAsync(payload));
-        await dispatch(savePayloadSearch(payload));
-        await dispatch(savePayloadSearchLocation(payload));
-        setFlagSearch(true);
+        await searchStockBalanceLocation(limits, filterSKU);
       }
-    }
 
-    handleOpenLoading('open', false);
+      handleOpenLoading('open', false);
+    }
+  };
+
+  const searchStockBalance = async (limits: any, filterSKU: any) => {
+    const payload: OutstandingRequest = {
+      limit: limits,
+      page: page,
+      skuCodes: filterSKU,
+      locationCode: values.locationId === 'ALL' ? '' : values.locationId,
+      branchCode: branchFromCode,
+    };
+
+    await dispatch(featchStockBalanceSearchAsync(payload));
+    await dispatch(savePayloadSearch(payload));
+    await dispatch(savePayloadSearchLocation(payload));
+    setFlagSearch(true);
+  };
+
+  const searchStockBalanceNegative = async (limits: any, filterSKU: any) => {
+    const payload: OutstandingRequest = {
+      limit: limits,
+      page: page,
+      skuCodes: filterSKU,
+      branchCode: branchFromCode,
+    };
+    await dispatch(featchStockBalanceNegativeSearchAsync(payload));
+    await dispatch(savePayloadSearch(payload));
+    await dispatch(savePayloadSearchLocation(payload));
+    setFlagSearchNegative(true);
+  };
+
+  const searchStockBalanceLocation = async (limits: any, filterSKU: any) => {
+    const payload: OutstandingRequest = {
+      limit: limits,
+      page: page,
+      skuCodes: filterSKU,
+      locationCode: values.locationId === 'ALL' ? '' : values.locationId,
+      branchCode: branchFromCode,
+      positionName: values.positionName,
+    };
+
+    await dispatch(featchStockBalanceLocationSearchAsync(payload));
+    await dispatch(savePayloadSearch(payload));
+    await dispatch(savePayloadSearchLocation(payload));
+    setFlagSearchLocation(true);
   };
 
   const isValidateInput = () => {
@@ -449,10 +481,10 @@ function StockSearch() {
         {flagSearch && <StockBalance />}
       </TabPanel>
       <TabPanel value={value} index={1}>
-        {flagSearch && <StockBalanceNegative />}
+        {flagSearchNegative && <StockBalanceNegative />}
       </TabPanel>
       <TabPanel value={value} index={2}>
-        {flagSearch && <StockBalanceLocation />}
+        {flagSearchLocation && <StockBalanceLocation />}
       </TabPanel>
 
       <LoadingModal open={openLoadingModal.open} />

@@ -45,8 +45,8 @@ const stockBalanceNegativeSearchSlice = createSlice({
   name: 'stockBalanceNegativeSearch',
   initialState,
   reducers: {
-    clearDataLocationFilter: (state) => initialState,
-    savePayloadSearchLocation: (state, action: PayloadAction<any>) => {
+    clearDataNegativeFilter: (state) => initialState,
+    savePayloadSearchNegative: (state, action: PayloadAction<any>) => {
       state.savePayloadSearch = action.payload;
     },
   },
@@ -63,5 +63,5 @@ const stockBalanceNegativeSearchSlice = createSlice({
   },
 });
 
-export const { clearDataLocationFilter, savePayloadSearchLocation } = stockBalanceNegativeSearchSlice.actions;
+export const { clearDataNegativeFilter, savePayloadSearchNegative } = stockBalanceNegativeSearchSlice.actions;
 export default stockBalanceNegativeSearchSlice.reducer;
