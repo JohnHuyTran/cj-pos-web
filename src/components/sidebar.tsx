@@ -106,6 +106,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
   const [disableSubMenuTODestroy, setDisableSubMenuTODestroy] = React.useState(true);
   const [disableSubMenuTOStoreUse, setDisableSubMenuTOStoreUse] = React.useState(true);
+  const [disableSubMenuProductMaster, setDisableSubMenuProductMaster] = React.useState(true);
 
   useEffect(() => {
     setOpen(navState);
@@ -430,6 +431,18 @@ export default function Sidebar({}: Props): ReactElement {
                 onClick={() => handleListItemClick(12)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ความเคลื่อนไหวของสินค้า' />
+              </ListItemButton>
+            </Link>
+            <Link
+              to='/product-master'
+              style={{ textDecoration: 'none', color: '#676767'}}
+              id='subMenuProductMaster'>
+              <ListItemButton
+                key='ProductMaster'
+                selected={selectedIndex === 13}
+                onClick={() => handleListItemClick(13)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='รายละเอียดสินค้า' />
               </ListItemButton>
             </Link>
           </List>

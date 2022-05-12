@@ -25,6 +25,7 @@ import StockBalance from './pages/stock/stock-balance';
 import TransferOutDestroy from './pages/transfer-out-destroy/transfer-out-destroy';
 import StockMovement from './pages/stock/stock-movement';
 import { featchMasterStockMovementTypeListAsync } from './store/slices/master/stock-movement-type-slice';
+import ProductMaster from './pages/stock/product-master';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -99,6 +100,7 @@ export default function App2() {
           <Route path='/transfer-out-destroy' component={TransferOutDestroy} />
           <Route path='/stock-balance' component={StockBalance} />
           <Route path='/stock-movement' component={StockMovement} />
+          <Route path='/product-master' component={ProductMaster} />
         </Switch>
       </Main>
     </Box>
