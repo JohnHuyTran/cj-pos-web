@@ -178,12 +178,22 @@ function OrderList() {
     {
       field: 'shipmentDate',
       headerName: 'วันที่รับสินค้า',
-
       headerAlign: 'center',
       align: 'center',
       minWidth: 105,
       flex: 1,
       sortable: false,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              textAlign: 'center',
+            }}
+          >
+            {params.value}
+          </div>
+        );
+      },
     },
     {
       field: 'comment',

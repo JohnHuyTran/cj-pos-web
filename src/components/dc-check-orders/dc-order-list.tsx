@@ -53,7 +53,7 @@ function DCOrderList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -133,7 +133,7 @@ function DCOrderList() {
       align: 'center',
       renderCell: (params) => {
         if (params.value === true) {
-          return <Done fontSize='small' sx={{ color: '#F54949' }} />;
+          return <Done fontSize="small" sx={{ color: '#F54949' }} />;
         } else if (params.value === false) {
           return '-';
         }
@@ -150,7 +150,7 @@ function DCOrderList() {
       align: 'center',
       renderCell: (params) => {
         if (params.value === true) {
-          return <Done fontSize='small' sx={{ color: '#F54949' }} />;
+          return <Done fontSize="small" sx={{ color: '#F54949' }} />;
         } else if (params.value === false) {
           return '-';
         }
@@ -164,6 +164,17 @@ function DCOrderList() {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              textAlign: 'center',
+            }}
+          >
+            {params.value}
+          </div>
+        );
+      },
     },
     // { field: "detail", headerName: "รายละเอียด", minWidth: 200 },
   ];
@@ -267,7 +278,7 @@ function DCOrderList() {
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -281,7 +292,7 @@ function DCOrderList() {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}

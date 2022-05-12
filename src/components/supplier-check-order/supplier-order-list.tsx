@@ -65,7 +65,7 @@ export default function SupplierOrderList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -77,6 +77,17 @@ export default function SupplierOrderList() {
       // flex: 0.8,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              textAlign: 'center',
+            }}
+          >
+            {params.value}
+          </div>
+        );
+      },
     },
     {
       field: 'supplierName',
@@ -87,10 +98,10 @@ export default function SupplierOrderList() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
+          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
             {params.value}
           </Typography>
-          <Typography color='textSecondary' variant='body2' sx={{ lineHeight: '120%' }}>
+          <Typography color="textSecondary" variant="body2" sx={{ lineHeight: '120%' }}>
             {params.getValue(params.id, 'supplierCode') || ''}
           </Typography>
         </div>
@@ -128,11 +139,11 @@ export default function SupplierOrderList() {
       sortable: false,
       renderCell: (params) => {
         if (params.value === 0) {
-          return <Chip label='บันทึก' size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
+          return <Chip label="บันทึก" size="small" sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
         } else if (params.value === 1) {
-          return <Chip label='อนุมัติ' size='small' sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
+          return <Chip label="อนุมัติ" size="small" sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
         } else if (params.value === 9) {
-          return <Chip label='ยกเลิก' size='small' sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }} />;
+          return <Chip label="ยกเลิก" size="small" sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }} />;
         }
       },
     },
@@ -146,7 +157,7 @@ export default function SupplierOrderList() {
       renderCell: (params) => {
         return (
           <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
-            <Typography variant='body2' noWrap>
+            <Typography variant="body2" noWrap>
               {params.value}
             </Typography>
           </HtmlTooltip>
@@ -167,12 +178,13 @@ export default function SupplierOrderList() {
             //check Create PN
             return (
               <Button
-                variant='contained'
-                color='warning'
-                size='small'
+                variant="contained"
+                color="warning"
+                size="small"
                 className={classes.MbtnSearch}
                 sx={{ minWidth: 90 }}
-                onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}>
+                onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}
+              >
                 คืนสินค้า
               </Button>
             );
@@ -180,10 +192,11 @@ export default function SupplierOrderList() {
             //PN Number 'บันทึก pnState=1, อนุมัติpnState=2'
             return (
               <Typography
-                color='secondary'
-                variant='body2'
+                color="secondary"
+                variant="body2"
                 sx={{ textDecoration: 'underline' }}
-                onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}>
+                onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}
+              >
                 {params.value}
               </Typography>
             );
@@ -192,7 +205,8 @@ export default function SupplierOrderList() {
           return (
             <Box
               sx={{ height: '100%', width: '100px' }}
-              onClick={() => handleOpenReturnModal(params.row.piNo, 'blank')}></Box>
+              onClick={() => handleOpenReturnModal(params.row.piNo, 'blank')}
+            ></Box>
           );
         }
       },
@@ -317,7 +331,7 @@ export default function SupplierOrderList() {
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -331,7 +345,7 @@ export default function SupplierOrderList() {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
