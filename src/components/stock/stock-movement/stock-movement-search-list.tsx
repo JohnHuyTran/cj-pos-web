@@ -22,10 +22,21 @@ import CheckOrderDetail from '../../check-orders/check-order-detail';
 import { featchOrderDetailAsync } from '../../../store/slices/check-order-detail-slice';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
-import { isShowMovementDetail } from '../../../utils/enum/stock-enum';
+import { isShowMovementDetail, MOVEMENT_TYPE } from '../../../utils/enum/stock-enum';
 import AlertError from '../../commons/ui/alert-error';
 import { isErrorCode } from '../../../utils/exception/pos-exception';
 import LoadingModal from '../../commons/ui/loading-modal';
+import SupplierOrderReturn from '../../supplier-check-order/supplier-order-return';
+import CheckOrderDetailSD from '../../check-orders/check-order-detail-sd';
+import ModalCreateTransferOut from '../../transfer-out/modal-create-transfer-out';
+import ModalCreateTransferOutDestroy from '../../transfer-out-destroy/modal-create-transfer-out-destroy';
+import { Action } from '../../../utils/enum/common-enum';
+import { getUserInfo } from '../../../store/sessionStore';
+import { featchPurchaseNoteAsync } from '../../../store/slices/supplier-order-return-slice';
+import SupplierOrderDetail from '../../supplier-check-order/supplier-order-detail';
+import { featchSupplierOrderDetailAsync } from '../../../store/slices/supplier-order-detail-slice';
+import { featchOrderSDListAsync } from '../../../store/slices/check-order-sd-slice';
+import { getTransferOutDetail } from '../../../store/slices/transfer-out-detail-slice';
 
 function StockMovementSearchList() {
   const classes = useStyles();
@@ -34,6 +45,9 @@ function StockMovementSearchList() {
   const masterStockMovementType = useAppSelector(
     (state) => state.masterStockMovementTypeSlice.masterStockMovementType.data
   );
+  const [openPopup, setOpenPopup] = React.useState<boolean>(false);
+  const handleGetData = () => {};
+  const [movementTypeCodeState, setMovementTypeCodeState] = React.useState('');
   const savePayLoadSearch = useAppSelector((state) => state.stockMovementSearchSlice.savePayloadSearch);
   const items = useAppSelector((state) => state.stockMovementSearchSlice.stockList);
   const cuurentPage = useAppSelector((state) => state.stockMovementSearchSlice.stockList.page);
@@ -135,13 +149,17 @@ function StockMovementSearchList() {
           params.getValue(params.id, 'docType') && params.getValue(params.id, 'docType') !== undefined
             ? String(params.getValue(params.id, 'docType'))
             : '';
+        const movementTypeCode: string =
+          params.getValue(params.id, 'movementTypeCode') && params.getValue(params.id, 'movementTypeCode') !== undefined
+            ? String(params.getValue(params.id, 'movementTypeCode'))
+            : '';
         if (params.getValue(params.id, 'movementAction') === true && docNo) {
           return (
             <Typography
               color='secondary'
               variant='body2'
               sx={{ textDecoration: 'underline' }}
-              onClick={() => showDocumentDetail(docNo, docRef, docType)}>
+              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}>
               {params.value}
             </Typography>
           );
@@ -276,9 +294,9 @@ function StockMovementSearchList() {
     }
   };
 
-  const showDocumentDetail = async (docNo: string, docRefNo: string, docType: string) => {
+  const showDocumentDetail = async (docNo: string, docRefNo: string, docType: string, movementTypeCode: string) => {
     handleOpenLoading('open', true);
-    if (docType === 'LD') {
+    if (MOVEMENT_TYPE.ORDER_RECEIVE_LD === movementTypeCode || MOVEMENT_TYPE.ORDER_RECEIVE_BT === movementTypeCode) {
       setDocNo(docNo);
       setDocRefNo(docRefNo);
       setDocType(docType);
@@ -290,6 +308,78 @@ function StockMovementSearchList() {
               setTextError('ไม่พบข้อมูล');
             } else {
               handleOpenModalDocDetail();
+              setMovementTypeCodeState(movementTypeCode);
+            }
+          }
+        })
+        .catch((err) => {
+          setOpenAlert(true);
+          setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
+        });
+    } else if (MOVEMENT_TYPE.PURCHASE_NOTE === movementTypeCode) {
+      await dispatch(featchPurchaseNoteAsync(docRefNo))
+        .then((value: any) => {
+          if (value) {
+            if (isErrorCode(value.payload.code)) {
+              setOpenAlert(true);
+              setTextError('ไม่พบข้อมูล');
+            } else {
+              handleOpenModalDocDetail();
+              setMovementTypeCodeState(movementTypeCode);
+            }
+          }
+        })
+        .catch((err) => {
+          setOpenAlert(true);
+          setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
+        });
+    } else if (MOVEMENT_TYPE.PURCHASE_ORDER === movementTypeCode) {
+      await dispatch(featchSupplierOrderDetailAsync(docNo))
+        .then((value: any) => {
+          if (value) {
+            if (isErrorCode(value.payload.code)) {
+              setOpenAlert(true);
+              setTextError('ไม่พบข้อมูล');
+            } else {
+              handleOpenModalDocDetail();
+              setMovementTypeCodeState(movementTypeCode);
+            }
+          }
+        })
+        .catch((err) => {
+          setOpenAlert(true);
+          setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
+        });
+    } else if (MOVEMENT_TYPE.ADJ_TRNS_IN_LD === movementTypeCode) {
+      await dispatch(featchOrderSDListAsync(docRefNo))
+        .then((value: any) => {
+          if (value) {
+            if (isErrorCode(value.payload.code)) {
+              setOpenAlert(true);
+              setTextError('ไม่พบข้อมูล');
+            } else {
+              handleOpenModalDocDetail();
+              setMovementTypeCodeState(movementTypeCode);
+            }
+          }
+        })
+        .catch((err) => {
+          setOpenAlert(true);
+          setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
+        });
+    } else if (
+      MOVEMENT_TYPE.TRANSFER_OUT === movementTypeCode ||
+      MOVEMENT_TYPE.TRANSFER_OUT_DESTROY === movementTypeCode
+    ) {
+      await dispatch(getTransferOutDetail(docNo))
+        .then((value: any) => {
+          if (value) {
+            if (isErrorCode(value.payload.code)) {
+              setOpenAlert(true);
+              setTextError('ไม่พบข้อมูล');
+            } else {
+              handleOpenModalDocDetail();
+              setMovementTypeCodeState(movementTypeCode);
             }
           }
         })
@@ -351,15 +441,56 @@ function StockMovementSearchList() {
         onClose={handleCloseModalTransaction}
         movementTransaction={movementTransaction}
       />
-      {openModalDocDetail && (
-        <CheckOrderDetail
+      {openModalDocDetail &&
+        (movementTypeCodeState === MOVEMENT_TYPE.ORDER_RECEIVE_LD ||
+          movementTypeCodeState === MOVEMENT_TYPE.ORDER_RECEIVE_BT) && (
+          <CheckOrderDetail
+            sdNo={docNo}
+            docRefNo={docRefNo}
+            docType={docType}
+            defaultOpen={openModalDocDetail}
+            onClickClose={handleCloseModalDocDetail}
+          />
+        )}
+      {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.PURCHASE_ORDER && (
+        <SupplierOrderDetail isOpen={openModalDocDetail} onClickClose={handleCloseModalDocDetail} />
+      )}
+      {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.PURCHASE_NOTE && (
+        <SupplierOrderReturn isOpen={openModalDocDetail} onClickClose={handleCloseModalDocDetail} />
+      )}
+      {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_IN_LD && (
+        <CheckOrderDetailSD
           sdNo={docNo}
-          docRefNo={docRefNo}
-          docType={docType}
+          sdRefNo={docRefNo}
+          shipmentNo={''}
           defaultOpen={openModalDocDetail}
           onClickClose={handleCloseModalDocDetail}
         />
       )}
+
+      {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.TRANSFER_OUT && (
+        <ModalCreateTransferOut
+          isOpen={openModalDocDetail}
+          onClickClose={handleCloseModalDocDetail}
+          action={Action.UPDATE}
+          setPopupMsg={''}
+          setOpenPopup={setOpenPopup}
+          onSearchMain={handleGetData}
+          userPermission={getUserInfo().acl}
+        />
+      )}
+      {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.TRANSFER_OUT_DESTROY && (
+        <ModalCreateTransferOutDestroy
+          isOpen={openModalDocDetail}
+          onClickClose={handleCloseModalDocDetail}
+          action={Action.UPDATE}
+          setPopupMsg={''}
+          setOpenPopup={setOpenPopup}
+          onSearchMain={handleGetData}
+          userPermission={getUserInfo().acl}
+        />
+      )}
+
       <LoadingModal open={openLoadingModal.open} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>

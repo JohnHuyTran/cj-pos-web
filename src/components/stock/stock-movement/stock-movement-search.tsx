@@ -158,6 +158,7 @@ function StockMovementSearch() {
     setStartDate(null);
     setEndDate(null);
     setClearBranchDropDown(!clearBranchDropDown);
+    setBranchFromCode('');
     setValues({ storeId: 0, locationId: 'ALL', skuCodes: '', branchCode: '', dateFrom: '', dateTo: '' });
     await dispatch(updateAddTypeAndProductState([]));
     dispatch(clearSearchAllProductAsync({}));
@@ -246,23 +247,6 @@ function StockMovementSearch() {
             <Typography gutterBottom variant='subtitle1' component='div'>
               ค้นหาสินค้า*
             </Typography>
-            {/* <TextField
-              id='txtProductList'
-              name='productId'
-              size='small'
-              value={values.skuCodes}
-              onClick={handleOpenAddItems}
-              className={`${classes.MtextField} ${classes.MSearchBranchInput}`}
-              fullWidth
-              placeholder='กรุณาเลือก'
-              autoComplete='off'
-              InputProps={{
-                endAdornment: <SearchIcon color='primary' sx={{ marginRight: '12px' }} />,
-                inputProps: {
-                  style: { textAlignLast: 'start' },
-                },
-              }}
-            /> */}
             <TextBoxSearchProduct skuType={[2]} onSelectItem={handleChangeProduct} isClear={clearBranchDropDown} />
           </Grid>
           <Grid item xs={4}>
