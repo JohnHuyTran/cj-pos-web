@@ -105,6 +105,7 @@ function OrderList() {
       // flex: 1.4,
       headerAlign: 'center',
       sortable: false,
+      renderCell: (params) => <div>{getShipmentTypeText(Number(params.value))}</div>,
     },
     {
       field: 'sdStatus',
@@ -150,6 +151,13 @@ function OrderList() {
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params) => {
+        if (params.getValue(params.id, 'sdType') === 1) {
+          return <div>-</div>;
+        } else {
+          <div>{params.value}</div>;
+        }
+      },
     },
     {
       field: 'toteCnt',
@@ -159,14 +167,22 @@ function OrderList() {
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params) => {
+        if (params.getValue(params.id, 'sdType') === 1) {
+          return <div>-</div>;
+        } else {
+          <div>{params.value}</div>;
+        }
+      },
     },
     {
       field: 'shipmentDate',
       headerName: 'วันที่รับสินค้า',
-      minWidth: 105,
-      flex: 1,
+
       headerAlign: 'center',
       align: 'center',
+      minWidth: 105,
+      flex: 1,
       sortable: false,
     },
     {
@@ -189,7 +205,7 @@ function OrderList() {
       docRefNo: data.docRefNo,
       docType: data.docType,
       sdNo: data.sdNo,
-      sdType: getShipmentTypeText(data.sdType),
+      sdType: data.sdType,
       boxCnt: data.boxCnt,
       toteCnt: data.toteCnt,
       shipmentDate: convertUtcToBkkDate(data.shipmentDate),
