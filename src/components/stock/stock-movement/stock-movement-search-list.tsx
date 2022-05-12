@@ -104,7 +104,7 @@ function StockMovementSearchList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -123,9 +123,8 @@ function StockMovementSearchList() {
           <div
             style={{
               textAlign: 'center',
-            }}
-          >
-            <Typography variant="body2" noWrap>
+            }}>
+            <Typography variant='body2' noWrap>
               {`${moment(date).add(543, 'year').format('DD/MM/YYYY')} ${moment(date).format('HH:mm ')}`}
             </Typography>
           </div>
@@ -160,11 +159,10 @@ function StockMovementSearchList() {
         if (params.getValue(params.id, 'movementAction') === true && docNo) {
           return (
             <Typography
-              color="secondary"
-              variant="body2"
+              color='secondary'
+              variant='body2'
               sx={{ textDecoration: 'underline' }}
-              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}
-            >
+              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}>
               {params.value}
             </Typography>
           );
@@ -268,6 +266,7 @@ function StockMovementSearchList() {
       page: page,
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
+      dateTo: savePayLoadSearch.dateTo,
       skuCodes: savePayLoadSearch.skuCodes,
       locationCode: savePayLoadSearch.locationCode,
     };
@@ -286,6 +285,7 @@ function StockMovementSearchList() {
       page: 1,
       branchCode: savePayLoadSearch.branchCode,
       dateFrom: savePayLoadSearch.dateFrom,
+      dateTo: savePayLoadSearch.dateTo,
       skuCodes: savePayLoadSearch.skuCodes,
       locationCode: savePayLoadSearch.locationCode,
     };
@@ -407,7 +407,7 @@ function StockMovementSearchList() {
     <React.Fragment>
       <Box
         mt={2}
-        bgcolor="background.paper"
+        bgcolor='background.paper'
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -419,8 +419,7 @@ function StockMovementSearchList() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}
-      >
+        }}>
         <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -433,7 +432,7 @@ function StockMovementSearchList() {
             pageSize={pageSize}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={items.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             onCellClick={currentlySelected}
