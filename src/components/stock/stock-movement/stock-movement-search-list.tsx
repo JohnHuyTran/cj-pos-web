@@ -307,7 +307,7 @@ function StockMovementSearchList() {
       setDocNo(docNo);
       setDocRefNo(docRefNo);
       setDocType(docType);
-      await dispatch(featchOrderDetailAsync(docNo))
+      await dispatch(featchOrderDetailAsync(docRefNo))
         .then((value: any) => {
           if (value) {
             if (isErrorCode(value.payload.code)) {
@@ -453,8 +453,8 @@ function StockMovementSearchList() {
         (movementTypeCodeState === MOVEMENT_TYPE.ORDER_RECEIVE_LD ||
           movementTypeCodeState === MOVEMENT_TYPE.ORDER_RECEIVE_BT) && (
           <CheckOrderDetail
-            sdNo={docNo}
-            docRefNo={docRefNo}
+            sdNo={docRefNo}
+            docRefNo={docNo}
             docType={docType}
             defaultOpen={openModalDocDetail}
             onClickClose={handleCloseModalDocDetail}
