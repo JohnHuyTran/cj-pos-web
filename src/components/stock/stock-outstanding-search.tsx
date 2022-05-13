@@ -109,16 +109,13 @@ function StockSearch() {
   const handleChangeTab = async (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
 
-    // if (newValue === 0 && flagSearchTabLocation) {
-    //   setFlagSearchTabLocation(false);
-    //   onClickClearBtn();
-    // }
-
     handleOpenLoading('open', true);
     if (newValue === 1 && !flagSearchNegative && !flagSearchTabLocation) {
       await searchStockBalanceNegative(limitsSearch, filterSKUSearch);
     } else if (newValue === 2 && !flagSearchLocation && !flagSearchTabNegative) {
       await searchStockBalanceLocation(limitsSearch, filterSKUSearch);
+    } else {
+      setValues({ ...values, positionName: '' });
     }
     handleOpenLoading('open', false);
   };
@@ -243,7 +240,6 @@ function StockSearch() {
 
     await dispatch(featchStockBalanceSearchAsync(payload));
     await dispatch(savePayloadSearch(payload));
-    // await dispatch(savePayloadSearchLocation(payload));
     setFlagSearch(true);
   };
 
@@ -255,7 +251,6 @@ function StockSearch() {
       branchCode: branchFromCode,
     };
     await dispatch(featchStockBalanceNegativeSearchAsync(payload));
-    // await dispatch(savePayloadSearch(payload));
     await dispatch(savePayloadSearchNegative(payload));
     setFlagSearchNegative(true);
   };
@@ -271,10 +266,7 @@ function StockSearch() {
     };
 
     await dispatch(featchStockBalanceLocationSearchAsync(payload));
-
-    // await dispatch(savePayloadSearch(payload));
-
-    await dispatch(savePayloadSearchNegative(payload));
+    await dispatch(savePayloadSearchLocation(payload));
     setFlagSearchLocation(true);
   };
 
