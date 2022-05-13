@@ -18,6 +18,8 @@ import {
   MAINMENU,
   PERMISSION_GROUP,
   SUBMENU,
+  KEYCLOAK_GROUP_PI,
+  KEYCLOAK_GROUP_PCM,
 } from './enum/permission-enum';
 
 const _ = require('lodash');
@@ -46,6 +48,10 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.SM;
   } else if (group === KEYCLOAK_GROUP_ACCOUNTING) {
     return PERMISSION_GROUP.ACCOUNTING;
+  } else if (group === KEYCLOAK_GROUP_PI) {
+    return PERMISSION_GROUP.PI;
+  } else if (group === KEYCLOAK_GROUP_PCM) {
+    return PERMISSION_GROUP.PCM;
   }
 
   return '';
@@ -223,5 +229,19 @@ const permission = {
       submenu: [SUBMENU.SALE_SALE_LIMIT],
     },
     action: [ACTIONS.CAMPAIGN_TO_VIEW],
+  },
+  operationProcess: {
+    menu: {
+      mainmenu: [MAINMENU.PRODUCT_INFO],
+      submenu: [SUBMENU.PI_STOCK_BALANCE, SUBMENU.PI_STOCK_MOVEMENT],
+    },
+    action: [ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW, ACTIONS.STOCK_BL_LOCATION],
+  },
+  procurement: {
+    menu: {
+      mainmenu: [MAINMENU.PRODUCT_INFO],
+      submenu: [SUBMENU.PI_STOCK_BALANCE, SUBMENU.PI_STOCK_MOVEMENT],
+    },
+    action: [ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW, ACTIONS.STOCK_BL_LOCATION],
   },
 };
