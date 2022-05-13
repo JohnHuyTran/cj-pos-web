@@ -103,21 +103,26 @@ function StockSearch() {
   const [flagSearchNegative, setFlagSearchNegative] = React.useState(false);
   const [flagSearchLocation, setFlagSearchLocation] = React.useState(false);
 
+  const [flagSearchTabStockBalance, setFlagSearchTabStockBalance] = React.useState(false);
   const [flagSearchTabNegative, setFlagSearchTabNegative] = React.useState(false);
   const [flagSearchTabLocation, setFlagSearchTabLocation] = React.useState(false);
 
   const handleChangeTab = async (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
 
-    handleOpenLoading('open', true);
-    if (newValue === 1 && !flagSearchNegative && !flagSearchTabLocation) {
-      await searchStockBalanceNegative(limitsSearch, filterSKUSearch);
-    } else if (newValue === 2 && !flagSearchLocation && !flagSearchTabNegative) {
-      await searchStockBalanceLocation(limitsSearch, filterSKUSearch);
+    if (flagSearchTabStockBalance) {
+      handleOpenLoading('open', true);
+      if (newValue === 1 && !flagSearchNegative && !flagSearchTabLocation) {
+        await searchStockBalanceNegative(limitsSearch, filterSKUSearch);
+      } else if (newValue === 2 && !flagSearchLocation && !flagSearchTabNegative) {
+        await searchStockBalanceLocation(limitsSearch, filterSKUSearch);
+      } else {
+        setValues({ ...values, positionName: '' });
+      }
+      handleOpenLoading('open', false);
     } else {
       setValues({ ...values, positionName: '' });
     }
-    handleOpenLoading('open', false);
   };
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
@@ -205,6 +210,7 @@ function StockSearch() {
 
         setFlagSearchNegative(false);
         setFlagSearchLocation(false);
+        setFlagSearchTabStockBalance(true);
         setFlagSearchTabNegative(false);
         setFlagSearchTabLocation(false);
       } else if (value === 1) {
