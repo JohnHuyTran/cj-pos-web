@@ -62,6 +62,7 @@ export enum MAINMENU {
   STOCK_TRANSFER = 'stockTransfer',
   TRANSFER_OUT = 'transferOut',
   PRODUCT_INFO = 'productInfo',
+  PURCHASE_BRANCH = 'purchasebranch',
 }
 
 export enum SUBMENU {
@@ -77,6 +78,7 @@ export enum SUBMENU {
   TO_STORE_USE = 'transferOut.storeUse',
   PI_STOCK_BALANCE = 'productInfo.stockOutstanding',
   PI_STOCK_MOVEMENT = 'productInfo.stockMovement',
+  PR_CREATE_PURCHASE_BRANCH = 'purchasebranch.createPurchaseBranch',
 }
 
 export enum PERMISSION_GROUP {
