@@ -261,16 +261,24 @@ function ProductMasterSearch() {
               />
             </Grid>
             <Grid item xs={2}>
-              <TextField
-                id="productTypeName"
-                name="productTypeName"
-                size="small"
-                value={skuValue.productChainName ? skuValue.productChainName.productTypeName : ''}
-                style={{ backgroundColor: '#f1f1f1' }}
-                className={classes.MtextField}
-                fullWidth
-                disabled
-              />
+              <HtmlTooltip
+                title={
+                  <React.Fragment>
+                    {skuValue.productChainName ? skuValue.productChainName.productTypeName : ''}
+                  </React.Fragment>
+                }
+              >
+                <TextField
+                  id="productTypeName"
+                  name="productTypeName"
+                  size="small"
+                  value={skuValue.productChainName ? skuValue.productChainName.productTypeName : ''}
+                  style={{ backgroundColor: '#f1f1f1' }}
+                  className={classes.MtextField}
+                  fullWidth
+                  disabled
+                />
+              </HtmlTooltip>
             </Grid>
           </Grid>
           <Grid container spacing={3} mt={-2}>
@@ -310,16 +318,18 @@ function ProductMasterSearch() {
               />
             </Grid>
             <Grid item xs={2}>
-              <TextField
-                id="supplierName"
-                name="supplierName"
-                size="small"
-                value={skuValue.supplier ? skuValue.supplier.name : ''}
-                style={{ backgroundColor: '#f1f1f1' }}
-                className={classes.MtextField}
-                fullWidth
-                disabled
-              />
+              <HtmlTooltip title={<React.Fragment>{skuValue.supplier ? skuValue.supplier.name : ''}</React.Fragment>}>
+                <TextField
+                  id="supplierName"
+                  name="supplierName"
+                  size="small"
+                  value={skuValue.supplier ? skuValue.supplier.name : ''}
+                  style={{ backgroundColor: '#f1f1f1' }}
+                  className={classes.MtextField}
+                  fullWidth
+                  disabled
+                />
+              </HtmlTooltip>
             </Grid>
           </Grid>
           <Grid container spacing={3} mt={-2}>
