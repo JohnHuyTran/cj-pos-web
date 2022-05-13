@@ -485,7 +485,9 @@ export default function ModalCreateTransferOut({
       const allAttachFile = await handleAllAttachFile();
       const payload = {
         products: payloadTransferOut.products,
-        attachFiles: allAttachFile
+        attachFiles: allAttachFile,
+        transferOutReason: dataDetail.transferOutReason,
+        store: dataDetail.store
       };
       const rs = await approveTransferOut(dataDetail.id, payload);
       if (rs.code === 20000) {
@@ -570,7 +572,11 @@ export default function ModalCreateTransferOut({
 
   const handleReject = async () => {
     try {
-      let res = await rejectTransferOut(dataDetail.id);
+      const payload = {
+        transferOutReason: dataDetail.transferOutReason,
+        store: dataDetail.store
+      };
+      let res = await rejectTransferOut(dataDetail.id, payload);
       if (res && res.code === 20000) {
         dispatch(
           updateDataDetail({
@@ -673,7 +679,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
-                เหตุผลการเบิก<b style={{ fontSize:'18px' }}> *</b> :
+                เหตุผลการเบิก<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
@@ -707,7 +713,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5} pl={2}>
               <Grid item xs={4}>
-                คลัง<b style={{ fontSize:'18px' }}> *</b> :
+                คลัง<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>

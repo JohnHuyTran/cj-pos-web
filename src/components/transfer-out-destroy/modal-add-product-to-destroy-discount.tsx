@@ -76,7 +76,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
           barcodeName: item.detail.productName,
           skuCode: item.detail.skuCode,
           unit: item.detail.unitFactor,
-          numberOfDiscounted: item.total,
+          numberOfDiscounted: item.total || 0,
           numberOfApproved: 0,
         };
       });
@@ -328,8 +328,12 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
           if (objectNullOrEmpty(dataObj)) {
             showModalError('ไม่ใช่บาร์โค้ดส่วนลด โปรดสแกนใหม่');
           } else {
-            dataObj.numberOfApproved = dataObj.numberOfApproved + 1;
-            setDataTable(dataTableHandle);
+            if (dataObj.numberOfApproved === dataObj.numberOfDiscounted) {
+              showModalError('จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก');
+            } else {
+              dataObj.numberOfApproved = dataObj.numberOfApproved + 1;
+              setDataTable(dataTableHandle);
+            }
           }
         } catch (e) {
           showModalError('ไม่ใช่บาร์โค้ดส่วนลด โปรดสแกนใหม่');

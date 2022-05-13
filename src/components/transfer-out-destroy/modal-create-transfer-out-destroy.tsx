@@ -606,7 +606,11 @@ export default function ModalCreateTransferOutDestroy({
 
   const handleReject = async () => {
     try {
-      let res = await rejectTransferOut(dataDetail.id);
+      const allAttachFileBefore = await handleAllAttachFile(true);
+      const payload = {
+        beforeAttachFiles: allAttachFileBefore
+      };
+      let res = await rejectTransferOut(dataDetail.id, payload);
       if (res && res.code === 20000) {
         dispatch(
           updateDataDetail({
