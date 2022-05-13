@@ -176,6 +176,7 @@ function StockSearch() {
       setFlagSearch(false);
       setFlagSearchNegative(false);
       setFlagSearchLocation(false);
+      setFlagSearchTabStockBalance(false);
       setFlagSearchTabNegative(false);
       setFlagSearchTabLocation(false);
 
