@@ -158,9 +158,9 @@ function StockBalanceLocation() {
       limit: pageSize,
       page: page,
       branchCode: savePayLoadSearch.branchCode,
-      dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
       locationCode: savePayLoadSearch.locationCode,
+      positionName: savePayLoadSearch.positionName,
     };
 
     await dispatch(featchStockBalanceLocationSearchAsync(payloadNewpage));
@@ -176,9 +176,9 @@ function StockBalanceLocation() {
       limit: pageSize,
       page: 1,
       branchCode: savePayLoadSearch.branchCode,
-      dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
       locationCode: savePayLoadSearch.locationCode,
+      positionName: savePayLoadSearch.positionName,
     };
 
     await dispatch(featchStockBalanceLocationSearchAsync(payloadNewpage));
