@@ -71,6 +71,7 @@ import checkOrderToteSlice from './slices/check-order-detail-tote-slice';
 import stockBalanceLocationSearchSlice from './slices/stock/stock-balance-location-search-slice';
 import stockBalanceSearchSlice from './slices/stock/stock-balance-search-slice';
 import stockMovementSearchSlice from './slices/stock/stock-movement-search-slice';
+import stockBalanceNegativeSearchSlice from './slices/stock/stock-balance-negative-search-slice';
 import masterStockMovementTypeSlice from './slices/master/stock-movement-type-slice';
 const store = configureStore({
   reducer: {
@@ -145,6 +146,7 @@ const store = configureStore({
     stockBalanceLocationSearchSlice: stockBalanceLocationSearchSlice,
     stockBalanceSearchSlice: stockBalanceSearchSlice,
     stockMovementSearchSlice: stockMovementSearchSlice,
+    stockBalanceNegativeSearchSlice: stockBalanceNegativeSearchSlice,
     masterStockMovementTypeSlice: masterStockMovementTypeSlice,
   },
 });
