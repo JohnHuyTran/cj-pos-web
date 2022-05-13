@@ -3,22 +3,14 @@ import { styled, useTheme } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
 import Drawer from '@mui/material/Drawer';
-import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
 import MuiListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import LoyaltyOutlinedIcon from '@mui/icons-material/LoyaltyOutlined';
-import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
-import StarBorder from '@mui/icons-material/StarBorder';
-import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -28,7 +20,7 @@ import { useAppSelector, useAppDispatch } from '../store/store';
 import { changeState } from '../store/slices/nav-slice';
 import imgLogo from '../assets/images/CJlogo.jpeg';
 import Menu from '@mui/icons-material/Menu';
-import { ShoppingCartSharp } from '@mui/icons-material';
+import { MoveToInbox, ShoppingCartSharp } from '@mui/icons-material';
 import { MAINMENU, SUBMENU } from '../utils/enum/permission-enum';
 import { isAllowMainMenuPermission, isAllowSubMenuPermission } from '../utils/role-permission';
 
@@ -449,7 +441,7 @@ export default function Sidebar({}: Props): ReactElement {
           id='mainMenuProductInfo'
           style={{ display: disableMainMenuPurchaseBranch ? 'none' : '' }}>
           <ListItemIcon>
-            <StoreMallDirectoryIcon />
+            <MoveToInbox />
           </ListItemIcon>
           <ListItemText primary='สั่งสินค้าจากสาขา' style={{ marginLeft: -15 }} />
           {openPurchaseBranchMenu ? <ExpandLess /> : <ExpandMore />}
