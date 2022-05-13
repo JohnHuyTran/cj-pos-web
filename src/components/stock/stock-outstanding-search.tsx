@@ -12,6 +12,7 @@ import DatePickerAllComponent from '../commons/ui/date-picker-all';
 import ModalAddTypeProduct from '../commons/ui/modal-add-type-products';
 import StockBalance from './stock-balance';
 import StockBalanceLocation from './stock-balance-location';
+import StockBalanceNegative from './stock-balance-negative';
 import SearchIcon from '@mui/icons-material/Search';
 import {
   clearDataFilter,
@@ -29,6 +30,11 @@ import { updateAddTypeAndProductState } from '../../store/slices/add-type-produc
 import AlertError from '../commons/ui/alert-error';
 import _ from 'lodash';
 import LoadingModal from '../commons/ui/loading-modal';
+import {
+  clearDataNegativeFilter,
+  featchStockBalanceNegativeSearchAsync,
+  savePayloadSearchNegative,
+} from '../../store/slices/stock/stock-balance-negative-search-slice';
 interface State {
   storeId: number;
   locationId: string;
@@ -94,14 +100,27 @@ function StockSearch() {
   };
   const [value, setValue] = React.useState(0);
   const [flagSearch, setFlagSearch] = React.useState(false);
+  const [flagSearchNegative, setFlagSearchNegative] = React.useState(false);
   const [flagSearchLocation, setFlagSearchLocation] = React.useState(false);
-  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
+
+  const [flagSearchTabNegative, setFlagSearchTabNegative] = React.useState(false);
+  const [flagSearchTabLocation, setFlagSearchTabLocation] = React.useState(false);
+
+  const handleChangeTab = async (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
 
-    if (newValue === 0 && flagSearchLocation) {
-      setFlagSearchLocation(false);
-      onClickClearBtn();
+    // if (newValue === 0 && flagSearchTabLocation) {
+    //   setFlagSearchTabLocation(false);
+    //   onClickClearBtn();
+    // }
+
+    handleOpenLoading('open', true);
+    if (newValue === 1 && !flagSearchNegative && !flagSearchTabLocation) {
+      await searchStockBalanceNegative(limitsSearch, filterSKUSearch);
+    } else if (newValue === 2 && !flagSearchLocation && !flagSearchTabNegative) {
+      await searchStockBalanceLocation(limitsSearch, filterSKUSearch);
     }
+    handleOpenLoading('open', false);
   };
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
@@ -150,19 +169,23 @@ function StockSearch() {
     await dispatch(updateAddTypeAndProductState([]));
     await dispatch(clearDataFilter());
     await dispatch(clearDataLocationFilter());
+    await dispatch(clearDataNegativeFilter());
     setTimeout(() => {
       setFlagSearch(false);
+      setFlagSearchNegative(false);
+      setFlagSearchLocation(false);
+      setFlagSearchTabNegative(false);
+      setFlagSearchTabLocation(false);
+
       handleOpenLoading('open', false);
     }, 300);
   };
 
+  const [limitsSearch, setLimitsSearch] = React.useState<any>(0);
+  const [filterSKUSearch, setFilterSKUSearch] = React.useState<any>([]);
   const onClickSearchBtn = async () => {
-    if (value === 1) {
-      setFlagSearchLocation(true);
-    }
-
-    handleOpenLoading('open', true);
     if (isValidateInput()) {
+      handleOpenLoading('open', true);
       let limits: number;
       if (limit === 0 || limit === undefined) {
         limits = 10;
@@ -170,44 +193,89 @@ function StockSearch() {
         limits = limit;
       }
       const productList: string[] = [];
-      payloadAddTypeProduct
+      await payloadAddTypeProduct
         .filter((el: any) => el.selectedType === 2 && el.showProduct)
         .map((item: any, index: number) => {
           productList.push(item.skuCode);
         });
       const filterSKU = _.uniq(productList);
 
+      setLimitsSearch(limits);
+      setFilterSKUSearch(filterSKU);
+
       if (value === 0) {
-        const payload: OutstandingRequest = {
-          limit: limits,
-          page: page,
-          skuCodes: filterSKU,
-          locationCode: values.locationId === 'ALL' ? '' : values.locationId,
-          branchCode: branchFromCode,
-        };
+        await searchStockBalance(limits, filterSKU);
 
-        await dispatch(featchStockBalanceSearchAsync(payload));
-        await dispatch(featchStockBalanceLocationSearchAsync(payload));
-        await dispatch(savePayloadSearch(payload));
-        await dispatch(savePayloadSearchLocation(payload));
-        setFlagSearch(true);
+        setFlagSearchNegative(false);
+        setFlagSearchLocation(false);
+        setFlagSearchTabNegative(false);
+        setFlagSearchTabLocation(false);
       } else if (value === 1) {
-        const payload: OutstandingRequest = {
-          limit: limits,
-          page: page,
-          skuCodes: filterSKU,
-          locationCode: values.locationId === 'ALL' ? '' : values.locationId,
-          branchCode: branchFromCode,
-          positionName: values.positionName,
-        };
+        await searchStockBalanceNegative(limits, filterSKU);
+        setFlagSearchTabNegative(true);
 
-        await dispatch(featchStockBalanceLocationSearchAsync(payload));
-        await dispatch(savePayloadSearch(payload));
-        await dispatch(savePayloadSearchLocation(payload));
-        setFlagSearch(true);
+        setFlagSearch(false);
+        setFlagSearchLocation(false);
+        await dispatch(clearDataFilter());
+        await dispatch(clearDataLocationFilter());
+      } else if (value === 2) {
+        await searchStockBalanceLocation(limits, filterSKU);
+        setFlagSearchTabLocation(true);
+
+        setFlagSearch(false);
+        setFlagSearchNegative(false);
+        await dispatch(clearDataFilter());
+        await dispatch(clearDataNegativeFilter());
       }
+
+      handleOpenLoading('open', false);
     }
-    handleOpenLoading('open', false);
+  };
+
+  const searchStockBalance = async (limits: any, filterSKU: any) => {
+    const payload: OutstandingRequest = {
+      limit: limits,
+      page: page,
+      skuCodes: filterSKU,
+      locationCode: values.locationId === 'ALL' ? '' : values.locationId,
+      branchCode: branchFromCode,
+    };
+
+    await dispatch(featchStockBalanceSearchAsync(payload));
+    await dispatch(savePayloadSearch(payload));
+    // await dispatch(savePayloadSearchLocation(payload));
+    setFlagSearch(true);
+  };
+
+  const searchStockBalanceNegative = async (limits: any, filterSKU: any) => {
+    const payload: OutstandingRequest = {
+      limit: limits,
+      page: page,
+      skuCodes: filterSKU,
+      branchCode: branchFromCode,
+    };
+    await dispatch(featchStockBalanceNegativeSearchAsync(payload));
+    // await dispatch(savePayloadSearch(payload));
+    await dispatch(savePayloadSearchNegative(payload));
+    setFlagSearchNegative(true);
+  };
+
+  const searchStockBalanceLocation = async (limits: any, filterSKU: any) => {
+    const payload: OutstandingRequest = {
+      limit: limits,
+      page: page,
+      skuCodes: filterSKU,
+      locationCode: values.locationId === 'ALL' ? '' : values.locationId,
+      branchCode: branchFromCode,
+      positionName: values.positionName,
+    };
+
+    await dispatch(featchStockBalanceLocationSearchAsync(payload));
+
+    // await dispatch(savePayloadSearch(payload));
+
+    await dispatch(savePayloadSearchNegative(payload));
+    setFlagSearchLocation(true);
   };
 
   const isValidateInput = () => {
@@ -217,7 +285,7 @@ function StockSearch() {
         setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
         return false;
       }
-    } else if (value === 1) {
+    } else if (value === 2) {
       if (Object.keys(payloadAddTypeProduct).length <= 0 && values.positionName === '') {
         setOpenAlert(true);
         setTextError('กรุณาระบุสินค้าหรือโลเคชั่นสาขาที่ต้องการค้นหา');
@@ -333,24 +401,27 @@ function StockSearch() {
             <Typography gutterBottom variant='subtitle1' component='div'>
               คลัง
             </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id='tbxlocationId'
-                name='locationId'
-                value={values.locationId}
-                onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={'ALL'} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem key={'1'} value={'001'}>
-                  หน้าร้าน
-                </MenuItem>
-                <MenuItem key={'2'} value={'002'}>
-                  หลังร้าน
-                </MenuItem>
-              </Select>
-            </FormControl>
+            {value !== 1 && (
+              <FormControl fullWidth className={classes.Mselect}>
+                <Select
+                  id='tbxlocationId'
+                  name='locationId'
+                  value={values.locationId}
+                  onChange={handleChange}
+                  inputProps={{ 'aria-label': 'Without label' }}>
+                  <MenuItem value={'ALL'} selected={true}>
+                    ทั้งหมด
+                  </MenuItem>
+                  <MenuItem key={'1'} value={'001'}>
+                    หน้าร้าน
+                  </MenuItem>
+                  <MenuItem key={'2'} value={'002'}>
+                    หลังร้าน
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            )}
+            {value === 1 && <TextField size='small' className={classes.MtextField} fullWidth disabled={value === 1} />}
           </Grid>
           <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant='subtitle1' component='div'>
@@ -384,8 +455,8 @@ function StockSearch() {
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder={value === 0 ? '' : 'กรุณาระบุโลเคชั่นสาขา'}
-              disabled={value === 0}
+              placeholder={value === 0 || value === 1 ? '' : 'กรุณาระบุโลเคชั่นสาขา'}
+              disabled={value === 0 || value === 1}
             />
           </Grid>
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
@@ -411,18 +482,17 @@ function StockSearch() {
         </Grid>
       </Box>
 
-      {/* {flagSearch && (
-        <> */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChangeTab} aria-label='basic tabs example'>
           <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลัง</Typography>} {...a11yProps(0)} />
+          <Tab label={<Typography sx={{ fontWeight: 'bold' }}>สินค้าคงคลังติดลบ</Typography>} {...a11yProps(1)} />
           <Tab
             label={
               <Typography sx={{ fontWeight: 'bold' }} style={{ textTransform: 'none' }}>
                 สินค้าคงคลัง(ตาม Location)
               </Typography>
             }
-            {...a11yProps(1)}
+            {...a11yProps(2)}
           />
         </Tabs>
       </Box>
@@ -431,10 +501,12 @@ function StockSearch() {
         {flagSearch && <StockBalance />}
       </TabPanel>
       <TabPanel value={value} index={1}>
-        {flagSearch && <StockBalanceLocation />}
+        {flagSearchNegative && <StockBalanceNegative />}
       </TabPanel>
-      {/* </>
-      )} */}
+      <TabPanel value={value} index={2}>
+        {flagSearchLocation && <StockBalanceLocation />}
+      </TabPanel>
+
       <LoadingModal open={openLoadingModal.open} />
       <ModalAddTypeProduct
         open={openModelAddItems}

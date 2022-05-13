@@ -1,23 +1,20 @@
 import { Box, Grid, Typography } from '@mui/material';
-import { DataGrid, GridColDef, gridColumnsTotalWidthSelector } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import React from 'react';
-import { useStyles } from '../../styles/makeTheme';
-import { OutstandingRequest, positionInfo, StockInfo } from '../../models/stock-model';
+import { OutstandingRequest, StockInfo } from '../../models/stock-model';
 import { useAppSelector, useAppDispatch } from '../../store/store';
-import {
-  featchStockBalanceLocationSearchAsync,
-  savePayloadSearchLocation,
-} from '../../store/slices/stock/stock-balance-location-search-slice';
+import { useStyles } from '../../styles/makeTheme';
 import { SearchOff } from '@mui/icons-material';
+import { savePayloadSearch } from '../../store/slices/stock/stock-balance-search-slice';
+import { featchStockBalanceNegativeSearchAsync } from '../../store/slices/stock/stock-balance-negative-search-slice';
 
-function StockBalanceLocation() {
+function StockBalance() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const _ = require('lodash');
-  const savePayLoadSearch = useAppSelector((state) => state.stockBalanceLocationSearchSlice.savePayloadSearch);
-  const items = useAppSelector((state) => state.stockBalanceLocationSearchSlice.stockList);
-  const cuurentPage = useAppSelector((state) => state.stockBalanceLocationSearchSlice.stockList.page);
-  const limit = useAppSelector((state) => state.stockBalanceLocationSearchSlice.stockList.perPage);
+  const savePayLoadSearch = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.savePayloadSearch);
+  const items = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.stockList);
+  const cuurentPage = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.stockList.page);
+  const limit = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.stockList.perPage);
   const [pageSize, setPageSize] = React.useState(limit);
 
   const columns: GridColDef[] = [
@@ -35,19 +32,11 @@ function StockBalanceLocation() {
       ),
     },
     {
-      field: 'barcode',
-      headerClassName: 'columnHeaderTitle',
-      headerName: 'บาร์โค้ด',
-      minWidth: 122,
-      headerAlign: 'center',
-      sortable: false,
-    },
-    {
       field: 'skuName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'รายละเอียดสินค้า',
       headerAlign: 'center',
-      minWidth: 235,
+      // minWidth: 235,
       flex: 0.3,
       sortable: false,
       renderCell: (params) => (
@@ -60,131 +49,66 @@ function StockBalanceLocation() {
       ),
     },
     {
-      field: 'locationName',
-      headerClassName: 'columnHeaderTitle',
-      headerName: 'คลัง',
-      width: 75,
-      headerAlign: 'center',
-      sortable: false,
-    },
-    {
-      field: 'positions',
-      headerClassName: 'columnHeaderTitle',
-      headerName: 'โลเคชั่น',
-      minWidth: 85,
-      headerAlign: 'center',
-      sortable: false,
-    },
-    {
-      field: 'qty',
+      field: 'availableQty',
       headerClassName: 'columnHeaderTitle-BG',
       cellClassName: 'columnFilled-BG',
       headerName: 'สินค้าคงเหลือ',
-      width: 111,
+      minWidth: 125,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params) => (
+        <Typography variant='body2' sx={{ color: '#FF0000' }}>
+          {params.value}
+        </Typography>
+      ),
     },
     {
       field: 'unitName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'หน่วย',
-      width: 75,
+      minWidth: 125,
       headerAlign: 'center',
-      sortable: false,
-    },
-    {
-      field: 'minBeauty',
-      headerClassName: 'columnHeaderTitle',
-      headerName: 'จำนวนกำหนดต่ำสุด',
-      minWidth: 150,
-      headerAlign: 'center',
-      align: 'right',
-      sortable: false,
-    },
-    {
-      field: 'maxBeauty',
-      headerClassName: 'columnHeaderTitle',
-      headerName: 'จำนวนกำหนดสูงสุด',
-      minWidth: 150,
-      headerAlign: 'center',
-      align: 'right',
       sortable: false,
     },
   ];
 
-  const concatName = (value: positionInfo[]) => {
-    let positionNameStr: string = '';
-    value.forEach((data, index) => {
-      if (index === value.length - 1) {
-        positionNameStr += `${data.name}`;
-      } else {
-        positionNameStr += `${data.name} ,`;
-      }
-    });
-    return positionNameStr;
-  };
-
   const rows = items.data.map((data: StockInfo, indexs: number) => {
-    let minValObject = _.maxBy(data.positions, 'minBeauty');
-    let maxValObject = _.maxBy(data.positions, 'maxBeauty');
-
     return {
       id: indexs,
       index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
-      barcode: data.barcode,
-      barcodeName: data.barcodeName,
       skuCode: data.skuCode,
       skuName: data.skuName,
-      locationCode: data.locationCode,
-      locationName: data.locationName,
-      qty: data.qty,
-      unitCode: data.unitCode,
+      availableQty: data.availableQty,
       unitName: data.unitName,
-      barFactor: data.barFactor,
-      positions: data.positions ? concatName(data.positions) : '',
-      minBeauty: minValObject ? minValObject.minBeauty : 0,
-      maxBeauty: maxValObject ? maxValObject.maxBeauty : 0,
     };
   });
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
-
     let page: number = newPage + 1;
-
-    const payloadNewpage: OutstandingRequest = {
-      limit: pageSize,
-      page: page,
-      branchCode: savePayLoadSearch.branchCode,
-      dateFrom: savePayLoadSearch.dateFrom,
-      skuCodes: savePayLoadSearch.skuCodes,
-      locationCode: savePayLoadSearch.locationCode,
-    };
-
-    await dispatch(featchStockBalanceLocationSearchAsync(payloadNewpage));
-    await dispatch(savePayloadSearchLocation(payloadNewpage));
+    handleSearchStockBalanceNegative(pageSize, page);
     setLoading(false);
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
     setPageSize(pageSize);
     setLoading(true);
+    handleSearchStockBalanceNegative(pageSize, 1);
+    setLoading(false);
+  };
 
+  const handleSearchStockBalanceNegative = async (pageLimit: number, page: number) => {
     const payloadNewpage: OutstandingRequest = {
-      limit: pageSize,
-      page: 1,
+      limit: pageLimit,
+      page: page,
       branchCode: savePayLoadSearch.branchCode,
-      dateFrom: savePayLoadSearch.dateFrom,
       skuCodes: savePayLoadSearch.skuCodes,
-      locationCode: savePayLoadSearch.locationCode,
     };
 
-    await dispatch(featchStockBalanceLocationSearchAsync(payloadNewpage));
-    await dispatch(savePayloadSearchLocation(payloadNewpage));
-
-    setLoading(false);
+    await dispatch(featchStockBalanceNegativeSearchAsync(payloadNewpage));
+    await dispatch(savePayloadSearch(payloadNewpage));
   };
 
   return (
@@ -225,7 +149,6 @@ function StockBalanceLocation() {
             />
           </div>
         )}
-
         {items.data.length === 0 && (
           <Grid container xs={12} justifyContent='center'>
             <Box color='#CBD4DB' justifyContent='center'>
@@ -240,4 +163,4 @@ function StockBalanceLocation() {
   );
 }
 
-export default StockBalanceLocation;
+export default StockBalance;
