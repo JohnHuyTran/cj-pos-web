@@ -119,6 +119,11 @@ export const formatFileInvoice = (invoiceNo: string, counter: number) => {
   return `${invoiceNo}-${counter}.pdf`;
 };
 
+export const addTwoDecimalPlaces = (value: any) => {
+  if (stringNullOrEmpty(value)) return '0.00';
+  else return value.toFixed(2);
+};
+
 export const getEncodeBarcode = ({
   price = '',
   barcode = '',

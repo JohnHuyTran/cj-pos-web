@@ -6,6 +6,7 @@ import FormControl from '@mui/material/FormControl';
 import { useStyles } from '../../../styles/makeTheme';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import SearchIcon from '@mui/icons-material/Search';
+import { addTwoDecimalPlaces } from '../../../utils/utils';
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -16,6 +17,18 @@ const _ = require('lodash');
 
 export const ModalBarcodeDetail = ({ open, onClose, dataDetail }: Props) => {
   const classes = useStyles();
+  let textDisplay;
+  switch (dataDetail.unitFactor) {
+    case 'ST':
+      textDisplay = 'ชิ้น';
+      break;
+    case 'PAK':
+      textDisplay = 'แพค';
+      break;
+    case 'KAR':
+      textDisplay = 'ลัง';
+      break;
+  }
 
   return (
     <div>
@@ -89,7 +102,7 @@ export const ModalBarcodeDetail = ({ open, onClose, dataDetail }: Props) => {
                   id="unitFactor"
                   name="unitFactor"
                   size="small"
-                  value={dataDetail.unitFactor}
+                  value={textDisplay}
                   className={classes.MtextField}
                   sx={{ backgroundColor: '#EAEBEB' }}
                   fullWidth
@@ -127,7 +140,7 @@ export const ModalBarcodeDetail = ({ open, onClose, dataDetail }: Props) => {
                   name="retailPriceTier1"
                   size="small"
                   inputProps={{ style: { textAlign: 'right' } }}
-                  value={dataDetail.retailPriceTier1}
+                  value={addTwoDecimalPlaces(dataDetail.retailPriceTier1)}
                   className={classes.MtextField}
                   sx={{ backgroundColor: '#EAEBEB' }}
                   fullWidth
@@ -143,7 +156,7 @@ export const ModalBarcodeDetail = ({ open, onClose, dataDetail }: Props) => {
                   name="freshLifeBuyPrice"
                   size="small"
                   inputProps={{ style: { textAlign: 'right' } }}
-                  value={dataDetail.freshLifeBuyPrice}
+                  value={addTwoDecimalPlaces(dataDetail.freshLifeBuyPrice)}
                   className={classes.MtextField}
                   sx={{ backgroundColor: '#EAEBEB' }}
                   fullWidth
@@ -233,7 +246,7 @@ export const ModalBarcodeDetail = ({ open, onClose, dataDetail }: Props) => {
                   name="pkgWidth"
                   size="small"
                   inputProps={{ style: { textAlign: 'right' } }}
-                  value={dataDetail.pkgWidth}
+                  value={addTwoDecimalPlaces(dataDetail.pkgWidth)}
                   className={classes.MtextField}
                   sx={{ backgroundColor: '#EAEBEB' }}
                   fullWidth
