@@ -40,9 +40,9 @@ export async function approveTransferOut(id: string, payload: any) {
   }
 }
 
-export async function rejectTransferOut(id: string) {
+export async function rejectTransferOut(id: string, payload: any) {
   try {
-    const response = await get(getPathReject(id));
+    const response = await post(getPathReject(id), payload);
     return response;
   } catch (error) {
     throw error;
