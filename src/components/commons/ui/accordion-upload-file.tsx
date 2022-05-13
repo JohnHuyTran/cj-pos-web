@@ -254,7 +254,7 @@ function AccordionUploadFile({
       <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
         <label htmlFor={'btnBrowse' + (stringNullOrEmpty(idControl) ? '' : idControl)}>
           <Button
-            id={"btnPrint" + (stringNullOrEmpty(idControl) ? '' : idControl)}
+            id={'btnPrint' + (stringNullOrEmpty(idControl) ? '' : idControl)}
             color="primary"
             variant="contained"
             component="span"
@@ -273,7 +273,7 @@ function AccordionUploadFile({
       </Box>
 
       <input
-        id={"btnBrowse" + (stringNullOrEmpty(idControl) ? '' : idControl)}
+        id={'btnBrowse' + (stringNullOrEmpty(idControl) ? '' : idControl)}
         type="file"
         // multiple
         // onDrop
@@ -290,9 +290,13 @@ function AccordionUploadFile({
           py: 1,
           mt: 2,
           borderRadius: '5px',
-          border: (stringNullOrEmpty(warningMessage)
-            || (!stringNullOrEmpty(warningMessage) && !stringNullOrEmpty(idControl) && warningMessage?.split('__')[0] != idControl))
-            ? `1px dashed ${theme.palette.primary.main}` : `1px dashed #F54949`,
+          border:
+            stringNullOrEmpty(warningMessage) ||
+            (!stringNullOrEmpty(warningMessage) &&
+              !stringNullOrEmpty(idControl) &&
+              warningMessage?.split('__')[0] != idControl)
+              ? `1px dashed ${theme.palette.primary.main}`
+              : `1px dashed #F54949`,
         }}
       >
         <Box
@@ -323,13 +327,15 @@ function AccordionUploadFile({
                 }}
               >
                 {item.status === 'old' && (
-                  <Typography
-                    color="secondary"
-                    sx={{ textDecoration: 'underline', fontSize: '13px' }}
-                    onClick={() => getHuaweiFileUrl(item)}
-                  >
-                    {item.fileName}
-                  </Typography>
+                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <Typography
+                      color="secondary"
+                      sx={{ textDecoration: 'underline', fontSize: '13px' }}
+                      onClick={() => getHuaweiFileUrl(item)}
+                    >
+                      {item.fileName}
+                    </Typography>
+                  </div>
                 )}
 
                 {item.status === 'new' && (
@@ -358,11 +364,17 @@ function AccordionUploadFile({
       </Box>
       <Typography
         id={'warningMessage' + (stringNullOrEmpty(idControl) ? '' : idControl)}
-        hidden={stringNullOrEmpty(warningMessage)
-          || (!stringNullOrEmpty(warningMessage) && !stringNullOrEmpty(idControl) && warningMessage?.split('__')[0] != idControl)}
+        hidden={
+          stringNullOrEmpty(warningMessage) ||
+          (!stringNullOrEmpty(warningMessage) &&
+            !stringNullOrEmpty(idControl) &&
+            warningMessage?.split('__')[0] != idControl)
+        }
         sx={{ fontSize: '14px', color: '#F54949', textAlign: 'right' }}
       >
-        {(!stringNullOrEmpty(warningMessage) && !stringNullOrEmpty(idControl)) ? warningMessage?.split('__')[1] : warningMessage}
+        {!stringNullOrEmpty(warningMessage) && !stringNullOrEmpty(idControl)
+          ? warningMessage?.split('__')[1]
+          : warningMessage}
       </Typography>
 
       <ModalShowHuaweiFile
