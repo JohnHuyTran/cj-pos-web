@@ -91,6 +91,8 @@ export enum PERMISSION_GROUP {
   DISTRICT_MANAGER = 'districtManager',
   SM = 'storeManagement',
   ACCOUNTING = 'accounting',
+  PI = 'operationProcess',
+  PCM = 'procurement',
 }
 
 export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
@@ -105,3 +107,5 @@ export const KEYCLOAK_GROUP_AUDIT = '/service.posback/audit';
 export const KEYCLOAK_GROUP_DISTRICT_MANAGER = '/service.posback/district-manager';
 export const KEYCLOAK_GROUP_SM = '/service.posback/sm';
 export const KEYCLOAK_GROUP_ACCOUNTING = '/service.posback/accounting';
+export const KEYCLOAK_GROUP_PI = '/service.posback/pi';
+export const KEYCLOAK_GROUP_PCM = '/service.posback/pcm';

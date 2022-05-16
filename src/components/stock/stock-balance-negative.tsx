@@ -7,6 +7,7 @@ import { useStyles } from '../../styles/makeTheme';
 import { SearchOff } from '@mui/icons-material';
 import { savePayloadSearch } from '../../store/slices/stock/stock-balance-search-slice';
 import { featchStockBalanceNegativeSearchAsync } from '../../store/slices/stock/stock-balance-negative-search-slice';
+import { numberWithCommas } from '../../utils/utils';
 
 function StockBalance() {
   const classes = useStyles();
@@ -57,11 +58,7 @@ function StockBalance() {
       headerAlign: 'center',
       align: 'right',
       sortable: false,
-      renderCell: (params) => (
-        <Typography variant='body2' sx={{ color: '#FF0000' }}>
-          {params.value}
-        </Typography>
-      ),
+      renderCell: (params) => handleNumberWithCommas(params.value),
     },
     {
       field: 'unitName',
@@ -83,6 +80,14 @@ function StockBalance() {
       unitName: data.unitName,
     };
   });
+
+  const handleNumberWithCommas = (availableQty: any) => {
+    return (
+      <Typography variant='body2' sx={{ color: '#FF0000' }}>
+        {numberWithCommas(availableQty)}
+      </Typography>
+    );
+  };
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
