@@ -16,6 +16,8 @@ import ProductListItems from './product-list-item';
 import { getProductMaster } from '../../../services/product-master';
 import LoadingModal from '../../commons/ui/loading-modal';
 import HtmlTooltip from '../../commons/ui/html-tooltip';
+import AlertError from '../../commons/ui/alert-error';
+import TextBoxSearchProduct from './text-box-search-product';
 interface State {
   query: string;
   branch: string;
@@ -24,15 +26,6 @@ interface State {
 const flexStyle = {
   display: 'flex',
   justifyContent: 'space-between',
-};
-const listStatus = {
-  '1': 'สินค้าทั่วไป',
-  '2': 'สินค้าชุด',
-  '3': 'สินค้าบริการ',
-  '4': 'สินค้ารายรับ',
-  '5': 'สินคารายจ่าย',
-  '6': 'สินค้าฝากขาย',
-  '9': 'สินค้าอื่นๆ',
 };
 
 function ProductMasterSearch() {
@@ -60,6 +53,9 @@ function ProductMasterSearch() {
   const [listBarcode, setlistBarCode] = React.useState([]);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const [skuValue, setSkuValue] = React.useState<any>({});
+  const [openAlert, setOpenAlert] = React.useState<boolean>(false);
+  const [textError, setTextError] = React.useState<string>('');
+  const [isClear, setIsClear] = React.useState<boolean>(false)
 
   const handleChangeBranch = (branchCode: string) => {
     if (branchCode !== null) {
@@ -72,20 +68,23 @@ function ProductMasterSearch() {
 
   const onClear = async () => {
     setClearBranchDropDown(!clearBranchDropDown);
-    // setFlagSearch(false);
+    setIsClear(!isClear)
     setValues({
       query: '',
       branch: env.branch.channel === 'branch' ? env.branch.code : '',
     });
     setShowdData(false);
-    // const payload: BarcodeDiscountSearchRequest = {
-    //   perPage: (limit ? limit : 10).toString(),
-    //   page: page,
-    //   query: values.documentNumber,
-    //   branch: values.branch,
-    //   clearSearch: true,
-    // };
-    // dispatch(barcodeDiscountSearch(payload));
+  };
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
+
+  const handleChangeProduct = (value: any) => {
+    if (value) {
+      setValues({ ...values, query: value.skuCode });
+    } else {
+      setValues({ ...values, query: '' });
+    }
   };
   const onSearch = async () => {
     try {
@@ -98,7 +97,12 @@ function ProductMasterSearch() {
           setShowdData(true);
         } else {
           setShowdData(false);
+          setTextError('Invalid Product Name, Product Code or SKU Product');
+          setOpenAlert(true);
         }
+      } else {
+        setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
+        setOpenAlert(true);
       }
     } catch (error) {
       console.log('err: ', error);
@@ -131,6 +135,7 @@ function ProductMasterSearch() {
             fullWidth
             placeholder="รหัสสินค้า/ชื่อสินค้า/บาร์โค้ด"
           />
+          {/* <TextBoxSearchProduct isClear={isClear} onSelectItem={handleChangeProduct}/> */}
         </Grid>
         <Grid item xs={4}>
           <Typography>
@@ -518,6 +523,7 @@ function ProductMasterSearch() {
         </Box>
       )}
       <LoadingModal open={openLoadingModal} />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
   );
 }
