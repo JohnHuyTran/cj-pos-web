@@ -59,7 +59,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [brNo, setBRNo] = React.useState('');
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
   const [branchCode, setBranchCode] = React.useState('0001');
-  const [status, setStatus] = React.useState('');
+  const [status, setStatus] = React.useState('DRAFT');
 
   const handleChangeComment = (value: any) => {
     // setFlagSave(true);
@@ -72,7 +72,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleChkSaveClose}>
           <Typography sx={{ fontSize: '1em' }}>สร้างรายการสั่งสินค้า</Typography>
-          <Steppers status='DRAFT' type='RT'></Steppers>
+          <Steppers status={status}></Steppers>
         </BootstrapDialogTitle>
 
         <DialogContent>

@@ -4,13 +4,13 @@ import { Step, StepLabel, Stepper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useStyles } from '../../styles/makeTheme';
 import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
+import { getPurchaseBranchList } from '../../utils/enum/purchase-branch-enum';
 
 interface Props {
   status: string;
-  type: string;
 }
 
-function Steppers({ status, type }: Props): ReactElement {
+function Steppers({ status }: Props): ReactElement {
   const { t } = useTranslation(['purchaseBranch', 'common']);
 
   const classes = useStyles();
@@ -19,17 +19,17 @@ function Steppers({ status, type }: Props): ReactElement {
   const stepsList: any = [];
 
   useEffect(() => {
-    getStockTransferStatusList(type).map((item, index: number) => {
+    getPurchaseBranchList().map((item) => {
       if (item.stepperGrp === 1 && item.value === status) {
         stepsList.push(t(`status.${item.value}`));
         stepsList.push('อยู่ระหว่างดำเนินการ: -');
-        handleStepApproved(type);
+        stepsList.push(t(`status.CLOSED`));
       } else if (item.stepperGrp === 2 && item.value === status) {
-        handleStepDraft(type);
+        stepsList.push(t('status.DRAFT'));
         stepsList.push('อยู่ระหว่างดำเนินการ: ' + t(`status.${item.value}`));
-        handleStepApproved(type);
+        stepsList.push(t(`status.CLOSED`));
       } else if (item.stepperGrp === 3 && item.value === status) {
-        handleStepDraft(type);
+        stepsList.push(t('status.DRAFT'));
         stepsList.push('อยู่ระหว่างดำเนินการ: -');
         stepsList.push(t(`status.${item.value}`));
       }
