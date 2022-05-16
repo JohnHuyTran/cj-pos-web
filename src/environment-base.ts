@@ -67,16 +67,16 @@ export const environment = {
   task: {
     notification: {
       tasks: {
-        url: '/testtask/notifications/tasks',
+        url: '/task/notifications/tasks',
       },
       reminders: {
-        url: '/testtask/notifications/reminders',
+        url: '/task/notifications/reminders',
       },
       announcements: {
-        url: '/testtesttasktest/notifications/announcements',
+        url: '/task/notifications/announcements',
       },
       read: {
-        url: '/testtask/notifications/{id}',
+        url: '/task/notifications/{id}',
       },
     },
   },
