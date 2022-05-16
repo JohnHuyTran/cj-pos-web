@@ -215,7 +215,7 @@ export default function StockTransferRt() {
     setClearBranchDropDown(!clearBranchDropDown);
     setValues({
       docNo: '',
-      branchFrom: '',
+      branchFrom: values.branchFrom,
       branchTo: '',
       dateFrom: '',
       dateTo: '',
