@@ -76,6 +76,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
           barcodeName: item.detail.productName,
           skuCode: item.detail.skuCode,
           unit: item.detail.unitFactor,
+          unitCode: item.detail.unitCode || '',
           numberOfDiscounted: item.total || 0,
           numberOfApproved: 0,
         };
