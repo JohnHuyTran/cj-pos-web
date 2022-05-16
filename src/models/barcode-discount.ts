@@ -17,6 +17,7 @@ export interface DiscountDetail {
   barcodeName: string;
   skuCode: string;
   unit: string;
+  unitCode: string;
   price: number;
   discount: any;
   expiryDate: string | any;

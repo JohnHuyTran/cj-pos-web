@@ -99,6 +99,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           barCode: item.barcode,
           barcodeName: item.barcodeName,
           unit: item.unitName,
+          unitCode: item.unitCode || '',
           price: price,
           discount: discount,
           errorDiscount: '',
@@ -145,6 +146,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           numberOfApproved: parseInt(String(item.numberOfApproved).replace(/,/g, '')),
           expiredDate: item.expiryDate,
           unitFactor: item.unit,
+          unitCode: item.unitCode,
           productName: item.barcodeName,
           skuCode: item.skuCode,
         };

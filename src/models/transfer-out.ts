@@ -12,6 +12,7 @@ export interface TransferOutDetail {
   barcodeName: string;
   skuCode: string;
   unit: string;
+  unitCode: string;
   numberOfRequested: number;
   numberOfApproved: number;
   remark: string;
@@ -24,6 +25,7 @@ export interface TransferOutDestroyDiscountDetail {
   barcodeName: string;
   skuCode: string;
   unit: string;
+  unitCode: string;
   numberOfRequested: number;
   numberOfApproved: number;
   remark: string;

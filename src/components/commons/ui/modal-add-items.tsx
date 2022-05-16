@@ -136,6 +136,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
       id: index,
       barcode: item.barcode,
       unitName: item.unitName,
+      unitCode: item.unitCode,
       barcodeName: item.barcodeName,
       productName: item.barcodeName,
       qty: item.qty ? item.qty : 1,

@@ -80,6 +80,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
           barcode: item.barcode,
           barcodeName: item.barcodeName,
           unit: item.unit,
+          unitCode: item.unitCode || '',
           qty: numberOfRequested,
           numberOfRequested: numberOfRequested,
           numberOfApproved: numberOfApproved,
@@ -104,6 +105,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
           numberOfRequested: parseInt(String(item.numberOfRequested).replace(/,/g, '')),
           numberOfApproved: parseInt(String(item.numberOfApproved).replace(/,/g, '')),
           unitName: item.unit,
+          unitCode: item.unitCode,
           productName: item.barcodeName,
           sku: item.skuCode,
           remark: item.remark
