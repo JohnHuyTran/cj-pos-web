@@ -196,7 +196,7 @@ function DCCheckOrderSearch() {
     setClearBranchDropDown(!clearBranchDropDown);
     setValues({
       docNo: '',
-      shipBranchFrom: '',
+      shipBranchFrom: values.shipBranchFrom,
       shipBranchTo: '',
       verifyDCStatus: 'ALL',
       dateFrom: '',

@@ -194,7 +194,7 @@ export default function SupplierCheckOrderSearch() {
     setClearBranchDropDown(!clearBranchDropDown);
     setValues({
       docNo: '',
-      branchFrom: '',
+      branchFrom: values.branchFrom,
       branchTo: '',
       dateFrom: '',
       dateTo: '',
