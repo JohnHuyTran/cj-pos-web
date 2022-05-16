@@ -1,11 +1,10 @@
 import React, { ReactElement, useEffect } from 'react';
-import Dialog from '@mui/material/Dialog';
 import { Box, Typography } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { ProductListItemProps } from '../../../models/product-master';
 import ModalBarcodeDetail from './modal-barcode-detail';
+import { addTwoDecimalPlaces } from '../../../utils/utils';
 const _ = require('lodash');
 
 interface Props {
@@ -124,7 +123,7 @@ export default function ProductListItems({ listData }: Props): ReactElement {
       renderCell: (params) => {
         return (
           <Typography variant="body2" paddingLeft="10px">
-            {params.value}
+            {addTwoDecimalPlaces(params.value)}
           </Typography>
         );
       },
