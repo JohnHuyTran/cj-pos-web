@@ -24,6 +24,7 @@ import TransferOut from './pages/transfer-out/transfer-out';
 import StockBalance from './pages/stock/stock-balance';
 import TransferOutDestroy from './pages/transfer-out-destroy/transfer-out-destroy';
 import StockMovement from './pages/stock/stock-movement';
+import CreatePurchaseBranch from './pages/purchase-branch-request/create-purchase-branch';
 import { featchMasterStockMovementTypeListAsync } from './store/slices/master/stock-movement-type-slice';
 const drawerWidth = 240;
 
@@ -99,6 +100,7 @@ export default function App2() {
           <Route path='/transfer-out-destroy' component={TransferOutDestroy} />
           <Route path='/stock-balance' component={StockBalance} />
           <Route path='/stock-movement' component={StockMovement} />
+          <Route path='/create-purchase-branch' component={CreatePurchaseBranch} />
         </Switch>
       </Main>
     </Box>
