@@ -22,6 +22,8 @@ export enum ACTIONS {
   CAMPAIGN_TO_APPROVE = 'campaign.to.approve',
   CAMPAIGN_TO_CANCEL = 'campaign.to.cancel',
   SUPPLIER_SEARCH = 'supplier.search',
+  PURCHASE_BR_VIEW = 'purchase.br.view',
+  PURCHASE_BR_MANAGE = 'purchase.br.manage',
 
   STOCK_RT_VIEW = 'stock.rt.view',
   STOCK_RT_MANAGE = 'stock.rt.manage',
