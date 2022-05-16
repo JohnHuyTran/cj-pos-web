@@ -1,0 +1,10 @@
+{
+  "status": {
+    "DRAFT": "บันทึก",
+    "SUBMITTED": "ส่งรายการแล้ว",
+    "CREATED_PO": "สร้างเอกสาร PO แล้ว",
+    "WAITING_BRANCH_EXAMINE": "รอสาขาตรวจรับสินค้า",
+    "CLOSED": "ปิดงาน"
+  },
+  "documentSearch": "ค้นหาเอกสาร"
+}
