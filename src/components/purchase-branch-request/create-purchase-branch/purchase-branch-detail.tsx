@@ -1,4 +1,5 @@
 import React, { ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
@@ -46,6 +47,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const classes = useStyles();
+  const { t } = useTranslation(['purchaseBranch', 'common']);
 
   const handleChkSaveClose = async () => {
     handleClose();
@@ -59,7 +61,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [brNo, setBRNo] = React.useState('');
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
   const [branchCode, setBranchCode] = React.useState('0001');
-  const [status, setStatus] = React.useState('DRAFT');
+  const [status, setStatus] = React.useState('SUBMITTED');
 
   const handleChangeComment = (value: any) => {
     // setFlagSave(true);
@@ -103,7 +105,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
               สถานะ :
             </Grid>
             <Grid item xs={4}>
-              {status}
+              {t(`status.${status}`)}
             </Grid>
           </Grid>
 
