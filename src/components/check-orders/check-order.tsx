@@ -173,7 +173,7 @@ function CheckOrderSearch() {
       dateFrom: '',
       dateTo: '',
       branchFrom: '',
-      branchTo: '',
+      branchTo: values.branchTo,
     });
 
     const payload: ShipmentRequest = {
@@ -188,6 +188,7 @@ function CheckOrderSearch() {
       sdType: parseInt(values.orderType),
       clearSearch: true,
     };
+
     dispatch(featchOrderListAsync(payload));
     dispatch(clearSearchCriteria());
 

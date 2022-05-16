@@ -114,7 +114,7 @@ function StockMovementSearchList() {
       headerClassName: 'columnHeaderTitle',
       headerName: 'วันที่ทำรายการ',
       minWidth: 150,
-      flex: 0.5,
+      flex: 0.35,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => {
@@ -136,7 +136,7 @@ function StockMovementSearchList() {
       headerClassName: 'columnHeaderTitle',
       headerName: 'เลขที่เอกสาร',
       headerAlign: 'center',
-      flex: 0.5,
+      flex: 0.35,
       minWidth: 180,
       sortable: false,
       renderCell: (params) => {
@@ -176,7 +176,7 @@ function StockMovementSearchList() {
       headerClassName: 'columnHeaderTitle',
       headerName: 'เลขที่เอกสารอ้างอิง',
       minWidth: 100,
-      flex: 0.5,
+      flex: 0.35,
       headerAlign: 'center',
       sortable: false,
     },
@@ -192,8 +192,8 @@ function StockMovementSearchList() {
       field: 'movementTypeName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'ประเภท',
-      minWidth: 150,
-      flex: 0.8,
+      width: 100,
+      flex: 0.65,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
@@ -202,7 +202,8 @@ function StockMovementSearchList() {
       field: 'movementQty',
       headerClassName: 'columnHeaderTitle',
       headerName: 'จำนวนที่ทำรายการ',
-      width: 100,
+      minWidth: 100,
+      flex: 0.3,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
@@ -213,6 +214,7 @@ function StockMovementSearchList() {
       cellClassName: 'columnFilled-BG',
       headerName: 'สินค้าคงเหลือ',
       minWidth: 100,
+      flex: 0.25,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
@@ -221,14 +223,14 @@ function StockMovementSearchList() {
       field: 'unitName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'หน่วย',
-      width: 75,
+      width: 70,
       headerAlign: 'center',
       sortable: false,
     },
     {
       field: 'action',
       headerName: ' ',
-      width: 40,
+      width: 20,
       align: 'center',
       sortable: false,
       renderCell: (params) => handleModelAction(params),
@@ -301,7 +303,11 @@ function StockMovementSearchList() {
 
   const showDocumentDetail = async (docNo: string, docRefNo: string, docType: string, movementTypeCode: string) => {
     handleOpenLoading('open', true);
-    if (MOVEMENT_TYPE.ORDER_RECEIVE_LD === movementTypeCode || MOVEMENT_TYPE.ORDER_RECEIVE_BT === movementTypeCode) {
+    if (
+      MOVEMENT_TYPE.ORDER_RECEIVE_LD === movementTypeCode ||
+      MOVEMENT_TYPE.ORDER_RECEIVE_BT === movementTypeCode ||
+      MOVEMENT_TYPE.ADJ_TRNS_IN_LD === movementTypeCode
+    ) {
       setDocNo(docNo);
       setDocRefNo(docRefNo);
       setDocType(docType);
@@ -448,7 +454,8 @@ function StockMovementSearchList() {
       />
       {openModalDocDetail &&
         (movementTypeCodeState === MOVEMENT_TYPE.ORDER_RECEIVE_LD ||
-          movementTypeCodeState === MOVEMENT_TYPE.ORDER_RECEIVE_BT) && (
+          movementTypeCodeState === MOVEMENT_TYPE.ORDER_RECEIVE_BT ||
+          movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_IN_LD) && (
           <CheckOrderDetail
             sdNo={docRefNo}
             docRefNo={docNo}
@@ -463,15 +470,15 @@ function StockMovementSearchList() {
       {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.PURCHASE_NOTE && (
         <SupplierOrderReturn isOpen={openModalDocDetail} onClickClose={handleCloseModalDocDetail} />
       )}
-      {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_IN_LD && (
-        <CheckOrderDetailSD
-          sdNo={docNo}
-          sdRefNo={docRefNo}
-          shipmentNo={''}
+      {/* {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_IN_LD && (
+        <CheckOrderDetail
+          sdNo={docRefNo}
+          docRefNo={docNo}
+          docType={docType}
           defaultOpen={openModalDocDetail}
           onClickClose={handleCloseModalDocDetail}
         />
-      )}
+      )} */}
 
       {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.TRANSFER_OUT && (
         <ModalCreateTransferOut

@@ -22,6 +22,8 @@ export enum ACTIONS {
   CAMPAIGN_TO_APPROVE = 'campaign.to.approve',
   CAMPAIGN_TO_CANCEL = 'campaign.to.cancel',
   SUPPLIER_SEARCH = 'supplier.search',
+  PURCHASE_BR_VIEW = 'purchase.br.view',
+  PURCHASE_BR_MANAGE = 'purchase.br.manage',
 
   STOCK_RT_VIEW = 'stock.rt.view',
   STOCK_RT_MANAGE = 'stock.rt.manage',
@@ -62,6 +64,7 @@ export enum MAINMENU {
   STOCK_TRANSFER = 'stockTransfer',
   TRANSFER_OUT = 'transferOut',
   PRODUCT_INFO = 'productInfo',
+  PURCHASE_BRANCH = 'purchasebranch',
 }
 
 export enum SUBMENU {
@@ -77,6 +80,7 @@ export enum SUBMENU {
   TO_STORE_USE = 'transferOut.storeUse',
   PI_STOCK_BALANCE = 'productInfo.stockOutstanding',
   PI_STOCK_MOVEMENT = 'productInfo.stockMovement',
+  PR_CREATE_PURCHASE_BRANCH = 'purchasebranch.createPurchaseBranch',
 }
 
 export enum PERMISSION_GROUP {

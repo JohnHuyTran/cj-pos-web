@@ -3,22 +3,14 @@ import { styled, useTheme } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
 import Drawer from '@mui/material/Drawer';
-import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
 import MuiListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import LoyaltyOutlinedIcon from '@mui/icons-material/LoyaltyOutlined';
-import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
-import StarBorder from '@mui/icons-material/StarBorder';
-import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -28,7 +20,7 @@ import { useAppSelector, useAppDispatch } from '../store/store';
 import { changeState } from '../store/slices/nav-slice';
 import imgLogo from '../assets/images/CJlogo.jpeg';
 import Menu from '@mui/icons-material/Menu';
-import { ShoppingCartSharp } from '@mui/icons-material';
+import { MoveToInbox, ShoppingCartSharp } from '@mui/icons-material';
 import { MAINMENU, SUBMENU } from '../utils/enum/permission-enum';
 import { isAllowMainMenuPermission, isAllowSubMenuPermission } from '../utils/role-permission';
 
@@ -83,6 +75,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [openTransferMenu, setOpenTransferMenu] = React.useState(false);
   const [openWithDrawMenu, setOpenWithDrawMenu] = React.useState(false);
   const [openProductInfoMenu, setOpenProductInfoMenu] = React.useState(false);
+  const [openPurchaseBranchMenu, setOpenPurchaseBranchMenu] = React.useState(false);
 
   const navState = useAppSelector((state) => state.navigator.state);
 
@@ -91,6 +84,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableMainMenuSell, setDisableMainMenuSell] = React.useState(true);
   const [disableMainMenuTransferOut, setDisableMainMenuTransferOut] = React.useState(true);
   const [disableMainMenuProductInfo, setDisableMainMenuProductInfo] = React.useState(true);
+  const [disableMainMenuPurchaseBranch, setDisableMainMenuPurchaseBranch] = React.useState(true);
 
   const [disableSubMenuOROrderReceive, setDisableSubMenuOROrderReceive] = React.useState(true);
   const [disableSubMenuORStockDiff, setDisableSubMenuORStockDiff] = React.useState(true);
@@ -101,6 +95,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuTaxInvoice, setDisableSubMenuTaxInvoice] = React.useState(true);
   const [disableSubMenuStockBalance, setDisableSubMenuStockBalance] = React.useState(true);
   const [disableSubMenuStockMovement, setDisableSubMenuStockMovement] = React.useState(true);
+  const [disableSubMenuCreatePurchaseBranch, setDisableSubMenuCreatePurchaseBranch] = React.useState(true);
 
   const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
   const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
@@ -114,6 +109,7 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableMainMenuSell(isAllowMainMenuPermission(MAINMENU.SALE));
     setDisableMainMenuTransferOut(isAllowMainMenuPermission(MAINMENU.TRANSFER_OUT));
     setDisableMainMenuProductInfo(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO));
+    setDisableMainMenuPurchaseBranch(isAllowMainMenuPermission(MAINMENU.PURCHASE_BRANCH));
 
     setDisableSubMenuSaleDiscount(isAllowSubMenuPermission(SUBMENU.SALE_DISCOUNT));
     setDisableSubMenuSaleSaleLimit(isAllowSubMenuPermission(SUBMENU.SALE_SALE_LIMIT));
@@ -131,6 +127,8 @@ export default function Sidebar({}: Props): ReactElement {
 
     setDisableSubMenuStockBalance(isAllowSubMenuPermission(SUBMENU.PI_STOCK_BALANCE));
     setDisableSubMenuStockMovement(isAllowSubMenuPermission(SUBMENU.PI_STOCK_MOVEMENT));
+
+    setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
   }, [navState]);
 
   const dispatch = useAppDispatch();
@@ -170,6 +168,10 @@ export default function Sidebar({}: Props): ReactElement {
   const handleClickProductInfo = () => {
     setOpenProductInfoMenu(!openProductInfoMenu);
   };
+  const handleClickPurchaseBranch = () => {
+    setOpenPurchaseBranchMenu(!openPurchaseBranchMenu);
+  };
+
   return (
     <Drawer
       sx={{
@@ -457,6 +459,36 @@ export default function Sidebar({}: Props): ReactElement {
                 sx={{ pl: 7 }}
               >
                 <ListItemText primary="ความเคลื่อนไหวของสินค้า" />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        <ListItemButton
+          onClick={handleClickPurchaseBranch}
+          id='mainMenuProductInfo'
+          style={{ display: disableMainMenuPurchaseBranch ? 'none' : '' }}>
+          <ListItemIcon>
+            <MoveToInbox />
+          </ListItemIcon>
+          <ListItemText primary='สั่งสินค้าจากสาขา' style={{ marginLeft: -15 }} />
+          {openPurchaseBranchMenu ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openPurchaseBranchMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
+            <Link
+              to='/create-purchase-branch'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                display: disableSubMenuCreatePurchaseBranch ? 'none' : '',
+              }}
+              id='subMenuCreatePurchaseBranch'>
+              <ListItemButton
+                key='CreatePurchaseBranch'
+                selected={selectedIndex === 13}
+                onClick={() => handleListItemClick(13)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='สร้างรายการสั่งสินค้า' />
               </ListItemButton>
             </Link>
           </List>
