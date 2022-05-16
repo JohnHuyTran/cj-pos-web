@@ -72,7 +72,7 @@ function StockMovementSearch() {
     }
   };
   const page = 1;
-  const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
+  const limit = useAppSelector((state) => state.stockMovementSearchSlice.stockList.perPage);
   const [flagSearch, setFlagSearch] = React.useState(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<{ open: boolean }>({
     open: false,
