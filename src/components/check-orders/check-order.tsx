@@ -99,24 +99,7 @@ function CheckOrderSearch() {
   };
 
   const onClickValidateForm = () => {
-    if (
-      values.orderShipment === '' &&
-      values.orderStatus === 'ALL' &&
-      values.orderType === 'ALL' &&
-      startDate === null &&
-      endDate === null &&
-      values.branchFrom === '' &&
-      values.branchFrom === ''
-    ) {
-      setOpenAlert(true);
-      setTextError('กรุณากรอกข้อมูลค้นหา');
-    } else if (
-      values.orderShipment === '' &&
-      values.orderStatus === 'ALL' &&
-      values.orderType === 'ALL' &&
-      values.branchFrom === '' &&
-      values.branchFrom === ''
-    ) {
+    if (startDate !== null || endDate !== null) {
       if (startDate === null || endDate === null) {
         setOpenAlert(true);
         setTextError('กรุณากรอกวันที่รับสินค้าให้ครบ');
@@ -124,7 +107,20 @@ function CheckOrderSearch() {
         onClickSearchBtn();
       }
     } else {
-      onClickSearchBtn();
+      if (
+        values.orderShipment === '' &&
+        values.orderStatus === 'ALL' &&
+        values.orderType === 'ALL' &&
+        startDate === null &&
+        endDate === null &&
+        values.branchFrom === '' &&
+        values.branchFrom === ''
+      ) {
+        setOpenAlert(true);
+        setTextError('กรุณากรอกข้อมูลค้นหา');
+      } else {
+        onClickSearchBtn();
+      }
     }
   };
 
