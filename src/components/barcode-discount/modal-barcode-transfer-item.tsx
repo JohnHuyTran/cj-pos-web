@@ -84,7 +84,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
           typeDiscount === 'percent'
             ? Math.floor((parseFloat(String(discount).replace(/,/g, '')) * price) / 100)
             : parseFloat(String(discount).replace(/,/g, ''));
-
         const priceAfterDiscount = price - (cashDiscount || 0);
         let numberOfApproved = !!sameItem
           ? sameItem.numberOfApproved
