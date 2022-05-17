@@ -327,7 +327,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
           let dataTableHandle = _.cloneDeep(dataTable);
           let dataObj = dataTableHandle.find((it: any) => it.barcode === barcode);
           if (objectNullOrEmpty(dataObj)) {
-            showModalError('ไม่ใช่บาร์โค้ดส่วนลด โปรดสแกนใหม่');
+            showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
           } else {
             if (dataObj.numberOfApproved === dataObj.numberOfDiscounted) {
               showModalError('จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก');
@@ -337,10 +337,10 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
             }
           }
         } catch (e) {
-          showModalError('ไม่ใช่บาร์โค้ดส่วนลด โปรดสแกนใหม่');
+          showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
         }
       } else {
-        showModalError('ไม่ใช่บาร์โค้ดส่วนลด โปรดสแกนใหม่');
+        showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
       }
     }
   };
@@ -379,6 +379,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
                   size="small"
                   sx={{ width: '266px' }}
                   onChange={onChangeScanProduct}
+                  onKeyPress={onChangeScanProduct}
                 />
               </Grid>
             </Grid>

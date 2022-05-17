@@ -238,6 +238,7 @@ export default function ModalCreateTransferOut({
             barcode: item.barcode,
             barcodeName: item.productName,
             unitName: item.unitName,
+            unitCode: item.unitCode,
             unitPrice: item.price || 0,
             discount: item.requestedDiscount || 0,
             qty: item.numberOfRequested || 0,

@@ -25,7 +25,6 @@ import {
   uploadAttachFile,
 } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
-import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { getBranchName, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import { Action, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
 import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
@@ -114,7 +113,8 @@ export default function ModalCreateToDestroyDiscount({
     setOpenModelAddItems(true);
   };
 
-  const handleModelAddItems = async () => {
+  const handleCloseModelAddItems = async () => {
+    dispatch(updateErrorList([]));
     setOpenModelAddItems(false);
   };
 
@@ -240,6 +240,7 @@ export default function ModalCreateToDestroyDiscount({
             barcode: item.barcode,
             barcodeName: item.productName,
             unit: item.unitName,
+            unitCode: item.unitCode,
             unitPrice: item.price || 0,
             numberOfDiscounted: item.numberOfRequested || 0,
             numberOfApproved: (TOStatus.WAIT_FOR_APPROVAL == transferOutDetail.status && approvePermission)
@@ -253,10 +254,10 @@ export default function ModalCreateToDestroyDiscount({
     }
   }, [transferOutDetail]);
 
-  const validate = (checkApprove: boolean) => {
+  const validate = (checkApprove: boolean, sendRequest: boolean) => {
     let isValid = true;
     //validate data detail
-    if (TOStatus.DRAFT == status && fileUploadList.length === 0 && attachFileBeforeOlds.length === 0) {
+    if (sendRequest && TOStatus.DRAFT == status && fileUploadList.length === 0 && attachFileBeforeOlds.length === 0) {
       setAttachFileBeforeError('AttachFileBefore__กรุณาแนบไฟล์เอกสาร');
       isValid = false;
     }
@@ -373,7 +374,7 @@ export default function ModalCreateToDestroyDiscount({
 
   const handleCreateDraft = async (sendRequest: boolean) => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
-    if (validate(true)) {
+    if (validate(true, sendRequest)) {
       const rsCheckStock = await handleCheckStock();
       if (rsCheckStock) {
         await dispatch(save({ ...payloadTransferOut }));
@@ -464,7 +465,7 @@ export default function ModalCreateToDestroyDiscount({
       return;
     }
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
-    if (validate(true)) {
+    if (validate(true, false)) {
       setOpenModalConfirmApprove(true);
     } else {
       dispatch(updateErrorList(errorListProduct));
@@ -703,7 +704,7 @@ export default function ModalCreateToDestroyDiscount({
 
       <ModalAddProductToDestroyDiscount
         open={openModelAddItems}
-        onClose={handleModelAddItems}
+        onClose={handleCloseModelAddItems}
       />
       <ModelConfirm
         open={openModalCancel}
