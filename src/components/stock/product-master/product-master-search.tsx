@@ -55,7 +55,7 @@ function ProductMasterSearch() {
   const [skuValue, setSkuValue] = React.useState<any>({});
   const [openAlert, setOpenAlert] = React.useState<boolean>(false);
   const [textError, setTextError] = React.useState<string>('');
-  const [isClear, setIsClear] = React.useState<boolean>(false)
+  const [isClear, setIsClear] = React.useState<boolean>(false);
 
   const handleChangeBranch = (branchCode: string) => {
     if (branchCode !== null) {
@@ -68,7 +68,7 @@ function ProductMasterSearch() {
 
   const onClear = async () => {
     setClearBranchDropDown(!clearBranchDropDown);
-    setIsClear(!isClear)
+    setIsClear(!isClear);
     setValues({
       query: '',
       branch: env.branch.channel === 'branch' ? env.branch.code : '',
@@ -106,6 +106,8 @@ function ProductMasterSearch() {
       }
     } catch (error) {
       console.log('err: ', error);
+      setTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+      setOpenAlert(true);
       setShowdData(false);
     }
     setOpenLoadingModal(false);
@@ -402,9 +404,13 @@ function ProductMasterSearch() {
               <Typography>ใช้งาน</Typography> {/* isActive */}
               <Checkbox size="small" name="isActive" checked={skuValue.isActive} disabled />
             </Grid>
-            <Grid item xs={2} style={flexStyle}>
-              <Typography>อนุญาต ทำรายการ</Typography> {/* XBSkuIsExtendMat */}
+            {/* <Grid item xs={2} style={flexStyle}>
+              <Typography>อนุญาต ทำรายการ</Typography> XBSkuIsExtendMat 
               <Checkbox size="small" name="XBSkuIsExtendMat" checked={skuValue.XBSkuIsExtendMat} disabled />
+            </Grid> */}
+            <Grid item xs={2} style={flexStyle}>
+              <Typography>อนุญาต ลดคูปอง / บัตรเงินสด</Typography> {/* isAllowCoupon */}
+              <Checkbox size="small" name="isAllowCoupon" checked={skuValue.isAllowCoupon} disabled />
             </Grid>
             <Grid item xs={3}>
               <Typography>สถานะสินค้า</Typography> {/* scmStatus */}
@@ -429,8 +435,8 @@ function ProductMasterSearch() {
               <Checkbox size="small" name="isCalVat" checked={skuValue.isCalVat} disabled />
             </Grid>
             <Grid item xs={2} style={flexStyle}>
-              <Typography>อนุญาต ลดคูปอง / บัตรเงินสด</Typography> {/* isAllowCoupon */}
-              <Checkbox size="small" name="isAllowCoupon" checked={skuValue.isAllowCoupon} disabled />
+              <Typography>อนุญาต แก้ราคา</Typography> {/* isAllowEditPrice */}
+              <Checkbox size="small" name="isAllowEditPrice" checked={skuValue.isAllowEditPrice} disabled />
             </Grid>
             <Grid item xs={3}>
               <Typography>อายุสินค้า</Typography> {/* shelfLife */}
@@ -455,8 +461,8 @@ function ProductMasterSearch() {
               <Checkbox size="small" name="isSpecialRegulate" checked={skuValue.isSpecialRegulate} disabled />
             </Grid>
             <Grid item xs={2} style={flexStyle}>
-              <Typography>อนุญาต แก้ราคา</Typography> {/* isAllowEditPrice */}
-              <Checkbox size="small" name="isAllowEditPrice" checked={skuValue.isAllowEditPrice} disabled />
+              <Typography>อนุญาต ลด/ชาร์จ</Typography> {/* isAllowDiscount */}
+              <Checkbox size="small" name="isAllowDiscount" checked={skuValue.isAllowDiscount} disabled />
             </Grid>
             <Grid item xs={3}>
               <Typography>สินค้าแลกแต้ม</Typography> {/* pointType */}
@@ -483,8 +489,8 @@ function ProductMasterSearch() {
               <Checkbox size="small" name="isCtrlStock" checked={skuValue.isCtrlStock} disabled />
             </Grid>
             <Grid item xs={2} style={flexStyle}>
-              <Typography>อนุญาต ลด/ชาร์จ</Typography> {/* isAllowDiscount */}
-              <Checkbox size="small" name="isAllowDiscount" checked={skuValue.isAllowDiscount} disabled />
+              <Typography>อนุญาต ลดทอปอัพ</Typography> {/* isAllowTopup */}
+              <Checkbox size="small" name="isAllowTopup" checked={skuValue.isAllowTopup} disabled />
             </Grid>
           </Grid>
           <Grid container spacing={3} mt={-2}>
@@ -492,20 +498,16 @@ function ProductMasterSearch() {
               <Typography>สินค้าด่วน</Typography> {/* isQuickItem */}
               <Checkbox size="small" name="isQuickItem" checked={skuValue.isQuickItem} disabled />
             </Grid>
-            <Grid item xs={2} style={flexStyle}>
-              <Typography>อนุญาต ลดทอปอัพ</Typography> {/* isAllowTopup */}
-              <Checkbox size="small" name="isAllowTopup" checked={skuValue.isAllowTopup} disabled />
-            </Grid>
           </Grid>
           <Grid container spacing={3} mt={-2}>
             <Grid item xs={3} style={flexStyle}>
               <Typography>ของสด</Typography> {/* isFreshLife */}
               <Checkbox size="small" name="isFreshLife" checked={skuValue.isFreshLife} disabled />
             </Grid>
-            <Grid item xs={2} style={flexStyle}>
-              <Typography>อนุญาตใช้บัตรสวัสดิการ</Typography> {/* XVSgdCode  */}
+            {/* <Grid item xs={2} style={flexStyle}>
+              <Typography>อนุญาตใช้บัตรสวัสดิการ</Typography>  XVSgdCode  
               <Checkbox size="small" name="XVSgdCode" checked={skuValue.XVSgdCode} disabled />
-            </Grid>
+            </Grid> */}
           </Grid>
           <Grid container spacing={3} mt={-2}>
             <Grid item xs={3} style={flexStyle}>
