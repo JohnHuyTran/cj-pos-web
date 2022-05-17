@@ -64,7 +64,7 @@ export enum MAINMENU {
   STOCK_TRANSFER = 'stockTransfer',
   TRANSFER_OUT = 'transferOut',
   PRODUCT_INFO = 'productInfo',
-  PURCHASE_BRANCH = 'purchasebranch',
+  PURCHASE_BRANCH = 'purchaseBranch',
 }
 
 export enum SUBMENU {
