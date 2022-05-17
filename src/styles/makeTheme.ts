@@ -59,6 +59,19 @@ const useStyles = makeStyles({
       '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
     },
   },
+  MtextFieldDate: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      paddingLeft: '10px',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      fontSize: '14px',
+    },
+    '& .Mui-disabled': {
+      // backgroundColor: '#EAEBEB',
+      color: '#263238 !important',
+    },
+  },
   MtextUpLoadFile: {
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
