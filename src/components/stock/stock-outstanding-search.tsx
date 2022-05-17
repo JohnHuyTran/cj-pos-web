@@ -1,5 +1,6 @@
 import { Box, Button, FormControl, Grid, MenuItem, Select, Tab, Tabs, TextField, Typography } from '@mui/material';
 import React from 'react';
+import moment from 'moment';
 import { env } from '../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../models/branch-model';
 import { getUserInfo } from '../../store/sessionStore';
@@ -35,6 +36,7 @@ import {
   featchStockBalanceNegativeSearchAsync,
   savePayloadSearchNegative,
 } from '../../store/slices/stock/stock-balance-negative-search-slice';
+import { CalendarToday } from '@mui/icons-material';
 interface State {
   storeId: number;
   locationId: string;
@@ -440,7 +442,20 @@ function StockSearch() {
             <Typography gutterBottom variant='subtitle1' component='div'>
               ข้อมูล ณ วันที่
             </Typography>
-            <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} disabled={true} />
+            {/* <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} disabled={true} /> */}
+            <TextField
+              id='txtStartDate'
+              name='startDate'
+              size='small'
+              value={moment(startDate).add(543, 'y').format('DD/MM/YYYY')}
+              className={classes.MtextFieldDate}
+              fullWidth
+              autoComplete='off'
+              InputProps={{
+                startAdornment: <CalendarToday color='disabled' fontSize='small' sx={{ marginRight: '12px' }} />,
+              }}
+              disabled={true}
+            />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
