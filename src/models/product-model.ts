@@ -18,4 +18,7 @@ export type FindProductProps = {
 
 export type FindProductRequest = {
   skuCodes: string[];
+  skuTypes?: any[];
+  isOrderable?: boolean;
+  isSellable?: boolean;
 };
