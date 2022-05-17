@@ -4,19 +4,21 @@ module.exports = {
   testEnvironment: 'jsdom',
   // The root of your source code, typically /src
   // `<rootDir>` is a token Jest substitutes
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/src', '<rootDir>/src/tests'],
 
   // Jest transformations -- this adds support for TypeScript
   // using ts-jest
   transform: {
     // '^.+\\.tsx?$': 'ts-jest',
     '^.+\\.(t|j)sx?$': 'ts-jest',
+    '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
   coveragePathIgnorePatterns: ['/node_modules/'],
   // transformIgnorePatterns: [`node_modules/*`],
-  // transformIgnorePatterns: ['node_modules/(?!(dateformat)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(dateformat)/)'],
   // transformIgnorePatterns: ['node_modules/(?!(react-redux)/)'],
   // transformIgnorePatterns: ['node_modules/(?!(pdfjs-dist)/)'],
+  // transformIgnorePatterns: [],
 
   // Runs special logic, adding special
   // extended assertions to Jest
@@ -27,8 +29,18 @@ module.exports = {
   // should contain `test` or `spec`.
   // testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
   // testRegex: '.*\\.(test|spec)\\.tsx?$',
-  testRegex: '(/tests/.*|(\\.|/)(test|spec))\\.tsx?$',
+  // testRegex: '(/tests/.*|(\\.|/)(test|spec))\\.tsx?$',
 
   // Module file extensions for importing
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  moduleNameMapper: {
+    'react-pdf/dist/esm/entry.webpack': 'react-pdf',
+    '\\.(jpg|jpeg|png)$': 'identity-obj-proxy',
+    'react-i18next': '<rootDir>/reacti18nextMock.js',
+  },
+  // collectCoverageFrom: ['src/**/*.{spec,test}.{js,jsx,ts,tsx}'],
+  collectCoverageFrom: ['src/components/commons/ui/*.tsx'],
+  // coverageDirectory: '<rootDir>/src/tests/coverage/',
+  collectCoverage: true,
+  testMatch: ['**/*.{spec,test}.{js,jsx,ts,tsx}'],
 };

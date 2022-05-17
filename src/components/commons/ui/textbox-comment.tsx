@@ -41,6 +41,9 @@ function TextBoxComment({
     <>
       <Typography variant='body2'>{fieldName}</Typography>
       <TextField
+        data-testid='form-field-tbxComment'
+        id='tbxComment'
+        label='tbxComment'
         multiline
         fullWidth
         rows={rowDisplay ? rowDisplay : 2}
@@ -55,6 +58,7 @@ function TextBoxComment({
       />
 
       <div
+        data-testid='div-warning-msg'
         style={{
           fontSize: '11px',
           color: '#AEAEAE',

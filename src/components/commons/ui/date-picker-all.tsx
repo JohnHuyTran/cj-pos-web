@@ -46,7 +46,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
-        clearable
+        clearable='true'
         autoOk
         fullWidth
         variant='inline'
@@ -57,7 +57,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton size='small' onClick={() => handleDateChange(null)}>
+            <IconButton size='small' onClick={() => handleDateChange(null)} data-testid='endDateIconClose'>
               <CloseIcon fontSize='small' />
             </IconButton>
           ),
@@ -68,7 +68,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         }}
         minDate={props.minDateTo}
         placeholder='กรุณาเลือกวันที่'
-        minDateMessage="วันที่โอน ต้องไม่น้อยกว่าวันที่ปัจจุบัน"
+        minDateMessage='วันที่โอน ต้องไม่น้อยกว่าวันที่ปัจจุบัน'
         disabled={props.disabled ? props.disabled : false}
       />
     );
@@ -76,7 +76,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
-        clearable
+        clearable='true'
         autoOk
         fullWidth
         variant='inline'
@@ -87,7 +87,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton size='small' onClick={() => handleDateChange(null)}>
+            <IconButton size='small' onClick={() => handleDateChange(null)} data-testid='startDateIconClose'>
               <CloseIcon fontSize='small' />
             </IconButton>
           ),
