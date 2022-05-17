@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
@@ -10,6 +11,7 @@ import moment from 'moment';
 import { useStyles } from '../../../styles/makeTheme';
 import PurchaseBranchListItem from './purchase-branch-list-item';
 import TextBoxComment from '../../commons/ui/textbox-comment';
+import ModalAddItems from '../../commons/ui/modal-add-items';
 
 interface Props {
   isOpen: boolean;
@@ -69,6 +71,15 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
 
     console.log('handleChangeComment:', value);
   };
+
+  const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
+  const handleOpenAddItems = () => {
+    setOpenModelAddItems(true);
+  };
+  const handleModelAddItems = async () => {
+    setOpenModelAddItems(false);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -115,7 +126,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Button
                   id='btnCreateStockTransferModal'
                   variant='contained'
-                  // onClick={handleOpenCreateModal}
+                  onClick={handleOpenAddItems}
                   // sx={{ width: 150, display: `${displayBtnCreate ? 'none' : ''}` }}
                   sx={{ width: 120 }}
                   className={classes.MbtnAdd}
@@ -176,6 +187,15 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
             </Grid>
           </Box>
+
+          <ModalAddItems
+            open={openModelAddItems}
+            onClose={handleModelAddItems}
+            requestBody={{
+              skuCodes: [],
+              skuTypes: [3, 6],
+              isOrderable: true,
+            }}></ModalAddItems>
         </DialogContent>
       </Dialog>
     </div>

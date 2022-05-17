@@ -1,8 +1,9 @@
 import React from 'react';
+import { useAppSelector } from '../../../store/store';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
 import { useStyles } from '../../../styles/makeTheme';
-import { Checkbox, FormControlLabel, FormGroup, Grid, TextField, Typography } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
 
 export interface DataGridProps {
@@ -116,6 +117,9 @@ function PurchaseBranchListItem({}: DataGridProps) {
 
   let rows: any = [];
   const [pageSize, setPageSize] = React.useState<number>(10);
+
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  console.log('payloadAddItem:', JSON.stringify(payloadAddItem));
 
   return (
     <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
