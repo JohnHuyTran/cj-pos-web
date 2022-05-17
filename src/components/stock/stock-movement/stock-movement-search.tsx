@@ -247,7 +247,11 @@ function StockMovementSearch() {
             <Typography gutterBottom variant='subtitle1' component='div'>
               ค้นหาสินค้า*
             </Typography>
-            <TextBoxSearchProduct skuType={[2]} onSelectItem={handleChangeProduct} isClear={clearBranchDropDown} />
+            <TextBoxSearchProduct
+              skuType={[values.storeId]}
+              onSelectItem={handleChangeProduct}
+              isClear={clearBranchDropDown}
+            />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>

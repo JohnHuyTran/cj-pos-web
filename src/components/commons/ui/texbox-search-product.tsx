@@ -83,7 +83,7 @@ function TextBoxSearchProduct({ skuType, onSelectItem, isClear }: Props) {
         searchAllProductAsync({
           search: keyword,
           productTypeCodes: [],
-          skuTypes: skuType ? skuType : [2],
+          skuTypes: skuType ? (skuType[0] == 0 ? [1, 2] : skuType) : [2],
         })
       );
       setLoading(false);
