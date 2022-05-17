@@ -251,6 +251,7 @@ export default function ModalCreateTransferOutDestroy({
             barcode: item.barcode,
             barcodeName: item.productName,
             unitName: item.unitName,
+            unitCode: item.unitCode,
             unitPrice: item.price || 0,
             discount: item.requestedDiscount || 0,
             qty: item.numberOfRequested || 0,
@@ -266,10 +267,10 @@ export default function ModalCreateTransferOutDestroy({
     }
   }, [transferOutDetail]);
 
-  const validate = (checkApprove: boolean) => {
+  const validate = (checkApprove: boolean, sendRequest: boolean) => {
     let isValid = true;
     //validate data detail
-    if (TOStatus.DRAFT == status && fileUploadList.length === 0 && attachFileBeforeOlds.length === 0) {
+    if (sendRequest && TOStatus.DRAFT == status && fileUploadList.length === 0 && attachFileBeforeOlds.length === 0) {
       setAttachFileError('AttachFileBefore__กรุณาแนบไฟล์เอกสาร');
       isValid = false;
     }
@@ -402,7 +403,7 @@ export default function ModalCreateTransferOutDestroy({
 
   const handleCreateDraft = async (sendRequest: boolean) => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
-    if (validate(false)) {
+    if (validate(false, sendRequest)) {
       const rsCheckStock = await handleCheckStock();
       if (rsCheckStock) {
         await dispatch(save({ ...payloadTransferOut }));
@@ -507,7 +508,7 @@ export default function ModalCreateTransferOutDestroy({
 
   const handleOpenModalConfirmApprove = () => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
-    if (validate(true)) {
+    if (validate(true, false)) {
       setOpenModalConfirmApprove(true);
     } else {
       dispatch(updateErrorList(errorListProduct));
