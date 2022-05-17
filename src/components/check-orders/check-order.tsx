@@ -124,7 +124,16 @@ function CheckOrderSearch() {
         onClickSearchBtn();
       }
     } else {
-      onClickSearchBtn();
+      if (startDate !== null || endDate !== null) {
+        if (startDate === null || endDate === null) {
+          setOpenAlert(true);
+          setTextError('กรุณากรอกวันที่รับสินค้าให้ครบ');
+        } else {
+          onClickSearchBtn();
+        }
+      } else {
+        onClickSearchBtn();
+      }
     }
   };
 
