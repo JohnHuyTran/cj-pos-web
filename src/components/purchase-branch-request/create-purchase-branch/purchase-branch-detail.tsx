@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import DialogContent from '@mui/material/DialogContent';
@@ -12,6 +12,8 @@ import { useStyles } from '../../../styles/makeTheme';
 import PurchaseBranchListItem from './purchase-branch-list-item';
 import TextBoxComment from '../../commons/ui/textbox-comment';
 import ModalAddItems from '../../commons/ui/modal-add-items';
+import { getBranchName } from '../../../utils/utils';
+import { getUserInfo } from '../../../store/sessionStore';
 
 interface Props {
   isOpen: boolean;
@@ -62,8 +64,14 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const [brNo, setBRNo] = React.useState('');
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
-  const [branchCode, setBranchCode] = React.useState('0001');
   const [status, setStatus] = React.useState('SUBMITTED');
+  const [branchName, setBranchName] = React.useState('');
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+
+  useEffect(() => {
+    const strBranchName = getBranchName(branchList, getUserInfo().branch);
+    setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
+  }, [branchList]);
 
   const handleChangeComment = (value: any) => {
     // setFlagSave(true);
@@ -110,7 +118,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
               สาขาที่สร้างรายการ :
             </Grid>
             <Grid item xs={4}>
-              {branchCode}
+              {branchName}
             </Grid>
             <Grid item xs={2}>
               สถานะ :

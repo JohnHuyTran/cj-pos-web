@@ -59,6 +59,7 @@ const columns: GridColDef[] = [
     field: 'orderMaxQty',
     headerName: 'จำนวนสั่งมากที่สุด',
     headerAlign: 'center',
+    align: 'right',
     minWidth: 300,
     flex: 2,
     sortable: false,
@@ -77,14 +78,21 @@ const columns: GridColDef[] = [
         type='number'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
-        // onChange={(e) => {
-        //   let qty = Number(params.getValue(params.id, 'qty'));
-        //   var value = e.target.value ? parseInt(e.target.value, 10) : '';
-        //   if (qty === 0) value = chkQty(value);
-        //   if (value < 0) value = 0;
-        //   params.api.updateRows([{ ...params.row, qty: value }]);
-        // }}
-        disabled={params.getValue(params.id, 'editMode') ? false : true}
+        onChange={(e) => {
+          let orderQty = Number(params.getValue(params.id, 'orderQty'));
+          let orderMaxQty = Number(params.getValue(params.id, 'orderMaxQty'));
+
+          var value = e.target.value ? parseInt(e.target.value, 10) : '';
+          if (orderQty === 0) value = chkQty(value);
+          if (value < 0) value = 0;
+          else if (value > 0) chkOrderMaxQty(value, orderMaxQty);
+
+          console.log('orderQty:', orderQty);
+          console.log('value:', value);
+
+          params.api.updateRows([{ ...params.row, orderQty: value }]);
+        }}
+        // disabled={params.getValue(params.id, 'editMode') ? false : true}
         autoComplete='off'
       />
     ),
@@ -105,12 +113,29 @@ const columns: GridColDef[] = [
     align: 'right',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
+      // <div>
+      //   {params.getValue(params.id, 'editMode') && <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />}
+      // </div>
       <div>
-        {params.getValue(params.id, 'editMode') && <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />}
+        <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
       </div>
     ),
   },
 ];
+
+const chkQty = (value: any) => {
+  let v = String(value);
+  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  return value;
+};
+
+const chkOrderMaxQty = (value: any, orderMaxQty: any) => {
+  if (value > orderMaxQty) {
+    console.log('chkOrderMaxQty value:', value);
+    console.log('chkOrderMaxQty orderMaxQty:', orderMaxQty);
+    return orderMaxQty;
+  }
+};
 
 function PurchaseBranchListItem({}: DataGridProps) {
   const classes = useStyles();
@@ -119,7 +144,21 @@ function PurchaseBranchListItem({}: DataGridProps) {
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  console.log('payloadAddItem:', JSON.stringify(payloadAddItem));
+  // console.log('payloadAddItem xx:', JSON.stringify(payloadAddItem));
+
+  if (Object.keys(payloadAddItem).length !== 0) {
+    rows = payloadAddItem.map((item: any, index: number) => {
+      return {
+        id: index,
+        index: index + 1,
+        barcode: item.barcode,
+        barcodeName: item.barcodeName,
+        orderQty: item.qty ? item.qty : 1,
+        orderMaxQty: item.stockMax,
+        unitName: item.unitName,
+      };
+    });
+  }
 
   return (
     <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
