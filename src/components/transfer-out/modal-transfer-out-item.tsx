@@ -23,7 +23,7 @@ import {
 } from '../../store/slices/transfer-out-slice';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, BDStatus, TOStatus } from '../../utils/enum/common-enum';
+import { Action, TOStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import HtmlTooltip from '../commons/ui/html-tooltip';
