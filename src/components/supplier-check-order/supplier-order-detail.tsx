@@ -791,7 +791,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>ใบรับสินค้าจากผู้จำหน่าย</Typography>
-          <Steppers status={piStatus}></Steppers>
+          {piStatus !== 9 && <Steppers status={piStatus} stepsList={['บันทึก', 'อนุมัติ']}></Steppers>}
+          {piStatus === 9 && <Steppers status={piStatus} stepsList={['บันทึก', 'ยกเลิก']}></Steppers>}
         </BootstrapDialogTitle>
 
         <DialogContent>
