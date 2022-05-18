@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import moment from 'moment';
 import { Box, Button, FormControl, MenuItem, Select } from '@mui/material';
 import { Grid } from '@mui/material';
 import { Typography } from '@mui/material';
@@ -10,25 +11,106 @@ import { useStyles } from '../../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import DatePickerComponent from '../../commons/ui/date-picker';
+import { getPurchaseBranchList } from '../../../utils/enum/purchase-branch-enum';
+import { getUserInfo } from '../../../store/sessionStore';
+import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
+import { isGroupBranch } from '../../../utils/role-permission';
+import { getBranchName } from '../../../utils/utils';
+import { env } from '../../../adapters/environmentConfigs';
+import { BranchListOptionType } from '../../../models/branch-model';
+import LoadingModal from '../../commons/ui/loading-modal';
+import { featchSearchPurchaseBranchRequestAsync } from '../../../store/slices/purchase-branch-request-slice';
+import { PurchaseBranchSearchRequest } from '../../../models/purchase-branch-request-model';
+
+interface State {
+  docNo: string;
+  branchCode: string;
+  dateFrom: string;
+  dateTo: string;
+  status: string;
+}
+interface loadingModalState {
+  open: boolean;
+}
 
 function PurchaseBranchRequest() {
   const { t } = useTranslation(['purchaseBranch', 'common']);
   const dispatch = useAppDispatch();
   const classes = useStyles();
+  const page = '1';
 
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
 
-  const handleChangeBranch = (branchCode: string) => {
-    console.log('branch: ', branchCode);
-    // if (branchCode !== null) {
-    //   let codes = JSON.stringify(branchCode);
-    //   setBranchFromCode(branchCode);
-    //   setValues({ ...values, branchFrom: JSON.parse(codes) });
-    // } else {
-    //   setValues({ ...values, branchFrom: '' });
-    // }
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [branchToCode, setBranchToCode] = React.useState('');
+  const [isAuthorizedBranch, setIsAuthorizedBranch] = React.useState<boolean>(true);
+  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [ownBranch, setOwnBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : env.branch.code
+      : env.branch.code
+  );
+
+  const [values, setValues] = React.useState<State>({
+    docNo: '',
+    branchCode: '',
+    dateFrom: '',
+    dateTo: '',
+    status: 'ALL',
+  });
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+    open: false,
+  });
+
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+
+  React.useEffect(() => {
+    const pi = getUserInfo().group === PERMISSION_GROUP.PI;
+    const pcm = getUserInfo().group === PERMISSION_GROUP.PCM;
+
+    if (pi) {
+      setIsAuthorizedBranch(!pi);
+    }
+
+    if (pcm) {
+      setIsAuthorizedBranch(!pcm);
+    }
+
+    if (groupBranch) {
+      setValues({ ...values, branchCode: ownBranch });
+    }
+  });
+
+  const handleChange = (event: any) => {
+    const value = event.target.value;
+    setValues({ ...values, [event.target.name]: value });
+    // console.log(values);
+  };
+
+  const branchFrom = getBranchName(branchList, ownBranch);
+  const branchFromMap: BranchListOptionType = {
+    code: ownBranch,
+    name: branchFrom ? branchFrom : '',
+  };
+  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
+    groupBranch ? branchFromMap : null
+  );
+
+  const handleChangeBranch = (branch: string) => {
+    if (branch !== null) {
+      let codes = JSON.stringify(branch);
+      setBranchToCode(branch);
+      setValues({ ...values, branchCode: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branchCode: '' });
+    }
   };
 
   const handleStartDatePicker = (value: any) => {
@@ -37,6 +119,36 @@ function PurchaseBranchRequest() {
 
   const handleEndDatePicker = (value: Date) => {
     setEndDate(value);
+  };
+
+  const onClickValidateForm = () => {
+    onClickSearchBtn();
+  };
+
+  const onClickSearchBtn = async () => {
+    let limits;
+    // if (limit === 0) {
+    //   limits = '10';
+    // } else {
+    //   limits = limit.toString();
+    // }
+
+    limits = '10';
+
+    const payload: PurchaseBranchSearchRequest = {
+      limit: limits,
+      page: page,
+      docNo: values.docNo,
+      branchCode: values.branchCode,
+      status: values.status,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      clearSearch: false,
+    };
+
+    handleOpenLoading('open', true);
+    await dispatch(featchSearchPurchaseBranchRequestAsync(payload));
+    handleOpenLoading('open', false);
   };
 
   return (
@@ -48,11 +160,11 @@ function PurchaseBranchRequest() {
               {t('documentSearch')}
             </Typography>
             <TextField
-              id="txtOrderShipment"
-              name="orderShipment"
+              id="txtDocNo"
+              name="docNo"
               size="small"
-              //   value={values.orderShipment}
-              //   onChange={handleChange}
+              value={values.docNo}
+              onChange={handleChange}
               className={classes.MtextField}
               fullWidth
               placeholder="เลขที่เอกสาร BR"
@@ -63,9 +175,12 @@ function PurchaseBranchRequest() {
               สาขาที่สร้างรายการ
             </Typography>
             <BranchListDropDown
-              sourceBranchCode={''}
+              valueBranch={valuebranchFrom}
+              sourceBranchCode={branchToCode}
               onChangeBranch={handleChangeBranch}
               isClear={clearBranchDropDown}
+              isFilterAuthorizedBranch={isAuthorizedBranch}
+              disable={groupBranch}
             />
           </Grid>
           <Grid item xs={4}>
@@ -74,21 +189,20 @@ function PurchaseBranchRequest() {
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selOrderStatus"
-                name="orderStatus"
-                // value={values.orderStatus}
-                // onChange={handleChange}
+                id="selStatus"
+                name="status"
+                value={values.status}
+                onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}
               >
                 <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
-                {/* {shipmentStatus.map((status) => (
-                  <MenuItem
-                    key={status.key}
-                    value={status.key}
-                  >
-                    {status.text}
-                  </MenuItem>
-                ))} */}
+                {getPurchaseBranchList().map((item: any) => {
+                  return (
+                    <MenuItem key={item.key} value={item.key}>
+                      {t(`status.${item.value}`)}
+                    </MenuItem>
+                  );
+                })}
               </Select>
             </FormControl>
           </Grid>
@@ -112,9 +226,9 @@ function PurchaseBranchRequest() {
 
         <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
           <Button
-            id="btnCreateStockTransferModal"
+            id="btnCreateDoc"
             variant="contained"
-            //   onClick={handleOpenOrderReceiveModal}
+            //   onClick={handleCreateDoc}
             sx={{ minWidth: '15%' }}
             className={classes.MbtnClear}
             startIcon={<AddCircleOutlineOutlinedIcon />}
@@ -136,7 +250,7 @@ function PurchaseBranchRequest() {
             id="btnSearch"
             variant="contained"
             color="primary"
-            //   onClick={onClickValidateForm}
+            onClick={onClickValidateForm}
             sx={{ width: '13%', ml: 2 }}
             className={classes.MbtnSearch}
           >
@@ -144,6 +258,8 @@ function PurchaseBranchRequest() {
           </Button>
         </Grid>
       </Box>
+
+      <LoadingModal open={openLoadingModal.open} />
     </>
   );
 }
