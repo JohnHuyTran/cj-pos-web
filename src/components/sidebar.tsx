@@ -436,7 +436,7 @@ export default function Sidebar({}: Props): ReactElement {
             </Link>
           </List>
         </Collapse>
-        {/* <ListItemButton
+        <ListItemButton
           onClick={handleClickPurchaseBranch}
           id='mainMenuProductInfo'
           style={{ display: disableMainMenuPurchaseBranch ? 'none' : '' }}>
@@ -465,7 +465,7 @@ export default function Sidebar({}: Props): ReactElement {
               </ListItemButton>
             </Link>
           </List>
-        </Collapse> */}
+        </Collapse>
       </List>
     </Drawer>
   );

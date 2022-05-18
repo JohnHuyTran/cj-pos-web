@@ -10,6 +10,7 @@ import {
 } from '../models/supplier-check-order-model';
 import { PurchaseCreditNoteType } from '../models/purchase-credit-note';
 import { ContentType } from '../utils/enum/common-enum';
+import { PurchaseBRRequest } from '../models/purchase-branch-request-model';
 
 // export async function saveSupplierOrder(payload: SavePurchaseRequest, piNo: string) {
 //   try {
@@ -202,6 +203,17 @@ export async function fetchDataFilePN(pnNo: string) {
     return response;
   } catch (error) {
     console.log('error = ', error);
+    throw error;
+  }
+}
+
+export async function savePurchaseBR(payload: PurchaseBRRequest) {
+  try {
+    const response = await put(environment.purchase.purchaseBranchRequest.save.url, payload, ContentType.JSON).then(
+      (result: any) => result
+    );
+    return response;
+  } catch (error) {
     throw error;
   }
 }

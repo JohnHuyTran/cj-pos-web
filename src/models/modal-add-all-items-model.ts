@@ -18,6 +18,7 @@ export interface ItemInfo {
   unitText?: string;
   baseUnit?: number;
   qty?: number;
+  stockMax?: number;
 }
 
 export interface ProductTypeResponse {
