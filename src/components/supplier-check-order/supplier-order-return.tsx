@@ -588,7 +588,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>ใบคืนสินค้า</Typography>
-          <Steppers status={pnStatus}></Steppers>
+          <Steppers status={pnStatus} stepsList={['บันทึก', 'อนุมัติ']}></Steppers>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box mt={4} sx={{ flexGrow: 1 }}>
