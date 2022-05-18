@@ -21,7 +21,7 @@ import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { getorderReceiveThStatus, getShipmentTypeText } from '../../utils/enum/check-order-enum';
 import OrderReceiveConfirmModel from '../check-orders/order-receive-confirm-model';
 import LoadingModal from '../commons/ui/loading-modal';
-import { searchOrderReceiveAsync } from '../../store/slices/order-receive-slice';
+import { searchOrderReceiveAsync, clearDataFilter } from '../../store/slices/order-receive-slice';
 import { searchToteAsync } from '../../store/slices/search-tote-slice';
 import { EntryTote } from '../../models/order-model';
 import CheckOrderDetailTote from './check-order-detail-tote';
@@ -124,6 +124,8 @@ export default function OrderReceiveDetail({
   };
 
   const handleSearch = async () => {
+    await dispatch(searchOrderReceiveAsync());
+    await dispatch(searchToteAsync());
     handleOpenLoading('open', true);
     setFlagSearch(true);
 
@@ -234,7 +236,7 @@ export default function OrderReceiveDetail({
   let orderReceiveDataLength = Object.keys(orderReceiveData).length;
   let orderReceiveTable;
   const [flagSearch, setFlagSearch] = React.useState(false);
-  const [disableButton, setDisableButton] = React.useState(false);
+
   if (flagSearch) {
     if (Object.keys(orderReceiveData).length > 0) {
       orderReceiveTable = <OrderReceiveDetailList isTote={isTote} />;

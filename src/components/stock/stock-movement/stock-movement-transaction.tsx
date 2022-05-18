@@ -28,6 +28,7 @@ function StockMovementTransaction({ open, onClose, movementTransaction }: Props)
       minWidth: 150,
       // flex: 0.5,
       headerAlign: 'center',
+      align: 'right',
       sortable: false,
     },
     {
@@ -44,6 +45,7 @@ function StockMovementTransaction({ open, onClose, movementTransaction }: Props)
       minWidth: 150,
       // flex: 0.5,
       headerAlign: 'center',
+      align: 'right',
       sortable: false,
     },
     {
@@ -52,6 +54,7 @@ function StockMovementTransaction({ open, onClose, movementTransaction }: Props)
       minWidth: 200,
       // flex: 0.5,
       headerAlign: 'center',
+      align: 'right',
       sortable: false,
     },
   ];
@@ -74,10 +77,11 @@ function StockMovementTransaction({ open, onClose, movementTransaction }: Props)
   return (
     <Dialog
       open={open}
-      aria-labelledby='alert-dialog-title'
-      aria-describedby='alert-dialog-description'
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
       fullWidth={true}
-      maxWidth='md'>
+      maxWidth="md"
+    >
       <DialogContent sx={{ padding: '1em' }}>
         <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000', pt: 3 }}>
           <div className={classes.MdataGridPaginationTop} style={{ width: '100%' }}>
@@ -95,11 +99,12 @@ function StockMovementTransaction({ open, onClose, movementTransaction }: Props)
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 10px 0px' }}>
         <Button
-          id='btnClose'
-          variant='contained'
-          color='error'
+          id="btnClose"
+          variant="contained"
+          color="error"
           sx={{ borderRadius: '5px', width: '126px' }}
-          onClick={onClose}>
+          onClick={onClose}
+        >
           ปิด
         </Button>
       </DialogActions>
