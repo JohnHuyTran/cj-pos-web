@@ -22,6 +22,8 @@ import LoadingModal from '../../commons/ui/loading-modal';
 import { getPurchaseBranchList } from '../../../utils/enum/purchase-branch-enum';
 import ModelConfirm from '../modal-confirm';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
+import { ACTIONS } from '../../../utils/enum/permission-enum';
+import { isAllowActionPermission } from '../../../utils/role-permission';
 
 interface Props {
   isOpen: boolean;
@@ -81,7 +83,22 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
+  const [displayBtnSubmit, setDisplayBtnSubmit] = React.useState(false);
+  const [displayBtnSave, setDisplayBtnSave] = React.useState(false);
+  const [displayBtnDelete, setDisplayBtnDelete] = React.useState(false);
+  const [displayAddItems, setDisplayAddItems] = React.useState(false);
+
   useEffect(() => {
+    if (status !== 'DRAFT' && isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE)) {
+      setDisplayBtnDelete(true);
+    } else {
+      setDisplayBtnDelete(false);
+    }
+    setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+    setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+    // setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+    setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+
     if (purchaseBRDetail) {
       setDocNo(purchaseBRDetail.docNo);
       setStatus(purchaseBRDetail.status);
@@ -196,21 +213,17 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         docNo: docNo,
         remark: remark,
         items: items,
-        // items: [
-        //   { barcode: '9885202161237', orderMaxQty: 100, orderQty: 1 },
-        //   { barcode: '9999990075444', orderMaxQty: 100, orderQty: 1 },
-        // ],
       };
 
       return await payload;
     } else {
       const payload: PurchaseBRRequest = {
         remark: remark,
-        // items: items,
-        items: [
-          { barcode: '9885202161237', orderMaxQty: 100, orderQty: 1 },
-          { barcode: '9999990075444', orderMaxQty: 100, orderQty: 1 },
-        ],
+        items: items,
+        // items: [
+        //   { barcode: '9885202161237', orderMaxQty: 100, orderQty: 1 },
+        //   { barcode: '9999990075444', orderMaxQty: 100, orderQty: 1 },
+        // ],
       };
 
       return await payload;
@@ -300,8 +313,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   id='btnCreateStockTransferModal'
                   variant='contained'
                   onClick={handleOpenAddItems}
-                  // sx={{ width: 150, display: `${displayBtnCreate ? 'none' : ''}` }}
-                  sx={{ width: 120 }}
+                  sx={{ width: 120, display: `${displayAddItems ? 'none' : ''}` }}
                   className={classes.MbtnAdd}
                   startIcon={<AddCircleOutlineOutlined />}
                   color='secondary'>
@@ -313,20 +325,18 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   id='btnCreateStockTransferModal'
                   variant='contained'
                   onClick={handleSaveBR}
-                  // sx={{ width: 150, display: `${displayBtnCreate ? 'none' : ''}` }}
-                  sx={{ width: 120 }}
+                  sx={{ width: 120, display: `${displayBtnSave ? 'none' : ''}` }}
                   className={classes.MbtnAdd}
                   startIcon={<Save />}
                   color='warning'
-                  // disabled={Object.keys(payloadAddItem).length === 0}
-                >
+                  disabled={Object.keys(payloadAddItem).length === 0}>
                   บันทึก
                 </Button>
                 <Button
                   id='btnClear'
                   variant='contained'
-                  // onClick={onClickClearBtn}
-                  sx={{ width: 120, ml: 2 }}
+                  // onClick={onClickSubmitBtn}
+                  sx={{ width: 120, ml: 2, display: `${displayBtnSubmit ? 'none' : ''}` }}
                   className={classes.MbtnClear}
                   startIcon={<CheckCircle />}
                   color='primary'
@@ -337,7 +347,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   id='btnSearch'
                   variant='contained'
                   onClick={handleOpenConfirm}
-                  sx={{ width: 120, ml: 2, display: `${status !== 'DRAFT' ? 'none' : ''}` }}
+                  sx={{ width: 120, ml: 2, display: `${displayBtnDelete ? 'none' : ''}` }}
                   startIcon={<Cancel />}
                   className={classes.MbtnSearch}
                   color='error'

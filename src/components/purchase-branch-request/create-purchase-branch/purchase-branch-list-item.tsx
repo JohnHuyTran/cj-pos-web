@@ -15,6 +15,8 @@ import { useStyles } from '../../../styles/makeTheme';
 import { TextField, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
 import ModelDeleteConfirm from '../../commons/ui/modal-delete-confirm';
+import { isAllowActionPermission } from '../../../utils/role-permission';
+import { ACTIONS } from '../../../utils/enum/permission-enum';
 
 export interface DataGridProps {
   // type: string;
@@ -98,7 +100,7 @@ const columns: GridColDef[] = [
 
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
-        // disabled={params.getValue(params.id, 'editMode') ? false : true}
+        disabled={params.getValue(params.id, 'editMode') ? true : false}
         autoComplete='off'
       />
     ),
@@ -119,11 +121,8 @@ const columns: GridColDef[] = [
     align: 'right',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
-      // <div>
-      //   {params.getValue(params.id, 'editMode') && <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />}
-      // </div>
       <div>
-        <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
+        {!params.getValue(params.id, 'editMode') && <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />}
       </div>
     ),
   },
@@ -167,8 +166,6 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  // console.log('payloadAddItem xx:', JSON.stringify(payloadAddItem));
-
   if (Object.keys(payloadAddItem).length !== 0) {
     rows = payloadAddItem.map((item: any, index: number) => {
       return {
@@ -180,6 +177,7 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
         qty: item.qty ? item.qty : 1,
         stockMax: item.stockMax,
         unitName: item.unitName,
+        editMode: isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE),
       };
     });
   }
