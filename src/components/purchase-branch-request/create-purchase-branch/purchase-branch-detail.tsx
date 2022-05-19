@@ -15,11 +15,13 @@ import ModalAddItems from '../../commons/ui/modal-add-items';
 import { getBranchName } from '../../../utils/utils';
 import { getUserInfo } from '../../../store/sessionStore';
 import { PurchaseBRRequest } from '../../../models/purchase-branch-request-model';
-import { savePurchaseBR } from '../../../services/purchase';
+import { deletePurchaseBR, savePurchaseBR } from '../../../services/purchase';
 import { ApiError } from '../../../models/api-error-model';
 import { updateAddItemsState } from '../../../store/slices/add-items-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
 import { getPurchaseBranchList } from '../../../utils/enum/purchase-branch-enum';
+import ModelConfirm from '../modal-confirm';
+import SnackbarStatus from '../../commons/ui/snackbar-status';
 
 interface Props {
   isOpen: boolean;
@@ -152,6 +154,9 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const handleModelAddItems = async () => {
     setOpenModelAddItems(false);
   };
+  const handleChangeItems = async (items: any) => {
+    await dispatch(updateAddItemsState(items));
+  };
 
   const handleSaveBR = async () => {
     setOpenLoadingModal(true);
@@ -160,9 +165,15 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       .then((value) => {
         setDocNo(value.docNo);
         setStatus('DRAFT');
+
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
       })
       .catch((error: ApiError) => {
-        console.log('error:', JSON.stringify(error));
+        setShowSnackBar(true);
+        setSnackbarIsStatus(false);
+        setContentMsg(error.message);
       });
     setOpenLoadingModal(false);
   };
@@ -195,16 +206,52 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     } else {
       const payload: PurchaseBRRequest = {
         remark: remark,
-        items: items,
+        // items: items,
+        items: [
+          { barcode: '9885202161237', orderMaxQty: 100, orderQty: 1 },
+          { barcode: '9999990075444', orderMaxQty: 100, orderQty: 1 },
+        ],
       };
 
       return await payload;
     }
   };
 
-  const handleChangeItems = async (items: any) => {
-    await dispatch(updateAddItemsState(items));
+  const [openModalConfirmDelete, setOpenModalConfirmDelete] = React.useState<boolean>(false);
+  const handleOpenConfirm = async () => {
+    setOpenModalConfirmDelete(true);
   };
+  const handleCloseModalConfirm = () => {
+    setOpenModalConfirmDelete(false);
+  };
+  const handleDeletePurchaseBR = async () => {
+    handleCloseModalConfirm();
+    setOpenLoadingModal(true);
+    await deletePurchaseBR(docNo)
+      .then((value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้ยกเลิกข้อมูลเรียบร้อยแล้ว');
+
+        setTimeout(() => {
+          handleChkSaveClose();
+        }, 300);
+      })
+      .catch((error: ApiError) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(false);
+        setContentMsg(error.message);
+      });
+    setOpenLoadingModal(false);
+  };
+
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -271,7 +318,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   className={classes.MbtnAdd}
                   startIcon={<Save />}
                   color='warning'
-                  disabled={Object.keys(payloadAddItem).length === 0}>
+                  // disabled={Object.keys(payloadAddItem).length === 0}
+                >
                   บันทึก
                 </Button>
                 <Button
@@ -288,8 +336,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Button
                   id='btnSearch'
                   variant='contained'
-                  // onClick={onClickValidateForm}
-                  sx={{ width: 120, ml: 2 }}
+                  onClick={handleOpenConfirm}
+                  sx={{ width: 120, ml: 2, display: `${status !== 'DRAFT' ? 'none' : ''}` }}
                   startIcon={<Cancel />}
                   className={classes.MbtnSearch}
                   color='error'
@@ -327,6 +375,21 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             }}></ModalAddItems>
 
           <LoadingModal open={openLoadingModal} />
+
+          <ModelConfirm
+            open={openModalConfirmDelete}
+            onClose={handleCloseModalConfirm}
+            onConfirm={handleDeletePurchaseBR}
+            headerTitle={'ยืนยันยกเลิกสั่งสินค้าสาขา'}
+            docNo={docNo}
+          />
+
+          <SnackbarStatus
+            open={showSnackBar}
+            onClose={handleCloseSnackBar}
+            isSuccess={snackbarIsStatus}
+            contentMsg={contentMsg}
+          />
         </DialogContent>
       </Dialog>
     </div>

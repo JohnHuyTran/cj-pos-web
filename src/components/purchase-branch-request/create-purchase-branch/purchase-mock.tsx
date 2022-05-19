@@ -30,8 +30,15 @@ function CreatePurchaseBranch() {
   const handleOpenDetailModal = async () => {
     handleOpenLoading('open', true);
     await dispatch(updateAddItemsState({}));
-    const docNo = 'BR2205B005-000001'; //BR2205B005-000001 //BR22050101-000002
+    const docNo = 'BR2205B005-000003'; //BR2205B005-000001 //BR22050101-000002
     await dispatch(featchPurchaseBRDetailAsync(docNo));
+    // .then((value) => {
+    //   console.log('value :', JSON.stringify(value.payload));
+    //   handleOpenModal();
+    // })
+    // .catch((error: any) => {
+    //   console.log('ไม่พบ BR');
+    // });
     handleOpenModal();
     handleOpenLoading('open', false);
   };
