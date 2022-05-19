@@ -6,7 +6,7 @@ import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import { Box, Button, DialogTitle, Grid, IconButton } from '@mui/material';
 import { AddCircleOutlineOutlined, Cancel, CheckCircle, HighlightOff, Save } from '@mui/icons-material';
-import Steppers from '../steppers';
+import Steppers from '../../commons/ui/steppers';
 import moment from 'moment';
 import { useStyles } from '../../../styles/makeTheme';
 import PurchaseBranchListItem from './purchase-branch-list-item';
@@ -17,6 +17,9 @@ import { getUserInfo } from '../../../store/sessionStore';
 import { PurchaseBRRequest } from '../../../models/purchase-branch-request-model';
 import { savePurchaseBR } from '../../../services/purchase';
 import { ApiError } from '../../../models/api-error-model';
+import { updateAddItemsState } from '../../../store/slices/add-items-slice';
+import LoadingModal from '../../commons/ui/loading-modal';
+import { getPurchaseBranchList } from '../../../utils/enum/purchase-branch-enum';
 
 interface Props {
   isOpen: boolean;
@@ -52,9 +55,11 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 };
 
 function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
-  const [open, setOpen] = React.useState(isOpen);
+  const dispatch = useAppDispatch();
   const classes = useStyles();
   const { t } = useTranslation(['purchaseBranch', 'common']);
+  const [open, setOpen] = React.useState(isOpen);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
 
   const handleChkSaveClose = async () => {
     handleClose();
@@ -66,22 +71,47 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const [docNo, setDocNo] = React.useState('');
+  const [remark, setRemark] = React.useState('');
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
-  const [status, setStatus] = React.useState('SUBMITTED');
+  const [status, setStatus] = React.useState('DRAFT');
   const [branchName, setBranchName] = React.useState('');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const [items, setItems] = React.useState([]);
+  const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   useEffect(() => {
     const strBranchName = getBranchName(branchList, getUserInfo().branch);
     setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
+    handleStatusStepper();
   }, [branchList]);
 
-  const handleChangeComment = (value: any) => {
-    // setFlagSave(true);
-    // setCommentOC(value);
+  const [steps, setSteps] = React.useState([]);
+  const [statusSteps, setStatusSteps] = React.useState(0);
+  const stepsList: any = [];
+  const handleStatusStepper = async () => {
+    getPurchaseBranchList().map((item) => {
+      if (item.stepperGrp === 1 && item.value === status) {
+        stepsList.push(t(`status.${item.value}`));
+        stepsList.push('อยู่ระหว่างดำเนินการ: -');
+        stepsList.push(t(`status.CLOSED`));
+        setStatusSteps(item.stepperGrp - 1);
+      } else if (item.stepperGrp === 2 && item.value === status) {
+        stepsList.push(t('status.DRAFT'));
+        stepsList.push('อยู่ระหว่างดำเนินการ: ' + t(`status.${item.value}`));
+        stepsList.push(t(`status.CLOSED`));
+        setStatusSteps(item.stepperGrp - 1);
+      } else if (item.stepperGrp === 3 && item.value === status) {
+        stepsList.push(t('status.DRAFT'));
+        stepsList.push('อยู่ระหว่างดำเนินการ: -');
+        stepsList.push(t(`status.${item.value}`));
+        setStatusSteps(item.stepperGrp - 1);
+      }
+      //setSteps
+      setSteps(stepsList);
+    });
+  };
 
-    console.log('handleChangeComment:', value);
+  const handleChangeComment = (value: any) => {
+    setRemark(value);
   };
 
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
@@ -93,43 +123,47 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleSaveBR = async () => {
+    setOpenLoadingModal(true);
     const payloadSave: any = await handleMapPayloadSave();
-    console.log('payloadSave:', JSON.stringify(payloadSave));
-
     await savePurchaseBR(payloadSave)
       .then((value) => {
-        console.log('value:', JSON.stringify(value));
+        setDocNo(value.docNo);
       })
       .catch((error: ApiError) => {
         console.log('error:', JSON.stringify(error));
       });
+    setOpenLoadingModal(false);
   };
 
   const handleMapPayloadSave = async () => {
-    const itemsList: any = [];
-    if (items.length > 0) {
-      await items.forEach((data: any) => {
+    const items: any = [];
+    if (Object.keys(payloadAddItem).length > 0) {
+      await payloadAddItem.forEach((data: any) => {
         const item: any = {
           barcode: data.barcode,
-          orderMaxQty: data.orderMaxQty ? data.orderMaxQty : 0,
-          orderQty: data.orderQty ? data.orderQty : 0,
+          orderMaxQty: data.stockMax ? data.stockMax : 0,
+          orderQty: data.qty ? data.qty : 0,
         };
-        itemsList.push(item);
+        items.push(item);
       });
     }
 
-    if (docNo === '') {
+    if (docNo !== '') {
       const payload: PurchaseBRRequest = {
         docNo: docNo,
-        remark: 'testttt',
-        items: itemsList,
+        remark: remark,
+        items: items,
+        // items: [
+        //   { barcode: '9885202161237', orderMaxQty: 100, orderQty: 1 },
+        //   { barcode: '9999990075444', orderMaxQty: 100, orderQty: 1 },
+        // ],
       };
 
       return await payload;
     } else {
       const payload: PurchaseBRRequest = {
-        remark: 'testttt',
-        items: itemsList,
+        remark: remark,
+        items: items,
       };
 
       return await payload;
@@ -137,15 +171,14 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleChangeItems = async (items: any) => {
-    console.log('handleChangeItems:', JSON.stringify(items));
-    setItems(items);
+    await dispatch(updateAddItemsState(items));
   };
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleChkSaveClose}>
           <Typography sx={{ fontSize: '1em' }}>สร้างรายการสั่งสินค้า</Typography>
-          <Steppers status={status}></Steppers>
+          <Steppers status={statusSteps} stepsList={steps}></Steppers>
         </BootstrapDialogTitle>
 
         <DialogContent>
@@ -205,7 +238,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   className={classes.MbtnAdd}
                   startIcon={<Save />}
                   color='warning'
-                  disabled={items.length === 0}>
+                  disabled={Object.keys(payloadAddItem).length === 0}>
                   บันทึก
                 </Button>
                 <Button
@@ -216,7 +249,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   className={classes.MbtnClear}
                   startIcon={<CheckCircle />}
                   color='primary'
-                  disabled={items.length === 0}>
+                  disabled={Object.keys(payloadAddItem).length === 0}>
                   ส่งรายการ
                 </Button>
                 <Button
@@ -227,7 +260,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   startIcon={<Cancel />}
                   className={classes.MbtnSearch}
                   color='error'
-                  disabled={items.length === 0}>
+                  disabled={Object.keys(payloadAddItem).length === 0}>
                   ยกเลิก
                 </Button>
               </Grid>
@@ -242,7 +275,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
               <Grid item xs={3}>
                 <TextBoxComment
                   fieldName='หมายเหตุ :'
-                  defaultValue='xxxxxx'
+                  defaultValue={remark}
                   maxLength={100}
                   onChangeComment={handleChangeComment}
                   isDisable={false}
@@ -259,6 +292,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
               skuTypes: [3, 6],
               isOrderable: true,
             }}></ModalAddItems>
+
+          <LoadingModal open={openLoadingModal} />
         </DialogContent>
       </Dialog>
     </div>

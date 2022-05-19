@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useAppSelector } from '../../../store/store';
 import {
   DataGrid,
+  GridCellParams,
   GridColDef,
   GridEditCellValueParams,
   GridRenderCellParams,
@@ -13,6 +14,7 @@ import { Box } from '@mui/system';
 import { useStyles } from '../../../styles/makeTheme';
 import { TextField, Typography } from '@mui/material';
 import { DeleteForever } from '@mui/icons-material';
+import ModelDeleteConfirm from '../../commons/ui/modal-delete-confirm';
 
 export interface DataGridProps {
   // type: string;
@@ -63,7 +65,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'orderMaxQty',
+    field: 'stockMax',
     headerName: 'จำนวนสั่งมากที่สุด',
     headerAlign: 'center',
     align: 'right',
@@ -72,7 +74,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'orderQty',
+    field: 'qty',
     headerName: 'จำนวน',
     minWidth: 150,
     headerAlign: 'center',
@@ -86,18 +88,15 @@ const columns: GridColDef[] = [
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
-          let orderQty = Number(params.getValue(params.id, 'orderQty'));
-          let orderMaxQty = Number(params.getValue(params.id, 'orderMaxQty'));
+          let qty = Number(params.getValue(params.id, 'qty'));
+          let stockMax = Number(params.getValue(params.id, 'stockMax'));
 
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
-          if (orderQty === 0) value = chkQty(value);
+          if (qty === 0) value = chkQty(value);
           if (value < 0) value = 0;
-          else if (value > 0) chkOrderMaxQty(value, orderMaxQty);
+          else if (value > 0) value = chkStockMax(value, stockMax);
 
-          console.log('orderQty:', orderQty);
-          console.log('value:', value);
-
-          params.api.updateRows([{ ...params.row, orderQty: value }]);
+          params.api.updateRows([{ ...params.row, qty: value }]);
         }}
         // disabled={params.getValue(params.id, 'editMode') ? false : true}
         autoComplete='off'
@@ -136,12 +135,9 @@ const chkQty = (value: any) => {
   return value;
 };
 
-const chkOrderMaxQty = (value: any, orderMaxQty: any) => {
-  if (value > orderMaxQty) {
-    console.log('chkOrderMaxQty value:', value);
-    console.log('chkOrderMaxQty orderMaxQty:', orderMaxQty);
-    return orderMaxQty;
-  }
+const chkStockMax = (value: any, orderMaxQty: any) => {
+  if (value > orderMaxQty) return orderMaxQty;
+  return value;
 };
 
 function useApiRef() {
@@ -178,10 +174,11 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
       return {
         id: index,
         index: index + 1,
+        skuCode: item.skuCode,
         barcode: item.barcode,
         barcodeName: item.barcodeName,
-        orderQty: item.qty ? item.qty : 1,
-        orderMaxQty: item.stockMax,
+        qty: item.qty ? item.qty : 1,
+        stockMax: item.stockMax,
         unitName: item.unitName,
       };
     });
@@ -196,35 +193,57 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
         await rows.forEach((data: GridRowData) => {
           itemsList.push(data);
         });
-
-        console.log('rows:', JSON.stringify(rows));
       }
-
-      console.log('itemsList:', JSON.stringify(itemsList));
-
       return onChangeItems(itemsList ? itemsList : []);
     }
   };
 
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+  const [productNameDel, setProductNameDel] = React.useState('');
+  const [skuCodeDel, setSkuCodeDel] = React.useState('');
+  const [barCodeDel, setBarCodeDel] = React.useState('');
+  const currentlySelected = async (params: GridCellParams) => {
+    const value = params.colDef.field;
+    if (value === 'delete') {
+      setProductNameDel(String(params.getValue(params.id, 'barcodeName')));
+      setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
+      setBarCodeDel(String(params.getValue(params.id, 'barcode')));
+      setOpenModelDeleteConfirm(true);
+    }
+  };
+  const handleModelDeleteConfirm = () => {
+    setOpenModelDeleteConfirm(false);
+  };
+
   return (
-    <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={pageSize}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        rowsPerPageOptions={[10, 20, 50, 100]}
-        pagination
-        disableColumnMenu
-        autoHeight={rows.length >= 8 ? false : true}
-        scrollbarSize={10}
-        rowHeight={65}
-        // onCellClick={currentlySelected}
-        onCellFocusOut={handleEditItems}
-        // onCellOut={handleEditItems}
-        onCellKeyDown={handleEditItems}
+    <>
+      <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[10, 20, 50, 100]}
+          pagination
+          disableColumnMenu
+          autoHeight={rows.length >= 8 ? false : true}
+          scrollbarSize={10}
+          rowHeight={65}
+          onCellClick={currentlySelected}
+          onCellFocusOut={handleEditItems}
+          // onCellOut={handleEditItems}
+          onCellKeyDown={handleEditItems}
+        />
+      </div>
+
+      <ModelDeleteConfirm
+        open={openModelDeleteConfirm}
+        onClose={handleModelDeleteConfirm}
+        productName={productNameDel}
+        skuCode={skuCodeDel}
+        barCode={barCodeDel}
       />
-    </div>
+    </>
   );
 }
 
