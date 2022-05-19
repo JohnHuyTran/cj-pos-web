@@ -69,11 +69,13 @@ const AccordionHuaweiFile = ({ files }: Props) => {
                 }}
                 onClick={() => getHuaweiFileUrl(item)}
               >
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  <Typography color="secondary" sx={{ textDecoration: 'underline', fontSize: '13px' }}>
-                    {item.fileName}
-                  </Typography>
-                </div>
+                <Typography
+                  color="secondary"
+                  sx={{ textDecoration: 'underline', fontSize: '13px', whiteSpace: 'normal' }}
+                  noWrap
+                >
+                  {item.fileName}
+                </Typography>
               </Box>
             ))}
         </Box>
