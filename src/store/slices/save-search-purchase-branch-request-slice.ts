@@ -1,36 +1,34 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { StockTransferRequest } from '../../models/stock-transfer-model';
+import { PurchaseBranchSearchRequest } from '../../models/purchase-branch-request-model';
 
 type State = {
-  searchStockTransferRt: StockTransferRequest;
+  searchPurchaseBranchRequest: PurchaseBranchSearchRequest;
 };
 
 const initialState: State = {
-  searchStockTransferRt: {
+  searchPurchaseBranchRequest: {
     limit: '10',
     page: '1',
     docNo: '',
-    branchFrom: '',
-    branchTo: '',
+    branchCode: '',
     dateFrom: '',
     dateTo: '',
-    statuses: '',
-    transferReason: '',
+    status: '',
   },
 };
 
-const saveSearchStockRt = createSlice({
-  name: 'searchStockTransferRt',
+const saveSearchPurchaseBranchRequest = createSlice({
+  name: 'searchPurchaseBranchRequest',
   initialState,
   reducers: {
-    saveSearchStockTransferRt: (state, action: PayloadAction<any>) => {
-      state.searchStockTransferRt = action.payload;
+    saveSearchPurchaseBranch: (state, action: PayloadAction<any>) => {
+      state.searchPurchaseBranchRequest = action.payload;
     },
-    clearSearchStockTransferRt: () => {
+    clearSearchPurchaseBranchRequest: () => {
       initialState;
     },
   },
 });
 
-export const { saveSearchStockTransferRt, clearSearchStockTransferRt } = saveSearchStockRt.actions;
-export default saveSearchStockRt.reducer;
+export const { saveSearchPurchaseBranch, clearSearchPurchaseBranchRequest } = saveSearchPurchaseBranchRequest.actions;
+export default saveSearchPurchaseBranchRequest.reducer;

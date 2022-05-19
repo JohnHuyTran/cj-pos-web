@@ -20,7 +20,9 @@ import { env } from '../../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../../models/branch-model';
 import LoadingModal from '../../commons/ui/loading-modal';
 import { featchSearchPurchaseBranchRequestAsync } from '../../../store/slices/purchase-branch-request-slice';
+import { saveSearchPurchaseBranch } from '../../../store/slices/save-search-purchase-branch-request-slice';
 import { PurchaseBranchSearchRequest } from '../../../models/purchase-branch-request-model';
+import AlertError from '../../commons/ui/alert-error';
 
 interface State {
   docNo: string;
@@ -42,6 +44,8 @@ function PurchaseBranchRequest() {
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
 
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [branchToCode, setBranchToCode] = React.useState('');
@@ -122,8 +126,15 @@ function PurchaseBranchRequest() {
   };
 
   const onClickValidateForm = () => {
-    onClickSearchBtn();
+    if (startDate === null || endDate === null) {
+      setOpenAlert(true);
+      setTextError('กรุณากรอกวันที่สร้างรายการ');
+    } else {
+      onClickSearchBtn();
+    }
   };
+
+  const [flagSearch, setFlagSearch] = React.useState(false);
 
   const onClickSearchBtn = async () => {
     let limits;
@@ -148,7 +159,47 @@ function PurchaseBranchRequest() {
 
     handleOpenLoading('open', true);
     await dispatch(featchSearchPurchaseBranchRequestAsync(payload));
+    await dispatch(saveSearchPurchaseBranch(payload));
+    setFlagSearch(true);
     handleOpenLoading('open', false);
+  };
+
+  const onClickClearBtn = () => {
+    handleOpenLoading('open', true);
+    setFlagSearch(false);
+    setStartDate(null);
+    setEndDate(null);
+    setClearBranchDropDown(!clearBranchDropDown);
+    setValues({
+      docNo: '',
+      branchCode: groupBranch ? values.branchCode : '',
+      dateFrom: '',
+      dateTo: '',
+      status: 'ALL',
+    });
+
+    // const payload: StockTransferRequest = {
+    //     limit: limit ? limit.toString() : '10',
+    //     page: page,
+    //     docNo: values.docNo,
+    //     branchFrom: values.branchFrom,
+    //     branchTo: values.branchTo,
+    //     dateFrom: moment(startDate).startOf('day').toISOString(),
+    //     dateTo: moment(endDate).endOf('day').toISOString(),
+    //     statuses: values.statuses,
+    //     transferReason: values.transferReason,
+    //     clearSearch: true,
+    //   };
+    //   dispatch(featchSearchStockTransferRtAsync(payload));
+
+    setTimeout(() => {
+      handleOpenLoading('open', false);
+    }, 300);
+  };
+
+  //alert Errormodel
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
   };
 
   return (
@@ -209,7 +260,7 @@ function PurchaseBranchRequest() {
 
           <Grid item xs={4} sx={{ pt: 30 }}>
             <Typography gutterBottom variant="subtitle1" component="div">
-              วันที่รับสินค้า
+              วันที่สร้างรายการ
             </Typography>
             <Typography gutterBottom variant="subtitle1" component="div">
               ตั้งแต่ <span style={{ color: '#F54949' }}>*</span>
@@ -239,7 +290,7 @@ function PurchaseBranchRequest() {
           <Button
             id="btnClear"
             variant="contained"
-            //   onClick={onClickClearBtn}
+            onClick={onClickClearBtn}
             sx={{ width: '13%', ml: 2 }}
             className={classes.MbtnClear}
             color="cancelColor"
@@ -260,6 +311,8 @@ function PurchaseBranchRequest() {
       </Box>
 
       <LoadingModal open={openLoadingModal.open} />
+
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </>
   );
 }
