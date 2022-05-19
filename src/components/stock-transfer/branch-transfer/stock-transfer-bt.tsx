@@ -225,8 +225,22 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
     setIsDraft(branchTransferInfo.status === 'CREATED' ? true : false);
     setIsDC(getUserInfo().group === PERMISSION_GROUP.DC);
-    setStartDate(new Date(branchTransferInfo.startDate));
-    setEndDate(new Date(branchTransferInfo.endDate));
+
+    const s_date = new Date(branchTransferInfo.startDate);
+
+    if (s_date <= new Date()) {
+      setStartDate(new Date());
+    } else {
+      setStartDate(new Date(branchTransferInfo.startDate));
+    }
+
+    const e_date = new Date(branchTransferInfo.endDate);
+    if (e_date <= new Date()) {
+      setEndDate(null);
+    } else {
+      setEndDate(new Date(branchTransferInfo.endDate));
+    }
+
     // dispatch(updateAddItemSkuGroupState(branchTransferInfo.itemGroups));
     setSkuList(branchTransferInfo.itemGroups);
   }, [open]);
@@ -562,8 +576,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
                 variant='body2'
                 onClick={(e) => {
                   handleLinkDocument(DOCUMENT_TYPE.BT);
-                }}
-              >
+                }}>
                 เรียกดูเอกสารใบโอน BT
               </Link>
             </Box>
@@ -580,8 +593,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             className={classes.MbtnPrint}
             onClick={handleOpenAddItems}
             startIcon={<ControlPoint />}
-            sx={{ width: 200 }}
-          >
+            sx={{ width: 200 }}>
             เพิ่มสินค้า
           </Button>
         </Grid>
@@ -593,8 +605,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             className={classes.MbtnSave}
             onClick={handleSaveBtn}
             startIcon={<SaveIcon />}
-            sx={{ width: 200 }}
-          >
+            sx={{ width: 200 }}>
             บันทึก
           </Button>
 
@@ -605,8 +616,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             className={classes.MbtnSendDC}
             onClick={handleConfirmBtn}
             startIcon={<CheckCircleOutline />}
-            sx={{ width: 200 }}
-          >
+            sx={{ width: 200 }}>
             ส่งงานให้ DC
           </Button>
         </Grid>
@@ -632,8 +642,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BT);
-              }}
-            >
+              }}>
               เรียกดูเอกสารใบโอน BT
             </Link>
           </Box>
@@ -643,8 +652,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BO);
-              }}
-            >
+              }}>
               เรียกดูเอกสารใบ BO
             </Link>
           </Box>
@@ -654,8 +662,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BOX);
-              }}
-            >
+              }}>
               เรียกดูเอกสารใบปะลัง
             </Link>
           </Box>
@@ -677,7 +684,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               onClickDate={handleStartDatePicker}
               value={startDate}
               type={'TO'}
-              minDateTo={new Date(branchTransferInfo.startDate)}
+              minDateTo={startDate}
             />
           </Grid>
           <Grid item xs={1}></Grid>
@@ -702,8 +709,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           className={classes.MbtnSave}
           onClick={handleSendToPickup}
           startIcon={<SaveIcon />}
-          sx={{ width: 200 }}
-        >
+          sx={{ width: 200 }}>
           บันทึก
         </Button>
       </Grid>
@@ -771,8 +777,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.RECALL);
-              }}
-            >
+              }}>
               เรียกดูเอกสารใบเรียกเก็บ
             </Link>
           </Box>
@@ -823,8 +828,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BT);
-              }}
-            >
+              }}>
               เรียกดูเอกสารใบโอน BT
             </Link>
           </Box>
@@ -834,8 +838,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BO);
-              }}
-            >
+              }}>
               เรียกดูเอกสารใบ BO
             </Link>
           </Box>
@@ -845,8 +848,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BOX);
-              }}
-            >
+              }}>
               เรียกดูเอกสารใบปะลัง
             </Link>
           </Box>
@@ -863,8 +865,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             className={classes.MbtnSave}
             onClick={handleSubmitTransfer}
             // startIcon={<SaveIcon />}
-            sx={{ width: 200 }}
-          >
+            sx={{ width: 200 }}>
             ส่งงาน
           </Button>
         </Grid>
@@ -915,8 +916,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BT);
-              }}
-            >
+              }}>
               เรียกดูเอกสารใบโอน BT
             </Link>
           </Box>
@@ -926,8 +926,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BO);
-              }}
-            >
+              }}>
               เรียกดูเอกสารใบ BO
             </Link>
           </Box>
@@ -937,8 +936,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               variant='body2'
               onClick={(e) => {
                 handleLinkDocument(DOCUMENT_TYPE.BOX);
-              }}
-            >
+              }}>
               เรียกดูเอกสารใบปะลัง
             </Link>
           </Box>
@@ -1091,8 +1089,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       <ModalAddItems
         open={openModelAddItems}
         onClose={handleCloseModelAddItems}
-        requestBody={bodyRequest ? bodyRequest : { skuCodes: [] }}
-      ></ModalAddItems>
+        requestBody={bodyRequest ? bodyRequest : { skuCodes: [] }}></ModalAddItems>
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       <ModalShowFile
