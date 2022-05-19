@@ -217,3 +217,9 @@ export async function savePurchaseBR(payload: PurchaseBRRequest) {
     throw error;
   }
 }
+
+export const getPathPurchaseBRDetail = (docNo: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.purchase.purchaseBranchRequest.detail.url}`, {
+    docNo: docNo,
+  });
+};

@@ -6,6 +6,10 @@ import ModalPurchaseBranchDetail from './purchase-branch-detail';
 import { useAppDispatch } from '../../../store/store';
 import { updateAddItemsState } from '../../../store/slices/add-items-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
+import {
+  clearDataPurchaseBRDetail,
+  featchPurchaseBRDetailAsync,
+} from '../../../store/slices/purchase/purchase-branch-request-detail-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -26,18 +30,43 @@ function CreatePurchaseBranch() {
   const handleOpenDetailModal = async () => {
     handleOpenLoading('open', true);
     await dispatch(updateAddItemsState({}));
-    setOpenDetailModal(true);
+    const docNo = 'BR2205B005-000001'; //BR2205B005-000001 //BR22050101-000002
+    await dispatch(featchPurchaseBRDetailAsync(docNo));
+    handleOpenModal();
+    handleOpenLoading('open', false);
+  };
+  const handleOpenCreateModal = async () => {
+    handleOpenLoading('open', true);
+    await dispatch(updateAddItemsState({}));
+
+    await dispatch(clearDataPurchaseBRDetail());
+    handleOpenModal();
     handleOpenLoading('open', false);
   };
 
-  const handleCloseDetailModal = () => {
+  const handleOpenModal = () => {
+    setOpenDetailModal(true);
+  };
+  const handleCloseModal = () => {
     setOpenDetailModal(false);
   };
 
   return (
     <>
+      <h1>Mock</h1>
       <Box mb={6}>
         <Grid item xs={7}>
+          <Button
+            id='btnCreateStockTransferModal'
+            variant='contained'
+            onClick={handleOpenCreateModal}
+            sx={{ mr: 3 }}
+            className={classes.MbtnClear}
+            startIcon={<AddCircleOutlineOutlined />}
+            color='secondary'>
+            สร้างเอกสารใหม่
+          </Button>
+
           <Button
             id='btnCreateStockTransferModal'
             variant='contained'
@@ -46,11 +75,11 @@ function CreatePurchaseBranch() {
             className={classes.MbtnClear}
             startIcon={<AddCircleOutlineOutlined />}
             color='secondary'>
-            สร้างเอกสารใหม่
+            ดูรายละเอียด
           </Button>
         </Grid>
       </Box>
-      {openDetailModal && <ModalPurchaseBranchDetail isOpen={openDetailModal} onClickClose={handleCloseDetailModal} />}
+      {openDetailModal && <ModalPurchaseBranchDetail isOpen={openDetailModal} onClickClose={handleCloseModal} />}
 
       <LoadingModal open={openLoadingModal.open} />
     </>

@@ -70,24 +70,55 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     onClickClose();
   };
 
+  const purchaseBRDetail = useAppSelector((state) => state.purchaseBRDetailSlice.purchaseBRDetail.data);
   const [docNo, setDocNo] = React.useState('');
   const [remark, setRemark] = React.useState('');
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
-  const [status, setStatus] = React.useState('DRAFT');
+  const [status, setStatus] = React.useState('');
   const [branchName, setBranchName] = React.useState('');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   useEffect(() => {
-    const strBranchName = getBranchName(branchList, getUserInfo().branch);
-    setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
-    handleStatusStepper();
+    if (purchaseBRDetail) {
+      setDocNo(purchaseBRDetail.docNo);
+      setStatus(purchaseBRDetail.status);
+      handleStatusStepper(purchaseBRDetail.status);
+      setRemark(purchaseBRDetail.remark);
+      setCreateDate(new Date(purchaseBRDetail.createdDate));
+
+      const strBranchName = getBranchName(branchList, purchaseBRDetail.branchCode);
+      setBranchName(strBranchName ? `${purchaseBRDetail.branchCode}-${strBranchName}` : getUserInfo().branch);
+
+      if (purchaseBRDetail.items.length > 0) {
+        let items: any = [];
+        purchaseBRDetail.items.forEach((data: any) => {
+          const item: any = {
+            skuCode: data.skuCode,
+            barcode: data.barcode,
+            barcodeName: data.barcodeName,
+            unitCode: data.unitCode,
+            unitName: data.unitName,
+            baseUnit: data.barFactor,
+            qty: data.orderQty,
+            stockMax: data.orderMaxQty,
+          };
+          items.push(item);
+        });
+
+        dispatch(updateAddItemsState(items));
+      }
+    } else {
+      const strBranchName = getBranchName(branchList, getUserInfo().branch);
+      setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
+      handleStatusStepper('DRAFT');
+    }
   }, [branchList]);
 
   const [steps, setSteps] = React.useState([]);
   const [statusSteps, setStatusSteps] = React.useState(0);
   const stepsList: any = [];
-  const handleStatusStepper = async () => {
+  const handleStatusStepper = async (status: string) => {
     getPurchaseBranchList().map((item) => {
       if (item.stepperGrp === 1 && item.value === status) {
         stepsList.push(t(`status.${item.value}`));
@@ -128,6 +159,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     await savePurchaseBR(payloadSave)
       .then((value) => {
         setDocNo(value.docNo);
+        setStatus('DRAFT');
       })
       .catch((error: ApiError) => {
         console.log('error:', JSON.stringify(error));
@@ -209,7 +241,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
               สถานะ :
             </Grid>
             <Grid item xs={4}>
-              {t(`status.${status}`)}
+              {status !== '' && t(`status.${status}`)}
+              {status === '' && '-'}
             </Grid>
           </Grid>
 

@@ -14,7 +14,7 @@ export interface PurchaseBRDetailResponse {
   ref: string;
   code: number;
   message: string;
-  data: PurchaseBRInfo[];
+  data: PurchaseBRInfo | null;
 }
 
 export interface PurchaseBRInfo {
