@@ -39,8 +39,11 @@ function TextBoxComment({
 
   return (
     <>
-      <Typography variant='body2'>{fieldName}</Typography>
+      <Typography variant="body2">{fieldName}</Typography>
       <TextField
+        data-testid="form-field-tbxComment"
+        id="tbxComment"
+        // label='tbxComment'
         multiline
         fullWidth
         rows={rowDisplay ? rowDisplay : 2}
@@ -62,7 +65,8 @@ function TextBoxComment({
           maxWidth: 350,
           textAlign: 'right',
           // marginTop: "-1.5em",
-        }}>
+        }}
+      >
         {characterCount}/{maxLength}
       </div>
     </>

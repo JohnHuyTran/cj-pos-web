@@ -255,6 +255,7 @@ function AccordionUploadFile({
         <label htmlFor={'btnBrowse' + (stringNullOrEmpty(idControl) ? '' : idControl)}>
           <Button
             id={'btnPrint' + (stringNullOrEmpty(idControl) ? '' : idControl)}
+            data-testid="testid-btnBrowse"
             color="primary"
             variant="contained"
             component="span"
@@ -274,6 +275,7 @@ function AccordionUploadFile({
 
       <input
         id={'btnBrowse' + (stringNullOrEmpty(idControl) ? '' : idControl)}
+        data-testid="testid-tbxBrowse"
         type="file"
         // multiple
         // onDrop
@@ -339,12 +341,15 @@ function AccordionUploadFile({
                 )}
 
                 {item.status === 'new' && (
-                  <Typography color="secondary" sx={{ fontSize: '13px' }}>
-                    {item.fileName}
-                  </Typography>
+                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <Typography color="secondary" sx={{ fontSize: '13px' }}>
+                      {item.fileName}
+                    </Typography>
+                  </div>
                 )}
 
                 <IconButton
+                  data-testid="testid-btnDeletefile"
                   sx={{
                     display:
                       (!stringNullOrEmpty(enabledControl) && !enabledControl) ||
