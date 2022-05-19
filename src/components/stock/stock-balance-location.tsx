@@ -71,7 +71,7 @@ function StockBalanceLocation() {
       field: 'positions',
       headerClassName: 'columnHeaderTitle',
       headerName: 'โลเคชั่น',
-      minWidth: 90,
+      minWidth: 93,
       headerAlign: 'center',
       sortable: false,
     },
