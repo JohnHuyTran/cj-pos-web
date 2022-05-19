@@ -254,17 +254,18 @@ function AccordionUploadFile({
         <label htmlFor={'btnBrowse' + (stringNullOrEmpty(idControl) ? '' : idControl)}>
           <Button
             id={'btnPrint' + (stringNullOrEmpty(idControl) ? '' : idControl)}
-            data-testid='testid-btnBrowse'
-            color='primary'
-            variant='contained'
-            component='span'
+            data-testid="testid-btnBrowse"
+            color="primary"
+            variant="contained"
+            component="span"
             className={classes.MbtnBrowse}
-            disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl)}>
+            disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl)}
+          >
             แนบไฟล์
           </Button>
         </label>
 
-        <Typography variant='overline' sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
+        <Typography variant="overline" sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
           {reMark && reMark}
 
           {!reMark && 'แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb'}
@@ -273,11 +274,11 @@ function AccordionUploadFile({
 
       <input
         id={'btnBrowse' + (stringNullOrEmpty(idControl) ? '' : idControl)}
-        data-testid='testid-tbxBrowse'
-        type='file'
+        data-testid="testid-tbxBrowse"
+        type="file"
         // multiple
         // onDrop
-        accept='.pdf, .jpg, .jpeg'
+        accept=".pdf, .jpg, .jpeg"
         onClick={handleFileInputClick}
         onChange={handleFileInputChange}
         style={{ display: 'none' }}
@@ -297,16 +298,18 @@ function AccordionUploadFile({
               warningMessage?.split('__')[0] != idControl)
               ? `1px dashed ${theme.palette.primary.main}`
               : `1px dashed #F54949`,
-        }}>
+        }}
+      >
         <Box
           sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => {
             if (newFileDisplayList.length > 0) setAccordionFile(!accordionFile);
-          }}>
+          }}
+        >
           <Typography sx={{ fontSize: '14px', color: '#676767' }}>
             เอกสารแนบ จำนวน {newFileDisplayList.length}/5
           </Typography>
-          {accordionFile ? <KeyboardArrowUp color='primary' /> : <KeyboardArrowDown color='primary' />}
+          {accordionFile ? <KeyboardArrowUp color="primary" /> : <KeyboardArrowDown color="primary" />}
         </Box>
 
         <Box sx={{ display: accordionFile ? 'visible' : 'none' }}>
@@ -314,7 +317,7 @@ function AccordionUploadFile({
             newFileDisplayList.map((item: fileDisplayList, index: number) => (
               <Box
                 key={index}
-                component='a'
+                component="a"
                 href={void 0}
                 sx={{
                   color: theme.palette.secondary.main,
@@ -322,26 +325,30 @@ function AccordionUploadFile({
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                }}>
+                }}
+              >
                 {item.status === 'old' && (
                   <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     <Typography
-                      color='secondary'
+                      color="secondary"
                       sx={{ textDecoration: 'underline', fontSize: '13px' }}
-                      onClick={() => getHuaweiFileUrl(item)}>
+                      onClick={() => getHuaweiFileUrl(item)}
+                    >
                       {item.fileName}
                     </Typography>
                   </div>
                 )}
 
                 {item.status === 'new' && (
-                  <Typography color='secondary' sx={{ fontSize: '13px' }}>
-                    {item.fileName}
-                  </Typography>
+                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <Typography color="secondary" sx={{ fontSize: '13px' }}>
+                      {item.fileName}
+                    </Typography>
+                  </div>
                 )}
 
                 <IconButton
-                  data-testid='testid-btnDeletefile'
+                  data-testid="testid-btnDeletefile"
                   sx={{
                     display:
                       (!stringNullOrEmpty(enabledControl) && !enabledControl) ||
@@ -351,8 +358,9 @@ function AccordionUploadFile({
                   }}
                   // onClick={() => onDeleteAttachFile ? handleDeleteAttachFile(item) : handleDelete(item)}
                   onClick={() => handleDeleteAttachFile(item)}
-                  size='small'>
-                  <CloseIcon fontSize='small' color='error' />
+                  size="small"
+                >
+                  <CloseIcon fontSize="small" color="error" />
                 </IconButton>
               </Box>
             ))}
@@ -366,7 +374,8 @@ function AccordionUploadFile({
             !stringNullOrEmpty(idControl) &&
             warningMessage?.split('__')[0] != idControl)
         }
-        sx={{ fontSize: '14px', color: '#F54949', textAlign: 'right' }}>
+        sx={{ fontSize: '14px', color: '#F54949', textAlign: 'right' }}
+      >
         {!stringNullOrEmpty(warningMessage) && !stringNullOrEmpty(idControl)
           ? warningMessage?.split('__')[1]
           : warningMessage}
