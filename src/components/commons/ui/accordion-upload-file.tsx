@@ -328,23 +328,20 @@ function AccordionUploadFile({
                 }}
               >
                 {item.status === 'old' && (
-                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    <Typography
-                      color="secondary"
-                      sx={{ textDecoration: 'underline', fontSize: '13px' }}
-                      onClick={() => getHuaweiFileUrl(item)}
-                    >
-                      {item.fileName}
-                    </Typography>
-                  </div>
+                  <Typography
+                    color="secondary"
+                    sx={{ textDecoration: 'underline', fontSize: '13px', whiteSpace: 'normal' }}
+                    noWrap
+                    onClick={() => getHuaweiFileUrl(item)}
+                  >
+                    {item.fileName}
+                  </Typography>
                 )}
 
                 {item.status === 'new' && (
-                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    <Typography color="secondary" sx={{ fontSize: '13px' }}>
-                      {item.fileName}
-                    </Typography>
-                  </div>
+                  <Typography color="secondary" sx={{ fontSize: '13px', whiteSpace: 'normal' }} noWrap>
+                    {item.fileName}
+                  </Typography>
                 )}
 
                 <IconButton
