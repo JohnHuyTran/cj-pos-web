@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Chip, Typography } from '@mui/material';
-import { DataGrid, GridColDef, useGridApiRef } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, useGridApiRef } from '@mui/x-data-grid';
 import { useStyles } from '../../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { PurChaseBranchInfo, PurchaseBranchSearchRequest } from '../../../models/purchase-branch-request-model';
@@ -9,6 +9,12 @@ import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import LoadingModal from '../../commons/ui/loading-modal';
 import { featchSearchPurchaseBranchRequestAsync } from '../../../store/slices/purchase-branch-request-slice';
 import { saveSearchPurchaseBranch } from '../../../store/slices/save-search-purchase-branch-request-slice';
+import ModalPurchaseBranchDetail from './purchase-branch-detail';
+import { updateAddItemsState } from '../../../store/slices/add-items-slice';
+import {
+  clearDataPurchaseBRDetail,
+  featchPurchaseBRDetailAsync,
+} from '../../../store/slices/purchase/purchase-branch-request-detail-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -22,7 +28,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -47,8 +53,7 @@ const columns: GridColDef[] = [
         <div
           style={{
             textAlign: 'center',
-          }}
-        >
+          }}>
           {params.value}
         </div>
       );
@@ -63,7 +68,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
           {params.value}-{params.getValue(params.id, 'branchName') || ''}
         </Typography>
       </div>
@@ -89,7 +94,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
@@ -97,7 +102,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
@@ -105,7 +110,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
           />
         );
@@ -217,22 +222,39 @@ export default function PurchaseBranchRequestList() {
     setLoading(false);
   };
 
+  const [openDetailModal, setOpenDetailModal] = React.useState(false);
+  const handleOpenModal = () => {
+    setOpenDetailModal(true);
+  };
+  const handleCloseModal = () => {
+    setOpenDetailModal(false);
+  };
+
+  const currentlySelected = async (params: GridCellParams) => {
+    handleOpenLoading('open', true);
+    await dispatch(updateAddItemsState({}));
+    await dispatch(clearDataPurchaseBRDetail());
+    await dispatch(featchPurchaseBRDetailAsync(params.row.docNo));
+    handleOpenModal();
+    handleOpenLoading('open', false);
+  };
+
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
             columns={columns}
             disableColumnMenu
-            // onCellClick={currentlySelected}
+            onCellClick={currentlySelected}
             autoHeight={rows.length >= 10 ? false : true}
             scrollbarSize={10}
             page={cuurentPage - 1}
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
@@ -243,6 +265,8 @@ export default function PurchaseBranchRequestList() {
       </Box>
 
       <LoadingModal open={openLoadingModal.open} />
+
+      {openDetailModal && <ModalPurchaseBranchDetail isOpen={openDetailModal} onClickClose={handleCloseModal} />}
     </div>
   );
 }

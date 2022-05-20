@@ -94,7 +94,7 @@ const columns: GridColDef[] = [
           if (value > stockMax) value = stockMax;
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
-        disabled={params.getValue(params.id, 'editMode') ? false : true}
+        disabled={params.getValue(params.id, 'editMode') ? true : false}
         autoComplete='off'
       />
     ),

@@ -6,7 +6,6 @@ import { Grid } from '@mui/material';
 import { Typography } from '@mui/material';
 import { TextField } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-
 import { useStyles } from '../../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
@@ -14,7 +13,7 @@ import DatePickerComponent from '../../commons/ui/date-picker';
 import { getPurchaseBranchList } from '../../../utils/enum/purchase-branch-enum';
 import { getUserInfo } from '../../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
-import { isGroupBranch } from '../../../utils/role-permission';
+import { isAllowActionPermission, isGroupBranch } from '../../../utils/role-permission';
 import { getBranchName } from '../../../utils/utils';
 import { env } from '../../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../../models/branch-model';
@@ -24,6 +23,10 @@ import { saveSearchPurchaseBranch } from '../../../store/slices/save-search-purc
 import { PurchaseBranchSearchRequest } from '../../../models/purchase-branch-request-model';
 import AlertError from '../../commons/ui/alert-error';
 import PurchaseBranchRequestList from '../create-purchase-branch/purchase-branch-request-list';
+import ModalPurchaseBranchDetail from './purchase-branch-detail';
+import { ACTIONS } from '../../../utils/enum/permission-enum';
+import { updateAddItemsState } from '../../../store/slices/add-items-slice';
+import { clearDataPurchaseBRDetail } from '../../../store/slices/purchase/purchase-branch-request-detail-slice';
 
 interface State {
   docNo: string;
@@ -51,6 +54,7 @@ function PurchaseBranchRequest() {
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
 
+  const [displayCreate, setDisplayCreate] = React.useState(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [branchToCode, setBranchToCode] = React.useState('');
   const [isAuthorizedBranch, setIsAuthorizedBranch] = React.useState<boolean>(true);
@@ -203,27 +207,42 @@ function PurchaseBranchRequest() {
     setOpenAlert(false);
   };
 
+  const [openDetailModal, setOpenDetailModal] = React.useState(false);
+  const handleOpenCreateModal = async () => {
+    handleOpenLoading('open', true);
+    await dispatch(updateAddItemsState({}));
+    await dispatch(clearDataPurchaseBRDetail());
+    handleOpenModal();
+    handleOpenLoading('open', false);
+  };
+  const handleOpenModal = () => {
+    setOpenDetailModal(true);
+  };
+  const handleCloseModal = () => {
+    setOpenDetailModal(false);
+  };
+
   return (
     <>
       <Box mb={6}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {t('documentSearch')}
             </Typography>
             <TextField
-              id="txtDocNo"
-              name="docNo"
-              size="small"
+              id='txtDocNo'
+              name='docNo'
+              size='small'
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่เอกสาร BR"
+              placeholder='เลขที่เอกสาร BR'
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาขาที่สร้างรายการ
             </Typography>
             <BranchListDropDown
@@ -236,17 +255,16 @@ function PurchaseBranchRequest() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สถานะ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selStatus"
-                name="status"
+                id='selStatus'
+                name='status'
                 value={values.status}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
                 {getPurchaseBranchList().map((item: any) => {
                   return (
@@ -260,52 +278,49 @@ function PurchaseBranchRequest() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่สร้างรายการ
             </Typography>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ตั้งแต่ <span style={{ color: '#F54949' }}>*</span>
             </Typography>
             <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
               ถึง <span style={{ color: '#F54949' }}>*</span>
             </Typography>
             <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
           </Grid>
         </Grid>
 
-        <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+        <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
           <Button
-            id="btnCreateDoc"
-            variant="contained"
-            //   onClick={handleCreateDoc}
-            sx={{ minWidth: '15%' }}
+            id='btnCreateDoc'
+            variant='contained'
+            onClick={handleOpenCreateModal}
+            sx={{ minWidth: '15%', display: `${displayCreate ? 'none' : ''}` }}
             className={classes.MbtnClear}
             startIcon={<AddCircleOutlineOutlinedIcon />}
-            color="secondary"
-          >
+            color='secondary'>
             สร้างเอกสารใหม่
           </Button>
           <Button
-            id="btnClear"
-            variant="contained"
+            id='btnClear'
+            variant='contained'
             onClick={onClickClearBtn}
             sx={{ width: '13%', ml: 2 }}
             className={classes.MbtnClear}
-            color="cancelColor"
-          >
+            color='cancelColor'>
             เคลียร์
           </Button>
           <Button
-            id="btnSearch"
-            variant="contained"
-            color="primary"
+            id='btnSearch'
+            variant='contained'
+            color='primary'
             onClick={onClickValidateForm}
             sx={{ width: '13%', ml: 2 }}
-            className={classes.MbtnSearch}
-          >
+            className={classes.MbtnSearch}>
             ค้นหา
           </Button>
         </Grid>
@@ -315,8 +330,8 @@ function PurchaseBranchRequest() {
         <div>
           {dataList.length > 0 && <PurchaseBranchRequestList />}
           {dataList.length === 0 && (
-            <Grid item container xs={12} justifyContent="center">
-              <Box color="#CBD4DB">
+            <Grid item container xs={12} justifyContent='center'>
+              <Box color='#CBD4DB'>
                 <h2>ไม่มีข้อมูล</h2>
               </Box>
             </Grid>
@@ -327,6 +342,8 @@ function PurchaseBranchRequest() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+      {openDetailModal && <ModalPurchaseBranchDetail isOpen={openDetailModal} onClickClose={handleCloseModal} />}
     </>
   );
 }
