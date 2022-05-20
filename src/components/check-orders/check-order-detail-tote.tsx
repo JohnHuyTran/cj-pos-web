@@ -76,16 +76,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
-          <HighlightOff fontSize="large" />
+          }}>
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -144,8 +143,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2">{params.value}</Typography>
-        <Typography variant="body2" color="textSecondary">
+        <Typography variant='body2'>{params.value}</Typography>
+        <Typography variant='body2' color='textSecondary'>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
@@ -174,9 +173,9 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnQuantityActual"
-        type="number"
+        variant='outlined'
+        name='txnQuantityActual'
+        type='number'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
@@ -190,7 +189,7 @@ const columns: GridColDef[] = [
           params.api.updateRows([{ ...params.row, actualQty: e.target.value }]);
         }}
         disabled={isDisable(params) ? true : false}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
@@ -212,12 +211,12 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnComment"
+        variant='outlined'
+        name='txnComment'
         value={params.value}
         onChange={(e) => params.api.updateRows([{ ...params.row, comment: e.target.value }])}
         disabled={isDisable(params) ? true : false}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
@@ -488,7 +487,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
       });
 
       setSumActualQty(sumActualQtyItems);
-    setSumQuantityRef(sumQuantityRefItems);
+      setSumQuantityRef(sumQuantityRefItems);
       // handleCalculateDCPercent(sumActualQtyItems, sumQuantityRefItems); //คำนวณDC(%)
     });
   };
@@ -569,8 +568,8 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
 
   return (
     <div>
-      <Dialog open={openTote} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+      <Dialog open={openTote} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>รายละเอียดตรวจสอบการรับ-โอนสินค้า</Typography>
         </BootstrapDialogTitle>
 
@@ -578,92 +577,89 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร:</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetailTote.docRefNo ? orderDetailTote.docRefNo : '-'}</Typography>
+                <Typography variant='body2'>{orderDetailTote.docRefNo ? orderDetailTote.docRefNo : '-'}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">เลข Tote:</Typography>
+                <Typography variant='body2'>เลข Tote:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetailTote.toteCode}</Typography>
+                <Typography variant='body2'>{orderDetailTote.toteCode}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{orderDetailTote.sdNo}</Typography>
+                <Typography variant='body2'>{orderDetailTote.sdNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">สถานะ:</Typography>
+                <Typography variant='body2'>สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{getShipmentStatusText(orderDetailTote.sdStatus)}</Typography>
+                <Typography variant='body2'>{getShipmentStatusText(orderDetailTote.sdStatus)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">วันที่:</Typography>
+                <Typography variant='body2'>วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{convertUtcToBkkDate(orderDetailTote.receivedDate)}</Typography>
+                <Typography variant='body2'>{convertUtcToBkkDate(orderDetailTote.receivedDate)}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">ประเภท:</Typography>
+                <Typography variant='body2'>ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{getShipmentTypeText(orderDetailTote.sdType)}</Typography>
+                <Typography variant='body2'>{getShipmentTypeText(orderDetailTote.sdType)}</Typography>
               </Grid>
             </Grid>
           </Box>
 
           {/* DisplayBtn */}
           <Box sx={{ marginTop: 4 }}>
-            <Grid container spacing={2} display="flex" justifyContent="space-between">
+            <Grid container spacing={2} display='flex' justifyContent='space-between'>
               <Grid item xl={4}>
                 {!statusWaitApprove1 && (
                   <Button
-                    id="btnPrint"
-                    variant="contained"
-                    color="secondary"
+                    id='btnPrint'
+                    variant='contained'
+                    color='secondary'
                     onClick={handlePrintBtn}
                     startIcon={<Print />}
                     className={classes.MbtnPrint}
                     style={{ textTransform: 'none' }}
-                    sx={{ display: `${statusClosed ? 'none' : ''}` }}
-                  >
+                    sx={{ display: `${statusClosed ? 'none' : ''}` }}>
                     พิมพ์ใบผลต่าง
                   </Button>
                 )}
 
                 {statusDraft && (
                   <Button
-                    id="btnAddItem"
-                    variant="contained"
-                    color="secondary"
+                    id='btnAddItem'
+                    variant='contained'
+                    color='secondary'
                     onClick={handleClickAddItem}
                     className={classes.MbtnAdd}
                     // sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                     // disabled={newAddItemListArray.length === 0}
                     startIcon={<AddCircleOutlineIcon />}
-                    endIcon={<KeyboardArrowDownIcon />}
-                  >
+                    endIcon={<KeyboardArrowDownIcon />}>
                     เพิ่มสินค้า
                   </Button>
                 )}
 
                 <StyledMenu
-                  id="demo-customized-menu"
+                  id='demo-customized-menu'
                   MenuListProps={{
                     'aria-labelledby': 'demo-customized-button',
                   }}
                   anchorEl={anchorEl}
                   open={openDropdown}
-                  onClose={handleCloseDropdown}
-                >
+                  onClose={handleCloseDropdown}>
                   <MenuItem sx={{ color: '#446EF2' }} onClick={handleOpenAddItem}>
                     เพิ่มสินค้า
                   </MenuItem>
@@ -674,9 +670,9 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                 {statusDraft && (
                   <div>
                     <Button
-                      id="btnSave"
-                      variant="contained"
-                      color="warning"
+                      id='btnSave'
+                      variant='contained'
+                      color='warning'
                       className={classes.MbtnSave}
                       onClick={handleSaveButton}
                       startIcon={<SaveIcon />}
@@ -687,9 +683,9 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                     </Button>
 
                     <Button
-                      id="btnApprove"
-                      variant="contained"
-                      color="primary"
+                      id='btnApprove'
+                      variant='contained'
+                      color='primary'
                       className={classes.MbtnApprove}
                       onClick={handleApproveBtn}
                       startIcon={<CheckCircleOutline />}
@@ -732,11 +728,10 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
             </Grid>
           </Box>
 
-          <Box mt={2} bgcolor="background.paper">
+          <Box mt={2} bgcolor='background.paper'>
             <div
               style={{ width: '100%', height: rowsEntriesTote.length >= 8 ? '70vh' : 'auto' }}
-              className={classes.MdataGridDetail}
-            >
+              className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rowsEntriesTote}
                 columns={columns}
@@ -766,7 +761,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
         action={action}
         items={itemsDiffState}
         percentDiffType={false}
-        percentDiffValue="0"
+        percentDiffValue='0'
         // sumDCPercent={sumDCPercent}
         sumActualQty={sumActualQty}
         sumQuantityRef={sumQuantityRef}
@@ -790,7 +785,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
             ? orderDetailTote.sdImageFilename
             : formatFileNam(orderDetailTote.sdNo, orderDetailTote.sdStatus)
         }
-        btnPrintName="พิมพ์ใบผลต่าง"
+        btnPrintName='พิมพ์ใบผลต่าง'
       />
 
       <ModalAddItemsTote
@@ -798,9 +793,9 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
         onClose={handleModelAddItems}
         requestBody={{
           skuCodes: [],
-        }}
-      ></ModalAddItemsTote>
-
+          skuTypes: [2],
+          isSellable: true,
+        }}></ModalAddItemsTote>
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
 
       <Snackbar open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={snackbarStatus} contentMsg={contentMsg} />

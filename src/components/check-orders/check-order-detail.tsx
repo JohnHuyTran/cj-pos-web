@@ -1162,7 +1162,6 @@ export default function CheckOrderDetail({
       <LoadingModal open={openLoadingModal.open} />
 
       <AddToteModel open={openModelAddTote} onClose={handleCloseModelAddTote} updateToteNo={handleUpdateToteNo} />
-
       <ModalAddItems
         open={openModelAddItems}
         onClose={handleModelAddItems}

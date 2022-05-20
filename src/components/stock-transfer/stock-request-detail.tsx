@@ -1154,7 +1154,6 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
         requestBody={{
           skuCodes: [],
         }}></ModalAddItems>
-
       <SnackbarStatus
         open={showSnackBar}
         onClose={handleCloseSnackBar}
