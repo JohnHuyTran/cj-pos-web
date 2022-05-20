@@ -24,6 +24,7 @@ import ModelConfirm from '../modal-confirm';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { ACTIONS } from '../../../utils/enum/permission-enum';
 import { isAllowActionPermission } from '../../../utils/role-permission';
+import ConfirmModelExit from '../../commons/ui/confirm-exit-model';
 
 interface Props {
   isOpen: boolean;
@@ -65,13 +66,26 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
 
+  const [flagSave, setFlagSave] = React.useState(false);
   const handleChkSaveClose = async () => {
-    handleClose();
+    if (flagSave) {
+      setConfirmModelExit(true);
+    } else {
+      handleClose();
+    }
   };
 
   const handleClose = async () => {
     setOpen(false);
     onClickClose();
+  };
+
+  const [confirmModelExit, setConfirmModelExit] = React.useState(false);
+  const handleNotExitModelConfirm = () => {
+    setConfirmModelExit(false);
+  };
+  const handleExitModelConfirm = () => {
+    handleClose();
   };
 
   const purchaseBRDetail = useAppSelector((state) => state.purchaseBRDetailSlice.purchaseBRDetail.data);
@@ -161,6 +175,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleChangeComment = (value: any) => {
+    setFlagSave(true);
     setRemark(value);
   };
 
@@ -171,8 +186,9 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const handleModelAddItems = async () => {
     setOpenModelAddItems(false);
   };
-  const handleChangeItems = async (items: any) => {
-    await dispatch(updateAddItemsState(items));
+  const handleChangeItems = async () => {
+    setFlagSave(true);
+    // await dispatch(updateAddItemsState(items));
   };
 
   const handleSaveBR = async () => {
@@ -183,6 +199,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         setDocNo(value.docNo);
         setStatus('DRAFT');
 
+        setFlagSave(false);
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -220,10 +237,6 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       const payload: PurchaseBRRequest = {
         remark: remark,
         items: items,
-        // items: [
-        //   { barcode: '9885202161237', orderMaxQty: 100, orderQty: 1 },
-        //   { barcode: '9999990075444', orderMaxQty: 100, orderQty: 1 },
-        // ],
       };
 
       return await payload;
@@ -399,6 +412,12 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             onClose={handleCloseSnackBar}
             isSuccess={snackbarIsStatus}
             contentMsg={contentMsg}
+          />
+
+          <ConfirmModelExit
+            open={confirmModelExit}
+            onClose={handleNotExitModelConfirm}
+            onConfirm={handleExitModelConfirm}
           />
         </DialogContent>
       </Dialog>

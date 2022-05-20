@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useAppSelector } from '../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import {
   DataGrid,
   GridCellParams,
@@ -17,15 +17,11 @@ import { DeleteForever } from '@mui/icons-material';
 import ModelDeleteConfirm from '../../commons/ui/modal-delete-confirm';
 import { isAllowActionPermission } from '../../../utils/role-permission';
 import { ACTIONS } from '../../../utils/enum/permission-enum';
+import { updateAddItemsState } from '../../../store/slices/add-items-slice';
 
 export interface DataGridProps {
-  // type: string;
-  // edit: boolean;
-  onChangeItems: (items: Array<any>) => void;
-  // update: boolean;
-  // status: string;
-  // skuCode: string;
-  // skuName: string;
+  // onChangeItems: (items: Array<any>) => void;
+  onChangeItems: () => void;
 }
 
 const columns: GridColDef[] = [
@@ -92,15 +88,13 @@ const columns: GridColDef[] = [
         onChange={(e) => {
           let qty = Number(params.getValue(params.id, 'qty'));
           let stockMax = Number(params.getValue(params.id, 'stockMax'));
-
           var value = e.target.value ? parseInt(e.target.value, 10) : '';
           if (qty === 0) value = chkQty(value);
           if (value < 0) value = 0;
-          else if (value > 0) value = chkStockMax(value, stockMax);
-
+          if (value > stockMax) value = stockMax;
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
-        disabled={params.getValue(params.id, 'editMode') ? true : false}
+        disabled={params.getValue(params.id, 'editMode') ? false : true}
         autoComplete='off'
       />
     ),
@@ -134,11 +128,6 @@ const chkQty = (value: any) => {
   return value;
 };
 
-const chkStockMax = (value: any, orderMaxQty: any) => {
-  if (value > orderMaxQty) return orderMaxQty;
-  return value;
-};
-
 function useApiRef() {
   const apiRef = useGridApiRef();
   const _columns = useMemo(
@@ -160,6 +149,7 @@ function useApiRef() {
 }
 
 function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
+  const dispatch = useAppDispatch();
   const classes = useStyles();
 
   let rows: any = [];
@@ -184,15 +174,18 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
 
   const { apiRef, columns } = useApiRef();
   const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'orderQty') {
+    if (params.field === 'qty') {
       const itemsList: any = [];
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         await rows.forEach((data: GridRowData) => {
           itemsList.push(data);
         });
+
+        await dispatch(updateAddItemsState(itemsList));
+        return onChangeItems();
+        // return onChangeItems(itemsList ? itemsList : []);
       }
-      return onChangeItems(itemsList ? itemsList : []);
     }
   };
 
@@ -229,7 +222,7 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
           rowHeight={65}
           onCellClick={currentlySelected}
           onCellFocusOut={handleEditItems}
-          // onCellOut={handleEditItems}
+          onCellOut={handleEditItems}
           onCellKeyDown={handleEditItems}
         />
       </div>
