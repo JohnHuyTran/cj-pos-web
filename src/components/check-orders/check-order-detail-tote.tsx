@@ -796,7 +796,6 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
           skuTypes: [2],
           isSellable: true,
         }}></ModalAddItemsTote>
-
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
 
       <Snackbar open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={snackbarStatus} contentMsg={contentMsg} />

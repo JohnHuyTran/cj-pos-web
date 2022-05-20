@@ -900,6 +900,7 @@ export default function ModalCreateTransferOut({
           isSellable: true,
         }}
       />
+
       <ModelConfirm
         open={openModalCancel}
         onClose={handleCloseModalCancel}

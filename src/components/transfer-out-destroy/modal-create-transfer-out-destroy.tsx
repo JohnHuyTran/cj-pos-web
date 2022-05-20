@@ -879,6 +879,7 @@ export default function ModalCreateTransferOutDestroy({
           isSellable: true,
         }}
       />
+
       <ModelConfirm
         open={openModalCancel}
         onClose={handleCloseModalCancel}

@@ -1193,6 +1193,7 @@ export default function ModalCreateBarcodeDiscount({
           isSellable: true,
         }}
       />
+
       <ModelConfirm
         open={openModalCancel}
         onClose={handleCloseModalCancel}

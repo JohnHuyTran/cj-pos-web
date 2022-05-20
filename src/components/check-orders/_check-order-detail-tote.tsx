@@ -610,7 +610,6 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
       />
 
       <LoadingModal open={openLoadingModal.open} />
-
       <ModalAddItems
         open={openModelAddItems}
         onClose={handleModelAddItems}
