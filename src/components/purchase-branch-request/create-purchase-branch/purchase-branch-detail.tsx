@@ -25,6 +25,7 @@ import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { ACTIONS } from '../../../utils/enum/permission-enum';
 import { isAllowActionPermission } from '../../../utils/role-permission';
 import ConfirmModelExit from '../../commons/ui/confirm-exit-model';
+import { featchSearchPurchaseBranchRequestAsync } from '../../../store/slices/purchase-branch-request-slice';
 
 interface Props {
   isOpen: boolean;
@@ -251,6 +252,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const handleCloseModalConfirm = () => {
     setOpenModalConfirmDelete(false);
   };
+
+  const payLoadSearch = useAppSelector((state) => state.saveSearchPurchaseBranchRequest.searchPurchaseBranchRequest);
   const handleDeletePurchaseBR = async () => {
     handleCloseModalConfirm();
     setOpenLoadingModal(true);
@@ -260,8 +263,10 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้ยกเลิกข้อมูลเรียบร้อยแล้ว');
 
+        dispatch(featchSearchPurchaseBranchRequestAsync(payLoadSearch));
+
         setTimeout(() => {
-          handleChkSaveClose();
+          handleClose();
         }, 300);
       })
       .catch((error: ApiError) => {
@@ -354,7 +359,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   className={classes.MbtnClear}
                   startIcon={<CheckCircle />}
                   color='primary'
-                  disabled={Object.keys(payloadAddItem).length === 0}>
+                  // disabled={Object.keys(payloadAddItem).length === 0}
+                  disabled={true}>
                   ส่งรายการ
                 </Button>
                 <Button

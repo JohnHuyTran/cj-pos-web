@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import { Box, Button, FormControl, MenuItem, Select } from '@mui/material';
@@ -83,22 +83,13 @@ function PurchaseBranchRequest() {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const pi = getUserInfo().group === PERMISSION_GROUP.PI;
     const pcm = getUserInfo().group === PERMISSION_GROUP.PCM;
-
-    if (pi) {
-      setIsAuthorizedBranch(!pi);
-    }
-
-    if (pcm) {
-      setIsAuthorizedBranch(!pcm);
-    }
-
-    if (groupBranch) {
-      setValues({ ...values, branchCode: ownBranch });
-    }
-  });
+    if (pi) setIsAuthorizedBranch(!pi);
+    if (pcm) setIsAuthorizedBranch(!pcm);
+    if (groupBranch) setValues({ ...values, branchCode: ownBranch });
+  }, [branchList]);
 
   const handleChange = (event: any) => {
     const value = event.target.value;
