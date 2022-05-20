@@ -70,6 +70,8 @@ import stockMovementSearchSlice from './slices/stock/stock-movement-search-slice
 import stockBalanceNegativeSearchSlice from './slices/stock/stock-balance-negative-search-slice';
 import masterStockMovementTypeSlice from './slices/master/stock-movement-type-slice';
 import purchaseBRDetailSlice from './slices/purchase/purchase-branch-request-detail-slice';
+import purchaseBranchRequestSlice from './slices/purchase-branch-request-slice';
+import saveSearchPurchaseBranchRequest from './slices/save-search-purchase-branch-request-slice';
 const store = configureStore({
   reducer: {
     auth: authSlice,
@@ -142,6 +144,8 @@ const store = configureStore({
     stockBalanceNegativeSearchSlice: stockBalanceNegativeSearchSlice,
     masterStockMovementTypeSlice: masterStockMovementTypeSlice,
     purchaseBRDetailSlice: purchaseBRDetailSlice,
+    purchaseBranchRequestSlice: purchaseBranchRequestSlice,
+    saveSearchPurchaseBranchRequest: saveSearchPurchaseBranchRequest,
   },
 });
 
