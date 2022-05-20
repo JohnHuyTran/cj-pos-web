@@ -9,7 +9,8 @@ import {
   RadioGroup,
   FormControlLabel,
   Typography,
-  FormControl, Link,
+  FormControl,
+  Link,
 } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -27,13 +28,15 @@ import {
   saveBarcodeDiscount,
   updateDataDetail,
   updateErrorList,
-  updateCheckEdit, updateApproveReject,
+  updateCheckEdit,
+  updateApproveReject,
 } from '../../store/slices/barcode-discount-slice';
 import {
   sendForApprovalBarcodeDiscount,
   cancelBarcodeDiscount,
   saveDraftBarcodeDiscount,
-  approveBarcodeDiscount, uploadAttachFile,
+  approveBarcodeDiscount,
+  uploadAttachFile,
 } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
@@ -43,18 +46,18 @@ import ModalCheckStock from './modal-check-stock';
 import ModalCheckPrice from './modal-check-price';
 import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 import SnackbarStatus from '../commons/ui/snackbar-status';
-import { ACTIONS } from "../../utils/enum/permission-enum";
-import ModalReject from "./modal-reject";
-import { PrintSharp } from "@mui/icons-material";
-import ModalConfirmPrintedBarcode from "./modal-confirm-printed-barcode";
+import { ACTIONS } from '../../utils/enum/permission-enum';
+import ModalReject from './modal-reject';
+import { PrintSharp } from '@mui/icons-material';
+import ModalConfirmPrintedBarcode from './modal-confirm-printed-barcode';
 
-import { getReasonForPrintText } from "../../utils/enum/barcode-discount-enum";
-import { getBarcodeDiscountDetail } from "../../store/slices/barcode-discount-detail-slice";
-import { uploadFileState } from "../../store/slices/upload-file-slice";
-import AccordionUploadFile from "../commons/ui/accordion-upload-file";
-import { getUserInfo } from "../../store/sessionStore";
-import { checkStockBalance } from "../../services/common";
-import { updateCheckStock } from "../../store/slices/stock-balance-check-slice";
+import { getReasonForPrintText } from '../../utils/enum/barcode-discount-enum';
+import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-detail-slice';
+import { uploadFileState } from '../../store/slices/upload-file-slice';
+import AccordionUploadFile from '../commons/ui/accordion-upload-file';
+import { getUserInfo } from '../../store/sessionStore';
+import { checkStockBalance } from '../../services/common';
+import { updateCheckStock } from '../../store/slices/stock-balance-check-slice';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 interface Props {
@@ -70,14 +73,14 @@ interface Props {
 const _ = require('lodash');
 
 export default function ModalCreateBarcodeDiscount({
-                                                     isOpen,
-                                                     onClickClose,
-                                                     setOpenPopup,
-                                                     action,
-                                                     setPopupMsg,
-                                                     onSearchBD,
-                                                     userPermission,
-                                                   }: Props): ReactElement {
+  isOpen,
+  onClickClose,
+  setOpenPopup,
+  action,
+  setPopupMsg,
+  onSearchBD,
+  userPermission,
+}: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
 
   const [valueRadios, setValueRadios] = React.useState<string>('percent');
@@ -107,10 +110,12 @@ export default function ModalCreateBarcodeDiscount({
   //get detail from search
   const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail.data);
   //permission
-  const [approvePermission, setApprovePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
-    ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false);
-  const [printPermission, setPrintPermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
-    ? userPermission.includes(ACTIONS.CAMPAIGN_BD_PRINT) : false);
+  const [approvePermission, setApprovePermission] = useState<boolean>(
+    userPermission != null && userPermission.length > 0 ? userPermission.includes(ACTIONS.CAMPAIGN_BD_APPROVE) : false
+  );
+  const [printPermission, setPrintPermission] = useState<boolean>(
+    userPermission != null && userPermission.length > 0 ? userPermission.includes(ACTIONS.CAMPAIGN_BD_PRINT) : false
+  );
   //print barcode
   const barcodeDiscountPrint = useAppSelector((state) => state.barcodeDiscountPrintSlice.state);
   const printInDetail = useAppSelector((state) => state.barcodeDiscountPrintSlice.inDetail);
@@ -122,7 +127,7 @@ export default function ModalCreateBarcodeDiscount({
     ids: '',
     lstProductNotPrinted: [],
     lstProductPrintAgain: [],
-    lstProductPrint: []
+    lstProductPrint: [],
   });
   const [openModalPrint, setOpenModalPrint] = React.useState(false);
   const [printHistoryRows, setPrintHistoryRows] = React.useState<any>([]);
@@ -130,11 +135,18 @@ export default function ModalCreateBarcodeDiscount({
   const [attachFileOlds, setAttachFileOlds] = React.useState<any>([]);
   const [attachFileError, setAttachFileError] = React.useState('');
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
-  const [alertTextError, setAlertTextError] = React.useState('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+  const [alertTextError, setAlertTextError] = React.useState(
+    'กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง'
+  );
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
-    ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
-  const [branchCodeCheckStock, setBranchCodeCheckStock] = React.useState(getUserInfo().branch ? getUserInfo().branch : '');
+  const [currentBranch, setCurrentBranch] = React.useState(
+    branchList && branchList.length > 0 && getUserInfo().branch
+      ? getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)
+      : ''
+  );
+  const [branchCodeCheckStock, setBranchCodeCheckStock] = React.useState(
+    getUserInfo().branch ? getUserInfo().branch : ''
+  );
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -260,8 +272,10 @@ export default function ModalCreateBarcodeDiscount({
     if (Action.UPDATE === action && !objectNullOrEmpty(barcodeDiscountDetail)) {
       setValueRadios(barcodeDiscountDetail.percentDiscount ? 'percent' : 'amount');
       //set current branch
-      let currentBranch = stringNullOrEmpty(barcodeDiscountDetail.branchCode) ? '' : (barcodeDiscountDetail.branchCode);
-      currentBranch += (stringNullOrEmpty(barcodeDiscountDetail.branchName) ? '' : (' - ' + barcodeDiscountDetail.branchName));
+      let currentBranch = stringNullOrEmpty(barcodeDiscountDetail.branchCode) ? '' : barcodeDiscountDetail.branchCode;
+      currentBranch += stringNullOrEmpty(barcodeDiscountDetail.branchName)
+        ? ''
+        : ' - ' + barcodeDiscountDetail.branchName;
       setCurrentBranch(currentBranch);
       if (!stringNullOrEmpty(barcodeDiscountDetail.branchCode)) {
         setBranchCodeCheckStock(barcodeDiscountDetail.branchCode);
@@ -281,7 +295,7 @@ export default function ModalCreateBarcodeDiscount({
       dispatch(
         updateApproveReject({
           ...approveReject,
-          approvalNote: barcodeDiscountDetail.rejectReason
+          approvalNote: barcodeDiscountDetail.rejectReason,
         })
       );
       //set value for attach files
@@ -294,7 +308,7 @@ export default function ModalCreateBarcodeDiscount({
             fileName: item.name,
             status: 'old',
             mimeType: item.mimeType,
-            branchCode: item.branchCode
+            branchCode: item.branchCode,
           });
         }
         setAttachFileOlds(lstAttachFile);
@@ -311,8 +325,10 @@ export default function ModalCreateBarcodeDiscount({
             unitPrice: item.price || 0,
             discount: item.requestedDiscount || 0,
             qty: item.numberOfDiscounted || 0,
-            numberOfApproved: (Number(BDStatus.WAIT_FOR_APPROVAL) == barcodeDiscountDetail.status && approvePermission)
-              ? (item.numberOfDiscounted || 0) : (item.numberOfApproved || 0),
+            numberOfApproved:
+              Number(BDStatus.WAIT_FOR_APPROVAL) == barcodeDiscountDetail.status && approvePermission
+                ? item.numberOfDiscounted || 0
+                : item.numberOfApproved || 0,
             expiryDate: item.expiredDate,
             skuCode: item.skuCode,
           });
@@ -336,11 +352,12 @@ export default function ModalCreateBarcodeDiscount({
             sequence: itemH.sequence,
             printBy: itemH.printBy,
             position: itemH.position,
-            printingReason: (1 == itemH.printingTime) ? getReasonForPrintText('1') : getReasonForPrintText(itemH.printingReason),
+            printingReason:
+              1 == itemH.printingTime ? getReasonForPrintText('1') : getReasonForPrintText(itemH.printingReason),
             printingTime: itemH.printingTime,
             printedTime: moment(itemH.printedTime).format(DateFormat.DATE_TIME_DISPLAY_FORMAT),
             numberOfPrinting: itemH.numberOfPrinting,
-            listOfProduct: itemH.listOfProduct
+            listOfProduct: itemH.listOfProduct,
           };
         });
         setPrintHistoryRows(rows);
@@ -350,16 +367,23 @@ export default function ModalCreateBarcodeDiscount({
 
   const genStatusIncludeExpiredCase = (rowData: any) => {
     let status = rowData.status;
-    if (rowData.products && rowData.products.length > 0
-      && (Number(BDStatus.APPROVED) == rowData.status || Number(BDStatus.BARCODE_PRINTED) == rowData.status)) {
-      let productPassValidation = rowData.products.filter((itPro: any) => itPro.numberOfApproved > 0
-        && !stringNullOrEmpty(itPro.expiredDate) && moment(itPro.expiredDate).isSameOrAfter(moment(new Date()), 'day'));
+    if (
+      rowData.products &&
+      rowData.products.length > 0 &&
+      (Number(BDStatus.APPROVED) == rowData.status || Number(BDStatus.BARCODE_PRINTED) == rowData.status)
+    ) {
+      let productPassValidation = rowData.products.filter(
+        (itPro: any) =>
+          itPro.numberOfApproved > 0 &&
+          !stringNullOrEmpty(itPro.expiredDate) &&
+          moment(itPro.expiredDate).isSameOrAfter(moment(new Date()), 'day')
+      );
       if (productPassValidation.length === 0) {
         status = Number(BDStatus.ALREADY_EXPIRED);
       }
     }
     return status;
-  }
+  };
 
   const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (errorList && errorList.length > 0) {
@@ -423,10 +447,7 @@ export default function ModalCreateBarcodeDiscount({
               item.errorDiscount = 'ยอดลดต้องไม่เกิน 100%';
             }
           } else {
-            if (
-              preData.requestedDiscount <= 0 ||
-              !preData.requestedDiscount
-            ) {
+            if (preData.requestedDiscount <= 0 || !preData.requestedDiscount) {
               isValid = false;
               item.errorDiscount = 'ยอดลดต้องมากกว่า 0';
             } else if (preData.requestedDiscount >= preData.price) {
@@ -455,7 +476,7 @@ export default function ModalCreateBarcodeDiscount({
       dataAfterValidate = dt;
     }
     return isValid;
-  }
+  };
 
   const handleOnChangeUploadFile = (status: boolean) => {
     setUploadFileFlag(status);
@@ -483,7 +504,7 @@ export default function ModalCreateBarcodeDiscount({
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   const handleCreateDraft = async (sendRequest: boolean) => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
@@ -507,7 +528,7 @@ export default function ModalCreateBarcodeDiscount({
               key: oldFile.fileKey,
               name: oldFile.fileName,
               mimeType: oldFile.mimeType,
-              branchCode: oldFile.branchCode
+              branchCode: oldFile.branchCode,
             });
           }
         }
@@ -518,15 +539,15 @@ export default function ModalCreateBarcodeDiscount({
         try {
           const body = !!dataDetail.id
             ? {
-              ...payloadBarcodeDiscount,
-              id: dataDetail.id,
-              documentNumber: dataDetail.documentNumber,
-              attachFiles: allAttachFile
-            }
+                ...payloadBarcodeDiscount,
+                id: dataDetail.id,
+                documentNumber: dataDetail.documentNumber,
+                attachFiles: allAttachFile,
+              }
             : {
-              ...payloadBarcodeDiscount,
-              attachFiles: allAttachFile
-            };
+                ...payloadBarcodeDiscount,
+                attachFiles: allAttachFile,
+              };
           const rs = await saveDraftBarcodeDiscount(body);
           if (rs.code === 201) {
             if (!sendRequest) {
@@ -545,7 +566,7 @@ export default function ModalCreateBarcodeDiscount({
                     fileName: item.name,
                     status: 'old',
                     mimeType: item.mimeType,
-                    branchCode: item.branchCode
+                    branchCode: item.branchCode,
                   });
                 }
                 await setUploadFileFlag(true);
@@ -737,7 +758,12 @@ export default function ModalCreateBarcodeDiscount({
           lstProductPrintAgain.push(itPro);
         }
       }
-    } else if (Number(BDStatus.BARCODE_PRINTED) == status && barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail) {
+    } else if (
+      Number(BDStatus.BARCODE_PRINTED) == status &&
+      barcodeDiscountPrint &&
+      barcodeDiscountPrint.length > 0 &&
+      printInDetail
+    ) {
       for (const itPro of products) {
         if (!stringNullOrEmpty(itPro.expiryDate) && moment(itPro.expiryDate).isBefore(moment(new Date()), 'day')) {
           itPro.barcode = itPro.barCode;
@@ -753,7 +779,7 @@ export default function ModalCreateBarcodeDiscount({
           ...product,
           barcode: product.barCode,
           productName: product.barcodeName,
-        }))
+        }));
     }
 
     let ids = [];
@@ -767,7 +793,7 @@ export default function ModalCreateBarcodeDiscount({
       printInDetail: printInDetail,
       lstProductNotPrinted: lstProductNotPrinted,
       lstProductPrintAgain: lstProductPrintAgain,
-      lstProductPrint: lstProductPrint
+      lstProductPrint: lstProductPrint,
     });
     handleOpenModalPrint();
   };
@@ -802,12 +828,12 @@ export default function ModalCreateBarcodeDiscount({
           printNormal: false,
           printInDetail: printInDetail,
           lstProductNotPrinted: [],
-          lstProductPrintAgain: lstProductPrintHistory
+          lstProductPrintAgain: lstProductPrintHistory,
         });
         handleOpenModalPrint();
       }
     }
-  }
+  };
 
   const printHistoryColumns: GridColDef[] = [
     {
@@ -818,19 +844,19 @@ export default function ModalCreateBarcodeDiscount({
       flex: 0.5,
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
+            <Typography variant='body2' noWrap>
               <b>{'ลำดับ'}</b>
             </Typography>
           </div>
         );
-      }
+      },
     },
     {
       field: 'printBy',
@@ -842,12 +868,12 @@ export default function ModalCreateBarcodeDiscount({
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
+            <Typography variant='body2' noWrap>
               <b>{'ชื่อผู้ทำรายการ'}</b>
             </Typography>
           </div>
         );
-      }
+      },
     },
     {
       field: 'position',
@@ -858,12 +884,12 @@ export default function ModalCreateBarcodeDiscount({
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
+            <Typography variant='body2' noWrap>
               <b>{'ตำแหน่ง'}</b>
             </Typography>
           </div>
         );
-      }
+      },
     },
     {
       field: 'printingReason',
@@ -874,12 +900,12 @@ export default function ModalCreateBarcodeDiscount({
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
+            <Typography variant='body2' noWrap>
               <b>{'เหตุผลที่ทำการพิมพ์บาร์โค้ด'}</b>
             </Typography>
           </div>
         );
-      }
+      },
     },
     {
       field: 'numberOfPrinting',
@@ -889,9 +915,11 @@ export default function ModalCreateBarcodeDiscount({
       flex: 0.8,
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
-          <Link href="#" underline="always"
-                onClick={() => onShowPrintedHistory(params.getValue(params.id, 'sequence') || '')}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
+          <Link
+            href='#'
+            underline='always'
+            onClick={() => onShowPrintedHistory(params.getValue(params.id, 'sequence') || '')}>
             {params.value}
           </Link>
         </Box>
@@ -899,15 +927,15 @@ export default function ModalCreateBarcodeDiscount({
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
+            <Typography variant='body2' noWrap>
               <b>{'รายการส่วนลด'}</b>
             </Typography>
-            <Typography variant="body2" noWrap>
+            <Typography variant='body2' noWrap>
               <b>{'ที่พิมพ์'}</b>
             </Typography>
           </div>
         );
-      }
+      },
     },
     {
       field: 'printingTime',
@@ -919,12 +947,12 @@ export default function ModalCreateBarcodeDiscount({
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
+            <Typography variant='body2' noWrap>
               <b>{'พิมพ์ครั้งที่'}</b>
             </Typography>
           </div>
         );
-      }
+      },
     },
     {
       field: 'printedTime',
@@ -936,13 +964,13 @@ export default function ModalCreateBarcodeDiscount({
       renderHeader: (params) => {
         return (
           <div style={{ color: '#36C690' }}>
-            <Typography variant="body2" noWrap>
+            <Typography variant='body2' noWrap>
               <b>{'พิมพ์วันที่/เวลา'}</b>
             </Typography>
           </div>
         );
-      }
-    }
+      },
+    },
   ];
 
   return (
@@ -950,7 +978,7 @@ export default function ModalCreateBarcodeDiscount({
       <Dialog open={open} maxWidth='xl' fullWidth>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCloseModalCreate}>
           <Typography sx={{ fontSize: '1em' }}>ส่วนลดสินค้า</Typography>
-          <StepperBar activeStep={status} setActiveStep={setStatus}/>
+          <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container sx={{ paddingTop: '50px' }}>
@@ -988,7 +1016,7 @@ export default function ModalCreateBarcodeDiscount({
             </Grid>
             <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
-                ยอดลด<b style={{ fontSize:'18px' }}> *</b> :
+                ยอดลด<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>
               <Grid item xs={8} sx={{ marginTop: '-8px' }}>
                 <FormControl component='fieldset' disabled={dataDetail.status > 1}>
@@ -1002,22 +1030,21 @@ export default function ModalCreateBarcodeDiscount({
                     }}>
                     <FormControlLabel
                       value='percent'
-                      control={<Radio disabled={status > 1}/>}
+                      control={<Radio disabled={status > 1} />}
                       label='ยอดลดเป็นเปอร์เซ็น (%)'
                     />
                     <FormControlLabel
                       value='amount'
-                      control={<Radio disabled={status > 1}/>}
+                      control={<Radio disabled={status > 1} />}
                       label='ยอดลดแบบ 5-7 เดือน เป็นจำนวนเงิน(บาท)'
                     />
                   </RadioGroup>
                 </FormControl>
               </Grid>
             </Grid>
-            <Grid container item xs={6}
-                  sx={{ marginBottom: '15px' }}>
+            <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
-                แนบรูปสินค้าขอส่วนลด<b style={{ fontSize:'18px' }}> *</b> :
+                แนบรูปสินค้าขอส่วนลด<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>
               <Grid item xs={8}>
                 <AccordionUploadFile
@@ -1043,10 +1070,14 @@ export default function ModalCreateBarcodeDiscount({
                   className={classes.MbtnSearch}
                   onClick={onPrintedBarcode}
                   disabled={!(barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail)}
-                  startIcon={<PrintSharp/>}
+                  startIcon={<PrintSharp />}
                   sx={{ width: '208px' }}
-                  style={{ display: (status >= Number(BDStatus.APPROVED) && status != Number(BDStatus.REJECT) && printPermission) ? undefined : 'none' }}
-                >
+                  style={{
+                    display:
+                      status >= Number(BDStatus.APPROVED) && status != Number(BDStatus.REJECT) && printPermission
+                        ? undefined
+                        : 'none',
+                  }}>
                   พิมพ์บาร์โค้ด
                 </Button>
                 <Button
@@ -1054,10 +1085,12 @@ export default function ModalCreateBarcodeDiscount({
                   variant='contained'
                   color='info'
                   className={classes.MbtnSearch}
-                  startIcon={<AddCircleOutlineOutlinedIcon/>}
+                  startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
-                  style={{ display: (status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission) ? 'none' : undefined }}
+                  style={{
+                    display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission ? 'none' : undefined,
+                  }}
                   disabled={status > 1}>
                   เพิ่มสินค้า
                 </Button>
@@ -1067,9 +1100,11 @@ export default function ModalCreateBarcodeDiscount({
                   id='btnSaveDraft'
                   variant='contained'
                   color='warning'
-                  startIcon={<SaveIcon/>}
+                  startIcon={<SaveIcon />}
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
-                  style={{ display: (status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission) ? 'none' : undefined }}
+                  style={{
+                    display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission ? 'none' : undefined,
+                  }}
                   onClick={() => handleCreateDraft(false)}
                   className={classes.MbtnSearch}>
                   บันทึก
@@ -1080,8 +1115,10 @@ export default function ModalCreateBarcodeDiscount({
                   color='primary'
                   sx={{ margin: '0 17px' }}
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
-                  style={{ display: (status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission) ? 'none' : undefined }}
-                  startIcon={<CheckCircleOutlineIcon/>}
+                  style={{
+                    display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission ? 'none' : undefined,
+                  }}
+                  startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleSendRequest}
                   className={classes.MbtnSearch}>
                   ขออนุมัติ
@@ -1091,8 +1128,10 @@ export default function ModalCreateBarcodeDiscount({
                   variant='contained'
                   color='error'
                   disabled={status > 1}
-                  style={{ display: (status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission) ? 'none' : undefined }}
-                  startIcon={<HighlightOffIcon/>}
+                  style={{
+                    display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission ? 'none' : undefined,
+                  }}
+                  startIcon={<HighlightOffIcon />}
                   onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
                   ยกเลิก
@@ -1100,10 +1139,12 @@ export default function ModalCreateBarcodeDiscount({
                 <Button
                   id='btnApprove'
                   sx={{ margin: '0 17px' }}
-                  style={{ display: (status == Number(BDStatus.WAIT_FOR_APPROVAL) && approvePermission) ? undefined : 'none' }}
+                  style={{
+                    display: status == Number(BDStatus.WAIT_FOR_APPROVAL) && approvePermission ? undefined : 'none',
+                  }}
                   variant='contained'
                   color='primary'
-                  startIcon={<CheckCircleOutlineIcon/>}
+                  startIcon={<CheckCircleOutlineIcon />}
                   onClick={() => handleOpenModalConfirmApprove(false)}
                   className={classes.MbtnSearch}>
                   อนุมัติ
@@ -1111,9 +1152,11 @@ export default function ModalCreateBarcodeDiscount({
                 <Button
                   id='btnReject'
                   variant='contained'
-                  style={{ display: (status == Number(BDStatus.WAIT_FOR_APPROVAL) && approvePermission) ? undefined : 'none' }}
+                  style={{
+                    display: status == Number(BDStatus.WAIT_FOR_APPROVAL) && approvePermission ? undefined : 'none',
+                  }}
                   color='error'
-                  startIcon={<HighlightOffIcon/>}
+                  startIcon={<HighlightOffIcon />}
                   onClick={handleReject}
                   className={classes.MbtnSearch}>
                   ไม่อนุมัติ
@@ -1121,18 +1164,24 @@ export default function ModalCreateBarcodeDiscount({
               </Box>
             </Box>
             <Box>
-              <ModalBacodeTransferItem id='' typeDiscount={valueRadios} action={action}
-                                       userPermission={userPermission}/>
+              <ModalBacodeTransferItem
+                id=''
+                typeDiscount={valueRadios}
+                action={action}
+                userPermission={userPermission}
+              />
             </Box>
             <Box hidden={status !== Number(BDStatus.BARCODE_PRINTED)}>
               <Typography>ประวัติการพิมพ์บาร์โค้ด</Typography>
-              <DataGrid rows={printHistoryRows}
-                        columns={printHistoryColumns}
-                        className={classes.MdataGridDetail}
-                        disableColumnMenu
-                        hideFooter
-                        autoHeight
-                        rowHeight={70}/>
+              <DataGrid
+                rows={printHistoryRows}
+                columns={printHistoryColumns}
+                className={classes.MdataGridDetail}
+                disableColumnMenu
+                hideFooter
+                autoHeight
+                rowHeight={70}
+              />
             </Box>
           </Box>
         </DialogContent>
@@ -1143,7 +1192,11 @@ export default function ModalCreateBarcodeDiscount({
         onClose={handleModelAddItems}
         requestBody={{
           skuCodes: [],
-        }}/>
+          skuTypes: [2],
+          isSellable: true,
+        }}
+      />
+
       <ModelConfirm
         open={openModalCancel}
         onClose={handleCloseModalCancel}
@@ -1152,12 +1205,8 @@ export default function ModalCreateBarcodeDiscount({
         headerTitle={'ยืนยันยกเลิกขอส่วนลดสินค้า'}
         documentField={'เลขที่เอกสาร BD'}
       />
-      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
-      <AlertError
-        open={openModalError}
-        onClose={handleCloseModalError}
-        textError={alertTextError}
-      />
+      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
+      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError} />
       <ModalCheckStock
         open={openCheckStock}
         onClose={() => {
@@ -1165,8 +1214,8 @@ export default function ModalCreateBarcodeDiscount({
         }}
         headerTitle={'จำนวนที่ขอลดเกินจำนวนสินค้าในสต๊อก'}
       />
-      <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts}/>
-      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
+      <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts} />
+      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
       <ModelConfirm
         open={openModalConfirmApprove}
         onClose={() => handleCloseModalConfirmApprove(false)}
@@ -1181,10 +1230,11 @@ export default function ModalCreateBarcodeDiscount({
         barCode={dataDetail.documentNumber}
         id={dataDetail.id}
       />
-      <ModalConfirmPrintedBarcode onClose={handleCloseModalPrint}
-                                  onConfirm={onConfirmModalPrint}
-                                  open={openModalPrint}
-                                  values={valuePrints}
+      <ModalConfirmPrintedBarcode
+        onClose={handleCloseModalPrint}
+        onConfirm={onConfirmModalPrint}
+        open={openModalPrint}
+        values={valuePrints}
       />
     </div>
   );

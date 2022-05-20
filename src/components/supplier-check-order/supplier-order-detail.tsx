@@ -334,7 +334,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     if (purchaseDetail.piType === 1 && purchaseDetail.piStatus === 0) {
       dispatch(featchItemBySupplierListAsync(purchaseDetail.supplierCode));
     }
-    if (purchaseDetail.piStatus === 1) {
+    if (purchaseDetail.piStatus === 1 || purchaseDetail.piStatus === 9) {
       setTotalAmount(purchaseDetail.amountText.totalAmount);
       setVat(purchaseDetail.amountText.vat);
       setVatRate(purchaseDetail.amountText.vatRate);

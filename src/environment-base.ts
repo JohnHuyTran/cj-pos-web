@@ -228,6 +228,17 @@ export const environment = {
         url: '/purchase/purchase-note/export/{pnNo}',
       },
     },
+    purchaseBranchRequest: {
+      detail: {
+        url: '/purchase/purchase-branch-request/{docNo}',
+      },
+      save: {
+        url: '/purchase/purchase-branch-request/save',
+      },
+      delete: {
+        url: '/purchase/purchase-branch-request/{docNo}/delete',
+      },
+    },
   },
   products: {
     type: {
