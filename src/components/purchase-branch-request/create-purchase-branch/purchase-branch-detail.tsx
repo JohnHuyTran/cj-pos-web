@@ -183,7 +183,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
   };
-  const handleModelAddItems = async () => {
+  const handleModelCloseAddItems = async () => {
+    if (Object.keys(payloadAddItem).length !== 0) setFlagSave(true);
     setOpenModelAddItems(false);
   };
   const handleChangeItems = async () => {
@@ -390,7 +391,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
 
           <ModalAddItems
             open={openModelAddItems}
-            onClose={handleModelAddItems}
+            onClose={handleModelCloseAddItems}
             requestBody={{
               skuCodes: [],
               skuTypes: [3, 6],

@@ -229,6 +229,9 @@ export const environment = {
       },
     },
     purchaseBranchRequest: {
+      search: {
+        url: '/purchase/purchase-branch-request',
+      },
       detail: {
         url: '/purchase/purchase-branch-request/{docNo}',
       },
