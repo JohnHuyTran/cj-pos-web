@@ -5,8 +5,10 @@ import { OutstandingRequest, StockInfo } from '../../models/stock-model';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { SearchOff } from '@mui/icons-material';
-import { savePayloadSearch } from '../../store/slices/stock/stock-balance-search-slice';
-import { featchStockBalanceNegativeSearchAsync } from '../../store/slices/stock/stock-balance-negative-search-slice';
+import {
+  featchStockBalanceNegativeSearchAsync,
+  savePayloadSearchNegative,
+} from '../../store/slices/stock/stock-balance-negative-search-slice';
 import { numberWithCommas } from '../../utils/utils';
 
 function StockBalance() {
@@ -113,7 +115,7 @@ function StockBalance() {
     };
 
     await dispatch(featchStockBalanceNegativeSearchAsync(payloadNewpage));
-    await dispatch(savePayloadSearch(payloadNewpage));
+    await dispatch(savePayloadSearchNegative(payloadNewpage));
   };
 
   return (

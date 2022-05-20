@@ -159,7 +159,9 @@ function StockSearch() {
   });
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const page = 1;
-  const limit = useAppSelector((state) => state.stockBalanceSearchSlice.stockList.perPage);
+  const limitSearchStock = useAppSelector((state) => state.stockBalanceSearchSlice.savePayloadSearch.limit);
+  const limitSearchNegative = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.savePayloadSearch.limit);
+  const limitSearchLocation = useAppSelector((state) => state.stockBalanceLocationSearchSlice.savePayloadSearch.limit);
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
 
@@ -191,12 +193,6 @@ function StockSearch() {
   const onClickSearchBtn = async () => {
     if (isValidateInput()) {
       handleOpenLoading('open', true);
-      let limits: number;
-      if (limit === 0 || limit === undefined) {
-        limits = 10;
-      } else {
-        limits = limit;
-      }
       const productList: string[] = [];
       await payloadAddTypeProduct
         .filter((el: any) => el.selectedType === 2 && el.showProduct)
@@ -205,10 +201,16 @@ function StockSearch() {
         });
       const filterSKU = _.uniq(productList);
 
-      setLimitsSearch(limits);
+      // setLimitsSearch(limits);
       setFilterSKUSearch(filterSKU);
 
       if (value === 0) {
+        let limits: number;
+        if (limitSearchStock === 0 || limitSearchStock === undefined) {
+          limits = 10;
+        } else {
+          limits = limitSearchStock;
+        }
         await searchStockBalance(limits, filterSKU);
 
         setFlagSearchNegative(false);
@@ -217,6 +219,12 @@ function StockSearch() {
         setFlagSearchTabNegative(false);
         setFlagSearchTabLocation(false);
       } else if (value === 1) {
+        let limits: number;
+        if (limitSearchNegative === 0 || limitSearchNegative === undefined) {
+          limits = 10;
+        } else {
+          limits = limitSearchNegative;
+        }
         await searchStockBalanceNegative(limits, filterSKU);
         setFlagSearchTabNegative(true);
 
@@ -225,6 +233,12 @@ function StockSearch() {
         await dispatch(clearDataFilter());
         await dispatch(clearDataLocationFilter());
       } else if (value === 2) {
+        let limits: number;
+        if (limitSearchLocation === 0 || limitSearchLocation === undefined) {
+          limits = 10;
+        } else {
+          limits = limitSearchLocation;
+        }
         await searchStockBalanceLocation(limits, filterSKU);
         setFlagSearchTabLocation(true);
 
