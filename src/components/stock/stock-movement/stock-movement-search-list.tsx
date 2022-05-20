@@ -100,11 +100,11 @@ function StockMovementSearchList() {
       field: 'index',
       headerClassName: 'columnHeaderTitle',
       headerName: 'ลำดับ',
-      width: 70,
+      width: 65,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -113,20 +113,17 @@ function StockMovementSearchList() {
       field: 'createDate',
       headerClassName: 'columnHeaderTitle',
       headerName: 'วันที่ทำรายการ',
-      minWidth: 132,
-      flex: 0.35,
+      minWidth: 148,
+      // flex: 0.35,
       headerAlign: 'center',
       sortable: false,
+      align: 'center',
       renderCell: (params) => {
         const date = params.value?.toString();
         return (
-          <div
-            style={{
-              textAlign: 'center',
-            }}
-          >
-            {`${moment(date).add(543, 'year').format('DD/MM/YYYY')} ${moment(date).format('HH:mm')}`}
-          </div>
+          <Typography>{`${moment(date).add(543, 'year').format('DD/MM/YYYY')} ${moment(date).format(
+            'HH:mm'
+          )}`}</Typography>
         );
       },
     },
@@ -136,7 +133,7 @@ function StockMovementSearchList() {
       headerName: 'เลขที่เอกสาร',
       headerAlign: 'center',
       flex: 0.35,
-      minWidth: 180,
+      minWidth: 165,
       sortable: false,
       renderCell: (params) => {
         const docNo: string =
@@ -158,11 +155,10 @@ function StockMovementSearchList() {
         if (params.getValue(params.id, 'movementAction') === true && docNo) {
           return (
             <Typography
-              color="secondary"
-              variant="body2"
+              color='secondary'
+              variant='body2'
               sx={{ textDecoration: 'underline' }}
-              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}
-            >
+              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}>
               {params.value}
             </Typography>
           );
@@ -175,7 +171,7 @@ function StockMovementSearchList() {
       field: 'docRefNo',
       headerClassName: 'columnHeaderTitle',
       headerName: 'เลขที่เอกสารอ้างอิง',
-      minWidth: 130,
+      minWidth: 145,
       flex: 0.35,
       headerAlign: 'center',
       sortable: false,
@@ -184,15 +180,19 @@ function StockMovementSearchList() {
       field: 'locationCode',
       headerClassName: 'columnHeaderTitle',
       headerName: 'คลัง',
-      minWidth: 85,
+      width: 70,
       headerAlign: 'center',
       sortable: false,
+      align: 'right',
+      renderCell: (params) => {
+        return params.value;
+      },
     },
     {
       field: 'movementTypeName',
       headerClassName: 'columnHeaderTitle',
       headerName: 'ประเภท',
-      width: 100,
+      // width: 100,
       flex: 0.65,
       headerAlign: 'center',
       align: 'left',
@@ -202,8 +202,8 @@ function StockMovementSearchList() {
       field: 'movementQty',
       headerClassName: 'columnHeaderTitle',
       headerName: 'จำนวนที่ทำรายการ',
-      minWidth: 100,
-      flex: 0.3,
+      minWidth: 140,
+      // flex: 0.3,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
@@ -213,8 +213,8 @@ function StockMovementSearchList() {
       headerClassName: 'columnHeaderTitle-BG',
       cellClassName: 'columnFilled-BG',
       headerName: 'สินค้าคงเหลือ',
-      minWidth: 100,
-      flex: 0.25,
+      minWidth: 115,
+      // flex: 0.25,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
@@ -413,7 +413,7 @@ function StockMovementSearchList() {
     <React.Fragment>
       <Box
         mt={2}
-        bgcolor="background.paper"
+        bgcolor='background.paper'
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -425,8 +425,7 @@ function StockMovementSearchList() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}
-      >
+        }}>
         <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -439,7 +438,7 @@ function StockMovementSearchList() {
             pageSize={pageSize}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={items.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             onCellClick={currentlySelected}
