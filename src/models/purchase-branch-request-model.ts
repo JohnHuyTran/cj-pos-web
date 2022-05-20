@@ -24,6 +24,7 @@ export interface PurchaseBranchSearchrResponse {
 export interface PurChaseBranchInfo {
   docNo: string;
   branchCode: string;
+  branchName: string;
   status: string;
   createdBy: string;
   createByFullName: string;

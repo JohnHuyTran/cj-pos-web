@@ -23,6 +23,7 @@ import { featchSearchPurchaseBranchRequestAsync } from '../../../store/slices/pu
 import { saveSearchPurchaseBranch } from '../../../store/slices/save-search-purchase-branch-request-slice';
 import { PurchaseBranchSearchRequest } from '../../../models/purchase-branch-request-model';
 import AlertError from '../../commons/ui/alert-error';
+import PurchaseBranchRequestList from '../create-purchase-branch/purchase-branch-request-list';
 
 interface State {
   docNo: string;
@@ -40,6 +41,9 @@ function PurchaseBranchRequest() {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const page = '1';
+  const limit = useAppSelector((state) => state.purchaseBranchRequestSlice.orderList.perPage);
+  const items = useAppSelector((state) => state.purchaseBranchRequestSlice);
+  const dataList = items.orderList.data;
 
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
@@ -138,13 +142,11 @@ function PurchaseBranchRequest() {
 
   const onClickSearchBtn = async () => {
     let limits;
-    // if (limit === 0) {
-    //   limits = '10';
-    // } else {
-    //   limits = limit.toString();
-    // }
-
-    limits = '10';
+    if (limit === 0) {
+      limits = '10';
+    } else {
+      limits = limit.toString();
+    }
 
     const payload: PurchaseBranchSearchRequest = {
       limit: limits,
@@ -178,19 +180,18 @@ function PurchaseBranchRequest() {
       status: 'ALL',
     });
 
-    // const payload: StockTransferRequest = {
-    //     limit: limit ? limit.toString() : '10',
-    //     page: page,
-    //     docNo: values.docNo,
-    //     branchFrom: values.branchFrom,
-    //     branchTo: values.branchTo,
-    //     dateFrom: moment(startDate).startOf('day').toISOString(),
-    //     dateTo: moment(endDate).endOf('day').toISOString(),
-    //     statuses: values.statuses,
-    //     transferReason: values.transferReason,
-    //     clearSearch: true,
-    //   };
-    //   dispatch(featchSearchStockTransferRtAsync(payload));
+    const payload: PurchaseBranchSearchRequest = {
+      limit: limit ? limit.toString() : '10',
+      page: page,
+      docNo: values.docNo,
+      branchCode: values.branchCode,
+      status: values.status,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      clearSearch: true,
+    };
+
+    dispatch(featchSearchPurchaseBranchRequestAsync(payload));
 
     setTimeout(() => {
       handleOpenLoading('open', false);
@@ -204,7 +205,7 @@ function PurchaseBranchRequest() {
 
   return (
     <>
-      <Box>
+      <Box mb={6}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
@@ -309,6 +310,19 @@ function PurchaseBranchRequest() {
           </Button>
         </Grid>
       </Box>
+
+      {flagSearch && (
+        <div>
+          {dataList.length > 0 && <PurchaseBranchRequestList />}
+          {dataList.length === 0 && (
+            <Grid item container xs={12} justifyContent="center">
+              <Box color="#CBD4DB">
+                <h2>ไม่มีข้อมูล</h2>
+              </Box>
+            </Grid>
+          )}
+        </div>
+      )}
 
       <LoadingModal open={openLoadingModal.open} />
 

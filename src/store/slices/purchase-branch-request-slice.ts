@@ -65,7 +65,6 @@ export const featchSearchPurchaseBranchRequestAsync = createAsyncThunk(
       if (!payload.clearSearch) {
         response = await get(path).then();
       }
-      console.log('response: ', response);
 
       return response;
     } catch (error) {
