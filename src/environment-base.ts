@@ -232,6 +232,9 @@ export const environment = {
       save: {
         url: '/purchase/purchase-branch-request/save',
       },
+      delete: {
+        url: '/purchase/purchase-branch-request/{docNo}/delete',
+      },
     },
   },
   products: {

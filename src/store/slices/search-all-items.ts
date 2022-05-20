@@ -25,7 +25,8 @@ const initialState: State = {
 export const featchAllItemsListAsync = createAsyncThunk('SearchAllItemsList', async (payload: FindProductProps) => {
   try {
     const path = `${environment.products.addItem.allitemsList.url}/${payload.search}?limit=10`;
-    const body = { ...payload.payload, skuTypes: [2], isSellable: true };
+    // const body = { ...payload.payload, skuTypes: [2], isSellable: true };
+    const body = { ...payload.payload };
     let response = await post(path, body, ContentType.JSON).then();
 
     if (response === 204) {
