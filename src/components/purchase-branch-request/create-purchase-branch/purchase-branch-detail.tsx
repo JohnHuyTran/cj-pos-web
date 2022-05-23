@@ -199,8 +199,21 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       if (v.payload) {
         const p: any = v.payload ? v.payload : null;
         if (p) {
-          console.log('featchPurchaseBRDetailAsync:', JSON.stringify(p.data.items));
-          dispatch(updateAddItemsState(p.data.items));
+          let items: any = [];
+          p.data.items.forEach((data: any) => {
+            const item: any = {
+              skuCode: data.skuCode,
+              barcode: data.barcode,
+              barcodeName: data.barcodeName,
+              unitCode: data.unitCode,
+              unitName: data.unitName,
+              baseUnit: data.barFactor,
+              qty: data.orderQty,
+              stockMax: data.orderMaxQty,
+            };
+            items.push(item);
+          });
+          dispatch(updateAddItemsState(items));
         }
       }
     });
