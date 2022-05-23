@@ -152,7 +152,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
     },
     {
       field: 'documentNumber',
-      headerName: 'เลขที่เอกสารทำลาย',
+      headerName: 'เอกสารทำลาย',
       headerAlign: 'center',
       sortable: false,
       minWidth: 260,

@@ -500,7 +500,7 @@ const useStyles = makeStyles({
       top: '110%',
       left: '0',
       color: 'red',
-      width: '300px',
+      width: '500px',
       display: 'none',
     },
     '&:hover .title': {

@@ -80,6 +80,7 @@ export enum SUBMENU {
   TO_STORE_USE = 'transferOut.storeUse',
   PI_STOCK_BALANCE = 'productInfo.stockOutstanding',
   PI_STOCK_MOVEMENT = 'productInfo.stockMovement',
+  PI_PRODUCT_MASTER = 'productInfo.productMaster',
   PR_CREATE_PURCHASE_BRANCH = 'purchasebranch.createPurchaseBranch',
 }
 
@@ -95,6 +96,7 @@ export enum PERMISSION_GROUP {
   ACCOUNTING = 'accounting',
   PI = 'operationProcess',
   PCM = 'procurement',
+  RTC = 'readyToClear',
 }
 
 export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
@@ -111,3 +113,4 @@ export const KEYCLOAK_GROUP_SM = '/service.posback/sm';
 export const KEYCLOAK_GROUP_ACCOUNTING = '/service.posback/accounting';
 export const KEYCLOAK_GROUP_PI = '/service.posback/pi';
 export const KEYCLOAK_GROUP_PCM = '/service.posback/pcm';
+export const KEYCLOAK_GROUP_RTC = '/service.posback/rtc';

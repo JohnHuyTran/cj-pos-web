@@ -263,6 +263,13 @@ export const environment = {
         url: '/products/barcode/',
       },
     },
+    sku: {
+      productMaster: {
+        search: {
+          url: '/products/sku/product-master',
+        },
+      },
+    },
   },
   stock: {
     searchStockTransfer: {

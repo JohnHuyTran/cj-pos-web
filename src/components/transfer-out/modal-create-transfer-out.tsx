@@ -240,6 +240,7 @@ export default function ModalCreateTransferOut({
             barcode: item.barcode,
             barcodeName: item.productName,
             unitName: item.unitName,
+            unitCode: item.unitCode,
             unitPrice: item.price || 0,
             discount: item.requestedDiscount || 0,
             qty: item.numberOfRequested || 0,
@@ -490,6 +491,8 @@ export default function ModalCreateTransferOut({
       const payload = {
         products: payloadTransferOut.products,
         attachFiles: allAttachFile,
+        transferOutReason: dataDetail.transferOutReason,
+        store: dataDetail.store,
       };
       const rs = await approveTransferOut(dataDetail.id, payload);
       if (rs.code === 20000) {
@@ -574,7 +577,11 @@ export default function ModalCreateTransferOut({
 
   const handleReject = async () => {
     try {
-      let res = await rejectTransferOut(dataDetail.id);
+      const payload = {
+        transferOutReason: dataDetail.transferOutReason,
+        store: dataDetail.store,
+      };
+      let res = await rejectTransferOut(dataDetail.id, payload);
       if (res && res.code === 20000) {
         dispatch(
           updateDataDetail({
