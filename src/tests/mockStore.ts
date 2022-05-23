@@ -15810,7 +15810,15 @@ export const initialState = {
     checkEdit: false,
   },
   stockBalanceCheckSlice: {
-    checkStock: [],
+    checkStock: [
+      {
+        barcode: "18857122754576",
+        productName: "Product Name",
+        skuCode: "000000000020029758",
+        stockRemain: 0,
+        unitName: "ลัง"
+      }
+    ],
   },
   updateBTSkuSlice: {
     state: {},
