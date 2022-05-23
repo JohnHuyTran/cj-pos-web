@@ -26,6 +26,7 @@ import { ACTIONS } from '../../../utils/enum/permission-enum';
 import { isAllowActionPermission } from '../../../utils/role-permission';
 import ConfirmModelExit from '../../commons/ui/confirm-exit-model';
 import { featchSearchPurchaseBranchRequestAsync } from '../../../store/slices/purchase-branch-request-slice';
+import { featchPurchaseBRDetailAsync } from '../../../store/slices/purchase/purchase-branch-request-detail-slice';
 
 interface Props {
   isOpen: boolean;
@@ -193,6 +194,18 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     // await dispatch(updateAddItemsState(items));
   };
 
+  const featchPurchaseBRDetail = async (docNo: string) => {
+    await dispatch(featchPurchaseBRDetailAsync(docNo)).then((v) => {
+      if (v.payload) {
+        const p: any = v.payload ? v.payload : null;
+        if (p) {
+          console.log('featchPurchaseBRDetailAsync:', JSON.stringify(p.data.items));
+          dispatch(updateAddItemsState(p.data.items));
+        }
+      }
+    });
+  };
+
   const handleSaveBR = async () => {
     setOpenLoadingModal(true);
     const payloadSave: any = await handleMapPayloadSave();
@@ -200,6 +213,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       .then((value) => {
         setDocNo(value.docNo);
         setStatus('DRAFT');
+        featchPurchaseBRDetail(value.docNo);
 
         setFlagSave(false);
         setShowSnackBar(true);
