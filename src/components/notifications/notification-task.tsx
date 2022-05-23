@@ -102,7 +102,7 @@ export default function NotificationTask(props: Props) {
     try {
       setOpenLoadingModal(true);
       const rs = await getNotificationTasks(page);
-      if (rs) {
+      if (rs && rs != 204) {
         if (rs.data !== null) {
           setListData(rs.data);
           setTotal(rs.total);
