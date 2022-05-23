@@ -402,11 +402,6 @@ export default function CheckOrderDetail({
     }
   };
 
-  // function handleCloseDetailToteModal() {
-  //   setOpenTote(false);
-  //   onClickClose();
-  // }
-
   function handleCloseOrderReceiveModal() {
     setOpenOrderReceiveModal(false);
     onClickClose();
@@ -455,7 +450,7 @@ export default function CheckOrderDetail({
 
         return {
           rowOrder: index + 1,
-          id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
+          id: index,
           deliveryOrderNo: item.deliveryOrderNo,
           isTote: item.isTote ? item.isTote : false,
           sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
@@ -508,10 +503,10 @@ export default function CheckOrderDetail({
       await rows.forEach((data: GridRowData) => {
         itemsList.push(data);
       });
-    }
 
-    if (itemsList.length > 0) {
-      updateState(itemsList);
+      if (itemsList.length > 0) {
+        updateState(itemsList);
+      }
     }
   };
 
@@ -558,22 +553,37 @@ export default function CheckOrderDetail({
 
       await saveOrderShipments(payload, orderDetail.sdNo)
         .then((_value) => {
+          featchOrderDetail(orderDetail.sdNo);
+          // updateShipmentOrder();
+          updateAddItemsState({});
           setShowSnackBar(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
           setSnackbarStatus(true);
-          updateShipmentOrder();
         })
         .catch((error: ApiError) => {
+          updateState(itemsListUpdate);
           setShowSnackBar(true);
           setContentMsg(error.message);
           setSnackbarStatus(false);
-          updateShipmentOrder();
+          // updateShipmentOrder();
         });
 
-      updateState(itemsListUpdate);
+      // updateState(itemsListUpdate);
     }
 
     handleOpenLoading('open', false);
+  };
+
+  const featchOrderDetail = async (sdNo: string) => {
+    await dispatch(featchOrderDetailAsync(sdNo)).then((v) => {
+      if (v.payload) {
+        const p: any = v.payload ? v.payload : null;
+
+        if (p) {
+          updateState(p.data.items);
+        }
+      }
+    });
   };
 
   const [sumActualQty, setSumActualQty] = React.useState(0);
@@ -1081,7 +1091,9 @@ export default function CheckOrderDetail({
                   autoHeight={rowsEntries.length >= 8 ? false : true}
                   scrollbarSize={10}
                   onCellFocusOut={handleEditItems}
-                  // onCellOut={handleEditItems}
+                  onCellOut={handleEditItems}
+                  onCellEditStart={handleEditItems}
+                  onCellEditStop={handleEditItems}
                   // onCellKeyDown={handleEditItems}
                   // onCellBlur={handleEditItems}
                 />
