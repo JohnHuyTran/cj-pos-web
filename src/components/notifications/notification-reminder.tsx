@@ -81,8 +81,8 @@ export default function NotificationReminder(props: Props) {
     try {
       setOpenLoadingModal(true);
       const rs = await getNotificationReminders(page);
-      if (rs) {
-        if (rs.data !== null) {
+      if (rs && rs != 204) {
+        if (rs.data) {
           setListData(rs.data);
           setTotal(rs.total);
         } else {

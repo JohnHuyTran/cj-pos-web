@@ -56,7 +56,7 @@ export default function NotificationAnnouncement(props: Props) {
     try {
       setOpenLoadingModal(true);
       const rs = await getNotificationAnnouncements(page);
-      if (rs) {
+      if (rs && rs != 204) {
         if (rs.data) {
           setListData(rs.data);
           setTotal(rs.total);
