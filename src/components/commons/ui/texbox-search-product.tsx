@@ -6,7 +6,7 @@ import { useStyles } from '../../../styles/makeTheme';
 import SearchIcon from '@mui/icons-material/Search';
 
 interface Props {
-  skuType: any[];
+  skuType?: any[];
   onSelectItem: (value: any) => void;
   isClear: boolean;
 }
@@ -83,7 +83,7 @@ function TextBoxSearchProduct({ skuType, onSelectItem, isClear }: Props) {
         searchAllProductAsync({
           search: keyword,
           productTypeCodes: [],
-          skuTypes: skuType ? (skuType[0] == 0 ? [1, 2] : skuType) : [2],
+          // skuTypes: skuType ? (skuType[0] == 0 ? [1, 2] : skuType) : [2],
         })
       );
       setLoading(false);

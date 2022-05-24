@@ -224,7 +224,7 @@ function StockMovementSearch() {
     <React.Fragment>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
-          <Grid item xs={4}>
+          {/* <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
               กลุ่มสินค้า (Article)
             </Typography>
@@ -242,13 +242,13 @@ function StockMovementSearch() {
                 <MenuItem value={2}>สินค้า Trading goods</MenuItem>
               </Select>
             </FormControl>
-          </Grid>
+          </Grid> */}
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
               ค้นหาสินค้า*
             </Typography>
             <TextBoxSearchProduct
-              skuType={[values.storeId]}
+              // skuType={[values.storeId]}
               onSelectItem={handleChangeProduct}
               isClear={clearBranchDropDown}
             />
