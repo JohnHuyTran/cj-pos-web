@@ -67,8 +67,7 @@ const columns: GridColDef[] = [
     headerName: 'จำนวนสั่งมากที่สุด',
     headerAlign: 'center',
     align: 'right',
-    minWidth: 300,
-    flex: 2,
+    minWidth: 150,
     sortable: false,
   },
   {
