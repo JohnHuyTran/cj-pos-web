@@ -104,7 +104,7 @@ function StockMovementSearchList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -124,9 +124,8 @@ function StockMovementSearchList() {
           <div
             style={{
               textAlign: 'center',
-            }}
-          >
-            <Typography variant="body2" noWrap>
+            }}>
+            <Typography variant='body2' noWrap>
               {`${moment(date).add(543, 'year').format('DD/MM/YYYY')} ${moment(date).format('HH:mm ')}`}
             </Typography>
           </div>
@@ -161,11 +160,10 @@ function StockMovementSearchList() {
         if (params.getValue(params.id, 'movementAction') === true && docNo) {
           return (
             <Typography
-              color="secondary"
-              variant="body2"
+              color='secondary'
+              variant='body2'
               sx={{ textDecoration: 'underline' }}
-              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}
-            >
+              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}>
               {params.value}
             </Typography>
           );
@@ -225,6 +223,7 @@ function StockMovementSearchList() {
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params) => textNegative(params.value),
     },
     {
       field: 'unitName',
@@ -243,6 +242,16 @@ function StockMovementSearchList() {
       renderCell: (params) => handleModelAction(params),
     },
   ];
+
+  const textNegative = (value: any) => {
+    if (Number(value) < 0)
+      return (
+        <Typography variant='body2' sx={{ color: '#F54949' }}>
+          {value}
+        </Typography>
+      );
+    return value;
+  };
 
   const rows = items.data.map((data: StockMomentInfoType, indexs: number) => {
     const movementType = getMovementType(data.movementTypeCode);
@@ -420,7 +429,7 @@ function StockMovementSearchList() {
     <React.Fragment>
       <Box
         mt={2}
-        bgcolor="background.paper"
+        bgcolor='background.paper'
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -432,8 +441,7 @@ function StockMovementSearchList() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}
-      >
+        }}>
         <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -446,7 +454,7 @@ function StockMovementSearchList() {
             pageSize={pageSize}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={items.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             onCellClick={currentlySelected}
