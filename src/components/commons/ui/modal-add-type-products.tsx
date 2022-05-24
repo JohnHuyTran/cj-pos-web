@@ -24,6 +24,7 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import { objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
 import {
   clearSearchAllProductAsync,
+  newSearchAllProductAsync,
   searchAllProductAsync,
   searchAllProductTypeAsync,
 } from '../../../store/slices/search-type-product-slice';
@@ -31,6 +32,7 @@ import { updateAddTypeAndProductState } from '../../../store/slices/add-type-pro
 import LoadingModal from './loading-modal';
 import { getAllProductByType } from '../../../services/common';
 import { setCheckEdit } from '../../../store/slices/sale-limit-time-slice';
+import { FindProductProps, FindProductRequest } from '../../../models/product-model';
 
 interface Error {
   productTypeExist: string;
@@ -95,13 +97,27 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       if (!objectNullOrEmpty(values.productType)) {
         productTypeCodes.push(values.productType.productTypeCode);
       }
-      await dispatch(
-        searchAllProductAsync({
-          search: keyword,
-          productTypeCodes: productTypeCodes,
-          skuTypes: props.skuType ? props.skuType : [2],
-        })
-      );
+      // await dispatch(
+      //   newSearchAllProductAsync({
+      //     search: keyword,
+      //     payload: {
+      //       productTypeCodes: productTypeCodes,
+      //       skuTypes: props.skuType ? props.skuType : [2],
+      //     },
+      //   })
+      // );
+
+      const requestBody: FindProductRequest = {
+        productTypeCodes: [],
+        skuTypes: [2],
+        isSellable: true,
+        // isControlStock: true,
+      };
+      const payload: FindProductProps = {
+        search: keyword,
+        payload: requestBody,
+      };
+      await dispatch(newSearchAllProductAsync(payload));
     } else {
       clearData();
     }

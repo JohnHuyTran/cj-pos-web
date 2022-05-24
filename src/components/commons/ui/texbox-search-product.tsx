@@ -1,9 +1,10 @@
 import { Autocomplete, CircularProgress, createFilterOptions, TextField, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
-import { searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
+import { newSearchAllProductAsync, searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import SearchIcon from '@mui/icons-material/Search';
+import { FindProductProps, FindProductRequest } from '../../../models/product-model';
 
 interface Props {
   skuType?: any[];
@@ -79,13 +80,27 @@ function TextBoxSearchProduct({ skuType, onSelectItem, isClear }: Props) {
     if (keyword.length >= 3 && reason !== 'reset') {
       setLoading(true);
       setSearchItem(keyword);
-      await dispatch(
-        searchAllProductAsync({
-          search: keyword,
-          productTypeCodes: [],
-          // skuTypes: skuType ? (skuType[0] == 0 ? [1, 2] : skuType) : [2],
-        })
-      );
+
+      const requestBody: FindProductRequest = {
+        productTypeCodes: [],
+        skuTypes: [2],
+        isSellable: true,
+        // isControlStock: true,
+      };
+      const payload: FindProductProps = {
+        search: keyword,
+        payload: requestBody,
+      };
+      await dispatch(newSearchAllProductAsync(payload));
+
+      // await dispatch(
+      //   searchAllProductAsync({
+      //     search: keyword,
+      //     productTypeCodes: [],
+      //     skuTypes: skuType ? (skuType[0] == 0 ? [1, 2] : skuType) : [2],
+      //   })
+      // );
+
       setLoading(false);
     } else {
       clearData();
