@@ -18,7 +18,7 @@ beforeEach(() => {
   wrapper = render(
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <Steppers status={0} stepsList={['บันทึก', 'อนุมัติ']} />
+        <Steppers status={0} />
       </ThemeProvider>
     </Provider>
   );

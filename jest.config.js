@@ -31,4 +31,14 @@ module.exports = {
 
   // Module file extensions for importing
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  moduleNameMapper: {
+    'react-pdf/dist/esm/entry.webpack': 'react-pdf',
+    '\\.(jpg|jpeg|png)$': 'identity-obj-proxy',
+    'react-i18next': '<rootDir>/reacti18nextMock.js',
+  },
+  // collectCoverageFrom: ['src/**/*.{spec,test}.{js,jsx,ts,tsx}'],
+  collectCoverageFrom: ['src/components/commons/ui/*.tsx', 'src/components/barcode-discount/*.tsx'],
+  // coverageDirectory: '<rootDir>/src/tests/coverage/',
+  collectCoverage: true,
+  testMatch: ['**/*.{spec,test}.{js,jsx,ts,tsx}'],
 };

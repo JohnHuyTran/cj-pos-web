@@ -1,27 +1,33 @@
 // componets/Greetings.test.tsx
 
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { idText } from 'typescript';
-import { UnitTestComponent } from '../../../pages/unit-test-component';
+import DCCheckOrderSearch from '../../../components/dc-check-orders/dc-check-order';
 
-// let wrapper:any = render(<UnitTestComponent name="Test Name" />);
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
+import { Store, AnyAction } from '@reduxjs/toolkit';
+import { initialState } from '../../mockStore';
+import { ThemeProvider } from '@mui/material';
+import theme from '../../../styles/theme';
+import { mockUserInfo } from '../../mockData';
+
 let wrapper;
+const mockStore = configureStore();
+let store: Store<any, AnyAction>;
+sessionStorage.setItem('user_info', mockUserInfo);
 beforeEach(() => {
-  wrapper = render(<UnitTestComponent name="Test Name" />);
+  store = mockStore(initialState);
+  wrapper = render(
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <DCCheckOrderSearch />
+      </ThemeProvider>
+    </Provider>
+  );
 });
 
-describe('when rendered with a `name` prop', () => {
-  it('should paste it into the greetings text', () => {
-    expect(screen.getByText(/Hello Test Name!/)).toBeInTheDocument();
-  });
-
-  it('should render the sending waves button', () => {
-    expect(screen.getByRole('button')).toBeInTheDocument();
-  });
-
-  it('should call the `testXX` callback', () => {
-    userEvent.click(screen.getByRole('button'));
-    expect(screen.getByText(/success/)).toBeInTheDocument();
+describe('show screen', () => {
+  it('find wording text', () => {
+    expect(screen.getByText(/ค้นหาเอกสาร/)).toBeInTheDocument();
   });
 });
