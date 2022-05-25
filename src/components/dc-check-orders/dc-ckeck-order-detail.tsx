@@ -218,6 +218,12 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item xs={2}>
+                <Typography variant='body2'>แนบเอกสาร:</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
+              </Grid>
+              <Grid item xs={2}>
                 <Typography variant='body2'>หมายเหตุ:</Typography>
               </Grid>
               <Grid item xs={4}>
@@ -253,12 +259,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     </div>
                   )}
                 </div>
-              </Grid>
-              <Grid item xs={2}>
-                <Typography variant='body2'>แนบเอกสาร:</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
               </Grid>
             </Grid>
 
