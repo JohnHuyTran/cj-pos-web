@@ -39,10 +39,10 @@ function TextBoxComment({
 
   return (
     <>
-      <Typography variant="body2">{fieldName}</Typography>
+      <Typography variant='body2'>{fieldName}</Typography>
       <TextField
-        data-testid="form-field-tbxComment"
-        id="tbxComment"
+        data-testid='form-field-tbxComment'
+        id='tbxComment'
         // label='tbxComment'
         multiline
         fullWidth
@@ -58,6 +58,7 @@ function TextBoxComment({
       />
 
       <div
+        data-testid='div-warning-msg'
         style={{
           fontSize: '11px',
           color: '#AEAEAE',
@@ -65,8 +66,7 @@ function TextBoxComment({
           maxWidth: 350,
           textAlign: 'right',
           // marginTop: "-1.5em",
-        }}
-      >
+        }}>
         {characterCount}/{maxLength}
       </div>
     </>
