@@ -17,7 +17,7 @@ import { convertUtcToBkkDate } from '../../utils/date-utill';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import LoadingModal from '../commons/ui/loading-modal';
 import { useStyles } from '../../styles/makeTheme';
-import { TextField } from '@mui/material';
+import { FormControl, MenuItem, Select, TextField } from '@mui/material';
 import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
 import { isAllowActionPermission } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
@@ -38,6 +38,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const orderDetailList = useAppSelector((state) => state.dcCheckOrderDetail.orderDetail);
+  const reasonNoApproveList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
@@ -62,6 +63,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
   const [idVerify, setIDVerify] = React.useState(idDC);
   const [isTote, setIsTote] = React.useState(false);
+  const [isShowApproveFlow, setIsShowApproveFlow] = React.useState(false);
 
   useEffect(() => {
     setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
@@ -156,6 +158,11 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     }
   };
 
+  const [values, setValues] = React.useState();
+  const handleChange = (event: any) => {
+    const value = event.target.value;
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -206,61 +213,145 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                 <Typography variant='body2'>{`${detailDC.shipBranchTo.code}-${detailDC.shipBranchTo.name}`}</Typography>
               </Grid>
             </Grid>
-            <Grid container spacing={2} mb={1}>
-              <Grid item xs={2}>
-                <Typography variant='body2'>วันที่:</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography variant='body2'>{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
-              </Grid>
-              <Grid item xs={2}></Grid>
-              <Grid item xs={4}></Grid>
-            </Grid>
-            <Grid container spacing={2} mb={1}>
-              <Grid item xs={2}>
-                <Typography variant='body2'>แนบเอกสาร:</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
-              </Grid>
-              <Grid item xs={2}>
-                <Typography variant='body2'>หมายเหตุ:</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                {/* {detailDC.verifyDCStatus === 0 && ( */}
-                <div>
-                  <TextField
-                    multiline
-                    fullWidth
-                    rows={4}
-                    onChange={handleChangeCommentDC}
-                    // defaultValue={valueCommentDC}
-                    value={valueCommentDC}
-                    placeholder='ความยาวไม่เกิน 100 ตัวอักษร'
-                    className={classes.MtextFieldRemark}
-                    inputProps={{ maxLength: 100 }}
-                    error={errorCommentDC === true}
-                    helperText={errorCommentDC === true ? 'กรุณากรอก หมายเหตุ' : ' '}
-                    disabled={detailDC.verifyDCStatus !== 0}
-                    sx={{ maxWidth: 300 }}
-                  />
+            {!isShowApproveFlow && (
+              <>
+                <Grid container spacing={2} mb={1}>
+                  <Grid item xs={2}>
+                    <Typography variant='body2'>วันที่:</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography variant='body2'>{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
+                  </Grid>
+                  <Grid item xs={2}></Grid>
+                  <Grid item xs={4}></Grid>
+                </Grid>
+                <Grid container spacing={2} mb={1}>
+                  <Grid item xs={2}>
+                    <Typography variant='body2'>หมายเหตุ:</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    {/* {detailDC.verifyDCStatus === 0 && ( */}
+                    <div>
+                      <TextField
+                        multiline
+                        fullWidth
+                        rows={4}
+                        onChange={handleChangeCommentDC}
+                        // defaultValue={valueCommentDC}
+                        value={valueCommentDC}
+                        placeholder='ความยาวไม่เกิน 100 ตัวอักษร'
+                        className={classes.MtextFieldRemark}
+                        inputProps={{ maxLength: 100 }}
+                        error={errorCommentDC === true}
+                        helperText={errorCommentDC === true ? 'กรุณากรอก หมายเหตุ' : ' '}
+                        disabled={detailDC.verifyDCStatus !== 0}
+                        sx={{ maxWidth: 300 }}
+                      />
 
-                  {detailDC.verifyDCStatus === 0 && (
-                    <div
-                      style={{
-                        fontSize: '11px',
-                        color: '#AEAEAE',
-                        width: '100%',
-                        maxWidth: 300,
-                        textAlign: 'right',
-                        marginTop: '-1.5em',
-                      }}>
-                      {characterCount}/100
+                      {detailDC.verifyDCStatus === 0 && (
+                        <div
+                          style={{
+                            fontSize: '11px',
+                            color: '#AEAEAE',
+                            width: '100%',
+                            maxWidth: 300,
+                            textAlign: 'right',
+                            marginTop: '-1.5em',
+                          }}>
+                          {characterCount}/100
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </Grid>
-            </Grid>
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Typography variant='body2'>แนบเอกสาร:</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
+                  </Grid>
+                </Grid>
+              </>
+            )}
+            {isShowApproveFlow && (
+              <>
+                <Grid container spacing={2} mb={1}>
+                  <Grid item xs={2}>
+                    <Typography variant='body2'>วันที่:</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography variant='body2'>{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
+                  </Grid>
+                  <Grid item xs={2}>
+                    เหตุผล-การแก้ไข:
+                  </Grid>
+                  <Grid item xs={4}>
+                    {' '}
+                    <FormControl fullWidth className={classes.Mselect}>
+                      <Select
+                        id='selPiType'
+                        name='statuses'
+                        value={values.statuses}
+                        onChange={handleChange}
+                        inputProps={{ 'aria-label': 'Without label' }}>
+                        <MenuItem value={''} selected={true}>
+                          กรุณาระบุเหตุผล
+                        </MenuItem>
+                        {reasonNoApproveList.map((reason) => (
+                          <MenuItem key={reason.id} value={reason.code}>
+                            {reason.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} mb={1}>
+                  <Grid item xs={2}>
+                    <Typography variant='body2'>หมายเหตุ:</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    {/* {detailDC.verifyDCStatus === 0 && ( */}
+                    <div>
+                      <TextField
+                        multiline
+                        fullWidth
+                        rows={4}
+                        onChange={handleChangeCommentDC}
+                        // defaultValue={valueCommentDC}
+                        value={valueCommentDC}
+                        placeholder='ความยาวไม่เกิน 100 ตัวอักษร'
+                        className={classes.MtextFieldRemark}
+                        inputProps={{ maxLength: 100 }}
+                        error={errorCommentDC === true}
+                        helperText={errorCommentDC === true ? 'กรุณากรอก หมายเหตุ' : ' '}
+                        disabled={detailDC.verifyDCStatus !== 0}
+                        sx={{ maxWidth: 300 }}
+                      />
+
+                      {detailDC.verifyDCStatus === 0 && (
+                        <div
+                          style={{
+                            fontSize: '11px',
+                            color: '#AEAEAE',
+                            width: '100%',
+                            maxWidth: 300,
+                            textAlign: 'right',
+                            marginTop: '-1.5em',
+                          }}>
+                          {characterCount}/100
+                        </div>
+                      )}
+                    </div>
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Typography variant='body2'>แนบเอกสาร:</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
+                  </Grid>
+                </Grid>
+              </>
+            )}
 
             <Grid container spacing={2} justifyContent='right' sx={{ mt: 1 }}>
               <Grid item>
