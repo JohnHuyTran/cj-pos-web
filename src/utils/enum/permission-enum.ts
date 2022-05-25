@@ -53,6 +53,7 @@ export enum ACTIONS {
 
   ORDER_VER_VIEW = 'order.ver.view',
   ORDER_VER_MANAGE = 'order.ver.manage',
+  ORDER_VER_APPROVE_ALL = 'order.ver.manage',
 
   SALE_TAX_INVOICE_VIEW = 'sale.tax.view',
   SALE_TAX_INVOICE_REQUEST = 'sale.tax.view',
