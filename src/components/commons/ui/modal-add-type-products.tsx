@@ -53,6 +53,7 @@ interface Props {
   skuType?: any[];
   showSearch?: boolean;
   textBtn?: string;
+  requestBody: FindProductRequest;
 }
 
 interface SelectedItemProps {
@@ -97,25 +98,10 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       if (!objectNullOrEmpty(values.productType)) {
         productTypeCodes.push(values.productType.productTypeCode);
       }
-      // await dispatch(
-      //   newSearchAllProductAsync({
-      //     search: keyword,
-      //     payload: {
-      //       productTypeCodes: productTypeCodes,
-      //       skuTypes: props.skuType ? props.skuType : [2],
-      //     },
-      //   })
-      // );
 
-      const requestBody: FindProductRequest = {
-        productTypeCodes: [],
-        skuTypes: [2],
-        isSellable: true,
-        // isControlStock: true,
-      };
       const payload: FindProductProps = {
         search: keyword,
-        payload: requestBody,
+        payload: props.requestBody,
       };
       await dispatch(newSearchAllProductAsync(payload));
     } else {

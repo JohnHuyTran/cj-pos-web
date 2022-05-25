@@ -1,16 +1,14 @@
 import React from 'react';
-import { Box, Button, FormControl, Grid, MenuItem, Select, Tab, Tabs, TextField, Typography } from '@mui/material';
+import { Box, Button, FormControl, Grid, MenuItem, Select, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import AlertError from '../../commons/ui/alert-error';
-import ModalAddTypeProduct from '../../commons/ui/modal-add-type-products';
 import { updateAddTypeAndProductState } from '../../../store/slices/add-type-product-slice';
 import { isAllowActionPermission, isGroupBranch } from '../../../utils/role-permission';
 import { getUserInfo } from '../../../store/sessionStore';
 import { getBranchName, stringNullOrEmpty } from '../../../utils/utils';
 import { ACTIONS } from '../../../utils/enum/permission-enum';
 import { env } from '../../../adapters/environmentConfigs';
-import SearchIcon from '@mui/icons-material/Search';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import { BranchListOptionType } from '../../../models/branch-model';
 import DatePickerComponent from '../../commons/ui/date-picker';
@@ -21,12 +19,11 @@ import {
   savePayloadSearch,
 } from '../../../store/slices/stock/stock-movement-search-slice';
 import moment from 'moment';
-import { isOverDate } from '../../../utils/date-utill';
 import { SearchOff } from '@mui/icons-material';
 import StockMovementSearchList from './stock-movement-search-list';
 import LoadingModal from '../../commons/ui/loading-modal';
 import TextBoxSearchProduct from '../../commons/ui/texbox-search-product';
-import { clearSearchAllProductAsync, searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
+import { clearSearchAllProductAsync } from '../../../store/slices/search-type-product-slice';
 interface State {
   storeId: number;
   locationId: string;
@@ -224,33 +221,16 @@ function StockMovementSearch() {
     <React.Fragment>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
-          {/* <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div'>
-              กลุ่มสินค้า (Article)
-            </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id='tbxstoreId'
-                name='storeId'
-                value={values.storeId}
-                onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={0} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem value={1}>วัตถุดิบ</MenuItem>
-                <MenuItem value={2}>สินค้า Trading goods</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid> */}
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
               ค้นหาสินค้า*
             </Typography>
             <TextBoxSearchProduct
-              // skuType={[values.storeId]}
               onSelectItem={handleChangeProduct}
               isClear={clearBranchDropDown}
+              requestBody={{
+                isControlStock: true,
+              }}
             />
           </Grid>
           <Grid item xs={4}>
@@ -343,13 +323,6 @@ function StockMovementSearch() {
         </Grid>
       )}
       <LoadingModal open={openLoadingModal.open} />
-      <ModalAddTypeProduct
-        open={openModelAddItems}
-        onClose={handleCloseModalAddItems}
-        title='ระบุสินค้าที่ต้องการค้นหา*'
-        skuType={skuTypes}
-        showSearch={true}
-      />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>
   );
