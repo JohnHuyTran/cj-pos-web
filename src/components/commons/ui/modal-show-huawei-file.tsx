@@ -50,6 +50,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {onPrint ? (
         <Button
           id='btnPrint'
+          data-testid='btn-print'
           variant='contained'
           color='secondary'
           onClick={onPrint}
@@ -149,7 +150,7 @@ export default function ModalShowHuaweiFile({
             textAlign: 'center',
           }}>
           {!isImage && (
-            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper} data-testid='testid-pdfWrapper-document'>
               <Document file={{ url }} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page
@@ -164,7 +165,7 @@ export default function ModalShowHuaweiFile({
           )}
 
           {isImage && (
-            <div id='pdfWrapper' style={{ minWidth: '200px' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ minWidth: '200px' }} ref={pdfWrapper} data-testid='testid-pdfWrapper-image'>
               <img src={url} style={{ width: '-webkit-fill-available', height: '-webkit-fill-available' }} />
             </div>
           )}

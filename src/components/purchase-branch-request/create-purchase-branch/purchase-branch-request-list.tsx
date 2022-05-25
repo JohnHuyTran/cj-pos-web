@@ -36,7 +36,7 @@ const columns: GridColDef[] = [
   {
     field: 'docNo',
     headerName: 'เลขที่เอกสาร',
-    minWidth: 160,
+    minWidth: 100,
     flex: 0.7,
     headerAlign: 'center',
     sortable: false,
@@ -77,7 +77,7 @@ const columns: GridColDef[] = [
   {
     field: 'createByFullName',
     headerName: 'ผู้สร้างรายการ',
-    minWidth: 145,
+    minWidth: 200,
     headerAlign: 'center',
     align: 'left',
     sortable: false,

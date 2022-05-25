@@ -93,7 +93,7 @@ function PurchaseBranchRequest() {
 
   const handleChange = (event: any) => {
     const value = event.target.value;
-    setValues({ ...values, [event.target.name]: value });
+    setValues({ ...values, [event.target.name]: value.trim() });
     // console.log(values);
   };
 

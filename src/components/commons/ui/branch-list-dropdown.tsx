@@ -74,6 +74,7 @@ function BranchListDropDown({
 
   return (
     <Autocomplete
+      data-testid='autocomplete-search-branch-list'
       {...defaultPropsBranchList}
       className={classes.Mautocomplete}
       popupIcon={<SearchIcon />}
@@ -90,6 +91,7 @@ function BranchListDropDown({
       }}
       renderInput={(params) => (
         <TextField
+          data-testid='textfiled-branch-list'
           {...params}
           placeholder={placeHolder ? placeHolder : 'ทั้งหมด'}
           size='small'

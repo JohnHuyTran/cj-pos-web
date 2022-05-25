@@ -24,8 +24,8 @@ function Steppers({ status, stepsList }: Props): ReactElement {
   const classes = useStyles();
   return (
     <div className={classes.MStepper} style={{ paddingBottom: 5 }}>
-      <Box sx={{ width: '45%', margin: 'auto', marginTop: '-1em' }}>
-        <Stepper activeStep={activeStep} alternativeLabel>
+      <Box data-testid='boxStepper' sx={{ width: '45%', margin: 'auto', marginTop: '-1em' }}>
+        <Stepper data-testid='stepper' activeStep={activeStep} alternativeLabel>
           {steps.map((label) => (
             <Step key={label}>
               <StepLabel>{label}</StepLabel>

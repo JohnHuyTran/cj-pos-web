@@ -75,7 +75,7 @@ function StockBalance() {
   const rows = items.data.map((data: StockInfo, indexs: number) => {
     return {
       id: indexs,
-      index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
+      index: (Number(cuurentPage) - 1) * Number(pageSize) + indexs + 1,
       skuCode: data.skuCode,
       skuName: data.skuName,
       availableQty: data.availableQty,
@@ -85,7 +85,7 @@ function StockBalance() {
 
   const handleNumberWithCommas = (availableQty: any) => {
     return (
-      <Typography variant='body2' sx={{ color: '#FF0000' }}>
+      <Typography variant='body2' sx={{ color: '#F54949' }}>
         {numberWithCommas(availableQty)}
       </Typography>
     );

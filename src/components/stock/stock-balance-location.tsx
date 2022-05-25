@@ -29,7 +29,7 @@ function StockBalanceLocation() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -52,8 +52,8 @@ function StockBalanceLocation() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2">{params.value}</Typography>
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant='body2'>{params.value}</Typography>
+          <Typography variant='body2' color='textSecondary'>
             {params.getValue(params.id, 'skuCode') || ''}
           </Typography>
         </div>
@@ -84,6 +84,7 @@ function StockBalanceLocation() {
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params) => textNegative(params.value),
     },
     {
       field: 'unitName',
@@ -113,6 +114,16 @@ function StockBalanceLocation() {
     },
   ];
 
+  const textNegative = (value: any) => {
+    if (Number(value) < 0)
+      return (
+        <Typography variant='body2' sx={{ color: '#F54949' }}>
+          {value}
+        </Typography>
+      );
+    return value;
+  };
+
   const concatName = (value: positionInfo[]) => {
     let positionNameStr: string = '';
     value.forEach((data, index) => {
@@ -131,7 +142,7 @@ function StockBalanceLocation() {
 
     return {
       id: indexs,
-      index: (cuurentPage - 1) * Number(pageSize) + indexs + 1,
+      index: (Number(cuurentPage) - 1) * Number(pageSize) + indexs + 1,
       barcode: data.barcode,
       barcodeName: data.barcodeName,
       skuCode: data.skuCode,
@@ -151,12 +162,10 @@ function StockBalanceLocation() {
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
-
-    let page: number = newPage + 1;
-
-    const payloadNewpage: OutstandingRequest = {
+    // let page: number = newPage + 1;
+    const payloadNewpage: OutstandingRequest = await {
       limit: pageSize,
-      page: page,
+      page: newPage + 1,
       branchCode: savePayLoadSearch.branchCode,
       skuCodes: savePayLoadSearch.skuCodes,
       locationCode: savePayLoadSearch.locationCode,
@@ -191,7 +200,7 @@ function StockBalanceLocation() {
     <div>
       <Box
         mt={2}
-        bgcolor="background.paper"
+        bgcolor='background.paper'
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -203,8 +212,7 @@ function StockBalanceLocation() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}
-      >
+        }}>
         {items.data.length > 0 && (
           <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
             <DataGrid
@@ -218,7 +226,7 @@ function StockBalanceLocation() {
               pageSize={pageSize}
               rowsPerPageOptions={[10, 20, 50, 100]}
               rowCount={items.total}
-              paginationMode="server"
+              paginationMode='server'
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               loading={loading}
@@ -228,10 +236,10 @@ function StockBalanceLocation() {
         )}
 
         {items.data.length === 0 && (
-          <Grid container xs={12} justifyContent="center">
-            <Box color="#CBD4DB" justifyContent="center">
+          <Grid container xs={12} justifyContent='center'>
+            <Box color='#CBD4DB' justifyContent='center'>
               <h2>
-                ไม่มีข้อมูล <SearchOff fontSize="large" />
+                ไม่มีข้อมูล <SearchOff fontSize='large' />
               </h2>
             </Box>
           </Grid>
