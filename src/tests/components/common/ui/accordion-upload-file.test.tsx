@@ -19,6 +19,7 @@ const file: FileType = {
   fileKey: 'key1234',
   fileName: 'test.pdf',
   mimeType: 'application/pdf',
+  branchCode: '',
 };
 const handleOnChangeUploadFile = jest.fn();
 const handleOnDeleteFile = jest.fn();

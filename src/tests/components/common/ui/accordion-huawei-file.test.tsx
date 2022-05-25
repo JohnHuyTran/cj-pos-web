@@ -25,6 +25,7 @@ describe('component tooltip', () => {
       fileKey: 'key1234',
       fileName: 'test.pdf',
       mimeType: 'application/pdf',
+      branchCode: '',
     };
     const container = render(
       <Provider store={store}>
@@ -41,6 +42,7 @@ describe('component tooltip', () => {
       fileKey: 'key1234',
       fileName: 'test.pdf',
       mimeType: 'application/pdf',
+      branchCode: '',
     };
     const container = render(
       <Provider store={store}>
@@ -59,6 +61,7 @@ describe('component tooltip', () => {
       fileKey: 'key1234',
       fileName: 'test.pdf',
       mimeType: 'application/pdf',
+      branchCode: '',
     };
     const container = render(
       <Provider store={store}>
@@ -77,6 +80,7 @@ describe('component tooltip', () => {
       fileKey: 'key1234',
       fileName: 'test.pdf',
       mimeType: 'application/pdf',
+      branchCode: '',
     };
     const container = render(
       <Provider store={store}>
