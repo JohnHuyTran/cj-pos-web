@@ -19,16 +19,22 @@ export default function AlertError({ open, onClose, textError }: Props): ReactEl
       fullWidth={true}
       maxWidth='xs'>
       <DialogContent sx={{ padding: '1em' }}>
-        <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000' }}>
+        <DialogContentText
+          data-testid='txtContent'
+          sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000' }}>
           <ErrorOutline sx={{ color: '#F54949', fontSize: '4em' }} />
           <br />
           {textError}{' '}
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 20px 0px' }}>
-        <Button id='btnClose' variant='contained' color='error'
-                sx={{ borderRadius: '5px', width: '126px' }}
-                onClick={onClose}>
+        <Button
+          data-testid='btnClose'
+          id='btnClose'
+          variant='contained'
+          color='error'
+          sx={{ borderRadius: '5px', width: '126px' }}
+          onClick={onClose}>
           ปิด
         </Button>
       </DialogActions>

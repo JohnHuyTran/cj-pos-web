@@ -23,6 +23,7 @@ import { isAllowActionPermission } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
+import TextBoxComment from '../commons/ui/textbox-comment';
 
 interface Props {
   isOpen: boolean;
@@ -77,13 +78,8 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  const handleChangeCommentDC = (event: any) => {
-    const value = event.target.value;
-    const length = event.target.value.length;
-    if (length <= 100) {
-      setCharacterCount(event.target.value.length);
-      setValueCommentDC(value);
-    }
+  const handleChangeComment = (value: any) => {
+    setValueCommentDC(value);
   };
 
   const handleClearComment = () => {
@@ -230,38 +226,16 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     <Typography variant='body2'>หมายเหตุ:</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    {/* {detailDC.verifyDCStatus === 0 && ( */}
-                    <div>
-                      <TextField
-                        multiline
-                        fullWidth
-                        rows={4}
-                        onChange={handleChangeCommentDC}
-                        // defaultValue={valueCommentDC}
-                        value={valueCommentDC}
-                        placeholder='ความยาวไม่เกิน 100 ตัวอักษร'
-                        className={classes.MtextFieldRemark}
-                        inputProps={{ maxLength: 100 }}
-                        error={errorCommentDC === true}
-                        helperText={errorCommentDC === true ? 'กรุณากรอก หมายเหตุ' : ' '}
-                        disabled={detailDC.verifyDCStatus !== 0}
-                        sx={{ maxWidth: 300 }}
-                      />
-
-                      {detailDC.verifyDCStatus === 0 && (
-                        <div
-                          style={{
-                            fontSize: '11px',
-                            color: '#AEAEAE',
-                            width: '100%',
-                            maxWidth: 300,
-                            textAlign: 'right',
-                            marginTop: '-1.5em',
-                          }}>
-                          {characterCount}/100
-                        </div>
-                      )}
-                    </div>
+                    <TextBoxComment
+                      fieldName=''
+                      defaultValue={valueCommentDC}
+                      maxLength={100}
+                      onChangeComment={handleChangeComment}
+                      isDisable={detailDC.verifyDCStatus !== 0}
+                      rowDisplay={2}
+                      isError={errorCommentDC}
+                      hypterText='กรุณากรอก หมายเหตุ'
+                    />
                   </Grid>
                   <Grid item xs={2}>
                     <Typography variant='body2'>แนบเอกสาร:</Typography>
@@ -310,38 +284,16 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     <Typography variant='body2'>หมายเหตุ:</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    {/* {detailDC.verifyDCStatus === 0 && ( */}
-                    <div>
-                      <TextField
-                        multiline
-                        fullWidth
-                        rows={4}
-                        onChange={handleChangeCommentDC}
-                        // defaultValue={valueCommentDC}
-                        value={valueCommentDC}
-                        placeholder='ความยาวไม่เกิน 100 ตัวอักษร'
-                        className={classes.MtextFieldRemark}
-                        inputProps={{ maxLength: 100 }}
-                        error={errorCommentDC === true}
-                        helperText={errorCommentDC === true ? 'กรุณากรอก หมายเหตุ' : ' '}
-                        disabled={detailDC.verifyDCStatus !== 0}
-                        sx={{ maxWidth: 300 }}
-                      />
-
-                      {detailDC.verifyDCStatus === 0 && (
-                        <div
-                          style={{
-                            fontSize: '11px',
-                            color: '#AEAEAE',
-                            width: '100%',
-                            maxWidth: 300,
-                            textAlign: 'right',
-                            marginTop: '-1.5em',
-                          }}>
-                          {characterCount}/100
-                        </div>
-                      )}
-                    </div>
+                    <TextBoxComment
+                      fieldName=''
+                      defaultValue={valueCommentDC}
+                      maxLength={100}
+                      onChangeComment={handleChangeComment}
+                      isDisable={detailDC.verifyDCStatus !== 0}
+                      rowDisplay={2}
+                      isError={errorCommentDC}
+                      hypterText='กรุณากรอก หมายเหตุ'
+                    />
                   </Grid>
                   <Grid item xs={2}>
                     <Typography variant='body2'>แนบเอกสาร:</Typography>

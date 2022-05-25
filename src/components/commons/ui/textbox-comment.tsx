@@ -10,6 +10,8 @@ interface Props {
   onChangeComment: (value: string) => void;
   isDisable: boolean;
   rowDisplay?: number;
+  hypterText?: string;
+  isError?: boolean;
 }
 function TextBoxComment({
   fieldName,
@@ -18,6 +20,8 @@ function TextBoxComment({
   isDisable,
   onChangeComment,
   rowDisplay,
+  hypterText,
+  isError,
 }: Props): ReactElement {
   const classes = useStyles();
   const [characterCount, setCharacterCount] = React.useState(0);
@@ -39,10 +43,10 @@ function TextBoxComment({
 
   return (
     <>
-      <Typography variant="body2">{fieldName}</Typography>
+      <Typography variant='body2'>{fieldName}</Typography>
       <TextField
-        data-testid="form-field-tbxComment"
-        id="tbxComment"
+        data-testid='form-field-tbxComment'
+        id='tbxComment'
         // label='tbxComment'
         multiline
         fullWidth
@@ -55,18 +59,20 @@ function TextBoxComment({
         inputProps={{ maxLength: maxLength }}
         sx={{ maxWidth: 350 }}
         disabled={isDisable}
+        helperText={isError === true ? hypterText : ' '}
+        error={isError}
       />
 
       <div
+        data-testid='div-warning-msg'
         style={{
           fontSize: '11px',
           color: '#AEAEAE',
           width: '100%',
           maxWidth: 350,
           textAlign: 'right',
-          // marginTop: "-1.5em",
-        }}
-      >
+          marginTop: '-1.5em',
+        }}>
         {characterCount}/{maxLength}
       </div>
     </>
