@@ -24,13 +24,15 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import { objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
 import {
   clearSearchAllProductAsync,
+  newSearchAllProductAsync,
   searchAllProductAsync,
   searchAllProductTypeAsync,
 } from '../../../store/slices/search-type-product-slice';
 import { updateAddTypeAndProductState } from '../../../store/slices/add-type-product-slice';
 import LoadingModal from './loading-modal';
-import { getAllProductByType } from '../../../services/common';
+import { getProductByType } from '../../../services/product-master';
 import { setCheckEdit } from '../../../store/slices/sale-limit-time-slice';
+import { FindProductProps, FindProductRequest } from '../../../models/product-model';
 
 interface Error {
   productTypeExist: string;
@@ -51,6 +53,8 @@ interface Props {
   skuType?: any[];
   showSearch?: boolean;
   textBtn?: string;
+  requestBody: FindProductRequest;
+  isControlStockType?: boolean;
 }
 
 interface SelectedItemProps {
@@ -95,13 +99,12 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       if (!objectNullOrEmpty(values.productType)) {
         productTypeCodes.push(values.productType.productTypeCode);
       }
-      await dispatch(
-        searchAllProductAsync({
-          search: keyword,
-          productTypeCodes: productTypeCodes,
-          skuTypes: props.skuType ? props.skuType : [2],
-        })
-      );
+
+      const payload: FindProductProps = {
+        search: keyword,
+        payload: props.requestBody,
+      };
+      await dispatch(newSearchAllProductAsync(payload));
     } else {
       clearData();
     }
@@ -319,8 +322,21 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         if (!objectNullOrEmpty(values.productType)) {
           productTypeCode = values.productType.productTypeCode;
         }
+
+        let payload: any;
+        if (props.isControlStockType) {
+          payload = {
+            productTypeCode: productTypeCode,
+            isControlStock: props.isControlStockType,
+          };
+        } else {
+          payload = {
+            productTypeCode: productTypeCode,
+          };
+        }
+
         setOpenLoadingModal(true);
-        let res = await getAllProductByType(productTypeCode);
+        let res = await getProductByType(payload);
         if (res && res.data && res.data.length > 0) {
           selectedAddItems.push(productTypeItem);
           let lstProductByType = res.data;
