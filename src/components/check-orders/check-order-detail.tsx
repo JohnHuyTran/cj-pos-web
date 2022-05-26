@@ -13,16 +13,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-  useGridApiRef,
-  GridValueGetterParams,
-  GridRowId,
-  GridRowData,
-  GridEditCellValueParams,
-} from '@mui/x-data-grid';
 import DialogTitle from '@mui/material/DialogTitle';
 import Link from '@mui/material/Link';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
@@ -40,7 +30,14 @@ import {
   formatFileNam,
 } from '../../utils/enum/check-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
-import { SaveDraftSDRequest, CheckOrderDetailProps, Entry, itemsDetail, ToteRequest } from '../../models/order-model';
+import {
+  SaveDraftSDRequest,
+  CheckOrderDetailProps,
+  Entry,
+  itemsDetail,
+  ToteRequest,
+  ShipmentDetailInfo,
+} from '../../models/order-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { ApiError } from '../../models/api-error-model';
 import AlertError from '../commons/ui/alert-error';
@@ -58,19 +55,17 @@ import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import ModalAddItems from '../commons/ui/modal-add-items';
 import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permission';
 import { getUserInfo } from '../../store/sessionStore';
-import { getBranchName } from '../../utils/utils';
 import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import theme from '../../styles/theme';
 import { env } from '../../adapters/environmentConfigs';
+import CheckOrderDetailList from '../check-orders/check-order-detail-list';
 import CheckOrderDetailListTote from '../check-orders/check-order-detail-list-tote';
-import CheckOrderDetailTote from './check-order-detail-tote';
-import { couldStartTrivia } from 'typescript';
 import OrderReceiveDetail from './order-receive-detail';
 import { searchToteAsync } from '../../store/slices/search-tote-slice';
-import CheckOrderDetailItems from '../check-orders/check-order-detail-items';
 import { featchOrderDetailToteAsync } from '../../store/slices/check-order-detail-tote-slice';
+import _ from 'lodash';
 
 interface loadingModalState {
   open: boolean;
@@ -91,7 +86,6 @@ const StyledMenu = styled((props: MenuProps) => (
   />
 ))(({ theme }) => ({
   '& .MuiPaper-root': {
-    // marginTop: theme.spacing(1),
     boxShadow:
       'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
     '& .MuiMenuItem-root': {
@@ -101,150 +95,6 @@ const StyledMenu = styled((props: MenuProps) => (
     },
   },
 }));
-
-const columns: GridColDef[] = [
-  {
-    field: 'rowOrder',
-    headerName: 'ลำดับ',
-    width: 80,
-    headerAlign: 'center',
-    disableColumnMenu: true,
-    sortable: false,
-  },
-  {
-    field: 'barcode',
-    headerName: 'บาร์โค้ด',
-    minWidth: 135,
-    headerAlign: 'center',
-    disableColumnMenu: true,
-    sortable: false,
-  },
-  {
-    field: 'productName',
-    headerName: 'รายละเอียดสินค้า',
-    headerAlign: 'center',
-    minWidth: 160,
-    flex: 1,
-    sortable: false,
-    renderCell: (params) => (
-      <div>
-        <Typography variant='body2'>{params.value}</Typography>
-        <Typography variant='body2' color='textSecondary'>
-          {params.getValue(params.id, 'skuCode') || ''}
-        </Typography>
-      </div>
-    ),
-  },
-  {
-    field: 'unitName',
-    headerName: 'หน่วย',
-    width: 90,
-    headerAlign: 'center',
-    sortable: false,
-  },
-  {
-    field: 'qtyRef',
-    headerName: 'จำนวนอ้างอิง',
-    width: 130,
-    headerAlign: 'center',
-    align: 'right',
-    sortable: false,
-  },
-  {
-    field: 'actualQty',
-    headerName: 'จำนวนรับจริง',
-    width: 135,
-    headerAlign: 'center',
-    sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <TextField
-        variant='outlined'
-        name='txnQuantityActual'
-        type='number'
-        inputProps={{ style: { textAlign: 'right' } }}
-        value={params.value}
-        onChange={(e) => {
-          let actualQty = Number(params.getValue(params.id, 'actualQty'));
-          var value = e.target.value ? parseInt(e.target.value, 10) : '';
-
-          if (actualQty === 0) value = chkActualQty(value);
-          if (value < 0) value = 0;
-          params.api.updateRows([{ ...params.row, actualQty: value }]);
-        }}
-        // onBlur={(e) => {
-        //   // isAllowActualQty(params, parseInt(e.target.value, 10));
-        //   params.api.updateRows([{ ...params.row, actualQty: e.target.value }]);
-        // }}
-        disabled={isDisable(params) ? true : false}
-        autoComplete='off'
-      />
-    ),
-  },
-  {
-    field: 'qtyDiff',
-    headerName: 'ส่วนต่างการรับ',
-    width: 140,
-    headerAlign: 'center',
-    align: 'right',
-    sortable: false,
-    renderCell: (params) => calProductDiff(params),
-  },
-  {
-    field: 'comment',
-    headerName: 'หมายเหตุ',
-    headerAlign: 'center',
-    minWidth: 120,
-    // flex: 0.5,
-    sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <TextField
-        variant='outlined'
-        name='txnComment'
-        value={params.value}
-        onChange={(e) => params.api.updateRows([{ ...params.row, comment: e.target.value }])}
-        disabled={isDisable(params) ? true : false}
-        autoComplete='off'
-      />
-    ),
-  },
-];
-
-var calProductDiff = function (params: GridValueGetterParams) {
-  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qtyRef'));
-
-  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
-  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
-  return diff;
-};
-
-var chkActualQty = (value: any) => {
-  let v = String(value);
-  if (v.substring(1) === '0') return Number(v.substring(0, 1));
-  return value;
-};
-
-function useApiRef() {
-  const apiRef = useGridApiRef();
-  const _columns = useMemo(
-    () =>
-      columns.concat({
-        field: '',
-        width: 0,
-        minWidth: 0,
-        sortable: false,
-        renderCell: (params) => {
-          apiRef.current = params.api;
-          return null;
-        },
-      }),
-    [columns]
-  );
-
-  return { apiRef, columns: _columns };
-}
-const isDisable = (params: GridRenderCellParams) => {
-  return params.row.sdStatus;
-};
 
 export interface DialogTitleProps {
   id: string;
@@ -260,15 +110,16 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label='close'
+          aria-label="close"
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}>
-          <HighlightOff fontSize='large' />
+          }}
+        >
+          <HighlightOff fontSize="large" />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -295,15 +146,11 @@ export default function CheckOrderDetail({
   const orderDetails = useAppSelector((state) => state.checkOrderDetail.orderDetail);
   const orderDetail: any = orderDetails.data ? orderDetails.data : null;
   const [open, setOpen] = React.useState(defaultOpen);
-  const { apiRef, columns } = useApiRef();
   const [showSaveBtn, setShowSaveBtn] = React.useState(false);
   const [showApproveBtn, setShowApproveBtn] = React.useState(false);
   const [statusWaitApprove1, setStatusWaitApprove1] = React.useState(false);
   const [showCloseJobBtn, setShowCloseJobBtn] = React.useState(false);
   const [closeJobTote, setCloseJobTote] = React.useState(false);
-  const [validationFile, setValidationFile] = React.useState(false);
-  const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
-  const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [action, setAction] = useState<string>('');
   const [itemsDiffState, setItemsDiffState] = useState<Entry[]>([]);
@@ -338,6 +185,9 @@ export default function CheckOrderDetail({
   const DCPercent = env.dc.percent;
   const [isAllowExportBtn, setIsAllowExportBtn] = React.useState(true);
 
+  const orderComment = orderDetail.docRefRemark;
+  const findIndexStr = orderComment.startsWith('SD', 0);
+
   useEffect(() => {
     const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
     const oc = getUserInfo().group === PERMISSION_GROUP.OC;
@@ -358,8 +208,8 @@ export default function CheckOrderDetail({
       setShipmentStatusText(getShipmentStatusText(orderDetail.sdStatus));
       setShipmentTypeText(getShipmentTypeText(orderDetail.sdType));
       if (orderDetail.receivedDate) setShipmentDateFormat(convertUtcToBkkDate(orderDetail.receivedDate));
-      if (orderDetail.Comment !== '') {
-        dispatch(featchOrderSDListAsync(orderDetail.Comment));
+      if (orderDetail.docRefRemark !== '') {
+        dispatch(featchOrderSDListAsync(orderDetail.docRefRemark));
       }
     }
 
@@ -375,7 +225,7 @@ export default function CheckOrderDetail({
   const [toteCode, setToteCode] = React.useState('');
 
   const handleOpenModalTote = async (value: string, isAddItem: boolean) => {
-    rowsEntries = [];
+    // rowsEntries = [];
     if (isAddItem === false) {
       try {
         await dispatch(featchOrderDetailAsync(value));
@@ -406,7 +256,7 @@ export default function CheckOrderDetail({
     onClickClose();
   }
 
-  let rowsEntries: any = [];
+  // let rowsEntries: any = [];
   let sumDCPercent: number = 0;
   const handleCalculateDCPercent = async () => {
     // if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
@@ -429,42 +279,6 @@ export default function CheckOrderDetail({
   };
 
   if (openTote === false) {
-    let entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
-    if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
-      updateState(entries);
-    }
-
-    if (Object.keys(payloadAddItem).length !== 0) {
-      rowsEntries = payloadAddItem.map((item: any, index: number) => {
-        let qtyRef: number = 0;
-        let actualQty: number = 0;
-
-        if (item.id !== null && item.id !== undefined) {
-          qtyRef = Number(item.qtyRef) ? Number(item.qtyRef) : 0;
-          actualQty = Number(item.qty) ? Number(item.qty) : Number(item.actualQty) ? Number(item.actualQty) : 0;
-        } else {
-          qtyRef = Number(item.qty);
-          actualQty = Number(item.actualQty);
-        }
-
-        return {
-          rowOrder: index + 1,
-          id: index,
-          deliveryOrderNo: item.deliveryOrderNo,
-          isTote: item.isTote ? item.isTote : false,
-          sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
-          skuCode: item.skuCode,
-          barcode: item.barcode,
-          productName: item.productName,
-          unitName: item.unitName,
-          qtyRef: qtyRef,
-          actualQty: actualQty,
-          qtyDiff: item.qtyDiff,
-          comment: item.comment,
-        };
-      });
-    }
-
     if (docType === 'LD' && orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1) {
       if (sumDCPercent === 0) {
         handleCalculateDCPercent();
@@ -491,15 +305,16 @@ export default function CheckOrderDetail({
 
   const updateShipmentOrder = () => {
     dispatch(featchOrderListAsync(payloadSearchOrder));
-    // dispatch(featchOrderDetailAsync(sdNo));
   };
 
   const mapUpdateState = async () => {
     const itemsList: any = [];
 
-    if (rowsEntries.length > 0) {
-      const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      await rows.forEach((data: GridRowData) => {
+    // if (rowsEntries.length > 0) {
+    if (payloadAddItem.length > 0) {
+      // const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      // await rows.forEach((data: GridRowData) => {
+      await payloadAddItem.forEach((data: any) => {
         itemsList.push(data);
       });
 
@@ -509,21 +324,16 @@ export default function CheckOrderDetail({
     }
   };
 
-  const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'actualQty' || params.field === 'comment') {
-      mapUpdateState();
-    }
-  };
-
   const handleSaveButton = async () => {
     handleOpenLoading('open', true);
 
     let qtyIsValid: boolean = true;
-    const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    // const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
 
     const itemsList: any = [];
     const itemsListUpdate: any = [];
-    rows.forEach((data: GridRowData) => {
+    // rows.forEach((data: GridRowData) => {
+    payloadAddItem.forEach((data: any) => {
       const item: any = {
         barcode: data.barcode,
         deliveryOrderNo: data.deliveryOrderNo,
@@ -553,7 +363,7 @@ export default function CheckOrderDetail({
       await saveOrderShipments(payload, orderDetail.sdNo)
         .then((_value) => {
           featchOrderDetail(orderDetail.sdNo);
-          // updateShipmentOrder();
+
           updateAddItemsState({});
           setShowSnackBar(true);
           setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -564,10 +374,7 @@ export default function CheckOrderDetail({
           setShowSnackBar(true);
           setContentMsg(error.message);
           setSnackbarStatus(false);
-          // updateShipmentOrder();
         });
-
-      // updateState(itemsListUpdate);
     }
 
     handleOpenLoading('open', false);
@@ -592,14 +399,15 @@ export default function CheckOrderDetail({
       setItemsDiffState([]);
 
       setAction(ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+      // const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
       const itemsList: any = [];
 
       let qtyIsValid: boolean = true;
 
       let sumActualQtyItems: number = 0;
       let sumQuantityRefItems: number = 0;
-      rowsEdit.forEach((data: GridRowData) => {
+      // rowsEdit.forEach((data: GridRowData) => {
+      payloadAddItem.forEach((data: any) => {
         let diffCount: number = data.actualQty - data.qtyRef;
         sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
         sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
@@ -694,15 +502,8 @@ export default function CheckOrderDetail({
     handleOpenLoading('open', false);
   };
 
-  // const handleLinkDocument = async () => {
-  //   handleOpenLoading('open', true);
-  //   setStatusFile(0);
-  //   setOpenModelPreviewDocument(true);
-  //   handleOpenLoading('open', false);
-  // };
-
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
 
   const handleCloseSnackBar = () => {
@@ -748,38 +549,13 @@ export default function CheckOrderDetail({
         setOpensSD(true);
       } else {
         setOpenFailAlert(true);
-        setTextFail(`ไม่พบข้อมูล อ้างอิง SD โอนลอย: ${orderDetail.Comment}`);
+        setTextFail(`ไม่พบข้อมูล อ้างอิง SD โอนลอย: ${orderDetail.docRefRemark}`);
       }
     }, 200);
   };
 
   const handleClose = () => {
-    if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT) {
-      const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-      let i = 0;
-      let exit = false;
-
-      // const itemsList: any = [];
-      // rowsEdit.forEach((data: GridRowData) => {
-      //   if (data.actualQty !== rowsEntries[i].actualQty) {
-      //     exit = true;
-      //   } else if (data.comment !== rowsEntries[i].comment) {
-      //     exit = true;
-      //   }
-      //   i++;
-
-      //   itemsList.push(data);
-      // });
-
-      if (!exit) {
-        dispatch(updateAddItemsState({}));
-        setOpen(false);
-        onClickClose();
-      } else if (exit) {
-        setConfirmModelExit(true);
-      }
-    } else if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
-      // if (fileInfo.base64URL) {
+    if (orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
       if (fileUploadList.length > 0) {
         setConfirmModelExit(true);
       } else {
@@ -840,8 +616,8 @@ export default function CheckOrderDetail({
 
   return (
     <div>
-      <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
+      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>รายละเอียดใบตรวจสอบการรับ-โอนสินค้า</Typography>
         </BootstrapDialogTitle>
 
@@ -849,45 +625,45 @@ export default function CheckOrderDetail({
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร:</Typography>
+                <Typography variant="body2">เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{docRefNo}</Typography>
+                <Typography variant="body2">{docRefNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลข Tote:</Typography>
+                <Typography variant="body2">เลข Tote:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{orderDetail.toteCode ? orderDetail.toteCode : '-'}</Typography>
+                <Typography variant="body2">{orderDetail.toteCode ? orderDetail.toteCode : '-'}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>เลขที่เอกสาร SD:</Typography>
+                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{orderDetail.sdNo}</Typography>
+                <Typography variant="body2">{orderDetail.sdNo}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>สถานะ:</Typography>
+                <Typography variant="body2">สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
                 {/* <Typography variant="body2">{shipmentStatusText}</Typography> */}
-                <Typography variant='body2'>{getShipmentStatusText(orderDetail.sdStatus)}</Typography>
+                <Typography variant="body2">{getShipmentStatusText(orderDetail.sdStatus)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={2}>
-                <Typography variant='body2'>วันที่:</Typography>
+                <Typography variant="body2">วันที่:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{shipmentDateFormat}</Typography>
+                <Typography variant="body2">{shipmentDateFormat}</Typography>
               </Grid>
               <Grid item lg={2}>
-                <Typography variant='body2'>ประเภท:</Typography>
+                <Typography variant="body2">ประเภท:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{getShipmentTypeText(orderDetail.sdType)}</Typography>
+                <Typography variant="body2">{getShipmentTypeText(orderDetail.sdType)}</Typography>
               </Grid>
             </Grid>
 
@@ -895,21 +671,21 @@ export default function CheckOrderDetail({
               <Grid item lg={6}></Grid>
               <Grid item lg={2}>
                 {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
-                  <Typography variant='body2'>ใบผลต่างหลังเซ็นต์:</Typography>
+                  <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
                 )}
 
                 {orderDetail.sdImageFile !== '' &&
                   orderDetail.sdImageFile !== 'temp' &&
                   orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB && (
-                    <Typography variant='body2'>ใบผลต่างหลังเซ็นต์:</Typography>
+                    <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
                   )}
               </Grid>
               <Grid item lg={4}>
                 {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && !statusOC && (
                   <AccordionUploadFile
                     files={[]}
-                    docNo=''
-                    docType=''
+                    docNo=""
+                    docType=""
                     isStatus={uploadFileFlag}
                     onChangeUploadFile={handleOnChangeUploadFile}
                     enabledControl={true}
@@ -922,17 +698,20 @@ export default function CheckOrderDetail({
               </Grid>
             </Grid>
 
-            {orderDetail.Comment !== '' && (
+            {orderDetail.docRefRemark !== '' && (
               <Grid container spacing={2} mb={1}>
                 <Grid item lg={2}>
-                  <Typography variant='body2'>อ้างอิง SD โอนลอย :</Typography>
+                  <Typography variant="body2">เอกสารอ้างอิง :</Typography>
                 </Grid>
                 <Grid item lg={4}>
-                  <Typography variant='body2'>
-                    <u onClick={clickSelectedSDRef} style={{ cursor: 'pointer' }}>
-                      {orderDetail.Comment}
-                    </u>
-                  </Typography>
+                  {findIndexStr && (
+                    <Typography variant="body2">
+                      <u onClick={clickSelectedSDRef} style={{ cursor: 'pointer' }}>
+                        {orderDetail.docRefRemark}
+                      </u>
+                    </Typography>
+                  )}
+                  <div>{!findIndexStr && <Typography variant="body2">{orderDetail.docRefRemark}</Typography>}</div>
                 </Grid>
                 <Grid item lg={6}></Grid>
               </Grid>
@@ -941,17 +720,18 @@ export default function CheckOrderDetail({
 
           {/* DisplayBtn */}
           <Box sx={{ marginTop: 4 }}>
-            <Grid container spacing={2} display='flex' justifyContent='space-between'>
+            <Grid container spacing={2} display="flex" justifyContent="space-between">
               {/* <Grid item xl={2}> */}
               <Grid item xl={4}>
                 {statusWaitApprove1 && orderDetail.sdType !== 1 && (
                   <>
                     <Typography
-                      variant='body1'
-                      align='center'
+                      variant="body1"
+                      align="center"
                       sx={{
                         color: '#FF0000',
-                      }}>
+                      }}
+                    >
                       {sumDCPercent < DCPercent && `*จำนวนรับจริง ${sumDCPercent}% น้อยกว่าค่าที่กำหนด ${DCPercent}%*`}
                       {sumDCPercent > DCPercent && `*จำนวนรับจริง ${sumDCPercent}% มากกว่าค่าที่กำหนด ${DCPercent}%*`}
                     </Typography>
@@ -960,41 +740,44 @@ export default function CheckOrderDetail({
 
                 {!statusWaitApprove1 && (
                   <Button
-                    id='btnPrint'
-                    variant='contained'
-                    color='secondary'
+                    id="btnPrint"
+                    variant="contained"
+                    color="secondary"
                     onClick={handlePrintBtn}
                     startIcon={<Print />}
                     className={classes.MbtnPrint}
                     style={{ textTransform: 'none' }}
-                    sx={{ display: `${showCloseJobBtn || isAllowExportBtn ? 'none' : ''}` }}>
+                    sx={{ display: `${showCloseJobBtn || isAllowExportBtn ? 'none' : ''}` }}
+                  >
                     พิมพ์ใบผลต่าง
                   </Button>
                 )}
 
                 {showSaveBtn && (
                   <Button
-                    id='btnAddItem'
-                    variant='contained'
-                    color='secondary'
+                    id="btnAddItem"
+                    variant="contained"
+                    color="secondary"
                     onClick={handleClickAddItem}
                     className={classes.MbtnAdd}
                     sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
                     // disabled={newAddItemListArray.length === 0}
                     startIcon={<AddCircleOutlineIcon />}
-                    endIcon={<KeyboardArrowDownIcon />}>
+                    endIcon={<KeyboardArrowDownIcon />}
+                  >
                     เพิ่มสินค้า
                   </Button>
                 )}
 
                 <StyledMenu
-                  id='demo-customized-menu'
+                  id="demo-customized-menu"
                   MenuListProps={{
                     'aria-labelledby': 'demo-customized-button',
                   }}
                   anchorEl={anchorEl}
                   open={openDropdown}
-                  onClose={handleCloseDropdown}>
+                  onClose={handleCloseDropdown}
+                >
                   {showSdTypeTote && (
                     <MenuItem sx={{ color: '#446EF2' }} onClick={handleOpenTote}>
                       เพิ่ม Tote
@@ -1010,26 +793,28 @@ export default function CheckOrderDetail({
                 {showSaveBtn && (
                   <div>
                     <Button
-                      id='btnSave'
-                      variant='contained'
-                      color='warning'
+                      id="btnSave"
+                      variant="contained"
+                      color="warning"
                       className={classes.MbtnSave}
                       onClick={handleSaveButton}
                       startIcon={<SaveIcon />}
                       style={{ width: 200 }}
-                      sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}>
+                      sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                    >
                       บันทึก
                     </Button>
 
                     <Button
-                      id='btnApprove'
-                      variant='contained'
-                      color='primary'
+                      id="btnApprove"
+                      variant="contained"
+                      color="primary"
                       className={classes.MbtnApprove}
                       onClick={handleApproveBtn}
                       startIcon={<CheckCircleOutline />}
                       style={{ width: 200 }}
-                      sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}>
+                      sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                    >
                       ยืนยัน
                     </Button>
                   </div>
@@ -1037,26 +822,28 @@ export default function CheckOrderDetail({
 
                 {showApproveBtn && (
                   <Button
-                    id='btnClose'
-                    variant='contained'
-                    color='primary'
+                    id="btnClose"
+                    variant="contained"
+                    color="primary"
                     className={classes.MbtnClose}
                     onClick={handleCloseJobBtn}
                     startIcon={<BookmarkAdded />}
-                    sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}>
+                    sx={{ display: `${!displayBranchGroup ? 'none' : ''}` }}
+                  >
                     ปิดงาน
                   </Button>
                 )}
 
                 {statusOC && statusWaitApprove1 && (
                   <Button
-                    id='btnApprove'
-                    variant='contained'
-                    color='primary'
+                    id="btnApprove"
+                    variant="contained"
+                    color="primary"
                     className={classes.MbtnApprove}
                     onClick={handleApproveOCBtn}
                     startIcon={<CheckCircleOutline />}
-                    style={{ width: 200 }}>
+                    style={{ width: 200 }}
+                  >
                     อนุมัติ
                   </Button>
                 )}
@@ -1064,31 +851,8 @@ export default function CheckOrderDetail({
             </Grid>
           </Box>
 
-          <Box mt={2} bgcolor='background.paper'>
-            {!closeJobTote && (
-              <div
-                style={{ width: '100%', height: rowsEntries.length >= 8 ? '70vh' : 'auto' }}
-                className={classes.MdataGridDetail}>
-                {/* {!openTote && <CheckOrderDetailItems rowList={rowsEntries} />} */}
-                <DataGrid
-                  rows={rowsEntries}
-                  columns={columns}
-                  pageSize={pageSize}
-                  onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                  rowsPerPageOptions={[10, 20, 50, 100]}
-                  pagination
-                  disableColumnMenu
-                  autoHeight={rowsEntries.length >= 8 ? false : true}
-                  scrollbarSize={10}
-                  onCellFocusOut={handleEditItems}
-                  onCellOut={handleEditItems}
-                  onCellEditStart={handleEditItems}
-                  onCellEditStop={handleEditItems}
-                  // onCellKeyDown={handleEditItems}
-                  // onCellBlur={handleEditItems}
-                />
-              </div>
-            )}
+          <Box mt={2} bgcolor="background.paper">
+            {!closeJobTote && <CheckOrderDetailList />}
 
             {closeJobTote && (
               <div>
@@ -1102,14 +866,12 @@ export default function CheckOrderDetail({
       {opensSD && (
         <CheckOrderSDRefDetail
           sdNo={sdNo}
-          sdRefNo={orderDetail.Comment}
+          sdRefNo={orderDetail.docRefRemark}
           shipmentNo={docRefNo}
           defaultOpen={opensSD}
           onClickClose={isClosSDModal}
         />
       )}
-
-      {/* {openTote && <CheckOrderDetailTote defaultOpen={openTote} onClickClose={handleCloseDetailToteModal} />} */}
 
       {openOrderReceiveModal && (
         <OrderReceiveDetail
@@ -1129,7 +891,7 @@ export default function CheckOrderDetail({
         action={action}
         items={itemsDiffState}
         percentDiffType={false}
-        percentDiffValue='0'
+        percentDiffValue="0"
         // sumDCPercent={sumDCPercent}
         sumActualQty={sumActualQty}
         sumQuantityRef={sumQuantityRef}
@@ -1154,7 +916,7 @@ export default function CheckOrderDetail({
             ? orderDetail.sdImageFilename
             : formatFileNam(orderDetail.sdNo, orderDetail.sdStatus)
         }
-        btnPrintName='พิมพ์ใบผลต่าง'
+        btnPrintName="พิมพ์ใบผลต่าง"
       />
 
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
@@ -1171,7 +933,8 @@ export default function CheckOrderDetail({
           skuCodes: [],
           skuTypes: [2],
           isSellable: true,
-        }}></ModalAddItems>
+        }}
+      ></ModalAddItems>
     </div>
   );
 }

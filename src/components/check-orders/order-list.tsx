@@ -197,7 +197,7 @@ function OrderList() {
     },
     {
       field: 'comment',
-      headerName: 'อ้างอิง SD โอนลอย',
+      headerName: 'เอกสารอ้างอิง',
       minWidth: 145,
       flex: 1.3,
       headerAlign: 'center',
