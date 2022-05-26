@@ -523,6 +523,7 @@ function StockSearch() {
         requestBody={{
           isControlStock: true,
         }}
+        isControlStockType={true}
       />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>

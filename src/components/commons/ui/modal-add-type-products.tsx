@@ -30,7 +30,7 @@ import {
 } from '../../../store/slices/search-type-product-slice';
 import { updateAddTypeAndProductState } from '../../../store/slices/add-type-product-slice';
 import LoadingModal from './loading-modal';
-import { getAllProductByType } from '../../../services/common';
+import { getProductByType } from '../../../services/product-master';
 import { setCheckEdit } from '../../../store/slices/sale-limit-time-slice';
 import { FindProductProps, FindProductRequest } from '../../../models/product-model';
 
@@ -54,6 +54,7 @@ interface Props {
   showSearch?: boolean;
   textBtn?: string;
   requestBody: FindProductRequest;
+  isControlStockType?: boolean;
 }
 
 interface SelectedItemProps {
@@ -321,8 +322,21 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         if (!objectNullOrEmpty(values.productType)) {
           productTypeCode = values.productType.productTypeCode;
         }
+
+        let payload: any;
+        if (props.isControlStockType) {
+          payload = {
+            productTypeCode: productTypeCode,
+            isControlStock: props.isControlStockType,
+          };
+        } else {
+          payload = {
+            productTypeCode: productTypeCode,
+          };
+        }
+
         setOpenLoadingModal(true);
-        let res = await getAllProductByType(productTypeCode);
+        let res = await getProductByType(payload);
         if (res && res.data && res.data.length > 0) {
           selectedAddItems.push(productTypeItem);
           let lstProductByType = res.data;

@@ -71,13 +71,6 @@ export const searchAllProductAsync = createAsyncThunk(
 
 export const newSearchAllProductAsync = createAsyncThunk('searchAllProductAsync', async (payload: FindProductProps) => {
   try {
-    // const path = `${environment.products.addItem.allitemsList.url}/${payloadSearchProduct.search}?limit=10`;
-    // let response = await post(path, {
-    //   productTypeCodes: payloadSearchProduct.productTypeCodes,
-    //   skuTypes: payloadSearchProduct.skuTypes,
-    //   isSellable: true,
-    // }).then();
-
     const path = `${environment.products.addItem.allitemsList.url}/${payload.search}?limit=10`;
     const body = { ...payload.payload };
     let response = await post(path, body, ContentType.JSON).then();
