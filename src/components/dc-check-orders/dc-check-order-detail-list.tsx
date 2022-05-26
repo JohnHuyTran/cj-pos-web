@@ -1,12 +1,20 @@
 import React, { ReactElement } from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid, GridCellParams, GridColDef, GridRowData, GridValueGetterParams } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRenderCellParams,
+  GridRowData,
+  GridValueGetterParams,
+} from '@mui/x-data-grid';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { CheckOrderDetailItims } from '../../models/dc-check-order-model';
 
 import { useStyles } from '../../styles/makeTheme';
 import Typography from '@mui/material/Typography';
 import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
+import { TextField } from '@mui/material';
 
 interface Props {
   items: [];
@@ -58,6 +66,13 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
   },
   {
+    field: 'hhQty',
+    headerName: 'จำนวนที่ scan HH',
+    minWidth: 135,
+    sortable: false,
+    headerAlign: 'center',
+  },
+  {
     field: 'productQuantityRef',
     headerName: 'จำนวนอ้างอิง',
     width: 115,
@@ -72,6 +87,21 @@ const columns: GridColDef[] = [
     sortable: false,
     align: 'right',
     headerAlign: 'center',
+    renderCell: (params: GridRenderCellParams) => (
+      <TextField
+        variant='outlined'
+        name='txbProductQuantityActual'
+        inputProps={{ style: { textAlign: 'right' } }}
+        value={params.value}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(e) => {
+          params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
+          // e.target.setSelectionRange(caretStart, caretEnd);
+        }}
+        disabled={params.getValue(params.id, 'isDisable') ? true : false}
+        autoComplete='off'
+      />
+    ),
   },
   {
     field: 'productDifference',
@@ -92,7 +122,8 @@ const columns: GridColDef[] = [
   {
     field: 'sdNo',
     headerName: 'รับสินค้าใน Tote',
-    flex: 0.5,
+    // flex: 0.5,
+    minWidth: 150,
     sortable: false,
     headerAlign: 'center',
     renderCell: (params) => {
