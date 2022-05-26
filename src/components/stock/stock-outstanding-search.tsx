@@ -370,25 +370,6 @@ function StockSearch() {
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
-              กลุ่มสินค้า (Article)
-            </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id='tbxstoreId'
-                name='storeId'
-                value={values.storeId}
-                onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={0} selected={true}>
-                  ทั้งหมด
-                </MenuItem>
-                <MenuItem value={1}>วัตถุดิบ</MenuItem>
-                <MenuItem value={2}>สินค้า Trading goods</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div'>
               ค้นหาสินค้า{value === 0 && '*'}
             </Typography>
             <TextField
@@ -537,9 +518,12 @@ function StockSearch() {
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
         title='ระบุสินค้าที่ต้องการค้นหา*'
-        skuType={skuTypes}
         showSearch={true}
         textBtn='เลือกสินค้า'
+        requestBody={{
+          isControlStock: true,
+        }}
+        isControlStockType={true}
       />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>

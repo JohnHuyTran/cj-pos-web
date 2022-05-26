@@ -1,17 +1,19 @@
 import { Autocomplete, CircularProgress, createFilterOptions, TextField, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
-import { searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
+import { newSearchAllProductAsync, searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import SearchIcon from '@mui/icons-material/Search';
+import { FindProductProps, FindProductRequest } from '../../../models/product-model';
 
 interface Props {
-  skuType: any[];
+  // skuType?: any[];
   onSelectItem: (value: any) => void;
   isClear: boolean;
+  requestBody: FindProductRequest;
 }
 
-function TextBoxSearchProduct({ skuType, onSelectItem, isClear }: Props) {
+function TextBoxSearchProduct({ onSelectItem, isClear, requestBody }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [value, setValue] = React.useState('');
@@ -71,21 +73,22 @@ function TextBoxSearchProduct({ skuType, onSelectItem, isClear }: Props) {
     if (event && event.keyCode && event.keyCode === 13) {
       return false;
     }
-    if (reason == 'reset') {
-      clearInput();
-    }
+    // console.log('onInputChange', { reason, value });
+    // if (reason == 'reset') {
+    //   clearInput();
+    // }
 
     const keyword = value.trim();
     if (keyword.length >= 3 && reason !== 'reset') {
       setLoading(true);
       setSearchItem(keyword);
-      await dispatch(
-        searchAllProductAsync({
-          search: keyword,
-          productTypeCodes: [],
-          skuTypes: skuType ? (skuType[0] == 0 ? [1, 2] : skuType) : [2],
-        })
-      );
+
+      const payload: FindProductProps = {
+        search: keyword,
+        payload: requestBody,
+      };
+      await dispatch(newSearchAllProductAsync(payload));
+
       setLoading(false);
     } else {
       clearData();
