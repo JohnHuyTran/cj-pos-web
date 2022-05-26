@@ -19,7 +19,7 @@ export async function getProductByType(payload: any) {
       );
     }
 
-    return await post(`${environment.products.type.productByType.url}?product-type=${payload.productTypeCode}`);
+    return await get(`${environment.products.type.productByType.url}?product-type=${payload.productTypeCode}`);
   } catch (error) {
     throw error;
   }
