@@ -1,3 +1,5 @@
+import { ReasonType } from './common-model';
+
 export interface CheckOrderRequest {
   limit: string;
   page: string;
@@ -108,4 +110,11 @@ export interface ItemsInfo {
   barcode: string;
   actualQty: number;
   comment: string;
+}
+
+export interface ReasonRejectResponseType {
+  data: ReasonType[];
+  ref: string;
+  code: number;
+  message: string;
 }

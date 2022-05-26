@@ -76,6 +76,7 @@ import masterStockMovementTypeSlice from './slices/master/stock-movement-type-sl
 import purchaseBRDetailSlice from './slices/purchase/purchase-branch-request-detail-slice';
 import purchaseBranchRequestSlice from './slices/purchase-branch-request-slice';
 import saveSearchPurchaseBranchRequest from './slices/save-search-purchase-branch-request-slice';
+import verifyReasonsRejectListSlice from './slices/master/verify-order-reject-reasons-slice';
 const store = configureStore({
   reducer: {
     auth: authSlice,
@@ -154,6 +155,7 @@ const store = configureStore({
     purchaseBRDetailSlice: purchaseBRDetailSlice,
     purchaseBranchRequestSlice: purchaseBranchRequestSlice,
     saveSearchPurchaseBranchRequest: saveSearchPurchaseBranchRequest,
+    verifyReasonsRejectListSlice: verifyReasonsRejectListSlice,
   },
 });
 

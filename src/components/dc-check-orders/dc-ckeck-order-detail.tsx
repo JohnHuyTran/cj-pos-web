@@ -26,6 +26,8 @@ import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc
 import TextBoxComment from '../commons/ui/textbox-comment';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
+import AlertError from '../commons/ui/alert-error';
+import { fetchVerifyOrderReasonsRejectListAsync } from '../../store/slices/master/verify-order-reject-reasons-slice';
 
 interface Props {
   isOpen: boolean;
@@ -45,10 +47,18 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const orderDetailList = useAppSelector((state) => state.dcCheckOrderDetail.orderDetail);
-  const reasonNoApproveList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
+  const reasonRejectList = useAppSelector((state) => state.verifyReasonsRejectListSlice.reasonsList.data);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
+
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
+
   const [valueCommentDC, setValueCommentDC] = React.useState('');
   const [errorCommentDC, setErrorCommentDC] = React.useState(false);
 
@@ -65,6 +75,8 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
   const [characterCount, setCharacterCount] = React.useState(0);
   const [disableCheckBtn, setDisableCheckBtn] = React.useState(true);
+  const [isAllowRejectBtn, setIsAllowRejectBtn] = React.useState(true);
+  const [isAllowApproveBtn, setIsApproveRejectBtn] = React.useState(true);
   const detailDC: any = orderDetailList.data ? orderDetailList.data : null;
   const detailDCItems = detailDC.items ? detailDC.items : [];
 
@@ -73,7 +85,10 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const [isShowApproveFlow, setIsShowApproveFlow] = React.useState(false);
 
   useEffect(() => {
+    if (reasonRejectList === null || reasonRejectList.length <= 0) dispatch(fetchVerifyOrderReasonsRejectListAsync());
     setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
+    setIsAllowRejectBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
+    setIsApproveRejectBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
     setOpen(isOpen);
     setValueCommentDC(detailDC.dcComment);
     setIDVerify(detailDC.id);
@@ -172,9 +187,27 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const handleOnChangeUploadFile = (status: boolean) => {
     setUploadFileFlag(status);
-    // if (status) {
-    //   dispatch(featchPurchaseNoteAsync(btNo));
-    // }
+  };
+
+  const handleOnClickApproveBtn = () => {};
+  const handleOnClickRejectBtn = () => {
+    const isValid = validateInput();
+    if (isValid) {
+    }
+
+    setOpenAlert(!isValid);
+  };
+
+  const validateInput = () => {
+    const isvalid = fileUploadList.length > 0 ? true : false;
+    if (values.reason === null || values.reason === undefined || values.reason === 'All') {
+      setTextError('กรุณาระบุเหตุผลที่แก้ไข');
+      return false;
+    } else if (!isvalid) {
+      setTextError('กรุณาแนบเอกสาร');
+      return false;
+    }
+    return true;
   };
 
   return (
@@ -274,7 +307,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     <Typography variant='body2'>{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
                   </Grid>
                   <Grid item xs={2}>
-                    เหตุผล-การแก้ไข:
+                    <Typography variant='body2'>เหตุผล-การแก้ไข:</Typography>
                   </Grid>
                   <Grid item xs={4}>
                     {' '}
@@ -284,12 +317,13 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                         name='reason'
                         value={values.reason}
                         onChange={handleChange}
-                        inputProps={{ 'aria-label': 'Without label' }}>
+                        inputProps={{ 'aria-label': 'Without label' }}
+                        disabled={detailDC.verifyDCStatus !== 0}>
                         <MenuItem value={'All'} selected={true}>
                           กรุณาระบุเหตุผล
                         </MenuItem>
-                        {reasonNoApproveList.map((reason) => (
-                          <MenuItem key={reason.id} value={reason.code}>
+                        {reasonRejectList.map((reason) => (
+                          <MenuItem key={reason.code} value={reason.code}>
                             {reason.name}
                           </MenuItem>
                         ))}
@@ -309,14 +343,20 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     <Typography variant='body2'>แนบเอกสาร-ไม่อนุมัติ:</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    <AccordionUploadFile
-                      files={[]}
-                      docNo={detailDC.docRefNo}
-                      docType={detailDC.docType}
-                      isStatus={uploadFileFlag}
-                      onChangeUploadFile={handleOnChangeUploadFile}
-                      enabledControl={true}
-                    />
+                    {detailDC.verifyDCStatus === 0 && (
+                      <AccordionUploadFile
+                        files={[]}
+                        docNo={detailDC.docRefNo}
+                        docType={detailDC.docType}
+                        isStatus={uploadFileFlag}
+                        onChangeUploadFile={handleOnChangeUploadFile}
+                        enabledControl={true}
+                      />
+                    )}
+
+                    {detailDC.verifyDCStatus !== 0 && detailDC.files && detailDC.files.length > 0 && (
+                      <AccordionHuaweiFile files={detailDC.files} />
+                    )}
                   </Grid>
                 </Grid>
               </>
@@ -333,12 +373,12 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                           variant='contained'
                           color='secondary'
                           startIcon={<ContentPaste />}
-                          onClick={handlCheckedButton}
+                          onClick={handleOnClickRejectBtn}
                           sx={{
                             borderRadius: '5px',
                             width: '200px',
                             padding: '8px',
-                            display: `${disableCheckBtn ? 'none' : ''}`,
+                            display: `${isAllowApproveBtn ? 'none' : ''}`,
                           }}>
                           อนุมัติ
                         </Button>
@@ -348,13 +388,13 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                           variant='contained'
                           color='error'
                           startIcon={<ContentPaste />}
-                          onClick={handlCheckedButton}
+                          onClick={handleOnClickRejectBtn}
                           sx={{
                             ml: 1,
                             borderRadius: '5px',
                             width: '200px',
                             padding: '8px',
-                            display: `${disableCheckBtn ? 'none' : ''}`,
+                            display: `${isAllowRejectBtn ? 'none' : ''}`,
                           }}>
                           ไม่อนุมัติ
                         </Button>
@@ -412,7 +452,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         isSuccess={approveDCStatus}
         contentMsg={contentMsg}
       />
-
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       {/* <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}

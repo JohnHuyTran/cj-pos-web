@@ -414,6 +414,13 @@ export const environment = {
         url: '/master/stock-movement-types',
       },
     },
+    reason: {
+      verifyOrder: {
+        disapprove: {
+          url: 'master/disapproval-reasons',
+        },
+      },
+    },
   },
   authority: {
     authorizedBranch: {
