@@ -96,7 +96,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
       flex: 1,
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -119,8 +119,8 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
       renderCell: (params) => {
         return (
           <div style={{ paddingLeft: '10px' }}>
-            <Typography variant="body2">{params.value}</Typography>
-            <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+            <Typography variant='body2'>{params.value}</Typography>
+            <Typography color='textSecondary' sx={{ fontSize: 12 }}>
               {params.getValue(params.id, 'skuCode') || ''}
             </Typography>
           </div>
@@ -136,7 +136,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
       sortable: false,
       renderCell: (params) => {
         return (
-          <Typography variant="body2" paddingLeft="10px">
+          <Typography variant='body2' paddingLeft='10px'>
             {params.value}
           </Typography>
         );
@@ -161,7 +161,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
 
         const handleDeleteItem = () => {
           let newList = payloadAddTypeProduct.filter((r: any) => r.barcode !== params.row.barcode);
-          let listCodeProductByType = newList.map((el1: any) => el1.ProductTypeCode);
+          let listCodeProductByType = newList.map((el1: any) => el1.productTypeCode);
 
           let listAdd = newList.filter((item: any) => {
             if (item.selectedType === 1 && !listCodeProductByType.includes(item.productTypeCode)) {
@@ -178,19 +178,18 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
           <>
             {!disabled && (
               <Button onClick={handleOpenModalDelete}>
-                <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+                <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
               </Button>
             )}
 
             <Dialog
               open={openModalDelete}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-              PaperProps={{ sx: { minWidth: 450, height: 241 } }}
-            >
+              aria-labelledby='alert-dialog-title'
+              aria-describedby='alert-dialog-description'
+              PaperProps={{ sx: { minWidth: 450, height: 241 } }}>
               <DialogContent sx={{ pl: 6, pr: 8 }}>
-                <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-                  <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+                <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
+                  <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
                     ต้องการลบสินค้า
                   </Typography>
                   <Grid container>
@@ -205,8 +204,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
                           style={{
                             color: '#AEAEAE',
                             fontSize: 14,
-                          }}
-                        >
+                          }}>
                           {params.row.categoryTypeCode}
                         </label>
                       </label>
@@ -225,21 +223,19 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
 
               <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
                 <Button
-                  id="btnCancle"
-                  variant="contained"
-                  color="inherit"
+                  id='btnCancle'
+                  variant='contained'
+                  color='inherit'
                   sx={{ borderRadius: 2, width: 90, mr: 2 }}
-                  onClick={handleCloseModalDelete}
-                >
+                  onClick={handleCloseModalDelete}>
                   ยกเลิก
                 </Button>
                 <Button
-                  id="btnConfirm"
-                  variant="contained"
-                  color="error"
+                  id='btnConfirm'
+                  variant='contained'
+                  color='error'
                   sx={{ borderRadius: 2, width: 90 }}
-                  onClick={handleDeleteItem}
-                >
+                  onClick={handleDeleteItem}>
                   ลบสินค้า
                 </Button>
               </DialogActions>
@@ -256,8 +252,8 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
       </Typography>
       <FormGroup>
         <FormControlLabel
-          control={<Checkbox size="small" checked={showAll} onClick={handleShowProducts} />}
-          label="แสดงรายการสินค้าทั้งหมด"
+          control={<Checkbox size='small' checked={showAll} onClick={handleShowProducts} />}
+          label='แสดงรายการสินค้าทั้งหมด'
         />
       </FormGroup>
       <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 1, mb: 1.5 }}>
@@ -274,7 +270,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
             rowHeight={70}
             components={{
               NoRowsOverlay: () => (
-                <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
+                <Typography position='relative' textAlign='center' top='112px' color='#AEAEAE'>
                   ไม่มีข้อมูล
                 </Typography>
               ),
