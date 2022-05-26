@@ -124,6 +124,7 @@ export interface ShipmentDetailInfo {
   sdImageFile: string;
   sdStatus: number;
   Comment: string;
+  docRefRemark: string;
   items: itemsDetail[] | [];
 }
 export interface itemsDetail {
