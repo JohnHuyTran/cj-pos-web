@@ -13,6 +13,7 @@ export interface TransferOutDetail {
   skuCode: string;
   unit: string;
   unitCode: string;
+  barFactor: number;
   numberOfRequested: number;
   numberOfApproved: number;
   remark: string;
@@ -26,6 +27,7 @@ export interface TransferOutDestroyDiscountDetail {
   skuCode: string;
   unit: string;
   unitCode: string;
+  barFactor: number;
   numberOfRequested: number;
   numberOfApproved: number;
   remark: string;

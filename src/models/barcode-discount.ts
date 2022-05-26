@@ -18,6 +18,7 @@ export interface DiscountDetail {
   skuCode: string;
   unit: string;
   unitCode: string;
+  barFactor: number;
   price: number;
   discount: any;
   expiryDate: string | any;
