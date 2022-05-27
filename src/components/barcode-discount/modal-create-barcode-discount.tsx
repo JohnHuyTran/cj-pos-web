@@ -323,6 +323,7 @@ export default function ModalCreateBarcodeDiscount({
             barcodeName: item.productName,
             unitName: item.unitFactor,
             unitCode: item.unitCode,
+            baseUnit: item.barFactor,
             unitPrice: item.price || 0,
             discount: item.requestedDiscount || 0,
             qty: item.numberOfDiscounted || 0,
