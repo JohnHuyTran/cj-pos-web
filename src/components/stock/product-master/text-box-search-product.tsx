@@ -1,9 +1,9 @@
 import { Autocomplete, CircularProgress, createFilterOptions, TextField, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
-import { searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
+import { useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import SearchIcon from '@mui/icons-material/Search';
+import { searchProductItem } from '../../../services/product-master';
 
 interface Props {
   onSelectItem: (value: any) => void;
@@ -16,20 +16,22 @@ function TextBoxSearchProduct({ onSelectItem, isClear }: Props) {
   const [value, setValue] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [searchItem, setSearchItem] = React.useState<any | null>(null);
-  const itemsList = useAppSelector((state) => state.searchTypeAndProduct.itemList);
+  const [itemsList, setItemList] = React.useState([]);
   let options: any = [];
-  if (searchItem) options = itemsList && itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
+  if (searchItem) options = itemsList && itemsList.length > 0 ? itemsList : [];
+  console.log({ options });
+
   const filterOptions = createFilterOptions({
-    stringify: (option: any) => option.barcodeName + option.barcode,
+    stringify: (option: any) => option.barcodeName + option.barcode + option.skuCode,
   });
 
   const autocompleteRenderListItem = (props: any, option: any) => {
     return (
-      <li {...props} key={option.barcode}>
+      <li {...props} key={option.barcode + option.skuCode}>
         <div>
           <Typography variant="body2">{option.barcodeName}</Typography>
           <Typography color="textSecondary" variant="caption">
-            {option.skuCode}
+            {option.barcode} / {option.skuCode}
           </Typography>
         </div>
       </li>
@@ -78,13 +80,15 @@ function TextBoxSearchProduct({ onSelectItem, isClear }: Props) {
     if (keyword.length >= 3 && reason !== 'reset') {
       setLoading(true);
       setSearchItem(keyword);
-      await dispatch(
-        searchAllProductAsync({
-          search: keyword,
-          productTypeCodes: [],
-        })
-      );
-      setLoading(false);
+      try {
+        const rs = await searchProductItem(keyword);
+        if (rs) {
+          setItemList(rs.data);
+          setLoading(false);
+        }
+      } catch (error) {
+        setLoading(false);
+      }
     } else {
       clearData();
     }

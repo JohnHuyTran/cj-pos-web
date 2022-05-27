@@ -268,6 +268,9 @@ export const environment = {
         search: {
           url: '/products/sku/product-master',
         },
+        searchItem: {
+          url: 'products/product/find',
+        },
       },
     },
   },
