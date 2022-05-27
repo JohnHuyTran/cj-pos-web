@@ -70,6 +70,15 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
       sortable: false,
     },
     {
+      field: 'hhQty',
+      headerName: 'จำนวนที่ scanHH',
+      width: 133,
+      headerAlign: 'center',
+      align: 'right',
+      sortable: false,
+      renderCell: (params) => calHHDiff(params),
+    },
+    {
       field: 'qtyRef',
       headerName: 'จำนวนอ้างอิง',
       width: 130,
@@ -186,6 +195,14 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
     return diff;
   };
 
+  var calHHDiff = function (params: GridValueGetterParams) {
+    let hhQty = params.getValue(params.id, 'hhQty');
+    let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'hhQty'));
+
+    if (diff > 0) return <label style={{ color: '#FBA600', fontWeight: 700 }}> {hhQty} </label>;
+    return hhQty;
+  };
+
   function useApiRef() {
     const apiRef = useGridApiRef();
     const _columns = useMemo(
@@ -235,7 +252,7 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
 
       return {
         rowOrder: index + 1,
-        id: `${item.deliveryOrderNo}${item.barcode}_${index}`,
+        id: index,
         deliveryOrderNo: item.deliveryOrderNo,
         isTote: item.isTote ? item.isTote : false,
         sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
@@ -252,6 +269,7 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
         docType: item.docType,
         docRefNo: item.docRefNo,
         toteCode: item.toteCode,
+        hhQty: item.hhQty,
       };
     });
   }
