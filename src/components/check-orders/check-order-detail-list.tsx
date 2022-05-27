@@ -12,7 +12,7 @@ import {
 import { TextField, Typography } from '@mui/material';
 import { useStyles } from '../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../store/store';
-import { itemsDetail } from '../../models/order-model';
+import { itemsDetail, ShipmentDetailInfo } from '../../models/order-model';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 
@@ -55,6 +55,15 @@ const columns: GridColDef[] = [
     width: 90,
     headerAlign: 'center',
     sortable: false,
+  },
+  {
+    field: 'hhQty',
+    headerName: 'จำนวนที่ scanHH',
+    width: 133,
+    headerAlign: 'center',
+    align: 'right',
+    sortable: false,
+    renderCell: (params) => calHHDiff(params),
   },
   {
     field: 'qtyRef',
@@ -133,6 +142,14 @@ var chkActualQty = (value: any) => {
   return value;
 };
 
+var calHHDiff = function (params: GridValueGetterParams) {
+  let hhQty = params.getValue(params.id, 'hhQty');
+  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'hhQty'));
+
+  if (diff > 0) return <label style={{ color: '#FBA600', fontWeight: 700 }}> {hhQty} </label>;
+  return hhQty;
+};
+
 function useApiRef() {
   const apiRef = useGridApiRef();
   const _columns = useMemo(
@@ -203,6 +220,7 @@ function CheckOrderDetailList() {
         actualQty: actualQty,
         qtyDiff: item.qtyDiff,
         comment: item.comment,
+        hhQty: item.hhQty,
       };
     });
   }
