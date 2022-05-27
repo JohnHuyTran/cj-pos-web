@@ -718,6 +718,8 @@ export default function ModalCreateBarcodeDiscount({
       const payload = {
         branchCode: branchCodeCheckStock,
         products: products,
+        frontStore: true,
+        backStore: true
       };
       const rs = await checkStockBalance(payload);
 
@@ -983,13 +985,13 @@ export default function ModalCreateBarcodeDiscount({
           <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
         <DialogContent>
-          <Grid container sx={{ paddingTop: '50px' }}>
+          <Grid container>
             <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
                 เลขที่เอกสาร BD :
               </Grid>
               <Grid item xs={4}>
-                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '_'}
+                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '-'}
               </Grid>
             </Grid>
             <Grid container item xs={6} sx={{ marginBottom: '15px' }}>

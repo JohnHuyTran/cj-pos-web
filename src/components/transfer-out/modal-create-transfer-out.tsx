@@ -58,14 +58,14 @@ interface Props {
 const _ = require('lodash');
 
 export default function ModalCreateTransferOut({
-  isOpen,
-  onClickClose,
-  setOpenPopup,
-  action,
-  setPopupMsg,
-  onSearchMain,
-  userPermission,
-}: Props): ReactElement {
+                                                 isOpen,
+                                                 onClickClose,
+                                                 setOpenPopup,
+                                                 action,
+                                                 setPopupMsg,
+                                                 onSearchMain,
+                                                 userPermission,
+                                               }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   let errorListProduct: any = [];
@@ -386,21 +386,21 @@ export default function ModalCreateTransferOut({
           const allAttachFile = await handleAllAttachFile();
           const body = !!dataDetail.id
             ? {
-                ...payloadTransferOut,
-                id: dataDetail.id,
-                documentNumber: dataDetail.documentNumber,
-                attachFiles: allAttachFile,
-                transferOutReason: dataDetail.transferOutReason,
-                store: dataDetail.store,
-                type: TO_TYPE.TO_ACTIVITY,
-              }
+              ...payloadTransferOut,
+              id: dataDetail.id,
+              documentNumber: dataDetail.documentNumber,
+              attachFiles: allAttachFile,
+              transferOutReason: dataDetail.transferOutReason,
+              store: dataDetail.store,
+              type: TO_TYPE.TO_ACTIVITY,
+            }
             : {
-                ...payloadTransferOut,
-                attachFiles: allAttachFile,
-                transferOutReason: dataDetail.transferOutReason,
-                store: dataDetail.store,
-                type: TO_TYPE.TO_ACTIVITY,
-              };
+              ...payloadTransferOut,
+              attachFiles: allAttachFile,
+              transferOutReason: dataDetail.transferOutReason,
+              store: dataDetail.store,
+              type: TO_TYPE.TO_ACTIVITY,
+            };
           const rs = await saveDraftTransferOut(body);
           if (rs.code === 201) {
             if (!sendRequest) {
@@ -554,6 +554,8 @@ export default function ModalCreateTransferOut({
       const payload = {
         branchCode: branchCodeCheckStock,
         products: products,
+        frontStore: '1' === dataDetail.store,
+        backStore: '2' === dataDetail.store
       };
       const rs = await checkStockBalance(payload);
       if (rs.data && rs.data.length > 0) {
@@ -645,7 +647,7 @@ export default function ModalCreateTransferOut({
       <Dialog open={open} maxWidth='xl' fullWidth>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCloseModalCreate}>
           <Typography sx={{ fontSize: '1em' }}>สร้างเอกสารเบิกใช้ในการทำกิจกรรม</Typography>
-          <StepperBar activeStep={status} setActiveStep={setStatus} />
+          <StepperBar activeStep={status} setActiveStep={setStatus}/>
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container mt={1} mb={-1}>
@@ -663,7 +665,7 @@ export default function ModalCreateTransferOut({
                 เลขที่เอกสารเบิก :
               </Grid>
               <Grid item xs={8}>
-                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '_'}
+                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '-'}
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5} pl={2}>
@@ -793,7 +795,7 @@ export default function ModalCreateTransferOut({
                   variant='contained'
                   color='info'
                   className={classes.MbtnSearch}
-                  startIcon={<AddCircleOutlineOutlinedIcon />}
+                  startIcon={<AddCircleOutlineOutlinedIcon/>}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
                   style={{
@@ -811,7 +813,7 @@ export default function ModalCreateTransferOut({
                   id='btnSaveDraft'
                   variant='contained'
                   color='warning'
-                  startIcon={<SaveIcon />}
+                  startIcon={<SaveIcon/>}
                   disabled={
                     (!stringNullOrEmpty(status) && status != TOStatus.DRAFT) ||
                     (payloadTransferOut.products && payloadTransferOut.products.length === 0)
@@ -841,7 +843,7 @@ export default function ModalCreateTransferOut({
                         ? 'none'
                         : undefined,
                   }}
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleSendRequest}
                   className={classes.MbtnSearch}>
                   ขออนุมัติ
@@ -857,7 +859,7 @@ export default function ModalCreateTransferOut({
                         ? 'none'
                         : undefined,
                   }}
-                  startIcon={<HighlightOffIcon />}
+                  startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
                   ยกเลิก
@@ -868,7 +870,7 @@ export default function ModalCreateTransferOut({
                   style={{ display: status == TOStatus.WAIT_FOR_APPROVAL && approvePermission ? undefined : 'none' }}
                   variant='contained'
                   color='primary'
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirmApprove}
                   className={classes.MbtnSearch}>
                   อนุมัติ
@@ -878,7 +880,7 @@ export default function ModalCreateTransferOut({
                   variant='contained'
                   style={{ display: status == TOStatus.WAIT_FOR_APPROVAL && approvePermission ? undefined : 'none' }}
                   color='error'
-                  startIcon={<HighlightOffIcon />}
+                  startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenModalReject}
                   className={classes.MbtnSearch}>
                   ไม่อนุมัติ
@@ -888,7 +890,7 @@ export default function ModalCreateTransferOut({
                   variant='contained'
                   style={{ display: status != TOStatus.APPROVED || approvePermission ? 'none' : undefined }}
                   color='info'
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirmEnd}
                   className={classes.MbtnSearch}>
                   ปิดงาน
@@ -896,7 +898,7 @@ export default function ModalCreateTransferOut({
               </Box>
             </Box>
             <Box>
-              <ModalTransferOutItem id='' action={action} userPermission={userPermission} />
+              <ModalTransferOutItem id='' action={action} userPermission={userPermission}/>
             </Box>
           </Box>
         </DialogContent>
@@ -920,8 +922,8 @@ export default function ModalCreateTransferOut({
         headerTitle={'ยืนยันยกเลิกเบิกใช้ในการทำกิจกรรม'}
         documentField={'เลขที่เอกสารเบิก'}
       />
-      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
-      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError} />
+      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
+      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError}/>
       <ModalCheckStock
         open={openCheckStock}
         onClose={() => {
@@ -929,7 +931,7 @@ export default function ModalCreateTransferOut({
         }}
         headerTitle={'จำนวนที่ขอเกินจำนวนสินค้าสต๊อก'}
       />
-      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
+      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm
         open={openModalConfirmApprove}
         onClose={() => handleCloseModalConfirmApprove(false)}
