@@ -1,4 +1,4 @@
-import { ReasonType } from './common-model';
+import { FileType, ReasonType } from './common-model';
 
 export interface CheckOrderRequest {
   limit: string;
@@ -86,6 +86,7 @@ export interface CheckOrderDetailItims {
   sdNo?: string;
   sdID?: string;
   isTote?: boolean;
+  isDisableChange?: boolean;
 }
 
 export interface ItemsState {
@@ -117,4 +118,15 @@ export interface ReasonRejectResponseType {
   ref: string;
   code: number;
   message: string;
+}
+
+export interface VerifyDocLDRequestType {
+  approved: boolean;
+  reasonCode?: string;
+  items?: Item[];
+}
+
+export interface Item {
+  barcode: string;
+  actualQty: number;
 }

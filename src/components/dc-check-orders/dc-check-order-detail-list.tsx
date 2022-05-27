@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import {
   DataGrid,
@@ -6,7 +6,9 @@ import {
   GridColDef,
   GridRenderCellParams,
   GridRowData,
+  GridRowId,
   GridValueGetterParams,
+  useGridApiRef,
 } from '@mui/x-data-grid';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { CheckOrderDetailItims } from '../../models/dc-check-order-model';
@@ -20,6 +22,9 @@ interface Props {
   items: [];
   clearCommment: () => void;
   isTote: boolean;
+  onUpdateItems: (items: CheckOrderDetailItims[]) => void;
+  isLD: boolean;
+  isWaitForCheck: boolean;
 }
 
 const columns: GridColDef[] = [
@@ -71,6 +76,8 @@ const columns: GridColDef[] = [
     minWidth: 135,
     sortable: false,
     headerAlign: 'center',
+    align: 'right',
+    renderCell: (params) => calQtyHH(params),
   },
   {
     field: 'productQuantityRef',
@@ -95,10 +102,10 @@ const columns: GridColDef[] = [
         value={params.value}
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
-          params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
+          params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }]);
           // e.target.setSelectionRange(caretStart, caretEnd);
         }}
-        disabled={params.getValue(params.id, 'isDisable') ? true : false}
+        disabled={params.getValue(params.id, 'isDisableChange') ? false : true}
         autoComplete='off'
       />
     ),
@@ -141,6 +148,26 @@ const columns: GridColDef[] = [
   },
 ];
 
+function useApiRef() {
+  const apiRef = useGridApiRef();
+  const _columns = useMemo(
+    () =>
+      columns.concat({
+        field: '',
+        width: 0,
+        minWidth: 0,
+        sortable: false,
+        renderCell: (params) => {
+          apiRef.current = params.api;
+          return null;
+        },
+      }),
+    [columns]
+  );
+
+  return { apiRef, columns: _columns };
+}
+
 var calProductDiff = function (params: GridValueGetterParams) {
   let diff =
     Number(params.getValue(params.id, 'productQuantityActual')) -
@@ -151,9 +178,27 @@ var calProductDiff = function (params: GridValueGetterParams) {
   return diff;
 };
 
-export default function DCOrderEntries({ items, clearCommment, isTote }: Props): ReactElement {
+var calQtyHH = function (params: GridValueGetterParams) {
+  const actualQty = Number(params.getValue(params.id, 'productQuantityActual'));
+  const qtyHH = Number(params.getValue(params.id, 'hhQty'));
+
+  if (actualQty !== qtyHH) {
+    return <label style={{ color: '#446EF2', fontWeight: 700 }}> {qtyHH} </label>;
+  }
+  return qtyHH;
+};
+
+export default function DCOrderEntries({
+  items,
+  clearCommment,
+  isTote,
+  onUpdateItems,
+  isLD,
+  isWaitForCheck,
+}: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const { apiRef, columns } = useApiRef();
   const rows = items.map((item: CheckOrderDetailItims, index: number) => {
     return {
       id: `${item.barcode}-${index + 1}`,
@@ -164,11 +209,13 @@ export default function DCOrderEntries({ items, clearCommment, isTote }: Props):
       productUnit: item.unitName,
       productQuantityRef: item.qty,
       productQuantityActual: item.actualQty,
+      hhQty: 2,
       productDifference: item.qtyDiff,
       productComment: item.comment,
       sdNo: item.sdNo ? item.sdNo : '',
       sdID: item.sdID ? item.sdID : '',
       isTote: item.isTote ? item.isTote : false,
+      isDisableChange: isLD || isWaitForCheck,
     };
   });
 
@@ -194,6 +241,39 @@ export default function DCOrderEntries({ items, clearCommment, isTote }: Props):
   } else {
     columns[8]['hide'] = true;
   }
+  if (isLD) {
+    columns[4]['hide'] = false;
+  } else {
+    columns[4]['hide'] = true;
+  }
+
+  const handleUpdateItems = () => {
+    let newItems: CheckOrderDetailItims[] = [];
+    let index: number = 0;
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    rowsEdit.forEach((dataRow: GridRowData) => {
+      const item: CheckOrderDetailItims = {
+        skuCode: dataRow.productId,
+        skuType: '',
+        barcode: dataRow.productBarCode,
+        productName: dataRow.productDescription,
+        unitCode: '',
+        unitName: dataRow.productUnit,
+        unitFactor: 0,
+        qty: dataRow.productQuantityRef,
+        actualQty: dataRow.productQuantityActual,
+        qtyDiff: dataRow.productDifference,
+        comment: dataRow.productComment,
+        id: `${dataRow.productBarCode}-${index + 1}`,
+        sdNo: dataRow.sdNo,
+        sdID: dataRow.sdID,
+        isTote: dataRow.isTote,
+        isDisableChange: dataRow.isDisableChange,
+      };
+      newItems.push(item);
+    });
+    onUpdateItems(newItems);
+  };
 
   return (
     <Box mt={2} bgcolor='background.paper'>
@@ -211,6 +291,7 @@ export default function DCOrderEntries({ items, clearCommment, isTote }: Props):
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           onCellClick={currentlySelected}
+          onCellOut={handleUpdateItems}
         />
       </div>
     </Box>

@@ -51,8 +51,11 @@ export const environment = {
       detailDC: {
         url: '/order/stock-diff/verify/view',
       },
-      approve: {
-        url: '/order/stock-diff/verify/{idDC}',
+      verifyBT: {
+        url: '/order/stock-diff/verify/bt/{sdNo}',
+      },
+      verifyLD: {
+        url: '/order/stock-diff/verify/ldtest/{sdNo}',
       },
     },
     tote: {

@@ -28,6 +28,13 @@ import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import AlertError from '../commons/ui/alert-error';
 import { fetchVerifyOrderReasonsRejectListAsync } from '../../store/slices/master/verify-order-reject-reasons-slice';
+import {
+  CheckOrderDetailItims,
+  DCOrderApproveRequest,
+  VerifyDocLDRequestType,
+} from '../../models/dc-check-order-model';
+import { verifyDCOrderShipmentsBT, verifyDCOrderShipmentsLD } from '../../services/order-shipment';
+import { ApiError } from '../../models/api-error-model';
 
 interface Props {
   isOpen: boolean;
@@ -78,13 +85,15 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const [isAllowRejectBtn, setIsAllowRejectBtn] = React.useState(true);
   const [isAllowApproveBtn, setIsApproveRejectBtn] = React.useState(true);
   const detailDC: any = orderDetailList.data ? orderDetailList.data : null;
-  const detailDCItems = detailDC.items ? detailDC.items : [];
+  // const detailDCItems = detailDC.items ? detailDC.items : [];
+  const [detailDCItems, setDetailDCItems] = React.useState<any>([]);
 
   const [idVerify, setIDVerify] = React.useState(idDC);
   const [isTote, setIsTote] = React.useState(false);
-  const [isShowApproveFlow, setIsShowApproveFlow] = React.useState(false);
+  const [isDocTypeLD, setIsDocTypeLD] = React.useState(false);
 
   useEffect(() => {
+    setDetailDCItems(detailDC.items ? detailDC.items : []);
     if (reasonRejectList === null || reasonRejectList.length <= 0) dispatch(fetchVerifyOrderReasonsRejectListAsync());
     setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
     setIsAllowRejectBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
@@ -93,7 +102,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     setValueCommentDC(detailDC.dcComment);
     setIDVerify(detailDC.id);
     setIsTote(detailDC.sdType === 0 ? true : false);
-    setIsShowApproveFlow(detailDC.docType === 'LD' ? true : false);
+    setIsDocTypeLD(detailDC.docType === 'LD' ? true : false);
   }, [open, detailDC]);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -189,13 +198,21 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     setUploadFileFlag(status);
   };
 
-  const handleOnClickApproveBtn = () => {};
+  const onUpdateItems = (items: any) => {
+    setDetailDCItems(items);
+  };
+
+  const handleOnClickApproveBtn = () => {
+    setAction('approve');
+    setOpenModelConfirm(true);
+  };
   const handleOnClickRejectBtn = () => {
     const isValid = validateInput();
-    if (isValid) {
-    }
-
     setOpenAlert(!isValid);
+    if (isValid) {
+      setAction('reject');
+      setOpenModelConfirm(true);
+    }
   };
 
   const validateInput = () => {
@@ -208,6 +225,79 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       return false;
     }
     return true;
+  };
+
+  const verifyBT = async () => {
+    const payload: DCOrderApproveRequest = {
+      dcComment: valueCommentDC,
+    };
+    await verifyDCOrderShipmentsBT(detailDC.sdNo, payload).then(
+      function (value) {
+        return;
+      },
+      function (error: ApiError) {
+        throw error;
+      }
+    );
+  };
+
+  const verifyLD = async (isApprove: boolean) => {
+    let payload: VerifyDocLDRequestType;
+    if (isApprove) {
+      const items = detailDCItems.map((item: CheckOrderDetailItims) => {
+        return {
+          barcode: item.barcode,
+          actualQty: item.actualQty,
+        };
+      });
+      payload = {
+        approved: isApprove,
+        items: items,
+      };
+    } else {
+      payload = {
+        approved: isApprove,
+        reasonCode: values.reason,
+      };
+    }
+
+    await verifyDCOrderShipmentsLD(detailDC.sdNo, payload, isApprove ? [] : fileUploadList).then(
+      function (value) {
+        return;
+      },
+      function (error: ApiError) {
+        throw error;
+      }
+    );
+  };
+
+  const updateDCOrder = async () => {
+    await dispatch(featchorderDetailDCAsync(idDC));
+  };
+  const [action, setAction] = React.useState('');
+  const handleVerfiyDoc = () => {
+    handleOpenLoading('open', true);
+    if (isDocTypeLD) {
+      verifyLD(action === 'approve')
+        .then(() => {
+          updateDCOrder();
+          handleGenerateBOStatus(true, '');
+        })
+        .catch((error: ApiError) => {
+          handleGenerateBOStatus(false, error.message);
+        })
+        .finally(() => handleOpenLoading('open', false));
+    } else {
+      verifyBT()
+        .then(() => {
+          updateDCOrder();
+          handleGenerateBOStatus(true, '');
+        })
+        .catch((error: ApiError) => {
+          handleGenerateBOStatus(false, error.message);
+        })
+        .finally(() => handleOpenLoading('open', false));
+    }
   };
 
   return (
@@ -260,7 +350,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                 <Typography variant='body2'>{`${detailDC.shipBranchTo.code}-${detailDC.shipBranchTo.name}`}</Typography>
               </Grid>
             </Grid>
-            {!isShowApproveFlow && (
+            {!isDocTypeLD && (
               <>
                 <Grid container spacing={2} mb={1}>
                   <Grid item xs={2}>
@@ -297,7 +387,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                 </Grid>
               </>
             )}
-            {isShowApproveFlow && (
+            {isDocTypeLD && (
               <>
                 <Grid container spacing={2} mb={1}>
                   <Grid item xs={2}>
@@ -324,7 +414,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                         </MenuItem>
                         {reasonRejectList.map((reason) => (
                           <MenuItem key={reason.code} value={reason.code}>
-                            {reason.name}
+                            {reason.nameTH}
                           </MenuItem>
                         ))}
                       </Select>
@@ -362,7 +452,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
               </>
             )}
 
-            {isShowApproveFlow && (
+            {isDocTypeLD && (
               <>
                 <Grid container spacing={2} justifyContent='right' sx={{ mt: 1 }}>
                   <Grid item>
@@ -373,7 +463,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                           variant='contained'
                           color='secondary'
                           startIcon={<ContentPaste />}
-                          onClick={handleOnClickRejectBtn}
+                          onClick={handleOnClickApproveBtn}
                           sx={{
                             borderRadius: '5px',
                             width: '200px',
@@ -405,7 +495,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
               </>
             )}
 
-            {!isShowApproveFlow && (
+            {!isDocTypeLD && (
               <>
                 <Grid container spacing={2} justifyContent='right' sx={{ mt: 1 }}>
                   <Grid item>
@@ -431,7 +521,14 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
             )}
           </Box>
           {detailDCItems !== [] && (
-            <DCOrderDetailList items={detailDCItems} clearCommment={handleClearComment} isTote={isTote} />
+            <DCOrderDetailList
+              items={detailDCItems}
+              clearCommment={handleClearComment}
+              isTote={isTote}
+              onUpdateItems={onUpdateItems}
+              isLD={isDocTypeLD}
+              isWaitForCheck={detailDC.verifyDCStatus === 0}
+            />
           )}
         </DialogContent>
       </Dialog>
@@ -444,6 +541,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         sdNo={detailDC.sdNo}
         docRefNo={detailDC.docRefNo}
         comment={valueCommentDC}
+        handleActionVerify={handleVerfiyDoc}
       />
 
       <SnackbarStatus
@@ -453,22 +551,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         contentMsg={contentMsg}
       />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
-      {/* <ModalShowFile
-        open={openModelPreviewDocument}
-        onClose={handleModelPreviewDocument}
-        file={detailDC.sdImageFile}
-      /> */}
-
-      {/* <ModalShowFile
-        open={openModelPreviewDocument}
-        onClose={handleModelPreviewDocument}
-        url=''
-        statusFile={statusFile}
-        sdImageFile={detailDC.sdImageFile}
-        fileName=''
-        btnPrintName=''
-      /> */}
-
       <LoadingModal open={openLoadingModal.open} />
     </div>
   );

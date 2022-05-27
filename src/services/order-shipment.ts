@@ -62,8 +62,22 @@ export async function generateBO(sdNo: string, payload: GenerateBORequest) {
   return response;
 }
 
-export async function approveDCOrderShipments(idDC: string, payload: any) {
-  const response = await put(getPathDCApprove(idDC), payload)
+export async function verifyDCOrderShipmentsBT(sdNo: string, payload: any) {
+  const response = await put(getPathVerifyBT(sdNo), payload)
+    .then((result: any) => result)
+    .catch((error: ApiError) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function verifyDCOrderShipmentsLD(sdNo: string, payload: any, files: File[]) {
+  const bodyFormData = new FormData();
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+  files.map((file: File) => {
+    return bodyFormData.append('file[]', file);
+  });
+  const response = await put(getPathVerifyLD(sdNo), bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
     .catch((error: ApiError) => {
       throw error;
@@ -138,8 +152,14 @@ export const getPathGenerateBO = (sdNo: string) => {
   });
 };
 
-export const getPathDCApprove = (idDC: string) => {
-  return getPathUrl(`${environment.orders.dcCheckOrder.approve.url}`, {
-    idDC: idDC,
+export const getPathVerifyBT = (value: string) => {
+  return getPathUrl(`${environment.orders.dcCheckOrder.verifyBT.url}`, {
+    docNo: value,
+  });
+};
+
+export const getPathVerifyLD = (value: string) => {
+  return getPathUrl(`${environment.orders.dcCheckOrder.verifyLD.url}`, {
+    sdNO: value,
   });
 };

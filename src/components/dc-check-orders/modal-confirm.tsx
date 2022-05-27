@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
 import { ApiError } from '../../models/api-error-model';
-import { approveDCOrderShipments } from '../../services/order-shipment';
+import { verifyDCOrderShipmentsBT } from '../../services/order-shipment';
 import { DCOrderApproveRequest } from '../../models/dc-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
@@ -20,6 +20,7 @@ interface Props {
   docRefNo: string;
   sdNo: string;
   comment: string;
+  handleActionVerify: () => void;
 }
 interface loadingModalState {
   open: boolean;
@@ -33,6 +34,7 @@ export default function ModelConfirm({
   docRefNo,
   sdNo,
   comment,
+  handleActionVerify,
 }: Props): ReactElement {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -48,22 +50,27 @@ export default function ModelConfirm({
     await dispatch(featchorderDetailDCAsync(idDC));
   };
 
-  const handleConfirm = async () => {
-    handleOpenLoading('open', true);
-    const payload: DCOrderApproveRequest = {
-      dcComment: comment,
-    };
-    await approveDCOrderShipments(idDC, payload).then(
-      function (value) {
-        updateDCOrder();
-        onUpdateAction(true, '');
-      },
-      function (error: ApiError) {
-        console.log('error : ' + JSON.stringify(error));
-        onUpdateAction(false, error.message);
-      }
-    );
-    handleOpenLoading('open', false);
+  // const handleConfirm = async () => {
+  //   handleOpenLoading('open', true);
+  //   const payload: DCOrderApproveRequest = {
+  //     dcComment: comment,
+  //   };
+  //   await verifyDCOrderShipmentsBT(sdNo, payload).then(
+  //     function (value) {
+  //       updateDCOrder();
+  //       onUpdateAction(true, '');
+  //     },
+  //     function (error: ApiError) {
+  //       console.log('error : ' + JSON.stringify(error));
+  //       onUpdateAction(false, error.message);
+  //     }
+  //   );
+  //   handleOpenLoading('open', false);
+  //   onClose();
+  // };
+
+  const handleConfirm = () => {
+    handleActionVerify();
     onClose();
   };
 
