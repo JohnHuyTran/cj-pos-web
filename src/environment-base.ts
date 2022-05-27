@@ -55,7 +55,7 @@ export const environment = {
         url: '/order/stock-diff/verify/bt/{sdNo}',
       },
       verifyLD: {
-        url: '/order/stock-diff/verify/ldtest/{sdNo}',
+        url: '/order/stock-diff/verify/ld/{sdNo}',
       },
     },
     tote: {

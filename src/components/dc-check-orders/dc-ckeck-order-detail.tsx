@@ -542,6 +542,13 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         docRefNo={detailDC.docRefNo}
         comment={valueCommentDC}
         handleActionVerify={handleVerfiyDoc}
+        subject={
+          isDocTypeLD
+            ? action === 'approve'
+              ? 'ยืนยันอนุมัติผลต่างการรับสินค้า'
+              : 'ยืนยันไม่อนุมัติผลต่างการรับสินค้า'
+            : 'ยืนยันการตรวจสอบผลต่าง (DC)'
+        }
       />
 
       <SnackbarStatus

@@ -21,6 +21,7 @@ interface Props {
   sdNo: string;
   comment: string;
   handleActionVerify: () => void;
+  subject: string;
 }
 interface loadingModalState {
   open: boolean;
@@ -35,6 +36,7 @@ export default function ModelConfirm({
   sdNo,
   comment,
   handleActionVerify,
+  subject,
 }: Props): ReactElement {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -85,7 +87,7 @@ export default function ModelConfirm({
         <DialogContent>
           <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
             <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
-              ยืนยันการตรวจสอบผลต่าง (DC)
+              {subject}
             </Typography>
             <Typography variant='body1' align='center'>
               เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
