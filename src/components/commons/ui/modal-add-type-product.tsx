@@ -144,13 +144,13 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       <li {...props} key={option.barcode}>
         <Grid container spacing={2}>
           <Grid item xs={8}>
-            <Typography variant='body2'>{option.barcodeName}</Typography>
-            <Typography color='textSecondary' variant='caption'>
+            <Typography variant="body2">{option.barcodeName}</Typography>
+            <Typography color="textSecondary" variant="caption">
               {option.unitName}
             </Typography>
           </Grid>
           <Grid item xs={4} justifyContent={'flex-end'}>
-            <Typography variant='body2'>{option.barcode}</Typography>
+            <Typography variant="body2">{option.barcode}</Typography>
           </Grid>
         </Grid>
       </li>
@@ -169,7 +169,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
   const renderProductTypeListItem = (props: any, option: any) => {
     return (
       <li {...props} key={option.productTypeCode}>
-        <Typography variant='body2'>{option.productTypeName}</Typography>
+        <Typography variant="body2">{option.productTypeName}</Typography>
       </li>
     );
   };
@@ -186,10 +186,11 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             marginRight: 0,
           },
         }}
+        data-testid="textfiled-product"
         placeholder={'ค้นหาบาร์โค๊ด / รายละเอียดสินค้า'}
         className={classes.MtextField}
-        variant='outlined'
-        size='small'
+        variant="outlined"
+        size="small"
         fullWidth
       />
     );
@@ -207,10 +208,11 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             marginRight: 0,
           },
         }}
+        data-testid="textfiled-product-type"
         placeholder={'รหัสประเภท/ประเภทสินค้า'}
         className={classes.MtextField}
-        variant='outlined'
-        size='small'
+        variant="outlined"
+        size="small"
         fullWidth
       />
     );
@@ -333,9 +335,9 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
   const SelectedItem = (props: SelectedItemProps) => {
     const { label, onDelete, ...other } = props;
     return (
-      <div className='wrapper-item'>
+      <div className="wrapper-item">
         <span>{label}</span>
-        <CloseIcon onClick={onDelete} />
+        <CloseIcon onClick={onDelete} data-testid="icon-delete-item" />
       </div>
     );
   };
@@ -427,15 +429,16 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       <Box sx={{ flex: 1, ml: 2 }}>
         {props.onClose ? (
           <IconButton
-            aria-label='close'
+            aria-label="close"
             onClick={props.onClose}
             sx={{
               position: 'absolute',
               right: 8,
               top: 8,
               color: (theme: any) => theme.palette.grey[400],
-            }}>
-            <CancelOutlinedIcon fontSize='large' stroke={'white'} stroke-width={1} />
+            }}
+          >
+            <CancelOutlinedIcon fontSize="large" stroke={'white'} stroke-width={1} />
           </IconButton>
         ) : null}
       </Box>
@@ -443,19 +446,20 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         <Grid container spacing={2}>
           <Grid item xs={5} pr={5.5}>
             <Box>
-              <Typography gutterBottom variant='subtitle1' component='div' mb={1} mt={-1.9}>
+              <Typography gutterBottom variant="subtitle1" component="div" mb={1} mt={-1.9}>
                 เพิ่มรายการสินค้า (งด) ขาย
               </Typography>
             </Box>
             <Box>
-              <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-                ประเภทสินค้า
+              <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+                ประภทสินค้า
               </Typography>
               <Autocomplete
+                data-testid="autocomplete-product-type"
                 options={productTypeOptions}
-                id='combo-box-type'
-                popupIcon={<SearchIcon color='primary' />}
-                size='small'
+                id="combo-box-type"
+                popupIcon={<SearchIcon color="primary" />}
+                size="small"
                 filterOptions={filterProductTypeOptions}
                 renderOption={renderProductTypeListItem}
                 renderInput={autocompleteProductTypeRenderInput}
@@ -470,13 +474,17 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             </Box>
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
-                <Typography gutterBottom variant='subtitle1' component='div' mr={3}>
+                <Typography gutterBottom variant="subtitle1" component="div" mr={3}>
                   ค้นหาสินค้า
                 </Typography>
                 <FormGroup>
                   <FormControlLabel
                     control={
-                      <Checkbox checked={values.selectAllProduct} disabled={objectNullOrEmpty(values.productType)} />
+                      <Checkbox
+                        checked={values.selectAllProduct}
+                        disabled={objectNullOrEmpty(values.productType)}
+                        data-testid="checkbox-select-all-product"
+                      />
                     }
                     onClick={onChangeSelectAllProduct}
                     label={'เลือกสินค้าทั้งหมด'}
@@ -484,10 +492,11 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 </FormGroup>
               </Box>
               <Autocomplete
+                data-testid="autocomplete-product-option"
                 options={productOptions}
-                id='combo-box-product'
-                popupIcon={<SearchIcon color='primary' />}
-                size='small'
+                id="combo-box-product"
+                popupIcon={<SearchIcon color="primary" />}
+                size="small"
                 filterOptions={filterProductOptions}
                 renderOption={renderProductListItem}
                 renderInput={autocompleteProductRenderInput}
@@ -501,21 +510,22 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
               />
             </Box>
             {/* <Box sx={{textAlign: 'right', mt: 3}}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                className={classes.MbtnSearch}
-                                onClick={handleAddItem}
-                                disabled={!values.btnAddStatus}
-                            >
-                                เพิ่ม
-                            </Button>
-                        </Box> */}
+                              <Button
+                                  variant="contained"
+                                  color="primary"
+                                  className={classes.MbtnSearch}
+                                  onClick={handleAddItem}
+                                  disabled={!values.btnAddStatus}
+                              >
+                                  เพิ่ม
+                              </Button>
+                          </Box> */}
           </Grid>
           <Grid item xs={7}>
             <Box
               className={classes.MWrapperListBranch}
-              sx={{ width: '543px', minWidth: '543px', minHeight: '270px', height: '270px' }}>
+              sx={{ width: '543px', minWidth: '543px', minHeight: '270px', height: '270px' }}
+            >
               <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>{renderSelectedItems()}</Box>
             </Box>
           </Grid>
@@ -523,12 +533,14 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       </DialogContent>
       <Grid item xs={12} sx={{ textAlign: 'right' }} mr={3} mb={4}>
         <Button
-          variant='contained'
-          color='info'
+          variant="contained"
+          color="info"
           startIcon={<AddCircleOutlineOutlinedIcon />}
           onClick={handleAddProduct}
           disabled={!(selectedItems && selectedItems.length > 0)}
-          className={classes.MbtnSearch}>
+          className={classes.MbtnSearch}
+          data-testid="btn-add-product"
+        >
           เพิ่มสินค้า
         </Button>
       </Grid>
