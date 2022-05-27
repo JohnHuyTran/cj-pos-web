@@ -534,6 +534,7 @@ export default function ModalCreateToDestroyDiscount({
       const payload = {
         branchCode: branchCodeCheckStock,
         products: products,
+        backStore: true
       };
       const rs = await checkStockBalance(payload);
       if (rs.data && rs.data.length > 0) {

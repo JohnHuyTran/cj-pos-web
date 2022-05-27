@@ -589,6 +589,7 @@ export default function ModalCreateTransferOutDestroy({
       const payload = {
         branchCode: branchCodeCheckStock,
         products: products,
+        backStore: true
       };
       const rs = await checkStockBalance(payload);
       if (rs.data && rs.data.length > 0) {
@@ -703,7 +704,7 @@ export default function ModalCreateTransferOutDestroy({
                 เลขที่เอกสารทำลาย :
               </Grid>
               <Grid item xs={8}>
-                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '_'}
+                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '-'}
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5} pl={3}>
