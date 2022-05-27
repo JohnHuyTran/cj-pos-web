@@ -384,7 +384,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       selectedItemFilter = selectedItems.filter(
         (it: any) =>
           (it.selectedType === data.selectedType && it.productTypeCode !== data.productTypeCode) ||
-          (it.selectedType === 2 && data.productTypeCode !== it.ProductTypeCode)
+          (it.selectedType === 2 && data.productTypeCode !== it.productTypeCode)
       );
     } else if (data.selectedType === 2) {
       selectedItemFilter = selectedItems.filter((it: any) => it.selectedType === 1 || it.barcode !== data.barcode);
@@ -397,7 +397,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     let selectedItemEnds = _.cloneDeep(selectedItems);
     if (selectedItemEnds && selectedItemEnds.length > 0) {
       let listTypeCodeProducts = new Set(
-        selectedItemEnds.map((item: any) => item.ProductTypeCode).filter((el: any) => el != undefined)
+        selectedItemEnds.map((item: any) => item.productTypeCode).filter((el: any) => el != undefined)
       );
       let listCategoryCode = selectedItemEnds
         .filter((el: any) => el.selectedType === 1)
@@ -406,10 +406,10 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       let listTypes = Array.from(listTypeCodeProducts);
       for (let i of listTypes) {
         if (!listCategoryCode.includes(i)) {
-          const item = selectedItemEnds.find((el: any) => i === el.ProductTypeCode);
+          const item = selectedItemEnds.find((el: any) => i === el.productTypeCode);
           selectedItemEnds.push({
-            productTypeCode: item.ProductTypeCode,
-            productTypeName: item.ProductTypeName,
+            productTypeCode: item.productTypeCode,
+            productTypeName: item.productTypeName,
             selectedType: 1,
           });
         }
@@ -455,7 +455,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       const items: any = [];
       let productTypeName: any = [];
       payloadAddTypeProduct.map((item: any, index: number) => {
-        let pTypeName = item.ProductTypeName ? item.ProductTypeName : item.productTypeName ? item.productTypeName : '';
+        let pTypeName = item.productTypeName ? item.productTypeName : item.productTypeName ? item.productTypeName : '';
 
         if (item.selectedType === 2 && !item.productByType) {
           productTypeName.push(pTypeName);

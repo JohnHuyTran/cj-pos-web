@@ -72,16 +72,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
-          <HighlightOff fontSize="large" />
+          }}>
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -174,7 +173,7 @@ function STCreateModal({
               skuCode: item.skuCode,
               unitName: item.unitName,
               barcodeName: item.name,
-              ProductTypeCode: item.categoryTypeCode,
+              productTypeCode: item.categoryTypeCode,
               selectedType: 2,
             };
           })
@@ -373,7 +372,7 @@ function STCreateModal({
                 skuCode: item.skuCode,
                 barcode: item.barcode,
                 unitName: item.unitName,
-                categoryTypeCode: item.ProductTypeCode,
+                categoryTypeCode: item.productTypeCode,
               };
             }),
           appliedCategories: payloadAddTypeProduct
@@ -554,8 +553,8 @@ function STCreateModal({
   const handleAddProduct = (list: any) => {
     let selectList = list.map((item: any) => {
       return {
-        ProductTypeCode: item.categoryTypeCode,
-        ProductTypeName: item.categoryName,
+        productTypeCode: item.categoryTypeCode,
+        productTypeName: item.categoryName,
         barcode: item.barcode,
         unitName: item.unitName,
         barcodeName: item.name,
@@ -567,7 +566,7 @@ function STCreateModal({
 
     if (selectedItemEnds && selectedItemEnds.length > 0) {
       let listTypeCodeProducts = new Set(
-        selectedItemEnds.map((item: any) => item.ProductTypeCode).filter((el: any) => el != undefined)
+        selectedItemEnds.map((item: any) => item.productTypeCode).filter((el: any) => el != undefined)
       );
       let listCategoryCode = selectedItemEnds
         .filter((el: any) => el.selectedType === 1)
@@ -576,10 +575,10 @@ function STCreateModal({
       let listTypes = Array.from(listTypeCodeProducts);
       for (let i of listTypes) {
         if (!listCategoryCode.includes(i)) {
-          const item = selectedItemEnds.find((el: any) => i === el.ProductTypeCode);
+          const item = selectedItemEnds.find((el: any) => i === el.productTypeCode);
           selectedItemEnds.push({
-            productTypeCode: item.ProductTypeCode,
-            productTypeName: item.ProductTypeName,
+            productTypeCode: item.productTypeCode,
+            productTypeName: item.productTypeName,
             selectedType: 1,
           });
         }
@@ -617,14 +616,14 @@ function STCreateModal({
 
   return (
     <div>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleCheckClose}>
+      <Dialog open={open} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCheckClose}>
           <Typography sx={{ fontSize: '1em', mb: 2 }}>{'สร้างเอกสารกำหนดเวลา (งด) ขายสินค้าใหม่'}</Typography>
           <StepperBar activeStep={status} />
         </BootstrapDialogTitle>
 
         <DialogContent>
-          <Grid container spacing={2} mb={2} mt={2} id="top-item">
+          <Grid container spacing={2} mb={2} mt={2} id='top-item'>
             <Grid item xs={2}>
               <Box mb={2}>เลขที่เอกสาร ST :</Box>
               <Box>วันที่สร้างรายการ :</Box>
@@ -639,7 +638,7 @@ function STCreateModal({
             </Grid>
             <Grid item xs={3}>
               <TextField
-                placeholder=" ความยาวไม่เกิน 50 ตัวอักษร"
+                placeholder=' ความยาวไม่เกิน 50 ตัวอักษร'
                 multiline
                 fullWidth
                 rows={2}
@@ -650,14 +649,14 @@ function STCreateModal({
                 inputProps={{
                   maxLength: '50',
                 }}
-                variant="outlined"
+                variant='outlined'
                 onChange={(e) => {
                   handleChangeDescription(e.target.value);
                 }}
                 disabled={status > 1 || !isAdmin}
               />
               {checkValue.descriptionError && (
-                <Box textAlign="right" color="#F54949">
+                <Box textAlign='right' color='#F54949'>
                   กรุณาระบุรายละเอียด
                 </Box>
               )}
@@ -675,7 +674,7 @@ function STCreateModal({
                 value={values.startDate}
               />
               {checkValue.startDateError && (
-                <Box textAlign="right" color="#F54949">
+                <Box textAlign='right' color='#F54949'>
                   กรุณาระบุรายละเอียด
                 </Box>
               )}
@@ -690,11 +689,11 @@ function STCreateModal({
                 disabled={status > 1 || !isAdmin}
                 onClickDate={handleEndDatePicker}
                 value={values.endDate}
-                type="TO"
+                type='TO'
                 minDateTo={values.startDate}
               />
               {checkValue.endDateError && (
-                <Box textAlign="right" color="#F54949">
+                <Box textAlign='right' color='#F54949'>
                   กรุณาระบุรายละเอียด
                 </Box>
               )}
@@ -707,8 +706,8 @@ function STCreateModal({
             </Grid>
             <Grid item xs={3}>
               <TextField
-                id="time-start"
-                type="time"
+                id='time-start'
+                type='time'
                 fullWidth
                 style={{ backgroundColor: status > 1 || !isAdmin ? '#f1f1f1' : 'transparent' }}
                 error={!!checkValue.startTimeError}
@@ -722,7 +721,7 @@ function STCreateModal({
               />
 
               {checkValue.startTimeError && (
-                <Box textAlign="right" color="#F54949">
+                <Box textAlign='right' color='#F54949'>
                   {checkValue.startTimeError}
                 </Box>
               )}
@@ -733,8 +732,8 @@ function STCreateModal({
             </Grid>
             <Grid item xs={3}>
               <TextField
-                id="time-end"
-                type="time"
+                id='time-end'
+                type='time'
                 fullWidth
                 error={!!checkValue.endTimeError}
                 style={{ backgroundColor: status > 1 || !isAdmin ? '#f1f1f1' : 'transparent' }}
@@ -747,7 +746,7 @@ function STCreateModal({
                 disabled={status > 1 || !isAdmin}
               />
               {checkValue.endTimeError && (
-                <Box textAlign="right" color="#F54949">
+                <Box textAlign='right' color='#F54949'>
                   {checkValue.endTimeError}
                 </Box>
               )}
@@ -761,7 +760,7 @@ function STCreateModal({
             <Grid item xs={3}>
               <SearchBranch disabled={status > 1 || !isAdmin} error={checkValue.payloadBranchesError} />
               {checkValue.payloadBranchesError && (
-                <Box textAlign="right" color="#F54949">
+                <Box textAlign='right' color='#F54949'>
                   กรุณาระบุรายละเอียด
                 </Box>
               )}
@@ -776,35 +775,33 @@ function STCreateModal({
                   {status < 2 && (
                     <>
                       <Button
-                        id="btnAddItem"
-                        variant="contained"
-                        color="info"
+                        id='btnAddItem'
+                        variant='contained'
+                        color='info'
                         className={classes.MbtnPrint}
                         onClick={handleOpenAddItems}
                         startIcon={<ControlPoint />}
-                        sx={{ width: 126 }}
-                      >
+                        sx={{ width: 126 }}>
                         เพิ่มสินค้า
                       </Button>
-                      <label htmlFor="import-st-button-file">
+                      <label htmlFor='import-st-button-file'>
                         {Object.keys(payloadAddTypeProduct).length === 0 && (
                           <Input
-                            id="import-st-button-file"
-                            type="file"
+                            id='import-st-button-file'
+                            type='file'
                             onChange={handleImportFile}
                             style={{ display: 'none' }}
                           />
                         )}
                         <Button
-                          id="btnImport"
-                          variant="contained"
-                          color="primary"
+                          id='btnImport'
+                          variant='contained'
+                          color='primary'
                           className={classes.MbtnPrint}
                           startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
                           sx={{ width: 126, ml: '19px' }}
-                          component="span"
-                          disabled={!!Object.keys(payloadAddTypeProduct).length}
-                        >
+                          component='span'
+                          disabled={!!Object.keys(payloadAddTypeProduct).length}>
                           Import
                         </Button>
                       </label>
@@ -819,48 +816,44 @@ function STCreateModal({
                   {status < 2 ? (
                     <>
                       <Button
-                        variant="contained"
-                        color="warning"
+                        variant='contained'
+                        color='warning'
                         onClick={() => handleCreateSTDetail(false)}
                         startIcon={<SaveIcon />}
                         className={classes.MbtnSearch}
                         style={{ display: status > 1 ? 'none' : undefined }}
-                        disabled={!!!Object.keys(payloadAddTypeProduct).length}
-                      >
+                        disabled={!!!Object.keys(payloadAddTypeProduct).length}>
                         บันทึก
                       </Button>
                       <Button
-                        variant="contained"
-                        color="primary"
+                        variant='contained'
+                        color='primary'
                         sx={{ margin: '0 17px' }}
                         startIcon={<CheckCircleOutlineIcon />}
                         onClick={() => handleOpenStart()}
                         className={classes.MbtnSearch}
-                        disabled={!!!Object.keys(payloadAddTypeProduct).length}
-                      >
+                        disabled={!!!Object.keys(payloadAddTypeProduct).length}>
                         เริ่มใช้งาน
                       </Button>
                     </>
                   ) : (
                     <Button
-                      variant="contained"
-                      color="info"
+                      variant='contained'
+                      color='info'
                       sx={{ margin: '0 17px' }}
                       startIcon={<ContentCopyIcon />}
                       className={classes.MbtnSearch}
-                      onClick={handleOpenModalCopy}
-                    >
+                      onClick={handleOpenModalCopy}>
                       Copy
                     </Button>
                   )}
                   {status < 3 && (
                     <Button
-                      variant="contained"
-                      color="error"
+                      variant='contained'
+                      color='error'
                       onClick={handleOpenCancel}
                       startIcon={<HighlightOffIcon />}
-                      className={classes.MbtnSearch}
-                    >
+                      className={classes.MbtnSearch}>
                       ยกเลิก
                     </Button>
                   )}
@@ -880,7 +873,7 @@ function STCreateModal({
           <Grid container spacing={2} mb={2}>
             <Grid item xs={3}>
               <TextBoxComment
-                fieldName="หมายเหตุ :"
+                fieldName='หมายเหตุ :'
                 defaultValue={remark}
                 maxLength={100}
                 onChangeComment={handleChangeRemark}
@@ -889,7 +882,7 @@ function STCreateModal({
               />
             </Grid>
             <Grid item xs={7}></Grid>
-            <Grid item xs={2} mt={15} textAlign="center">
+            <Grid item xs={2} mt={15} textAlign='center'>
               <IconButton onClick={topFunction}>
                 <ArrowForwardIosIcon
                   sx={{
@@ -903,7 +896,7 @@ function STCreateModal({
                 />
               </IconButton>
 
-              <Box fontSize="13px">กลับขึ้นด้านบน</Box>
+              <Box fontSize='13px'>กลับขึ้นด้านบน</Box>
             </Grid>
           </Grid>
         </DialogContent>
@@ -951,11 +944,11 @@ function STCreateModal({
         onClose={handleNotExitModelConfirm}
         onConfirm={handleExitModelConfirm}
       />
-      <ModalValidateImport isOpen={openModalValidate} title="ไม่สามารถ import file ได้ ">
+      <ModalValidateImport isOpen={openModalValidate} title='ไม่สามารถ import file ได้ '>
         <Box sx={{ textAlign: 'center' }}>
           {!!urlModalValidate ? (
             <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>
-              <a href={urlModalValidate} target="_blank">
+              <a href={urlModalValidate} target='_blank'>
                 ดาวน์โหลดผลการ import file คลิ๊กที่ link นี้{' '}
               </a>
             </Typography>
@@ -963,13 +956,12 @@ function STCreateModal({
             <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>{msgModalValidate}</Typography>
           )}
           <Button
-            id="btnClose"
-            variant="contained"
-            color="error"
+            id='btnClose'
+            variant='contained'
+            color='error'
             onClick={() => {
               setOpenModalValidate(false);
-            }}
-          >
+            }}>
             ปิด
           </Button>
         </Box>

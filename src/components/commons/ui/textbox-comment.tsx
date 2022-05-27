@@ -10,6 +10,8 @@ interface Props {
   onChangeComment: (value: string) => void;
   isDisable: boolean;
   rowDisplay?: number;
+  hypterText?: string;
+  isError?: boolean;
 }
 function TextBoxComment({
   fieldName,
@@ -18,6 +20,8 @@ function TextBoxComment({
   isDisable,
   onChangeComment,
   rowDisplay,
+  hypterText,
+  isError,
 }: Props): ReactElement {
   const classes = useStyles();
   const [characterCount, setCharacterCount] = React.useState(0);
@@ -55,6 +59,8 @@ function TextBoxComment({
         inputProps={{ maxLength: maxLength }}
         sx={{ maxWidth: 350 }}
         disabled={isDisable}
+        helperText={isError === true ? hypterText : ' '}
+        error={isError}
       />
 
       <div
@@ -65,7 +71,7 @@ function TextBoxComment({
           width: '100%',
           maxWidth: 350,
           textAlign: 'right',
-          // marginTop: "-1.5em",
+          marginTop: '-1.5em',
         }}>
         {characterCount}/{maxLength}
       </div>

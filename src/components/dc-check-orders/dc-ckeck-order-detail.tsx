@@ -23,6 +23,7 @@ import { isAllowActionPermission } from '../../utils/role-permission';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
+import TextBoxComment from '../commons/ui/textbox-comment';
 
 interface Props {
   isOpen: boolean;
@@ -75,13 +76,8 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  const handleChangeCommentDC = (event: any) => {
-    const value = event.target.value;
-    const length = event.target.value.length;
-    if (length <= 100) {
-      setCharacterCount(event.target.value.length);
-      setValueCommentDC(value);
-    }
+  const handleChangeComment = (value: any) => {
+    setValueCommentDC(value);
   };
 
   const handleClearComment = () => {
@@ -223,7 +219,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
               <Grid item xs={4}>
                 {/* {detailDC.verifyDCStatus === 0 && ( */}
                 <div>
-                  <TextField
+                  {/* <TextField
                     multiline
                     fullWidth
                     rows={4}
@@ -237,21 +233,17 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     helperText={errorCommentDC === true ? 'กรุณากรอก หมายเหตุ' : ' '}
                     disabled={detailDC.verifyDCStatus !== 0}
                     sx={{ maxWidth: 300 }}
+                  /> */}
+                  <TextBoxComment
+                    fieldName=''
+                    defaultValue={valueCommentDC}
+                    maxLength={100}
+                    onChangeComment={handleChangeComment}
+                    isDisable={detailDC.verifyDCStatus !== 0}
+                    rowDisplay={2}
+                    isError={errorCommentDC}
+                    hypterText='กรุณากรอก หมายเหตุ'
                   />
-
-                  {detailDC.verifyDCStatus === 0 && (
-                    <div
-                      style={{
-                        fontSize: '11px',
-                        color: '#AEAEAE',
-                        width: '100%',
-                        maxWidth: 300,
-                        textAlign: 'right',
-                        marginTop: '-1.5em',
-                      }}>
-                      {characterCount}/100
-                    </div>
-                  )}
                 </div>
               </Grid>
               <Grid item xs={2}>

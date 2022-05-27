@@ -169,7 +169,7 @@ export default function NotificationReminder(props: Props) {
             content = 'เบิก-ทำลายไม่มีส่วนลด';
           }
           documentNumber = item.payload.documentNumber;
-          branchCode = item.payload.branch;
+          branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('ปิดงาน', {
             color: '#676767',
             backgroundColor: '#EAEBEB',
@@ -185,7 +185,7 @@ export default function NotificationReminder(props: Props) {
             content = 'เบิก-ทำลายไม่มีส่วนลด';
           }
           documentNumber = item.payload.documentNumber;
-          branchCode = item.payload.branch;
+          branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('ไม่อนุมัติ', {
             color: '#F76C6C',
             backgroundColor: '#FFD7D7',

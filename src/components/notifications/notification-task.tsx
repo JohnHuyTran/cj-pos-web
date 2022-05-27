@@ -226,7 +226,7 @@ export default function NotificationTask(props: Props) {
         break;
       case 'SEND_TO_FOR_APPROVAL':
         content = item.payload.type === 1 ? 'เบิก-ใช้ในการทำกิจกรรม' : 'เบิก-ทำลายไม่มีส่วนลด';
-        branchCode = item.payload.branch;
+        branchCode = item.payload.branchCode;
         documentNumber = item.payload.documentNumber;
         statusDisplay = genStatusValue('รออนุมัติ', {
           color: '#36C690',
@@ -235,7 +235,7 @@ export default function NotificationTask(props: Props) {
         break;
       case 'APPROVE_TRANSFER_OUT':
         content = item.payload.type === 1 ? 'เบิก-ใช้ในการทำกิจกรรม' : 'เบิก-ทำลายไม่มีส่วนลด';
-        branchCode = item.payload.branch;
+        branchCode = item.payload.branchCode;
         documentNumber = item.payload.documentNumber;
         statusDisplay = genStatusValue('อนุมัติ', {
           color: '#36C690',

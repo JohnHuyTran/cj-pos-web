@@ -29,7 +29,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear }: Props) {
         <div>
           <Typography variant="body2">{option.barcodeName}</Typography>
           <Typography color="textSecondary" variant="caption">
-            {option.barcode}
+            {option.skuCode}
           </Typography>
         </div>
       </li>
