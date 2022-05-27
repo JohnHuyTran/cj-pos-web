@@ -126,6 +126,7 @@ export interface ShipmentDetailInfo {
   Comment: string;
   docRefRemark: string;
   items: itemsDetail[] | [];
+  hhQty: number;
 }
 export interface itemsDetail {
   skuCode: string;
