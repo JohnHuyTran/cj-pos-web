@@ -186,7 +186,10 @@ export default function CheckOrderDetail({
   const [isAllowExportBtn, setIsAllowExportBtn] = React.useState(true);
 
   const orderComment = orderDetail.docRefRemark;
-  const findIndexStr = orderComment.startsWith('SD', 0);
+  let findIndexStr = false;
+  if (orderComment) {
+    findIndexStr = orderComment.startsWith('SD', 0);
+  }
 
   useEffect(() => {
     const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
