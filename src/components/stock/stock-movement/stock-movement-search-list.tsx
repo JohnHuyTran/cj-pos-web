@@ -168,7 +168,7 @@ function StockMovementSearchList() {
             </Typography>
           );
         } else {
-          return <Typography>{params.value}</Typography>;
+          return <Typography variant='body2'>{params.value}</Typography>;
         }
       },
     },
