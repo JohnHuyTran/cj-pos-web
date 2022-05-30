@@ -92,6 +92,7 @@ export interface Entry {
   qty: number;
   qtyAll: number;
   qtyAllBefore: number;
+  qtyRef?: number;
   actualQty: number;
   qtyDiff: number;
   price: number;
