@@ -95,6 +95,9 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   useEffect(() => {
     setDetailDCItems(detailDC.items ? detailDC.items : []);
     if (reasonRejectList === null || reasonRejectList.length <= 0) dispatch(fetchVerifyOrderReasonsRejectListAsync());
+    //if reason
+    setValues({ ...values, reason: 'CANCELED_BY_BRANCH' });
+
     setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
     setIsAllowRejectBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
     setIsApproveRejectBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));

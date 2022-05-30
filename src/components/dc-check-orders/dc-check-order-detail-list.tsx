@@ -183,7 +183,7 @@ var calQtyHH = function (params: GridValueGetterParams) {
   const qtyHH = Number(params.getValue(params.id, 'hhQty'));
 
   if (actualQty !== qtyHH) {
-    return <label style={{ color: '#446EF2', fontWeight: 700 }}> {qtyHH} </label>;
+    return <label style={{ color: '#FBA600', fontWeight: 700 }}> {qtyHH} </label>;
   }
   return qtyHH;
 };
