@@ -130,3 +130,24 @@ export interface Item {
   barcode: string;
   actualQty: number;
 }
+
+export interface VerifySDListRequestType {
+  requestList: RequestListType[];
+}
+export interface RequestListType {
+  dcComment?: string;
+  sdNo: string;
+}
+export interface VerifySDListResponseType {
+  ref: string;
+  code: number;
+  message: string;
+  data: DataType[];
+}
+
+export interface DataType {
+  ref: string;
+  code: number;
+  message: string;
+  sdNo: string;
+}

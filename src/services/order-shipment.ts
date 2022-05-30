@@ -4,7 +4,7 @@ import { SaveDraftSDRequest, GenerateBORequest, ItemsApprove, ItemSubmitToteRequ
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
 import { ApiError } from '../models/api-error-model';
-import { OrderReceiveApproveRequest } from '../models/dc-check-order-model';
+import { OrderReceiveApproveRequest, VerifySDListRequestType } from '../models/dc-check-order-model';
 import { ContentType } from '../utils/enum/common-enum';
 
 export async function saveOrderShipments(payload: SaveDraftSDRequest, sdNo: string) {
@@ -83,6 +83,15 @@ export async function verifyDCOrderShipmentsLD(sdNo: string, payload: any, files
       throw error;
     });
   return response;
+}
+
+export async function verifyDCOrderShipmentList(payload: VerifySDListRequestType) {
+  try {
+    const response = await put(environment.orders.dcCheckOrder.verifyList.url, payload).then((result: any) => result);
+    return response;
+  } catch (error) {
+    throw error;
+  }
 }
 
 export async function approveOrderReceive(payload: OrderReceiveApproveRequest) {

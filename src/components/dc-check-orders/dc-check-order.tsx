@@ -11,7 +11,13 @@ import { Button } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
 import { saveSearchCriteriaDc } from '../../store/slices/save-search-order-dc-slice';
-import { CheckOrderRequest } from '../../models/dc-check-order-model';
+import {
+  CheckOrderRequest,
+  DataType,
+  RequestListType,
+  VerifySDListRequestType,
+  VerifySDListResponseType,
+} from '../../models/dc-check-order-model';
 import DCOrderList from './dc-order-list';
 import { useStyles } from '../../styles/makeTheme';
 import DatePickerComponent from '../commons/ui/date-picker';
@@ -27,6 +33,10 @@ import { isAllowActionPermission, isGroupDC } from '../../utils/role-permission'
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { setItemId, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
 import { BranchInfo } from '../../models/search-branch-model';
+import { ApiError } from '../../models/api-error-model';
+import { verifyDCOrderShipmentList } from '../../services/order-shipment';
+import i18n from '../../locales/i18n';
+import { mappingErrorParam } from '../../utils/exception/pos-exception';
 
 moment.locale('th');
 
@@ -50,7 +60,6 @@ interface branchListOptionType {
 }
 
 function DCCheckOrderSearch() {
-  // const limit = "10";
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
   const [disableApproveBtn, setDisableApproveBtn] = React.useState(true);
   const page = '1';
@@ -289,7 +298,33 @@ function DCCheckOrderSearch() {
     setOpenAlert(false);
   };
 
-  const handleOnApprove = () => {};
+  const handleOnApprove = () => {
+    const items: RequestListType[] = selectRowsList.map((item: any) => {
+      return {
+        sdNo: item,
+      };
+    });
+
+    const payload: VerifySDListRequestType = {
+      requestList: items,
+    };
+    verifyDCOrderShipmentList(payload).then(
+      function (value: VerifySDListResponseType) {
+        const data: DataType[] = value.data;
+        const errorList = data.find((item: DataType) => item.code !== 20100)?.sdNo;
+        if (errorList && errorList.length > 0) {
+          const err_msg = i18n.t(`error:${`stockDiff.verifyListReject`}`);
+          mappingErrorParam(err_msg, { errorList });
+          setTextError(err_msg);
+          setOpenAlert(true);
+        }
+      },
+      function (error: ApiError) {
+        setOpenAlert(true);
+        setTextError(error.message);
+      }
+    );
+  };
 
   return (
     <>

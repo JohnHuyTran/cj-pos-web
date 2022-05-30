@@ -291,7 +291,7 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
     const rowSelect = apiRef.current.getSelectedRows();
     let rowSelectList: any = [];
     rowSelect.forEach((data: GridRowData) => {
-      rowSelectList.push(data.rtNo);
+      rowSelectList.push(data.sdNo);
     });
 
     return onSelectRows(rowSelectList ? rowSelectList : []);
