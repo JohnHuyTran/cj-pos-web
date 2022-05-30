@@ -118,10 +118,24 @@ function ProductMasterSearch() {
       <Grid container spacing={10} mb={4}>
         <Grid item xs={4}>
           <Typography>
+            สาขา
+            <span style={{ color: 'red' }}>*</span>
+          </Typography>
+          <BranchListDropDown
+            valueBranch={branchOptions}
+            sourceBranchCode={ownBranch}
+            onChangeBranch={handleChangeBranch}
+            isClear={clearBranchDropDown}
+            disable={groupBranch}
+            isFilterAuthorizedBranch={true}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <Typography>
             ค้นหาสินค้า
             <span style={{ color: 'red' }}>*</span>
           </Typography>
-          <TextField
+          {/* <TextField
             id="query"
             name="query"
             size="small"
@@ -136,22 +150,8 @@ function ProductMasterSearch() {
             className={classes.MtextField}
             fullWidth
             placeholder="รหัสสินค้า/ชื่อสินค้า/บาร์โค้ด"
-          />
-          {/* <TextBoxSearchProduct isClear={isClear} onSelectItem={handleChangeProduct}/> */}
-        </Grid>
-        <Grid item xs={4}>
-          <Typography>
-            สาขา
-            <span style={{ color: 'red' }}>*</span>
-          </Typography>
-          <BranchListDropDown
-            valueBranch={branchOptions}
-            sourceBranchCode={ownBranch}
-            onChangeBranch={handleChangeBranch}
-            isClear={clearBranchDropDown}
-            disable={groupBranch}
-            isFilterAuthorizedBranch={true}
-          />
+          /> */}
+          <TextBoxSearchProduct isClear={isClear} onSelectItem={handleChangeProduct} />
         </Grid>
         <Grid item xs={4} mt={3} sx={{ display: 'flex' }}>
           <Button

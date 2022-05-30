@@ -24,3 +24,13 @@ export async function getProductByType(payload: any) {
     throw error;
   }
 }
+export async function searchProductItem(query: string) {
+  try {
+    const response = await get(
+      `${environment.products.sku.productMaster.searchItem.url}?query=${query}&limit=10&offset=0`
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

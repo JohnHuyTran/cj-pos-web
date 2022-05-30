@@ -17,7 +17,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Box } from '@mui/system';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import SearchIcon from '@mui/icons-material/Search';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import CloseIcon from '@mui/icons-material/Close';
@@ -43,7 +43,7 @@ export default function SearchBranch(props: Props): ReactElement {
   const { error, helperText, disabled } = props;
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
-  const { t } = useTranslation(['common']);
+  // const { t } = useTranslation(['common']);
   const [province, setProvince] = React.useState<any | null>(null);
   const [branch, setBranch] = React.useState<any | null>(null);
   const [listBranch, setListBranch] = React.useState<ListBranches>({ branches: [], provinces: [] });
@@ -353,6 +353,7 @@ export default function SearchBranch(props: Props): ReactElement {
                 top: 8,
                 color: (theme: any) => theme.palette.grey[400],
               }}
+              data-testid="iconCloseModal"
             >
               <CancelOutlinedIcon fontSize="large" stroke={'white'} strokeWidth={1} />
             </IconButton>
@@ -507,6 +508,7 @@ export default function SearchBranch(props: Props): ReactElement {
                 size="large"
                 onClick={handleClearForm}
                 sx={{ marginRight: '15px' }}
+                data-testid="buttonClear"
               >
                 เคลียร์
               </Button>
@@ -520,6 +522,7 @@ export default function SearchBranch(props: Props): ReactElement {
                   (!allBranches && listBranch['branches'].length === 0 && listBranch['provinces'].length === 0) ||
                   disabled
                 }
+                data-testid="buttonAdd"
               >
                 เลือกสาขา
               </Button>

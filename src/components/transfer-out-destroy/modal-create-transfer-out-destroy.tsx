@@ -254,7 +254,8 @@ export default function ModalCreateTransferOutDestroy({
             barcode: item.barcode,
             barcodeName: item.productName,
             unitName: item.unitName,
-            unitCode: item.unitCode,
+            unitCode: item.unitFactor,
+            baseUnit: item.barFactor,
             unitPrice: item.price || 0,
             discount: item.requestedDiscount || 0,
             qty: item.numberOfRequested || 0,
@@ -588,6 +589,7 @@ export default function ModalCreateTransferOutDestroy({
       const payload = {
         branchCode: branchCodeCheckStock,
         products: products,
+        backStore: true
       };
       const rs = await checkStockBalance(payload);
       if (rs.data && rs.data.length > 0) {
@@ -702,7 +704,7 @@ export default function ModalCreateTransferOutDestroy({
                 เลขที่เอกสารทำลาย :
               </Grid>
               <Grid item xs={8}>
-                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '_'}
+                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '-'}
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5} pl={3}>

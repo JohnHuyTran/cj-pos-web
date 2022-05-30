@@ -240,7 +240,8 @@ export default function ModalCreateToDestroyDiscount({
             barcode: item.barcode,
             barcodeName: item.productName,
             unit: item.unitName,
-            unitCode: item.unitCode,
+            unitCode: item.unitFactor,
+            barFactor: item.barFactor,
             unitPrice: item.price || 0,
             numberOfDiscounted: item.numberOfRequested || 0,
             numberOfApproved: (TOStatus.WAIT_FOR_APPROVAL == transferOutDetail.status && approvePermission)
@@ -533,6 +534,7 @@ export default function ModalCreateToDestroyDiscount({
       const payload = {
         branchCode: branchCodeCheckStock,
         products: products,
+        backStore: true
       };
       const rs = await checkStockBalance(payload);
       if (rs.data && rs.data.length > 0) {

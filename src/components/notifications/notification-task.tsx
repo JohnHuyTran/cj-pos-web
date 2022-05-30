@@ -102,8 +102,8 @@ export default function NotificationTask(props: Props) {
     try {
       setOpenLoadingModal(true);
       const rs = await getNotificationTasks(page);
-      if (rs) {
-        if (rs.data !== null) {
+      if (rs && rs != 204) {
+        if (rs.data) {
           setListData(rs.data);
           setTotal(rs.total);
         } else {
@@ -226,7 +226,7 @@ export default function NotificationTask(props: Props) {
         break;
       case 'SEND_TO_FOR_APPROVAL':
         content = item.payload.type === 1 ? 'เบิก-ใช้ในการทำกิจกรรม' : 'เบิก-ทำลายไม่มีส่วนลด';
-        branchCode = item.payload.branch;
+        branchCode = item.payload.branchCode;
         documentNumber = item.payload.documentNumber;
         statusDisplay = genStatusValue('รออนุมัติ', {
           color: '#36C690',
@@ -235,7 +235,7 @@ export default function NotificationTask(props: Props) {
         break;
       case 'APPROVE_TRANSFER_OUT':
         content = item.payload.type === 1 ? 'เบิก-ใช้ในการทำกิจกรรม' : 'เบิก-ทำลายไม่มีส่วนลด';
-        branchCode = item.payload.branch;
+        branchCode = item.payload.branchCode;
         documentNumber = item.payload.documentNumber;
         statusDisplay = genStatusValue('อนุมัติ', {
           color: '#36C690',
