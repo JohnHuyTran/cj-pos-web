@@ -314,8 +314,7 @@ function DCCheckOrderSearch() {
         const errorList = data.find((item: DataType) => item.code !== 20100)?.sdNo;
         if (errorList && errorList.length > 0) {
           const err_msg = i18n.t(`error:${`stockDiff.verifyListReject`}`);
-          mappingErrorParam(err_msg, { errorList });
-          setTextError(err_msg);
+          setTextError(mappingErrorParam(err_msg, { docNoList: errorList }));
           setOpenAlert(true);
         }
       },
