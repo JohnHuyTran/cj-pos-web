@@ -53,6 +53,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         value={props.value}
         onChange={handleDateChange}
         disabled={props.disabled}
+        data-testid="EndDate"
         // InputProps={{
         //   endAdornment: (
         //     <IconButton size="small" onClick={() => handleDateChange(null)}>
@@ -82,6 +83,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         className={props.error ? classes.MdatepickerError : classes.MdatepickerV2}
         value={props.value}
         onChange={handleDateChange}
+        data-testid="StartDate"
         // InputProps={{
         //   endAdornment: (
         //     <IconButton size="small" onClick={() => handleDateChange(null)}>

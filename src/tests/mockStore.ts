@@ -8016,7 +8016,15 @@ export const initialState = {
       ref: '',
       code: 0,
       message: '',
-      data: [],
+      data: [
+        {
+          id: '61dffd799bfc3701dce4f09d',
+          name: 'สาขาที่00000 จรัญสนิทวงศ์13',
+          province: { code: 52, name: 'กทม.' },
+          code: '00001',
+          isDC: false,
+        },
+      ],
     },
     branchList: {
       ref: '6260f367c67e471c631750be',
@@ -15659,8 +15667,14 @@ export const initialState = {
     payloadBranches: {
       isAllBranches: true,
       appliedBranches: {
-        province: [],
-        branchList: [],
+        province: [
+          { code: 52, name: 'กทม.' },
+          { code: 23, name: 'นครนายก' },
+        ],
+        branchList: [
+          { code: 52, name: 'กทม.' },
+          { code: 23, name: 'นครนายก' },
+        ],
       },
       saved: false,
     },
@@ -15673,7 +15687,22 @@ export const initialState = {
       code: 0,
       message: '',
       error_details: '',
-      data: [],
+      data: [
+        {
+          ProductTypeCode: 'C0300',
+          ProductTypeName: 'TEA',
+          barcode: '8850804000193',
+          barcodeName: '3ม้าใบชาเบอร์3 80g Pack',
+          baseUnit: 10,
+          qty: 1,
+          skuCode: '000000000020006559',
+          skuName: '3ม้าใบชาเบอร์3 80g',
+          unitCode: 'PAK',
+          unitName: 'แพค',
+          unitPrice: 245,
+          unitPriceText: '245.00',
+        },
+      ],
     },
     productTypeList: {
       timestamp: '',
@@ -15681,7 +15710,7 @@ export const initialState = {
       code: 0,
       message: '',
       error_details: '',
-      data: [],
+      data: [{ productTypeCode: '10300', productTypeName: 'BEER' }],
     },
     productByTypeList: {
       timestamp: '',
@@ -15689,12 +15718,33 @@ export const initialState = {
       code: 0,
       message: '',
       error_details: '',
-      data: [],
+      data: [
+        {
+          ProductTypeCode: 'C0300',
+          ProductTypeName: 'TEA',
+          barcode: '8850804000193',
+          barcodeName: '3ม้าใบชาเบอร์3 80g Pack',
+          baseUnit: 10,
+          qty: 1,
+          skuCode: '000000000020006559',
+          skuName: '3ม้าใบชาเบอร์3 80g',
+          unitCode: 'PAK',
+          unitName: 'แพค',
+          unitPrice: 245,
+          unitPriceText: '245.00',
+        },
+      ],
     },
     error: '',
   },
   addTypeAndProduct: {
-    state: [],
+    state: [
+      {
+        productTypeCode: '10300',
+        productTypeName: 'BEER',
+        selectedType: 1,
+      },
+    ],
   },
   searchSaleLimitTime: {
     payloadST: {

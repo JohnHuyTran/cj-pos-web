@@ -7,6 +7,7 @@ import { useStyles } from '../../../styles/makeTheme';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import SearchIcon from '@mui/icons-material/Search';
 import { addTwoDecimalPlaces } from '../../../utils/utils';
+import HtmlTooltip from '../../commons/ui/html-tooltip';
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -65,16 +66,24 @@ export const ModalBarcodeDetail = ({ open, onClose, dataDetail }: Props) => {
                 ชื่อสินค้า
               </Grid>
               <Grid item xs={4}>
-                <TextField
-                  id="barcodeName"
-                  name="barcodeName"
-                  size="small"
-                  value={dataDetail.barcodeName}
-                  className={classes.MtextField}
-                  sx={{ backgroundColor: '#EAEBEB' }}
-                  fullWidth
-                  disabled
-                />
+                <HtmlTooltip title={<React.Fragment>{dataDetail.barcodeName}</React.Fragment>}>
+                  <TextField
+                    id="barcodeName"
+                    name="barcodeName"
+                    size="small"
+                    value={dataDetail.barcodeName}
+                    className={classes.MtextField}
+                    sx={{
+                      backgroundColor: '#EAEBEB',
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                    fullWidth
+                    disabled
+                  />
+                </HtmlTooltip>
               </Grid>
             </Grid>
             {/*line c*/}
