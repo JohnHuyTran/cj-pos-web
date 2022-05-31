@@ -37,6 +37,10 @@ import SupplierOrderDetail from '../../supplier-check-order/supplier-order-detai
 import { featchSupplierOrderDetailAsync } from '../../../store/slices/supplier-order-detail-slice';
 import { featchOrderSDListAsync } from '../../../store/slices/check-order-sd-slice';
 import { getTransferOutDetail } from '../../../store/slices/transfer-out-detail-slice';
+import { featchorderDetailDCAsync } from '../../../store/slices/dc-check-order-detail-slice';
+import StockTransferBT from '../../stock-transfer/branch-transfer/stock-transfer-bt';
+import { featchBranchTransferDetailAsync } from '../../../store/slices/stock-transfer-branch-request-slice';
+import DCOrderDetail from '../../dc-check-orders/dc-ckeck-order-detail';
 
 function StockMovementSearchList() {
   const classes = useStyles();
@@ -104,7 +108,7 @@ function StockMovementSearchList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -124,8 +128,9 @@ function StockMovementSearchList() {
           <div
             style={{
               textAlign: 'center',
-            }}>
-            <Typography variant='body2' noWrap>
+            }}
+          >
+            <Typography variant="body2" noWrap>
               {`${moment(date).add(543, 'year').format('DD/MM/YYYY')} ${moment(date).format('HH:mm ')}`}
             </Typography>
           </div>
@@ -160,10 +165,11 @@ function StockMovementSearchList() {
         if (params.getValue(params.id, 'movementAction') === true && docNo) {
           return (
             <Typography
-              color='secondary'
-              variant='body2'
+              color="secondary"
+              variant="body2"
               sx={{ textDecoration: 'underline' }}
-              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}>
+              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}
+            >
               {params.value}
             </Typography>
           );
@@ -246,7 +252,7 @@ function StockMovementSearchList() {
   const textNegative = (value: any) => {
     if (Number(value) < 0)
       return (
-        <Typography variant='body2' sx={{ color: '#F54949' }}>
+        <Typography variant="body2" sx={{ color: '#F54949' }}>
           {value}
         </Typography>
       );
@@ -318,11 +324,16 @@ function StockMovementSearchList() {
   };
 
   const showDocumentDetail = async (docNo: string, docRefNo: string, docType: string, movementTypeCode: string) => {
+    console.log('movementTypeCode: ', movementTypeCode);
     handleOpenLoading('open', true);
     if (
       MOVEMENT_TYPE.ORDER_RECEIVE_LD === movementTypeCode ||
       MOVEMENT_TYPE.ORDER_RECEIVE_BT === movementTypeCode ||
-      MOVEMENT_TYPE.ADJ_TRNS_IN_LD === movementTypeCode
+      MOVEMENT_TYPE.ADJ_TRNS_IN_LD === movementTypeCode ||
+      MOVEMENT_TYPE.ADJ_TRNS_OUT_DEST_BT === movementTypeCode ||
+      MOVEMENT_TYPE.ADJ_TRNS_OUT_LD === movementTypeCode ||
+      MOVEMENT_TYPE.ADJ_TRNS_OUT_SRC_BT === movementTypeCode ||
+      MOVEMENT_TYPE.ADJ_TRNS_IN_DEST_BT === movementTypeCode
     ) {
       setDocNo(docNo);
       setDocRefNo(docRefNo);
@@ -414,6 +425,40 @@ function StockMovementSearchList() {
           setOpenAlert(true);
           setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
         });
+    } else if (MOVEMENT_TYPE.ADJ_TRNS_IN_SRC_BT === movementTypeCode) {
+      await dispatch(featchorderDetailDCAsync(docNo))
+        .then((value: any) => {
+          if (value) {
+            if (isErrorCode(value.payload.code)) {
+              setOpenAlert(true);
+              setTextError('ไม่พบข้อมูล');
+            } else {
+              handleOpenModalDocDetail();
+              setMovementTypeCodeState(movementTypeCode);
+            }
+          }
+        })
+        .catch((err) => {
+          setOpenAlert(true);
+          setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
+        });
+    } else if (MOVEMENT_TYPE.BRANCH_TRANSFER_OUT === movementTypeCode) {
+      await dispatch(featchBranchTransferDetailAsync(docNo))
+        .then((value: any) => {
+          if (value) {
+            if (isErrorCode(value.payload.code)) {
+              setOpenAlert(true);
+              setTextError('ไม่พบข้อมูล');
+            } else {
+              handleOpenModalDocDetail();
+              setMovementTypeCodeState(movementTypeCode);
+            }
+          }
+        })
+        .catch((err) => {
+          setOpenAlert(true);
+          setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
+        });
     }
     handleOpenLoading('open', false);
   };
@@ -429,7 +474,7 @@ function StockMovementSearchList() {
     <React.Fragment>
       <Box
         mt={2}
-        bgcolor='background.paper'
+        bgcolor="background.paper"
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -441,7 +486,8 @@ function StockMovementSearchList() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}>
+        }}
+      >
         <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -454,7 +500,7 @@ function StockMovementSearchList() {
             pageSize={pageSize}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={items.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             onCellClick={currentlySelected}
@@ -471,7 +517,11 @@ function StockMovementSearchList() {
       {openModalDocDetail &&
         (movementTypeCodeState === MOVEMENT_TYPE.ORDER_RECEIVE_LD ||
           movementTypeCodeState === MOVEMENT_TYPE.ORDER_RECEIVE_BT ||
-          movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_IN_LD) && (
+          movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_IN_LD ||
+          movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_OUT_LD ||
+          movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_OUT_DEST_BT ||
+          movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_OUT_SRC_BT ||
+          movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_IN_DEST_BT) && (
           <CheckOrderDetail
             sdNo={docRefNo}
             docRefNo={docNo}
@@ -517,6 +567,18 @@ function StockMovementSearchList() {
           onSearchMain={handleGetData}
           userPermission={getUserInfo().acl}
         />
+      )}
+
+      {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_IN_SRC_BT && (
+        <DCOrderDetail
+          idDC={'628f52227c80c16fbe7dc536'}
+          isOpen={openModalDocDetail}
+          onClickClose={handleCloseModalDocDetail}
+        />
+      )}
+
+      {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.BRANCH_TRANSFER_OUT && (
+        <StockTransferBT isOpen={openModalDocDetail} onClickClose={handleCloseModalDocDetail} />
       )}
 
       <LoadingModal open={openLoadingModal.open} />
