@@ -8,7 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { Button } from '@mui/material';
-import { useAppSelector, useAppDispatch } from '../../store/store';
+import store, { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
 import { saveSearchCriteriaDc } from '../../store/slices/save-search-order-dc-slice';
 import {
@@ -22,7 +22,7 @@ import DCOrderList from './dc-order-list';
 import { useStyles } from '../../styles/makeTheme';
 import DatePickerComponent from '../commons/ui/date-picker';
 import LoadingModal from '../commons/ui/loading-modal';
-import { SearchOff } from '@mui/icons-material';
+import { FemaleSharp, SearchOff } from '@mui/icons-material';
 import AlertError from '../commons/ui/alert-error';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import { getUserInfo } from '../../store/sessionStore';
@@ -299,6 +299,7 @@ function DCCheckOrderSearch() {
   };
 
   const handleOnApprove = () => {
+    handleOpenLoading('open', true);
     const items: RequestListType[] = selectRowsList.map((item: any) => {
       return {
         sdNo: item,
@@ -308,21 +309,27 @@ function DCCheckOrderSearch() {
     const payload: VerifySDListRequestType = {
       requestList: items,
     };
-    verifyDCOrderShipmentList(payload).then(
-      function (value: VerifySDListResponseType) {
-        const data: DataType[] = value.data;
-        const errorList = data.find((item: DataType) => item.code !== 20100)?.sdNo;
-        if (errorList && errorList.length > 0) {
-          const err_msg = i18n.t(`error:${`stockDiff.verifyListReject`}`);
-          setTextError(mappingErrorParam(err_msg, { docNoList: errorList }));
+    verifyDCOrderShipmentList(payload)
+      .then(
+        function (value: VerifySDListResponseType) {
+          const data: DataType[] = value.data;
+          const errorList = data.find((item: DataType) => item.code !== 20100)?.sdNo;
+          if (errorList && errorList.length > 0) {
+            const err_msg = i18n.t(`error:${`stockDiff.verifyListReject`}`);
+            setTextError(mappingErrorParam(err_msg, { docNoList: errorList }));
+            setOpenAlert(true);
+          }
+        },
+        function (error: ApiError) {
           setOpenAlert(true);
+          setTextError(error.message);
         }
-      },
-      function (error: ApiError) {
-        setOpenAlert(true);
-        setTextError(error.message);
-      }
-    );
+      )
+      .finally(async () => {
+        const payloadSearchDC = store.getState().saveSearchOrderDc.searchCriteriaDc;
+        await dispatch(featchOrderListDcAsync(payloadSearchDC));
+        handleOpenLoading('open', false);
+      });
   };
 
   return (
