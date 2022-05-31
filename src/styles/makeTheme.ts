@@ -340,6 +340,17 @@ const useStyles = makeStyles({
       // padding: "2px 4px 2px 6px !important",
     },
   },
+  MautocompleteAddProduct: {
+    '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
+      padding: '1.5px !important',
+      height: '38px',
+    },
+    '& .MuiOutlinedInput-root .MuiAutocomplete-endAdornment': {
+      backgroundColor: '#FFFFFF !important',
+      marginRight: '12px !important',
+      position: 'initial !important',
+    },
+  },
   MbtnClear: {
     borderRadius: '5px !important',
     color: '#fff',

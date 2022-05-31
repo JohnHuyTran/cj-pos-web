@@ -119,7 +119,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear, requestBody }: Props) {
       isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
       renderInput={autocompleteRenderInput}
       size='small'
-      className={classes.Mautocomplete}
+      className={classes.MautocompleteAddProduct}
       noOptionsText=''
     />
   );
