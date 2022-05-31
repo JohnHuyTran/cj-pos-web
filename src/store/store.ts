@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { useSelector, useDispatch, TypedUseSelectorHook } from 'react-redux';
 import authSlice from './slices/authSlice';
+import superviseBranchSlice from './slices/authority/authorized-branch-slice';
 import checkOrderSlice from './slices/check-order-slice';
 import checkOrderDetailSlice from './slices/check-order-detail-slice';
 import dcCheckOrderSlice from './slices/dc-check-order-slice';
@@ -79,6 +80,7 @@ import saveSearchPurchaseBranchRequest from './slices/save-search-purchase-branc
 const store = configureStore({
   reducer: {
     auth: authSlice,
+    superviseBranch: superviseBranchSlice,
     checkOrderList: checkOrderSlice,
     checkOrderDetail: checkOrderDetailSlice,
     checkOrderSDList: checkOrderSDSlice,

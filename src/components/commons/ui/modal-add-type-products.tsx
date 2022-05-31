@@ -547,7 +547,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 getOptionLabel={(option) => (option.productTypeName ? option.productTypeName : '')}
                 isOptionEqualToValue={(option, value) => option.productTypeName === value.productTypeName}
                 noOptionsText={null}
-                className={classes.Mautocomplete}
+                className={classes.MautocompleteAddProduct}
                 value={values.productType}
               />
             </Box>
@@ -588,7 +588,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 getOptionLabel={(option) => (option.barcodeName ? option.barcodeName : '')}
                 isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
                 noOptionsText={null}
-                className={classes.Mautocomplete}
+                className={classes.MautocompleteAddProduct}
                 value={values.product}
               />
             </Box>
@@ -596,8 +596,10 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
           <Grid item xs={7}>
             <Box
               className={classes.MWrapperListBranch}
-              sx={{ width: '543px', minWidth: '543px', minHeight: '270px', height: '270px' }}>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>{renderSelectedItems()}</Box>
+              sx={{ width: '543px', minWidth: '543px', minHeight: '280px', height: '280px' }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', maxHeight: '260px', overflow: 'auto' }}>
+                {renderSelectedItems()}
+              </Box>
             </Box>
           </Grid>
         </Grid>
