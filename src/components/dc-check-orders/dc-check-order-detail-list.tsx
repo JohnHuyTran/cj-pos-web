@@ -209,7 +209,7 @@ export default function DCOrderEntries({
       productUnit: item.unitName,
       productQuantityRef: item.qty,
       productQuantityActual: item.actualQty,
-      hhQty: 2,
+      hhQty: item.hhQty,
       productDifference: item.qtyDiff,
       productComment: item.comment,
       sdNo: item.sdNo ? item.sdNo : '',
@@ -269,6 +269,7 @@ export default function DCOrderEntries({
         sdID: dataRow.sdID,
         isTote: dataRow.isTote,
         isDisableChange: dataRow.isDisableChange,
+        hhQty: dataRow.hhQty,
       };
       newItems.push(item);
     });

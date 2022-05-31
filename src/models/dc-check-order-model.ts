@@ -87,6 +87,7 @@ export interface CheckOrderDetailItims {
   sdID?: string;
   isTote?: boolean;
   isDisableChange?: boolean;
+  hhQty: number;
 }
 
 export interface ItemsState {
