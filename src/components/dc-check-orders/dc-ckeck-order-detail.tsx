@@ -250,7 +250,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       const items = detailDCItems.map((item: CheckOrderDetailItims) => {
         return {
           barcode: item.barcode,
-          actualQty: item.actualQty,
+          actualQty: Number(item.actualQty),
         };
       });
       payload = {

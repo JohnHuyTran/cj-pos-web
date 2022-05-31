@@ -169,6 +169,6 @@ export const getPathVerifyBT = (value: string) => {
 
 export const getPathVerifyLD = (value: string) => {
   return getPathUrl(`${environment.orders.dcCheckOrder.verifyLD.url}`, {
-    sdNO: value,
+    sdNo: value,
   });
 };
