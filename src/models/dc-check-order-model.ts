@@ -67,6 +67,8 @@ export interface CheckOrderDetailInfo {
   receivedDate: string;
   sdImageFilename: string;
   sdImageFile: string;
+  approvalReasonCode?: string;
+  approvalFiles?: FileType[];
 }
 
 export interface CheckOrderDetailItims {

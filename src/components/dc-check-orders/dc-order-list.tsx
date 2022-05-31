@@ -223,7 +223,7 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
     setidDC(params.row.id);
 
     try {
-      await dispatch(featchorderDetailDCAsync(params.row.id));
+      await dispatch(featchorderDetailDCAsync(params.row.sdNo));
       await dispatch(setItemId(params.row.id));
       setOpensDCOrderDetail(true);
     } catch (error) {

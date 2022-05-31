@@ -96,7 +96,9 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     setDetailDCItems(detailDC.items ? detailDC.items : []);
     if (reasonRejectList === null || reasonRejectList.length <= 0) dispatch(fetchVerifyOrderReasonsRejectListAsync());
     //if reason
-    // setValues({ ...values, reason: 'CANCELED_BY_BRANCH' });
+    if (detailDC.verifyDCStatus === 1) {
+      setValues({ ...values, reason: detailDC.approvalReasonCode ? detailDC.approvalReasonCode : '' });
+    }
 
     setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
     setIsAllowRejectBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
@@ -430,7 +432,9 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     <Typography variant='body2'>แนบเอกสาร:</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
+                    {detailDC.approvalFiles && detailDC.approvalFiles.length > 0 && (
+                      <AccordionHuaweiFile files={detailDC.approvalFiles} />
+                    )}
                   </Grid>
                   <Grid item xs={2}>
                     <Typography variant='body2'>แนบเอกสาร-ไม่อนุมัติ:</Typography>
