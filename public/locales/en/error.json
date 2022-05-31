@@ -9,7 +9,7 @@
     "notauthorize": "user is not permission"
   },
   "stockDiff": {
-    "verifyListReject": "อนุมัติรายการไม่สำเร็จ เลขที่เอกสาร {docNoList}"
+    "verifyListReject": "อนุมัติรายการไม่สำเร็จ เลขที่เอกสาร [{docNoList}]"
   },
   "default": "ไม่สามารถเชื่อมต่อกับระบบได้ในขณะนี้\nกรุณาลองใหม่อีกครั้ง",
   "timeout": "ไม่สามารถเชื่อมต่อระบบได้ในเวลาที่กำหนด",

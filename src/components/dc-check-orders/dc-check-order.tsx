@@ -300,7 +300,7 @@ function DCCheckOrderSearch() {
 
   const handleOnApprove = () => {
     handleOpenLoading('open', true);
-    const items: RequestListType[] = selectRowsList.map((item: any) => {
+    const items: RequestListType[] = selectRowsList.map((item: any, index: number) => {
       return {
         sdNo: item,
       };
@@ -313,10 +313,13 @@ function DCCheckOrderSearch() {
       .then(
         function (value: VerifySDListResponseType) {
           const data: DataType[] = value.data;
-          const errorList = data.find((item: DataType) => item.code !== 20100)?.sdNo;
+          const errorList = data
+            .filter((item: DataType) => item.code !== 20100)
+            .map((item: DataType) => ` ${item.sdNo}`);
+          console.log(errorList);
           if (errorList && errorList.length > 0) {
             const err_msg = i18n.t(`error:${`stockDiff.verifyListReject`}`);
-            setTextError(mappingErrorParam(err_msg, { docNoList: errorList }));
+            setTextError(mappingErrorParam(err_msg, { docNoList: errorList.toString() }));
             setOpenAlert(true);
           }
         },
