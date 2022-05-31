@@ -18,6 +18,7 @@ interface Props {
   filterOutDC?: boolean;
   isFilterAuthorizedBranch?: boolean;
   placeHolder?: string;
+  superviseBranch?: boolean;
 }
 
 function BranchListDropDown({
@@ -29,12 +30,14 @@ function BranchListDropDown({
   filterOutDC,
   isFilterAuthorizedBranch,
   placeHolder,
+  superviseBranch,
 }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [valueBranchList, setValueBranchList] = React.useState<BranchListOptionType | null>(null);
   let branchList = useAppSelector((state) => state.searchBranchSlice);
   let authorizedBranchList = useAppSelector((state) => state.authorizedhBranchSlice);
+  let superviseBranchList = useAppSelector((state) => state.superviseBranch);
   useEffect(() => {
     if (branchList === null || branchList.branchList.data.length <= 0) dispatch(featchBranchListAsync());
     if (
@@ -60,10 +63,27 @@ function BranchListDropDown({
       return branch.code === item.code;
     });
   };
-  const defaultPropsBranchList = {
-    options: branchList.branchList.data.filter((branch: BranchInfo) => {
+  const getOptionsBranch = () => {
+    const branchListFilter: any = branchList.branchList.data.filter((branch: BranchInfo) => {
       return branch.code !== sourceBranchCode && filterAuthorizedBranch(branch) && filterDC(branch);
-    }),
+    });
+
+    if (superviseBranch) {
+      const superviseItem: any = [];
+      superviseBranchList.branchList.data?.branches.forEach((supervise: any) => {
+        superviseItem.push(supervise);
+      });
+      const superviseList = [...branchListFilter, ...superviseItem];
+      return superviseList;
+    }
+
+    return branchListFilter;
+  };
+  const defaultPropsBranchList = {
+    // options: branchList.branchList.data.filter((branch: BranchInfo) => {
+    //   return branch.code !== sourceBranchCode && filterAuthorizedBranch(branch) && filterDC(branch);
+    // }),
+    options: getOptionsBranch(),
     getOptionLabel: (option: BranchListOptionType) => `${option.code}-${option.name}`,
   };
 

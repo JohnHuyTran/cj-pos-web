@@ -419,6 +419,9 @@ export const environment = {
     authorizedBranch: {
       url: '/authority/authorized-branches',
     },
+    superviseBranch: {
+      url: '/authority/authorized-branches/supervise',
+    },
   },
   sale: {
     taxInvoice: {

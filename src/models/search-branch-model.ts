@@ -22,3 +22,17 @@ export interface AuthorizedBranchResponse {
 export interface Data {
   branches: BranchInfo[];
 }
+
+export interface SuperviseBranchRequest {
+  role?: string;
+  branchCode?: string;
+  isDC?: boolean;
+}
+
+export interface SuperviseBranchResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: Data | null;
+}
