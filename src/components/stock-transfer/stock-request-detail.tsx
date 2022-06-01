@@ -412,6 +412,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     setOpenLoadingModal(true);
 
     let validateActualQty = payloadAddItem.filter((r: any) => r.qty === 0);
+    const validateStockQty: any = skuList.filter((item: any) => {
+      return Number(item.orderAllQty) > Number(item.stock);
+    });
+
     if (!startDate || !endDate) {
       setOpenAlert(true);
       setTextError('กรุณาเลือกวันที่โอนสินค้า');
@@ -424,6 +428,9 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     } else if (validateActualQty.length > 0) {
       setOpenAlert(true);
       setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+    } else if (validateStockQty.length > 0) {
+      setOpenAlert(true);
+      setTextError('กรุณาแก้ไขจำนวนที่สั่ง เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ');
     } else {
       const payloadSave: any = await handleMapPayloadSave();
       await saveStockRequest(payloadSave)
@@ -449,6 +456,11 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             setContentMsg(
               'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
             );
+          } else if (error.code === 40014) {
+            setShowSnackBar(true);
+            setSnackbarIsStatus(false);
+            setContentMsg('กรุณาแก้ไขจำนวนที่สั่ง เนื่องจากสต๊อกสินค้าคงเหลือ ไม่เพียงพอ');
+            // flag ยิง api check stock ใหม่
           } else {
             setShowSnackBar(true);
             setSnackbarIsStatus(false);
@@ -502,6 +514,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     setOpenLoadingModal(true);
 
     let validateActualQty = payloadAddItem.filter((r: any) => r.qty === 0);
+    const validateStockQty: any = skuList.filter((item: any) => {
+      return Number(item.orderAllQty) > Number(item.stock);
+    });
+
     if (!startDate || !endDate) {
       setOpenAlert(true);
       setTextError('กรุณาเลือกวันที่โอนสินค้า');
@@ -514,6 +530,9 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     } else if (validateActualQty.length > 0) {
       setOpenAlert(true);
       setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+    } else if (validateStockQty.length > 0) {
+      setOpenAlert(true);
+      setTextError('กรุณาแก้ไขจำนวนที่สั่ง เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ');
     } else {
       if (rtNo === '') {
         const payloadSave: any = await handleMapPayloadSave();
