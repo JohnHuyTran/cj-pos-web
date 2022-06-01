@@ -95,14 +95,19 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     const keyword = value.trim();
     if (keyword.length >= 3 && reason !== 'reset') {
       setSearchItem(keyword);
-      let productTypeCodes = [];
+      let productTypeList = [];
+      let payloadBody: any;
+      let requestBody = props.requestBody;
       if (!objectNullOrEmpty(values.productType)) {
-        productTypeCodes.push(values.productType.productTypeCode);
+        productTypeList.push(values.productType.productTypeCode);
+        payloadBody = { ...requestBody, productTypeCodes: productTypeList };
+      } else {
+        payloadBody = requestBody;
       }
 
       const payload: FindProductProps = {
         search: keyword,
-        payload: props.requestBody,
+        payload: payloadBody,
       };
       await dispatch(newSearchAllProductAsync(payload));
     } else {
