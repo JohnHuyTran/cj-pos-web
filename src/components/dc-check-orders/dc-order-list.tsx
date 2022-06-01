@@ -220,11 +220,11 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
 
   const currentlySelected = async (params: GridCellParams) => {
     handleOpenLoading('open', true);
-    setidDC(params.row.id);
+    setidDC(params.row.sdNo);
 
     try {
       await dispatch(featchorderDetailDCAsync(params.row.sdNo));
-      await dispatch(setItemId(params.row.id));
+      await dispatch(setItemId(params.row.sdNo));
       setOpensDCOrderDetail(true);
     } catch (error) {
       console.log(error);

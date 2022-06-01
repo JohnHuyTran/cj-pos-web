@@ -116,6 +116,11 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
   const handleChangeComment = (value: any) => {
     setValueCommentDC(value);
+    if (value !== '') {
+      setErrorCommentDC(false);
+    } else {
+      setErrorCommentDC(true);
+    }
   };
 
   const handleClearComment = () => {
@@ -432,9 +437,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     <Typography variant='body2'>แนบเอกสาร:</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    {detailDC.approvalFiles && detailDC.approvalFiles.length > 0 && (
-                      <AccordionHuaweiFile files={detailDC.approvalFiles} />
-                    )}
+                    {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
                   </Grid>
                   <Grid item xs={2}>
                     <Typography variant='body2'>แนบเอกสาร-ไม่อนุมัติ:</Typography>
@@ -450,9 +453,8 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                         enabledControl={true}
                       />
                     )}
-
-                    {detailDC.verifyDCStatus !== 0 && detailDC.files && detailDC.files.length > 0 && (
-                      <AccordionHuaweiFile files={detailDC.files} />
+                    {detailDC.approvalFiles && detailDC.approvalFiles.length > 0 && (
+                      <AccordionHuaweiFile files={detailDC.approvalFiles} />
                     )}
                   </Grid>
                 </Grid>

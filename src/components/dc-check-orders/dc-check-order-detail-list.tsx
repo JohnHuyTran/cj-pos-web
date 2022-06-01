@@ -105,7 +105,7 @@ const columns: GridColDef[] = [
           params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }]);
           // e.target.setSelectionRange(caretStart, caretEnd);
         }}
-        disabled={params.getValue(params.id, 'isDisableChange') ? false : true}
+        disabled={Boolean(params.getValue(params.id, 'isDisableChange'))}
         autoComplete='off'
       />
     ),
@@ -215,7 +215,7 @@ export default function DCOrderEntries({
       sdNo: item.sdNo ? item.sdNo : '',
       sdID: item.sdID ? item.sdID : '',
       isTote: item.isTote ? item.isTote : false,
-      isDisableChange: isLD || isWaitForCheck,
+      isDisableChange: !(isLD && isWaitForCheck),
     };
   });
 
@@ -223,7 +223,7 @@ export default function DCOrderEntries({
 
   const currentlySelected = async (params: GridCellParams) => {
     const fieldName = params.colDef.field;
-    const sdId: any = params.getValue(params.id, 'sdID');
+    const sdId: any = params.getValue(params.id, 'sdNo');
     const sdNo = params.getValue(params.id, 'sdNo');
     if (fieldName === 'sdNo' && sdId) {
       try {

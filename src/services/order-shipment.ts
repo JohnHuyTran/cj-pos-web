@@ -163,7 +163,7 @@ export const getPathGenerateBO = (sdNo: string) => {
 
 export const getPathVerifyBT = (value: string) => {
   return getPathUrl(`${environment.orders.dcCheckOrder.verifyBT.url}`, {
-    docNo: value,
+    sdNo: value,
   });
 };
 
