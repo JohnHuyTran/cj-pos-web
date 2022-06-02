@@ -57,9 +57,10 @@ describe('show screen', () => {
     expect(getById('btnSearch')).toBeInTheDocument();
     expect(screen.getByText('ค้นหา')).toBeInTheDocument();
     await waitFor(() => fireEvent.click(screen.getByText('ค้นหา')));
-    setTimeout(() => {
-      expect(screen.getByText('SD22060101-000004')).toBeInTheDocument();
-    }, 5000);
+    // setTimeout(() => {
+    expect(screen.getByRole('grid')).toBeInTheDocument();
+    expect(screen.getByText('18857122754576')).toBeInTheDocument();
+    // }, 5000);
   });
   it('is click btn clear defaul value is clear', async () => {
     expect(screen.getByText(/เคลียร์/)).toBeInTheDocument();
@@ -75,7 +76,12 @@ describe('show screen', () => {
       expect(txtContent.textContent).toEqual('กรุณากรอกวันที่รับสินค้า');
     }, 5000);
   });
-  it('find LD20220601001001  is render in datagrid ', () => {});
+  // it('find LD20220601001001  is render in datagrid ', () => {
+  //   // setTimeout(() => {
+  //   expect(screen.getByRole('grid')).toBeInTheDocument();
+  //   expect(screen.getAllByRole('row')[1]).toContainHTML('18857122754576');
+  //   // }, 5000);
+  // });
 });
 
 // describe('component check stock', () => {
