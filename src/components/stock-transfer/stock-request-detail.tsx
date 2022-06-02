@@ -459,8 +459,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
           } else if (error.code === 40014) {
             setShowSnackBar(true);
             setSnackbarIsStatus(false);
-            setContentMsg('กรุณาแก้ไขจำนวนที่สั่ง เนื่องจากสต๊อกสินค้าคงเหลือ ไม่เพียงพอ');
-            // flag ยิง api check stock ใหม่
+            setContentMsg('กรุณาแก้ไขจำนวนที่สั่ง เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ');
           } else {
             setShowSnackBar(true);
             setSnackbarIsStatus(false);
