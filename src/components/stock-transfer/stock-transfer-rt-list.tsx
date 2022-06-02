@@ -51,7 +51,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -73,7 +73,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
           {params.value} - {params.getValue(params.id, 'endDate') || ''}
         </Typography>
       </div>
@@ -88,7 +88,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
           {params.getValue(params.id, 'branchFrom') || ''}-{params.value}
         </Typography>
       </div>
@@ -103,7 +103,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
           {params.getValue(params.id, 'branchTo') || ''}-{params.value}
         </Typography>
       </div>
@@ -134,7 +134,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
@@ -142,7 +142,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
@@ -150,7 +150,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
           />
         );
@@ -220,6 +220,7 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
   const { apiRef, columns } = useApiRef();
   const [preferredUsername, setPreferredUsername] = React.useState(isPreferredUsername());
   const [groupOC, setGroupOC] = React.useState(getUserInfo().group === PERMISSION_GROUP.OC);
+
   const rows = res.data.map((data: StockTransferInfo, indexs: number) => {
     let editMode = false;
     if (
@@ -244,6 +245,7 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
       status: data.status,
       statusText: t(`status.${data.status}`),
       edit: editMode,
+      itemGroups: data.itemGroups,
     };
   });
 
@@ -368,7 +370,8 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
     const rowSelect = apiRef.current.getSelectedRows();
     let rowSelectList: any = [];
     rowSelect.forEach((data: GridRowData) => {
-      rowSelectList.push(data.rtNo);
+      // rowSelectList.push(data.rtNo);
+      rowSelectList.push(data);
     });
 
     return onSelectRows(rowSelectList ? rowSelectList : []);
@@ -376,7 +379,7 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
 
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -389,7 +392,7 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
