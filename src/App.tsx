@@ -27,6 +27,7 @@ import StockMovement from './pages/stock/stock-movement';
 import CreatePurchaseBranch from './pages/purchase-branch-request/create-purchase-branch';
 import { featchMasterStockMovementTypeListAsync } from './store/slices/master/stock-movement-type-slice';
 import ProductMaster from './pages/stock/product-master';
+import TORawMasterial from './pages/transfer-out-raw-masterial/transfer-out-raw-masterial';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -99,6 +100,7 @@ export default function App2() {
           <Route path='/stock-transfer-rt' component={StockTransferRt} />
           <Route path='/transfer-out' component={TransferOut} />
           <Route path='/transfer-out-destroy' component={TransferOutDestroy} />
+          <Route path='/transfer-out-raw-masterial' component={TORawMasterial} />
           <Route path='/stock-balance' component={StockBalance} />
           <Route path='/stock-movement' component={StockMovement} />
           <Route path='/create-purchase-branch' component={CreatePurchaseBranch} />
