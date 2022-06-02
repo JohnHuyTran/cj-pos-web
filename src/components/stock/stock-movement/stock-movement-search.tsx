@@ -272,7 +272,7 @@ function StockMovementSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
-              วันที่เคลื่อนไหวสินค้า ตั้งแต่
+              วันที่เคลื่อนไหวสินค้า ตั้งแต่*
             </Typography>
             <DatePickerComponent
               onClickDate={handleStartDatePicker}
@@ -283,7 +283,7 @@ function StockMovementSearch() {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div'>
-              ถึง
+              ถึง*
             </Typography>
             <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
           </Grid>
