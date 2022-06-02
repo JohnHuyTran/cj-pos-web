@@ -413,6 +413,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     {' '}
                     <FormControl fullWidth className={classes.Mselect}>
                       <Select
+                        data-testid='testid-reason'
                         id='reason'
                         name='reason'
                         value={values.reason}
@@ -468,6 +469,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     {detailDC.verifyDCStatus === 0 && (
                       <>
                         <Button
+                          data-testid='testid-btnApprove'
                           id='btnApprove'
                           variant='contained'
                           color='secondary'
@@ -483,6 +485,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                         </Button>
 
                         <Button
+                          data-testid='testid-btnReject'
                           id='btnReject'
                           variant='contained'
                           color='error'
@@ -510,6 +513,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                   <Grid item>
                     {detailDC.verifyDCStatus === 0 && (
                       <Button
+                        data-testid='testid-btnChecked'
                         id='btnChecked'
                         variant='contained'
                         color='primary'

@@ -1,6 +1,6 @@
 // componets/Greetings.test.tsx
 
-import { fireEvent, getByText, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, getByText, prettyDOM, render, RenderResult, screen, waitFor, within } from '@testing-library/react';
 import DCCheckOrderSearch from '../../../components/dc-check-orders/dc-check-order';
 
 import { Provider } from 'react-redux';
@@ -17,19 +17,19 @@ import thunk from 'redux-thunk';
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
-let wrapper;
+let wrapper: RenderResult<typeof import('@testing-library/dom/types/queries'), HTMLElement>;
 // const mockStore = configureStore();
 let store: Store<any, AnyAction>;
 sessionStorage.setItem('user_info', mockUserInfo);
 beforeEach(() => {
   store = mockStore(initialState);
-  wrapper = render(
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <DCCheckOrderSearch />
-      </ThemeProvider>
-    </Provider>
-  );
+  // wrapper = render(
+  //   <Provider store={store}>
+  //     <ThemeProvider theme={theme}>
+  //       <DCCheckOrderSearch />
+  //     </ThemeProvider>
+  //   </Provider>
+  // );
 });
 // const mockDispatch = jest.fn();
 // jest.mock('react-redux', () => ({
@@ -53,46 +53,41 @@ jest.mock('react-i18next', () => ({
 }));
 
 describe('show screen', () => {
-  it('to be click btn search find show datagrid have sd no-> SD22060101-000004 ', async () => {
+  it('find btn search', async () => {
+    const renderer: any = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DCCheckOrderSearch />
+        </ThemeProvider>
+      </Provider>
+    );
+
     expect(getById('btnSearch')).toBeInTheDocument();
-    expect(screen.getByText('ค้นหา')).toBeInTheDocument();
-    await waitFor(() => fireEvent.click(screen.getByText('ค้นหา')));
-    // setTimeout(() => {
-    expect(screen.getByRole('grid')).toBeInTheDocument();
-    expect(screen.getByText('18857122754576')).toBeInTheDocument();
-    // }, 5000);
+    expect(renderer.getByText('ค้นหา')).toBeInTheDocument();
+    await fireEvent.click(renderer.getByText('ค้นหา'));
+    expect(renderer.getByText('กรุณารอสักครู่')).toBeInTheDocument();
   });
   it('is click btn clear defaul value is clear', async () => {
-    expect(screen.getByText(/เคลียร์/)).toBeInTheDocument();
-    await waitFor(() => fireEvent.click(screen.getByText(/เคลียร์/)));
-    setTimeout(() => {
-      expect(screen.getByText(/กรุณาเลือกวันที่/)).toBeInTheDocument();
-    }, 5000);
-
-    // await waitFor(() => fireEvent.click(screen.getByText('ค้นหา')));
-    setTimeout(() => {
-      expect(screen.getByTestId(/txtContent/)).toBeInTheDocument();
-      let txtContent = screen.getByTestId(/txtContent/);
-      expect(txtContent.textContent).toEqual('กรุณากรอกวันที่รับสินค้า');
-    }, 5000);
+    const renderer: any = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DCCheckOrderSearch />
+        </ThemeProvider>
+      </Provider>
+    );
+    expect(renderer.getByText(/เคลียร์/)).toBeInTheDocument();
+    await waitFor(() => fireEvent.click(renderer.getByText(/เคลียร์/)));
   });
-  // it('find LD20220601001001  is render in datagrid ', () => {
-  //   // setTimeout(() => {
-  //   expect(screen.getByRole('grid')).toBeInTheDocument();
-  //   expect(screen.getAllByRole('row')[1]).toContainHTML('18857122754576');
-  //   // }, 5000);
-  // });
+
+  it('find btn approve is disable', async () => {
+    const renderer: any = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DCCheckOrderSearch />
+        </ThemeProvider>
+      </Provider>
+    );
+    const button = renderer.getByText(/อนุมัติ/).closest('button');
+    expect(button).toBeDisabled();
+  });
 });
-
-// describe('component check stock', () => {
-//   it('find button close', () => {
-//     expect(screen.getByText('ปิด')).toBeInTheDocument();
-//     fireEvent.click(screen.getByText('ปิด'));
-//     expect(onClose).toHaveBeenCalledTimes(1);
-//   });
-
-//   it('find data stock', () => {
-//     expect(screen.getByRole('grid')).toBeInTheDocument();
-//     expect(screen.getAllByRole('row')[1]).toContainHTML('18857122754576');
-//   });
-// });
