@@ -540,6 +540,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 ประเภทสินค้า
               </Typography>
               <Autocomplete
+                data-testid='autocomplete-product-type'
                 options={productTypeOptions}
                 id='combo-box-type'
                 popupIcon={<SearchIcon color='primary' />}

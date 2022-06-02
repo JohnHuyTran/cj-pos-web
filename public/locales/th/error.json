@@ -8,6 +8,9 @@
   "authentication": {
     "notauthorize": "user is not permission"
   },
+  "stockDiff": {
+    "verifyListReject": "อนุมัติรายการไม่สำเร็จ เลขที่เอกสาร [{docNoList}]"
+  },
   "default": "พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง",
   "timeout": "ไม่สามารถเชื่อมต่อระบบได้ในเวลาที่กำหนด",
   "ECONNABORTED": "ไม่สามารถเชื่อมต่อระบบได้ในเวลาที่กำหนด",

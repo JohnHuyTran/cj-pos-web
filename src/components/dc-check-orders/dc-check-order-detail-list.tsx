@@ -1,17 +1,30 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid, GridCellParams, GridColDef, GridRowData, GridValueGetterParams } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRenderCellParams,
+  GridRowData,
+  GridRowId,
+  GridValueGetterParams,
+  useGridApiRef,
+} from '@mui/x-data-grid';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import { CheckOrderDetailItims } from '../../models/dc-check-order-model';
 
 import { useStyles } from '../../styles/makeTheme';
 import Typography from '@mui/material/Typography';
 import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
+import { TextField } from '@mui/material';
 
 interface Props {
   items: [];
   clearCommment: () => void;
   isTote: boolean;
+  onUpdateItems: (items: CheckOrderDetailItims[]) => void;
+  isLD: boolean;
+  isWaitForCheck: boolean;
 }
 
 const columns: GridColDef[] = [
@@ -58,6 +71,15 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
   },
   {
+    field: 'hhQty',
+    headerName: 'จำนวนที่ scan HH',
+    minWidth: 135,
+    sortable: false,
+    headerAlign: 'center',
+    align: 'right',
+    renderCell: (params) => calQtyHH(params),
+  },
+  {
     field: 'productQuantityRef',
     headerName: 'จำนวนอ้างอิง',
     width: 115,
@@ -72,6 +94,21 @@ const columns: GridColDef[] = [
     sortable: false,
     align: 'right',
     headerAlign: 'center',
+    renderCell: (params: GridRenderCellParams) => (
+      <TextField
+        variant='outlined'
+        name='txbProductQuantityActual'
+        inputProps={{ style: { textAlign: 'right' } }}
+        value={params.value}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(e) => {
+          params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }]);
+          // e.target.setSelectionRange(caretStart, caretEnd);
+        }}
+        disabled={Boolean(params.getValue(params.id, 'isDisableChange'))}
+        autoComplete='off'
+      />
+    ),
   },
   {
     field: 'productDifference',
@@ -92,7 +129,8 @@ const columns: GridColDef[] = [
   {
     field: 'sdNo',
     headerName: 'รับสินค้าใน Tote',
-    flex: 0.5,
+    // flex: 0.5,
+    minWidth: 150,
     sortable: false,
     headerAlign: 'center',
     renderCell: (params) => {
@@ -110,6 +148,26 @@ const columns: GridColDef[] = [
   },
 ];
 
+function useApiRef() {
+  const apiRef = useGridApiRef();
+  const _columns = useMemo(
+    () =>
+      columns.concat({
+        field: '',
+        width: 0,
+        minWidth: 0,
+        sortable: false,
+        renderCell: (params) => {
+          apiRef.current = params.api;
+          return null;
+        },
+      }),
+    [columns]
+  );
+
+  return { apiRef, columns: _columns };
+}
+
 var calProductDiff = function (params: GridValueGetterParams) {
   let diff =
     Number(params.getValue(params.id, 'productQuantityActual')) -
@@ -120,9 +178,27 @@ var calProductDiff = function (params: GridValueGetterParams) {
   return diff;
 };
 
-export default function DCOrderEntries({ items, clearCommment, isTote }: Props): ReactElement {
+var calQtyHH = function (params: GridValueGetterParams) {
+  const actualQty = Number(params.getValue(params.id, 'productQuantityActual'));
+  const qtyHH = Number(params.getValue(params.id, 'hhQty'));
+
+  if (actualQty !== qtyHH) {
+    return <label style={{ color: '#FBA600', fontWeight: 700 }}> {qtyHH} </label>;
+  }
+  return qtyHH;
+};
+
+export default function DCOrderEntries({
+  items,
+  clearCommment,
+  isTote,
+  onUpdateItems,
+  isLD,
+  isWaitForCheck,
+}: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const { apiRef, columns } = useApiRef();
   const rows = items.map((item: CheckOrderDetailItims, index: number) => {
     return {
       id: `${item.barcode}-${index + 1}`,
@@ -133,11 +209,13 @@ export default function DCOrderEntries({ items, clearCommment, isTote }: Props):
       productUnit: item.unitName,
       productQuantityRef: item.qty,
       productQuantityActual: item.actualQty,
+      hhQty: item.hhQty,
       productDifference: item.qtyDiff,
       productComment: item.comment,
       sdNo: item.sdNo ? item.sdNo : '',
       sdID: item.sdID ? item.sdID : '',
       isTote: item.isTote ? item.isTote : false,
+      isDisableChange: !(isLD && isWaitForCheck),
     };
   });
 
@@ -145,7 +223,7 @@ export default function DCOrderEntries({ items, clearCommment, isTote }: Props):
 
   const currentlySelected = async (params: GridCellParams) => {
     const fieldName = params.colDef.field;
-    const sdId: any = params.getValue(params.id, 'sdID');
+    const sdId: any = params.getValue(params.id, 'sdNo');
     const sdNo = params.getValue(params.id, 'sdNo');
     if (fieldName === 'sdNo' && sdId) {
       try {
@@ -163,6 +241,40 @@ export default function DCOrderEntries({ items, clearCommment, isTote }: Props):
   } else {
     columns[8]['hide'] = true;
   }
+  if (isLD) {
+    columns[4]['hide'] = false;
+  } else {
+    columns[4]['hide'] = true;
+  }
+
+  const handleUpdateItems = () => {
+    let newItems: CheckOrderDetailItims[] = [];
+    let index: number = 0;
+    const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+    rowsEdit.forEach((dataRow: GridRowData) => {
+      const item: CheckOrderDetailItims = {
+        skuCode: dataRow.productId,
+        skuType: '',
+        barcode: dataRow.productBarCode,
+        productName: dataRow.productDescription,
+        unitCode: '',
+        unitName: dataRow.productUnit,
+        unitFactor: 0,
+        qty: dataRow.productQuantityRef,
+        actualQty: dataRow.productQuantityActual,
+        qtyDiff: dataRow.productDifference,
+        comment: dataRow.productComment,
+        id: `${dataRow.productBarCode}-${index + 1}`,
+        sdNo: dataRow.sdNo,
+        sdID: dataRow.sdID,
+        isTote: dataRow.isTote,
+        isDisableChange: dataRow.isDisableChange,
+        hhQty: dataRow.hhQty,
+      };
+      newItems.push(item);
+    });
+    onUpdateItems(newItems);
+  };
 
   return (
     <Box mt={2} bgcolor='background.paper'>
@@ -180,6 +292,7 @@ export default function DCOrderEntries({ items, clearCommment, isTote }: Props):
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}
           onCellClick={currentlySelected}
+          onCellOut={handleUpdateItems}
         />
       </div>
     </Box>

@@ -51,8 +51,14 @@ export const environment = {
       detailDC: {
         url: '/order/stock-diff/verify/view',
       },
-      approve: {
-        url: '/order/stock-diff/verify/{idDC}',
+      verifyBT: {
+        url: '/order/stock-diff/verify/bt/{sdNo}',
+      },
+      verifyLD: {
+        url: '/order/stock-diff/verify/ld/{sdNo}',
+      },
+      verifyList: {
+        url: '/order/stock-diff/verifyList',
       },
     },
     tote: {
@@ -415,6 +421,13 @@ export const environment = {
     stock: {
       movementType: {
         url: '/master/stock-movement-types',
+      },
+    },
+    reason: {
+      verifyOrder: {
+        disapprove: {
+          url: 'master/disapproval-reasons',
+        },
       },
     },
   },

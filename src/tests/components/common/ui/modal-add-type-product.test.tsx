@@ -6,22 +6,46 @@ import { initialState } from '../../../mockStore';
 import { ThemeProvider, Typography } from '@mui/material';
 import theme from '../../../../styles/theme';
 import { mockUserInfo } from '../../../mockData';
-import ModalAddTypeProduct from '../../../../components/commons/ui/modal-add-type-product';
 import React, { Profiler } from 'react';
 import { addTypeAndProduct } from '../../../../store/slices/add-type-product-slice';
 import userEvent from '@testing-library/user-event';
+import ModalAddTypeProduct from '../../../../components/commons/ui/modal-add-type-products';
 
 let wrapper;
 const mockStore = configureStore();
 let store: Store<any, AnyAction>;
 sessionStorage.setItem('user_info', mockUserInfo);
+jest.mock('react-i18next', () => ({
+  // this mock makes sure any components using the translate hook can use it without a warning being shown
+  useTranslation: () => {
+    return {
+      t: (str: string) => str,
+      i18n: {
+        changeLanguage: () => new Promise(() => {}),
+      },
+    };
+  },
+  initReactI18next: {
+    type: '3rdParty',
+    init: jest.fn(),
+  },
+}));
 beforeEach(() => {
   store = mockStore(initialState);
   const handleOnclick = jest.fn();
   const container = render(
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <ModalAddTypeProduct open={true} onClose={handleOnclick} />
+        <ModalAddTypeProduct
+          open={true}
+          onClose={handleOnclick}
+          requestBody={{
+            skuCodes: [],
+            skuTypes: undefined,
+            isOrderable: undefined,
+            isSellable: undefined,
+          }}
+        />
       </ThemeProvider>
     </Provider>
   );
@@ -57,7 +81,16 @@ describe('component modal add type product', () => {
     const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <ModalAddTypeProduct open={true} onClose={handleOnclick} />
+          <ModalAddTypeProduct
+            open={true}
+            onClose={handleOnclick}
+            requestBody={{
+              skuCodes: [],
+              skuTypes: undefined,
+              isOrderable: undefined,
+              isSellable: undefined,
+            }}
+          />
         </ThemeProvider>
       </Provider>
     );
@@ -174,7 +207,15 @@ describe('component modal add type product', () => {
     const { container } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <ModalAddTypeProduct open={true} onClose={handleOnclick} />
+          <ModalAddTypeProduct
+            open={true}
+            onClose={handleOnclick}
+            requestBody={{
+              skuCodes: [],
+              skuTypes: [2],
+              isSellable: true,
+            }}
+          />
         </ThemeProvider>
       </Provider>
     );
