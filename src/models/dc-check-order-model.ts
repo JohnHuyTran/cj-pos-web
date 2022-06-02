@@ -1,3 +1,5 @@
+import { FileType, ReasonType } from './common-model';
+
 export interface CheckOrderRequest {
   limit: string;
   page: string;
@@ -65,6 +67,8 @@ export interface CheckOrderDetailInfo {
   receivedDate: string;
   sdImageFilename: string;
   sdImageFile: string;
+  approvalReasonCode?: string;
+  approvalFiles?: FileType[];
 }
 
 export interface CheckOrderDetailItims {
@@ -84,6 +88,8 @@ export interface CheckOrderDetailItims {
   sdNo?: string;
   sdID?: string;
   isTote?: boolean;
+  isDisableChange?: boolean;
+  hhQty: number;
 }
 
 export interface ItemsState {
@@ -108,4 +114,43 @@ export interface ItemsInfo {
   barcode: string;
   actualQty: number;
   comment: string;
+}
+
+export interface ReasonRejectResponseType {
+  data: ReasonType[];
+  ref: string;
+  code: number;
+  message: string;
+}
+
+export interface VerifyDocLDRequestType {
+  approved: boolean;
+  reasonCode?: string;
+  items?: Item[];
+}
+
+export interface Item {
+  barcode: string;
+  actualQty: number;
+}
+
+export interface VerifySDListRequestType {
+  requestList: RequestListType[];
+}
+export interface RequestListType {
+  dcComment?: string;
+  sdNo: string;
+}
+export interface VerifySDListResponseType {
+  ref: string;
+  code: number;
+  message: string;
+  data: DataType[];
+}
+
+export interface DataType {
+  ref: string;
+  code: number;
+  message: string;
+  sdNo: string;
 }
