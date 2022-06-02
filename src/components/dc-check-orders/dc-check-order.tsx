@@ -381,7 +381,7 @@ function DCCheckOrderSearch() {
             <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่รับสินค้า ตั้งแต่
             </Typography>
-            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} data-testid='dateFrom' />
           </Grid>
           <Grid item xs={4}>
             <Box sx={{ width: '100%' }}>

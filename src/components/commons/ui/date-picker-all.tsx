@@ -46,7 +46,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
-        clearable
+        clearable='true'
         autoOk
         fullWidth
         variant='inline'
@@ -76,7 +76,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
-        clearable
+        clearable='true'
         autoOk
         fullWidth
         variant='inline'
