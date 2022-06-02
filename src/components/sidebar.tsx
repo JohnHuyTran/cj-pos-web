@@ -398,6 +398,15 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='ใช้ในการทำกิจกรรม' />
               </ListItemButton>
             </Link>
+            <Link to='/transfer-out-raw-masterial' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTOMasterial'>
+              <ListItemButton
+                key='subMenuTOMasterial'
+                selected={selectedIndex === 20}
+                onClick={() => handleListItemClick(20)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ขอใช้วัตถุดิบร้านบาว' />
+              </ListItemButton>
+            </Link>
           </List>
         </Collapse>
         <ListItemButton
