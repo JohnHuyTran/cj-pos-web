@@ -13,10 +13,10 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import moment from 'moment';
 import { TransferOut, TransferOutSearchRequest, TransferOutSearchResponse } from '../../models/transfer-out-model';
-import ModalCreateTransferOut from '../../components/transfer-out/modal-create-transfer-out';
 import { getTransferOutDetail } from '../../store/slices/transfer-out-detail-slice';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
+import ModalCreateToRawMaterial from "../../components/transfer-out-raw-material/modal-create-to-raw-material";
 
 const _ = require('lodash');
 
@@ -324,7 +324,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
             columns={columns}
             disableColumnMenu
             hideFooterSelectedRowCount={true}
-            onCellClick={currentlySelected}
+            // onCellClick={currentlySelected}
             autoHeight={lstTransferOut.length < 10}
             scrollbarSize={10}
             pagination
@@ -350,7 +350,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
         </div>
       </Box>
       {openDetail && (
-        <ModalCreateTransferOut
+        <ModalCreateToRawMaterial
           isOpen={openDetail}
           onClickClose={handleCloseDetail}
           action={Action.UPDATE}
