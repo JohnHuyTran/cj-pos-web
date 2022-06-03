@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { environment } from '../../environment-base';
 import { get, post } from '../../adapters/posback-adapter';
 import { ItemsResponse, PayloadSearchProduct, ProductTypeResponse } from '../../models/modal-add-all-items-model';
+import { FindProductProps, FindProductRequest } from '../../models/product-model';
+import { ContentType } from '../../utils/enum/common-enum';
 
 type State = {
   itemList: ItemsResponse;
@@ -66,6 +68,29 @@ export const searchAllProductAsync = createAsyncThunk(
     }
   }
 );
+
+export const newSearchAllProductAsync = createAsyncThunk('searchAllProductAsync', async (payload: FindProductProps) => {
+  try {
+    const path = `${environment.products.addItem.allitemsList.url}/${payload.search}?limit=10`;
+    const body = { ...payload.payload };
+    let response = await post(path, body, ContentType.JSON).then();
+
+    if (response === 204) {
+      let responseCode: any = {
+        ref: '',
+        code: response,
+        message: '',
+        data: [],
+      };
+
+      return responseCode;
+    }
+
+    return response;
+  } catch (error) {
+    throw error;
+  }
+});
 
 export const searchAllProductTypeAsync = createAsyncThunk('searchAllProductTypeAsync', async (search: string) => {
   try {

@@ -92,6 +92,7 @@ export interface Entry {
   qty: number;
   qtyAll: number;
   qtyAllBefore: number;
+  qtyRef?: number;
   actualQty: number;
   qtyDiff: number;
   price: number;
@@ -126,6 +127,7 @@ export interface ShipmentDetailInfo {
   Comment: string;
   docRefRemark: string;
   items: itemsDetail[] | [];
+  hhQty: number;
 }
 export interface itemsDetail {
   skuCode: string;

@@ -20,8 +20,6 @@ import {
   Approve1StockTransferRequest,
   Approve2StockTransferRequest,
   SaveStockTransferRequest,
-  StockTransferRequest,
-  SubmitStockTransferRequest,
 } from '../../models/stock-transfer-model';
 import { ApiError } from '../../models/api-error-model';
 import {
@@ -47,16 +45,15 @@ import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-
 import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permission';
 import { env } from '../../adapters/environmentConfigs';
 import { getUserInfo } from '../../store/sessionStore';
-import {
-  ACTIONS,
-  KEYCLOAK_GROUP_BRANCH_MANAGER,
-  KEYCLOAK_GROUP_OC01,
-  KEYCLOAK_GROUP_SCM01,
-  PERMISSION_GROUP,
-} from '../../utils/enum/permission-enum';
+import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { isPreferredUsername } from '../../utils/role-permission';
 import ModelDeleteConfirm from './modal-delete-confirm';
+import { SuperviseBranchRequest } from '../../models/search-branch-model';
+import {
+  clearSuperviseBranchFilter,
+  featchSuperviseBranchListAsync,
+} from '../../store/slices/authority/authorized-branch-slice';
 
 interface State {
   branchCode: string;
@@ -87,16 +84,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
-          <HighlightOff fontSize="large" />
+          }}>
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -232,7 +228,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     ) {
       setCanCleMode(true);
     }
-  }, [open]);
+  }, [open === true]);
 
   const [status, setStatus] = React.useState('');
   const [rtNo, setRTNo] = React.useState('');
@@ -323,6 +319,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   const [toBranch, setToBranch] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const handleChangeFromBranch = (branchCode: string) => {
+    if (groupSCM) {
+      getSuperviseBranch(branchCode);
+    }
+
     setFlagSave(true);
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
@@ -347,6 +347,16 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       setValues({ ...values, branchCode: '' });
       setToBranch('');
     }
+  };
+
+  const getSuperviseBranch = async (branchCode: string) => {
+    await dispatch(clearSuperviseBranchFilter());
+    const payload: SuperviseBranchRequest = {
+      role: 'dc',
+      branchCode: branchCode,
+      isDC: true,
+    };
+    await dispatch(featchSuperviseBranchListAsync(payload));
   };
 
   const [reasons, setReasons] = React.useState('');
@@ -812,19 +822,19 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
   return (
     <div>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleChkSaveClose}>
+      <Dialog open={open} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleChkSaveClose}>
           <Typography sx={{ fontSize: '1em' }}>
             {type === 'Create' && 'สร้างรายการโอนสินค้า'}
             {type !== 'Create' && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && 'รายการโอนสินค้า'}
             {type !== 'Create' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && 'ตรวจสอบรายการโอนสินค้า'}
           </Typography>
-          {status !== '' && <Steppers status={status} type="RT"></Steppers>}
-          {status === '' && <Steppers status="DRAFT" type="RT"></Steppers>}
+          {status !== '' && <Steppers status={status} type='RT'></Steppers>}
+          {status === '' && <Steppers status='DRAFT' type='RT'></Steppers>}
         </BootstrapDialogTitle>
 
         <DialogContent>
-          <Grid container spacing={2} mb={2} id="top-item">
+          <Grid container spacing={2} mb={2} id='top-item'>
             <Grid item xs={2}>
               เลขที่เอกสาร RT :
             </Grid>
@@ -889,7 +899,9 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     onChangeBranch={handleChangeToBranch}
                     isClear={clearBranchDropDown}
                     isFilterAuthorizedBranch={isAuthorizedBranch}
-                    filterOutDC={groupBranch}
+                    // filterOutDC={groupBranch}
+                    filterOutDC={groupSCM ? groupSCM : groupBranch}
+                    superviseBranch={groupSCM}
                   />
                 </Grid>
                 <Grid item xs={1}></Grid>
@@ -973,68 +985,63 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             <Grid container spacing={2} mt={4} mb={2}>
               <Grid item xs={5}>
                 <Button
-                  id="btnAddItem"
-                  variant="contained"
-                  color="info"
+                  id='btnAddItem'
+                  variant='contained'
+                  color='info'
                   className={classes.MbtnPrint}
                   onClick={handleOpenAddItems}
                   startIcon={<ControlPoint />}
                   // sx={{ width: 200, display: `${!displayBtnAddItem ? 'none' : ''}` }}
                   sx={{ width: 200 }}
-                  disabled={!displayBtnAddItem}
-                >
+                  disabled={!displayBtnAddItem}>
                   เพิ่มสินค้า
                 </Button>
               </Grid>
               <Grid item xs={7} sx={{ textAlign: 'end' }}>
                 <Button
-                  id="btnSave"
-                  variant="contained"
-                  color="warning"
+                  id='btnSave'
+                  variant='contained'
+                  color='warning'
                   className={classes.MbtnSave}
                   onClick={handleSave}
                   startIcon={<SaveIcon />}
                   sx={{ width: 140, display: `${displayBtnSave ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
+                  disabled={rowLength == 0}>
                   บันทึก
                 </Button>
 
                 <Button
-                  id="btnCreateTransfer"
-                  variant="contained"
-                  color="primary"
+                  id='btnCreateTransfer'
+                  variant='contained'
+                  color='primary'
                   className={classes.MbtnSave}
                   onClick={handleSubmit}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 140, display: `${displayBtnSubmit ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
+                  disabled={rowLength == 0}>
                   ส่งงาน
                 </Button>
 
                 <Button
-                  id="btnCreateTransfer"
-                  variant="contained"
-                  color="primary"
+                  id='btnCreateTransfer'
+                  variant='contained'
+                  color='primary'
                   className={classes.MbtnSave}
                   onClick={handleSubmit}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 140, display: `${!groupSCM ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
+                  disabled={rowLength == 0}>
                   ส่งงาน
                 </Button>
 
                 <Button
-                  id="btnCancle"
-                  variant="contained"
-                  color="error"
+                  id='btnCancle'
+                  variant='contained'
+                  color='error'
                   className={classes.MbtnSave}
                   onClick={handleCancle}
                   sx={{ width: 140, display: `${!canCleMode ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
+                  disabled={rowLength == 0}>
                   ยกเลิก
                 </Button>
               </Grid>
@@ -1047,25 +1054,23 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               {groupOC && status === 'WAIT_FOR_APPROVAL_1' && (
                 <div>
                   <Button
-                    id="btnSave"
-                    variant="contained"
-                    color="error"
+                    id='btnSave'
+                    variant='contained'
+                    color='error'
                     className={classes.MbtnSave}
                     onClick={handleReject}
                     startIcon={<SaveIcon />}
-                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
-                  >
+                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}>
                     ปฎิเสธ
                   </Button>
                   <Button
-                    id="btnCreateTransfer"
-                    variant="contained"
-                    color="primary"
+                    id='btnCreateTransfer'
+                    variant='contained'
+                    color='primary'
                     className={classes.MbtnSave}
                     onClick={handleApprove}
                     startIcon={<CheckCircleOutline />}
-                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
-                  >
+                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}>
                     อนุมัติ
                   </Button>
                 </div>
@@ -1074,25 +1079,23 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
                 <div>
                   <Button
-                    id="btnSave"
-                    variant="contained"
-                    color="error"
+                    id='btnSave'
+                    variant='contained'
+                    color='error'
                     className={classes.MbtnSave}
                     onClick={handleReject}
                     startIcon={<SaveIcon />}
-                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
-                  >
+                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}>
                     ปฎิเสธ
                   </Button>
                   <Button
-                    id="btnCreateTransfer"
-                    variant="contained"
-                    color="primary"
+                    id='btnCreateTransfer'
+                    variant='contained'
+                    color='primary'
                     className={classes.MbtnSave}
                     onClick={handleApprove}
                     startIcon={<CheckCircleOutline />}
-                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
-                  >
+                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}>
                     อนุมัติ
                   </Button>
                 </div>
@@ -1115,7 +1118,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             <Grid container spacing={2} mb={2}>
               <Grid item xs={3}>
                 <TextBoxComment
-                  fieldName="หมายเหตุจากผู้อนุมัติ 1 :"
+                  fieldName='หมายเหตุจากผู้อนุมัติ 1 :'
                   defaultValue={commentOC}
                   maxLength={100}
                   onChangeComment={handleChangeCommentOC}
@@ -1125,7 +1128,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               <Grid item xs={6}></Grid>
               <Grid item xs={3}>
                 <TextBoxComment
-                  fieldName="หมายเหตุจากผู้อนุมัติ 2 :"
+                  fieldName='หมายเหตุจากผู้อนุมัติ 2 :'
                   defaultValue={commentSCM}
                   maxLength={100}
                   onChangeComment={handleChangeCommentSCM}
@@ -1137,7 +1140,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item xs={10}></Grid>
-              <Grid item xs={2} textAlign="center">
+              <Grid item xs={2} textAlign='center'>
                 <IconButton onClick={topFunction}>
                   <ArrowForwardIosIcon
                     sx={{
@@ -1151,7 +1154,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                   />
                 </IconButton>
 
-                <Box fontSize="13px">กลับขึ้นด้านบน</Box>
+                <Box fontSize='13px'>กลับขึ้นด้านบน</Box>
               </Grid>
             </Grid>
           </Box>
@@ -1165,8 +1168,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
           skuCodes: [],
           skuTypes: [2],
           isSellable: true,
-        }}
-      ></ModalAddItems>
+        }}></ModalAddItems>
       <SnackbarStatus
         open={showSnackBar}
         onClose={handleCloseSnackBar}
@@ -1179,7 +1181,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
         onClose={handleCloseModelConfirm}
         handleConfirm={handleConfirm}
         header={textHeaderConfirm}
-        title="เลขที่เอกสาร RT"
+        title='เลขที่เอกสาร RT'
         value={rtNo}
       />
 

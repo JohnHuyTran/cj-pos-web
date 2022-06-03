@@ -24,13 +24,15 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import { objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
 import {
   clearSearchAllProductAsync,
+  newSearchAllProductAsync,
   searchAllProductAsync,
   searchAllProductTypeAsync,
 } from '../../../store/slices/search-type-product-slice';
 import { updateAddTypeAndProductState } from '../../../store/slices/add-type-product-slice';
 import LoadingModal from './loading-modal';
-import { getAllProductByType } from '../../../services/common';
+import { getProductByType } from '../../../services/product-master';
 import { setCheckEdit } from '../../../store/slices/sale-limit-time-slice';
+import { FindProductProps, FindProductRequest } from '../../../models/product-model';
 
 interface Error {
   productTypeExist: string;
@@ -51,6 +53,8 @@ interface Props {
   skuType?: any[];
   showSearch?: boolean;
   textBtn?: string;
+  requestBody: FindProductRequest;
+  isControlStockType?: boolean;
 }
 
 interface SelectedItemProps {
@@ -91,17 +95,21 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     const keyword = value.trim();
     if (keyword.length >= 3 && reason !== 'reset') {
       setSearchItem(keyword);
-      let productTypeCodes = [];
+      let productTypeList = [];
+      let payloadBody: any;
+      let requestBody = props.requestBody;
       if (!objectNullOrEmpty(values.productType)) {
-        productTypeCodes.push(values.productType.productTypeCode);
+        productTypeList.push(values.productType.productTypeCode);
+        payloadBody = { ...requestBody, productTypeCodes: productTypeList };
+      } else {
+        payloadBody = requestBody;
       }
-      await dispatch(
-        searchAllProductAsync({
-          search: keyword,
-          productTypeCodes: productTypeCodes,
-          skuTypes: props.skuType ? props.skuType : [2],
-        })
-      );
+
+      const payload: FindProductProps = {
+        search: keyword,
+        payload: payloadBody,
+      };
+      await dispatch(newSearchAllProductAsync(payload));
     } else {
       clearData();
     }
@@ -319,8 +327,21 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
         if (!objectNullOrEmpty(values.productType)) {
           productTypeCode = values.productType.productTypeCode;
         }
+
+        let payload: any;
+        if (props.isControlStockType) {
+          payload = {
+            productTypeCode: productTypeCode,
+            isControlStock: props.isControlStockType,
+          };
+        } else {
+          payload = {
+            productTypeCode: productTypeCode,
+          };
+        }
+
         setOpenLoadingModal(true);
-        let res = await getAllProductByType(productTypeCode);
+        let res = await getProductByType(payload);
         if (res && res.data && res.data.length > 0) {
           selectedAddItems.push(productTypeItem);
           let lstProductByType = res.data;
@@ -531,7 +552,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 getOptionLabel={(option) => (option.productTypeName ? option.productTypeName : '')}
                 isOptionEqualToValue={(option, value) => option.productTypeName === value.productTypeName}
                 noOptionsText={null}
-                className={classes.Mautocomplete}
+                className={classes.MautocompleteAddProduct}
                 value={values.productType}
               />
             </Box>
@@ -572,7 +593,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 getOptionLabel={(option) => (option.barcodeName ? option.barcodeName : '')}
                 isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
                 noOptionsText={null}
-                className={classes.Mautocomplete}
+                className={classes.MautocompleteAddProduct}
                 value={values.product}
               />
             </Box>
@@ -580,8 +601,10 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
           <Grid item xs={7}>
             <Box
               className={classes.MWrapperListBranch}
-              sx={{ width: '543px', minWidth: '543px', minHeight: '270px', height: '270px' }}>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>{renderSelectedItems()}</Box>
+              sx={{ width: '543px', minWidth: '543px', minHeight: '280px', height: '280px' }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', maxHeight: '260px', overflow: 'auto' }}>
+                {renderSelectedItems()}
+              </Box>
             </Box>
           </Grid>
         </Grid>

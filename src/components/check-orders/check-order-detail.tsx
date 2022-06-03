@@ -186,7 +186,10 @@ export default function CheckOrderDetail({
   const [isAllowExportBtn, setIsAllowExportBtn] = React.useState(true);
 
   const orderComment = orderDetail.docRefRemark;
-  const findIndexStr = orderComment.startsWith('SD', 0);
+  let findIndexStr = false;
+  if (orderComment) {
+    findIndexStr = orderComment.startsWith('SD', 0);
+  }
 
   useEffect(() => {
     const branch = getUserInfo().group === PERMISSION_GROUP.BRANCH;
@@ -386,7 +389,25 @@ export default function CheckOrderDetail({
         const p: any = v.payload ? v.payload : null;
 
         if (p) {
-          updateState(p.data.items);
+          const itemsNewMap = p.data.items.map((item: any, index: number) => {
+            return {
+              rowOrder: index + 1,
+              id: index,
+              deliveryOrderNo: item.deliveryOrderNo,
+              isTote: item.isTote ? item.isTote : false,
+              sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
+              skuCode: item.skuCode,
+              barcode: item.barcode,
+              productName: item.productName,
+              unitName: item.unitName,
+              qtyRef: item.qty,
+              actualQty: item.actualQty,
+              qtyDiff: item.qtyDiff,
+              comment: item.comment,
+              hhQty: item.hhQty,
+            };
+          });
+          updateState(itemsNewMap);
         }
       }
     });
@@ -430,6 +451,7 @@ export default function CheckOrderDetail({
           qtyAll: 0,
           qtyAllBefore: 0,
           qtyDiff: diffCount,
+          qtyRef: data.qtyRef,
           price: 0,
           isControlStock: 0,
           toteCode: '',

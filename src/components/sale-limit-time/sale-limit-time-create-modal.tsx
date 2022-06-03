@@ -23,7 +23,8 @@ import SearchBranch from '../commons/ui/search-branch';
 import ImportAppIcon from '@mui/icons-material/ExitToApp';
 import STProductTypeItems from './ST-product-type-item';
 import STProductItems from './ST-product-item';
-import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
+// import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
+import ModalAddTypeProducts from '../commons/ui/modal-add-type-products';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
 import { fetchTotalBranch, updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 import TextBoxComment from '../commons/ui/textbox-comment';
@@ -934,7 +935,18 @@ function STCreateModal({
 
       <SnackbarStatus open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={true} contentMsg={contentMsg} />
 
-      <ModalAddTypeProduct open={openModelAddItems} onClose={handleCloseModalAddItems} />
+      {/* <ModalAddTypeProduct open={openModelAddItems} onClose={handleCloseModalAddItems} /> */}
+      <ModalAddTypeProducts
+        open={openModelAddItems}
+        onClose={handleCloseModalAddItems}
+        title='เพิ่มรายการสินค้า (งด) ขาย'
+        showSearch={false}
+        textBtn='เพิ่มสินค้า'
+        requestBody={{
+          isSellable: true,
+          skuTypes: [2],
+        }}
+      />
 
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
