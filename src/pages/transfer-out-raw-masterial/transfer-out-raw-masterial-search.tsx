@@ -25,9 +25,8 @@ import { isGroupBranch } from '../../utils/role-permission';
 import TransferOutList from './transfer-out-raw-masterial-list';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
-import ModalCreateTransferOut from '../../components/transfer-out/modal-create-transfer-out';
-import SelectBranch from '../transfer-out/transfer-out-branch';
 import BranchListDropDown from '../../components/commons/ui/branch-list-dropdown';
+import ModalCreateToRawMaterial from "../../components/transfer-out-raw-material/modal-create-to-raw-material";
 
 const _ = require('lodash');
 
@@ -163,7 +162,7 @@ const TORawMasterialSearch = () => {
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
       clearSearch: true,
-      type: TO_TYPE.TO_RAW_MASTERIAL + '',
+      type: TO_TYPE.TO_RAW_MATERIAL + '',
     };
     dispatch(barcodeDiscountSearch(payload));
   };
@@ -196,7 +195,7 @@ const TORawMasterialSearch = () => {
       status: values.status,
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
-      type: TO_TYPE.TO_RAW_MASTERIAL + '',
+      type: TO_TYPE.TO_RAW_MATERIAL + '',
     };
 
     handleOpenLoading('open', true);
@@ -354,7 +353,7 @@ const TORawMasterialSearch = () => {
       <LoadingModal open={openLoadingModal.open} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       {openModal && (
-        <ModalCreateTransferOut
+        <ModalCreateToRawMaterial
           isOpen={openModal}
           onClickClose={handleCloseModal}
           setOpenPopup={setOpenPopup}

@@ -16,8 +16,8 @@ const initialState: ItemsState = {
     regionId: '61de9ddab10bfe85dfab22e9',
     requesterId: '61de9ddab10bfe85dfab22e9',
     products: [],
-    beforeAttachFiles: [],
-    afterAttachFiles: [],
+    requesterNote: '',
+    transferOutReason: 'เพื่อใช้ (วัตถุดิบ)',
     type: 0
   },
   validate: false,
@@ -27,6 +27,7 @@ const initialState: ItemsState = {
     status: '',
     approvedDate: null,
     createdDate: moment(new Date()).toISOString(),
+    transferOutReason: 'เพื่อใช้ (วัตถุดิบ)'
   },
   approveReject: {
     branchId: '61dffd619bfc3701dce4eda4',
@@ -42,15 +43,12 @@ const initialState: ItemsState = {
   checkEdit: false,
 };
 
-const transferOutDestroyDiscountSlice = createSlice({
-  name: 'transferOutDestroyDiscountSlice',
+const transferOutRawMaterialSlice = createSlice({
+  name: 'transferOutRawMaterialSlice',
   initialState,
   reducers: {
     save: (state, action: PayloadAction<any>) => {
       state.createDraft = action.payload;
-    },
-    updateValidate: (state, action: any) => {
-      state.validate = action.payload;
     },
     updateDataDetail: (state, action: any) => {
       state.dataDetail = action.payload;
@@ -71,11 +69,10 @@ const transferOutDestroyDiscountSlice = createSlice({
 });
 export const {
   save,
-  updateValidate,
   updateDataDetail,
   updateErrorList,
   updateCheckStock,
   updateCheckEdit,
   updateApproveReject
-} = transferOutDestroyDiscountSlice.actions;
-export default transferOutDestroyDiscountSlice.reducer;
+} = transferOutRawMaterialSlice.actions;
+export default transferOutRawMaterialSlice.reducer;
