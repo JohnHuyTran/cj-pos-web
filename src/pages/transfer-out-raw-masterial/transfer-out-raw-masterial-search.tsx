@@ -311,7 +311,7 @@ const TORawMasterialSearch = () => {
                 className={classes.MbtnSearch}
                 color="secondary"
                 startIcon={<AddCircleOutlineOutlinedIcon />}
-                // onClick={handleOpenModal}
+                onClick={handleOpenModal}
               >
                 {'ขอใช้วัตถุดิบ'}
               </Button>

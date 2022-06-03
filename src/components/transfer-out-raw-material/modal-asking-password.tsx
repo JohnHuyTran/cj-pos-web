@@ -9,12 +9,16 @@ import LoadingModal from '../commons/ui/loading-modal';
 import { TextField } from "@mui/material";
 import { stringNullOrEmpty } from "../../utils/utils";
 import { useStyles } from "../../styles/makeTheme";
+import { approveTransferOutRM } from "../../services/transfer-out";
+import AlertError from "../commons/ui/alert-error";
+import _ from "lodash";
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  onConfirm: (password: string) => boolean;
+  onConfirm: () => void;
   headerTitle: string;
+  payload: any;
 }
 
 interface loadingModalState {
@@ -22,8 +26,10 @@ interface loadingModalState {
 }
 
 export default function ModalAskingPassword(props: Props): ReactElement {
-  const { open, onClose, onConfirm, headerTitle } = props;
+  const { open, onClose, onConfirm, headerTitle, payload } = props;
   const classes = useStyles();
+  const [openModalError, setOpenModalError] = React.useState<boolean>(false);
+  const [alertTextError, setAlertTextError] = React.useState('');
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
@@ -36,13 +42,22 @@ export default function ModalAskingPassword(props: Props): ReactElement {
 
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-    if (onConfirm(password)) {
-      onClose();
-    } else {
-      setError('กรุณาตรวจสอบ password และลองอีกครั้ง');
+    setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+    try {
+      const payloadAskingPassword = _.cloneDeep(payload);
+      payloadAskingPassword.password = password;
+      const rs = await approveTransferOutRM(payloadAskingPassword.id, payloadAskingPassword);
+      if (rs.code === 20000) {
+        onConfirm();
+      } else if (rs.code === 40000) {
+        setError('กรุณาตรวจสอบ password และลองอีกครั้ง');
+      } else {
+        setOpenModalError(true);
+      }
+    } catch (error) {
+      setOpenModalError(true);
     }
     handleOpenLoading('open', false);
-
   };
 
   return (
@@ -75,6 +90,7 @@ export default function ModalAskingPassword(props: Props): ReactElement {
               fullWidth
               onChange={(e) => {
                 setPassword(e.target.value);
+                setError('');
               }}
             />
           </DialogContentText>
@@ -100,7 +116,13 @@ export default function ModalAskingPassword(props: Props): ReactElement {
           </Button>
         </DialogActions>
       </Dialog>
-
+      <AlertError
+        open={openModalError}
+        onClose={() => {
+          setOpenModalError(false)
+        }}
+        textError={alertTextError}
+      />
       <LoadingModal open={openLoadingModal.open}/>
     </div>
   );

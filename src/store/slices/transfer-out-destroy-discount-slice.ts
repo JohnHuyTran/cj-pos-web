@@ -71,7 +71,6 @@ const transferOutDestroyDiscountSlice = createSlice({
 });
 export const {
   save,
-  updateValidate,
   updateDataDetail,
   updateErrorList,
   updateCheckStock,

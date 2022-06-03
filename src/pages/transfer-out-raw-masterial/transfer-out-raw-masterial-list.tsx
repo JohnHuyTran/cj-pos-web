@@ -65,8 +65,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
           requestorName: data.requestor,
           approverName: data.approver,
           branch: `${data.branch}-${data.branchName}`,
-          remark:
-            'For remark, it can accept up to 30 characters. If there are more than 30 characters, it will display … and the users can hover the mouse for displaying all the text.',
+          remark: data.requesterNote
         };
       });
       setLstTransferOut(rows);
@@ -324,7 +323,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
             columns={columns}
             disableColumnMenu
             hideFooterSelectedRowCount={true}
-            // onCellClick={currentlySelected}
+            onCellClick={currentlySelected}
             autoHeight={lstTransferOut.length < 10}
             scrollbarSize={10}
             pagination
@@ -360,7 +359,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
           userPermission={userPermission}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
     </div>
   );
 };

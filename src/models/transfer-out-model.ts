@@ -39,6 +39,7 @@ export interface TransferOut {
   attachFiles: attachFile[];
   products: TransferOutProductDetail[];
   type?: string | number | undefined;
+  requesterNote: string;
 }
 
 export interface TransferOutProductDetail {

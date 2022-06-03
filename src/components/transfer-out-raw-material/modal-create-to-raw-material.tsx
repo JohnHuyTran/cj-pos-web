@@ -32,15 +32,13 @@ import ModelConfirm from "../barcode-discount/modal-confirm";
 import ModalCheckStock from "../barcode-discount/modal-check-stock";
 import {
   cancelTransferOut,
-  saveDraftTransferOut,
-  sendForApprovalTransferOut
+  saveDraftTransferOut
 } from "../../services/transfer-out";
 import { updateCheckStock } from "../../store/slices/stock-balance-check-slice";
 import { checkStockBalance } from "../../services/common";
 import StepperBarToRawMaterial from "./stepper-bar-to-raw-material";
 import ModalToRawMaterialItem from "./modal-to-raw-material-item";
 import ModalAddItems from "../commons/ui/modal-add-items";
-import { saveBarcodeDiscount } from "../../store/slices/barcode-discount-slice";
 import { updateAddItemsState } from "../../store/slices/add-items-slice";
 import ModalAskingPassword from "./modal-asking-password";
 
@@ -83,7 +81,6 @@ export default function ModalCreateToRawMaterial({
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const payloadTransferOut = useAppSelector((state) => state.transferOutRawMaterialSlice.createDraft);
   const dataDetail = useAppSelector((state) => state.transferOutRawMaterialSlice.dataDetail);
-  const approveReject = useAppSelector((state) => state.transferOutRawMaterialSlice.approveReject);
   const checkEdit = useAppSelector((state) => state.transferOutRawMaterialSlice.checkEdit);
   const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail.data);
   //permission
@@ -112,8 +109,20 @@ export default function ModalCreateToRawMaterial({
     setOpenModalCancel(false);
   };
 
-  const handleCloseAskingPassword = () => {
+  const handleCloseAskingPassword = (confirm: boolean) => {
     setOpenAskingPassword(false);
+    if (confirm) {
+      dispatch(
+        updateDataDetail({
+          ...dataDetail,
+          status: TOStatus.APPROVED,
+        })
+      );
+      setOpenPopup(true);
+      setPopupMsg('คุณได้อนุมัติขอใช้วัตถุดิบร้านบาวเรียบร้อยแล้ว');
+      handleClose();
+      if (onSearchMain) onSearchMain();
+    }
   };
 
   const handleCloseModalConfirmApprove = (confirm: boolean) => {
@@ -147,6 +156,7 @@ export default function ModalCreateToRawMaterial({
       })
     );
     dispatch(updateCheckEdit(false));
+    dispatch(save({ ...payloadTransferOut, requesterNote: '' }));
     setOpen(false);
     onClickClose();
   };
@@ -189,7 +199,7 @@ export default function ModalCreateToRawMaterial({
       );
       //set value for requesterNote
       dispatch(
-        saveBarcodeDiscount({
+        save({
           ...payloadTransferOut,
           requesterNote: transferOutDetail.requesterNote,
         })
@@ -201,11 +211,11 @@ export default function ModalCreateToRawMaterial({
           lstProductDetail.push({
             barcode: item.barcode,
             barcodeName: item.productName,
-            unit: item.unitName,
+            unitName: item.unitName,
             unitCode: item.unitFactor,
-            barFactor: item.barFactor,
+            baseUnit: item.barFactor,
             unitPrice: item.price || 0,
-            numberOfDiscounted: item.numberOfRequested || 0,
+            qty: item.numberOfRequested || 0,
             numberOfApproved: item.numberOfRequested || 0,
             skuCode: item.sku,
             remark: item.remark
@@ -277,7 +287,7 @@ export default function ModalCreateToRawMaterial({
             })
           );
           if (sendRequest) {
-            handleApprove(dataDetail.id);
+            setOpenModalConfirmApprove(true);
           }
         } else {
           setOpenModalError(true);
@@ -289,41 +299,9 @@ export default function ModalCreateToRawMaterial({
   };
 
   const handleClickApprove = async () => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     const rsCheckStock = await handleCheckStock();
-    if (true) {
-      setOpenModalConfirmApprove(true);
-    } else {
-      dispatch(updateErrorList(errorListProduct));
-      setOpenModalError(true);
-    }
-  };
-
-  const handleConfirmAskingPassword = () => {
-    //call api check pass
-    return false;
-  }
-
-  const handleApprove = async (id: string) => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
-    try {
-      const rs = await sendForApprovalTransferOut(id);
-      if (rs.code === 20000) {
-        dispatch(
-          updateDataDetail({
-            ...dataDetail,
-            status: TOStatus.APPROVED,
-          })
-        );
-        setOpenPopup(true);
-        setPopupMsg('คุณได้อนุมัติขอใช้วัตถุดิบร้านบาวเรียบร้อยแล้ว');
-        handleClose();
-        if (onSearchMain) onSearchMain();
-      } else {
-        setOpenModalError(true);
-      }
-    } catch (error) {
-      setOpenModalError(true);
+    if (rsCheckStock) {
+      handleCreateDraft(true);
     }
   };
 
@@ -537,9 +515,13 @@ export default function ModalCreateToRawMaterial({
       />
       <ModalAskingPassword
         open={openAskingPassword}
-        onClose={handleCloseAskingPassword}
-        onConfirm={handleConfirmAskingPassword}
+        onClose={() => handleCloseAskingPassword(false)}
+        onConfirm={() => handleCloseAskingPassword(true)}
         headerTitle={'กรุณาใส่ password ของคุณเพื่อยืนยัน'}
+        payload={{
+          id: dataDetail.id,
+          products: payloadTransferOut.products
+        }}
       />
     </div>
   );

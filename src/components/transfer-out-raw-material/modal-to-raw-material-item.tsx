@@ -19,13 +19,13 @@ import {
   updateCheckEdit,
   updateDataDetail,
   updateErrorList,
-} from '../../store/slices/transfer-out-destroy-discount-slice';
+} from '../../store/slices/transfer-out-raw-material-slice';
 import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import { Action, TOStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { TransferOutDetail } from "../../models/transfer-out";
-import { updateAddDestroyProductState } from "../../store/slices/add-to-destroy-product-slice";
 import TextBoxComment from "../commons/ui/textbox-comment";
+import { updateAddItemsState } from "../../store/slices/add-items-slice";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -62,11 +62,6 @@ export const ModalToRawMaterialItem = (props: DataGridProps) => {
           remark = stringNullOrEmpty(item.remark) ? '' : item.remark;
           numberOfRequested = stringNullOrEmpty(item.qty) ? null : item.qty;
         }
-        let numberOfApproved = !!sameItem
-          ? sameItem.numberOfApproved
-          : item.numberOfApproved
-            ? item.numberOfApproved
-            : 0;
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -79,7 +74,7 @@ export const ModalToRawMaterialItem = (props: DataGridProps) => {
           qty: numberOfRequested,
           errorQty: '',
           numberOfRequested: numberOfRequested,
-          numberOfApproved: numberOfApproved,
+          numberOfApproved: numberOfRequested,
           errorNumberOfApproved: '',
           skuCode: item.skuCode,
           remark: remark
@@ -257,7 +252,7 @@ export const ModalToRawMaterialItem = (props: DataGridProps) => {
         };
 
         const handleDeleteItem = () => {
-          dispatch(updateAddDestroyProductState(payloadAddItem.filter((r: any) => r.barcode !== params.row.barcode)));
+          dispatch(updateAddItemsState(payloadAddItem.filter((r: any) => r.barcode !== params.row.barcode)));
           dispatch(updateCheckEdit(true));
           setOpenModalDelete(false);
           setOpenPopupModal(true);
@@ -378,7 +373,7 @@ export const ModalToRawMaterialItem = (props: DataGridProps) => {
               defaultValue={payloadTransferOut.requesterNote}
               maxLength={100}
               onChangeComment={handleChangeNote}
-              isDisable={false}
+              isDisable={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT}
               rowDisplay={4}
             />
           </Grid>
