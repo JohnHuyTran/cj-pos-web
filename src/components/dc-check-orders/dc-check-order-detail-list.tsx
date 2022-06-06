@@ -282,7 +282,6 @@ export default function DCOrderEntries({
         className={classes.MdataGridDetail}
         style={{ width: '100%', marginBottom: '1em', height: rows.length >= 8 ? '70vh' : 'auto' }}>
         <DataGrid
-          autoHeight
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           rowsPerPageOptions={[10, 20, 50, 100]}
