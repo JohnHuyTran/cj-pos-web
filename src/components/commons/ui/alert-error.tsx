@@ -21,7 +21,7 @@ export default function AlertError({ open, onClose, textError }: Props): ReactEl
       <DialogContent sx={{ padding: '1em' }}>
         <DialogContentText
           data-testid='txtContent'
-          sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000' }}>
+          sx={{ textAlign: 'center', whiteSpace: 'pre-wrap', color: '#000000' }}>
           <ErrorOutline sx={{ color: '#F54949', fontSize: '4em' }} />
           <br />
           {textError}{' '}

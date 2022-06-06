@@ -199,19 +199,20 @@ describe('component dc-order-detail', () => {
     expect(onClickClose).toHaveBeenCalledTimes(1);
   });
 
-  // it('Is group oc hide btn', async () => {
-  //   sessionStorage.setItem('user_info', mockUserInfoGroupOC);
-  //   store = mockStore(mockDataDcCheckOrderDetailIsLDAndStatusWaitCheck);
-  //   const onClickClose = jest.fn();
-  //   const container = render(
-  //     <Provider store={store}>
-  //       <ThemeProvider theme={theme}>
-  //         <DCOrderDetail isOpen={true} idDC={''} onClickClose={onClickClose} />
-  //       </ThemeProvider>
-  //     </Provider>
-  //   );
-  //   const button = screen.getByTestId(/testid-btnApprove/);
+  it('Is group oc hide btn', async () => {
+    await sessionStorage.setItem('user_info', mockUserInfoGroupOC);
+    store = mockStore(mockDataDcCheckOrderDetailIsLDAndStatusWaitCheck);
+    const onClickClose = jest.fn();
+    const container = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DCOrderDetail isOpen={true} idDC={''} onClickClose={onClickClose} />
+        </ThemeProvider>
+      </Provider>
+    );
 
-  //   expect(button).toHaveStyle('display: none');
-  // });
+    // const button = screen.getByTestId(/testid-btnApprove/);
+
+    const h3 = await screen.findByRole('button', { name: 'btnApprove', hidden: true });
+  });
 });

@@ -471,6 +471,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                         <Button
                           data-testid='testid-btnApprove'
                           id='btnApprove'
+                          name='btnApprove'
                           variant='contained'
                           color='secondary'
                           startIcon={<ContentPaste />}
