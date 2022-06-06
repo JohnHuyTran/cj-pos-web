@@ -8,6 +8,7 @@ import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import DatePickerAllComponent from '../commons/ui/date-picker-all';
 import ReasonsListDropDown from './transfer-reasons-list-dropdown';
 import AlertError from '../commons/ui/alert-error';
+import AlertErrorStock from './alert-error-stock';
 import LoadingModal from '../commons/ui/loading-modal';
 import { getStockTransferStatusList } from '../../utils/enum/stock-transfer-enum';
 import { Approve2MultipleStockRequest, StockTransferRequest } from '../../models/stock-transfer-model';
@@ -162,8 +163,6 @@ export default function StockTransferRt() {
     }
   };
 
-  const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState('');
   const onClickValidateForm = () => {
     if (startDate === null || endDate === null) {
       setOpenAlert(true);
@@ -242,9 +241,18 @@ export default function StockTransferRt() {
     }, 300);
   };
 
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
   //alert Errormodel
   const handleCloseAlert = () => {
     setOpenAlert(false);
+  };
+
+  const [openAlertErrStock, setOpenAlertErrStock] = React.useState(false);
+  const [textErrStock, setTextErrStock] = React.useState('');
+  //alert Errormodel
+  const handleCloseAlertErrStock = () => {
+    setOpenAlertErrStock(false);
   };
 
   //check dateFrom-dateTo
@@ -258,8 +266,25 @@ export default function StockTransferRt() {
   const orderListDatas = items.orderList.data ? items.orderList.data : [];
 
   const [selectRowsList, setSelectRowsList] = React.useState<Array<any>>([]);
+  const [stockRemaining, setStockRemaining] = React.useState<Array<any>>([]);
+
   const handleSelectRows = async (list: any) => {
-    setSelectRowsList(list);
+    // setSelectRowsList(list);
+    const selectRows: any = [];
+    const stockRemainingQty: any = [];
+    if (list.length > 0) {
+      await list.forEach((data: any) => {
+        selectRows.push(data.rtNo);
+
+        const validateStockQty: any = data.itemGroups.filter((item: any) => {
+          return Number(item.orderAllQty) > Number(item.remainingQty);
+        });
+        if (validateStockQty.length > 0) stockRemainingQty.push(data.rtNo);
+      });
+
+      setSelectRowsList(selectRows);
+      setStockRemaining(stockRemainingQty);
+    }
   };
 
   const [openCreateModal, setOpenCreateModal] = React.useState(false);
@@ -284,8 +309,13 @@ export default function StockTransferRt() {
   };
 
   const handleApprove2Multiple = async () => {
-    setTextHeaderConfirm('ยืนยันส่งงานรายการโอนสินค้า');
-    setOpenModelConfirm(true);
+    if (stockRemaining.length > 0) {
+      setOpenAlertErrStock(true);
+      setTextErrStock('ไม่สามารถส่งงานได้ เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ กรุณาแก้ไขจำนวนที่สั่ง');
+    } else {
+      setTextHeaderConfirm('ยืนยันส่งงานรายการโอนสินค้า');
+      setOpenModelConfirm(true);
+    }
   };
 
   const [showSnackBar, setShowSnackBar] = React.useState(false);
@@ -332,22 +362,22 @@ export default function StockTransferRt() {
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {t('documentSearch')}
             </Typography>
             <TextField
-              id="txtDocNo"
-              name="docNo"
-              size="small"
+              id='txtDocNo'
+              name='docNo'
+              size='small'
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่เอกสาร RT"
+              placeholder='เลขที่เอกสาร RT'
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาขาต้นทาง
             </Typography>
             <BranchListDropDown
@@ -361,7 +391,7 @@ export default function StockTransferRt() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาขาปลายทาง
             </Typography>
             <BranchListDropDown
@@ -374,16 +404,16 @@ export default function StockTransferRt() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่โอน
             </Typography>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ตั้งแต่*
             </Typography>
             <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
               ถึง*
             </Typography>
             <DatePickerAllComponent
@@ -394,17 +424,16 @@ export default function StockTransferRt() {
             />
           </Grid>
           <Grid item xs={4} container>
-            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
               สถานะ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selPiType"
-                name="statuses"
+                id='selPiType'
+                name='statuses'
                 value={values.statuses}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -416,7 +445,7 @@ export default function StockTransferRt() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาเหตุการโอน
             </Typography>
             <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
@@ -428,58 +457,53 @@ export default function StockTransferRt() {
         <Grid container spacing={2} mt={4} mb={2}>
           <Grid item xs={5}>
             <Button
-              id="btnImport"
-              variant="contained"
-              color="primary"
+              id='btnImport'
+              variant='contained'
+              color='primary'
               startIcon={<Download />}
               onClick={handleOpenUploadFileModal}
               sx={{ minWidth: 100, display: `${!displayBtnImport ? 'none' : ''}` }}
-              className={classes.MbtnSearch}
-            >
+              className={classes.MbtnSearch}>
               Import
             </Button>
             <Button
-              id="btnImport"
-              variant="contained"
-              color="primary"
+              id='btnImport'
+              variant='contained'
+              color='primary'
               onClick={handleApprove2Multiple}
               sx={{ ml: 2, minWidth: 100, display: `${!displayBtnSubmit ? 'none' : ''}` }}
               className={classes.MbtnSearch}
-              disabled={selectRowsList.length === 0}
-            >
+              disabled={selectRowsList.length === 0}>
               ส่งงาน
             </Button>
           </Grid>
           <Grid item xs={7} sx={{ textAlign: 'end' }}>
             <Button
-              id="btnCreateStockTransferModal"
-              variant="contained"
+              id='btnCreateStockTransferModal'
+              variant='contained'
               onClick={handleOpenCreateModal}
               sx={{ width: 150, display: `${displayBtnCreate ? 'none' : ''}` }}
               className={classes.MbtnClear}
               startIcon={<AddCircleOutlineOutlinedIcon />}
-              color="secondary"
-            >
+              color='secondary'>
               สร้างรายการโอน
             </Button>
             <Button
-              id="btnClear"
-              variant="contained"
+              id='btnClear'
+              variant='contained'
               onClick={onClickClearBtn}
               sx={{ width: 110, ml: 2 }}
               className={classes.MbtnClear}
-              color="cancelColor"
-            >
+              color='cancelColor'>
               เคลียร์
             </Button>
             <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
+              id='btnSearch'
+              variant='contained'
+              color='primary'
               onClick={onClickValidateForm}
               sx={{ width: 110, ml: 2 }}
-              className={classes.MbtnSearch}
-            >
+              className={classes.MbtnSearch}>
               ค้นหา
             </Button>
           </Grid>
@@ -490,8 +514,8 @@ export default function StockTransferRt() {
         <div>
           {orderListDatas.length > 0 && <StockTransferRtList onSelectRows={handleSelectRows} />}
           {orderListDatas.length === 0 && (
-            <Grid item container xs={12} justifyContent="center">
-              <Box color="#CBD4DB">
+            <Grid item container xs={12} justifyContent='center'>
+              <Box color='#CBD4DB'>
                 <h2>ไม่มีข้อมูล</h2>
               </Box>
             </Grid>
@@ -502,6 +526,12 @@ export default function StockTransferRt() {
       <LoadingModal open={openLoadingModal.open} />
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <AlertErrorStock
+        open={openAlertErrStock}
+        onClose={handleCloseAlertErrStock}
+        textError={textErrStock}
+        items={stockRemaining}
+      />
       {openCreateModal && (
         <ModalCreateStockTransfer
           type={typeModal}
@@ -520,7 +550,7 @@ export default function StockTransferRt() {
         onClose={handleCloseModelConfirm}
         handleConfirm={handleConfirm}
         header={textHeaderConfirm}
-        title="รายการเอกสาร RT"
+        title='รายการเอกสาร RT'
         value={`${selectRowsList.length} รายการ`}
       />
 
