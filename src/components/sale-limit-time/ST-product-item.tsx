@@ -150,7 +150,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
       sortable: false,
       renderCell: (params) => {
         const [openModalDelete, setOpenModalDelete] = React.useState<boolean>(false);
-
+        const newSluCode = params.row.skuCode.slice(10, params.row.skuCode.lenght)
         const handleOpenModalDelete = () => {
           setOpenModalDelete(true);
         };
@@ -162,7 +162,6 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
         const handleDeleteItem = () => {
           let newList = payloadAddTypeProduct.filter((r: any) => r.barcode !== params.row.barcode);
           let listCodeProductByType = newList.map((el1: any) => el1.productTypeCode);
-
           let listAdd = newList.filter((item: any) => {
             if (item.selectedType === 1 && !listCodeProductByType.includes(item.productTypeCode)) {
               return false;
@@ -205,7 +204,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
                             color: '#AEAEAE',
                             fontSize: 14,
                           }}>
-                          {params.row.categoryTypeCode}
+                          {newSluCode}
                         </label>
                       </label>
                     </Grid>
@@ -214,7 +213,7 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
                     </Grid>
                     <Grid item xs={8} sx={{ pl: 1 }}>
                       <label style={{ color: '#36C690' }}>
-                        <b>{params.row.skuCode}</b>
+                        <b>{params.row.barcode}</b>
                       </label>
                     </Grid>
                   </Grid>
