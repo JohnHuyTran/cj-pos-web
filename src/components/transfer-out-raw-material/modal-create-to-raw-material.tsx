@@ -480,7 +480,7 @@ export default function ModalCreateToRawMaterial({
           skuCodes: [],
           skuTypes: [2],
           isSellable: true,
-          skuCoffeeType: [1]
+          skuCoffeeTypes: [1]
         }}
       />
       <ModelConfirm
