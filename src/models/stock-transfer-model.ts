@@ -41,6 +41,7 @@ export interface StockTransferInfo {
   createdDate: string;
   lastModifiedBy: string;
   lastModifiedDate: string;
+  itemGroups?: ItemGroups[];
 }
 export interface SaveStockTransferRequest {
   rtNo: string;
