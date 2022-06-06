@@ -374,6 +374,12 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                 </Grid>
                 <Grid container spacing={2} mb={1}>
                   <Grid item xs={2}>
+                    <Typography variant='body2'>แนบเอกสาร:</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
+                  </Grid>
+                  <Grid item xs={2}>
                     <Typography variant='body2'>หมายเหตุ:</Typography>
                   </Grid>
                   <Grid item xs={4}>
@@ -387,12 +393,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                       isError={errorCommentDC}
                       hypterText='กรุณากรอก หมายเหตุ'
                     />
-                  </Grid>
-                  <Grid item xs={2}>
-                    <Typography variant='body2'>แนบเอกสาร:</Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
                   </Grid>
                 </Grid>
               </>
@@ -413,6 +413,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     {' '}
                     <FormControl fullWidth className={classes.Mselect}>
                       <Select
+                        data-testid='testid-reason'
                         id='reason'
                         name='reason'
                         value={values.reason}
@@ -468,7 +469,9 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     {detailDC.verifyDCStatus === 0 && (
                       <>
                         <Button
+                          data-testid='testid-btnApprove'
                           id='btnApprove'
+                          name='btnApprove'
                           variant='contained'
                           color='secondary'
                           startIcon={<ContentPaste />}
@@ -483,6 +486,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                         </Button>
 
                         <Button
+                          data-testid='testid-btnReject'
                           id='btnReject'
                           variant='contained'
                           color='error'
@@ -510,6 +514,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                   <Grid item>
                     {detailDC.verifyDCStatus === 0 && (
                       <Button
+                        data-testid='testid-btnChecked'
                         id='btnChecked'
                         variant='contained'
                         color='primary'

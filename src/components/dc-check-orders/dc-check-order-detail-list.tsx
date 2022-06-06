@@ -19,7 +19,7 @@ import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc
 import { TextField } from '@mui/material';
 
 interface Props {
-  items: [];
+  items: any;
   clearCommment: () => void;
   isTote: boolean;
   onUpdateItems: (items: CheckOrderDetailItims[]) => void;
