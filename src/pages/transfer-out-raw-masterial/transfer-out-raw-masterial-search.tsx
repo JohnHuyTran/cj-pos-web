@@ -26,7 +26,8 @@ import TransferOutList from './transfer-out-raw-masterial-list';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
 import BranchListDropDown from '../../components/commons/ui/branch-list-dropdown';
-import ModalCreateToRawMaterial from "../../components/transfer-out-raw-material/modal-create-to-raw-material";
+import ModalCreateToRawMaterial from '../../components/transfer-out-raw-material/modal-create-to-raw-material';
+import { env } from '../../adapters/environmentConfigs';
 
 const _ = require('lodash');
 
@@ -52,15 +53,17 @@ const TORawMasterialSearch = () => {
   const [lstStatus, setLstStatus] = React.useState([]);
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const [ownBranch, setOwnBranch] = React.useState(
-    getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
-  );
+  const ownBranch = getUserInfo().branch
+    ? getBranchName(branchList, getUserInfo().branch)
+      ? getUserInfo().branch
+      : env.branch.code
+    : env.branch.code;
   const branchName = getBranchName(branchList, ownBranch);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
-  const branchMap: BranchListOptionType = {
+  const [branchMap, setBranchMap] = React.useState<BranchListOptionType>({
     code: ownBranch,
     name: branchName ? branchName : '',
-  };
+  });
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
   const page = '1';
@@ -87,9 +90,8 @@ const TORawMasterialSearch = () => {
 
   useEffect(() => {
     if (groupBranch) {
-      setOwnBranch(
-        getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
-      );
+      setBranchMap({ code: ownBranch, name: branchName ? branchName : '' });
+      setBranchOptions(branchMap);
     }
   }, [branchList]);
   useEffect(() => {
