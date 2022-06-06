@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Button, Checkbox, FormControl, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
@@ -40,10 +40,10 @@ function ProductMasterSearch() {
   const [showData, setShowdData] = React.useState<boolean>(false);
   const branchName = getBranchName(branchList, ownBranch);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
-  const branchMap: BranchListOptionType = {
+  const [branchMap, setBranchMap] = React.useState<BranchListOptionType>({
     code: ownBranch,
     name: branchName ? branchName : '',
-  };
+  });
   const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [values, setValues] = React.useState<State>({
@@ -65,6 +65,12 @@ function ProductMasterSearch() {
       setValues({ ...values, branch: '' });
     }
   };
+  useEffect(() => {
+    if (groupBranch) {
+      setBranchMap({ code: ownBranch, name: branchName ? branchName : '' });
+      setBranchOptions(branchMap);
+    }
+  }, [branchList]);
 
   const onClear = async () => {
     setClearBranchDropDown(!clearBranchDropDown);

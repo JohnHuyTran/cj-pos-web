@@ -491,7 +491,7 @@ function STCreateModal({
     if (choiceCopy) {
       // second choice copy by update the information to the current amount
       let listItem = _.cloneDeep(payloadAddTypeProduct);
-
+      
       let listTypeItem = listItem.filter((el: any) => el.selectedType === 1);
 
       for (const el of listTypeItem) {
@@ -561,6 +561,7 @@ function STCreateModal({
         barcodeName: item.name,
         selectedType: 2,
         showProduct: true,
+        skuCode: item.skuCode,
       };
     });
     let selectedItemEnds = _.cloneDeep(selectList);

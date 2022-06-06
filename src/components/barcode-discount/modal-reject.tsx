@@ -59,7 +59,7 @@ export default function ModalReject({ open, onClose, barCode, id }: Props): Reac
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
-        PaperProps={{ sx: { minWidth: 450, height: 365 } }}
+        PaperProps={{ sx: { minWidth: 450, minHeight: 365 } }}
       >
         <DialogContent sx={{ mr: 4, ml: 4 }}>
           <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
@@ -100,7 +100,7 @@ export default function ModalReject({ open, onClose, barCode, id }: Props): Reac
               </Typography>
             </Box>
             <TextBoxComment
-              fieldName="comment label"
+              fieldName=""
               defaultValue={reason}
               maxLength={100}
               onChangeComment={(e) => {

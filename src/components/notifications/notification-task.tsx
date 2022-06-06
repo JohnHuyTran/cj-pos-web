@@ -122,12 +122,12 @@ export default function NotificationTask(props: Props) {
       handleUpdateRead(item.id);
       if (item.type === 'SEND_TO_FOR_APPROVAL' || item.type === 'APPROVE_TRANSFER_OUT') {
         if (item.payload.type === 1) {
-          await dispatch(getTransferOutDetail(item.payload.documentNumber));
+          await dispatch(getTransferOutDetail(item.documentNumber));
           if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
             setOpenTransferOutDetail(true);
           }
         } else if (item.payload.type === 2) {
-          await dispatch(getTransferOutDetail(item.payload.documentNumber));
+          await dispatch(getTransferOutDetail(item.documentNumber));
           if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
             setOpenTransferOutDestroyDetail(true);
           }
@@ -139,7 +139,7 @@ export default function NotificationTask(props: Props) {
         }
       } else if (item.type == 'ORDER_NEXT_APPROVE_OC' || item.type == 'ORDER_NEXT_APPROVE1') {
         setSdNo(item.payload.sdNo);
-        setDocRefNo(item.payload.docRefNo);
+        setDocRefNo(item.documentNumber);
         setDocType(item.payload.docType);
 
         await dispatch(updateAddItemsState({}));
@@ -169,7 +169,7 @@ export default function NotificationTask(props: Props) {
       } else if (item.type == 'STOCK_TRANSFER_CREATED' || item.type == 'EVENT_REQUEST_UPDATE_BT_DOC') {
         // const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
         await dispatch(updateAddItemsState({}));
-        await dispatch(featchBranchTransferDetailAsync(item.payload.btNo));
+        await dispatch(featchBranchTransferDetailAsync(item.documentNumber));
         dispatch(updateAddItemSkuGroupState([]));
         // if (reasonsList === null || reasonsList.length <= 0) await dispatch(featchTransferReasonsListAsync());
         setOpenStockTransferBT(true);
@@ -203,13 +203,12 @@ export default function NotificationTask(props: Props) {
   };
 
   const listTask = listData.map((item: any, index: number) => {
-    let content, documentNumber, statusDisplay, branchCode;
+    let content, statusDisplay, branchCode;
     let itemType = item.type;
     switch (itemType) {
       case 'SEND_BD_FOR_APPROVAL':
         branchCode = item.payload.branchCode;
         content = 'ส่วนลดสินค้า';
-        documentNumber = item.payload.documentNumber;
         statusDisplay = genStatusValue('รออนุมัติ', {
           color: '#36C690',
           backgroundColor: '#E7FFE9',
@@ -218,7 +217,6 @@ export default function NotificationTask(props: Props) {
       case 'APPROVE_BARCODE':
         content = 'ส่วนลดสินค้า';
         branchCode = item.payload.branchCode;
-        documentNumber = item.payload.documentNumber;
         statusDisplay = genStatusValue('อนุมัติ', {
           color: '#36C690',
           backgroundColor: '#E7FFE9',
@@ -227,7 +225,6 @@ export default function NotificationTask(props: Props) {
       case 'SEND_TO_FOR_APPROVAL':
         content = item.payload.type === 1 ? 'เบิก-ใช้ในการทำกิจกรรม' : 'เบิก-ทำลายไม่มีส่วนลด';
         branchCode = item.payload.branchCode;
-        documentNumber = item.payload.documentNumber;
         statusDisplay = genStatusValue('รออนุมัติ', {
           color: '#36C690',
           backgroundColor: '#E7FFE9',
@@ -236,7 +233,6 @@ export default function NotificationTask(props: Props) {
       case 'APPROVE_TRANSFER_OUT':
         content = item.payload.type === 1 ? 'เบิก-ใช้ในการทำกิจกรรม' : 'เบิก-ทำลายไม่มีส่วนลด';
         branchCode = item.payload.branchCode;
-        documentNumber = item.payload.documentNumber;
         statusDisplay = genStatusValue('อนุมัติ', {
           color: '#36C690',
           backgroundColor: '#E7FFE9',
@@ -245,7 +241,6 @@ export default function NotificationTask(props: Props) {
       case 'ORDER_NEXT_APPROVE1':
         content = 'รับสินค้า-น้อยกว่าเปอร์เซ็นต์ที่กำหนด';
         branchCode = item.payload.shipBranchTo;
-        documentNumber = item.payload.docRefNo;
         statusDisplay = genStatusValue('รออนุมัติ1', {
           color: '#36C690',
           backgroundColor: '#E7FFE9',
@@ -254,7 +249,6 @@ export default function NotificationTask(props: Props) {
       case 'ORDER_NEXT_APPROVE_OC':
         content = 'รับสินค้า';
         branchCode = item.payload.shipBranchTo;
-        documentNumber = item.payload.docRefNo;
         statusDisplay = genStatusValue('อนุมัติ', {
           color: '#36C690',
           backgroundColor: '#E7FFE9',
@@ -263,7 +257,6 @@ export default function NotificationTask(props: Props) {
       case 'SEND_ORDER_RECEIVE_FOR_VERIFY':
         content = 'ยืนยันผลต่างการรับสินค้า';
         branchCode = item.payload.shipBranchTo;
-        documentNumber = item.payload.docRefNo;
         statusDisplay = genStatusValue('รอการตรวจสอบ', {
           color: '#36C690',
           backgroundColor: '#E7FFE9',
@@ -272,7 +265,6 @@ export default function NotificationTask(props: Props) {
       case 'SUBMIT_BRANCH_TRANSFER_REQUEST':
         content = 'สร้างแผนโอนสินค้าระหว่างสาขา';
         branchCode = item.payload.branchFrom;
-        documentNumber = item.entryId;
         statusDisplay = genStatusValue('รออนุมัติ1', {
           color: '#36C690',
           backgroundColor: '#E7FFE9',
@@ -280,7 +272,6 @@ export default function NotificationTask(props: Props) {
         break;
       case 'STOCK_REQUEST_WAIT_FOR_APPROVAL_2':
         content = 'สร้างแผนโอนสินค้าระหว่างสาขา';
-        documentNumber = item.entryId;
         branchCode = item.payload.branchFrom;
         statusDisplay = genStatusValue('รออนุมัติ2', {
           color: '#36C690',
@@ -289,7 +280,6 @@ export default function NotificationTask(props: Props) {
         break;
       case 'EVENT_STOCK_REQUEST_REJECTED':
         content = 'สร้างแผนโอนสินค้าระหว่างสาขา';
-        documentNumber = item.entryId;
         branchCode = item.payload.branchFrom;
         statusDisplay = genStatusValue('ส่งกลับแก้ไข', {
           color: '#F54949',
@@ -298,7 +288,6 @@ export default function NotificationTask(props: Props) {
         break;
       case 'STOCK_TRANSFER_CREATED':
         content = 'โอนสินค้าระหว่างสาขา-จัดเตรียมสินค้า';
-        documentNumber = item.payload.btNo;
         branchCode = item.payload.branchFrom;
         statusDisplay = genStatusValue('บันทึก', {
           color: '#36C690',
@@ -306,7 +295,6 @@ export default function NotificationTask(props: Props) {
         });
         break;
       case 'EVENT_REQUEST_UPDATE_BT_DOC':
-        documentNumber = item.payload.btNo;
         branchCode = item.payload.branchFrom;
         if (item.payload.status == 'READY_TO_TRANSFER') {
           content = 'โอนสินค้าระหว่างสาขา-กำหนดรอบรถ';
@@ -363,12 +351,12 @@ export default function NotificationTask(props: Props) {
             <HtmlTooltip
               title={
                 <React.Fragment>
-                  {documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+                  {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
                 </React.Fragment>
               }
             >
               <span style={{ marginLeft: 5 }}>
-                {documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+                {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
               </span>
             </HtmlTooltip>
 

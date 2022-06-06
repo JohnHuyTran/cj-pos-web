@@ -101,12 +101,12 @@ export default function NotificationReminder(props: Props) {
       handleUpdateRead(item.id);
       if (item.type === 'REJECT_TRANSFER_OUT' || item.type === 'CLOSE_TRANSFER_OUT') {
         if (item.payload.type === 1) {
-          await dispatch(getTransferOutDetail(item.payload.documentNumber));
+          await dispatch(getTransferOutDetail(item.documentNumber));
           if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
             setOpenTransferOutDetail(true);
           }
         } else if (item.payload.type === 2) {
-          await dispatch(getTransferOutDetail(item.payload.documentNumber));
+          await dispatch(getTransferOutDetail(item.documentNumber));
           if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
             setOpenTransferOutDestroyDetail(true);
           }
@@ -147,13 +147,12 @@ export default function NotificationReminder(props: Props) {
   };
 
   const listTask = listData.map((item: any, index: number) => {
-    let content, statusDisplay, documentNumber, branchCode;
+    let content, statusDisplay, branchCode;
     switch (item.type) {
       case 'REJECT_BARCODE':
         {
           content = 'ส่วนลดสินค้า';
           branchCode = item.payload.branchCode;
-          documentNumber = item.payload.documentNumber;
           statusDisplay = genStatusValue('ไม่อนุมัติ', {
             color: '#F76C6C',
             backgroundColor: '#FFD7D7',
@@ -168,7 +167,6 @@ export default function NotificationReminder(props: Props) {
           } else {
             content = 'เบิก-ทำลายไม่มีส่วนลด';
           }
-          documentNumber = item.payload.documentNumber;
           branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('ปิดงาน', {
             color: '#676767',
@@ -184,7 +182,6 @@ export default function NotificationReminder(props: Props) {
           } else {
             content = 'เบิก-ทำลายไม่มีส่วนลด';
           }
-          documentNumber = item.payload.documentNumber;
           branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('ไม่อนุมัติ', {
             color: '#F76C6C',
@@ -197,7 +194,6 @@ export default function NotificationReminder(props: Props) {
         {
           content = 'โอนสินค้าระหว่างสาขา - อยู่ระหว่างขนส่ง';
           branchCode = item.payload.branchCode;
-          documentNumber = item.payload.docno;
           statusDisplay = genStatusValue('รับทราบ', {
             color: '#36C690',
             backgroundColor: '#E7FFE9',
@@ -239,12 +235,12 @@ export default function NotificationReminder(props: Props) {
             <HtmlTooltip
               title={
                 <React.Fragment>
-                  {documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+                  {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
                 </React.Fragment>
               }
             >
               <span style={{ marginLeft: 5 }}>
-                {documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+                {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
               </span>
             </HtmlTooltip>
             <Box>
