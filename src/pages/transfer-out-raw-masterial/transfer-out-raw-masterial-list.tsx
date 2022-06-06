@@ -13,10 +13,10 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import moment from 'moment';
 import { TransferOut, TransferOutSearchRequest, TransferOutSearchResponse } from '../../models/transfer-out-model';
-import ModalCreateTransferOut from '../../components/transfer-out/modal-create-transfer-out';
 import { getTransferOutDetail } from '../../store/slices/transfer-out-detail-slice';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
+import ModalCreateToRawMaterial from "../../components/transfer-out-raw-material/modal-create-to-raw-material";
 
 const _ = require('lodash');
 
@@ -65,8 +65,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
           requestorName: data.requestor,
           approverName: data.approver,
           branch: `${data.branch}-${data.branchName}`,
-          remark:
-            'For remark, it can accept up to 30 characters. If there are more than 30 characters, it will display … and the users can hover the mouse for displaying all the text.',
+          remark: data.requesterNote
         };
       });
       setLstTransferOut(rows);
@@ -350,7 +349,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
         </div>
       </Box>
       {openDetail && (
-        <ModalCreateTransferOut
+        <ModalCreateToRawMaterial
           isOpen={openDetail}
           onClickClose={handleCloseDetail}
           action={Action.UPDATE}
@@ -360,7 +359,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
           userPermission={userPermission}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
     </div>
   );
 };

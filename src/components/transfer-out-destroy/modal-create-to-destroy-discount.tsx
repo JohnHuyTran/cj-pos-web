@@ -666,7 +666,8 @@ export default function ModalCreateToDestroyDiscount({
                   color='warning'
                   startIcon={<SaveIcon/>}
                   disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT)
-                    || (payloadTransferOut.products && payloadTransferOut.products.length === 0)}
+                    || (payloadTransferOut.products && payloadTransferOut.products.length === 0)
+                    || (status == TOStatus.DRAFT && dataDetail && moment(dataDetail.createdDate).isBefore(moment(new Date), 'day'))}
                   style={{ display: ((!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission) ? 'none' : undefined }}
                   onClick={() => handleCreateDraft(false)}
                   className={classes.MbtnSearch}>

@@ -22,7 +22,7 @@ import { uploadAttachFile } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { getBranchName, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, BDStatus, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
+import { Action, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
 import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from '../../utils/enum/permission-enum';
