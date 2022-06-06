@@ -23,4 +23,5 @@ export type FindProductRequest = {
   isSellable?: boolean;
   productTypeCodes?: any[];
   isControlStock?: boolean;
+  skuCoffeeTypes?: any[];
 };

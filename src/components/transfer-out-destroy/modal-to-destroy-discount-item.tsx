@@ -17,7 +17,6 @@ import { useStyles } from '../../styles/makeTheme';
 import {
   save,
   updateCheckEdit,
-  updateCheckStock,
   updateDataDetail,
   updateErrorList,
 } from '../../store/slices/transfer-out-destroy-discount-slice';
@@ -38,7 +37,7 @@ export interface DataGridProps {
 
 const _ = require('lodash');
 
-export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
+export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
   const { action, userPermission } = props;
 
   const classes = useStyles();
@@ -459,4 +458,4 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
   );
 };
 
-export default ModalTransferOutDestroyItem;
+export default ModalToDestroyDiscountItem;

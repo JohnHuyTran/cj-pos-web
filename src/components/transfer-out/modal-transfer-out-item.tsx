@@ -61,7 +61,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let rows = payloadAddItem.map((item: any, index: number) => {
-        let sameItem = dtTable.find((el) => el.barCode === item.barcode);
+        let sameItem = dtTable.find((el) => el.barcode === item.barcode);
         let numberOfRequested = item.qty ? item.qty : 0;
         let remark = !!sameItem ? sameItem.remark : '';
         if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
@@ -77,7 +77,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
         return {
           id: `${item.barcode}-${index + 1}`,
           index: index + 1,
-          barCode: item.barcode,
+          barcode: item.barcode,
           barcodeName: item.barcodeName,
           unit: item.unitName,
           unitCode: item.unitCode || '',
@@ -103,7 +103,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
       updateSumOfApprovedDiscount(dtTable.reduce((acc, val) => acc + Number(val.numberOfApproved), 0));
       const products = dtTable.map((item) => {
         return {
-          barcode: item.barCode,
+          barcode: item.barcode,
           numberOfRequested: parseInt(String(item.numberOfRequested).replace(/,/g, '')),
           numberOfApproved: parseInt(String(item.numberOfApproved).replace(/,/g, '')),
           unitName: item.unit,
@@ -196,7 +196,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let updateList = _.cloneDeep(payloadAddItem);
       updateList.map((item: any) => {
-        if (item.barcode === currentData.barCode) {
+        if (item.barcode === currentData.barcode) {
           item.qty =
             parseInt(currentValue.replace(/,/g, '')) < 10000000000
               ? parseInt(currentValue.replace(/,/g, ''))
@@ -242,7 +242,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
       ),
     },
     {
-      field: 'barCode',
+      field: 'barcode',
       headerName: 'บาร์โค้ด',
       flex: 1,
       headerAlign: 'center',
@@ -282,10 +282,10 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const index =
-          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barcode) : -1;
         const indexStock =
           checkStocks && checkStocks.length > 0
-            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode)
+            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barcode)
             : -1;
         const condition = (index != -1 && errorList[index].errorNumberOfRequested) || indexStock !== -1;
         return (
@@ -298,7 +298,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
               className={classes.MtextFieldNumber}
               // inputProps={{ min: 0 }}
               onChange={(e) => {
-                handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barCode);
+                handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barcode);
               }}
               disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT)}
             />
@@ -316,10 +316,10 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const index =
-          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barcode) : -1;
         const indexStock =
           checkStocks && checkStocks.length > 0
-            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode)
+            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barcode)
             : -1;
         const condition = (index != -1 && errorList[index].errorNumberOfApproved) || indexStock !== -1;
         return (
@@ -332,7 +332,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
               disabled={!approvePermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
               onChange={(e) => {
-                handleChangeNumberOfApprove(e, params.row.index, index, params.row.barCode);
+                handleChangeNumberOfApprove(e, params.row.index, index, params.row.barcode);
               }}
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfApproved}</div>}
@@ -388,7 +388,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
         };
 
         const handleDeleteItem = () => {
-          dispatch(updateAddItemsState(payloadAddItem.filter((r: any) => r.barcode !== params.row.barCode)));
+          dispatch(updateAddItemsState(payloadAddItem.filter((r: any) => r.barcode !== params.row.barcode)));
           dispatch(updateCheckEdit(true));
           setOpenModalDelete(false);
           setOpenPopupModal(true);
@@ -438,7 +438,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
                     </Grid>
                     <Grid item xs={8} sx={{ pl: 1 }}>
                       <label style={{ color: '#36C690' }}>
-                        <b>{params.row.barCode}</b>
+                        <b>{params.row.barcode}</b>
                       </label>
                     </Grid>
                   </Grid>
