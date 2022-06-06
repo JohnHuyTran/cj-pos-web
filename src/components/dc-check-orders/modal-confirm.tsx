@@ -38,19 +38,19 @@ export default function ModelConfirm({
   handleActionVerify,
   subject,
 }: Props): ReactElement {
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+  // const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+  //   open: false,
+  // });
 
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
 
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
-  };
+  // const handleOpenLoading = (prop: any, event: boolean) => {
+  //   setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  // };
 
-  const updateDCOrder = async () => {
-    await dispatch(featchorderDetailDCAsync(idDC));
-  };
+  // const updateDCOrder = async () => {
+  //   await dispatch(featchorderDetailDCAsync(idDC));
+  // };
 
   // const handleConfirm = async () => {
   //   handleOpenLoading('open', true);
@@ -79,6 +79,7 @@ export default function ModelConfirm({
   return (
     <div>
       <Dialog
+        data-testid='testid-alert-confirm'
         open={open}
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
@@ -115,6 +116,7 @@ export default function ModelConfirm({
             ยกเลิก
           </Button>
           <Button
+            data-testid='testid-btnConfirm'
             id='btnConfirm'
             variant='contained'
             color='primary'
@@ -125,7 +127,7 @@ export default function ModelConfirm({
         </DialogActions>
       </Dialog>
 
-      <LoadingModal open={openLoadingModal.open} />
+      {/* <LoadingModal open={openLoadingModal.open} /> */}
     </div>
   );
 }
