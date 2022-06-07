@@ -5,7 +5,7 @@ import { useStyles } from '../../../styles/makeTheme';
 import _ from 'lodash';
 
 import SearchIcon from '@mui/icons-material/Search';
-import { getBranchName, onChange, stringNullOrEmpty } from '../../../utils/utils';
+import { getBranchName } from '../../../utils/utils';
 import { BranchListOptionType } from '../../../models/branch-model';
 import { getUserInfo } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
@@ -56,6 +56,7 @@ function ProductMasterSearch() {
   const [openAlert, setOpenAlert] = React.useState<boolean>(false);
   const [textError, setTextError] = React.useState<string>('');
   const [isClear, setIsClear] = React.useState<boolean>(false);
+  const textSize = screen.width < 1500 ? '12px' : '14px';
 
   const handleChangeBranch = (branchCode: string) => {
     if (branchCode !== null) {
@@ -153,7 +154,7 @@ function ProductMasterSearch() {
                 style: { textAlignLast: 'start' },
               },
             }}
-            className={classes.MtextField}
+            className={classes.MtextFieldAutoChangeSize}
             fullWidth
             placeholder="รหัสสินค้า/ชื่อสินค้า/บาร์โค้ด"
           /> */}
@@ -197,7 +198,7 @@ function ProductMasterSearch() {
                   size="small"
                   value={skuValue.skuCode}
                   style={{ backgroundColor: '#f1f1f1' }}
-                  className={classes.MtextField}
+                  className={classes.MtextFieldAutoChangeSize}
                   fullWidth
                   disabled
                 />
@@ -213,7 +214,7 @@ function ProductMasterSearch() {
                 size="small"
                 value={skuValue.productChainCode}
                 style={{ backgroundColor: '#f1f1f1' }}
-                className={classes.MtextField}
+                className={classes.MtextFieldAutoChangeSize}
                 InputProps={{
                   endAdornment: <SearchIcon color="disabled" sx={{ marginRight: '12px' }} />,
                 }}
@@ -228,7 +229,7 @@ function ProductMasterSearch() {
                 size="small"
                 value={skuValue.productChainName ? skuValue.productChainName.productChainName : ''}
                 style={{ backgroundColor: '#f1f1f1' }}
-                className={classes.MtextField}
+                className={classes.MtextFieldAutoChangeSize}
                 fullWidth
                 disabled
               />
@@ -246,7 +247,7 @@ function ProductMasterSearch() {
                   size="small"
                   value={skuValue.productNamePrime}
                   style={{ backgroundColor: '#f1f1f1' }}
-                  className={classes.MtextField}
+                  className={classes.MtextFieldAutoChangeSize}
                   fullWidth
                   disabled
                 />
@@ -262,7 +263,7 @@ function ProductMasterSearch() {
                 size="small"
                 value={skuValue.productTypeCode}
                 style={{ backgroundColor: '#f1f1f1' }}
-                className={classes.MtextField}
+                className={classes.MtextFieldAutoChangeSize}
                 fullWidth
                 InputProps={{
                   endAdornment: <SearchIcon color="disabled" sx={{ marginRight: '12px' }} />,
@@ -287,7 +288,7 @@ function ProductMasterSearch() {
                   size="small"
                   value={skuValue.productChainName ? skuValue.productChainName.productTypeName : ''}
                   style={{ backgroundColor: '#f1f1f1' }}
-                  className={classes.MtextField}
+                  className={classes.MtextFieldAutoChangeSize}
                   fullWidth
                   disabled
                 />
@@ -306,7 +307,7 @@ function ProductMasterSearch() {
                   size="small"
                   value={skuValue.productNameSecnd}
                   style={{ backgroundColor: '#f1f1f1' }}
-                  className={classes.MtextField}
+                  className={classes.MtextFieldAutoChangeSize}
                   fullWidth
                   disabled
                 />
@@ -322,7 +323,7 @@ function ProductMasterSearch() {
                 size="small"
                 value={skuValue.supplierCode}
                 style={{ backgroundColor: '#f1f1f1' }}
-                className={classes.MtextField}
+                className={classes.MtextFieldAutoChangeSize}
                 fullWidth
                 InputProps={{
                   endAdornment: <SearchIcon color="disabled" sx={{ marginRight: '12px' }} />,
@@ -338,7 +339,7 @@ function ProductMasterSearch() {
                   size="small"
                   value={skuValue.supplier ? skuValue.supplier.name : ''}
                   style={{ backgroundColor: '#f1f1f1' }}
-                  className={classes.MtextField}
+                  className={classes.MtextFieldAutoChangeSize}
                   fullWidth
                   disabled
                 />
@@ -357,6 +358,7 @@ function ProductMasterSearch() {
                   value={skuValue.skuStatus}
                   inputProps={{ 'aria-label': 'Without label' }}
                   disabled
+                  sx={{ fontSize: textSize }}
                 >
                   <MenuItem value={'1'}>{'สินค้าทั่วไป'}</MenuItem>
                   <MenuItem value={'2'}>{'สินค้าชุด'}</MenuItem>
@@ -379,7 +381,7 @@ function ProductMasterSearch() {
                 value={skuValue.stockMin}
                 inputProps={{ style: { textAlign: 'right' } }}
                 style={{ backgroundColor: '#f1f1f1' }}
-                className={classes.MtextField}
+                className={classes.MtextFieldAutoChangeSize}
                 fullWidth
                 disabled
               />
@@ -399,7 +401,7 @@ function ProductMasterSearch() {
                 value={skuValue.stockMax}
                 inputProps={{ style: { textAlign: 'right' } }}
                 style={{ backgroundColor: '#f1f1f1' }}
-                className={classes.MtextField}
+                className={classes.MtextFieldAutoChangeSize}
                 fullWidth
                 disabled
               />
@@ -429,7 +431,7 @@ function ProductMasterSearch() {
                 size="small"
                 value={skuValue.scmStatus}
                 style={{ backgroundColor: '#f1f1f1' }}
-                className={classes.MtextField}
+                className={classes.MtextFieldAutoChangeSize}
                 fullWidth
                 disabled
               />
@@ -455,7 +457,7 @@ function ProductMasterSearch() {
                 value={skuValue.shelfLife}
                 inputProps={{ style: { textAlign: 'right' } }}
                 style={{ backgroundColor: '#f1f1f1' }}
-                className={classes.MtextField}
+                className={classes.MtextFieldAutoChangeSize}
                 fullWidth
                 disabled
               />
