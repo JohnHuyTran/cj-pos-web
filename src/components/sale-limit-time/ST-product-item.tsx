@@ -150,7 +150,6 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
       sortable: false,
       renderCell: (params) => {
         const [openModalDelete, setOpenModalDelete] = React.useState<boolean>(false);
-        const newSluCode = params.row.skuCode.slice(10, params.row.skuCode.lenght)
         const handleOpenModalDelete = () => {
           setOpenModalDelete(true);
         };
@@ -195,16 +194,16 @@ export default function STProductItems({ unSelectAllType, disabled }: Props): Re
                     <Grid item xs={4} sx={{ textAlign: 'right' }}>
                       สินค้า <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
                     </Grid>
-                    <Grid item xs={8} sx={{ pl: 2 }}>
+                    <Grid item xs={8} sx={{ pl: 1 }}>
                       <label style={{ color: '#36C690' }}>
                         <b>{params.row.barcodeName}</b>
                         <br />
                         <label
                           style={{
                             color: '#AEAEAE',
-                            fontSize: 14,
+                            fontSize: 13,
                           }}>
-                          {newSluCode}
+                          {params.row.skuCode}
                         </label>
                       </label>
                     </Grid>
