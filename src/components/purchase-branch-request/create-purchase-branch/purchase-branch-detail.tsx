@@ -315,7 +315,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleChkSaveClose}>
-          <Typography sx={{ fontSize: '1em' }}>สร้างรายการสั่งสินค้า</Typography>
+          <Typography sx={{ fontSize: '1em' }}>เบิกของใช้หน้าร้าน</Typography>
           <Steppers status={statusSteps} stepsList={steps}></Steppers>
         </BootstrapDialogTitle>
 
