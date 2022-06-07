@@ -158,17 +158,17 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       if (item.stepperGrp === 1 && item.value === status) {
         stepsList.push(t(`status.${item.value}`));
         stepsList.push('อยู่ระหว่างดำเนินการ: -');
-        stepsList.push(t(`status.CLOSED`));
+        stepsList.push(t(`ปิดงาน`));
         setStatusSteps(item.stepperGrp - 1);
       } else if (item.stepperGrp === 2 && item.value === status) {
         stepsList.push(t('status.DRAFT'));
         stepsList.push('อยู่ระหว่างดำเนินการ: ' + t(`status.${item.value}`));
-        stepsList.push(t(`status.CLOSED`));
+        stepsList.push(t(`ปิดงาน`));
         setStatusSteps(item.stepperGrp - 1);
       } else if (item.stepperGrp === 3 && item.value === status) {
         stepsList.push(t('status.DRAFT'));
         stepsList.push('อยู่ระหว่างดำเนินการ: -');
-        stepsList.push(t(`status.${item.value}`));
+        stepsList.push('ปิดงาน - ' + t(`status.${item.value}`));
         setStatusSteps(item.stepperGrp - 1);
       }
       //setSteps
@@ -315,7 +315,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleChkSaveClose}>
-          <Typography sx={{ fontSize: '1em' }}>สร้างรายการสั่งสินค้า</Typography>
+          <Typography sx={{ fontSize: '1em' }}>เบิกของใช้หน้าร้าน</Typography>
           <Steppers status={statusSteps} stepsList={steps}></Steppers>
         </BootstrapDialogTitle>
 

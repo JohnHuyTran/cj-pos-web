@@ -64,15 +64,15 @@ const columns: GridColDef[] = [
   },
   {
     field: 'stockMax',
-    headerName: 'จำนวนสั่งมากที่สุด',
+    headerName: 'จำนวนที่สั่งได้มากที่สุด',
     headerAlign: 'center',
     align: 'right',
-    minWidth: 150,
+    minWidth: 160,
     sortable: false,
   },
   {
     field: 'qty',
-    headerName: 'จำนวน',
+    headerName: 'จำนวนที่สาขาเบิก',
     minWidth: 150,
     headerAlign: 'center',
     disableColumnMenu: true,
