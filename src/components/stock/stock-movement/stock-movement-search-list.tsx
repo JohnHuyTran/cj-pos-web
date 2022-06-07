@@ -174,7 +174,7 @@ function StockMovementSearchList() {
             </Typography>
           );
         } else {
-          return <Typography variant='body2'>{params.value}</Typography>;
+          return <Typography variant="body2">{params.value}</Typography>;
         }
       },
     },
@@ -426,7 +426,7 @@ function StockMovementSearchList() {
           setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
         });
     } else if (MOVEMENT_TYPE.ADJ_TRNS_IN_SRC_BT === movementTypeCode) {
-      await dispatch(featchorderDetailDCAsync(docNo))
+      await dispatch(featchorderDetailDCAsync(docRefNo))
         .then((value: any) => {
           if (value) {
             if (isErrorCode(value.payload.code)) {
