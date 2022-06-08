@@ -10,6 +10,17 @@ export interface TransferOutSearchRequest {
   type?: string | undefined;
 }
 
+export interface RequisitionSummaryRequest {
+  fromDate: string;
+  toDate: string;
+  branchCode: string;
+  // clearSearch?: boolean;
+}
+
+export interface RequisitionSummaryResponse {
+  data: any;
+}
+
 export interface TransferOutSearchResponse {
   ref: string;
   code: number;

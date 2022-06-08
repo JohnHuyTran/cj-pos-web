@@ -17,6 +17,7 @@ interface StateProps {
   value: any | Date | number | string;
   type?: string;
   minDateTo?: any | Date | number | string;
+  error?: boolean;
 }
 
 const defaultMaterialTheme = createTheme({
@@ -53,7 +54,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         variant='inline'
         inputVariant='outlined'
         format='DD/MM/YYYY'
-        className={classes.Mdatepicker}
+        className={props.error ? classes.MdatepickerError : classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
@@ -62,7 +63,8 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
               size='small'
               onClick={() => handleDateChange(null)}
               data-testid='endDateIconClose'
-              id='endDateIconClose'>
+              id='endDateIconClose'
+            >
               <CloseIcon fontSize='small' />
             </IconButton>
           ),
@@ -87,7 +89,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         variant='inline'
         inputVariant='outlined'
         format='DD/MM/YYYY'
-        className={classes.Mdatepicker}
+        className={props.error ? classes.MdatepickerError : classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
@@ -96,7 +98,8 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
               size='small'
               onClick={() => handleDateChange(null)}
               data-testid='startDateIconClose'
-              id='startDateIconClose'>
+              id='startDateIconClose'
+            >
               <CloseIcon fontSize='small' />
             </IconButton>
           ),

@@ -28,6 +28,7 @@ import { transferOutGetSearch } from '../../store/slices/transfer-out-search-sli
 import BranchListDropDown from '../../components/commons/ui/branch-list-dropdown';
 import ModalCreateToRawMaterial from '../../components/transfer-out-raw-material/modal-create-to-raw-material';
 import { env } from '../../adapters/environmentConfigs';
+import RequisitionSummary from '../../components/commons/ui/modal-requisition-summary';
 
 const _ = require('lodash');
 
@@ -76,6 +77,7 @@ const TORawMasterialSearch = () => {
     open: false,
   });
   const [openModal, setOpenModal] = React.useState(false);
+  const [openModalRequisition, setOpenModalRequisition] = React.useState(false);
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
@@ -130,6 +132,14 @@ const TORawMasterialSearch = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+  };
+
+  const handleOpenModalRequisition = () => {
+    setOpenModalRequisition(true);
+  };
+
+  const handleCloseModalRequisition = () => {
+    setOpenModalRequisition(false);
   };
 
   const handleClosePopup = () => {
@@ -324,7 +334,7 @@ const TORawMasterialSearch = () => {
               sx={{ width: 125, height: '40px', ml: 2 }}
               className={classes.MbtnSearch}
               color="warning"
-              // onClick={handleOpenModal}
+              onClick={handleOpenModalRequisition}
             >
               {'สรุปรายการเบิก'}
             </Button>
@@ -363,6 +373,9 @@ const TORawMasterialSearch = () => {
           action={Action.INSERT}
           onSearchMain={onSearch}
         />
+      )}
+      {openModalRequisition && (
+        <RequisitionSummary isOpen={openModalRequisition} onClickClose={handleCloseModalRequisition} />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>
