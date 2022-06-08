@@ -25,7 +25,7 @@ const initialState: State = {
 };
 
 export const featchSearchStockTransferRtAsync = createAsyncThunk(
-  'orderListDc',
+  'stockRequestList',
   async (payload: StockTransferRequest) => {
     try {
       const apiRootPath = environment.stock.searchStockTransfer.searchRT.url;
