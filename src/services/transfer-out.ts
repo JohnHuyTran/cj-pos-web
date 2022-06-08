@@ -1,4 +1,4 @@
-import { deleteData, get, post } from '../adapters/posback-adapter';
+import { deleteData, get, getFile, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { env } from '../adapters/environmentConfigs';
 import { Payload } from '../models/barcode-discount';
@@ -89,4 +89,21 @@ export const getPathEnd = (id: string) => {
 
 export const getPathApproveRM = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.approveRM.url}`, { id: id });
+};
+
+export async function getRequistionSummary(payload: any) {
+  try {
+    const response = await getFile(getPathRS(payload));
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getPathRS = (payload: any) => {
+  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.requisitionSummary.url}`, payload);
+};
+
+export const getLinkExportUrl = (payload: any) => {
+  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.requisitionSummary.url}`, payload);
 };

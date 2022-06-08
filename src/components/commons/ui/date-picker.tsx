@@ -51,21 +51,21 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         clearable
         autoOk
         fullWidth
-        variant="inline"
-        inputVariant="outlined"
-        format="DD/MM/YYYY"
+        variant='inline'
+        inputVariant='outlined'
+        format='DD/MM/YYYY'
         className={props.error ? classes.MdatepickerError : classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
             <IconButton
-              size="small"
+              size='small'
               onClick={() => handleDateChange(null)}
-              data-testid="endDateIconClose"
-              id="endDateIconClose"
+              data-testid='endDateIconClose'
+              id='endDateIconClose'
             >
-              <CloseIcon fontSize="small" />
+              <CloseIcon fontSize='small' />
             </IconButton>
           ),
           readOnly: true,
@@ -75,7 +75,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         }}
         maxDate={today}
         minDate={props.minDateTo}
-        placeholder="กรุณาเลือกวันที่"
+        placeholder='กรุณาเลือกวันที่'
         minDateMessage={'วันที่ต้องมากกว่าวันที่เริ่มต้น'}
       />
     );
@@ -86,21 +86,21 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         clearable
         autoOk
         fullWidth
-        variant="inline"
-        inputVariant="outlined"
-        format="DD/MM/YYYY"
+        variant='inline'
+        inputVariant='outlined'
+        format='DD/MM/YYYY'
         className={props.error ? classes.MdatepickerError : classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
             <IconButton
-              size="small"
+              size='small'
               onClick={() => handleDateChange(null)}
-              data-testid="startDateIconClose"
-              id="startDateIconClose"
+              data-testid='startDateIconClose'
+              id='startDateIconClose'
             >
-              <CloseIcon fontSize="small" />
+              <CloseIcon fontSize='small' />
             </IconButton>
           ),
           readOnly: true,
@@ -109,14 +109,14 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
           position: 'start',
         }}
         maxDate={today}
-        placeholder="กรุณาเลือกวันที่"
+        placeholder='กรุณาเลือกวันที่'
       />
     );
   }
 
   return (
     <div>
-      <MuiPickersUtilsProvider utils={OverwriteMomentBE} locale="th">
+      <MuiPickersUtilsProvider utils={OverwriteMomentBE} locale='th'>
         <ThemeProvider theme={defaultMaterialTheme}>{datePicker}</ThemeProvider>
       </MuiPickersUtilsProvider>
     </div>
