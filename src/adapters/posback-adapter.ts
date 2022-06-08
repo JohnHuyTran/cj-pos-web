@@ -96,8 +96,9 @@ export function get(path: string, contentType = defaultForJSON, overrideTimeOut 
     });
 }
 
-export function getFile(path: string, contentType = defaultForJSON) {
+export function getFile(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
 
   return instance
     .get(path, {
@@ -127,8 +128,9 @@ export function getFile(path: string, contentType = defaultForJSON) {
     });
 }
 
-export function getParams(path: string, payload: any, contentType = defaultForJSON) {
+export function getParams(path: string, payload: any, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .get(path, {
       params: payload,
@@ -146,8 +148,15 @@ export function getParams(path: string, payload: any, contentType = defaultForJS
     });
 }
 
-export function post(path: string, payload?: any, contentType = defaultForJSON, actionType?: string) {
+export function post(
+  path: string,
+  payload?: any,
+  contentType = defaultForJSON,
+  actionType?: string,
+  overrideTimeOut = defaultTimeout
+) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .post(path, payload)
     .then((response: AxiosResponse) => {
@@ -171,8 +180,9 @@ export function post(path: string, payload?: any, contentType = defaultForJSON, 
     });
 }
 
-export function put(path: string, payload: any, contentType = defaultForJSON) {
+export function put(path: string, payload: any, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .put(path, payload)
     .then((response: AxiosResponse) => {
@@ -188,8 +198,9 @@ export function put(path: string, payload: any, contentType = defaultForJSON) {
     });
 }
 
-export function putData(path: string, contentType = defaultForJSON) {
+export function putData(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .put(path)
     .then((response: AxiosResponse) => {
@@ -205,8 +216,9 @@ export function putData(path: string, contentType = defaultForJSON) {
     });
 }
 
-export function deleteData(path: string, contentType = defaultForJSON) {
+export function deleteData(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .delete(path)
     .then((result: any) => {
@@ -218,8 +230,14 @@ export function deleteData(path: string, contentType = defaultForJSON) {
     });
 }
 
-export function deleteDataBody(path: string, payload: any, contentType = defaultForJSON) {
+export function deleteDataBody(
+  path: string,
+  payload: any,
+  contentType = defaultForJSON,
+  overrideTimeOut = defaultTimeout
+) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .delete(path, { data: payload })
     .then((response: AxiosResponse) => {
