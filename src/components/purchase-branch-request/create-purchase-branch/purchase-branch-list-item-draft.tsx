@@ -18,7 +18,6 @@ import ModelDeleteConfirm from '../../commons/ui/modal-delete-confirm';
 import { isAllowActionPermission } from '../../../utils/role-permission';
 import { ACTIONS } from '../../../utils/enum/permission-enum';
 import { updateAddItemsState } from '../../../store/slices/add-items-slice';
-import HtmlTooltip from '../../commons/ui/html-tooltip';
 
 export interface DataGridProps {
   // onChangeItems: (items: Array<any>) => void;
@@ -29,7 +28,7 @@ const columns: GridColDef[] = [
   {
     field: 'index',
     headerName: 'ลำดับ',
-    width: 65,
+    width: 80,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -42,7 +41,7 @@ const columns: GridColDef[] = [
   {
     field: 'barcode',
     headerName: 'บาร์โค้ด',
-    minWidth: 115,
+    minWidth: 200,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -51,7 +50,7 @@ const columns: GridColDef[] = [
     field: 'barcodeName',
     headerName: 'รายละเอียดสินค้า',
     headerAlign: 'center',
-    minWidth: 200,
+    minWidth: 300,
     flex: 2,
     sortable: false,
     renderCell: (params) => (
@@ -74,76 +73,51 @@ const columns: GridColDef[] = [
   {
     field: 'qty',
     headerName: 'จำนวนที่สาขาเบิก',
-    minWidth: 135,
-    headerAlign: 'center',
-    align: 'right',
-    disableColumnMenu: true,
-    sortable: false,
-  },
-
-  {
-    field: 'unitName2',
-    headerName: 'อ้างอิง (จำนวนที่คลังส่ง)',
-    minWidth: 175,
+    minWidth: 150,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
-  },
-  {
-    field: 'unitName3',
-    headerName: 'จำนวนรับจริง',
-    minWidth: 115,
-    headerAlign: 'center',
-    disableColumnMenu: true,
-    sortable: false,
-  },
-  {
-    field: 'unitName4',
-    headerName: 'ส่วนต่างการรับจริง',
-    minWidth: 142,
-    headerAlign: 'center',
-    disableColumnMenu: true,
-    sortable: false,
-  },
-  {
-    field: 'unitName5',
-    headerName: 'ส่วนต่างการเบิกสินค้า',
-    minWidth: 158,
-    headerAlign: 'center',
-    disableColumnMenu: true,
-    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <TextField
+        variant='outlined'
+        name='txnQuantity'
+        type='number'
+        inputProps={{ style: { textAlign: 'right' } }}
+        value={params.value}
+        onChange={(e) => {
+          let qty = Number(params.getValue(params.id, 'qty'));
+          let stockMax = Number(params.getValue(params.id, 'stockMax'));
+          var value = e.target.value ? parseInt(e.target.value, 10) : '';
+          if (qty === 0) value = chkQty(value);
+          if (value < 0) value = 0;
+          if (value > stockMax) value = stockMax;
+          params.api.updateRows([{ ...params.row, qty: value }]);
+        }}
+        disabled={params.getValue(params.id, 'editMode') ? true : false}
+        autoComplete='off'
+      />
+    ),
   },
   {
     field: 'unitName',
     headerName: 'หน่วย',
-    minWidth: 60,
+    minWidth: 120,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
   },
   {
-    field: 'comment',
-    headerName: 'หมายเหตุ',
-    minWidth: 90,
-    flex: 1,
-    headerAlign: 'center',
+    field: 'delete',
+    headerName: ' ',
+    width: 40,
+    minWidth: 0,
+    align: 'right',
     sortable: false,
-    renderCell: (params) => {
-      return (
-        <HtmlTooltip
-          title={
-            <React.Fragment>
-              {/* {params.value} */}
-              xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            </React.Fragment>
-          }>
-          <Typography variant='body2' noWrap>
-            {/* {params.value} */}
-            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-          </Typography>
-        </HtmlTooltip>
-      );
-    },
+    renderCell: (params: GridRenderCellParams) => (
+      <div>
+        {!params.getValue(params.id, 'editMode') && <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />}
+      </div>
+    ),
   },
 ];
 

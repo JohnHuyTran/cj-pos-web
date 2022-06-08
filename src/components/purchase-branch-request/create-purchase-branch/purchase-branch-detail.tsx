@@ -9,6 +9,7 @@ import { AddCircleOutlineOutlined, Cancel, CheckCircle, HighlightOff, Save } fro
 import Steppers from '../../commons/ui/steppers';
 import moment from 'moment';
 import { useStyles } from '../../../styles/makeTheme';
+import PurchaseBranchListItemDraft from './purchase-branch-list-item-draft';
 import PurchaseBranchListItem from './purchase-branch-list-item';
 import TextBoxComment from '../../commons/ui/textbox-comment';
 import ModalAddItems from '../../commons/ui/modal-add-items';
@@ -94,7 +95,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [docNo, setDocNo] = React.useState('');
   const [remark, setRemark] = React.useState('');
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
-  const [status, setStatus] = React.useState('');
+  const [status, setStatus] = React.useState('DRAFT');
   const [branchName, setBranchName] = React.useState('');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
@@ -406,7 +407,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
           </Box>
 
           <Box mb={5}>
-            <PurchaseBranchListItem onChangeItems={handleChangeItems} />
+            {status === 'DRAFT' && <PurchaseBranchListItemDraft onChangeItems={handleChangeItems} />}
+            {status !== '' && status !== 'DRAFT' && <PurchaseBranchListItem onChangeItems={handleChangeItems} />}
           </Box>
           <Box mb={8}>
             <Grid container spacing={2} mb={2}>
