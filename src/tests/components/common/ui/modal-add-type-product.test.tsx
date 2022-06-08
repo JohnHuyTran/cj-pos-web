@@ -6,7 +6,7 @@ import { initialState } from '../../../mockStore';
 import { ThemeProvider, Typography } from '@mui/material';
 import theme from '../../../../styles/theme';
 import { mockUserInfo } from '../../../mockData';
-import ModalAddTypeProduct from '../../../../components/commons/ui/modal-add-type-product';
+import ModalAddTypeProduct from '../../../../components/commons/ui/_modal-add-type-product';
 import React, { Profiler } from 'react';
 import { addTypeAndProduct } from '../../../../store/slices/add-type-product-slice';
 import userEvent from '@testing-library/user-event';
