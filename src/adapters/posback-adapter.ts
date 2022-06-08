@@ -8,7 +8,9 @@ import { logout } from '../store/slices/authSlice';
 import { getSessionId, getAccessToken } from '../store/sessionStore';
 
 const defaultForJSON = ContentType.JSON;
+const defaultTimeout = env.backEnd.timeout;
 let contentType: string;
+let timeout: number = env.backEnd.timeout;
 // const instance = (contentType: string) => {
 const instance = axios.create({
   baseURL: env.backEnd.url,
@@ -24,6 +26,7 @@ instance.interceptors.request.use(function (config: AxiosRequestConfig) {
   config.headers.common['x-trace'] = sessionState;
   config.headers.Authorization = token ? `Bearer ${token}` : '';
   config.headers.common['Content-Type'] = contentType ? contentType : defaultForJSON;
+  config.timeout = timeout;
   return config;
 });
 
@@ -61,8 +64,10 @@ instance.interceptors.response.use(
   }
 );
 
-export function get(path: string, contentType = defaultForJSON) {
+export function get(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
+
   return instance
     .get(path)
     .then((result: any) => {
@@ -91,8 +96,9 @@ export function get(path: string, contentType = defaultForJSON) {
     });
 }
 
-export function getFile(path: string, contentType = defaultForJSON) {
+export function getFile(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
 
   return instance
     .get(path, {
@@ -122,8 +128,9 @@ export function getFile(path: string, contentType = defaultForJSON) {
     });
 }
 
-export function getParams(path: string, payload: any, contentType = defaultForJSON) {
+export function getParams(path: string, payload: any, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .get(path, {
       params: payload,
@@ -141,8 +148,15 @@ export function getParams(path: string, payload: any, contentType = defaultForJS
     });
 }
 
-export function post(path: string, payload?: any, contentType = defaultForJSON, actionType?: string) {
+export function post(
+  path: string,
+  payload?: any,
+  contentType = defaultForJSON,
+  actionType?: string,
+  overrideTimeOut = defaultTimeout
+) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .post(path, payload)
     .then((response: AxiosResponse) => {
@@ -166,8 +180,9 @@ export function post(path: string, payload?: any, contentType = defaultForJSON, 
     });
 }
 
-export function put(path: string, payload: any, contentType = defaultForJSON) {
+export function put(path: string, payload: any, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .put(path, payload)
     .then((response: AxiosResponse) => {
@@ -183,8 +198,9 @@ export function put(path: string, payload: any, contentType = defaultForJSON) {
     });
 }
 
-export function putData(path: string, contentType = defaultForJSON) {
+export function putData(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .put(path)
     .then((response: AxiosResponse) => {
@@ -200,8 +216,9 @@ export function putData(path: string, contentType = defaultForJSON) {
     });
 }
 
-export function deleteData(path: string, contentType = defaultForJSON) {
+export function deleteData(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .delete(path)
     .then((result: any) => {
@@ -213,8 +230,14 @@ export function deleteData(path: string, contentType = defaultForJSON) {
     });
 }
 
-export function deleteDataBody(path: string, payload: any, contentType = defaultForJSON) {
+export function deleteDataBody(
+  path: string,
+  payload: any,
+  contentType = defaultForJSON,
+  overrideTimeOut = defaultTimeout
+) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .delete(path, { data: payload })
     .then((response: AxiosResponse) => {
