@@ -398,13 +398,32 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='ใช้ในการทำกิจกรรม' />
               </ListItemButton>
             </Link>
-            <Link to='/transfer-out-raw-masterial' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTOMasterial'>
+            <Link
+              to='/transfer-out-raw-masterial'
+              style={{ textDecoration: 'none', color: '#676767' }}
+              id='subMenuTOMasterial'>
               <ListItemButton
                 key='subMenuTOMasterial'
                 selected={selectedIndex === 20}
                 onClick={() => handleListItemClick(20)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ขอใช้วัตถุดิบร้านบาว' />
+              </ListItemButton>
+            </Link>
+            <Link
+              to='/create-purchase-branch'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                display: disableSubMenuCreatePurchaseBranch ? 'none' : '',
+              }}
+              id='subMenuCreatePurchaseBranch'>
+              <ListItemButton
+                key='CreatePurchaseBranch'
+                selected={selectedIndex === 13}
+                onClick={() => handleListItemClick(13)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ของใช้หน้าร้าน' />
               </ListItemButton>
             </Link>
           </List>
@@ -459,36 +478,6 @@ export default function Sidebar({}: Props): ReactElement {
                 onClick={() => handleListItemClick(12)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ความเคลื่อนไหวของสินค้า' />
-              </ListItemButton>
-            </Link>
-          </List>
-        </Collapse>
-        <ListItemButton
-          onClick={handleClickPurchaseBranch}
-          id='mainMenuProductInfo'
-          style={{ display: disableMainMenuPurchaseBranch ? 'none' : '' }}>
-          <ListItemIcon>
-            <MoveToInbox />
-          </ListItemIcon>
-          <ListItemText primary='สั่งสินค้าจากสาขา' style={{ marginLeft: -15 }} />
-          {openPurchaseBranchMenu ? <ExpandLess /> : <ExpandMore />}
-        </ListItemButton>
-        <Collapse in={openPurchaseBranchMenu} timeout='auto' unmountOnExit>
-          <List component='div' disablePadding>
-            <Link
-              to='/create-purchase-branch'
-              style={{
-                textDecoration: 'none',
-                color: '#676767',
-                display: disableSubMenuCreatePurchaseBranch ? 'none' : '',
-              }}
-              id='subMenuCreatePurchaseBranch'>
-              <ListItemButton
-                key='CreatePurchaseBranch'
-                selected={selectedIndex === 13}
-                onClick={() => handleListItemClick(13)}
-                sx={{ pl: 7 }}>
-                <ListItemText primary='สร้างรายการสั่งสินค้า' />
               </ListItemButton>
             </Link>
           </List>

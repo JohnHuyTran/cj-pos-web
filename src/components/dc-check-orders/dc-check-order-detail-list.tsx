@@ -94,6 +94,7 @@ const columns: GridColDef[] = [
     sortable: false,
     align: 'right',
     headerAlign: 'center',
+    type: 'number',
     renderCell: (params: GridRenderCellParams) => (
       <TextField
         variant='outlined'
@@ -102,8 +103,20 @@ const columns: GridColDef[] = [
         value={params.value}
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
-          params.api.updateRows([{ ...params.row, productQuantityActual: e.target.value }]);
-          // e.target.setSelectionRange(caretStart, caretEnd);
+          let str = e.target.value.replace(/[^0-9]/g, '');
+          if (str.length > 5) {
+            str = str.substring(0, 5);
+          }
+
+          e.target.value = str;
+          var isTote = params.getValue(params.id, 'isTote');
+          var qty = params.getValue(params.id, 'productQuantityActual')
+            ? Number(params.getValue(params.id, 'productQuantityActual'))
+            : 0;
+          var value = e.target.value ? parseInt(e.target.value, 10) : 0;
+          if (value > 1 && isTote) value = qty;
+
+          params.api.updateRows([{ ...params.row, productQuantityActual: value }]);
         }}
         disabled={Boolean(params.getValue(params.id, 'isDisableChange'))}
         autoComplete='off'
