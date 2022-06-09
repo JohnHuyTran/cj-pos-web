@@ -224,6 +224,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
+        autoFocus={true}
         {...params}
         InputProps={{
           ...params.InputProps,
@@ -365,7 +366,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
                 id='selAddItem'
                 value={values}
                 fullWidth
-                freeSolo
+                // freeSolo
                 loadingText='กำลังโหลด...'
                 loading={loading}
                 options={options}
