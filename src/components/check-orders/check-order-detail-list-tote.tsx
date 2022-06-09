@@ -158,7 +158,8 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
             );
           } else if (params.getValue(params.id, 'canAddTote') === true) {
             let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qtyRef'));
-            if (diff > 0) {
+            let qty = Number(params.getValue(params.id, 'actualQty'));
+            if (diff >= 0 && qty !== 0) {
               return (
                 <Button
                   variant="contained"
