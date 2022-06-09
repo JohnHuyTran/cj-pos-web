@@ -429,14 +429,14 @@ export default function CheckOrderDetail({
       let sumQuantityRefItems: number = 0;
       // rowsEdit.forEach((data: GridRowData) => {
       payloadAddItem.forEach((data: any) => {
-        let diffCount: number = data.actualQty - data.qtyRef;
+        let diffCount: number = Number(data.actualQty) - Number(data.qtyRef);
         sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
         sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
 
         const itemDiff: Entry = {
           barcode: data.barcode,
           deliveryOrderNo: data.deliveryOrderNo,
-          actualQty: data.actualQty,
+          actualQty: Number(data.actualQty),
           comment: data.comment,
           seqItem: 0,
           itemNo: '',

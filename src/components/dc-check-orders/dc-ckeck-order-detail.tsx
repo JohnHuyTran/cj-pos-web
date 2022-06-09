@@ -270,7 +270,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         reasonCode: values.reason,
       };
     }
-
     await verifyDCOrderShipmentsLD(detailDC.sdNo, payload, isApprove ? [] : fileUploadList).then(
       function (value) {
         return;
