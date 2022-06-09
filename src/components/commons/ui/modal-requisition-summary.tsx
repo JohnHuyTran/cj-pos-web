@@ -1,34 +1,19 @@
-import {
-  Button,
-  createFilterOptions,
-  Dialog,
-  DialogContent,
-  Grid,
-  IconButton,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Button, Dialog, DialogContent, Grid, IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
-import SearchIcon from '@mui/icons-material/Search';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import CloseIcon from '@mui/icons-material/Close';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import _ from 'lodash';
 import moment from 'moment';
-import { DateFormat } from '../../../utils/enum/common-enum';
 import { BranchListOptionType } from '../../../models/branch-model';
 import DatePickerComponent from '../../../components/commons/ui/date-picker';
 import BranchListDropDown from '../../../components/commons/ui/branch-list-dropdown';
-import { getBranchName, objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../../utils/utils';
+import { getBranchName } from '../../../utils/utils';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useStyles } from '../../../styles/makeTheme';
 import { getUserInfo } from '../../../store/sessionStore';
-import { ItemProps, ListBranches } from '../../../models/search-branch-province-model';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
-import { paramsConvert } from '../../../utils/utils';
 import { isGroupBranch } from '../../../utils/role-permission';
-import fs from 'fs';
 import { RequisitionSummaryRequest } from '../../../models/transfer-out-model';
 import { getRequistionSummary } from '../../../services/transfer-out';
 import { env } from '../../../adapters/environmentConfigs';
@@ -64,10 +49,8 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
   const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
 
-  const dispatch = useAppDispatch();
-
   const [values, setValues] = React.useState<State>({
-    fromDate: new Date().setDate(new Date().getDate() - 7),
+    fromDate: new Date().setDate(new Date().getDate() - 6),
     toDate: new Date(),
     branch: '',
   });
@@ -75,8 +58,6 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
     fromDateError: false,
     toDateError: false,
   });
-
-  const [userPermission, setUserPermission] = useState<any[]>([]);
 
   const validateDate = () => {
     const diffTime = Math.abs(values.toDate - values.fromDate);
@@ -172,7 +153,7 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
 
   return (
     <div>
-      <Dialog maxWidth='md' fullWidth open={true} style={{ marginBottom: '350px' }}>
+      <Dialog maxWidth='md' fullWidth open={true}>
         <b style={{ fontSize: '18px', textAlign: 'center', marginTop: '26px' }}>สรุปรายการเบิก </b>
         <Box sx={{ flex: 1, ml: 2 }}>
           <IconButton
