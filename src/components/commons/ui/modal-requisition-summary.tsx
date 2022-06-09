@@ -50,7 +50,7 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
 
   const [values, setValues] = React.useState<State>({
-    fromDate: new Date().setDate(new Date().getDate() - 7),
+    fromDate: new Date().setDate(new Date().getDate() - 6),
     toDate: new Date(),
     branch: '',
   });
