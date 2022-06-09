@@ -220,7 +220,7 @@ function CheckOrderDetailList() {
         actualQty: actualQty,
         qtyDiff: item.qtyDiff,
         comment: item.comment,
-        hhQty: item.hhQty,
+        hhQty: item.hhQty ? item.hhQty : 0,
       };
     });
   }
