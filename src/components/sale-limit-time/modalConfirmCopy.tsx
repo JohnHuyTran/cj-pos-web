@@ -47,7 +47,7 @@ export default function ModalConfirmCopy({ open, choiceCopy, setChoiceCopy, onCl
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
-        PaperProps={{ sx: { minWidth: 450, height: 241 } }}
+        PaperProps={{ sx: { minWidth: 450, minHeight: 241 } }}
       >
         <DialogContent sx={{ textAlign: 'left', mt: 1, ml: 5 }}>
           <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>

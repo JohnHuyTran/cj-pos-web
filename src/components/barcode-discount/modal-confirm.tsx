@@ -42,7 +42,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, barCode, header
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
-        PaperProps={{ sx: { minWidth: 450, height: 241 } }}
+        PaperProps={{ sx: { minWidth: 450, minHeight: 241 } }}
       >
         <DialogContent sx={{ mt: 3, mr: 5, ml: 5 }}>
           <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
