@@ -107,6 +107,7 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
     if (groupBranch) {
       setBranchMap({ code: ownBranch, name: branchName ? branchName : '' });
       setBranchOptions(branchMap);
+      setValues({ ...values, branch: ownBranch });
     }
   }, [branchList]);
 
@@ -145,10 +146,10 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
         return;
       } else {
         if (values.branch !== null || ownBranch !== '') {
-          const payload: RequisitionSummaryRequest = {
+          let payload: RequisitionSummaryRequest = {
             fromDate: moment(values.fromDate).toISOString().split('T')[0],
             toDate: moment(values.toDate).toISOString().split('T')[0],
-            branchCode: ownBranch != '' ? ownBranch : values.branch,
+            branchCode: values.branch,
           };
           const res = await getRequistionSummary(payload);
           if (res && res.data) {
