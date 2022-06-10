@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import React, { ReactElement, useMemo } from 'react';
+import React, { ReactElement, useMemo, useRef } from 'react';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { ItemInfo } from '../../../models/modal-add-item-model';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
@@ -31,6 +31,7 @@ import {
 import LoadingModal from './loading-modal';
 import { featchAllItemsListAsync } from '../../../store/slices/search-all-items';
 import { FindProductProps, FindProductRequest } from '../../../models/product-model';
+import _ from 'lodash';
 
 interface StateItem {
   barcodeName: string;
@@ -130,7 +131,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
   const [values, setValues] = React.useState<string[]>([]);
   const itemsList = useAppSelector((state) => state.searchAllItemsList.itemList);
   const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
-
+  const searchDebouceRef = useRef<any>();
   let rows: any = [];
   rows = newAddItemListArray.map((item: any, index: number) => {
     return {
@@ -177,29 +178,33 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
   };
 
   const onInputChange = async (event: any, value: string, reason: string) => {
-    if (event && event.keyCode && event.keyCode === 13) {
-      return false;
-    }
+    searchDebouceRef.current?.cancel();
+    searchDebouceRef.current = _.debounce(async () => {
+      if (event && event.keyCode && event.keyCode === 13) {
+        return false;
+      }
 
-    // console.log('onInputChange', { reason, value });
-    if (reason == 'reset') {
-      clearInput();
-    }
+      // console.log('onInputChange', { reason, value });
+      if (reason == 'reset') {
+        clearInput();
+      }
 
-    const keyword = value.trim();
-    const payload: FindProductProps = {
-      search: keyword,
-      payload: requestBody,
-    };
+      const keyword = value.trim();
+      const payload: FindProductProps = {
+        search: keyword,
+        payload: requestBody,
+      };
 
-    if (keyword.length >= 3 && reason !== 'reset') {
-      setLoading(true);
-      setSearchItem(keyword);
-      await dispatch(featchAllItemsListAsync(payload));
-      setLoading(false);
-    } else {
-      clearData();
-    }
+      if (keyword.length >= 3 && reason !== 'reset') {
+        setLoading(true);
+        setSearchItem(keyword);
+        await dispatch(featchAllItemsListAsync(payload));
+        setLoading(false);
+      } else {
+        clearData();
+      }
+    }, 200);
+    searchDebouceRef.current();
   };
 
   let options: any = [];
@@ -224,6 +229,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
+        autoFocus={true}
         {...params}
         InputProps={{
           ...params.InputProps,
@@ -365,7 +371,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
                 id='selAddItem'
                 value={values}
                 fullWidth
-                freeSolo
+                // freeSolo
                 loadingText='กำลังโหลด...'
                 loading={loading}
                 options={options}
@@ -376,6 +382,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
                 getOptionLabel={(option) => (option.barcodeName ? option.barcodeName : '')}
                 isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
                 renderInput={autocompleteRenderInput}
+                noOptionsText={''}
               />
             </Box>
 
