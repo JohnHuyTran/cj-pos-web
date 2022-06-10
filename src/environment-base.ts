@@ -118,6 +118,9 @@ export const environment = {
       approveRM: {
         url: '/campaign/transfer-out/approve-transfer-rm/{id}',
       },
+      requisitionSummary: {
+        url: '/campaign/transfer-out/requisitionSummary/exportFile?branchCode={branchCode}&fromDate={fromDate}&toDate={toDate}',
+      },
     },
   },
   sell: {

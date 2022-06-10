@@ -16,7 +16,7 @@ import { TransferOut, TransferOutSearchRequest, TransferOutSearchResponse } from
 import { getTransferOutDetail } from '../../store/slices/transfer-out-detail-slice';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
-import ModalCreateToRawMaterial from "../../components/transfer-out-raw-material/modal-create-to-raw-material";
+import ModalCreateToRawMaterial from '../../components/transfer-out-raw-material/modal-create-to-raw-material';
 
 const _ = require('lodash');
 
@@ -56,7 +56,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
           id: data.id,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
           documentNumber: data.documentNumber,
-          status: genStatusIncludeExpiredCase(data),
+          status: data.status,
           transactionDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
           approvalDate: stringNullOrEmpty(data.approvedDate)
             ? ''
@@ -65,7 +65,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
           requestorName: data.requestor,
           approverName: data.approver,
           branch: `${data.branch}-${data.branchName}`,
-          remark: data.requesterNote
+          remark: data.requesterNote,
         };
       });
       setLstTransferOut(rows);
@@ -81,26 +81,6 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       }
     }
   }, [toSearchResponse]);
-
-  const genStatusIncludeExpiredCase = (rowData: any) => {
-    let status = rowData.status;
-    if (
-      rowData.products &&
-      rowData.products.length > 0 &&
-      (Number(BDStatus.APPROVED) == rowData.status || Number(BDStatus.BARCODE_PRINTED) == rowData.status)
-    ) {
-      let productPassValidation = rowData.products.filter(
-        (itPro: any) =>
-          itPro.numberOfApproved > 0 &&
-          !stringNullOrEmpty(itPro.expiredDate) &&
-          moment(itPro.expiredDate).isSameOrAfter(moment(new Date()), 'day')
-      );
-      if (productPassValidation.length === 0) {
-        status = Number(BDStatus.ALREADY_EXPIRED);
-      }
-    }
-    return status;
-  };
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -267,7 +247,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
-      type: TO_TYPE.TO_ACTIVITY + '',
+      type: TO_TYPE.TO_RAW_MATERIAL + '',
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));
@@ -286,7 +266,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
-      type: TO_TYPE.TO_ACTIVITY + '',
+      type: TO_TYPE.TO_RAW_MATERIAL + '',
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));
@@ -359,7 +339,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
           userPermission={userPermission}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </div>
   );
 };

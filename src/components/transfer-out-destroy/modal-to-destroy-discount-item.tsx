@@ -328,7 +328,7 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
               open={openModalDelete}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
-              PaperProps={{ sx: { minWidth: 450, height: 241 } }}
+              PaperProps={{ sx: { minWidth: 450, minHeight: 241 } }}
             >
               <DialogContent sx={{ pl: 6, pr: 8 }}>
                 <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>

@@ -166,7 +166,7 @@ export default function STProductTypeItems({ unSelectAllType, disabled }: Props)
               open={openModalDelete}
               aria-labelledby='alert-dialog-title'
               aria-describedby='alert-dialog-description'
-              PaperProps={{ sx: { minWidth: 450, height: 241 } }}>
+              PaperProps={{ sx: { minWidth: 450, minHeight: 241 } }}>
               <DialogContent>
                 <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
                   <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
