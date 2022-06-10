@@ -8,7 +8,7 @@ import moment from 'moment';
 import { BranchListOptionType } from '../../../models/branch-model';
 import DatePickerComponent from '../../../components/commons/ui/date-picker';
 import BranchListDropDown from '../../../components/commons/ui/branch-list-dropdown';
-import { getBranchName } from '../../../utils/utils';
+import { getBranchName, stringNullOrEmpty } from '../../../utils/utils';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useStyles } from '../../../styles/makeTheme';
 import { getUserInfo } from '../../../store/sessionStore';
@@ -17,6 +17,7 @@ import { isGroupBranch } from '../../../utils/role-permission';
 import { RequisitionSummaryRequest } from '../../../models/transfer-out-model';
 import { getRequistionSummary } from '../../../services/transfer-out';
 import { env } from '../../../adapters/environmentConfigs';
+import AlertError from '../../../components/commons/ui/alert-error';
 
 interface State {
   branch: string;
@@ -31,6 +32,9 @@ interface Props {
 
 export default function RequisitionSummary({ isOpen, onClickClose }: Props): ReactElement {
   const classes = useStyles();
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+
   const [open, setOpen] = React.useState(false);
   const { t } = useTranslation(['common']);
   const [branch, setBranch] = React.useState<any | null>(null);
@@ -69,13 +73,31 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
     return isValid;
   };
 
+  const validateSearch = () => {
+    let isValid = true;
+    if (stringNullOrEmpty(values.fromDate) || stringNullOrEmpty(values.toDate)) {
+      isValid = false;
+      setOpenAlert(true);
+      setTextError('กรุณากรอกวันที่');
+    }
+    return isValid;
+  };
+
   useEffect(() => {
+    if (stringNullOrEmpty(values.fromDate)) {
+      setCheckValue({ ...checkValue, fromDateError: true });
+      return;
+    }
     if (!validateDate()) {
       setCheckValue({ ...checkValue, fromDateError: true, toDateError: true });
     } else setCheckValue({ ...checkValue, fromDateError: false, toDateError: false });
   }, [values.fromDate]);
 
   useEffect(() => {
+    if (stringNullOrEmpty(values.toDate)) {
+      setCheckValue({ ...checkValue, toDateError: true });
+      return;
+    }
     if (!validateDate()) {
       setCheckValue({ ...checkValue, fromDateError: true, toDateError: true });
     } else setCheckValue({ ...checkValue, fromDateError: false, toDateError: false });
@@ -85,12 +107,17 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
     if (groupBranch) {
       setBranchMap({ code: ownBranch, name: branchName ? branchName : '' });
       setBranchOptions(branchMap);
+      setValues({ ...values, branch: ownBranch });
     }
   }, [branchList]);
 
   const handleCloseModal = () => {
     setOpen(false);
     onClickClose();
+  };
+
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
   };
 
   const handleChangefromDate = (value: any) => {
@@ -112,20 +139,23 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
 
   const downloadXLSFile = async () => {
     try {
+      if (!validateSearch()) {
+        return;
+      }
       if (!validateDate()) {
         return;
       } else {
-        if (values.branch !== null) {
-          const payload: RequisitionSummaryRequest = {
+        if (values.branch !== null || ownBranch !== '') {
+          let payload: RequisitionSummaryRequest = {
             fromDate: moment(values.fromDate).toISOString().split('T')[0],
             toDate: moment(values.toDate).toISOString().split('T')[0],
-            branchCode: ownBranch != '' ? ownBranch : branch,
+            branchCode: values.branch,
           };
           const res = await getRequistionSummary(payload);
           if (res && res.data) {
             const outputFilename =
               `RM_BaoCafe` +
-              `${values.branch}` +
+              `${payload.branchCode}` +
               `_${moment(values.fromDate).toISOString().split('T')[0].split('-').join('').substring(2)}-${moment(
                 values.toDate
               )
@@ -235,6 +265,7 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
           </Grid>
         </DialogContent>
       </Dialog>
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </div>
   );
 }
