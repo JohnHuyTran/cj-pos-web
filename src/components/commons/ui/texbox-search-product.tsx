@@ -1,10 +1,11 @@
 import { Autocomplete, CircularProgress, createFilterOptions, TextField, Typography } from '@mui/material';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { newSearchAllProductAsync, searchAllProductAsync } from '../../../store/slices/search-type-product-slice';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import SearchIcon from '@mui/icons-material/Search';
 import { FindProductProps, FindProductRequest } from '../../../models/product-model';
+import _ from 'lodash';
 
 interface Props {
   // skuType?: any[];
@@ -20,6 +21,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear, requestBody }: Props) {
   const [loading, setLoading] = React.useState(false);
   const [searchItem, setSearchItem] = React.useState<any | null>(null);
   const itemsList = useAppSelector((state) => state.searchTypeAndProduct.itemList);
+  const searchDebouceRef = useRef<any>();
   let options: any = [];
   if (searchItem) options = itemsList && itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
   const filterOptions = createFilterOptions({
@@ -70,29 +72,29 @@ function TextBoxSearchProduct({ onSelectItem, isClear, requestBody }: Props) {
 
   const clearInput = () => {};
   const onInputChange = async (event: any, value: string, reason: string) => {
-    if (event && event.keyCode && event.keyCode === 13) {
-      return false;
-    }
-    // console.log('onInputChange', { reason, value });
-    // if (reason == 'reset') {
-    //   clearInput();
-    // }
+    searchDebouceRef.current?.cancel();
+    searchDebouceRef.current = _.debounce(async () => {
+      if (event && event.keyCode && event.keyCode === 13) {
+        return false;
+      }
 
-    const keyword = value.trim();
-    if (keyword.length >= 3 && reason !== 'reset') {
-      setLoading(true);
-      setSearchItem(keyword);
+      const keyword = value.trim();
+      if (keyword.length >= 3 && reason !== 'reset') {
+        setLoading(true);
+        setSearchItem(keyword);
 
-      const payload: FindProductProps = {
-        search: keyword,
-        payload: requestBody,
-      };
-      await dispatch(newSearchAllProductAsync(payload));
+        const payload: FindProductProps = {
+          search: keyword,
+          payload: requestBody,
+        };
+        await dispatch(newSearchAllProductAsync(payload));
 
-      setLoading(false);
-    } else {
-      clearData();
-    }
+        setLoading(false);
+      } else {
+        clearData();
+      }
+    }, 200);
+    searchDebouceRef.current();
   };
 
   useEffect(() => {
