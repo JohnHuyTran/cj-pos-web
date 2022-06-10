@@ -49,7 +49,11 @@ export const featchAllItemsListAsync = createAsyncThunk('SearchAllItemsList', as
 const searchItemBySupSlice = createSlice({
   name: 'allItemList',
   initialState,
-  reducers: {},
+  reducers: {
+    updateItemList: (state, action: PayloadAction<any>) => {
+      state.itemList = action.payload;
+    },
+  },
   extraReducers: (builer) => {
     builer.addCase(featchAllItemsListAsync.pending, () => {
       initialState;
@@ -62,5 +66,5 @@ const searchItemBySupSlice = createSlice({
       });
   },
 });
-
+export const { updateItemList } = searchItemBySupSlice.actions;
 export default searchItemBySupSlice.reducer;
