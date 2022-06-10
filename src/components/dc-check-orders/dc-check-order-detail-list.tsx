@@ -97,23 +97,17 @@ const columns: GridColDef[] = [
     type: 'number',
     renderCell: (params: GridRenderCellParams) => (
       <TextField
+        type='number'
         variant='outlined'
         name='txbProductQuantityActual'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
-          let str = e.target.value.replace(/[^0-9]/g, '');
-          if (str.length > 5) {
-            str = str.substring(0, 5);
-          }
-
-          e.target.value = str;
-          var isTote = params.getValue(params.id, 'isTote');
-          var qty = params.getValue(params.id, 'productQuantityActual')
-            ? Number(params.getValue(params.id, 'productQuantityActual'))
-            : 0;
-          var value = e.target.value ? parseInt(e.target.value, 10) : 0;
+          let value = e.target.value ? parseInt(e.target.value, 10) : 0;
+          const isTote = params.getValue(params.id, 'isTote');
+          const qty = Number(params.getValue(params.id, 'productQuantityActual'));
+          if (value < 0) value = 0;
           if (value > 1 && isTote) value = qty;
 
           params.api.updateRows([{ ...params.row, productQuantityActual: value }]);
