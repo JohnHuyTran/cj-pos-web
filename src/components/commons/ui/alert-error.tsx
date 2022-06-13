@@ -8,33 +8,37 @@ interface Props {
   open: boolean;
   onClose: () => void;
   textError: string;
+  errorCode?: string;
 }
 
-export default function AlertError({ open, onClose, textError }: Props): ReactElement {
+export default function AlertError({ open, onClose, textError, errorCode }: Props): ReactElement {
   return (
     <Dialog
       open={open}
-      aria-labelledby='alert-dialog-title'
-      aria-describedby='alert-dialog-description'
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
       fullWidth={true}
-      maxWidth='xs'>
+      maxWidth="sm"
+    >
       <DialogContent sx={{ padding: '1em' }}>
         <DialogContentText
-          data-testid='txtContent'
-          sx={{ textAlign: 'center', whiteSpace: 'pre-wrap', color: '#000000' }}>
+          data-testid="txtContent"
+          sx={{ textAlign: 'center', whiteSpace: 'pre-wrap', color: '#000000' }}
+        >
           <ErrorOutline sx={{ color: '#F54949', fontSize: '4em' }} />
           <br />
-          {textError}{' '}
+          {textError}
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 20px 0px' }}>
         <Button
-          data-testid='btnClose'
-          id='btnClose'
-          variant='contained'
-          color='error'
+          data-testid="btnClose"
+          id="btnClose"
+          variant="contained"
+          color="error"
           sx={{ borderRadius: '5px', width: '126px' }}
-          onClick={onClose}>
+          onClick={onClose}
+        >
           ปิด
         </Button>
       </DialogActions>
