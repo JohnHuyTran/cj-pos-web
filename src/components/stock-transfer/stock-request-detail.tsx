@@ -317,7 +317,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
   const [valuebranchTo, setValuebranchTo] = React.useState<BranchListOptionType | null>(null);
   const [toBranch, setToBranch] = React.useState('');
-  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const [clearBranchFromDropDown, setClearBranchFromDropDown] = React.useState<boolean>(false);
+  const [clearBranchToDropDown, setClearBranchToDropDown] = React.useState<boolean>(false);
   const handleChangeFromBranch = (branchCode: string) => {
     if (groupSCM) {
       getSuperviseBranch(branchCode);
@@ -335,6 +336,9 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       setValues({ ...values, branchCode: '' });
       setFromBranch('');
     }
+
+    if (!clearBranchToDropDown) setClearBranchToDropDown(true);
+    else if (clearBranchToDropDown) setClearBranchToDropDown(false);
   };
 
   const handleChangeToBranch = (branchCode: string) => {
@@ -900,7 +904,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     valueBranch={valuebranchFrom}
                     sourceBranchCode={toBranch}
                     onChangeBranch={handleChangeFromBranch}
-                    isClear={clearBranchDropDown}
+                    isClear={clearBranchFromDropDown}
                     isFilterAuthorizedBranch={isAuthorizedBranch}
                     disable={groupBranch}
                     filterOutDC={groupBranchSCM}
@@ -915,7 +919,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     valueBranch={valuebranchTo}
                     sourceBranchCode={fromBranch}
                     onChangeBranch={handleChangeToBranch}
-                    isClear={clearBranchDropDown}
+                    isClear={clearBranchToDropDown}
                     isFilterAuthorizedBranch={isAuthorizedBranch}
                     // filterOutDC={groupBranch}
                     filterOutDC={groupSCM ? groupSCM : groupBranch}
@@ -977,7 +981,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                       valueBranch={valuebranchTo}
                       sourceBranchCode={fromBranch}
                       onChangeBranch={handleChangeToBranch}
-                      isClear={clearBranchDropDown}
+                      isClear={clearBranchToDropDown}
                       isFilterAuthorizedBranch={isAuthorizedBranch}
                       filterOutDC={groupBranch}
                     />

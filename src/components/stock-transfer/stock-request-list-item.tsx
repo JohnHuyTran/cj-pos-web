@@ -42,7 +42,7 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -64,8 +64,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2">{params.value}</Typography>
-        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+        <Typography variant='body2'>{params.value}</Typography>
+        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
@@ -80,9 +80,9 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnQuantity"
-        type="number"
+        variant='outlined'
+        name='txnQuantity'
+        type='number'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
@@ -93,7 +93,7 @@ const columns: GridColDef[] = [
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
         disabled={params.getValue(params.id, 'editMode') ? false : true}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
@@ -114,7 +114,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <div>
-        {params.getValue(params.id, 'editMode') && <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />}
+        {params.getValue(params.id, 'editMode') && <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />}
       </div>
     ),
     // renderCell: () => {
@@ -208,6 +208,7 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
         baseUnit: item.baseUnit ? item.baseUnit : 0,
         qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
         editMode: editM,
+        stock: item.stock,
       };
     });
 
@@ -308,7 +309,7 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
           <FormControlLabel
             control={<Checkbox />}
             checked={isChecked}
-            label="รายการสินค้าทั้งหมด"
+            label='รายการสินค้าทั้งหมด'
             onChange={handleCheckboxChange}
           />
         </FormGroup>
