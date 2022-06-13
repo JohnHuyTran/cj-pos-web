@@ -459,7 +459,7 @@ export default function CheckOrderDetail({
           isTote: data.isTote,
         };
 
-        if (data.isTote === true && !(data.actualQty * 1 >= 0 && data.actualQty * 1 <= 1)) {
+        if (data.isTote === true && !(Number(data.actualQty) * 1 >= 0 && Number(data.actualQty) * 1 <= 1)) {
           qtyIsValid = false;
         }
 
