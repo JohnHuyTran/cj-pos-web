@@ -193,7 +193,12 @@ export function put(path: string, payload: any, contentType = defaultForJSON, ov
       throw err;
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.code,
+        error.response?.data.message,
+        error.response?.data.error_details
+      );
       throw err;
     });
 }
