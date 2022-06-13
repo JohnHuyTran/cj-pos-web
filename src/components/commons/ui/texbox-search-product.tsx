@@ -43,6 +43,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear, requestBody }: Props) {
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
+        autoFocus={true}
         {...params}
         InputProps={{
           ...params.InputProps,
@@ -67,7 +68,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear, requestBody }: Props) {
   };
 
   const clearData = async () => {
-    setValue('');
+    // setValue('');
   };
 
   const clearInput = () => {};
