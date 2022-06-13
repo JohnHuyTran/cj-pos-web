@@ -28,12 +28,12 @@ import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-sl
 import CheckOrderDetail from '../check-orders/check-order-detail';
 import DCOrderDetail from '../dc-check-orders/dc-ckeck-order-detail';
 import { featchorderDetailDCAsync, setItemId } from '../../store/slices/dc-check-order-detail-slice';
-import StockTransferBT from '../stock-transfer/stock-transfer-bt';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
+import StockTransferBT from '../stock-transfer/branch-transfer/stock-transfer-bt';
 
 interface Props {
   refresh: boolean;
