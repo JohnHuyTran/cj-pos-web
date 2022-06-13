@@ -229,6 +229,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
+        data-testid='testid-tbxSearch'
         autoFocus={true}
         {...params}
         InputProps={{
@@ -368,6 +369,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
             </Box>
             <Box sx={{ flex: 7 }}>
               <Autocomplete
+                data-testid='autocomplete-search-branch-list'
                 id='selAddItem'
                 value={values}
                 fullWidth
@@ -389,6 +391,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
             <Box sx={{ flex: 1, ml: 2 }}>
               {handldCloseAddItemModal ? (
                 <IconButton
+                  data-testid='testid-btnClose'
                   aria-label='close'
                   onClick={handldCloseAddItemModal}
                   sx={{
@@ -424,7 +427,8 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
-              id='btnSearch'
+              data-testid='testid-btnAdd'
+              id='btnAdd'
               variant='contained'
               color='secondary'
               onClick={handleAddItems}
