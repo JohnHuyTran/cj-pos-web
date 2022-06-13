@@ -696,16 +696,20 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               }, 500);
             })
             .catch((error: ApiError) => {
+              const errorList = error.error_details;
+              const errList: any = [];
+              if (errorList.length !== 0) {
+                errorList.map((item: any) => {
+                  errList.push(`${item.skuCode} : ${item.productName}\n`);
+                });
+              }
+
               if (error.code === 40010) {
-                setShowSnackBar(true);
-                setSnackbarIsStatus(false);
-                setContentMsg(
-                  'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
-                );
+                setTextError(mappingErrorParam(error.message, { product: errList.toString() }));
+                setOpenAlert(true);
               } else {
-                setShowSnackBar(true);
-                setSnackbarIsStatus(false);
-                setContentMsg(error.message);
+                setTextError(error.message);
+                setOpenAlert(true);
               }
             });
         }
