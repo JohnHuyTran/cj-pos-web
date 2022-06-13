@@ -8,6 +8,7 @@ import {
   GridRenderCellParams,
   GridRowData,
   GridRowId,
+  GridValueGetterParams,
   useGridApiRef,
 } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
@@ -64,7 +65,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'stockMax',
+    field: 'orderMaxQty',
     headerName: 'จำนวนที่สั่งได้มากที่สุด',
     headerAlign: 'center',
     align: 'right',
@@ -72,7 +73,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'qty',
+    field: 'orderQty',
     headerName: 'จำนวนที่สาขาเบิก',
     minWidth: 135,
     headerAlign: 'center',
@@ -82,36 +83,42 @@ const columns: GridColDef[] = [
   },
 
   {
-    field: 'unitName2',
+    field: 'referenceQty',
     headerName: 'อ้างอิง (จำนวนที่คลังส่ง)',
     minWidth: 175,
     headerAlign: 'center',
+    align: 'right',
     disableColumnMenu: true,
     sortable: false,
   },
   {
-    field: 'unitName3',
+    field: 'actualQty',
     headerName: 'จำนวนรับจริง',
     minWidth: 115,
     headerAlign: 'center',
+    align: 'right',
     disableColumnMenu: true,
     sortable: false,
   },
   {
-    field: 'unitName4',
+    field: 'actualQtyDiff',
     headerName: 'ส่วนต่างการรับจริง',
     minWidth: 142,
     headerAlign: 'center',
+    align: 'right',
     disableColumnMenu: true,
     sortable: false,
+    renderCell: (params) => calActualQtyDiff(params),
   },
   {
-    field: 'unitName5',
+    field: 'orderQtyDiff',
     headerName: 'ส่วนต่างการเบิกสินค้า',
     minWidth: 158,
     headerAlign: 'center',
+    align: 'right',
     disableColumnMenu: true,
     sortable: false,
+    renderCell: (params) => calOrderQtyDiff(params),
   },
   {
     field: 'unitName',
@@ -122,7 +129,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'comment',
+    field: 'remark',
     headerName: 'หมายเหตุ',
     minWidth: 90,
     flex: 1,
@@ -130,16 +137,9 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => {
       return (
-        <HtmlTooltip
-          title={
-            <React.Fragment>
-              {/* {params.value} */}
-              xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            </React.Fragment>
-          }>
+        <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
           <Typography variant='body2' noWrap>
-            {/* {params.value} */}
-            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            {params.value}
           </Typography>
         </HtmlTooltip>
       );
@@ -147,10 +147,20 @@ const columns: GridColDef[] = [
   },
 ];
 
-const chkQty = (value: any) => {
-  let v = String(value);
-  if (v.substring(1) === '0') return Number(v.substring(0, 1));
-  return value;
+var calActualQtyDiff = function (params: GridValueGetterParams) {
+  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'referenceQty'));
+
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  return diff;
+};
+
+var calOrderQtyDiff = function (params: GridValueGetterParams) {
+  let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'orderQty'));
+
+  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
+  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  return diff;
 };
 
 function useApiRef() {
@@ -180,21 +190,29 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
   let rows: any = [];
   const [pageSize, setPageSize] = React.useState<number>(10);
 
-  const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  if (Object.keys(payloadAddItem).length !== 0) {
-    rows = payloadAddItem.map((item: any, index: number) => {
-      return {
-        id: index,
-        index: index + 1,
-        skuCode: item.skuCode,
-        barcode: item.barcode,
-        barcodeName: item.barcodeName,
-        qty: item.qty ? item.qty : 1,
-        stockMax: item.stockMax,
-        unitName: item.unitName,
-        editMode: isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE),
-      };
-    });
+  // const payloadAddItem = useAppSelector((state) => state.addItems.state);
+
+  const purchaseBRDetail = useAppSelector((state) => state.purchaseBRDetailSlice.purchaseBRDetail.data);
+  if (purchaseBRDetail) {
+    if (purchaseBRDetail.items.length > 0) {
+      rows = purchaseBRDetail.items.map((item: any, index: number) => {
+        console.log('');
+
+        return {
+          id: index,
+          index: index + 1,
+          skuCode: item.skuCode,
+          barcode: item.barcode,
+          barcodeName: item.barcodeName,
+          orderQty: item.orderQty ? item.orderQty : 0,
+          orderMaxQty: item.orderMaxQty ? item.orderMaxQty : 0,
+          unitName: item.unitName,
+          referenceQty: item.referenceQty ? item.referenceQty : 0,
+          actualQty: item.actualQty ? item.actualQty : 0,
+          remark: item.remark ? item.remark : '-',
+        };
+      });
+    }
   }
 
   const { apiRef, columns } = useApiRef();

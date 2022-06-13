@@ -16,7 +16,7 @@ import ModalAddItems from '../../commons/ui/modal-add-items';
 import { getBranchName } from '../../../utils/utils';
 import { getUserInfo } from '../../../store/sessionStore';
 import { PurchaseBRRequest } from '../../../models/purchase-branch-request-model';
-import { deletePurchaseBR, savePurchaseBR } from '../../../services/purchase';
+import { deletePurchaseBR, savePurchaseBR, sendPurchaseBR } from '../../../services/purchase';
 import { ApiError } from '../../../models/api-error-model';
 import { updateAddItemsState } from '../../../store/slices/add-items-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
@@ -71,7 +71,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const [flagSave, setFlagSave] = React.useState(false);
   const handleChkSaveClose = async () => {
-    if (flagSave) {
+    if (status === 'DRAFT' && flagSave) {
       setConfirmModelExit(true);
     } else {
       handleClose();
@@ -100,10 +100,10 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
-  const [displayBtnSubmit, setDisplayBtnSubmit] = React.useState(false);
-  const [displayBtnSave, setDisplayBtnSave] = React.useState(false);
-  const [displayBtnDelete, setDisplayBtnDelete] = React.useState(false);
-  const [displayAddItems, setDisplayAddItems] = React.useState(false);
+  const [displayBtnSubmit, setDisplayBtnSubmit] = React.useState(true);
+  const [displayBtnSave, setDisplayBtnSave] = React.useState(true);
+  const [displayBtnDelete, setDisplayBtnDelete] = React.useState(true);
+  const [displayAddItems, setDisplayAddItems] = React.useState(true);
 
   useEffect(() => {
     if (status !== 'DRAFT' && isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE)) {
@@ -111,10 +111,6 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     } else {
       setDisplayBtnDelete(false);
     }
-    setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-    setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-    // setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-    setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
 
     if (purchaseBRDetail) {
       setDocNo(purchaseBRDetail.docNo);
@@ -122,6 +118,15 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       handleStatusStepper(purchaseBRDetail.status);
       setRemark(purchaseBRDetail.remark);
       setCreateDate(new Date(purchaseBRDetail.createdDate));
+
+      if (purchaseBRDetail.status === 'DRAFT') {
+        setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+        setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+        // setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+        setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      } else {
+        setDisplayBtnDelete(!isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      }
 
       const strBranchName = getBranchName(branchList, purchaseBRDetail.branchCode);
       setBranchName(strBranchName ? `${purchaseBRDetail.branchCode}-${strBranchName}` : getUserInfo().branch);
@@ -148,6 +153,11 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       const strBranchName = getBranchName(branchList, getUserInfo().branch);
       setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
       handleStatusStepper('DRAFT');
+
+      setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      // setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
     }
   }, [branchList]);
 
@@ -305,6 +315,63 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenLoadingModal(false);
   };
 
+  const payloadSearch = useAppSelector((state) => state.saveSearchPurchaseBranchRequest.searchPurchaseBranchRequest);
+  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
+  const handleCloseModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+  const handleConfirm = async () => {
+    setOpenModelConfirm(false);
+
+    handleSendBR();
+  };
+
+  const handleBtnSendBR = async () => {
+    if (flagSave) {
+      const payloadSave: any = await handleMapPayloadSave();
+      await savePurchaseBR(payloadSave)
+        .then((value) => {
+          setFlagSave(false);
+          setDocNo(value.docNo);
+          setStatus('DRAFT');
+
+          setTextHeaderConfirm('ยืนยันส่งรายการ เบิกของใช้หน้าร้าน');
+          setOpenModelConfirm(true);
+        })
+        .catch((error: ApiError) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(false);
+          setContentMsg(error.message);
+        });
+    } else {
+      setTextHeaderConfirm('ยืนยันส่งรายการ เบิกของใช้หน้าร้าน');
+      setOpenModelConfirm(true);
+    }
+  };
+  const handleSendBR = async () => {
+    setOpenLoadingModal(true);
+    await sendPurchaseBR(docNo)
+      .then((value) => {
+        setFlagSave(false);
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้ส่งรายการเรียบร้อยแล้ว');
+
+        dispatch(featchSearchPurchaseBranchRequestAsync(payloadSearch));
+
+        setTimeout(() => {
+          handleClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(false);
+        setContentMsg(error.message);
+      });
+    setOpenLoadingModal(false);
+  };
+
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
@@ -325,15 +392,22 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             <Grid item xs={2}>
               เลขที่เอกสาร BR :
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               {docNo !== '' && docNo}
               {docNo === '' && '-'}
             </Grid>
             <Grid item xs={2}>
               วันที่สร้างรายการ :
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               {moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
+            </Grid>
+
+            <Grid item xs={2}>
+              {status !== 'DRAFT' && 'เลขที่เอกสาร PO :'}
+            </Grid>
+            <Grid item xs={2}>
+              {status !== 'DRAFT' && purchaseBRDetail?.poNo}
             </Grid>
           </Grid>
 
@@ -341,15 +415,22 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             <Grid item xs={2}>
               สาขาที่สร้างรายการ :
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               {branchName}
             </Grid>
             <Grid item xs={2}>
               สถานะ :
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               {status !== '' && t(`status.${status}`)}
               {status === '' && '-'}
+            </Grid>
+
+            <Grid item xs={2}>
+              {status !== 'DRAFT' && 'เลขที่เอกสาร DO :'}
+            </Grid>
+            <Grid item xs={2}>
+              {status !== 'DRAFT' && purchaseBRDetail?.doNo}
             </Grid>
           </Grid>
 
@@ -382,13 +463,12 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Button
                   id='btnClear'
                   variant='contained'
-                  // onClick={onClickSubmitBtn}
+                  onClick={handleBtnSendBR}
                   sx={{ width: 120, ml: 2, display: `${displayBtnSubmit ? 'none' : ''}` }}
                   className={classes.MbtnClear}
                   startIcon={<CheckCircle />}
                   color='primary'
-                  // disabled={Object.keys(payloadAddItem).length === 0}
-                  disabled={true}>
+                  disabled={Object.keys(payloadAddItem).length === 0}>
                   ส่งรายการ
                 </Button>
                 <Button
@@ -440,6 +520,14 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             onClose={handleCloseModalConfirm}
             onConfirm={handleDeletePurchaseBR}
             headerTitle={'ยืนยันยกเลิกสั่งสินค้าสาขา'}
+            docNo={docNo}
+          />
+
+          <ModelConfirm
+            open={openModelConfirm}
+            onClose={handleCloseModelConfirm}
+            onConfirm={handleConfirm}
+            headerTitle={textHeaderConfirm}
             docNo={docNo}
           />
 
