@@ -168,7 +168,7 @@ export default function NotificationTask(props: Props) {
         }
       } else if (
         item.type == 'EVENT_STOCK_REQUEST_REJECTED' ||
-        item.type == 'STOCK_REQUEST_WAIT_FOR_APPROVAL_2' ||
+        item.type == 'EVENT_REQUEST_UPDATE_RT_DOC' ||
         item.type == 'SUBMIT_BRANCH_TRANSFER_REQUEST'
       ) {
         await dispatch(updateAddItemsState({}));
@@ -288,13 +288,15 @@ export default function NotificationTask(props: Props) {
           backgroundColor: '#E7FFE9',
         });
         break;
-      case 'STOCK_REQUEST_WAIT_FOR_APPROVAL_2':
+      case 'EVENT_REQUEST_UPDATE_RT_DOC':
         content = 'สร้างแผนโอนสินค้าระหว่างสาขา';
         branchCode = item.payload.branchFrom;
-        statusDisplay = genStatusValue('รออนุมัติ2', {
-          color: '#36C690',
-          backgroundColor: '#E7FFE9',
-        });
+        if (item.payload.status == 'WAIT_FOR_APPROVAL_2') {
+          statusDisplay = genStatusValue('รออนุมัติ2', {
+            color: '#36C690',
+            backgroundColor: '#E7FFE9',
+          });
+        }
         break;
       case 'EVENT_STOCK_REQUEST_REJECTED':
         content = 'สร้างแผนโอนสินค้าระหว่างสาขา';
@@ -341,8 +343,7 @@ export default function NotificationTask(props: Props) {
           backgroundColor: item.read ? 'transparent' : '#F6FFF3',
           fontSize: '12px',
         }}
-        onClick={() => currentlySelected(item)}
-      >
+        onClick={() => currentlySelected(item)}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           {item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
@@ -363,16 +364,14 @@ export default function NotificationTask(props: Props) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               width: '80%',
-            }}
-          >
+            }}>
             <span style={{ color: theme.palette.primary.main }}>{content}: </span>
             <HtmlTooltip
               title={
                 <React.Fragment>
                   {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
                 </React.Fragment>
-              }
-            >
+              }>
               <span style={{ marginLeft: 5 }}>
                 {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
               </span>
@@ -397,10 +396,9 @@ export default function NotificationTask(props: Props) {
           border: '1px solid #E0E0E0',
           borderRadius: '10px',
           minWidth: '600px',
-        }}
-      >
+        }}>
         <TablePagination
-          component="div"
+          component='div'
           count={total}
           page={page}
           onPageChange={handleChangePage}
