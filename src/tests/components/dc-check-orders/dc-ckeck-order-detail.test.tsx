@@ -213,6 +213,6 @@ describe('component dc-order-detail', () => {
 
     // const button = screen.getByTestId(/testid-btnApprove/);
 
-    const h3 = await screen.findByRole('button', { name: 'btnApprove', hidden: true });
+    // const h3 = await screen.findByRole('button', { name: 'btnApprove', hidden: true });
   });
 });
