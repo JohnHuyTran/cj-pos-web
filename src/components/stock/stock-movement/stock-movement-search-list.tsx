@@ -570,11 +570,7 @@ function StockMovementSearchList() {
       )}
 
       {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_IN_SRC_BT && (
-        <DCOrderDetail
-          idDC={'628f52227c80c16fbe7dc536'}
-          isOpen={openModalDocDetail}
-          onClickClose={handleCloseModalDocDetail}
-        />
+        <DCOrderDetail idDC={docRefNo} isOpen={openModalDocDetail} onClickClose={handleCloseModalDocDetail} />
       )}
 
       {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.BRANCH_TRANSFER_OUT && (
