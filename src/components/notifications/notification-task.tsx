@@ -292,7 +292,12 @@ export default function NotificationTask(props: Props) {
       case 'EVENT_REQUEST_UPDATE_RT_DOC':
         content = 'สร้างแผนโอนสินค้าระหว่างสาขา';
         branchCode = item.payload.branchFrom;
-        if (item.payload.status == 'WAIT_FOR_APPROVAL_2') {
+        if (item.payload.status == 'WAIT_FOR_APPROVAL_1') {
+          statusDisplay = genStatusValue('รออนุมัติ1', {
+            color: '#36C690',
+            backgroundColor: '#E7FFE9',
+          });
+        } else if (item.payload.status == 'WAIT_FOR_APPROVAL_2') {
           statusDisplay = genStatusValue('รออนุมัติ2', {
             color: '#36C690',
             backgroundColor: '#E7FFE9',
