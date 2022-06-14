@@ -37,23 +37,24 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   return (
     <DialogTitle sx={{ m: 1, p: 2 }} {...other}>
       {children}
-      {onClose ? (
-        <IconButton
-          aria-label='close'
-          onClick={onClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: (theme: any) => theme.palette.grey[400],
-          }}>
-          <HighlightOff fontSize='large' />
-        </IconButton>
-      ) : null}
+
+      <IconButton
+        aria-label='close'
+        onClick={onClose}
+        sx={{
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          color: (theme: any) => theme.palette.grey[400],
+        }}>
+        <HighlightOff fontSize='large' />
+      </IconButton>
+
       {onPrint ? (
         <div>
           {status !== 0 && (
             <Button
+              data-testid='testid-btnPrint'
               id='btnPrint'
               variant='contained'
               color='secondary'
@@ -169,7 +170,7 @@ export default function ModalShowPDF({
           }}>
           {/* <div id="placeholderWrapper" style={{ height: "3000vh" }} /> */}
           {statusFile === 1 && (
-            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper} data-testid='testid-pdfWrapper-document'>
               <Document
                 file={{
                   url: url,
@@ -213,7 +214,7 @@ export default function ModalShowPDF({
           )} */}
           {/* file Base64 */}
           {statusFile === 2 && (
-            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
+            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper} data-testid='testid-pdfWrapper-document'>
               <Document
                 file={`data:application/pdf;base64,${url}`}
                 onLoadSuccess={onDocumentLoadSuccess}

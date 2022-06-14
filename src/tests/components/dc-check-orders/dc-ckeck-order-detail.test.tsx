@@ -13,7 +13,7 @@ import {
   mockDataDcCheckOrderDetailIsLDAndStatusChecked,
   mockDataDcCheckOrderDetailIsLDAndStatusWaitCheck,
   mockDataDcCheckOrderDetailReasonIsEmpty,
-} from '../../mock-store-dc-check-order';
+} from '../../mockdata-store/mock-store-dc-check-order';
 import userEvent from '@testing-library/user-event';
 
 const middlewares = [thunk];

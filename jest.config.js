@@ -42,6 +42,7 @@ module.exports = {
     'src/components/commons/ui/*.tsx',
     'src/components/barcode-discount/*.tsx',
     'src/components/dc-check-orders/*.tsx',
+    'src/components/stock/stock-movement/*.tsx',
   ],
   // coverageDirectory: '<rootDir>/src/tests/coverage/',
   collectCoverage: true,
