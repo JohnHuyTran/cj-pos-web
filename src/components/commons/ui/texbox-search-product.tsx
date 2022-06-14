@@ -43,6 +43,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear, requestBody }: Props) {
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
+        data-testid='textfiled-search'
         autoFocus={true}
         {...params}
         InputProps={{
@@ -106,6 +107,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear, requestBody }: Props) {
 
   return (
     <Autocomplete
+      data-testid='autocomplete-search'
       id='selAddItem'
       popupIcon={<SearchIcon color='primary' />}
       value={value}
