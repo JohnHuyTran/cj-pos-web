@@ -290,6 +290,7 @@ function StockMovementSearch() {
           <Grid item xs={4}></Grid>
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
             <Button
+              data-testid='testid-btnClear'
               id='btnClear'
               variant='contained'
               onClick={onClickClearBtn}
@@ -299,6 +300,7 @@ function StockMovementSearch() {
               เคลียร์
             </Button>
             <Button
+              data-testid='testid-btnSearch'
               id='btnSearch'
               variant='contained'
               color='primary'

@@ -1,4 +1,14 @@
-import { render, screen, waitFor, fireEvent, RenderResult, getByTestId, within, wait } from '@testing-library/react';
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  RenderResult,
+  getByTestId,
+  within,
+  wait,
+  act,
+} from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { Store, AnyAction } from '@reduxjs/toolkit';
@@ -52,17 +62,28 @@ describe('component textbox-search-product', () => {
 
   it('onchange value', async () => {
     const autocomplete = screen.getByTestId(/autocomplete-search/);
-    const input = within(autocomplete).getByRole('textbox') as HTMLInputElement;
+    const input = within(autocomplete).getByTestId('textfiled-search').querySelector('input') as HTMLInputElement;
+    autocomplete.click();
     autocomplete.focus();
-
-    // fireEvent.change(input, { target: { value: '0239' } });
-
+    fireEvent.change(input, { target: { value: '12PLUS' } });
     // navigate to the first item in the autocomplete box
-    fireEvent.keyDown(autocomplete, { key: 'ArrowDown' });
     fireEvent.keyDown(autocomplete, { key: 'ArrowDown' });
     // select the first item
     fireEvent.keyDown(autocomplete, { key: 'Enter' });
-    // check the new value of the input field
-    expect(input.value).toEqual('B004-CJค้าส่งบ้านเลือก');
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(input.value).toEqual('12PLUS');
+    // expect(handleOnSelectItem).toHaveBeenCalledTimes(1);
+  });
+
+  it('clear search data', () => {
+    wrapper = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <TextBoxSearchProduct onSelectItem={handleOnSelectItem} isClear={true} requestBody={{}} />
+        </ThemeProvider>
+      </Provider>
+    );
   });
 });
