@@ -5,7 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import { Box, Button, DialogTitle, Grid, IconButton } from '@mui/material';
-import { AddCircleOutlineOutlined, Cancel, CheckCircle, HighlightOff, Save } from '@mui/icons-material';
+import { AddCircleOutlineOutlined, Cancel, CheckCircle, ContentCopy, HighlightOff, Save } from '@mui/icons-material';
 import Steppers from '../../commons/ui/steppers';
 import moment from 'moment';
 import { useStyles } from '../../../styles/makeTheme';
@@ -27,7 +27,13 @@ import { ACTIONS } from '../../../utils/enum/permission-enum';
 import { isAllowActionPermission } from '../../../utils/role-permission';
 import ConfirmModelExit from '../../commons/ui/confirm-exit-model';
 import { featchSearchPurchaseBranchRequestAsync } from '../../../store/slices/purchase-branch-request-slice';
-import { featchPurchaseBRDetailAsync } from '../../../store/slices/purchase/purchase-branch-request-detail-slice';
+import {
+  clearDataPurchaseBRDetail,
+  featchPurchaseBRDetailAsync,
+} from '../../../store/slices/purchase/purchase-branch-request-detail-slice';
+import { getProductBySKUCodes } from '../../../services/product-master';
+
+import ModalPurchaseBranchCopy from './purchase-branch-detail';
 
 interface Props {
   isOpen: boolean;
@@ -104,13 +110,14 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [displayBtnSave, setDisplayBtnSave] = React.useState(true);
   const [displayBtnDelete, setDisplayBtnDelete] = React.useState(true);
   const [displayAddItems, setDisplayAddItems] = React.useState(true);
+  const [displayCopyItems, setDisplayCopyItems] = React.useState(true);
 
   useEffect(() => {
-    if (status !== 'DRAFT' && isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE)) {
-      setDisplayBtnDelete(true);
-    } else {
-      setDisplayBtnDelete(false);
-    }
+    // if (status !== 'DRAFT' && isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE)) {
+    //   setDisplayBtnDelete(true);
+    // } else {
+    //   setDisplayBtnDelete(false);
+    // }
 
     if (purchaseBRDetail) {
       setDocNo(purchaseBRDetail.docNo);
@@ -122,10 +129,10 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       if (purchaseBRDetail.status === 'DRAFT') {
         setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
         setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-        // setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+        setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
         setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-      } else {
-        setDisplayBtnDelete(!isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      } else if (purchaseBRDetail.status === 'DC_NO_STOCK') {
+        setDisplayCopyItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
       }
 
       const strBranchName = getBranchName(branchList, purchaseBRDetail.branchCode);
@@ -379,6 +386,32 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     setShowSnackBar(false);
   };
 
+  const [openCopyModal, setOpenCopyModal] = React.useState(false);
+  const handleOpenCopyModal = () => {
+    setOpenCopyModal(true);
+  };
+  const handleCloseCopyModal = () => {
+    handleClose();
+    setOpenCopyModal(false);
+  };
+  const handleOpenCopyItems = async () => {
+    await dispatch(clearDataPurchaseBRDetail());
+
+    console.log('handleOpenCopyItems ---');
+    console.log('payloadAddItem:', JSON.stringify(payloadAddItem));
+
+    handleOpenCopyModal();
+
+    // const SKUCodes: any = ['000000030002078008', '000000030002078007'];
+    // await getProductBySKUCodes(SKUCodes)
+    //   .then((value) => {
+    //     console.log('value:', JSON.stringify(value));
+    //   })
+    //   .catch((error: ApiError) => {
+    //     console.log('value:', JSON.stringify(error));
+    //   });
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -438,7 +471,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             <Grid container spacing={2} mt={4} mb={2}>
               <Grid item xs={5}>
                 <Button
-                  id='btnCreateStockTransferModal'
+                  id='btnAddItems'
                   variant='contained'
                   onClick={handleOpenAddItems}
                   sx={{ width: 120, display: `${displayAddItems ? 'none' : ''}` }}
@@ -450,7 +483,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
               <Grid item xs={7} sx={{ textAlign: 'end' }}>
                 <Button
-                  id='btnCreateStockTransferModal'
+                  id='btnSave'
                   variant='contained'
                   onClick={handleSaveBR}
                   sx={{ width: 120, display: `${displayBtnSave ? 'none' : ''}` }}
@@ -481,6 +514,17 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   color='error'
                   disabled={Object.keys(payloadAddItem).length === 0}>
                   ยกเลิก
+                </Button>
+
+                <Button
+                  id='btnCopyItems'
+                  variant='contained'
+                  onClick={handleOpenCopyItems}
+                  sx={{ width: 120, display: `${displayCopyItems ? 'none' : ''}` }}
+                  className={classes.MbtnAdd}
+                  startIcon={<ContentCopy />}
+                  color='secondary'>
+                  คัดลอก
                 </Button>
               </Grid>
             </Grid>
@@ -545,6 +589,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
           />
         </DialogContent>
       </Dialog>
+
+      {openCopyModal && <ModalPurchaseBranchCopy isOpen={openCopyModal} onClickClose={handleCloseCopyModal} />}
     </div>
   );
 }

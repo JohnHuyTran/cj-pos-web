@@ -24,3 +24,11 @@ export async function getProductByType(payload: any) {
     throw error;
   }
 }
+
+export async function getProductBySKUCodes(codes: any) {
+  try {
+    return await get(`${environment.products.type.productBySKUCodes.url}?codes=${codes}`);
+  } catch (error) {
+    throw error;
+  }
+}

@@ -260,6 +260,9 @@ export const environment = {
       productByType: {
         url: '/products/barcode/type',
       },
+      productBySKUCodes: {
+        url: '/products/sk-by-codes',
+      },
     },
     addItem: {
       allitemsList: {
