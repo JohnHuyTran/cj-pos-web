@@ -213,11 +213,10 @@ export const ModalBarcodeDetail = ({ open, onClose, dataDetail }: Props) => {
                 </FormControl>
               </Grid>
               <Grid item xs={3} pl={2}>
+                <Checkbox checked={dataDetail.isAllowBuy} disabled />
                 อนุญาต ซื้อ
               </Grid>
-              <Grid item xs={2} sx={{ textAlign: 'right' }} mt={-1}>
-                <Checkbox checked={dataDetail.isAllowBuy} disabled />
-              </Grid>
+              <Grid item xs={2} sx={{ textAlign: 'right' }} mt={-1}></Grid>
             </Grid>
             {/*line h*/}
             <Grid item container mb={1}>
@@ -238,11 +237,10 @@ export const ModalBarcodeDetail = ({ open, onClose, dataDetail }: Props) => {
                 />
               </Grid>
               <Grid item xs={3} pl={2}>
+                <Checkbox checked={dataDetail.isAllowSale} disabled />
                 อนุญาต ขาย
               </Grid>
-              <Grid item xs={2} sx={{ textAlign: 'right' }} mt={-1}>
-                <Checkbox checked={dataDetail.isAllowSale} disabled />
-              </Grid>
+              <Grid item xs={2} sx={{ textAlign: 'right' }} mt={-1}></Grid>
             </Grid>
             {/*line i*/}
             <Grid item container mb={1}>
@@ -263,11 +261,10 @@ export const ModalBarcodeDetail = ({ open, onClose, dataDetail }: Props) => {
                 />
               </Grid>
               <Grid item xs={3} pl={2}>
+                <Checkbox checked={dataDetail.isAllowOrder} disabled />
                 อนุญาต สั่ง
               </Grid>
-              <Grid item xs={2} sx={{ textAlign: 'right' }} mt={-1}>
-                <Checkbox checked={dataDetail.isAllowOrder} disabled />
-              </Grid>
+              <Grid item xs={2} sx={{ textAlign: 'right' }} mt={-1}></Grid>
             </Grid>
             {/*line j*/}
             <Grid item container mb={1}>

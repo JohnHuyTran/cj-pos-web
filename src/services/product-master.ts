@@ -1,9 +1,11 @@
 import { get, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 
-export async function getProductMaster(query: string) {
+export async function getProductMaster(query: string, branchCode: string) {
   try {
-    const response = await get(`${environment.products.sku.productMaster.search.url}?query=${query}`);
+    const response = await get(
+      `${environment.products.sku.productMaster.search.url}?query=${query}&branchCode=${branchCode}`
+    );
     // const response = await get('http://192.168.110.135:8000/sku/product-master?query=000000000020006559');
     return response;
   } catch (error) {

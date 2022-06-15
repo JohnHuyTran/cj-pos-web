@@ -226,7 +226,7 @@ export default function NotificationReminder(props: Props) {
         }}
         onClick={() => currentlySelected(item)}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type == 'REJECT_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
           ) : (
@@ -235,7 +235,7 @@ export default function NotificationReminder(props: Props) {
           <Box
             sx={{
               mt: 1,
-              ml: 1,
+              ml: 3,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',

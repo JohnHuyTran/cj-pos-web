@@ -51,4 +51,5 @@ export enum TO_TYPE {
   TO_WITHOUT_DISCOUNT = 2,
   TO_WITH_DISCOUNT = 3,
   TO_RAW_MATERIAL = 4,
+  TO_DEFECT = 5,
 }

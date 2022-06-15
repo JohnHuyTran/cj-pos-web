@@ -27,7 +27,7 @@ export default function ProductListItems({ listData }: Props): ReactElement {
           index: index + 1,
           barcode: item.barcode,
           skuCode: item.skuCode,
-          unitFactor: item.unitFactor,
+          unitName: item.unitName,
           barcodeName: item.barcodeName,
           barFactor: item.barFactor,
           retailPriceTier1: item.retailPriceTier1,
@@ -84,7 +84,7 @@ export default function ProductListItems({ listData }: Props): ReactElement {
       },
     },
     {
-      field: 'unitFactor',
+      field: 'unitName',
       headerName: 'หน่วย',
       flex: 1,
       align: 'left',

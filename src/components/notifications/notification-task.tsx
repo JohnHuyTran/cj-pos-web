@@ -343,7 +343,7 @@ export default function NotificationTask(props: Props) {
         }}
         onClick={() => currentlySelected(item)}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
           ) : item.type === 'APPROVE_TRANSFER_OUT' || item.type === 'SEND_TO_FOR_APPROVAL' ? (
@@ -358,7 +358,7 @@ export default function NotificationTask(props: Props) {
           <Box
             sx={{
               mt: 1,
-              ml: 1,
+              ml: 3,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
