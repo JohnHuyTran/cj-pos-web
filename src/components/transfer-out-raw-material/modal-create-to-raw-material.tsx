@@ -478,8 +478,6 @@ export default function ModalCreateToRawMaterial({
         onClose={handleCloseModelAddItems}
         requestBody={{
           skuCodes: [],
-          skuTypes: [2],
-          isSellable: true,
           skuCoffeeTypes: [1]
         }}
       />
