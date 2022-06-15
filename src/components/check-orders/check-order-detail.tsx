@@ -428,8 +428,10 @@ export default function CheckOrderDetail({
       let sumActualQtyItems: number = 0;
       let sumQuantityRefItems: number = 0;
       // rowsEdit.forEach((data: GridRowData) => {
+
       payloadAddItem.forEach((data: any) => {
-        let diffCount: number = Number(data.actualQty) - Number(data.qtyRef);
+        let qtyRef = data.qty ? data.qty : data.qtyRef;
+        let diffCount: number = Number(data.actualQty) - Number(qtyRef);
         sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
         sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
 
@@ -451,7 +453,7 @@ export default function CheckOrderDetail({
           qtyAll: 0,
           qtyAllBefore: 0,
           qtyDiff: diffCount,
-          qtyRef: data.qtyRef,
+          qtyRef: data.qtyRef ? data.qtyRef : data.qty,
           price: 0,
           isControlStock: 0,
           toteCode: '',

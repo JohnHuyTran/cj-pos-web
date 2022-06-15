@@ -44,14 +44,32 @@ jest.mock('react-i18next', () => ({
   },
 }));
 describe('component modal-add-items', () => {
-  // it('find text autocomplete', () => {
-  //   expect(screen.getByTestId('testid-selAddItem')).toBeInTheDocument();
-  // });
-  // it('find  testid-tbxSearch', () => {
-  //   expect(screen.getByTestId('testid-tbxSearch')).toBeInTheDocument();
-  // });
+  // it('find componet and placeholder', async () => {
+  //   let rendered: ReturnType<typeof render>;
 
-  // it('find place holder', () => {
+  //   await act(() => {
+  //     rendered = render(
+  //       <Provider store={store}>
+  //         <ThemeProvider theme={theme}>
+  //           <ModalAddItems
+  //             open={true}
+  //             onClose={handleOnClose}
+  //             requestBody={{
+  //               skuCodes: undefined,
+  //               skuTypes: undefined,
+  //               isOrderable: undefined,
+  //               isSellable: undefined,
+  //               productTypeCodes: undefined,
+  //               isControlStock: undefined,
+  //             }}
+  //           />
+  //         </ThemeProvider>
+  //       </Provider>
+  //     );
+  //   });
+  //   expect(screen.getByTestId('autocomplete-search-branch-list')).toBeInTheDocument();
+  //   expect(screen.getByTestId('testid-tbxSearch')).toBeInTheDocument();
+  //   expect(screen.getByTestId('testid-btnAdd')).toBeInTheDocument();
   //   expect(screen.getByPlaceholderText('บาร์โค้ด/รายละเอียดสินค้า')).toBeInTheDocument();
   // });
 
@@ -77,48 +95,55 @@ describe('component modal-add-items', () => {
   // });
 
   it('onselect items', async () => {
-    let rendered: ReturnType<typeof render>;
+    store = await mockStore(initialState);
+    const { debug, getAllByRole } = await render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <ModalAddItems
+            open={true}
+            onClose={handleOnClose}
+            requestBody={{
+              skuCodes: ['000000000020039124'],
+              isSellable: true,
+              isControlStock: true,
+            }}
+          />
+        </ThemeProvider>
+      </Provider>
+    );
+    // preview.debug();
+    const autocomplete = screen.getByTestId('autocomplete-search-branch-list');
+    const input = within(autocomplete).getByRole('textbox') as HTMLInputElement;
+    autocomplete.focus();
+    input.focus();
+    // await fireEvent.keyDown(autocomplete, { key: '1' });
+    // jest.setTimeout(5000);
+    // await fireEvent.keyDown(autocomplete, { key: '8' });
+    // jest.setTimeout(5000);
+    // await fireEvent.keyDown(autocomplete, { key: '8' });
+    // jest.setTimeout(5000);
+    // await fireEvent.keyDown(autocomplete, { key: '5' });
+    // jest.setTimeout(5000);
+    // await fireEvent.keyDown(autocomplete, { key: '1' });
+    // jest.setTimeout(5000);
+    // await fireEvent.keyDown(autocomplete, { key: '1' });
+    // jest.setTimeout(5000);
+    // await fireEvent.keyDown(autocomplete, { key: 'ArrowDown' });
+    // jest.setTimeout(5000);
+    // // await fireEvent.keyDown(autocomplete, { key: 'ArrowDown' });
+    // jest.setTimeout(5000);
+    // fireEvent.keyDown(autocomplete, { key: 'Enter' });
+    // jest.setTimeout(5000);
 
-    await act(() => {
-      rendered = render(
-        <Provider store={store}>
-          <ThemeProvider theme={theme}>
-            <ModalAddItems
-              open={true}
-              onClose={handleOnClose}
-              requestBody={{
-                skuCodes: undefined,
-                skuTypes: undefined,
-                isOrderable: undefined,
-                isSellable: undefined,
-                productTypeCodes: undefined,
-                isControlStock: undefined,
-              }}
-            />
-          </ThemeProvider>
-        </Provider>
-      );
-    });
-
-    const autocomplete = await screen.getByPlaceholderText('บาร์โค้ด/รายละเอียดสินค้า');
-
-    fireEvent.mouseDown(autocomplete);
-    console.debug('body: ', document.body);
-    // const { getByText: getByBodyText } = within(document.body);
-    // const option = getByBodyText('BuBuBu');
-    // expect(option).toBeInTheDocument();
-    // fireEvent.click(option as HTMLElement);
-
-    // expect(autocomplete).toHaveProperty('value', 'BuBuBu');
+    // expect(input.value).toEqual('12PLUSบอดี้&แฮร์เพอร์ฟูมลอนดอนแพร์25ml Carton');
+    expect(screen.queryByText('12PLUSบอดี้&แฮร์เพอร์ฟูมลอนดอนแพร์25ml Carton')).toBeNull();
   });
 
-  //   it('on close modal', () => {
-  //     fireEvent.click(screen.getByTestId('testid-btnClose'));
-  //     expect(handleOnClose).toHaveBeenCalledTimes(1);
-  //   });
+  // it('on close modal', async () => {
+  //   let rendered: ReturnType<typeof render>;
 
-  //   it('on add item modal', async () => {
-  //     const { container } = await render(
+  //   await act(() => {
+  //     rendered = render(
   //       <Provider store={store}>
   //         <ThemeProvider theme={theme}>
   //           <ModalAddItems
@@ -136,9 +161,37 @@ describe('component modal-add-items', () => {
   //         </ThemeProvider>
   //       </Provider>
   //     );
-  //     setTimeout(() => {
-  //       fireEvent.click(screen.getByTestId('testid-btnAdd'));
-  //       expect(handleOnClose).toHaveBeenCalledTimes(1);
-  //     }, 1000);
   //   });
+  //   fireEvent.click(screen.getByTestId('testid-btnClose'));
+  //   expect(handleOnClose).toHaveBeenCalledTimes(1);
+  // });
+
+  // it('on add item modal', async () => {
+  //   let rendered: ReturnType<typeof render>;
+
+  //   await act(() => {
+  //     rendered = render(
+  //       <Provider store={store}>
+  //         <ThemeProvider theme={theme}>
+  //           <ModalAddItems
+  //             open={true}
+  //             onClose={handleOnClose}
+  //             requestBody={{
+  //               skuCodes: undefined,
+  //               skuTypes: undefined,
+  //               isOrderable: undefined,
+  //               isSellable: undefined,
+  //               productTypeCodes: undefined,
+  //               isControlStock: undefined,
+  //             }}
+  //           />
+  //         </ThemeProvider>
+  //       </Provider>
+  //     );
+  //   });
+  //   // setTimeout(() => {
+  //   fireEvent.click(screen.getByTestId('testid-btnAdd'));
+  //   expect(handleOnClose).toHaveBeenCalledTimes(1);
+  //   // }, 1000);
+  // });
 });

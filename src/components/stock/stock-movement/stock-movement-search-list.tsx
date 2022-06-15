@@ -4,15 +4,9 @@ import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from '@mui
 import { Button } from '@mui/material';
 import { MoreVertOutlined } from '@mui/icons-material';
 
-import store, { useAppSelector, useAppDispatch } from '../../../store/store';
+import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import {
-  Barcode,
-  OutstandingRequest,
-  StockInfo,
-  StockMomentInfoType,
-  StockMovementMasterInfo,
-} from '../../../models/stock-model';
+import { Barcode, OutstandingRequest, StockMomentInfoType, StockMovementMasterInfo } from '../../../models/stock-model';
 import {
   featchStockMovementeSearchAsync,
   savePayloadSearch,
@@ -27,7 +21,6 @@ import AlertError from '../../commons/ui/alert-error';
 import { isErrorCode } from '../../../utils/exception/pos-exception';
 import LoadingModal from '../../commons/ui/loading-modal';
 import SupplierOrderReturn from '../../supplier-check-order/supplier-order-return';
-import CheckOrderDetailSD from '../../check-orders/check-order-detail-sd';
 import ModalCreateTransferOut from '../../transfer-out/modal-create-transfer-out';
 import ModalCreateTransferOutDestroy from '../../transfer-out-destroy/modal-create-transfer-out-destroy';
 import { Action } from '../../../utils/enum/common-enum';
@@ -108,7 +101,7 @@ function StockMovementSearchList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -128,9 +121,8 @@ function StockMovementSearchList() {
           <div
             style={{
               textAlign: 'center',
-            }}
-          >
-            <Typography variant="body2" noWrap>
+            }}>
+            <Typography variant='body2' noWrap>
               {`${moment(date).add(543, 'year').format('DD/MM/YYYY')} ${moment(date).format('HH:mm ')}`}
             </Typography>
           </div>
@@ -165,11 +157,10 @@ function StockMovementSearchList() {
         if (params.getValue(params.id, 'movementAction') === true && docNo) {
           return (
             <Typography
-              color="secondary"
-              variant="body2"
+              color='secondary'
+              variant='body2'
               sx={{ textDecoration: 'underline' }}
-              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}
-            >
+              onClick={() => showDocumentDetail(docNo, docRef, docType, movementTypeCode)}>
               {params.value}
             </Typography>
           );
@@ -252,7 +243,7 @@ function StockMovementSearchList() {
   const textNegative = (value: any) => {
     if (Number(value) < 0)
       return (
-        <Typography variant="body2" sx={{ color: '#F54949' }}>
+        <Typography variant='body2' sx={{ color: '#F54949' }}>
           {value}
         </Typography>
       );
@@ -474,7 +465,7 @@ function StockMovementSearchList() {
     <React.Fragment>
       <Box
         mt={2}
-        bgcolor="background.paper"
+        bgcolor='background.paper'
         sx={{
           '& .columnHeaderTitle-BG': {
             backgroundColor: '#20AE79',
@@ -486,8 +477,7 @@ function StockMovementSearchList() {
           '& .columnFilled-BG': {
             backgroundColor: '#E7FFE9',
           },
-        }}
-      >
+        }}>
         <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -500,7 +490,7 @@ function StockMovementSearchList() {
             pageSize={pageSize}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={items.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             onCellClick={currentlySelected}
@@ -570,11 +560,7 @@ function StockMovementSearchList() {
       )}
 
       {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.ADJ_TRNS_IN_SRC_BT && (
-        <DCOrderDetail
-          idDC={'628f52227c80c16fbe7dc536'}
-          isOpen={openModalDocDetail}
-          onClickClose={handleCloseModalDocDetail}
-        />
+        <DCOrderDetail idDC={docRefNo} isOpen={openModalDocDetail} onClickClose={handleCloseModalDocDetail} />
       )}
 
       {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.BRANCH_TRANSFER_OUT && (

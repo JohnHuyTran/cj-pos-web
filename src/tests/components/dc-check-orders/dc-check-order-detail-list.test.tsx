@@ -16,7 +16,7 @@ import DCOrderEntries from '../../../components/dc-check-orders/dc-check-order-d
 import {
   mockDataDcCheckOrderDetailIsLDAndStatusChecked,
   mockDataDcCheckOrderDetailIsLDAndStatusWaitCheck,
-} from '../../mock-store-dc-check-order';
+} from '../../mockdata-store/mock-store-dc-check-order';
 import { DataGridProps } from '@mui/x-data-grid';
 
 const middlewares = [thunk];
