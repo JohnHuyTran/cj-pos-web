@@ -76,6 +76,7 @@ const TORawMasterialSearch = () => {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
+  const [branchSelect, setBranchSelect] = React.useState('');
   const [openModal, setOpenModal] = React.useState(false);
   const [openModalRequisition, setOpenModalRequisition] = React.useState(false);
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -84,7 +85,7 @@ const TORawMasterialSearch = () => {
   const dateDefault = new Date();
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
-    branch: 'ALL',
+    branch: '',
     status: 'ALL',
     fromDate: dateDefault.setDate(dateDefault.getDate() - 6),
     approveDate: new Date(),
@@ -225,10 +226,10 @@ const TORawMasterialSearch = () => {
       dataTable = <TransferOutList onSearch={onSearch} />;
     } else {
       dataTable = (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
+        <Grid item container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB'>
             <h2>
-              {t('noData')} <SearchOff fontSize="large" />
+              {t('noData')} <SearchOff fontSize='large' />
             </h2>
           </Box>
         </Grid>
@@ -241,13 +242,13 @@ const TORawMasterialSearch = () => {
       <Box sx={{ flexGrow: 1 }} mb={3}>
         <Grid container rowSpacing={3} columnSpacing={6} mt={0.1}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {'เลขที่เอกสารเบิก'}
             </Typography>
             <TextField
-              id="documentNumber"
-              name="documentNumber"
-              size="small"
+              id='documentNumber'
+              name='documentNumber'
+              size='small'
               value={values.documentNumber}
               onChange={onChange.bind(this, setValues, values)}
               className={classes.MtextField}
@@ -256,7 +257,7 @@ const TORawMasterialSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {t('branch')}
             </Typography>
             <BranchListDropDown
@@ -269,13 +270,13 @@ const TORawMasterialSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {t('status')}
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="status"
-                name="status"
+                id='status'
+                name='status'
                 value={values.status}
                 onChange={onChange.bind(this, setValues, values)}
                 inputProps={{ 'aria-label': 'Without label' }}
@@ -290,7 +291,7 @@ const TORawMasterialSearch = () => {
         <Typography mt={2}>วันที่ทำรายการ</Typography>
         <Grid container rowSpacing={3} columnSpacing={6}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {'ตั้งแต่'}
             </Typography>
             <DatePickerComponent
@@ -299,7 +300,7 @@ const TORawMasterialSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {'ถึง'}
             </Typography>
             <DatePickerComponent
@@ -317,11 +318,11 @@ const TORawMasterialSearch = () => {
           <Grid item xs={12} style={{ textAlign: 'right' }}>
             {requestPermission && (
               <Button
-                id="btnCreate"
-                variant="contained"
+                id='btnCreate'
+                variant='contained'
                 sx={{ width: 140, height: '40px' }}
                 className={classes.MbtnSearch}
-                color="secondary"
+                color='secondary'
                 startIcon={<AddCircleOutlineOutlinedIcon />}
                 onClick={handleOpenModal}
               >
@@ -329,29 +330,29 @@ const TORawMasterialSearch = () => {
               </Button>
             )}
             <Button
-              id="btnDrawdown"
-              variant="contained"
+              id='btnDrawdown'
+              variant='contained'
               sx={{ width: 125, height: '40px', ml: 2 }}
               className={classes.MbtnSearch}
-              color="warning"
+              color='warning'
               onClick={handleOpenModalRequisition}
             >
               {'สรุปรายการเบิก'}
             </Button>
             <Button
-              id="btnClear"
-              variant="contained"
+              id='btnClear'
+              variant='contained'
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnClear}
-              color="cancelColor"
+              color='cancelColor'
               onClick={onClear}
             >
               {t('common:button.clear')}
             </Button>
             <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
+              id='btnSearch'
+              variant='contained'
+              color='primary'
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnSearch}
               onClick={onSearch}
@@ -375,7 +376,11 @@ const TORawMasterialSearch = () => {
         />
       )}
       {openModalRequisition && (
-        <RequisitionSummary isOpen={openModalRequisition} onClickClose={handleCloseModalRequisition} />
+        <RequisitionSummary
+          isOpen={openModalRequisition}
+          onClickClose={handleCloseModalRequisition}
+          branchSelected={values.branch}
+        />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>
