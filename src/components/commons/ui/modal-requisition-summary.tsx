@@ -154,7 +154,7 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
           const res = await getRequistionSummary(payload);
           if (res && res.data) {
             const outputFilename =
-              `RM_BaoCafe` +
+              `TO_BaoCafe` +
               `${payload.branchCode}` +
               `_${moment(values.fromDate).toISOString().split('T')[0].split('-').join('').substring(2)}-${moment(
                 values.toDate
