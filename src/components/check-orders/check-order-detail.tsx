@@ -430,15 +430,18 @@ export default function CheckOrderDetail({
       // rowsEdit.forEach((data: GridRowData) => {
 
       payloadAddItem.forEach((data: any) => {
-        let qtyRef = data.qty ? data.qty : data.qtyRef;
-        let diffCount: number = Number(data.actualQty) - Number(qtyRef);
+        // let qtyRef = data.qtyRef ? data.qtyRef : data.qty ? data.qty : 0;
+        let qtyRef = data.qtyRef ? data.qtyRef : 0;
+        let actualQty = data.actualQty ? data.actualQty : data.qty ? data.qty : 0;
+
+        let diffCount: number = Number(actualQty) - Number(qtyRef);
         sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
         sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
 
         const itemDiff: Entry = {
           barcode: data.barcode,
           deliveryOrderNo: data.deliveryOrderNo,
-          actualQty: Number(data.actualQty),
+          actualQty: actualQty,
           comment: data.comment,
           seqItem: 0,
           itemNo: '',
@@ -453,7 +456,7 @@ export default function CheckOrderDetail({
           qtyAll: 0,
           qtyAllBefore: 0,
           qtyDiff: diffCount,
-          qtyRef: data.qtyRef ? data.qtyRef : data.qty,
+          qtyRef: qtyRef,
           price: 0,
           isControlStock: 0,
           toteCode: '',
