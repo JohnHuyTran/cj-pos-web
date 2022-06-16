@@ -112,7 +112,7 @@ export default function NotificationReminder(props: Props) {
           } else {
             setOpenModalError(true);
           }
-        } else if (item.payload.type === 2) {
+        } else if (item.payload.type === 2 || item.payload.type === 5) {
           const rs = await dispatch(getTransferOutDetail(item.documentNumber));
           if (!!rs.payload) {
             setOpenTransferOutDestroyDetail(true);
@@ -173,11 +173,7 @@ export default function NotificationReminder(props: Props) {
         break;
       case 'CLOSE_TRANSFER_OUT':
         {
-          if (item.payload.type === 1) {
-            content = 'เบิก-ใช้ในการทำกิจกรรม';
-          } else {
-            content = 'เบิก-ทำลายไม่มีส่วนลด';
-          }
+          content = item.payload.type === 1 ? 'เบิกทำกิจกรรม' : 'เบิกทำลาย';
           branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('ปิดงาน', {
             color: '#676767',
@@ -188,11 +184,7 @@ export default function NotificationReminder(props: Props) {
         break;
       case 'REJECT_TRANSFER_OUT':
         {
-          if (item.payload.type === 1) {
-            content = 'เบิก-ใช้ในการทำกิจกรรม';
-          } else {
-            content = 'เบิก-ทำลายไม่มีส่วนลด';
-          }
+          content = item.payload.type === 1 ? 'เบิกทำกิจกรรม' : 'เบิกทำลาย';
           branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('ไม่อนุมัติ', {
             color: '#F76C6C',
