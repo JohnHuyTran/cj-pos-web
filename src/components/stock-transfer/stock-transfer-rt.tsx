@@ -30,6 +30,7 @@ import ModalUploadFile from './stock-request-upload-file';
 import ModalConfirmTransaction from './modal-confirm-transaction';
 import { approve2MultipleStockRequest } from '../../services/stock-transfer';
 import SnackbarStatus from '../commons/ui/snackbar-status';
+import { mappingErrorParam } from '../../utils/exception/pos-exception';
 
 interface State {
   docNo: string;
@@ -309,13 +310,8 @@ export default function StockTransferRt() {
   };
 
   const handleApprove2Multiple = async () => {
-    if (stockRemaining.length > 0) {
-      setOpenAlertErrStock(true);
-      setTextErrStock('ไม่สามารถส่งงานได้ เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ กรุณาแก้ไขจำนวนที่สั่ง');
-    } else {
-      setTextHeaderConfirm('ยืนยันส่งงานรายการโอนสินค้า');
-      setOpenModelConfirm(true);
-    }
+    setTextHeaderConfirm('ยืนยันส่งงานรายการโอนสินค้า');
+    setOpenModelConfirm(true);
   };
 
   const [showSnackBar, setShowSnackBar] = React.useState(false);
@@ -331,6 +327,7 @@ export default function StockTransferRt() {
   const handleCloseModelConfirm = () => {
     setOpenModelConfirm(false);
   };
+
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
     setOpenModelConfirm(false);
@@ -346,13 +343,23 @@ export default function StockTransferRt() {
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
 
+        if (value.data.insufficientBalanceRTNos) {
+          setTextError(
+            mappingErrorParam(
+              'ไม่สามารถส่งงานได้ เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ กรุณาแก้ไขจำนวนที่สั่ง \n[{rtNoList}]',
+              { rtNoList: value.data.insufficientBalanceRTNos.toString() }
+            )
+          );
+          setOpenAlert(true);
+        }
+
         setTimeout(() => {
           handleCloseSnackBar();
         }, 300);
       })
       .catch((error: any) => {
-        setShowSnackBar(true);
-        setContentMsg(error.message);
+        setTextError(error.message);
+        setOpenAlert(true);
       });
     handleOpenLoading('open', false);
   };
