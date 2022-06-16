@@ -853,6 +853,7 @@ function STCreateModal({
                     <Button
                       variant='contained'
                       color='error'
+                      disabled={status < 1}
                       onClick={handleOpenCancel}
                       startIcon={<HighlightOffIcon />}
                       className={classes.MbtnSearch}>

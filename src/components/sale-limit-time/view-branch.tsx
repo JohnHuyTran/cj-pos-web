@@ -79,7 +79,7 @@ export default function ViewBranch({ values }: Props) {
               handleOpenModal();
             }}
           >
-            หลายสาขา
+            {values.isAllBranches ? 'ทุกสาขา' : 'หลายสาขา'}
           </Button>
           <Dialog maxWidth="lg" fullWidth open={open}>
             <Box sx={{ flex: 1, ml: 2 }}>

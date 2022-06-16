@@ -402,7 +402,7 @@ export default function ModalCreateToDestroyDiscount({
             if (!sendRequest) {
               dispatch(updateCheckEdit(false));
               setOpenPopupModal(true);
-              setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+              setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
               if (onSearchMain) onSearchMain();
             }
             if (rs && rs.data) {
@@ -689,7 +689,7 @@ export default function ModalCreateToDestroyDiscount({
                   id='btnCancel'
                   variant='contained'
                   color='error'
-                  disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
+                  disabled={stringNullOrEmpty(status) || (!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
                   style={{ display: ((!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission) ? 'none' : undefined }}
                   startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}
@@ -728,7 +728,7 @@ export default function ModalCreateToDestroyDiscount({
         onClose={() => {
           setOpenCheckStock(false);
         }}
-        headerTitle={'เบิกสินค้ามากกว่าที่มีในคลัง โปรดตรวจสอบ'}
+        headerTitle={'จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm
