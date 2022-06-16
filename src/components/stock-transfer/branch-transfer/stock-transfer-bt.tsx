@@ -587,6 +587,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
         <Grid item xl={5}>
           <Button
+            data-testid='testid-btnAddItem'
             id='btnAddItem'
             variant='contained'
             color='info'
@@ -599,6 +600,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         </Grid>
         <Grid item>
           <Button
+            data-testid='testid-btnSave'
             id='btnSave'
             variant='contained'
             color='warning'
@@ -610,7 +612,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           </Button>
 
           <Button
-            id='btnApprove'
+            data-testid='testid-btnSendToDC'
+            id='btnSendToDC'
             variant='contained'
             color='primary'
             className={classes.MbtnSendDC}
@@ -703,6 +706,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       </Grid>
       <Grid item>
         <Button
+          data-testid='testid-btnSave'
           id='btnSave'
           variant='contained'
           color='warning'
@@ -859,7 +863,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         <Grid item xl={8}></Grid>
         <Grid item>
           <Button
-            id='btnSave'
+            data-testid='testid-btnApprove'
+            id='btnApprove'
             variant='contained'
             color='warning'
             className={classes.MbtnSave}

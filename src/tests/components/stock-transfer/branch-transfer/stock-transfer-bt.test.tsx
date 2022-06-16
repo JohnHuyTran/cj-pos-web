@@ -3,28 +3,20 @@ import { Provider } from 'react-redux';
 import { Store, AnyAction } from '@reduxjs/toolkit';
 import { ThemeProvider } from '@mui/material';
 import theme from '../../../../styles/theme';
-import { mockUserInfo } from '../../../mockData';
-import StockMovementSearch from '../../../../components/stock/stock-movement/stock-movement-search';
-import { mockDataStockMovement } from '../../../mockdata-store/mock-store-stock';
+import { mockUserInfo, mockUserInfoGroupDC } from '../../../mockData';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import StockTransferBT from '../../../../components/stock-transfer/branch-transfer/stock-transfer-bt';
-let wrapper: RenderResult<typeof import('@testing-library/dom/types/queries'), HTMLElement>;
+import {
+  mockDataBtDetailDraft,
+  mockDataBtDetailWaitForPickup,
+} from '../../../mockdata-store/mock-store-stock-transfer-bt';
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 let store: Store<any, AnyAction>;
 const handleOnClose = jest.fn();
 sessionStorage.setItem('user_info', mockUserInfo);
-beforeEach(() => {
-  store = mockStore(mockDataStockMovement);
-  wrapper = render(
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <StockTransferBT isOpen={true} onClickClose={handleOnClose} />
-      </ThemeProvider>
-    </Provider>
-  );
-});
+beforeEach(() => {});
 jest.mock('react-i18next', () => ({
   useTranslation: () => {
     return {
@@ -41,8 +33,46 @@ jest.mock('react-i18next', () => ({
 }));
 
 describe('component stock-transfer-bt', () => {
-  it('find all items', () => {
-    expect(screen.getByTestId('testid-btnClear')).toBeInTheDocument();
-    expect(screen.getByTestId('testid-btnSearch')).toBeInTheDocument();
+  it('find all button is status draft', () => {
+    store = mockStore(mockDataBtDetailDraft);
+    const wrapper = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockTransferBT isOpen={true} onClickClose={handleOnClose} />
+        </ThemeProvider>
+      </Provider>
+    );
+    expect(screen.getByTestId('testid-btnSave')).toBeInTheDocument();
+    expect(screen.getByTestId('testid-btnSendToDC')).toBeInTheDocument();
+    expect(screen.getByTestId('testid-btnAddItem')).toBeInTheDocument();
+  });
+
+  it('find all button is status wait for picker and group branch', () => {
+    store = mockStore(mockDataBtDetailWaitForPickup);
+    const wrapper = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockTransferBT isOpen={true} onClickClose={handleOnClose} />
+        </ThemeProvider>
+      </Provider>
+    );
+    expect(screen.getByTestId('testid-btnApprove')).toBeInTheDocument();
+    expect(screen.queryByTestId('testid-btnSave')).toBeNull();
+    expect(screen.queryByTestId('testid-btnAddItem')).toBeNull();
+  });
+
+  it('find all button is status wait for picker and group dc', () => {
+    sessionStorage.setItem('user_info', mockUserInfoGroupDC);
+    store = mockStore(mockDataBtDetailWaitForPickup);
+    const wrapper = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockTransferBT isOpen={true} onClickClose={handleOnClose} />
+        </ThemeProvider>
+      </Provider>
+    );
+    expect(screen.queryByTestId('testid-btnApprove')).toBeNull();
+    expect(screen.queryByTestId('testid-btnSave')).toBeNull();
+    expect(screen.queryByTestId('testid-btnAddItem')).toBeNull();
   });
 });
