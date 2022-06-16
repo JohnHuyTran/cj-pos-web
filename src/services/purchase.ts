@@ -241,7 +241,7 @@ export async function deletePurchaseBR(docNo: string) {
 
 export async function sendPurchaseBR(docNo: string) {
   try {
-    const response = await post(getPathSendPurchaseBR(docNo)).then((result: any) => result);
+    const response = await post(getPathSendPurchaseBR(docNo), 3000).then((result: any) => result);
     return response;
   } catch (error) {
     throw error;

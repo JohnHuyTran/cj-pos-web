@@ -131,31 +131,32 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
         setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
         setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-      } else if (purchaseBRDetail.status === 'DC_NO_STOCK') {
+
+        if (purchaseBRDetail.items.length > 0) {
+          let items: any = [];
+          purchaseBRDetail.items.forEach((data: any) => {
+            const item: any = {
+              skuCode: data.skuCode,
+              barcode: data.barcode,
+              barcodeName: data.barcodeName,
+              unitCode: data.unitCode,
+              unitName: data.unitName,
+              baseUnit: data.barFactor,
+              qty: data.orderQty,
+              stockMax: data.orderMaxQty,
+            };
+            items.push(item);
+          });
+
+          dispatch(updateAddItemsState(items));
+        }
+      } else if (purchaseBRDetail.status === 'INCOMPLETE_RECEIVED') {
         setDisplayCopyItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+        dispatch(updateAddItemsState(purchaseBRDetail.items));
       }
 
       const strBranchName = getBranchName(branchList, purchaseBRDetail.branchCode);
       setBranchName(strBranchName ? `${purchaseBRDetail.branchCode}-${strBranchName}` : getUserInfo().branch);
-
-      if (purchaseBRDetail.items.length > 0) {
-        let items: any = [];
-        purchaseBRDetail.items.forEach((data: any) => {
-          const item: any = {
-            skuCode: data.skuCode,
-            barcode: data.barcode,
-            barcodeName: data.barcodeName,
-            unitCode: data.unitCode,
-            unitName: data.unitName,
-            baseUnit: data.barFactor,
-            qty: data.orderQty,
-            stockMax: data.orderMaxQty,
-          };
-          items.push(item);
-        });
-
-        dispatch(updateAddItemsState(items));
-      }
     } else {
       const strBranchName = getBranchName(branchList, getUserInfo().branch);
       setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
@@ -395,21 +396,49 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenCopyModal(false);
   };
   const handleOpenCopyItems = async () => {
+    setOpenLoadingModal(true);
     await dispatch(clearDataPurchaseBRDetail());
 
-    console.log('handleOpenCopyItems ---');
-    console.log('payloadAddItem:', JSON.stringify(payloadAddItem));
+    const itemsCopy: any = [];
+    const SKUCodes: any = [];
+    payloadAddItem.map((item: any) => {
+      const actualQty = item.actualQty ? item.actualQty : 0;
+      const orderQty = item.orderQty ? item.orderQty : 0;
+      let diff = Number(actualQty) - Number(orderQty);
+      if (diff < 0) {
+        itemsCopy.push(item);
+        SKUCodes.push(item.skuCode);
+      }
+    });
+
+    await getProductBySKUCodes(SKUCodes)
+      .then((value) => {
+        const itemsCopyMap: any = [];
+        itemsCopy.map((data: any) => {
+          const sku = value.data.filter((r: any) => r.skuCode === data.skuCode);
+          const item: any = {
+            skuCode: data.skuCode,
+            barcode: data.barcode,
+            barcodeName: data.barcodeName,
+            unitCode: data.unitCode,
+            unitName: data.unitName,
+            baseUnit: data.barFactor,
+            qty: data.orderQty,
+            stockMax: sku[0].stockMax ? sku[0].stockMax : data.orderMaxQty,
+          };
+          itemsCopyMap.push(item);
+        });
+
+        dispatch(updateAddItemsState(itemsCopyMap));
+        setFlagSave(true);
+      })
+      .catch((error: ApiError) => {
+        console.log('getProductBySKUCodes:', JSON.stringify(error));
+      });
 
     handleOpenCopyModal();
-
-    // const SKUCodes: any = ['000000030002078008', '000000030002078007'];
-    // await getProductBySKUCodes(SKUCodes)
-    //   .then((value) => {
-    //     console.log('value:', JSON.stringify(value));
-    //   })
-    //   .catch((error: ApiError) => {
-    //     console.log('value:', JSON.stringify(error));
-    //   });
+    // handleClose();
+    setOpenLoadingModal(false);
   };
 
   return (
@@ -420,7 +449,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
           <Steppers status={statusSteps} stepsList={steps}></Steppers>
         </BootstrapDialogTitle>
 
-        <DialogContent>
+        <DialogContent sx={{ minHeight: '70vh' }}>
           <Grid container spacing={2} mb={2} id='top-item'>
             <Grid item xs={2}>
               เลขที่เอกสาร BR :
@@ -542,7 +571,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   defaultValue={remark}
                   maxLength={100}
                   onChangeComment={handleChangeComment}
-                  isDisable={false}
+                  isDisable={status !== 'DRAFT'}
                 />
               </Grid>
             </Grid>
