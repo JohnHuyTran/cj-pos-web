@@ -410,6 +410,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         SKUCodes.push(item.skuCode);
       }
     });
+    console.log('itemsCopy:', JSON.stringify(itemsCopy));
+    console.log('SKUCodes:', JSON.stringify(SKUCodes));
 
     await getProductBySKUCodes(SKUCodes)
       .then((value) => {
@@ -434,6 +436,24 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       })
       .catch((error: ApiError) => {
         console.log('getProductBySKUCodes:', JSON.stringify(error));
+
+        const itemsCopyMap: any = [];
+        itemsCopy.map((data: any) => {
+          const item: any = {
+            skuCode: data.skuCode,
+            barcode: data.barcode,
+            barcodeName: data.barcodeName,
+            unitCode: data.unitCode,
+            unitName: data.unitName,
+            baseUnit: data.barFactor,
+            qty: data.orderQty,
+            stockMax: data.orderMaxQty,
+          };
+          itemsCopyMap.push(item);
+        });
+
+        dispatch(updateAddItemsState(itemsCopyMap));
+        setFlagSave(true);
       });
 
     handleOpenCopyModal();
