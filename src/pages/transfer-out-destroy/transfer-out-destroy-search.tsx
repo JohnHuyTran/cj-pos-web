@@ -223,7 +223,7 @@ const TransferOutSearch = () => {
       <Box sx={{ flexGrow: 1 }} mb={3}>
         <Grid container rowSpacing={3} columnSpacing={6} mt={0.1}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {'เลขที่เอกสารทำลาย'}
             </Typography>
             <TextField
@@ -262,8 +262,7 @@ const TransferOutSearch = () => {
                 <MenuItem value={'ALL'} selected={true}>
                   {t('all')}
                 </MenuItem>
-
-                <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>
+                {groupBranch && <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>}
                 <MenuItem value={TOStatus.WAIT_FOR_APPROVAL}>รออนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.APPROVED}>อนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.REJECTED}>ไม่อนุมัติ</MenuItem>
