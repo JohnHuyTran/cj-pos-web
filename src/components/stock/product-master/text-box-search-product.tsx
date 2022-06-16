@@ -8,9 +8,10 @@ import { searchProductItem } from '../../../services/product-master';
 interface Props {
   onSelectItem: (value: any) => void;
   isClear: boolean;
+  disable: boolean;
 }
 
-function TextBoxSearchProduct({ onSelectItem, isClear }: Props) {
+function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [value, setValue] = React.useState('');
@@ -107,6 +108,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear }: Props) {
       value={value}
       fullWidth
       // freeSolo
+      disabled={disable}
       loadingText="กำลังโหลด..."
       loading={loading}
       options={options}
