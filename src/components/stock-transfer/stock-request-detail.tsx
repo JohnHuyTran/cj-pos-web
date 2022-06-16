@@ -86,16 +86,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
-          <HighlightOff fontSize="large" />
+          }}>
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -342,6 +341,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
     if (!clearBranchToDropDown) setClearBranchToDropDown(true);
     else if (clearBranchToDropDown) setClearBranchToDropDown(false);
+    setValuebranchTo(null);
   };
 
   const handleChangeToBranch = (branchCode: string) => {
@@ -552,8 +552,21 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             setOpenModelConfirm(true);
           })
           .catch((error: ApiError) => {
-            setShowSnackBar(true);
-            setContentMsg(error.message);
+            const errorList = error.error_details;
+            const errList: any = [];
+            if (errorList.length !== 0) {
+              errorList.map((item: any) => {
+                errList.push(`${item.skuCode} : ${item.productName}\n`);
+              });
+            }
+
+            if (error.code === 40010) {
+              setTextError(mappingErrorParam(error.message, { product: errList.toString() }));
+              setOpenAlert(true);
+            } else {
+              setTextError(error.message);
+              setOpenAlert(true);
+            }
           });
       } else {
         setTextHeaderConfirm('ยืนยันส่งงาน รายการโอนสินค้า');
@@ -669,17 +682,20 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               }, 500);
             })
             .catch((error: ApiError) => {
-              if (error.code === 40010) {
-                setShowSnackBar(true);
-                setSnackbarIsStatus(false);
-                setContentMsg(
-                  'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
-                );
-              } else {
-                setShowSnackBar(true);
-                setSnackbarIsStatus(false);
-                setContentMsg(error.message);
-              }
+              // if (error.code === 40010) {
+              //   setShowSnackBar(true);
+              //   setSnackbarIsStatus(false);
+              //   setContentMsg(
+              //     'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+              //   );
+              // } else {
+              //   setShowSnackBar(true);
+              //   setSnackbarIsStatus(false);
+              //   setContentMsg(error.message);
+              // }
+
+              setTextError(error.message);
+              setOpenAlert(true);
             });
         } else {
           await submitStockRequest(rtNo, payloadSubmit)
@@ -737,8 +753,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             }, 500);
           })
           .catch((error) => {
-            setShowSnackBar(true);
-            setContentMsg(error.message);
+            // setShowSnackBar(true);
+            // setContentMsg(error.message);
+            setTextError(error.message);
+            setOpenAlert(true);
           });
       } else {
         await approve1StockRequest(rtNo, payload1)
@@ -754,8 +772,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             }, 500);
           })
           .catch((error) => {
-            setShowSnackBar(true);
-            setContentMsg(error.message);
+            // setShowSnackBar(true);
+            // setContentMsg(error.message);
+            setTextError(error.message);
+            setOpenAlert(true);
           });
       }
     } else if (status === 'WAIT_FOR_APPROVAL_2') {
@@ -782,8 +802,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             }, 500);
           })
           .catch((error) => {
-            setShowSnackBar(true);
-            setContentMsg(error.message);
+            // setShowSnackBar(true);
+            // setContentMsg(error.message);
+            setTextError(error.message);
+            setOpenAlert(true);
           });
       } else {
         handleApprove2(payload2);
@@ -807,17 +829,20 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
         }, 500);
       })
       .catch((error: ApiError) => {
-        if (error.code === 40010) {
-          setShowSnackBar(true);
-          setSnackbarIsStatus(false);
-          setContentMsg(
-            'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
-          );
-        } else {
-          setShowSnackBar(true);
-          setSnackbarIsStatus(false);
-          setContentMsg(error.message);
-        }
+        // if (error.code === 40010) {
+        //   setShowSnackBar(true);
+        //   setSnackbarIsStatus(false);
+        //   setContentMsg(
+        //     'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+        //   );
+        // } else {
+        //   setShowSnackBar(true);
+        //   setSnackbarIsStatus(false);
+        //   setContentMsg(error.message);
+        // }
+
+        setTextError(error.message);
+        setOpenAlert(true);
       });
   };
 
@@ -851,19 +876,19 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
   return (
     <div>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleChkSaveClose}>
+      <Dialog open={open} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleChkSaveClose}>
           <Typography sx={{ fontSize: '1em' }}>
             {type === 'Create' && 'สร้างรายการโอนสินค้า'}
             {type !== 'Create' && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && 'รายการโอนสินค้า'}
             {type !== 'Create' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && 'ตรวจสอบรายการโอนสินค้า'}
           </Typography>
-          {status !== '' && <Steppers status={status} type="RT"></Steppers>}
-          {status === '' && <Steppers status="DRAFT" type="RT"></Steppers>}
+          {status !== '' && <Steppers status={status} type='RT'></Steppers>}
+          {status === '' && <Steppers status='DRAFT' type='RT'></Steppers>}
         </BootstrapDialogTitle>
 
         <DialogContent>
-          <Grid container spacing={2} mb={2} id="top-item">
+          <Grid container spacing={2} mb={2} id='top-item'>
             <Grid item xs={2}>
               เลขที่เอกสาร RT :
             </Grid>
@@ -1014,68 +1039,63 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             <Grid container spacing={2} mt={4} mb={2}>
               <Grid item xs={5}>
                 <Button
-                  id="btnAddItem"
-                  variant="contained"
-                  color="info"
+                  id='btnAddItem'
+                  variant='contained'
+                  color='info'
                   className={classes.MbtnPrint}
                   onClick={handleOpenAddItems}
                   startIcon={<ControlPoint />}
                   // sx={{ width: 200, display: `${!displayBtnAddItem ? 'none' : ''}` }}
                   sx={{ width: 200 }}
-                  disabled={!displayBtnAddItem}
-                >
+                  disabled={!displayBtnAddItem}>
                   เพิ่มสินค้า
                 </Button>
               </Grid>
               <Grid item xs={7} sx={{ textAlign: 'end' }}>
                 <Button
-                  id="btnSave"
-                  variant="contained"
-                  color="warning"
+                  id='btnSave'
+                  variant='contained'
+                  color='warning'
                   className={classes.MbtnSave}
                   onClick={handleSave}
                   startIcon={<SaveIcon />}
                   sx={{ width: 140, display: `${displayBtnSave ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
+                  disabled={rowLength == 0}>
                   บันทึก
                 </Button>
 
                 <Button
-                  id="btnCreateTransfer"
-                  variant="contained"
-                  color="primary"
+                  id='btnCreateTransfer'
+                  variant='contained'
+                  color='primary'
                   className={classes.MbtnSave}
                   onClick={handleSubmit}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 140, display: `${displayBtnSubmit ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
+                  disabled={rowLength == 0}>
                   ส่งงาน
                 </Button>
 
                 <Button
-                  id="btnCreateTransfer"
-                  variant="contained"
-                  color="primary"
+                  id='btnCreateTransfer'
+                  variant='contained'
+                  color='primary'
                   className={classes.MbtnSave}
                   onClick={handleSubmit}
                   startIcon={<CheckCircleOutline />}
                   sx={{ width: 140, display: `${!groupSCM ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
+                  disabled={rowLength == 0}>
                   ส่งงาน
                 </Button>
 
                 <Button
-                  id="btnCancle"
-                  variant="contained"
-                  color="error"
+                  id='btnCancle'
+                  variant='contained'
+                  color='error'
                   className={classes.MbtnSave}
                   onClick={handleCancle}
                   sx={{ width: 140, display: `${!canCleMode ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
+                  disabled={rowLength == 0}>
                   ยกเลิก
                 </Button>
               </Grid>
@@ -1088,25 +1108,23 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               {groupOC && status === 'WAIT_FOR_APPROVAL_1' && (
                 <div>
                   <Button
-                    id="btnSave"
-                    variant="contained"
-                    color="error"
+                    id='btnSave'
+                    variant='contained'
+                    color='error'
                     className={classes.MbtnSave}
                     onClick={handleReject}
                     startIcon={<SaveIcon />}
-                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
-                  >
+                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}>
                     ปฎิเสธ
                   </Button>
                   <Button
-                    id="btnCreateTransfer"
-                    variant="contained"
-                    color="primary"
+                    id='btnCreateTransfer'
+                    variant='contained'
+                    color='primary'
                     className={classes.MbtnSave}
                     onClick={handleApprove}
                     startIcon={<CheckCircleOutline />}
-                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
-                  >
+                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}>
                     อนุมัติ
                   </Button>
                 </div>
@@ -1115,25 +1133,23 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
                 <div>
                   <Button
-                    id="btnSave"
-                    variant="contained"
-                    color="error"
+                    id='btnSave'
+                    variant='contained'
+                    color='error'
                     className={classes.MbtnSave}
                     onClick={handleReject}
                     startIcon={<SaveIcon />}
-                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
-                  >
+                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}>
                     ปฎิเสธ
                   </Button>
                   <Button
-                    id="btnCreateTransfer"
-                    variant="contained"
-                    color="primary"
+                    id='btnCreateTransfer'
+                    variant='contained'
+                    color='primary'
                     className={classes.MbtnSave}
                     onClick={handleApprove}
                     startIcon={<CheckCircleOutline />}
-                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
-                  >
+                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}>
                     อนุมัติ
                   </Button>
                 </div>
@@ -1156,7 +1172,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             <Grid container spacing={2} mb={2}>
               <Grid item xs={3}>
                 <TextBoxComment
-                  fieldName="หมายเหตุจากผู้อนุมัติ 1 :"
+                  fieldName='หมายเหตุจากผู้อนุมัติ 1 :'
                   defaultValue={commentOC}
                   maxLength={100}
                   onChangeComment={handleChangeCommentOC}
@@ -1166,7 +1182,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               <Grid item xs={6}></Grid>
               <Grid item xs={3}>
                 <TextBoxComment
-                  fieldName="หมายเหตุจากผู้อนุมัติ 2 :"
+                  fieldName='หมายเหตุจากผู้อนุมัติ 2 :'
                   defaultValue={commentSCM}
                   maxLength={100}
                   onChangeComment={handleChangeCommentSCM}
@@ -1178,7 +1194,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item xs={10}></Grid>
-              <Grid item xs={2} textAlign="center">
+              <Grid item xs={2} textAlign='center'>
                 <IconButton onClick={topFunction}>
                   <ArrowForwardIosIcon
                     sx={{
@@ -1192,7 +1208,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                   />
                 </IconButton>
 
-                <Box fontSize="13px">กลับขึ้นด้านบน</Box>
+                <Box fontSize='13px'>กลับขึ้นด้านบน</Box>
               </Grid>
             </Grid>
           </Box>
@@ -1206,8 +1222,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
           skuCodes: [],
           skuTypes: [2],
           isSellable: true,
-        }}
-      ></ModalAddItems>
+        }}></ModalAddItems>
       <SnackbarStatus
         open={showSnackBar}
         onClose={handleCloseSnackBar}
@@ -1220,7 +1235,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
         onClose={handleCloseModelConfirm}
         handleConfirm={handleConfirm}
         header={textHeaderConfirm}
-        title="เลขที่เอกสาร RT"
+        title='เลขที่เอกสาร RT'
         value={rtNo}
       />
 

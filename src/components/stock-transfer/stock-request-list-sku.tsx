@@ -104,8 +104,8 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
   let rowsSKU: any = [];
 
   useEffect(() => {
-    let skuCodes: any = [];
     if (stock) {
+      let skuCodes: any = [];
       if (Object.keys(payloadAddItem).length !== 0) {
         payloadAddItem.map((item: any) => {
           //chk duplicates sku
@@ -237,13 +237,21 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
     await dispatch(updateAddItemsState(items));
   };
 
-  if (Object.keys(payloadAddItem).length > 0) {
-    itemsMap(payloadAddItem);
-  } else if (!update && type !== 'Create') {
+  const mapStockRequestDetail = async () => {
     let _item: any = [];
     if (stockRequestDetail) {
       const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
       const items = stockRequestDetail.items ? stockRequestDetail.items : [];
+
+      if (stockRequestDetail.status === 'DRAFT' && stockBalanceList.length === 0) {
+        let skuCodes: any = [];
+        const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
+        itemGroups.map((item: any) => {
+          skuCodes.push(item.skuCode);
+        });
+        await stockBalanceBySKU(skuCodes);
+      }
+
       if (items.length > 0) {
         items.map((item: any) => {
           let productName: any = '';
@@ -251,10 +259,24 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
           let orderAllQty: any = 0;
           if (itemGroups.length > 0) {
             itemGroups.forEach((i: any) => {
+              const pName = i.productName;
+              const oAllQty = i.orderAllQty;
+              let sRemain = 0;
+
+              if (stockRequestDetail.status === 'DRAFT') {
+                stockBalanceList.forEach((s: any) => {
+                  if (i.skuCode === s.skuCode) {
+                    sRemain = s.stockRemain;
+                  }
+                });
+              } else {
+                sRemain = i.remainingQty;
+              }
+
               if (i.skuCode === item.skuCode) {
-                productName = i.productName;
-                remainingQty = i.remainingQty;
-                orderAllQty = i.orderAllQty;
+                productName = pName;
+                remainingQty = sRemain;
+                orderAllQty = oAllQty;
               }
             });
           }
@@ -278,6 +300,12 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
       updateItemsState(_item);
       itemsMap(_item);
     }
+  };
+
+  if (Object.keys(payloadAddItem).length > 0) {
+    itemsMap(payloadAddItem);
+  } else if (!update && type !== 'Create') {
+    mapStockRequestDetail();
   }
 
   const [pageSizeSKU, setPageSizeSKU] = React.useState<number>(10);
