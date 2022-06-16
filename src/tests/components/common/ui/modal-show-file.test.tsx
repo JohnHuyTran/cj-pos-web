@@ -6,8 +6,7 @@ import { initialState } from '../../../mockStore';
 import { ThemeProvider, Typography } from '@mui/material';
 import theme from '../../../../styles/theme';
 import { mockUserInfo } from '../../../mockData';
-
-import ModalShowHuaweiFile from '../../../../components/commons/ui/modal-show-huawei-file';
+import ModalShowPDF from '../../../../components/commons/ui/modal-show-file';
 import React from 'react';
 
 let wrapper;
@@ -17,26 +16,43 @@ sessionStorage.setItem('user_info', mockUserInfo);
 beforeEach(() => {
   store = mockStore(initialState);
 });
+jest.mock('react-i18next', () => ({
+  // this mock makes sure any components using the translate hook can use it without a warning being shown
+  useTranslation: () => {
+    return {
+      t: (str: string) => str,
+      i18n: {
+        changeLanguage: () => new Promise(() => {}),
+      },
+    };
+  },
+  initReactI18next: {
+    type: '3rdParty',
+    init: jest.fn(),
+  },
+}));
 
-describe('component modal show huawei file', () => {
+describe('component modal show file pdf', () => {
   it('should click button  print ', async () => {
     const handleOnClick = jest.fn();
     const handleOnPrint = jest.fn();
     const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <ModalShowHuaweiFile
+          <ModalShowPDF
             open={true}
-            url={'https://picsum.photos/200/300?random=1'}
-            isImage={true}
-            fileName={'untest.jpg'}
             onClose={handleOnClick}
-            isPrint={true}
+            url={'https://picsum.photos/200/300?random=1'}
+            statusFile={1}
+            sdImageFile={'SD22060101-001234'}
+            fileName={'unittest.jpg'}
+            btnPrintName="พิมพ์ใบผลต่าง"
             onPrint={handleOnPrint}
           />
         </ThemeProvider>
       </Provider>
     );
+
     setTimeout(() => {
       fireEvent.click(screen.getByTestId('btn-print'));
       setTimeout(() => {
@@ -49,18 +65,19 @@ describe('component modal show huawei file', () => {
   });
 
   it('should click button  close ', async () => {
-    const handleOnClick = jest.fn();
+    const handleOnClose = jest.fn();
     const handleOnPrint = jest.fn();
     const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <ModalShowHuaweiFile
+          <ModalShowPDF
             open={true}
+            onClose={handleOnClose}
             url={'https://picsum.photos/200/300?random=1'}
-            isImage={true}
-            fileName={'untest.jpg'}
-            onClose={handleOnClick}
-            isPrint={true}
+            statusFile={1}
+            sdImageFile={'SD22060101-001234'}
+            fileName={'unittest.jpg'}
+            btnPrintName="พิมพ์ใบผลต่าง"
             onPrint={handleOnPrint}
           />
         </ThemeProvider>
@@ -68,8 +85,8 @@ describe('component modal show huawei file', () => {
     );
     await new Promise((r) => setTimeout(r, 5000));
 
-    fireEvent.click(screen.getByLabelText('close'));
-    expect(handleOnClick).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByTestId('btn-close'));
+    expect(handleOnClose).toHaveBeenCalledTimes(1);
   });
 
   it('should hide button print ', () => {
@@ -78,13 +95,14 @@ describe('component modal show huawei file', () => {
     const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <ModalShowHuaweiFile
+          <ModalShowPDF
             open={true}
-            url={'https://picsum.photos/200/300?random=1'}
-            isImage={false}
-            fileName={''}
             onClose={handleOnClick}
-            isPrint={false}
+            url={'https://picsum.photos/200/300?random=1'}
+            statusFile={1}
+            sdImageFile={'SD22060101-001234'}
+            fileName={'unittest.jpg'}
+            btnPrintName="พิมพ์ใบผลต่าง"
             onPrint={handleOnPrint}
           />
         </ThemeProvider>
@@ -93,46 +111,48 @@ describe('component modal show huawei file', () => {
     expect(screen.queryByLabelText('print')).toBeNull;
   });
 
-  it('should display image ', () => {
+  it('should display document if statusFile = 1 ', () => {
     const handleOnClick = jest.fn();
     const handleOnPrint = jest.fn();
     const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <ModalShowHuaweiFile
+          <ModalShowPDF
             open={true}
-            url={'https://picsum.photos/200/300?random=1'}
-            isImage={true}
-            fileName={''}
             onClose={handleOnClick}
-            isPrint={false}
+            url={'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'}
+            statusFile={1}
+            sdImageFile={'SD22060101-001234'}
+            fileName={''}
+            btnPrintName="พิมพ์ใบผลต่าง"
             onPrint={handleOnPrint}
           />
         </ThemeProvider>
       </Provider>
     );
-    expect(screen.getByTestId('testid-pdfWrapper-image')).toBeInTheDocument();
+    expect(screen.getByTestId('testid-pdfWrapper-1')).toBeInTheDocument();
   });
 
-  it('should display pdf ', () => {
+  it('should display document if statusFile = 2 ', () => {
     const handleOnClick = jest.fn();
     const handleOnPrint = jest.fn();
     const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <ModalShowHuaweiFile
+          <ModalShowPDF
             open={true}
-            url={'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'}
-            isImage={false}
-            fileName={''}
             onClose={handleOnClick}
-            isPrint={false}
+            url={'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'}
+            statusFile={2}
+            sdImageFile={'SD22060101-001234'}
+            fileName={''}
+            btnPrintName="พิมพ์ใบผลต่าง"
             onPrint={handleOnPrint}
           />
         </ThemeProvider>
       </Provider>
     );
-    expect(screen.getByTestId('testid-pdfWrapper-document')).toBeInTheDocument();
+    expect(screen.getByTestId('testid-pdfWrapper-2')).toBeInTheDocument();
   });
 
   it('should display popup failed to load pdf ', async () => {
@@ -141,15 +161,43 @@ describe('component modal show huawei file', () => {
     const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <ModalShowHuaweiFile
+          <ModalShowPDF
             open={true}
+            onClose={handleOnClick}
             url={
               'https://posback-dev.obs.ap-southeast-2.myhuaweicloud.com/0101/BT22040101-000035-01.pdf?AWSAccessKeyId=O8YIMUIBJFUOILXDUNAM&Expires=1651803232&Signature=DOs%2BDXRjOvlAIy6VJlVi96%2FWlD8%3D'
             }
-            isImage={false}
+            statusFile={1}
+            sdImageFile={''}
             fileName={''}
+            btnPrintName="พิมพ์ใบผลต่าง"
+            onPrint={handleOnPrint}
+          />
+        </ThemeProvider>
+      </Provider>
+    );
+
+    setTimeout(() => {
+      expect(screen.getByText('Failed to load PDF')).toBeInTheDocument();
+    }, 5000);
+  });
+
+  it('should display popup failed to load pdf ', async () => {
+    const handleOnClick = jest.fn();
+    const handleOnPrint = jest.fn();
+    const container = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <ModalShowPDF
+            open={true}
             onClose={handleOnClick}
-            isPrint={true}
+            url={
+              'https://posback-dev.obs.ap-southeast-2.myhuaweicloud.com/0101/BT22040101-000035-01.pdf?AWSAccessKeyId=O8YIMUIBJFUOILXDUNAM&Expires=1651803232&Signature=DOs%2BDXRjOvlAIy6VJlVi96%2FWlD8%3D'
+            }
+            statusFile={1}
+            sdImageFile={''}
+            fileName={''}
+            btnPrintName="พิมพ์ใบผลต่าง"
             onPrint={handleOnPrint}
           />
         </ThemeProvider>
@@ -167,15 +215,16 @@ describe('component modal show huawei file', () => {
     const container = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <ModalShowHuaweiFile
+          <ModalShowPDF
             open={true}
+            onClose={handleOnClick}
             url={
               'https://posback-dev.obs.ap-southeast-2.myhuaweicloud.com/0101/BT22040101-000035-01.pdf?AWSAccessKeyId=O8YIMUIBJFUOILXDUNAM&Expires=1651803232&Signature=DOs%2BDXRjOvlAIy6VJlVi96%2FWlD8%3D'
             }
-            isImage={false}
+            statusFile={2}
+            sdImageFile={'SD22060101-001234'}
             fileName={''}
-            onClose={handleOnClick}
-            isPrint={true}
+            btnPrintName="พิมพ์ใบผลต่าง"
             onPrint={handleOnPrint}
           />
         </ThemeProvider>
