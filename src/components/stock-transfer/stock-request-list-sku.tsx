@@ -243,7 +243,10 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
       const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
       const items = stockRequestDetail.items ? stockRequestDetail.items : [];
 
-      if (stockRequestDetail.status === 'DRAFT' && stockBalanceList.length === 0) {
+      if (
+        (stockRequestDetail.status === 'DRAFT' || stockRequestDetail.status === 'AWAITING_FOR_REQUESTER') &&
+        stockBalanceList.length === 0
+      ) {
         let skuCodes: any = [];
         const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
         itemGroups.map((item: any) => {
