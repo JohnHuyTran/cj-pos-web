@@ -852,7 +852,7 @@ export default function ModalCreateTransferOut({
                   id='btnCancel'
                   variant='contained'
                   color='error'
-                  disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT}
+                  disabled={stringNullOrEmpty(status) || (!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
                   style={{
                     display:
                       (!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission

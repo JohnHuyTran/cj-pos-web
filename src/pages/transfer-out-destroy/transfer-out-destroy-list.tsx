@@ -334,7 +334,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
       try {
         await dispatch(getTransferOutDetail(params.row.documentNumber));
         if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
-          if (TO_TYPE.TO_WITHOUT_DISCOUNT === params.row.typeValue) {
+          if (TO_TYPE.TO_WITHOUT_DISCOUNT === params.row.typeValue || TO_TYPE.TO_DEFECT === params.row.typeValue) {
             setOpenDetail(true);
           } else if (TO_TYPE.TO_WITH_DISCOUNT === params.row.typeValue) {
             setOpenDetailDestroyDiscount(true);
