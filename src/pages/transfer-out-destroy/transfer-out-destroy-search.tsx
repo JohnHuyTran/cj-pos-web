@@ -207,10 +207,10 @@ const TransferOutSearch = () => {
       dataTable = <TransferOutList onSearch={onSearch} type={values.type} />;
     } else {
       dataTable = (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
+        <Grid item container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB'>
             <h2>
-              {t('noData')} <SearchOff fontSize="large" />
+              {t('noData')} <SearchOff fontSize='large' />
             </h2>
           </Box>
         </Grid>
@@ -227,9 +227,9 @@ const TransferOutSearch = () => {
               {'เลขที่เอกสารทำลาย'}
             </Typography>
             <TextField
-              id="documentNumber"
-              name="documentNumber"
-              size="small"
+              id='documentNumber'
+              name='documentNumber'
+              size='small'
               value={values.documentNumber}
               onChange={onChange.bind(this, setValues, values)}
               className={classes.MtextField}
@@ -238,7 +238,7 @@ const TransferOutSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {t('branch')}
             </Typography>
             <SelectBranch
@@ -248,21 +248,20 @@ const TransferOutSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {t('status')}
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="status"
-                name="status"
+                id='status'
+                name='status'
                 value={values.status}
                 onChange={onChange.bind(this, setValues, values)}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   {t('all')}
                 </MenuItem>
-                {groupBranch && <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>}
+                <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>
                 <MenuItem value={TOStatus.WAIT_FOR_APPROVAL}>รออนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.APPROVED}>อนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.REJECTED}>ไม่อนุมัติ</MenuItem>
@@ -274,7 +273,7 @@ const TransferOutSearch = () => {
         <Typography mt={2}>วันที่ทำรายการ</Typography>
         <Grid container rowSpacing={3} columnSpacing={6}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {'ตั้งแต่'}
             </Typography>
             <DatePickerComponent
@@ -283,7 +282,7 @@ const TransferOutSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {'ถึง'}
             </Typography>
             <DatePickerComponent
@@ -294,17 +293,16 @@ const TransferOutSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               ประเภท
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="type"
-                name="type"
+                id='type'
+                name='type'
                 value={values.type}
                 onChange={onChange.bind(this, setValues, values)}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   {t('all')}
                 </MenuItem>
@@ -320,48 +318,44 @@ const TransferOutSearch = () => {
           <Grid item xs={12} style={{ textAlign: 'right' }}>
             {requestPermission && (
               <Button
-                id="btnCreateToDestroyDiscount"
-                variant="contained"
+                id='btnCreateToDestroyDiscount'
+                variant='contained'
                 sx={{ width: '150px', height: '40px' }}
                 className={classes.MbtnSearch}
-                color="secondary"
+                color='secondary'
                 startIcon={<AddCircleOutlineOutlinedIcon />}
-                onClick={handleOpenModalTODestroyDiscount}
-              >
+                onClick={handleOpenModalTODestroyDiscount}>
                 {'ทำลายมีส่วนลด'}
               </Button>
             )}
             {requestPermission && (
               <Button
-                id="btnCreate"
-                variant="contained"
+                id='btnCreate'
+                variant='contained'
                 sx={{ width: '120px', height: '40px', ml: 2 }}
                 className={classes.MbtnSearch}
-                color="warning"
+                color='warning'
                 startIcon={<AddCircleOutlineOutlinedIcon />}
-                onClick={handleOpenModal}
-              >
+                onClick={handleOpenModal}>
                 {'ทำลาย'}
               </Button>
             )}
             <Button
-              id="btnClear"
-              variant="contained"
+              id='btnClear'
+              variant='contained'
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnClear}
-              color="cancelColor"
-              onClick={onClear}
-            >
+              color='cancelColor'
+              onClick={onClear}>
               {t('common:button.clear')}
             </Button>
             <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
+              id='btnSearch'
+              variant='contained'
+              color='primary'
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnSearch}
-              onClick={onSearch}
-            >
+              onClick={onSearch}>
               {t('common:button.search')}
             </Button>
           </Grid>
