@@ -49,3 +49,11 @@ export async function getAllProductByBarcode(payload: FindProductProps) {
     throw error;
   }
 }
+
+export async function getProductBySKUCodes(codes: any) {
+  try {
+    return await get(`${environment.products.type.productBySKUCodes.url}?codes=${codes}`);
+  } catch (error) {
+    throw error;
+  }
+}

@@ -28,7 +28,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -53,8 +53,7 @@ const columns: GridColDef[] = [
         <div
           style={{
             textAlign: 'center',
-          }}
-        >
+          }}>
           {params.value}
         </div>
       );
@@ -69,7 +68,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
           {params.value}-{params.getValue(params.id, 'branchName') || ''}
         </Typography>
       </div>
@@ -86,32 +85,36 @@ const columns: GridColDef[] = [
   {
     field: 'status',
     headerName: 'สถานะ',
-    minWidth: 140,
+    minWidth: 150,
     headerAlign: 'center',
     align: 'center',
     sortable: false,
     renderCell: (params) => {
-      if (params.value === 'DRAFT' || params.value === 'CREATED_PO' || params.value === 'WAITING_BRANCH_EXAMINE') {
+      if (params.value === 'DRAFT') {
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
-      } else if (params.value === 'SUBMITTED') {
+      } else if (params.value === 'WAITING_BRANCH_EXAMINE' || params.value === 'WAITING_DC_CHECK_DIFF') {
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
-      } else if (params.value === 'CLOSED') {
+      } else if (
+        params.value === 'DC_NO_STOCK' ||
+        params.value === 'RECEIVE_COMPLETE' ||
+        params.value === 'INCOMPLETE_RECEIVED'
+      ) {
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
           />
         );
@@ -242,7 +245,7 @@ export default function PurchaseBranchRequestList() {
 
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -255,7 +258,7 @@ export default function PurchaseBranchRequestList() {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}

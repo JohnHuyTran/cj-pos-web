@@ -19,6 +19,8 @@ export interface PurchaseBRDetailResponse {
 
 export interface PurchaseBRInfo {
   docNo: string;
+  poNo?: string;
+  doNo?: string;
   branchCode: string;
   status: string;
   remark: string;
@@ -38,6 +40,9 @@ export interface PurchaseBRItem {
   barFactor: number;
   orderMaxQty: number;
   orderQty: number;
+  referenceQty?: number;
+  actualQty?: number;
+  remark?: string;
 }
 export interface PurchaseBranchSearchRequest {
   limit: string;
