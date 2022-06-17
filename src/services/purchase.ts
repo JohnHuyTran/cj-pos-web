@@ -209,9 +209,12 @@ export async function fetchDataFilePN(pnNo: string) {
 
 export async function savePurchaseBR(payload: PurchaseBRRequest) {
   try {
-    const response = await put(environment.purchase.purchaseBranchRequest.save.url, payload, ContentType.JSON).then(
-      (result: any) => result
-    );
+    const response = await put(
+      environment.purchase.purchaseBranchRequest.save.url,
+      payload,
+      ContentType.JSON,
+      3000
+    ).then((result: any) => result);
     return response;
   } catch (error) {
     throw error;
@@ -238,3 +241,18 @@ export async function deletePurchaseBR(docNo: string) {
     throw error;
   }
 }
+
+export async function sendPurchaseBR(docNo: string) {
+  try {
+    const response = await post(getPathSendPurchaseBR(docNo), 3000).then((result: any) => result);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getPathSendPurchaseBR = (docNo: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.purchase.purchaseBranchRequest.send.url}`, {
+    docNo: docNo,
+  });
+};

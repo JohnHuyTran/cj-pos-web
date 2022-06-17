@@ -341,6 +341,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
     if (!clearBranchToDropDown) setClearBranchToDropDown(true);
     else if (clearBranchToDropDown) setClearBranchToDropDown(false);
+    setValuebranchTo(null);
   };
 
   const handleChangeToBranch = (branchCode: string) => {
@@ -551,8 +552,21 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             setOpenModelConfirm(true);
           })
           .catch((error: ApiError) => {
-            setShowSnackBar(true);
-            setContentMsg(error.message);
+            const errorList = error.error_details;
+            const errList: any = [];
+            if (errorList.length !== 0) {
+              errorList.map((item: any) => {
+                errList.push(`${item.skuCode} : ${item.productName}\n`);
+              });
+            }
+
+            if (error.code === 40010) {
+              setTextError(mappingErrorParam(error.message, { product: errList.toString() }));
+              setOpenAlert(true);
+            } else {
+              setTextError(error.message);
+              setOpenAlert(true);
+            }
           });
       } else {
         setTextHeaderConfirm('ยืนยันส่งงาน รายการโอนสินค้า');
@@ -668,17 +682,20 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               }, 500);
             })
             .catch((error: ApiError) => {
-              if (error.code === 40010) {
-                setShowSnackBar(true);
-                setSnackbarIsStatus(false);
-                setContentMsg(
-                  'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
-                );
-              } else {
-                setShowSnackBar(true);
-                setSnackbarIsStatus(false);
-                setContentMsg(error.message);
-              }
+              // if (error.code === 40010) {
+              //   setShowSnackBar(true);
+              //   setSnackbarIsStatus(false);
+              //   setContentMsg(
+              //     'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+              //   );
+              // } else {
+              //   setShowSnackBar(true);
+              //   setSnackbarIsStatus(false);
+              //   setContentMsg(error.message);
+              // }
+
+              setTextError(error.message);
+              setOpenAlert(true);
             });
         } else {
           await submitStockRequest(rtNo, payloadSubmit)
@@ -736,8 +753,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             }, 500);
           })
           .catch((error) => {
-            setShowSnackBar(true);
-            setContentMsg(error.message);
+            // setShowSnackBar(true);
+            // setContentMsg(error.message);
+            setTextError(error.message);
+            setOpenAlert(true);
           });
       } else {
         await approve1StockRequest(rtNo, payload1)
@@ -753,8 +772,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             }, 500);
           })
           .catch((error) => {
-            setShowSnackBar(true);
-            setContentMsg(error.message);
+            // setShowSnackBar(true);
+            // setContentMsg(error.message);
+            setTextError(error.message);
+            setOpenAlert(true);
           });
       }
     } else if (status === 'WAIT_FOR_APPROVAL_2') {
@@ -781,8 +802,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             }, 500);
           })
           .catch((error) => {
-            setShowSnackBar(true);
-            setContentMsg(error.message);
+            // setShowSnackBar(true);
+            // setContentMsg(error.message);
+            setTextError(error.message);
+            setOpenAlert(true);
           });
       } else {
         handleApprove2(payload2);
@@ -806,17 +829,20 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
         }, 500);
       })
       .catch((error: ApiError) => {
-        if (error.code === 40010) {
-          setShowSnackBar(true);
-          setSnackbarIsStatus(false);
-          setContentMsg(
-            'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
-          );
-        } else {
-          setShowSnackBar(true);
-          setSnackbarIsStatus(false);
-          setContentMsg(error.message);
-        }
+        // if (error.code === 40010) {
+        //   setShowSnackBar(true);
+        //   setSnackbarIsStatus(false);
+        //   setContentMsg(
+        //     'สาขาปลายทางไม่สามารถรับโอนสินค้าได้ เนื่องจากไม่มีการผูกข้อมูลกลุ่มสินค้า(assortment)ไว้ที่สาขา'
+        //   );
+        // } else {
+        //   setShowSnackBar(true);
+        //   setSnackbarIsStatus(false);
+        //   setContentMsg(error.message);
+        // }
+
+        setTextError(error.message);
+        setOpenAlert(true);
       });
   };
 

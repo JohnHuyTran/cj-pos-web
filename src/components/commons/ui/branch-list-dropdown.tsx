@@ -51,10 +51,6 @@ function BranchListDropDown({
 
     if (valueBranch) setValueBranchList(valueBranch);
     else setValueBranchList(null);
-
-    if (isClear) {
-      setValueBranchList(null);
-    }
   }, [isClear, branchList]);
   const filterDC = (branch: BranchInfo) => {
     return filterOutDC && branch.isDC ? false : true;

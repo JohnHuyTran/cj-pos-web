@@ -1,37 +1,21 @@
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../store/store';
-import {
-  DataGrid,
-  GridCellParams,
-  GridColDef,
-  GridRowData,
-  GridRowId,
-  GridRowParams,
-  GridValueGetterParams,
-  useGridApiRef,
-} from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRowData, GridRowParams, useGridApiRef } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 // import { makeStyles } from '@mui/styles';
 import { useStyles } from '../../styles/makeTheme';
-import Done from '@mui/icons-material/Done';
-
 import LoadingModal from '../commons/ui/loading-modal';
 import { Chip, Typography } from '@mui/material';
 import { StockTransferInfo, StockTransferRequest, StockTransferResponse } from '../../models/stock-transfer-model';
-import ModelDeleteConfirm from './modal-delete-confirm';
-import { DeleteForever } from '@mui/icons-material';
 import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
 import { saveSearchStockTransferRt } from '../../store/slices/save-search-stock-transfer-rt-slice';
 import ModalDetailStockTransfer from './stock-request-detail';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
-import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
-import { removeStockRequest } from '../../services/stock-transfer';
-import { isAllowActionPermission, isPreferredUsername } from '../../utils/role-permission';
-import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
+import { isPreferredUsername } from '../../utils/role-permission';
 import { getUserInfo } from '../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 

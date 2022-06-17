@@ -247,6 +247,9 @@ export const environment = {
       delete: {
         url: '/purchase/purchase-branch-request/{docNo}/delete',
       },
+      send: {
+        url: '/purchase/purchase-branch-request/{docNo}/send',
+      },
     },
   },
   products: {
@@ -256,6 +259,9 @@ export const environment = {
       },
       productByType: {
         url: '/products/barcode/type',
+      },
+      productBySKUCodes: {
+        url: '/products/sku-by-codes',
       },
     },
     addItem: {
