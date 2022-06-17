@@ -144,6 +144,7 @@ export default function ModalCreateToRawMaterial({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddItemsState({}));
     dispatch(
       updateDataDetail({

@@ -174,6 +174,7 @@ export default function ModalCreateTransferOutDestroy({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddItemsState({}));
     dispatch(
       updateDataDetail({
@@ -738,10 +739,10 @@ export default function ModalCreateTransferOutDestroy({
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={8}>
-              <Grid item xs={4}>
+              <Grid item xs={5}>
                 เลขที่เอกสารทำลาย :
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={7}>
                 {!!dataDetail.documentNumber ? dataDetail.documentNumber : '-'}
               </Grid>
             </Grid>
