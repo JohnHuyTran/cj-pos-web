@@ -48,16 +48,8 @@ describe('component stock-transfer-bt', () => {
     expect(screen.getByTestId('testid-btnSave')).toBeInTheDocument();
     expect(screen.getByTestId('testid-btnSendToDC')).toBeInTheDocument();
     expect(screen.getByTestId('testid-btnAddItem')).toBeInTheDocument();
-    // fireEvent.click(screen.getByTestId('testid-btnSave'));
-
-    //call scroll
-    let scrollIntoViewMock = jest.fn();
-    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
-    fireEvent.click(screen.getByTestId('testid-btnTop'));
-    expect(scrollIntoViewMock).toBeCalled();
-
-    fireEvent.click(screen.getByText('จอห์นสันเบบี้ออยล์125ml'));
-    expect(screen.getByText('รายการสินค้า: จอห์นสันเบบี้ออยล์125ml (000000000020001504)')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('testid-title-btnClose"'));
+    expect(handleOnClose).toBeCalledTimes(1);
   });
 
   it('on click item is show follow expect result', async () => {
@@ -78,6 +70,20 @@ describe('component stock-transfer-bt', () => {
 
     fireEvent.click(screen.getByText('จอห์นสันเบบี้ออยล์125ml'));
     expect(screen.getByText('รายการสินค้า: จอห์นสันเบบี้ออยล์125ml (000000000020001504)')).toBeInTheDocument();
+  });
+
+  it('can click เรียกดูเอกสารใบโอน BT -> show modal', async () => {
+    store = mockStore(mockDataBtDetailDraft);
+    const wrapper = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockTransferBT isOpen={true} onClickClose={handleOnClose} />
+        </ThemeProvider>
+      </Provider>
+    );
+
+    fireEvent.click(screen.getByText('เรียกดูเอกสารใบโอน BT'));
+    expect(screen.getByTestId('testid-pdfWrapper-document')).toBeInTheDocument();
   });
 
   it('find all button is status wait for picker and group branch', () => {
