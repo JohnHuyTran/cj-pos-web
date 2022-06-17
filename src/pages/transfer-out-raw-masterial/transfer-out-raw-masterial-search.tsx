@@ -29,6 +29,7 @@ import BranchListDropDown from '../../components/commons/ui/branch-list-dropdown
 import ModalCreateToRawMaterial from '../../components/transfer-out-raw-material/modal-create-to-raw-material';
 import { env } from '../../adapters/environmentConfigs';
 import RequisitionSummary from '../../components/commons/ui/modal-requisition-summary';
+import SelectBranch from '../transfer-out/transfer-out-branch';
 
 const _ = require('lodash');
 
@@ -51,37 +52,20 @@ const TORawMasterialSearch = () => {
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
   const [popupMsg, setPopupMsg] = React.useState<string>('');
-  const [lstStatus, setLstStatus] = React.useState([]);
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
-  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const ownBranch = getUserInfo().branch
-    ? getBranchName(branchList, getUserInfo().branch)
-      ? getUserInfo().branch
-      : env.branch.code
-    : env.branch.code;
-  const branchName = getBranchName(branchList, ownBranch);
-  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
-  const [branchMap, setBranchMap] = React.useState<BranchListOptionType>({
-    code: ownBranch,
-    name: branchName ? branchName : '',
-  });
-  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
-  const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
   const page = '1';
   const limit = useAppSelector((state) => state.transferOutSearchSlice.toSearchResponse.perPage);
   const barcodeDiscountSearchSlice = useAppSelector((state) => state.transferOutSearchSlice);
-  const [userPermission, setUserPermission] = useState<any[]>([]);
-  const [approvePermission, setApprovePermission] = useState<boolean>(false);
   const [requestPermission, setRequestPermission] = useState<boolean>(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
-  const [branchSelect, setBranchSelect] = React.useState('');
   const [openModal, setOpenModal] = React.useState(false);
   const [openModalRequisition, setOpenModalRequisition] = React.useState(false);
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+  const [listBranchSelect, setListBranchSelect] = React.useState<BranchListOptionType[]>([]);
   const dateDefault = new Date();
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
@@ -92,13 +76,6 @@ const TORawMasterialSearch = () => {
   });
 
   useEffect(() => {
-    if (groupBranch) {
-      setBranchMap({ code: ownBranch, name: branchName ? branchName : '' });
-      setBranchOptions(branchMap);
-    }
-  }, [branchList]);
-  useEffect(() => {
-    setLstStatus(t('lstStatus', { returnObjects: true }));
     //permission
     const userInfo: KeyCloakTokenInfo = getUserInfo();
     if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
@@ -106,10 +83,6 @@ const TORawMasterialSearch = () => {
         userInfo.acl['service.posback-campaign'] != null && userInfo.acl['service.posback-campaign'].length > 0
           ? userInfo.acl['service.posback-campaign']
           : [];
-      setUserPermission(userPermission);
-      setApprovePermission(
-        userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.approve') : false
-      );
       setRequestPermission(
         userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.create') : false
       );
@@ -123,6 +96,14 @@ const TORawMasterialSearch = () => {
       // });
     }
   }, []);
+  useEffect(() => {
+    if (listBranchSelect.length > 0) {
+      let branches = listBranchSelect.map((item: any) => item.code).join(',');
+      setValues({ ...values, branch: branches });
+    } else {
+      setValues({ ...values, branch: '' });
+    }
+  }, [listBranchSelect]);
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -146,17 +127,9 @@ const TORawMasterialSearch = () => {
   const handleClosePopup = () => {
     setOpenPopup(false);
   };
-  const handleChangeBranch = (branchCode: string) => {
-    if (branchCode !== null) {
-      let codes = JSON.stringify(branchCode);
-      setValues({ ...values, branch: JSON.parse(codes) });
-    } else {
-      setValues({ ...values, branch: '' });
-    }
-  };
 
   const onClear = async () => {
-    setClearBranchDropDown(!clearBranchDropDown);
+    setListBranchSelect([]);
     setFlagSearch(false);
     setValues({
       documentNumber: '',
@@ -226,10 +199,10 @@ const TORawMasterialSearch = () => {
       dataTable = <TransferOutList onSearch={onSearch} />;
     } else {
       dataTable = (
-        <Grid item container xs={12} justifyContent='center'>
-          <Box color='#CBD4DB'>
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
             <h2>
-              {t('noData')} <SearchOff fontSize='large' />
+              {t('noData')} <SearchOff fontSize="large" />
             </h2>
           </Box>
         </Grid>
@@ -242,13 +215,13 @@ const TORawMasterialSearch = () => {
       <Box sx={{ flexGrow: 1 }} mb={3}>
         <Grid container rowSpacing={3} columnSpacing={6} mt={0.1}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {'เลขที่เอกสารเบิก'}
             </Typography>
             <TextField
-              id='documentNumber'
-              name='documentNumber'
-              size='small'
+              id="documentNumber"
+              name="documentNumber"
+              size="small"
               value={values.documentNumber}
               onChange={onChange.bind(this, setValues, values)}
               className={classes.MtextField}
@@ -257,26 +230,31 @@ const TORawMasterialSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('branch')}
             </Typography>
-            <BranchListDropDown
+            {/* <BranchListDropDown
               valueBranch={branchOptions}
               sourceBranchCode={ownBranch}
               onChangeBranch={handleChangeBranch}
               isClear={clearBranchDropDown}
               disable={groupBranch}
               isFilterAuthorizedBranch={true}
+            /> */}
+            <SelectBranch
+              disabled={requestPermission}
+              listSelect={listBranchSelect}
+              setListSelect={setListBranchSelect}
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('status')}
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id='status'
-                name='status'
+                id="status"
+                name="status"
                 value={values.status}
                 onChange={onChange.bind(this, setValues, values)}
                 inputProps={{ 'aria-label': 'Without label' }}
@@ -291,7 +269,7 @@ const TORawMasterialSearch = () => {
         <Typography mt={2}>วันที่ทำรายการ</Typography>
         <Grid container rowSpacing={3} columnSpacing={6}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {'ตั้งแต่'}
             </Typography>
             <DatePickerComponent
@@ -300,7 +278,7 @@ const TORawMasterialSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {'ถึง'}
             </Typography>
             <DatePickerComponent
@@ -318,11 +296,11 @@ const TORawMasterialSearch = () => {
           <Grid item xs={12} style={{ textAlign: 'right' }}>
             {requestPermission && (
               <Button
-                id='btnCreate'
-                variant='contained'
+                id="btnCreate"
+                variant="contained"
                 sx={{ width: 140, height: '40px' }}
                 className={classes.MbtnSearch}
-                color='secondary'
+                color="secondary"
                 startIcon={<AddCircleOutlineOutlinedIcon />}
                 onClick={handleOpenModal}
               >
@@ -330,29 +308,29 @@ const TORawMasterialSearch = () => {
               </Button>
             )}
             <Button
-              id='btnDrawdown'
-              variant='contained'
+              id="btnDrawdown"
+              variant="contained"
               sx={{ width: 125, height: '40px', ml: 2 }}
               className={classes.MbtnSearch}
-              color='warning'
+              color="warning"
               onClick={handleOpenModalRequisition}
             >
               {'สรุปรายการเบิก'}
             </Button>
             <Button
-              id='btnClear'
-              variant='contained'
+              id="btnClear"
+              variant="contained"
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnClear}
-              color='cancelColor'
+              color="cancelColor"
               onClick={onClear}
             >
               {t('common:button.clear')}
             </Button>
             <Button
-              id='btnSearch'
-              variant='contained'
-              color='primary'
+              id="btnSearch"
+              variant="contained"
+              color="primary"
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnSearch}
               onClick={onSearch}
