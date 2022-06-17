@@ -16598,6 +16598,203 @@ export const mockDataBT = {
   },
 };
 
+export const mockDataBtDetailDraftNoUpdate = {
+  branchTransferDetailSlice: {
+    branchTransferRs: {
+      timestamp: '2022-06-16T03:53:46.509+0000',
+      ref: '62aaa94a74ff70ef36f03025',
+      code: 20000,
+      message: 'success',
+      data: {
+        id: '62aa9f61481929362cc6eb08',
+        btNo: 'BT22060101-000062',
+        rtNo: 'RT2206B005-000031',
+        branchCode: '0101',
+        startDate: '2022-06-08T17:00:00Z',
+        endDate: '2022-06-08T17:00:00Z',
+        branchFrom: '0101',
+        branchTo: 'D002',
+        itemGroups: [
+          {
+            skuCode: '000000000020001504',
+            productName: 'จอห์นสันเบบี้ออยล์125ml',
+            remainingQty: 75,
+            orderAllQty: 66,
+            actualAllQty: 0,
+          },
+        ],
+        items: [
+          {
+            seqItem: 1,
+            skuCode: '000000000020001504',
+            productName: 'จอห์นสันเบบี้ออยล์125ml',
+            barcode: '8850007060987',
+            barcodeName: 'จอห์นสันเบบี้ออยล์125ml Pack',
+            unitCode: 'PAK',
+            unitName: 'แพค',
+            barFactor: 3,
+            orderQty: 0,
+            actualQty: 0,
+          },
+        ],
+        delivery: {
+          fromDate: '0001-01-01T00:00:00Z',
+          toDate: '0001-01-01T00:00:00Z',
+        },
+        transferReason: '1',
+        status: 'CREATED',
+        auditLogs: [
+          {
+            activity: 'Created',
+            editBy: 'posscm',
+            editByName: 'posscm',
+            editDate: '2022-06-16T03:11:29.334Z',
+          },
+        ],
+        createdBy: 'posscm',
+        lastModifiedBy: 'posscm',
+        createdDate: '2022-06-16T03:11:29.334Z',
+        lastModifiedDate: '2022-06-16T03:11:29.334Z',
+        files: null,
+      },
+    },
+    error: '',
+  },
+  transferReasonsList: {
+    reasonsList: {
+      timestamp: '2022-06-16T02:57:52.403+0000',
+      ref: '62aa9c30eb97e9c141e88f49',
+      code: 20000,
+      message: 'success',
+      data: [
+        {
+          id: '61dbd0f31a241f241c4ad729',
+          code: '1',
+          name: 'โอนสินค้าตามรอบ',
+        },
+        {
+          id: '61dbd0f31a241f241c4ad72a',
+          code: '2',
+          name: 'โอนสินค้าคืน DC',
+        },
+        {
+          id: '61dbd0f31a241f241c4ad72b',
+          code: '3',
+          name: 'โอนสินค้าเนื่องจาก Event',
+        },
+        {
+          id: '61dbd0f31a241f241c4ad72c',
+          code: '4',
+          name: 'โอนสินค้าเนื่องจากยกเลิกการขาย',
+        },
+      ],
+    },
+    error: '',
+  },
+  searchBranchSlice: {
+    branchList: {
+      ref: '62aa9bf7573d5f20455eb5a6',
+      code: 20000,
+      message: 'success',
+      data: [
+        {
+          id: '61dffd799bfc3701dce4f0f5',
+          name: 'CJค้าส่งบ้านเลือก',
+          province: {
+            code: 0,
+            name: '',
+          },
+          code: 'B004',
+          isDC: false,
+        },
+        {
+          id: '61dffd799bfc3701dce4f0fa',
+          name: 'Nineti9(Online)',
+          province: {
+            code: 0,
+            name: '',
+          },
+          code: 'B009',
+          isDC: false,
+        },
+        {
+          id: '61dffd799bfc3701dce4f287',
+          name: 'สาขาที่00253 ตลาดโพธาราม',
+          province: {
+            code: 52,
+            name: 'ราชบุรี',
+          },
+          code: '0239',
+          isDC: false,
+        },
+      ],
+    },
+  },
+  searchStockTransfer: {
+    orderList: {
+      timestamp: '2022-06-16T03:52:14.949+0000',
+      ref: '62aaa8ee74ff70ef36f03021',
+      code: 20000,
+      message: 'success',
+      data: [
+        {
+          id: '62aa9f61481929362cc6eb08',
+          btNo: 'BT22060101-000062',
+          rtNo: 'RT2206B005-000031',
+          startDate: '2022-06-08T17:00:00Z',
+          endDate: '2022-06-08T17:00:00Z',
+          branchFrom: '0101',
+          branchFromName: 'สาขาที่00123 ไทรโยค',
+          branchTo: 'D002',
+          branchToName: 'สาขาที่00575 ศูนย์กระจายสินค้า คลัง 2',
+          status: 'CREATED',
+          transferReason: '1',
+          createdBy: 'posscm',
+          lastModifiedBy: 'posscm',
+          createdDate: '2022-06-16T03:11:29.334Z',
+          lastModifiedDate: '2022-06-16T03:11:29.334Z',
+        },
+      ],
+      total: 18,
+      page: 1,
+      perPage: 10,
+      next: 2,
+      totalPage: 2,
+    },
+    error: '',
+  },
+  saveSearchStock: {
+    searchStockTransfer: {
+      limit: '10',
+      page: '1',
+      docNo: '',
+      branchFrom: '0101',
+      branchTo: '',
+      dateFrom: '2022-05-31T17:00:00.000Z',
+      dateTo: '2022-06-16T16:59:59.999Z',
+      statuses: 'CREATED',
+      transferReason: '',
+      clearSearch: false,
+    },
+  },
+  uploadFileSlice: {
+    state: [],
+  },
+  searchAllItemsList: {
+    itemList: {
+      timestamp: '',
+      ref: '',
+      code: 0,
+      message: '',
+      error_details: '',
+      data: [],
+    },
+  },
+  addItems: {
+    state: [],
+  },
+};
+
 export const mockDataBtDetailDraft = {
   branchTransferDetailSlice: {
     branchTransferRs: {
@@ -16636,18 +16833,18 @@ export const mockDataBtDetailDraft = {
             orderQty: 0,
             actualQty: 0,
           },
-          {
-            seqItem: 1,
-            skuCode: '000000000020001503',
-            productName: 'จอห์นสันเบบี้ออยล์125ml',
-            barcode: '8850007060987',
-            barcodeName: 'จอห์นสันเบบี้ออยล์125ml Pack',
-            // unitCode: '',
-            unitName: 'แพค',
-            barFactor: 3,
-            // orderQty: ,
-            actualQty: 0,
-          },
+          // {
+          //   seqItem: 1,
+          //   skuCode: '000000000020001503',
+          //   productName: 'จอห์นสันเบบี้ออยล์125ml',
+          //   barcode: '8850007060987',
+          //   barcodeName: 'จอห์นสันเบบี้ออยล์125ml Pack',
+          //   // unitCode: '',
+          //   unitName: 'แพค',
+          //   barFactor: 3,
+          //   // orderQty: ,
+          //   actualQty: 0,
+          // },
         ],
         delivery: {
           fromDate: '0001-01-01T00:00:00Z',

@@ -9,6 +9,7 @@ import thunk from 'redux-thunk';
 import StockTransferBT from '../../../../components/stock-transfer/branch-transfer/stock-transfer-bt';
 import {
   mockDataBtDetailDraft,
+  mockDataBtDetailDraftNoUpdate,
   mockDataBtDetailReadyToTransfer,
   mockDataBtDetailTransfering,
   mockDataBtDetailWaitForPickup,
@@ -36,7 +37,7 @@ jest.mock('react-i18next', () => ({
 
 describe('component stock-transfer-bt', () => {
   it('find all button is status draft and group branch', async () => {
-    store = mockStore(mockDataBtDetailDraft);
+    store = mockStore(mockDataBtDetailDraftNoUpdate);
     const wrapper = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -49,7 +50,7 @@ describe('component stock-transfer-bt', () => {
     expect(screen.getByTestId('testid-btnSendToDC')).toBeInTheDocument();
     expect(screen.getByTestId('testid-btnAddItem')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('testid-title-btnClose'));
-    expect(handleOnClose).toBeCalledTimes(1);
+    expect(handleOnClose).toHaveBeenCalledTimes(1);
   });
 
   it('on click item is show follow expect result', async () => {
@@ -70,21 +71,23 @@ describe('component stock-transfer-bt', () => {
 
     fireEvent.click(screen.getByText('จอห์นสันเบบี้ออยล์125ml'));
     expect(screen.getByText('รายการสินค้า: จอห์นสันเบบี้ออยล์125ml (000000000020001504)')).toBeInTheDocument();
-  });
-
-  it('can click เรียกดูเอกสารใบโอน BT -> show modal', async () => {
-    store = mockStore(mockDataBtDetailDraft);
-    const wrapper = render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <StockTransferBT isOpen={true} onClickClose={handleOnClose} />
-        </ThemeProvider>
-      </Provider>
-    );
-
     await fireEvent.click(screen.getByText('เรียกดูเอกสารใบโอน BT'));
     expect(screen.getByText('Loading PDF…')).toBeInTheDocument();
   });
+
+  // it('can click เรียกดูเอกสารใบโอน BT -> show modal', async () => {
+  //   store = mockStore(mockDataBtDetailDraft);
+  //   const wrapper = render(
+  //     <Provider store={store}>
+  //       <ThemeProvider theme={theme}>
+  //         <StockTransferBT isOpen={true} onClickClose={handleOnClose} />
+  //       </ThemeProvider>
+  //     </Provider>
+  //   );
+
+  //   await fireEvent.click(screen.getByText('เรียกดูเอกสารใบโอน BT'));
+  //   expect(screen.getByText('Loading PDF…')).toBeInTheDocument();
+  // });
 
   it('find all button is status wait for picker and group branch', () => {
     store = mockStore(mockDataBtDetailWaitForPickup);
