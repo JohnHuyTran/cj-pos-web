@@ -143,6 +143,7 @@ export default function ModalCreateToDestroyDiscount({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddDestroyProductState([]));
     dispatch(
       updateDataDetail({
@@ -577,10 +578,10 @@ export default function ModalCreateToDestroyDiscount({
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5}>
-              <Grid item xs={4}>
+              <Grid item xs={5}>
                 เลขที่เอกสารทำลาย :
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={7}>
                 {!!dataDetail.documentNumber ? dataDetail.documentNumber : '-'}
               </Grid>
             </Grid>

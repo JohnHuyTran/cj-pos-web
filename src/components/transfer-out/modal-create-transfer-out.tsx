@@ -156,6 +156,7 @@ export default function ModalCreateTransferOut({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddItemsState({}));
     dispatch(
       updateDataDetail({

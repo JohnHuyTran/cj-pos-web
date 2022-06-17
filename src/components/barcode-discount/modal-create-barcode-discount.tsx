@@ -229,6 +229,7 @@ export default function ModalCreateBarcodeDiscount({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddItemsState({}));
     dispatch(
       updateDataDetail({
