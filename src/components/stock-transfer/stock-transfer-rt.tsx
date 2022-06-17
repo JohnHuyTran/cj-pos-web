@@ -343,7 +343,7 @@ export default function StockTransferRt() {
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
 
-        if (value.data.insufficientBalanceRTNos) {
+        if (value.data.insufficientBalanceRTNos.length > 0) {
           setTextError(
             mappingErrorParam(
               'ไม่สามารถส่งงานได้ เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ กรุณาแก้ไขจำนวนที่สั่ง \n[{rtNoList}]',
