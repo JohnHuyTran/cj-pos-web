@@ -1,27 +1,17 @@
-import {
-  render,
-  screen,
-  waitFor,
-  fireEvent,
-  RenderResult,
-  getByTestId,
-  within,
-  wait,
-  act,
-} from '@testing-library/react';
+import { render, screen, fireEvent, RenderResult, within, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import configureStore from 'redux-mock-store';
+
 import { Store, AnyAction } from '@reduxjs/toolkit';
 import { initialState } from '../../../mockStore';
-import { inputAdornmentClasses, TextField, ThemeProvider } from '@mui/material';
+import { ThemeProvider } from '@mui/material';
 import theme from '../../../../styles/theme';
 import { mockUserInfo } from '../../../mockData';
-
-import { BranchListOptionType } from '../../../../models/branch-model';
 import TextBoxSearchProduct from '../../../../components/commons/ui/texbox-search-product';
-
+import configureMockStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
 let wrapper: RenderResult<typeof import('@testing-library/dom/types/queries'), HTMLElement>;
-const mockStore = configureStore();
+const middlewares = [thunk];
+const mockStore = configureMockStore(middlewares);
 let store: Store<any, AnyAction>;
 const handleOnSelectItem = jest.fn();
 sessionStorage.setItem('user_info', mockUserInfo);

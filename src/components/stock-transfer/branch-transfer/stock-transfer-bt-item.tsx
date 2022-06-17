@@ -11,7 +11,6 @@ import {
   GridRenderCellParams,
   GridRowData,
   GridRowId,
-  GridValueGetterParams,
   useGridApiRef,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
@@ -98,17 +97,11 @@ const columns: GridColDef[] = [
         value={params.value}
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
-          // e.persist();
-          // const caretStart = e.target.selectionStart;
-          // const caretEnd = e.target.selectionEnd;
           var value = e.target.value ? parseInt(e.target.value, 10) : '0';
           var returnQty = Number(params.getValue(params.id, 'actualQty'));
           if (returnQty === 0) value = chkReturnQty(value);
           if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, actualQty: value }]);
-
-          // update the state and reset the caret
-          // e.target.setSelectionRange(caretStart, caretEnd);
         }}
         disabled={params.getValue(params.id, 'isDisable') ? true : false}
         autoComplete='off'
@@ -131,7 +124,6 @@ const columns: GridColDef[] = [
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
           params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
-          // e.target.setSelectionRange(caretStart, caretEnd);
         }}
         disabled={params.getValue(params.id, 'isDisable') ? true : false}
         autoComplete='off'
@@ -205,7 +197,6 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
   );
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  // const skuGroupItems = useAppSelector((state) => state.updateBTSkuSlice.state);
   const [skuGroupItems, setskuGroupItems] = React.useState<ItemGroups[]>(
     branchTransferInfo.itemGroups ? branchTransferInfo.itemGroups : []
   );
@@ -214,10 +205,6 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
   const [pageSize, setPageSize] = React.useState<number>(10);
 
   const [isChecked, setIschecked] = React.useState(true);
-  const [skuNameDisplay, setSkuNameDisplay] = React.useState<string>(branchTransferInfo.itemGroups[0].productName);
-  // const [skuCodeSelect, setSkuCodeSelect] = React.useState<string>('');
-  const [defaultSkuSelected, setDefaultSkuSelected] = React.useState<string>(branchTransferInfo.itemGroups[0].skuCode);
-
   let rows = branchTransferItems
     .filter((item: Item, index: number) => {
       if (skuCodeSelect && !isChecked) {
@@ -378,7 +365,6 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
         _items = [..._items, newData];
       }
     });
-    // });
 
     _sku.forEach((data: ItemGroups) => {
       const sum = _items
@@ -406,8 +392,6 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
 
   const deleteItem = async () => {
     let _items = [...branchTransferItems];
-    let _sku = [...skuGroupItems];
-    let _newSku: ItemGroups[] = [];
 
     _.remove(_items, function (item: Item) {
       return item.barcode === itemDelete.barcode;
@@ -424,12 +408,6 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
     newColumns[7]['hide'] = true;
     newColumns[8]['hide'] = false;
   }
-
-  // const handleEditItems = async (params: GridEditCellValueParams) => {
-  //   if (params.field === 'actualQty' || params.field === 'toteCode') {
-  //     storeItem();
-  //   }
-  // };
 
   const handleOnFocusOut = async (params: GridEditCellValueParams) => {
     storeItem();
@@ -511,7 +489,6 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
             rowHeight={65}
             onCellFocusOut={handleOnFocusOut}
             onCellOut={handleOnCellOut}
-            // onCellKeyDown={handleEditItems}
             onCellClick={currentlySelected}
           />
         </div>
