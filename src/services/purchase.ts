@@ -209,9 +209,12 @@ export async function fetchDataFilePN(pnNo: string) {
 
 export async function savePurchaseBR(payload: PurchaseBRRequest) {
   try {
-    const response = await put(environment.purchase.purchaseBranchRequest.save.url, payload, ContentType.JSON).then(
-      (result: any) => result
-    );
+    const response = await put(
+      environment.purchase.purchaseBranchRequest.save.url,
+      payload,
+      ContentType.JSON,
+      3000
+    ).then((result: any) => result);
     return response;
   } catch (error) {
     throw error;

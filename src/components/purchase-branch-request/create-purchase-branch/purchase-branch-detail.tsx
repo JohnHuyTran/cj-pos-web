@@ -150,9 +150,18 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
 
           dispatch(updateAddItemsState(items));
         }
-      } else if (purchaseBRDetail.status === 'INCOMPLETE_RECEIVED') {
-        setDisplayCopyItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      } else if (purchaseBRDetail.status === 'INCOMPLETE_RECEIVED' || purchaseBRDetail.status === 'DC_NO_STOCK') {
         dispatch(updateAddItemsState(purchaseBRDetail.items));
+
+        let DisplayCopy = true;
+        purchaseBRDetail.items.map((item: any) => {
+          const actualQty = item.actualQty ? item.actualQty : 0;
+          const orderQty = item.orderQty ? item.orderQty : 0;
+          let diff = Number(actualQty) - Number(orderQty);
+          if (diff < 0) DisplayCopy = false;
+        });
+
+        if (!isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE)) setDisplayCopyItems(DisplayCopy);
       }
 
       const strBranchName = getBranchName(branchList, purchaseBRDetail.branchCode);
