@@ -459,8 +459,10 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
   const [openModalDeleteConfirm, setOpenModalDeleteConfirm] = React.useState(false);
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
+    const isEdit = params.row.edit;
+    const orderQty = params.row.orderqty;
 
-    if (value === 'delete') {
+    if (value === 'delete' && (isEdit || orderQty <= 0)) {
       const _item: Item = {
         barcode: params.row.barcode,
         barcodeName: params.row.barcodeName,
