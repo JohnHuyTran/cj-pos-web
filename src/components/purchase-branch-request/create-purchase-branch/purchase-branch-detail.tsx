@@ -410,8 +410,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         SKUCodes.push(item.skuCode);
       }
     });
-    console.log('itemsCopy:', JSON.stringify(itemsCopy));
-    console.log('SKUCodes:', JSON.stringify(SKUCodes));
+    // console.log('itemsCopy:', JSON.stringify(itemsCopy));
+    // console.log('SKUCodes:', JSON.stringify(SKUCodes));
 
     await getProductBySKUCodes(SKUCodes)
       .then((value) => {
