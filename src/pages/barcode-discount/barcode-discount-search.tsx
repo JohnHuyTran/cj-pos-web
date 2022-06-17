@@ -350,7 +350,7 @@ const BarcodeDiscountSearch = () => {
                 <MenuItem value={'ALL'} selected={true}>
                   {t('all')}
                 </MenuItem>
-                {approvePermission ? <></> : <MenuItem value={'1'}>{getStatusText('1')}</MenuItem>}
+                <MenuItem value={'1'}>{getStatusText('1')}</MenuItem>
                 <MenuItem value={'2'}>{getStatusText('2')}</MenuItem>
                 <MenuItem value={'3'}>{getStatusText('3')}</MenuItem>
                 <MenuItem value={'4'}>{getStatusText('4')}</MenuItem>
