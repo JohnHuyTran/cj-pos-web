@@ -41,6 +41,6 @@ describe('component AlertError', () => {
   it('find alert text error', () => {
     expect(screen.getByTestId(/txtContent/)).toBeInTheDocument();
     let txtContent = screen.getByTestId(/txtContent/);
-    expect(txtContent.textContent).toEqual('กรุณาตรวจสอบข้อมูล ');
+    expect(txtContent.textContent).toEqual('กรุณาตรวจสอบข้อมูล');
   });
 });

@@ -1,26 +1,10 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import {
-  BranchTransferRequest,
-  Delivery,
-  Item,
-  ItemGroups,
-  StockBalanceType,
-} from '../../../models/stock-transfer-model';
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  Grid,
-  IconButton,
-  Link,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { BranchTransferRequest, Delivery, Item, ItemGroups } from '../../../models/stock-transfer-model';
+import { Button, Grid, IconButton, Link, Typography } from '@mui/material';
 import Steppers from '../steppers';
 import Box from '@mui/system/Box';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
@@ -48,20 +32,15 @@ import {
   sendBranchTransferToDC,
   sendBranchTransferToPickup,
   submitStockTransfer,
-  checkStockBalance,
   saveBranchTransfer,
 } from '../../../services/stock-transfer';
-import theme from '../../../styles/theme';
 import { featchPurchaseNoteAsync } from '../../../store/slices/supplier-order-return-slice';
-import { FileType } from '../../../models/supplier-check-order-model';
 import { featchSearchStockTransferAsync } from '../../../store/slices/stock-transfer-slice';
 import { ApiError } from '../../../models/api-error-model';
 import { GridRowData } from '@mui/x-data-grid';
 import { featchBranchTransferDetailAsync } from '../../../store/slices/stock-transfer-branch-request-slice';
 import moment from 'moment';
-import { env } from 'process';
 import { updateAddItemsState } from '../../../store/slices/add-items-slice';
-import { updateAddItemSkuGroupState } from '../../../store/slices/stock-transfer-bt-sku-slice';
 import { isGroupBranch } from '../../../utils/role-permission';
 import AccordionUploadFile from '../../commons/ui/accordion-upload-file';
 import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
@@ -587,6 +566,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
         <Grid item xl={5}>
           <Button
+            data-testid='testid-btnAddItem'
             id='btnAddItem'
             variant='contained'
             color='info'
@@ -599,6 +579,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         </Grid>
         <Grid item>
           <Button
+            data-testid='testid-btnSave'
             id='btnSave'
             variant='contained'
             color='warning'
@@ -610,7 +591,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           </Button>
 
           <Button
-            id='btnApprove'
+            data-testid='testid-btnSendToDC'
+            id='btnSendToDC'
             variant='contained'
             color='primary'
             className={classes.MbtnSendDC}
@@ -703,6 +685,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       </Grid>
       <Grid item>
         <Button
+          data-testid='testid-btnSave'
           id='btnSave'
           variant='contained'
           color='warning'
@@ -859,7 +842,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         <Grid item xl={8}></Grid>
         <Grid item>
           <Button
-            id='btnSave'
+            data-testid='testid-btnApprove'
+            id='btnApprove'
             variant='contained'
             color='warning'
             className={classes.MbtnSave}
@@ -1044,7 +1028,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               </Grid>
               <Grid item xs={7}></Grid>
               <Grid item xs={2} textAlign='center'>
-                <IconButton onClick={topFunction}>
+                <IconButton onClick={topFunction} data-testid='testid-btnTop'>
                   <ArrowForwardIosIcon
                     sx={{
                       fontSize: '41px',

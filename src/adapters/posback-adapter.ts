@@ -6,12 +6,13 @@ import { ContentType, ERROR_CODE } from '../utils/enum/common-enum';
 import { refreshToken } from './keycloak-adapter';
 import { logout } from '../store/slices/authSlice';
 import { getSessionId, getAccessToken } from '../store/sessionStore';
+import i18next from 'i18next';
 
 const defaultForJSON = ContentType.JSON;
 const defaultTimeout = env.backEnd.timeout;
 let contentType: string;
 let timeout: number = env.backEnd.timeout;
-// const instance = (contentType: string) => {
+const msg_tiemout = i18next.t('error:timeout');
 const instance = axios.create({
   baseURL: env.backEnd.url,
   timeout: env.backEnd.timeout,
@@ -79,11 +80,7 @@ export function get(path: string, contentType = defaultForJSON, overrideTimeOut 
     })
     .catch((error: any) => {
       if (error.code === 'ECONNABORTED') {
-        const err = new ApiError(
-          error.response?.status,
-          ERROR_CODE.TIME_OUT,
-          'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
-        );
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
         throw err;
       }
 
@@ -111,11 +108,7 @@ export function getFile(path: string, contentType = defaultForJSON, overrideTime
     })
     .catch((error: any) => {
       if (error.code === 'ECONNABORTED') {
-        const err = new ApiError(
-          error.response?.status,
-          ERROR_CODE.TIME_OUT,
-          'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
-        );
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
         throw err;
       }
 
@@ -143,7 +136,16 @@ export function getParams(path: string, payload: any, contentType = defaultForJS
       throw err;
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
+
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.error_code,
+        error.response?.data.error_message
+      );
       throw err;
     });
 }
@@ -165,6 +167,10 @@ export function post(
       }
     })
     .catch((error: any) => {
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
       if (actionType === 'Upload') {
         const err = new ApiUploadError(
           error.response?.status,
@@ -189,10 +195,15 @@ export function put(path: string, payload: any, contentType = defaultForJSON, ov
       if (response.status == 200 || response.status == 201) {
         return response.data;
       }
+      console.log(response);
       const err = new ApiError(response.status, response.status, response.statusText);
       throw err;
     })
     .catch((error: any) => {
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
       const err = new ApiError(
         error.response?.status,
         error.response?.data.code,
@@ -216,7 +227,16 @@ export function putData(path: string, contentType = defaultForJSON, overrideTime
       throw err;
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
+
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.error_code,
+        error.response?.data.error_message
+      );
       throw err;
     });
 }
@@ -230,7 +250,16 @@ export function deleteData(path: string, contentType = defaultForJSON, overrideT
       return result;
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
+
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.error_code,
+        error.response?.data.error_message
+      );
       throw err;
     });
 }
@@ -249,7 +278,16 @@ export function deleteDataBody(
       return response;
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
+
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.error_code,
+        error.response?.data.error_message
+      );
       throw err;
     });
 }
