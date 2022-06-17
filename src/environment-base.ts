@@ -267,7 +267,7 @@ export const environment = {
         url: '/products/barcode/type',
       },
       productBySKUCodes: {
-        url: '/products/sk-by-codes',
+        url: '/products/sku-by-codes',
       },
     },
     addItem: {

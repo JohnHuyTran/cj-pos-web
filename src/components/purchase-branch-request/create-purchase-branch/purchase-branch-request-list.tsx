@@ -98,7 +98,11 @@ const columns: GridColDef[] = [
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
-      } else if (params.value === 'WAITING_BRANCH_EXAMINE' || params.value === 'WAITING_DC_CHECK_DIFF') {
+      } else if (
+        params.value === 'WAITING_BRANCH_EXAMINE' ||
+        params.value === 'WAITING_DC_CHECK_DIFF' ||
+        params.value === 'RECEIVE_COMPLETE'
+      ) {
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
@@ -106,11 +110,7 @@ const columns: GridColDef[] = [
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
-      } else if (
-        params.value === 'DC_NO_STOCK' ||
-        params.value === 'RECEIVE_COMPLETE' ||
-        params.value === 'INCOMPLETE_RECEIVED'
-      ) {
+      } else if (params.value === 'DC_NO_STOCK' || params.value === 'INCOMPLETE_RECEIVED') {
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
