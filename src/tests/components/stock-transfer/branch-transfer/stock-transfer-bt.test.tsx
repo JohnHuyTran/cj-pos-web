@@ -48,7 +48,7 @@ describe('component stock-transfer-bt', () => {
     expect(screen.getByTestId('testid-btnSave')).toBeInTheDocument();
     expect(screen.getByTestId('testid-btnSendToDC')).toBeInTheDocument();
     expect(screen.getByTestId('testid-btnAddItem')).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('testid-title-btnClose"'));
+    fireEvent.click(screen.getByTestId('testid-title-btnClose'));
     expect(handleOnClose).toBeCalledTimes(1);
   });
 
@@ -82,8 +82,8 @@ describe('component stock-transfer-bt', () => {
       </Provider>
     );
 
-    fireEvent.click(screen.getByText('เรียกดูเอกสารใบโอน BT'));
-    expect(screen.getByTestId('testid-pdfWrapper-document')).toBeInTheDocument();
+    await fireEvent.click(screen.getByText('เรียกดูเอกสารใบโอน BT'));
+    expect(screen.getByText('Loading PDF…')).toBeInTheDocument();
   });
 
   it('find all button is status wait for picker and group branch', () => {
