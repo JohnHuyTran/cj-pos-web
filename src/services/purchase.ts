@@ -213,7 +213,7 @@ export async function savePurchaseBR(payload: PurchaseBRRequest) {
       environment.purchase.purchaseBranchRequest.save.url,
       payload,
       ContentType.JSON,
-      3000
+      env.backEnd.timeoutpurchasebranch
     ).then((result: any) => result);
     return response;
   } catch (error) {
@@ -244,7 +244,13 @@ export async function deletePurchaseBR(docNo: string) {
 
 export async function sendPurchaseBR(docNo: string) {
   try {
-    const response = await post(getPathSendPurchaseBR(docNo), 3000).then((result: any) => result);
+    const response = await post(
+      getPathSendPurchaseBR(docNo),
+      undefined,
+      undefined,
+      undefined,
+      env.backEnd.timeoutpurchasebranch
+    ).then((result: any) => result);
     return response;
   } catch (error) {
     throw error;
