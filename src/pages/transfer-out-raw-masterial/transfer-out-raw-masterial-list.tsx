@@ -109,6 +109,21 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       ),
     },
     {
+      field: 'branch',
+      headerName: 'สาขา',
+      headerAlign: 'center',
+      sortable: false,
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params) => (
+        <HtmlTooltip title={params.value ? params.value : ''}>
+          <Typography component="div" sx={{ fontSize: textSize }} noWrap>
+            {params.value}
+          </Typography>
+        </HtmlTooltip>
+      ),
+    },
+    {
       field: 'documentNumber',
       headerName: 'เลขที่ขอใช้วัตถุดิบ',
       headerAlign: 'center',
@@ -165,9 +180,11 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       flex: 1,
       minWidth: 200,
       renderCell: (params) => (
-        <Box component="div" sx={{ marginLeft: '1rem', fontSize: textSize }}>
-          {params.value}
-        </Box>
+        <HtmlTooltip title={params.value ? params.value : ''}>
+          <Typography component="div" sx={{ fontSize: textSize }} noWrap>
+            {params.value}
+          </Typography>
+        </HtmlTooltip>
       ),
     },
     {
@@ -178,9 +195,11 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       flex: 1,
       minWidth: 200,
       renderCell: (params) => (
-        <Box component="div" sx={{ marginLeft: '1rem', fontSize: textSize }}>
-          {params.value}
-        </Box>
+        <HtmlTooltip title={params.value ? params.value : ''}>
+          <Typography component="div" sx={{ fontSize: textSize }} noWrap>
+            {params.value}
+          </Typography>
+        </HtmlTooltip>
       ),
     },
     {
@@ -188,8 +207,8 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       headerName: 'หมายเหตุ',
       headerAlign: 'center',
       sortable: false,
-      flex: 1.2,
-      minWidth: 240,
+      flex: 1,
+      minWidth: 200,
       renderCell: (params) => {
         if (params.value) {
           let len = String(params.value).length;

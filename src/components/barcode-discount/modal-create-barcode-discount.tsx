@@ -229,6 +229,7 @@ export default function ModalCreateBarcodeDiscount({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddItemsState({}));
     dispatch(
       updateDataDetail({
@@ -1131,7 +1132,7 @@ export default function ModalCreateBarcodeDiscount({
                   id='btnCancel'
                   variant='contained'
                   color='error'
-                  disabled={status > 1}
+                  disabled={status < 1}
                   style={{
                     display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission ? 'none' : undefined,
                   }}

@@ -28,9 +28,10 @@ interface State {
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
+  branchSelected: string;
 }
 
-export default function RequisitionSummary({ isOpen, onClickClose }: Props): ReactElement {
+export default function RequisitionSummary({ isOpen, onClickClose, branchSelected }: Props): ReactElement {
   const classes = useStyles();
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
@@ -44,13 +45,24 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
       ? getUserInfo().branch
       : env.branch.code
     : env.branch.code;
+  const branchSelectName = !stringNullOrEmpty(branchSelected)
+    ? branchSelected + '-' + getBranchName(branchList, branchSelected)
+    : '';
   const branchName = getBranchName(branchList, ownBranch);
+  const branchName1 = getBranchName(branchList, branchSelected);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const [branchMap, setBranchMap] = React.useState<BranchListOptionType>({
     code: ownBranch,
     name: branchName ? branchName : '',
   });
+  const [branchMap1, setBranchMap1] = React.useState<BranchListOptionType>({
+    code: branchSelected,
+    name: branchName1 ? branchName1 : '',
+  });
   const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
+  const [branchOptions1, setBranchOptions1] = React.useState<BranchListOptionType | null>(
+    !stringNullOrEmpty(branchSelected) ? branchMap1 : null
+  );
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
 
   const [values, setValues] = React.useState<State>({
@@ -61,6 +73,7 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
   const [checkValue, setCheckValue] = React.useState({
     fromDateError: false,
     toDateError: false,
+    branchError: false,
   });
 
   const validateDate = () => {
@@ -79,6 +92,10 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
       isValid = false;
       setOpenAlert(true);
       setTextError('กรุณากรอกวันที่');
+    }
+    if (stringNullOrEmpty(values.branch)) {
+      isValid = false;
+      setCheckValue({ ...checkValue, branchError: true });
     }
     return isValid;
   };
@@ -108,6 +125,11 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
       setBranchMap({ code: ownBranch, name: branchName ? branchName : '' });
       setBranchOptions(branchMap);
       setValues({ ...values, branch: ownBranch });
+    }
+    if (!stringNullOrEmpty(branchSelected)) {
+      setBranchMap1({ code: ownBranch, name: branchName ? branchName : '' });
+      setBranchOptions1(branchMap1);
+      setValues({ ...values, branch: branchSelected });
     }
   }, [branchList]);
 
@@ -145,12 +167,13 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
       if (!validateDate()) {
         return;
       } else {
-        if (values.branch !== null || ownBranch !== '') {
+        if (values.branch !== null || ownBranch !== '' || branchSelected !== '') {
           let payload: RequisitionSummaryRequest = {
             fromDate: moment(values.fromDate).toISOString().split('T')[0],
             toDate: moment(values.toDate).toISOString().split('T')[0],
             branchCode: values.branch,
           };
+          if (!stringNullOrEmpty(branchSelected)) payload.branchCode = branchSelected;
           const res = await getRequistionSummary(payload);
           if (res && res.data) {
             const outputFilename =
@@ -175,6 +198,11 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
             document.body.appendChild(link);
             link.click();
             URL.revokeObjectURL(link.href);
+            setCheckValue({
+              fromDateError: false,
+              toDateError: false,
+              branchError: false,
+            });
           }
         }
       }
@@ -238,13 +266,18 @@ export default function RequisitionSummary({ isOpen, onClickClose }: Props): Rea
                 สาขา
               </Typography>
               <BranchListDropDown
-                valueBranch={branchOptions}
-                sourceBranchCode={ownBranch}
+                valueBranch={branchSelected ? branchOptions1 : branchOptions}
+                sourceBranchCode={ownBranch || branchSelectName}
                 onChangeBranch={handleChangeBranch}
                 isClear={clearBranchDropDown}
                 disable={groupBranch}
                 isFilterAuthorizedBranch={true}
               />
+              {checkValue.branchError && (
+                <Box textAlign='right' color='#F54949'>
+                  กรุณาระบุวันที่
+                </Box>
+              )}
             </Grid>
             <Grid item xs={6}></Grid>
             <Grid item xs={4}></Grid>

@@ -144,6 +144,7 @@ export default function ModalCreateToRawMaterial({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddItemsState({}));
     dispatch(
       updateDataDetail({
@@ -457,7 +458,7 @@ export default function ModalCreateToRawMaterial({
                   id='btnCancel'
                   variant='contained'
                   color='error'
-                  disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
+                  disabled={stringNullOrEmpty(status) || (!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
                   style={{ display: ((!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission) ? 'none' : undefined }}
                   startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}

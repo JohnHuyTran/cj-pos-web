@@ -267,7 +267,7 @@ const TransferOutSearch = () => {
                 inputProps={{ 'aria-label': 'Without label' }}
               >
                 <MenuItem value={'ALL'}>{t('all')}</MenuItem>
-                {!approvePermission && <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>}
+                <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>
                 <MenuItem value={TOStatus.WAIT_FOR_APPROVAL}>รออนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.APPROVED}>อนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.REJECTED}>ไม่อนุมัติ</MenuItem>

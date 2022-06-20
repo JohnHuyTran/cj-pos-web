@@ -29,6 +29,7 @@ import BranchListDropDown from '../../components/commons/ui/branch-list-dropdown
 import ModalCreateToRawMaterial from '../../components/transfer-out-raw-material/modal-create-to-raw-material';
 import { env } from '../../adapters/environmentConfigs';
 import RequisitionSummary from '../../components/commons/ui/modal-requisition-summary';
+import SelectBranch from '../transfer-out/transfer-out-branch';
 
 const _ = require('lodash');
 
@@ -51,27 +52,10 @@ const TORawMasterialSearch = () => {
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
   const [popupMsg, setPopupMsg] = React.useState<string>('');
-  const [lstStatus, setLstStatus] = React.useState([]);
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
-  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const ownBranch = getUserInfo().branch
-    ? getBranchName(branchList, getUserInfo().branch)
-      ? getUserInfo().branch
-      : env.branch.code
-    : env.branch.code;
-  const branchName = getBranchName(branchList, ownBranch);
-  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
-  const [branchMap, setBranchMap] = React.useState<BranchListOptionType>({
-    code: ownBranch,
-    name: branchName ? branchName : '',
-  });
-  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
-  const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
   const page = '1';
   const limit = useAppSelector((state) => state.transferOutSearchSlice.toSearchResponse.perPage);
   const barcodeDiscountSearchSlice = useAppSelector((state) => state.transferOutSearchSlice);
-  const [userPermission, setUserPermission] = useState<any[]>([]);
-  const [approvePermission, setApprovePermission] = useState<boolean>(false);
   const [requestPermission, setRequestPermission] = useState<boolean>(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -81,23 +65,17 @@ const TORawMasterialSearch = () => {
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+  const [listBranchSelect, setListBranchSelect] = React.useState<BranchListOptionType[]>([]);
   const dateDefault = new Date();
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
-    branch: 'ALL',
+    branch: '',
     status: 'ALL',
     fromDate: dateDefault.setDate(dateDefault.getDate() - 6),
     approveDate: new Date(),
   });
 
   useEffect(() => {
-    if (groupBranch) {
-      setBranchMap({ code: ownBranch, name: branchName ? branchName : '' });
-      setBranchOptions(branchMap);
-    }
-  }, [branchList]);
-  useEffect(() => {
-    setLstStatus(t('lstStatus', { returnObjects: true }));
     //permission
     const userInfo: KeyCloakTokenInfo = getUserInfo();
     if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
@@ -105,10 +83,6 @@ const TORawMasterialSearch = () => {
         userInfo.acl['service.posback-campaign'] != null && userInfo.acl['service.posback-campaign'].length > 0
           ? userInfo.acl['service.posback-campaign']
           : [];
-      setUserPermission(userPermission);
-      setApprovePermission(
-        userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.approve') : false
-      );
       setRequestPermission(
         userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.create') : false
       );
@@ -122,6 +96,14 @@ const TORawMasterialSearch = () => {
       // });
     }
   }, []);
+  useEffect(() => {
+    if (listBranchSelect.length > 0) {
+      let branches = listBranchSelect.map((item: any) => item.code).join(',');
+      setValues({ ...values, branch: branches });
+    } else {
+      setValues({ ...values, branch: '' });
+    }
+  }, [listBranchSelect]);
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -145,17 +127,9 @@ const TORawMasterialSearch = () => {
   const handleClosePopup = () => {
     setOpenPopup(false);
   };
-  const handleChangeBranch = (branchCode: string) => {
-    if (branchCode !== null) {
-      let codes = JSON.stringify(branchCode);
-      setValues({ ...values, branch: JSON.parse(codes) });
-    } else {
-      setValues({ ...values, branch: '' });
-    }
-  };
 
   const onClear = async () => {
-    setClearBranchDropDown(!clearBranchDropDown);
+    setListBranchSelect([]);
     setFlagSearch(false);
     setValues({
       documentNumber: '',
@@ -259,13 +233,18 @@ const TORawMasterialSearch = () => {
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('branch')}
             </Typography>
-            <BranchListDropDown
+            {/* <BranchListDropDown
               valueBranch={branchOptions}
               sourceBranchCode={ownBranch}
               onChangeBranch={handleChangeBranch}
               isClear={clearBranchDropDown}
               disable={groupBranch}
               isFilterAuthorizedBranch={true}
+            /> */}
+            <SelectBranch
+              disabled={requestPermission}
+              listSelect={listBranchSelect}
+              setListSelect={setListBranchSelect}
             />
           </Grid>
           <Grid item xs={4}>
@@ -375,7 +354,11 @@ const TORawMasterialSearch = () => {
         />
       )}
       {openModalRequisition && (
-        <RequisitionSummary isOpen={openModalRequisition} onClickClose={handleCloseModalRequisition} />
+        <RequisitionSummary
+          isOpen={openModalRequisition}
+          onClickClose={handleCloseModalRequisition}
+          branchSelected={values.branch}
+        />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>

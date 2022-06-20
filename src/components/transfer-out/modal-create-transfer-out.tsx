@@ -156,6 +156,7 @@ export default function ModalCreateTransferOut({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddItemsState({}));
     dispatch(
       updateDataDetail({
@@ -852,7 +853,7 @@ export default function ModalCreateTransferOut({
                   id='btnCancel'
                   variant='contained'
                   color='error'
-                  disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT}
+                  disabled={stringNullOrEmpty(status) || (!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
                   style={{
                     display:
                       (!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission

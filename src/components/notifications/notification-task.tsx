@@ -131,7 +131,7 @@ export default function NotificationTask(props: Props) {
           } else {
             setOpenModalError(true);
           }
-        } else if (item.payload.type === 2) {
+        } else if (item.payload.type === 2 || item.payload.type === 5) {
           const rs = await dispatch(getTransferOutDetail(item.documentNumber));
           if (!!rs.payload) {
             setOpenTransferOutDestroyDetail(true);
@@ -242,7 +242,7 @@ export default function NotificationTask(props: Props) {
         });
         break;
       case 'SEND_TO_FOR_APPROVAL':
-        content = item.payload.type === 1 ? 'เบิก-ใช้ในการทำกิจกรรม' : 'เบิก-ทำลายไม่มีส่วนลด';
+        content = item.payload.type === 1 ? 'เบิกทำกิจกรรม' : 'เบิกทำลาย';
         branchCode = item.payload.branchCode;
         statusDisplay = genStatusValue('รออนุมัติ', {
           color: '#36C690',
@@ -250,7 +250,7 @@ export default function NotificationTask(props: Props) {
         });
         break;
       case 'APPROVE_TRANSFER_OUT':
-        content = item.payload.type === 1 ? 'เบิก-ใช้ในการทำกิจกรรม' : 'เบิก-ทำลายไม่มีส่วนลด';
+        content = item.payload.type === 1 ? 'เบิกทำกิจกรรม' : 'เบิกทำลาย';
         branchCode = item.payload.branchCode;
         statusDisplay = genStatusValue('อนุมัติ', {
           color: '#36C690',
@@ -350,7 +350,7 @@ export default function NotificationTask(props: Props) {
           fontSize: '12px',
         }}
         onClick={() => currentlySelected(item)}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
           ) : item.type === 'APPROVE_TRANSFER_OUT' || item.type === 'SEND_TO_FOR_APPROVAL' ? (
@@ -365,7 +365,7 @@ export default function NotificationTask(props: Props) {
           <Box
             sx={{
               mt: 1,
-              ml: 1,
+              ml: 3,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',

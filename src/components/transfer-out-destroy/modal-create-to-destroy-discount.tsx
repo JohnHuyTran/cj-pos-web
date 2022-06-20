@@ -143,6 +143,7 @@ export default function ModalCreateToDestroyDiscount({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddDestroyProductState([]));
     dispatch(
       updateDataDetail({
@@ -402,7 +403,7 @@ export default function ModalCreateToDestroyDiscount({
             if (!sendRequest) {
               dispatch(updateCheckEdit(false));
               setOpenPopupModal(true);
-              setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+              setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
               if (onSearchMain) onSearchMain();
             }
             if (rs && rs.data) {
@@ -577,10 +578,10 @@ export default function ModalCreateToDestroyDiscount({
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5}>
-              <Grid item xs={4}>
+              <Grid item xs={5}>
                 เลขที่เอกสารทำลาย :
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={7}>
                 {!!dataDetail.documentNumber ? dataDetail.documentNumber : '-'}
               </Grid>
             </Grid>
@@ -689,7 +690,7 @@ export default function ModalCreateToDestroyDiscount({
                   id='btnCancel'
                   variant='contained'
                   color='error'
-                  disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
+                  disabled={stringNullOrEmpty(status) || (!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
                   style={{ display: ((!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission) ? 'none' : undefined }}
                   startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}
@@ -728,7 +729,7 @@ export default function ModalCreateToDestroyDiscount({
         onClose={() => {
           setOpenCheckStock(false);
         }}
-        headerTitle={'เบิกสินค้ามากกว่าที่มีในคลัง โปรดตรวจสอบ'}
+        headerTitle={'จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm

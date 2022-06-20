@@ -440,7 +440,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                     {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
                   </Grid>
                   <Grid item xs={2}>
-                    <Typography variant='body2'>แนบเอกสาร-ไม่อนุมัติ:</Typography>
+                    <Typography variant='body2'>แนบเอกสาร-การแก้ไข:</Typography>
                   </Grid>
                   <Grid item xs={4}>
                     {detailDC.verifyDCStatus === 0 && (

@@ -27,6 +27,7 @@ interface loadingModalState {
 
 interface StateProps {
   onSearch: () => void;
+  type: string;
 }
 
 const TransferOutDestroyList: React.FC<StateProps> = (props) => {
@@ -71,7 +72,12 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
           products: data.products,
           requestorName: data.requestor,
           approverName: data.approver,
-          type: data.type == TO_TYPE.TO_WITHOUT_DISCOUNT ? 'ไม่มีส่วนลด' : 'มีส่วนลด',
+          type:
+            data.type == TO_TYPE.TO_WITHOUT_DISCOUNT
+              ? 'ไม่มีส่วนลด'
+              : data.type == TO_TYPE.TO_WITH_DISCOUNT
+              ? 'มีส่วนลด'
+              : 'วัตถุดิบร้านบาว',
           typeValue: data.type,
         };
       });
@@ -143,7 +149,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
       headerName: t('branch'),
       headerAlign: 'center',
       sortable: false,
-      minWidth: 250,
+      minWidth: 230,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '0 auto' }}>
           {params.value}
@@ -155,7 +161,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
       headerName: 'เอกสารทำลาย',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 260,
+      minWidth: 200,
     },
     {
       field: 'transactionDate',
@@ -186,7 +192,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
       headerName: 'ประเภท',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 50,
+      minWidth: 140,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '1rem' }}>
           {params.value}
@@ -287,7 +293,10 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
-      type: TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT,
+      type:
+        props.type == 'ALL'
+          ? TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT + ',' + TO_TYPE.TO_DEFECT
+          : props.type,
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));
@@ -306,7 +315,10 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
-      type: TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT,
+      type:
+        props.type == 'ALL'
+          ? TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT + ',' + TO_TYPE.TO_DEFECT
+          : props.type,
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));
@@ -322,7 +334,7 @@ const TransferOutDestroyList: React.FC<StateProps> = (props) => {
       try {
         await dispatch(getTransferOutDetail(params.row.documentNumber));
         if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
-          if (TO_TYPE.TO_WITHOUT_DISCOUNT === params.row.typeValue) {
+          if (TO_TYPE.TO_WITHOUT_DISCOUNT === params.row.typeValue || TO_TYPE.TO_DEFECT === params.row.typeValue) {
             setOpenDetail(true);
           } else if (TO_TYPE.TO_WITH_DISCOUNT === params.row.typeValue) {
             setOpenDetailDestroyDiscount(true);
