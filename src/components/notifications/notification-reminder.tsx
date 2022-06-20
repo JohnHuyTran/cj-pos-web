@@ -220,14 +220,14 @@ export default function NotificationReminder(props: Props) {
       >
         <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type == 'REJECT_BARCODE' ? (
-            <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
+            <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           ) : (
-            <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
+            <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           )}
           <Box
             sx={{
               mt: 1,
-              ml: 3,
+              ml: 2,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -252,7 +252,7 @@ export default function NotificationReminder(props: Props) {
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ textAlign: 'right', mt: '3px', pr: 2.5 }}>{statusDisplay}</Box>
+          <Box sx={{ textAlign: 'right', mt: '6px', pr: 2.5 }}>{statusDisplay}</Box>
         </Box>
       </Box>
     );

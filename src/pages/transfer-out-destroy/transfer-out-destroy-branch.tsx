@@ -209,7 +209,7 @@ export default function SelectBranch(props: Props): ReactElement {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder="ทั้งหมด"
+                    placeholder="ค้นหาจากรหัสสาขา / ชื่อสาขา"
                     size="small"
                     className={classes.MtextField}
                     fullWidth

@@ -345,20 +345,20 @@ export default function NotificationTask(props: Props) {
       >
         <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE' ? (
-            <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
+            <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           ) : item.type === 'APPROVE_TRANSFER_OUT' || item.type === 'SEND_TO_FOR_APPROVAL' ? (
-            <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
+            <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           ) : item.type == 'SEND_ORDER_RECEIVE_FOR_VERIFY' ||
             item.type == 'ORDER_NEXT_APPROVE_OC' ||
             item.type == 'ORDER_NEXT_APPROVE1' ? (
-            <LoyaltyOutlinedIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
+            <LoyaltyOutlinedIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           ) : (
-            <SwapHorizontalCircleIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
+            <SwapHorizontalCircleIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           )}
           <Box
             sx={{
               mt: 1,
-              ml: 3,
+              ml: 2,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -384,7 +384,7 @@ export default function NotificationTask(props: Props) {
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ textAlign: 'right', mt: '3px', pr: 2.5 }}>{statusDisplay}</Box>
+          <Box sx={{ textAlign: 'right', mt: '6px', pr: 2.5 }}>{statusDisplay}</Box>
         </Box>
       </Box>
     );
