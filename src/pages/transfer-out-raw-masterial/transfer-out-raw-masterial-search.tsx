@@ -16,18 +16,20 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
 import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
 import LoadingModal from '../../components/commons/ui/loading-modal';
-import { Action, TOStatus, TO_TYPE } from '../../utils/enum/common-enum';
+import { Action, DateFormat, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../../components/commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import { BranchListOptionType } from '../../models/branch-model';
 import { isGroupBranch } from '../../utils/role-permission';
-import TransferOutList from './transfer-out-destroy-list';
-import SelectBranch from './transfer-out-destroy-branch';
+import TransferOutList from './transfer-out-raw-masterial-list';
 import { TransferOutSearchRequest } from '../../models/transfer-out-model';
 import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
-import ModalCreateTransferOutDestroy from '../../components/transfer-out-destroy/modal-create-transfer-out-destroy';
-import ModalCreateToDestroyDiscount from '../../components/transfer-out-destroy/modal-create-to-destroy-discount';
+import BranchListDropDown from '../../components/commons/ui/branch-list-dropdown';
+import ModalCreateToRawMaterial from '../../components/transfer-out-raw-material/modal-create-to-raw-material';
+import { env } from '../../adapters/environmentConfigs';
+import RequisitionSummary from '../../components/commons/ui/modal-requisition-summary';
+import SelectBranch from '../transfer-out/transfer-out-branch';
 
 const _ = require('lodash');
 
@@ -35,7 +37,6 @@ interface State {
   documentNumber: string;
   branch: string;
   status: string;
-  type: string;
   fromDate: any | Date | number | string;
   approveDate: any | Date | number | string;
 }
@@ -44,16 +45,14 @@ interface loadingModalState {
   open: boolean;
 }
 
-const TransferOutSearch = () => {
+const TORawMasterialSearch = () => {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation(['barcodeDiscount', 'common']);
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
-  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
-
-  const dispatch = useAppDispatch();
   const page = '1';
   const limit = useAppSelector((state) => state.transferOutSearchSlice.toSearchResponse.perPage);
   const barcodeDiscountSearchSlice = useAppSelector((state) => state.transferOutSearchSlice);
@@ -62,17 +61,17 @@ const TransferOutSearch = () => {
     open: false,
   });
   const [openModal, setOpenModal] = React.useState(false);
-  const [openModalTODestroyDiscount, setOpenModalTODestroyDiscount] = React.useState(false);
-  const [listBranchSelect, setListBranchSelect] = React.useState<BranchListOptionType[]>([]);
+  const [openModalRequisition, setOpenModalRequisition] = React.useState(false);
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+  const [listBranchSelect, setListBranchSelect] = React.useState<BranchListOptionType[]>([]);
+  const dateDefault = new Date();
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
-    branch: 'ALL',
+    branch: '',
     status: 'ALL',
-    type: 'ALL',
-    fromDate: new Date(),
+    fromDate: dateDefault.setDate(dateDefault.getDate() - 6),
     approveDate: new Date(),
   });
 
@@ -87,19 +86,24 @@ const TransferOutSearch = () => {
       setRequestPermission(
         userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.create') : false
       );
-      setValues({
-        ...values,
-        status: 'ALL',
-      });
+      // setValues({
+      //   ...values,
+      //   status: userPermission.includes('campaign.to.approve')
+      //     ? TOStatus.WAIT_FOR_APPROVAL
+      //     : userPermission.includes('campaign.to.create')
+      //     ? TOStatus.DRAFT
+      //     : 'ALL',
+      // });
     }
   }, []);
   useEffect(() => {
     if (listBranchSelect.length > 0) {
       let branches = listBranchSelect.map((item: any) => item.code).join(',');
       setValues({ ...values, branch: branches });
+    } else {
+      setValues({ ...values, branch: '' });
     }
   }, [listBranchSelect]);
-
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -112,12 +116,12 @@ const TransferOutSearch = () => {
     setOpenModal(false);
   };
 
-  const handleOpenModalTODestroyDiscount = () => {
-    setOpenModalTODestroyDiscount(true);
+  const handleOpenModalRequisition = () => {
+    setOpenModalRequisition(true);
   };
 
-  const handleCloseModalTODestroyDiscount = () => {
-    setOpenModalTODestroyDiscount(false);
+  const handleCloseModalRequisition = () => {
+    setOpenModalRequisition(false);
   };
 
   const handleClosePopup = () => {
@@ -125,14 +129,13 @@ const TransferOutSearch = () => {
   };
 
   const onClear = async () => {
-    setClearBranchDropDown(!clearBranchDropDown);
+    setListBranchSelect([]);
     setFlagSearch(false);
     setValues({
       documentNumber: '',
       branch: '',
       status: 'ALL',
-      type: 'ALL',
-      fromDate: new Date(),
+      fromDate: dateDefault,
       approveDate: new Date(),
     });
 
@@ -145,25 +148,17 @@ const TransferOutSearch = () => {
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
       clearSearch: true,
-      type:
-        values.type == 'ALL'
-          ? TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT + ',' + TO_TYPE.TO_DEFECT
-          : values.type,
+      type: TO_TYPE.TO_RAW_MATERIAL + '',
     };
     dispatch(barcodeDiscountSearch(payload));
-    if (!requestPermission) {
-      setListBranchSelect([]);
-    }
   };
 
   const validateSearch = () => {
     let isValid = true;
-    if (values.status == 'ALL') {
-      if (stringNullOrEmpty(values.fromDate) || stringNullOrEmpty(values.approveDate)) {
-        isValid = false;
-        setOpenAlert(true);
-        setTextError('กรุณากรอกวันที่');
-      }
+    if (stringNullOrEmpty(values.fromDate) || stringNullOrEmpty(values.approveDate)) {
+      isValid = false;
+      setOpenAlert(true);
+      setTextError('กรุณากรอกวันที่');
     }
     return isValid;
   };
@@ -186,10 +181,7 @@ const TransferOutSearch = () => {
       status: values.status,
       startDate: moment(values.fromDate).startOf('day').toISOString(),
       endDate: moment(values.approveDate).endOf('day').toISOString(),
-      type:
-        values.type == 'ALL'
-          ? TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT + ',' + TO_TYPE.TO_DEFECT
-          : values.type,
+      type: TO_TYPE.TO_RAW_MATERIAL + '',
     };
 
     handleOpenLoading('open', true);
@@ -204,13 +196,13 @@ const TransferOutSearch = () => {
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      dataTable = <TransferOutList onSearch={onSearch} type={values.type} />;
+      dataTable = <TransferOutList onSearch={onSearch} />;
     } else {
       dataTable = (
-        <Grid item container xs={12} justifyContent='center'>
-          <Box color='#CBD4DB'>
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
             <h2>
-              {t('noData')} <SearchOff fontSize='large' />
+              {t('noData')} <SearchOff fontSize="large" />
             </h2>
           </Box>
         </Grid>
@@ -223,13 +215,13 @@ const TransferOutSearch = () => {
       <Box sx={{ flexGrow: 1 }} mb={3}>
         <Grid container rowSpacing={3} columnSpacing={6} mt={0.1}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-              {'เลขที่เอกสารทำลาย'}
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              {'เลขที่เอกสารเบิก'}
             </Typography>
             <TextField
-              id='documentNumber'
-              name='documentNumber'
-              size='small'
+              id="documentNumber"
+              name="documentNumber"
+              size="small"
               value={values.documentNumber}
               onChange={onChange.bind(this, setValues, values)}
               className={classes.MtextField}
@@ -238,9 +230,17 @@ const TransferOutSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('branch')}
             </Typography>
+            {/* <BranchListDropDown
+              valueBranch={branchOptions}
+              sourceBranchCode={ownBranch}
+              onChangeBranch={handleChangeBranch}
+              isClear={clearBranchDropDown}
+              disable={groupBranch}
+              isFilterAuthorizedBranch={true}
+            /> */}
             <SelectBranch
               disabled={requestPermission}
               listSelect={listBranchSelect}
@@ -248,24 +248,20 @@ const TransferOutSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('status')}
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id='status'
-                name='status'
+                id="status"
+                name="status"
                 value={values.status}
                 onChange={onChange.bind(this, setValues, values)}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={'ALL'} selected={true}>
-                  {t('all')}
-                </MenuItem>
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
+                <MenuItem value={'ALL'}>{t('all')}</MenuItem>
                 <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>
-                <MenuItem value={TOStatus.WAIT_FOR_APPROVAL}>รออนุมัติ</MenuItem>
                 <MenuItem value={TOStatus.APPROVED}>อนุมัติ</MenuItem>
-                <MenuItem value={TOStatus.REJECTED}>ไม่อนุมัติ</MenuItem>
-                <MenuItem value={TOStatus.CLOSED}>ปิดงาน</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -273,7 +269,7 @@ const TransferOutSearch = () => {
         <Typography mt={2}>วันที่ทำรายการ</Typography>
         <Grid container rowSpacing={3} columnSpacing={6}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {'ตั้งแต่'}
             </Typography>
             <DatePickerComponent
@@ -282,7 +278,7 @@ const TransferOutSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {'ถึง'}
             </Typography>
             <DatePickerComponent
@@ -293,69 +289,52 @@ const TransferOutSearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-              ประเภท
-            </Typography>
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id='type'
-                name='type'
-                value={values.type}
-                onChange={onChange.bind(this, setValues, values)}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={'ALL'} selected={true}>
-                  {t('all')}
-                </MenuItem>
-
-                <MenuItem value={TO_TYPE.TO_WITH_DISCOUNT}>มีส่วนลด</MenuItem>
-                <MenuItem value={TO_TYPE.TO_WITHOUT_DISCOUNT}>ไม่มีส่วนลด</MenuItem>
-                <MenuItem value={TO_TYPE.TO_DEFECT}>วัตถุดิบร้านบาว</MenuItem>
-              </Select>
-            </FormControl>
+            {/* <SearchBranch /> */}
           </Grid>
         </Grid>
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
           <Grid item xs={12} style={{ textAlign: 'right' }}>
             {requestPermission && (
               <Button
-                id='btnCreateToDestroyDiscount'
-                variant='contained'
-                sx={{ width: '150px', height: '40px' }}
+                id="btnCreate"
+                variant="contained"
+                sx={{ width: 140, height: '40px' }}
                 className={classes.MbtnSearch}
-                color='secondary'
+                color="secondary"
                 startIcon={<AddCircleOutlineOutlinedIcon />}
-                onClick={handleOpenModalTODestroyDiscount}>
-                {'ทำลายมีส่วนลด'}
-              </Button>
-            )}
-            {requestPermission && (
-              <Button
-                id='btnCreate'
-                variant='contained'
-                sx={{ width: '120px', height: '40px', ml: 2 }}
-                className={classes.MbtnSearch}
-                color='warning'
-                startIcon={<AddCircleOutlineOutlinedIcon />}
-                onClick={handleOpenModal}>
-                {'ทำลาย'}
+                onClick={handleOpenModal}
+              >
+                {'ขอใช้วัตถุดิบ'}
               </Button>
             )}
             <Button
-              id='btnClear'
-              variant='contained'
+              id="btnDrawdown"
+              variant="contained"
+              sx={{ width: 125, height: '40px', ml: 2 }}
+              className={classes.MbtnSearch}
+              color="warning"
+              onClick={handleOpenModalRequisition}
+            >
+              {'สรุปรายการเบิก'}
+            </Button>
+            <Button
+              id="btnClear"
+              variant="contained"
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnClear}
-              color='cancelColor'
-              onClick={onClear}>
+              color="cancelColor"
+              onClick={onClear}
+            >
               {t('common:button.clear')}
             </Button>
             <Button
-              id='btnSearch'
-              variant='contained'
-              color='primary'
+              id="btnSearch"
+              variant="contained"
+              color="primary"
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnSearch}
-              onClick={onSearch}>
+              onClick={onSearch}
+            >
               {t('common:button.search')}
             </Button>
           </Grid>
@@ -365,7 +344,7 @@ const TransferOutSearch = () => {
       <LoadingModal open={openLoadingModal.open} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       {openModal && (
-        <ModalCreateTransferOutDestroy
+        <ModalCreateToRawMaterial
           isOpen={openModal}
           onClickClose={handleCloseModal}
           setOpenPopup={setOpenPopup}
@@ -374,14 +353,11 @@ const TransferOutSearch = () => {
           onSearchMain={onSearch}
         />
       )}
-      {openModalTODestroyDiscount && (
-        <ModalCreateToDestroyDiscount
-          isOpen={openModalTODestroyDiscount}
-          onClickClose={handleCloseModalTODestroyDiscount}
-          setOpenPopup={setOpenPopup}
-          setPopupMsg={setPopupMsg}
-          action={Action.INSERT}
-          onSearchMain={onSearch}
+      {openModalRequisition && (
+        <RequisitionSummary
+          isOpen={openModalRequisition}
+          onClickClose={handleCloseModalRequisition}
+          branchSelected={values.branch}
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
@@ -389,4 +365,4 @@ const TransferOutSearch = () => {
   );
 };
 
-export default TransferOutSearch;
+export default TORawMasterialSearch;

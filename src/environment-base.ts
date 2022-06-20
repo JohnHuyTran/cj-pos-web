@@ -115,6 +115,12 @@ export const environment = {
       getExpiredProduct: {
         url: '/campaign/expired-products',
       },
+      approveRM: {
+        url: '/campaign/transfer-out/approve-transfer-rm/{id}',
+      },
+      requisitionSummary: {
+        url: '/campaign/transfer-out/requisitionSummary/exportFile?branchCode={branchCode}&fromDate={fromDate}&toDate={toDate}',
+      },
     },
   },
   sell: {
@@ -279,6 +285,9 @@ export const environment = {
       productMaster: {
         search: {
           url: '/products/sku/product-master',
+        },
+        searchItem: {
+          url: 'products/product/find',
         },
       },
     },

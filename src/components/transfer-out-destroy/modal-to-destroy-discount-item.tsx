@@ -4,10 +4,6 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@material-ui/core';
 import {
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
   Grid,
   TextField,
   Typography,
@@ -17,7 +13,6 @@ import { useStyles } from '../../styles/makeTheme';
 import {
   save,
   updateCheckEdit,
-  updateCheckStock,
   updateDataDetail,
   updateErrorList,
 } from '../../store/slices/transfer-out-destroy-discount-slice';
@@ -28,6 +23,7 @@ import { ACTIONS } from '../../utils/enum/permission-enum';
 import HtmlTooltip from '../commons/ui/html-tooltip';
 import { TransferOutDestroyDiscountDetail } from "../../models/transfer-out";
 import { updateAddDestroyProductState } from "../../store/slices/add-to-destroy-product-slice";
+import ModelConfirmDeleteProduct from "../commons/ui/modal-confirm-delete-product";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -38,7 +34,7 @@ export interface DataGridProps {
 
 const _ = require('lodash');
 
-export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
+export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
   const { action, userPermission } = props;
 
   const classes = useStyles();
@@ -81,6 +77,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
           barcodeName: item.barcodeName,
           unit: item.unit,
           unitCode: item.unitCode || '',
+          barFactor: item.barFactor || 0,
           qty: numberOfRequested,
           numberOfRequested: numberOfRequested,
           numberOfApproved: numberOfApproved,
@@ -105,7 +102,8 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
           numberOfRequested: parseInt(String(item.numberOfRequested).replace(/,/g, '')),
           numberOfApproved: parseInt(String(item.numberOfApproved).replace(/,/g, '')),
           unitName: item.unit,
-          unitCode: item.unitCode,
+          unitFactor: item.unitCode,
+          barFactor: item.barFactor,
           productName: item.barcodeName,
           sku: item.skuCode,
           remark: item.remark
@@ -322,69 +320,15 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
             >
               <DeleteForever fontSize="medium" sx={{ color: '#F54949' }}/>
             </Button>
-
-            <Dialog
-              open={openModalDelete}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-              PaperProps={{ sx: { minWidth: 450, height: 241 } }}
-            >
-              <DialogContent sx={{ pl: 6, pr: 8 }}>
-                <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-                  <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
-                    ต้องการลบสินค้า
-                  </Typography>
-                  <Grid container>
-                    <Grid item xs={4} sx={{ textAlign: 'right' }}>
-                      สินค้า <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
-                    </Grid>
-                    <Grid item xs={8} sx={{ pl: 2 }}>
-                      <label style={{ color: '#36C690' }}>
-                        <b>{params.row.barcodeName}</b>
-                        <br/>
-                        <label
-                          style={{
-                            color: '#AEAEAE',
-                            fontSize: 14,
-                          }}
-                        >
-                          {params.row.skuCode}
-                        </label>
-                      </label>
-                    </Grid>
-                    <Grid item xs={4} sx={{ textAlign: 'right' }}>
-                      บาร์โค้ด <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
-                    </Grid>
-                    <Grid item xs={8} sx={{ pl: 1 }}>
-                      <label style={{ color: '#36C690' }}>
-                        <b>{params.row.barcode}</b>
-                      </label>
-                    </Grid>
-                  </Grid>
-                </DialogContentText>
-              </DialogContent>
-
-              <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
-                <Button
-                  id="btnCancle"
-                  variant="contained"
-                  color="inherit"
-                  sx={{ borderRadius: 2, width: 90, mr: 2 }}
-                  onClick={handleCloseModalDelete}
-                >
-                  ยกเลิก
-                </Button>
-                <Button
-                  id="btnConfirm"
-                  variant="contained"
-                  color="error"
-                  sx={{ borderRadius: 2, width: 90 }}
-                  onClick={handleDeleteItem}
-                >
-                  ลบสินค้า
-                </Button>
-              </DialogActions>
-            </Dialog>
+            <ModelConfirmDeleteProduct open={openModalDelete}
+                                       onConfirm={handleDeleteItem}
+                                       onClose={handleCloseModalDelete}
+                                       productInfo={{
+                                         barcodeName: params.row.barcodeName,
+                                         skuCode: params.row.skuCode,
+                                         barcode: params.row.barcode
+                                       }}
+            />
           </>
         );
       },
@@ -457,4 +401,4 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
   );
 };
 
-export default ModalTransferOutDestroyItem;
+export default ModalToDestroyDiscountItem;

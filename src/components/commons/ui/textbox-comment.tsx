@@ -51,7 +51,6 @@ function TextBoxComment({
         multiline
         fullWidth
         rows={rowDisplay ? rowDisplay : 2}
-        onClick={(e) => e.stopPropagation()}
         onChange={handleChangeComment}
         defaultValue={defaultValue}
         placeholder={`ความยาวไม่เกิน ${maxLength} ตัวอักษร`}

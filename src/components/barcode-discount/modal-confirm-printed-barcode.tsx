@@ -3,7 +3,6 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import LoadingModal from '../commons/ui/loading-modal';
 import { Box, InputLabel, TextField, Typography } from "@mui/material";
 import { useStyles } from "../../styles/makeTheme";
 import Select from "@mui/material/Select";
@@ -35,10 +34,6 @@ interface Props {
   };
 }
 
-interface loadingModalState {
-  open: boolean;
-}
-
 export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, values }: Props): ReactElement {
   const classes = useStyles();
   const [printAgainRows, setPrintAgainRows] = useState<any>([]);
@@ -47,12 +42,6 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
   const [errorList, setErrorList] = useState<any>([]);
   const [textError, setTextError] = React.useState('');
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
-  const [openLoadingModal, setOpenLoadingModal] = useState<loadingModalState>({
-    open: false,
-  });
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
-  };
 
   const handleCloseModalError = () => {
     setOpenModalError(false);
@@ -545,7 +534,6 @@ export default function ModalConfirmPrintedBarcode({ open, onClose, onConfirm, v
         onClose={handleCloseModalError}
         textError={textError}
       />
-      <LoadingModal open={openLoadingModal.open}/>
     </div>
   );
 }

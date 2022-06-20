@@ -186,6 +186,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             marginRight: 0,
           },
         }}
+        data-testid="textfiled-product"
         placeholder={'ค้นหาบาร์โค๊ด / รายละเอียดสินค้า'}
         className={classes.MtextField}
         variant="outlined"
@@ -207,6 +208,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             marginRight: 0,
           },
         }}
+        data-testid="textfiled-product-type"
         placeholder={'รหัสประเภท/ประเภทสินค้า'}
         className={classes.MtextField}
         variant="outlined"
@@ -335,7 +337,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     return (
       <div className="wrapper-item">
         <span>{label}</span>
-        <CloseIcon onClick={onDelete} />
+        <CloseIcon onClick={onDelete} data-testid="icon-delete-item" />
       </div>
     );
   };
@@ -363,7 +365,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       selectedItemFilter = selectedItems.filter(
         (it: any) =>
           (it.selectedType === data.selectedType && it.productTypeCode !== data.productTypeCode) ||
-          (it.selectedType === 2 && data.productTypeCode !== it.ProductTypeCode)
+          (it.selectedType === 2 && data.productTypeCode !== it.productTypeCode)
       );
     } else if (data.selectedType === 2) {
       selectedItemFilter = selectedItems.filter((it: any) => it.selectedType === 1 || it.barcode !== data.barcode);
@@ -376,7 +378,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     let selectedItemEnds = _.cloneDeep(selectedItems);
     if (selectedItemEnds && selectedItemEnds.length > 0) {
       let listTypeCodeProducts = new Set(
-        selectedItemEnds.map((item: any) => item.ProductTypeCode).filter((el: any) => el != undefined)
+        selectedItemEnds.map((item: any) => item.productTypeCode).filter((el: any) => el != undefined)
       );
       let listCategoryCode = selectedItemEnds
         .filter((el: any) => el.selectedType === 1)
@@ -385,10 +387,10 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
       let listTypes = Array.from(listTypeCodeProducts);
       for (let i of listTypes) {
         if (!listCategoryCode.includes(i)) {
-          const item = selectedItemEnds.find((el: any) => i === el.ProductTypeCode);
+          const item = selectedItemEnds.find((el: any) => i === el.productTypeCode);
           selectedItemEnds.push({
-            productTypeCode: item.ProductTypeCode,
-            productTypeName: item.ProductTypeName,
+            productTypeCode: item.productTypeCode,
+            productTypeName: item.productTypeName,
             selectedType: 1,
           });
         }
@@ -450,9 +452,10 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
             </Box>
             <Box>
               <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-                ประเภทสินค้า
+                ประภทสินค้า
               </Typography>
               <Autocomplete
+                data-testid="autocomplete-product-type"
                 options={productTypeOptions}
                 id="combo-box-type"
                 popupIcon={<SearchIcon color="primary" />}
@@ -477,7 +480,11 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 <FormGroup>
                   <FormControlLabel
                     control={
-                      <Checkbox checked={values.selectAllProduct} disabled={objectNullOrEmpty(values.productType)} />
+                      <Checkbox
+                        checked={values.selectAllProduct}
+                        disabled={objectNullOrEmpty(values.productType)}
+                        data-testid="checkbox-select-all-product"
+                      />
                     }
                     onClick={onChangeSelectAllProduct}
                     label={'เลือกสินค้าทั้งหมด'}
@@ -485,6 +492,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 </FormGroup>
               </Box>
               <Autocomplete
+                data-testid="autocomplete-product-option"
                 options={productOptions}
                 id="combo-box-product"
                 popupIcon={<SearchIcon color="primary" />}
@@ -502,16 +510,16 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
               />
             </Box>
             {/* <Box sx={{textAlign: 'right', mt: 3}}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                className={classes.MbtnSearch}
-                                onClick={handleAddItem}
-                                disabled={!values.btnAddStatus}
-                            >
-                                เพิ่ม
-                            </Button>
-                        </Box> */}
+                              <Button
+                                  variant="contained"
+                                  color="primary"
+                                  className={classes.MbtnSearch}
+                                  onClick={handleAddItem}
+                                  disabled={!values.btnAddStatus}
+                              >
+                                  เพิ่ม
+                              </Button>
+                          </Box> */}
           </Grid>
           <Grid item xs={7}>
             <Box
@@ -531,6 +539,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
           onClick={handleAddProduct}
           disabled={!(selectedItems && selectedItems.length > 0)}
           className={classes.MbtnSearch}
+          data-testid="btn-add-product"
         >
           เพิ่มสินค้า
         </Button>

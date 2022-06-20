@@ -174,7 +174,7 @@ function STCreateModal({
               skuCode: item.skuCode,
               unitName: item.unitName,
               barcodeName: item.name,
-              ProductTypeCode: item.categoryTypeCode,
+              productTypeCode: item.categoryTypeCode,
               selectedType: 2,
             };
           })
@@ -373,7 +373,7 @@ function STCreateModal({
                 skuCode: item.skuCode,
                 barcode: item.barcode,
                 unitName: item.unitName,
-                categoryTypeCode: item.ProductTypeCode,
+                categoryTypeCode: item.productTypeCode,
               };
             }),
           appliedCategories: payloadAddTypeProduct
@@ -491,7 +491,7 @@ function STCreateModal({
     if (choiceCopy) {
       // second choice copy by update the information to the current amount
       let listItem = _.cloneDeep(payloadAddTypeProduct);
-
+      
       let listTypeItem = listItem.filter((el: any) => el.selectedType === 1);
 
       for (const el of listTypeItem) {
@@ -554,20 +554,21 @@ function STCreateModal({
   const handleAddProduct = (list: any) => {
     let selectList = list.map((item: any) => {
       return {
-        ProductTypeCode: item.categoryTypeCode,
-        ProductTypeName: item.categoryName,
+        productTypeCode: item.categoryTypeCode,
+        productTypeName: item.categoryName,
         barcode: item.barcode,
         unitName: item.unitName,
         barcodeName: item.name,
         selectedType: 2,
         showProduct: true,
+        skuCode: item.skuCode,
       };
     });
     let selectedItemEnds = _.cloneDeep(selectList);
 
     if (selectedItemEnds && selectedItemEnds.length > 0) {
       let listTypeCodeProducts = new Set(
-        selectedItemEnds.map((item: any) => item.ProductTypeCode).filter((el: any) => el != undefined)
+        selectedItemEnds.map((item: any) => item.productTypeCode).filter((el: any) => el != undefined)
       );
       let listCategoryCode = selectedItemEnds
         .filter((el: any) => el.selectedType === 1)
@@ -576,10 +577,10 @@ function STCreateModal({
       let listTypes = Array.from(listTypeCodeProducts);
       for (let i of listTypes) {
         if (!listCategoryCode.includes(i)) {
-          const item = selectedItemEnds.find((el: any) => i === el.ProductTypeCode);
+          const item = selectedItemEnds.find((el: any) => i === el.productTypeCode);
           selectedItemEnds.push({
-            productTypeCode: item.ProductTypeCode,
-            productTypeName: item.ProductTypeName,
+            productTypeCode: item.productTypeCode,
+            productTypeName: item.productTypeName,
             selectedType: 1,
           });
         }
@@ -852,6 +853,7 @@ function STCreateModal({
                     <Button
                       variant='contained'
                       color='error'
+                      disabled={status < 1}
                       onClick={handleOpenCancel}
                       startIcon={<HighlightOffIcon />}
                       className={classes.MbtnSearch}>

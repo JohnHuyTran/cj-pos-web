@@ -143,6 +143,7 @@ export default function ModalCreateToDestroyDiscount({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddDestroyProductState([]));
     dispatch(
       updateDataDetail({
@@ -240,7 +241,8 @@ export default function ModalCreateToDestroyDiscount({
             barcode: item.barcode,
             barcodeName: item.productName,
             unit: item.unitName,
-            unitCode: item.unitCode,
+            unitCode: item.unitFactor,
+            barFactor: item.barFactor,
             unitPrice: item.price || 0,
             numberOfDiscounted: item.numberOfRequested || 0,
             numberOfApproved: (TOStatus.WAIT_FOR_APPROVAL == transferOutDetail.status && approvePermission)
@@ -401,7 +403,7 @@ export default function ModalCreateToDestroyDiscount({
             if (!sendRequest) {
               dispatch(updateCheckEdit(false));
               setOpenPopupModal(true);
-              setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+              setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
               if (onSearchMain) onSearchMain();
             }
             if (rs && rs.data) {
@@ -533,6 +535,7 @@ export default function ModalCreateToDestroyDiscount({
       const payload = {
         branchCode: branchCodeCheckStock,
         products: products,
+        backStore: true
       };
       const rs = await checkStockBalance(payload);
       if (rs.data && rs.data.length > 0) {
@@ -575,10 +578,10 @@ export default function ModalCreateToDestroyDiscount({
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5}>
-              <Grid item xs={4}>
+              <Grid item xs={5}>
                 เลขที่เอกสารทำลาย :
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={7}>
                 {!!dataDetail.documentNumber ? dataDetail.documentNumber : '-'}
               </Grid>
             </Grid>
@@ -664,7 +667,8 @@ export default function ModalCreateToDestroyDiscount({
                   color='warning'
                   startIcon={<SaveIcon/>}
                   disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT)
-                    || (payloadTransferOut.products && payloadTransferOut.products.length === 0)}
+                    || (payloadTransferOut.products && payloadTransferOut.products.length === 0)
+                    || (status == TOStatus.DRAFT && dataDetail && moment(dataDetail.createdDate).isBefore(moment(new Date), 'day'))}
                   style={{ display: ((!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission) ? 'none' : undefined }}
                   onClick={() => handleCreateDraft(false)}
                   className={classes.MbtnSearch}>
@@ -686,7 +690,7 @@ export default function ModalCreateToDestroyDiscount({
                   id='btnCancel'
                   variant='contained'
                   color='error'
-                  disabled={(!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
+                  disabled={stringNullOrEmpty(status) || (!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
                   style={{ display: ((!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission) ? 'none' : undefined }}
                   startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}
@@ -725,7 +729,7 @@ export default function ModalCreateToDestroyDiscount({
         onClose={() => {
           setOpenCheckStock(false);
         }}
-        headerTitle={'เบิกสินค้ามากกว่าที่มีในคลัง โปรดตรวจสอบ'}
+        headerTitle={'จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm

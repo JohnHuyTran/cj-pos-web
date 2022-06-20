@@ -80,6 +80,25 @@ const useStyles = makeStyles({
       // maxWidth: '90% !important',
     },
   },
+  MtextFieldAutoChangeSize: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      // padding: "2x 2px 2px 6px",
+      fontSize: screen.width < 1500 ? '13px' : 'auto',
+      paddingLeft: '5px',
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      fontSize: screen.width < 1500 ? '13px' : 'auto',
+    },
+    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+      // opacity: 0,
+      color: '#263238 !important',
+      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+    },
+    '& .Mui-disabled': {
+      backgroundColor: '#EAEBEB',
+    },
+  },
   MtimeTextField: {
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',

@@ -13,17 +13,15 @@ import { useStyles } from '../../styles/makeTheme';
 import {
   save,
   updateCheckEdit,
-  updateCheckStock,
   updateDataDetail,
   updateErrorList,
-} from '../../store/slices/transfer-out-slice';
-import { updateAddItemsState } from '../../store/slices/add-items-slice';
+} from '../../store/slices/transfer-out-raw-material-slice';
 import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
 import { Action, TOStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
-import { ACTIONS } from '../../utils/enum/permission-enum';
-import HtmlTooltip from '../commons/ui/html-tooltip';
 import { TransferOutDetail } from "../../models/transfer-out";
+import TextBoxComment from "../commons/ui/textbox-comment";
+import { updateAddItemsState } from "../../store/slices/add-items-slice";
 import ModelConfirmDeleteProduct from "../commons/ui/modal-confirm-delete-product";
 
 export interface DataGridProps {
@@ -35,25 +33,21 @@ export interface DataGridProps {
 
 const _ = require('lodash');
 
-export const ModalTransferOutItem = (props: DataGridProps) => {
+export const ModalToRawMaterialItem = (props: DataGridProps) => {
   const { action, userPermission } = props;
 
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  const payloadTransferOut = useAppSelector((state) => state.transferOutSlice.createDraft);
-  const dataDetail = useAppSelector((state) => state.transferOutSlice.dataDetail);
-  const errorList = useAppSelector((state) => state.transferOutSlice.errorList);
+  const payloadTransferOut = useAppSelector((state) => state.transferOutRawMaterialSlice.createDraft);
+  const dataDetail = useAppSelector((state) => state.transferOutRawMaterialSlice.dataDetail);
+  const errorList = useAppSelector((state) => state.transferOutRawMaterialSlice.errorList);
 
   const [dtTable, setDtTable] = React.useState<Array<TransferOutDetail>>([]);
   const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const checkStocks = useAppSelector((state) => state.stockBalanceCheckSlice.checkStock);
-  //permission
-  const [approvePermission, setApprovePermission] = useState<boolean>(
-    userPermission != null && userPermission.length > 0 ? userPermission.includes(ACTIONS.CAMPAIGN_TO_APPROVE) : false
-  );
 
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
@@ -65,11 +59,6 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
           remark = stringNullOrEmpty(item.remark) ? '' : item.remark;
           numberOfRequested = stringNullOrEmpty(item.qty) ? null : item.qty;
         }
-        let numberOfApproved = !!sameItem
-          ? sameItem.numberOfApproved
-          : item.numberOfApproved
-            ? item.numberOfApproved
-            : 0;
 
         return {
           id: `${item.barcode}-${index + 1}`,
@@ -82,7 +71,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
           qty: numberOfRequested,
           errorQty: '',
           numberOfRequested: numberOfRequested,
-          numberOfApproved: numberOfApproved,
+          numberOfApproved: numberOfRequested,
           errorNumberOfApproved: '',
           skuCode: item.skuCode,
           remark: remark
@@ -130,16 +119,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     setOpenPopupModal(false);
   };
 
-  const handleChangeRemark = (event: any, index: number) => {
-    setDtTable((preData: Array<TransferOutDetail>) => {
-      const data = [...preData];
-      data[index - 1].remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
-      return data;
-    });
-    dispatch(updateCheckEdit(true));
-  };
-
-  const handleChangeNumberOfApprove = (event: any, index: number, errorIndex: number, barcode: string) => {
+  const handleChangeNumberOfRequested = (event: any, index: number, errorIndex: number, barcode: string) => {
     let currentValue = event.target.value;
     if (stringNullOrEmpty(event.target.value)
       || stringNullOrEmpty(event.target.value.trim())
@@ -151,57 +131,9 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     }
     setDtTable((preData: Array<TransferOutDetail>) => {
       const data = [...preData];
-      data[index - 1].numberOfApproved = currentValue ? parseInt(currentValue.replace(/,/g, '')) : 0;
+      data[index - 1].numberOfRequested = currentValue ? parseInt(currentValue.replace(/,/g, '')) : 0;
       return data;
     });
-    dispatch(
-      updateErrorList(
-        errorList.map((item: any, idx: number) => {
-          return idx === errorIndex
-            ? {
-              ...item,
-              errorNumberOfApproved: '',
-            }
-            : item;
-        })
-      )
-    );
-    dispatch(updateCheckEdit(true));
-  };
-
-  const handleChangeNumberOfDiscount = (event: any, index: number, errorIndex: number, barcode: string) => {
-    let currentValue = event.target.value;
-    if (stringNullOrEmpty(event.target.value)
-      || stringNullOrEmpty(event.target.value.trim())
-    ) {
-      currentValue = '0';
-    }
-    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
-      return;
-    }
-    let currentData: any;
-    setDtTable((preData: Array<TransferOutDetail>) => {
-      const data = [...preData];
-      currentData = data[index - 1];
-      data[index - 1].numberOfRequested = currentValue
-        ? parseInt(currentValue.replace(/,/g, '')) < 10000000000
-          ? parseInt(currentValue.replace(/,/g, ''))
-          : 0
-        : 0;
-      return data;
-    });
-    if (Object.keys(payloadAddItem).length !== 0) {
-      let updateList = _.cloneDeep(payloadAddItem);
-      updateList.map((item: any) => {
-        if (item.barcode === currentData.barcode) {
-          item.qty =
-            parseInt(currentValue.replace(/,/g, '')) < 10000000000
-              ? parseInt(currentValue.replace(/,/g, ''))
-              : 0;
-        }
-      });
-      dispatch(updateAddItemsState(updateList));
-    }
     dispatch(
       updateErrorList(
         errorList.map((item: any, idx: number) => {
@@ -215,12 +147,6 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
       )
     );
     dispatch(updateCheckEdit(true));
-    dispatch(updateCheckStock(checkStocks.filter((el: any) => el.barcode !== barcode)));
-  };
-
-  const addTwoDecimalPlaces = (value: any) => {
-    if (stringNullOrEmpty(value)) return '0.00';
-    else return value.toFixed(2);
   };
 
   const columns: GridColDef[] = [
@@ -241,7 +167,7 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     {
       field: 'barcode',
       headerName: 'บาร์โค้ด',
-      flex: 1,
+      flex: 0.8,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -272,9 +198,10 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
     },
     {
       field: 'numberOfRequested',
-      headerName: 'จำนวน *',
-      flex: 1,
+      headerName: 'จำนวนสินค้า',
+      flex: 0.8,
       headerAlign: 'center',
+      align: 'center',
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
@@ -291,80 +218,17 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
               error={condition}
               type="text"
               inputProps={{ maxLength: 13 }}
-              value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
               className={classes.MtextFieldNumber}
-              // inputProps={{ min: 0 }}
+              value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
               onChange={(e) => {
-                handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barcode);
+                handleChangeNumberOfRequested(e, params.row.index, index, params.row.barcode);
               }}
-              disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT)}
+              disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT}
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfRequested}</div>}
           </div>
         );
-      },
-    },
-    {
-      field: 'numberOfApproved',
-      headerName: 'จำนวนที่อนุมัติ *',
-      flex: 1,
-      headerAlign: 'center',
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) => {
-        const index =
-          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barcode) : -1;
-        const indexStock =
-          checkStocks && checkStocks.length > 0
-            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barcode)
-            : -1;
-        const condition = (index != -1 && errorList[index].errorNumberOfApproved) || indexStock !== -1;
-        return (
-          <div className={classes.MLabelTooltipWrapper}>
-            <TextField
-              error={condition}
-              type="text"
-              inputProps={{ maxLength: 13 }}
-              className={classes.MtextFieldNumber}
-              value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
-              disabled={!approvePermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
-              onChange={(e) => {
-                handleChangeNumberOfApprove(e, params.row.index, index, params.row.barcode);
-              }}
-            />
-            {condition && <div className="title">{errorList[index]?.errorNumberOfApproved}</div>}
-          </div>
-        );
       }
-    },
-    {
-      field: 'remark',
-      headerName: 'หมายเหตุ',
-      flex: 1.2,
-      headerAlign: 'center',
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: (params) => (
-        <HtmlTooltip disableHoverListener={stringNullOrEmpty(params.value)}
-                     disableTouchListener={stringNullOrEmpty(params.value)}
-                     disableFocusListener={stringNullOrEmpty(params.value)}
-                     disableInteractive={stringNullOrEmpty(params.value)}
-                     title={<React.Fragment>{params.value}</React.Fragment>}>
-          <TextField
-            type="text"
-            sx={{ width: '100%' }}
-            inputProps={{ maxLength: 250 }}
-            className={classes.MtextField}
-            value={stringNullOrEmpty(params.value) ? '' : params.value}
-            onChange={(e) => {
-              handleChangeRemark(e, params.row.index);
-            }}
-            disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT
-              && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL)
-              || (TOStatus.WAIT_FOR_APPROVAL == dataDetail.status && !approvePermission)}
-          />
-        </HtmlTooltip>
-      )
     },
     {
       field: 'delete',
@@ -414,7 +278,13 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
       },
     },
   ];
+
+  const handleChangeNote = (e: any) => {
+    dispatch(save({ ...payloadTransferOut, requesterNote: e }));
+    dispatch(updateCheckEdit(true));
+  };
   const [pageSize, setPageSize] = React.useState<number>(10);
+
   return (
     <div>
       <div style={{ width: '100%', height: dtTable.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
@@ -438,37 +308,21 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
           }}
         />
       </div>
-      <Box display="flex" justifyContent="space-between" mt={0}>
+      <Box display="flex" justifyContent="space-between" mt={3}>
         <Grid container spacing={2} mb={2}>
-          <Grid item xs={3}/>
-          <Grid item xs={3}/>
-          <Grid item xs={3}/>
           <Grid item xs={3}>
-            <Box display="flex" justifyContent="space-between" marginTop="25px">
-              <Typography fontSize="14px" fontWeight="700" lineHeight="30px" height="24px">
-                จำนวนทั้งหมด
-              </Typography>
-              <TextField
-                disabled
-                type="text"
-                sx={{ bgcolor: '#EAEBEB' }}
-                className={classes.MtextFieldNumberNoneArrow}
-                value={numberWithCommas(sumOfDiscount)}
-              />
-            </Box>
-            <Box display="flex" justifyContent="space-between" marginTop="10px">
-              <Typography fontSize="14px" fontWeight="700" marginTop="6px">
-                จำนวนที่อนุมัติทั้งหมด
-              </Typography>
-              <TextField
-                type="text"
-                sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
-                inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
-                className={classes.MtextFieldNumberNoneArrow}
-                value={numberWithCommas(sumOfApprovedDiscount)}
-              />
-            </Box>
+            <TextBoxComment
+              fieldName="หมายเหตุ :"
+              defaultValue={payloadTransferOut.requesterNote}
+              maxLength={100}
+              onChangeComment={handleChangeNote}
+              isDisable={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT}
+              rowDisplay={4}
+            />
           </Grid>
+          <Grid item xs={3}/>
+          <Grid item xs={3}/>
+          <Grid item xs={3}/>
         </Grid>
       </Box>
       <SnackbarStatus
@@ -481,4 +335,4 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
   );
 };
 
-export default ModalTransferOutItem;
+export default ModalToRawMaterialItem;

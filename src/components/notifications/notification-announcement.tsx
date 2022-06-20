@@ -12,6 +12,7 @@ import { getsaleLimitTimeDetail } from '../../store/slices/sale-limit-time-detai
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { getNotificationAnnouncements, updateNotificationItem } from '../../services/notification';
 import { DateFormat } from '../../utils/enum/common-enum';
+import AlertError from '../commons/ui/alert-error';
 
 interface Props {
   refresh: boolean;
@@ -26,7 +27,7 @@ export default function NotificationAnnouncement(props: Props) {
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const dispatch = useAppDispatch();
-  const saleLimitTimeDetail = useAppSelector((state) => state.saleLimitTimeDetailSlice.saleLimitTimeDetail);
+  const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
@@ -51,12 +52,15 @@ export default function NotificationAnnouncement(props: Props) {
   const handleClosePopup = () => {
     setOpenPopup(false);
   };
+  const handleCloseModalError = () => {
+    setOpenModalError(false);
+  };
 
   const handleGetData = async () => {
     try {
       setOpenLoadingModal(true);
       const rs = await getNotificationAnnouncements(page);
-      if (rs) {
+      if (rs && rs != 204) {
         if (rs.data) {
           setListData(rs.data);
           setTotal(rs.total);
@@ -75,9 +79,11 @@ export default function NotificationAnnouncement(props: Props) {
     try {
       setOpenLoadingModal(true);
       handleUpdateRead(item.id);
-      await dispatch(getsaleLimitTimeDetail(item.payload._id));
-      if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
+      const rs = await dispatch(getsaleLimitTimeDetail(item.payload._id));
+      if (!!rs.payload) {
         setOpenDetail(true);
+      } else {
+        setOpenModalError(true);
       }
       setOpenLoadingModal(false);
     } catch (error) {
@@ -173,6 +179,11 @@ export default function NotificationAnnouncement(props: Props) {
 
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
       <LoadingModal open={openLoadingModal} />
+      <AlertError
+        open={openModalError}
+        onClose={handleCloseModalError}
+        textError={'เกิดข้อผิดพลาดระหว่างการดำเนินการ'}
+      />
     </>
   );
 }

@@ -20,6 +20,7 @@ import ModalCreateTransferOutDestroy from '../transfer-out-destroy/modal-create-
 import ModalCreateTransferOut from '../transfer-out/modal-create-transfer-out';
 import { ShoppingCartSharp } from '@mui/icons-material';
 import HtmlTooltip from '../commons/ui/html-tooltip';
+import AlertError from '../commons/ui/alert-error';
 
 interface Props {
   refresh: boolean;
@@ -39,6 +40,7 @@ export default function NotificationReminder(props: Props) {
   const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail);
   const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   const userPermission =
     !objectNullOrEmpty(userInfo) &&
@@ -76,13 +78,16 @@ export default function NotificationReminder(props: Props) {
   const handleClosePopup = () => {
     setOpenPopup(false);
   };
+  const handleCloseModalError = () => {
+    setOpenModalError(false);
+  };
 
   const handleGetData = async () => {
     try {
       setOpenLoadingModal(true);
       const rs = await getNotificationReminders(page);
-      if (rs) {
-        if (rs.data !== null) {
+      if (rs && rs != 204) {
+        if (rs.data) {
           setListData(rs.data);
           setTotal(rs.total);
         } else {
@@ -101,20 +106,26 @@ export default function NotificationReminder(props: Props) {
       handleUpdateRead(item.id);
       if (item.type === 'REJECT_TRANSFER_OUT' || item.type === 'CLOSE_TRANSFER_OUT') {
         if (item.payload.type === 1) {
-          await dispatch(getTransferOutDetail(item.payload.documentNumber));
-          if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
+          const rs = await dispatch(getTransferOutDetail(item.documentNumber));
+          if (!!rs.payload) {
             setOpenTransferOutDetail(true);
+          } else {
+            setOpenModalError(true);
           }
-        } else if (item.payload.type === 2) {
-          await dispatch(getTransferOutDetail(item.payload.documentNumber));
-          if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
+        } else if (item.payload.type === 2 || item.payload.type === 5) {
+          const rs = await dispatch(getTransferOutDetail(item.documentNumber));
+          if (!!rs.payload) {
             setOpenTransferOutDestroyDetail(true);
+          } else {
+            setOpenModalError(true);
           }
         }
       } else if (item.type === 'REJECT_BARCODE') {
-        await dispatch(getBarcodeDiscountDetail(item.payload._id));
-        if (barcodeDiscountDetail.data.length > 0 || barcodeDiscountDetail.data) {
+        const rs = await dispatch(getBarcodeDiscountDetail(item.payload._id));
+        if (!!rs.payload) {
           setOpenBDDetail(true);
+        } else {
+          setOpenModalError(true);
         }
       }
       setOpenLoadingModal(false);
@@ -147,13 +158,12 @@ export default function NotificationReminder(props: Props) {
   };
 
   const listTask = listData.map((item: any, index: number) => {
-    let content, statusDisplay, documentNumber, branchCode;
+    let content, statusDisplay, branchCode;
     switch (item.type) {
       case 'REJECT_BARCODE':
         {
           content = 'ส่วนลดสินค้า';
           branchCode = item.payload.branchCode;
-          documentNumber = item.payload.documentNumber;
           statusDisplay = genStatusValue('ไม่อนุมัติ', {
             color: '#F76C6C',
             backgroundColor: '#FFD7D7',
@@ -163,13 +173,8 @@ export default function NotificationReminder(props: Props) {
         break;
       case 'CLOSE_TRANSFER_OUT':
         {
-          if (item.payload.type === 1) {
-            content = 'เบิก-ใช้ในการทำกิจกรรม';
-          } else {
-            content = 'เบิก-ทำลายไม่มีส่วนลด';
-          }
-          documentNumber = item.payload.documentNumber;
-          branchCode = item.payload.branch;
+          content = item.payload.type === 1 ? 'เบิกทำกิจกรรม' : 'เบิกทำลาย';
+          branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('ปิดงาน', {
             color: '#676767',
             backgroundColor: '#EAEBEB',
@@ -179,13 +184,8 @@ export default function NotificationReminder(props: Props) {
         break;
       case 'REJECT_TRANSFER_OUT':
         {
-          if (item.payload.type === 1) {
-            content = 'เบิก-ใช้ในการทำกิจกรรม';
-          } else {
-            content = 'เบิก-ทำลายไม่มีส่วนลด';
-          }
-          documentNumber = item.payload.documentNumber;
-          branchCode = item.payload.branch;
+          content = item.payload.type === 1 ? 'เบิกทำกิจกรรม' : 'เบิกทำลาย';
+          branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('ไม่อนุมัติ', {
             color: '#F76C6C',
             backgroundColor: '#FFD7D7',
@@ -197,7 +197,6 @@ export default function NotificationReminder(props: Props) {
         {
           content = 'โอนสินค้าระหว่างสาขา - อยู่ระหว่างขนส่ง';
           branchCode = item.payload.branchCode;
-          documentNumber = item.payload.docno;
           statusDisplay = genStatusValue('รับทราบ', {
             color: '#36C690',
             backgroundColor: '#E7FFE9',
@@ -219,7 +218,7 @@ export default function NotificationReminder(props: Props) {
         }}
         onClick={() => currentlySelected(item)}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type == 'REJECT_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
           ) : (
@@ -228,7 +227,7 @@ export default function NotificationReminder(props: Props) {
           <Box
             sx={{
               mt: 1,
-              ml: 1,
+              ml: 3,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -239,12 +238,12 @@ export default function NotificationReminder(props: Props) {
             <HtmlTooltip
               title={
                 <React.Fragment>
-                  {documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+                  {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
                 </React.Fragment>
               }
             >
               <span style={{ marginLeft: 5 }}>
-                {documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+                {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
               </span>
             </HtmlTooltip>
             <Box>
@@ -316,6 +315,11 @@ export default function NotificationReminder(props: Props) {
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
       <LoadingModal open={openLoadingModal} />
+      <AlertError
+        open={openModalError}
+        onClose={handleCloseModalError}
+        textError={'เกิดข้อผิดพลาดระหว่างการดำเนินการ'}
+      />
     </>
   );
 }

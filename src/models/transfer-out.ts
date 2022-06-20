@@ -8,11 +8,12 @@ export interface Payload {
 export interface TransferOutDetail {
   id: string;
   index: number;
-  barCode: string;
+  barcode: string;
   barcodeName: string;
   skuCode: string;
   unit: string;
   unitCode: string;
+  barFactor: number;
   numberOfRequested: number;
   numberOfApproved: number;
   remark: string;
@@ -26,6 +27,7 @@ export interface TransferOutDestroyDiscountDetail {
   skuCode: string;
   unit: string;
   unitCode: string;
+  barFactor: number;
   numberOfRequested: number;
   numberOfApproved: number;
   remark: string;

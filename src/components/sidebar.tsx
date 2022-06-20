@@ -399,6 +399,18 @@ export default function Sidebar({}: Props): ReactElement {
               </ListItemButton>
             </Link>
             <Link
+              to='/transfer-out-raw-masterial'
+              style={{ textDecoration: 'none', color: '#676767' }}
+              id='subMenuTOMasterial'>
+              <ListItemButton
+                key='subMenuTOMasterial'
+                selected={selectedIndex === 20}
+                onClick={() => handleListItemClick(20)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ขอใช้วัตถุดิบร้านบาว' />
+              </ListItemButton>
+            </Link>
+            <Link
               to='/create-purchase-branch'
               style={{
                 textDecoration: 'none',

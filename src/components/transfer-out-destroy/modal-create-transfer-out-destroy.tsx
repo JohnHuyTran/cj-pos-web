@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import { Box } from '@mui/system';
-import { Button, Dialog, DialogContent, Grid, Typography } from '@mui/material';
+import { Button, Dialog, DialogContent, FormControl, Grid, Typography } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -13,10 +13,10 @@ import moment from 'moment';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
   save,
+  updateApproveReject,
+  updateCheckEdit,
   updateDataDetail,
   updateErrorList,
-  updateCheckEdit,
-  updateApproveReject,
 } from '../../store/slices/transfer-out-destroy-slice';
 import { uploadAttachFile } from '../../services/barcode-discount';
 import AlertError from '../commons/ui/alert-error';
@@ -42,6 +42,8 @@ import {
 } from '../../services/transfer-out';
 import { updateCheckStock } from '../../store/slices/stock-balance-check-slice';
 import { checkStockBalance } from '../../services/common';
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -56,14 +58,14 @@ interface Props {
 const _ = require('lodash');
 
 export default function ModalCreateTransferOutDestroy({
-  isOpen,
-  onClickClose,
-  setOpenPopup,
-  action,
-  setPopupMsg,
-  onSearchMain,
-  userPermission,
-}: Props): ReactElement {
+                                                        isOpen,
+                                                        onClickClose,
+                                                        setOpenPopup,
+                                                        action,
+                                                        setPopupMsg,
+                                                        onSearchMain,
+                                                        userPermission,
+                                                      }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   let errorListProduct: any = [];
@@ -74,6 +76,7 @@ export default function ModalCreateTransferOutDestroy({
   const [openModalReject, setOpenModalReject] = React.useState<boolean>(false);
   const [openModalConfirmEnd, setOpenModalConfirmEnd] = React.useState<boolean>(false);
   const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
+  const [openModelAddItemDFs, setOpenModelAddItemDFs] = React.useState<boolean>(false);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const [openCheckStock, setOpenCheckStock] = React.useState<boolean>(false);
@@ -110,13 +113,29 @@ export default function ModalCreateTransferOutDestroy({
   const [branchCodeCheckStock, setBranchCodeCheckStock] = React.useState(
     getUserInfo().branch ? getUserInfo().branch : ''
   );
+  const [typeDestroy, setTypeDestroy] = React.useState<any>(null);
 
   const handleOpenAddItems = () => {
-    setOpenModelAddItems(true);
+    if (stringNullOrEmpty(typeDestroy)) {
+      setErrors({
+        ...errors,
+        typeDestroy: 'กรุณาเลือก',
+      });
+    } else {
+      if (TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy) {
+        setOpenModelAddItems(true);
+      } else if (TO_TYPE.TO_DEFECT === typeDestroy) {
+        setOpenModelAddItemDFs(true);
+      }
+    }
   };
 
-  const handleModelAddItems = async () => {
+  const handleCloseModelAddItems = async () => {
     setOpenModelAddItems(false);
+  };
+
+  const handleCloseModelAddItemDFs = async () => {
+    setOpenModelAddItemDFs(false);
   };
 
   const handleOpenCancel = () => {
@@ -155,6 +174,7 @@ export default function ModalCreateTransferOutDestroy({
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
+    dispatch(updateCheckStock([]));
     dispatch(updateAddItemsState({}));
     dispatch(
       updateDataDetail({
@@ -189,6 +209,8 @@ export default function ModalCreateTransferOutDestroy({
   useEffect(() => {
     //set value detail from search
     if (Action.UPDATE === action && !objectNullOrEmpty(transferOutDetail)) {
+      //set typeDestroy
+      setTypeDestroy(transferOutDetail.type);
       //set current branch
       let currentBranch = stringNullOrEmpty(transferOutDetail.branch) ? '' : transferOutDetail.branch;
       currentBranch += stringNullOrEmpty(transferOutDetail.branchName) ? '' : ' - ' + transferOutDetail.branchName;
@@ -254,7 +276,8 @@ export default function ModalCreateTransferOutDestroy({
             barcode: item.barcode,
             barcodeName: item.productName,
             unitName: item.unitName,
-            unitCode: item.unitCode,
+            unitCode: item.unitFactor,
+            baseUnit: item.barFactor,
             unitPrice: item.price || 0,
             discount: item.requestedDiscount || 0,
             qty: item.numberOfRequested || 0,
@@ -409,30 +432,33 @@ export default function ModalCreateTransferOutDestroy({
   const handleCreateDraft = async (sendRequest: boolean) => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     if (validate(false, sendRequest)) {
-      const rsCheckStock = await handleCheckStock();
+      let rsCheckStock: boolean | undefined = true;
+      if (TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy) {
+        rsCheckStock = await handleCheckStock();
+      }
       if (rsCheckStock) {
         await dispatch(save({ ...payloadTransferOut }));
         try {
           const allAttachFileBefore = await handleAllAttachFile(true);
           const body = !!dataDetail.id
             ? {
-                ...payloadTransferOut,
-                id: dataDetail.id,
-                documentNumber: dataDetail.documentNumber,
-                beforeAttachFiles: allAttachFileBefore,
-                type: TO_TYPE.TO_WITHOUT_DISCOUNT,
-              }
+              ...payloadTransferOut,
+              id: dataDetail.id,
+              documentNumber: dataDetail.documentNumber,
+              beforeAttachFiles: allAttachFileBefore,
+              type: TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy ? TO_TYPE.TO_WITHOUT_DISCOUNT : TO_TYPE.TO_DEFECT,
+            }
             : {
-                ...payloadTransferOut,
-                beforeAttachFiles: allAttachFileBefore,
-                type: TO_TYPE.TO_WITHOUT_DISCOUNT,
-              };
+              ...payloadTransferOut,
+              beforeAttachFiles: allAttachFileBefore,
+              type: TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy ? TO_TYPE.TO_WITHOUT_DISCOUNT : TO_TYPE.TO_DEFECT,
+            };
           const rs = await saveDraftTransferOut(body);
           if (rs.code === 201) {
             if (!sendRequest) {
               dispatch(updateCheckEdit(false));
               setOpenPopupModal(true);
-              setTextPopup('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+              setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
               if (onSearchMain) onSearchMain();
             }
             if (rs && rs.data) {
@@ -500,7 +526,7 @@ export default function ModalCreateTransferOutDestroy({
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ทำการส่งขออนุมัติเบิกทำลายมีส่วนลดเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการส่งขออนุมัติเบิกทำลายเรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
       } else {
@@ -538,7 +564,7 @@ export default function ModalCreateTransferOutDestroy({
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ทำการอนุมัติเบิกทำลายไม่มีส่วนลดเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการอนุมัติเบิกทำลายเรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
       } else if (rs.code === 50003) {
@@ -559,7 +585,7 @@ export default function ModalCreateTransferOutDestroy({
         const rs = await cancelTransferOut(dataDetail.id);
         if (rs.status === 200) {
           setOpenPopup(true);
-          setPopupMsg('คุณได้ยกเลิกเบิกทำลายไม่มีส่วนลดเรียบร้อยแล้ว');
+          setPopupMsg('คุณได้ยกเลิกเบิกทำลายเรียบร้อยแล้ว');
           handleClose();
           if (onSearchMain) onSearchMain();
         } else {
@@ -572,7 +598,7 @@ export default function ModalCreateTransferOutDestroy({
       }
     } else {
       setOpenPopup(true);
-      setPopupMsg('คุณได้ยกเลิกเบิกทำลายไม่มีส่วนลดเรียบร้อยแล้ว');
+      setPopupMsg('คุณได้ยกเลิกเบิกทำลายเรียบร้อยแล้ว');
       handleClose();
     }
   };
@@ -588,6 +614,7 @@ export default function ModalCreateTransferOutDestroy({
       const payload = {
         branchCode: branchCodeCheckStock,
         products: products,
+        backStore: true
       };
       const rs = await checkStockBalance(payload);
       if (rs.data && rs.data.length > 0) {
@@ -625,7 +652,7 @@ export default function ModalCreateTransferOutDestroy({
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ทำการไม่อนุมัติเบิกทำลายไม่มีส่วนลดเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการไม่อนุมัติเบิกทำลายเรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
       } else {
@@ -666,7 +693,7 @@ export default function ModalCreateTransferOutDestroy({
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ทำการปิดงานเบิกทำลายไม่มีส่วนลดเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการปิดงานเบิกทำลายเรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
       } else {
@@ -679,17 +706,31 @@ export default function ModalCreateTransferOutDestroy({
     }
   };
 
+  const renderValueSelectType = (value: any) => {
+    let valueRender: any = '';
+    if (stringNullOrEmpty(value)) {
+      valueRender = <div style={{ color: '#CBD4DB' }}>{'กรุณาเลือกประเภท'}</div>;
+    } else {
+      if (TO_TYPE.TO_WITHOUT_DISCOUNT === value) {
+        valueRender = 'ทำลาย(ไม่มีส่วนลด) - TO';
+      } else if (TO_TYPE.TO_DEFECT === value) {
+        valueRender = 'ทำลายวัตถุดิบร้านบาว - DF';
+      }
+    }
+    return valueRender;
+  }
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCloseModalCreate}>
-          <Typography sx={{ fontSize: '1em' }}>สร้างเอกสารทำลายไม่มีส่วนลด</Typography>
-          <StepperBar activeStep={status} setActiveStep={setStatus} />
+          <Typography sx={{ fontSize: '1em' }}>รายละเอียดเอกสารทำลาย</Typography>
+          <StepperBar activeStep={status} setActiveStep={setStatus}/>
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container mt={1} mb={-1}>
             {/*line 1*/}
-            <Grid item container xs={4} mb={5} mr={-3}>
+            <Grid item container xs={4} mb={8} mr={-3}>
               <Grid item xs={4}>
                 สาขา :
               </Grid>
@@ -697,15 +738,15 @@ export default function ModalCreateTransferOutDestroy({
                 {currentBranch}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5}>
-              <Grid item xs={4}>
+            <Grid item container xs={4} mb={8}>
+              <Grid item xs={5}>
                 เลขที่เอกสารทำลาย :
               </Grid>
-              <Grid item xs={8}>
-                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '_'}
+              <Grid item xs={7}>
+                {!!dataDetail.documentNumber ? dataDetail.documentNumber : '-'}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5} pl={3}>
+            <Grid item container xs={4} mb={8} pl={3}>
               <Grid item xs={4}>
                 วันที่ทำรายการ :
               </Grid>
@@ -717,9 +758,46 @@ export default function ModalCreateTransferOutDestroy({
             <Grid item container xs={4} mb={5} mr={-3}>
               <Grid item xs={4}>
                 วันที่อนุมัติ :
+                {/*add control selection type in here avoid to before and after control attach many files will be pushed down row*/}
+                <Grid item xs={12} pt={8.5}>
+                  ประเภททำลาย <b style={{ fontSize: '18px' }}> *</b> :
+                </Grid>
               </Grid>
               <Grid item xs={8}>
                 {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
+                {/*add control selection type in here avoid to before and after control attach many files will be pushed down row*/}
+                <Grid item xs={9} pt={8.5}>
+                  <FormControl fullWidth className={classes.Mselect}>
+                    <Select
+                      id='typeDestroy'
+                      name='typeDestroy'
+                      value={typeDestroy}
+                      onChange={(e) => {
+                        setTypeDestroy(e.target.value);
+                        setErrors({
+                          ...errors,
+                          typeDestroy: '',
+                        });
+                        dispatch(updateCheckEdit(true));
+                      }}
+                      disabled={(payloadTransferOut.products && payloadTransferOut.products.length > 0)
+                        || !stringNullOrEmpty(status)}
+                      inputProps={{ 'aria-label': 'Without label' }}
+                      displayEmpty
+                      renderValue={renderValueSelectType}
+                      error={!stringNullOrEmpty(errors['typeDestroy'])}>
+                      <MenuItem value={TO_TYPE.TO_WITHOUT_DISCOUNT}>{'ทำลาย(ไม่มีส่วนลด) - TO'}</MenuItem>
+                      <MenuItem value={TO_TYPE.TO_DEFECT}>{'ทำลายวัตถุดิบร้านบาว - DF'}</MenuItem>
+                    </Select>
+                    <Typography
+                      hidden={stringNullOrEmpty(errors['typeDestroy'])}
+                      display={'flex'}
+                      justifyContent={'flex-end'}
+                      sx={{ color: '#F54949' }}>
+                      {errors['typeDestroy']}
+                    </Typography>
+                  </FormControl>
+                </Grid>
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={2}>
@@ -762,6 +840,8 @@ export default function ModalCreateTransferOutDestroy({
                 />
               </Grid>
             </Grid>
+            {/*line 3*/}
+
           </Grid>
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>
@@ -771,7 +851,7 @@ export default function ModalCreateTransferOutDestroy({
                   variant='contained'
                   color='info'
                   className={classes.MbtnSearch}
-                  startIcon={<AddCircleOutlineOutlinedIcon />}
+                  startIcon={<AddCircleOutlineOutlinedIcon/>}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
                   style={{
@@ -789,7 +869,7 @@ export default function ModalCreateTransferOutDestroy({
                   id='btnSaveDraft'
                   variant='contained'
                   color='warning'
-                  startIcon={<SaveIcon />}
+                  startIcon={<SaveIcon/>}
                   disabled={
                     (!stringNullOrEmpty(status) && status != TOStatus.DRAFT) ||
                     (payloadTransferOut.products && payloadTransferOut.products.length === 0)
@@ -819,7 +899,7 @@ export default function ModalCreateTransferOutDestroy({
                         ? 'none'
                         : undefined,
                   }}
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleSendRequest}
                   className={classes.MbtnSearch}>
                   ขออนุมัติ
@@ -828,14 +908,14 @@ export default function ModalCreateTransferOutDestroy({
                   id='btnCancel'
                   variant='contained'
                   color='error'
-                  disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT}
+                  disabled={stringNullOrEmpty(status) || (!stringNullOrEmpty(status) && status != TOStatus.DRAFT)}
                   style={{
                     display:
                       (!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission
                         ? 'none'
                         : undefined,
                   }}
-                  startIcon={<HighlightOffIcon />}
+                  startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
                   ยกเลิก
@@ -846,7 +926,7 @@ export default function ModalCreateTransferOutDestroy({
                   style={{ display: status == TOStatus.WAIT_FOR_APPROVAL && approvePermission ? undefined : 'none' }}
                   variant='contained'
                   color='primary'
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirmApprove}
                   className={classes.MbtnSearch}>
                   อนุมัติ
@@ -856,7 +936,7 @@ export default function ModalCreateTransferOutDestroy({
                   variant='contained'
                   style={{ display: status == TOStatus.WAIT_FOR_APPROVAL && approvePermission ? undefined : 'none' }}
                   color='error'
-                  startIcon={<HighlightOffIcon />}
+                  startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenModalReject}
                   className={classes.MbtnSearch}>
                   ไม่อนุมัติ
@@ -866,7 +946,7 @@ export default function ModalCreateTransferOutDestroy({
                   variant='contained'
                   style={{ display: status != TOStatus.APPROVED || approvePermission ? 'none' : undefined }}
                   color='info'
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirmEnd}
                   className={classes.MbtnSearch}>
                   ปิดงาน
@@ -874,7 +954,7 @@ export default function ModalCreateTransferOutDestroy({
               </Box>
             </Box>
             <Box>
-              <ModalTransferOutDestroyItem id='' action={action} userPermission={userPermission} />
+              <ModalTransferOutDestroyItem id='' action={action} userPermission={userPermission}/>
             </Box>
           </Box>
         </DialogContent>
@@ -882,10 +962,19 @@ export default function ModalCreateTransferOutDestroy({
 
       <ModalAddItems
         open={openModelAddItems}
-        onClose={handleModelAddItems}
+        onClose={handleCloseModelAddItems}
         requestBody={{
           skuCodes: [],
           skuTypes: [2],
+          isSellable: true,
+        }}
+      />
+      <ModalAddItems
+        open={openModelAddItemDFs}
+        onClose={handleCloseModelAddItemDFs}
+        requestBody={{
+          skuCodes: [],
+          skuTypes: [1, 7],
           isSellable: true,
         }}
       />
@@ -895,11 +984,11 @@ export default function ModalCreateTransferOutDestroy({
         onClose={handleCloseModalCancel}
         onConfirm={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันยกเลิกเบิกทำลายไม่มีส่วนลด'}
+        headerTitle={'ยืนยันยกเลิกเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
-      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
-      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError} />
+      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
+      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError}/>
       <ModalCheckStock
         open={openCheckStock}
         onClose={() => {
@@ -907,13 +996,13 @@ export default function ModalCreateTransferOutDestroy({
         }}
         headerTitle={'เบิกสินค้ามากกว่าที่มีในคลัง โปรดตรวจสอบ'}
       />
-      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
+      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm
         open={openModalConfirmApprove}
         onClose={() => handleCloseModalConfirmApprove(false)}
         onConfirm={() => handleCloseModalConfirmApprove(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันอนุมัติเบิกทำลายไม่มีส่วนลด'}
+        headerTitle={'ยืนยันอนุมัติเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <ModelConfirm
@@ -921,7 +1010,7 @@ export default function ModalCreateTransferOutDestroy({
         onClose={() => handleCloseModalConfirmReject(false)}
         onConfirm={() => handleCloseModalConfirmReject(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันไม่อนุมัติเบิกทำลายไม่มีส่วนลด'}
+        headerTitle={'ยืนยันไม่อนุมัติเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <ModelConfirm
@@ -929,7 +1018,7 @@ export default function ModalCreateTransferOutDestroy({
         onClose={() => handleCloseModalConfirmSendForApproval(false)}
         onConfirm={() => handleCloseModalConfirmSendForApproval(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันส่งขอเบิกทำลายไม่มีส่วนลด'}
+        headerTitle={'ยืนยันส่งขอเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <ModelConfirm
@@ -937,7 +1026,7 @@ export default function ModalCreateTransferOutDestroy({
         onClose={() => handleCloseModalConfirmEnd(false)}
         onConfirm={() => handleCloseModalConfirmEnd(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันปิดงานเบิกทำลายไม่มีส่วนลด'}
+        headerTitle={'ยืนยันปิดงานเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
     </div>

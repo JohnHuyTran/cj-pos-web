@@ -4,10 +4,6 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@material-ui/core';
 import {
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
   Grid,
   TextField,
   Typography,
@@ -28,6 +24,7 @@ import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import HtmlTooltip from '../commons/ui/html-tooltip';
 import { TransferOutDetail } from "../../models/transfer-out";
+import ModelConfirmDeleteProduct from "../commons/ui/modal-confirm-delete-product";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -61,7 +58,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let rows = payloadAddItem.map((item: any, index: number) => {
-        let sameItem = dtTable.find((el) => el.barCode === item.barcode);
+        let sameItem = dtTable.find((el) => el.barcode === item.barcode);
         let numberOfRequested = item.qty ? item.qty : 0;
         let remark = !!sameItem ? sameItem.remark : '';
         if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
@@ -77,10 +74,11 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
         return {
           id: `${item.barcode}-${index + 1}`,
           index: index + 1,
-          barCode: item.barcode,
+          barcode: item.barcode,
           barcodeName: item.barcodeName,
           unit: item.unitName,
           unitCode: item.unitCode || '',
+          barFactor: item.baseUnit || 0,
           qty: numberOfRequested,
           errorQty: '',
           numberOfRequested: numberOfRequested,
@@ -102,11 +100,12 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
       updateSumOfApprovedDiscount(dtTable.reduce((acc, val) => acc + Number(val.numberOfApproved), 0));
       const products = dtTable.map((item) => {
         return {
-          barcode: item.barCode,
+          barcode: item.barcode,
           numberOfRequested: parseInt(String(item.numberOfRequested).replace(/,/g, '')),
           numberOfApproved: parseInt(String(item.numberOfApproved).replace(/,/g, '')),
           unitName: item.unit,
-          unitCode: item.unitCode,
+          unitFactor: item.unitCode,
+          barFactor: item.barFactor,
           productName: item.barcodeName,
           sku: item.skuCode,
           remark: item.remark
@@ -194,7 +193,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let updateList = _.cloneDeep(payloadAddItem);
       updateList.map((item: any) => {
-        if (item.barcode === currentData.barCode) {
+        if (item.barcode === currentData.barcode) {
           item.qty =
             parseInt(currentValue.replace(/,/g, '')) < 10000000000
               ? parseInt(currentValue.replace(/,/g, ''))
@@ -240,7 +239,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
       ),
     },
     {
-      field: 'barCode',
+      field: 'barcode',
       headerName: 'บาร์โค้ด',
       flex: 1,
       headerAlign: 'center',
@@ -280,10 +279,10 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const index =
-          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barcode) : -1;
         const indexStock =
           checkStocks && checkStocks.length > 0
-            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode)
+            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barcode)
             : -1;
         const condition = (index != -1 && errorList[index].errorNumberOfRequested) || indexStock !== -1;
         return (
@@ -296,7 +295,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
               className={classes.MtextFieldNumber}
               // inputProps={{ min: 0 }}
               onChange={(e) => {
-                handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barCode);
+                handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barcode);
               }}
               disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT)}
             />
@@ -314,10 +313,10 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const index =
-          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barcode) : -1;
         const indexStock =
           checkStocks && checkStocks.length > 0
-            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barCode)
+            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barcode)
             : -1;
         const condition = (index != -1 && errorList[index].errorNumberOfApproved) || indexStock !== -1;
         return (
@@ -330,7 +329,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
               disabled={!approvePermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
               onChange={(e) => {
-                handleChangeNumberOfApprove(e, params.row.index, index, params.row.barCode);
+                handleChangeNumberOfApprove(e, params.row.index, index, params.row.barcode);
               }}
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfApproved}</div>}
@@ -385,7 +384,7 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
         };
 
         const handleDeleteItem = () => {
-          dispatch(updateAddItemsState(payloadAddItem.filter((r: any) => r.barcode !== params.row.barCode)));
+          dispatch(updateAddItemsState(payloadAddItem.filter((r: any) => r.barcode !== params.row.barcode)));
           dispatch(updateCheckEdit(true));
           setOpenModalDelete(false);
           setOpenPopupModal(true);
@@ -400,69 +399,15 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
             >
               <DeleteForever fontSize="medium" sx={{ color: '#F54949' }}/>
             </Button>
-
-            <Dialog
-              open={openModalDelete}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-              PaperProps={{ sx: { minWidth: 450, height: 241 } }}
-            >
-              <DialogContent sx={{ pl: 6, pr: 8 }}>
-                <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-                  <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
-                    ต้องการลบสินค้า
-                  </Typography>
-                  <Grid container>
-                    <Grid item xs={4} sx={{ textAlign: 'right' }}>
-                      สินค้า <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
-                    </Grid>
-                    <Grid item xs={8} sx={{ pl: 2 }}>
-                      <label style={{ color: '#36C690' }}>
-                        <b>{params.row.barcodeName}</b>
-                        <br/>
-                        <label
-                          style={{
-                            color: '#AEAEAE',
-                            fontSize: 14,
-                          }}
-                        >
-                          {params.row.skuCode}
-                        </label>
-                      </label>
-                    </Grid>
-                    <Grid item xs={4} sx={{ textAlign: 'right' }}>
-                      บาร์โค้ด <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
-                    </Grid>
-                    <Grid item xs={8} sx={{ pl: 1 }}>
-                      <label style={{ color: '#36C690' }}>
-                        <b>{params.row.barCode}</b>
-                      </label>
-                    </Grid>
-                  </Grid>
-                </DialogContentText>
-              </DialogContent>
-
-              <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
-                <Button
-                  id="btnCancle"
-                  variant="contained"
-                  color="inherit"
-                  sx={{ borderRadius: 2, width: 90, mr: 2 }}
-                  onClick={handleCloseModalDelete}
-                >
-                  ยกเลิก
-                </Button>
-                <Button
-                  id="btnConfirm"
-                  variant="contained"
-                  color="error"
-                  sx={{ borderRadius: 2, width: 90 }}
-                  onClick={handleDeleteItem}
-                >
-                  ลบสินค้า
-                </Button>
-              </DialogActions>
-            </Dialog>
+            <ModelConfirmDeleteProduct open={openModalDelete}
+                                       onConfirm={handleDeleteItem}
+                                       onClose={handleCloseModalDelete}
+                                       productInfo={{
+                                         barcodeName: params.row.barcodeName,
+                                         skuCode: params.row.skuCode,
+                                         barcode: params.row.barcode
+                                       }}
+            />
           </>
         );
       },

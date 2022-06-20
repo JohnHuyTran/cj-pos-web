@@ -4,9 +4,7 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import {
   Button,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogContentText,
   Grid,
   TextField,
   Typography,
@@ -20,6 +18,7 @@ import SnackbarStatus from "../commons/ui/snackbar-status";
 import AlertError from "../commons/ui/alert-error";
 import { updateAddDestroyProductState } from "../../store/slices/add-to-destroy-product-slice";
 import { searchProductDiscount } from "../../store/slices/search-product-discount";
+import ModelConfirmDeleteProduct from "../commons/ui/modal-confirm-delete-product";
 
 interface Props {
   open: boolean;
@@ -75,8 +74,9 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
           barcode: item.detail.barcode,
           barcodeName: item.detail.productName,
           skuCode: item.detail.skuCode,
-          unit: item.detail.unitFactor,
+          unit: item.detail.unitName,
           unitCode: item.detail.unitCode || '',
+          barFactor: item.detail.barFactor || 0,
           numberOfDiscounted: item.total || 0,
           numberOfApproved: 0,
         };
@@ -247,69 +247,15 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
             >
               <DeleteForever fontSize="medium" sx={{ color: '#F54949' }}/>
             </Button>
-
-            <Dialog
-              open={openModalDelete}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-              PaperProps={{ sx: { minWidth: 450, height: 241 } }}
-            >
-              <DialogContent sx={{ pl: 6, pr: 8 }}>
-                <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-                  <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
-                    ต้องการลบสินค้า
-                  </Typography>
-                  <Grid container>
-                    <Grid item xs={4} sx={{ textAlign: 'right' }}>
-                      สินค้า <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
-                    </Grid>
-                    <Grid item xs={8} sx={{ pl: 2 }}>
-                      <label style={{ color: '#36C690' }}>
-                        <b>{params.row.barcodeName}</b>
-                        <br/>
-                        <label
-                          style={{
-                            color: '#AEAEAE',
-                            fontSize: 14,
-                          }}
-                        >
-                          {params.row.skuCode}
-                        </label>
-                      </label>
-                    </Grid>
-                    <Grid item xs={4} sx={{ textAlign: 'right' }}>
-                      บาร์โค้ด <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
-                    </Grid>
-                    <Grid item xs={8} sx={{ pl: 1 }}>
-                      <label style={{ color: '#36C690' }}>
-                        <b>{params.row.barcode}</b>
-                      </label>
-                    </Grid>
-                  </Grid>
-                </DialogContentText>
-              </DialogContent>
-
-              <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
-                <Button
-                  id="btnCancle"
-                  variant="contained"
-                  color="inherit"
-                  sx={{ borderRadius: 2, width: 90, mr: 2 }}
-                  onClick={handleCloseModalDelete}
-                >
-                  ยกเลิก
-                </Button>
-                <Button
-                  id="btnConfirm"
-                  variant="contained"
-                  color="error"
-                  sx={{ borderRadius: 2, width: 90 }}
-                  onClick={handleDeleteItem}
-                >
-                  ลบสินค้า
-                </Button>
-              </DialogActions>
-            </Dialog>
+            <ModelConfirmDeleteProduct open={openModalDelete}
+                                       onConfirm={handleDeleteItem}
+                                       onClose={handleCloseModalDelete}
+                                       productInfo={{
+                                         barcodeName: params.row.barcodeName,
+                                         skuCode: params.row.skuCode,
+                                         barcode: params.row.barcode
+                                       }}
+            />
           </>
         );
       },

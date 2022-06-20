@@ -75,6 +75,7 @@ export default function ModelConfirm({ open, onClose, productName, skuCode, barC
           color="cancelColor"
           sx={{ borderRadius: 2, width: 90, mr: 2 }}
           onClick={onClose}
+          data-testid="btnCancle"
         >
           ยกเลิก
         </Button>
@@ -84,6 +85,7 @@ export default function ModelConfirm({ open, onClose, productName, skuCode, barC
           color="error"
           sx={{ borderRadius: 2, width: 90 }}
           onClick={handleDeleteItem}
+          data-testid="btnConfirm"
         >
           ลบสินค้า
         </Button>

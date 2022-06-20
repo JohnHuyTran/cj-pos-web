@@ -4,10 +4,6 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
 import {
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
   Grid,
   TextField,
   Typography,
@@ -35,6 +31,7 @@ import TextBoxComment from '../commons/ui/textbox-comment';
 import HtmlTooltip from '../commons/ui/html-tooltip';
 import { updateBarcodeDiscountPrintState, updatePrintInDetail } from "../../store/slices/barcode-discount-print-slice";
 import { env } from '../../adapters/environmentConfigs';
+import ModelConfirmDeleteProduct from "../commons/ui/modal-confirm-delete-product";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -99,6 +96,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           barcodeName: item.barcodeName,
           unit: item.unitName,
           unitCode: item.unitCode || '',
+          barFactor: item.baseUnit || 0,
           price: price,
           discount: discount,
           errorDiscount: '',
@@ -121,8 +119,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
         if (rows && rows.length > 0) {
           let rowData = _.cloneDeep(rows);
           let productPrintFilter = rowData.filter((itPro: any) => !stringNullOrEmpty(itPro.expiryDate)
-                && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day')
-                && (itPro.numberOfApproved && itPro.numberOfApproved > 0));
+            && moment(itPro.expiryDate).isSameOrAfter(moment(new Date()), 'day')
+            && (itPro.numberOfApproved && itPro.numberOfApproved > 0));
           dispatch(updateBarcodeDiscountPrintState(productPrintFilter));
           dispatch(updatePrintInDetail(true));
         }
@@ -146,6 +144,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           expiredDate: item.expiryDate,
           unitFactor: item.unit,
           unitCode: item.unitCode,
+          barFactor: item.barFactor,
           productName: item.barcodeName,
           skuCode: item.skuCode,
         };
@@ -564,7 +563,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               className={classes.MtextFieldNumber}
               value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
               disabled={!approvePermission || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)
-              || (approvePermission && dataDetail.status < Number(BDStatus.WAIT_FOR_APPROVAL))}
+                || (approvePermission && dataDetail.status < Number(BDStatus.WAIT_FOR_APPROVAL))}
               onChange={(e) => {
                 handleChangeNumberOfApprove(e, params.row.index, index, params.row.barCode);
               }}
@@ -638,7 +637,8 @@ export const ModalTransferItem = (props: DataGridProps) => {
               }
             />
             {condition &&
-            <div className="title" title={errorList[index].errorExpiryDate}>{errorList[index].errorExpiryDate}</div>}
+                <div className="title"
+                     title={errorList[index].errorExpiryDate}>{errorList[index].errorExpiryDate}</div>}
           </div>
         );
       },
@@ -677,91 +677,15 @@ export const ModalTransferItem = (props: DataGridProps) => {
             >
               <DeleteForever fontSize="medium" sx={{ color: '#F54949' }}/>
             </Button>
-
-            <Dialog
-              open={openModalDelete}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-              PaperProps={{ sx: { minWidth: 450, height: 241 } }}
-            >
-              <DialogContent sx={{ pl: 6, pr: 8 }}>
-                <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-                  <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
-                    ต้องการลบสินค้า
-                  </Typography>
-                  {/* <Typography variant="body1" align="left" marginLeft="17px">
-                    สินค้า <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>{' '}
-                    <label style={{ color: '#36C690' }}>
-                      <b>{params.row.barcodeName}</b>
-                      <br />
-                      <label
-                        style={{
-                          color: '#AEAEAE',
-                          fontSize: 14,
-                          marginLeft: '4em',
-                        }}
-                      >
-                        {params.row.skuCode}
-                      </label>
-                    </label>
-                  </Typography>
-                  <Typography variant="body1" align="left">
-                    บาร์โค้ด <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>{' '}
-                    <label style={{ color: '#36C690' }}>
-                      <b>{params.row.barCode}</b>
-                    </label>
-                  </Typography> */}
-                  <Grid container>
-                    <Grid item xs={4} sx={{ textAlign: 'right' }}>
-                      สินค้า <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
-                    </Grid>
-                    <Grid item xs={8} sx={{ pl: 2 }}>
-                      <label style={{ color: '#36C690' }}>
-                        <b>{params.row.barcodeName}</b>
-                        <br/>
-                        <label
-                          style={{
-                            color: '#AEAEAE',
-                            fontSize: 14,
-                          }}
-                        >
-                          {params.row.skuCode}
-                        </label>
-                      </label>
-                    </Grid>
-                    <Grid item xs={4} sx={{ textAlign: 'right' }}>
-                      บาร์โค้ด <label style={{ color: '#AEAEAE', margin: '0 5px' }}>|</label>
-                    </Grid>
-                    <Grid item xs={8} sx={{ pl: 1 }}>
-                      <label style={{ color: '#36C690' }}>
-                        <b>{params.row.barCode}</b>
-                      </label>
-                    </Grid>
-                  </Grid>
-                </DialogContentText>
-              </DialogContent>
-
-              <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
-                <Button
-                  id="btnCancle"
-                  variant="contained"
-                  color="inherit"
-                  sx={{ borderRadius: 2, width: 90, mr: 2 }}
-                  onClick={handleCloseModalDelete}
-                >
-                  ยกเลิก
-                </Button>
-                <Button
-                  id="btnConfirm"
-                  variant="contained"
-                  color="error"
-                  sx={{ borderRadius: 2, width: 90 }}
-                  onClick={handleDeleteItem}
-                >
-                  ลบสินค้า
-                </Button>
-              </DialogActions>
-            </Dialog>
+            <ModelConfirmDeleteProduct open={openModalDelete}
+                                       onConfirm={handleDeleteItem}
+                                       onClose={handleCloseModalDelete}
+                                       productInfo={{
+                                         barcodeName: params.row.barcodeName,
+                                         skuCode: params.row.skuCode,
+                                         barcode: params.row.barCode
+                                       }}
+            />
           </>
         );
       },
@@ -789,31 +713,29 @@ export const ModalTransferItem = (props: DataGridProps) => {
               </Typography>
             ),
           }}
-          // onCellClick={currentlySelected}
-          // onCellFocusOut={handleCalculateItems}
         />
       </div>
       <Box display="flex" justifyContent="space-between" paddingTop="30px">
         <Grid container spacing={2} mb={2}>
           <Grid item xs={3}>
             <TextBoxComment
-                fieldName="หมายเหตุจากสาขา :"
-                defaultValue={payloadBarcodeDiscount.requesterNote}
-                maxLength={100}
-                onChangeComment={handleChangeNote}
-                isDisable={dataDetail.status > 1}
-                rowDisplay={4}
+              fieldName="หมายเหตุจากสาขา :"
+              defaultValue={payloadBarcodeDiscount.requesterNote}
+              maxLength={100}
+              onChangeComment={handleChangeNote}
+              isDisable={dataDetail.status > 1}
+              rowDisplay={4}
             />
           </Grid>
           <Grid item xs={3}>
             <Box style={{ display: dataDetail.status > 1 ? undefined : 'none' }}>
               <TextBoxComment
-                  fieldName="หมายเหตุจากผู้อนุมัติ :"
-                  defaultValue={approveReject ? approveReject.approvalNote : ''}
-                  maxLength={100}
-                  onChangeComment={handleChangeReason}
-                  isDisable={dataDetail.status > 2 || !approvePermission}
-                  rowDisplay={4}
+                fieldName="หมายเหตุจากผู้อนุมัติ :"
+                defaultValue={approveReject ? approveReject.approvalNote : ''}
+                maxLength={100}
+                onChangeComment={handleChangeReason}
+                isDisable={dataDetail.status > 2 || !approvePermission}
+                rowDisplay={4}
               />
             </Box>
           </Grid>
@@ -825,11 +747,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 {env.currency && ` (${env.currency})`}
               </Typography>
               <TextField
-                  disabled
-                  type="text"
-                  sx={{ bgcolor: '#EAEBEB' }}
-                  className={classes.MtextFieldNumberNoneArrow}
-                  value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
+                disabled
+                type="text"
+                sx={{ bgcolor: '#EAEBEB' }}
+                className={classes.MtextFieldNumberNoneArrow}
+                value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
               />
             </Box>
             <Box display="flex" justifyContent="space-between" marginTop="10px">
@@ -838,21 +760,21 @@ export const ModalTransferItem = (props: DataGridProps) => {
                 {env.currency && ` (${env.currency})`}
               </Typography>
               <TextField
-                  type="text"
-                  sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
-                  inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
-                  className={classes.MtextFieldNumberNoneArrow}
-                  value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
+                type="text"
+                sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
+                inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
+                className={classes.MtextFieldNumberNoneArrow}
+                value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
               />
             </Box>
           </Grid>
         </Grid>
       </Box>
       <SnackbarStatus
-          open={openPopupModal}
-          onClose={handleClosePopup}
-          isSuccess={true}
-          contentMsg={'คุณได้ลบข้อมูลเรียบร้อยแล้ว'}
+        open={openPopupModal}
+        onClose={handleClosePopup}
+        isSuccess={true}
+        contentMsg={'คุณได้ลบข้อมูลเรียบร้อยแล้ว'}
       />
     </div>
   );
