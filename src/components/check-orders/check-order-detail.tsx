@@ -269,7 +269,7 @@ export default function CheckOrderDetail({
     if (Object.keys(payloadAddItem).length > 0) {
       payloadAddItem.forEach((item: itemsDetail) => {
         sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
-        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qtyRef); //รวมจำนวนอ้าง
       });
 
       let sumPercent: number = (sumActualQtyItems * 100) / sumQuantityRefItems;
