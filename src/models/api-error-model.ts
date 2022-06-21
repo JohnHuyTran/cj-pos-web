@@ -64,6 +64,4 @@ export interface Header {
   field1: boolean;
   field2: boolean;
   field3: boolean;
-  field4: boolean;
-  fiele5: boolean;
 }
