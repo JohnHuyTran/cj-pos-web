@@ -400,6 +400,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
       setIsClearProvinces(false);
     } else if (provincesCode === '') {
       setValue('province', provincesCode);
+      setDisabledSelDistricts(true);
     }
 
     //Clear district, subDistrict, postcode
@@ -425,6 +426,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
       clearErrors('district');
       setDistrictsCode(districtsCode);
       setDisabledSelSubDistricts(false);
+    } else if (districtsCode === '') {
+      setDisabledSelSubDistricts(true);
     }
     setIsClearDistricts(false);
 
