@@ -6,6 +6,7 @@ import { ErrorOutline } from '@mui/icons-material';
 import { ErrorDetailResponse } from '../../../models/api-error-model';
 import { numberWithCommas, stringNullOrEmpty } from '../../../utils/utils';
 import { GridColDef } from '@mui/x-data-grid';
+import { useStyles } from '../../../styles/makeTheme';
 
 interface Props {
   open: boolean;
