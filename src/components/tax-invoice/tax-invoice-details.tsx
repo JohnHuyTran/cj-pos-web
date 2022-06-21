@@ -401,6 +401,20 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
     } else if (provincesCode === '') {
       setValue('province', provincesCode);
     }
+
+    //Clear district, subDistrict, postcode
+    setDisabledSelSubDistricts(true);
+    setIsClearDistricts(true);
+    setIsClearSubDistricts(true);
+    setDistrictsCode('');
+    setSubDistrictsCode('');
+    setSearchDistrictsCode('');
+    setSearchPostalCode('');
+    reset({
+      district: '',
+      subDistrict: '',
+      postcode: '',
+    });
   };
 
   const handleChangeDistricts = (districtsCode: string, provincesCode: string) => {
@@ -413,6 +427,16 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
       setDisabledSelSubDistricts(false);
     }
     setIsClearDistricts(false);
+
+    //Clear subDistrict, postcode
+    setIsClearSubDistricts(true);
+    setSubDistrictsCode('');
+    setSearchDistrictsCode('');
+    setSearchPostalCode('');
+    reset({
+      subDistrict: '',
+      postcode: '',
+    });
   };
 
   const handleChangeSubDistricts = (subDistrictsCode: string, postalCode: string, districtCode: string) => {
@@ -423,6 +447,12 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
       setValue('postcode', postalCode);
       clearErrors('subDistrict');
       clearErrors('postcode');
+    } else if (subDistrictsCode === '') {
+      //Clear postcode
+      setSearchPostalCode('');
+      reset({
+        postcode: '',
+      });
     }
     setSubDistrictsCode('');
     setIsClearSubDistricts(false);
