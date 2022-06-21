@@ -621,10 +621,10 @@ const useStyles = makeStyles({
       minHeight: '20px !important',
       padding: '0px 0px 0px 5px',
     },
-    '& .Mui-disabled': {
-      '-webkit-text-fill-color': 'rgb(0 0 0) !important',
-      color: '#263238 !important',
-    },
+    // '& .Mui-disabled': {
+    //   '-webkit-text-fill-color': 'rgb(0 0 0) !important',
+    //   color: '#263238 !important',
+    // },
   },
 });
 
