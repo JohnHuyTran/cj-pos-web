@@ -138,6 +138,7 @@ export interface itemsDetail {
   unitName: string;
   unitFactor: number;
   qty: number;
+  qtyRef?: number;
   actualQty: number;
   qtyDiff: number;
   comment: string;
