@@ -398,24 +398,6 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
       setProvincesCode(provincesCode);
       setDisabledSelDistricts(false);
       setIsClearProvinces(false);
-
-      if (searchPostalCode === '') {
-        setDistrictsCode('');
-        setSubDistrictsCode('');
-        setSearchDistrictsCode('');
-        setSearchPostalCode('');
-        setSearchPostalCode('');
-
-        // setDisabledSelDistricts(true);
-        setDisabledSelSubDistricts(true);
-
-        setValue('district', '');
-        setValue('subDistrict', '');
-        setValue('postcode', '');
-
-        setIsClearDistricts(true);
-        setIsClearSubDistricts(true);
-      }
     } else if (provincesCode === '') {
       setValue('province', provincesCode);
     }
@@ -430,13 +412,6 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
       setDistrictsCode(districtsCode);
       setDisabledSelSubDistricts(false);
     }
-
-    if (searchPostalCode != '') {
-      // setSearchProvincesCode(provincesCode);
-      setProvincesCode('');
-      setDisabledSelProvinces(false);
-    }
-
     setIsClearDistricts(false);
   };
 
@@ -449,48 +424,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
       clearErrors('subDistrict');
       clearErrors('postcode');
     }
-
-    if (searchPostalCode != '') {
-      setSearchDistrictsCode(districtCode);
-      setDistrictsCode('');
-      setDisabledSelDistricts(false);
-    }
-
     setSubDistrictsCode('');
     setIsClearSubDistricts(false);
-  };
-
-  const handleChangePostalCode = (e: any) => {
-    const keySearch = e.target.value.trim();
-    setFlagSave(true);
-
-    if (keySearch.length >= 5) {
-      setSearchPostalCode(keySearch);
-      setProvincesCode('');
-      setDistrictsCode('');
-      setDisabledSelSubDistricts(false);
-      setDisabledSelProvinces(true);
-    } else if (keySearch.length === 0) {
-      setProvincesCode('');
-      setDistrictsCode('');
-      setSubDistrictsCode('');
-
-      // setSearchProvincesCode('');
-      setSearchPostalCode('');
-      setSearchDistrictsCode('');
-
-      setDisabledSelDistricts(true);
-      setDisabledSelSubDistricts(true);
-      setDisabledSelProvinces(false);
-
-      setIsClearProvinces(true);
-      setIsClearDistricts(true);
-      setIsClearSubDistricts(true);
-
-      setValue('province', '');
-      setValue('district', '');
-      setValue('subDistrict', '');
-    }
   };
 
   const handleEditMode = () => {
@@ -834,23 +769,18 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
 
             <Grid item xs={2}>
               <Typography gutterBottom variant='subtitle1' component='div' mb={2}>
-                รหัสไปรษณีย์ :
+                รหัสไปรษณีย์:
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <TextField
                 id='txtpostCode'
                 size='small'
-                // type="number"
-                inputProps={{ maxLength: 5 }}
-                className={classes.MtextField}
+                className={classes.MtextFieldPostCode}
                 fullWidth
-                placeholder='กรุณากรอกรหัสไปรษณีย์'
+                // placeholder='กรุณากรอกรหัสไปรษณีย์'
                 {...register('postcode', { maxLength: 5, pattern: /\d+/ })}
-                onChange={(e) => {
-                  handleChangePostalCode(e);
-                }}
-                disabled={editMode}
+                disabled={true}
               />
               {errors.postcode && (
                 <FormHelperText id='component-helper-text' style={{ color: '#FF0000', textAlign: 'right' }}>
