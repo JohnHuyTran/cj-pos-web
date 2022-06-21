@@ -62,6 +62,7 @@ const columnsSKU: GridColDef[] = [
     align: 'right',
     disableColumnMenu: true,
     sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
   },
   {
     field: 'orderAllQty',
