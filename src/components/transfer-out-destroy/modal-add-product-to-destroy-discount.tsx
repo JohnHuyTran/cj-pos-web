@@ -19,6 +19,7 @@ import AlertError from "../commons/ui/alert-error";
 import { updateAddDestroyProductState } from "../../store/slices/add-to-destroy-product-slice";
 import { searchProductDiscount } from "../../store/slices/search-product-discount";
 import ModelConfirmDeleteProduct from "../commons/ui/modal-confirm-delete-product";
+import { debounce } from "lodash";
 
 interface Props {
   open: boolean;
@@ -26,33 +27,6 @@ interface Props {
 }
 
 const _ = require('lodash');
-
-const lstProductMock = [
-  {
-    id: 1,
-    barcode: '9999990181225',
-    barcodeName: 'GF กล้วยหอมแพ็คเดี่ยว 120g',
-    unitName: 'ชิ้น',
-    numberOfDiscounted: 5,
-    numberOfApproved: 0
-  },
-  {
-    id: 2,
-    barcode: '9999990197786',
-    barcodeName: 'GF ส้มแพ็ค 500 g',
-    unitName: 'ชิ้น',
-    numberOfDiscounted: 10,
-    numberOfApproved: 0
-  },
-  {
-    id: 3,
-    barcode: '9999990197788',
-    barcodeName: 'GF ส้มแพ็ค 600 g',
-    unitName: 'ชิ้น',
-    numberOfDiscounted: 3,
-    numberOfApproved: 0
-  }
-];
 
 export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
   const classes = useStyles();
@@ -64,6 +38,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const payloadAddItem = useAppSelector((state) => state.addToDestroyProductSlice.state);
   const productDiscountList = useAppSelector((state) => state.searchProductDiscountSlice.itemList.data);
+  const [pageSize, setPageSize] = React.useState<number>(10);
 
   useEffect(() => {
     if (productDiscountList && productDiscountList.length > 0) {
@@ -134,21 +109,50 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
     });
   };
 
+  const onChangeScanProduct = (e: any) => {
+    handleDebounceFn(e.target.value);
+  };
+
+  const handleDebounceFn = debounce(async (valueInput: any) => {
+    if (!stringNullOrEmpty(valueInput) && valueInput.length > 2) {
+      let currentValue = valueInput.trim();
+      let prefixValue = currentValue.slice(0, 2);
+      if ('A4' === prefixValue) {
+        try {
+          let barcode = currentValue.slice(9, currentValue.length);
+          let dataTableHandle = _.cloneDeep(dataTable);
+          let dataObj = dataTableHandle.find((it: any) => it.barcode === barcode);
+          if (objectNullOrEmpty(dataObj)) {
+            showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
+          } else {
+            if (dataObj.numberOfApproved === dataObj.numberOfDiscounted) {
+              showModalError('จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก');
+            } else {
+              dataObj.numberOfApproved = dataObj.numberOfApproved + 1;
+              setDataTable(dataTableHandle);
+            }
+          }
+        } catch (e) {
+          showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
+        }
+      } else {
+        showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
+      }
+    }
+  }, 500);
+
+  const showModalError = (textError: string) => {
+    setOpenModalError(true);
+    setTextError(textError);
+  };
+
+  const handleAddProductDestroy = () => {
+    let allProduct = [...dataTable, ...payloadAddItem];
+    dispatch(updateAddDestroyProductState(allProduct));
+    onClose();
+  }
+
   const columns: GridColDef[] = [
-    // {
-    //   field: 'id',
-    //   headerName: 'ลำดับ',
-    //   flex: 0.4,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    //   disableColumnMenu: false,
-    //   sortable: false,
-    //   renderCell: (params) => (
-    //     <Box component="div" sx={{ paddingLeft: '20px' }}>
-    //       {params.value}
-    //     </Box>
-    //   ),
-    // },
     {
       field: 'barcode',
       headerName: 'บาร์โค้ด',
@@ -261,46 +265,6 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
       },
     },
   ];
-  const [pageSize, setPageSize] = React.useState<number>(10);
-
-  const onChangeScanProduct = (e: any) => {
-    if (e && !stringNullOrEmpty(e.target.value) && e.target.value.length > 2) {
-      let currentValue = e.target.value.trim();
-      let prefixValue = currentValue.slice(0, 2);
-      if ('A4' === prefixValue) {
-        try {
-          let barcode = currentValue.slice(9, currentValue.length);
-          let dataTableHandle = _.cloneDeep(dataTable);
-          let dataObj = dataTableHandle.find((it: any) => it.barcode === barcode);
-          if (objectNullOrEmpty(dataObj)) {
-            showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
-          } else {
-            if (dataObj.numberOfApproved === dataObj.numberOfDiscounted) {
-              showModalError('จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก');
-            } else {
-              dataObj.numberOfApproved = dataObj.numberOfApproved + 1;
-              setDataTable(dataTableHandle);
-            }
-          }
-        } catch (e) {
-          showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
-        }
-      } else {
-        showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
-      }
-    }
-  };
-
-  const showModalError = (textError: string) => {
-    setOpenModalError(true);
-    setTextError(textError);
-  };
-
-  const handleAddProductDestroy = () => {
-    let allProduct = [...dataTable, ...payloadAddItem];
-    dispatch(updateAddDestroyProductState(allProduct));
-    onClose();
-  }
 
   return (
     <div>
