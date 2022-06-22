@@ -336,11 +336,12 @@ export default function CheckOrderDetail({
     const itemsList: any = [];
     const itemsListUpdate: any = [];
     // rows.forEach((data: GridRowData) => {
+
     payloadAddItem.forEach((data: any) => {
       const item: any = {
         barcode: data.barcode,
         deliveryOrderNo: data.deliveryOrderNo,
-        actualQty: Number(data.actualQty),
+        actualQty: Number(data.actualQty) ? Number(data.actualQty) : Number(data.qty) ? Number(data.qty) : 0,
         comment: data.comment,
         isTote: data.isTote,
       };
