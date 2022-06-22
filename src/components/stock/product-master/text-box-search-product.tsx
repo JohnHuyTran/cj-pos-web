@@ -13,14 +13,12 @@ interface Props {
 
 function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const [value, setValue] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [searchItem, setSearchItem] = React.useState<any | null>(null);
   const [itemsList, setItemList] = React.useState([]);
   let options: any = [];
   if (searchItem) options = itemsList && itemsList.length > 0 ? itemsList : [];
-  console.log({ options });
 
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.barcodeName + option.barcode + option.skuCode,
@@ -64,19 +62,10 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
     onSelectItem(option);
   };
 
-  const clearData = async () => {
-    setValue('');
-  };
-
-  const clearInput = () => {};
   const onInputChange = async (event: any, value: string, reason: string) => {
     if (event && event.keyCode && event.keyCode === 13) {
       return false;
     }
-    if (reason == 'reset') {
-      clearInput();
-    }
-
     const keyword = value.trim();
     if (keyword.length >= 3 && reason !== 'reset') {
       setLoading(true);
@@ -90,8 +79,6 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
       } catch (error) {
         setLoading(false);
       }
-    } else {
-      clearData();
     }
   };
 

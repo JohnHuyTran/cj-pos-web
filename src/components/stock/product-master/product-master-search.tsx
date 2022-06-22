@@ -18,6 +18,7 @@ import LoadingModal from '../../commons/ui/loading-modal';
 import HtmlTooltip from '../../commons/ui/html-tooltip';
 import AlertError from '../../commons/ui/alert-error';
 import TextBoxSearchProduct from './text-box-search-product';
+import { SearchOff } from '@mui/icons-material';
 interface State {
   query: string;
   branch: string;
@@ -37,6 +38,7 @@ function ProductMasterSearch() {
       : env.branch.code
     : env.branch.code;
   const [showData, setShowdData] = React.useState<boolean>(false);
+  const [showNonData, setShowNonData] = React.useState<boolean>(false);
   const branchName = getBranchName(branchList, ownBranch);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const [branchMap, setBranchMap] = React.useState<BranchListOptionType>({
@@ -97,10 +99,14 @@ function ProductMasterSearch() {
       if (values.query) {
         setOpenLoadingModal(true);
         const rs = await getProductMaster(values.query, values.branch);
-        if (rs.code == 20000) {
+        if (!!rs && rs.code == 20000) {
           setSkuValue(rs.data.sku);
           setlistBarCode(rs.data.barcodes);
           setShowdData(true);
+          setShowNonData(false);
+        } else if (rs == 204) {
+          setShowdData(false);
+          setShowNonData(true);
         } else {
           setShowdData(false);
           setTextError('Invalid Product Name, Product Code or SKU Product');
@@ -186,6 +192,15 @@ function ProductMasterSearch() {
           </Button>
         </Grid>
       </Grid>
+      {showNonData && (
+        <Grid item container xs={12} justifyContent="center" mt={8}>
+          <Box color="#CBD4DB">
+            <h2>
+              ไม่พบข้อมูล <SearchOff fontSize="large" />
+            </h2>
+          </Box>
+        </Grid>
+      )}
       {showData && (
         <>
           <TitleHeader title="ผลการค้นหา" />
