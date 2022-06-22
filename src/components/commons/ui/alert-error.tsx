@@ -57,7 +57,12 @@ export default function AlertError({ open, onClose, textError, errorCode, payloa
     {
       field: 'productDetail',
       headerName: 'รายละเอียด',
-      minWidth: 250,
+      minWidth:
+        payload?.header.field1 && payload?.header.field3
+          ? 250
+          : payload?.header.field1 || payload?.header.field3
+          ? 250
+          : 400,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -75,6 +80,9 @@ export default function AlertError({ open, onClose, textError, errorCode, payloa
             <Typography color='textSecondary' sx={{ fontSize: 12 }}>
               {params.row.docNo || ''}
             </Typography>
+            <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+              {params.row.toteCode || ''}
+            </Typography>
           </div>
         );
       },
@@ -90,7 +98,7 @@ export default function AlertError({ open, onClose, textError, errorCode, payloa
       renderCell: (params) => {
         return (
           <Typography variant='body2' sx={{ color: 'red', marginRight: '10px' }}>
-            <b>{numberWithCommas(params.value)}</b>
+            <b>{stringNullOrEmpty(params.value) ? '' : numberWithCommas(params.value)}</b>
           </Typography>
         );
       },
@@ -106,6 +114,7 @@ export default function AlertError({ open, onClose, textError, errorCode, payloa
       barcodeName: item.barcodeName,
       qty: item.qty,
       docNo: item.docNo,
+      toteCode: item.toteCode,
     };
   });
 

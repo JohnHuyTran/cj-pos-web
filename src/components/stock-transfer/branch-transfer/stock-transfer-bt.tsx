@@ -3,7 +3,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { BranchTransferRequest, Delivery, Item, ItemGroups } from '../../../models/stock-transfer-model';
+import { BranchTransferRequest, Delivery, ErrorItem, Item, ItemGroups } from '../../../models/stock-transfer-model';
 import { Button, Grid, IconButton, Link, Typography } from '@mui/material';
 import Steppers from '../steppers';
 import Box from '@mui/system/Box';
@@ -36,9 +36,12 @@ import {
 } from '../../../services/stock-transfer';
 import { featchPurchaseNoteAsync } from '../../../store/slices/supplier-order-return-slice';
 import { featchSearchStockTransferAsync } from '../../../store/slices/stock-transfer-slice';
-import { ApiError } from '../../../models/api-error-model';
+import { ApiError, ErrorDetail, ErrorDetailResponse, Header } from '../../../models/api-error-model';
 import { GridRowData } from '@mui/x-data-grid';
-import { featchBranchTransferDetailAsync } from '../../../store/slices/stock-transfer-branch-request-slice';
+import {
+  featchBranchTransferDetailAsync,
+  updateErrorList,
+} from '../../../store/slices/stock-transfer-branch-request-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../../store/slices/add-items-slice';
 import { isGroupBranch } from '../../../utils/role-permission';
@@ -46,6 +49,9 @@ import AccordionUploadFile from '../../commons/ui/accordion-upload-file';
 import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import BranchTransferListSKU from './stock-transfer-bt-sku';
+import { InquiryToteRequest, ToteItem } from '../../../models/tote-model';
+import { inquiryTote } from '../../../services/tote-service';
+import { isErrorCode } from '../../../utils/exception/pos-exception';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -96,6 +102,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
+  const [payloadError, setPayloadError] = React.useState<ErrorDetailResponse>();
   const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
   const [pathReport, setPathReport] = React.useState<string>('');
   const [suffixDocType, setSuffixDocType] = React.useState<string>('');
@@ -222,6 +229,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
 
     // dispatch(updateAddItemSkuGroupState(branchTransferInfo.itemGroups));
     setSkuList(branchTransferInfo.itemGroups);
+    dispatch(updateErrorList([]));
   }, [open]);
 
   const mappingPayload = () => {
@@ -343,6 +351,28 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     }
   };
 
+  const saveBranchTransferService = async (payload: BranchTransferRequest) => {
+    await saveBranchTransfer(payload)
+      .then(async (value) => {
+        setBtNo(value.docNo);
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+        await dispatch(featchBranchTransferDetailAsync(value.docNo));
+        await dispatch(featchSearchStockTransferAsync(payloadSearch));
+
+        const _branchTransferRslList = store.getState().branchTransferDetailSlice.branchTransferRs;
+        const _branchTransferInfo: any = _branchTransferRslList.data ? _branchTransferRslList.data : null;
+        setBranchTransferItems(_branchTransferInfo.items);
+        // await storeItem();
+      })
+      .catch((error: ApiError) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(false);
+        setContentMsg(error.message);
+      });
+  };
+
   const handleSaveBtn = async () => {
     setOpenLoadingModal(true);
     // await storeItem();
@@ -351,25 +381,10 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     const isvalidItem = validateItem('save');
     if (isvalidItem) {
       const payload: BranchTransferRequest = await mappingPayload();
-      await saveBranchTransfer(payload)
-        .then(async (value) => {
-          setBtNo(value.docNo);
-          setShowSnackBar(true);
-          setSnackbarIsStatus(true);
-          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
-          await dispatch(featchBranchTransferDetailAsync(value.docNo));
-          await dispatch(featchSearchStockTransferAsync(payloadSearch));
-
-          const _branchTransferRslList = store.getState().branchTransferDetailSlice.branchTransferRs;
-          const _branchTransferInfo: any = _branchTransferRslList.data ? _branchTransferRslList.data : null;
-          setBranchTransferItems(_branchTransferInfo.items);
-          // await storeItem();
-        })
-        .catch((error: ApiError) => {
-          setShowSnackBar(true);
-          setSnackbarIsStatus(false);
-          setContentMsg(error.message);
-        });
+      const isToteValid = checkTote(payload.items && payload.items?.length > 0 ? payload.items : []);
+      if (isToteValid) {
+        saveBranchTransferService(payload);
+      }
     }
     setOpenLoadingModal(false);
   };
@@ -406,20 +421,23 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     await dispatch(updateAddItemsState({}));
     const isvalidItem = validateItem('sendToDC');
     if (isvalidItem) {
-      if (!btNo) {
-        const payload: BranchTransferRequest = await mappingPayload();
-        await saveBranchTransfer(payload)
-          .then(async (value) => {
-            setBtNo(value.btNo);
-            setOpenModelConfirmTransaction(true);
-          })
-          .catch((error: ApiError) => {
-            setShowSnackBar(true);
-            setSnackbarIsStatus(false);
-            setContentMsg(error.message);
-          });
-      } else {
-        setOpenModelConfirmTransaction(true);
+      const payload: BranchTransferRequest = await mappingPayload();
+      const isToteValid = checkTote(payload.items && payload.items?.length > 0 ? payload.items : []);
+      if (isToteValid) {
+        if (!btNo) {
+          await saveBranchTransfer(payload)
+            .then(async (value) => {
+              setBtNo(value.btNo);
+              setOpenModelConfirmTransaction(true);
+            })
+            .catch((error: ApiError) => {
+              setShowSnackBar(true);
+              setSnackbarIsStatus(false);
+              setContentMsg(error.message);
+            });
+        } else {
+          setOpenModelConfirmTransaction(true);
+        }
       }
     }
   };
@@ -533,6 +551,52 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     setUploadFileFlag(status);
     if (status) {
       dispatch(featchPurchaseNoteAsync(btNo));
+    }
+  };
+
+  const checkTote = (items: Item[]) => {
+    const _items = _.uniqBy(items, 'toteCode');
+    const totes = _items
+      .filter((item: Item) => item.actualQty && item.actualQty > 0)
+      .map((item: Item) => item.toteCode);
+    const payload: InquiryToteRequest = {
+      branchCode: branchTransferInfo.branchFrom,
+      toteItem: totes,
+    };
+    if (totes.length <= 0) {
+      return true;
+    } else {
+      inquiryTote(payload)
+        .then(() => {
+          return true;
+        })
+        .catch((error: ApiError) => {
+          let errorList: ErrorDetail[] = [];
+          const datas: ToteItem[] = error.data;
+          datas.forEach((item: ToteItem) => {
+            if (isErrorCode(item.toteCode)) {
+              const _err: ErrorDetail = {
+                toteCode: item.toteCode,
+              };
+              errorList.push(_err);
+            }
+          });
+          dispatch(updateErrorList(errorList));
+          setOpenAlert(true);
+          setTextError('ไม่สามารถใช้ เลข Tote ดังต่อไปนี้ได้');
+          const header: Header = {
+            field1: false,
+            field2: true,
+            field3: false,
+          };
+          const payload: ErrorDetailResponse = {
+            header: header,
+            error_details: errorList,
+          };
+          setPayloadError(payload);
+        })
+        .finally(() => {});
+      return false;
     }
   };
 
@@ -1075,7 +1139,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         onClose={handleCloseModelAddItems}
         requestBody={bodyRequest ? bodyRequest : { skuCodes: [] }}></ModalAddItems>
       <LoadingModal open={openLoadingModal} />
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} payload={payloadError} />
       <ModalShowFile
         open={openModelPreviewDocument}
         onClose={handleModelPreviewDocument}

@@ -5,12 +5,14 @@ export class ApiError {
   httpStatus: number;
   message: string;
   error_details: any;
+  data: any;
 
-  constructor(httpStatus: number, code: any, message: string, error_details?: any) {
+  constructor(httpStatus: number, code: any, message: string, error_details?: any, data?: any) {
     this.code = code;
     this.httpStatus = httpStatus;
     this.message = this.getErrorMessage();
     this.error_details = error_details;
+    this.data = data;
   }
 
   getErrorMessage = () => {
@@ -58,6 +60,7 @@ export interface ErrorDetail {
   barcodeName?: string;
   qty?: number;
   docNo?: string;
+  toteCode?: string;
 }
 
 export interface Header {
