@@ -309,7 +309,6 @@ export default function SearchBranch(props: Props): ReactElement {
       saved: false,
     };
     dispatch(updatePayloadBranches(payload));
-    setOpen(false);
   };
 
   const filterOptions = createFilterOptions({
