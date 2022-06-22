@@ -1176,7 +1176,7 @@ export default function ModalCreateBarcodeDiscount({
                 userPermission={userPermission}
               />
             </Box>
-            <Box hidden={status !== Number(BDStatus.BARCODE_PRINTED)}>
+            <Box hidden={Number(BDStatus.BARCODE_PRINTED) !== status && Number(BDStatus.ALREADY_EXPIRED) !== status}>
               <Typography>ประวัติการพิมพ์บาร์โค้ด</Typography>
               <DataGrid
                 rows={printHistoryRows}

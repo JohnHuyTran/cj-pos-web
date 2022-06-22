@@ -34,6 +34,7 @@ export default function AlertError({ open, onClose, textError }: Props): ReactEl
           variant='contained'
           color='error'
           sx={{ borderRadius: '5px', width: '126px' }}
+          autoFocus
           onClick={onClose}>
           ปิด
         </Button>
