@@ -45,3 +45,23 @@ export class ApiUploadError {
     this.data = data ? data : null;
   }
 }
+
+export interface ErrorDetailResponse {
+  header: Header;
+  error_details: ErrorDetail[];
+}
+
+export interface ErrorDetail {
+  skuCode?: string;
+  productName?: string;
+  barcode?: string;
+  barcodeName?: string;
+  qty?: number;
+  docNo?: string;
+}
+
+export interface Header {
+  field1: boolean;
+  field2: boolean;
+  field3: boolean;
+}

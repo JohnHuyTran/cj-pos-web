@@ -1,3 +1,5 @@
+import { ErrorDetail, ErrorDetailResponse, Header } from '../models/api-error-model';
+
 const rs = {
   timestamp: '2022-02-21T09:18:20.080+0000',
   ref: '621358dcdf5c0f81b471bc18',
@@ -198,3 +200,21 @@ export function getStrockTransferMockup() {
     resolve(rs);
   });
 }
+const headerMock: Header = {
+  field1: true,
+  field2: true,
+  field3: true,
+};
+
+const errorDetailMock: ErrorDetail = {
+  skuCode: 'skuCode',
+  productName: 'productName',
+  barcode: 'barcode',
+  barcodeName: 'barcodeName',
+  qty: 9,
+  docNo: 'RT000000',
+};
+export const mockError: ErrorDetailResponse = {
+  header: headerMock,
+  error_details: [errorDetailMock, errorDetailMock, errorDetailMock, errorDetailMock, errorDetailMock, errorDetailMock],
+};
