@@ -1,9 +1,9 @@
 import { Autocomplete, CircularProgress, createFilterOptions, TextField, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
-import { useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import SearchIcon from '@mui/icons-material/Search';
 import { searchProductItem } from '../../../services/product-master';
+import { debounce } from 'lodash';
 
 interface Props {
   onSelectItem: (value: any) => void;
@@ -36,6 +36,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
       </li>
     );
   };
+
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
@@ -57,12 +58,17 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
       />
     );
   };
+
   const handleChangeItem = async (event: any, option: any, reason: string) => {
     setValue(option);
     onSelectItem(option);
   };
 
   const onInputChange = async (event: any, value: string, reason: string) => {
+    debouncedSearch(event, value, reason);
+  };
+
+  const debouncedSearch = debounce(async function (event: any, value: string, reason: string) {
     if (event && event.keyCode && event.keyCode === 13) {
       return false;
     }
@@ -80,7 +86,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
         setLoading(false);
       }
     }
-  };
+  }, 500);
 
   useEffect(() => {
     if (isClear) {

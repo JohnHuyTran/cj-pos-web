@@ -104,9 +104,6 @@ function ProductMasterSearch() {
           setlistBarCode(rs.data.barcodes);
           setShowdData(true);
           setShowNonData(false);
-        } else if (rs == 204) {
-          setShowdData(false);
-          setShowNonData(true);
         } else {
           setShowdData(false);
           setTextError('Invalid Product Name, Product Code or SKU Product');
@@ -117,10 +114,16 @@ function ProductMasterSearch() {
         setOpenAlert(true);
       }
     } catch (error) {
-      console.log('err: ', error);
-      setTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
-      setOpenAlert(true);
-      setShowdData(false);
+      const er: any = error;
+      if (er.httpStatus == 404) {
+        setShowdData(false);
+        setShowNonData(true);
+      } else {
+        console.log('err: ', error);
+        setTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+        setOpenAlert(true);
+        setShowdData(false);
+      }
     }
     setOpenLoadingModal(false);
   };
