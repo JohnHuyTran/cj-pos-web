@@ -480,7 +480,7 @@ export const environment = {
   },
   tote: {
     inquiryTote: {
-      url: 'tote/toteinquiry',
+      url: '/webtote/toteinquiry',
     },
   },
 };
