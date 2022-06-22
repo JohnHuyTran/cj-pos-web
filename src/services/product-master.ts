@@ -2,6 +2,7 @@ import { get, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { FindProductProps } from '../models/product-model';
 import { ContentType } from '../utils/enum/common-enum';
+import { getPathUrl } from './base-service';
 
 export async function getProductMaster(query: string, branchCode: string) {
   try {
@@ -69,3 +70,9 @@ export async function getProductBySKUCodes(codes: any) {
     throw error;
   }
 }
+
+export const getProductBySupplierCode = (supplierCode: string) => {
+  return getPathUrl(`${environment.products.addItem.productsBySupplierCode.url}`, {
+    supplierCode: supplierCode,
+  });
+};

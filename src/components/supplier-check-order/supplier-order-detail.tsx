@@ -20,12 +20,7 @@ import {
   GridEditCellValueParams,
 } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import {
-  SavePurchaseRequest,
-  FileType,
-  CalculatePurchasePIRequest,
-  PurchaseDetailResponse,
-} from '../../models/supplier-check-order-model';
+import { SavePurchaseRequest, FileType, CalculatePurchasePIRequest } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
 import { calculateSupplierPI, delFileUrlHuawei, getPathReportPI, saveSupplierOrder } from '../../services/purchase';
@@ -38,7 +33,7 @@ import theme from '../../styles/theme';
 import ModalAddItem from './modal-add-items';
 import ModelDeleteConfirm from './modal-delete-confirm';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
-import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
+import { featchItemBySupplierListAsync } from '../../store/slices/products/search-item-by-supplier-slice';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { formatFileNam } from '../../utils/enum/supplier-order-enum';
 import AlertError from '../commons/ui/alert-error';

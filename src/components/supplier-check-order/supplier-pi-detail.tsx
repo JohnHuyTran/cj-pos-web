@@ -30,13 +30,10 @@ import ModelConfirm from './modal-confirm';
 import ModelDeleteConfirm from './modal-delete-confirm';
 import ModalAddItem from './modal-add-items';
 import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
-import { updateState } from '../../store/slices/supplier-selection-slice';
-import { featchItemBySupplierListAsync } from '../../store/slices/search-item-by-sup-slice';
-import theme from '../../styles/theme';
+import { featchItemBySupplierListAsync } from '../../store/slices/products/search-item-by-supplier-slice';
 import AlertError from '../commons/ui/alert-error';
 import { uploadFileState } from '../../store/slices/upload-file-slice';
 import { featchSupplierOrderDetailAsync } from '../../store/slices/supplier-order-detail-slice';
-import ConfirmCloseModel from '../commons/ui/confirm-exit-model';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 interface Props {
   isOpen: boolean;
