@@ -1,8 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { ItemBySupplierCodeResponse } from '../../models/modal-add-item-model';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
-import { SupplierItem } from '../../mockdata/supplier-items';
+import { ItemBySupplierCodeResponse } from '../../../models/modal-add-item-model';
+import { get } from '../../../adapters/posback-adapter';
+import { getProductBySupplierCode } from '../../../services/product-master';
 
 type State = {
   itemList: ItemBySupplierCodeResponse;
@@ -20,12 +19,10 @@ const initialState: State = {
   error: '',
 };
 
-export const featchItemBySupplierListAsync = createAsyncThunk('ItemList', async (supNo: string) => {
+export const featchItemBySupplierListAsync = createAsyncThunk('ItemListBySupplier', async (SupplierCode: string) => {
   try {
-    const path = environment.products.addItem.itemList.url + supNo;
-
+    const path = `${getProductBySupplierCode(SupplierCode)}?onlyAllowToBuy=true`;
     let response = await get(path).then();
-
     if (response === 204) {
       let responseCode: any = {
         ref: '',
@@ -33,19 +30,16 @@ export const featchItemBySupplierListAsync = createAsyncThunk('ItemList', async 
         message: '',
         data: [],
       };
-
       return responseCode;
     }
-
     return response;
-    // return SupplierItem;
   } catch (error) {
     throw error;
   }
 });
 
 const searchItemBySupSlice = createSlice({
-  name: 'itemList',
+  name: 'ItemListBySupplier',
   initialState,
   reducers: {},
   extraReducers: (builer) => {

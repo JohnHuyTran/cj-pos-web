@@ -274,8 +274,8 @@ export const environment = {
       allitemsList: {
         url: '/products/barcode/all',
       },
-      itemList: {
-        url: '/products/',
+      productsBySupplierCode: {
+        url: '/products/{supplierCode}',
       },
       itemByBarcode: {
         url: '/products/barcode/',
