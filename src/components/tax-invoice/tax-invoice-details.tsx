@@ -141,9 +141,9 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
         moo: data.moo,
         soi: data.soi,
         road: data.road,
-        subDistrictCode: data.subDistrict,
-        districtCode: data.district,
-        provinceCode: data.province,
+        subDistrictCode: Number(data.subDistrict),
+        districtCode: Number(data.district),
+        provinceCode: Number(data.province),
         postcode: data.postcode,
       };
       const customer: any = {
