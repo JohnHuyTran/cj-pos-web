@@ -8,7 +8,6 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Button from '@mui/material/Button';
 import ModelConfirm from './modal-confirm';
-import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ContentPaste } from '@mui/icons-material';
 import store, { useAppDispatch, useAppSelector } from '../../store/store';
 import { getDCStatus, getSdType } from '../../utils/utils';
@@ -75,10 +74,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const [statusFile, setStatusFile] = React.useState(0);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
 
-  const [showSnackBar, setShowSnackBar] = React.useState(false);
-  const [contentMsg, setContentMsg] = React.useState('');
-
-  const [approveDCStatus, setApproveDCStatus] = React.useState(false);
 
   const [characterCount, setCharacterCount] = React.useState(0);
   const [disableCheckBtn, setDisableCheckBtn] = React.useState(true);
@@ -155,9 +150,9 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     handleOpenLoading('open', true);
     const isRefreshScreen = store.getState().dcCheckOrderDetail.isReloadScreen;
     const msg = issuccess ? 'ตรวจสอบผลต่าง(DC) สำเร็จ' : errorMsg;
-    setShowSnackBar(true);
-    setContentMsg(msg);
-    setApproveDCStatus(issuccess);
+
+    setOpenAlert(true);
+    setTextError(msg);
     if (issuccess && !isRefreshScreen) {
       await dispatch(featchOrderListDcAsync(payloadSearchDC));
       setTimeout(() => {
@@ -169,16 +164,12 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       await dispatch(featchorderDetailDCAsync(itemId));
       handleOpenLoading('open', false);
       setTimeout(() => {
-        handleCloseSnackBar();
+        handleCloseAlert();
       }, 500);
       await dispatch(setReloadScreen(false));
     } else {
       handleOpenLoading('open', false);
     }
-  };
-
-  const handleCloseSnackBar = () => {
-    setShowSnackBar(false);
   };
 
   const handleClose = async () => {
@@ -564,12 +555,6 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         }
       />
 
-      <SnackbarStatus
-        open={showSnackBar}
-        onClose={handleCloseSnackBar}
-        isSuccess={approveDCStatus}
-        contentMsg={contentMsg}
-      />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       <LoadingModal open={openLoadingModal.open} />
     </div>
