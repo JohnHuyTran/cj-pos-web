@@ -203,7 +203,7 @@ export function getStrockTransferMockup() {
 const headerMock: Header = {
   field1: true,
   field2: true,
-  field3: false,
+  field3: true,
 };
 
 const errorDetailMock: ErrorDetail = {

@@ -109,9 +109,6 @@ export default function AlertError({ open, onClose, textError, errorCode, payloa
     };
   });
 
-  useEffect(() => {
-    console.log('test: ', payload);
-  }, [open]);
   return (
     <Dialog
       open={open}
