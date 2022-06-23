@@ -223,6 +223,6 @@ const inquiry_tote_error = {
 
 export function inquiryToteMockData() {
   return new Promise((resolve, reject) => {
-    reject(inquiry_tote_error);
+    resolve(inquiry_tote_error);
   });
 }
