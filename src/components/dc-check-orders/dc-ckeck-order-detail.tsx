@@ -155,11 +155,15 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     handleOpenLoading('open', true);
     const isRefreshScreen = store.getState().dcCheckOrderDetail.isReloadScreen;
     const msg = issuccess ? 'ตรวจสอบผลต่าง(DC) สำเร็จ' : errorMsg;
-    setShowSnackBar(true);
-    setContentMsg(msg);
-    setApproveDCStatus(issuccess);
+    const successMessage = () => {
+      setShowSnackBar(true);
+      setContentMsg(msg);
+      setApproveDCStatus(issuccess);
+    }
+
     if (issuccess && !isRefreshScreen) {
       await dispatch(featchOrderListDcAsync(payloadSearchDC));
+      successMessage()
       setTimeout(() => {
         handleClose();
       }, 500);
@@ -168,12 +172,15 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       const itemId = store.getState().dcCheckOrderDetail.itemId;
       await dispatch(featchorderDetailDCAsync(itemId));
       handleOpenLoading('open', false);
+      successMessage()
       setTimeout(() => {
         handleCloseSnackBar();
       }, 500);
       await dispatch(setReloadScreen(false));
     } else {
       handleOpenLoading('open', false);
+      setOpenAlert(true);
+      setTextError(msg);
     }
   };
 

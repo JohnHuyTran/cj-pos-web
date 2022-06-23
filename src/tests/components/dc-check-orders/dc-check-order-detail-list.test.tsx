@@ -2,7 +2,6 @@ import { fireEvent, getByText, prettyDOM, render, RenderResult, screen, waitFor,
 import DCCheckOrderSearch from '../../../components/dc-check-orders/dc-check-order';
 
 import { Provider } from 'react-redux';
-import configureStore from 'redux-mock-store';
 import { Store, AnyAction } from '@reduxjs/toolkit';
 import { initialState, mocksliceDcOrderListOver10 } from '../../mockStore';
 import { ThemeProvider } from '@mui/material';

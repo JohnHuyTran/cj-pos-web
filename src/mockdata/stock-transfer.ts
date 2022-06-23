@@ -204,6 +204,7 @@ const headerMock: Header = {
   field1: true,
   field2: true,
   field3: true,
+  field4: false,
 };
 
 const errorDetailMock: ErrorDetail = {
