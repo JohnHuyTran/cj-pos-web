@@ -139,7 +139,7 @@ export default function NotificationReminder(props: Props) {
           setOpenModalError(true);
         }
       } else if (item.type === 'ORDER_SD_CLOSED') {
-        await dispatch(featchOrderDetailAsync(item?.payload?.ref2InNo))
+        await dispatch(featchOrderDetailAsync(item?.payload?.sdNo))
         .then((value) => {
             if (value) {
               setOrderDetailParams({
