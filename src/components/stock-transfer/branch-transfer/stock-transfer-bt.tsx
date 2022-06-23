@@ -380,7 +380,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     const isvalidItem = validateItem('save');
     if (isvalidItem) {
       const payload: BranchTransferRequest = await mappingPayload();
-      const isToteValid = checkTote(payload.items && payload.items?.length > 0 ? payload.items : []);
+      const isToteValid = await checkTote(payload.items && payload.items?.length > 0 ? payload.items : []);
       if (isToteValid) {
         saveBranchTransferService(payload);
       }
@@ -421,7 +421,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     const isvalidItem = validateItem('sendToDC');
     if (isvalidItem) {
       const payload: BranchTransferRequest = await mappingPayload();
-      const isToteValid = checkTote(payload.items && payload.items?.length > 0 ? payload.items : []);
+      const isToteValid = await checkTote(payload.items && payload.items?.length > 0 ? payload.items : []);
       if (isToteValid) {
         if (!btNo) {
           await saveBranchTransfer(payload)
@@ -561,7 +561,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     }
   };
 
-  const checkTote = (items: Item[]) => {
+  const checkTote = async (items: Item[]) => {
+    let status = false;
     const _items = _.uniqBy(items, 'toteCode');
     const totes = _items
       .filter((item: Item) => item.actualQty && item.actualQty > 0)
@@ -579,9 +580,9 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     if (totes.length <= 0) {
       return true;
     } else {
-      inquiryTote(payload)
+      await inquiryTote(payload)
         .then(() => {
-          return true;
+          status = true;
         })
         .catch((error: ApiError) => {
           let errorList: ErrorDetail[] = [];
@@ -613,10 +614,9 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             setTextError('ไม่สามารถใช้ เลข Tote ดังต่อไปนี้ได้');
             setPayloadError(payload);
           }
-        })
-        .finally(() => {});
-      return false;
+        });
     }
+    return status;
   };
 
   const componetStatusCreate = (
