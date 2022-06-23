@@ -367,9 +367,8 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         // await storeItem();
       })
       .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setSnackbarIsStatus(false);
-        setContentMsg(error.message);
+        setOpenAlert(true);
+        setTextError(error.message);
       });
   };
 
@@ -431,9 +430,11 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               setOpenModelConfirmTransaction(true);
             })
             .catch((error: ApiError) => {
-              setShowSnackBar(true);
-              setSnackbarIsStatus(false);
-              setContentMsg(error.message);
+              // setShowSnackBar(true);
+              // setSnackbarIsStatus(false);
+              // setContentMsg(error.message);
+              setOpenAlert(true);
+              setTextError(error.message);
             });
         } else {
           setOpenModelConfirmTransaction(true);
@@ -457,9 +458,11 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       })
       .catch((error: ApiError) => {
         handleOnCloseModalConfirm();
-        setShowSnackBar(true);
-        setSnackbarIsStatus(false);
-        setContentMsg(error.message);
+        // setShowSnackBar(true);
+        // setSnackbarIsStatus(false);
+        // setContentMsg(error.message);
+        setOpenAlert(true);
+        setTextError(error.message);
       });
     handleOnCloseModalConfirm();
     setOpenLoadingModal(false);
@@ -486,9 +489,11 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         })
         .catch((error: ApiError) => {
           handleOnCloseModalConfirm();
-          setShowSnackBar(true);
-          setSnackbarIsStatus(false);
-          setContentMsg(error.message);
+          // setShowSnackBar(true);
+          // setSnackbarIsStatus(false);
+          // setContentMsg(error.message);
+          setOpenAlert(true);
+          setTextError(error.message);
         });
       handleOnCloseModalConfirm();
     }
@@ -524,9 +529,11 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         })
         .catch((error: ApiError) => {
           handleOnCloseModalConfirm();
-          setShowSnackBar(true);
-          setSnackbarIsStatus(false);
-          setContentMsg(error.message);
+          // setShowSnackBar(true);
+          // setSnackbarIsStatus(false);
+          // setContentMsg(error.message);
+          setOpenAlert(true);
+          setTextError(error.message);
         });
     }
     setOpenLoadingModal(false);
@@ -788,36 +795,6 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         <Grid item lg={1}></Grid>
         <Grid item lg={2}></Grid>
         <Grid item lg={3}>
-          {/* <Box>
-            <Link
-              component='button'
-              variant='body2'
-              onClick={(e) => {
-                handleLinkDocument(DOCUMENT_TYPE.BT);
-              }}>
-              เรียกดูเอกสารใบโอน BT
-            </Link>
-          </Box>
-          <Box>
-            <Link
-              component='button'
-              variant='body2'
-              onClick={(e) => {
-                handleLinkDocument(DOCUMENT_TYPE.BO);
-              }}>
-              เรียกดูเอกสารใบ BO
-            </Link>
-          </Box>
-          <Box>
-            <Link
-              component='button'
-              variant='body2'
-              onClick={(e) => {
-                handleLinkDocument(DOCUMENT_TYPE.BOX);
-              }}>
-              เรียกดูเอกสารใบปะลัง
-            </Link>
-          </Box> */}
           <Box>
             <Link
               component='button'
@@ -912,7 +889,6 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
             color='warning'
             className={classes.MbtnSave}
             onClick={handleSubmitTransfer}
-            // startIcon={<SaveIcon />}
             sx={{ width: 200 }}>
             ส่งงาน
           </Button>
@@ -951,13 +927,6 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           {branchTransferInfo.files && branchTransferInfo.files.length > 0 && (
             <AccordionHuaweiFile files={branchTransferInfo.files} />
           )}
-          {/* <AccordionUploadFile
-            files={branchTransferInfo.files}
-            docNo={btNo}
-            docType='PN'
-            isStatus={uploadFileFlag}
-            onChangeUploadFile={handleOnChangeUploadFile}
-          /> */}
           <Box>
             <Link
               component='button'
@@ -993,18 +962,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
       </Grid>
       <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
         <Grid item xl={8}></Grid>
-        <Grid item>
-          {/* <Button
-            id='btnSave'
-            variant='contained'
-            color='warning'
-            className={classes.MbtnSave}
-            onClick={handleSubmitTransfer}
-            // startIcon={<SaveIcon />}
-            sx={{ width: 200 }}>
-            ส่งงาน
-          </Button> */}
-        </Grid>
+        <Grid item></Grid>
       </Grid>
     </>
   );
