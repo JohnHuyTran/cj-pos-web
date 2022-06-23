@@ -61,10 +61,12 @@ export interface ErrorDetail {
   qty?: number;
   docNo?: string;
   toteCode?: string;
+  description?: string;
 }
 
 export interface Header {
-  field1: boolean;
-  field2: boolean;
-  field3: boolean;
+  field1: boolean; // barcode
+  field2: boolean; // toteCode
+  field3: boolean; // description
+  field4: boolean; // qty
 }

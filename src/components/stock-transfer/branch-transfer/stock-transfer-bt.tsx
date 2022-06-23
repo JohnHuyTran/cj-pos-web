@@ -565,7 +565,13 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     const _items = _.uniqBy(items, 'toteCode');
     const totes = _items
       .filter((item: Item) => item.actualQty && item.actualQty > 0)
-      .map((item: Item) => item.toteCode);
+      .map((item: Item) => {
+        const tote: ToteItem = {
+          toteCode: item.toteCode,
+        };
+        return tote;
+      });
+
     const payload: InquiryToteRequest = {
       branchCode: branchTransferInfo.branchFrom,
       toteItem: totes,
@@ -579,28 +585,33 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
         })
         .catch((error: ApiError) => {
           let errorList: ErrorDetail[] = [];
-          const datas: ToteItem[] = error.data;
-          datas.forEach((item: ToteItem) => {
-            if (isErrorCode(item.toteCode)) {
-              const _err: ErrorDetail = {
-                toteCode: item.toteCode,
-              };
-              errorList.push(_err);
-            }
-          });
-          dispatch(updateErrorList(errorList));
           setOpenAlert(true);
-          setTextError('ไม่สามารถใช้ เลข Tote ดังต่อไปนี้ได้');
-          const header: Header = {
-            field1: false,
-            field2: true,
-            field3: false,
-          };
-          const payload: ErrorDetailResponse = {
-            header: header,
-            error_details: errorList,
-          };
-          setPayloadError(payload);
+          setTextError(error.message);
+          if (error.data) {
+            const datas: ToteItem[] = error.data;
+            datas.forEach((item: ToteItem) => {
+              if (isErrorCode(item.toteCode)) {
+                const _err: ErrorDetail = {
+                  toteCode: item.toteCode,
+                  description: item.message,
+                };
+                errorList.push(_err);
+              }
+            });
+            dispatch(updateErrorList(errorList));
+
+            const header: Header = {
+              field1: false,
+              field2: true,
+              field3: true,
+              field4: false,
+            };
+            const payload: ErrorDetailResponse = {
+              header: header,
+              error_details: errorList,
+            };
+            setPayloadError(payload);
+          }
         })
         .finally(() => {});
       return false;

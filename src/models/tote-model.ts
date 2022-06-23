@@ -12,7 +12,7 @@ export interface InquiryToteResponse {
 }
 
 export interface ToteItem {
-  toteCode: string;
+  toteCode?: string;
   toteStatus?: string;
   branchCode?: string;
   remark?: string;
