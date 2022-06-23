@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useStyles } from '../../../styles/makeTheme';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import { numberWithCommas } from '../../../utils/utils';
+import { numberWithCommas, stringNullOrEmpty } from '../../../utils/utils';
 import {
   DataGrid,
   GridCellParams,
@@ -16,11 +16,12 @@ import {
 import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { Item, ItemGroups } from '../../../models/stock-transfer-model';
+import { ErrorItem, Item, ItemGroups } from '../../../models/stock-transfer-model';
 import { isGroupBranch } from '../../../utils/role-permission';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
-import { DeleteForever } from '@mui/icons-material';
+import { DeleteForever, Tune } from '@mui/icons-material';
 import ModalDeleteItem from '../modal-delete-item-confirm';
+import { ErrorDetail } from '../../../models/api-error-model';
 
 interface Props {
   skuCodeSelect: string;
@@ -127,6 +128,7 @@ const columns: GridColDef[] = [
         }}
         disabled={params.getValue(params.id, 'isDisable') ? true : false}
         autoComplete='off'
+        error={isToteErrot(params.getValue(params.id, 'isToteError'))}
       />
     ),
   },
@@ -160,6 +162,9 @@ const columns: GridColDef[] = [
   },
 ];
 
+const isToteErrot = (value: any) => {
+  return stringNullOrEmpty(value) ? false : value;
+};
 const chkReturnQty = (value: any) => {
   let v = String(value);
   if (v.substring(1) === '0') return Number(v.substring(0, 1));
@@ -190,6 +195,7 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
   const { apiRef, columns } = useApiRef();
   const dispatch = useAppDispatch();
 
+  const errorList = useAppSelector((state) => state.branchTransferDetailSlice.errorLists);
   const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
   const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
   const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
@@ -230,6 +236,7 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
         isDisable: isDisable,
         boNo: item.boNo,
         edit: item.edit ? item.edit : false,
+        isToteError: item.toteCode ? errorList.some((i: ErrorDetail) => i.toteCode == item.toteCode) : false,
       };
     });
 

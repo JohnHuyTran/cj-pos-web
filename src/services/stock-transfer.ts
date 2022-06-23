@@ -258,3 +258,12 @@ export async function approve2BySCMStockRequest(rtNo: string, payload: Approve2B
     });
   return response;
 }
+
+export async function inquiryTote(rtNo: string, payload: Approve2BySCMStockRequest) {
+  const response = await put(getPathApprove2BySCMStockRequest(rtNo), payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}

@@ -478,4 +478,9 @@ export const environment = {
       },
     },
   },
+  tote: {
+    inquiryTote: {
+      url: '/webtote/toteinquiry',
+    },
+  },
 };

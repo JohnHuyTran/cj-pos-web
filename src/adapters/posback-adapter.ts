@@ -84,11 +84,7 @@ export function get(path: string, contentType = defaultForJSON, overrideTimeOut 
         throw err;
       }
 
-      const err = new ApiError(
-        error.response?.status,
-        error.response?.data.error_code,
-        error.response?.data.error_message
-      );
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }
@@ -112,11 +108,7 @@ export function getFile(path: string, contentType = defaultForJSON, overrideTime
         throw err;
       }
 
-      const err = new ApiError(
-        error.response?.status,
-        error.response?.data.error_code,
-        error.response?.data.error_message
-      );
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }
@@ -141,11 +133,7 @@ export function getParams(path: string, payload: any, contentType = defaultForJS
         throw err;
       }
 
-      const err = new ApiError(
-        error.response?.status,
-        error.response?.data.error_code,
-        error.response?.data.error_message
-      );
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }
@@ -180,8 +168,13 @@ export function post(
         );
         throw err;
       }
-
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.code,
+        error.response?.data.message,
+        error.response?.data.error_details,
+        error.response?.data.data
+      );
       throw err;
     });
 }
@@ -232,11 +225,7 @@ export function putData(path: string, contentType = defaultForJSON, overrideTime
         throw err;
       }
 
-      const err = new ApiError(
-        error.response?.status,
-        error.response?.data.error_code,
-        error.response?.data.error_message
-      );
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }
@@ -255,11 +244,7 @@ export function deleteData(path: string, contentType = defaultForJSON, overrideT
         throw err;
       }
 
-      const err = new ApiError(
-        error.response?.status,
-        error.response?.data.error_code,
-        error.response?.data.error_message
-      );
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }
@@ -283,11 +268,7 @@ export function deleteDataBody(
         throw err;
       }
 
-      const err = new ApiError(
-        error.response?.status,
-        error.response?.data.error_code,
-        error.response?.data.error_message
-      );
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }

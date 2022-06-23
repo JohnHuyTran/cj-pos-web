@@ -1,12 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { get } from '../../adapters/posback-adapter';
 import { getStrockTransferMockup } from '../../mockdata/stock-transfer';
-import { BranchTransferResponse } from '../../models/stock-transfer-model';
+import { ErrorDetail } from '../../models/api-error-model';
+import { BranchTransferResponse, ErrorItem } from '../../models/stock-transfer-model';
 import { getPathBranchTransferDetail } from '../../services/stock-transfer';
 
 type State = {
   branchTransferRs: BranchTransferResponse;
   error: string;
+  errorLists: ErrorDetail[];
 };
 
 const initialState: State = {
@@ -17,6 +19,7 @@ const initialState: State = {
     data: null,
   },
   error: '',
+  errorLists: [],
 };
 
 export const featchBranchTransferDetailAsync = createAsyncThunk('branchTransfer', async (btNo: string) => {
@@ -41,6 +44,9 @@ const branchTransferDetailSlice = createSlice({
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
+    updateErrorList: (state, action: PayloadAction<any>) => {
+      state.errorLists = action.payload;
+    },
   },
   extraReducers: (builer) => {
     builer.addCase(featchBranchTransferDetailAsync.pending, () => {
@@ -55,5 +61,5 @@ const branchTransferDetailSlice = createSlice({
   },
 });
 
-export const { clearDataFilter } = branchTransferDetailSlice.actions;
+export const { clearDataFilter, updateErrorList } = branchTransferDetailSlice.actions;
 export default branchTransferDetailSlice.reducer;
