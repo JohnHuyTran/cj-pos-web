@@ -287,3 +287,8 @@ export interface Approve2BySCMStockRequest {
   itemGroups: ItemGroups[];
   items: Item[];
 }
+
+export interface ErrorItem {
+  toteCode?: string;
+  qty?: string;
+}
