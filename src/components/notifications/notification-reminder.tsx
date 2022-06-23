@@ -18,6 +18,8 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import ModalCreateTransferOutDestroy from '../transfer-out-destroy/modal-create-transfer-out-destroy';
 import ModalCreateTransferOut from '../transfer-out/modal-create-transfer-out';
+import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+import CheckOrderDetail from '../check-orders/check-order-detail';
 import { ShoppingCartSharp } from '@mui/icons-material';
 import HtmlTooltip from '../commons/ui/html-tooltip';
 import AlertError from '../commons/ui/alert-error';
@@ -30,6 +32,12 @@ export default function NotificationReminder(props: Props) {
   const [page, setPage] = React.useState(0);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const [total, setTotal] = React.useState(0);
+  const [orderDetailParams, setOrderDetailParams] = React.useState({
+    sdNo: '',
+    docRefNo: '',
+    docType: ''
+  })
+  const [openCheckOrderDetail, setOpenCheckOrderDetail] = React.useState(false);
   const [listData, setListData] = React.useState<any[]>([]);
   const [openTransferOutDetail, setOpenTransferOutDetail] = React.useState(false);
   const [openTransferOutDestroyDetail, setOpenTransferOutDestroyDetail] = React.useState(false);
@@ -81,6 +89,9 @@ export default function NotificationReminder(props: Props) {
   const handleCloseModalError = () => {
     setOpenModalError(false);
   };
+  function handleCloseModalCheckOrderDetail() {
+    setOpenCheckOrderDetail(false);
+  };
 
   const handleGetData = async () => {
     try {
@@ -127,6 +138,21 @@ export default function NotificationReminder(props: Props) {
         } else {
           setOpenModalError(true);
         }
+      } else if (item.type === 'ORDER_SD_CLOSED') {
+        await dispatch(featchOrderDetailAsync(item?.payload?.ref2InNo))
+        .then((value) => {
+            if (value) {
+              setOrderDetailParams({
+                sdNo: item?.payload?.sdNo,
+                docRefNo: item?.payload?.docRefNo,
+                docType: item?.payload?.docType
+              })
+              setOpenCheckOrderDetail(true);
+            }
+        })
+        .catch((err) => {
+          console.error('err : ', err);
+        })
       }
       setOpenLoadingModal(false);
     } catch (error) {
@@ -189,6 +215,17 @@ export default function NotificationReminder(props: Props) {
           statusDisplay = genStatusValue('ไม่อนุมัติ', {
             color: '#F76C6C',
             backgroundColor: '#FFD7D7',
+          });
+        }
+
+        break;
+      case 'ORDER_SD_CLOSED':
+        {
+          content = 'รับสินค้า-โอนลอย'
+          branchCode = item.payload.branchCode;
+          statusDisplay = genStatusValue('รับทราบ', {
+            color: '#36C690',
+            backgroundColor: '#E7FFE9',
           });
         }
 
@@ -311,6 +348,15 @@ export default function NotificationReminder(props: Props) {
           setOpenPopup={setOpenPopup}
           onSearchMain={handleGetData}
           userPermission={userPermission}
+        />
+      )}
+      {openCheckOrderDetail && (
+        <CheckOrderDetail
+          sdNo={orderDetailParams.sdNo}
+          docRefNo={orderDetailParams.docRefNo}
+          docType={orderDetailParams.docType}
+          defaultOpen={openCheckOrderDetail}
+          onClickClose={handleCloseModalCheckOrderDetail}
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
