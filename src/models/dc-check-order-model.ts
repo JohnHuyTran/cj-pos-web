@@ -44,6 +44,7 @@ export interface CheckOrderInfo {
   docRefNo: string;
   shipBranchFrom: ShipBranch;
   shipBranchTo: ShipBranch;
+  carNo: string;
 }
 export interface ShipBranch {
   code: string;
