@@ -139,20 +139,17 @@ export default function NotificationReminder(props: Props) {
           setOpenModalError(true);
         }
       } else if (item.type === 'ORDER_SD_CLOSED') {
-        await dispatch(featchOrderDetailAsync(item?.payload?.sdNo))
-        .then((value) => {
-            if (value) {
-              setOrderDetailParams({
-                sdNo: item?.payload?.sdNo,
-                docRefNo: item?.payload?.docRefNo,
-                docType: item?.payload?.docType
-              })
-              setOpenCheckOrderDetail(true);
-            }
-        })
-        .catch((err) => {
-          console.error('err : ', err);
-        })
+        const rs = await dispatch(featchOrderDetailAsync(item?.payload?.sdNo))
+        if (!!rs.payload) {
+          setOrderDetailParams({
+            sdNo: item?.payload?.sdNo,
+            docRefNo: item?.payload?.docRefNo,
+            docType: item?.payload?.docType
+          })
+          setOpenCheckOrderDetail(true);
+        } else {
+          setOpenModalError(true);
+        }
       }
       setOpenLoadingModal(false);
     } catch (error) {
