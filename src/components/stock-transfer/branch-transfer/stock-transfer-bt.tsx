@@ -610,6 +610,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
               header: header,
               error_details: errorList,
             };
+            setTextError('ไม่สามารถใช้ เลข Tote ดังต่อไปนี้ได้');
             setPayloadError(payload);
           }
         })

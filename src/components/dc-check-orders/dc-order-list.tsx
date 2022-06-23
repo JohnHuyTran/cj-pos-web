@@ -139,6 +139,25 @@ const columns: GridColDef[] = [
       );
     },
   },
+  {
+    field: 'carNo',
+    headerName: 'ทะเบียนรถ',
+    minWidth: 110,
+    // flex: 1,
+    headerAlign: 'center',
+    align: 'center',
+    sortable: false,
+    renderCell: (params) => {
+      return (
+        <div
+          style={{
+            textAlign: 'center',
+          }}>
+          {params.value}
+        </div>
+      );
+    },
+  },
 ];
 
 function useApiRef() {
@@ -204,9 +223,7 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
       hasOver: data.hasOver,
       receivedDate: convertUtcToBkkDate(data.receivedDate),
       branchOutNo: data.branchOutNo,
-
-      // sdType: getSdType(data.sdType),
-      // sdStatus: getSdStatus(data.sdStatus),
+      carNo: data.carNo,
     };
   });
 
