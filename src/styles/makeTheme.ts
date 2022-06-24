@@ -359,6 +359,32 @@ const useStyles = makeStyles({
       // padding: "2px 4px 2px 6px !important",
     },
   },
+  MautocompleteError: {
+    '& .MuiOutlinedInput-input': {
+      // padding: "6px 0px !important",
+      fontFamily: 'Kanit',
+    },
+    '& .MuiIconButton-root': {
+      color: '#CBD4DB !important',
+      // padding: "5px !important",
+    },
+    '& .MuiOutlinedInput-adornedEnd': {
+      paddingRight: '0px !important',
+    },
+    '& .MuiOutlinedInput-adornedStart': {
+      paddingLeft: '0px !important',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'red !important',
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'red !important',
+    },
+    '& .MuiInputBase-root.MuiOutlinedInput-root': {
+      height: '38px !important',
+    },
+  },
+
   MautocompleteAddProduct: {
     '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
       padding: '1.5px !important',

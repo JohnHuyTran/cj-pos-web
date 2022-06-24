@@ -45,6 +45,8 @@ export default function SelectBranch(props: Props): ReactElement {
   const [ownBranch, setOwnBranch] = React.useState(
     getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
   );
+  const [branch, setBranch] = React.useState<any | null>(null);
+  const [checkSelectBranch, setCheckSelectBranch] = React.useState<boolean>(false);
   const userPermission =
     !objectNullOrEmpty(userInfo) &&
     !objectNullOrEmpty(userInfo.acl) &&
@@ -88,6 +90,11 @@ export default function SelectBranch(props: Props): ReactElement {
       setValue(text);
     }
   }, [props.listSelect]);
+
+  useEffect(() => {
+    setBranch(null);
+  }, [checkSelectBranch]);
+
   const filterAuthorizedBranch = (branch: BranchInfo) => {
     authorizedBranchList.branchList.data?.branches.some((item: BranchInfo) => {
       return branch.code === item.code;
@@ -124,6 +131,8 @@ export default function SelectBranch(props: Props): ReactElement {
   };
 
   const handleChangeBranch = (event: any, newValue: BranchListOptionType | null) => {
+    setBranch(newValue);
+    setCheckSelectBranch(!checkSelectBranch);
     if (newValue != null && !listBranchSelect.includes(newValue)) {
       let list = [...listBranchSelect];
       list.push(newValue);
@@ -142,7 +151,7 @@ export default function SelectBranch(props: Props): ReactElement {
   const defaultPropsBranchList = {
     options: userPermission.includes('campaign.to.create')
       ? branchList.filter((branch: BranchInfo) => {
-          return branch.code !== ownBranch && filterAuthorizedBranch(branch) && filterDC(branch);
+          return branch.code !== ownBranch && filterDC(branch);
         })
       : !!authorizedBranchList.branchList.data?.branches
       ? authorizedBranchList.branchList.data?.branches
@@ -197,6 +206,7 @@ export default function SelectBranch(props: Props): ReactElement {
                 popupIcon={<SearchIcon />}
                 noOptionsText='ไม่พอข้อมูล'
                 id='selBranchNo'
+                value={branch}
                 onChange={handleChangeBranch}
                 renderOption={(props, option) => {
                   return (
