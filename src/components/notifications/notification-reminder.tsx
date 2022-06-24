@@ -23,6 +23,10 @@ import CheckOrderDetail from '../check-orders/check-order-detail';
 import { ShoppingCartSharp } from '@mui/icons-material';
 import HtmlTooltip from '../commons/ui/html-tooltip';
 import AlertError from '../commons/ui/alert-error';
+import StockRequestDetail from '../stock-transfer/stock-request-detail';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
+import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 
 interface Props {
   refresh: boolean;
@@ -35,9 +39,10 @@ export default function NotificationReminder(props: Props) {
   const [orderDetailParams, setOrderDetailParams] = React.useState({
     sdNo: '',
     docRefNo: '',
-    docType: ''
-  })
+    docType: '',
+  });
   const [openCheckOrderDetail, setOpenCheckOrderDetail] = React.useState(false);
+  const [openStockRequestDetail, setOpenStockRequestDetail] = React.useState(false);
   const [listData, setListData] = React.useState<any[]>([]);
   const [openTransferOutDetail, setOpenTransferOutDetail] = React.useState(false);
   const [openTransferOutDestroyDetail, setOpenTransferOutDestroyDetail] = React.useState(false);
@@ -91,7 +96,7 @@ export default function NotificationReminder(props: Props) {
   };
   function handleCloseModalCheckOrderDetail() {
     setOpenCheckOrderDetail(false);
-  };
+  }
 
   const handleGetData = async () => {
     try {
@@ -139,14 +144,23 @@ export default function NotificationReminder(props: Props) {
           setOpenModalError(true);
         }
       } else if (item.type === 'ORDER_SD_CLOSED') {
-        const rs = await dispatch(featchOrderDetailAsync(item?.payload?.sdNo))
+        const rs = await dispatch(featchOrderDetailAsync(item?.payload?.sdNo));
         if (!!rs.payload) {
           setOrderDetailParams({
             sdNo: item?.payload?.sdNo,
             docRefNo: item?.payload?.docRefNo,
-            docType: item?.payload?.docType
-          })
+            docType: item?.payload?.docType,
+          });
           setOpenCheckOrderDetail(true);
+        } else {
+          setOpenModalError(true);
+        }
+      } else if (item.type === 'STOCK_TRANSFER_APPROVED') {
+        await dispatch(updateAddItemsState({}));
+        await dispatch(updatestockRequestItemsState({}));
+        const rs = await dispatch(featchStockRequestDetailAsync(item.payload.rtNo));
+        if (!!rs.payload) {
+          setOpenStockRequestDetail(true);
         } else {
           setOpenModalError(true);
         }
@@ -218,7 +232,7 @@ export default function NotificationReminder(props: Props) {
         break;
       case 'ORDER_SD_CLOSED':
         {
-          content = 'รับสินค้า-โอนลอย'
+          content = 'รับสินค้า-โอนลอย';
           branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('รับทราบ', {
             color: '#36C690',
@@ -238,6 +252,17 @@ export default function NotificationReminder(props: Props) {
         }
 
         break;
+      case 'STOCK_TRANSFER_APPROVED':
+        {
+          content = 'สร้างแผนโอนระหว่างสาขา-อนุมัติ';
+          branchCode = item.payload.branchCode;
+          statusDisplay = genStatusValue('อนุมัติ', {
+            color: '#36C690',
+            backgroundColor: '#E7FFE9',
+          });
+        }
+
+        break;
     }
     return (
       <Box
@@ -250,8 +275,7 @@ export default function NotificationReminder(props: Props) {
           cursor: 'pointer',
           fontSize: '12px',
         }}
-        onClick={() => currentlySelected(item)}
-      >
+        onClick={() => currentlySelected(item)}>
         <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type == 'REJECT_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
@@ -266,16 +290,14 @@ export default function NotificationReminder(props: Props) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               width: '80%',
-            }}
-          >
+            }}>
             <span style={{ color: theme.palette.primary.main }}>{content}: </span>
             <HtmlTooltip
               title={
                 <React.Fragment>
                   {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
                 </React.Fragment>
-              }
-            >
+              }>
               <span style={{ marginLeft: 5 }}>
                 {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
               </span>
@@ -299,10 +321,9 @@ export default function NotificationReminder(props: Props) {
           border: '1px solid #E0E0E0',
           borderRadius: '10px',
           minWidth: '600px',
-        }}
-      >
+        }}>
         <TablePagination
-          component="div"
+          component='div'
           count={total}
           page={page}
           onPageChange={handleChangePage}
@@ -354,6 +375,16 @@ export default function NotificationReminder(props: Props) {
           docType={orderDetailParams.docType}
           defaultOpen={openCheckOrderDetail}
           onClickClose={handleCloseModalCheckOrderDetail}
+        />
+      )}
+      {openStockRequestDetail && (
+        <StockRequestDetail
+          type={'View'}
+          edit={false}
+          isOpen={openStockRequestDetail}
+          onClickClose={() => {
+            setOpenStockRequestDetail(false);
+          }}
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />

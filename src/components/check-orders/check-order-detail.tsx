@@ -375,9 +375,11 @@ export default function CheckOrderDetail({
         })
         .catch((error: ApiError) => {
           updateState(itemsListUpdate);
-          setShowSnackBar(true);
-          setContentMsg(error.message);
-          setSnackbarStatus(false);
+          // setShowSnackBar(true);
+          // setContentMsg(error.message);
+          // setSnackbarStatus(false);
+          setOpenFailAlert(true);
+          setTextFail(error.message);
         });
     }
 
@@ -499,9 +501,8 @@ export default function CheckOrderDetail({
         onClickClose();
       })
       .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setContentMsg(error.message);
-        setSnackbarStatus(false);
+        setOpenFailAlert(true);
+        setTextFail(error.message);
       });
   };
 

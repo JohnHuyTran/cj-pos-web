@@ -302,6 +302,11 @@ export default function NotificationTask(props: Props) {
             color: '#36C690',
             backgroundColor: '#E7FFE9',
           });
+        } else if (item.payload.status == 'CANCELED') {
+          statusDisplay = genStatusValue('ส่งกลับแก้ไข', {
+            color: '#F54949',
+            backgroundColor: '#FFD7D7',
+          });
         }
         break;
       case 'EVENT_STOCK_REQUEST_REJECTED':

@@ -150,3 +150,8 @@ export const getEncodeBarcode = ({
 
   return prefix + priceDigit + ((length - 2 - (nSum % (length - 2))) % 8) + barcode;
 };
+
+export const isToteNo = (value: string) => {
+  const regex = /^(T|B).*/;
+  return regex.test(value);
+};

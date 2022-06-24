@@ -12,7 +12,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import ControlPoint from '@mui/icons-material/ControlPoint';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { formatFileStockTransfer, getBranchName, getReasonLabel } from '../../../utils/utils';
+import { formatFileStockTransfer, getBranchName, getReasonLabel, isToteNo } from '../../../utils/utils';
 import { getUserInfo } from '../../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
 import { DOCUMENT_TYPE } from '../../../utils/enum/stock-transfer-enum';
@@ -565,7 +565,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
     let status = false;
     const _items = _.uniqBy(items, 'toteCode');
     const totes = _items
-      .filter((item: Item) => item.actualQty && item.actualQty > 0)
+      .filter((item: Item) => item.actualQty && item.actualQty > 0 && item.toteCode && isToteNo(item.toteCode))
       .map((item: Item) => {
         const tote: ToteItem = {
           toteCode: item.toteCode,
