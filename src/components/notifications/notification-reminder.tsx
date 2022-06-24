@@ -35,8 +35,8 @@ export default function NotificationReminder(props: Props) {
   const [orderDetailParams, setOrderDetailParams] = React.useState({
     sdNo: '',
     docRefNo: '',
-    docType: ''
-  })
+    docType: '',
+  });
   const [openCheckOrderDetail, setOpenCheckOrderDetail] = React.useState(false);
   const [listData, setListData] = React.useState<any[]>([]);
   const [openTransferOutDetail, setOpenTransferOutDetail] = React.useState(false);
@@ -91,7 +91,7 @@ export default function NotificationReminder(props: Props) {
   };
   function handleCloseModalCheckOrderDetail() {
     setOpenCheckOrderDetail(false);
-  };
+  }
 
   const handleGetData = async () => {
     try {
@@ -139,13 +139,13 @@ export default function NotificationReminder(props: Props) {
           setOpenModalError(true);
         }
       } else if (item.type === 'ORDER_SD_CLOSED') {
-        const rs = await dispatch(featchOrderDetailAsync(item?.payload?.sdNo))
+        const rs = await dispatch(featchOrderDetailAsync(item?.payload?.sdNo));
         if (!!rs.payload) {
           setOrderDetailParams({
             sdNo: item?.payload?.sdNo,
             docRefNo: item?.payload?.docRefNo,
-            docType: item?.payload?.docType
-          })
+            docType: item?.payload?.docType,
+          });
           setOpenCheckOrderDetail(true);
         } else {
           setOpenModalError(true);
@@ -218,7 +218,7 @@ export default function NotificationReminder(props: Props) {
         break;
       case 'ORDER_SD_CLOSED':
         {
-          content = 'รับสินค้า-โอนลอย'
+          content = 'รับสินค้า-โอนลอย';
           branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('รับทราบ', {
             color: '#36C690',
@@ -230,6 +230,17 @@ export default function NotificationReminder(props: Props) {
       case 'EVENT_REQUEST_GENERATE_ORDER_SHIPMENT_ORDER_TOTE':
         {
           content = 'โอนสินค้าระหว่างสาขา - อยู่ระหว่างขนส่ง';
+          branchCode = item.payload.branchCode;
+          statusDisplay = genStatusValue('รับทราบ', {
+            color: '#36C690',
+            backgroundColor: '#E7FFE9',
+          });
+        }
+
+        break;
+      case 'STOCK_TRANSFER_APPROVED':
+        {
+          content = 'สร้างแผนโอนระหว่างสาขา-อนุมัติ';
           branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('รับทราบ', {
             color: '#36C690',
@@ -250,8 +261,7 @@ export default function NotificationReminder(props: Props) {
           cursor: 'pointer',
           fontSize: '12px',
         }}
-        onClick={() => currentlySelected(item)}
-      >
+        onClick={() => currentlySelected(item)}>
         <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type == 'REJECT_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
@@ -266,16 +276,14 @@ export default function NotificationReminder(props: Props) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               width: '80%',
-            }}
-          >
+            }}>
             <span style={{ color: theme.palette.primary.main }}>{content}: </span>
             <HtmlTooltip
               title={
                 <React.Fragment>
                   {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
                 </React.Fragment>
-              }
-            >
+              }>
               <span style={{ marginLeft: 5 }}>
                 {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
               </span>
@@ -299,10 +307,9 @@ export default function NotificationReminder(props: Props) {
           border: '1px solid #E0E0E0',
           borderRadius: '10px',
           minWidth: '600px',
-        }}
-      >
+        }}>
         <TablePagination
-          component="div"
+          component='div'
           count={total}
           page={page}
           onPageChange={handleChangePage}
