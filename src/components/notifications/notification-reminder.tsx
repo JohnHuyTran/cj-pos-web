@@ -23,6 +23,10 @@ import CheckOrderDetail from '../check-orders/check-order-detail';
 import { ShoppingCartSharp } from '@mui/icons-material';
 import HtmlTooltip from '../commons/ui/html-tooltip';
 import AlertError from '../commons/ui/alert-error';
+import StockRequestDetail from '../stock-transfer/stock-request-detail';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
+import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 
 interface Props {
   refresh: boolean;
@@ -38,6 +42,7 @@ export default function NotificationReminder(props: Props) {
     docType: '',
   });
   const [openCheckOrderDetail, setOpenCheckOrderDetail] = React.useState(false);
+  const [openStockRequestDetail, setOpenStockRequestDetail] = React.useState(false);
   const [listData, setListData] = React.useState<any[]>([]);
   const [openTransferOutDetail, setOpenTransferOutDetail] = React.useState(false);
   const [openTransferOutDestroyDetail, setOpenTransferOutDestroyDetail] = React.useState(false);
@@ -150,6 +155,15 @@ export default function NotificationReminder(props: Props) {
         } else {
           setOpenModalError(true);
         }
+      } else if (item.type === 'STOCK_TRANSFER_APPROVED') {
+        await dispatch(updateAddItemsState({}));
+        await dispatch(updatestockRequestItemsState({}));
+        const rs = await dispatch(featchStockRequestDetailAsync(item.payload.rtNo));
+        if (!!rs.payload) {
+          setOpenStockRequestDetail(true);
+        } else {
+          setOpenModalError(true);
+        }
       }
       setOpenLoadingModal(false);
     } catch (error) {
@@ -242,7 +256,7 @@ export default function NotificationReminder(props: Props) {
         {
           content = 'สร้างแผนโอนระหว่างสาขา-อนุมัติ';
           branchCode = item.payload.branchCode;
-          statusDisplay = genStatusValue('รับทราบ', {
+          statusDisplay = genStatusValue('อนุมัติ', {
             color: '#36C690',
             backgroundColor: '#E7FFE9',
           });
@@ -361,6 +375,16 @@ export default function NotificationReminder(props: Props) {
           docType={orderDetailParams.docType}
           defaultOpen={openCheckOrderDetail}
           onClickClose={handleCloseModalCheckOrderDetail}
+        />
+      )}
+      {openStockRequestDetail && (
+        <StockRequestDetail
+          type={'View'}
+          edit={false}
+          isOpen={openStockRequestDetail}
+          onClickClose={() => {
+            setOpenStockRequestDetail(false);
+          }}
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
