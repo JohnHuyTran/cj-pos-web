@@ -454,5 +454,21 @@ export const ProductMaster = {
       productTypeName: 'MAKE UP LIPS',
       stockMax: 0,
     },
+
+    {
+      barcode: '38852537011164',
+      skuCode: '000000000020006978',
+      unitCode: 'KAR',
+      unitName: 'ลัง',
+      barcodeName: 'ไทยเดนมาร์คUHTรสจืด200mlx6 Carton',
+      unitPrice: 324,
+      unitPriceText: '324.00',
+      baseUnit: 36,
+      qty: 1,
+      skuName: 'ไทยเดนมาร์คUHTรสจืด200mlx6',
+      productTypeCode: '21000',
+      productTypeName: 'LIQUID MILK-ADULT',
+      stockMax: 1712,
+    },
   ],
 };
