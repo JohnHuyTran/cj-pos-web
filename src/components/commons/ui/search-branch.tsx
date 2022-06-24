@@ -52,7 +52,7 @@ export default function SearchBranch(props: Props): ReactElement {
   const [errorProvince, setErrorProvince] = React.useState<string | null>();
   const [errorBranch, setErrorBranch] = React.useState<string | null>();
   const [value, setValue] = React.useState<string>('');
-
+  const [checkSelectBranch, setCheckSelectBranch] = React.useState<boolean>(false);
   const provinceList = useAppSelector((state) => state.searchBranchProvince.provinceList);
   const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
   const totalBranches = useAppSelector((state) => state.searchBranchProvince.totalBranches);
@@ -92,7 +92,7 @@ export default function SearchBranch(props: Props): ReactElement {
 
   useEffect(() => {
     setBranch(null);
-  }, [listBranch]);
+  }, [checkSelectBranch]);
 
   useEffect(() => {
     try {
@@ -225,6 +225,7 @@ export default function SearchBranch(props: Props): ReactElement {
 
   const handleSelectBranch = (e: any) => {
     setBranch(e);
+    setCheckSelectBranch(!checkSelectBranch)
     if (e) {
       const existBranch = listBranch['branches'].some((item: any) => item.id == e.id);
       const existInProvince = listBranch['provinces'].some((item: any) => item.code == e.province.code);
