@@ -140,7 +140,7 @@ const columns: GridColDef[] = [
     },
   },
   {
-    field: 'carNo',
+    field: 'truckID',
     headerName: 'ทะเบียนรถ',
     minWidth: 110,
     // flex: 1,
@@ -223,7 +223,7 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
       hasOver: data.hasOver,
       receivedDate: convertUtcToBkkDate(data.receivedDate),
       branchOutNo: data.branchOutNo,
-      carNo: data.carNo,
+      truckID: data.truckID,
     };
   });
 

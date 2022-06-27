@@ -14,7 +14,7 @@ import { Address, Customer, SaveInvoiceRequest } from '../../models/tax-invoice-
 import { saveInvoice, savePrintInvoice, searchMemberInformation } from '../../services/sale';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import LoadingModal from '../commons/ui/loading-modal';
-import AlertError from '../commons/ui/alert-warning';
+import AlertWarning from '../commons/ui/alert-warning';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import TaxInvoiceHistory from './tax-invoice-history';
 import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
@@ -22,6 +22,7 @@ import AccordionUploadFile from '../commons/ui/accordion-upload-file';
 // import { clearUploadFileState, uploadFileState } from '../../store/slices/upload-file-slice';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { formatFileInvoice } from '../../utils/utils';
+import AlertError from '../commons/ui/alert-error';
 
 interface Props {
   isOpen: boolean;
@@ -221,6 +222,12 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
     setTextFail('');
   };
 
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
+
   const handleSearchMember = async (memberNo: string) => {
     setOpenLoadingModal(true);
     await searchMemberInformation(memberNo)
@@ -295,8 +302,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
         }
       })
       .catch((error: any) => {
-        setShowSnackBar(true);
-        setContentMsg(error.message);
+        setTextError(error.message);
+        setOpenAlert(true);
       });
 
     setOpenLoadingModal(false);
@@ -339,8 +346,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
         });
       })
       .catch((error: any) => {
-        setShowSnackBar(true);
-        setContentMsg(error.message);
+        setTextError(error.message);
+        setOpenAlert(true);
 
         setOpenLoadingModal(false);
       });
@@ -906,7 +913,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
 
         <LoadingModal open={openLoadingModal} />
 
-        <AlertError open={openFailAlert} onClose={handleCloseFailAlert} text={textFail} />
+        <AlertWarning open={openFailAlert} onClose={handleCloseFailAlert} text={textFail} />
+        <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
 
         <ConfirmModelExit
           open={confirmModelExit}
