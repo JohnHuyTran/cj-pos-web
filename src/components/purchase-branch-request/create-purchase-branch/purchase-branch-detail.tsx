@@ -111,6 +111,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [displayBtnSubmit, setDisplayBtnSubmit] = React.useState(true);
   const [displayBtnSave, setDisplayBtnSave] = React.useState(true);
   const [displayBtnDelete, setDisplayBtnDelete] = React.useState(true);
+  const [disabledBtnDelete, setDisabledBtnDelete] = React.useState(true);
   const [displayAddItems, setDisplayAddItems] = React.useState(true);
   const [displayCopyItems, setDisplayCopyItems] = React.useState(true);
 
@@ -129,10 +130,11 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       setCreateDate(new Date(purchaseBRDetail.createdDate));
 
       if (purchaseBRDetail.status === 'DRAFT') {
+        setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
         setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
         setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
         setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-        setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+        setDisabledBtnDelete(false);
 
         if (purchaseBRDetail.items.length > 0) {
           let items: any = [];
@@ -172,11 +174,10 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       const strBranchName = getBranchName(branchList, getUserInfo().branch);
       setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
       handleStatusStepper('DRAFT');
-
+      setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
       setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
       setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
       setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-      setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
     }
   }, [branchList]);
 
@@ -262,6 +263,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       .then((value) => {
         setDocNo(value.docNo);
         setStatus('DRAFT');
+        setDisabledBtnDelete(false);
         featchPurchaseBRDetail(value.docNo);
 
         setFlagSave(false);
@@ -358,6 +360,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
           setFlagSave(false);
           setDocNo(value.docNo);
           setStatus('DRAFT');
+          setDisabledBtnDelete(false);
 
           setTextHeaderConfirm('ยืนยันส่งรายการ เบิกของใช้หน้าร้าน');
           setOpenModelConfirm(true);
@@ -592,7 +595,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   startIcon={<Cancel />}
                   className={classes.MbtnSearch}
                   color='error'
-                  disabled={docNo !== ' '}>
+                  disabled={disabledBtnDelete}>
                   ยกเลิก
                 </Button>
 
