@@ -242,15 +242,13 @@ export async function deletePurchaseBR(docNo: string) {
   }
 }
 
-export async function sendPurchaseBR(docNo: string) {
+export async function sendPurchaseBR(docNo: string, caseNo: string) {
   try {
-    const response = await post(
-      getPathSendPurchaseBR(docNo),
-      undefined,
-      undefined,
-      undefined,
-      env.backEnd.timeoutpurchasebranch
-    ).then((result: any) => result);
+    const path = `${getPathSendPurchaseBR(docNo)}/?mock=${caseNo}`; //Mock Case Await Sap
+    // const path = getPathSendPurchaseBR(docNo)
+    const response = await post(path, undefined, undefined, undefined, env.backEnd.timeoutpurchasebranch).then(
+      (result: any) => result
+    );
     return response;
   } catch (error) {
     throw error;

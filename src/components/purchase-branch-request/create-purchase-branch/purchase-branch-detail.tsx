@@ -32,8 +32,10 @@ import {
   featchPurchaseBRDetailAsync,
 } from '../../../store/slices/purchase/purchase-branch-request-detail-slice';
 import { getProductBySKUCodes } from '../../../services/product-master';
-
 import ModalPurchaseBranchCopy from './purchase-branch-detail';
+import AlertError from '../../commons/ui/alert-error';
+import ModelMockupCase from '../modal-mockup-case';
+import { mappingErrorParam } from '../../../utils/exception/pos-exception';
 
 interface Props {
   isOpen: boolean;
@@ -173,7 +175,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
 
       setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
       setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-      // setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
       setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
     }
   }, [branchList]);
@@ -222,6 +224,12 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     // await dispatch(updateAddItemsState(items));
   };
 
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
+
   const featchPurchaseBRDetail = async (docNo: string) => {
     await dispatch(featchPurchaseBRDetailAsync(docNo)).then((v) => {
       if (v.payload) {
@@ -262,9 +270,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
       })
       .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setSnackbarIsStatus(false);
-        setContentMsg(error.message);
+        setTextError(error.message);
+        setOpenAlert(true);
       });
     setOpenLoadingModal(false);
   };
@@ -325,9 +332,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         }, 300);
       })
       .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setSnackbarIsStatus(false);
-        setContentMsg(error.message);
+        setTextError(error.message);
+        setOpenAlert(true);
       });
     setOpenLoadingModal(false);
   };
@@ -357,9 +363,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
           setOpenModelConfirm(true);
         })
         .catch((error: ApiError) => {
-          setShowSnackBar(true);
-          setSnackbarIsStatus(false);
-          setContentMsg(error.message);
+          setTextError(error.message);
+          setOpenAlert(true);
         });
     } else {
       setTextHeaderConfirm('ยืนยันส่งรายการ เบิกของใช้หน้าร้าน');
@@ -368,7 +373,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
   const handleSendBR = async () => {
     setOpenLoadingModal(true);
-    await sendPurchaseBR(docNo)
+    await sendPurchaseBR(docNo, caseNo)
       .then((value) => {
         setFlagSave(false);
         setShowSnackBar(true);
@@ -382,9 +387,16 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         }, 500);
       })
       .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setSnackbarIsStatus(false);
-        setContentMsg(error.message);
+        if (error.code === 40113) {
+          setTextError(error.message);
+          setOpenAlert(true);
+        } else if (error.code === 40114) {
+          setTextError(mappingErrorParam(error.message, { headerErrMsg: error.data.toString() }));
+          setOpenAlert(true);
+        } else {
+          setTextError(error.message);
+          setOpenAlert(true);
+        }
       });
     setOpenLoadingModal(false);
   };
@@ -419,8 +431,6 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         SKUCodes.push(item.skuCode);
       }
     });
-    // console.log('itemsCopy:', JSON.stringify(itemsCopy));
-    // console.log('SKUCodes:', JSON.stringify(SKUCodes));
 
     await getProductBySKUCodes(SKUCodes)
       .then((value) => {
@@ -444,8 +454,6 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         setFlagSave(true);
       })
       .catch((error: ApiError) => {
-        console.log('getProductBySKUCodes:', JSON.stringify(error));
-
         const itemsCopyMap: any = [];
         itemsCopy.map((data: any) => {
           const item: any = {
@@ -468,6 +476,19 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     handleOpenCopyModal();
     // handleClose();
     setOpenLoadingModal(false);
+  };
+
+  // Mock Case Await Sap
+  const [openModelMockupCase, setOpenModelMockupCase] = React.useState(false);
+  const [caseNo, setCaseNo] = React.useState('5');
+  const handleOpenModelMockupCase = () => {
+    setOpenModelMockupCase(true);
+  };
+  const handleCloseModelMockupCase = (valueCase: string) => {
+    setCaseNo(valueCase);
+    setOpenModelMockupCase(false);
+
+    handleBtnSendBR();
   };
 
   return (
@@ -554,7 +575,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Button
                   id='btnClear'
                   variant='contained'
-                  onClick={handleBtnSendBR}
+                  // onClick={handleBtnSendBR}
+                  onClick={handleOpenModelMockupCase}
                   sx={{ width: 120, ml: 2, display: `${displayBtnSubmit ? 'none' : ''}` }}
                   className={classes.MbtnClear}
                   startIcon={<CheckCircle />}
@@ -570,7 +592,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   startIcon={<Cancel />}
                   className={classes.MbtnSearch}
                   color='error'
-                  disabled={Object.keys(payloadAddItem).length === 0}>
+                  disabled={docNo !== ' '}>
                   ยกเลิก
                 </Button>
 
@@ -645,6 +667,10 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             onClose={handleNotExitModelConfirm}
             onConfirm={handleExitModelConfirm}
           />
+
+          <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+          <ModelMockupCase open={openModelMockupCase} onClose={handleCloseModelMockupCase} caseNo={caseNo} />
         </DialogContent>
       </Dialog>
 
