@@ -40,6 +40,7 @@ export default function modalMockupCase({ open, onClose, caseNo }: Props): React
             fullWidth
             className={classes.MtextField}
             placeholder='กรุณากรอกเลข 1 - 6'
+            autoComplete='off'
           />
         </DialogContentText>
       </DialogContent>
