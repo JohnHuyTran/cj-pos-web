@@ -102,7 +102,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
-  const [payloadError, setPayloadError] = React.useState<ErrorDetailResponse>();
+  const [payloadError, setPayloadError] = React.useState<ErrorDetailResponse | null>();
   const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
   const [pathReport, setPathReport] = React.useState<string>('');
   const [suffixDocType, setSuffixDocType] = React.useState<string>('');
@@ -588,6 +588,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           let errorList: ErrorDetail[] = [];
           setOpenAlert(true);
           setTextError(error.message);
+          setPayloadError(null);
           if (error.data) {
             const datas: ToteItem[] = error.data;
             datas.forEach((item: ToteItem) => {
