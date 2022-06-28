@@ -356,7 +356,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2">{params.value}</Typography>
+          <Typography variant="body2" style={{ wordBreak: 'break-all' }}>{params.value}</Typography>
           <Typography color="textSecondary" sx={{ fontSize: 12 }}>
             {params.getValue(params.id, 'skuCode') || ''}
           </Typography>
