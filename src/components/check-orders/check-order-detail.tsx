@@ -697,7 +697,12 @@ export default function CheckOrderDetail({
             </Grid>
 
             <Grid container spacing={2} mb={1}>
-              <Grid item lg={6}></Grid>
+              <Grid item lg={2}>
+                <Typography variant="body2">ทะเบียนรถ:</Typography>
+              </Grid>
+              <Grid item lg={4}>
+                <Typography variant="body2">{orderDetail.truckID}</Typography>
+              </Grid>
               <Grid item lg={2}>
                 {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
                   <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
