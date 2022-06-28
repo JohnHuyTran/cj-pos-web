@@ -13,7 +13,7 @@ interface Props {
   onClose: () => void;
   textError: string;
   errorCode?: string;
-  payload?: ErrorDetailResponse;
+  payload?: ErrorDetailResponse | null;
   title?: string;
 }
 
