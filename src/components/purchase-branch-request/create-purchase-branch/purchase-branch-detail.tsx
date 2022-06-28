@@ -229,6 +229,10 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [textError, setTextError] = React.useState('');
   const handleCloseAlert = () => {
     setOpenAlert(false);
+
+    if (status === 'DC_NO_STOCK') {
+      handleClose();
+    }
   };
 
   const featchPurchaseBRDetail = async (docNo: string) => {
@@ -378,16 +382,21 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     setOpenLoadingModal(true);
     await sendPurchaseBR(docNo, caseNo)
       .then((value) => {
-        setFlagSave(false);
-        setShowSnackBar(true);
-        setSnackbarIsStatus(true);
-        setContentMsg('คุณได้ส่งรายการเรียบร้อยแล้ว');
-
-        dispatch(featchSearchPurchaseBranchRequestAsync(payloadSearch));
-
-        setTimeout(() => {
-          handleClose();
-        }, 500);
+        // DC_NO_STOCK
+        if (value.status === 'DC_NO_STOCK') {
+          setStatus(value.status);
+          setTextError('ไม่มีสต๊อกสินค้าที่คลัง');
+          setOpenAlert(true);
+        } else {
+          setFlagSave(false);
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้ส่งรายการเรียบร้อยแล้ว');
+          dispatch(featchSearchPurchaseBranchRequestAsync(payloadSearch));
+          setTimeout(() => {
+            handleClose();
+          }, 500);
+        }
       })
       .catch((error: ApiError) => {
         if (error.code === 40113) {
