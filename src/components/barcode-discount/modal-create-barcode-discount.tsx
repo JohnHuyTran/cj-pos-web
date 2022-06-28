@@ -810,7 +810,7 @@ export default function ModalCreateBarcodeDiscount({
         status: Number(BDStatus.BARCODE_PRINTED),
       })
     );
-    dispatch(getBarcodeDiscountDetail(dataDetail.id));
+    dispatch(getBarcodeDiscountDetail(dataDetail.documentNumber));
     if (onSearchBD) onSearchBD();
   };
 
