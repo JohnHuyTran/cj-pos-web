@@ -446,7 +446,7 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
           <Grid item xs={3}>
             <Box display="flex" justifyContent="space-between" marginTop="25px">
               <Typography fontSize="14px" fontWeight="700" lineHeight="30px" height="24px">
-                จำนวนขอส่วนลดทั้งหมด
+                จำนวนทำลายจริงทั้งหมด
               </Typography>
               <TextField
                 disabled
@@ -458,7 +458,7 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
             </Box>
             <Box display="flex" justifyContent="space-between" marginTop="10px">
               <Typography fontSize="14px" fontWeight="700" marginTop="6px">
-                จำนวนทำลายจริงทั้งหมด
+                จำนวนที่อนุมัติทั้งหมด
               </Typography>
               <TextField
                 type="text"
