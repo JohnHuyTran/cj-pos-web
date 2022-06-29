@@ -383,7 +383,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     await sendPurchaseBR(docNo, caseNo)
       .then((value) => {
         // DC_NO_STOCK
-        if (value.status === 'DC_NO_STOCK') {
+        if (String(value.status) === 'DC_NO_STOCK') {
           setStatus(value.status);
           setTextError('ไม่มีสต๊อกสินค้าที่คลัง');
           setOpenAlert(true);
