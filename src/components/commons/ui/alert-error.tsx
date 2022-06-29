@@ -13,7 +13,7 @@ interface Props {
   onClose: () => void;
   textError: string;
   errorCode?: string;
-  payload?: ErrorDetailResponse;
+  payload?: ErrorDetailResponse | null;
   title?: string;
 }
 
@@ -40,6 +40,7 @@ export default function AlertError({ open, onClose, textError, errorCode, payloa
       field: 'barcode',
       headerName: 'บาร์โค้ด',
       minWidth: 122,
+      flex: 1,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -58,6 +59,7 @@ export default function AlertError({ open, onClose, textError, errorCode, payloa
       field: 'toteCode',
       headerName: 'เลข Tote',
       minWidth: 122,
+      flex: 0.1,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -75,16 +77,17 @@ export default function AlertError({ open, onClose, textError, errorCode, payloa
     {
       field: 'productDetail',
       headerName: 'รายละเอียด',
-      minWidth:
-        payload?.header.field1 && payload?.header.field3
-          ? 250
-          : payload?.header.field1 || payload?.header.field3
-          ? 250
-          : 400,
+      // minWidth:
+      //   payload?.header.field1 && payload?.header.field3
+      //     ? 250
+      //     : payload?.header.field1 || payload?.header.field3
+      //     ? 250
+      //     : 400,
+      flex: 0.2,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
-      hide: !payload?.header.field2,
+      hide: !payload?.header.field3,
       renderCell: (params) => {
         return (
           <div>
@@ -95,7 +98,7 @@ export default function AlertError({ open, onClose, textError, errorCode, payloa
             <Typography color='textSecondary' sx={{ fontSize: 12 }}>
               {params.row.productName || ''}
             </Typography>
-            <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+            <Typography color='textSecondary' variant='body2'>
               {params.row.docNo || ''}
             </Typography>
             <Typography color='textSecondary' sx={{ fontSize: 12 }}>
@@ -108,8 +111,8 @@ export default function AlertError({ open, onClose, textError, errorCode, payloa
     {
       field: 'qty',
       headerName: 'จำนวน',
-      headerAlign: 'right',
-      flex: 1.2,
+      headerAlign: 'center',
+      flex: 0.1,
       sortable: false,
       align: 'right',
       hide: !payload?.header.field4,

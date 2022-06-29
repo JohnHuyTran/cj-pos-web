@@ -31,6 +31,7 @@ import ModalConfirmTransaction from './modal-confirm-transaction';
 import { approve2MultipleStockRequest } from '../../services/stock-transfer';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { mappingErrorParam } from '../../utils/exception/pos-exception';
+import { ErrorDetailResponse, Header } from '../../models/api-error-model';
 
 interface State {
   docNo: string;
@@ -244,6 +245,8 @@ export default function StockTransferRt() {
 
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
+  const [titleError, setTitleError] = React.useState('');
+  const [payloadError, setPayloadError] = React.useState<ErrorDetailResponse>();
   //alert Errormodel
   const handleCloseAlert = () => {
     setOpenAlert(false);
@@ -334,7 +337,6 @@ export default function StockTransferRt() {
     const payload: Approve2MultipleStockRequest = {
       rtNos: selectRowsList,
     };
-
     await approve2MultipleStockRequest(payload)
       .then((value) => {
         dispatch(featchSearchStockTransferRtAsync(searchStockTransferRt));
@@ -343,23 +345,41 @@ export default function StockTransferRt() {
         setSnackbarIsStatus(true);
         setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
 
-        if (value.data.insufficientBalanceRTNos.length > 0) {
-          setTextError(
-            mappingErrorParam(
-              'ไม่สามารถส่งงานได้ เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ กรุณาแก้ไขจำนวนที่สั่ง \n[{rtNoList}]',
-              { rtNoList: value.data.insufficientBalanceRTNos.toString() }
-            )
-          );
-          setOpenAlert(true);
-        }
+        // if (value.data.insufficientBalanceRTNos.length > 0) {
+        //   setTextError(
+        //     mappingErrorParam(
+        //       'ไม่สามารถส่งงานได้ เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ กรุณาแก้ไขจำนวนที่สั่ง \n[{rtNoList}]',
+        //       { rtNoList: value.data.insufficientBalanceRTNos.toString() }
+        //     )
+        //   );
+        //   setOpenAlert(true);
+        // }
 
         setTimeout(() => {
           handleCloseSnackBar();
         }, 300);
       })
       .catch((error: any) => {
-        setTextError(error.message);
-        setOpenAlert(true);
+        if (String(error.code) === '40014') {
+          const header: Header = {
+            field1: false,
+            field2: false,
+            field3: true,
+            field4: false,
+          };
+          const payload: ErrorDetailResponse = {
+            header: header,
+            error_details: error.error_details,
+          };
+          setOpenAlert(true);
+          // setTitleError('เลขที่เอกสาร');
+          setTextError(error.message);
+          setPayloadError(payload);
+        } else {
+          setOpenAlert(true);
+          setTextError(error.message);
+          setTitleError('');
+        }
       });
     handleOpenLoading('open', false);
   };
@@ -532,7 +552,15 @@ export default function StockTransferRt() {
 
       <LoadingModal open={openLoadingModal.open} />
 
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      {/* <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} /> */}
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        textError={textError}
+        title={titleError}
+        payload={payloadError}
+      />
+
       <AlertErrorStock
         open={openAlertErrStock}
         onClose={handleCloseAlertErrStock}
