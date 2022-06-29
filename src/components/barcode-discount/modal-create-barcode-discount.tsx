@@ -73,14 +73,14 @@ interface Props {
 const _ = require('lodash');
 
 export default function ModalCreateBarcodeDiscount({
-                                                     isOpen,
-                                                     onClickClose,
-                                                     setOpenPopup,
-                                                     action,
-                                                     setPopupMsg,
-                                                     onSearchBD,
-                                                     userPermission,
-                                                   }: Props): ReactElement {
+  isOpen,
+  onClickClose,
+  setOpenPopup,
+  action,
+  setPopupMsg,
+  onSearchBD,
+  userPermission,
+}: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
 
   const [valueRadios, setValueRadios] = React.useState<string>('percent');
