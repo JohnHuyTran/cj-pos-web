@@ -357,7 +357,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleBtnSendBR = async () => {
-    if (flagSave) {
+    // if (flagSave) {
+    if (docNo === '') {
       const payloadSave: any = await handleMapPayloadSave();
       await savePurchaseBR(payloadSave)
         .then((value) => {
