@@ -52,7 +52,7 @@ export default function SearchBranch(props: Props): ReactElement {
   const [errorProvince, setErrorProvince] = React.useState<string | null>();
   const [errorBranch, setErrorBranch] = React.useState<string | null>();
   const [value, setValue] = React.useState<string>('');
-
+  const [checkSelectBranch, setCheckSelectBranch] = React.useState<boolean>(false);
   const provinceList = useAppSelector((state) => state.searchBranchProvince.provinceList);
   const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
   const totalBranches = useAppSelector((state) => state.searchBranchProvince.totalBranches);
@@ -89,6 +89,10 @@ export default function SearchBranch(props: Props): ReactElement {
       dispatch(fetchBranchProvinceListAsync('limit=1000'));
     }
   }, [open]);
+
+  useEffect(() => {
+    setBranch(null);
+  }, [checkSelectBranch]);
 
   useEffect(() => {
     try {
@@ -182,28 +186,26 @@ export default function SearchBranch(props: Props): ReactElement {
   };
 
   const onInputChange = (event: any, value: string) => {
+    if (!!province) return;
     searchDebouceRef.current?.cancel();
     searchDebouceRef.current = _.debounce(() => {
       if (event?.keyCode === 13) return;
-
       const keyword = value.trim();
       const payload: { [key: string]: any } = {
         name: keyword,
         code: keyword,
         limit: '10',
       };
-
       if (!!province?.name) {
         payload.province = province.name;
       }
       const params = paramsConvert(payload);
-
       try {
         dispatch(fetchBranchProvinceListAsync(params));
       } catch (error) {
         console.error(error);
       }
-    }, 200);
+    }, 300);
     searchDebouceRef.current();
   };
 
@@ -220,50 +222,10 @@ export default function SearchBranch(props: Props): ReactElement {
       throw error;
     }
   };
-  // const handleAddBranch = () => {
-  //   if (checked) {
-  //     const existProvince = listBranch['provinces'].some((item: any) => item.code == province.code);
-  //     if (!existProvince) {
-  //       const preData = [...listBranch['provinces'], province];
-  //       const newBranches = listBranch['branches'].filter((item: any) => item.province.code !== province.code);
-  //       const checkArrays = _.difference(listBranch['branches'], newBranches);
-  //       if (checkArrays.length > 0) {
-  //         setListBranch({
-  //           ...listBranch,
-  //           branches: newBranches,
-  //           provinces: preData,
-  //         });
-  //       } else {
-  //         setListBranch({
-  //           ...listBranch,
-  //           provinces: preData,
-  //         });
-  //       }
-  //       // setErrorProvince(null);
-  //     }
-  //     setProvince(null);
-  //     setChecked(false);
-  //     // else {
-  //     //   setErrorProvince('จังหวัดนี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง');
-  //     // }
-  //   } else {
-  //     const existBranch = listBranch['branches'].some((item: any) => item.id == branch.id);
-  //     const existInProvince = listBranch['provinces'].some((item: any) => item.code == branch.province.code);
-
-  //     if (!existBranch && !existInProvince) {
-  //       const preData = [...listBranch['branches'], branch];
-  //       setListBranch({ ...listBranch, branches: preData });
-  //     }
-  //     setBranch(null);
-  //     setErrorBranch(null);
-  //     // else {
-  //     //   setErrorBranch('สาขานี้ได้ถูกเลือกแล้ว กรุณาลบก่อนทำการเพิ่มใหม่อีกครั้ง');
-  //     // }
-  //   }
-  // };
 
   const handleSelectBranch = (e: any) => {
     setBranch(e);
+    setCheckSelectBranch(!checkSelectBranch)
     if (e) {
       const existBranch = listBranch['branches'].some((item: any) => item.id == e.id);
       const existInProvince = listBranch['provinces'].some((item: any) => item.code == e.province.code);
@@ -272,7 +234,6 @@ export default function SearchBranch(props: Props): ReactElement {
         setListBranch({ ...listBranch, branches: preData });
       }
     }
-    setBranch(null);
   };
 
   const handleDeleteBranch = (code: string) => {
