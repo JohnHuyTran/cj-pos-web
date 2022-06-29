@@ -58,11 +58,13 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let rows = payloadAddItem.map((item: any, index: number) => {
         let sameItem = dtTable.find((el) => el.barcode === item.barcode);
-        let numberOfRequested = item.numberOfDiscounted ? item.numberOfDiscounted : 0;
+        let numberOfDiscounted = item.numberOfDiscounted ? item.numberOfDiscounted : 0;
+        let numberOfRequested = item.numberOfRequested ? item.numberOfRequested : 0;
         let remark = !!sameItem ? sameItem.remark : '';
         if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
           remark = stringNullOrEmpty(item.remark) ? '' : item.remark;
-          numberOfRequested = stringNullOrEmpty(item.numberOfDiscounted) ? null : item.numberOfDiscounted;
+          numberOfDiscounted = stringNullOrEmpty(item.numberOfDiscounted) ? 0 : item.numberOfDiscounted;
+          numberOfRequested = stringNullOrEmpty(item.numberOfRequested) ? 0 : item.numberOfRequested;
         }
         let numberOfApproved = !!sameItem
           ? sameItem.numberOfApproved
@@ -79,6 +81,7 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
           unitCode: item.unitCode || '',
           barFactor: item.barFactor || 0,
           qty: numberOfRequested,
+          numberOfDiscounted: numberOfDiscounted,
           numberOfRequested: numberOfRequested,
           numberOfApproved: numberOfApproved,
           errorNumberOfApproved: '',
@@ -99,6 +102,7 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
       const products = dtTable.map((item) => {
         return {
           barcode: item.barcode,
+          numberOfDiscounted: parseInt(String(item.numberOfDiscounted).replace(/,/g, '')),
           numberOfRequested: parseInt(String(item.numberOfRequested).replace(/,/g, '')),
           numberOfApproved: parseInt(String(item.numberOfApproved).replace(/,/g, '')),
           unitName: item.unit,
@@ -134,6 +138,36 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
       data[index - 1].remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
       return data;
     });
+    dispatch(updateCheckEdit(true));
+  };
+
+  const handleChangeNumberOfRequest = (event: any, index: number, errorIndex: number, barcode: string) => {
+    let currentValue = event.target.value;
+    if (stringNullOrEmpty(event.target.value)
+      || stringNullOrEmpty(event.target.value.trim())
+    ) {
+      currentValue = '0';
+    }
+    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
+      return;
+    }
+    setDtTable((preData: Array<TransferOutDestroyDiscountDetail>) => {
+      const data = [...preData];
+      data[index - 1].numberOfRequested = currentValue ? parseInt(currentValue.replace(/,/g, '')) : 0;
+      return data;
+    });
+    dispatch(
+      updateErrorList(
+        errorList.map((item: any, idx: number) => {
+          return idx === errorIndex
+            ? {
+              ...item,
+              errorNumberOfRequested: '',
+            }
+            : item;
+        })
+      )
+    );
     dispatch(updateCheckEdit(true));
   };
 
@@ -185,7 +219,7 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
     {
       field: 'barcode',
       headerName: 'บาร์โค้ด',
-      flex: 1,
+      flex: 0.8,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -215,9 +249,8 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
       sortable: false,
     },
     {
-      field: 'numberOfRequested',
-      headerName: 'จำนวนขอส่วนลด',
-      flex: 1,
+      field: 'numberOfDiscounted',
+      flex: 0.8,
       headerAlign: 'center',
       align: 'right',
       disableColumnMenu: true,
@@ -225,10 +258,55 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
       renderCell: (params: GridRenderCellParams) => {
         return numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value);
       },
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690', textAlign: 'center' }}>
+            <Typography variant='body2' noWrap>
+              <b>{'จำนวน'}</b>
+            </Typography>
+            <Typography variant='body2' noWrap>
+              <b>{'ขอส่วนลด'}</b>
+            </Typography>
+          </div>
+        );
+      },
+    },
+    {
+      field: 'numberOfRequested',
+      headerName: 'จำนวนทำลายจริง*',
+      flex: 1,
+      headerAlign: 'center',
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        const index =
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barcode) : -1;
+        const indexStock =
+          checkStocks && checkStocks.length > 0
+            ? checkStocks.findIndex((item: any) => item.barcode === params.row.barcode)
+            : -1;
+        const condition = (index != -1 && errorList[index].errorNumberOfRequested) || indexStock !== -1;
+        return (
+          <div className={classes.MLabelTooltipWrapper}>
+            <TextField
+              error={condition}
+              type="text"
+              inputProps={{ maxLength: 13 }}
+              className={classes.MtextFieldNumber}
+              value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
+              onChange={(e) => {
+                handleChangeNumberOfRequest(e, params.row.index, index, params.row.barcode);
+              }}
+              disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT}
+            />
+            {condition && <div className="title">{errorList[index]?.errorNumberOfRequested}</div>}
+          </div>
+        );
+      }
     },
     {
       field: 'numberOfApproved',
-      headerName: 'จำนวนทำลายจริง *',
+      headerName: 'จำนวนที่อนุมัติ*',
       flex: 1,
       headerAlign: 'center',
       disableColumnMenu: true,
@@ -252,7 +330,7 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
               onChange={(e) => {
                 handleChangeNumberOfApprove(e, params.row.index, index, params.row.barcode);
               }}
-              disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT}
+              disabled={!approvePermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfApproved}</div>}
           </div>
@@ -281,7 +359,9 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
             onChange={(e) => {
               handleChangeRemark(e, params.row.index);
             }}
-            disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT}
+            disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT
+                && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL)
+              || (TOStatus.WAIT_FOR_APPROVAL == dataDetail.status && !approvePermission)}
           />
         </HtmlTooltip>
       )

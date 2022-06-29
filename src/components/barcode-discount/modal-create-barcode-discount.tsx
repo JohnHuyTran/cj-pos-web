@@ -73,14 +73,14 @@ interface Props {
 const _ = require('lodash');
 
 export default function ModalCreateBarcodeDiscount({
-  isOpen,
-  onClickClose,
-  setOpenPopup,
-  action,
-  setPopupMsg,
-  onSearchBD,
-  userPermission,
-}: Props): ReactElement {
+                                                     isOpen,
+                                                     onClickClose,
+                                                     setOpenPopup,
+                                                     action,
+                                                     setPopupMsg,
+                                                     onSearchBD,
+                                                     userPermission,
+                                                   }: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
 
   const [valueRadios, setValueRadios] = React.useState<string>('percent');
@@ -296,7 +296,8 @@ export default function ModalCreateBarcodeDiscount({
       dispatch(
         updateApproveReject({
           ...approveReject,
-          approvalNote: barcodeDiscountDetail.rejectReason,
+          approvalNote: Number(BDStatus.REJECT) === barcodeDiscountDetail.status
+            ? barcodeDiscountDetail.rejectReason : barcodeDiscountDetail.approverNote,
         })
       );
       //set value for attach files
@@ -542,15 +543,15 @@ export default function ModalCreateBarcodeDiscount({
         try {
           const body = !!dataDetail.id
             ? {
-                ...payloadBarcodeDiscount,
-                id: dataDetail.id,
-                documentNumber: dataDetail.documentNumber,
-                attachFiles: allAttachFile,
-              }
+              ...payloadBarcodeDiscount,
+              id: dataDetail.id,
+              documentNumber: dataDetail.documentNumber,
+              attachFiles: allAttachFile,
+            }
             : {
-                ...payloadBarcodeDiscount,
-                attachFiles: allAttachFile,
-              };
+              ...payloadBarcodeDiscount,
+              attachFiles: allAttachFile,
+            };
           const rs = await saveDraftBarcodeDiscount(body);
           if (rs.code === 201) {
             if (!sendRequest) {
@@ -657,7 +658,10 @@ export default function ModalCreateBarcodeDiscount({
   const handleApprove = async () => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     try {
-      const rs = await approveBarcodeDiscount(dataDetail.id, payloadBarcodeDiscount.products);
+      const rs = await approveBarcodeDiscount(dataDetail.id, {
+        products: payloadBarcodeDiscount.products,
+        approverNote: approveReject.approvalNote
+      });
       if (rs.code === 20000) {
         dispatch(
           updateDataDetail({
@@ -983,7 +987,7 @@ export default function ModalCreateBarcodeDiscount({
       <Dialog open={open} maxWidth='xl' fullWidth>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCloseModalCreate}>
           <Typography sx={{ fontSize: '1em' }}>ส่วนลดสินค้า</Typography>
-          <StepperBar activeStep={status} setActiveStep={setStatus} />
+          <StepperBar activeStep={status} setActiveStep={setStatus}/>
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container>
@@ -1035,12 +1039,12 @@ export default function ModalCreateBarcodeDiscount({
                     }}>
                     <FormControlLabel
                       value='percent'
-                      control={<Radio disabled={status > 1} />}
+                      control={<Radio disabled={status > 1}/>}
                       label='ยอดลดเป็นเปอร์เซ็น (%)'
                     />
                     <FormControlLabel
                       value='amount'
-                      control={<Radio disabled={status > 1} />}
+                      control={<Radio disabled={status > 1}/>}
                       label='ยอดลดแบบ 5-7 เดือน เป็นจำนวนเงิน(บาท)'
                     />
                   </RadioGroup>
@@ -1075,7 +1079,7 @@ export default function ModalCreateBarcodeDiscount({
                   className={classes.MbtnSearch}
                   onClick={onPrintedBarcode}
                   disabled={!(barcodeDiscountPrint && barcodeDiscountPrint.length > 0 && printInDetail)}
-                  startIcon={<PrintSharp />}
+                  startIcon={<PrintSharp/>}
                   sx={{ width: '208px' }}
                   style={{
                     display:
@@ -1090,7 +1094,7 @@ export default function ModalCreateBarcodeDiscount({
                   variant='contained'
                   color='info'
                   className={classes.MbtnSearch}
-                  startIcon={<AddCircleOutlineOutlinedIcon />}
+                  startIcon={<AddCircleOutlineOutlinedIcon/>}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
                   style={{
@@ -1105,7 +1109,7 @@ export default function ModalCreateBarcodeDiscount({
                   id='btnSaveDraft'
                   variant='contained'
                   color='warning'
-                  startIcon={<SaveIcon />}
+                  startIcon={<SaveIcon/>}
                   disabled={status > 1 || !payloadBarcodeDiscount.products.length}
                   style={{
                     display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission ? 'none' : undefined,
@@ -1123,7 +1127,7 @@ export default function ModalCreateBarcodeDiscount({
                   style={{
                     display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission ? 'none' : undefined,
                   }}
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleSendRequest}
                   className={classes.MbtnSearch}>
                   ขออนุมัติ
@@ -1136,7 +1140,7 @@ export default function ModalCreateBarcodeDiscount({
                   style={{
                     display: status >= Number(BDStatus.WAIT_FOR_APPROVAL) || approvePermission ? 'none' : undefined,
                   }}
-                  startIcon={<HighlightOffIcon />}
+                  startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
                   ยกเลิก
@@ -1149,7 +1153,7 @@ export default function ModalCreateBarcodeDiscount({
                   }}
                   variant='contained'
                   color='primary'
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={() => handleOpenModalConfirmApprove(false)}
                   className={classes.MbtnSearch}>
                   อนุมัติ
@@ -1161,7 +1165,7 @@ export default function ModalCreateBarcodeDiscount({
                     display: status == Number(BDStatus.WAIT_FOR_APPROVAL) && approvePermission ? undefined : 'none',
                   }}
                   color='error'
-                  startIcon={<HighlightOffIcon />}
+                  startIcon={<HighlightOffIcon/>}
                   onClick={handleReject}
                   className={classes.MbtnSearch}>
                   ไม่อนุมัติ
@@ -1210,8 +1214,8 @@ export default function ModalCreateBarcodeDiscount({
         headerTitle={'ยืนยันยกเลิกขอส่วนลดสินค้า'}
         documentField={'เลขที่เอกสาร BD'}
       />
-      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
-      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError} />
+      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
+      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError}/>
       <ModalCheckStock
         open={openCheckStock}
         onClose={() => {
@@ -1219,8 +1223,8 @@ export default function ModalCreateBarcodeDiscount({
         }}
         headerTitle={'จำนวนที่ขอลดเกินจำนวนสินค้าในสต๊อก'}
       />
-      <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts} />
-      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
+      <ModalCheckPrice open={openModalCheck} onClose={handleCloseModalCheck} products={listProducts}/>
+      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm
         open={openModalConfirmApprove}
         onClose={() => handleCloseModalConfirmApprove(false)}

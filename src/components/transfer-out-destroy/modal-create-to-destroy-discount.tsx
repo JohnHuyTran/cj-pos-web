@@ -36,7 +36,8 @@ import { getUserInfo } from "../../store/sessionStore";
 import ModelConfirm from "../barcode-discount/modal-confirm";
 import ModalCheckStock from "../barcode-discount/modal-check-stock";
 import {
-  cancelTransferOut,
+  approveTransferOut,
+  cancelTransferOut, endTransferOut, rejectTransferOut,
   saveDraftTransferOut,
   sendForApprovalTransferOut
 } from "../../services/transfer-out";
@@ -48,6 +49,7 @@ import ModalAddProductToDestroyDiscount from "./modal-add-product-to-destroy-dis
 import { uploadFileAfterState } from "../../store/slices/to-destroy-discount-attach-after-slice";
 import ModalToDestroyDiscountItem from "./modal-to-destroy-discount-item";
 import { updateAddDestroyProductState } from "../../store/slices/add-to-destroy-product-slice";
+import StepperBar from "./stepper-bar";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -75,7 +77,10 @@ export default function ModalCreateToDestroyDiscount({
   let errorListProduct: any = [];
   const [open, setOpen] = React.useState(isOpen);
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
+  const [openModalConfirmSendForApproval, setOpenModalConfirmSendForApproval] = React.useState<boolean>(false);
   const [openModalConfirmApprove, setOpenModalConfirmApprove] = React.useState<boolean>(false);
+  const [openModalReject, setOpenModalReject] = React.useState<boolean>(false);
+  const [openModalConfirmEnd, setOpenModalConfirmEnd] = React.useState<boolean>(false);
   const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
@@ -126,11 +131,22 @@ export default function ModalCreateToDestroyDiscount({
     setOpenModalCancel(false);
   };
 
+  const handleCloseModalConfirmSendForApproval = (confirm: boolean) => {
+    setOpenModalConfirmSendForApproval(false);
+    if (confirm) {
+      handleSendForApproval(dataDetail.id);
+    }
+  };
+
   const handleCloseModalConfirmApprove = (confirm: boolean) => {
     setOpenModalConfirmApprove(false);
     if (confirm) {
-      handleCreateDraft(true);
+      handleApprove();
     }
+  };
+
+  const handleOpenModalReject = () => {
+    setOpenModalReject(true);
   };
 
   const handleClosePopup = () => {
@@ -244,7 +260,8 @@ export default function ModalCreateToDestroyDiscount({
             unitCode: item.unitFactor,
             barFactor: item.barFactor,
             unitPrice: item.price || 0,
-            numberOfDiscounted: item.numberOfRequested || 0,
+            numberOfDiscounted: item.numberOfDiscounted || 0,
+            numberOfRequested: item.numberOfRequested || 0,
             numberOfApproved: (TOStatus.WAIT_FOR_APPROVAL == transferOutDetail.status && approvePermission)
               ? (item.numberOfRequested || 0) : (item.numberOfApproved || 0),
             skuCode: item.sku,
@@ -285,13 +302,16 @@ export default function ModalCreateToDestroyDiscount({
               item.errorNumberOfApproved = 'จำนวนการทำลายต้องมากกว่าหรือเท่ากับ 0';
             } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
-              item.errorNumberOfApproved = 'จำนวนที่ทำลายต้องน้อยกว่าหรือเท่ากับจำนวนขอส่วนลด';
+              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนที่ทำลายจริง';
             }
           }
         } else {
           if (preData.numberOfRequested <= 0 || !preData.numberOfRequested) {
             isValid = false;
             item.errorNumberOfRequested = 'จำนวนคำขอต้องมากกว่า 0';
+          } else if (preData.numberOfRequested > preData.numberOfDiscounted) {
+            isValid = false;
+            item.errorNumberOfRequested = 'จำนวนทำลายจริงต้องไม่น้อยกว่าจำนวนขอส่วนลด';
           }
         }
         if (!isValid) {
@@ -376,26 +396,23 @@ export default function ModalCreateToDestroyDiscount({
 
   const handleCreateDraft = async (sendRequest: boolean) => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
-    if (validate(true, sendRequest)) {
+    if (validate(false, sendRequest)) {
       const rsCheckStock = await handleCheckStock();
       if (rsCheckStock) {
         await dispatch(save({ ...payloadTransferOut }));
         try {
           const allAttachFileBefore = await handleAllAttachFile(fileUploadList, attachFileBeforeOlds);
-          const allAttachFileAfter = await handleAllAttachFile(fileUploadAfterList, attachFileAfterOlds);
           const body = !!dataDetail.id
             ? {
               ...payloadTransferOut,
               id: dataDetail.id,
               documentNumber: dataDetail.documentNumber,
               beforeAttachFiles: allAttachFileBefore,
-              afterAttachFiles: allAttachFileAfter,
               type: TO_TYPE.TO_WITH_DISCOUNT
             }
             : {
               ...payloadTransferOut,
               beforeAttachFiles: allAttachFileBefore,
-              afterAttachFiles: allAttachFileAfter,
               type: TO_TYPE.TO_WITH_DISCOUNT
             };
           const rs = await saveDraftTransferOut(body);
@@ -449,7 +466,12 @@ export default function ModalCreateToDestroyDiscount({
               })
             );
             if (sendRequest) {
-              handleApprove(dataDetail.id);
+              //validate attach file
+              if (fileUploadList.length === 0 && attachFileBeforeOlds.length === 0) {
+                setAttachFileBeforeError('AttachFileBefore__กรุณาแนบไฟล์เอกสาร');
+                return;
+              }
+              setOpenModalConfirmSendForApproval(true);
             }
           } else {
             setOpenModalError(true);
@@ -461,11 +483,34 @@ export default function ModalCreateToDestroyDiscount({
     }
   };
 
-  const handleClickApprove = () => {
-    if (TOStatus.DRAFT == status && fileUploadAfterList.length === 0 && attachFileAfterOlds.length === 0) {
-      setAttachFileAfterError('AttachFileAfter__กรุณาแนบไฟล์เอกสาร');
-      return;
+  const handleSendRequest = () => {
+    handleCreateDraft(true);
+  };
+
+  const handleSendForApproval = async (id: string) => {
+    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    try {
+      const rs = await sendForApprovalTransferOut(id);
+      if (rs.code === 20000) {
+        dispatch(
+          updateDataDetail({
+            ...dataDetail,
+            status: TOStatus.WAIT_FOR_APPROVAL,
+          })
+        );
+        setOpenPopup(true);
+        setPopupMsg('คุณได้ทำการส่งขออนุมัติเบิกทำลายเรียบร้อยแล้ว');
+        handleClose();
+        if (onSearchMain) onSearchMain();
+      } else {
+        setOpenModalError(true);
+      }
+    } catch (error) {
+      setOpenModalError(true);
     }
+  };
+
+  const handleOpenModalConfirmApprove = () => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     if (validate(true, false)) {
       setOpenModalConfirmApprove(true);
@@ -475,11 +520,15 @@ export default function ModalCreateToDestroyDiscount({
     }
   };
 
-  const handleApprove = async (id: string) => {
+  const handleApprove = async () => {
     setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
     try {
-      //handle transfer before and after attach file
-      const rs = await sendForApprovalTransferOut(id);
+      const allAttachFile = await handleAllAttachFile(fileUploadList, attachFileBeforeOlds);
+      const payload = {
+        products: payloadTransferOut.products,
+        beforeAttachFiles: allAttachFile,
+      };
+      const rs = await approveTransferOut(dataDetail.id, payload);
       if (rs.code === 20000) {
         dispatch(
           updateDataDetail({
@@ -488,9 +537,12 @@ export default function ModalCreateToDestroyDiscount({
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ทำการอนุมัติเบิกทำลายมีส่วนลดเรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการอนุมัติเบิกทำลายเรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
+      } else if (rs.code === 50003) {
+        dispatch(updateCheckStock(rs.data));
+        setOpenCheckStock(true);
       } else {
         setOpenModalError(true);
       }
@@ -506,7 +558,7 @@ export default function ModalCreateToDestroyDiscount({
         const rs = await cancelTransferOut(dataDetail.id);
         if (rs.status === 200) {
           setOpenPopup(true);
-          setPopupMsg('คุณได้ยกเลิกเบิกทำลายมีส่วนลดเรียบร้อยแล้ว');
+          setPopupMsg('คุณได้ยกเลิกเบิกทำลายเรียบร้อยแล้ว');
           handleClose();
           if (onSearchMain) onSearchMain();
         } else {
@@ -519,7 +571,7 @@ export default function ModalCreateToDestroyDiscount({
       }
     } else {
       setOpenPopup(true);
-      setPopupMsg('คุณได้ยกเลิกเบิกทำลายมีส่วนลดเรียบร้อยแล้ว');
+      setPopupMsg('คุณได้ยกเลิกเบิกทำลายเรียบร้อยแล้ว');
       handleClose();
     }
   };
@@ -551,20 +603,93 @@ export default function ModalCreateToDestroyDiscount({
     }
   };
 
+  const handleCloseModalConfirmReject = async (confirm: boolean) => {
+    setOpenModalReject(false);
+    if (confirm) {
+      handleReject();
+    }
+  };
+
+  const handleReject = async () => {
+    try {
+      const allAttachFileBefore = await handleAllAttachFile(fileUploadList, attachFileBeforeOlds);
+      const payload = {
+        beforeAttachFiles: allAttachFileBefore
+      };
+      let res = await rejectTransferOut(dataDetail.id, payload);
+      if (res && res.code === 20000) {
+        dispatch(
+          updateDataDetail({
+            ...dataDetail,
+            status: Number(TOStatus.REJECTED),
+          })
+        );
+        setOpenPopup(true);
+        setPopupMsg('คุณได้ทำการไม่อนุมัติเบิกทำลายเรียบร้อยแล้ว');
+        handleClose();
+        if (onSearchMain) onSearchMain();
+      } else {
+        setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+        setOpenModalError(true);
+      }
+    } catch (error) {
+      setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+      setOpenModalError(true);
+    }
+  };
+
+  const handleOpenModalConfirmEnd = () => {
+    //validate attach file
+    if (fileUploadAfterList.length === 0 && attachFileAfterOlds.length === 0) {
+      setAttachFileAfterError('AttachFileAfter__กรุณาแนบไฟล์เอกสาร');
+      return;
+    }
+    setOpenModalConfirmEnd(true);
+  };
+
+  const handleCloseModalConfirmEnd = async (confirm: boolean) => {
+    setOpenModalConfirmEnd(false);
+    if (confirm) {
+      handleEnd();
+    }
+  };
+
+  const handleEnd = async () => {
+    try {
+      const allAttachFileAfter = await handleAllAttachFile(fileUploadAfterList, attachFileAfterOlds);
+      let res = await endTransferOut(dataDetail.id, allAttachFileAfter);
+      if (res && res.code === 20000) {
+        dispatch(
+          updateDataDetail({
+            ...dataDetail,
+            status: Number(TOStatus.CLOSED),
+          })
+        );
+        setOpenPopup(true);
+        setPopupMsg('คุณได้ทำการปิดงานเบิกทำลายเรียบร้อยแล้ว');
+        handleClose();
+        if (onSearchMain) onSearchMain();
+      } else {
+        setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+        setOpenModalError(true);
+      }
+    } catch (error) {
+      setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
+      setOpenModalError(true);
+    }
+  };
+
   const genDisabledApproveButton = () => {
-    return (!stringNullOrEmpty(status) && status != TOStatus.DRAFT)
-      || (payloadTransferOut.products && payloadTransferOut.products.length === 0)
-      || (fileUploadList.length === 0 && attachFileBeforeOlds.length === 0)
-      || (fileUploadAfterList.length === 0 && attachFileAfterOlds.length === 0)
-      || (dataDetail && moment(dataDetail.createdDate).isBefore(moment(new Date), 'day'));
+    return (dataDetail && moment(dataDetail.createdDate).isBefore(moment(new Date), 'day'));
   };
 
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCloseModalCreate}>
-          <Typography sx={{ fontSize: '1em' }}>สร้างเอกสารทำลาย (ส่วนลด)</Typography>
-          <StepperBarToDestroyDiscount activeStep={status} setActiveStep={setStatus}/>
+          <Typography sx={{ fontSize: '1em' }}>รายละเอียดเอกสารทำลาย (ส่วนลด)</Typography>
+          {/*<StepperBarToDestroyDiscount activeStep={status} setActiveStep={setStatus}/>*/}
+          <StepperBar activeStep={status} setActiveStep={setStatus}/>
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container mt={1} mb={-1}>
@@ -615,7 +740,9 @@ export default function ModalCreateToDestroyDiscount({
                   onChangeUploadFile={handleOnChangeUploadFileBefore}
                   onDeleteAttachFile={onDeleteAttachFileBeforeOld}
                   idControl={'AttachFileBefore'}
-                  enabledControl={TOStatus.DRAFT === status}
+                  enabledControl={
+                    TOStatus.DRAFT === status || (TOStatus.WAIT_FOR_APPROVAL === status && approvePermission)
+                  }
                   warningMessage={attachFileBeforeError}
                   deletePermission={TOStatus.DRAFT === status}
                 />
@@ -634,9 +761,7 @@ export default function ModalCreateToDestroyDiscount({
                   onChangeUploadFile={handleOnChangeUploadFileAfter}
                   onDeleteAttachFile={onDeleteAttachFileAfterOld}
                   idControl={'AttachFileAfter'}
-                  enabledControl={(TOStatus.DRAFT === status
-                    && (attachFileBeforeOlds && attachFileBeforeOlds.length > 0)
-                    || (fileUploadList && fileUploadList.length > 0))}
+                  enabledControl={TOStatus.APPROVED === status && !approvePermission}
                   warningMessage={attachFileAfterError}
                   deletePermission={TOStatus.DRAFT === status}
                 />
@@ -675,16 +800,25 @@ export default function ModalCreateToDestroyDiscount({
                   บันทึก
                 </Button>
                 <Button
-                  id='btnApprove'
+                  id='btnSendForApproval'
                   variant='contained'
                   color='primary'
                   sx={{ margin: '0 17px' }}
-                  disabled={genDisabledApproveButton()}
-                  style={{ display: ((!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission) ? 'none' : undefined }}
+                  disabled={
+                    (!stringNullOrEmpty(status) && status != TOStatus.DRAFT)
+                    || (payloadTransferOut.products && payloadTransferOut.products.length === 0)
+                    || (status == TOStatus.DRAFT && dataDetail && moment(dataDetail.createdDate).isBefore(moment(new Date), 'day'))
+                  }
+                  style={{
+                    display:
+                      (!stringNullOrEmpty(status) && status != TOStatus.DRAFT) || approvePermission
+                        ? 'none'
+                        : undefined,
+                  }}
                   startIcon={<CheckCircleOutlineIcon/>}
-                  onClick={handleClickApprove}
+                  onClick={handleSendRequest}
                   className={classes.MbtnSearch}>
-                  อนุมัติ
+                  ขออนุมัติ
                 </Button>
                 <Button
                   id='btnCancel'
@@ -696,6 +830,38 @@ export default function ModalCreateToDestroyDiscount({
                   onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
                   ยกเลิก
+                </Button>
+                <Button
+                  id='btnApprove'
+                  sx={{ margin: '0 17px' }}
+                  style={{ display: status == TOStatus.WAIT_FOR_APPROVAL && approvePermission ? undefined : 'none' }}
+                  variant='contained'
+                  color='primary'
+                  disabled={genDisabledApproveButton()}
+                  startIcon={<CheckCircleOutlineIcon/>}
+                  onClick={handleOpenModalConfirmApprove}
+                  className={classes.MbtnSearch}>
+                  อนุมัติ
+                </Button>
+                <Button
+                  id='btnReject'
+                  variant='contained'
+                  style={{ display: status == TOStatus.WAIT_FOR_APPROVAL && approvePermission ? undefined : 'none' }}
+                  color='error'
+                  startIcon={<HighlightOffIcon/>}
+                  onClick={handleOpenModalReject}
+                  className={classes.MbtnSearch}>
+                  ไม่อนุมัติ
+                </Button>
+                <Button
+                  id='btnEnd'
+                  variant='contained'
+                  style={{ display: status != TOStatus.APPROVED || approvePermission ? 'none' : undefined }}
+                  color='info'
+                  startIcon={<CheckCircleOutlineIcon/>}
+                  onClick={handleOpenModalConfirmEnd}
+                  className={classes.MbtnSearch}>
+                  ปิดงาน
                 </Button>
               </Box>
             </Box>
@@ -715,7 +881,7 @@ export default function ModalCreateToDestroyDiscount({
         onClose={handleCloseModalCancel}
         onConfirm={handleDeleteDraft}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันยกเลิกเบิกทำลายมีส่วนลด'}
+        headerTitle={'ยืนยันยกเลิกเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
@@ -733,11 +899,35 @@ export default function ModalCreateToDestroyDiscount({
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm
+        open={openModalConfirmSendForApproval}
+        onClose={() => handleCloseModalConfirmSendForApproval(false)}
+        onConfirm={() => handleCloseModalConfirmSendForApproval(true)}
+        barCode={dataDetail.documentNumber}
+        headerTitle={'ยืนยันส่งขอเบิกทำลาย'}
+        documentField={'เลขที่เอกสารเบิก'}
+      />
+      <ModelConfirm
         open={openModalConfirmApprove}
         onClose={() => handleCloseModalConfirmApprove(false)}
         onConfirm={() => handleCloseModalConfirmApprove(true)}
         barCode={dataDetail.documentNumber}
         headerTitle={'ยืนยันอนุมัติเบิกทำลายมีส่วนลด'}
+        documentField={'เลขที่เอกสารเบิก'}
+      />
+      <ModelConfirm
+        open={openModalReject}
+        onClose={() => handleCloseModalConfirmReject(false)}
+        onConfirm={() => handleCloseModalConfirmReject(true)}
+        barCode={dataDetail.documentNumber}
+        headerTitle={'ยืนยันไม่อนุมัติเบิกทำลาย'}
+        documentField={'เลขที่เอกสารเบิก'}
+      />
+      <ModelConfirm
+        open={openModalConfirmEnd}
+        onClose={() => handleCloseModalConfirmEnd(false)}
+        onConfirm={() => handleCloseModalConfirmEnd(true)}
+        barCode={dataDetail.documentNumber}
+        headerTitle={'ยืนยันปิดงานเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
     </div>
