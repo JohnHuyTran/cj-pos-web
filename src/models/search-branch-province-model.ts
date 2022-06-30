@@ -7,6 +7,13 @@ export interface ListBranches {
   provinces: Object[];
 }
 
+export interface ListAllBranches {
+  branches: Object[];
+  provinces: Object[];
+  excludeBranches: Object[];
+  excludeProvinces: Object[];
+}
+
 export interface Payload {
   name: string;
   province: string;
