@@ -53,7 +53,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
           unitCode: item.detail.unitCode || '',
           barFactor: item.detail.barFactor || 0,
           numberOfDiscounted: item.total || 0,
-          numberOfApproved: 0,
+          numberOfRequested: 0,
         };
       });
       setProductDiscountListHandle(rows);
@@ -67,7 +67,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
     let dataTableHandle = _.cloneDeep(dataTableFilter);
     if (dataTableHandle && dataTableHandle.length > 0) {
       for (const item of dataTableHandle) {
-        item.numberOfApproved = 0;
+        item.numberOfRequested = 0;
       }
     }
     setDataTable(dataTableHandle);
@@ -99,7 +99,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
       const data = [...preData];
       let currentData = data.find((it: any) => it.barcode === barcode);
       if (!objectNullOrEmpty(currentData)) {
-        currentData.numberOfApproved = currentValue
+        currentData.numberOfRequested = currentValue
           ? parseInt(currentValue.replace(/,/g, '')) < 10000000000
             ? parseInt(currentValue.replace(/,/g, ''))
             : 0
@@ -125,10 +125,10 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
           if (objectNullOrEmpty(dataObj)) {
             showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
           } else {
-            if (dataObj.numberOfApproved === dataObj.numberOfDiscounted) {
+            if (dataObj.numberOfRequested === dataObj.numberOfDiscounted) {
               showModalError('จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก');
             } else {
-              dataObj.numberOfApproved = dataObj.numberOfApproved + 1;
+              dataObj.numberOfRequested = dataObj.numberOfRequested + 1;
               setDataTable(dataTableHandle);
             }
           }
@@ -198,7 +198,7 @@ export const ModalAddProductToDestroyDiscount = ({ open, onClose }: Props) => {
       },
     },
     {
-      field: 'numberOfApproved',
+      field: 'numberOfRequested',
       headerName: 'จำนวนทำลายจริง',
       flex: 1,
       headerAlign: 'center',

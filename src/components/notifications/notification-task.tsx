@@ -140,7 +140,7 @@ export default function NotificationTask(props: Props) {
           }
         }
       } else if (item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE') {
-        const rs = await dispatch(getBarcodeDiscountDetail(item.payload._id));
+        const rs = await dispatch(getBarcodeDiscountDetail(item.payload.documentNumber));
         if (!!rs.payload) {
           setOpenBDDetail(true);
         } else {
