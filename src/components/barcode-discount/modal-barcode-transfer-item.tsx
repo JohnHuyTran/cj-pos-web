@@ -350,13 +350,13 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'barcodeName',
       headerName: 'รายละเอียดสินค้า',
-      minWidth: 250,
+      minWidth: 260,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2" style={{ wordBreak: 'break-word' }}>{params.value}</Typography>
+          <Typography variant="body2">{params.value}</Typography>
           <Typography color="textSecondary" sx={{ fontSize: 12 }}>
             {params.getValue(params.id, 'skuCode') || ''}
           </Typography>
@@ -403,7 +403,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'discount',
       headerName: typeDiscount === 'percent' ? 'ยอดลด * (%)' : 'ยอดลด * (บาท)',
-      minWidth: 150,
+      minWidth: 140,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -705,7 +705,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           disableColumnMenu
           autoHeight={dtTable.length < 8}
           scrollbarSize={10}
-          rowHeight={70}
+          rowHeight={85}
           components={{
             NoRowsOverlay: () => (
               <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
