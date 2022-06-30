@@ -450,6 +450,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         const itemsCopyMap: any = [];
         itemsCopy.map((data: any) => {
           const sku = value.data.filter((r: any) => r.skuCode === data.skuCode);
+          const diff = Number(data.orderQty) - Number(data.actualQty);
           const item: any = {
             skuCode: data.skuCode,
             barcode: data.barcode,
@@ -457,7 +458,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             unitCode: data.unitCode,
             unitName: data.unitName,
             baseUnit: data.barFactor,
-            qty: data.orderQtyDiff,
+            qty: diff ? diff : 0,
             stockMax: sku[0].stockMax ? sku[0].stockMax : data.orderMaxQty,
           };
           itemsCopyMap.push(item);
@@ -469,6 +470,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       .catch((error: ApiError) => {
         const itemsCopyMap: any = [];
         itemsCopy.map((data: any) => {
+          const diff = Number(data.orderQty) - Number(data.actualQty);
           const item: any = {
             skuCode: data.skuCode,
             barcode: data.barcode,
@@ -476,7 +478,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             unitCode: data.unitCode,
             unitName: data.unitName,
             baseUnit: data.barFactor,
-            qty: data.orderQty,
+            qty: diff ? diff : 0,
             stockMax: data.orderMaxQty,
           };
           itemsCopyMap.push(item);
