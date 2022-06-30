@@ -157,13 +157,15 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   if (Object.keys(payloadAddItem).length !== 0) {
     rows = payloadAddItem.map((item: any, index: number) => {
+      let qty = item.qty ? item.qty : 1;
+      if (item.qty > item.stockMax) qty = item.stockMax;
       return {
         id: index,
         index: index + 1,
         skuCode: item.skuCode,
         barcode: item.barcode,
         barcodeName: item.barcodeName,
-        qty: item.qty ? item.qty : 1,
+        qty: qty,
         stockMax: item.stockMax,
         unitName: item.unitName,
         editMode: isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE),
