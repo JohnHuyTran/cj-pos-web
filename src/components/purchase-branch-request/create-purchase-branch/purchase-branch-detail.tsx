@@ -457,7 +457,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             unitCode: data.unitCode,
             unitName: data.unitName,
             baseUnit: data.barFactor,
-            qty: data.orderQty,
+            qty: data.orderQtyDiff,
             stockMax: sku[0].stockMax ? sku[0].stockMax : data.orderMaxQty,
           };
           itemsCopyMap.push(item);
@@ -488,7 +488,10 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
 
     handleOpenCopyModal();
     // handleClose();
-    setOpenLoadingModal(false);
+
+    setTimeout(() => {
+      setOpenLoadingModal(false);
+    }, 300);
   };
 
   // Mock Case Await Sap
