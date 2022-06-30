@@ -132,15 +132,6 @@ export default function SupplierCheckOrderSearch() {
     setEndDate(value);
   };
 
-  const handleChangeReasons = (ReasonsCode: string) => {
-    if (ReasonsCode !== null) {
-      let codes = JSON.stringify(ReasonsCode);
-      setValues({ ...values, transferReason: JSON.parse(codes) });
-    } else {
-      setValues({ ...values, transferReason: '' });
-    }
-  };
-
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
   const onClickValidateForm = () => {
@@ -345,13 +336,6 @@ export default function SupplierCheckOrderSearch() {
               </Select>
             </FormControl>
           </Grid>
-
-          {/* <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-              สาเหตุการโอน
-            </Typography>
-            <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
-          </Grid> */}
 
           <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
             <Button

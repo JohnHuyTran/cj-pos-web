@@ -16796,6 +16796,18 @@ export const mockDataBtDetailDraftNoUpdate = {
 };
 
 export const mockDataBtDetailDraft = {
+  authorizedhBranchSlice: {
+    branchList: {
+      timestamp: '2022-06-30T04:06:41.148+0000',
+      ref: '62bd2151f21fcbb746223d07',
+      code: 20000,
+      message: 'success',
+      data: {
+        branches: [],
+      },
+    },
+    error: '',
+  },
   branchTransferDetailSlice: {
     branchTransferRs: {
       timestamp: '2022-06-16T03:53:46.509+0000',
@@ -18126,6 +18138,18 @@ export const mockDataBtDetailItemEmpty = {
 };
 
 export const mockDataBtDetailDataEmpty = {
+  authorizedhBranchSlice: {
+    branchList: {
+      timestamp: '2022-06-30T04:06:41.148+0000',
+      ref: '62bd2151f21fcbb746223d07',
+      code: 20000,
+      message: 'success',
+      data: {
+        branches: [],
+      },
+    },
+    error: '',
+  },
   branchTransferDetailSlice: {
     branchTransferRs: {
       timestamp: '2022-06-16T03:53:46.509+0000',
@@ -18236,6 +18260,145 @@ export const mockDataBtDetailDataEmpty = {
       perPage: 10,
       next: 2,
       totalPage: 2,
+    },
+    error: '',
+  },
+  saveSearchStock: {
+    searchStockTransfer: {
+      limit: '10',
+      page: '1',
+      docNo: '',
+      branchFrom: '0101',
+      branchTo: '',
+      dateFrom: '2022-05-31T17:00:00.000Z',
+      dateTo: '2022-06-16T16:59:59.999Z',
+      statuses: 'CREATED',
+      transferReason: '',
+      clearSearch: false,
+    },
+  },
+  uploadFileSlice: {
+    state: [],
+  },
+  searchAllItemsList: {
+    itemList: {
+      timestamp: '',
+      ref: '',
+      code: 0,
+      message: '',
+      error_details: '',
+      data: [],
+    },
+  },
+  addItems: {
+    state: [],
+  },
+};
+
+export const mockDataBtSearchDataEmpty = {
+  authorizedhBranchSlice: {
+    branchList: {
+      timestamp: '2022-06-30T04:06:41.148+0000',
+      ref: '62bd2151f21fcbb746223d07',
+      code: 20000,
+      message: 'success',
+      data: {
+        branches: [],
+      },
+    },
+    error: '',
+  },
+  branchTransferDetailSlice: {
+    branchTransferRs: {
+      timestamp: '2022-06-16T03:53:46.509+0000',
+      ref: '62aaa94a74ff70ef36f03025',
+      code: 20000,
+      message: 'success',
+      data: {},
+    },
+    error: '',
+  },
+  transferReasonsList: {
+    reasonsList: {
+      timestamp: '2022-06-16T02:57:52.403+0000',
+      ref: '62aa9c30eb97e9c141e88f49',
+      code: 20000,
+      message: 'success',
+      data: [
+        {
+          id: '61dbd0f31a241f241c4ad729',
+          code: '1',
+          name: 'โอนสินค้าตามรอบ',
+        },
+        {
+          id: '61dbd0f31a241f241c4ad72a',
+          code: '2',
+          name: 'โอนสินค้าคืน DC',
+        },
+        {
+          id: '61dbd0f31a241f241c4ad72b',
+          code: '3',
+          name: 'โอนสินค้าเนื่องจาก Event',
+        },
+        {
+          id: '61dbd0f31a241f241c4ad72c',
+          code: '4',
+          name: 'โอนสินค้าเนื่องจากยกเลิกการขาย',
+        },
+      ],
+    },
+    error: '',
+  },
+  searchBranchSlice: {
+    branchList: {
+      ref: '62aa9bf7573d5f20455eb5a6',
+      code: 20000,
+      message: 'success',
+      data: [
+        {
+          id: '61dffd799bfc3701dce4f0f5',
+          name: 'CJค้าส่งบ้านเลือก',
+          province: {
+            code: 0,
+            name: '',
+          },
+          code: 'B004',
+          isDC: false,
+        },
+        {
+          id: '61dffd799bfc3701dce4f0fa',
+          name: 'Nineti9(Online)',
+          province: {
+            code: 0,
+            name: '',
+          },
+          code: 'B009',
+          isDC: false,
+        },
+        {
+          id: '61dffd799bfc3701dce4f287',
+          name: 'สาขาที่00253 ตลาดโพธาราม',
+          province: {
+            code: 52,
+            name: 'ราชบุรี',
+          },
+          code: '0239',
+          isDC: false,
+        },
+      ],
+    },
+  },
+  searchStockTransfer: {
+    orderList: {
+      timestamp: '2022-06-16T03:52:14.949+0000',
+      ref: '62aaa8ee74ff70ef36f03021',
+      code: 20000,
+      message: 'success',
+      data: [],
+      total: 0,
+      page: 1,
+      next: 0,
+      totalPage: 0,
     },
     error: '',
   },
