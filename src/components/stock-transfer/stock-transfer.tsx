@@ -242,8 +242,8 @@ export default function SupplierCheckOrderSearch() {
       orderListData = <StockTransferList />;
     } else {
       orderListData = (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
+        <Grid item container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB'>
             <h2>
               {/* ไม่มีข้อมูล <SearchOff fontSize='large' /> */}
               ไม่มีข้อมูล
@@ -259,22 +259,23 @@ export default function SupplierCheckOrderSearch() {
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {t('documentSearch')}
             </Typography>
             <TextField
-              id="txtDocNo"
-              name="docNo"
-              size="small"
+              data-testid='testid-txtDocNo'
+              id='txtDocNo'
+              name='docNo'
+              size='small'
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่เอกสาร BT, RT"
+              placeholder='เลขที่เอกสาร BT, RT'
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาขาต้นทาง
             </Typography>
             <BranchListDropDown
@@ -287,7 +288,7 @@ export default function SupplierCheckOrderSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาขาปลายทาง
             </Typography>
             <BranchListDropDown
@@ -300,16 +301,16 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่โอน
             </Typography>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ตั้งแต่*
             </Typography>
             <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
               ถึง*
             </Typography>
             <DatePickerAllComponent
@@ -321,17 +322,16 @@ export default function SupplierCheckOrderSearch() {
           </Grid>
 
           <Grid item xs={4} container>
-            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
               สถานะ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selPiType"
-                name="statuses"
+                id='selPiType'
+                name='statuses'
                 value={values.statuses}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -353,48 +353,32 @@ export default function SupplierCheckOrderSearch() {
             <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={clearBranchDropDown} />
           </Grid> */}
 
-          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
             <Button
-              id="btnClear"
-              variant="contained"
+              data-testid='testid-btnClear'
+              id='btnClear'
+              variant='contained'
               onClick={onClickClearBtn}
               sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
-              color="cancelColor"
-            >
+              color='cancelColor'>
               เคลียร์
             </Button>
             <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
+              data-testid='testid-btnSearch'
+              id='btnSearch'
+              variant='contained'
+              color='primary'
               onClick={onClickValidateForm}
               sx={{ width: '13%', ml: 2, display: `${disableSearchBtn ? 'none' : ''}` }}
               // sx={{ width: '13%', ml: 2 }}
-              className={classes.MbtnSearch}
-            >
+              className={classes.MbtnSearch}>
               ค้นหา
             </Button>
           </Grid>
         </Grid>
 
         <Box mt={2}></Box>
-
-        {/* <hr />
-
-        <Box mt={2}>
-          <Button
-            id="btnSearch"
-            variant="contained"
-            color="primary"
-            // onClick={}
-            sx={{ width: '13%', ml: 2 }}
-            className={classes.MbtnSearch}
-            disabled
-          >
-            ส่งงาน
-          </Button>
-        </Box> */}
       </Box>
 
       <Box mt={6}></Box>
