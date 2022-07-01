@@ -572,7 +572,6 @@ export default function CheckOrderDetail({
   };
 
   const handleShowSnackBar = async (issuccess: boolean, error: ApiError) => {
-    console.log('error: ', error);
     handleOpenLoading('open', true);
     if (issuccess) {
       setShowSnackBar(true);
