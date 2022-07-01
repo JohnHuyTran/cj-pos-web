@@ -137,7 +137,7 @@ export default function NotificationReminder(props: Props) {
           }
         }
       } else if (item.type === 'REJECT_BARCODE') {
-        const rs = await dispatch(getBarcodeDiscountDetail(item.payload._id));
+        const rs = await dispatch(getBarcodeDiscountDetail(item.payload.documentNumber));
         if (!!rs.payload) {
           setOpenBDDetail(true);
         } else {

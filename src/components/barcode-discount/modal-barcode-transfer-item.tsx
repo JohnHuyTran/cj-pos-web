@@ -329,7 +329,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'index',
       headerName: 'ลำดับ',
-      minWidth: 60,
+      width: 70,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -342,7 +342,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'barCode',
       headerName: 'บาร์โค้ด',
-      minWidth: 122,
+      minWidth: 125,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -356,7 +356,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2">{params.value}</Typography>
+          <Typography variant="body2" style={{ wordBreak: 'break-word' }}>{params.value}</Typography>
           <Typography color="textSecondary" sx={{ fontSize: 12 }}>
             {params.getValue(params.id, 'skuCode') || ''}
           </Typography>
@@ -366,7 +366,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'unit',
       headerName: 'หน่วย',
-      minWidth: 60,
+      width: 70,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -374,7 +374,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'price',
       headerName: 'ราคาปกติ',
-      minWidth: 60,
+      minWidth: 70,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
