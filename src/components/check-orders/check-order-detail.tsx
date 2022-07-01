@@ -39,7 +39,7 @@ import {
   ShipmentDetailInfo,
 } from '../../models/order-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { ApiError } from '../../models/api-error-model';
+import { ApiError, ErrorDetail, ErrorDetailResponse, Header } from '../../models/api-error-model';
 import AlertError from '../commons/ui/alert-error';
 import { BookmarkAdded, CheckCircleOutline, HighlightOff, Print } from '@mui/icons-material';
 import LoadingModal from '../commons/ui/loading-modal';
@@ -66,6 +66,8 @@ import OrderReceiveDetail from './order-receive-detail';
 import { searchToteAsync } from '../../store/slices/search-tote-slice';
 import { featchOrderDetailToteAsync } from '../../store/slices/check-order-detail-tote-slice';
 import _ from 'lodash';
+import { isErrorCode } from '../../utils/exception/pos-exception';
+import { ToteItem } from '../../models/tote-model';
 
 interface loadingModalState {
   open: boolean;
@@ -184,7 +186,7 @@ export default function CheckOrderDetail({
   const [statusOC, setStatusOC] = React.useState(false);
   const DCPercent = env.dc.percent;
   const [isAllowExportBtn, setIsAllowExportBtn] = React.useState(true);
-
+  const [payloadError, setPayloadError] = React.useState<ErrorDetailResponse | null>();
   const orderComment = orderDetail.docRefRemark;
   let findIndexStr = false;
   if (orderComment) {
@@ -503,6 +505,34 @@ export default function CheckOrderDetail({
       .catch((error: ApiError) => {
         setOpenFailAlert(true);
         setTextFail(error.message);
+
+        let errorList: ErrorDetail[] = [];
+        setPayloadError(null);
+        if (error.data) {
+          const datas: ToteItem[] = error.data;
+          datas.forEach((item: ToteItem) => {
+            if (isErrorCode(item.code)) {
+              const _err: ErrorDetail = {
+                toteCode: item.toteCode,
+                description: item.message,
+              };
+              errorList.push(_err);
+            }
+          });
+
+          const header: Header = {
+            field1: false,
+            field2: true,
+            field3: true,
+            field4: false,
+          };
+          const payload: ErrorDetailResponse = {
+            header: header,
+            error_details: errorList,
+          };
+          setTextFail('ไม่สามารถใช้ เลข Tote ดังต่อไปนี้ได้');
+          setPayloadError(payload);
+        }
       });
   };
 
@@ -541,20 +571,58 @@ export default function CheckOrderDetail({
     setSnackbarStatus(false);
   };
 
-  const handleShowSnackBar = async (issuccess: boolean, errorMsg: string) => {
+  const handleShowSnackBar = async (issuccess: boolean, error: ApiError) => {
     handleOpenLoading('open', true);
-    const msg = issuccess ? 'คุณได้ทำรายการเรียบร้อยแล้ว' : errorMsg;
-    setShowSnackBar(true);
-    setContentMsg(msg);
-    setSnackbarStatus(issuccess);
-
     if (issuccess) {
-      updateShipmentOrder();
-      setTimeout(() => {
-        setOpen(false);
-        onClickClose();
-      }, 1000);
+      setShowSnackBar(true);
+      setContentMsg('คุณได้ทำรายการเรียบร้อยแล้ว');
+      setSnackbarStatus(issuccess);
+    } else {
+      let errorList: ErrorDetail[] = [];
+      setOpenFailAlert(true);
+      setTextFail(error.message);
+      setPayloadError(null);
+      if (error.error_details) {
+        const datas: ToteItem[] = error.error_details;
+        datas.forEach((item: ToteItem) => {
+          if (isErrorCode(item.code)) {
+            const _err: ErrorDetail = {
+              toteCode: item.toteCode,
+              description: item.message,
+            };
+            errorList.push(_err);
+          }
+        });
+        const header: Header = {
+          field1: false,
+          field2: true,
+          field3: true,
+          field4: false,
+        };
+        const payload: ErrorDetailResponse = {
+          header: header,
+          error_details: errorList,
+        };
+        setTextFail('ไม่สามารถใช้ เลข Tote ดังต่อไปนี้ได้');
+        setPayloadError(payload);
+      }
     }
+
+    // if (issuccess) {
+    //   const msg = 'คุณได้ทำรายการเรียบร้อยแล้ว';
+    //   setShowSnackBar(true);
+    //   setContentMsg(msg);
+    //   setSnackbarStatus(issuccess);
+
+    //   updateShipmentOrder();
+    //   setTimeout(() => {
+    //     setOpen(false);
+    //     onClickClose();
+    //   }, 1000);
+    // } else {
+    //   setOpenFailAlert(true);
+    //   setTextFail(errorMsg);
+    // }
     handleOpenLoading('open', false);
   };
 
@@ -953,7 +1021,7 @@ export default function CheckOrderDetail({
         btnPrintName="พิมพ์ใบผลต่าง"
       />
 
-      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} payload={payloadError} />
 
       <Snackbar open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={snackbarStatus} contentMsg={contentMsg} />
 

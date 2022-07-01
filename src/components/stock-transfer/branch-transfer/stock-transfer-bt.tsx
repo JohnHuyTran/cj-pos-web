@@ -592,7 +592,7 @@ function StockTransferBT({ isOpen, onClickClose }: Props) {
           if (error.data) {
             const datas: ToteItem[] = error.data;
             datas.forEach((item: ToteItem) => {
-              if (isErrorCode(item.toteCode)) {
+              if (isErrorCode(item.code)) {
                 const _err: ErrorDetail = {
                   toteCode: item.toteCode,
                   description: item.message,
