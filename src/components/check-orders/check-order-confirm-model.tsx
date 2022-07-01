@@ -113,7 +113,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
           // }, 3000);
         },
         function (error: ApiError) {
-          onUpdateShipmentStatus(false, error.message);
+          onUpdateShipmentStatus(false, error);
           onClose();
         }
       );
@@ -128,7 +128,7 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
             onClose();
           },
           function (error: ApiError) {
-            onUpdateShipmentStatus(false, error.message);
+            onUpdateShipmentStatus(false, error);
             onClose();
           }
         )
