@@ -543,17 +543,24 @@ export default function CheckOrderDetail({
 
   const handleShowSnackBar = async (issuccess: boolean, errorMsg: string) => {
     handleOpenLoading('open', true);
-    const msg = issuccess ? 'คุณได้ทำรายการเรียบร้อยแล้ว' : errorMsg;
-    setShowSnackBar(true);
-    setContentMsg(msg);
-    setSnackbarStatus(issuccess);
+    // setShowSnackBar(true);
+    // setContentMsg(msg);
+    // setSnackbarStatus(issuccess);
 
     if (issuccess) {
+      const msg = 'คุณได้ทำรายการเรียบร้อยแล้ว';
+      setShowSnackBar(true);
+      setContentMsg(msg);
+      setSnackbarStatus(issuccess);
+
       updateShipmentOrder();
       setTimeout(() => {
         setOpen(false);
         onClickClose();
       }, 1000);
+    } else {
+      setOpenFailAlert(true);
+      setTextFail(errorMsg);
     }
     handleOpenLoading('open', false);
   };
