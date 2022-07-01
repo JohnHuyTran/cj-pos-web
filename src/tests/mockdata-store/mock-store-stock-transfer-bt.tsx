@@ -16659,6 +16659,7 @@ export const mockDataBtDetailDraftNoUpdate = {
       },
     },
     error: '',
+    errorLists: [],
   },
   transferReasonsList: {
     reasonsList: {
@@ -17248,6 +17249,7 @@ export const mockDataBtDetailWaitForPickup = {
       },
     },
     error: '',
+    errorLists: [],
   },
   transferReasonsList: {
     reasonsList: {
@@ -17461,6 +17463,7 @@ export const mockDataBtDetailReadyToTransfer = {
       },
     },
     error: '',
+    errorLists: [],
   },
   transferReasonsList: {
     reasonsList: {
@@ -17746,6 +17749,7 @@ export const mockDataBtDetailTransfering = {
       },
     },
     error: '',
+    errorLists: [],
   },
   transferReasonsList: {
     reasonsList: {

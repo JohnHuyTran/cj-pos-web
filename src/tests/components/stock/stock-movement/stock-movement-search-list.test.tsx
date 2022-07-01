@@ -8,6 +8,7 @@ import { mockDataStockMovement, mockDataStockMovementMoreThen10 } from '../../..
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import StockMovementSearchList from '../../../../components/stock/stock-movement/stock-movement-search-list';
+import { act } from 'react-dom/test-utils';
 let wrapper: RenderResult<typeof import('@testing-library/dom/types/queries'), HTMLElement>;
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -67,6 +68,18 @@ describe('component stock-movement-search-list', () => {
       </Provider>
     );
 
-    await fireEvent.click(screen.getByText('BT22060101-000014'));
+    const row = container.getByText('BT22060101-000014');
+    row.focus();
+    act(() => {
+      fireEvent.keyDown(row, { key: 'Enter' });
+      fireEvent.click(row);
+    });
+
+    const row2 = container.getByText('LD20220530000003');
+    row2.focus();
+    act(() => {
+      fireEvent.keyDown(row2, { key: 'Enter' });
+      fireEvent.click(row2);
+    });
   });
 });
