@@ -7901,12 +7901,65 @@ export const mockDataStockMovement = {
   },
   branchTransferDetailSlice: {
     branchTransferRs: {
-      ref: '',
-      code: 0,
-      message: '',
-      data: null,
+      timestamp: '2022-06-16T03:53:46.509+0000',
+      ref: '62aaa94a74ff70ef36f03025',
+      code: 20000,
+      message: 'success',
+      data: {
+        id: '62aa9f61481929362cc6eb08',
+        btNo: 'BT22060101-000062',
+        rtNo: 'RT2206B005-000031',
+        branchCode: '0101',
+        startDate: '2022-06-08T17:00:00Z',
+        endDate: '2022-06-08T17:00:00Z',
+        branchFrom: '0101',
+        branchTo: 'D002',
+        itemGroups: [
+          {
+            skuCode: '000000000020001504',
+            productName: 'จอห์นสันเบบี้ออยล์125ml',
+            remainingQty: 75,
+            orderAllQty: 66,
+            actualAllQty: 0,
+          },
+        ],
+        items: [
+          {
+            seqItem: 1,
+            skuCode: '000000000020001504',
+            productName: 'จอห์นสันเบบี้ออยล์125ml',
+            barcode: '8850007060987',
+            barcodeName: 'จอห์นสันเบบี้ออยล์125ml Pack',
+            unitCode: 'PAK',
+            unitName: 'แพค',
+            barFactor: 3,
+            orderQty: 0,
+            actualQty: 0,
+          },
+        ],
+        delivery: {
+          fromDate: '0001-01-01T00:00:00Z',
+          toDate: '0001-01-01T00:00:00Z',
+        },
+        transferReason: '1',
+        status: 'CREATED',
+        auditLogs: [
+          {
+            activity: 'Created',
+            editBy: 'posscm',
+            editByName: 'posscm',
+            editDate: '2022-06-16T03:11:29.334Z',
+          },
+        ],
+        createdBy: 'posscm',
+        lastModifiedBy: 'posscm',
+        createdDate: '2022-06-16T03:11:29.334Z',
+        lastModifiedDate: '2022-06-16T03:11:29.334Z',
+        files: null,
+      },
     },
     error: '',
+    errorLists: [],
   },
   searchBranchProvince: {
     provinceList: {
@@ -16054,7 +16107,7 @@ export const mockDataStockMovement = {
   },
   masterStockMovementTypeSlice: {
     masterStockMovementType: {
-      ref: '62a85dad9704b3e9b406a003',
+      ref: '62be775fe1660a7d9d8d4a2f',
       code: 20000,
       message: 'success',
       data: [
@@ -16710,7 +16763,7 @@ export const mockDataStockMovementMoreThen10 = {
   },
   masterStockMovementTypeSlice: {
     masterStockMovementType: {
-      ref: '62a85dad9704b3e9b406a003',
+      ref: '62be775fe1660a7d9d8d4a2f',
       code: 20000,
       message: 'success',
       data: [
