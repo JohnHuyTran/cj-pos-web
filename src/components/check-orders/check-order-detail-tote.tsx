@@ -565,7 +565,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
           header: header,
           error_details: errorList,
         };
-        setTextFail('ไม่สามารถใช้ เลข Tote ดังต่อไปนี้ได้');
+        setTextFail('ไม่สามารถปรับสถานะ Tote ดังต่อไปนี้ได้');
         setPayloadError(payload);
       }
     }
