@@ -739,34 +739,35 @@ export const ModalTransferItem = (props: DataGridProps) => {
               />
             </Box>
           </Grid>
-          <Grid item xs={3}/>
-          <Grid item xs={3}>
-            <Box display="flex" justifyContent="space-between" marginTop="25px">
-              <Typography fontSize="14px" lineHeight="21px" height="24px">
-                ขอส่วนลดทั้งหมด
-                {env.currency && ` (${env.currency})`}
-              </Typography>
-              <TextField
-                disabled
-                type="text"
-                sx={{ bgcolor: '#EAEBEB' }}
-                className={classes.MtextFieldNumberNoneArrow}
-                value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
-              />
-            </Box>
-            <Box display="flex" justifyContent="space-between" marginTop="10px">
-              <Typography fontSize="14px" fontWeight="700" marginTop="6px">
-                ส่วนลดที่อนุมัติทั้งหมด
-                {env.currency && ` (${env.currency})`}
-              </Typography>
-              <TextField
-                type="text"
-                sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
-                inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
-                className={classes.MtextFieldNumberNoneArrow}
-                value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
-              />
-            </Box>
+          <Grid item xs={6} display={'flex'} justifyContent={'flex-end'}>
+            <Grid item sx={{ minWidth: '380px' }}>
+              <Box display="flex" justifyContent="space-between" marginTop="25px">
+                <Typography fontSize="14px" lineHeight="21px" height="24px" marginTop="6px">
+                  ขอส่วนลดทั้งหมด
+                  {env.currency && ` (${env.currency})`}
+                </Typography>
+                <TextField
+                  disabled
+                  type="text"
+                  sx={{ bgcolor: '#EAEBEB' }}
+                  className={classes.MtextFieldNumberNoneArrow}
+                  value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
+                />
+              </Box>
+              <Box display="flex" justifyContent="space-between" marginTop="10px">
+                <Typography fontSize="14px" fontWeight="700" marginTop="6px">
+                  ส่วนลดที่อนุมัติทั้งหมด
+                  {env.currency && ` (${env.currency})`}
+                </Typography>
+                <TextField
+                  type="text"
+                  sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
+                  inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
+                  className={classes.MtextFieldNumberNoneArrow}
+                  value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
+                />
+              </Box>
+            </Grid>
           </Grid>
         </Grid>
       </Box>
