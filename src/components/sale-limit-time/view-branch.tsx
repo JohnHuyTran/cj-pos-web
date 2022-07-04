@@ -64,12 +64,9 @@ export default function ViewBranch({ values }: Props) {
 
   return (
     <>
-      {values.appliedBranches &&
-      values.appliedBranches.branchList &&
-      values.appliedBranches.branchList.length == 1 &&
-      !values.appliedBranches.province ? (
+      {values.appliedBranches && branches.length == 1 && province.length == 0 ? (
         <Typography variant="body2">
-          {values.appliedBranches.branchList[0].code}-{values.appliedBranches.branchList[0].name}
+          {branches[0].code}-{branches[0].name}
         </Typography>
       ) : (
         <>
@@ -80,7 +77,9 @@ export default function ViewBranch({ values }: Props) {
               handleOpenModal();
             }}
           >
-            {values.isAllBranches ? 'ทุกสาขา' : 'หลายสาขา'}
+            {values.isAllBranches && excludeProvinces.length == 0 && excludeBranches.length == 0
+              ? 'ทุกสาขา'
+              : 'หลายสาขา'}
           </Button>
           <Dialog maxWidth="md" fullWidth open={open}>
             <Box sx={{ flex: 1, ml: 2 }}>
