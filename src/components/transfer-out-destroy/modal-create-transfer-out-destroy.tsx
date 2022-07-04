@@ -102,7 +102,7 @@ export default function ModalCreateTransferOutDestroy({
   const [attachFileError, setAttachFileError] = React.useState('');
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [alertTextError, setAlertTextError] = React.useState(
-    'กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง'
+    'กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'
   );
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState(
@@ -430,7 +430,7 @@ export default function ModalCreateTransferOutDestroy({
   };
 
   const handleCreateDraft = async (sendRequest: boolean) => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate(false, sendRequest)) {
       let rsCheckStock: boolean | undefined = true;
       if (TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy) {
@@ -510,7 +510,7 @@ export default function ModalCreateTransferOutDestroy({
   };
 
   const handleSendForApproval = async (id: string) => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     //validate attach file
     if (fileUploadList.length === 0 && attachFileBeforeOlds.length === 0) {
       setAttachFileError('AttachFileBefore__กรุณาแนบไฟล์เอกสาร');
@@ -538,7 +538,7 @@ export default function ModalCreateTransferOutDestroy({
   };
 
   const handleOpenModalConfirmApprove = () => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate(true, false)) {
       setOpenModalConfirmApprove(true);
     } else {
@@ -548,7 +548,7 @@ export default function ModalCreateTransferOutDestroy({
   };
 
   const handleApprove = async () => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const allAttachFile = await handleAllAttachFile(true);
       const payload = {

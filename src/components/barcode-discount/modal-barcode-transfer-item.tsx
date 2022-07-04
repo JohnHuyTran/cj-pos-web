@@ -694,10 +694,23 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const [pageSize, setPageSize] = React.useState<number>(10);
   return (
     <div>
+      <Box
+        sx={{
+          '& .row-highlight': {
+            bgcolor: '#FFFFB9',
+          },
+        }}
+      >
       <div style={{ width: '100%', height: dtTable.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
         <DataGrid
           rows={dtTable}
           columns={columns}
+          getRowClassName={(params) => {
+            if (params.row.numberOfDiscounted !== params.row.numberOfApproved) {
+              return `row-highlight`;
+            }
+            return '';
+          }}
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           rowsPerPageOptions={[10, 20, 50, 100]}
@@ -715,6 +728,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           }}
         />
       </div>
+      </Box>
       <Box display="flex" justifyContent="space-between" paddingTop="30px">
         <Grid container spacing={2} mb={2}>
           <Grid item xs={3}>

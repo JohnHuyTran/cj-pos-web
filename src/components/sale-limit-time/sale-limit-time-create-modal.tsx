@@ -438,11 +438,11 @@ function STCreateModal({
           }
         } else {
           setOpenAlert(true);
-          setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+          setTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
         }
       } catch (error) {
         setOpenAlert(true);
-        setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+        setTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
       }
     }
   };
@@ -459,11 +459,11 @@ function STCreateModal({
         if (onSearch) onSearch();
       } else {
         setOpenAlert(true);
-        setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+        setTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
       }
     } catch (error) {
       setOpenAlert(true);
-      setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+      setTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     }
   };
 
@@ -486,11 +486,11 @@ function STCreateModal({
           if (onSearch) onSearch();
         } else {
           setOpenAlert(true);
-          setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+          setTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
         }
       } catch (error) {
         setOpenAlert(true);
-        setTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+        setTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
       }
     } else {
       setOpenPopup(true);
