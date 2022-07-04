@@ -8,6 +8,8 @@ type State = {
   branchList: BranchResponse;
   totalBranches: number;
   payloadBranches: any;
+  excludeSelectBranch: any;
+  listAllBranch: any;
   error: string;
 };
 
@@ -30,6 +32,17 @@ const initialState: State = {
     appliedBranches: {
       province: [],
       branchList: [],
+    },
+    saved: false,
+  },
+  listAllBranch: [],
+  excludeSelectBranch: {
+    isAllBranches: null,
+    appliedBranches: {
+      province: [],
+      branchList: [],
+      excludedBranchList: [],
+      excludedProvinceList: [],
     },
     saved: false,
   },
@@ -79,6 +92,12 @@ const searchBranchSlice = createSlice({
     updatePayloadBranches: (state, action: PayloadAction<any>) => {
       state.payloadBranches = action.payload;
     },
+    updateExcludeSelectBranches: (state, action: PayloadAction<any>) => {
+      state.excludeSelectBranch = action.payload;
+    },
+    setListAllBranch: (state, action: PayloadAction<any>) => {
+      state.listAllBranch = action.payload;
+    },
   },
   extraReducers: (builer) => {
     builer.addCase(fetchProvinceListAsync.pending, () => {
@@ -110,5 +129,5 @@ const searchBranchSlice = createSlice({
       });
   },
 });
-export const { updatePayloadBranches } = searchBranchSlice.actions;
+export const { updatePayloadBranches, updateExcludeSelectBranches, setListAllBranch } = searchBranchSlice.actions;
 export default searchBranchSlice.reducer;

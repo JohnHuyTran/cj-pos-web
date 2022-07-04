@@ -622,6 +622,33 @@ const useStyles = makeStyles({
       },
     },
   },
+  MWrapperListBranchForm: {
+    border: '1px solid #C1C1C1',
+    borderRadius: '10px',
+    padding: '15px 13px',
+    minHeight: '100px',
+    maxHeight: '165px',
+    overflow: 'auto',
+    '& .wrapper-item': {
+      border: '1px solid #AEAEAE',
+      boxSizing: 'border-box',
+      borderRadius: '5px',
+      background: '#EAEBEB',
+      color: '#C1C1C1',
+      marginRight: '10px',
+      marginBottom: '10px',
+      padding: '0px 9px',
+      fontSize: '14px',
+      height: '28px',
+      display: 'flex',
+      alignItems: 'center',
+      '& svg': {
+        cursor: 'pointer',
+        fontSize: '14px',
+        marginLeft: '5px',
+      },
+    },
+  },
   MScrollBar: {
     '&::-webkit-scrollbar': {
       width: '4px',

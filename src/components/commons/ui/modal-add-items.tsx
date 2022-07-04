@@ -57,8 +57,13 @@ const columns: GridColDef[] = [
     headerName: 'รายละเอียด',
     headerAlign: 'center',
     minWidth: 200,
-    flex: 2,
+    flex: 2.25,
     sortable: false,
+    renderCell: (params) => (
+      <div>
+        <Typography variant="body2" sx={{wordBreak: 'break-word'}}>{params.value}</Typography>
+      </div>
+    ),
   },
   {
     field: 'unitName',
@@ -419,6 +424,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
                   autoHeight
                   onCellClick={currentlyDelete}
                   onCellOut={handleEditItems}
+                  rowHeight={70}
                 />
               </div>
             </Box>
