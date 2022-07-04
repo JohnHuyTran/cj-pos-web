@@ -3,8 +3,8 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
 import {
-  Button,
-  Grid,
+  Button, FormControl,
+  Grid, MenuItem, Select,
   TextField,
   Typography,
 } from '@mui/material';
@@ -32,6 +32,7 @@ import HtmlTooltip from '../commons/ui/html-tooltip';
 import { updateBarcodeDiscountPrintState, updatePrintInDetail } from "../../store/slices/barcode-discount-print-slice";
 import { env } from '../../adapters/environmentConfigs';
 import ModelConfirmDeleteProduct from "../commons/ui/modal-confirm-delete-product";
+import { getPercentages } from "../../services/common";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -55,6 +56,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const errorList = useAppSelector((state) => state.barcodeDiscount.errorList);
 
   const [dtTable, setDtTable] = React.useState<Array<DiscountDetail>>([]);
+  const [percentages, setPercentages] = React.useState([]);
   const [sumOfDiscount, updateSumOfDiscount] = React.useState<number>(0);
   const [sumOfApprovedDiscount, updateSumOfApprovedDiscount] = React.useState<number>(0);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
@@ -164,6 +166,19 @@ export const ModalTransferItem = (props: DataGridProps) => {
     }
   }, [dtTable]);
 
+  useEffect(() => {
+    if (typeDiscount === 'percent') {
+      handleGetPercentages();
+    }
+  }, [typeDiscount]);
+
+  const handleGetPercentages = async () => {
+    let res: any = await getPercentages();
+    if (res && res.data && res.data.length > 0) {
+      setPercentages(res.data);
+    }
+  }
+
   const handleClosePopup = () => {
     setOpenPopupModal(false);
   };
@@ -171,7 +186,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
   const handleChangeDiscount = (event: any, index: number, errorIndex: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      const value = event.target.value.replace(/[^0-9.]/g, '').replace(/,/g, '');
+      const value = event.target.value;
       data[index - 1].discount = value || 0;
 
       if (typeDiscount === 'percent') {
@@ -411,26 +426,49 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const index =
           errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
         const condition = index !== -1 && !!errorList[index].errorDiscount;
-        return (
-          <div className={classes.MLabelTooltipWrapper}>
-            <NumberFormat
-              customInput={TextField}
-              variant="outlined"
-              className={condition ? classes.MtextFieldNumberError : classes.MtextFieldNumber}
-              style={{ borderColor: 'red' }}
-              thousandSeparator={true}
-              decimalScale={2}
-              onChange={(e: any) => {
-                handleChangeDiscount(e, params.row.index, index);
-              }}
-              fixedDecimalScale
-              value={String(params.value)}
-              disabled={dataDetail.status > 1}
-              autoComplete="off"
-            />
-            {condition && <div className="title">{errorList[index].errorDiscount}</div>}
-          </div>
-        );
+        return typeDiscount === 'percent' ?
+          (
+            <FormControl fullWidth className={classes.Mselect}>
+              <Select
+                id='discountPercent'
+                name='discountPercent'
+                value={params.value}
+                onChange={(e: any) => {
+                  handleChangeDiscount(e, params.row.index, index);
+                }}
+                className={classes.MSelected}
+                inputProps={{ 'aria-label': 'Without label' }}>
+                {percentages && percentages.length > 0 && percentages.map((item: any) => {
+                  return (
+                    <MenuItem key={item.value} value={item.value}>
+                      <span style={{ width: '100%', textAlign: 'right' }}>{item.code}</span>
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          )
+          :
+          (
+            <div className={classes.MLabelTooltipWrapper}>
+              <NumberFormat
+                customInput={TextField}
+                variant="outlined"
+                className={condition ? classes.MtextFieldNumberError : classes.MtextFieldNumber}
+                style={{ borderColor: 'red' }}
+                thousandSeparator={true}
+                decimalScale={2}
+                onChange={(e: any) => {
+                  handleChangeDiscount(e, params.row.index, index);
+                }}
+                fixedDecimalScale
+                value={String(params.value)}
+                disabled={dataDetail.status > 1}
+                autoComplete="off"
+              />
+              {condition && <div className="title">{errorList[index].errorDiscount}</div>}
+            </div>
+          );
       },
     },
     {
@@ -508,7 +546,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'numberOfDiscounted',
       headerName: 'จำนวนที่ขอลด *',
-      minWidth: 125,
+      minWidth: 130,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -524,9 +562,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
               error={condition}
-              type="text"
+              type='number'
               inputProps={{ maxLength: 13 }}
-              value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
+              value={stringNullOrEmpty(params.value) ? '' : params.value}
               className={classes.MtextFieldNumber}
               // inputProps={{ min: 0 }}
               onChange={(e) => {
@@ -542,7 +580,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'numberOfApproved',
       headerName: 'จำนวนที่อนุมัติ',
-      minWidth: 125,
+      minWidth: 130,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -558,10 +596,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
               error={condition}
-              type="text"
+              type='number'
               inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
-              value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
+              value={stringNullOrEmpty(params.value) ? '' : params.value}
               disabled={!approvePermission || dataDetail.status > Number(BDStatus.WAIT_FOR_APPROVAL)
                 || (approvePermission && dataDetail.status < Number(BDStatus.WAIT_FOR_APPROVAL))}
               onChange={(e) => {

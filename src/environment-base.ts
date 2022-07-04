@@ -423,6 +423,9 @@ export const environment = {
         url: '/master/stock-movement-types',
       },
     },
+    percentages: {
+      url: 'master/branch-config/get-percentages',
+    }
   },
   authority: {
     authorizedBranch: {
