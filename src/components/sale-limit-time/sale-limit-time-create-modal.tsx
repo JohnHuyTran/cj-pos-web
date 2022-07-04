@@ -26,7 +26,7 @@ import STProductItems from './ST-product-item';
 // import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
 import ModalAddTypeProducts from '../commons/ui/modal-add-type-products';
 import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
-import { fetchTotalBranch, updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
+import { fetchTotalBranch, updateExcludeSelectBranches, updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
 import TextBoxComment from '../commons/ui/textbox-comment';
 import { cancelST, getStartSaleLimitTime, saveDraftST, importST } from '../../services/sale-limit-time';
 import { DateFormat } from '../../utils/enum/common-enum';
@@ -39,6 +39,7 @@ import ModalConfirmCopy from './modalConfirmCopy';
 import { getAllProductByType } from '../../services/common';
 import { styled } from '@mui/material/styles';
 import ModalValidateImport from './modal-validate-import';
+import SelectExcludeBranch from '../commons/ui/modal-select-exclude-branch';
 interface State {
   description: string;
   startDate: any | Date | number | string;
@@ -101,7 +102,7 @@ function STCreateModal({
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
-  const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
+  const payloadBranches = useAppSelector((state) => state.searchBranchProvince.excludeSelectBranch);
   const payLoadSt = useAppSelector((state) => state.saleLimitTime.state);
   const checkEdit = useAppSelector((state) => state.saleLimitTime.checkEdit);
   const [values, setValues] = React.useState<State>({
@@ -191,7 +192,7 @@ function STCreateModal({
       dispatch(updateAddTypeAndProductState(listProducts.concat(listCategories)));
       dispatch(fetchTotalBranch());
       dispatch(
-        updatePayloadBranches({
+        updateExcludeSelectBranches({
           isAllBranches: saleLimitTimeDetail.stDetail.isAllBranches,
           appliedBranches: {
             province: saleLimitTimeDetail.stDetail.appliedBranches.province
@@ -200,6 +201,12 @@ function STCreateModal({
             branchList: saleLimitTimeDetail.stDetail.appliedBranches.branchList
               ? saleLimitTimeDetail.stDetail.appliedBranches.branchList
               : [],
+            excludedBranchList: saleLimitTimeDetail.stDetail.appliedBranches.excludedBranchList
+            ? saleLimitTimeDetail.stDetail.appliedBranches.excludedBranchList
+            : [],
+            excludedProvinceList: saleLimitTimeDetail.stDetail.appliedBranches.excludedProvinceList
+            ? saleLimitTimeDetail.stDetail.appliedBranches.excludedProvinceList
+            : [],
           },
           saved: true,
         })
@@ -250,6 +257,16 @@ function STCreateModal({
     dispatch(updatesaleLimitTimeState({}));
     dispatch(updateAddTypeAndProductState([]));
     dispatch(setProductList('รายการสินค้าทั้งหมด'));
+    dispatch(updateExcludeSelectBranches({
+      isAllBranches: null,
+      appliedBranches: {
+        branchList: [],
+        province: [],
+        excludedBranchList: [],
+        excludedProvinceList: [],
+      },
+      saved: false,
+    }))
   };
   const handleClose = async () => {
     setOpen(false);
@@ -760,7 +777,7 @@ function STCreateModal({
               สาขา<b style={{ fontSize: '18px' }}> *</b> :
             </Grid>
             <Grid item xs={3}>
-              <SearchBranch disabled={status > 1 || !isAdmin} error={checkValue.payloadBranchesError} />
+              <SelectExcludeBranch disabled={status > 1 || !isAdmin} error={checkValue.payloadBranchesError} />
               {checkValue.payloadBranchesError && (
                 <Box textAlign='right' color='#F54949'>
                   กรุณาระบุรายละเอียด

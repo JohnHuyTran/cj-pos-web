@@ -31,10 +31,11 @@ interface ItemProps {
 export default function ViewBranch({ values }: Props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState<boolean>(false);
-  const allBranch = values.isAllBranches;
-  const options: any[] = [];
+  const allBranches = values.isAllBranches;
   const branches = values.appliedBranches.branchList || [];
-  const provinces = values.appliedBranches.province || [];
+  const province = values.appliedBranches.province || [];
+  const excludeBranches = values.appliedBranches.excludedBranchList || [];
+  const excludeProvinces = values.appliedBranches.excludedProvinceList || [];
   const totalBranches = useAppSelector((state) => state.searchBranchProvince.totalBranches);
   const { t } = useTranslation(['common']);
   const dispatch = useAppDispatch();
@@ -81,7 +82,7 @@ export default function ViewBranch({ values }: Props) {
           >
             {values.isAllBranches ? 'ทุกสาขา' : 'หลายสาขา'}
           </Button>
-          <Dialog maxWidth="lg" fullWidth open={open}>
+          <Dialog maxWidth="md" fullWidth open={open}>
             <Box sx={{ flex: 1, ml: 2 }}>
               {handleCloseModal ? (
                 <IconButton
@@ -92,120 +93,243 @@ export default function ViewBranch({ values }: Props) {
                     top: 8,
                     color: (theme: any) => theme.palette.grey[400],
                   }}
+                  data-testid="iconCloseModal"
                 >
                   <CancelOutlinedIcon fontSize="large" stroke={'white'} strokeWidth={1} />
                 </IconButton>
               ) : null}
             </Box>
-            <DialogContent sx={{ padding: '45px 24px 32px 100px' }}>
-              <Grid container spacing={2}>
-                <Grid item xs={5} pr={4}>
-                  <FormControl sx={{ marginBottom: '15px' }}>
-                    <RadioGroup
-                      aria-labelledby="branch-radio-buttons-group-label"
-                      value={allBranch}
-                      name="radio-buttons-group"
-                    >
-                      <FormControlLabel
-                        value={true}
-                        control={<Radio />}
-                        label={`เลือกสาขาทั้งหมด  สาขา)`}
-                        disabled={true}
-                      />
-                      <FormControlLabel disabled={true} value={false} control={<Radio />} label="เลือกสาขาเอง" />
-                    </RadioGroup>
-                  </FormControl>
-                  {!allBranch && (
-                    <Box>
-                      <Box mb={1}>
-                        <Typography gutterBottom variant="subtitle1" component="div">
-                          จังหวัด
-                        </Typography>
-                        <Autocomplete
-                          options={options}
-                          id="combo-box-province"
-                          popupIcon={<SearchIcon color="primary" />}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              FormHelperTextProps={{
-                                style: {
-                                  textAlign: 'right',
-                                  marginRight: 0,
-                                },
-                              }}
-                            />
-                          )}
-                          size="small"
-                          disabled={true}
-                          className={classes.MSearchBranch}
-                        />
-                      </Box>
-                      <Box sx={{ marginBottom: '20px' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Typography gutterBottom variant="subtitle1" component="div" mr={3}>
-                            ค้นหาสาขา
-                          </Typography>
-                          <FormGroup>
-                            <FormControlLabel
+            <DialogContent sx={{ padding: '45px 24px 32px 60px', minHeight: '438px' }}>
+              <FormControl sx={{ marginBottom: '5px' }}>
+                <RadioGroup
+                  aria-labelledby="branch-radio-buttons-group-label"
+                  value={allBranches}
+                  name="radio-buttons-group"
+                >
+                  <FormControlLabel
+                    value={true}
+                    control={<Radio />}
+                    label={`เลือกสาขาทั้งหมด (${totalBranches} สาขา)`}
+                    disabled={true}
+                  />
+                  <FormControlLabel disabled={true} value={false} control={<Radio />} label="เลือกสาขาเอง" />
+                </RadioGroup>
+              </FormControl>
+              <Grid container spacing={1} mb={7}>
+                {allBranches != null && (
+                  <>
+                    <Grid item xs={12} pr={1} mb={0.5}>
+                      <Typography fontWeight={400} color={'#000000'}>
+                        สาขาที่เลือก
+                      </Typography>
+                    </Grid>
+                    {!allBranches && (
+                      <>
+                        <Grid item xs={12} display={'flex'}>
+                          <Box width={'37%'}>
+                            <Autocomplete
+                              options={[]}
+                              id="combo-box-province"
+                              popupIcon={<SearchIcon color="primary" />}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  FormHelperTextProps={{
+                                    style: {
+                                      textAlign: 'right',
+                                      marginRight: 0,
+                                    },
+                                  }}
+                                  className={classes.MtextField}
+                                  placeholder="ค้นหาจังหวัด"
+                                />
+                              )}
+                              size="small"
                               disabled={true}
-                              control={<Checkbox checked={false} />}
-                              label="เลือกสาขาทั้งหมด"
+                              className={classes.MSearchBranch}
+                              getOptionLabel={(option) => option.name}
+                              value={province}
+                              fullWidth
                             />
-                          </FormGroup>
-                        </Box>
-                        <Autocomplete
-                          options={options}
-                          id="combo-box-branch"
-                          popupIcon={<SearchIcon color="primary" />}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              FormHelperTextProps={{
-                                style: {
-                                  textAlign: 'right',
-                                  marginRight: 0,
-                                },
-                              }}
+                          </Box>
+
+                          <Box width={'37%'} ml={2}>
+                            <Autocomplete
+                              options={[]}
+                              id="combo-box-branch"
+                              popupIcon={<SearchIcon color="primary" />}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  className={classes.MtextField}
+                                  FormHelperTextProps={{
+                                    style: {
+                                      textAlign: 'right',
+                                      marginRight: 0,
+                                    },
+                                  }}
+                                  placeholder="ค้นหาสาขา"
+                                />
+                              )}
+                              size="small"
+                              className={classes.MSearchBranch}
+                              disabled={true}
+                              fullWidth
                             />
-                          )}
-                          size="small"
-                          className={classes.MSearchBranch}
-                          disabled={true}
-                        />
-                      </Box>
-                      <Box sx={{ textAlign: 'right' }}>
-                        <Button variant="contained" color="primary" className={classes.MbtnSearch} disabled={true}>
-                          {t('button.add')}
-                        </Button>
-                      </Box>
-                    </Box>
-                  )}
-                </Grid>
-                <Grid item xs={7} pr={5} mt={5}>
-                  <Box className={classes.MWrapperListBranch}>
-                    {allBranch ? (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                        <BranchItem label={`สาขาทั้งหมด (${totalBranches} สาขา)`} />
-                      </Box>
-                    ) : (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                        {provinces.map((item: any, index: number) => (
-                          <BranchItem label={`สาขาจังหวัด${item.name}`} key={index} />
-                        ))}
-                        {branches.map((item: any, index: number) => (
-                          <BranchItem label={`${item.code}-${item.name}`} key={index} />
-                        ))}
-                      </Box>
+                          </Box>
+                          <Box mt={2} ml={2}>
+                            <FormGroup>
+                              <FormControlLabel
+                                disabled={true}
+                                control={<Checkbox checked={false} />}
+                                label={
+                                  <Typography fontWeight={400} fontSize={'14px'} mt={0.7} color={'#000000'}>
+                                    เลือกสาขาทั้งหมด
+                                  </Typography>
+                                }
+                              />
+                            </FormGroup>
+                          </Box>
+                        </Grid>
+                      </>
                     )}
-                  </Box>
-                </Grid>
+                    <Grid item xs={12} pr={5}>
+                      <Box className={classes.MWrapperListBranchForm}>
+                        {allBranches ? (
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                            <BranchItem label={`สาขาทั้งหมด (${totalBranches} สาขา)`} />
+                          </Box>
+                        ) : (
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                            {province.map((item: any, index: number) => (
+                              <BranchItem label={`สาขาจังหวัด${item.name}`} key={index} />
+                            ))}
+                            {branches.map((item: any, index: number) => (
+                              <BranchItem label={`${item.code}-${item.name}`} key={index} />
+                            ))}
+                          </Box>
+                        )}
+                      </Box>
+                    </Grid>
+                    {(!!allBranches || province.length > 0) && (
+                      <>
+                        <Grid item xs={12} pr={1} mb={0.5} mt={2.5}>
+                          <Typography fontWeight={400} color={'#000000'}>
+                            สาขาที่ยกเว้น
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} display={'flex'}>
+                          <Box width={'37%'}>
+                            <Autocomplete
+                              options={[]}
+                              id="combo-box-province"
+                              popupIcon={<SearchIcon color="primary" />}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  FormHelperTextProps={{
+                                    style: {
+                                      textAlign: 'right',
+                                      marginRight: 0,
+                                    },
+                                  }}
+                                  className={classes.MtextField}
+                                  placeholder="ค้นหาจังหวัด"
+                                />
+                              )}
+                              size="small"
+                              disabled={true}
+                              className={classes.MSearchBranch}
+                              fullWidth
+                            />
+                          </Box>
+
+                          <Box width={'37%'} ml={2}>
+                            <Autocomplete
+                              options={[]}
+                              id="combo-box-branch"
+                              popupIcon={<SearchIcon color="primary" />}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  FormHelperTextProps={{
+                                    style: {
+                                      textAlign: 'right',
+                                      marginRight: 0,
+                                    },
+                                  }}
+                                  className={classes.MtextField}
+                                  placeholder="ค้นหาสาขา"
+                                />
+                              )}
+                              size="small"
+                              className={classes.MSearchBranch}
+                              disabled={true}
+                              fullWidth
+                            />
+                          </Box>
+                          <Box mt={2} ml={2}>
+                            <FormGroup>
+                              <FormControlLabel
+                                disabled={true}
+                                control={<Checkbox checked={false} />}
+                                label={
+                                  <Typography fontWeight={400} fontSize={'14px'} mt={0.7} color={'#000000'}>
+                                    เลือกสาขาทั้งหมด
+                                  </Typography>
+                                }
+                              />
+                            </FormGroup>
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12} pr={5}>
+                          <Box className={classes.MWrapperListBranchForm}>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                              {excludeProvinces.map((item: any, index: number) => (
+                                <BranchItem label={`สาขาจังหวัด${item.name}`} key={index} />
+                              ))}
+                              {excludeBranches.map((item: any, index: number) => (
+                                <BranchItem label={`${item.code}-${item.name}`} key={index} />
+                              ))}
+                            </Box>
+                          </Box>
+                        </Grid>
+                      </>
+                    )}
+                  </>
+                )}
                 <Grid
                   item
                   xs={12}
-                  sx={{ textAlign: 'right', height: '43px', padding: '0 !important', marginTop: '30px' }}
+                  sx={{
+                    position: 'absolute',
+                    right: '50px',
+                    bottom: '30px',
+                    height: '43px',
+                    marginTop: '30px',
+                  }}
                 >
-                  <Button variant="contained" color="info" className={classes.MbtnSearch} size="large" disabled={true}>
+                  <Button
+                    variant="contained"
+                    color="cancelColor"
+                    className={classes.MbtnSearch}
+                    size="large"
+                    disabled={true}
+                    sx={{ marginRight: '15px', width: '126px' }}
+                    data-testid="buttonClear"
+                  >
+                    เคลียร์
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="info"
+                    className={classes.MbtnSearch}
+                    size="large"
+                    disabled={true}
+                    data-testid="buttonAdd"
+                    sx={{ width: '126px' }}
+                  >
                     เลือกสาขา
                   </Button>
                 </Grid>

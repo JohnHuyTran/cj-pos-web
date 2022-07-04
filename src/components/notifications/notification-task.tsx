@@ -12,7 +12,7 @@ import { getUserInfo } from '../../store/sessionStore';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getBranchName, objectNullOrEmpty } from '../../utils/utils';
 import ModalCreateBarcodeDiscount from '../barcode-discount/modal-create-barcode-discount';
-import { Action, DateFormat } from '../../utils/enum/common-enum';
+import { Action, DateFormat, TO_TYPE } from '../../utils/enum/common-enum';
 import ModalCreateTransferOutDestroy from '../transfer-out-destroy/modal-create-transfer-out-destroy';
 import ModalCreateTransferOut from '../transfer-out/modal-create-transfer-out';
 import SnackbarStatus from '../commons/ui/snackbar-status';
@@ -35,6 +35,7 @@ import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt
 import AlertError from '../commons/ui/alert-error';
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 import StockTransferBT from '../stock-transfer/branch-transfer/stock-transfer-bt';
+import ModalCreateToDestroyDiscount from '../transfer-out-destroy/modal-create-to-destroy-discount';
 
 interface Props {
   refresh: boolean;
@@ -61,6 +62,7 @@ export default function NotificationTask(props: Props) {
   const dispatch = useAppDispatch();
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
+  const [openDetailDestroyDiscount, setOpenDetailDestroyDiscount] = React.useState(false);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const userPermission =
     !objectNullOrEmpty(userInfo) &&
@@ -101,6 +103,9 @@ export default function NotificationTask(props: Props) {
   const handleCloseModalError = () => {
     setOpenModalError(false);
   };
+  const handleCloseDetailDestroyDiscount = () => {
+    setOpenDetailDestroyDiscount(false);
+  };
   const handleGetData = async () => {
     try {
       setOpenLoadingModal(true);
@@ -124,14 +129,21 @@ export default function NotificationTask(props: Props) {
       setOpenLoadingModal(true);
       handleUpdateRead(item.id);
       if (item.type === 'SEND_TO_FOR_APPROVAL' || item.type === 'APPROVE_TRANSFER_OUT') {
-        if (item.payload.type === 1) {
+        if (item.payload.type === TO_TYPE.TO_ACTIVITY) {
           const rs = await dispatch(getTransferOutDetail(item.documentNumber));
           if (!!rs.payload) {
             setOpenTransferOutDetail(true);
           } else {
             setOpenModalError(true);
           }
-        } else if (item.payload.type === 2 || item.payload.type === 5) {
+        } else if (item.payload.type === TO_TYPE.TO_WITH_DISCOUNT) {
+          const rs = await dispatch(getTransferOutDetail(item.documentNumber));
+          if (!!rs.payload) {
+            setOpenDetailDestroyDiscount(true);
+          } else {
+            setOpenModalError(true);
+          }
+        } else if (item.payload.type === TO_TYPE.TO_WITHOUT_DISCOUNT || item.payload.type === TO_TYPE.TO_DEFECT) {
           const rs = await dispatch(getTransferOutDetail(item.documentNumber));
           if (!!rs.payload) {
             setOpenTransferOutDestroyDetail(true);
@@ -436,6 +448,17 @@ export default function NotificationTask(props: Props) {
         <ModalCreateTransferOutDestroy
           isOpen={openTransferOutDestroyDetail}
           onClickClose={handleCloseModalDetail}
+          action={Action.UPDATE}
+          setPopupMsg={setPopupMsg}
+          setOpenPopup={setOpenPopup}
+          onSearchMain={handleGetData}
+          userPermission={userPermission}
+        />
+      )}
+      {openDetailDestroyDiscount && (
+        <ModalCreateToDestroyDiscount
+          isOpen={openDetailDestroyDiscount}
+          onClickClose={handleCloseDetailDestroyDiscount}
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
