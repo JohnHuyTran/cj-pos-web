@@ -58,14 +58,14 @@ interface Props {
 const _ = require('lodash');
 
 export default function ModalCreateTransferOutDestroy({
-                                                        isOpen,
-                                                        onClickClose,
-                                                        setOpenPopup,
-                                                        action,
-                                                        setPopupMsg,
-                                                        onSearchMain,
-                                                        userPermission,
-                                                      }: Props): ReactElement {
+  isOpen,
+  onClickClose,
+  setOpenPopup,
+  action,
+  setPopupMsg,
+  onSearchMain,
+  userPermission,
+}: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   let errorListProduct: any = [];
@@ -312,6 +312,7 @@ export default function ModalCreateTransferOutDestroy({
           id: preData.barcode,
           errorNumberOfRequested: '',
           errorNumberOfApproved: '',
+          errorRemark: '',
         };
 
         if (checkApprove) {
@@ -331,6 +332,12 @@ export default function ModalCreateTransferOutDestroy({
           if (preData.numberOfRequested <= 0 || !preData.numberOfRequested) {
             isValid = false;
             item.errorNumberOfRequested = 'จำนวนคำขอต้องมากกว่า 0';
+          }
+        }
+        if (sendRequest) {
+          if (stringNullOrEmpty(preData.remark)) {
+            isValid = false;
+            item.errorRemark = 'กรุณาระบุเหตุผล';
           }
         }
         if (!isValid) {
@@ -641,7 +648,8 @@ export default function ModalCreateTransferOutDestroy({
     try {
       const allAttachFileBefore = await handleAllAttachFile(true);
       const payload = {
-        beforeAttachFiles: allAttachFileBefore
+        beforeAttachFiles: allAttachFileBefore,
+        products: payloadTransferOut.products
       };
       let res = await rejectTransferOut(dataDetail.id, payload);
       if (res && res.code === 20000) {

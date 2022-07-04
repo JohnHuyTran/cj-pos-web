@@ -302,7 +302,7 @@ export default function ModalCreateToDestroyDiscount({
               item.errorNumberOfApproved = 'จำนวนการทำลายต้องมากกว่าหรือเท่ากับ 0';
             } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
-              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนที่ทำลายจริง';
+              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนทำลายจริง';
             }
           }
         } else {
@@ -895,7 +895,7 @@ export default function ModalCreateToDestroyDiscount({
         onClose={() => {
           setOpenCheckStock(false);
         }}
-        headerTitle={'จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก'}
+        headerTitle={'เบิกสินค้ามากกว่าที่มีในคลัง โปรดตรวจสอบ'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm
@@ -911,7 +911,7 @@ export default function ModalCreateToDestroyDiscount({
         onClose={() => handleCloseModalConfirmApprove(false)}
         onConfirm={() => handleCloseModalConfirmApprove(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันอนุมัติเบิกทำลายมีส่วนลด'}
+        headerTitle={'ยืนยันอนุมัติเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <ModelConfirm

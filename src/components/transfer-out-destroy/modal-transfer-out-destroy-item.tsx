@@ -130,12 +130,24 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
     setOpenPopupModal(false);
   };
 
-  const handleChangeRemark = (event: any, index: number) => {
+  const handleChangeRemark = (event: any, index: number, errorIndex: number) => {
     setDtTable((preData: Array<TransferOutDetail>) => {
       const data = [...preData];
       data[index - 1].remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
       return data;
     });
+    dispatch(
+      updateErrorList(
+        errorList.map((item: any, idx: number) => {
+          return idx === errorIndex
+            ? {
+              ...item,
+              errorRemark: '',
+            }
+            : item;
+        })
+      )
+    );
     dispatch(updateCheckEdit(true));
   };
 
@@ -339,26 +351,44 @@ export const ModalTransferOutDestroyItem = (props: DataGridProps) => {
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
-      renderCell: (params) => (
-        <HtmlTooltip disableHoverListener={stringNullOrEmpty(params.value)}
-                     disableTouchListener={stringNullOrEmpty(params.value)}
-                     disableFocusListener={stringNullOrEmpty(params.value)}
-                     disableInteractive={stringNullOrEmpty(params.value)}
-                     title={<React.Fragment>{params.value}</React.Fragment>}>
-          <TextField
-            type="text"
-            sx={{ width: '100%' }}
-            inputProps={{ maxLength: 250 }}
-            className={classes.MtextField}
-            value={stringNullOrEmpty(params.value) ? '' : params.value}
-            onChange={(e) => {
-              handleChangeRemark(e, params.row.index);
-            }}
-            disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT
-              && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
-          />
-        </HtmlTooltip>
-      )
+      renderCell: (params) => {
+        const index =
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barcode) : -1;
+        const condition = (index != -1 && errorList[index].errorRemark);
+        return (
+          <HtmlTooltip disableHoverListener={stringNullOrEmpty(params.value)}
+                       disableTouchListener={stringNullOrEmpty(params.value)}
+                       disableFocusListener={stringNullOrEmpty(params.value)}
+                       disableInteractive={stringNullOrEmpty(params.value)}
+                       title={<React.Fragment>{params.value}</React.Fragment>}>
+            <div className={classes.MLabelTooltipWrapper} style={{ width: '100%' }}>
+              <TextField
+                error={condition}
+                type="text"
+                sx={{ width: '100%' }}
+                inputProps={{ maxLength: 250 }}
+                className={classes.MtextField}
+                value={stringNullOrEmpty(params.value) ? '' : params.value}
+                onChange={(e) => {
+                  handleChangeRemark(e, params.row.index, index);
+                }}
+                disabled={!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT
+                  && dataDetail.status != TOStatus.WAIT_FOR_APPROVAL}
+              />
+              {condition && <div className="title">{errorList[index]?.errorRemark}</div>}
+            </div>
+          </HtmlTooltip>
+        )
+      },
+      renderHeader: (params) => {
+        return (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant="body2" noWrap>
+              <b>{(TOStatus.DRAFT === dataDetail.status) ? 'หมายเหตุ *' : 'หมายเหตุ'}</b>
+            </Typography>
+          </div>
+        );
+      },
     },
     {
       field: 'delete',
