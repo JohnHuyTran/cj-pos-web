@@ -74,12 +74,14 @@ describe('component stock-movement-search-list', () => {
       fireEvent.keyDown(row, { key: 'Enter' });
       fireEvent.click(row);
     });
+    await new Promise((r) => setTimeout(r, 1000));
+    expect(screen.getByText('ตรวจสอบรายการใบโอน')).toBeInTheDocument();
 
-    const row2 = container.getByText('LD20220530000003');
-    row2.focus();
-    act(() => {
-      fireEvent.keyDown(row2, { key: 'Enter' });
-      fireEvent.click(row2);
-    });
+    // const row2 = container.getByText('LD20220530000003');
+    // row2.focus();
+    // act(() => {
+    //   fireEvent.keyDown(row2, { key: 'Enter' });
+    //   fireEvent.click(row2);
+    // });
   });
 });
