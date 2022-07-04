@@ -136,7 +136,7 @@ export default function ModalCreateBarcodeDiscount({
   const [attachFileError, setAttachFileError] = React.useState('');
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [alertTextError, setAlertTextError] = React.useState(
-    'กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง'
+    'กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'
   );
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState(
@@ -172,7 +172,7 @@ export default function ModalCreateBarcodeDiscount({
         return;
       }
     } else {
-      setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+      setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
       if (!validate(true)) {
         dispatch(updateErrorList(dataAfterValidate));
         setOpenModalError(true);
@@ -448,15 +448,15 @@ export default function ModalCreateBarcodeDiscount({
           if (payloadBarcodeDiscount.percentDiscount) {
             if (preData.requestedDiscount <= 0 || preData.requestedDiscount >= 100 || !preData.requestedDiscount) {
               isValid = false;
-              item.errorDiscount = 'ยอดลดต้องไม่เกิน 100%';
+              item.errorDiscount = 'ระบุยอดลด';
             }
           } else {
             if (preData.requestedDiscount <= 0 || !preData.requestedDiscount) {
               isValid = false;
-              item.errorDiscount = 'ยอดลดต้องมากกว่า 0';
+              item.errorDiscount = 'ระบุยอดลด';
             } else if (preData.requestedDiscount >= preData.price) {
               isValid = false;
-              item.errorDiscount = 'ยอดลดต้องไม่เกินราคาปกติ';
+              item.errorDiscount = 'ยอดลดต้องน้อยกว่าราคาปกติ';
             }
           }
           if (preData.numberOfDiscounted <= 0 || !preData.numberOfDiscounted) {
@@ -511,7 +511,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleCreateDraft = async (sendRequest: boolean) => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate(false)) {
       let allAttachFile = [];
       if (fileUploadList && fileUploadList.length > 0) {
@@ -614,7 +614,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleSendForApproval = async (id: string) => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     //validate attach file
     if (fileUploadList.length === 0 && attachFileOlds.length === 0) {
       setAttachFileError('กรุณาแนบไฟล์เอกสาร');
@@ -656,7 +656,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleApprove = async () => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const rs = await approveBarcodeDiscount(dataDetail.id, {
         products: payloadBarcodeDiscount.products,
