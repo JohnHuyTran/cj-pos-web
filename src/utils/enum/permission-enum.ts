@@ -98,6 +98,7 @@ export enum PERMISSION_GROUP {
   PI = 'operationProcess',
   PCM = 'procurement',
   RTC = 'readyToClear',
+  DATA = 'data',
 }
 
 export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
@@ -115,3 +116,4 @@ export const KEYCLOAK_GROUP_ACCOUNTING = '/service.posback/accounting';
 export const KEYCLOAK_GROUP_PI = '/service.posback/pi';
 export const KEYCLOAK_GROUP_PCM = '/service.posback/pcm';
 export const KEYCLOAK_GROUP_RTC = '/service.posback/rtc';
+export const KEYCLOAK_GROUP_DATA = '/service.posback/data';
