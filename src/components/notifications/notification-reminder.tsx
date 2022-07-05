@@ -130,7 +130,7 @@ export default function NotificationReminder(props: Props) {
             setOpenModalError(true);
           }
         }
-      } else if (item.type === 'REJECT_BARCODE') {
+      } else if (item.type === 'REJECT_BARCODE' || item.type === 'APPROVE_BARCODE') {
         const rs = await dispatch(getBarcodeDiscountDetail(item.payload.documentNumber));
         if (!!rs.payload) {
           setOpenBDDetail(true);
@@ -181,6 +181,14 @@ export default function NotificationReminder(props: Props) {
         }
 
         break;
+      case 'APPROVE_BARCODE':
+        content = 'ส่วนลดสินค้า';
+        branchCode = item.payload.branchCode;
+        statusDisplay = genStatusValue('อนุมัติ', {
+          color: '#36C690',
+          backgroundColor: '#E7FFE9',
+        });
+        break;
       case 'CLOSE_TRANSFER_OUT':
         {
           content = item.payload.type === 1 ? 'เบิกทำกิจกรรม' : 'เบิกทำลาย';
@@ -229,7 +237,7 @@ export default function NotificationReminder(props: Props) {
         onClick={() => currentlySelected(item)}
       >
         <Box sx={{ display: 'flex', justifyContent: 'start' }}>
-          {item.type == 'REJECT_BARCODE' ? (
+          {item.type == 'REJECT_BARCODE' || item.type == 'APPROVE_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           ) : (
             <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
