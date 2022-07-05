@@ -6,3 +6,10 @@ export interface ExpenseInfo {
   active: boolean;
   docReferance: string;
 }
+
+export interface ExpenseMasterResponseType {
+  data: ExpenseInfo[];
+  ref: string;
+  code: number;
+  message: string;
+}
