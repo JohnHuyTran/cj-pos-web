@@ -812,7 +812,7 @@ export default function ModalCreateTransferOutDestroy({
               <Grid item xs={4}>
                 รูปก่อนทำลาย<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={8} pl={2}>
                 <AccordionUploadFile
                   files={attachFileBeforeOlds}
                   docNo={dataDetail ? dataDetail.documentNumber : ''}
