@@ -16,6 +16,8 @@ interface StateProps {
   type?: string;
   minDateTo?: any | Date | number | string;
   disabled?: boolean;
+  isError?: boolean;
+  hyperText?: string;
 }
 
 const defaultMaterialTheme = createTheme({
@@ -70,6 +72,8 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         placeholder='กรุณาเลือกวันที่'
         minDateMessage='วันที่ ต้องมากกว่าหรือเท่ากับวันที่ปัจจุบัน'
         disabled={props.disabled ? props.disabled : false}
+        helperText={props.hyperText}
+        error={props.isError}
       />
     );
   } else {
