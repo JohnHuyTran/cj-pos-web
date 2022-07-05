@@ -113,6 +113,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           errorNumberOfApproved: '',
           approvedDiscount: approvedDiscount,
           skuCode: item.skuCode,
+          remark: item.remark,
         };
       });
       setDtTable(rows);
@@ -131,6 +132,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       setDtTable([]);
     }
   }, [payloadAddItem, typeDiscount]);
+console.log(payloadAddItem);
 
   useEffect(() => {
     if (dtTable.length !== 0) {
@@ -149,6 +151,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           barFactor: item.barFactor,
           productName: item.barcodeName,
           skuCode: item.skuCode,
+          remark: item.remark,
         };
       });
       dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, products: products }));
@@ -323,6 +326,26 @@ export const ModalTransferItem = (props: DataGridProps) => {
 
       return data;
     });
+  };
+  const handleChangeRemark = (event: any, index: number, errorIndex:number) => {
+    setDtTable((preData: Array<DiscountDetail>) => {
+      const data = [...preData];
+      data[index - 1].remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
+      return data;
+    });
+    dispatch(
+      updateErrorList(
+        errorList.map((item: any, idx: number) => {
+          return idx === errorIndex
+            ? {
+              ...item,
+              errorRemark: '',
+            }
+            : item;
+        })
+      )
+    );
+    dispatch(updateCheckEdit(true));
   };
 
   const handleChangeNote = (e: any) => {
@@ -680,6 +703,42 @@ export const ModalTransferItem = (props: DataGridProps) => {
           </div>
         );
       },
+    },
+    {
+      field: 'remark',
+      headerName: 'หมายเหตุ',
+      minWidth: 130,
+      headerAlign: 'center',
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (params) => {
+        const index =
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+        const condition = (index != -1 && errorList[index].errorRemark);
+        return (
+          <div className={classes.MLabelTooltipWrapper}>
+            <HtmlTooltip disableHoverListener={stringNullOrEmpty(params.value)}
+                         disableTouchListener={stringNullOrEmpty(params.value)}
+                         disableFocusListener={stringNullOrEmpty(params.value)}
+                         disableInteractive={stringNullOrEmpty(params.value)}
+                         title={<React.Fragment>{params.value}</React.Fragment>}>
+              <TextField
+                error={condition}
+                type="text"
+                sx={{ width: '100%' }}
+                inputProps={{ maxLength: 250 }}
+                className={classes.MtextField}
+                value={stringNullOrEmpty(params.value) ? '' : params.value}
+                disabled={(dataDetail.status > 1 && !approvePermission) || (approvePermission && dataDetail.status != 2)}
+                onChange={(e) => {
+                  handleChangeRemark(e, params.row.index, index);
+                }}
+              />
+            </HtmlTooltip>
+            {condition && <div className="title">{errorList[index]?.errorRemark}</div>}
+          </div>
+        )
+      } 
     },
     {
       field: 'delete',

@@ -78,7 +78,11 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   useEffect(() => {
     const userInfo: KeyCloakTokenInfo = getUserInfo();
     if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
-      setIsAdmin(userInfo.acl['service.posback-campaign'].includes('campaign.st.create'));
+      setIsAdmin(
+        userInfo.acl['service.posback-campaign']
+          ? userInfo.acl['service.posback-campaign'].includes('campaign.st.create')
+          : false
+      );
     }
   }, []);
 

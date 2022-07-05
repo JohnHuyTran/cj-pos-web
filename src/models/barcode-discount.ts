@@ -20,6 +20,7 @@ export interface DiscountDetail {
   unitCode: string;
   barFactor: number;
   price: number;
+  remark: string;
   discount: any;
   expiryDate: string | any;
   cashDiscount: number | any;
@@ -30,6 +31,7 @@ export interface DiscountDetail {
   errorDiscount: string;
   errorExpiryDate: string;
   errorNumberOfDiscounted: string;
+  errorRemark: string;
 }
 
 interface Product {
