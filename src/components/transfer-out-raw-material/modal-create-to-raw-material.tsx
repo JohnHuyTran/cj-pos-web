@@ -86,7 +86,7 @@ export default function ModalCreateToRawMaterial({
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.CAMPAIGN_TO_APPROVE) : false);
-  const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+  const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
     ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
@@ -256,7 +256,7 @@ export default function ModalCreateToRawMaterial({
   }
 
   const handleCreateDraft = async (sendRequest: boolean) => {
-    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate()) {
       await dispatch(save({ ...payloadTransferOut }));
       try {
