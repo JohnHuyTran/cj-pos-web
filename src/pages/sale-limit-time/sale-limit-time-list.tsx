@@ -421,7 +421,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       <AlertError
         open={openAlert}
         onClose={() => setOpenAlert(false)}
-        textError={'กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'}
+        textError={'กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'}
       />
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>
