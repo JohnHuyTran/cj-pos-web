@@ -335,6 +335,7 @@ export default function ModalCreateBarcodeDiscount({
                 : item.numberOfApproved || 0,
             expiryDate: item.expiredDate,
             skuCode: item.skuCode,
+            remark: item.remark,
           });
         }
         dispatch(updateAddItemsState(lstProductDetail));
@@ -429,6 +430,7 @@ export default function ModalCreateBarcodeDiscount({
           errorNumberOfDiscounted: '',
           errorNumberOfApproved: '',
           errorExpiryDate: '',
+          errorRemark: '',
         };
 
         if (checkApprove) {
@@ -442,6 +444,9 @@ export default function ModalCreateBarcodeDiscount({
             } else if (preData.numberOfApproved > preData.numberOfDiscounted) {
               isValid = false;
               item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่เกินจำนวนที่ขอลด';
+            } else if (preData.numberOfApproved < preData.numberOfDiscounted && !preData.remark) {
+              isValid = false;
+              item.errorRemark = 'กรุณาระบุเหตุผล';
             }
           }
         } else {

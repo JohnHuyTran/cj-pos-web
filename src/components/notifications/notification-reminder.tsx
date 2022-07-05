@@ -130,7 +130,7 @@ export default function NotificationReminder(props: Props) {
             setOpenModalError(true);
           }
         }
-      } else if (item.type === 'REJECT_BARCODE' || item.type === 'APPROVE_BARCODE') {
+      } else if (item.type === 'REJECT_BARCODE' || item.type === 'APPROVE_BARCODE' || item.type == 'PRINT_BARCODE') {
         const rs = await dispatch(getBarcodeDiscountDetail(item.payload.documentNumber));
         if (!!rs.payload) {
           setOpenBDDetail(true);
@@ -187,6 +187,14 @@ export default function NotificationReminder(props: Props) {
         statusDisplay = genStatusValue('อนุมัติ', {
           color: '#36C690',
           backgroundColor: '#E7FFE9',
+        });
+        break;
+      case 'PRINT_BARCODE':
+        content = 'ส่วนลดสินค้า';
+        branchCode = item.payload.branchCode;
+        statusDisplay = genStatusValue('พิมพ์บาร์โค้ดแล้ว', {
+          color: '#676767',
+          backgroundColor: '#EAEBEB',
         });
         break;
       case 'CLOSE_TRANSFER_OUT':
