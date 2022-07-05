@@ -744,7 +744,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           rows={dtTable}
           columns={columns}
           getRowClassName={(params) => {
-            if (params.row.numberOfDiscounted !== params.row.numberOfApproved) {
+            if ((params.row.numberOfDiscounted !== params.row.numberOfApproved) && (dataDetail.status >= Number(BDStatus.APPROVED))) {
               return `row-highlight`;
             }
             return '';
