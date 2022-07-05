@@ -303,7 +303,7 @@ export default function NotificationReminder(props: Props) {
         }}
         onClick={() => currentlySelected(item)}>
         <Box sx={{ display: 'flex', justifyContent: 'start' }}>
-          {item.type == 'REJECT_BARCODE' || item.type == 'APPROVE_BARCODE' ? (
+          {item.type == 'REJECT_BARCODE' || item.type == 'APPROVE_BARCODE' || item.type == 'PRINT_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           ) : (
             <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
