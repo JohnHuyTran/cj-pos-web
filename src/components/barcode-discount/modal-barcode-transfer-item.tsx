@@ -132,7 +132,6 @@ export const ModalTransferItem = (props: DataGridProps) => {
       setDtTable([]);
     }
   }, [payloadAddItem, typeDiscount]);
-console.log(payloadAddItem);
 
   useEffect(() => {
     if (dtTable.length !== 0) {
