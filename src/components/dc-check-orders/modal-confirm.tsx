@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
 import { ApiError } from '../../models/api-error-model';
-import { approveDCOrderShipments } from '../../services/order-shipment';
+import { verifyDCOrderShipmentsBT } from '../../services/order-shipment';
 import { DCOrderApproveRequest } from '../../models/dc-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
@@ -20,6 +20,8 @@ interface Props {
   docRefNo: string;
   sdNo: string;
   comment: string;
+  handleActionVerify: () => void;
+  subject: string;
 }
 interface loadingModalState {
   open: boolean;
@@ -33,43 +35,51 @@ export default function ModelConfirm({
   docRefNo,
   sdNo,
   comment,
+  handleActionVerify,
+  subject,
 }: Props): ReactElement {
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+  // const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
+  //   open: false,
+  // });
 
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
 
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
-  };
+  // const handleOpenLoading = (prop: any, event: boolean) => {
+  //   setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  // };
 
-  const updateDCOrder = async () => {
-    await dispatch(featchorderDetailDCAsync(idDC));
-  };
+  // const updateDCOrder = async () => {
+  //   await dispatch(featchorderDetailDCAsync(idDC));
+  // };
 
-  const handleConfirm = async () => {
-    handleOpenLoading('open', true);
-    const payload: DCOrderApproveRequest = {
-      dcComment: comment,
-    };
-    await approveDCOrderShipments(idDC, payload).then(
-      function (value) {
-        updateDCOrder();
-        onUpdateAction(true, '');
-      },
-      function (error: ApiError) {
-        console.log('error : ' + JSON.stringify(error));
-        onUpdateAction(false, error.message);
-      }
-    );
-    handleOpenLoading('open', false);
+  // const handleConfirm = async () => {
+  //   handleOpenLoading('open', true);
+  //   const payload: DCOrderApproveRequest = {
+  //     dcComment: comment,
+  //   };
+  //   await verifyDCOrderShipmentsBT(sdNo, payload).then(
+  //     function (value) {
+  //       updateDCOrder();
+  //       onUpdateAction(true, '');
+  //     },
+  //     function (error: ApiError) {
+  //       console.log('error : ' + JSON.stringify(error));
+  //       onUpdateAction(false, error.message);
+  //     }
+  //   );
+  //   handleOpenLoading('open', false);
+  //   onClose();
+  // };
+
+  const handleConfirm = () => {
+    handleActionVerify();
     onClose();
   };
 
   return (
     <div>
       <Dialog
+        data-testid='testid-alert-confirm'
         open={open}
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
@@ -78,7 +88,7 @@ export default function ModelConfirm({
         <DialogContent>
           <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
             <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
-              ยืนยันการตรวจสอบผลต่าง (DC)
+              {subject}
             </Typography>
             <Typography variant='body1' align='center'>
               เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
@@ -106,6 +116,7 @@ export default function ModelConfirm({
             ยกเลิก
           </Button>
           <Button
+            data-testid='testid-btnConfirm'
             id='btnConfirm'
             variant='contained'
             color='primary'
@@ -116,7 +127,7 @@ export default function ModelConfirm({
         </DialogActions>
       </Dialog>
 
-      <LoadingModal open={openLoadingModal.open} />
+      {/* <LoadingModal open={openLoadingModal.open} /> */}
     </div>
   );
 }

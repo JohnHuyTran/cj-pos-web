@@ -41,6 +41,7 @@ export interface StockTransferInfo {
   createdDate: string;
   lastModifiedBy: string;
   lastModifiedDate: string;
+  itemGroups?: ItemGroups[];
 }
 export interface SaveStockTransferRequest {
   rtNo: string;
@@ -285,4 +286,9 @@ export interface Approve2BySCMStockRequest {
   transferReason: string;
   itemGroups: ItemGroups[];
   items: Item[];
+}
+
+export interface ErrorItem {
+  toteCode?: string;
+  qty?: string;
 }

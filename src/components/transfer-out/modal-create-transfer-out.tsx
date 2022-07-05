@@ -100,7 +100,7 @@ export default function ModalCreateTransferOut({
   const [attachFileError, setAttachFileError] = React.useState('');
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [alertTextError, setAlertTextError] = React.useState(
-    'กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'
+    'กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'
   );
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState(
@@ -378,7 +378,7 @@ export default function ModalCreateTransferOut({
   };
 
   const handleCreateDraft = async (sendRequest: boolean) => {
-    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate(false)) {
       const rsCheckStock = await handleCheckStock();
       if (rsCheckStock) {
@@ -454,7 +454,7 @@ export default function ModalCreateTransferOut({
   };
 
   const handleSendForApproval = async (id: string) => {
-    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const rs = await sendForApprovalTransferOut(id);
       if (rs.code === 20000) {
@@ -477,7 +477,7 @@ export default function ModalCreateTransferOut({
   };
 
   const handleOpenModalConfirmApprove = () => {
-    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate(true)) {
       setOpenModalConfirmApprove(true);
     } else {
@@ -487,7 +487,7 @@ export default function ModalCreateTransferOut({
   };
 
   const handleApprove = async () => {
-    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const allAttachFile = await handleAllAttachFile();
       const payload = {

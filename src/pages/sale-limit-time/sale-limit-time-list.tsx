@@ -78,7 +78,11 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   useEffect(() => {
     const userInfo: KeyCloakTokenInfo = getUserInfo();
     if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
-      setIsAdmin(userInfo.acl['service.posback-campaign'].includes('campaign.st.create'));
+      setIsAdmin(
+        userInfo.acl['service.posback-campaign']
+          ? userInfo.acl['service.posback-campaign'].includes('campaign.st.create')
+          : false
+      );
     }
   }, []);
 
@@ -421,7 +425,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       <AlertError
         open={openAlert}
         onClose={() => setOpenAlert(false)}
-        textError={'กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'}
+        textError={'กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'}
       />
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </>

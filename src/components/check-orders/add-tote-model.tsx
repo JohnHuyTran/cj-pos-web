@@ -54,6 +54,7 @@ export default function AddToteModel({ open, onClose, updateToteNo }: Props): Re
             unitName: '',
             unitFactor: 0,
             qty: 0,
+            qtyRef: 0,
             actualQty: 1,
             qtyDiff: 0,
             comment: '',

@@ -51,8 +51,14 @@ export const environment = {
       detailDC: {
         url: '/order/stock-diff/verify/view',
       },
-      approve: {
-        url: '/order/stock-diff/verify/{idDC}',
+      verifyBT: {
+        url: '/order/stock-diff/verify/bt/{sdNo}',
+      },
+      verifyLD: {
+        url: '/order/stock-diff/verify/ld/{sdNo}',
+      },
+      verifyList: {
+        url: '/order/stock-diff/verifyList',
       },
     },
     tote: {
@@ -247,6 +253,9 @@ export const environment = {
       delete: {
         url: '/purchase/purchase-branch-request/{docNo}/delete',
       },
+      send: {
+        url: '/purchase/purchase-branch-request/{docNo}/send',
+      },
     },
   },
   products: {
@@ -257,13 +266,16 @@ export const environment = {
       productByType: {
         url: '/products/barcode/type',
       },
+      productBySKUCodes: {
+        url: '/products/sku-by-codes',
+      },
     },
     addItem: {
       allitemsList: {
         url: '/products/barcode/all',
       },
-      itemList: {
-        url: '/products/',
+      productsBySupplierCode: {
+        url: '/products/{supplierCode}',
       },
       itemByBarcode: {
         url: '/products/barcode/',
@@ -425,7 +437,14 @@ export const environment = {
     },
     percentages: {
       url: 'master/branch-config/get-percentages',
-    }
+    },
+    reason: {
+      verifyOrder: {
+        disapprove: {
+          url: 'master/disapproval-reasons',
+        },
+      },
+    },
   },
   authority: {
     authorizedBranch: {
@@ -460,6 +479,11 @@ export const environment = {
       searchMemberInformation: {
         url: '/sale/members/{memberNo}',
       },
+    },
+  },
+  tote: {
+    inquiryTote: {
+      url: '/webtote/toteinquiry',
     },
   },
 };

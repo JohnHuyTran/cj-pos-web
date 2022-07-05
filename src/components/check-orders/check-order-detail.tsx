@@ -39,7 +39,7 @@ import {
   ShipmentDetailInfo,
 } from '../../models/order-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { ApiError } from '../../models/api-error-model';
+import { ApiError, ErrorDetail, ErrorDetailResponse, Header } from '../../models/api-error-model';
 import AlertError from '../commons/ui/alert-error';
 import { BookmarkAdded, CheckCircleOutline, HighlightOff, Print } from '@mui/icons-material';
 import LoadingModal from '../commons/ui/loading-modal';
@@ -66,6 +66,8 @@ import OrderReceiveDetail from './order-receive-detail';
 import { searchToteAsync } from '../../store/slices/search-tote-slice';
 import { featchOrderDetailToteAsync } from '../../store/slices/check-order-detail-tote-slice';
 import _ from 'lodash';
+import { isErrorCode } from '../../utils/exception/pos-exception';
+import { ToteItem } from '../../models/tote-model';
 
 interface loadingModalState {
   open: boolean;
@@ -184,7 +186,7 @@ export default function CheckOrderDetail({
   const [statusOC, setStatusOC] = React.useState(false);
   const DCPercent = env.dc.percent;
   const [isAllowExportBtn, setIsAllowExportBtn] = React.useState(true);
-
+  const [payloadError, setPayloadError] = React.useState<ErrorDetailResponse | null>();
   const orderComment = orderDetail.docRefRemark;
   let findIndexStr = false;
   if (orderComment) {
@@ -269,7 +271,7 @@ export default function CheckOrderDetail({
     if (Object.keys(payloadAddItem).length > 0) {
       payloadAddItem.forEach((item: itemsDetail) => {
         sumActualQtyItems = Number(sumActualQtyItems) + Number(item.actualQty); //รวมจำนวนรับจริง
-        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qty); //รวมจำนวนอ้าง
+        sumQuantityRefItems = Number(sumQuantityRefItems) + Number(item.qtyRef); //รวมจำนวนอ้าง
       });
 
       let sumPercent: number = (sumActualQtyItems * 100) / sumQuantityRefItems;
@@ -336,11 +338,12 @@ export default function CheckOrderDetail({
     const itemsList: any = [];
     const itemsListUpdate: any = [];
     // rows.forEach((data: GridRowData) => {
+
     payloadAddItem.forEach((data: any) => {
       const item: any = {
         barcode: data.barcode,
         deliveryOrderNo: data.deliveryOrderNo,
-        actualQty: Number(data.actualQty),
+        actualQty: Number(data.actualQty) ? Number(data.actualQty) : Number(data.qty) ? Number(data.qty) : 0,
         comment: data.comment,
         isTote: data.isTote,
       };
@@ -374,9 +377,11 @@ export default function CheckOrderDetail({
         })
         .catch((error: ApiError) => {
           updateState(itemsListUpdate);
-          setShowSnackBar(true);
-          setContentMsg(error.message);
-          setSnackbarStatus(false);
+          // setShowSnackBar(true);
+          // setContentMsg(error.message);
+          // setSnackbarStatus(false);
+          setOpenFailAlert(true);
+          setTextFail(error.message);
         });
     }
 
@@ -428,15 +433,20 @@ export default function CheckOrderDetail({
       let sumActualQtyItems: number = 0;
       let sumQuantityRefItems: number = 0;
       // rowsEdit.forEach((data: GridRowData) => {
+
       payloadAddItem.forEach((data: any) => {
-        let diffCount: number = data.actualQty - data.qtyRef;
+        // let qtyRef = data.qtyRef ? data.qtyRef : data.qty ? data.qty : 0;
+        let qtyRef = data.qtyRef ? data.qtyRef : 0;
+        let actualQty = data.actualQty ? data.actualQty : data.qty ? data.qty : 0;
+
+        let diffCount: number = Number(actualQty) - Number(qtyRef);
         sumActualQtyItems = Number(sumActualQtyItems) + Number(data.actualQty); //รวมจำนวนรับจริง
         sumQuantityRefItems = Number(sumQuantityRefItems) + Number(data.qtyRef); //รวมจำนวนอ้าง
 
         const itemDiff: Entry = {
           barcode: data.barcode,
           deliveryOrderNo: data.deliveryOrderNo,
-          actualQty: data.actualQty,
+          actualQty: actualQty,
           comment: data.comment,
           seqItem: 0,
           itemNo: '',
@@ -451,7 +461,7 @@ export default function CheckOrderDetail({
           qtyAll: 0,
           qtyAllBefore: 0,
           qtyDiff: diffCount,
-          qtyRef: data.qtyRef,
+          qtyRef: qtyRef,
           price: 0,
           isControlStock: 0,
           toteCode: '',
@@ -459,7 +469,7 @@ export default function CheckOrderDetail({
           isTote: data.isTote,
         };
 
-        if (data.isTote === true && !(data.actualQty * 1 >= 0 && data.actualQty * 1 <= 1)) {
+        if (data.isTote === true && !(Number(data.actualQty) * 1 >= 0 && Number(data.actualQty) * 1 <= 1)) {
           qtyIsValid = false;
         }
 
@@ -493,9 +503,36 @@ export default function CheckOrderDetail({
         onClickClose();
       })
       .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setContentMsg(error.message);
-        setSnackbarStatus(false);
+        setOpenFailAlert(true);
+        setTextFail(error.message);
+
+        let errorList: ErrorDetail[] = [];
+        setPayloadError(null);
+        if (error.data) {
+          const datas: ToteItem[] = error.data;
+          datas.forEach((item: ToteItem) => {
+            if (isErrorCode(item.code)) {
+              const _err: ErrorDetail = {
+                toteCode: item.toteCode,
+                description: item.message,
+              };
+              errorList.push(_err);
+            }
+          });
+
+          const header: Header = {
+            field1: false,
+            field2: true,
+            field3: true,
+            field4: false,
+          };
+          const payload: ErrorDetailResponse = {
+            header: header,
+            error_details: errorList,
+          };
+          setTextFail('ไม่สามารถปรับสถานะ Tote ดังต่อไปนี้ได้');
+          setPayloadError(payload);
+        }
       });
   };
 
@@ -534,20 +571,58 @@ export default function CheckOrderDetail({
     setSnackbarStatus(false);
   };
 
-  const handleShowSnackBar = async (issuccess: boolean, errorMsg: string) => {
+  const handleShowSnackBar = async (issuccess: boolean, error: ApiError) => {
     handleOpenLoading('open', true);
-    const msg = issuccess ? 'คุณได้ทำรายการเรียบร้อยแล้ว' : errorMsg;
-    setShowSnackBar(true);
-    setContentMsg(msg);
-    setSnackbarStatus(issuccess);
-
     if (issuccess) {
-      updateShipmentOrder();
-      setTimeout(() => {
-        setOpen(false);
-        onClickClose();
-      }, 1000);
+      setShowSnackBar(true);
+      setContentMsg('คุณได้ทำรายการเรียบร้อยแล้ว');
+      setSnackbarStatus(issuccess);
+    } else {
+      let errorList: ErrorDetail[] = [];
+      setOpenFailAlert(true);
+      setTextFail(error.message);
+      setPayloadError(null);
+      if (error.error_details) {
+        const datas: ToteItem[] = error.error_details;
+        datas.forEach((item: ToteItem) => {
+          if (isErrorCode(item.code)) {
+            const _err: ErrorDetail = {
+              toteCode: item.toteCode,
+              description: item.message,
+            };
+            errorList.push(_err);
+          }
+        });
+        const header: Header = {
+          field1: false,
+          field2: true,
+          field3: true,
+          field4: false,
+        };
+        const payload: ErrorDetailResponse = {
+          header: header,
+          error_details: errorList,
+        };
+        setTextFail('ไม่สามารถใช้ เลข Tote ดังต่อไปนี้ได้');
+        setPayloadError(payload);
+      }
     }
+
+    // if (issuccess) {
+    //   const msg = 'คุณได้ทำรายการเรียบร้อยแล้ว';
+    //   setShowSnackBar(true);
+    //   setContentMsg(msg);
+    //   setSnackbarStatus(issuccess);
+
+    //   updateShipmentOrder();
+    //   setTimeout(() => {
+    //     setOpen(false);
+    //     onClickClose();
+    //   }, 1000);
+    // } else {
+    //   setOpenFailAlert(true);
+    //   setTextFail(errorMsg);
+    // }
     handleOpenLoading('open', false);
   };
 
@@ -690,7 +765,12 @@ export default function CheckOrderDetail({
             </Grid>
 
             <Grid container spacing={2} mb={1}>
-              <Grid item lg={6}></Grid>
+              <Grid item lg={2}>
+                <Typography variant="body2">ทะเบียนรถ:</Typography>
+              </Grid>
+              <Grid item lg={4}>
+                <Typography variant="body2">{orderDetail.truckID}</Typography>
+              </Grid>
               <Grid item lg={2}>
                 {orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE && (
                   <Typography variant="body2">ใบผลต่างหลังเซ็นต์:</Typography>
@@ -941,7 +1021,7 @@ export default function CheckOrderDetail({
         btnPrintName="พิมพ์ใบผลต่าง"
       />
 
-      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} payload={payloadError} />
 
       <Snackbar open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={snackbarStatus} contentMsg={contentMsg} />
 

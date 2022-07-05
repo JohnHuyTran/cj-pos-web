@@ -113,6 +113,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           errorNumberOfApproved: '',
           approvedDiscount: approvedDiscount,
           skuCode: item.skuCode,
+          remark: item.remark,
         };
       });
       setDtTable(rows);
@@ -149,6 +150,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           barFactor: item.barFactor,
           productName: item.barcodeName,
           skuCode: item.skuCode,
+          remark: item.remark,
         };
       });
       dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, products: products }));
@@ -324,6 +326,26 @@ export const ModalTransferItem = (props: DataGridProps) => {
       return data;
     });
   };
+  const handleChangeRemark = (event: any, index: number, errorIndex:number) => {
+    setDtTable((preData: Array<DiscountDetail>) => {
+      const data = [...preData];
+      data[index - 1].remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
+      return data;
+    });
+    dispatch(
+      updateErrorList(
+        errorList.map((item: any, idx: number) => {
+          return idx === errorIndex
+            ? {
+              ...item,
+              errorRemark: '',
+            }
+            : item;
+        })
+      )
+    );
+    dispatch(updateCheckEdit(true));
+  };
 
   const handleChangeNote = (e: any) => {
     dispatch(saveBarcodeDiscount({ ...payloadBarcodeDiscount, requesterNote: e }));
@@ -428,25 +450,30 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const condition = index !== -1 && !!errorList[index].errorDiscount;
         return typeDiscount === 'percent' ?
           (
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id='discountPercent'
-                name='discountPercent'
-                value={params.value}
-                onChange={(e: any) => {
-                  handleChangeDiscount(e, params.row.index, index);
-                }}
-                className={classes.MSelected}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                {percentages && percentages.length > 0 && percentages.map((item: any) => {
-                  return (
-                    <MenuItem key={item.value} value={item.value}>
-                      <span style={{ width: '100%', textAlign: 'right' }}>{item.code}</span>
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
+            <div className={classes.MLabelTooltipWrapper} style={{ width: '100%' }}>
+              <FormControl fullWidth className={classes.Mselect}
+                           error={condition}>
+                <Select
+                  id='discountPercent'
+                  name='discountPercent'
+                  value={params.value}
+                  onChange={(e: any) => {
+                    handleChangeDiscount(e, params.row.index, index);
+                  }}
+                  disabled={dataDetail.status > 1}
+                  className={classes.MSelected}
+                  inputProps={{ 'aria-label': 'Without label' }}>
+                  {percentages && percentages.length > 0 && percentages.map((item: any) => {
+                    return (
+                      <MenuItem key={item.value} value={item.value}>
+                        <span style={{ width: '100%', textAlign: 'right' }}>{item.code}</span>
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+                {condition && <div className="title">{errorList[index].errorDiscount}</div>}
+              </FormControl>
+            </div>
           )
           :
           (
@@ -682,6 +709,42 @@ export const ModalTransferItem = (props: DataGridProps) => {
       },
     },
     {
+      field: 'remark',
+      headerName: 'หมายเหตุ',
+      minWidth: 130,
+      headerAlign: 'center',
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (params) => {
+        const index =
+          errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
+        const condition = (index != -1 && errorList[index].errorRemark);
+        return (
+          <div className={classes.MLabelTooltipWrapper}>
+            <HtmlTooltip disableHoverListener={stringNullOrEmpty(params.value)}
+                         disableTouchListener={stringNullOrEmpty(params.value)}
+                         disableFocusListener={stringNullOrEmpty(params.value)}
+                         disableInteractive={stringNullOrEmpty(params.value)}
+                         title={<React.Fragment>{params.value}</React.Fragment>}>
+              <TextField
+                error={condition}
+                type="text"
+                sx={{ width: '100%' }}
+                inputProps={{ maxLength: 250 }}
+                className={classes.MtextField}
+                value={stringNullOrEmpty(params.value) ? '' : params.value}
+                disabled={(dataDetail.status > 1 && !approvePermission) || (approvePermission && dataDetail.status != 2)}
+                onChange={(e) => {
+                  handleChangeRemark(e, params.row.index, index);
+                }}
+              />
+            </HtmlTooltip>
+            {condition && <div className="title">{errorList[index]?.errorRemark}</div>}
+          </div>
+        )
+      } 
+    },
+    {
       field: 'delete',
       headerName: ' ',
       flex: 0.2,
@@ -744,7 +807,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           rows={dtTable}
           columns={columns}
           getRowClassName={(params) => {
-            if (params.row.numberOfDiscounted !== params.row.numberOfApproved) {
+            if ((params.row.numberOfDiscounted !== params.row.numberOfApproved) && (dataDetail.status >= Number(BDStatus.APPROVED))) {
               return `row-highlight`;
             }
             return '';

@@ -28,12 +28,13 @@ import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-sl
 import CheckOrderDetail from '../check-orders/check-order-detail';
 import DCOrderDetail from '../dc-check-orders/dc-ckeck-order-detail';
 import { featchorderDetailDCAsync, setItemId } from '../../store/slices/dc-check-order-detail-slice';
-import StockTransferBT from '../stock-transfer/stock-transfer-bt';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
 import AlertError from '../commons/ui/alert-error';
+import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
+import StockTransferBT from '../stock-transfer/branch-transfer/stock-transfer-bt';
 import ModalCreateToDestroyDiscount from '../transfer-out-destroy/modal-create-to-destroy-discount';
 
 interface Props {
@@ -180,7 +181,7 @@ export default function NotificationTask(props: Props) {
         }
       } else if (
         item.type == 'EVENT_STOCK_REQUEST_REJECTED' ||
-        item.type == 'STOCK_REQUEST_WAIT_FOR_APPROVAL_2' ||
+        item.type == 'EVENT_REQUEST_UPDATE_RT_DOC' ||
         item.type == 'SUBMIT_BRANCH_TRANSFER_REQUEST'
       ) {
         await dispatch(updateAddItemsState({}));
@@ -300,13 +301,25 @@ export default function NotificationTask(props: Props) {
           backgroundColor: '#E7FFE9',
         });
         break;
-      case 'STOCK_REQUEST_WAIT_FOR_APPROVAL_2':
+      case 'EVENT_REQUEST_UPDATE_RT_DOC':
         content = 'สร้างแผนโอนสินค้าระหว่างสาขา';
         branchCode = item.payload.branchFrom;
-        statusDisplay = genStatusValue('รออนุมัติ2', {
-          color: '#36C690',
-          backgroundColor: '#E7FFE9',
-        });
+        if (item.payload.status == 'WAIT_FOR_APPROVAL_1') {
+          statusDisplay = genStatusValue('รออนุมัติ1', {
+            color: '#36C690',
+            backgroundColor: '#E7FFE9',
+          });
+        } else if (item.payload.status == 'WAIT_FOR_APPROVAL_2') {
+          statusDisplay = genStatusValue('รออนุมัติ2', {
+            color: '#36C690',
+            backgroundColor: '#E7FFE9',
+          });
+        } else if (item.payload.status == 'CANCELED') {
+          statusDisplay = genStatusValue('ส่งกลับแก้ไข', {
+            color: '#F54949',
+            backgroundColor: '#FFD7D7',
+          });
+        }
         break;
       case 'EVENT_STOCK_REQUEST_REJECTED':
         content = 'สร้างแผนโอนสินค้าระหว่างสาขา';
@@ -353,8 +366,7 @@ export default function NotificationTask(props: Props) {
           backgroundColor: item.read ? 'transparent' : '#F6FFF3',
           fontSize: '12px',
         }}
-        onClick={() => currentlySelected(item)}
-      >
+        onClick={() => currentlySelected(item)}>
         <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type === 'SEND_BD_FOR_APPROVAL' || item.type === 'APPROVE_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
@@ -375,16 +387,14 @@ export default function NotificationTask(props: Props) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               width: '80%',
-            }}
-          >
+            }}>
             <span style={{ color: theme.palette.primary.main }}>{content}: </span>
             <HtmlTooltip
               title={
                 <React.Fragment>
                   {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
                 </React.Fragment>
-              }
-            >
+              }>
               <span style={{ marginLeft: 5 }}>
                 {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
               </span>
@@ -409,10 +419,9 @@ export default function NotificationTask(props: Props) {
           border: '1px solid #E0E0E0',
           borderRadius: '10px',
           minWidth: '600px',
-        }}
-      >
+        }}>
         <TablePagination
-          component="div"
+          component='div'
           count={total}
           page={page}
           onPageChange={handleChangePage}

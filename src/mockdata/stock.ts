@@ -203,3 +203,26 @@ export function getStrockMovementMockup() {
     resolve(resStockMovement);
   });
 }
+
+const inquiry_tote_error = {
+  timestamp: '2022-05-10T04:30:57.797+0000',
+  ref: '6279ea81972d0d933de2ab9f',
+  code: 20000,
+  message: 'success',
+  data: [
+    {
+      toteCode: 'T01',
+      toteStatus: 'false',
+      branchCode: '001',
+      remark: '',
+      code: '20000',
+      message: 'failed',
+    },
+  ],
+};
+
+export function inquiryToteMockData() {
+  return new Promise((resolve, reject) => {
+    resolve(inquiry_tote_error);
+  });
+}

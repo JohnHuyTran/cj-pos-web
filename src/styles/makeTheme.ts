@@ -673,6 +673,17 @@ const useStyles = makeStyles({
       background: 'rgb(255, 251, 251)',
     },
   },
+  MtextFieldPostCode: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      minHeight: '20px !important',
+      padding: '0px 0px 0px 5px',
+    },
+    // '& .Mui-disabled': {
+    //   '-webkit-text-fill-color': 'rgb(0 0 0) !important',
+    //   color: '#263238 !important',
+    // },
+  },
 });
 
 export { useStyles };

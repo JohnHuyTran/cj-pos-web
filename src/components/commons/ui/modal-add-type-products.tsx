@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { Box } from '@mui/system';
 import { useStyles } from '../../../styles/makeTheme';
@@ -81,38 +81,42 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
   const productResponse = useAppSelector((state) => state.searchTypeAndProduct.itemList);
   const productTypeResponse = useAppSelector((state) => state.searchTypeAndProduct.productTypeList);
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
-
+  const searchDebouceRef = useRef<any>();
   const onInputChangeProduct = async (event: any, value: string, reason: string) => {
-    if (event && event.keyCode && event.keyCode === 13) {
-      return false;
-    }
-
-    // console.log('onInputChange', { reason, value });
-    // if (reason == 'reset') {
-    //   clearInput();
-    // }
-
-    const keyword = value.trim();
-    if (keyword.length >= 3 && reason !== 'reset') {
-      setSearchItem(keyword);
-      let productTypeList = [];
-      let payloadBody: any;
-      let requestBody = props.requestBody;
-      if (!objectNullOrEmpty(values.productType)) {
-        productTypeList.push(values.productType.productTypeCode);
-        payloadBody = { ...requestBody, productTypeCodes: productTypeList };
-      } else {
-        payloadBody = requestBody;
+    searchDebouceRef.current?.cancel();
+    searchDebouceRef.current = _.debounce(async () => {
+      if (event && event.keyCode && event.keyCode === 13) {
+        return false;
       }
 
-      const payload: FindProductProps = {
-        search: keyword,
-        payload: payloadBody,
-      };
-      await dispatch(newSearchAllProductAsync(payload));
-    } else {
-      clearData();
-    }
+      // console.log('onInputChange', { reason, value });
+      // if (reason == 'reset') {
+      //   clearInput();
+      // }
+
+      const keyword = value.trim();
+      if (keyword.length >= 3 && reason !== 'reset') {
+        setSearchItem(keyword);
+        let productTypeList = [];
+        let payloadBody: any;
+        let requestBody = props.requestBody;
+        if (!objectNullOrEmpty(values.productType)) {
+          productTypeList.push(values.productType.productTypeCode);
+          payloadBody = { ...requestBody, productTypeCodes: productTypeList };
+        } else {
+          payloadBody = requestBody;
+        }
+
+        const payload: FindProductProps = {
+          search: keyword,
+          payload: payloadBody,
+        };
+        await dispatch(newSearchAllProductAsync(payload));
+      } else {
+        clearData();
+      }
+    }, 200);
+    searchDebouceRef.current();
   };
 
   const onInputChangeProductType = async (event: any, value: string, reason: string) => {
@@ -540,6 +544,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
                 ประเภทสินค้า
               </Typography>
               <Autocomplete
+                data-testid='autocomplete-product-type'
                 options={productTypeOptions}
                 id='combo-box-type'
                 popupIcon={<SearchIcon color='primary' />}

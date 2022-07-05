@@ -4,22 +4,16 @@ import { useAppSelector, useAppDispatch } from '../../store/store';
 import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
-// import { makeStyles } from '@mui/styles';
 import { useStyles } from '../../styles/makeTheme';
-import Done from '@mui/icons-material/Done';
 
 import LoadingModal from '../commons/ui/loading-modal';
 import { Chip, Typography } from '@mui/material';
 import { StockTransferInfo, StockTransferRequest, StockTransferResponse } from '../../models/stock-transfer-model';
-import { DeleteForever } from '@mui/icons-material';
 import { featchSearchStockTransferAsync } from '../../store/slices/stock-transfer-slice';
 import { saveSearchStockTransfer } from '../../store/slices/save-search-stock-transfer-slice';
-import StockPackChecked from './stock-pack';
-import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import { featchBranchTransferDetailAsync } from '../../store/slices/stock-transfer-branch-request-slice';
 import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
-// import StockTransferBT from './new-stock-transfer-bt';
 import StockTransferBT from './branch-transfer/stock-transfer-bt';
 import { updateAddItemSkuGroupState } from '../../store/slices/stock-transfer-bt-sku-slice';
 
@@ -36,7 +30,6 @@ function StockTransferList() {
   const limit = useAppSelector((state) => state.searchStockTransfer.orderList.perPage);
   const res: StockTransferResponse = items.orderList;
   const payload = useAppSelector((state) => state.saveSearchStock.searchStockTransfer);
-  // const [opensDCOrderDetail, setOpensDCOrderDetail] = React.useState(false);
 
   const [idDC, setidDC] = React.useState('');
 
@@ -47,11 +40,10 @@ function StockTransferList() {
       field: 'index',
       headerName: 'ลำดับ',
       width: 65,
-      // flex: 0.7,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -59,7 +51,6 @@ function StockTransferList() {
     {
       field: 'btNo',
       headerName: 'เลขที่เอกสาร BT',
-      // minWidth: 185,
       flex: 1,
       headerAlign: 'center',
       sortable: false,
@@ -75,15 +66,13 @@ function StockTransferList() {
     {
       field: 'startDate',
       headerName: 'วันที่โอน',
-      // width: 160,
       minWidth: 130,
-      // flex: 1,
       headerAlign: 'center',
       align: 'left',
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
             {params.value} - {params.getValue(params.id, 'endDate') || ''}
           </Typography>
         </div>
@@ -92,14 +81,12 @@ function StockTransferList() {
     {
       field: 'branchFromName',
       headerName: 'สาขาต้นทาง',
-      // minWidth: 205,
-      // width: 195,
       flex: 1.2,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
             {params.getValue(params.id, 'branchFrom') || ''}-{params.value}
           </Typography>
         </div>
@@ -108,28 +95,18 @@ function StockTransferList() {
     {
       field: 'branchToName',
       headerName: 'สาขาปลายทาง',
-      // minWidth: 205,
-      // width: 195,
       flex: 1.2,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
             {params.getValue(params.id, 'branchTo') || ''}-{params.value}
           </Typography>
         </div>
       ),
     },
-    // {
-    //   field: 'createdBy',
-    //   headerName: 'ผู้สร้างรายการ',
-    //   minWidth: 80,
-    //   flex: 0.75,
-    //   headerAlign: 'center',
-    //   align: 'left',
-    //   sortable: false,
-    // },
+
     {
       field: 'status',
       headerName: 'สถานะ BT',
@@ -148,7 +125,7 @@ function StockTransferList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
@@ -156,25 +133,13 @@ function StockTransferList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
         }
       },
     },
-
-    // {
-    //   field: 'button',
-    //   headerName: ' ',
-    //   width: 60,
-    //   minWidth: 0,
-    //   align: 'center',
-    //   sortable: false,
-    //   renderCell: () => {
-    //     return <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />;
-    //   },
-    // },
   ];
 
   const rows = res.data.map((data: StockTransferInfo, indexs: number) => {
@@ -202,24 +167,6 @@ function StockTransferList() {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  // const currentlySelected = async (params: GridCellParams) => {
-  //   handleOpenLoading('open', true);
-  //   setidDC(params.row.id);
-
-  //   try {
-  //     await dispatch(featchorderDetailDCAsync(params.row.id));
-  //     setOpensDCOrderDetail(true);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-
-  //   handleOpenLoading('open', false);
-  // };
-
-  // function isClosModal() {
-  //   setOpensDCOrderDetail(false);
-  // }
-
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
@@ -244,7 +191,6 @@ function StockTransferList() {
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
-    // console.log("pageSize: ", pageSize);
     setPageSize(pageSize.toString());
 
     setLoading(true);
@@ -274,15 +220,18 @@ function StockTransferList() {
   }
   const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
   const currentlySelected = async (params: GridCellParams) => {
+    handleOpenLoading('open', true);
     await dispatch(updateAddItemsState({}));
     await dispatch(featchBranchTransferDetailAsync(params.row.btNo));
     dispatch(updateAddItemSkuGroupState([]));
     if (reasonsList === null || reasonsList.length <= 0) await dispatch(featchTransferReasonsListAsync());
     setOpenCreateModal(true);
+
+    handleOpenLoading('open', false);
   };
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -296,7 +245,7 @@ function StockTransferList() {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
@@ -304,7 +253,6 @@ function StockTransferList() {
           />
         </div>
       </Box>
-      {/* {openCreateModal && <StockPackChecked isOpen={true} onClickClose={handleCloseCreateModal} />} */}
       {openCreateModal && <StockTransferBT isOpen={true} onClickClose={handleCloseCreateModal} />}
       <LoadingModal open={openLoadingModal.open} />
     </div>

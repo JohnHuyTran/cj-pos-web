@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
-import DialogTitle from "@mui/material/DialogTitle";
-import IconButton from "@mui/material/IconButton";
-import { HighlightOff } from "@mui/icons-material";
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import { HighlightOff } from '@mui/icons-material';
 
 export interface DialogTitleProps {
   id: string;
@@ -18,16 +18,16 @@ export const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          data-testid='testid-title-btnClose'
+          aria-label='close'
           onClick={onClose}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
-          <HighlightOff fontSize="large" />
+          }}>
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
     </DialogTitle>

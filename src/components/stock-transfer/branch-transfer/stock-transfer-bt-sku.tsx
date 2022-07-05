@@ -193,7 +193,6 @@ function BranchTransferListSKU({ onSelectSku, skuList, onUpdateItemList }: Props
       _newSku.push(newData);
     });
     setBtItemGroups(_newSku);
-    // dispatch(updateAddItemSkuGroupState(_newSku));
   };
 
   const updateSKUList = (_items: Item[]) => {

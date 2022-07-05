@@ -18,9 +18,15 @@ import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
 import ModalCreateTransferOutDestroy from '../transfer-out-destroy/modal-create-transfer-out-destroy';
 import ModalCreateTransferOut from '../transfer-out/modal-create-transfer-out';
+import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+import CheckOrderDetail from '../check-orders/check-order-detail';
 import { ShoppingCartSharp } from '@mui/icons-material';
 import HtmlTooltip from '../commons/ui/html-tooltip';
 import AlertError from '../commons/ui/alert-error';
+import StockRequestDetail from '../stock-transfer/stock-request-detail';
+import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
+import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 import ModalCreateToDestroyDiscount from '../transfer-out-destroy/modal-create-to-destroy-discount';
 
 interface Props {
@@ -31,6 +37,13 @@ export default function NotificationReminder(props: Props) {
   const [page, setPage] = React.useState(0);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const [total, setTotal] = React.useState(0);
+  const [orderDetailParams, setOrderDetailParams] = React.useState({
+    sdNo: '',
+    docRefNo: '',
+    docType: '',
+  });
+  const [openCheckOrderDetail, setOpenCheckOrderDetail] = React.useState(false);
+  const [openStockRequestDetail, setOpenStockRequestDetail] = React.useState(false);
   const [listData, setListData] = React.useState<any[]>([]);
   const [openTransferOutDetail, setOpenTransferOutDetail] = React.useState(false);
   const [openTransferOutDestroyDetail, setOpenTransferOutDestroyDetail] = React.useState(false);
@@ -81,6 +94,9 @@ export default function NotificationReminder(props: Props) {
   const handleCloseModalError = () => {
     setOpenModalError(false);
   };
+  function handleCloseModalCheckOrderDetail() {
+    setOpenCheckOrderDetail(false);
+  }
   const handleCloseDetailDestroyDiscount = () => {
     setOpenDetailDestroyDiscount(false);
   };
@@ -130,10 +146,31 @@ export default function NotificationReminder(props: Props) {
             setOpenModalError(true);
           }
         }
-      } else if (item.type === 'REJECT_BARCODE' || item.type === 'APPROVE_BARCODE') {
+      } else if (item.type === 'REJECT_BARCODE' || item.type === 'APPROVE_BARCODE' || item.type == 'PRINT_BARCODE') {
         const rs = await dispatch(getBarcodeDiscountDetail(item.payload.documentNumber));
         if (!!rs.payload) {
           setOpenBDDetail(true);
+        } else {
+          setOpenModalError(true);
+        }
+      } else if (item.type === 'ORDER_SD_CLOSED') {
+        const rs = await dispatch(featchOrderDetailAsync(item?.payload?.sdNo));
+        if (!!rs.payload) {
+          setOrderDetailParams({
+            sdNo: item?.payload?.sdNo,
+            docRefNo: item?.payload?.docRefNo,
+            docType: item?.payload?.docType,
+          });
+          setOpenCheckOrderDetail(true);
+        } else {
+          setOpenModalError(true);
+        }
+      } else if (item.type === 'STOCK_TRANSFER_APPROVED') {
+        await dispatch(updateAddItemsState({}));
+        await dispatch(updatestockRequestItemsState({}));
+        const rs = await dispatch(featchStockRequestDetailAsync(item.payload.rtNo));
+        if (!!rs.payload) {
+          setOpenStockRequestDetail(true);
         } else {
           setOpenModalError(true);
         }
@@ -189,6 +226,14 @@ export default function NotificationReminder(props: Props) {
           backgroundColor: '#E7FFE9',
         });
         break;
+      case 'PRINT_BARCODE':
+        content = 'ส่วนลดสินค้า';
+        branchCode = item.payload.branchCode;
+        statusDisplay = genStatusValue('พิมพ์บาร์โค้ดแล้ว', {
+          color: '#676767',
+          backgroundColor: '#EAEBEB',
+        });
+        break;
       case 'CLOSE_TRANSFER_OUT':
         {
           content = item.payload.type === 1 ? 'เบิกทำกิจกรรม' : 'เบิกทำลาย';
@@ -211,11 +256,33 @@ export default function NotificationReminder(props: Props) {
         }
 
         break;
+      case 'ORDER_SD_CLOSED':
+        {
+          content = 'รับสินค้า-โอนลอย';
+          branchCode = item.payload.branchCode;
+          statusDisplay = genStatusValue('รับทราบ', {
+            color: '#36C690',
+            backgroundColor: '#E7FFE9',
+          });
+        }
+
+        break;
       case 'EVENT_REQUEST_GENERATE_ORDER_SHIPMENT_ORDER_TOTE':
         {
           content = 'โอนสินค้าระหว่างสาขา - อยู่ระหว่างขนส่ง';
           branchCode = item.payload.branchCode;
           statusDisplay = genStatusValue('รับทราบ', {
+            color: '#36C690',
+            backgroundColor: '#E7FFE9',
+          });
+        }
+
+        break;
+      case 'STOCK_TRANSFER_APPROVED':
+        {
+          content = 'สร้างแผนโอนระหว่างสาขา-อนุมัติ';
+          branchCode = item.payload.branchCode;
+          statusDisplay = genStatusValue('อนุมัติ', {
             color: '#36C690',
             backgroundColor: '#E7FFE9',
           });
@@ -234,8 +301,7 @@ export default function NotificationReminder(props: Props) {
           cursor: 'pointer',
           fontSize: '12px',
         }}
-        onClick={() => currentlySelected(item)}
-      >
+        onClick={() => currentlySelected(item)}>
         <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type == 'REJECT_BARCODE' || item.type == 'APPROVE_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
@@ -250,16 +316,14 @@ export default function NotificationReminder(props: Props) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               width: '80%',
-            }}
-          >
+            }}>
             <span style={{ color: theme.palette.primary.main }}>{content}: </span>
             <HtmlTooltip
               title={
                 <React.Fragment>
                   {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
                 </React.Fragment>
-              }
-            >
+              }>
               <span style={{ marginLeft: 5 }}>
                 {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
               </span>
@@ -283,10 +347,9 @@ export default function NotificationReminder(props: Props) {
           border: '1px solid #E0E0E0',
           borderRadius: '10px',
           minWidth: '600px',
-        }}
-      >
+        }}>
         <TablePagination
-          component="div"
+          component='div'
           count={total}
           page={page}
           onPageChange={handleChangePage}
@@ -329,6 +392,25 @@ export default function NotificationReminder(props: Props) {
           setOpenPopup={setOpenPopup}
           onSearchMain={handleGetData}
           userPermission={userPermission}
+        />
+      )}
+      {openCheckOrderDetail && (
+        <CheckOrderDetail
+          sdNo={orderDetailParams.sdNo}
+          docRefNo={orderDetailParams.docRefNo}
+          docType={orderDetailParams.docType}
+          defaultOpen={openCheckOrderDetail}
+          onClickClose={handleCloseModalCheckOrderDetail}
+        />
+      )}
+      {openStockRequestDetail && (
+        <StockRequestDetail
+          type={'View'}
+          edit={false}
+          isOpen={openStockRequestDetail}
+          onClickClose={() => {
+            setOpenStockRequestDetail(false);
+          }}
         />
       )}
       {openDetailDestroyDiscount && (

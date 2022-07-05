@@ -108,7 +108,7 @@ export default function ModalCreateToDestroyDiscount({
   const [attachFileAfterError, setAttachFileAfterError] = React.useState('');
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const fileUploadAfterList = useAppSelector((state) => state.toDestroyDiscountAttachAfterSlice.state);
-  const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+  const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
     ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
@@ -395,7 +395,7 @@ export default function ModalCreateToDestroyDiscount({
   };
 
   const handleCreateDraft = async (sendRequest: boolean) => {
-    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate(false, sendRequest)) {
       const rsCheckStock = await handleCheckStock();
       if (rsCheckStock) {
@@ -488,7 +488,7 @@ export default function ModalCreateToDestroyDiscount({
   };
 
   const handleSendForApproval = async (id: string) => {
-    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const rs = await sendForApprovalTransferOut(id);
       if (rs.code === 20000) {
@@ -511,7 +511,7 @@ export default function ModalCreateToDestroyDiscount({
   };
 
   const handleOpenModalConfirmApprove = () => {
-    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate(true, false)) {
       setOpenModalConfirmApprove(true);
     } else {
@@ -521,7 +521,7 @@ export default function ModalCreateToDestroyDiscount({
   };
 
   const handleApprove = async () => {
-    setAlertTextError('กรุณาตรวจสอบกรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const allAttachFile = await handleAllAttachFile(fileUploadList, attachFileBeforeOlds);
       const payload = {

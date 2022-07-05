@@ -18,6 +18,7 @@ import { featchOrderListAsync } from '../../store/slices/check-order-slice';
 import LoadingModal from '../commons/ui/loading-modal';
 import { env } from '../../adapters/environmentConfigs';
 import { Grid } from '@mui/material';
+import { searchToteAsync } from '../../store/slices/search-tote-slice';
 
 interface ConfirmOrderShipment {
   open: boolean;
@@ -104,13 +105,15 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
       await approveOrderShipments(sdNo, payload).then(
         async function (value) {
           await updateShipmentOrder();
+          await dispatch(searchToteAsync());
           // setTimeout(() => {
           onUpdateShipmentStatus(true, '');
+
           onClose();
           // }, 3000);
         },
         function (error: ApiError) {
-          onUpdateShipmentStatus(false, error.message);
+          onUpdateShipmentStatus(false, error);
           onClose();
         }
       );
@@ -119,12 +122,13 @@ export default function CheckOrderConfirmModel(props: ConfirmOrderShipment) {
         .then(
           async function (value) {
             await updateShipmentOrder();
+            await dispatch(searchToteAsync());
 
             onUpdateShipmentStatus(true, '');
             onClose();
           },
           function (error: ApiError) {
-            onUpdateShipmentStatus(false, error.message);
+            onUpdateShipmentStatus(false, error);
             onClose();
           }
         )
