@@ -450,25 +450,30 @@ export const ModalTransferItem = (props: DataGridProps) => {
         const condition = index !== -1 && !!errorList[index].errorDiscount;
         return typeDiscount === 'percent' ?
           (
-            <FormControl fullWidth className={classes.Mselect}>
-              <Select
-                id='discountPercent'
-                name='discountPercent'
-                value={params.value}
-                onChange={(e: any) => {
-                  handleChangeDiscount(e, params.row.index, index);
-                }}
-                className={classes.MSelected}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                {percentages && percentages.length > 0 && percentages.map((item: any) => {
-                  return (
-                    <MenuItem key={item.value} value={item.value}>
-                      <span style={{ width: '100%', textAlign: 'right' }}>{item.code}</span>
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
+            <div className={classes.MLabelTooltipWrapper} style={{ width: '100%' }}>
+              <FormControl fullWidth className={classes.Mselect}
+                           error={condition}>
+                <Select
+                  id='discountPercent'
+                  name='discountPercent'
+                  value={params.value}
+                  onChange={(e: any) => {
+                    handleChangeDiscount(e, params.row.index, index);
+                  }}
+                  disabled={dataDetail.status > 1}
+                  className={classes.MSelected}
+                  inputProps={{ 'aria-label': 'Without label' }}>
+                  {percentages && percentages.length > 0 && percentages.map((item: any) => {
+                    return (
+                      <MenuItem key={item.value} value={item.value}>
+                        <span style={{ width: '100%', textAlign: 'right' }}>{item.code}</span>
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+                {condition && <div className="title">{errorList[index].errorDiscount}</div>}
+              </FormControl>
+            </div>
           )
           :
           (
