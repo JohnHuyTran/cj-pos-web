@@ -5,17 +5,18 @@ import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
 import { Box, Button, DialogTitle, Grid, IconButton } from '@mui/material';
-import { AddCircleOutlineOutlined, Cancel, CheckCircle, HighlightOff, Save } from '@mui/icons-material';
+import { AddCircleOutlineOutlined, Cancel, CheckCircle, ContentCopy, HighlightOff, Save } from '@mui/icons-material';
 import Steppers from '../../commons/ui/steppers';
 import moment from 'moment';
 import { useStyles } from '../../../styles/makeTheme';
+import PurchaseBranchListItemDraft from './purchase-branch-list-item-draft';
 import PurchaseBranchListItem from './purchase-branch-list-item';
 import TextBoxComment from '../../commons/ui/textbox-comment';
 import ModalAddItems from '../../commons/ui/modal-add-items';
 import { getBranchName } from '../../../utils/utils';
 import { getUserInfo } from '../../../store/sessionStore';
 import { PurchaseBRRequest } from '../../../models/purchase-branch-request-model';
-import { deletePurchaseBR, savePurchaseBR } from '../../../services/purchase';
+import { deletePurchaseBR, savePurchaseBR, sendPurchaseBR } from '../../../services/purchase';
 import { ApiError } from '../../../models/api-error-model';
 import { updateAddItemsState } from '../../../store/slices/add-items-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
@@ -26,7 +27,15 @@ import { ACTIONS } from '../../../utils/enum/permission-enum';
 import { isAllowActionPermission } from '../../../utils/role-permission';
 import ConfirmModelExit from '../../commons/ui/confirm-exit-model';
 import { featchSearchPurchaseBranchRequestAsync } from '../../../store/slices/purchase-branch-request-slice';
-import { featchPurchaseBRDetailAsync } from '../../../store/slices/purchase/purchase-branch-request-detail-slice';
+import {
+  clearDataPurchaseBRDetail,
+  featchPurchaseBRDetailAsync,
+} from '../../../store/slices/purchase/purchase-branch-request-detail-slice';
+import { getProductBySKUCodes } from '../../../services/product-master';
+import ModalPurchaseBranchCopy from './purchase-branch-detail';
+import AlertError from '../../commons/ui/alert-error';
+import ModelMockupCase from '../modal-mockup-case';
+import { mappingErrorParam } from '../../../utils/exception/pos-exception';
 
 interface Props {
   isOpen: boolean;
@@ -70,7 +79,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   const [flagSave, setFlagSave] = React.useState(false);
   const handleChkSaveClose = async () => {
-    if (flagSave) {
+    if (status === 'DRAFT' && flagSave) {
       setConfirmModelExit(true);
     } else {
       handleClose();
@@ -94,26 +103,24 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [docNo, setDocNo] = React.useState('');
   const [remark, setRemark] = React.useState('');
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
-  const [status, setStatus] = React.useState('');
+  const [status, setStatus] = React.useState('DRAFT');
   const [branchName, setBranchName] = React.useState('');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
-  const [displayBtnSubmit, setDisplayBtnSubmit] = React.useState(false);
-  const [displayBtnSave, setDisplayBtnSave] = React.useState(false);
-  const [displayBtnDelete, setDisplayBtnDelete] = React.useState(false);
-  const [displayAddItems, setDisplayAddItems] = React.useState(false);
+  const [displayBtnSubmit, setDisplayBtnSubmit] = React.useState(true);
+  const [displayBtnSave, setDisplayBtnSave] = React.useState(true);
+  const [displayBtnDelete, setDisplayBtnDelete] = React.useState(true);
+  const [disabledBtnDelete, setDisabledBtnDelete] = React.useState(true);
+  const [displayAddItems, setDisplayAddItems] = React.useState(true);
+  const [displayCopyItems, setDisplayCopyItems] = React.useState(true);
 
   useEffect(() => {
-    if (status !== 'DRAFT' && isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE)) {
-      setDisplayBtnDelete(true);
-    } else {
-      setDisplayBtnDelete(false);
-    }
-    setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-    setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-    // setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
-    setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+    // if (status !== 'DRAFT' && isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE)) {
+    //   setDisplayBtnDelete(true);
+    // } else {
+    //   setDisplayBtnDelete(false);
+    // }
 
     if (purchaseBRDetail) {
       setDocNo(purchaseBRDetail.docNo);
@@ -122,31 +129,55 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       setRemark(purchaseBRDetail.remark);
       setCreateDate(new Date(purchaseBRDetail.createdDate));
 
-      const strBranchName = getBranchName(branchList, purchaseBRDetail.branchCode);
-      setBranchName(strBranchName ? `${purchaseBRDetail.branchCode}-${strBranchName}` : getUserInfo().branch);
+      if (purchaseBRDetail.status === 'DRAFT') {
+        setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+        setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+        setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+        setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+        setDisabledBtnDelete(false);
 
-      if (purchaseBRDetail.items.length > 0) {
-        let items: any = [];
-        purchaseBRDetail.items.forEach((data: any) => {
-          const item: any = {
-            skuCode: data.skuCode,
-            barcode: data.barcode,
-            barcodeName: data.barcodeName,
-            unitCode: data.unitCode,
-            unitName: data.unitName,
-            baseUnit: data.barFactor,
-            qty: data.orderQty,
-            stockMax: data.orderMaxQty,
-          };
-          items.push(item);
+        if (purchaseBRDetail.items.length > 0) {
+          let items: any = [];
+          purchaseBRDetail.items.forEach((data: any) => {
+            const item: any = {
+              skuCode: data.skuCode,
+              barcode: data.barcode,
+              barcodeName: data.barcodeName,
+              unitCode: data.unitCode,
+              unitName: data.unitName,
+              baseUnit: data.barFactor,
+              qty: data.orderQty,
+              stockMax: data.orderMaxQty,
+            };
+            items.push(item);
+          });
+
+          dispatch(updateAddItemsState(items));
+        }
+      } else if (purchaseBRDetail.status === 'INCOMPLETE_RECEIVED' || purchaseBRDetail.status === 'DC_NO_STOCK') {
+        dispatch(updateAddItemsState(purchaseBRDetail.items));
+
+        let DisplayCopy = true;
+        purchaseBRDetail.items.map((item: any) => {
+          const actualQty = item.actualQty ? item.actualQty : 0;
+          const orderQty = item.orderQty ? item.orderQty : 0;
+          let diff = Number(actualQty) - Number(orderQty);
+          if (diff < 0) DisplayCopy = false;
         });
 
-        dispatch(updateAddItemsState(items));
+        if (!isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE)) setDisplayCopyItems(DisplayCopy);
       }
+
+      const strBranchName = getBranchName(branchList, purchaseBRDetail.branchCode);
+      setBranchName(strBranchName ? `${purchaseBRDetail.branchCode}-${strBranchName}` : getUserInfo().branch);
     } else {
       const strBranchName = getBranchName(branchList, getUserInfo().branch);
       setBranchName(strBranchName ? `${getUserInfo().branch}-${strBranchName}` : getUserInfo().branch);
       handleStatusStepper('DRAFT');
+      setDisplayAddItems(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      setDisplayBtnSubmit(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      setDisplayBtnSave(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
+      setDisplayBtnDelete(isAllowActionPermission(ACTIONS.PURCHASE_BR_MANAGE));
     }
   }, [branchList]);
 
@@ -158,17 +189,17 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       if (item.stepperGrp === 1 && item.value === status) {
         stepsList.push(t(`status.${item.value}`));
         stepsList.push('อยู่ระหว่างดำเนินการ: -');
-        stepsList.push(t(`status.CLOSED`));
+        stepsList.push(t(`ปิดงาน`));
         setStatusSteps(item.stepperGrp - 1);
       } else if (item.stepperGrp === 2 && item.value === status) {
         stepsList.push(t('status.DRAFT'));
         stepsList.push('อยู่ระหว่างดำเนินการ: ' + t(`status.${item.value}`));
-        stepsList.push(t(`status.CLOSED`));
+        stepsList.push(t(`ปิดงาน`));
         setStatusSteps(item.stepperGrp - 1);
       } else if (item.stepperGrp === 3 && item.value === status) {
         stepsList.push(t('status.DRAFT'));
         stepsList.push('อยู่ระหว่างดำเนินการ: -');
-        stepsList.push(t(`status.${item.value}`));
+        stepsList.push('ปิดงาน - ' + t(`status.${item.value}`));
         setStatusSteps(item.stepperGrp - 1);
       }
       //setSteps
@@ -192,6 +223,16 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
   const handleChangeItems = async () => {
     setFlagSave(true);
     // await dispatch(updateAddItemsState(items));
+  };
+
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+
+    if (status === 'DC_NO_STOCK') {
+      handleClose();
+    }
   };
 
   const featchPurchaseBRDetail = async (docNo: string) => {
@@ -226,6 +267,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
       .then((value) => {
         setDocNo(value.docNo);
         setStatus('DRAFT');
+        setDisabledBtnDelete(false);
         featchPurchaseBRDetail(value.docNo);
 
         setFlagSave(false);
@@ -234,9 +276,8 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
       })
       .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setSnackbarIsStatus(false);
-        setContentMsg(error.message);
+        setTextError(error.message);
+        setOpenAlert(true);
       });
     setOpenLoadingModal(false);
   };
@@ -297,9 +338,78 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
         }, 300);
       })
       .catch((error: ApiError) => {
-        setShowSnackBar(true);
-        setSnackbarIsStatus(false);
-        setContentMsg(error.message);
+        setTextError(error.message);
+        setOpenAlert(true);
+      });
+    setOpenLoadingModal(false);
+  };
+
+  const payloadSearch = useAppSelector((state) => state.saveSearchPurchaseBranchRequest.searchPurchaseBranchRequest);
+  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
+  const handleCloseModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+  const handleConfirm = async () => {
+    setOpenModelConfirm(false);
+
+    handleSendBR();
+  };
+
+  const handleBtnSendBR = async () => {
+    // if (flagSave) {
+    if (docNo === '') {
+      const payloadSave: any = await handleMapPayloadSave();
+      await savePurchaseBR(payloadSave)
+        .then((value) => {
+          setFlagSave(false);
+          setDocNo(value.docNo);
+          setStatus('DRAFT');
+          setDisabledBtnDelete(false);
+
+          setTextHeaderConfirm('ยืนยันส่งรายการ เบิกของใช้หน้าร้าน');
+          setOpenModelConfirm(true);
+        })
+        .catch((error: ApiError) => {
+          setTextError(error.message);
+          setOpenAlert(true);
+        });
+    } else {
+      setTextHeaderConfirm('ยืนยันส่งรายการ เบิกของใช้หน้าร้าน');
+      setOpenModelConfirm(true);
+    }
+  };
+  const handleSendBR = async () => {
+    setOpenLoadingModal(true);
+    await sendPurchaseBR(docNo, caseNo)
+      .then((value) => {
+        // DC_NO_STOCK
+        if (String(value.data.status) === 'DC_NO_STOCK') {
+          setStatus(value.data.status);
+          setTextError('ไม่มีสต๊อกสินค้าที่คลัง');
+          setOpenAlert(true);
+        } else {
+          setFlagSave(false);
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้ส่งรายการเรียบร้อยแล้ว');
+          dispatch(featchSearchPurchaseBranchRequestAsync(payloadSearch));
+          setTimeout(() => {
+            handleClose();
+          }, 500);
+        }
+      })
+      .catch((error: ApiError) => {
+        if (error.code === 40113) {
+          setTextError(error.message);
+          setOpenAlert(true);
+        } else if (error.code === 40114) {
+          setTextError(mappingErrorParam(error.message, { headerErrMsg: error.data.toString() }));
+          setOpenAlert(true);
+        } else {
+          setTextError(error.message);
+          setOpenAlert(true);
+        }
       });
     setOpenLoadingModal(false);
   };
@@ -311,28 +421,123 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
     setShowSnackBar(false);
   };
 
+  const [openCopyModal, setOpenCopyModal] = React.useState(false);
+  const handleOpenCopyModal = () => {
+    setOpenCopyModal(true);
+  };
+  const handleCloseCopyModal = () => {
+    handleClose();
+    setOpenCopyModal(false);
+  };
+  const handleOpenCopyItems = async () => {
+    setOpenLoadingModal(true);
+    await dispatch(clearDataPurchaseBRDetail());
+
+    const itemsCopy: any = [];
+    const SKUCodes: any = [];
+    payloadAddItem.map((item: any) => {
+      const actualQty = item.actualQty ? item.actualQty : 0;
+      const orderQty = item.orderQty ? item.orderQty : 0;
+      let diff = Number(actualQty) - Number(orderQty);
+      if (diff < 0) {
+        itemsCopy.push(item);
+        SKUCodes.push(item.skuCode);
+      }
+    });
+
+    await getProductBySKUCodes(SKUCodes)
+      .then((value) => {
+        const itemsCopyMap: any = [];
+        itemsCopy.map((data: any) => {
+          const sku = value.data.filter((r: any) => r.skuCode === data.skuCode);
+          const diff = Number(data.orderQty) - Number(data.actualQty);
+          const item: any = {
+            skuCode: data.skuCode,
+            barcode: data.barcode,
+            barcodeName: data.barcodeName,
+            unitCode: data.unitCode,
+            unitName: data.unitName,
+            baseUnit: data.barFactor,
+            qty: diff ? diff : 0,
+            stockMax: sku[0].stockMax ? sku[0].stockMax : data.orderMaxQty,
+          };
+          itemsCopyMap.push(item);
+        });
+
+        dispatch(updateAddItemsState(itemsCopyMap));
+        setFlagSave(true);
+      })
+      .catch((error: ApiError) => {
+        const itemsCopyMap: any = [];
+        itemsCopy.map((data: any) => {
+          const diff = Number(data.orderQty) - Number(data.actualQty);
+          const item: any = {
+            skuCode: data.skuCode,
+            barcode: data.barcode,
+            barcodeName: data.barcodeName,
+            unitCode: data.unitCode,
+            unitName: data.unitName,
+            baseUnit: data.barFactor,
+            qty: diff ? diff : 0,
+            stockMax: data.orderMaxQty,
+          };
+          itemsCopyMap.push(item);
+        });
+
+        dispatch(updateAddItemsState(itemsCopyMap));
+        setFlagSave(true);
+      });
+
+    handleOpenCopyModal();
+    // handleClose();
+
+    setTimeout(() => {
+      setOpenLoadingModal(false);
+    }, 300);
+  };
+
+  // Mock Case Await Sap
+  const [openModelMockupCase, setOpenModelMockupCase] = React.useState(false);
+  const [caseNo, setCaseNo] = React.useState('5');
+  const handleOpenModelMockupCase = () => {
+    setOpenModelMockupCase(true);
+  };
+  const handleCloseModelMockupCase = (valueCase: string) => {
+    setCaseNo(valueCase);
+    setOpenModelMockupCase(false);
+
+    handleBtnSendBR();
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleChkSaveClose}>
-          <Typography sx={{ fontSize: '1em' }}>สร้างรายการสั่งสินค้า</Typography>
+          <Typography sx={{ fontSize: '1em' }}>เบิกของใช้หน้าร้าน</Typography>
           <Steppers status={statusSteps} stepsList={steps}></Steppers>
         </BootstrapDialogTitle>
 
-        <DialogContent>
+        <DialogContent sx={{ minHeight: '70vh' }}>
           <Grid container spacing={2} mb={2} id='top-item'>
             <Grid item xs={2}>
               เลขที่เอกสาร BR :
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               {docNo !== '' && docNo}
               {docNo === '' && '-'}
             </Grid>
             <Grid item xs={2}>
               วันที่สร้างรายการ :
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               {moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
+            </Grid>
+
+            <Grid item xs={2}>
+              {status !== 'DRAFT' && 'เลขที่เอกสาร PO :'}
+            </Grid>
+            <Grid item xs={2}>
+              {status !== 'DRAFT' && purchaseBRDetail?.poNo}
             </Grid>
           </Grid>
 
@@ -340,15 +545,22 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             <Grid item xs={2}>
               สาขาที่สร้างรายการ :
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               {branchName}
             </Grid>
             <Grid item xs={2}>
               สถานะ :
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               {status !== '' && t(`status.${status}`)}
               {status === '' && '-'}
+            </Grid>
+
+            <Grid item xs={2}>
+              {status !== 'DRAFT' && 'เลขที่เอกสาร DO :'}
+            </Grid>
+            <Grid item xs={2}>
+              {status !== 'DRAFT' && purchaseBRDetail?.doNo}
             </Grid>
           </Grid>
 
@@ -356,7 +568,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             <Grid container spacing={2} mt={4} mb={2}>
               <Grid item xs={5}>
                 <Button
-                  id='btnCreateStockTransferModal'
+                  id='btnAddItems'
                   variant='contained'
                   onClick={handleOpenAddItems}
                   sx={{ width: 120, display: `${displayAddItems ? 'none' : ''}` }}
@@ -368,7 +580,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
               </Grid>
               <Grid item xs={7} sx={{ textAlign: 'end' }}>
                 <Button
-                  id='btnCreateStockTransferModal'
+                  id='btnSave'
                   variant='contained'
                   onClick={handleSaveBR}
                   sx={{ width: 120, display: `${displayBtnSave ? 'none' : ''}` }}
@@ -381,13 +593,13 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                 <Button
                   id='btnClear'
                   variant='contained'
-                  // onClick={onClickSubmitBtn}
+                  // onClick={handleBtnSendBR}
+                  onClick={handleOpenModelMockupCase}
                   sx={{ width: 120, ml: 2, display: `${displayBtnSubmit ? 'none' : ''}` }}
                   className={classes.MbtnClear}
                   startIcon={<CheckCircle />}
                   color='primary'
-                  // disabled={Object.keys(payloadAddItem).length === 0}
-                  disabled={true}>
+                  disabled={Object.keys(payloadAddItem).length === 0}>
                   ส่งรายการ
                 </Button>
                 <Button
@@ -398,15 +610,27 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   startIcon={<Cancel />}
                   className={classes.MbtnSearch}
                   color='error'
-                  disabled={Object.keys(payloadAddItem).length === 0}>
+                  disabled={disabledBtnDelete}>
                   ยกเลิก
+                </Button>
+
+                <Button
+                  id='btnCopyItems'
+                  variant='contained'
+                  onClick={handleOpenCopyItems}
+                  sx={{ width: 120, display: `${displayCopyItems ? 'none' : ''}` }}
+                  className={classes.MbtnAdd}
+                  startIcon={<ContentCopy />}
+                  color='secondary'>
+                  คัดลอก
                 </Button>
               </Grid>
             </Grid>
           </Box>
 
           <Box mb={5}>
-            <PurchaseBranchListItem onChangeItems={handleChangeItems} />
+            {status === 'DRAFT' && <PurchaseBranchListItemDraft onChangeItems={handleChangeItems} />}
+            {status !== '' && status !== 'DRAFT' && <PurchaseBranchListItem onChangeItems={handleChangeItems} />}
           </Box>
           <Box mb={8}>
             <Grid container spacing={2} mb={2}>
@@ -416,7 +640,7 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
                   defaultValue={remark}
                   maxLength={100}
                   onChangeComment={handleChangeComment}
-                  isDisable={false}
+                  isDisable={status !== 'DRAFT'}
                 />
               </Grid>
             </Grid>
@@ -441,6 +665,14 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             docNo={docNo}
           />
 
+          <ModelConfirm
+            open={openModelConfirm}
+            onClose={handleCloseModelConfirm}
+            onConfirm={handleConfirm}
+            headerTitle={textHeaderConfirm}
+            docNo={docNo}
+          />
+
           <SnackbarStatus
             open={showSnackBar}
             onClose={handleCloseSnackBar}
@@ -453,8 +685,14 @@ function purchaseBranchDetail({ isOpen, onClickClose }: Props): ReactElement {
             onClose={handleNotExitModelConfirm}
             onConfirm={handleExitModelConfirm}
           />
+
+          <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+          <ModelMockupCase open={openModelMockupCase} onClose={handleCloseModelMockupCase} caseNo={caseNo} />
         </DialogContent>
       </Dialog>
+
+      {openCopyModal && <ModalPurchaseBranchCopy isOpen={openCopyModal} onClickClose={handleCloseCopyModal} />}
     </div>
   );
 }

@@ -1,37 +1,21 @@
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../store/store';
-import {
-  DataGrid,
-  GridCellParams,
-  GridColDef,
-  GridRowData,
-  GridRowId,
-  GridRowParams,
-  GridValueGetterParams,
-  useGridApiRef,
-} from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRowData, GridRowParams, useGridApiRef } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 // import { makeStyles } from '@mui/styles';
 import { useStyles } from '../../styles/makeTheme';
-import Done from '@mui/icons-material/Done';
-
 import LoadingModal from '../commons/ui/loading-modal';
 import { Chip, Typography } from '@mui/material';
 import { StockTransferInfo, StockTransferRequest, StockTransferResponse } from '../../models/stock-transfer-model';
-import ModelDeleteConfirm from './modal-delete-confirm';
-import { DeleteForever } from '@mui/icons-material';
 import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
 import { saveSearchStockTransferRt } from '../../store/slices/save-search-stock-transfer-rt-slice';
 import ModalDetailStockTransfer from './stock-request-detail';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
-import { featchTransferReasonsListAsync } from '../../store/slices/transfer-reasons-slice';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
-import { removeStockRequest } from '../../services/stock-transfer';
-import { isAllowActionPermission, isPreferredUsername } from '../../utils/role-permission';
-import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
+import { isPreferredUsername } from '../../utils/role-permission';
 import { getUserInfo } from '../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 
@@ -51,7 +35,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -73,7 +57,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
           {params.value} - {params.getValue(params.id, 'endDate') || ''}
         </Typography>
       </div>
@@ -88,7 +72,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
           {params.getValue(params.id, 'branchFrom') || ''}-{params.value}
         </Typography>
       </div>
@@ -103,7 +87,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
           {params.getValue(params.id, 'branchTo') || ''}-{params.value}
         </Typography>
       </div>
@@ -134,7 +118,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
@@ -142,7 +126,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
@@ -150,7 +134,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
           />
         );
@@ -220,6 +204,7 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
   const { apiRef, columns } = useApiRef();
   const [preferredUsername, setPreferredUsername] = React.useState(isPreferredUsername());
   const [groupOC, setGroupOC] = React.useState(getUserInfo().group === PERMISSION_GROUP.OC);
+
   const rows = res.data.map((data: StockTransferInfo, indexs: number) => {
     let editMode = false;
     if (
@@ -244,6 +229,7 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
       status: data.status,
       statusText: t(`status.${data.status}`),
       edit: editMode,
+      itemGroups: data.itemGroups,
     };
   });
 
@@ -368,7 +354,8 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
     const rowSelect = apiRef.current.getSelectedRows();
     let rowSelectList: any = [];
     rowSelect.forEach((data: GridRowData) => {
-      rowSelectList.push(data.rtNo);
+      // rowSelectList.push(data.rtNo);
+      rowSelectList.push(data);
     });
 
     return onSelectRows(rowSelectList ? rowSelectList : []);
@@ -376,7 +363,7 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
 
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -389,7 +376,7 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}

@@ -56,26 +56,24 @@ export default function ModalReject({ open, onClose, barCode, id }: Props): Reac
     <div>
       <Dialog
         open={open}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="lg"
-        PaperProps={{ sx: { minWidth: 450, minHeight: 365 } }}
-      >
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+        maxWidth='lg'
+        PaperProps={{ sx: { minWidth: 450, minHeight: 365 } }}>
         <DialogContent sx={{ mr: 4, ml: 4 }}>
-          <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-            <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+          <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
+            <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
               ยืนยันไม่อนุมัติส่วนลดสินค้า
             </Typography>
             {!!barCode && (
-              <Typography variant="body1" align="left" sx={{ marginBottom: 2 }}>
+              <Typography variant='body1' align='left' sx={{ marginBottom: 2 }}>
                 เลขที่เอกสาร BD{' '}
                 <label
                   style={{
                     color: '#AEAEAE',
                     marginLeft: '10px',
                     marginRight: '5px',
-                  }}
-                >
+                  }}>
                   |
                 </label>{' '}
                 <label style={{ color: '#36C690' }}>
@@ -84,7 +82,7 @@ export default function ModalReject({ open, onClose, barCode, id }: Props): Reac
               </Typography>
             )}
             <Box sx={{ display: 'flex' }}>
-              <Typography align="left" sx={{ display: 'flex', width: '100%' }}>
+              <Typography align='left' sx={{ display: 'flex', width: '100%' }}>
                 กรุณากรอกเหตุผล
                 <Typography sx={{ color: '#F54949', marginRight: '5px' }}> * </Typography> :
               </Typography>
@@ -94,13 +92,12 @@ export default function ModalReject({ open, onClose, barCode, id }: Props): Reac
                   color: '#F54949',
                   textAlign: 'right',
                   display: stringNullOrEmpty(error) ? 'none' : undefined,
-                }}
-              >
+                }}>
                 {error}
               </Typography>
             </Box>
             <TextBoxComment
-              fieldName=""
+              fieldName=''
               defaultValue={reason}
               maxLength={100}
               onChangeComment={(e) => {
@@ -114,21 +111,19 @@ export default function ModalReject({ open, onClose, barCode, id }: Props): Reac
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', mb: 2, mr: 5, ml: 5 }}>
           <Button
-            id="btnCancle"
-            variant="contained"
-            color="cancelColor"
+            id='btnCancle'
+            variant='contained'
+            color='cancelColor'
             sx={{ borderRadius: 2, width: 80, mr: 4 }}
-            onClick={onCloseModal}
-          >
+            onClick={onCloseModal}>
             ยกเลิก
           </Button>
           <Button
-            id="btnConfirm"
-            variant="contained"
-            color="primary"
+            id='btnConfirm'
+            variant='contained'
+            color='primary'
             sx={{ borderRadius: 2, width: 80 }}
-            onClick={handleConfirm}
-          >
+            onClick={handleConfirm}>
             ยืนยัน
           </Button>
         </DialogActions>

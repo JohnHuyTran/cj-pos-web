@@ -6,10 +6,13 @@ import { ContentType, ERROR_CODE } from '../utils/enum/common-enum';
 import { refreshToken } from './keycloak-adapter';
 import { logout } from '../store/slices/authSlice';
 import { getSessionId, getAccessToken } from '../store/sessionStore';
+import i18next from 'i18next';
 
 const defaultForJSON = ContentType.JSON;
+const defaultTimeout = env.backEnd.timeout;
 let contentType: string;
-// const instance = (contentType: string) => {
+let timeout: number = env.backEnd.timeout;
+const msg_tiemout = i18next.t('error:timeout');
 const instance = axios.create({
   baseURL: env.backEnd.url,
   timeout: env.backEnd.timeout,
@@ -24,6 +27,7 @@ instance.interceptors.request.use(function (config: AxiosRequestConfig) {
   config.headers.common['x-trace'] = sessionState;
   config.headers.Authorization = token ? `Bearer ${token}` : '';
   config.headers.common['Content-Type'] = contentType ? contentType : defaultForJSON;
+  config.timeout = timeout;
   return config;
 });
 
@@ -61,8 +65,10 @@ instance.interceptors.response.use(
   }
 );
 
-export function get(path: string, contentType = defaultForJSON) {
+export function get(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
+
   return instance
     .get(path)
     .then((result: any) => {
@@ -74,25 +80,18 @@ export function get(path: string, contentType = defaultForJSON) {
     })
     .catch((error: any) => {
       if (error.code === 'ECONNABORTED') {
-        const err = new ApiError(
-          error.response?.status,
-          ERROR_CODE.TIME_OUT,
-          'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
-        );
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
         throw err;
       }
 
-      const err = new ApiError(
-        error.response?.status,
-        error.response?.data.error_code,
-        error.response?.data.error_message
-      );
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }
 
-export function getFile(path: string, contentType = defaultForJSON) {
+export function getFile(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
 
   return instance
     .get(path, {
@@ -105,25 +104,18 @@ export function getFile(path: string, contentType = defaultForJSON) {
     })
     .catch((error: any) => {
       if (error.code === 'ECONNABORTED') {
-        const err = new ApiError(
-          error.response?.status,
-          ERROR_CODE.TIME_OUT,
-          'ไม่สามารถเชื่อมต่อระบบสมาชิกได้ในเวลาที่กำหนด'
-        );
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
         throw err;
       }
 
-      const err = new ApiError(
-        error.response?.status,
-        error.response?.data.error_code,
-        error.response?.data.error_message
-      );
+      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }
 
-export function getParams(path: string, payload: any, contentType = defaultForJSON) {
+export function getParams(path: string, payload: any, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .get(path, {
       params: payload,
@@ -136,13 +128,25 @@ export function getParams(path: string, payload: any, contentType = defaultForJS
       throw err;
     })
     .catch((error: any) => {
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
+
       const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }
 
-export function post(path: string, payload?: any, contentType = defaultForJSON, actionType?: string) {
+export function post(
+  path: string,
+  payload?: any,
+  contentType = defaultForJSON,
+  actionType?: string,
+  overrideTimeOut = defaultTimeout
+) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .post(path, payload)
     .then((response: AxiosResponse) => {
@@ -151,6 +155,10 @@ export function post(path: string, payload?: any, contentType = defaultForJSON, 
       }
     })
     .catch((error: any) => {
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
       if (actionType === 'Upload') {
         const err = new ApiUploadError(
           error.response?.status,
@@ -160,31 +168,48 @@ export function post(path: string, payload?: any, contentType = defaultForJSON, 
         );
         throw err;
       }
-
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.code,
+        error.response?.data.message,
+        error.response?.data.error_details,
+        error.response?.data.data
+      );
       throw err;
     });
 }
 
-export function put(path: string, payload: any, contentType = defaultForJSON) {
+export function put(path: string, payload: any, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .put(path, payload)
     .then((response: AxiosResponse) => {
       if (response.status == 200 || response.status == 201) {
         return response.data;
       }
+      console.log(response);
       const err = new ApiError(response.status, response.status, response.statusText);
       throw err;
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.code,
+        error.response?.data.message,
+        error.response?.data.error_details
+      );
       throw err;
     });
 }
 
-export function putData(path: string, contentType = defaultForJSON) {
+export function putData(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .put(path)
     .then((response: AxiosResponse) => {
@@ -195,32 +220,54 @@ export function putData(path: string, contentType = defaultForJSON) {
       throw err;
     })
     .catch((error: any) => {
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
+
       const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }
 
-export function deleteData(path: string, contentType = defaultForJSON) {
+export function deleteData(path: string, contentType = defaultForJSON, overrideTimeOut = defaultTimeout) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .delete(path)
     .then((result: any) => {
       return result;
     })
     .catch((error: any) => {
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
+
       const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });
 }
 
-export function deleteDataBody(path: string, payload: any, contentType = defaultForJSON) {
+export function deleteDataBody(
+  path: string,
+  payload: any,
+  contentType = defaultForJSON,
+  overrideTimeOut = defaultTimeout
+) {
   contentType = contentType;
+  timeout = overrideTimeOut;
   return instance
     .delete(path, { data: payload })
     .then((response: AxiosResponse) => {
       return response;
     })
     .catch((error: any) => {
+      if (error.code === 'ECONNABORTED') {
+        const err = new ApiError(error.response?.status, ERROR_CODE.TIME_OUT, msg_tiemout);
+        throw err;
+      }
+
       const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
       throw err;
     });

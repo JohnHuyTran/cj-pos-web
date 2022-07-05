@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { DataGrid, GridColDef, GridValueGetterParams, GridCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridValueGetterParams, GridCellParams, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
 import { useStyles } from '../../styles/makeTheme';
 import { Checkbox, FormControlLabel, FormGroup, Grid, TextField, Typography } from '@mui/material';
@@ -33,7 +33,7 @@ const columnsSKU: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -47,8 +47,8 @@ const columnsSKU: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2">{params.value}</Typography>
-        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+        <Typography variant='body2'>{params.value}</Typography>
+        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
@@ -62,6 +62,7 @@ const columnsSKU: GridColDef[] = [
     align: 'right',
     disableColumnMenu: true,
     sortable: false,
+    renderCell: (params) => numberWithCommas(params.value),
   },
   {
     field: 'orderAllQty',
@@ -71,7 +72,7 @@ const columnsSKU: GridColDef[] = [
     align: 'right',
     disableColumnMenu: true,
     sortable: false,
-    // renderCell: (params) => calBaseUnit(params),
+    renderCell: (params) => checkStock(params),
   },
 ];
 
@@ -79,6 +80,20 @@ const columnsSKU: GridColDef[] = [
 //   let cal = Number(params.getValue(params.id, 'qty')) * Number(params.getValue(params.id, 'baseUnit'));
 //   return numberWithCommas(cal);
 // };
+
+const checkStock = (params: GridValueGetterParams) => {
+  const stock = Number(params.getValue(params.id, 'stock'));
+  const orderAllQty = Number(params.getValue(params.id, 'orderAllQty'));
+  if (orderAllQty > stock) {
+    return (
+      <Typography variant='body2' sx={{ color: '#F54949' }}>
+        {numberWithCommas(orderAllQty)}
+      </Typography>
+    );
+  }
+
+  return <Typography variant='body2'>{numberWithCommas(orderAllQty)}</Typography>;
+};
 
 function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, branch, status }: DataGridProps) {
   const dispatch = useAppDispatch();
@@ -90,8 +105,8 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
   let rowsSKU: any = [];
 
   useEffect(() => {
-    let skuCodes: any = [];
     if (stock) {
+      let skuCodes: any = [];
       if (Object.keys(payloadAddItem).length !== 0) {
         payloadAddItem.map((item: any) => {
           //chk duplicates sku
@@ -223,13 +238,24 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
     await dispatch(updateAddItemsState(items));
   };
 
-  if (Object.keys(payloadAddItem).length > 0) {
-    itemsMap(payloadAddItem);
-  } else if (!update && type !== 'Create') {
+  const mapStockRequestDetail = async () => {
     let _item: any = [];
     if (stockRequestDetail) {
       const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
       const items = stockRequestDetail.items ? stockRequestDetail.items : [];
+
+      if (
+        (stockRequestDetail.status === 'DRAFT' || stockRequestDetail.status === 'AWAITING_FOR_REQUESTER') &&
+        stockBalanceList.length === 0
+      ) {
+        let skuCodes: any = [];
+        const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
+        itemGroups.map((item: any) => {
+          skuCodes.push(item.skuCode);
+        });
+        await stockBalanceBySKU(skuCodes);
+      }
+
       if (items.length > 0) {
         items.map((item: any) => {
           let productName: any = '';
@@ -237,10 +263,24 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
           let orderAllQty: any = 0;
           if (itemGroups.length > 0) {
             itemGroups.forEach((i: any) => {
+              const pName = i.productName;
+              const oAllQty = i.orderAllQty;
+              let sRemain = 0;
+
+              if (stockRequestDetail.status === 'DRAFT') {
+                stockBalanceList.forEach((s: any) => {
+                  if (i.skuCode === s.skuCode) {
+                    sRemain = s.stockRemain;
+                  }
+                });
+              } else {
+                sRemain = i.remainingQty;
+              }
+
               if (i.skuCode === item.skuCode) {
-                productName = i.productName;
-                remainingQty = i.remainingQty;
-                orderAllQty = i.orderAllQty;
+                productName = pName;
+                remainingQty = sRemain;
+                orderAllQty = oAllQty;
               }
             });
           }
@@ -261,24 +301,15 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
           _item.push(_i);
         });
       }
-
       updateItemsState(_item);
-
       itemsMap(_item);
-
-      // rowsSKU = _item.map((item: any, index: number) => {
-      //   console.log('_item :', _item);
-      //   return {
-      //     id: `${item.skuCode}-${index + 1}`,
-      //     index: index + 1,
-      //     skuCode: item.skuCode,
-      //     skuName: item.skuName ? item.skuName : '',
-      //     stock: item.stock,
-      //     orderAllQty: item.orderAllQty ? item.orderAllQty : 0,
-      //     qty: item.qty ? item.qty : 0,
-      //   };
-      // });
     }
+  };
+
+  if (Object.keys(payloadAddItem).length > 0) {
+    itemsMap(payloadAddItem);
+  } else if (!update && type !== 'Create') {
+    mapStockRequestDetail();
   }
 
   const [pageSizeSKU, setPageSizeSKU] = React.useState<number>(10);
@@ -298,9 +329,10 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
   //   setFlagSave(true);
   // };
 
-  const handleCheckboxChange = (e: any) => {
-    const ischeck = e.target.checked;
-  };
+  // const handleCheckboxChange = (e: any) => {
+  //   const ischeck = e.target.checked;
+  // };
+
   return (
     <div>
       <div style={{ width: '100%', height: rowsSKU.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>

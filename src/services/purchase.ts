@@ -209,9 +209,12 @@ export async function fetchDataFilePN(pnNo: string) {
 
 export async function savePurchaseBR(payload: PurchaseBRRequest) {
   try {
-    const response = await put(environment.purchase.purchaseBranchRequest.save.url, payload, ContentType.JSON).then(
-      (result: any) => result
-    );
+    const response = await put(
+      environment.purchase.purchaseBranchRequest.save.url,
+      payload,
+      ContentType.JSON,
+      env.backEnd.timeoutpurchasebranch
+    ).then((result: any) => result);
     return response;
   } catch (error) {
     throw error;
@@ -238,3 +241,22 @@ export async function deletePurchaseBR(docNo: string) {
     throw error;
   }
 }
+
+export async function sendPurchaseBR(docNo: string, caseNo: string) {
+  try {
+    const path = `${getPathSendPurchaseBR(docNo)}/?mock=${caseNo}`; //Mock Case Await Sap
+    // const path = getPathSendPurchaseBR(docNo)
+    const response = await post(path, undefined, undefined, undefined, env.backEnd.timeoutpurchasebranch).then(
+      (result: any) => result
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getPathSendPurchaseBR = (docNo: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.purchase.purchaseBranchRequest.send.url}`, {
+    docNo: docNo,
+  });
+};

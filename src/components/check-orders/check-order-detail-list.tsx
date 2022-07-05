@@ -190,7 +190,28 @@ function CheckOrderDetailList() {
   let rowsEntries: any = [];
   const entries: itemsDetail[] = orderDetail.items ? orderDetail.items : [];
   if (entries.length > 0 && Object.keys(payloadAddItem).length === 0) {
-    updateState(entries);
+    const itemsNewMap = entries.map((item: any, index: number) => {
+      return {
+        actualQty: item.actualQty,
+        barcode: item.barcode,
+        comment: item.comment,
+        deliveryOrderNo: item.deliveryOrderNo,
+        hhQty: item.hhQty,
+        isTote: item.isTote,
+        productName: item.productName,
+        qtyRef: item.qty,
+        qtyDiff: item.qtyDiff,
+        sdID: item.sdID,
+        sdNo: item.sdNo,
+        skuCode: item.skuCode,
+        skuType: item.skuType,
+        toteCode: item.toteCode,
+        unitCode: item.unitCode,
+        unitFactor: item.unitFactor,
+        unitName: item.unitName,
+      };
+    });
+    updateState(itemsNewMap);
   }
 
   if (Object.keys(payloadAddItem).length !== 0) {
@@ -202,7 +223,8 @@ function CheckOrderDetailList() {
         qtyRef = Number(item.qtyRef) ? Number(item.qtyRef) : 0;
         actualQty = Number(item.qty) ? Number(item.qty) : Number(item.actualQty) ? Number(item.actualQty) : 0;
       } else {
-        qtyRef = Number(item.qty);
+        // qtyRef = Number(item.qty);
+        qtyRef = Number(item.qtyRef);
         actualQty = Number(item.actualQty);
       }
 
@@ -220,7 +242,7 @@ function CheckOrderDetailList() {
         actualQty: actualQty,
         qtyDiff: item.qtyDiff,
         comment: item.comment,
-        hhQty: item.hhQty,
+        hhQty: item.hhQty ? item.hhQty : 0,
       };
     });
   }

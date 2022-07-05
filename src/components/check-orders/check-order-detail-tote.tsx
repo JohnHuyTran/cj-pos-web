@@ -48,10 +48,12 @@ import { updateItemsToteState } from '../../store/slices/items-tote-slice';
 import CheckOrderDetailItems from '../check-orders/check-order-detail-items';
 import AlertError from '../commons/ui/alert-error';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
-import { ApiError } from '../../models/api-error-model';
+import { ApiError, ErrorDetail, ErrorDetailResponse, Header } from '../../models/api-error-model';
 import ConfirmOrderShipment from './check-order-confirm-model';
 import Snackbar from '../commons/ui/snackbar-status';
 import ConfirmExitModel from './confirm-model';
+import { ToteItem } from '../../models/tote-model';
+import { isErrorCode } from '../../utils/exception/pos-exception';
 
 export interface CheckOrderDetailToteProps {
   defaultOpen: boolean;
@@ -282,7 +284,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
   const [statusOC, setStatusOC] = React.useState(false);
   const [itemsDiffState, setItemsDiffState] = useState<Entry[]>([]);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
-
+  const [payloadError, setPayloadError] = React.useState<ErrorDetailResponse | null>();
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
@@ -531,13 +533,42 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
     setSnackbarStatus(false);
   };
 
-  const handleShowSnackBar = async (issuccess: boolean, errorMsg: string) => {
+  const handleShowSnackBar = async (issuccess: boolean, error: ApiError) => {
     handleOpenLoading('open', true);
-    const msg = issuccess ? 'คุณได้ทำรายการเรียบร้อยแล้ว' : errorMsg;
-    setShowSnackBar(true);
-    setContentMsg(msg);
-    setSnackbarStatus(issuccess);
-
+    if (issuccess) {
+      setShowSnackBar(true);
+      setContentMsg('คุณได้ทำรายการเรียบร้อยแล้ว');
+      setSnackbarStatus(issuccess);
+    } else {
+      let errorList: ErrorDetail[] = [];
+      setOpenFailAlert(true);
+      setTextFail(error.message);
+      setPayloadError(null);
+      if (error.error_details) {
+        const datas: ToteItem[] = error.error_details;
+        datas.forEach((item: ToteItem) => {
+          if (isErrorCode(item.code)) {
+            const _err: ErrorDetail = {
+              toteCode: item.toteCode,
+              description: item.message,
+            };
+            errorList.push(_err);
+          }
+        });
+        const header: Header = {
+          field1: false,
+          field2: true,
+          field3: true,
+          field4: false,
+        };
+        const payload: ErrorDetailResponse = {
+          header: header,
+          error_details: errorList,
+        };
+        setTextFail('ไม่สามารถปรับสถานะ Tote ดังต่อไปนี้ได้');
+        setPayloadError(payload);
+      }
+    }
     if (issuccess) {
       updateShipmentOrder();
       setTimeout(() => {
@@ -796,7 +827,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
           skuTypes: [2],
           isSellable: true,
         }}></ModalAddItemsTote>
-      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} payload={payloadError} />
 
       <Snackbar open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={snackbarStatus} contentMsg={contentMsg} />
 

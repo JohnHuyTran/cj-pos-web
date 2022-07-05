@@ -44,7 +44,7 @@ const columns: GridColDef[] = [
   {
     field: 'createdDate',
     headerName: 'วันที่สร้างรายการ',
-    minWidth: 150,
+    minWidth: 140,
     headerAlign: 'center',
     align: 'center',
     sortable: false,
@@ -85,12 +85,12 @@ const columns: GridColDef[] = [
   {
     field: 'status',
     headerName: 'สถานะ',
-    minWidth: 90,
+    minWidth: 150,
     headerAlign: 'center',
     align: 'center',
     sortable: false,
     renderCell: (params) => {
-      if (params.value === 'DRAFT' || params.value === 'CREATED_PO' || params.value === 'WAITING_BRANCH_EXAMINE') {
+      if (params.value === 'DRAFT') {
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
@@ -98,7 +98,11 @@ const columns: GridColDef[] = [
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
-      } else if (params.value === 'SUBMITTED') {
+      } else if (
+        params.value === 'WAITING_BRANCH_EXAMINE' ||
+        params.value === 'WAITING_DC_CHECK_DIFF' ||
+        params.value === 'RECEIVE_COMPLETE'
+      ) {
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
@@ -106,7 +110,7 @@ const columns: GridColDef[] = [
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
-      } else if (params.value === 'CLOSED') {
+      } else if (params.value === 'DC_NO_STOCK' || params.value === 'INCOMPLETE_RECEIVED') {
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}

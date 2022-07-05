@@ -21,12 +21,11 @@ beforeEach(() => {
   const container = render(
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <ModelConfirm open={true} onClose={handleOnClose} productName="" skuCode="" barCode="" />
+        <ModelConfirm open={true} onClose={handleOnClose} productName='' skuCode='' barCode='' />
       </ThemeProvider>
     </Provider>
   );
 });
-
 jest.mock('react-i18next', () => ({
   // this mock makes sure any components using the translate hook can use it without a warning being shown
   useTranslation: () => {
@@ -42,7 +41,6 @@ jest.mock('react-i18next', () => ({
     init: jest.fn(),
   },
 }));
-
 describe('component modal delete confirm ', () => {
   it('should click btn-cancle ', () => {
     const handleOnClick = jest.fn();

@@ -8,15 +8,21 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { Button } from '@mui/material';
-import { useAppSelector, useAppDispatch } from '../../store/store';
+import store, { useAppSelector, useAppDispatch } from '../../store/store';
 import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
 import { saveSearchCriteriaDc } from '../../store/slices/save-search-order-dc-slice';
-import { CheckOrderRequest } from '../../models/dc-check-order-model';
+import {
+  CheckOrderRequest,
+  DataType,
+  RequestListType,
+  VerifySDListRequestType,
+  VerifySDListResponseType,
+} from '../../models/dc-check-order-model';
 import DCOrderList from './dc-order-list';
 import { useStyles } from '../../styles/makeTheme';
 import DatePickerComponent from '../commons/ui/date-picker';
 import LoadingModal from '../commons/ui/loading-modal';
-import { SearchOff } from '@mui/icons-material';
+import { FemaleSharp, SearchOff } from '@mui/icons-material';
 import AlertError from '../commons/ui/alert-error';
 import BranchListDropDown from '../commons/ui/branch-list-dropdown';
 import { getUserInfo } from '../../store/sessionStore';
@@ -27,6 +33,10 @@ import { isAllowActionPermission, isGroupDC } from '../../utils/role-permission'
 import { ACTIONS } from '../../utils/enum/permission-enum';
 import { setItemId, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
 import { BranchInfo } from '../../models/search-branch-model';
+import { ApiError } from '../../models/api-error-model';
+import { verifyDCOrderShipmentList } from '../../services/order-shipment';
+import i18n from '../../locales/i18n';
+import { mappingErrorParam } from '../../utils/exception/pos-exception';
 
 moment.locale('th');
 
@@ -50,8 +60,8 @@ interface branchListOptionType {
 }
 
 function DCCheckOrderSearch() {
-  // const limit = "10";
   const [disableSearchBtn, setDisableSearchBtn] = React.useState(true);
+  const [disableApproveBtn, setDisableApproveBtn] = React.useState(true);
   const page = '1';
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -67,7 +77,7 @@ function DCCheckOrderSearch() {
     sdType: 'ALL',
     sortBy: '',
   });
-  // const [codeBranch, setCodeBranch] = React.useState('');
+  const [groupDC, setGroupDC] = React.useState<boolean>(false);
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
@@ -107,9 +117,10 @@ function DCCheckOrderSearch() {
 
   React.useEffect(() => {
     setDisableSearchBtn(isAllowActionPermission(ACTIONS.ORDER_VER_VIEW));
-
+    setDisableApproveBtn(isAllowActionPermission(ACTIONS.ORDER_VER_APPROVE_ALL));
     setBranchFromCode(ownBranch);
     setValues({ ...values, shipBranchFrom: ownBranch });
+    // setGroupDC(isGroupDC());
   }, []);
 
   const branchFrom = getBranchName(branchList, ownBranch);
@@ -252,18 +263,22 @@ function DCCheckOrderSearch() {
       setValues({ ...values, shipBranchTo: '' });
     }
   };
+  const [selectRowsList, setSelectRowsList] = React.useState<Array<any>>([]);
+  const handleSelectRows = async (list: any) => {
+    setSelectRowsList(list);
+  };
   let orderListData;
   const orderListDatas = items.orderList.data ? items.orderList.data : [];
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (orderListDatas.length > 0) {
-      orderListData = <DCOrderList />;
+      orderListData = <DCOrderList onSelectRows={handleSelectRows} />;
     } else {
       orderListData = (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
+        <Grid item container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB'>
             <h2>
-              ไม่มีข้อมูล <SearchOff fontSize="large" />
+              ไม่มีข้อมูล <SearchOff fontSize='large' />
             </h2>
           </Box>
         </Grid>
@@ -283,27 +298,64 @@ function DCCheckOrderSearch() {
     setOpenAlert(false);
   };
 
+  const handleOnApprove = () => {
+    handleOpenLoading('open', true);
+    const items: RequestListType[] = selectRowsList.map((item: any, index: number) => {
+      return {
+        sdNo: item,
+      };
+    });
+
+    const payload: VerifySDListRequestType = {
+      requestList: items,
+    };
+    verifyDCOrderShipmentList(payload)
+      .then(
+        function (value: VerifySDListResponseType) {
+          const data: DataType[] = value.data;
+          const errorList = data
+            .filter((item: DataType) => item.code !== 20100)
+            .map((item: DataType) => ` ${item.sdNo}`);
+          console.log(errorList);
+          if (errorList && errorList.length > 0) {
+            const err_msg = i18n.t(`error:${`stockDiff.verifyListReject`}`);
+            setTextError(mappingErrorParam(err_msg, { docNoList: errorList.toString() }));
+            setOpenAlert(true);
+          }
+        },
+        function (error: ApiError) {
+          setOpenAlert(true);
+          setTextError(error.message);
+        }
+      )
+      .finally(async () => {
+        const payloadSearchDC = store.getState().saveSearchOrderDc.searchCriteriaDc;
+        await dispatch(featchOrderListDcAsync(payloadSearchDC));
+        handleOpenLoading('open', false);
+      });
+  };
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id="txtDocNo"
-              name="docNo"
-              size="small"
+              id='txtDocNo'
+              name='docNo'
+              size='small'
               value={values.docNo}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่เอกสาร LD/BT/SD"
+              placeholder='เลขที่เอกสาร LD/BT/SD'
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div'>
               สาขาต้นทาง
             </Typography>
             <BranchListDropDown
@@ -315,7 +367,7 @@ function DCCheckOrderSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div'>
               สาขาปลายทาง
             </Typography>
             <BranchListDropDown
@@ -325,18 +377,15 @@ function DCCheckOrderSearch() {
               isFilterAuthorizedBranch={isGroupDC() ? true : false}
             />
           </Grid>
-          <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div">
-              วันที่รับสินค้า
+          <Grid item xs={4} sx={{ pt: 40 }}>
+            <Typography gutterBottom variant='subtitle1' component='div'>
+              วันที่รับสินค้า ตั้งแต่
             </Typography>
-            <Typography gutterBottom variant="subtitle1" component="div">
-              ตั้งแต่
-            </Typography>
-            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+            <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} data-testid='dateFrom' />
           </Grid>
-          <Grid item xs={4} container alignItems="flex-end">
+          <Grid item xs={4}>
             <Box sx={{ width: '100%' }}>
-              <Typography gutterBottom variant="subtitle1" component="div">
+              <Typography gutterBottom variant='subtitle1' component='div'>
                 ถึง
               </Typography>
               <DatePickerComponent
@@ -347,18 +396,17 @@ function DCCheckOrderSearch() {
               />
             </Box>
           </Grid>
-          <Grid item xs={4} container alignItems="flex-end">
-            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+          <Grid item xs={4}>
+            <Typography gutterBottom variant='subtitle1' component='div'>
               สถานะการตรวจสอบผลต่าง
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selVerifyDCStatus"
-                name="verifyDCStatus"
+                id='selVerifyDCStatus'
+                name='verifyDCStatus'
                 value={values.verifyDCStatus}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -370,17 +418,16 @@ function DCCheckOrderSearch() {
 
           <Grid item xs={4} sx={{ pt: 30 }}>
             {' '}
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ประเภท
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selSdType"
-                name="sdType"
+                id='selSdType'
+                name='sdType'
                 value={values.sdType}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -389,29 +436,44 @@ function DCCheckOrderSearch() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={4} container alignItems="flex-end"></Grid>
-          <Grid item xs={4} container alignItems="flex-end">
-            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+          <Grid item xs={4} container alignItems='flex-end'></Grid>
+          <Grid item xs={4} container alignItems='flex-end'></Grid>
+
+          <Grid item xs={4} container alignItems='flex-end'>
+            <Grid item container xs={12} sx={{ mt: 3 }} direction='row'>
               <Button
-                id="btnClear"
-                variant="contained"
+                id='btnApprove'
+                variant='contained'
+                color='secondary'
+                onClick={handleOnApprove}
+                sx={{ width: '45%', ml: 1, display: `${disableApproveBtn ? 'none' : ''}` }}
+                className={classes.MbtnClear}
+                disabled={selectRowsList.length === 0}>
+                อนุมัติ
+              </Button>
+            </Grid>
+          </Grid>
+          <Grid item xs={4} container alignItems='flex-end'></Grid>
+          <Grid item xs={4} container alignItems='flex-end'>
+            <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
+              <Button
+                id='btnClear'
+                variant='contained'
                 onClick={onClickClearBtn}
                 sx={{ width: '45%' }}
                 className={classes.MbtnClear}
-                color="cancelColor"
-                fullWidth={true}
-              >
+                color='cancelColor'
+                fullWidth={true}>
                 เคลียร์
               </Button>
               <Button
-                id="btnSearch"
-                variant="contained"
-                color="primary"
+                id='btnSearch'
+                variant='contained'
+                color='primary'
                 onClick={onClickValidateForm}
                 sx={{ width: '45%', ml: 1, display: `${disableSearchBtn ? 'none' : ''}` }}
                 className={classes.MbtnSearch}
-                fullWidth={true}
-              >
+                fullWidth={true}>
                 ค้นหา
               </Button>
             </Grid>

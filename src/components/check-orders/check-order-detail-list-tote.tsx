@@ -158,7 +158,8 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
             );
           } else if (params.getValue(params.id, 'canAddTote') === true) {
             let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'qtyRef'));
-            if (diff >= 0) {
+            let qty = Number(params.getValue(params.id, 'actualQty'));
+            if (diff >= 0 && qty !== 0) {
               return (
                 <Button
                   variant="contained"
@@ -199,7 +200,7 @@ function CheckOrderDetailListTote({ onOpenToteDetail }: CheckOrderDetailListTote
     let hhQty = params.getValue(params.id, 'hhQty');
     let diff = Number(params.getValue(params.id, 'actualQty')) - Number(params.getValue(params.id, 'hhQty'));
 
-    if (diff > 0) return <label style={{ color: '#FBA600', fontWeight: 700 }}> {hhQty} </label>;
+    if (diff !== 0) return <label style={{ color: '#FBA600', fontWeight: 700 }}> {hhQty} </label>;
     return hhQty;
   };
 

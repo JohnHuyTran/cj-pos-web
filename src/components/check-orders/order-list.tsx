@@ -45,7 +45,7 @@ function OrderList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -75,7 +75,7 @@ function OrderList() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
             {params.value}-{params.getValue(params.id, 'shipBranchFromname') || ''}
           </Typography>
         </div>
@@ -91,7 +91,7 @@ function OrderList() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
             {params.value}-{params.getValue(params.id, 'shipBranchToname') || ''}
           </Typography>
         </div>
@@ -120,7 +120,7 @@ function OrderList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
@@ -128,7 +128,7 @@ function OrderList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
@@ -136,7 +136,7 @@ function OrderList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
             />
           );
@@ -188,8 +188,7 @@ function OrderList() {
           <div
             style={{
               textAlign: 'center',
-            }}
-          >
+            }}>
             {params.value}
           </div>
         );
@@ -211,7 +210,7 @@ function OrderList() {
     return {
       id: `${data.docRefNo}_${data.sdNo}`,
       index: (cuurentPages - 1) * parseInt(pageSize) + indexs + 1,
-      shipmentNo: data.shipmentNo,
+      // shipmentNo: data.shipmentNo,
       docRefNo: data.docRefNo,
       docType: data.docType,
       sdNo: data.sdNo,
@@ -346,7 +345,7 @@ function OrderList() {
           pageSize={parseInt(pageSize)}
           rowsPerPageOptions={[10, 20, 50, 100]}
           rowCount={res.total}
-          paginationMode="server"
+          paginationMode='server'
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           loading={loading}

@@ -39,26 +39,30 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label='close'
+          aria-label="close"
+          data-testid="btn-close"
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}>
-          <HighlightOff fontSize='large' />
+          }}
+        >
+          <HighlightOff fontSize="large" />
         </IconButton>
       ) : null}
       {onPrint ? (
         <div>
           {status !== 0 && (
             <Button
-              id='btnPrint'
-              variant='contained'
-              color='secondary'
+              id="btnPrint"
+              data-testid="btn-print"
+              variant="contained"
+              color="secondary"
               onClick={onPrint}
-              endIcon={<LocalPrintshopOutlinedIcon />}>
+              endIcon={<LocalPrintshopOutlinedIcon />}
+            >
               {/* {text && 'พิมพ์เอกสาร'}
               {!text && 'พิมพ์ใบผลต่าง'} */}
               {text}
@@ -155,7 +159,7 @@ export default function ModalShowPDF({
     <div>
       <Dialog open={open} maxWidth={false}>
         <BootstrapDialogTitle
-          id='customized-dialog-title'
+          id="customized-dialog-title"
           onClose={handleClose}
           onPrint={showPrint}
           status={statusFile}
@@ -166,10 +170,11 @@ export default function ModalShowPDF({
             minWidth: 600,
             minHeight: 600,
             textAlign: 'center',
-          }}>
+          }}
+        >
           {/* <div id="placeholderWrapper" style={{ height: "3000vh" }} /> */}
           {statusFile === 1 && (
-            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
+            <div id="pdfWrapper" style={{ width: '80vw' }} ref={pdfWrapper} data-testid="testid-pdfWrapper-1">
               <Document
                 file={{
                   url: url,
@@ -178,7 +183,8 @@ export default function ModalShowPDF({
                   },
                 }}
                 onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadFail}>
+                onLoadError={onDocumentLoadFail}
+              >
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page
                     onLoadSuccess={onSourceSuccess}
@@ -213,11 +219,12 @@ export default function ModalShowPDF({
           )} */}
           {/* file Base64 */}
           {statusFile === 2 && (
-            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper}>
+            <div id="pdfWrapper" style={{ width: '80vw' }} ref={pdfWrapper} data-testid="testid-pdfWrapper-2">
               <Document
                 file={`data:application/pdf;base64,${url}`}
                 onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadFail}>
+                onLoadError={onDocumentLoadFail}
+              >
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page
                     onLoadSuccess={onSourceSuccess}
@@ -233,7 +240,7 @@ export default function ModalShowPDF({
         </DialogContent>
       </Dialog>
 
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError='Failed to load PDF' />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError="Failed to load PDF" />
     </div>
   );
 }
