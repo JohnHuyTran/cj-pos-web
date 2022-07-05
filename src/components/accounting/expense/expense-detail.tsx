@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogContent, Grid, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, Grid, IconButton, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import { useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
@@ -6,11 +6,16 @@ import AccordionUploadFile from '../../commons/ui/accordion-upload-file';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import Steppers from '../../commons/ui/steppers';
 import SaveIcon from '@mui/icons-material/Save';
+import InfoIcon from '@mui/icons-material/Info';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import ControlPoint from '@mui/icons-material/ControlPoint';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ExpenseDetailSummary from './expense-detail-summary';
 import ModalAddExpense from './modal-add-expense';
+import ModelDescriptionExpense from './modal-description-expense';
+import { mockExpenseInfo, mockExpenseInfoNoActive } from '../../../mockdata/branch-accounting';
+import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
+import { Cancel } from '@mui/icons-material';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -23,19 +28,29 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
   const dispatch = useAppDispatch();
   const [titleName, setTitle] = React.useState('รายละเอียดเอกสาร');
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
-  const [showAddExpense, setShowAddExpense] = React.useState(false);
+  const [openModalAddExpense, setOpenModalAddExpense] = React.useState(false);
+  const [openModalDescriptionExpense, setOpenModalDescriptionExpense] = React.useState(false);
 
   const handleClose = () => {};
-  const handleOnChangeUploadFile = (status: boolean) => {};
+  const handleOnChangeUploadFileSave = (status: boolean) => {
+    setUploadFileFlag(status);
+  };
+  const handleOnChangeUploadFileEdit = (status: boolean) => {
+    setUploadFileFlag(status);
+  };
+  const handleOnChangeUploadFileOC = (status: boolean) => {
+    setUploadFileFlag(status);
+  };
 
   const OnCloseAddExpense = () => {
-    setShowAddExpense(false);
+    setOpenModalAddExpense(false);
   };
   const handleAddExpenseTransactionBtn = () => {
-    setShowAddExpense(true);
+    setOpenModalAddExpense(true);
   };
   const handleSaveBtn = () => {};
   const handleApproveBtn = () => {};
+  const handleRejectBtn = () => {};
 
   const componetButtonDraft = (
     <>
@@ -82,6 +97,39 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
     </>
   );
 
+  const componetButtonApprove = (
+    <>
+      <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
+        <Grid item xl={5}></Grid>
+        <Grid item>
+          <Button
+            data-testid='testid-btnSave'
+            id='btnSave'
+            variant='contained'
+            color='warning'
+            className={classes.MbtnSave}
+            onClick={handleRejectBtn}
+            startIcon={<SaveIcon />}
+            sx={{ width: 200 }}>
+            ขออนุมัติ
+          </Button>
+
+          <Button
+            data-testid='testid-btnSendToDC'
+            id='btnSendToDC'
+            variant='contained'
+            color='error'
+            className={classes.MbtnSendDC}
+            onClick={handleRejectBtn}
+            startIcon={<Cancel />}
+            sx={{ width: 200 }}>
+            ไม่อนุมัติ
+          </Button>
+        </Grid>
+      </Grid>
+    </>
+  );
+
   useEffect(() => {
     setTitle(1 ? 'รายละเอียดเอกสารค่าใช้จ่ายร้านกาแฟ' : 2 ? 'รายละเอียดเอกสารค่าใช้จ่ายหน้าร้าน' : 'รายละเอียดเอกสาร');
   }, [isOpen]);
@@ -116,17 +164,29 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
 
           <Grid container spacing={2} mb={2} id='top-item'>
             <Grid item xs={1}>
-              <Typography variant='body2'>แนบเอกสารจากสาขา:</Typography>
+              <Typography variant='body2'>
+                แนบเอกสารจากสาขา{' '}
+                <IconButton
+                  size='small'
+                  onClick={() => setOpenModalDescriptionExpense(true)}
+                  id='id-infoIcon'
+                  data-testid='testid-infoIcon'>
+                  <InfoIcon fontSize='small' />
+                </IconButton>
+                :
+              </Typography>
             </Grid>
             <Grid item xs={3}>
               <AccordionUploadFile
                 files={[]}
                 docNo={'docNo'}
-                docType='PN'
+                docType='BA'
                 isStatus={uploadFileFlag}
-                onChangeUploadFile={handleOnChangeUploadFile}
+                onChangeUploadFile={handleOnChangeUploadFileSave}
                 enabledControl={true}
+                idControl={'AttachFileSave'}
               />
+              <AccordionHuaweiFile files={[]} />
             </Grid>
             <Grid item xs={1}>
               <Typography variant='body2'>แนบเอกสารแก้ไข:</Typography>
@@ -135,11 +195,13 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
               <AccordionUploadFile
                 files={[]}
                 docNo={'docNo'}
-                docType='PN'
+                docType='BA'
                 isStatus={uploadFileFlag}
-                onChangeUploadFile={handleOnChangeUploadFile}
+                onChangeUploadFile={handleOnChangeUploadFileEdit}
                 enabledControl={true}
+                idControl={'AttachFileEdit'}
               />
+              <AccordionHuaweiFile files={[]} />
             </Grid>
             <Grid item xs={1}>
               <Typography variant='body2'>แนบเอกสารOC:</Typography>
@@ -148,20 +210,28 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
               <AccordionUploadFile
                 files={[]}
                 docNo={'docNo'}
-                docType='PN'
+                docType='BA'
                 isStatus={uploadFileFlag}
-                onChangeUploadFile={handleOnChangeUploadFile}
+                onChangeUploadFile={handleOnChangeUploadFileOC}
                 enabledControl={true}
+                idControl={'AttachFileByOC'}
               />
+              <AccordionHuaweiFile files={[]} />
             </Grid>
           </Grid>
           <Box>{componetButtonDraft}</Box>
+          <Box>{componetButtonApprove}</Box>
           <Box mb={3} mt={3}>
             <ExpenseDetailSummary />
           </Box>
         </DialogContent>
       </Dialog>
-      <ModalAddExpense open={showAddExpense} onClose={OnCloseAddExpense} />
+      <ModalAddExpense open={openModalAddExpense} onClose={OnCloseAddExpense} />
+      <ModelDescriptionExpense
+        open={openModalDescriptionExpense}
+        onClickClose={() => setOpenModalDescriptionExpense(false)}
+        info={[mockExpenseInfo, mockExpenseInfoNoActive]}
+      />
     </React.Fragment>
   );
 }
