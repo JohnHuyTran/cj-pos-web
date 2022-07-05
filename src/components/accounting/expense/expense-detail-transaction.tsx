@@ -9,6 +9,13 @@ function ExpenseDetailTransaction() {
   const _ = require('lodash');
   const dispatch = useAppDispatch();
 
+  const styles = {
+    disabledInput: {
+      '& .MuiInputBase-root.Mui-disabled': {
+        color: 'black',
+      },
+    },
+  };
   const rows: string | any[] = [
     {
       id: '1',
@@ -45,10 +52,16 @@ function ExpenseDetailTransaction() {
         <TextField
           variant='outlined'
           name='txbToteCode'
-          inputProps={{ style: { textAlign: 'right', color: 'red' } }}
+          inputProps={{ style: { textAlign: 'right' } }}
           value={params.value}
           disabled={true}
           autoComplete='off'
+          sx={{
+            '& .MuiInputBase-root.Mui-disabled': {
+              color: 'red',
+              // WebkitTextFillColor: '#000',
+            },
+          }}
         />
       ),
     },
