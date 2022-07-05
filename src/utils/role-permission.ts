@@ -20,6 +20,7 @@ import {
   SUBMENU,
   KEYCLOAK_GROUP_PI,
   KEYCLOAK_GROUP_PCM,
+  KEYCLOAK_GROUP_DATA,
 } from './enum/permission-enum';
 
 const _ = require('lodash');
@@ -52,6 +53,8 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.PI;
   } else if (group === KEYCLOAK_GROUP_PCM) {
     return PERMISSION_GROUP.PCM;
+  } else if (group === KEYCLOAK_GROUP_DATA) {
+    return PERMISSION_GROUP.DATA;
   }
 
   return '';
@@ -270,5 +273,12 @@ const permission = {
       submenu: [SUBMENU.PI_PRODUCT_MASTER, SUBMENU.PR_CREATE_PURCHASE_BRANCH],
     },
     action: [ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW, ACTIONS.STOCK_BL_LOCATION, ACTIONS.PURCHASE_BR_VIEW],
+  },
+  data: {
+    menu: {
+      mainmenu: [MAINMENU.SALE],
+      submenu: [SUBMENU.SALE_SALE_LIMIT],
+    },
+    action: [ACTIONS.CAMPAIGN_TO_VIEW],
   },
 };
