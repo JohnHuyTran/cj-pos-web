@@ -21,6 +21,7 @@ import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 import { getUserInfo } from '../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import { ErrorDetail } from '../../models/api-error-model';
 
 export interface DataGridProps {
   type: string;
@@ -41,11 +42,21 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
-    renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
-        {params.value}
-      </Box>
-    ),
+    renderCell: (params) => {
+      const condition = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40010;
+
+      return (
+        <Box
+          component="div"
+          sx={{
+            paddingLeft: '20px',
+            color: `${condition ? '#F54949' : '#000000'}`,
+          }}
+        >
+          {params.value}
+        </Box>
+      );
+    },
   },
   {
     field: 'barcode',
@@ -54,6 +65,21 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
+    renderCell: (params) => {
+      const condition = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40010;
+
+      return (
+        <Box
+          component="div"
+          sx={{
+            paddingLeft: '20px',
+            color: `${condition ? '#F54949' : '#000000'}`,
+          }}
+        >
+          {params.value}
+        </Box>
+      );
+    },
   },
   {
     field: 'productName',
@@ -62,14 +88,27 @@ const columns: GridColDef[] = [
     minWidth: 300,
     flex: 2,
     sortable: false,
-    renderCell: (params) => (
-      <div>
-        <Typography variant='body2'>{params.value}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
-          {params.getValue(params.id, 'skuCode') || ''}
-        </Typography>
-      </div>
-    ),
+    renderCell: (params) => {
+      const condition = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40010;
+
+      return (
+        <div
+          style={{
+            color: `${condition ? '#F54949' : '#000000'}`,
+          }}
+        >
+          <Typography variant="body2">{params.value}</Typography>
+          <Typography
+            sx={{
+              fontSize: 12,
+              color: `${condition ? '#F54949' : '#999999'}`,
+            }}
+          >
+            {params.getValue(params.id, 'skuCode') || ''}
+          </Typography>
+        </div>
+      );
+    },
   },
   {
     field: 'qty',
@@ -78,24 +117,44 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <TextField
-        variant='outlined'
-        name='txnQuantity'
-        type='number'
-        inputProps={{ style: { textAlign: 'right' } }}
-        value={params.value}
-        onChange={(e) => {
-          let qty = Number(params.getValue(params.id, 'qty'));
-          var value = e.target.value ? parseInt(e.target.value, 10) : '';
-          if (qty === 0) value = chkQty(value);
-          if (value < 0) value = 0;
-          params.api.updateRows([{ ...params.row, qty: value }]);
-        }}
-        disabled={params.getValue(params.id, 'editMode') ? false : true}
-        autoComplete='off'
-      />
-    ),
+    renderCell: (params: GridRenderCellParams) => {
+      const condition1 = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40010;
+      const condition2 = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40014;
+
+      return (
+        <TextField
+          variant="outlined"
+          name="txnQuantity"
+          type="number"
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: `${condition2 ? '#F54949' : '#000000'}`,
+              },
+              '&:hover fieldset': {
+                borderColor: `${condition2 ? '#F54949' : '#000000'}`,
+              },
+            },
+          }}
+          inputProps={{
+            style: {
+              textAlign: 'right',
+              color: `${condition1 ? '#F54949' : '#000000'}`,
+            },
+          }}
+          value={params.value}
+          onChange={(e) => {
+            let qty = Number(params.getValue(params.id, 'qty'));
+            var value = e.target.value ? parseInt(e.target.value, 10) : '';
+            if (qty === 0) value = chkQty(value);
+            if (value < 0) value = 0;
+            params.api.updateRows([{ ...params.row, qty: value }]);
+          }}
+          disabled={params.getValue(params.id, 'editMode') ? false : true}
+          autoComplete="off"
+        />
+      );
+    },
   },
   {
     field: 'unitName',
@@ -104,6 +163,21 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
+    renderCell: (params) => {
+      const condition = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40010;
+
+      return (
+        <Box
+          component="div"
+          sx={{
+            paddingLeft: '20px',
+            color: `${condition ? '#F54949' : '#000000'}`,
+          }}
+        >
+          {params.value}
+        </Box>
+      );
+    },
   },
   {
     field: 'delete',
@@ -114,7 +188,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <div>
-        {params.getValue(params.id, 'editMode') && <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />}
+        {params.getValue(params.id, 'editMode') && <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />}
       </div>
     ),
     // renderCell: () => {
@@ -161,6 +235,9 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
   const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
   // const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const stockRequestItems = useAppSelector((state) => state.stockRequestItems.state);
+  const errorListUpdate = useAppSelector((state) => state.addItems.errorLists);
+  const errorList = errorListUpdate ? errorListUpdate : null;
+  const errorDetail = errorList.error_details ? errorList.error_details : [];
 
   let rows: any = [];
 
@@ -209,6 +286,8 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
         qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
         editMode: editM,
         stock: item.stock,
+        isError: item.skuCode ? errorDetail.some((i: ErrorDetail) => i.skuCode == item.skuCode) : false,
+        codeError: errorList ? errorList.code : 0,
       };
     });
 
@@ -309,7 +388,7 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
           <FormControlLabel
             control={<Checkbox />}
             checked={isChecked}
-            label='รายการสินค้าทั้งหมด'
+            label="รายการสินค้าทั้งหมด"
             onChange={handleCheckboxChange}
           />
         </FormGroup>
