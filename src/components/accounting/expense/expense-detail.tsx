@@ -137,7 +137,11 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
   return (
     <React.Fragment>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={onClickClose}>
+        <BootstrapDialogTitle
+          id='customized-dialog-title'
+          onClose={() => {
+            setOpen(false);
+          }}>
           <Typography sx={{ fontSize: 24, fontWeight: 400 }}>{titleName}</Typography>
           <Steppers status={1} stepsList={['บันทึก', 'สาขา', 'บัญชี', 'อนุมัติ']}></Steppers>
         </BootstrapDialogTitle>
