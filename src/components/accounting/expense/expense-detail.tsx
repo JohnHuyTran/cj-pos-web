@@ -17,6 +17,8 @@ import { mockExpenseInfo, mockExpenseInfoNoActive } from '../../../mockdata/bran
 import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
 import { Cancel } from '@mui/icons-material';
 import { GridColumnHeadersItemCollection } from '@mui/x-data-grid';
+import ModelConfirmDetail from './confirm/modal-confirm-detail';
+
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -50,7 +52,25 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
     setOpenModalAddExpense(true);
   };
   const handleSaveBtn = () => {};
-  const handleApproveBtn = () => {};
+  const handleApproveBtn = () => {
+    const x001 = {
+      '001': '001',
+    };
+    const x002 = {
+      '002': '002',
+    };
+
+    const x1 = {
+      id: 1,
+      name: 'ยอดเงินเบิก',
+      ...x001,
+      ...x002,
+    };
+
+    console.log('x1:', x1);
+
+    handleOpenModelConfirm();
+  };
   const handleRejectBtn = () => {};
 
   const componetButtonDraft = (
@@ -134,6 +154,22 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
   useEffect(() => {
     setTitle(1 ? 'รายละเอียดเอกสารค่าใช้จ่ายร้านกาแฟ' : 2 ? 'รายละเอียดเอกสารค่าใช้จ่ายหน้าร้าน' : 'รายละเอียดเอกสาร');
   }, [isOpen]);
+
+  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
+  const handleOpenModelConfirm = () => {
+    setTextHeaderConfirm('Tessssst');
+    setOpenModelConfirm(true);
+  };
+
+  const handleCloseModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+
+  const handleConfirm = () => {
+    console.log('xxxxxxxxxxx');
+  };
+
   return (
     <React.Fragment>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -237,6 +273,8 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
         onClickClose={() => setOpenModalDescriptionExpense(false)}
         info={[mockExpenseInfo, mockExpenseInfoNoActive]}
       />
+
+      <ModelConfirmDetail open={openModelConfirm} onClose={handleCloseModelConfirm} onConfirm={handleConfirm} />
     </React.Fragment>
   );
 }
