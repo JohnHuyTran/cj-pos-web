@@ -79,6 +79,8 @@ import purchaseBRDetailSlice from './slices/purchase/purchase-branch-request-det
 import purchaseBranchRequestSlice from './slices/purchase-branch-request-slice';
 import saveSearchPurchaseBranchRequest from './slices/save-search-purchase-branch-request-slice';
 import verifyReasonsRejectListSlice from './slices/master/verify-order-reject-reasons-slice';
+import masterExpenseListSlice from './slices/master/expense-list-slice';
+
 const store = configureStore({
   reducer: {
     auth: authSlice,
@@ -160,6 +162,7 @@ const store = configureStore({
     purchaseBranchRequestSlice: purchaseBranchRequestSlice,
     saveSearchPurchaseBranchRequest: saveSearchPurchaseBranchRequest,
     verifyReasonsRejectListSlice: verifyReasonsRejectListSlice,
+    masterExpenseListSlice: masterExpenseListSlice,
   },
 });
 

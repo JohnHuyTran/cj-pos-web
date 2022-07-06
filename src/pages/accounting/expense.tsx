@@ -1,17 +1,15 @@
-import Container from '@mui/material/Container';
-import { Box } from '@mui/material';
+import { Box, Container } from '@mui/material';
+import React from 'react';
+import ExpenseDetail from '../../components/accounting/expense/expense-detail';
 import TitleHeader from '../../components/title-header';
-import ExpenseSearch from '../../components/accounting/expense/expense-search-test';
 
-const StockBalance = () => {
+export default function Expense() {
   return (
     <Container maxWidth='xl'>
-      <TitleHeader title='ค่าใช้จ่าย' />
+      <TitleHeader title='ค่าใช่จ่าย' />
       <Box mt={3}>
-        <ExpenseSearch />
+        <ExpenseDetail isOpen={true} onClickClose={() => {}} expenseType={2} />
       </Box>
     </Container>
   );
-};
-
-export default StockBalance;
+}
