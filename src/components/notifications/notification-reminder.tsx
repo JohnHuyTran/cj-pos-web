@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { getTransferOutDetail } from '../../store/slices/transfer-out-detail-slice';
 import { getBarcodeDiscountDetail } from '../../store/slices/barcode-discount-detail-slice';
 import ModalCreateBarcodeDiscount from '../barcode-discount/modal-create-barcode-discount';
-import { Action, DateFormat } from '../../utils/enum/common-enum';
+import { Action, DateFormat, TO_TYPE } from '../../utils/enum/common-enum';
 import { getBranchName, objectNullOrEmpty } from '../../utils/utils';
 import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
 import { getUserInfo } from '../../store/sessionStore';
@@ -27,6 +27,7 @@ import StockRequestDetail from '../stock-transfer/stock-request-detail';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
+import ModalCreateToDestroyDiscount from '../transfer-out-destroy/modal-create-to-destroy-discount';
 
 interface Props {
   refresh: boolean;
@@ -50,8 +51,7 @@ export default function NotificationReminder(props: Props) {
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const dispatch = useAppDispatch();
-  const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail);
-  const barcodeDiscountDetail = useAppSelector((state) => state.barcodeDiscountDetailSlice.barcodeDiscountDetail);
+  const [openDetailDestroyDiscount, setOpenDetailDestroyDiscount] = React.useState(false);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const userInfo: KeyCloakTokenInfo = getUserInfo();
@@ -97,6 +97,9 @@ export default function NotificationReminder(props: Props) {
   function handleCloseModalCheckOrderDetail() {
     setOpenCheckOrderDetail(false);
   }
+  const handleCloseDetailDestroyDiscount = () => {
+    setOpenDetailDestroyDiscount(false);
+  };
 
   const handleGetData = async () => {
     try {
@@ -121,14 +124,21 @@ export default function NotificationReminder(props: Props) {
       setOpenLoadingModal(true);
       handleUpdateRead(item.id);
       if (item.type === 'REJECT_TRANSFER_OUT' || item.type === 'CLOSE_TRANSFER_OUT') {
-        if (item.payload.type === 1) {
+        if (item.payload.type === TO_TYPE.TO_ACTIVITY) {
           const rs = await dispatch(getTransferOutDetail(item.documentNumber));
           if (!!rs.payload) {
             setOpenTransferOutDetail(true);
           } else {
             setOpenModalError(true);
           }
-        } else if (item.payload.type === 2 || item.payload.type === 5) {
+        } else if (item.payload.type === TO_TYPE.TO_WITH_DISCOUNT) {
+          const rs = await dispatch(getTransferOutDetail(item.documentNumber));
+          if (!!rs.payload) {
+            setOpenDetailDestroyDiscount(true);
+          } else {
+            setOpenModalError(true);
+          }
+        } else if (item.payload.type === TO_TYPE.TO_WITHOUT_DISCOUNT || item.payload.type === TO_TYPE.TO_DEFECT) {
           const rs = await dispatch(getTransferOutDetail(item.documentNumber));
           if (!!rs.payload) {
             setOpenTransferOutDestroyDetail(true);
@@ -137,7 +147,7 @@ export default function NotificationReminder(props: Props) {
           }
         }
       } else if (item.type === 'REJECT_BARCODE') {
-        const rs = await dispatch(getBarcodeDiscountDetail(item.payload._id));
+        const rs = await dispatch(getBarcodeDiscountDetail(item.payload.documentNumber));
         if (!!rs.payload) {
           setOpenBDDetail(true);
         } else {
@@ -278,14 +288,14 @@ export default function NotificationReminder(props: Props) {
         onClick={() => currentlySelected(item)}>
         <Box sx={{ display: 'flex', justifyContent: 'start' }}>
           {item.type == 'REJECT_BARCODE' ? (
-            <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
+            <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           ) : (
-            <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1, ml: 1 }} />
+            <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           )}
           <Box
             sx={{
               mt: 1,
-              ml: 3,
+              ml: 2,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -308,7 +318,7 @@ export default function NotificationReminder(props: Props) {
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ textAlign: 'right', mt: '3px', pr: 2.5 }}>{statusDisplay}</Box>
+          <Box sx={{ textAlign: 'right', mt: '6px', pr: 2.5 }}>{statusDisplay}</Box>
         </Box>
       </Box>
     );
@@ -385,6 +395,17 @@ export default function NotificationReminder(props: Props) {
           onClickClose={() => {
             setOpenStockRequestDetail(false);
           }}
+        />
+      )}
+      {openDetailDestroyDiscount && (
+        <ModalCreateToDestroyDiscount
+          isOpen={openDetailDestroyDiscount}
+          onClickClose={handleCloseDetailDestroyDiscount}
+          action={Action.UPDATE}
+          setPopupMsg={setPopupMsg}
+          setOpenPopup={setOpenPopup}
+          onSearchMain={handleGetData}
+          userPermission={userPermission}
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />

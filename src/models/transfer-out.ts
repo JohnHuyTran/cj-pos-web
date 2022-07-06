@@ -28,6 +28,7 @@ export interface TransferOutDestroyDiscountDetail {
   unit: string;
   unitCode: string;
   barFactor: number;
+  numberOfDiscounted: number;
   numberOfRequested: number;
   numberOfApproved: number;
   remark: string;

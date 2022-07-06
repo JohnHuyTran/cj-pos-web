@@ -439,11 +439,8 @@ export const ModalTransferOutItem = (props: DataGridProps) => {
         />
       </div>
       <Box display="flex" justifyContent="space-between" mt={0}>
-        <Grid container spacing={2} mb={2}>
-          <Grid item xs={3}/>
-          <Grid item xs={3}/>
-          <Grid item xs={3}/>
-          <Grid item xs={3}>
+        <Grid container spacing={2} mb={2} justifyContent={'flex-end'}>
+          <Grid item xs={3} sx={{ minWidth: '360px' }}>
             <Box display="flex" justifyContent="space-between" marginTop="25px">
               <Typography fontSize="14px" fontWeight="700" lineHeight="30px" height="24px">
                 จำนวนทั้งหมด

@@ -359,6 +359,32 @@ const useStyles = makeStyles({
       // padding: "2px 4px 2px 6px !important",
     },
   },
+  MautocompleteError: {
+    '& .MuiOutlinedInput-input': {
+      // padding: "6px 0px !important",
+      fontFamily: 'Kanit',
+    },
+    '& .MuiIconButton-root': {
+      color: '#CBD4DB !important',
+      // padding: "5px !important",
+    },
+    '& .MuiOutlinedInput-adornedEnd': {
+      paddingRight: '0px !important',
+    },
+    '& .MuiOutlinedInput-adornedStart': {
+      paddingLeft: '0px !important',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'red !important',
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'red !important',
+    },
+    '& .MuiInputBase-root.MuiOutlinedInput-root': {
+      height: '38px !important',
+    },
+  },
+
   MautocompleteAddProduct: {
     '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
       padding: '1.5px !important',
@@ -576,6 +602,33 @@ const useStyles = makeStyles({
     borderRadius: '10px',
     padding: '15px 13px',
     minHeight: '270px',
+    '& .wrapper-item': {
+      border: '1px solid #AEAEAE',
+      boxSizing: 'border-box',
+      borderRadius: '5px',
+      background: '#EAEBEB',
+      color: '#C1C1C1',
+      marginRight: '10px',
+      marginBottom: '10px',
+      padding: '0px 9px',
+      fontSize: '14px',
+      height: '28px',
+      display: 'flex',
+      alignItems: 'center',
+      '& svg': {
+        cursor: 'pointer',
+        fontSize: '14px',
+        marginLeft: '5px',
+      },
+    },
+  },
+  MWrapperListBranchForm: {
+    border: '1px solid #C1C1C1',
+    borderRadius: '10px',
+    padding: '15px 13px',
+    minHeight: '100px',
+    maxHeight: '165px',
+    overflow: 'auto',
     '& .wrapper-item': {
       border: '1px solid #AEAEAE',
       boxSizing: 'border-box',

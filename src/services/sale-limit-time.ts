@@ -1,9 +1,8 @@
-import { deleteDataBody, post } from '../adapters/posback-adapter';
+import { get, post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
 import { Payload, PayloadCancel, PayloadStart } from '../models/sale-limit-time';
-import { ContentType } from '../utils/enum/common-enum';
 
 export async function importST(payload: any) {
   try {
@@ -51,6 +50,14 @@ export async function getStartMultipeSaleLimitTime(payload: PayloadStart) {
 export async function cancelST(payload: PayloadCancel) {
   try {
     const response = await post(`${env.backEnd.url}${environment.sell.saleLimitTime.cancel.url}`, payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+export async function getAllBranch(params: string) {
+  try {
+    const response = await get(`${environment.master.branch.searchBranch.url}?${params}`);
     return response;
   } catch (error) {
     throw error;

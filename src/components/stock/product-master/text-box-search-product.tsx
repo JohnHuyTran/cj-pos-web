@@ -1,9 +1,9 @@
 import { Autocomplete, CircularProgress, createFilterOptions, TextField, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
-import { useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import SearchIcon from '@mui/icons-material/Search';
 import { searchProductItem } from '../../../services/product-master';
+import { debounce } from 'lodash';
 
 interface Props {
   onSelectItem: (value: any) => void;
@@ -13,14 +13,12 @@ interface Props {
 
 function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const [value, setValue] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [searchItem, setSearchItem] = React.useState<any | null>(null);
   const [itemsList, setItemList] = React.useState([]);
   let options: any = [];
   if (searchItem) options = itemsList && itemsList.length > 0 ? itemsList : [];
-  console.log({ options });
 
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.barcodeName + option.barcode + option.skuCode,
@@ -38,6 +36,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
       </li>
     );
   };
+
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
@@ -59,24 +58,20 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
       />
     );
   };
+
   const handleChangeItem = async (event: any, option: any, reason: string) => {
     setValue(option);
     onSelectItem(option);
   };
 
-  const clearData = async () => {
-    setValue('');
+  const onInputChange = async (event: any, value: string, reason: string) => {
+    debouncedSearch(event, value, reason);
   };
 
-  const clearInput = () => {};
-  const onInputChange = async (event: any, value: string, reason: string) => {
+  const debouncedSearch = debounce(async function (event: any, value: string, reason: string) {
     if (event && event.keyCode && event.keyCode === 13) {
       return false;
     }
-    if (reason == 'reset') {
-      clearInput();
-    }
-
     const keyword = value.trim();
     if (keyword.length >= 3 && reason !== 'reset') {
       setLoading(true);
@@ -90,10 +85,8 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
       } catch (error) {
         setLoading(false);
       }
-    } else {
-      clearData();
     }
-  };
+  }, 500);
 
   useEffect(() => {
     if (isClear) {

@@ -481,7 +481,7 @@ const BarcodeDiscountList: React.FC<StateProps> = (props) => {
     handleOpenLoading('open', true);
     if (chkPN !== 'checked') {
       try {
-        await dispatch(getBarcodeDiscountDetail(params.row.id));
+        await dispatch(getBarcodeDiscountDetail(params.row.documentNumber));
         if (barcodeDiscountDetail.data.length > 0 || barcodeDiscountDetail.data) {
           setOpenDetail(true);
         }
