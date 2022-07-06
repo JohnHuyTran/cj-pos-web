@@ -1,7 +1,7 @@
 import { InfoRounded } from '@mui/icons-material';
 import { Dialog, DialogContent, Grid, Typography } from '@mui/material';
 import React from 'react';
-import { ExpenseInfo } from '../../../models/branch-accoounting-model';
+import { ExpenseInfo } from '../../../models/branch-accounting-model';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 interface Props {
   open: boolean;
@@ -22,7 +22,7 @@ function ModelDescriptionExpense({ open, onClickClose, info }: Props) {
             .map((i: ExpenseInfo) => {
               return (
                 <Typography variant='body2'>
-                  {i.accountName} :{i.docReferance}
+                  {i.accountName} :{i.requiredDocument}
                 </Typography>
               );
             })}

@@ -29,6 +29,7 @@ import { featchMasterStockMovementTypeListAsync } from './store/slices/master/st
 import ProductMaster from './pages/stock/product-master';
 import TORawMasterial from './pages/transfer-out-raw-masterial/transfer-out-raw-masterial';
 import Expense from './pages/accounting/expense';
+import { featchMasterExpenseListAsync } from './store/slices/master/expense-list-slice';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -79,6 +80,7 @@ export default function App2() {
     dispatch(featchBranchListAsync());
     dispatch(featchAuthorizedBranchListAsync());
     dispatch(featchMasterStockMovementTypeListAsync());
+    dispatch(featchMasterExpenseListAsync());
   }
 
   return (

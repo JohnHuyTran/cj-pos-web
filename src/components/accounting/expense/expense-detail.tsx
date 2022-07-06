@@ -16,6 +16,7 @@ import ModelDescriptionExpense from './modal-description-expense';
 import { mockExpenseInfo, mockExpenseInfoNoActive } from '../../../mockdata/branch-accounting';
 import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
 import { Cancel } from '@mui/icons-material';
+import { GridColumnHeadersItemCollection } from '@mui/x-data-grid';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -77,7 +78,7 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
             className={classes.MbtnSave}
             onClick={handleSaveBtn}
             startIcon={<SaveIcon />}
-            sx={{ width: 200 }}>
+            sx={{ width: 140 }}>
             บันทึก
           </Button>
 
@@ -89,7 +90,7 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
             className={classes.MbtnSendDC}
             onClick={handleApproveBtn}
             startIcon={<CheckCircleOutline />}
-            sx={{ width: 200 }}>
+            sx={{ width: 140 }}>
             ขออนุมัติ
           </Button>
         </Grid>
@@ -103,14 +104,14 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
         <Grid item xl={5}></Grid>
         <Grid item>
           <Button
-            data-testid='testid-btnSave'
-            id='btnSave'
+            data-testid='testid-btnApprove'
+            id='btnApprove'
             variant='contained'
-            color='warning'
-            className={classes.MbtnSave}
-            onClick={handleRejectBtn}
-            startIcon={<SaveIcon />}
-            sx={{ width: 200 }}>
+            color='primary'
+            className={classes.MbtnSendDC}
+            onClick={handleApproveBtn}
+            startIcon={<CheckCircleOutline />}
+            sx={{ width: 140 }}>
             ขออนุมัติ
           </Button>
 
@@ -122,7 +123,7 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
             className={classes.MbtnSendDC}
             onClick={handleRejectBtn}
             startIcon={<Cancel />}
-            sx={{ width: 200 }}>
+            sx={{ width: 140 }}>
             ไม่อนุมัติ
           </Button>
         </Grid>

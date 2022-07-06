@@ -12,6 +12,7 @@ function ModalAddExpense({ open, onClose }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
+  const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const [isErrorDate, setIsErrorDate] = React.useState(false);
   const [isDisableSaveBtn, setIsDisableSaveBtn] = React.useState(false);
   const handleStartDatePicker = (value: any) => {
@@ -35,6 +36,7 @@ function ModalAddExpense({ open, onClose }: Props) {
                 value={startDate}
                 type={'TO'}
                 minDateTo={startDate}
+                maxDate={endDate}
                 isError={isErrorDate}
                 hyperText={isErrorDate ? 'เลือกวันที่ซ้ำ กรุณาเลือกใหม่' : ''}
               />

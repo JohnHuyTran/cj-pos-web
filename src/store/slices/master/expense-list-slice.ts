@@ -1,8 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { get } from '../../../adapters/posback-adapter';
 import { environment } from '../../../environment-base';
+import { featchMasterExpenseListAsyncMockup } from '../../../mockdata/branch-accounting';
 import { ExpenseMasterResponseType } from '../../../models/branch-accounting-model';
-import { StockMovementMasterResponse } from '../../../models/stock-model';
 
 type State = {
   masterExpenseList: ExpenseMasterResponseType;
@@ -19,13 +18,11 @@ const initialState: State = {
   error: '',
 };
 
-export const featchMasterExpenseeListAsync = createAsyncThunk('MasterExpenseList', async () => {
+export const featchMasterExpenseListAsync = createAsyncThunk('MasterExpenseList', async () => {
   try {
     const path = environment.master.expense.retrive.url;
-
-    let response = await get(path).then();
-
-    return response;
+    // return await get(path).then();
+    return featchMasterExpenseListAsyncMockup();
   } catch (error) {
     throw error;
   }
@@ -36,13 +33,13 @@ const masterExpenseListSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builer) => {
-    builer.addCase(featchMasterExpenseeListAsync.pending, () => {
+    builer.addCase(featchMasterExpenseListAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchMasterExpenseeListAsync.fulfilled, (state, action: PayloadAction<any>) => {
+      builer.addCase(featchMasterExpenseListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         state.masterExpenseList = action.payload;
       }),
-      builer.addCase(featchMasterExpenseeListAsync.rejected, () => {
+      builer.addCase(featchMasterExpenseListAsync.rejected, () => {
         initialState;
       });
   },

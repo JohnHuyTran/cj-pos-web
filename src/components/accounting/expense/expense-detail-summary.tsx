@@ -1,7 +1,8 @@
 import { Box } from '@mui/material';
 import { DataGrid, GridColDef, GridRowData } from '@mui/x-data-grid';
-import React from 'react';
-import { useAppDispatch } from '../../../store/store';
+import React, { useEffect } from 'react';
+import { ExpenseInfo } from '../../../models/branch-accounting-model';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import ExpenseDetailTransaction from './expense-detail-transaction';
 
@@ -9,12 +10,13 @@ function ExpenseDetailSummary() {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
-
+  const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
+  const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
   const rows: string | any[] = [];
-  const columns: GridColDef[] = [
-    {
-      field: 'index',
-      headerName: ' ',
+  const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
+    return {
+      field: i.expenseNo,
+      headerName: i.accountName,
       minWidth: 70,
       headerAlign: 'center',
       sortable: false,
@@ -23,92 +25,39 @@ function ExpenseDetailSummary() {
           {params.value}
         </Box>
       ),
-    },
-    {
-      field: 'expenseIce',
-      headerName: 'ค่าน้ำแข็ง',
-      minWidth: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: 'expenseCoffee',
-      headerName: 'ค่ากาแฟ',
-      minWidth: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: 'expenseEgg',
-      headerName: 'ค่าไข่ไก่',
-      minWidth: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: 'expenseMilk',
-      headerName: 'ค่านม',
-      minWidth: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: 'expenseWage',
-      headerName: 'ค่าจ้างรายวัน',
-      minWidth: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: 'expenseOther',
-      headerName: 'อื่นๆ',
-      minWidth: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: 'sum',
-      headerName: 'รวม',
-      minWidth: 70,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    },
-  ];
+    };
+  });
+  useEffect(() => {
+    let _newExpenseAllList: ExpenseInfo[] = [];
+    const headerDescription: ExpenseInfo = {
+      accountName: ' ',
+      skuCode: '',
+      approveLimit1: 0,
+      approveLimt2: 0,
+      active: true,
+      requiredDocument: '',
+      expenseNo: 'description',
+    };
+    const headerSum: ExpenseInfo = {
+      accountName: 'รวม',
+      skuCode: '',
+      approveLimit1: 0,
+      approveLimt2: 0,
+      active: true,
+      requiredDocument: '',
+      expenseNo: 'total',
+    };
+    _newExpenseAllList.push(headerDescription);
+
+    expenseMasterList
+      .filter((i: ExpenseInfo) => i.active)
+      .map((i: ExpenseInfo) => {
+        _newExpenseAllList.push(i);
+      });
+
+    _newExpenseAllList.push(headerSum);
+    setNewExpenseAllList(_newExpenseAllList);
+  }, []);
   const [pageSize, setPageSize] = React.useState<number>(10);
   return (
     <React.Fragment>
