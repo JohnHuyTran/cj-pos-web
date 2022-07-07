@@ -150,8 +150,9 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
     setOpenModelConfirm(false);
   };
 
-  const handleConfirm = () => {
-    console.log('xxxxxxxxxxx');
+  const handleConfirm = (periodData: any) => {
+    console.log('handleConfirm');
+    console.log('periodData:', periodData);
   };
 
   return (

@@ -10,7 +10,7 @@ import ConfirmContent from './confirm-content';
 interface Props {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (period: any) => void;
   startDate: string;
   endDate: string;
 }
@@ -27,11 +27,17 @@ export default function ModelConfirm({ open, onClose, onConfirm, startDate, endD
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
+  const [periodData, setPeriodData] = React.useState('');
+
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-    await onConfirm();
+    await onConfirm(periodData);
     handleOpenLoading('open', false);
     onClose();
+  };
+
+  const handleDate = async (period: any) => {
+    setPeriodData(period);
   };
 
   return (
@@ -43,7 +49,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, startDate, endD
         maxWidth='lg'
         PaperProps={{ sx: { minWidth: 900 } }}>
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
-          <ConfirmContent startDate={startDate} endDate={endDate} />
+          <ConfirmContent startDate={startDate} endDate={endDate} handleDate={handleDate} />
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: 'center', m: 5, mr: 5, ml: 5 }}>

@@ -1,4 +1,5 @@
 import React, { ReactElement } from 'react';
+import moment from 'moment';
 import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
@@ -9,24 +10,28 @@ import { useStyles } from '../../../../styles/makeTheme';
 interface Props {
   startDate: string;
   endDate: string;
+  handleDate: (period: any) => void;
 }
-interface loadingModalState {
-  open: boolean;
+interface State {
+  startDate: any;
+  endDate: any;
 }
 
-export default function confirmContent({ startDate, endDate }: Props): ReactElement {
+export default function confirmContent({ startDate, endDate, handleDate }: Props): ReactElement {
   const classes = useStyles();
-  const [sDate, setSDate] = React.useState<Date | null>(new Date(startDate));
-  const [eDate, setEDate] = React.useState<Date | null>(new Date(endDate));
-  const handleStartDatePicker = (value: any) => {
-    setSDate(value);
-  };
-  const handleEndDatePicker = (value: Date) => {
-    setEDate(value);
-  };
+  const [periodData, setPeriodData] = React.useState<State>({
+    startDate: startDate,
+    endDate: endDate,
+  });
 
-  console.log('startDate:', startDate);
-  console.log('endDate:', endDate);
+  const handleStartDatePicker = async (value: any) => {
+    setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });
+    await handleDate(periodData ? periodData : null);
+  };
+  const handleEndDatePicker = async (value: any) => {
+    setPeriodData({ ...periodData, endDate: moment(value).startOf('day').toISOString() });
+    await handleDate(periodData ? periodData : null);
+  };
 
   const columns: GridColDef[] = [
     {
@@ -133,13 +138,23 @@ export default function confirmContent({ startDate, endDate }: Props): ReactElem
           <Typography gutterBottom variant='subtitle1' component='div'>
             วันที่ค่าใช้จ่าย <span style={{ color: '#F54949' }}>*</span>
           </Typography>
-          <DatePickerComponent onClickDate={handleStartDatePicker} value={sDate} type={'TO'} minDateTo={sDate} />
+          <DatePickerComponent
+            onClickDate={handleStartDatePicker}
+            value={periodData.startDate}
+            type={'TO'}
+            minDateTo={periodData.startDate}
+          />
         </Grid>
         <Grid item xs={6}>
           <Typography gutterBottom variant='subtitle1' component='div'>
             วันที่อนุมัติเงินสำรอง <span style={{ color: '#F54949' }}>*</span>
           </Typography>
-          <DatePickerComponent onClickDate={handleEndDatePicker} value={eDate} type={'TO'} minDateTo={sDate} />
+          <DatePickerComponent
+            onClickDate={handleEndDatePicker}
+            value={periodData.endDate}
+            type={'TO'}
+            minDateTo={periodData.startDate}
+          />
         </Grid>
       </Grid>
 
