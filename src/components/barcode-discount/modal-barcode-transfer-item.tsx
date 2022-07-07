@@ -329,7 +329,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'index',
       headerName: 'ลำดับ',
-      minWidth: 60,
+      width: 70,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -342,7 +342,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'barCode',
       headerName: 'บาร์โค้ด',
-      minWidth: 122,
+      minWidth: 125,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -350,7 +350,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'barcodeName',
       headerName: 'รายละเอียดสินค้า',
-      minWidth: 250,
+      minWidth: 260,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -366,7 +366,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'unit',
       headerName: 'หน่วย',
-      minWidth: 60,
+      width: 70,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -374,7 +374,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'price',
       headerName: 'ราคาปกติ',
-      minWidth: 60,
+      minWidth: 70,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
@@ -403,7 +403,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
     {
       field: 'discount',
       headerName: typeDiscount === 'percent' ? 'ยอดลด * (%)' : 'ยอดลด * (บาท)',
-      minWidth: 150,
+      minWidth: 140,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -705,7 +705,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           disableColumnMenu
           autoHeight={dtTable.length < 8}
           scrollbarSize={10}
-          rowHeight={70}
+          rowHeight={85}
           components={{
             NoRowsOverlay: () => (
               <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
@@ -739,34 +739,35 @@ export const ModalTransferItem = (props: DataGridProps) => {
               />
             </Box>
           </Grid>
-          <Grid item xs={3}/>
-          <Grid item xs={3}>
-            <Box display="flex" justifyContent="space-between" marginTop="25px">
-              <Typography fontSize="14px" lineHeight="21px" height="24px">
-                ขอส่วนลดทั้งหมด
-                {env.currency && ` (${env.currency})`}
-              </Typography>
-              <TextField
-                disabled
-                type="text"
-                sx={{ bgcolor: '#EAEBEB' }}
-                className={classes.MtextFieldNumberNoneArrow}
-                value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
-              />
-            </Box>
-            <Box display="flex" justifyContent="space-between" marginTop="10px">
-              <Typography fontSize="14px" fontWeight="700" marginTop="6px">
-                ส่วนลดที่อนุมัติทั้งหมด
-                {env.currency && ` (${env.currency})`}
-              </Typography>
-              <TextField
-                type="text"
-                sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
-                inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
-                className={classes.MtextFieldNumberNoneArrow}
-                value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
-              />
-            </Box>
+          <Grid item xs={6} display={'flex'} justifyContent={'flex-end'}>
+            <Grid item sx={{ minWidth: '380px' }}>
+              <Box display="flex" justifyContent="space-between" marginTop="25px">
+                <Typography fontSize="14px" lineHeight="21px" height="24px" marginTop="6px">
+                  ขอส่วนลดทั้งหมด
+                  {env.currency && ` (${env.currency})`}
+                </Typography>
+                <TextField
+                  disabled
+                  type="text"
+                  sx={{ bgcolor: '#EAEBEB' }}
+                  className={classes.MtextFieldNumberNoneArrow}
+                  value={numberWithCommas(addTwoDecimalPlaces(sumOfDiscount))}
+                />
+              </Box>
+              <Box display="flex" justifyContent="space-between" marginTop="10px">
+                <Typography fontSize="14px" fontWeight="700" marginTop="6px">
+                  ส่วนลดที่อนุมัติทั้งหมด
+                  {env.currency && ` (${env.currency})`}
+                </Typography>
+                <TextField
+                  type="text"
+                  sx={{ bgcolor: '#E7FFE9', pointerEvents: 'none' }}
+                  inputProps={{ style: { fontWeight: 'bolder', color: '#263238' } }}
+                  className={classes.MtextFieldNumberNoneArrow}
+                  value={numberWithCommas(addTwoDecimalPlaces(sumOfApprovedDiscount))}
+                />
+              </Box>
+            </Grid>
           </Grid>
         </Grid>
       </Box>

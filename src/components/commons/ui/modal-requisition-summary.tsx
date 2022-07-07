@@ -231,7 +231,7 @@ export default function RequisitionSummary({ isOpen, onClickClose, branchSelecte
           <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
             <Grid item xs={6}>
               <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-                วันที่ขอใช้วัตถุ ตั้งแต่
+                วันที่ขอใช้วัตถุ ตั้งแต่ *
               </Typography>
               <DatePickerComponent
                 error={checkValue.fromDateError}
@@ -246,7 +246,7 @@ export default function RequisitionSummary({ isOpen, onClickClose, branchSelecte
             </Grid>
             <Grid item xs={6}>
               <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-                ถึง
+                ถึง *
               </Typography>
               <DatePickerComponent
                 error={checkValue.toDateError}
@@ -263,7 +263,7 @@ export default function RequisitionSummary({ isOpen, onClickClose, branchSelecte
             </Grid>
             <Grid item xs={6}>
               <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-                สาขา
+                สาขา *
               </Typography>
               <BranchListDropDown
                 valueBranch={branchSelected ? branchOptions1 : branchOptions}
@@ -275,7 +275,7 @@ export default function RequisitionSummary({ isOpen, onClickClose, branchSelecte
               />
               {checkValue.branchError && (
                 <Box textAlign='right' color='#F54949'>
-                  กรุณาระบุวันที่
+                  กรุณาระบุสาขา
                 </Box>
               )}
             </Grid>

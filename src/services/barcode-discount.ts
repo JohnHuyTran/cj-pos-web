@@ -31,7 +31,7 @@ export async function sendForApprovalBarcodeDiscount(id: string) {
   }
 }
 
-export async function approveBarcodeDiscount(id: string, payload: Payload) {
+export async function approveBarcodeDiscount(id: string, payload: any) {
   try {
     const response = await post(getPathApprove(id), payload);
     return response;

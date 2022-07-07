@@ -759,14 +759,14 @@ export default function ModalCreateTransferOutDestroy({
               <Grid item xs={4}>
                 วันที่อนุมัติ :
                 {/*add control selection type in here avoid to before and after control attach many files will be pushed down row*/}
-                <Grid item xs={12} pt={8.5}>
+                <Grid item xs={12} pt={8}>
                   ประเภททำลาย <b style={{ fontSize: '18px' }}> *</b> :
                 </Grid>
               </Grid>
               <Grid item xs={8}>
                 {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
                 {/*add control selection type in here avoid to before and after control attach many files will be pushed down row*/}
-                <Grid item xs={9} pt={8.5}>
+                <Grid item xs={9} pt={8}>
                   <FormControl fullWidth className={classes.Mselect}>
                     <Select
                       id='typeDestroy'
@@ -800,7 +800,7 @@ export default function ModalCreateTransferOutDestroy({
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={2}>
+            <Grid item container xs={4} mb={4}>
               <Grid item xs={4}>
                 รูปก่อนทำลาย<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>
@@ -821,7 +821,7 @@ export default function ModalCreateTransferOutDestroy({
                 />
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={2} pl={3}>
+            <Grid item container xs={4} mb={4} pl={3}>
               <Grid item xs={4}>
                 รูปหลังทำลาย<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>

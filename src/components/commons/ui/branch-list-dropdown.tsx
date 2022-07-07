@@ -19,6 +19,7 @@ interface Props {
   isFilterAuthorizedBranch?: boolean;
   placeHolder?: string;
   superviseBranch?: boolean;
+  error?: boolean;
 }
 
 function BranchListDropDown({
@@ -31,6 +32,7 @@ function BranchListDropDown({
   isFilterAuthorizedBranch,
   placeHolder,
   superviseBranch,
+  error,
 }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -94,12 +96,12 @@ function BranchListDropDown({
 
   return (
     <Autocomplete
-      data-testid='autocomplete-search-branch-list'
+      data-testid="autocomplete-search-branch-list"
       {...defaultPropsBranchList}
-      className={classes.Mautocomplete}
+      className={error ? classes.MautocompleteError : classes.Mautocomplete}
       popupIcon={<SearchIcon />}
-      noOptionsText='ไม่พอข้อมูล'
-      id='selBranchNo'
+      noOptionsText="ไม่พอข้อมูล"
+      id="selBranchNo"
       value={valueBranchList}
       onChange={handleChangeBranch}
       renderOption={(props, option) => {
@@ -111,16 +113,16 @@ function BranchListDropDown({
       }}
       renderInput={(params) => (
         <TextField
-          data-testid='textfiled-branch-list'
+          data-testid="textfiled-branch-list"
           {...params}
           placeholder={placeHolder ? placeHolder : 'ทั้งหมด'}
-          size='small'
+          size="small"
           className={classes.MtextField}
           fullWidth
           InputProps={{
             ...params.InputProps,
             endAdornment: (
-              <InputAdornment position='start'>
+              <InputAdornment position="start">
                 <SearchIcon />
               </InputAdornment>
             ),
