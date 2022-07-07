@@ -76,6 +76,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [openWithDrawMenu, setOpenWithDrawMenu] = React.useState(false);
   const [openProductInfoMenu, setOpenProductInfoMenu] = React.useState(false);
   const [openPurchaseBranchMenu, setOpenPurchaseBranchMenu] = React.useState(false);
+  const [openExpenseMenu, setOpenExpenseMenu] = React.useState(false);
 
   const navState = useAppSelector((state) => state.navigator.state);
 
@@ -85,6 +86,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableMainMenuTransferOut, setDisableMainMenuTransferOut] = React.useState(true);
   const [disableMainMenuProductInfo, setDisableMainMenuProductInfo] = React.useState(true);
   const [disableMainMenuPurchaseBranch, setDisableMainMenuPurchaseBranch] = React.useState(true);
+  const [disableMainMenuExpense, setDisableMainMenuExpense] = React.useState(true);
 
   const [disableSubMenuOROrderReceive, setDisableSubMenuOROrderReceive] = React.useState(true);
   const [disableSubMenuORStockDiff, setDisableSubMenuORStockDiff] = React.useState(true);
@@ -96,6 +98,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuStockBalance, setDisableSubMenuStockBalance] = React.useState(true);
   const [disableSubMenuStockMovement, setDisableSubMenuStockMovement] = React.useState(true);
   const [disableSubMenuCreatePurchaseBranch, setDisableSubMenuCreatePurchaseBranch] = React.useState(true);
+  const [disableSubMenuExpense, setDisableSubMenuExpense] = React.useState(true);
 
   const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
   const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
@@ -111,6 +114,8 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableMainMenuTransferOut(isAllowMainMenuPermission(MAINMENU.TRANSFER_OUT));
     setDisableMainMenuProductInfo(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO));
     setDisableMainMenuPurchaseBranch(isAllowMainMenuPermission(MAINMENU.PURCHASE_BRANCH));
+
+    setDisableMainMenuExpense(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO)); //Mock Permission
 
     setDisableSubMenuSaleDiscount(isAllowSubMenuPermission(SUBMENU.SALE_DISCOUNT));
     setDisableSubMenuSaleSaleLimit(isAllowSubMenuPermission(SUBMENU.SALE_SALE_LIMIT));
@@ -129,6 +134,8 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableSubMenuStockBalance(isAllowSubMenuPermission(SUBMENU.PI_STOCK_BALANCE));
     setDisableSubMenuStockMovement(isAllowSubMenuPermission(SUBMENU.PI_STOCK_MOVEMENT));
     setDisableSubMenuProductMaster(isAllowSubMenuPermission(SUBMENU.PI_PRODUCT_MASTER));
+
+    setDisableSubMenuExpense(isAllowSubMenuPermission(SUBMENU.PI_STOCK_BALANCE)); //Mock Permission
 
     setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
   }, [navState]);
@@ -172,6 +179,10 @@ export default function Sidebar({}: Props): ReactElement {
   };
   const handleClickPurchaseBranch = () => {
     setOpenPurchaseBranchMenu(!openPurchaseBranchMenu);
+  };
+
+  const handleClickExpense = () => {
+    setOpenExpenseMenu(!openExpenseMenu);
   };
 
   return (
@@ -478,6 +489,36 @@ export default function Sidebar({}: Props): ReactElement {
                 onClick={() => handleListItemClick(12)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ความเคลื่อนไหวของสินค้า' />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        <ListItemButton
+          onClick={handleClickExpense}
+          id='mainMenuExpense'
+          style={{ display: disableMainMenuExpense ? 'none' : '' }}>
+          <ListItemIcon>
+            <StoreMallDirectoryIcon />
+          </ListItemIcon>
+          <ListItemText primary='สรุปรับ-จ่าย' style={{ marginLeft: -15 }} />
+          {openExpenseMenu ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openExpenseMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
+            <Link
+              to='/expense'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                display: disableSubMenuExpense ? 'none' : '',
+              }}
+              id='subMenuExpense'>
+              <ListItemButton
+                key='Expense'
+                selected={selectedIndex === 15}
+                onClick={() => handleListItemClick(15)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ค่าใช้จ่าย' />
               </ListItemButton>
             </Link>
           </List>

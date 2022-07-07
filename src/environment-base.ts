@@ -442,6 +442,11 @@ export const environment = {
         },
       },
     },
+    expense: {
+      retrive: {
+        url: 'master/expenses',
+      },
+    },
   },
   authority: {
     authorizedBranch: {
@@ -481,6 +486,38 @@ export const environment = {
   tote: {
     inquiryTote: {
       url: '/webtote/toteinquiry',
+    },
+  },
+  branchAccounting: {
+    expense: {
+      save: {
+        url: 'branchAccount/',
+      },
+      approve: {
+        branch: {
+          url: 'approve',
+        },
+        ocArea: {
+          url: '',
+        },
+        account: {
+          url: '',
+        },
+        accountManager: {
+          url: '',
+        },
+      },
+      reject: {
+        ocArea: {
+          url: '',
+        },
+        account: {
+          url: '',
+        },
+        accountManager: {
+          url: '',
+        },
+      },
     },
   },
 };

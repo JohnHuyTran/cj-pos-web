@@ -10,3 +10,16 @@ export interface FileType {
   mimeType: string;
   status?: string;
 }
+
+export interface AuditLog {
+  activity: string;
+  editBy: string;
+  editByName: string;
+  editDate: string;
+  comment: AuditLogComment | '';
+}
+
+export interface AuditLogComment {
+  by: string;
+  detail: string;
+}
