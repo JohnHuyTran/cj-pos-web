@@ -584,6 +584,7 @@ export default function ModalCreateTransferOut({
       const payload = {
         transferOutReason: dataDetail.transferOutReason,
         store: dataDetail.store,
+        products: payloadTransferOut.products
       };
       let res = await rejectTransferOut(dataDetail.id, payload);
       if (res && res.code === 20000) {
