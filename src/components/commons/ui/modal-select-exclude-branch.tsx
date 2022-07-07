@@ -110,6 +110,18 @@ export default function SelectExcludeBranch(props: Props): ReactElement {
   };
 
   useEffect(() => {
+    if (open && payloadBranches.saved) {
+      setAllBranches(payloadBranches.isAllBranches);
+      setValues({
+        provinces: payloadBranches.appliedBranches.province,
+        branches: payloadBranches.appliedBranches.branchList,
+        excludeBranches: payloadBranches.appliedBranches.excludedBranchList,
+        excludeProvinces: payloadBranches.appliedBranches.excludedProvinceList,
+      });
+    }
+  }, [open]);
+
+  useEffect(() => {
     if (province) {
       let newList = !!branchList ? branchList.filter((el: any) => el.province.code == province.code) : [];
       setListBranchSelect(newList);
