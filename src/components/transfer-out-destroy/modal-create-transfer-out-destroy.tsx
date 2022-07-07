@@ -983,7 +983,6 @@ export default function ModalCreateTransferOutDestroy({
         requestBody={{
           skuCodes: [],
           skuTypes: [1, 7],
-          isSellable: true,
         }}
       />
 
