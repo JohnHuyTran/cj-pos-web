@@ -53,22 +53,6 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
   };
   const handleSaveBtn = () => {};
   const handleApproveBtn = () => {
-    const x001 = {
-      '001': '001',
-    };
-    const x002 = {
-      '002': '002',
-    };
-
-    const x1 = {
-      id: 1,
-      name: 'ยอดเงินเบิก',
-      ...x001,
-      ...x002,
-    };
-
-    console.log('x1:', x1);
-
     handleOpenModelConfirm();
   };
   const handleRejectBtn = () => {};
@@ -274,7 +258,13 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType }: Props) {
         info={[mockExpenseInfo, mockExpenseInfoNoActive]}
       />
 
-      <ModelConfirmDetail open={openModelConfirm} onClose={handleCloseModelConfirm} onConfirm={handleConfirm} />
+      <ModelConfirmDetail
+        open={openModelConfirm}
+        onClose={handleCloseModelConfirm}
+        onConfirm={handleConfirm}
+        startDate='2022-06-16T00:00:00+07:00'
+        endDate='2022-06-30T23:59:59.999999999+07:00'
+      />
     </React.Fragment>
   );
 }
