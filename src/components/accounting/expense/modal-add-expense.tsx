@@ -141,12 +141,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
               <>
                 <Grid container spacing={2} mb={2} mt={2}>
                   {expenseMasterList
-                    .filter((i: ExpenseInfo) => i.active && !i.isOtherExpense)
+                    .filter((i: ExpenseInfo) => i.isActive && !i.isOtherExpense)
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
                           <Grid item xs={1}>
-                            <Typography variant='body2'>{i.accountName}: </Typography>
+                            <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={3}>
                             <TextField
@@ -185,12 +185,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
                 <Grid container spacing={2} mb={2} mt={2}>
                   {expenseMasterList
-                    .filter((i: ExpenseInfo) => i.active && i.isOtherExpense)
+                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense)
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
                           <Grid item xs={1}>
-                            <Typography variant='body2'>{i.accountName}: </Typography>
+                            <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={3}>
                             <TextField
@@ -260,12 +260,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
                 <Grid container spacing={2} mb={2} mt={2}>
                   {expenseMasterList
-                    .filter((i: ExpenseInfo) => i.active && i.isOtherExpense)
+                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense)
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
                           <Grid item xs={1}>
-                            <Typography variant='body2'>{i.accountName}: </Typography>
+                            <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={3}>
                             <TextField

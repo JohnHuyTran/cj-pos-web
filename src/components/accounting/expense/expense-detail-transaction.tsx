@@ -39,7 +39,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     return {
       field: i.expenseNo,
-      headerName: i.accountName,
+      headerName: i.accountNameTh,
       minWidth: 70,
       flex: 1,
       headerAlign: 'center',
@@ -54,40 +54,46 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
   useEffect(() => {
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
-      accountName: 'วันที่ค่าใช่จ่าย',
+      accountNameTh: 'วันที่ค่าใช่จ่าย',
       skuCode: '',
       approveLimit1: 0,
       approveLimt2: 0,
-      active: true,
+      isActive: true,
       requiredDocument: '',
       expenseNo: 'date',
       isOtherExpense: false,
+      type: '',
+      accountCode: '',
     };
     const headerOtherDetail: ExpenseInfo = {
-      accountName: ' ',
+      accountNameTh: ' ',
       skuCode: '',
       approveLimit1: 0,
       approveLimt2: 0,
-      active: true,
+      isActive: true,
       requiredDocument: '',
       expenseNo: 'otherDetail',
       isOtherExpense: false,
+      type: '',
+      accountCode: '',
     };
 
     const headerSum: ExpenseInfo = {
-      accountName: 'รวม',
       skuCode: '',
       approveLimit1: 0,
       approveLimt2: 0,
-      active: true,
       requiredDocument: '',
       expenseNo: 'total',
       isOtherExpense: false,
+      type: '',
+      accountCode: '',
+      accountNameTh: 'รวม',
+      isActive: false,
     };
     _newExpenseAllList.push(headerDescription);
 
     expenseMasterList
-      .filter((i: ExpenseInfo) => i.active)
+      .filter((i: ExpenseInfo) => i.isActive)
       .map((i: ExpenseInfo) => {
         _newExpenseAllList.push(i);
       });

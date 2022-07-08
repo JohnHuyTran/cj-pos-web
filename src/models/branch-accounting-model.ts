@@ -2,14 +2,16 @@ import { FileType } from './common-model';
 
 //master Expense
 export interface ExpenseInfo {
-  accountName: string;
+  type: string;
+  accountCode: string;
+  accountNameTh: string;
   skuCode: string;
-  approveLimit1: number;
-  approveLimt2: number;
-  active: boolean;
-  requiredDocument: string;
+  isActive: boolean;
   expenseNo: string;
   isOtherExpense: boolean;
+  approveLimit1: number;
+  approveLimt2: number;
+  requiredDocument: string;
 }
 
 export interface ExpenseMasterResponseType {

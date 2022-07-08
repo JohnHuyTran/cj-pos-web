@@ -20,7 +20,7 @@ function ExpenseDetailSummary() {
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     return {
       field: i.expenseNo,
-      headerName: i.accountName,
+      headerName: i.accountNameTh,
       minWidth: 70,
       flex: 1,
       headerAlign: 'center',
@@ -35,29 +35,33 @@ function ExpenseDetailSummary() {
   useEffect(() => {
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
-      accountName: ' ',
+      accountNameTh: ' ',
       skuCode: '',
       approveLimit1: 0,
       approveLimt2: 0,
-      active: true,
+      isActive: true,
       requiredDocument: '',
       expenseNo: 'description',
       isOtherExpense: false,
+      type: '',
+      accountCode: '',
     };
     const headerSum: ExpenseInfo = {
-      accountName: 'รวม',
+      accountNameTh: 'รวม',
       skuCode: '',
       approveLimit1: 0,
       approveLimt2: 0,
-      active: true,
+      isActive: true,
       requiredDocument: '',
       expenseNo: 'total',
       isOtherExpense: false,
+      type: '',
+      accountCode: '',
     };
     _newExpenseAllList.push(headerDescription);
 
     expenseMasterList
-      .filter((i: ExpenseInfo) => i.active)
+      .filter((i: ExpenseInfo) => i.isActive)
       .map((i: ExpenseInfo) => {
         _newExpenseAllList.push(i);
       });

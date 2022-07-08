@@ -9,64 +9,76 @@ import {
 } from '../models/branch-accounting-model';
 
 export const mockExpenseInfo001: ExpenseInfo = {
-  accountName: 'ค่าน้ำแข็งหลอด',
+  accountNameTh: 'ค่าน้ำแข็งหลอด',
   skuCode: '000000700000007',
   approveLimit1: 2000,
   approveLimt2: 0,
-  active: true,
+  isActive: true,
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '001',
   isOtherExpense: false,
+  type: '',
+  accountCode: '',
 };
 export const mockExpenseInfo002: ExpenseInfo = {
-  accountName: 'ค่าน้ำดื่มชงกาแฟ',
+  accountNameTh: 'ค่าน้ำดื่มชงกาแฟ',
   skuCode: '000000700000007',
   approveLimit1: 2000,
   approveLimt2: 0,
-  active: true,
+  isActive: true,
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '002',
   isOtherExpense: false,
+  type: '',
+  accountCode: '',
 };
 export const mockExpenseInfo003: ExpenseInfo = {
-  accountName: 'ค่าไช่ไก่',
+  accountNameTh: 'ค่าไช่ไก่',
   skuCode: '000000700000007',
   approveLimit1: 2000,
   approveLimt2: 0,
-  active: true,
+  isActive: true,
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '003',
   isOtherExpense: false,
+  type: '',
+  accountCode: '',
 };
 export const mockExpenseInfo004: ExpenseInfo = {
-  accountName: 'ค่านม',
+  accountNameTh: 'ค่านม',
   skuCode: '000000700000007',
   approveLimit1: 2000,
   approveLimt2: 0,
-  active: true,
+  isActive: true,
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '004',
   isOtherExpense: false,
+  type: '',
+  accountCode: '',
 };
 export const mockExpenseInfo005: ExpenseInfo = {
-  accountName: 'ค่าจ่างรายวัน',
+  accountNameTh: 'ค่าจ่างรายวัน',
   skuCode: '000000700000007',
   approveLimit1: 2000,
   approveLimt2: 0,
-  active: true,
+  isActive: true,
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '005',
   isOtherExpense: true,
+  type: '',
+  accountCode: '',
 };
 export const mockExpenseInfo006: ExpenseInfo = {
-  accountName: 'สิ้นเปลือง',
+  accountNameTh: 'สิ้นเปลือง',
   skuCode: '000000700000007',
   approveLimit1: 2000,
   approveLimt2: 0,
-  active: true,
+  isActive: true,
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '006',
   isOtherExpense: true,
+  type: '',
+  accountCode: '',
 };
 
 const fetchMasterExpense = {
