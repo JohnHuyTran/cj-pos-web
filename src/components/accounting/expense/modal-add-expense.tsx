@@ -10,7 +10,9 @@ import { addNewItem, updateItemRows } from '../../../store/slices/accounting/acc
 import LoadingModal from '../../commons/ui/loading-modal';
 import userEvent from '@testing-library/user-event';
 import { setInit } from '../../../store/sessionStore';
-import { stringNullOrEmpty } from '../../../utils/utils';
+import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
+import moment from 'moment';
+import { convertUtcToBkkDate } from '../../../utils/date-utill';
 
 interface Props {
   open: boolean;
@@ -51,14 +53,19 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
       let sum: number = 0;
       testList.map((e: any) => {
         data = { ...data, [e.key]: e.value };
-        if (!isFilterField(e.key)) {
+        if (!isFilterFieldInExpense(e.key)) {
           sum += e.value;
         }
       });
       data = { ...data, total: sum };
       await dispatch(addNewItem(data));
     } else {
-      const data = { ...values, id: uuidv4(), total: 100, date: '12/07' };
+      const data = {
+        ...values,
+        id: uuidv4(),
+        total: 100,
+        date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
+      };
       await dispatch(addNewItem(data));
     }
     setInit('N');
@@ -82,16 +89,13 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
   const handleChange = (event: any) => {
     const value = event.target.value;
-    setValues({ ...values, [event.target.name]: value });
+    setValues({ ...values, [event.target.name]: Number(value) });
   };
   const handleOnChange = (event: any) => {
     const value = Number(event.target.value);
     const sum = Number(sumOther);
     setSumOther(sum + value);
     setValues({ ...values, [event.target.name]: value });
-  };
-  const isFilterField = (value: string) => {
-    return value === 'date' || value === 'total' || value === 'id';
   };
 
   useEffect(() => {
@@ -212,7 +216,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
               <>
                 <Grid container spacing={2} mb={2} mt={2}>
                   {testList
-                    .filter((i: payLoadAdd) => !isFilterField(i.key))
+                    .filter((i: payLoadAdd) => !isFilterFieldInExpense(i.key))
                     .map((i: payLoadAdd) => {
                       return (
                         <>

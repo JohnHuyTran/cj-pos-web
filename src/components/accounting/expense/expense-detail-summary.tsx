@@ -2,7 +2,7 @@ import { Box, setRef } from '@mui/material';
 import { DataGrid, GridColDef, GridRowData } from '@mui/x-data-grid';
 import { info } from 'console';
 import React, { useEffect } from 'react';
-import { AccountAccountExpenses, ExpenseInfo, ExpenseSummaryItem } from '../../../models/branch-accounting-model';
+import { AccountAccountExpenses, ExpenseInfo } from '../../../models/branch-accounting-model';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import ExpenseDetailTransaction from './expense-detail-transaction';

@@ -1,11 +1,11 @@
 import {
   AccountAccountExpenses,
-  ExpenseByDay,
+  DataItem,
   ExpenseInfo,
-  ExpenseItem,
   ExpensePeriod,
-  ExpenseSummary,
-  ExpenseSummaryItem,
+  ItemItem,
+  SumItems,
+  SumItemsItem,
 } from '../models/branch-accounting-model';
 
 export const mockExpenseInfo001: ExpenseInfo = {
@@ -84,82 +84,82 @@ const fetchMasterExpense = {
   ],
 };
 
-const summaryItem001: ExpenseSummaryItem = {
+const summaryItem001: SumItemsItem = {
   expenseNo: '001',
   withdrawAmount: 100,
   approvedAmount: 100,
 };
 
-const summaryItem002: ExpenseSummaryItem = {
+const summaryItem002: SumItemsItem = {
   expenseNo: '002',
   withdrawAmount: 200,
   approvedAmount: 200,
 };
-const summaryItem003: ExpenseSummaryItem = {
+const summaryItem003: SumItemsItem = {
   expenseNo: '003',
   withdrawAmount: 300,
   approvedAmount: 300,
 };
-const summaryItem004: ExpenseSummaryItem = {
+const summaryItem004: SumItemsItem = {
   expenseNo: '004',
   withdrawAmount: 400,
   approvedAmount: 400,
 };
-const summaryItem005: ExpenseSummaryItem = {
+const summaryItem005: SumItemsItem = {
   expenseNo: '005',
   withdrawAmount: 500,
   approvedAmount: 500,
 };
 
-const summary: ExpenseSummary = {
+const summary: SumItems = {
   items: [summaryItem001, summaryItem002, summaryItem003, summaryItem004, summaryItem005],
   sumWithdrawAmount: 606,
   sumApprovalAmount: 900,
 };
 
-const item001: ExpenseItem = {
+const item001: ItemItem = {
   expenseNo: '001',
   amount: 100,
   isOtherExpense: false,
 };
 
-const item002: ExpenseItem = {
+const item002: ItemItem = {
   expenseNo: '002',
   amount: 200,
   isOtherExpense: false,
 };
 
-const item003: ExpenseItem = {
+const item003: ItemItem = {
   expenseNo: '003',
   amount: 300,
   isOtherExpense: false,
 };
 
-const item004: ExpenseItem = {
+const item004: ItemItem = {
   expenseNo: '004',
   amount: 400,
   isOtherExpense: false,
 };
 
-const item005: ExpenseItem = {
+const item005: ItemItem = {
   expenseNo: '005',
   amount: 500,
   isOtherExpense: false,
 };
 
-const expenseByDay01: ExpenseByDay = {
+const expenseByDay01: DataItem = {
   expenseDate: '01/07/2565',
-  expenseItems: [item001, item002, item003, item004, item005],
+  items: [item001, item002, item003, item004, item005],
   totalAmount: 1000,
 };
-const expenseByDay02: ExpenseByDay = {
+const expenseByDay02: DataItem = {
   expenseDate: '02/07/2565',
-  expenseItems: [item001, item002, item003, item004, item005],
+  items: [item001, item002, item003, item004, item005],
   totalAmount: 200,
 };
-const expenseByDay03: ExpenseByDay = {
+const expenseByDay03: DataItem = {
   expenseDate: '03/07/2565',
-  expenseItems: [item001, item002, item003, item004, item005],
+  items: [item001, item002, item003, item004, item005],
   totalAmount: 9000,
 };
 
@@ -173,15 +173,15 @@ const accountExpense: AccountAccountExpenses = {
   branchCode: '0101',
   docNo: 'BA0001',
   type: 'COFFEE',
-  expenseMonth: 0,
-  expenseYear: 0,
+  month: 0,
+  year: 0,
   expensePeriod: period,
   status: 'DRAFT',
   attachFiles: [],
   editAttachFiles: [],
   approvalAttachFiles: [],
-  itemSummary: summary,
-  itemByDays: [expenseByDay01, expenseByDay02, expenseByDay03],
+  sumItems: summary,
+  items: [expenseByDay01, expenseByDay02, expenseByDay03],
   comments: [],
   expenseDate: '',
   approvedDate: '',

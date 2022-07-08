@@ -19,18 +19,24 @@ import { Cancel } from '@mui/icons-material';
 import { GridColumnHeadersItemCollection } from '@mui/x-data-grid';
 import { mockExpenseInfo001, mockExpenseInfo002 } from '../../../mockdata/branch-accounting';
 import {
-  ExpenseByDay,
-  ExpenseInfo,
-  ExpenseItem,
+  AccountAccountExpenses,
+  DataItem,
   ExpensePeriod,
-  ExpenseSummaryItem,
+  ItemItem,
+  SumItems,
+  SumItemsItem,
 } from '../../../models/branch-accounting-model';
 import { initialItems, updateItemRows, updateSummaryRows } from '../../../store/slices/accounting/accounting-slice';
-import { getBranchName } from '../../../utils/utils';
+import { getBranchName, isFilterFieldInExpense } from '../../../utils/utils';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { getInit, getUserInfo } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
 import { EXPENSE_TYPE, STATUS } from '../../../utils/enum/accounting-enum';
+import LoadingModal from '../../commons/ui/loading-modal';
+import AlertError from '../../commons/ui/alert-error';
+import SnackbarStatus from '../../commons/ui/snackbar-status';
+import { expenseSave } from '../../../services/accounting';
+import { ApiError } from '../../../models/api-error-model';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -56,9 +62,23 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
   // const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
   const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
   const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
-  const summary = expenseData ? expenseData.itemSummary : null;
-  const _items: ExpenseByDay[] = expenseData ? expenseData.itemByDays : [];
+  const summary: SumItems = expenseData ? expenseData.sumItems : null;
+  const _items: DataItem[] = expenseData ? expenseData.items : [];
   const [items, setItems] = React.useState<any>(_items ? _items : []);
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
 
   const handleClose = () => {};
   const handleOnChangeUploadFileSave = (status: boolean) => {
@@ -80,10 +100,89 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
     setPayloadAdd(entries);
     setOpenModalAddExpense(true);
   };
-  const handleSaveBtn = () => {};
+  const handleSaveBtn = async () => {
+    const isFileValidate: boolean = validateFileInfo();
+    if (isFileValidate) {
+      const items = store.getState().expenseAccountDetailSlice.itemRows;
+      const summarys = store.getState().expenseAccountDetailSlice.summaryRows;
+      console.log(items);
+      console.log(summarys);
+      let dataItem: DataItem[] = [];
+      items.forEach((e: any) => {
+        const arr = Object.entries(e);
+        let items: ItemItem[] = [];
+        arr
+          .filter((e: any) => !isFilterFieldInExpense(e[0]))
+          .map((element: any, index: number) => {
+            const item: ItemItem = {
+              expenseNo: element[0],
+              amount: element[1],
+              isOtherExpense: false,
+            };
+            items.push(item);
+          });
+        const data: DataItem = {
+          expenseDate: e['date'],
+          items: items,
+          totalAmount: e['total'],
+        };
+        dataItem.push(data);
+      });
+
+      const arr = Object.entries(summarys[0]);
+      let sumItems: SumItemsItem[] = [];
+      arr
+        .filter((e: any) => !isFilterFieldInExpense(e[0]))
+        .map((e: any, index: number) => {
+          const item: SumItemsItem = {
+            expenseNo: e[0],
+            withdrawAmount: e[1],
+          };
+          sumItems.push(item);
+        });
+
+      const sumItem: SumItems = {
+        items: sumItems,
+        sumWithdrawAmount: 0,
+        sumApprovalAmount: 0,
+      };
+      const payload: AccountAccountExpenses = {
+        branchCode: '',
+        type: '',
+        expensePeriod: periodProps,
+        sumItems: sumItem,
+        items: dataItem,
+        docNo: '',
+      };
+      await expenseSave(payload, fileUploadList)
+        .then(async (value) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('บันทึก เรียบร้อยแล้ว');
+          setTimeout(() => {
+            setOpen(false);
+            onClickClose();
+          }, 500);
+        })
+        .catch((error: ApiError) => {
+          setOpenAlert(true);
+          setTextError(error.message);
+        });
+    }
+  };
+
   const handleApproveBtn = () => {};
   const handleRejectBtn = () => {};
 
+  const validateFileInfo = () => {
+    const isvalid = fileUploadList.length > 0 ? true : false;
+    if (!isvalid) {
+      setOpenAlert(true);
+      setTextError('กรุณาแนบเอกสาร');
+      return false;
+    }
+    return true;
+  };
   const componetButtonDraft = (
     <>
       <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
@@ -166,11 +265,11 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
   let infosApprove: any;
   let totalWithDraw: number = 0;
   let totalApprove: number = 0;
-  const entries: ExpenseSummaryItem[] = summary && summary.items ? summary.items : [];
+  const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
   let rows: any[] = [];
   if (getInit()) {
     if (entries && entries.length > 0) {
-      entries.map((entrie: ExpenseSummaryItem, i: number) => {
+      entries.map((entrie: SumItemsItem, i: number) => {
         infosWithDraw = {
           ...infosWithDraw,
           id: 1,
@@ -192,24 +291,13 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
       ];
       dispatch(updateSummaryRows(rows));
     }
-  } else {
-    console.log('update summary');
-    console.log(store.getState().expenseAccountDetailSlice.itemRows);
-    console.log(store.getState().expenseAccountDetailSlice.summaryRows);
-    const items = store.getState().expenseAccountDetailSlice.itemRows;
-    let gfg = _.sumBy(items, function (o: any) {
-      return o.total;
-    });
-    console.log('total', gfg);
-    console.log(_.sumBy(items, '001'));
-    console.log(_.sum(items));
   }
 
   if (_items && _items.length > 0) {
-    const itemRows = items.map((item: ExpenseByDay, index: number) => {
-      const list: ExpenseItem[] = item.expenseItems;
+    const itemRows = items.map((item: DataItem, index: number) => {
+      const list: ItemItem[] = item.items;
       let newItem: any;
-      list.map((data: ExpenseItem) => {
+      list.map((data: ItemItem) => {
         newItem = {
           ...newItem,
           [data.expenseNo]: data.amount,
@@ -222,7 +310,6 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
         ...newItem,
       };
     });
-    console.log('detail113');
     dispatch(initialItems(itemRows));
   }
 
@@ -254,8 +341,6 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
           : 'รายละเอียดเอกสาร'
       );
     }
-
-    console.log('items: ', items);
   }, [open]);
 
   return (
@@ -352,6 +437,14 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
         open={openModalDescriptionExpense}
         onClickClose={() => setOpenModalDescriptionExpense(false)}
         info={[mockExpenseInfo001, mockExpenseInfo002]}
+      />
+      <LoadingModal open={openLoadingModal} />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} payload={null} />
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={contentMsg}
       />
     </React.Fragment>
   );

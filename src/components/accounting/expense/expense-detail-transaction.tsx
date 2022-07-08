@@ -2,13 +2,7 @@ import { Box, TextField, Typography } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridRowData } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
 import { isNullOrUndefined } from 'util';
-import {
-  ExpenseByDay,
-  ExpenseInfo,
-  ExpenseItem,
-  ExpenseSummaryItem,
-  payLoadAdd,
-} from '../../../models/branch-accounting-model';
+import { DataItem, ExpenseInfo, payLoadAdd, SumItems, SumItemsItem } from '../../../models/branch-accounting-model';
 import {
   initialItems,
   updateItemRows,
@@ -33,8 +27,8 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
 
   const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
   const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
-  const summary = expenseData ? expenseData.itemSummary : null;
-  const initItems: ExpenseByDay[] = expenseData ? expenseData.itemByDays : [];
+  const summary: SumItems = expenseData ? expenseData.sumItems : null;
+  const initItems: DataItem[] = expenseData ? expenseData.items : [];
 
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
   const _initialItems = useAppSelector((state) => state.expenseAccountDetailSlice.intialRows);
@@ -159,10 +153,10 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
     let rows: any[] = [];
     const expenseAccountDetail = store.getState().expenseAccountDetailSlice.expenseAccountDetail;
     const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
-    const summary = expenseData ? expenseData.itemSummary : null;
-    const entries: ExpenseSummaryItem[] = summary && summary.items ? summary.items : [];
+    const summary: SumItems = expenseData ? expenseData.sumItems : null;
+    const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
     if (entries && entries.length > 0) {
-      entries.map((entrie: ExpenseSummaryItem, i: number) => {
+      entries.map((entrie: SumItemsItem, i: number) => {
         infosWithDraw = {
           ...infosWithDraw,
           id: 1,
@@ -191,7 +185,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
   }, [payloadNewItem]);
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const currentlySelected = async (params: GridCellParams) => {
-    console.log('currentlySelected: ', params);
     const value = params;
     let listPayload: payLoadAdd[] = [];
     const arr = Object.entries(params.row);

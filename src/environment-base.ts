@@ -491,7 +491,7 @@ export const environment = {
   branchAccounting: {
     expense: {
       save: {
-        url: 'branchAccount/',
+        url: 'accounting/expense',
       },
       detail: {
         url: 'branchAccount/',
