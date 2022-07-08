@@ -439,11 +439,31 @@ export const ModalTransferItem = (props: DataGridProps) => {
     },
     {
       field: 'discount',
-      headerName: typeDiscount === 'percent' ? 'ยอดลด * (%)' : 'ยอดลด * (บาท)',
+      headerName: typeDiscount === 'percent' ? 'ยอดลด * (%)' : 'ยอดลด* (บาท)',
       minWidth: 140,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
+      renderHeader: (params) => {
+        return typeDiscount === 'percent' ? ( 
+          <div style={{ color: '#36C690' }}>
+            <Typography variant='body2' noWrap>
+              <b>{'ยอดลด * (%)'}</b>
+            </Typography>
+          </div>
+        ) : (
+          <div style={{ color: '#36C690' }}>
+            <Typography variant='body2' noWrap>
+              <b>{'ยอดลด*'}</b>
+            </Typography>
+            {env.currency && (
+              <Typography variant='body2' noWrap textAlign={'center'}>
+                <b>{`(${env.currency})`}</b>
+              </Typography>
+            )}
+          </div>
+        );
+      },
       renderCell: (params: GridRenderCellParams) => {
         const index =
           errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
@@ -577,6 +597,18 @@ export const ModalTransferItem = (props: DataGridProps) => {
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
+      renderHeader: (params) => {
+        return ( 
+          <div style={{ color: '#36C690' }}>
+            <Typography variant='body2' noWrap>
+              <b>{'จำนวน'}</b>
+            </Typography>
+            <Typography variant='body2' noWrap>
+              <b>{'ที่ขอลด*'}</b>
+            </Typography>
+          </div>
+        ) 
+      },
       renderCell: (params: GridRenderCellParams) => {
         const index =
           errorList && errorList.length > 0 ? errorList.findIndex((item: any) => item.id === params.row.barCode) : -1;
