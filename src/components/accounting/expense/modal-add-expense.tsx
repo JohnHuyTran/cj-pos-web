@@ -48,9 +48,14 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
     if (edit) {
       let data: any;
+      let sum: number = 0;
       testList.map((e: any) => {
         data = { ...data, [e.key]: e.value };
+        if (!isFilterField(e.key)) {
+          sum += e.value;
+        }
       });
+      data = { ...data, total: sum };
       await dispatch(addNewItem(data));
     } else {
       const data = { ...values, id: uuidv4(), total: 100, date: '12/07' };

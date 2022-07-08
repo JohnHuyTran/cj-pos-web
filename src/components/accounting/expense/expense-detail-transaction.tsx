@@ -169,14 +169,14 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
           description: 'ยอดเงินเบิก',
           [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
         };
-        totalWithDraw += Number(entrie?.withdrawAmount);
+        totalWithDraw += _.sumBy(_item, entrie.expenseNo);
         infosApprove = {
           ...infosApprove,
           id: 2,
           description: 'ยอดเงินอนุมัติ',
           [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
         };
-        totalApprove += Number(entrie?.approvedAmount);
+        totalApprove += _.sumBy(_item, entrie.expenseNo);
       });
       rows = [
         { ...infosWithDraw, total: totalWithDraw },
