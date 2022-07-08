@@ -16,8 +16,10 @@ import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 import { isPreferredUsername } from '../../utils/role-permission';
-import { getUserInfo } from '../../store/sessionStore';
+import { getUserInfo, setInit } from '../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
+import ExpenseDetail from '../accounting/expense/expense-detail';
+import { featchExpenseDetailAsync } from '../../store/slices/accounting/accounting-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -295,7 +297,10 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
     const value = params.colDef.field;
 
     handleOpenLoading('open', true);
-    await handleOpenDetailModal(params.row.rtNo, params.row.edit);
+    // await handleOpenDetailModal(params.row.rtNo, params.row.edit);
+    await dispatch(featchExpenseDetailAsync());
+    setInit('Y');
+    setOpenDetailModal(true);
     handleOpenLoading('open', false);
 
     // if (value === 'delete') {
@@ -392,15 +397,23 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
 
       <LoadingModal open={openLoadingModal.open} />
 
-      {openDetailModal && (
+      {/* {openDetailModal && (
         <ModalDetailStockTransfer
           type={typeDetailModal}
           edit={editDetailModal}
           isOpen={openDetailModal}
           onClickClose={handleCloseDetailModal}
         />
-      )}
+      )} */}
 
+      {openDetailModal && (
+        <ExpenseDetail
+          isOpen={openDetailModal}
+          onClickClose={handleCloseDetailModal}
+          expenseType={'COFFEE'}
+          edit={true}
+        />
+      )}
       {/* <ModelDeleteConfirm open={openModelDeleteConfirm} onClose={handleModelDeleteConfirm} rtNo={rtNoDel} /> */}
     </div>
   );

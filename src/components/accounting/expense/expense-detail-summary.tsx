@@ -1,7 +1,8 @@
-import { Box } from '@mui/material';
+import { Box, setRef } from '@mui/material';
 import { DataGrid, GridColDef, GridRowData } from '@mui/x-data-grid';
+import { info } from 'console';
 import React, { useEffect } from 'react';
-import { ExpenseInfo } from '../../../models/branch-accounting-model';
+import { AccountAccountExpenses, ExpenseInfo, ExpenseSummaryItem } from '../../../models/branch-accounting-model';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import ExpenseDetailTransaction from './expense-detail-transaction';
@@ -10,14 +11,18 @@ function ExpenseDetailSummary() {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
+
+  const [pageSize, setPageSize] = React.useState<number>(10);
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
+  const summaryRows = useAppSelector((state) => state.expenseAccountDetailSlice.summaryRows);
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
-  const rows: string | any[] = [];
+
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     return {
       field: i.expenseNo,
       headerName: i.accountName,
       minWidth: 70,
+      flex: 1,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -37,6 +42,7 @@ function ExpenseDetailSummary() {
       active: true,
       requiredDocument: '',
       expenseNo: 'description',
+      isOtherExpense: false,
     };
     const headerSum: ExpenseInfo = {
       accountName: 'รวม',
@@ -46,6 +52,7 @@ function ExpenseDetailSummary() {
       active: true,
       requiredDocument: '',
       expenseNo: 'total',
+      isOtherExpense: false,
     };
     _newExpenseAllList.push(headerDescription);
 
@@ -58,7 +65,8 @@ function ExpenseDetailSummary() {
     _newExpenseAllList.push(headerSum);
     setNewExpenseAllList(_newExpenseAllList);
   }, []);
-  const [pageSize, setPageSize] = React.useState<number>(10);
+
+  let rows: [] = summaryRows ? summaryRows : [];
   return (
     <React.Fragment>
       <Box mt={2} bgcolor='background.paper'>

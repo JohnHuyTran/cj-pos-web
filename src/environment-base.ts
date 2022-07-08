@@ -493,6 +493,9 @@ export const environment = {
       save: {
         url: 'branchAccount/',
       },
+      detail: {
+        url: 'branchAccount/',
+      },
       approve: {
         branch: {
           url: 'approve',

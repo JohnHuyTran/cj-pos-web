@@ -19,9 +19,9 @@ function ModelDescriptionExpense({ open, onClickClose, info }: Props) {
 
           {info
             .filter((i: ExpenseInfo) => i.active)
-            .map((i: ExpenseInfo) => {
+            .map((i: ExpenseInfo, index: number) => {
               return (
-                <Typography variant='body2'>
+                <Typography variant='body2' key={index}>
                   {i.accountName} :{i.requiredDocument}
                 </Typography>
               );

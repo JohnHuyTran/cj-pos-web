@@ -9,6 +9,7 @@ export interface ExpenseInfo {
   active: boolean;
   requiredDocument: string;
   expenseNo: string;
+  isOtherExpense: boolean;
 }
 
 export interface ExpenseMasterResponseType {
@@ -19,6 +20,13 @@ export interface ExpenseMasterResponseType {
 }
 
 // response inq
+
+export interface ExpenseDetailResponseType {
+  data: AccountAccountExpenses | null | [];
+  ref: string;
+  code: number;
+  message: string;
+}
 export interface AccountAccountExpenses {
   id: string;
   branchCode: string;
@@ -76,4 +84,11 @@ export interface ExpenseComment {
   statusDesc: string;
   commentDate: string;
   comment: string;
+}
+
+export interface payLoadAdd {
+  id: number;
+  key: string;
+  value: string;
+  title: string;
 }
