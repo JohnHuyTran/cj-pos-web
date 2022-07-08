@@ -321,11 +321,13 @@ export default function NotificationReminder(props: Props) {
             <HtmlTooltip
               title={
                 <React.Fragment>
-                  {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+                  {item.type == 'PRINT_BARCODE' ? item.payload.documentNumber : item.documentNumber} | {branchCode}-
+                  {getBranchName(branchList, branchCode)}
                 </React.Fragment>
               }>
               <span style={{ marginLeft: 5 }}>
-                {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+              {item.type == 'PRINT_BARCODE' ? item.payload.documentNumber : item.documentNumber} | {branchCode}-
+              {getBranchName(branchList, branchCode)}
               </span>
             </HtmlTooltip>
             <Box>
