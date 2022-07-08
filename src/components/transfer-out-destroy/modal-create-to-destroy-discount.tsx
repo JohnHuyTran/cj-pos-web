@@ -614,7 +614,8 @@ export default function ModalCreateToDestroyDiscount({
     try {
       const allAttachFileBefore = await handleAllAttachFile(fileUploadList, attachFileBeforeOlds);
       const payload = {
-        beforeAttachFiles: allAttachFileBefore
+        beforeAttachFiles: allAttachFileBefore,
+        products: payloadTransferOut.products
       };
       let res = await rejectTransferOut(dataDetail.id, payload);
       if (res && res.code === 20000) {
