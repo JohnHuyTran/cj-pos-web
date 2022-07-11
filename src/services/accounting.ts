@@ -1,16 +1,16 @@
 import { post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
-import { AccountAccountExpenses } from '../models/branch-accounting-model';
+import { AccountAccountExpenses, ExpenseSaveRequest } from '../models/branch-accounting-model';
 import { ContentType } from '../utils/enum/common-enum';
 import { getPathUrl } from './base-service';
 
-export async function expenseSave(payload: AccountAccountExpenses, files: File[]) {
+export async function expenseSave(payload: ExpenseSaveRequest, files: File[]) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
   files.map((file: File) => {
     return bodyFormData.append('file[]', file);
   });
-  const response = await post(environment.branchAccounting.expense.save.url, bodyFormData, ContentType.MULTIPART)
+  const response = await put(environment.branchAccounting.expense.save.url, bodyFormData, ContentType.MULTIPART)
     .then((result: any) => result)
     .catch((error) => {
       throw error;

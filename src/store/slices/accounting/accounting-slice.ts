@@ -37,7 +37,7 @@ export const featchExpenseDetailAsync = createAsyncThunk('ExpenseDetail', async 
 });
 
 const expenseAccountDetailSlice = createSlice({
-  name: 'MasterExpenseList',
+  name: 'ExpenseDetail',
   initialState,
   reducers: {
     updateToInitialState: () => {

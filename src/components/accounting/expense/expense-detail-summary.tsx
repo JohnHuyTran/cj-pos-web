@@ -7,11 +7,16 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import ExpenseDetailTransaction from './expense-detail-transaction';
 
-function ExpenseDetailSummary() {
+interface Props {
+  type: string;
+}
+
+function ExpenseDetailSummary({ type }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
 
+  const [expenseType, setExpenseType] = React.useState('');
   const [pageSize, setPageSize] = React.useState<number>(10);
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
   const summaryRows = useAppSelector((state) => state.expenseAccountDetailSlice.summaryRows);
@@ -33,6 +38,7 @@ function ExpenseDetailSummary() {
     };
   });
   useEffect(() => {
+    setExpenseType(type);
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
       accountNameTh: ' ',
@@ -43,7 +49,7 @@ function ExpenseDetailSummary() {
       requiredDocument: '',
       expenseNo: 'description',
       isOtherExpense: false,
-      type: '',
+      typeCode: '',
       accountCode: '',
     };
     const headerSum: ExpenseInfo = {
@@ -55,7 +61,7 @@ function ExpenseDetailSummary() {
       requiredDocument: '',
       expenseNo: 'total',
       isOtherExpense: false,
-      type: '',
+      typeCode: '',
       accountCode: '',
     };
     _newExpenseAllList.push(headerDescription);
@@ -88,7 +94,7 @@ function ExpenseDetailSummary() {
             rowHeight={65}
           />
         </div>
-        <ExpenseDetailTransaction />
+        <ExpenseDetailTransaction type={expenseType} />
       </Box>
     </React.Fragment>
   );

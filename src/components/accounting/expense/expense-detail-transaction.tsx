@@ -15,9 +15,10 @@ import { stringNullOrEmpty } from '../../../utils/utils';
 import ModalAddExpense from './modal-add-expense';
 interface Props {
   onClickAddNewBtn?: () => void;
+  type: string;
 }
 
-function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
+function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
@@ -35,7 +36,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
   const [items, setItems] = React.useState<any>(_initialItems && _initialItems.length > 0 ? _initialItems : []);
   const [actionEdit, setActionEdit] = React.useState(false);
   const payloadNewItem = useAppSelector((state) => state.expenseAccountDetailSlice.addNewItem);
-
+  const [expenseType, setExpenseType] = React.useState('');
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     return {
       field: i.expenseNo,
@@ -52,6 +53,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
     };
   });
   useEffect(() => {
+    setExpenseType(type);
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
       accountNameTh: 'วันที่ค่าใช่จ่าย',
@@ -62,7 +64,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
       requiredDocument: '',
       expenseNo: 'date',
       isOtherExpense: false,
-      type: '',
+      typeCode: '',
       accountCode: '',
     };
     const headerOtherDetail: ExpenseInfo = {
@@ -74,7 +76,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
       requiredDocument: '',
       expenseNo: 'otherDetail',
       isOtherExpense: false,
-      type: '',
+      typeCode: '',
       accountCode: '',
     };
 
@@ -85,7 +87,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
       requiredDocument: '',
       expenseNo: 'total',
       isOtherExpense: false,
-      type: '',
+      typeCode: '',
       accountCode: '',
       accountNameTh: 'รวม',
       isActive: false,
@@ -183,7 +185,40 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
         { ...infosApprove, total: totalApprove },
       ];
       dispatch(updateSummaryRows(rows));
+    } else {
+      totalWithDraw = 0;
+      totalApprove = 0;
+      expenseMasterList
+        .filter((i: ExpenseInfo) => i.isActive)
+        .map((entrie: ExpenseInfo) => {
+          infosWithDraw = {
+            ...infosWithDraw,
+            id: 1,
+            description: 'ยอดเงินเบิก',
+            [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
+          };
+
+          infosApprove = {
+            ...infosApprove,
+            id: 2,
+            description: 'ยอดเงินอนุมัติ',
+            [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
+          };
+        });
+      rows = [
+        { ...infosWithDraw, total: _.sumBy(_item, 'total') },
+        { ...infosApprove, total: _.sumBy(_item, 'total') },
+      ];
+      dispatch(updateSummaryRows(rows));
     }
+  };
+
+  const sum = (item: any) => {
+    const result = item.reduce(function (s: any, o: any) {
+      return o ? s : s + o;
+    }, 0);
+
+    return result;
   };
 
   useEffect(() => {
@@ -233,7 +268,13 @@ function ExpenseDetailTransaction({ onClickAddNewBtn }: Props) {
           />
         </div>
       </Box>
-      <ModalAddExpense open={openModalAddExpense} onClose={OnCloseAddExpense} edit={actionEdit} payload={payloadAdd} />
+      <ModalAddExpense
+        open={openModalAddExpense}
+        onClose={OnCloseAddExpense}
+        edit={actionEdit}
+        payload={payloadAdd}
+        type={expenseType}
+      />
     </React.Fragment>
   );
 }

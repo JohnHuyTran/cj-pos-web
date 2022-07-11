@@ -20,8 +20,9 @@ interface Props {
   periodProps?: ExpensePeriod;
   edit: boolean;
   payload: any;
+  type: string;
 }
-function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
+function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [isEdit, setisEdit] = React.useState(edit);
@@ -39,6 +40,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
   const [isLoad, setIsLoad] = React.useState(false);
   const { v4: uuidv4 } = require('uuid');
   const [testList, setTestList] = React.useState<any>(payload);
+  const [expenseType, setExpenseType] = React.useState<any>(type);
 
   const [flagEdit, setFlagEdit] = React.useState<boolean>(false);
   const handleStartDatePicker = (value: any) => {
@@ -63,7 +65,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
       const data = {
         ...values,
         id: uuidv4(),
-        total: 100,
+        total: sum(values),
         date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
       };
       await dispatch(addNewItem(data));
@@ -87,6 +89,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
   //   }, 300);
   // };
 
+  function sum(obj: any) {
+    return Object.keys(obj).reduce((sum, key) => sum + parseFloat(obj[key] || 0), 0);
+  }
+
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: Number(value) });
@@ -100,6 +106,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
   useEffect(() => {
     setTestList(payload);
+    setExpenseType(type);
   }, [open, edit]);
 
   const handleChangeNew = (value: any, name: any) => {
@@ -141,7 +148,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
               <>
                 <Grid container spacing={2} mb={2} mt={2}>
                   {expenseMasterList
-                    .filter((i: ExpenseInfo) => i.isActive && !i.isOtherExpense)
+                    .filter((i: ExpenseInfo) => i.isActive && !i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
@@ -185,7 +192,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
                 <Grid container spacing={2} mb={2} mt={2}>
                   {expenseMasterList
-                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense)
+                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
@@ -260,7 +267,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
                 <Grid container spacing={2} mb={2} mt={2}>
                   {expenseMasterList
-                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense)
+                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
                       return (
                         <>

@@ -17,7 +17,7 @@ export const mockExpenseInfo001: ExpenseInfo = {
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '001',
   isOtherExpense: false,
-  type: '',
+  typeCode: '',
   accountCode: '',
 };
 export const mockExpenseInfo002: ExpenseInfo = {
@@ -29,7 +29,7 @@ export const mockExpenseInfo002: ExpenseInfo = {
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '002',
   isOtherExpense: false,
-  type: '',
+  typeCode: '',
   accountCode: '',
 };
 export const mockExpenseInfo003: ExpenseInfo = {
@@ -41,7 +41,7 @@ export const mockExpenseInfo003: ExpenseInfo = {
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '003',
   isOtherExpense: false,
-  type: '',
+  typeCode: '',
   accountCode: '',
 };
 export const mockExpenseInfo004: ExpenseInfo = {
@@ -53,7 +53,7 @@ export const mockExpenseInfo004: ExpenseInfo = {
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '004',
   isOtherExpense: false,
-  type: '',
+  typeCode: '',
   accountCode: '',
 };
 export const mockExpenseInfo005: ExpenseInfo = {
@@ -65,7 +65,7 @@ export const mockExpenseInfo005: ExpenseInfo = {
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '005',
   isOtherExpense: true,
-  type: '',
+  typeCode: '',
   accountCode: '',
 };
 export const mockExpenseInfo006: ExpenseInfo = {
@@ -77,7 +77,7 @@ export const mockExpenseInfo006: ExpenseInfo = {
   requiredDocument: 'ใบเสร็จ',
   expenseNo: '006',
   isOtherExpense: true,
-  type: '',
+  typeCode: '',
   accountCode: '',
 };
 
@@ -175,10 +175,10 @@ const expenseByDay03: DataItem = {
   totalAmount: 9000,
 };
 
-const period: ExpensePeriod = {
+export const periodMockData: ExpensePeriod = {
   period: 1,
-  startDate: '01/07/2565',
-  endDate: '01/07/2565',
+  startDate: '2022-07-01T00:00:00+07:00',
+  endDate: '2022-07-15T23:59:59.999999999+07:00',
 };
 const accountExpense: AccountAccountExpenses = {
   id: '',
@@ -187,7 +187,7 @@ const accountExpense: AccountAccountExpenses = {
   type: 'COFFEE',
   month: 0,
   year: 0,
-  expensePeriod: period,
+  expensePeriod: periodMockData,
   status: 'DRAFT',
   attachFiles: [],
   editAttachFiles: [],
