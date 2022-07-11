@@ -141,7 +141,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                 value={startDate}
                 type={'TO'}
                 minDateTo={periodProps?.startDate ? periodProps.startDate : startDate}
-                maxDate={periodProps?.endDate ? periodProps.endDate : startDate}
+                maxDate={periodProps?.endDate ? periodProps.endDate : endDate}
                 isError={isErrorDate}
                 hyperText={isErrorDate ? 'เลือกวันที่ซ้ำ กรุณาเลือกใหม่' : ''}
               />
@@ -154,10 +154,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
-                          <Grid item xs={1}>
+                          <Grid item xs={2}>
                             <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
-                          <Grid item xs={3}>
+                          <Grid item xs={2}>
                             <TextField
                               id={i.expenseNo}
                               name={i.expenseNo}
@@ -198,10 +198,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
-                          <Grid item xs={1}>
+                          <Grid item xs={2}>
                             <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
-                          <Grid item xs={3}>
+                          <Grid item xs={2}>
                             <TextField
                               id='txtDocNo'
                               name={i.expenseNo}
@@ -229,10 +229,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                     .map((i: payLoadAdd) => {
                       return (
                         <>
-                          <Grid item xs={1}>
+                          <Grid item xs={2}>
                             <Typography variant='body2'>{i.title}: </Typography>
                           </Grid>
-                          <Grid item xs={3}>
+                          <Grid item xs={2}>
                             <TextField
                               id={i.key}
                               name={i.key}
@@ -250,10 +250,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                     })}
                 </Grid>
                 <Grid container spacing={2} mt={2}>
-                  <Grid item xs={1}>
+                  <Grid item xs={2}>
                     ค่าอื่นๆ:
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={2}>
                     <TextField
                       id='txtDocNo'
                       name='sumOther'
@@ -273,10 +273,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
-                          <Grid item xs={1}>
+                          <Grid item xs={2}>
                             <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
-                          <Grid item xs={3}>
+                          <Grid item xs={2}>
                             <TextField
                               id='txtDocNo'
                               name={i.expenseNo}
