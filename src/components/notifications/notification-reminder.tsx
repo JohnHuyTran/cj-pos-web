@@ -303,7 +303,7 @@ export default function NotificationReminder(props: Props) {
         }}
         onClick={() => currentlySelected(item)}>
         <Box sx={{ display: 'flex', justifyContent: 'start' }}>
-          {item.type == 'REJECT_BARCODE' || item.type == 'APPROVE_BARCODE' ? (
+          {item.type == 'REJECT_BARCODE' || item.type == 'APPROVE_BARCODE' || item.type == 'PRINT_BARCODE' ? (
             <ShoppingCartSharp sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
           ) : (
             <PresentToAllIcon sx={{ color: theme.palette.primary.main, fontSize: '20px', mt: 1.5, ml: 1 }} />
@@ -321,11 +321,13 @@ export default function NotificationReminder(props: Props) {
             <HtmlTooltip
               title={
                 <React.Fragment>
-                  {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+                  {item.type == 'PRINT_BARCODE' ? item.payload.documentNumber : item.documentNumber} | {branchCode}-
+                  {getBranchName(branchList, branchCode)}
                 </React.Fragment>
               }>
               <span style={{ marginLeft: 5 }}>
-                {item.documentNumber} | {branchCode}-{getBranchName(branchList, branchCode)}
+              {item.type == 'PRINT_BARCODE' ? item.payload.documentNumber : item.documentNumber} | {branchCode}-
+              {getBranchName(branchList, branchCode)}
               </span>
             </HtmlTooltip>
             <Box>

@@ -306,9 +306,9 @@ export default function ModalCreateToDestroyDiscount({
             }
           }
         } else {
-          if (preData.numberOfRequested <= 0 || !preData.numberOfRequested) {
+          if (stringNullOrEmpty(preData.numberOfRequested) || preData.numberOfRequested < 0) {
             isValid = false;
-            item.errorNumberOfRequested = 'จำนวนคำขอต้องมากกว่า 0';
+            item.errorNumberOfRequested = 'ระบุจำนวนการทำลายที่แท้จริง';
           } else if (preData.numberOfRequested > preData.numberOfDiscounted) {
             isValid = false;
             item.errorNumberOfRequested = 'จำนวนทำลายจริงต้องไม่น้อยกว่าจำนวนขอส่วนลด';
@@ -581,7 +581,7 @@ export default function ModalCreateToDestroyDiscount({
       const products = payloadTransferOut.products.map((item: any) => {
         return {
           barcode: item.barcode,
-          numberOfDiscounted: item.numberOfApproved,
+          numberOfDiscounted: item.numberOfRequested,
         };
       });
       const payload = {
@@ -732,7 +732,7 @@ export default function ModalCreateToDestroyDiscount({
               <Grid item xs={4}>
                 รูปก่อนทำลาย* :
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={8} pl={2}>
                 <AccordionUploadFile
                   files={attachFileBeforeOlds}
                   docNo={dataDetail ? dataDetail.documentNumber : ''}
