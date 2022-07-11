@@ -37,6 +37,8 @@ import AlertError from '../../commons/ui/alert-error';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { expenseSave } from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
+import ModelConfirmDetail from './confirm/modal-confirm-detail';
+
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -171,7 +173,9 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
     }
   };
 
-  const handleApproveBtn = () => {};
+  const handleApproveBtn = () => {
+    handleOpenModelConfirm();
+  };
   const handleRejectBtn = () => {};
 
   const validateFileInfo = () => {
@@ -343,6 +347,22 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
     }
   }, [open]);
 
+  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
+  const handleOpenModelConfirm = () => {
+    setTextHeaderConfirm('Tessssst');
+    setOpenModelConfirm(true);
+  };
+
+  const handleCloseModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+
+  const handleConfirm = (periodData: any) => {
+    console.log('handleConfirm');
+    console.log('periodData:', periodData);
+  };
+
   return (
     <React.Fragment>
       <Dialog open={isOpen} maxWidth='xl' fullWidth={true}>
@@ -445,6 +465,14 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
         onClose={handleCloseSnackBar}
         isSuccess={snackbarIsStatus}
         contentMsg={contentMsg}
+      />
+
+      <ModelConfirmDetail
+        open={openModelConfirm}
+        onClose={handleCloseModelConfirm}
+        onConfirm={handleConfirm}
+        startDate='2022-06-16T00:00:00+07:00'
+        endDate='2022-06-30T23:59:59.999999999+07:00'
       />
     </React.Fragment>
   );
