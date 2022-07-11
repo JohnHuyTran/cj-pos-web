@@ -30,6 +30,7 @@ import ProductMaster from './pages/stock/product-master';
 import TORawMasterial from './pages/transfer-out-raw-masterial/transfer-out-raw-masterial';
 import Expense from './pages/accounting/expense';
 import { featchMasterExpenseListAsync } from './store/slices/master/expense-list-slice';
+import { featchExpenseDetailAsync } from './store/slices/accounting/accounting-slice';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{

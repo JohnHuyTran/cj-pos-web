@@ -1,9 +1,10 @@
 import { post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
+import { AccountAccountExpenses } from '../models/branch-accounting-model';
 import { ContentType } from '../utils/enum/common-enum';
 import { getPathUrl } from './base-service';
 
-export async function expenseSave(payload: any, files: File[]) {
+export async function expenseSave(payload: AccountAccountExpenses, files: File[]) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
   files.map((file: File) => {

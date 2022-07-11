@@ -1,14 +1,17 @@
-import { AuditLog, FileType } from './common-model';
+import { FileType } from './common-model';
 
 //master Expense
 export interface ExpenseInfo {
-  accountName: string;
+  type: string;
+  accountCode: string;
+  accountNameTh: string;
   skuCode: string;
+  isActive: boolean;
+  expenseNo: string;
+  isOtherExpense: boolean;
   approveLimit1: number;
   approveLimt2: number;
-  active: boolean;
   requiredDocument: string;
-  expenseNo: string;
 }
 
 export interface ExpenseMasterResponseType {
@@ -19,29 +22,36 @@ export interface ExpenseMasterResponseType {
 }
 
 // response inq
+
+export interface ExpenseDetailResponseType {
+  data: AccountAccountExpenses | null | [];
+  ref: string;
+  code: number;
+  message: string;
+}
 export interface AccountAccountExpenses {
-  id: string;
-  branchCode: string;
-  docNo: string;
+  id?: string;
+  branchCode?: string;
+  docNo?: string;
   type: string;
-  expenseMonth: number;
-  expenseYear: number;
-  expensePeriod: ExpensePeriod;
-  status: string;
-  attachFiles: FileType[];
-  editAttachFiles: FileType[];
-  approvalAttachFiles: FileType[];
-  itemSummary: ExpenseSummary;
-  itemByDays: ExpenseByDay[];
-  comments: ExpenseComment[];
-  expenseDate: string;
-  approvedDate: string;
-  nextApprover: string;
-  auditLogs: AuditLog[];
-  createdBy: string;
-  lastModifiedBy: string;
-  createdDate: string;
-  lastModifiedDate: string;
+  month?: number;
+  year?: number;
+  expensePeriod?: ExpensePeriod;
+  status?: string;
+  attachFiles?: FileType[];
+  editAttachFiles?: FileType[];
+  approvalAttachFiles?: FileType[];
+  sumItems?: SumItems;
+  items?: DataItem[];
+  comments?: Comment[];
+  expenseDate?: string;
+  approvedDate?: string;
+  nextApprover?: string;
+  auditLogs?: AuditLog[];
+  createdBy?: string;
+  lastModifiedBy?: string;
+  createdDate?: string;
+  lastModifiedDate?: string;
 }
 export interface ExpensePeriod {
   period: number; //งวด 1,2
@@ -49,31 +59,53 @@ export interface ExpensePeriod {
   endDate: string;
 }
 
-export interface ExpenseSummary {
-  items: ExpenseSummaryItem[];
-  sumWithdrawAmount: number;
-  sumApprovalAmount: number;
-}
-export interface ExpenseSummaryItem {
-  expenseNo: string; // case other จะ fix เป็น "SUMOTHER"
-  withdrawAmount: number;
-  approvedAmount: number;
-}
-
-export interface ExpenseByDay {
+export interface DataItem {
   expenseDate: string;
-  expenseItems: ExpenseItem[];
+  items: ItemItem[];
   totalAmount: number;
 }
 
-export interface ExpenseItem {
+export interface ItemItem {
   expenseNo: string;
   amount: number;
   isOtherExpense: boolean;
 }
-export interface ExpenseComment {
+
+export interface SumItems {
+  items: SumItemsItem[];
+  sumWithdrawAmount: number;
+  sumApprovalAmount: number;
+}
+
+export interface SumItemsItem {
+  expenseNo: string;
+  withdrawAmount: number;
+  approvedAmount?: number;
+}
+export interface Comment {
   username: string;
   statusDesc: string;
   commentDate: string;
   comment: string;
+}
+export interface Differ {
+  type: string;
+  path: any[];
+  from: string;
+  to: string;
+}
+
+export interface AuditLog {
+  activity: string;
+  comment?: string;
+  editBy: string;
+  editByName: string;
+  editDate: string;
+  differ?: Differ[];
+}
+export interface payLoadAdd {
+  id: number;
+  key: string;
+  value: string;
+  title: string;
 }

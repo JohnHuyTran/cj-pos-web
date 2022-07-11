@@ -444,7 +444,7 @@ export const environment = {
     },
     expense: {
       retrive: {
-        url: 'master/expenses',
+        url: 'accounting/expense-config',
       },
     },
   },
@@ -491,7 +491,10 @@ export const environment = {
   branchAccounting: {
     expense: {
       save: {
-        url: 'branchAccount/',
+        url: 'accounting/expense',
+      },
+      detail: {
+        url: 'accounting/expense/{docNo}',
       },
       approve: {
         branch: {
