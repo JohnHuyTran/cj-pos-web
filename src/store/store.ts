@@ -81,6 +81,8 @@ import saveSearchPurchaseBranchRequest from './slices/save-search-purchase-branc
 import verifyReasonsRejectListSlice from './slices/master/verify-order-reject-reasons-slice';
 import masterExpenseListSlice from './slices/master/expense-list-slice';
 import expenseAccountDetailSlice from './slices/accounting/accounting-slice';
+import expenseDetailSlice from './slices/accounting/accounting-detail-slice';
+import searchBranchAccountingSlice from './slices/accounting/accounting-search-slice'; //mock
 
 const store = configureStore({
   reducer: {
@@ -165,6 +167,8 @@ const store = configureStore({
     verifyReasonsRejectListSlice: verifyReasonsRejectListSlice,
     masterExpenseListSlice: masterExpenseListSlice,
     expenseAccountDetailSlice: expenseAccountDetailSlice,
+    searchBranchAccounting: searchBranchAccountingSlice,
+    expenseDetail: expenseDetailSlice,
   },
 });
 

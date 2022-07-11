@@ -14,7 +14,11 @@ import {
 import { useAppDispatch } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 
+import ExpenseSearchTest from '../../components/accounting/expense/expense-search-test';
+import { useTranslation } from 'react-i18next';
+
 export default function Expense() {
+  const { t } = useTranslation(['expense', 'common']);
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
@@ -34,7 +38,7 @@ export default function Expense() {
   };
   return (
     <Container maxWidth='xl'>
-      <TitleHeader title='ค่าใช่จ่าย' />
+      <TitleHeader title={t('documentSearch')} />
 
       <Button
         data-testid='testid-btnSendToDC'
@@ -48,6 +52,10 @@ export default function Expense() {
       </Button>
       <Box mt={3}>
         <ExpenseDetail isOpen={open} onClickClose={onClose} type={'COFFEE'} edit={edit} periodProps={periodMockData} />
+      </Box>
+
+      <Box mt={3}>
+        <ExpenseSearchTest />
       </Box>
     </Container>
   );

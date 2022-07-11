@@ -45,6 +45,9 @@ import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { expenseSave } from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
 import moment from 'moment';
+import ModelConfirmDetail from './confirm/modal-confirm-detail';
+import AccordionUploadSingleFile from '../../commons/ui/accordion-upload-single-file';
+
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -180,7 +183,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     }
   };
 
-  const handleApproveBtn = () => {};
+  const handleApproveBtn = () => {
+    handleOpenModelConfirm();
+  };
   const handleRejectBtn = () => {};
 
   const validateFileInfo = () => {
@@ -360,6 +365,22 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     }
   }, [open]);
 
+  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
+  const handleOpenModelConfirm = () => {
+    setTextHeaderConfirm('Tessssst');
+    setOpenModelConfirm(true);
+  };
+
+  const handleCloseModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+
+  const handleConfirm = (periodData: any) => {
+    console.log('handleConfirm');
+    console.log('periodData:', periodData);
+  };
+
   return (
     <React.Fragment>
       <Dialog open={isOpen} maxWidth='xl' fullWidth={true}>
@@ -404,7 +425,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              <AccordionUploadFile
+              {/* <AccordionUploadFile
                 files={expenseData && expenseData.attachFiles ? expenseData.attachFiles : []}
                 docNo={'docNo'}
                 docType='BA'
@@ -412,6 +433,10 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                 onChangeUploadFile={handleOnChangeUploadFileSave}
                 enabledControl={status === STATUS.DRAFT}
                 idControl={'AttachFileSave'}
+              /> */}
+              <AccordionUploadSingleFile
+                files={expenseData && expenseData.attachFiles ? expenseData.attachFiles : []}
+                disabledControl={status !== STATUS.DRAFT}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -468,6 +493,14 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         onClose={handleCloseSnackBar}
         isSuccess={snackbarIsStatus}
         contentMsg={contentMsg}
+      />
+
+      <ModelConfirmDetail
+        open={openModelConfirm}
+        onClose={handleCloseModelConfirm}
+        onConfirm={handleConfirm}
+        startDate='2022-06-16T00:00:00+07:00'
+        endDate='2022-06-30T23:59:59.999999999+07:00'
       />
     </React.Fragment>
   );
