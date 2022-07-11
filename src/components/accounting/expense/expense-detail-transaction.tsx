@@ -220,7 +220,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
 
     return result;
   };
-
+  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   useEffect(() => {
     storeItemAddItem(payloadNewItem);
   }, [payloadNewItem]);
@@ -230,11 +230,12 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
     let listPayload: payLoadAdd[] = [];
     const arr = Object.entries(params.row);
     await arr.forEach((element: any, index: number) => {
+      const _title = getMasterExpenInto(element[0])?.accountNameTh || 'Field';
       const item: payLoadAdd = {
         id: index,
         key: element[0],
         value: element[1],
-        title: 'test',
+        title: _title,
       };
       listPayload.push(item);
     });

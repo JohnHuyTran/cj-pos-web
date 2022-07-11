@@ -1,8 +1,10 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { stat } from 'fs';
+import { get } from '../../../adapters/posback-adapter';
 import { environment } from '../../../environment-base';
 import { featchExpenseDetailAsyncMockup } from '../../../mockdata/branch-accounting';
 import { ExpenseDetailResponseType, ExpenseMasterResponseType } from '../../../models/branch-accounting-model';
+import { getPathExpenseDetail } from '../../../services/accounting';
 
 type State = {
   expenseAccountDetail: ExpenseDetailResponseType;
@@ -29,8 +31,10 @@ const initialState: State = {
 
 export const featchExpenseDetailAsync = createAsyncThunk('ExpenseDetail', async () => {
   try {
-    const path = environment.branchAccounting.expense.detail.url;
-    return featchExpenseDetailAsyncMockup();
+    const path = getPathExpenseDetail('EX22070101-000008', environment.branchAccounting.expense.detail.url);
+    return await get(path).then();
+
+    // return featchExpenseDetailAsyncMockup();
   } catch (error) {
     throw error;
   }

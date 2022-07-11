@@ -121,3 +121,7 @@ export async function expenseRejectByAccountManager(payload: any) {
 export const getPathExpense = (docNo: string, path: string) => {
   return getPathUrl(`${path}`, { docNo: docNo });
 };
+
+export const getPathExpenseDetail = (docNo: string, path: string) => {
+  return getPathUrl(`${path}`, { docNo: docNo });
+};

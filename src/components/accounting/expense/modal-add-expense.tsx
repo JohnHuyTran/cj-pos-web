@@ -125,6 +125,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
 
     setFlagEdit(false);
   }, [flagEdit === true]);
+  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+
   return (
     <div>
       <Dialog open={open} maxWidth='md' fullWidth={true} key='modal-add-expense'>

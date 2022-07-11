@@ -327,6 +327,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
   useEffect(() => {
     if (edit) {
+      setDocNo(expenseData.docNo);
       setBranchCode(expenseData.branchCode);
       setBranchName(`${expenseData.branchCode}-${getBranchName(branchList, expenseData.branchCode)}`);
       const startDate = convertUtcToBkkDate(expenseData.expensePeriod.startDate);
