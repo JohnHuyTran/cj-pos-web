@@ -116,6 +116,20 @@ export const convertUtcToBkkWithZ = (utcDate: string) => {
   return bkkDate;
 };
 
+export const convertUtcToBkkWithZFromThaiDisplay = (utcDate: string) => {
+  let bkkDate = null;
+
+  if (utcDate && utcDate !== '') {
+    if (!utcDate.endsWith('Z')) {
+      utcDate = `${utcDate}Z`;
+    }
+    const datetime = moment(utcDate).subtract(543, 'year');
+    bkkDate = datetime.add(7, 'hours').toISOString();
+  }
+
+  return bkkDate;
+};
+
 export const isOverDate = (fromDate: any, toDate: any, limit: number) => {
   const f = moment(fromDate);
   const t = moment(toDate);
