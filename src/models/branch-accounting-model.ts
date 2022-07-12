@@ -3,15 +3,16 @@ import { FileType } from './common-model';
 //master Expense
 export interface ExpenseInfo {
   typeCode: string;
+  typeNameTh: string;
+  expenseNo: string;
   accountCode: string;
   accountNameTh: string;
   skuCode: string;
+  approvalLimit1: number;
+  approvalLimit2: number;
   isActive: boolean;
-  expenseNo: string;
   isOtherExpense: boolean;
-  approveLimit1: number;
-  approveLimt2: number;
-  requiredDocument: string;
+  requiredDocumentTh: string;
 }
 
 export interface ExpenseMasterResponseType {
@@ -34,7 +35,7 @@ export interface ExpenseSaveRequest {
   id?: string;
   branchCode?: string;
   docNo?: string;
-  type: string;
+  type?: string;
   month?: number;
   year?: number;
   expensePeriod?: ExpensePeriod;
@@ -53,6 +54,7 @@ export interface ExpenseSaveRequest {
   lastModifiedBy?: string;
   createdDate?: string;
   lastModifiedDate?: string;
+  today?: string;
 }
 
 export interface AccountAccountExpenses {
@@ -134,4 +136,5 @@ export interface payLoadAdd {
   key: string;
   value: string;
   title: string;
+  isOtherExpense?: boolean;
 }

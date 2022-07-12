@@ -1,11 +1,19 @@
-import { Box, setRef } from '@mui/material';
-import { DataGrid, GridColDef, GridRowData } from '@mui/x-data-grid';
-import { info } from 'console';
+import { Box, setRef, TextField } from '@mui/material';
+import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridRowData } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
-import { AccountAccountExpenses, ExpenseInfo } from '../../../models/branch-accounting-model';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
+import {
+  AccountAccountExpenses,
+  ExpenseInfo,
+  payLoadAdd,
+  SumItems,
+  SumItemsItem,
+} from '../../../models/branch-accounting-model';
+import { updateSummaryRows } from '../../../store/slices/accounting/accounting-slice';
+import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
+import { isFilterFieldInExpense } from '../../../utils/utils';
 import ExpenseDetailTransaction from './expense-detail-transaction';
+import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
 
 interface Props {
   type: string;
@@ -20,8 +28,10 @@ function ExpenseDetailSummary({ type }: Props) {
   const [pageSize, setPageSize] = React.useState<number>(10);
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
   const summaryRows = useAppSelector((state) => state.expenseAccountDetailSlice.summaryRows);
+  const payloadAddSummaryItem = useAppSelector((state) => state.expenseAccountDetailSlice.addSummaryItem);
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
-
+  const [openModalUpdatedExpenseSummary, setOpenModalUpdateExpenseSummary] = React.useState(false);
+  const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     return {
       field: i.expenseNo,
@@ -30,11 +40,32 @@ function ExpenseDetailSummary({ type }: Props) {
       flex: 1,
       headerAlign: 'center',
       sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
+      renderCell: (params: GridRenderCellParams) => {
+        if (isFilterFieldInExpense(params.field)) {
+          return (
+            <Box component='div' sx={{ paddingLeft: '20px' }}>
+              {params.value}
+            </Box>
+          );
+        } else {
+          return (
+            <TextField
+              variant='outlined'
+              name={`txb${i.expenseNo}`}
+              inputProps={{ style: { textAlign: 'right' } }}
+              sx={{
+                '.MuiInputBase-input.Mui-disabled': {
+                  WebkitTextFillColor: '#000',
+                  color: '#000',
+                },
+              }}
+              value={params.value}
+              disabled={true}
+              autoComplete='off'
+            />
+          );
+        }
+      },
     };
   });
   useEffect(() => {
@@ -43,40 +74,134 @@ function ExpenseDetailSummary({ type }: Props) {
     const headerDescription: ExpenseInfo = {
       accountNameTh: ' ',
       skuCode: '',
-      approveLimit1: 0,
-      approveLimt2: 0,
+      approvalLimit1: 0,
+      approvalLimit2: 0,
       isActive: true,
-      requiredDocument: '',
+      requiredDocumentTh: '',
       expenseNo: 'description',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
+      typeNameTh: '',
     };
     const headerSum: ExpenseInfo = {
       accountNameTh: 'รวม',
       skuCode: '',
-      approveLimit1: 0,
-      approveLimt2: 0,
+      approvalLimit1: 0,
+      approvalLimit2: 0,
       isActive: true,
-      requiredDocument: '',
+      requiredDocumentTh: '',
       expenseNo: 'total',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
+      typeNameTh: '',
     };
     _newExpenseAllList.push(headerDescription);
 
     expenseMasterList
-      .filter((i: ExpenseInfo) => i.isActive)
+      .filter((i: ExpenseInfo) => i.isActive && i.typeCode === expenseType)
       .map((i: ExpenseInfo) => {
         _newExpenseAllList.push(i);
       });
 
     _newExpenseAllList.push(headerSum);
     setNewExpenseAllList(_newExpenseAllList);
-  }, []);
+  }, [expenseType]);
+
+  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const currentlySelected = async (params: GridCellParams) => {
+    if (params.id === 1) {
+      let listPayload: payLoadAdd[] = [];
+      const arr = Object.entries(params.row);
+      await arr.forEach((element: any, index: number) => {
+        const master = getMasterExpenInto(element[0]);
+        const _title = master?.accountNameTh || 'Field';
+        const _isOtherExpense = master?.isOtherExpense || false;
+        const _expenseType = master?.typeCode;
+        if (_expenseType !== expenseType) {
+          return;
+        }
+        const item: payLoadAdd = {
+          id: index,
+          key: element[0],
+          value: element[1],
+          title: _title,
+          isOtherExpense: _isOtherExpense,
+        };
+        listPayload.push(item);
+      });
+      await setPayloadAdd(listPayload);
+      setOpenModalUpdateExpenseSummary(true);
+    }
+  };
+
+  const storeSummaryItem = async (_item: any) => {
+    if (_item) {
+      let infosWithDraw: any;
+      let infosApprove: any;
+      let totalWithDraw: number = 0;
+      let totalApprove: number = 0;
+      let rows: any[] = [];
+      const expenseAccountDetail = store.getState().expenseAccountDetailSlice.expenseAccountDetail;
+      const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
+      const summary: SumItems = expenseData ? expenseData.sumItems : null;
+      const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
+      entries.map((entrie: SumItemsItem, i: number) => {
+        console.log(entrie);
+        infosWithDraw = {
+          ...infosWithDraw,
+
+          [entrie.expenseNo]: entrie.withdrawAmount,
+        };
+        totalWithDraw += Number(entrie?.withdrawAmount);
+      });
+      const arr = Object.entries(_item);
+      await arr.forEach((element: any, index: number) => {
+        const key = element[0];
+        if (key === 'total') {
+          totalApprove = element[1];
+        }
+        infosApprove = {
+          ...infosApprove,
+          [key]: element[1],
+        };
+      });
+
+      console.log(entries);
+      console.log(arr);
+      let infoDiff: any;
+      let totalDiff: number = 0;
+      arr.map((element: any, i: number) => {
+        const key = element[0];
+        const value = element[1];
+        const withDraw = entries.find((entrie: SumItemsItem, i: number) => entrie.expenseNo === key);
+        infoDiff = {
+          ...infoDiff,
+          [key]: Number(withDraw?.withdrawAmount) - Number(value),
+        };
+      });
+
+      infoDiff = {
+        ...infoDiff,
+        id: 3,
+        description: 'ผลต่าง',
+      };
+
+      rows = [
+        { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw },
+        { ...infosApprove, id: 2, description: 'ยอดเงินอนุมัติ', infosApprove },
+        { ...infoDiff, total: Number(totalWithDraw) - Number(totalApprove) },
+      ];
+      dispatch(updateSummaryRows(rows));
+    }
+  };
 
   let rows: [] = summaryRows ? summaryRows : [];
+  useEffect(() => {
+    storeSummaryItem(payloadAddSummaryItem);
+  }, [payloadAddSummaryItem]);
+
   return (
     <React.Fragment>
       <Box mt={2} bgcolor='background.paper'>
@@ -92,9 +217,15 @@ function ExpenseDetailSummary({ type }: Props) {
             autoHeight={rows.length >= 8 ? false : true}
             scrollbarSize={10}
             rowHeight={65}
+            onCellClick={currentlySelected}
           />
         </div>
         <ExpenseDetailTransaction type={expenseType} />
+        <ModalUpdateExpenseSummary
+          open={openModalUpdatedExpenseSummary}
+          onClose={() => setOpenModalUpdateExpenseSummary(false)}
+          payload={payloadAdd}
+        />
       </Box>
     </React.Fragment>
   );

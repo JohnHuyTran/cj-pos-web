@@ -168,6 +168,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
+                              autoComplete='off'
                             />
                           </Grid>
                         </>
@@ -188,6 +189,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       className={classes.MtextField}
                       fullWidth
                       placeholder=''
+                      autoComplete='off'
                     />
                   </Grid>
                 </Grid>
@@ -243,6 +245,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
+                              autoComplete='off'
                             />
                           </Grid>
                         </>
@@ -263,6 +266,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       className={classes.MtextField}
                       fullWidth
                       placeholder=''
+                      autoComplete='off'
                     />
                   </Grid>
                 </Grid>

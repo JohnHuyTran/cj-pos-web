@@ -13,6 +13,7 @@ type State = {
   intialRows: any;
   itemRows: any;
   addNewItem: any;
+  addSummaryItem: any;
 };
 
 const initialState: State = {
@@ -27,6 +28,7 @@ const initialState: State = {
   intialRows: [],
   itemRows: [],
   addNewItem: null,
+  addSummaryItem: null,
 };
 
 export const featchExpenseDetailAsync = createAsyncThunk('ExpenseDetail', async (docNo: string) => {
@@ -59,6 +61,9 @@ const expenseAccountDetailSlice = createSlice({
     updateItemRows: (state, action: PayloadAction<any>) => {
       state.itemRows = action.payload;
     },
+    addSummaryItem: (state, action: PayloadAction<any>) => {
+      state.addSummaryItem = action.payload;
+    },
   },
   extraReducers: (builer) => {
     builer.addCase(featchExpenseDetailAsync.pending, () => {
@@ -73,6 +78,6 @@ const expenseAccountDetailSlice = createSlice({
   },
 });
 
-export const { updateSummaryRows, updateItemRows, updateToInitialState, addNewItem, initialItems } =
+export const { updateSummaryRows, updateItemRows, updateToInitialState, addNewItem, initialItems, addSummaryItem } =
   expenseAccountDetailSlice.actions;
 export default expenseAccountDetailSlice.reducer;

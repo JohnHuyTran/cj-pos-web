@@ -11,7 +11,7 @@ import {
 } from '../../../store/slices/accounting/accounting-slice';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { stringNullOrEmpty } from '../../../utils/utils';
+import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
 import ModalAddExpense from './modal-add-expense';
 interface Props {
   onClickAddNewBtn?: () => void;
@@ -45,11 +45,50 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
       flex: 1,
       headerAlign: 'center',
       sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
+
+      renderCell: (params: GridRenderCellParams) => {
+        if (isFilterFieldInExpense(params.field)) {
+          return (
+            <Box component='div' sx={{ paddingLeft: '20px' }}>
+              {params.value}
+            </Box>
+          );
+        } else {
+          const master = getMasterExpenInto(params.field);
+
+          const value = params.value || 0;
+          const condition =
+            value > Number(master?.approvalLimit2)
+              ? 'overLimit2'
+              : value > Number(master?.approvalLimit1)
+              ? 'overLimit1'
+              : 'normal';
+          return (
+            <TextField
+              variant='outlined'
+              name={`txb${i.expenseNo}`}
+              inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+              sx={{
+                '.MuiInputBase-input.Mui-disabled': {
+                  WebkitTextFillColor: condition === 'overLimit1' ? 'red' : '#000',
+                  background: condition === 'overLimit2' ? 'red' : '',
+                },
+                // '.MuiOutlinedInput-root': {
+                //   '& fieldset': {
+                //     borderColor: 'red',
+                //   },
+                //   '&:hover fieldset': {
+                //     borderColor: 'red',
+                //   },
+                // },
+              }}
+              value={params.value}
+              disabled={true}
+              autoComplete='off'
+            />
+          );
+        }
+      },
     };
   });
   useEffect(() => {
@@ -58,44 +97,47 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
     const headerDescription: ExpenseInfo = {
       accountNameTh: 'วันที่ค่าใช่จ่าย',
       skuCode: '',
-      approveLimit1: 0,
-      approveLimt2: 0,
+      approvalLimit1: 0,
+      approvalLimit2: 0,
       isActive: true,
-      requiredDocument: '',
+      requiredDocumentTh: '',
       expenseNo: 'date',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
+      typeNameTh: '',
     };
     const headerOtherDetail: ExpenseInfo = {
       accountNameTh: ' ',
       skuCode: '',
-      approveLimit1: 0,
-      approveLimt2: 0,
+      approvalLimit1: 0,
+      approvalLimit2: 0,
       isActive: true,
-      requiredDocument: '',
+      requiredDocumentTh: '',
       expenseNo: 'otherDetail',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
+      typeNameTh: '',
     };
 
     const headerSum: ExpenseInfo = {
       skuCode: '',
-      approveLimit1: 0,
-      approveLimt2: 0,
-      requiredDocument: '',
+      approvalLimit1: 0,
+      approvalLimit2: 0,
+      requiredDocumentTh: '',
       expenseNo: 'total',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
       accountNameTh: 'รวม',
       isActive: false,
+      typeNameTh: '',
     };
     _newExpenseAllList.push(headerDescription);
 
     expenseMasterList
-      .filter((i: ExpenseInfo) => i.isActive)
+      .filter((i: ExpenseInfo) => i.isActive && i.typeCode === 'COFFEE')
       .map((i: ExpenseInfo) => {
         _newExpenseAllList.push(i);
       });
@@ -121,7 +163,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
     //   });
     //   setItems(itemRows);
     // }
-  }, []);
+  }, [expenseType]);
   const [pageSize, setPageSize] = React.useState<number>(10);
   const storeItemAddItem = async (_newItem: any) => {
     const isNewItem = sessionStorage.getItem('ADD_NEW_ITEM') === 'Y';
@@ -221,6 +263,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
   useEffect(() => {
     storeItemAddItem(payloadNewItem);
   }, [payloadNewItem]);
+
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const currentlySelected = async (params: GridCellParams) => {
     const value = params;

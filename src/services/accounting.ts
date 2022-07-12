@@ -18,16 +18,16 @@ export async function expenseSave(payload: ExpenseSaveRequest, files: File[]) {
   return response;
 }
 
-export async function expenseApproveByBranch(payload: any, files: File[]) {
+export async function expenseApproveByBranch(payload: ExpenseSaveRequest, files: File[]) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
   files.map((file: File) => {
     return bodyFormData.append('file[]', file);
   });
   const response = await put(
-    getPathExpense(payload.docNo, environment.branchAccounting.expense.approve.branch.url),
+    getPathExpense(payload.docNo || '', environment.branchAccounting.expense.approve.branch.url),
     bodyFormData,
-    ContentType.JSON
+    ContentType.MULTIPART
   )
     .then((result: any) => result)
     .catch((error) => {
