@@ -56,3 +56,15 @@ export const setUserInfo = (value: KeyCloakTokenInfo) => {
 export const removeUserInfo = () => {
   return sessionStorage.removeItem(USER_INFO);
 };
+
+export const getInit = () => {
+  return sessionStorage.getItem('INTIAL') === 'Y';
+};
+
+export const setInit = (value: string) => {
+  return sessionStorage.setItem('INTIAL', value);
+};
+
+export const removeInit = () => {
+  return sessionStorage.removeItem('INTIAL');
+};

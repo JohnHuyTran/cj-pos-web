@@ -15,7 +15,17 @@ export const expenseStatusList = [
   { key: 'WAITTING_EDIT_ATTACH_FILE', text: 'รอแก้ไขเอกสาร' },
 ];
 
+export enum STATUS {
+  DRAFT = 'DRAFT', // บันทึก
+  SEND_BACK_EDIT = 'SEND_BACK_EDIT', // ส่งกลับแก้ไข
+  WAITTING_EDIT_ATTACH_FILE = 'WAITTING_EDIT_ATTACH_FILE', // รอแก้ไขเอกสาร
+  WAITTING_APPROVAL1 = 'WAITTING_APPROVAL1', // รออนุมัติ1
+  WAITTING_APPROVAL2 = 'WAITTING_APPROVAL2', // รออนุมัติ2
+  WAITTING_ACCOUNTING = 'WAITTING_ACCOUNTING', // รอบัญชีตรวจสอบ
+  WAITTING_APPROVAL3 = 'WAITTING_APPROVAL3', // รออนุมัติ3
+  APPROVED = 'APPROVED', // อนุมัติ
+}
+
 // export const getExpenseTypes = (key: string) => expenseTypes.find((item) => item.key === key)?.text;
 // expenseStatusList.find((item) => item.key === key)?.text;
 // return stockTransferStatus.filter((item) => item.type === type || item.type === 'ALL');
-

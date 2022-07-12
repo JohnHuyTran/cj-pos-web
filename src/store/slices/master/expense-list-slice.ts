@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { get } from '../../../adapters/posback-adapter';
 import { environment } from '../../../environment-base';
 import { featchMasterExpenseListAsyncMockup } from '../../../mockdata/branch-accounting';
 import { ExpenseMasterResponseType } from '../../../models/branch-accounting-model';
@@ -21,8 +22,8 @@ const initialState: State = {
 export const featchMasterExpenseListAsync = createAsyncThunk('MasterExpenseList', async () => {
   try {
     const path = environment.master.expense.retrive.url;
-    // return await get(path).then();
-    return featchMasterExpenseListAsyncMockup();
+    return await get(path).then();
+    // return featchMasterExpenseListAsyncMockup();
   } catch (error) {
     throw error;
   }

@@ -1,23 +1,33 @@
-import { Box } from '@mui/material';
+import { Box, setRef } from '@mui/material';
 import { DataGrid, GridColDef, GridRowData } from '@mui/x-data-grid';
+import { info } from 'console';
 import React, { useEffect } from 'react';
-import { ExpenseInfo } from '../../../models/branch-accounting-model';
+import { AccountAccountExpenses, ExpenseInfo } from '../../../models/branch-accounting-model';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import ExpenseDetailTransaction from './expense-detail-transaction';
 
-function ExpenseDetailSummary() {
+interface Props {
+  type: string;
+}
+
+function ExpenseDetailSummary({ type }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
+
+  const [expenseType, setExpenseType] = React.useState('');
+  const [pageSize, setPageSize] = React.useState<number>(10);
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
+  const summaryRows = useAppSelector((state) => state.expenseAccountDetailSlice.summaryRows);
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
-  const rows: string | any[] = [];
+
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     return {
       field: i.expenseNo,
-      headerName: i.accountName,
+      headerName: i.accountNameTh,
       minWidth: 70,
+      flex: 1,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -28,29 +38,36 @@ function ExpenseDetailSummary() {
     };
   });
   useEffect(() => {
+    setExpenseType(type);
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
-      accountName: ' ',
+      accountNameTh: ' ',
       skuCode: '',
       approveLimit1: 0,
       approveLimt2: 0,
-      active: true,
+      isActive: true,
       requiredDocument: '',
       expenseNo: 'description',
+      isOtherExpense: false,
+      typeCode: '',
+      accountCode: '',
     };
     const headerSum: ExpenseInfo = {
-      accountName: 'รวม',
+      accountNameTh: 'รวม',
       skuCode: '',
       approveLimit1: 0,
       approveLimt2: 0,
-      active: true,
+      isActive: true,
       requiredDocument: '',
       expenseNo: 'total',
+      isOtherExpense: false,
+      typeCode: '',
+      accountCode: '',
     };
     _newExpenseAllList.push(headerDescription);
 
     expenseMasterList
-      .filter((i: ExpenseInfo) => i.active)
+      .filter((i: ExpenseInfo) => i.isActive)
       .map((i: ExpenseInfo) => {
         _newExpenseAllList.push(i);
       });
@@ -58,7 +75,8 @@ function ExpenseDetailSummary() {
     _newExpenseAllList.push(headerSum);
     setNewExpenseAllList(_newExpenseAllList);
   }, []);
-  const [pageSize, setPageSize] = React.useState<number>(10);
+
+  let rows: [] = summaryRows ? summaryRows : [];
   return (
     <React.Fragment>
       <Box mt={2} bgcolor='background.paper'>
@@ -76,7 +94,7 @@ function ExpenseDetailSummary() {
             rowHeight={65}
           />
         </div>
-        <ExpenseDetailTransaction />
+        <ExpenseDetailTransaction type={expenseType} />
       </Box>
     </React.Fragment>
   );
