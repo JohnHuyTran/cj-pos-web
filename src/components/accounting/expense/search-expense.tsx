@@ -51,21 +51,43 @@ export default function SearchExpense () {
     name: branchFrom ? branchFrom : ''
   }
   const valuebranchFrom = groupBranch ? branchFromMap : null
+
+  // Check role
+  const isBranchRole = getUserInfo().group === PERMISSION_GROUP.BRANCH;
+  const isAreaManagerRole = getUserInfo().group === PERMISSION_GROUP.AREA_MANAGER;
+  const isOCRole = getUserInfo().group === PERMISSION_GROUP.OC;
+  const isAccountRole = getUserInfo().group === PERMISSION_GROUP.ACCOUNTING;
+  const isAccountManagerRole = getUserInfo().group === PERMISSION_GROUP.ACCOUNT_MANAGER;
   
+  // Check default select status by role
+  let defaultStatus = ''
+  switch (true) {
+    case isAreaManagerRole:
+      defaultStatus = 'WAITTING_APPROVAL1'
+      break;
+    case isOCRole:
+      defaultStatus = 'WAITTING_APPROVAL2'
+      break;
+    case isAccountRole:
+      defaultStatus = 'WAITTING_ACCOUNTING'
+      break;
+    case isAccountManagerRole:
+      defaultStatus = 'WAITTING_APPROVAL3'
+      break;
+    default:
+      defaultStatus = 'ALL'
+      break;
+  }
+
   // Initial sate
   const initialSearchState = {
     type: '',
     branchCode: '',
-    status: 'WAITTING_APPROVAL3',
+    status: defaultStatus,
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear(),
     period: '',
   }
-
-  // Check role
-  const isAreaManagerRole = getUserInfo().group === PERMISSION_GROUP.AREA_MANAGER;
-  const isAccountRole = getUserInfo().group === PERMISSION_GROUP.ACCOUNTING;
-  const isAccountManagerRole = getUserInfo().group === PERMISSION_GROUP.ACCOUNT_MANAGER;
 
   // Set state data
   const [search, setSearch] = useState(initialSearchState);
@@ -103,6 +125,8 @@ export default function SearchExpense () {
   // Handle function
   const handleClearSearch = () => {
     setSearch({...initialSearchState})
+    setIsValidate(false)
+    setIsSearch(false)
   }
 
   const handleSearchExpense = () => {
@@ -241,7 +265,7 @@ export default function SearchExpense () {
           }
         </Grid>
         <Grid item md={7} sm={7} xs={12} sx={{textAlign: 'right'}}>
-          { isAreaManagerRole &&
+          { isBranchRole &&
             <Fragment>
               <Button
                 id="btnCoffee"
