@@ -13,6 +13,7 @@ import { LoadingButton } from '@mui/lab';
 import { useStyles } from '../../../styles/makeTheme';
 import { Upload, AddCircleOutline } from '@mui/icons-material';
 import { expenseTypes, expenseStatusList } from '../../../utils/enum/accounting-enum';
+import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
 import DatePickerMonth from '../../../components/commons/ui/date-picker-month';
 
 // Import File ที่เกี่ยวข้องกับ Business Logic Select สาขา
@@ -50,7 +51,8 @@ export default function SearchExpense () {
     name: branchFrom ? branchFrom : ''
   }
   const valuebranchFrom = groupBranch ? branchFromMap : null
-
+  
+  // Initial sate
   const initialSearchState = {
     type: '',
     branchCode: '',
@@ -59,6 +61,11 @@ export default function SearchExpense () {
     year: new Date().getFullYear(),
     period: '',
   }
+
+  // Check role
+  const isAreaManagerRole = getUserInfo().group === PERMISSION_GROUP.AREA_MANAGER;
+  const isAccountRole = getUserInfo().group === PERMISSION_GROUP.ACCOUNTING;
+  const isAccountManagerRole = getUserInfo().group === PERMISSION_GROUP.ACCOUNT_MANAGER;
 
   // Set state data
   const [search, setSearch] = useState(initialSearchState);
@@ -78,16 +85,18 @@ export default function SearchExpense () {
   
   useEffect(() => {
      // Select งวดเบิก
-     if (search.type === 'COFFEE') { // ถ้าเป็นค่าใช้จ่ายหน้าร้าน
-      setSearch({...search, period: '1'})
-      setexpensePeriodList([{key: '1', text: 'รายเดือน'}])
-    } else {
-      setSearch({...search, period: ''})
-      setexpensePeriodList([ // ถ้าเป็นค่าใช้จ่ายร้านกาแฟ
-        {key: '1', text: 'ครึ่งเดือนแรก'},
-        {key: '2', text: 'ครึ่งเดือนหลัง'}
-      ])
-    }
+     if (isAccountRole || isAccountManagerRole) {
+       if (search.type === 'COFFEE') { // ถ้าเป็นค่าใช้จ่ายหน้าร้าน
+        setSearch({...search, period: '1'})
+        setexpensePeriodList([{key: '1', text: 'รายเดือน'}])
+        } else {
+          setSearch({...search, period: ''})
+          setexpensePeriodList([ // ถ้าเป็นค่าใช้จ่ายร้านกาแฟ
+            {key: '1', text: 'ครึ่งเดือนแรก'},
+            {key: '2', text: 'ครึ่งเดือนหลัง'}
+          ])
+        }
+     }
   }, [search.type])
 
   
@@ -97,8 +106,10 @@ export default function SearchExpense () {
   }
 
   const handleSearchExpense = () => {
+    const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole)
+      ? false : true
     setIsValidate(true)
-    if (search.type && search.status) {
+    if (search.type && isPeriodValidate) {
       setIsSearch(true)
       setIsOpenLoading(true)
       setTimeout(() => {
@@ -174,80 +185,90 @@ export default function SearchExpense () {
             }
           />
         </Grid>
-        <Grid item md={4} sm={4} xs={6}>
-          <FormSelect
-              title="งวดเบิก"
-              dataList={expensePeriodList}
-              value={search.period}
-              isValidate={isValidate}
-              isDisabled={isOpenLoading}
-              setValue={(e) => setSearch({...search, period: e.target.value})} />
-        </Grid>
+        { isAccountRole || isAccountManagerRole &&
+          <Grid item md={4} sm={4} xs={6}>
+            <FormSelect
+                title="งวดเบิก"
+                dataList={expensePeriodList}
+                value={search.period}
+                isValidate={isValidate}
+                isDisabled={isOpenLoading}
+                setValue={(e) => setSearch({...search, period: e.target.value})} />
+          </Grid>
+        }
       </Grid>
       <Grid container rowSpacing={1} columnSpacing={8} mt={10}>
         <Grid item md={5} sm={5} xs={12}>
-          <Button
-            id="btnExport"
-            variant="contained"
-            color="primary"
-            onClick={handleExport}
-            sx={{ width: '170.42px', mr: 2 }}
-            startIcon={<Upload />}
-            className={classes.MbtnSearch}>
-            EXPORT
-          </Button>
-          { (isSearch && !isValidate) && 
+          { isAccountManagerRole &&
             <Fragment>
               <Button
-                id="btnSearch"
+                id="btnExport"
                 variant="contained"
                 color="primary"
-                onClick={handleApprove}
+                onClick={handleExport}
                 sx={{ width: '170.42px', mr: 2 }}
+                startIcon={<Upload />}
                 className={classes.MbtnSearch}>
-                อนุมัติ
+                EXPORT
               </Button>
-              <Button
-                id="btnSearch"
-                variant="contained"
-                disabled={search.status !== 'WAITTING_APPROVAL3'}
-                onClick={handleApproveAll}
-                sx={{ 
-                  width: '170.42px',
-                  background: '#5468ff',
-                  ":hover": {boxShadow: 6, background: '#3e4cb8'}
-                }}
-                className={classes.MbtnSearch}>
-                อนุมัติทั้งหมด
-              </Button>
+              { (isSearch && !isValidate) && 
+                <Fragment>
+                  <Button
+                    id="btnSearch"
+                    variant="contained"
+                    color="primary"
+                    onClick={handleApprove}
+                    sx={{ width: '170.42px', mr: 2 }}
+                    className={classes.MbtnSearch}>
+                    อนุมัติ
+                  </Button>
+                  <Button
+                    id="btnSearch"
+                    variant="contained"
+                    disabled={search.status !== 'WAITTING_APPROVAL3'}
+                    onClick={handleApproveAll}
+                    sx={{ 
+                      width: '170.42px',
+                      background: '#5468ff',
+                      ":hover": {boxShadow: 6, background: '#3e4cb8'}
+                    }}
+                    className={classes.MbtnSearch}>
+                    อนุมัติทั้งหมด
+                  </Button>
+                </Fragment>
+              }
             </Fragment>
           }
         </Grid>
         <Grid item md={7} sm={7} xs={12} sx={{textAlign: 'right'}}>
-          <Button
-            id="btnCoffee"
-            variant="contained"
-            color="primary"
-            onClick={handleCoffee}
-            startIcon={<AddCircleOutline />}
-            sx={{ 
-              width: '170.42px', mr: 2,
-              background: '#5468ff',
-              ":hover": {boxShadow: 6, background: '#3e4cb8'}
-            }}
-            className={classes.MbtnSearch}>
-            ค่าใช้จ่ายร้านกาแฟ
-          </Button>
-          <Button
-            id="btnStorefront"
-            variant="contained"
-            color="warning"
-            onClick={handleStorefront}
-            sx={{ width: '170.42px', mr: 2 }}
-            startIcon={<AddCircleOutline />}
-            className={classes.MbtnSearch}>
-            ค่าใช้จ่ายหน้าร้าน
-          </Button>
+          { isAreaManagerRole &&
+            <Fragment>
+              <Button
+                id="btnCoffee"
+                variant="contained"
+                color="primary"
+                onClick={handleCoffee}
+                startIcon={<AddCircleOutline />}
+                sx={{ 
+                  width: '170.42px', mr: 2,
+                  background: '#5468ff',
+                  ":hover": {boxShadow: 6, background: '#3e4cb8'}
+                }}
+                className={classes.MbtnSearch}>
+                ค่าใช้จ่ายร้านกาแฟ
+              </Button>
+              <Button
+                id="btnStorefront"
+                variant="contained"
+                color="warning"
+                onClick={handleStorefront}
+                sx={{ width: '170.42px', mr: 2 }}
+                startIcon={<AddCircleOutline />}
+                className={classes.MbtnSearch}>
+                ค่าใช้จ่ายหน้าร้าน
+              </Button>
+            </Fragment>
+          }
           <Button
             id="btnClear"
             variant="contained"
