@@ -15,6 +15,7 @@ import { Upload, AddCircleOutline } from '@mui/icons-material';
 import { expenseTypes, expenseStatusList } from '../../../utils/enum/accounting-enum';
 import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
 import DatePickerMonth from '../../../components/commons/ui/date-picker-month';
+import { useAppSelector, useAppDispatch } from '../../../store/store';
 
 // Import File ที่เกี่ยวข้องกับ Business Logic Select สาขา
 import BranchListDropDown from '../../../components/commons/ui/branch-list-dropdown';
@@ -23,7 +24,10 @@ import { isGroupBranch } from '../../../utils/role-permission';
 import { getBranchName } from '../../../utils/utils';
 import { BranchListOptionType } from '../../../models/branch-model';
 import { env } from '../../../adapters/environmentConfigs';
-import { useAppSelector } from '../../../store/store';
+
+// Call API
+import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
+import { ExpenseSearchRequest } from '../../../models/branch-accounting-model';
 
 interface FormSelectProps {
   title: string,
@@ -37,6 +41,8 @@ interface FormSelectProps {
 
 export default function SearchExpense () {
   const classes = useStyles()
+  const dispatch = useAppDispatch();
+
   // Business Logic Select สาขา
   const groupBranch = isGroupBranch()
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
@@ -129,19 +135,26 @@ export default function SearchExpense () {
     setIsSearch(false)
   }
 
-  const handleSearchExpense = () => {
+  const handleSearchExpense = async () => {
     const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole)
       ? false : true
     setIsValidate(true)
     if (search.type && isPeriodValidate) {
       setIsSearch(true)
       setIsOpenLoading(true)
-      setTimeout(() => {
-        setIsValidate(false)
-        setIsOpenLoading(false)
-      }, 1000)
+      const payload: ExpenseSearchRequest = {
+        limit: '10',
+        page: '1',
+        ...search,
+        period: +search.period
+      }
+      await dispatch(featchBranchAccountingListAsync(payload)).then((res) => {
+        setTimeout(() => {
+          setIsValidate(false)
+          setIsOpenLoading(false)
+        }, 500)
+      })
     }
-    // setSearch({...search})
   }
 
   const handleExport = () => {
