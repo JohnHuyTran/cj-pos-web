@@ -73,14 +73,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
                   WebkitTextFillColor: condition === 'overLimit1' ? 'red' : '#000',
                   background: condition === 'overLimit2' ? 'red' : '',
                 },
-                // '.MuiOutlinedInput-root': {
-                //   '& fieldset': {
-                //     borderColor: 'red',
-                //   },
-                //   '&:hover fieldset': {
-                //     borderColor: 'red',
-                //   },
-                // },
               }}
               value={params.value}
               disabled={true}

@@ -43,7 +43,15 @@ import { EXPENSE_TYPE, STATUS } from '../../../utils/enum/accounting-enum';
 import LoadingModal from '../../commons/ui/loading-modal';
 import AlertError from '../../commons/ui/alert-error';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
-import { expenseApproveByBranch, expenseSave } from '../../../services/accounting';
+import {
+  expenseApproveByAccount,
+  expenseApproveByAccountManager,
+  expenseApproveByBranch,
+  expenseApproveByOC,
+  expenseRejectByAccountManager,
+  expenseRejectByOC,
+  expenseSave,
+} from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
 import moment from 'moment';
 import ModelConfirmDetail from './confirm/modal-confirm-detail';
@@ -123,8 +131,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     await dispatch(addNewItem(null));
   };
   const handleSaveBtn = async () => {
-    // const isFileValidate: boolean = validateFileInfo();
-    // if (isFileValidate) {
     const items = store.getState().expenseAccountDetailSlice.itemRows;
     const summarys = store.getState().expenseAccountDetailSlice.summaryRows;
     let dataItem: DataItem[] = [];
@@ -146,7 +152,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       const data: DataItem = {
         expenseDate: moment(new Date(e['date'])).startOf('day').subtract(543, 'year').toISOString(),
         items: items,
-        // totalAmount: e['total'],
       };
       dataItem.push(data);
     });
@@ -188,13 +193,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setOpenAlert(true);
         setTextError(error.message);
       });
-    // }
   };
 
-  const handleApproveBtn = async () => {
-    // const isFileValidate: boolean = validateFileInfo();
-    // if (isFileValidate) {
+  const onApproveByBranch = async (comment: string) => {
     const payload: ExpenseSaveRequest = {
+      comments: comment,
       docNo: docNo,
       today: moment(new Date()).startOf('day').toISOString(),
     };
@@ -212,14 +215,172 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setOpenAlert(true);
         setTextError(error.message);
       });
-    // handleOpenModelConfirm();
-    // }
   };
-  const handleRejectBtn = () => {};
+
+  const onApproveByAreaMangerOC = async () => {
+    const payload: ExpenseSaveRequest = {
+      docNo: docNo,
+    };
+    await expenseApproveByOC(payload, fileUploadList)
+      .then(async (value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        setOpenAlert(true);
+        setTextError(error.message);
+      });
+  };
+  const onRejectByAreaMangerOC = async (comment: string) => {
+    const payload: ExpenseSaveRequest = {
+      docNo: docNo,
+      comments: comment,
+    };
+    await expenseRejectByOC(payload)
+      .then(async (value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        setOpenAlert(true);
+        setTextError(error.message);
+      });
+  };
+
+  const onApproveByAccount = async () => {
+    const payload: ExpenseSaveRequest = {
+      docNo: docNo,
+      comments: comment,
+    };
+    await expenseApproveByAccount(payload)
+      .then(async (value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        setOpenAlert(true);
+        setTextError(error.message);
+      });
+  };
+  const onRejectByAccount = async (returnto: string, comment: string) => {
+    const payload: ExpenseSaveRequest = {
+      docNo: docNo,
+      comments: comment,
+      returnTo: returnto,
+    };
+    await expenseRejectByOC(payload)
+      .then(async (value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        setOpenAlert(true);
+        setTextError(error.message);
+      });
+  };
+
+  const onApproveByAccountManager = async (expenDate: Date, approveDate: Date) => {
+    const payload: ExpenseSaveRequest = {
+      expenseDate: moment(expenDate).startOf('day').toISOString(),
+      approvedDate: moment(approveDate).startOf('day').toISOString(),
+    };
+    await expenseApproveByAccountManager(payload)
+      .then(async (value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        setOpenAlert(true);
+        setTextError(error.message);
+      });
+  };
+
+  const onRejectByAccountManager = async (comment: string) => {
+    const payload: ExpenseSaveRequest = {
+      comments: comment,
+    };
+    await expenseRejectByAccountManager(payload)
+      .then(async (value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        setTimeout(() => {
+          setOpen(false);
+          onClickClose();
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        setOpenAlert(true);
+        setTextError(error.message);
+      });
+  };
+  let callbackFunction: any;
+  const handleApproveBtn = () => {
+    if (status === STATUS.DRAFT) {
+      const isFileValidate: boolean = validateFileInfo();
+      if (isFileValidate) {
+        handleOpenModelConfirm();
+        callbackFunction = onApproveByBranch;
+      }
+    } else if (status === STATUS.WAITTING_APPROVAL1) {
+      callbackFunction = onApproveByAreaMangerOC;
+      handleOpenModelConfirm();
+    } else if (status === STATUS.WAITTING_APPROVAL2) {
+      callbackFunction = onApproveByAccount;
+      handleOpenModelConfirm();
+    } else if (status === STATUS.WAITTING_ACCOUNTING) {
+      callbackFunction = onApproveByAccountManager;
+      handleOpenModelConfirm();
+    }
+  };
+
+  const handleRejectBtn = () => {
+    if (status === STATUS.WAITTING_APPROVAL1) {
+      callbackFunction = onRejectByAreaMangerOC;
+    } else if (status === STATUS.WAITTING_APPROVAL2) {
+      callbackFunction = onRejectByAccount;
+    } else if (status === STATUS.WAITTING_ACCOUNTING) {
+      callbackFunction = onRejectByAccountManager;
+    }
+  };
 
   const validateFileInfo = () => {
     const isvalid = fileUploadList.length > 0 ? true : false;
-    if (!isvalid) {
+    const existingfileList =
+      status === STATUS.DRAFT
+        ? attachFiles
+        : status === STATUS.SEND_BACK_EDIT
+        ? editAttachFiles
+        : status === STATUS.WAITTING_EDIT_ATTACH_FILE
+        ? approvalAttachFiles
+        : '';
+    console.log(existingfileList);
+    if (!isvalid && existingfileList.length <= 0) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
       return false;
@@ -342,6 +503,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         };
       });
       totalDiff = Number(totalWithDraw) - Number(totalApprove);
+
       rows = [
         { ...infosWithDraw, total: totalWithDraw },
         { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove },
@@ -593,7 +755,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       <ModelConfirmDetail
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
-        onConfirm={handleConfirm}
+        onConfirm={callbackFunction}
         startDate='2022-06-16T00:00:00+07:00'
         endDate='2022-06-30T23:59:59.999999999+07:00'
       />

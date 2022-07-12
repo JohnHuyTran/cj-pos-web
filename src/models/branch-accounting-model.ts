@@ -45,7 +45,7 @@ export interface ExpenseSaveRequest {
   approvalAttachFiles?: FileType[];
   sumItems?: SumItemsItem[];
   items?: DataItem[];
-  comments?: Comment[];
+  comments?: string;
   expenseDate?: string;
   approvedDate?: string;
   nextApprover?: string;
@@ -55,6 +55,7 @@ export interface ExpenseSaveRequest {
   createdDate?: string;
   lastModifiedDate?: string;
   today?: string;
+  returnTo?: string;
 }
 
 export interface AccountAccountExpenses {

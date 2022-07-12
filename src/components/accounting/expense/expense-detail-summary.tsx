@@ -167,9 +167,6 @@ function ExpenseDetailSummary({ type }: Props) {
           [key]: element[1],
         };
       });
-
-      console.log(entries);
-      console.log(arr);
       let infoDiff: any;
       let totalDiff: number = 0;
       arr.map((element: any, i: number) => {

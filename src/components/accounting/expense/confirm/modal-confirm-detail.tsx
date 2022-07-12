@@ -10,7 +10,7 @@ import ConfirmContent from './confirm-content';
 interface Props {
   open: boolean;
   onClose: () => void;
-  onConfirm: (period: any) => void;
+  onConfirm: (comment: string) => void;
   startDate: string;
   endDate: string;
 }
@@ -31,7 +31,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, startDate, endD
 
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-    await onConfirm(periodData);
+    await onConfirm('comment');
     handleOpenLoading('open', false);
     onClose();
   };

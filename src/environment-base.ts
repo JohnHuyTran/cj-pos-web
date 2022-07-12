@@ -507,7 +507,7 @@ export const environment = {
           url: '',
         },
         accountManager: {
-          url: '',
+          url: '/expense/approve3/{docNo}',
         },
       },
       reject: {
@@ -518,7 +518,7 @@ export const environment = {
           url: '',
         },
         accountManager: {
-          url: '',
+          url: '/expense/reject3/{docNo}',
         },
       },
     },
