@@ -11,8 +11,10 @@ function expenseSearch(): ReactElement {
 
   const [docNo, setDocNo] = useState('');
 
+  const [selectRowsList, setSelectRowsList] = useState<Array<any>>([]);
   const handleSelectRows = async (list: any) => {
     console.log('list:', JSON.stringify(list));
+    setSelectRowsList(list);
   };
 
   const [flagSearch, setFlagSearch] = useState(false);
@@ -25,9 +27,30 @@ function expenseSearch(): ReactElement {
 
   return (
     <>
-      <Box mb={6}>
+      <Box mb={2}>
         <Grid container spacing={2} mt={4} mb={2}>
-          <Grid item xs={5}></Grid>
+          <Grid item xs={5}>
+            <Button
+              id='btnSearch'
+              variant='contained'
+              color='primary'
+              onClick={onClickSearchBtn}
+              sx={{ width: 110, ml: 2 }}
+              className={classes.MbtnSearch}
+              disabled={selectRowsList.length === 0 || orderListDatas.length === 0}>
+              อนุมัติ
+            </Button>
+            <Button
+              id='btnSearch'
+              variant='contained'
+              color='secondary'
+              onClick={onClickSearchBtn}
+              sx={{ width: 110, ml: 2 }}
+              className={classes.MbtnSearch}
+              disabled={orderListDatas.length === 0}>
+              อนุมัติทั้งหมด
+            </Button>
+          </Grid>
           <Grid item xs={7} sx={{ textAlign: 'end' }}>
             <Button
               id='btnSearch'
