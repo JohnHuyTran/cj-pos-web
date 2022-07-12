@@ -64,7 +64,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [docNo, setDocNo] = React.useState();
   const [expenseTypeName, setExpenseTypeName] = React.useState('รายละเอียดเอกสาร');
   const [expenseType, setExpenseType] = React.useState('รายละเอียดเอกสาร');
-  const [period, setPeriod] = React.useState('');
+  const [period, setPeriod] = React.useState<ExpensePeriod | undefined>();
+  const [periodLabel, setPeriodLabel] = React.useState('');
   const [status, setStatus] = React.useState(STATUS.DRAFT);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [branchCode, setBranchCode] = React.useState('');
@@ -115,6 +116,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     await dispatch(addNewItem(null));
   };
   const handleSaveBtn = async () => {
+    console.log(fileUploadList);
     const isFileValidate: boolean = validateFileInfo();
     if (isFileValidate) {
       const items = store.getState().expenseAccountDetailSlice.itemRows;
@@ -161,7 +163,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       const payload: ExpenseSaveRequest = {
         branchCode: branchCode,
         type: expenseType,
-        expensePeriod: periodProps,
+        expensePeriod: period,
         sumItems: sumItem.items,
         items: dataItem,
         docNo: docNo,
@@ -322,7 +324,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       });
       return {
         id: uuidv4(),
-        date: item.expenseDate,
+        date: convertUtcToBkkDate(moment(item.expenseDate).startOf('day').toISOString()),
         total: item.totalAmount,
         ...newItem,
       };
@@ -337,7 +339,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setBranchName(`${expenseData.branchCode}-${getBranchName(branchList, expenseData.branchCode)}`);
       const startDate = convertUtcToBkkDate(expenseData.expensePeriod.startDate);
       const endDate = convertUtcToBkkDate(expenseData.expensePeriod.endDate);
-      setPeriod(`${startDate}-${endDate}`);
+      setPeriodLabel(`${startDate}-${endDate}`);
+      setPeriod(expenseData.expensePeriod);
       setStatus(expenseData.status);
       setExpenseTypeName(
         expenseData.type === EXPENSE_TYPE.COFFEE
@@ -353,7 +356,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setBranchName(`${ownBranch}-${getBranchName(branchList, ownBranch)}`);
       const startDate = convertUtcToBkkDate(periodProps && periodProps.startDate ? periodProps.startDate : '');
       const endDate = convertUtcToBkkDate(periodProps && periodProps.endDate ? periodProps.endDate : '');
-      setPeriod(`${startDate}-${endDate}`);
+      setPeriodLabel(`${startDate}-${endDate}`);
+      setPeriod(periodProps);
       setExpenseType(type);
       setExpenseTypeName(
         expenseType === EXPENSE_TYPE.COFFEE
@@ -406,7 +410,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               <Typography variant='body2'>งวด:</Typography>
             </Grid>
             <Grid item xs={3}>
-              <Typography variant='body2'>{period}</Typography>
+              <Typography variant='body2'>{periodLabel}</Typography>
             </Grid>
           </Grid>
 
@@ -480,6 +484,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         edit={false}
         payload={payloadAdd}
         type={expenseType}
+        periodProps={period}
       />
       <ModelDescriptionExpense
         open={openModalDescriptionExpense}

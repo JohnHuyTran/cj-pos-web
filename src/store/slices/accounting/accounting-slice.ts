@@ -29,9 +29,9 @@ const initialState: State = {
   addNewItem: null,
 };
 
-export const featchExpenseDetailAsync = createAsyncThunk('ExpenseDetail', async () => {
+export const featchExpenseDetailAsync = createAsyncThunk('ExpenseDetail', async (docNo: string) => {
   try {
-    const path = getPathExpenseDetail('EX22070101-000008', environment.branchAccounting.expense.detail.url);
+    const path = getPathExpenseDetail(docNo, environment.branchAccounting.expense.detail.url);
     return await get(path).then();
 
     // return featchExpenseDetailAsyncMockup();

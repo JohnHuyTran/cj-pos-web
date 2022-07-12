@@ -145,9 +145,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
       }
       await dispatch(updateItemRows(_item));
       await dispatch(addNewItem(null));
-
-      console.log('_item: ', _item);
-      console.log(_.sumBy(_item, '001'));
       summaryRow(_item);
       // await dispatch(updateSummaryRows([]));
     }
