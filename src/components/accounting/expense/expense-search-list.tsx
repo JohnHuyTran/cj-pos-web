@@ -347,12 +347,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
       <LoadingModal open={openLoadingModal.open} />
 
       {openDetailModal && (
-        <ExpenseDetail
-          isOpen={openDetailModal}
-          onClickClose={handleCloseDetailModal}
-          expenseType={'COFFEE'}
-          edit={edit}
-        />
+        <ExpenseDetail isOpen={openDetailModal} onClickClose={handleCloseDetailModal} type={'COFFEE'} edit={edit} />
       )}
     </div>
   );

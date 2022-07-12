@@ -15,7 +15,6 @@ import { delFileUrlHuawei } from '../../../services/purchase';
 import { getFileUrlHuawei } from '../../../services/master-service';
 import ModalShowHuaweiFile from '../../commons/ui/modal-show-huawei-file';
 import { stringNullOrEmpty } from '../../../utils/utils';
-import { uploadSingleFileState } from '../../../store/slices/upload-single-file-slice';
 
 interface fileDisplayList {
   branchCode?: string;
@@ -175,13 +174,13 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
 
   return (
     <>
-      <Grid container spacing={0.5} direction="row" justifyContent="space-between" alignItems="center">
+      <Grid container spacing={0.5} direction='row' justifyContent='space-between' alignItems='center'>
         <Grid item xs={9}>
           <input
             id={'btnBrowseFile'}
-            data-testid="testid-tbxBrowse"
-            type="file"
-            accept=".pdf"
+            data-testid='testid-tbxBrowse'
+            type='file'
+            accept='.pdf'
             onClick={handleFileInputClick}
             onChange={handleFileInputChange}
             style={{ display: 'none' }}
@@ -195,8 +194,7 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
               mt: 0,
               borderRadius: '5px',
               border: `1px dashed ${theme.palette.primary.main}`,
-            }}
-          >
+            }}>
             {newFileDisplayList.length === 0 && (
               <Typography sx={{ fontSize: '13px', color: '#676767', whiteSpace: 'normal' }} noWrap>
                 แนบไฟล์รวมไม่เกิน 50 MB
@@ -210,9 +208,8 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'space-between',
-                  }}
-                >
-                  <Typography color="secondary" sx={{ fontSize: '13px', whiteSpace: 'normal' }} noWrap>
+                  }}>
+                  <Typography color='secondary' sx={{ fontSize: '13px', whiteSpace: 'normal' }} noWrap>
                     {item.fileName}
                   </Typography>
                 </Box>
@@ -224,14 +221,13 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
           <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
             <label htmlFor={'btnBrowseFile'}>
               <Button
-                data-testid="testid-btnBrowse"
-                variant="contained"
-                color="primary"
+                data-testid='testid-btnBrowse'
+                variant='contained'
+                color='primary'
                 className={classes.MbtnBrowseSmall}
                 disabled={disabledControl}
-                size="small"
-                component="span"
-              >
+                size='small'
+                component='span'>
                 Browse
               </Button>
             </label>

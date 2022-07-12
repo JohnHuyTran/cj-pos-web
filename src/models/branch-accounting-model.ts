@@ -2,7 +2,7 @@ import { FileType } from './common-model';
 
 //master Expense
 export interface ExpenseInfo {
-  type: string;
+  typeCode: string;
   accountCode: string;
   accountNameTh: string;
   skuCode: string;
@@ -29,6 +29,32 @@ export interface ExpenseDetailResponseType {
   code: number;
   message: string;
 }
+
+export interface ExpenseSaveRequest {
+  id?: string;
+  branchCode?: string;
+  docNo?: string;
+  type: string;
+  month?: number;
+  year?: number;
+  expensePeriod?: ExpensePeriod;
+  status?: string;
+  attachFiles?: FileType[];
+  editAttachFiles?: FileType[];
+  approvalAttachFiles?: FileType[];
+  sumItems?: SumItemsItem[];
+  items?: DataItem[];
+  comments?: Comment[];
+  expenseDate?: string;
+  approvedDate?: string;
+  nextApprover?: string;
+  auditLogs?: AuditLog[];
+  createdBy?: string;
+  lastModifiedBy?: string;
+  createdDate?: string;
+  lastModifiedDate?: string;
+}
+
 export interface AccountAccountExpenses {
   id?: string;
   branchCode?: string;
@@ -62,7 +88,7 @@ export interface ExpensePeriod {
 export interface DataItem {
   expenseDate: string;
   items: ItemItem[];
-  totalAmount: number;
+  totalAmount?: number;
 }
 
 export interface ItemItem {
@@ -73,8 +99,8 @@ export interface ItemItem {
 
 export interface SumItems {
   items: SumItemsItem[];
-  sumWithdrawAmount: number;
-  sumApprovalAmount: number;
+  sumWithdrawAmount?: number;
+  sumApprovalAmount?: number;
 }
 
 export interface SumItemsItem {

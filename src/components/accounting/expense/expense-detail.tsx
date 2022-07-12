@@ -21,14 +21,21 @@ import { mockExpenseInfo001, mockExpenseInfo002 } from '../../../mockdata/branch
 import {
   AccountAccountExpenses,
   DataItem,
+  ExpenseInfo,
   ExpensePeriod,
+  ExpenseSaveRequest,
   ItemItem,
   SumItems,
   SumItemsItem,
 } from '../../../models/branch-accounting-model';
-import { initialItems, updateItemRows, updateSummaryRows } from '../../../store/slices/accounting/accounting-slice';
-import { getBranchName, isFilterFieldInExpense } from '../../../utils/utils';
-import { convertUtcToBkkDate } from '../../../utils/date-utill';
+import {
+  addNewItem,
+  initialItems,
+  updateItemRows,
+  updateSummaryRows,
+} from '../../../store/slices/accounting/accounting-slice';
+import { getBranchName, isFilterFieldInExpense, objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
+import { convertUtcToBkkDate, convertUtcToBkkWithZ } from '../../../utils/date-utill';
 import { getInit, getUserInfo } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
 import { EXPENSE_TYPE, STATUS } from '../../../utils/enum/accounting-enum';
@@ -37,31 +44,36 @@ import AlertError from '../../commons/ui/alert-error';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { expenseSave } from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
+import moment from 'moment';
 import ModelConfirmDetail from './confirm/modal-confirm-detail';
+import AccordionUploadSingleFile from '../../commons/ui/accordion-upload-single-file';
 
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
-  expenseType: string;
+  type: string;
   edit: boolean;
   periodProps?: ExpensePeriod;
 }
-function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }: Props) {
+function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props) {
   const [open, setOpen] = React.useState(isOpen);
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
   const { v4: uuidv4 } = require('uuid');
   const [docNo, setDocNo] = React.useState();
-  const [titleName, setTitle] = React.useState('รายละเอียดเอกสาร');
-  const [period, setPeriod] = React.useState('');
+  const [expenseTypeName, setExpenseTypeName] = React.useState('รายละเอียดเอกสาร');
+  const [expenseType, setExpenseType] = React.useState('รายละเอียดเอกสาร');
+  const [period, setPeriod] = React.useState<ExpensePeriod | undefined>();
+  const [periodLabel, setPeriodLabel] = React.useState('');
   const [status, setStatus] = React.useState(STATUS.DRAFT);
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [branchCode, setBranchCode] = React.useState('');
   const [branchName, setBranchName] = React.useState('');
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const [openModalAddExpense, setOpenModalAddExpense] = React.useState(false);
   const [openModalDescriptionExpense, setOpenModalDescriptionExpense] = React.useState(false);
-  // const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
+  const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
   const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
   const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
   const summary: SumItems = expenseData ? expenseData.sumItems : null;
@@ -97,18 +109,18 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
     setOpenModalAddExpense(false);
   };
   const [payloadAdd, setPayloadAdd] = React.useState<any>();
-  const handleAddExpenseTransactionBtn = () => {
+  const handleAddExpenseTransactionBtn = async () => {
     sessionStorage.setItem('ADD_NEW_ITEM', 'Y');
-    setPayloadAdd(entries);
+    setPayloadAdd([]);
     setOpenModalAddExpense(true);
+    await dispatch(addNewItem(null));
   };
   const handleSaveBtn = async () => {
+    console.log(fileUploadList);
     const isFileValidate: boolean = validateFileInfo();
     if (isFileValidate) {
       const items = store.getState().expenseAccountDetailSlice.itemRows;
       const summarys = store.getState().expenseAccountDetailSlice.summaryRows;
-      console.log(items);
-      console.log(summarys);
       let dataItem: DataItem[] = [];
       items.forEach((e: any) => {
         const arr = Object.entries(e);
@@ -116,17 +128,19 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
         arr
           .filter((e: any) => !isFilterFieldInExpense(e[0]))
           .map((element: any, index: number) => {
+            let _isOtherExpense = getMasterExpenInto(element[0])?.isOtherExpense || false;
+
             const item: ItemItem = {
               expenseNo: element[0],
               amount: element[1],
-              isOtherExpense: false,
+              isOtherExpense: _isOtherExpense,
             };
             items.push(item);
           });
         const data: DataItem = {
-          expenseDate: e['date'],
+          expenseDate: moment(new Date(e['date'])).startOf('day').toISOString(),
           items: items,
-          totalAmount: e['total'],
+          // totalAmount: e['total'],
         };
         dataItem.push(data);
       });
@@ -145,16 +159,14 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
 
       const sumItem: SumItems = {
         items: sumItems,
-        sumWithdrawAmount: 0,
-        sumApprovalAmount: 0,
       };
-      const payload: AccountAccountExpenses = {
-        branchCode: '',
-        type: '',
-        expensePeriod: periodProps,
-        sumItems: sumItem,
+      const payload: ExpenseSaveRequest = {
+        branchCode: branchCode,
+        type: expenseType,
+        expensePeriod: period,
+        sumItems: sumItem.items,
         items: dataItem,
-        docNo: '',
+        docNo: docNo,
       };
       await expenseSave(payload, fileUploadList)
         .then(async (value) => {
@@ -187,6 +199,9 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
     }
     return true;
   };
+
+  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+
   const componetButtonDraft = (
     <>
       <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
@@ -309,7 +324,7 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
       });
       return {
         id: uuidv4(),
-        date: item.expenseDate,
+        date: convertUtcToBkkDate(moment(item.expenseDate).startOf('day').toISOString()),
         total: item.totalAmount,
         ...newItem,
       };
@@ -319,25 +334,32 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
 
   useEffect(() => {
     if (edit) {
+      setDocNo(expenseData.docNo);
+      setBranchCode(expenseData.branchCode);
       setBranchName(`${expenseData.branchCode}-${getBranchName(branchList, expenseData.branchCode)}`);
       const startDate = convertUtcToBkkDate(expenseData.expensePeriod.startDate);
       const endDate = convertUtcToBkkDate(expenseData.expensePeriod.endDate);
-      setPeriod(`${startDate}-${endDate}`);
+      setPeriodLabel(`${startDate}-${endDate}`);
+      setPeriod(expenseData.expensePeriod);
       setStatus(expenseData.status);
-      setTitle(
+      setExpenseTypeName(
         expenseData.type === EXPENSE_TYPE.COFFEE
           ? 'รายละเอียดเอกสารค่าใช้จ่ายร้านกาแฟ'
           : EXPENSE_TYPE.STOREFRONT === 'STOREFRONT'
           ? 'รายละเอียดเอกสารค่าใช้จ่ายหน้าร้าน'
           : 'รายละเอียดเอกสาร'
       );
+      setExpenseType(expenseData.type);
     } else {
       const ownBranch = getUserInfo().branch ? getUserInfo().branch : env.branch.code;
+      setBranchCode(ownBranch);
       setBranchName(`${ownBranch}-${getBranchName(branchList, ownBranch)}`);
       const startDate = convertUtcToBkkDate(periodProps && periodProps.startDate ? periodProps.startDate : '');
       const endDate = convertUtcToBkkDate(periodProps && periodProps.endDate ? periodProps.endDate : '');
-      setPeriod(`${startDate}-${endDate}`);
-      setTitle(
+      setPeriodLabel(`${startDate}-${endDate}`);
+      setPeriod(periodProps);
+      setExpenseType(type);
+      setExpenseTypeName(
         expenseType === EXPENSE_TYPE.COFFEE
           ? 'รายละเอียดเอกสารค่าใช้จ่ายร้านกาแฟ'
           : EXPENSE_TYPE.STOREFRONT === 'STOREFRONT'
@@ -367,7 +389,7 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
     <React.Fragment>
       <Dialog open={isOpen} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={onClickClose}>
-          <Typography sx={{ fontSize: 24, fontWeight: 400 }}>{titleName}</Typography>
+          <Typography sx={{ fontSize: 24, fontWeight: 400 }}>{expenseTypeName}</Typography>
           <Steppers status={1} stepsList={['บันทึก', 'สาขา', 'บัญชี', 'อนุมัติ']}></Steppers>
         </BootstrapDialogTitle>
         <DialogContent sx={{ minHeight: '70vh' }}>
@@ -388,7 +410,7 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
               <Typography variant='body2'>งวด:</Typography>
             </Grid>
             <Grid item xs={3}>
-              <Typography variant='body2'>{period}</Typography>
+              <Typography variant='body2'>{periodLabel}</Typography>
             </Grid>
           </Grid>
 
@@ -407,7 +429,7 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              <AccordionUploadFile
+              {/* <AccordionUploadFile
                 files={expenseData && expenseData.attachFiles ? expenseData.attachFiles : []}
                 docNo={'docNo'}
                 docType='BA'
@@ -415,6 +437,10 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
                 onChangeUploadFile={handleOnChangeUploadFileSave}
                 enabledControl={status === STATUS.DRAFT}
                 idControl={'AttachFileSave'}
+              /> */}
+              <AccordionUploadSingleFile
+                files={expenseData && expenseData.attachFiles ? expenseData.attachFiles : []}
+                disabledControl={status !== STATUS.DRAFT}
               />
             </Grid>
             <Grid item xs={1}></Grid>
@@ -448,11 +474,18 @@ function ExpenseDetail({ isOpen, onClickClose, expenseType, edit, periodProps }:
 
           {status !== STATUS.DRAFT && <Box>{componetButtonApprove}</Box>}
           <Box mb={3} mt={3}>
-            <ExpenseDetailSummary />
+            <ExpenseDetailSummary type={expenseType} />
           </Box>
         </DialogContent>
       </Dialog>
-      <ModalAddExpense open={openModalAddExpense} onClose={OnCloseAddExpense} edit={false} payload={payloadAdd} />
+      <ModalAddExpense
+        open={openModalAddExpense}
+        onClose={OnCloseAddExpense}
+        edit={false}
+        payload={payloadAdd}
+        type={expenseType}
+        periodProps={period}
+      />
       <ModelDescriptionExpense
         open={openModalDescriptionExpense}
         onClickClose={() => setOpenModalDescriptionExpense(false)}

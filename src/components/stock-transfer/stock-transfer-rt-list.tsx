@@ -16,7 +16,7 @@ import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 import { isPreferredUsername } from '../../utils/role-permission';
-import { getUserInfo } from '../../store/sessionStore';
+import { getUserInfo, setInit } from '../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 
 interface loadingModalState {
@@ -307,31 +307,6 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
     //   handleOpenLoading('open', false);
     // }
   };
-
-  // const handleModelDeleteConfirm = async (confirm: boolean) => {
-  //   if (confirm === true) {
-  //     await removeStockRequest(rtNoDel)
-  //       .then((value) => {
-  //         const payloadNewpage: StockTransferRequest = {
-  //           limit: pageSize,
-  //           page: cuurentPage.toString(),
-  //           docNo: payload.docNo,
-  //           branchFrom: payload.branchFrom,
-  //           branchTo: payload.branchTo,
-  //           dateFrom: payload.dateFrom,
-  //           dateTo: payload.dateTo,
-  //           statuses: payload.statuses,
-  //           transferReason: payload.transferReason,
-  //         };
-  //         dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
-  //         dispatch(saveSearchStockTransferRt(payloadNewpage));
-  //         setOpenModelDeleteConfirm(false);
-  //       })
-  //       .catch((error) => {});
-  //   } else {
-  //     setOpenModelDeleteConfirm(false);
-  //   }
-  // };
 
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const [typeDetailModal, setTypeDetailModal] = React.useState('View');

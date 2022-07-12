@@ -20,8 +20,9 @@ interface Props {
   periodProps?: ExpensePeriod;
   edit: boolean;
   payload: any;
+  type: string;
 }
-function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
+function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [isEdit, setisEdit] = React.useState(edit);
@@ -39,6 +40,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
   const [isLoad, setIsLoad] = React.useState(false);
   const { v4: uuidv4 } = require('uuid');
   const [testList, setTestList] = React.useState<any>(payload);
+  const [expenseType, setExpenseType] = React.useState<any>(type);
 
   const [flagEdit, setFlagEdit] = React.useState<boolean>(false);
   const handleStartDatePicker = (value: any) => {
@@ -63,7 +65,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
       const data = {
         ...values,
         id: uuidv4(),
-        total: 100,
+        total: sum(values),
         date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
       };
       await dispatch(addNewItem(data));
@@ -87,6 +89,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
   //   }, 300);
   // };
 
+  function sum(obj: any) {
+    return Object.keys(obj).reduce((sum, key) => sum + parseFloat(obj[key] || 0), 0);
+  }
+
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: Number(value) });
@@ -100,6 +106,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
   useEffect(() => {
     setTestList(payload);
+    setExpenseType(type);
   }, [open, edit]);
 
   const handleChangeNew = (value: any, name: any) => {
@@ -118,6 +125,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
     setFlagEdit(false);
   }, [flagEdit === true]);
+  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+
   return (
     <div>
       <Dialog open={open} maxWidth='md' fullWidth={true} key='modal-add-expense'>
@@ -132,7 +141,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
                 value={startDate}
                 type={'TO'}
                 minDateTo={periodProps?.startDate ? periodProps.startDate : startDate}
-                maxDate={periodProps?.endDate ? periodProps.endDate : startDate}
+                maxDate={periodProps?.endDate ? periodProps.endDate : endDate}
                 isError={isErrorDate}
                 hyperText={isErrorDate ? 'เลือกวันที่ซ้ำ กรุณาเลือกใหม่' : ''}
               />
@@ -141,14 +150,14 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
               <>
                 <Grid container spacing={2} mb={2} mt={2}>
                   {expenseMasterList
-                    .filter((i: ExpenseInfo) => i.isActive && !i.isOtherExpense)
+                    .filter((i: ExpenseInfo) => i.isActive && !i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
-                          <Grid item xs={1}>
+                          <Grid item xs={2}>
                             <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
-                          <Grid item xs={3}>
+                          <Grid item xs={2}>
                             <TextField
                               id={i.expenseNo}
                               name={i.expenseNo}
@@ -185,14 +194,14 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
                 <Grid container spacing={2} mb={2} mt={2}>
                   {expenseMasterList
-                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense)
+                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
-                          <Grid item xs={1}>
+                          <Grid item xs={2}>
                             <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
-                          <Grid item xs={3}>
+                          <Grid item xs={2}>
                             <TextField
                               id='txtDocNo'
                               name={i.expenseNo}
@@ -220,10 +229,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
                     .map((i: payLoadAdd) => {
                       return (
                         <>
-                          <Grid item xs={1}>
+                          <Grid item xs={2}>
                             <Typography variant='body2'>{i.title}: </Typography>
                           </Grid>
-                          <Grid item xs={3}>
+                          <Grid item xs={2}>
                             <TextField
                               id={i.key}
                               name={i.key}
@@ -241,10 +250,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
                     })}
                 </Grid>
                 <Grid container spacing={2} mt={2}>
-                  <Grid item xs={1}>
+                  <Grid item xs={2}>
                     ค่าอื่นๆ:
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={2}>
                     <TextField
                       id='txtDocNo'
                       name='sumOther'
@@ -260,14 +269,14 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload }: Props) {
 
                 <Grid container spacing={2} mb={2} mt={2}>
                   {expenseMasterList
-                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense)
+                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
                       return (
                         <>
-                          <Grid item xs={1}>
+                          <Grid item xs={2}>
                             <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
-                          <Grid item xs={3}>
+                          <Grid item xs={2}>
                             <TextField
                               id='txtDocNo'
                               name={i.expenseNo}
