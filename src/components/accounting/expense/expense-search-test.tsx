@@ -1,9 +1,10 @@
-import { Box, Button, Grid } from '@mui/material';
 import { ReactElement, useState } from 'react';
+import { Box, Button, Grid } from '@mui/material';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import ExpenseSearchList from './expense-search-list';
+import ModelConfirmSearch from './confirm/modal-confirm-search';
 
 function expenseSearch(): ReactElement {
   const classes = useStyles();
@@ -18,11 +19,29 @@ function expenseSearch(): ReactElement {
   };
 
   const [flagSearch, setFlagSearch] = useState(false);
+  const [flagBtnApproveAll, setFlagBtnApproveAll] = useState(true);
   const items = useAppSelector((state) => state.searchBranchAccounting);
   const orderListDatas = items.branchAccountingList.data ? items.branchAccountingList.data : [];
+
+  if (flagSearch && orderListDatas.length > 0 && flagBtnApproveAll) setFlagBtnApproveAll(false);
+
   const onClickSearchBtn = async () => {
     await dispatch(featchBranchAccountingListAsync());
     setFlagSearch(true);
+  };
+
+  const [openModelConfirm, setOpenModelConfirm] = useState(false);
+  const handleOpenModelConfirm = () => {
+    setOpenModelConfirm(true);
+  };
+
+  const handleCloseModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+
+  const handleConfirm = (periodData: any) => {
+    console.log('handleConfirm');
+    console.log('periodData:', periodData);
   };
 
   return (
@@ -34,8 +53,8 @@ function expenseSearch(): ReactElement {
               id='btnSearch'
               variant='contained'
               color='primary'
-              onClick={onClickSearchBtn}
-              sx={{ width: 110, ml: 2 }}
+              onClick={handleOpenModelConfirm}
+              sx={{ width: 110 }}
               className={classes.MbtnSearch}
               disabled={selectRowsList.length === 0 || orderListDatas.length === 0}>
               อนุมัติ
@@ -44,10 +63,10 @@ function expenseSearch(): ReactElement {
               id='btnSearch'
               variant='contained'
               color='secondary'
-              onClick={onClickSearchBtn}
+              onClick={handleOpenModelConfirm}
               sx={{ width: 110, ml: 2 }}
               className={classes.MbtnSearch}
-              disabled={orderListDatas.length === 0}>
+              disabled={flagBtnApproveAll}>
               อนุมัติทั้งหมด
             </Button>
           </Grid>
@@ -77,6 +96,14 @@ function expenseSearch(): ReactElement {
           )}
         </div>
       )}
+
+      <ModelConfirmSearch
+        open={openModelConfirm}
+        onClose={handleCloseModelConfirm}
+        onConfirm={handleConfirm}
+        startDate='2022-06-16T00:00:00+07:00'
+        endDate='2022-06-30T23:59:59.999999999+07:00'
+      />
     </>
   );
 }

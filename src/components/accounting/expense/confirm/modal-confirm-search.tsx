@@ -3,31 +3,23 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Typography from '@mui/material/Typography';
 import LoadingModal from '../../../commons/ui/loading-modal';
+import { useStyles } from '../../../../styles/makeTheme';
+import ConfirmContent from './confirm-content';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
-  headerTitle: string;
+  onConfirm: (period: any) => void;
+  startDate: string;
+  endDate: string;
 }
 interface loadingModalState {
   open: boolean;
 }
 
-export default function ModelConfirmSearch({
-  open,
-  // remark,
-  // setRemark,
-  // status,
-  onClose,
-  onConfirm,
-  // HQCode,
-  headerTitle,
-}: // error,
-Props): ReactElement {
+export default function ModelConfirmSearch({ open, onClose, onConfirm, startDate, endDate }: Props): ReactElement {
+  const classes = useStyles();
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
@@ -35,11 +27,17 @@ Props): ReactElement {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
+  const [periodData, setPeriodData] = React.useState('');
+
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-    await onConfirm();
+    await onConfirm(periodData);
     handleOpenLoading('open', false);
     onClose();
+  };
+
+  const handleDate = async (period: any) => {
+    setPeriodData(period);
   };
 
   return (
@@ -49,32 +47,17 @@ Props): ReactElement {
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
         maxWidth='lg'
-        PaperProps={{ sx: { minWidth: 450 } }}>
+        PaperProps={{ sx: { minWidth: 900 } }}>
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
-          <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
-            <Typography variant='h6' align='center' sx={{ marginBottom: 1 }}>
-              {headerTitle}
-            </Typography>
-            <Typography variant='h6' align='center'>
-              เลขที่เอกสาร BR{' '}
-              <label
-                style={{
-                  color: '#AEAEAE',
-                  marginLeft: '15px',
-                  marginRight: '5px',
-                }}>
-                |
-              </label>{' '}
-            </Typography>
-          </DialogContentText>
+          <ConfirmContent startDate={startDate} endDate={endDate} handleDate={handleDate} />
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', mb: 5, mr: 5, ml: 5 }}>
+        <DialogActions sx={{ justifyContent: 'center', m: 5, mr: 5, ml: 5 }}>
           <Button
             id='btnCancle'
             variant='contained'
             color='cancelColor'
-            sx={{ borderRadius: 2, width: 80, mr: 4 }}
+            sx={{ borderRadius: 2, width: 120, mr: 4 }}
             onClick={onClose}>
             ยกเลิก
           </Button>
@@ -82,7 +65,7 @@ Props): ReactElement {
             id='btnConfirm'
             variant='contained'
             color='primary'
-            sx={{ borderRadius: 2, width: 80 }}
+            sx={{ borderRadius: 2, width: 120 }}
             onClick={handleConfirm}>
             ยืนยัน
           </Button>
