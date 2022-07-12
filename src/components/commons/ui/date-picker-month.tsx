@@ -10,6 +10,7 @@ import thai_th from './thai_th';
 
 interface StateProps {
   onClickDate: any;
+  isDisabled?: boolean;
   value: any | Date | number | string;
 }
 //: React.FC<StateProps>
@@ -23,7 +24,8 @@ const DatePickerMonth: React.FC<StateProps> = (props) => {
   };
 
   return (
-    <box className={classes.MdatepickerMulti}>
+    <div className={classes.MdatepickerMulti}
+         style={{backgroundColor: props.isDisabled && '#EAEBEB'}}>
       <DatePicker
         onlyMonthPicker
         calendar={thai}
@@ -33,8 +35,9 @@ const DatePickerMonth: React.FC<StateProps> = (props) => {
         placeholder="กรุณาเลือกเดือน"
         editable={false}
         arrow={false}
+        disabled={props.isDisabled}
       />
-    </box>
+    </div>
   );
 };
 
