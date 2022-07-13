@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import {
   AccountAccountExpenses,
   ExpenseInfo,
+  ExpensePeriod,
   payLoadAdd,
   SumItems,
   SumItemsItem,
@@ -18,14 +19,20 @@ import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
 
 interface Props {
   type: string;
+  periodProps: ExpensePeriod;
 }
 
-function ExpenseDetailSummary({ type }: Props) {
+function ExpenseDetailSummary({ type, periodProps }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
 
   const [expenseType, setExpenseType] = React.useState('');
+  const [period, setPeriod] = React.useState<ExpensePeriod>({
+    period: 0,
+    startDate: '',
+    endDate: '',
+  });
   const [pageSize, setPageSize] = React.useState<number>(10);
   const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
   const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
@@ -129,6 +136,10 @@ function ExpenseDetailSummary({ type }: Props) {
     _newExpenseAllList.push(headerSum);
     setNewExpenseAllList(_newExpenseAllList);
   }, [expenseType]);
+
+  React.useEffect(() => {
+    setPeriod(periodProps);
+  }, [periodProps]);
 
   const currentlySelected = async (params: GridCellParams) => {
     if (params.id === 2 && status === STATUS.WAITTING_ACCOUNTING) {
@@ -237,7 +248,7 @@ function ExpenseDetailSummary({ type }: Props) {
             onCellClick={currentlySelected}
           />
         </div>
-        <ExpenseDetailTransaction type={expenseType} />
+        <ExpenseDetailTransaction type={expenseType} periodProps={period} />
         <ModalUpdateExpenseSummary
           open={openModalUpdatedExpenseSummary}
           onClose={() => setOpenModalUpdateExpenseSummary(false)}

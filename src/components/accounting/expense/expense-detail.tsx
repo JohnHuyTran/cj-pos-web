@@ -83,7 +83,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [docNo, setDocNo] = React.useState();
   const [expenseTypeName, setExpenseTypeName] = React.useState('รายละเอียดเอกสาร');
   const [expenseType, setExpenseType] = React.useState('รายละเอียดเอกสาร');
-  const [period, setPeriod] = React.useState<ExpensePeriod | undefined>();
+  const [period, setPeriod] = React.useState<ExpensePeriod>({
+    period: 0,
+    startDate: '',
+    endDate: '',
+  });
   const [periodLabel, setPeriodLabel] = React.useState('');
   const [status, setStatus] = React.useState(STATUS.DRAFT);
   const [attachFiles, setAttachFiles] = React.useState([]);
@@ -755,7 +759,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
           {status !== STATUS.DRAFT && <Box>{componetButtonApprove}</Box>}
           <Box mb={3} mt={3}>
-            <ExpenseDetailSummary type={expenseType} />
+            <ExpenseDetailSummary type={expenseType} periodProps={period} />
           </Box>
           <Box mt={1}>
             <Grid container spacing={2} mb={1}>

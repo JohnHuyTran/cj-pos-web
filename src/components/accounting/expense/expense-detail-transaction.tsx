@@ -2,7 +2,14 @@ import { Box, TextField, Typography } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridRowData } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
 import { isNullOrUndefined } from 'util';
-import { DataItem, ExpenseInfo, payLoadAdd, SumItems, SumItemsItem } from '../../../models/branch-accounting-model';
+import {
+  DataItem,
+  ExpenseInfo,
+  ExpensePeriod,
+  payLoadAdd,
+  SumItems,
+  SumItemsItem,
+} from '../../../models/branch-accounting-model';
 import {
   initialItems,
   updateItemRows,
@@ -17,9 +24,10 @@ import ModalAddExpense from './modal-add-expense';
 interface Props {
   onClickAddNewBtn?: () => void;
   type: string;
+  periodProps: ExpensePeriod;
 }
 
-function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
+function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
@@ -40,6 +48,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
   const payloadNewItem = useAppSelector((state) => state.expenseAccountDetailSlice.addNewItem);
   const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const [expenseType, setExpenseType] = React.useState('');
+  const [period, setPeriod] = React.useState<ExpensePeriod>();
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     const master = getMasterExpenInto(i.expenseNo);
     const hideColumn = master ? master.isOtherExpense : false;
@@ -197,6 +206,11 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
     //   setItems(itemRows);
     // }
   }, [expenseType]);
+
+  useEffect(() => {
+    setPeriod(periodProps);
+  }, [periodProps]);
+
   const [pageSize, setPageSize] = React.useState<number>(10);
   const storeItemAddItem = async (_newItem: any) => {
     const isNewItem = sessionStorage.getItem('ADD_NEW_ITEM') === 'Y';
@@ -365,7 +379,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
         edit={actionEdit}
         payload={payloadAdd}
         type={expenseType}
-        periodProps={expenseData.expensePeriod}
+        periodProps={period}
       />
     </React.Fragment>
   );
