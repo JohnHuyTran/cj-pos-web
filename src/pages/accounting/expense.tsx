@@ -14,7 +14,7 @@ import {
 import { useAppDispatch } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 
-import ExpenseSearchTest from '../../components/accounting/expense/expense-search-test';
+import SearchExpense from '../../components/accounting/expense/search-expense';
 import { useTranslation } from 'react-i18next';
 
 export default function Expense() {
@@ -56,7 +56,7 @@ export default function Expense() {
       </Box>
 
       <Box mt={3}>
-        <ExpenseSearchTest />
+        <SearchExpense />
       </Box>
     </Container>
   );

@@ -490,6 +490,9 @@ export const environment = {
   },
   branchAccounting: {
     expense: {
+      search: {
+        url: 'accounting/expense',
+      },
       save: {
         url: 'accounting/expense',
       },

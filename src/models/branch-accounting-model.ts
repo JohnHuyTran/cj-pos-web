@@ -147,3 +147,51 @@ export interface PeriodInfo {
   startDate: string;
   endDate: string;
 }
+
+// Search request
+export interface ExpenseSearchRequest {
+  limit: string;
+  page: string;
+  sortBy?: string;
+  sortDirection?: string;
+  type: string;
+  branchCode: string;
+  status: string;
+  month: number;
+  year: number;
+  period?: number;
+}
+
+// Search response
+export interface ExpenseSearchResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: ExpenseSearchInfo[];
+  total: number;
+  page: number;
+  perPage: number;
+  prev: number;
+  next: number;
+  totalPage: number;
+}
+
+export interface ExpenseSearchInfo {
+  branchCode: string;
+  branchName: string;
+  docNo: string;
+  type: string;
+  expensePeriod: ExpensePeriod[];
+  status: string;
+  sumWithdrawAmount: number;
+  sumApprovalAmount: number;
+  expenseDate: string;
+  approvedDate: string;
+}
+
+export interface ExpensePeriod {
+  period: number;
+  startDate: string;
+  endDate: string;
+}
