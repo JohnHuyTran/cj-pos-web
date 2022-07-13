@@ -24,7 +24,7 @@ interface ModalConfirmExpenseProps {
     period: string,
     sumWithdrawAmount: string
   };
-  onClose: () => void;
+  onClose: (value: any) => void;
   approve: boolean;
   showForward?: boolean;
   showReason?: boolean;
@@ -73,7 +73,6 @@ export default function ModalConfirmExpense({
     if (!isForwardValidate && !isReasonValidate) {
       setIsError(false)
       setIsOpenLoading(true)
-
       setTimeout(() => {
         setIsOpenLoading(false)
         onCloseModal()
@@ -83,16 +82,16 @@ export default function ModalConfirmExpense({
 
   // Clear state when close modal.
   const onCloseModal = () => {
+    onClose({forward, reason})
     setForward('')
     setReason('')
     setIsError(false)
-    onClose();
   };
 
   return (
     <Fragment>
       <Dialog
-        id="PopUpConfirmExpense"
+        id="ModalConfirmExpense"
         open={open}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
