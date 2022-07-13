@@ -31,9 +31,9 @@ export const featchBranchAccountingListAsync = createAsyncThunk('ExpenseSearchRe
 async (payload: ExpenseSearchRequest) => {
   try {
     const apiRootPath = environment.branchAccounting.expense.search.url;
-    let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}&type=${payload.type}
-    &branchCode=${payload.branchCode}&status=${payload.status}&month=${payload.month}
-    &year=${payload.year}`;
+    let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}&type=${payload.type}`+
+    `&branchCode=${payload.branchCode}&status=${payload.status}&month=${payload.month}&year=${payload.year}`;
+    
     if (payload.period !== 0) {
       path = `${path}&period=${payload.period}`;
     }
