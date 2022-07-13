@@ -47,8 +47,8 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
       return {
         field: i.expenseNo,
         headerName: i.accountNameTh,
-        minWidth: 80,
-        // flex: 1,
+        minWidth: 70,
+        flex: 0.6,
         headerAlign: 'center',
         sortable: false,
         hide: hideColumn,
@@ -66,7 +66,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
       return {
         field: i.expenseNo,
         headerName: i.accountNameTh,
-        minWidth: 70,
+        // minWidth: 70,
         flex: 1,
         headerAlign: 'center',
         sortable: false,
@@ -132,7 +132,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
       approvalLimit2: 0,
       isActive: true,
       requiredDocumentTh: '',
-      expenseNo: 'otherSum',
+      expenseNo: 'SUMOTHER',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
@@ -231,6 +231,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
     let totalWithDraw: number = 0;
     let totalApprove: number = 0;
     let rows: any[] = [];
+    let _otherSum: number = 0;
     const expenseAccountDetail = store.getState().expenseAccountDetailSlice.expenseAccountDetail;
     const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
     const summary: SumItems = expenseData ? expenseData.sumItems : null;
@@ -252,15 +253,21 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
         // totalApprove += _.sumBy(_item, (o: any) => {
         //   return 1;
         // });
+        const master = getMasterExpenInto(entrie.expenseNo);
+        const _isOtherExpense = master ? master.isOtherExpense : false;
+        if (_isOtherExpense) {
+          _otherSum += stringNullOrEmpty(sum) ? 0 : sum;
+        }
       });
       rows = [
-        { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw },
+        { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw, SUMOTHER: _otherSum },
         // { ...infosApprove, total: totalApprove },
       ];
       dispatch(updateSummaryRows(rows));
     } else {
       totalWithDraw = 0;
       totalApprove = 0;
+      _otherSum = 0;
       expenseMasterList
         .filter((i: ExpenseInfo) => i.isActive)
         .map((entrie: ExpenseInfo) => {
@@ -277,9 +284,16 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
             description: 'ยอดเงินอนุมัติ',
             [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
           };
+
+          const master = getMasterExpenInto(entrie.expenseNo);
+          const _isOtherExpense = master ? master.isOtherExpense : false;
+          if (_isOtherExpense) {
+            const sum = _.sumBy(_item, entrie.expenseNo);
+            _otherSum += stringNullOrEmpty(sum) ? 0 : sum;
+          }
         });
       rows = [
-        { ...infosWithDraw, total: _.sumBy(_item, 'total') },
+        { ...infosWithDraw, total: _.sumBy(_item, 'total'), SUMOTHER: _otherSum },
         // { ...infosApprove, total: _.sumBy(_item, 'total') },
       ];
       dispatch(updateSummaryRows(rows));
@@ -351,6 +365,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
         edit={actionEdit}
         payload={payloadAdd}
         type={expenseType}
+        periodProps={expenseData.expensePeriod}
       />
     </React.Fragment>
   );

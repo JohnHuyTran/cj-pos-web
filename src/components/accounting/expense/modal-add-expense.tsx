@@ -68,12 +68,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
         if (!isFilterFieldInExpense(e.key) && isOtherExpenseField(e.key)) {
           _otherSum += e.value;
           if (!stringNumberNullOrEmpty(e.value)) {
-            _otherDetail += `${getOterExpenseName(e.key)},`;
+            _otherDetail += `${getOtherExpenseName(e.key)},`;
           }
         }
       });
 
-      data = { ...data, total: sum, otherSum: _otherSum, otherDetail: _otherDetail };
+      data = { ...data, total: sum, SUMOTHER: _otherSum, otherDetail: _otherDetail };
       await dispatch(addNewItem(data));
     } else {
       console.log(values);
@@ -90,7 +90,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
         if (!isFilterFieldInExpense(element[0]) && isOtherExpenseField(element[0])) {
           _otherSum += element[1];
           if (!stringNumberNullOrEmpty(element[1])) {
-            _otherDetail += `${getOterExpenseName(element[0])},`;
+            _otherDetail += `${getOtherExpenseName(element[0])},`;
           }
         }
       });
@@ -99,7 +99,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
         id: uuidv4(),
         total: sum(values),
         date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
-        otherSum: _otherSum,
+        dateTime: startDate,
+        SUMOTHER: _otherSum,
         otherDetail: _otherDetail,
       };
       await dispatch(addNewItem(data));
@@ -164,7 +165,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     const master = getMasterExpenInto(key);
     return master?.isOtherExpense;
   };
-  const getOterExpenseName = (key: any) => {
+  const getOtherExpenseName = (key: any) => {
     return getMasterExpenInto(key)?.accountNameTh;
   };
 

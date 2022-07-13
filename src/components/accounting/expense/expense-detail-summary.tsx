@@ -36,7 +36,10 @@ function ExpenseDetailSummary({ type }: Props) {
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
   const [openModalUpdatedExpenseSummary, setOpenModalUpdateExpenseSummary] = React.useState(false);
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
+  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
+    const master = getMasterExpenInto(i.expenseNo);
+    const hideColumn = master ? master.isOtherExpense : false;
     return {
       field: i.expenseNo,
       headerName: i.accountNameTh,
@@ -44,6 +47,7 @@ function ExpenseDetailSummary({ type }: Props) {
       flex: 1,
       headerAlign: 'center',
       sortable: false,
+      hide: hideColumn,
       renderCell: (params: GridRenderCellParams) => {
         if (isFilterFieldInExpense(params.field)) {
           return (
@@ -95,7 +99,7 @@ function ExpenseDetailSummary({ type }: Props) {
       approvalLimit2: 0,
       isActive: true,
       requiredDocumentTh: '',
-      expenseNo: 'otherSum',
+      expenseNo: 'SUMOTHER',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
@@ -126,7 +130,6 @@ function ExpenseDetailSummary({ type }: Props) {
     setNewExpenseAllList(_newExpenseAllList);
   }, [expenseType]);
 
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const currentlySelected = async (params: GridCellParams) => {
     if (params.id === 2 && status === STATUS.WAITTING_ACCOUNTING) {
       let listPayload: payLoadAdd[] = [];

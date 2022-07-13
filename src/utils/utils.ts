@@ -170,7 +170,8 @@ export const isFilterOutFieldInAdd = (value: string) => {
     value === 'total' ||
     value === 'id' ||
     value === 'description' ||
-    value === 'otherSum' ||
-    value === 'otherDetail'
+    value === 'SUMOTHER' ||
+    value === 'otherDetail' ||
+    value === 'dateTime'
   );
 };

@@ -6,7 +6,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { ExpenseInfo, payLoadAdd } from '../../../models/branch-accounting-model';
 import { addSummaryItem } from '../../../store/slices/accounting/accounting-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
-import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
+import { isFilterFieldInExpense, isFilterOutFieldInAdd, stringNullOrEmpty } from '../../../utils/utils';
 
 interface Props {
   open: boolean;
@@ -32,13 +32,20 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
 
     let data: any;
     let sum: number = 0;
+    let _otherSum: number = 0;
     testList.map((e: any) => {
       data = { ...data, [e.key]: e.value };
-      if (!isFilterFieldInExpense(e.key)) {
+      if (!isFilterOutFieldInAdd(e.key)) {
         sum += e.value;
+
+        const master = getMasterExpenInto(e.key);
+        const _isOtherExpense = master ? master.isOtherExpense : false;
+        if (_isOtherExpense) {
+          _otherSum += stringNullOrEmpty(e.value) ? 0 : sum;
+        }
       }
     });
-    data = { ...data, total: sum };
+    data = { ...data, total: sum, SUMOTHER: _otherSum };
     await dispatch(addSummaryItem(data));
     setTimeout(() => {
       setOpenLoadingModal(false);
@@ -87,7 +94,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
             <>
               <Grid container spacing={2} mb={2} mt={2}>
                 {testList
-                  .filter((i: payLoadAdd) => !isFilterFieldInExpense(i.key))
+                  .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key))
                   .map((i: payLoadAdd) => {
                     return (
                       <>
@@ -133,7 +140,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
 
               <Grid container spacing={2} mb={2} mt={2}>
                 {testList
-                  .filter((i: payLoadAdd) => i.isOtherExpense && !isFilterFieldInExpense(i.key))
+                  .filter((i: payLoadAdd) => i.isOtherExpense && !isFilterOutFieldInAdd(i.key))
                   .map((i: payLoadAdd) => {
                     return (
                       <>

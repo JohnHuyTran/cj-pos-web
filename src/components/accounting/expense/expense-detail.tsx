@@ -35,7 +35,14 @@ import {
   updateItemRows,
   updateSummaryRows,
 } from '../../../store/slices/accounting/accounting-slice';
-import { getBranchName, isFilterFieldInExpense, objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
+import {
+  getBranchName,
+  isFilterFieldInExpense,
+  isFilterOutFieldInAdd,
+  objectNullOrEmpty,
+  stringNullOrEmpty,
+  stringNumberNullOrEmpty,
+} from '../../../utils/utils';
 import { convertUtcToBkkDate, convertUtcToBkkWithZ } from '../../../utils/date-utill';
 import { getInit, getUserInfo } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
@@ -139,7 +146,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       const arr = Object.entries(e);
       let items: ItemItem[] = [];
       arr
-        .filter((e: any) => !isFilterFieldInExpense(e[0]))
+        .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
         .map((element: any, index: number) => {
           let _isOtherExpense = getMasterExpenInto(element[0])?.isOtherExpense || false;
 
@@ -151,7 +158,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           items.push(item);
         });
       const data: DataItem = {
-        expenseDate: moment(new Date(e['date'])).startOf('day').subtract(543, 'year').toISOString(),
+        expenseDate: moment(e['dateTime']).startOf('day').toISOString(),
+        // expenseDate: moment(new Date()).startOf('day').subtract(543, 'year').toISOString(),
         items: items,
       };
       dataItem.push(data);
@@ -160,7 +168,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     const arr = Object.entries(summarys[0]);
     let sumItems: SumItemsItem[] = [];
     arr
-      .filter((e: any) => !isFilterFieldInExpense(e[0]))
+      .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
       .map((e: any, index: number) => {
         const item: SumItemsItem = {
           expenseNo: e[0],
@@ -382,7 +390,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         : status === STATUS.WAITTING_EDIT_ATTACH_FILE
         ? approvalAttachFiles
         : '';
-    console.log(existingfileList);
     if (!isvalid && existingfileList.length <= 0) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
@@ -392,7 +399,13 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   };
 
   const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
-
+  const isOtherExpenseField = (key: any) => {
+    const master = getMasterExpenInto(key);
+    return master?.isOtherExpense;
+  };
+  const getOtherExpenseName = (key: any) => {
+    return getMasterExpenInto(key)?.accountNameTh;
+  };
   const componetButtonDraft = (
     <>
       <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
@@ -480,6 +493,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   let totalWithDraw: number = 0;
   let totalApprove: number = 0;
   let totalDiff: any;
+  let totalOtherWithDraw: number = 0;
+  let totalOtherApprove: number = 0;
+  let totalOtherDiff: number = 0;
   const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
   let rows: any[] = [];
   if (getInit()) {
@@ -491,6 +507,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           description: 'ยอดเงินเบิก',
           [entrie.expenseNo]: entrie?.withdrawAmount,
         };
+
         totalWithDraw += Number(entrie?.withdrawAmount);
         infosApprove = {
           ...infosApprove,
@@ -506,8 +523,15 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           description: 'ผลต่าง',
           [entrie.expenseNo]: entrie?.approvedAmount,
         };
+        const master = getMasterExpenInto(entrie.expenseNo);
+        const _isOtherExpense = master ? master.isOtherExpense : false;
+        if (_isOtherExpense) {
+          totalOtherWithDraw += stringNullOrEmpty(entrie?.withdrawAmount) ? 0 : entrie?.withdrawAmount;
+          totalOtherApprove += entrie?.approvedAmount === undefined ? 0 : entrie?.approvedAmount;
+        }
       });
       totalDiff = Number(totalWithDraw) - Number(totalApprove);
+      totalOtherDiff = Number(totalOtherWithDraw) - Number(totalOtherApprove);
 
       if (status === STATUS.DRAFT) {
         rows = [{ ...infosWithDraw, total: totalWithDraw }];
@@ -518,9 +542,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         ];
       } else if (status === STATUS.WAITTING_APPROVAL2) {
         rows = [
-          { ...infosWithDraw, total: totalWithDraw },
-          { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove },
-          { ...infoDiff, total: isNaN(totalDiff) ? 0 : totalDiff },
+          { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
+          { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove, SUMOTHER: totalOtherApprove },
+          { ...infoDiff, total: isNaN(totalDiff) ? 0 : totalDiff, SUMOTHER: totalOtherDiff },
         ];
       }
 
@@ -534,6 +558,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   }
 
   if (_items && _items.length > 0) {
+    let _otherSum: number = 0;
+    let _otherDetail: string = '';
     const itemRows = items.map((item: DataItem, index: number) => {
       const list: ItemItem[] = item.items;
       let newItem: any;
@@ -542,11 +568,19 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           ...newItem,
           [data.expenseNo]: data.amount,
         };
+        if (!isFilterFieldInExpense(data.expenseNo) && isOtherExpenseField(data.expenseNo)) {
+          _otherSum += Number(data.amount);
+          if (!stringNumberNullOrEmpty(data.amount)) {
+            _otherDetail += `${getOtherExpenseName(data.expenseNo)},`;
+          }
+        }
       });
       return {
         id: uuidv4(),
         date: convertUtcToBkkDate(moment(item.expenseDate).startOf('day').toISOString()),
         total: item.totalAmount,
+        SUMOTHER: _otherSum,
+        otherDetail: _otherDetail,
         ...newItem,
       };
     });
@@ -784,3 +818,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 }
 
 export default ExpenseDetail;
+function isOtherExpenseField(expenseN: any) {
+  throw new Error('Function not implemented.');
+}

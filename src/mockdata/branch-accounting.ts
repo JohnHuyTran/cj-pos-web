@@ -183,8 +183,8 @@ const expenseByDay03: DataItem = {
 
 export const periodMockData: ExpensePeriod = {
   period: 1,
-  startDate: '2022-07-01T17:00:00Z',
-  endDate: '2022-07-15T23:59:59Z',
+  startDate: '2022-06-30T17:00:00Z',
+  endDate: '2022-07-15T16:59:59.999999999Z',
 };
 const accountExpense: AccountAccountExpenses = {
   id: '',
