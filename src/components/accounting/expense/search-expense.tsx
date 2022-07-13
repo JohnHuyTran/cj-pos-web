@@ -27,7 +27,10 @@ import { BranchListOptionType } from '../../../models/branch-model';
 import { env } from '../../../adapters/environmentConfigs';
 
 // Call API
-import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
+import {
+  clearDataSearchBranchAccounting,
+  featchBranchAccountingListAsync,
+} from '../../../store/slices/accounting/accounting-search-slice';
 import { ExpenseSearchRequest } from '../../../models/branch-accounting-model';
 import {
   clearDataExpensePeriod,
@@ -110,7 +113,6 @@ export default function SearchExpense() {
   const [branchFromCode, setBranchFromCode] = useState('');
   const [isOpenLoading, setIsOpenLoading] = useState(false);
 
-  const [flagSearch, setFlagSearch] = useState(false);
   const items = useAppSelector((state) => state.searchBranchAccounting);
   const orderListDatas = items.branchAccountingList.data ? items.branchAccountingList.data : [];
   const [flagBtnApproveAll, setFlagBtnApproveAll] = useState(true);
@@ -143,28 +145,30 @@ export default function SearchExpense() {
   }, [search.type]);
 
   // Handle function
-  const handleClearSearch = () => {
+  const handleClearSearch = async () => {
     setSearch({ ...initialSearchState });
     setIsValidate(false);
     setIsSearch(false);
+
+    setFlagBtnApproveAll(true);
+    await dispatch(clearDataSearchBranchAccounting());
   };
 
   const handleSearchExpense = async () => {
-    setFlagBtnApproveAll(true);
     // const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? false : true;
-
     const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? true : false;
     setIsValidate(true);
 
-    console.log('search.period:', search.period);
-    console.log('isAccountRole:', isAccountRole);
-    console.log('isAccountManagerRole:', isAccountManagerRole);
-    console.log('isPeriodValidate:', isPeriodValidate);
-    console.log('search.type:', search.type);
+    // console.log('search.period:', search.period);
+    // console.log('isAccountRole:', isAccountRole);
+    // console.log('isAccountManagerRole:', isAccountManagerRole);
+    // console.log('isPeriodValidate:', isPeriodValidate);
+    // console.log('search.type:', search.type);
 
     if (search.type && isPeriodValidate) {
       setIsSearch(true);
       setIsOpenLoading(true);
+      setFlagBtnApproveAll(true);
       const payload: ExpenseSearchRequest = {
         limit: '10',
         page: '1',
@@ -178,11 +182,11 @@ export default function SearchExpense() {
         setTimeout(() => {
           setIsValidate(false);
           setIsOpenLoading(false);
+
+          const payload: any = res.payload ? res.payload : [];
+          if (search.status === 'WAITTING_APPROVAL3' && payload.data.length) setFlagBtnApproveAll(!flagBtnApproveAll);
         }, 500);
       });
-
-      if (search.status === 'WAITTING_APPROVAL3') setFlagBtnApproveAll(false);
-      setFlagSearch(true);
     }
   };
 
@@ -294,7 +298,7 @@ export default function SearchExpense() {
                   onClick={handleApprove}
                   sx={{ width: 110, mr: 2 }}
                   className={classes.MbtnSearch}
-                  disabled={selectRowsList.length === 0 || orderListDatas.length === 0}>
+                  disabled={selectRowsList.length === 0}>
                   อนุมัติ
                 </Button>
                 <Button
@@ -374,7 +378,7 @@ export default function SearchExpense() {
         <ModalSelectPeriod open={openSelectPeriod} onClose={handleCloseSelectPeriodModal} type={types} />
       )}
 
-      {flagSearch && (
+      {isSearch && (
         <div>
           {orderListDatas.length > 0 && <ExpenseSearchList onSelectRows={handleSelectRows} />}
           {orderListDatas.length === 0 && (
