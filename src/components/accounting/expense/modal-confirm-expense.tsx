@@ -1,9 +1,12 @@
 import { Fragment, ReactElement, useState } from 'react';
 import TextBoxComment from '../../commons/ui/textbox-comment'
-// import LoadingModal from '../../commons/ui/loading-modal';
 import {
   Box,
   Button,
+  FormControl,
+  Select,
+  MenuItem,
+  FormHelperText,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,11 +14,19 @@ import {
   Typography,
   CircularProgress } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import { useStyles } from '../../../styles/makeTheme';
 
 interface ModalConfirmExpenseProps {
   open: boolean;
+  details: {
+    docNo: string,
+    type: string,
+    period: string,
+    sumWithdrawAmount: string
+  };
   onClose: () => void;
   approve: boolean;
+  showForward?: boolean;
   showReason?: boolean;
   validateReason?: boolean;
 }
@@ -25,48 +36,54 @@ interface DetailsProps {
 	detail: string;
 }
 
-interface loadingModalState {
-  open: boolean;
-}
-
 export default function ModalConfirmExpense({
     open,
+    details,
     approve,
     onClose,
+    showForward,
     showReason,
     validateReason
   }: ModalConfirmExpenseProps): ReactElement {
+  const classes = useStyles()
+  const forwardList = [
+    {key: 'AREA', text: 'สาขา'},
+    {key: 'OC', text: 'OC'},
+  ]
+
   // Set state data
+  const [forward, setForward] = useState('');
   const [reason, setReason] = useState('');
   const [isError, setIsError] = useState(false);
-  const [openLoadingModal, setOpenLoadingModal] = useState<loadingModalState>({
-    open: false,
-  });
+  const [isOpenLoading, setIsOpenLoading] = useState(false);
 
   // Check confirm modal
   const handleConfirm = () => {
+    let isForwardValidate = false
+    let isReasonValidate = false
+    if (showForward) {
+      isForwardValidate = forward === "" ? true : false
+    }
+    if (showReason && validateReason) {
+      isReasonValidate = reason === "" ? true : false
+    }
+    setIsError(true)
+    
     // Call API
-    const sentConfirm = () => {
-      handleOpenLoading('open', true);
-      setTimeout(() => {
-        handleOpenLoading('open', false);
-        onCloseModal()
-      }, 1000)
-    }
-    if (validateReason) { // Require reason
-      reason === '' ? setIsError(true) : sentConfirm()
-    } else { // Not require reason
-      sentConfirm()
-    }
-  };
+    if (!isForwardValidate && !isReasonValidate) {
+      setIsError(false)
+      setIsOpenLoading(true)
 
-  // Loading
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+      setTimeout(() => {
+        setIsOpenLoading(false)
+        onCloseModal()
+      }, 500)
+    }
   };
 
   // Clear state when close modal.
   const onCloseModal = () => {
+    setForward('')
     setReason('')
     setIsError(false)
     onClose();
@@ -92,26 +109,58 @@ export default function ModalConfirmExpense({
             </Typography>
           </DialogContentText>
           <Box id="Description">
-            <Details topic="เลขที่เอกสาร" detail="EX22060101" />
-            <Details topic="ประเภทค่าใช้จ่าย" detail="ค่าใช้จ่ายร้านกาแฟ" />
-            <Details topic="งวด" detail="01/06/2565 - 15/06/2565" />
-            <Details topic="ยอดเบิกทั้งหมด" detail="17,675.00 บาท" />
+            <Details topic="เลขที่เอกสาร" detail={details?.docNo}/>
+            <Details topic="ประเภทค่าใช้จ่าย" detail={details?.type} />
+            <Details topic="งวด" detail={details?.period} />
+            <Details topic="ยอดเบิกทั้งหมด" detail={details?.sumWithdrawAmount} />
           </Box>
+          { showForward &&
+            <Box>
+              <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+                ส่งกลับแก้ไขให้กับ
+              </Typography>
+              <FormControl id="SearchType" className={classes.Mselect}
+                fullWidth error={forward === "" && isError}>
+                <Select
+                  id='type'
+                  name='type'
+                  value={forward}
+                  disabled={isOpenLoading}
+                  onChange={(e) => setForward(e.target.value)}
+                  displayEmpty
+                  renderValue={
+                    forward !== "" 
+                    ? undefined
+                    : () => <div style={{color: '#CBD4DB'}}>กรุณาเลือกส่งกลับแก้ไขให้กับ</div>
+                  }
+                  inputProps={{ 'aria-label': 'Without label' }}>
+                    { forwardList.map((item, index: number) => (
+                        <MenuItem key={index} value={item.key}>
+                          {item.text}
+                        </MenuItem>
+                      ))
+                    }
+                </Select>
+                { (forward === "" && isError) &&
+                  <FormHelperText sx={{ml: 0}}>กรุณาเลือกส่งกลับแก้ไขให้กับ</FormHelperText>
+                }
+              </FormControl>
+            </Box>
+          }
           { showReason &&
             <Box sx={{ mt: 3 }}>
               <TextBoxComment
                 fieldName='หมายเหตุ :'
                 defaultValue={reason}
-                isDisable={openLoadingModal.open}
+                isDisable={isOpenLoading}
                 maxLength={100}
-                isError={validateReason ? isError : false}
+                isError={!reason && validateReason ? isError : false}
                 onChangeComment={(e) => {
                   setReason(e);
-                  setIsError(false);
                 }}
                 rowDisplay={2}
               />
-              { isError &&
+              { !reason && isError &&
                 <Typography component="label"
                   variant="caption"
                   sx={{ color: '#F54949'}}
@@ -128,7 +177,7 @@ export default function ModalConfirmExpense({
             id="btnCancle"
             variant="contained"
             color="cancelColor"
-            disabled={openLoadingModal.open}
+            disabled={isOpenLoading}
             sx={{ borderRadius: 2, width: 140, mr: 4 }}
             onClick={onCloseModal}
           >
@@ -138,7 +187,7 @@ export default function ModalConfirmExpense({
             id="btnConfirm"
             variant="contained"
             color="primary"
-            loading={openLoadingModal.open}
+            loading={isOpenLoading}
             loadingIndicator={
               <Typography component="span" sx={{ fontSize: '11px'}}>
                 กรุณารอสักครู่{' '}
@@ -152,7 +201,6 @@ export default function ModalConfirmExpense({
           </LoadingButton>
         </DialogActions>
       </Dialog>
-      {/* <LoadingModal open={openLoadingModal.open} /> */}
     </Fragment>
   )
 }
