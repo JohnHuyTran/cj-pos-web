@@ -65,6 +65,7 @@ import ModelConfirmDetail from './confirm/modal-confirm-detail';
 import AccordionUploadSingleFile from '../../commons/ui/accordion-upload-single-file';
 import TextBoxComment from '../../commons/ui/textbox-comment';
 import { Day } from '@material-ui/pickers';
+import ModalConfirmExpense from './modal-confirm-expense';
 
 interface Props {
   isOpen: boolean;
@@ -351,26 +352,31 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       });
   };
   let callbackFunction: any;
+  const [isOpenModelConfirmExpense, setIsOpenModelConfirmExpense] = React.useState<boolean>(false);
+  const [isApprove, setIsApprove] = React.useState<boolean>(false);
+  const [showForward, setShowForward] = React.useState<boolean>(false); // show dropdown resend
+  const [showReason, setShowReason] = React.useState<boolean>(false); // show comment
+  const [validateReason, setValidateReason] = React.useState<boolean>(false);
   const handleApproveBtn = () => {
+    setIsApprove(true);
     if (status === STATUS.DRAFT) {
       const isFileValidate: boolean = validateFileInfo();
       if (isFileValidate) {
-        handleOpenModelConfirm();
         callbackFunction = onApproveByBranch;
+        setIsOpenModelConfirmExpense(true);
+        setShowReason(true);
       }
     } else if (status === STATUS.WAITTING_APPROVAL1) {
       callbackFunction = onApproveByAreaMangerOC;
-      handleOpenModelConfirm();
     } else if (status === STATUS.WAITTING_APPROVAL2) {
       callbackFunction = onApproveByAccount;
-      handleOpenModelConfirm();
     } else if (status === STATUS.WAITTING_ACCOUNTING) {
       callbackFunction = onApproveByAccountManager;
-      handleOpenModelConfirm();
     }
   };
 
   const handleRejectBtn = () => {
+    setIsApprove(false);
     if (status === STATUS.WAITTING_APPROVAL1) {
       callbackFunction = onRejectByAreaMangerOC;
     } else if (status === STATUS.WAITTING_APPROVAL2) {
@@ -442,7 +448,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             color='primary'
             className={classes.MbtnSendDC}
             onClick={() => {
-              onApproveByBranch('test');
+              handleApproveBtn;
             }}
             startIcon={<CheckCircleOutline />}
             sx={{ width: 140 }}
@@ -813,6 +819,23 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         startDate='2022-06-16T00:00:00+07:00'
         endDate='2022-06-30T23:59:59.999999999+07:00'
       />
+
+      {isOpenModelConfirmExpense && (
+        <ModalConfirmExpense
+          open={isOpenModelConfirmExpense}
+          details={{
+            docNo: docNo ? docNo : '',
+            type: expenseTypeName,
+            period: periodLabel,
+            sumWithdrawAmount: '',
+          }}
+          onCallBackFunction={callbackFunction}
+          approve={isApprove}
+          showForward={showForward}
+          showReason={showReason}
+          validateReason={validateReason}
+        />
+      )}
     </React.Fragment>
   );
 }
