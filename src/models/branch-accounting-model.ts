@@ -37,7 +37,7 @@ export interface ExpenseSaveRequest {
   type: string;
   month?: number;
   year?: number;
-  expensePeriod?: ExpensePeriod;
+  expensePeriod?: ExpensePeriod | null;
   status?: string;
   attachFiles?: FileType[];
   editAttachFiles?: FileType[];
@@ -134,4 +134,16 @@ export interface payLoadAdd {
   key: string;
   value: string;
   title: string;
+}
+export interface ExpensePeriodTypeResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: PeriodInfo | null | [];
+}
+
+export interface PeriodInfo {
+  period: number;
+  startDate: string;
+  endDate: string;
 }

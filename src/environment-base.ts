@@ -521,6 +521,9 @@ export const environment = {
           url: '',
         },
       },
+      periodType: {
+        url: 'accounting/expense-period/{type}',
+      },
     },
   },
 };
