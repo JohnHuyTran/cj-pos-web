@@ -6,6 +6,7 @@ import {
   GridCellParams,
   GridColDef,
   GridRowData,
+  GridRowParams,
   GridValueGetterParams,
   useGridApiRef,
 } from '@mui/x-data-grid';
@@ -309,6 +310,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
     const rowSelect = apiRef.current.getSelectedRows();
     let rowSelectList: any = [];
     rowSelect.forEach((data: GridRowData) => {
+      // rowSelectList.push(data.rtNo);
       rowSelectList.push(data);
     });
 
@@ -337,7 +339,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
             rowHeight={65}
             pagination
             checkboxSelection={true}
-            // isRowSelectable={(params: GridRowParams) => params.row.edit}
+            isRowSelectable={(params: GridRowParams) => params.row.status === 'DRAFT'}
             onSelectionModelChange={handleSubmitRowSelect}
             disableSelectionOnClick
           />
