@@ -11,6 +11,7 @@ import {
 } from '../../../store/slices/accounting/accounting-slice';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
+import { STATUS } from '../../../utils/enum/accounting-enum';
 import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
 import ModalAddExpense from './modal-add-expense';
 interface Props {
@@ -28,6 +29,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
 
   const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
   const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
+  const status = expenseData && expenseData.status ? expenseData.status : '';
   const summary: SumItems = expenseData ? expenseData.sumItems : null;
   const initItems: DataItem[] = expenseData ? expenseData.items : [];
 
@@ -36,52 +38,76 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
   const [items, setItems] = React.useState<any>(_initialItems && _initialItems.length > 0 ? _initialItems : []);
   const [actionEdit, setActionEdit] = React.useState(false);
   const payloadNewItem = useAppSelector((state) => state.expenseAccountDetailSlice.addNewItem);
+  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const [expenseType, setExpenseType] = React.useState('');
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
-    return {
-      field: i.expenseNo,
-      headerName: i.accountNameTh,
-      minWidth: 70,
-      flex: 1,
-      headerAlign: 'center',
-      sortable: false,
+    const master = getMasterExpenInto(i.expenseNo);
+    const hideColumn = master ? master.isOtherExpense : false;
+    if (i.expenseNo === 'date') {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        minWidth: 80,
+        // flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          if (isFilterFieldInExpense(params.field)) {
+            return (
+              <Box component='div' sx={{ paddingLeft: '20px' }}>
+                {params.value}
+              </Box>
+            );
+          }
+        },
+      };
+    } else {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        minWidth: 70,
+        flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          if (isFilterFieldInExpense(params.field)) {
+            return (
+              <Box component='div' sx={{ paddingLeft: '20px' }}>
+                {params.value}
+              </Box>
+            );
+          } else {
+            const master = getMasterExpenInto(params.field);
 
-      renderCell: (params: GridRenderCellParams) => {
-        if (isFilterFieldInExpense(params.field)) {
-          return (
-            <Box component='div' sx={{ paddingLeft: '20px' }}>
-              {params.value}
-            </Box>
-          );
-        } else {
-          const master = getMasterExpenInto(params.field);
-
-          const value = params.value || 0;
-          const condition =
-            value > Number(master?.approvalLimit2)
-              ? 'overLimit2'
-              : value > Number(master?.approvalLimit1)
-              ? 'overLimit1'
-              : 'normal';
-          return (
-            <TextField
-              variant='outlined'
-              name={`txb${i.expenseNo}`}
-              inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
-              sx={{
-                '.MuiInputBase-input.Mui-disabled': {
-                  WebkitTextFillColor: condition === 'overLimit1' ? 'red' : '#000',
-                  background: condition === 'overLimit2' ? 'red' : '',
-                },
-              }}
-              value={params.value}
-              disabled={true}
-              autoComplete='off'
-            />
-          );
-        }
-      },
-    };
+            const value = params.value || 0;
+            const condition =
+              value > Number(master?.approvalLimit2)
+                ? 'overLimit2'
+                : value > Number(master?.approvalLimit1)
+                ? 'overLimit1'
+                : 'normal';
+            return (
+              <TextField
+                variant='outlined'
+                name={`txb${i.expenseNo}`}
+                inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+                sx={{
+                  '.MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: condition === 'overLimit1' ? 'red' : '#000',
+                    background: condition === 'overLimit2' ? 'red' : '',
+                  },
+                }}
+                value={params.value}
+                disabled={true}
+                autoComplete='off'
+              />
+            );
+          }
+        },
+      };
+    }
   });
   useEffect(() => {
     setExpenseType(type);
@@ -94,6 +120,19 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
       isActive: true,
       requiredDocumentTh: '',
       expenseNo: 'date',
+      isOtherExpense: false,
+      typeCode: '',
+      accountCode: '',
+      typeNameTh: '',
+    };
+    const headerOtherSum: ExpenseInfo = {
+      accountNameTh: 'อื่นๆ',
+      skuCode: '',
+      approvalLimit1: 0,
+      approvalLimit2: 0,
+      isActive: true,
+      requiredDocumentTh: '',
+      expenseNo: 'otherSum',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
@@ -126,6 +165,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
       isActive: false,
       typeNameTh: '',
     };
+
     _newExpenseAllList.push(headerDescription);
 
     expenseMasterList
@@ -133,7 +173,8 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
       .map((i: ExpenseInfo) => {
         _newExpenseAllList.push(i);
       });
-
+    _newExpenseAllList.push(headerOtherSum);
+    _newExpenseAllList.push(headerOtherDetail);
     _newExpenseAllList.push(headerSum);
     setNewExpenseAllList(_newExpenseAllList);
     // if (initItems && initItems.length > 0) {
@@ -198,22 +239,23 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
       entries.map((entrie: SumItemsItem, i: number) => {
         infosWithDraw = {
           ...infosWithDraw,
-          id: 1,
-          description: 'ยอดเงินเบิก',
           [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
         };
-        totalWithDraw += _.sumBy(_item, entrie.expenseNo);
-        infosApprove = {
-          ...infosApprove,
-          id: 2,
-          description: 'ยอดเงินอนุมัติ',
-          [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
-        };
-        totalApprove += _.sumBy(_item, entrie.expenseNo);
+        const sum = _.sumBy(_item, entrie.expenseNo);
+        totalWithDraw += stringNullOrEmpty(sum) ? 0 : sum;
+        // infosApprove = {
+        //   ...infosApprove,
+        //   id: 2,
+        //   description: 'ยอดเงินอนุมัติ',
+        //   [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
+        // };
+        // totalApprove += _.sumBy(_item, (o: any) => {
+        //   return 1;
+        // });
       });
       rows = [
-        { ...infosWithDraw, total: totalWithDraw },
-        { ...infosApprove, total: totalApprove },
+        { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw },
+        // { ...infosApprove, total: totalApprove },
       ];
       dispatch(updateSummaryRows(rows));
     } else {
@@ -238,7 +280,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
         });
       rows = [
         { ...infosWithDraw, total: _.sumBy(_item, 'total') },
-        { ...infosApprove, total: _.sumBy(_item, 'total') },
+        // { ...infosApprove, total: _.sumBy(_item, 'total') },
       ];
       dispatch(updateSummaryRows(rows));
     }
@@ -251,30 +293,32 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
 
     return result;
   };
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+
   useEffect(() => {
     storeItemAddItem(payloadNewItem);
   }, [payloadNewItem]);
 
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const currentlySelected = async (params: GridCellParams) => {
-    const value = params;
-    let listPayload: payLoadAdd[] = [];
-    const arr = Object.entries(params.row);
-    await arr.forEach((element: any, index: number) => {
-      const _title = getMasterExpenInto(element[0])?.accountNameTh || 'Field';
-      const item: payLoadAdd = {
-        id: index,
-        key: element[0],
-        value: element[1],
-        title: _title,
-      };
-      listPayload.push(item);
-    });
-    sessionStorage.setItem('ADD_NEW_ITEM', 'F');
-    await setActionEdit(true);
-    await setPayloadAdd(listPayload);
-    setOpenModalAddExpense(true);
+    if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) {
+      const value = params;
+      let listPayload: payLoadAdd[] = [];
+      const arr = Object.entries(params.row);
+      await arr.forEach((element: any, index: number) => {
+        const _title = getMasterExpenInto(element[0])?.accountNameTh || 'Field';
+        const item: payLoadAdd = {
+          id: index,
+          key: element[0],
+          value: element[1],
+          title: _title,
+        };
+        listPayload.push(item);
+      });
+      sessionStorage.setItem('ADD_NEW_ITEM', 'F');
+      await setActionEdit(true);
+      await setPayloadAdd(listPayload);
+      setOpenModalAddExpense(true);
+    }
   };
   const OnCloseAddExpense = () => {
     setOpenModalAddExpense(false);

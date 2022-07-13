@@ -10,9 +10,10 @@ import { addNewItem, updateItemRows } from '../../../store/slices/accounting/acc
 import LoadingModal from '../../commons/ui/loading-modal';
 import userEvent from '@testing-library/user-event';
 import { setInit } from '../../../store/sessionStore';
-import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
+import { isFilterFieldInExpense, isFilterOutFieldInAdd, stringNullOrEmpty } from '../../../utils/utils';
 import moment from 'moment';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
+import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 
 interface Props {
   open: boolean;
@@ -49,17 +50,22 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
 
   const handleSaveBtn = async () => {
     setOpenLoadingModal(true);
-
+    console.log(testList);
     if (edit) {
       let data: any;
       let sum: number = 0;
+      let _otherSum: number = 0;
       testList.map((e: any) => {
         data = { ...data, [e.key]: e.value };
         if (!isFilterFieldInExpense(e.key)) {
           sum += e.value;
         }
+        if (!isFilterFieldInExpense(e.key) && isOtherExpenseField(e.key)) {
+          _otherSum += e.value;
+        }
       });
-      data = { ...data, total: sum };
+
+      data = { ...data, total: sum, otherSum: _otherSum };
       await dispatch(addNewItem(data));
     } else {
       const data = {
@@ -126,10 +132,15 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     setFlagEdit(false);
   }, [flagEdit === true]);
   const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const isOtherExpenseField = (key: any) => {
+    const master = getMasterExpenInto(key);
+    return master?.isOtherExpense;
+  };
 
   return (
     <div>
       <Dialog open={open} maxWidth='md' fullWidth={true} key='modal-add-expense'>
+        <BootstrapDialogTitle id='dialog-title' onClose={onClose} />
         <DialogContent>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={3}>
@@ -205,7 +216,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                           </Grid>
                           <Grid item xs={2}>
                             <TextField
-                              id='txtDocNo'
+                              id={i.expenseNo}
                               name={i.expenseNo}
                               size='small'
                               type='number'
@@ -227,7 +238,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
               <>
                 <Grid container spacing={2} mb={2} mt={2}>
                   {testList
-                    .filter((i: payLoadAdd) => !isFilterFieldInExpense(i.key))
+                    .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && !isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
                       return (
                         <>
@@ -272,20 +283,20 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                 </Grid>
 
                 <Grid container spacing={2} mb={2} mt={2}>
-                  {expenseMasterList
-                    .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
-                    .map((i: ExpenseInfo) => {
+                  {testList
+                    .filter((i: payLoadAdd) => !isFilterFieldInExpense(i.key) && isOtherExpenseField(i.key))
+                    .map((i: payLoadAdd) => {
                       return (
                         <>
                           <Grid item xs={2}>
-                            <Typography variant='body2'>{i.accountNameTh}: </Typography>
+                            <Typography variant='body2'>{i.title}: </Typography>
                           </Grid>
                           <Grid item xs={2}>
                             <TextField
-                              id='txtDocNo'
-                              name={i.expenseNo}
+                              id={i.key}
+                              name={i.key}
                               size='small'
-                              // value=''
+                              value={i.value}
                               onKeyUp={handleOnChange}
                               className={classes.MtextField}
                               fullWidth

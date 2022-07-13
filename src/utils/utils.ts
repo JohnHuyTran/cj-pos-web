@@ -159,3 +159,7 @@ export const isToteNo = (value: string) => {
 export const isFilterFieldInExpense = (value: string) => {
   return value === 'date' || value === 'total' || value === 'id' || value === 'description';
 };
+
+export const isFilterOutFieldInAdd = (value: string) => {
+  return value === 'date' || value === 'total' || value === 'id' || value === 'description' || value === 'otherSum';
+};

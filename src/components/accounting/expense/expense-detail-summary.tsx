@@ -11,6 +11,7 @@ import {
 import { updateSummaryRows } from '../../../store/slices/accounting/accounting-slice';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
+import { STATUS } from '../../../utils/enum/accounting-enum';
 import { isFilterFieldInExpense } from '../../../utils/utils';
 import ExpenseDetailTransaction from './expense-detail-transaction';
 import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
@@ -26,6 +27,9 @@ function ExpenseDetailSummary({ type }: Props) {
 
   const [expenseType, setExpenseType] = React.useState('');
   const [pageSize, setPageSize] = React.useState<number>(10);
+  const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
+  const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
+  const status = expenseData && expenseData.status ? expenseData.status : '';
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
   const summaryRows = useAppSelector((state) => state.expenseAccountDetailSlice.summaryRows);
   const payloadAddSummaryItem = useAppSelector((state) => state.expenseAccountDetailSlice.addSummaryItem);
@@ -84,6 +88,19 @@ function ExpenseDetailSummary({ type }: Props) {
       accountCode: '',
       typeNameTh: '',
     };
+    const headerOtherSum: ExpenseInfo = {
+      accountNameTh: 'อื่นๆ',
+      skuCode: '',
+      approvalLimit1: 0,
+      approvalLimit2: 0,
+      isActive: true,
+      requiredDocumentTh: '',
+      expenseNo: 'otherSum',
+      isOtherExpense: false,
+      typeCode: '',
+      accountCode: '',
+      typeNameTh: '',
+    };
     const headerSum: ExpenseInfo = {
       accountNameTh: 'รวม',
       skuCode: '',
@@ -104,14 +121,14 @@ function ExpenseDetailSummary({ type }: Props) {
       .map((i: ExpenseInfo) => {
         _newExpenseAllList.push(i);
       });
-
+    _newExpenseAllList.push(headerOtherSum);
     _newExpenseAllList.push(headerSum);
     setNewExpenseAllList(_newExpenseAllList);
   }, [expenseType]);
 
   const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const currentlySelected = async (params: GridCellParams) => {
-    if (params.id === 1) {
+    if (params.id === 2 && status === STATUS.WAITTING_ACCOUNTING) {
       let listPayload: payLoadAdd[] = [];
       const arr = Object.entries(params.row);
       await arr.forEach((element: any, index: number) => {

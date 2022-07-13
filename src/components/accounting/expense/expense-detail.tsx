@@ -504,11 +504,26 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       });
       totalDiff = Number(totalWithDraw) - Number(totalApprove);
 
-      rows = [
-        { ...infosWithDraw, total: totalWithDraw },
-        { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove },
-        { ...infoDiff, total: isNaN(totalDiff) ? 0 : totalDiff },
-      ];
+      if (status === STATUS.DRAFT) {
+        rows = [{ ...infosWithDraw, total: totalWithDraw }];
+      } else if (status === STATUS.WAITTING_APPROVAL1) {
+        rows = [
+          { ...infosWithDraw, total: totalWithDraw },
+          { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove },
+        ];
+      } else if (status === STATUS.WAITTING_APPROVAL2) {
+        rows = [
+          { ...infosWithDraw, total: totalWithDraw },
+          { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove },
+          { ...infoDiff, total: isNaN(totalDiff) ? 0 : totalDiff },
+        ];
+      }
+
+      // rows = [
+      //   showWithDraw && { ...infosWithDraw, total: totalWithDraw },
+      //   showApprove && { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove },
+      //   showDiff && { ...infoDiff, total: isNaN(totalDiff) ? 0 : totalDiff },
+      // ];
       dispatch(updateSummaryRows(rows));
     }
   }
