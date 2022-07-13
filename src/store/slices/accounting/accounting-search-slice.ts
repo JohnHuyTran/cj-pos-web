@@ -32,8 +32,14 @@ async (payload: ExpenseSearchRequest) => {
   try {
     const apiRootPath = environment.branchAccounting.expense.search.url;
     let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}&type=${payload.type}`+
-    `&branchCode=${payload.branchCode}&status=${payload.status}&month=${payload.month}&year=${payload.year}`;
+    `&month=${payload.month}&year=${payload.year}`;
     
+    if (payload.branchCode !== "") {
+      path = `${path}&branchCode=${payload.branchCode}`;
+    }
+    if (payload.status !== "ALL") {
+      path = `${path}&status=${payload.status}`;
+    }
     if (payload.period !== 0) {
       path = `${path}&period=${payload.period}`;
     }
