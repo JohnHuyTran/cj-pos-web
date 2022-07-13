@@ -37,21 +37,22 @@ export default function Expense() {
     // await dispatch(updateItemRows([]));
   };
   return (
-    <Container maxWidth='xl'>
+    <Container maxWidth="xl">
       <TitleHeader title={t('documentSearch')} />
 
       <Button
-        data-testid='testid-btnSendToDC'
-        id='btnSendToDC'
-        variant='contained'
-        color='error'
+        data-testid="testid-btnSendToDC"
+        id="btnSendToDC"
+        variant="contained"
+        color="error"
         className={classes.MbtnSendDC}
         onClick={onOpenNew}
-        sx={{ width: 140 }}>
+        sx={{ width: 140 }}
+      >
         OpenNew
       </Button>
       <Box mt={3}>
-        <ExpenseDetail isOpen={open} onClickClose={onClose} type={'COFFEE'} edit={edit} periodProps={periodMockData} />
+        <ExpenseDetail isOpen={open} onClickClose={onClose} type={''} edit={edit} periodProps={periodMockData} />
       </Box>
 
       <Box mt={3}>

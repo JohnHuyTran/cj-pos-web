@@ -125,3 +125,7 @@ export const getPathExpense = (docNo: string, path: string) => {
 export const getPathExpenseDetail = (docNo: string, path: string) => {
   return getPathUrl(`${path}`, { docNo: docNo });
 };
+
+export const getPathExpensePeriodType = (type: string, path: string) => {
+  return getPathUrl(`${path}`, { type: type });
+};

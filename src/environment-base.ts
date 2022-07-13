@@ -524,6 +524,9 @@ export const environment = {
           url: '/expense/reject3/{docNo}',
         },
       },
+      periodType: {
+        url: 'accounting/expense-period/{type}',
+      },
     },
   },
 };

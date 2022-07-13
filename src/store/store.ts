@@ -83,6 +83,7 @@ import masterExpenseListSlice from './slices/master/expense-list-slice';
 import expenseAccountDetailSlice from './slices/accounting/accounting-slice';
 import expenseDetailSlice from './slices/accounting/accounting-detail-slice';
 import searchBranchAccountingSlice from './slices/accounting/accounting-search-slice'; //mock
+import expensePeriodTypeSlice from './slices/accounting/accounting-period-type-slice';
 
 const store = configureStore({
   reducer: {
@@ -169,6 +170,7 @@ const store = configureStore({
     expenseAccountDetailSlice: expenseAccountDetailSlice,
     searchBranchAccounting: searchBranchAccountingSlice,
     expenseDetail: expenseDetailSlice,
+    expensePeriodTypeSlice: expensePeriodTypeSlice,
   },
 });
 
