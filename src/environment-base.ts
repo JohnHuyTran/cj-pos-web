@@ -498,7 +498,7 @@ export const environment = {
       },
       approve: {
         branch: {
-          url: '/expense/submit/{docNo}',
+          url: 'accounting/expense/submit/{docNo}',
         },
         ocArea: {
           url: '',

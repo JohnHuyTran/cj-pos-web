@@ -61,6 +61,10 @@ export const stringNullOrEmpty = (value: any) => {
   return value === null || value === undefined || value === '' || value === 'Invalid date';
 };
 
+export const stringNumberNullOrEmpty = (value: any) => {
+  return value === null || value === undefined || value === '' || value === 'Invalid date' || value === 0;
+};
+
 export const objectNullOrEmpty = (object: any) => {
   if (object === undefined || object === null) {
     return true;
@@ -161,5 +165,12 @@ export const isFilterFieldInExpense = (value: string) => {
 };
 
 export const isFilterOutFieldInAdd = (value: string) => {
-  return value === 'date' || value === 'total' || value === 'id' || value === 'description' || value === 'otherSum';
+  return (
+    value === 'date' ||
+    value === 'total' ||
+    value === 'id' ||
+    value === 'description' ||
+    value === 'otherSum' ||
+    value === 'otherDetail'
+  );
 };

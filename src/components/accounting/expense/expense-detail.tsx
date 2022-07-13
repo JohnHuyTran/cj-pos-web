@@ -57,6 +57,7 @@ import moment from 'moment';
 import ModelConfirmDetail from './confirm/modal-confirm-detail';
 import AccordionUploadSingleFile from '../../commons/ui/accordion-upload-single-file';
 import TextBoxComment from '../../commons/ui/textbox-comment';
+import { Day } from '@material-ui/pickers';
 
 interface Props {
   isOpen: boolean;
@@ -199,7 +200,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     const payload: ExpenseSaveRequest = {
       comments: comment,
       docNo: docNo,
-      today: moment(new Date()).startOf('day').toISOString(),
+      today: moment(new Date().setDate(new Date().getDate() + 5))
+        .startOf('day')
+        .toISOString(),
     };
     await expenseApproveByBranch(payload, fileUploadList)
       .then(async (value) => {
@@ -425,7 +428,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             variant='contained'
             color='primary'
             className={classes.MbtnSendDC}
-            onClick={handleApproveBtn}
+            onClick={() => {
+              onApproveByBranch('test');
+            }}
             startIcon={<CheckCircleOutline />}
             sx={{ width: 140 }}
             disabled={docNo ? false : true}>
@@ -561,7 +566,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setExpenseTypeName(
         expenseData.type === EXPENSE_TYPE.COFFEE
           ? 'รายละเอียดเอกสารค่าใช้จ่ายร้านกาแฟ'
-          : EXPENSE_TYPE.STOREFRONT === 'STOREFRONT'
+          : expenseData.type === EXPENSE_TYPE.STOREFRONT
           ? 'รายละเอียดเอกสารค่าใช้จ่ายหน้าร้าน'
           : 'รายละเอียดเอกสาร'
       );
@@ -591,9 +596,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setPeriod(periodProps);
       setExpenseType(type);
       setExpenseTypeName(
-        expenseType === EXPENSE_TYPE.COFFEE
+        type === EXPENSE_TYPE.COFFEE
           ? 'รายละเอียดเอกสารค่าใช้จ่ายร้านกาแฟ'
-          : EXPENSE_TYPE.STOREFRONT === 'STOREFRONT'
+          : type === EXPENSE_TYPE.STOREFRONT
           ? 'รายละเอียดเอกสารค่าใช้จ่ายหน้าร้าน'
           : 'รายละเอียดเอกสาร'
       );

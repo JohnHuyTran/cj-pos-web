@@ -24,7 +24,7 @@ export async function expenseApproveByBranch(payload: ExpenseSaveRequest, files:
   files.map((file: File) => {
     return bodyFormData.append('file[]', file);
   });
-  const response = await put(
+  const response = await post(
     getPathExpense(payload.docNo || '', environment.branchAccounting.expense.approve.branch.url),
     bodyFormData,
     ContentType.MULTIPART

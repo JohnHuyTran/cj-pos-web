@@ -10,7 +10,12 @@ import { addNewItem, updateItemRows } from '../../../store/slices/accounting/acc
 import LoadingModal from '../../commons/ui/loading-modal';
 import userEvent from '@testing-library/user-event';
 import { setInit } from '../../../store/sessionStore';
-import { isFilterFieldInExpense, isFilterOutFieldInAdd, stringNullOrEmpty } from '../../../utils/utils';
+import {
+  isFilterFieldInExpense,
+  isFilterOutFieldInAdd,
+  stringNullOrEmpty,
+  stringNumberNullOrEmpty,
+} from '../../../utils/utils';
 import moment from 'moment';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
@@ -50,29 +55,52 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
 
   const handleSaveBtn = async () => {
     setOpenLoadingModal(true);
-    console.log(testList);
     if (edit) {
       let data: any;
       let sum: number = 0;
       let _otherSum: number = 0;
+      let _otherDetail: string = '';
       testList.map((e: any) => {
         data = { ...data, [e.key]: e.value };
-        if (!isFilterFieldInExpense(e.key)) {
+        if (!isFilterOutFieldInAdd(e.key)) {
           sum += e.value;
         }
         if (!isFilterFieldInExpense(e.key) && isOtherExpenseField(e.key)) {
           _otherSum += e.value;
+          if (!stringNumberNullOrEmpty(e.value)) {
+            _otherDetail += `${getOterExpenseName(e.key)},`;
+          }
         }
       });
 
-      data = { ...data, total: sum, otherSum: _otherSum };
+      data = { ...data, total: sum, otherSum: _otherSum, otherDetail: _otherDetail };
       await dispatch(addNewItem(data));
     } else {
+      console.log(values);
+      let _otherSum: number = 0;
+      let _otherDetail: string = '';
+      const arr = Object.entries(values);
+      expenseMasterList
+        .filter((e: ExpenseInfo) => e.isActive && e.typeCode === expenseType)
+        .map((e: ExpenseInfo) => {
+          // values.[e.expenseNo]
+        });
+
+      arr.map((element: any) => {
+        if (!isFilterFieldInExpense(element[0]) && isOtherExpenseField(element[0])) {
+          _otherSum += element[1];
+          if (!stringNumberNullOrEmpty(element[1])) {
+            _otherDetail += `${getOterExpenseName(element[0])},`;
+          }
+        }
+      });
       const data = {
         ...values,
         id: uuidv4(),
         total: sum(values),
         date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
+        otherSum: _otherSum,
+        otherDetail: _otherDetail,
       };
       await dispatch(addNewItem(data));
     }
@@ -135,6 +163,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   const isOtherExpenseField = (key: any) => {
     const master = getMasterExpenInto(key);
     return master?.isOtherExpense;
+  };
+  const getOterExpenseName = (key: any) => {
+    return getMasterExpenInto(key)?.accountNameTh;
   };
 
   return (
@@ -284,7 +315,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
 
                 <Grid container spacing={2} mb={2} mt={2}>
                   {testList
-                    .filter((i: payLoadAdd) => !isFilterFieldInExpense(i.key) && isOtherExpenseField(i.key))
+                    .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
                       return (
                         <>
@@ -297,7 +328,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               name={i.key}
                               size='small'
                               value={i.value}
-                              onKeyUp={handleOnChange}
+                              onChange={(event) => handleChangeNew(event.target.value, i.key)}
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
