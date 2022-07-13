@@ -5,6 +5,12 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import ExpenseSearchList from './expense-search-list';
 import ModelConfirmSearch from './confirm/modal-confirm-search';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import ModalSelectPeriod from '../expense/modal-select-period';
+import {
+  clearDataExpensePeriod,
+  featchExpensePeriodTypeAsync,
+} from '../../../store/slices/accounting/accounting-period-type-slice';
 
 function expenseSearch(): ReactElement {
   const classes = useStyles();
@@ -26,7 +32,7 @@ function expenseSearch(): ReactElement {
   if (flagSearch && orderListDatas.length > 0 && flagBtnApproveAll) setFlagBtnApproveAll(false);
 
   const onClickSearchBtn = async () => {
-    await dispatch(featchBranchAccountingListAsync());
+    // await dispatch(featchBranchAccountingListAsync());
     setFlagSearch(true);
   };
 
@@ -43,6 +49,22 @@ function expenseSearch(): ReactElement {
     console.log('handleConfirm');
     console.log('periodData:', periodData);
   };
+
+  const [openSelectPeriod, setOpenSelectPeriod] = useState(false);
+  const [types, setType] = useState('');
+  const handleOpenSelectPeriodModal = async (type: string) => {
+    setType(type);
+    await dispatch(clearDataExpensePeriod());
+    await dispatch(featchExpensePeriodTypeAsync(type));
+    setOpenSelectPeriod(true);
+  };
+  const handleCloseSelectPeriodModal = async () => {
+    setOpenSelectPeriod(false);
+  };
+
+  // useEffect(() => {
+  //
+  // }, []);
 
   return (
     <>
@@ -71,6 +93,28 @@ function expenseSearch(): ReactElement {
             </Button>
           </Grid>
           <Grid item xs={7} sx={{ textAlign: 'end' }}>
+            <Button
+              id='btnCreateStockTransferModal'
+              variant='contained'
+              onClick={() => handleOpenSelectPeriodModal('COFFEE')}
+              sx={{ minWidth: '15%' }}
+              className={classes.MbtnSearch}
+              startIcon={<AddCircleOutlineOutlinedIcon />}
+              color='secondary'>
+              ค่าใช้จ่ายร้านกาแฟ
+            </Button>
+
+            <Button
+              id='btnCreateStockTransferModal'
+              variant='contained'
+              onClick={() => handleOpenSelectPeriodModal('STOREFRONT')}
+              sx={{ minWidth: '15%', ml: 2 }}
+              className={classes.MbtnSearch}
+              startIcon={<AddCircleOutlineOutlinedIcon />}
+              color='warning'>
+              ค่าใช้จ่ายหน้าร้าน
+            </Button>
+
             <Button
               id='btnSearch'
               variant='contained'
@@ -104,6 +148,8 @@ function expenseSearch(): ReactElement {
         startDate='2022-06-16T00:00:00+07:00'
         endDate='2022-06-30T23:59:59.999999999+07:00'
       />
+
+      <ModalSelectPeriod open={openSelectPeriod} onClose={handleCloseSelectPeriodModal} type={types} />
     </>
   );
 }

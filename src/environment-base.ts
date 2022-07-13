@@ -490,6 +490,9 @@ export const environment = {
   },
   branchAccounting: {
     expense: {
+      search: {
+        url: 'accounting/expense',
+      },
       save: {
         url: 'accounting/expense',
       },
@@ -520,6 +523,9 @@ export const environment = {
         accountManager: {
           url: '',
         },
+      },
+      periodType: {
+        url: 'accounting/expense-period/{type}',
       },
     },
   },
