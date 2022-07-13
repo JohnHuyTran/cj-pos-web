@@ -37,9 +37,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
 
   const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
   const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
-  const status = expenseData && expenseData.status ? expenseData.status : '';
-  const summary: SumItems = expenseData ? expenseData.sumItems : null;
-  const initItems: DataItem[] = expenseData ? expenseData.items : [];
+  const status = expenseData && expenseData.status ? expenseData.status : 'NEW';
 
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
   const _initialItems = useAppSelector((state) => state.expenseAccountDetailSlice.intialRows);
@@ -178,7 +176,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
     _newExpenseAllList.push(headerDescription);
 
     expenseMasterList
-      .filter((i: ExpenseInfo) => i.isActive && i.typeCode === 'COFFEE')
+      .filter((i: ExpenseInfo) => i.isActive && i.typeCode === expenseType)
       .map((i: ExpenseInfo) => {
         _newExpenseAllList.push(i);
       });
@@ -207,8 +205,9 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
     // }
   }, [expenseType]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     setPeriod(periodProps);
+    setExpenseType(type);
   }, [periodProps]);
 
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -328,7 +327,8 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
 
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const currentlySelected = async (params: GridCellParams) => {
-    if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) {
+    console.log('status: ', status);
+    if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT || status === 'NEW') {
       const value = params;
       let listPayload: payLoadAdd[] = [];
       const arr = Object.entries(params.row);

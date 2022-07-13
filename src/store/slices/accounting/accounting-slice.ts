@@ -46,8 +46,13 @@ const expenseAccountDetailSlice = createSlice({
   name: 'ExpenseDetail',
   initialState,
   reducers: {
-    updateToInitialState: () => {
-      initialState;
+    updateToInitialState: (state) => {
+      state.expenseAccountDetail = {
+        ref: '',
+        code: 0,
+        message: '',
+        data: null,
+      };
     },
     initialItems: (state, action: PayloadAction<any>) => {
       state.intialRows = action.payload;

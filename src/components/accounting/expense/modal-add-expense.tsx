@@ -76,14 +76,17 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
       data = { ...data, total: sum, SUMOTHER: _otherSum, otherDetail: _otherDetail };
       await dispatch(addNewItem(data));
     } else {
-      console.log(values);
+      let allItem = {};
       let _otherSum: number = 0;
       let _otherDetail: string = '';
       const arr = Object.entries(values);
       expenseMasterList
         .filter((e: ExpenseInfo) => e.isActive && e.typeCode === expenseType)
         .map((e: ExpenseInfo) => {
-          // values.[e.expenseNo]
+          allItem = {
+            ...allItem,
+            [e.expenseNo]: Number(0),
+          };
         });
 
       arr.map((element: any) => {
@@ -94,8 +97,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           }
         }
       });
-      const data = {
+      allItem = {
+        ...allItem,
         ...values,
+      };
+      const data = {
+        ...allItem,
         id: uuidv4(),
         total: sum(values),
         date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),

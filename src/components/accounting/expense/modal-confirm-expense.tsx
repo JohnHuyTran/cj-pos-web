@@ -24,6 +24,7 @@ interface ModalConfirmExpenseProps {
     period: string;
     sumWithdrawAmount: string;
   };
+  onClose: () => void;
   onCallBackFunction: (value: any) => void;
   approve: boolean; // flag show label
   showForward?: boolean; // show dropdown resend
@@ -40,6 +41,7 @@ export default function ModalConfirmExpense({
   open,
   details,
   approve,
+  onClose,
   onCallBackFunction,
   showForward,
   showReason,
@@ -73,16 +75,15 @@ export default function ModalConfirmExpense({
     if (!isForwardValidate && !isReasonValidate) {
       setIsError(false);
       setIsOpenLoading(true);
-      setTimeout(() => {
-        setIsOpenLoading(false);
-        onCloseModal();
-      }, 500);
+      onCallBackFunction({ forward, reason });
+      setIsOpenLoading(false);
+      onCloseModal();
     }
   };
 
   // Clear state when close modal.
   const onCloseModal = () => {
-    onCallBackFunction({ forward, reason });
+    onClose();
     setForward('');
     setReason('');
     setIsError(false);

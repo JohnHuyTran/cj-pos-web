@@ -27,7 +27,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   const _ = require('lodash');
   const dispatch = useAppDispatch();
 
-  const [expenseType, setExpenseType] = React.useState('');
+  const [expenseType, setExpenseType] = React.useState(type);
   const [period, setPeriod] = React.useState<ExpensePeriod>({
     period: 0,
     startDate: '',
@@ -135,10 +135,11 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
     _newExpenseAllList.push(headerOtherSum);
     _newExpenseAllList.push(headerSum);
     setNewExpenseAllList(_newExpenseAllList);
-  }, [expenseType]);
+  }, [expenseType, type]);
 
   React.useEffect(() => {
     setPeriod(periodProps);
+    setExpenseType(type);
   }, [periodProps]);
 
   const currentlySelected = async (params: GridCellParams) => {
@@ -179,7 +180,6 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
       const summary: SumItems = expenseData ? expenseData.sumItems : null;
       const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
       entries.map((entrie: SumItemsItem, i: number) => {
-        console.log(entrie);
         infosWithDraw = {
           ...infosWithDraw,
 

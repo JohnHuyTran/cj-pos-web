@@ -31,6 +31,7 @@ import {
 } from '../../../models/branch-accounting-model';
 import {
   addNewItem,
+  featchExpenseDetailAsync,
   initialItems,
   updateItemRows,
   updateSummaryRows,
@@ -198,9 +199,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('บันทึก เรียบร้อยแล้ว');
+        setDocNo(value.docNo);
+
+        await dispatch(featchExpenseDetailAsync(value.docNo));
         setTimeout(() => {
           setOpen(false);
-          onClickClose();
+          // onClickClose();
         }, 500);
       })
       .catch((error: ApiError) => {
@@ -211,7 +215,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
   const onApproveByBranch = async (comment: string) => {
     const payload: ExpenseSaveRequest = {
-      comments: comment,
+      comment: comment,
       docNo: docNo,
       today: moment(new Date().setDate(new Date().getDate() + 5))
         .startOf('day')
@@ -255,7 +259,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const onRejectByAreaMangerOC = async (comment: string) => {
     const payload: ExpenseSaveRequest = {
       docNo: docNo,
-      comments: comment,
+      comment: comment,
     };
     await expenseRejectByOC(payload)
       .then(async (value) => {
@@ -276,7 +280,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const onApproveByAccount = async () => {
     const payload: ExpenseSaveRequest = {
       docNo: docNo,
-      comments: comment,
+      comment: comment,
     };
     await expenseApproveByAccount(payload)
       .then(async (value) => {
@@ -296,7 +300,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const onRejectByAccount = async (returnto: string, comment: string) => {
     const payload: ExpenseSaveRequest = {
       docNo: docNo,
-      comments: comment,
+      comment: comment,
       returnTo: returnto,
     };
     await expenseRejectByOC(payload)
@@ -338,7 +342,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
   const onRejectByAccountManager = async (comment: string) => {
     const payload: ExpenseSaveRequest = {
-      comments: comment,
+      comment: comment,
     };
     await expenseRejectByAccountManager(payload)
       .then(async (value) => {
@@ -361,32 +365,67 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [showForward, setShowForward] = React.useState<boolean>(false); // show dropdown resend
   const [showReason, setShowReason] = React.useState<boolean>(false); // show comment
   const [validateReason, setValidateReason] = React.useState<boolean>(false);
+
   const handleApproveBtn = () => {
     setIsApprove(true);
     if (status === STATUS.DRAFT) {
       const isFileValidate: boolean = validateFileInfo();
       if (isFileValidate) {
-        callbackFunction = onApproveByBranch;
         setIsOpenModelConfirmExpense(true);
         setShowReason(true);
       }
-    } else if (status === STATUS.WAITTING_APPROVAL1) {
-      callbackFunction = onApproveByAreaMangerOC;
-    } else if (status === STATUS.WAITTING_APPROVAL2) {
-      callbackFunction = onApproveByAccount;
-    } else if (status === STATUS.WAITTING_ACCOUNTING) {
-      callbackFunction = onApproveByAccountManager;
+    } else {
+      if (status === STATUS.WAITTING_APPROVAL1) {
+        setShowReason(false);
+        setIsOpenModelConfirmExpense(true);
+      } else if (status === STATUS.WAITTING_APPROVAL2) {
+        setOpenModelConfirm(true);
+      } else if (status === STATUS.WAITTING_ACCOUNTING) {
+        setOpenModelConfirm(true);
+      }
+    }
+  };
+
+  const onCallbackFunction = (value: any) => {
+    console.log(value);
+    console.log(isApprove);
+    if (isApprove) {
+      if (status === STATUS.DRAFT) {
+        onApproveByBranch(value.reason);
+      } else if (status === STATUS.WAITTING_APPROVAL1) {
+        onApproveByAreaMangerOC();
+      } else if (status === STATUS.WAITTING_APPROVAL2) {
+        onApproveByAccount();
+      } else if (status === STATUS.WAITTING_ACCOUNTING) {
+        onApproveByAccountManager(value.expenDate, value.approveDate);
+      }
+    } else {
+      if (status === STATUS.WAITTING_APPROVAL1) {
+        onRejectByAreaMangerOC(value.reason);
+      } else if (status === STATUS.WAITTING_APPROVAL2) {
+        //call confirm nun
+      } else if (status === STATUS.WAITTING_ACCOUNTING) {
+        //call confirm nun
+      }
     }
   };
 
   const handleRejectBtn = () => {
     setIsApprove(false);
+
     if (status === STATUS.WAITTING_APPROVAL1) {
-      callbackFunction = onRejectByAreaMangerOC;
+      setIsOpenModelConfirmExpense(true);
+      setShowReason(true);
+      setValidateReason(true);
     } else if (status === STATUS.WAITTING_APPROVAL2) {
-      callbackFunction = onRejectByAccount;
+      setShowReason(true);
+      setValidateReason(true);
+      setShowForward(true);
+      setIsOpenModelConfirmExpense(true);
     } else if (status === STATUS.WAITTING_ACCOUNTING) {
-      callbackFunction = onRejectByAccountManager;
+      setValidateReason(true);
+      setShowForward(true);
+      setIsOpenModelConfirmExpense(true);
     }
   };
 
@@ -451,9 +490,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             variant='contained'
             color='primary'
             className={classes.MbtnSendDC}
-            onClick={() => {
-              handleApproveBtn;
-            }}
+            onClick={handleApproveBtn}
             startIcon={<CheckCircleOutline />}
             sx={{ width: 140 }}
             disabled={docNo ? false : true}>
@@ -565,36 +602,36 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       // ];
       dispatch(updateSummaryRows(rows));
     }
-  }
 
-  if (_items && _items.length > 0) {
-    let _otherSum: number = 0;
-    let _otherDetail: string = '';
-    const itemRows = items.map((item: DataItem, index: number) => {
-      const list: ItemItem[] = item.items;
-      let newItem: any;
-      list.map((data: ItemItem) => {
-        newItem = {
-          ...newItem,
-          [data.expenseNo]: data.amount,
-        };
-        if (!isFilterFieldInExpense(data.expenseNo) && isOtherExpenseField(data.expenseNo)) {
-          _otherSum += Number(data.amount);
-          if (!stringNumberNullOrEmpty(data.amount)) {
-            _otherDetail += `${getOtherExpenseName(data.expenseNo)},`;
+    if (_items && _items.length > 0) {
+      let _otherSum: number = 0;
+      let _otherDetail: string = '';
+      const itemRows = items.map((item: DataItem, index: number) => {
+        const list: ItemItem[] = item.items;
+        let newItem: any;
+        list.map((data: ItemItem) => {
+          newItem = {
+            ...newItem,
+            [data.expenseNo]: data.amount,
+          };
+          if (!isFilterFieldInExpense(data.expenseNo) && isOtherExpenseField(data.expenseNo)) {
+            _otherSum += Number(data.amount);
+            if (!stringNumberNullOrEmpty(data.amount)) {
+              _otherDetail += `${getOtherExpenseName(data.expenseNo)},`;
+            }
           }
-        }
+        });
+        return {
+          id: uuidv4(),
+          date: convertUtcToBkkDate(moment(item.expenseDate).startOf('day').toISOString()),
+          total: item.totalAmount,
+          SUMOTHER: _otherSum,
+          otherDetail: _otherDetail,
+          ...newItem,
+        };
       });
-      return {
-        id: uuidv4(),
-        date: convertUtcToBkkDate(moment(item.expenseDate).startOf('day').toISOString()),
-        total: item.totalAmount,
-        SUMOTHER: _otherSum,
-        otherDetail: _otherDetail,
-        ...newItem,
-      };
-    });
-    dispatch(initialItems(itemRows));
+      dispatch(initialItems(itemRows));
+    }
   }
 
   useEffect(() => {
@@ -637,7 +674,15 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       const startDate = convertUtcToBkkDate(periodProps && periodProps.startDate ? periodProps.startDate : '');
       const endDate = convertUtcToBkkDate(periodProps && periodProps.endDate ? periodProps.endDate : '');
       setPeriodLabel(`${startDate}-${endDate}`);
-      setPeriod(periodProps);
+      setPeriod(
+        periodProps
+          ? periodProps
+          : {
+              period: 0,
+              startDate: '',
+              endDate: '',
+            }
+      );
       setExpenseType(type);
       setExpenseTypeName(
         type === EXPENSE_TYPE.COFFEE
@@ -824,27 +869,23 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         endDate='2022-06-30T23:59:59.999999999+07:00'
       />
 
-      {isOpenModelConfirmExpense && (
-        <ModalConfirmExpense
-          open={isOpenModelConfirmExpense}
-          details={{
-            docNo: docNo ? docNo : '',
-            type: expenseTypeName,
-            period: periodLabel,
-            sumWithdrawAmount: '',
-          }}
-          onCallBackFunction={callbackFunction}
-          approve={isApprove}
-          showForward={showForward}
-          showReason={showReason}
-          validateReason={validateReason}
-        />
-      )}
+      <ModalConfirmExpense
+        open={isOpenModelConfirmExpense}
+        details={{
+          docNo: docNo ? docNo : '',
+          type: expenseTypeName,
+          period: periodLabel,
+          sumWithdrawAmount: '',
+        }}
+        onCallBackFunction={onCallbackFunction}
+        approve={isApprove}
+        showForward={showForward}
+        showReason={showReason}
+        validateReason={validateReason}
+        onClose={() => setIsOpenModelConfirmExpense(false)}
+      />
     </React.Fragment>
   );
 }
 
 export default ExpenseDetail;
-function isOtherExpenseField(expenseN: any) {
-  throw new Error('Function not implemented.');
-}
