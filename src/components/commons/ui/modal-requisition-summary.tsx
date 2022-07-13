@@ -231,7 +231,7 @@ export default function RequisitionSummary({ isOpen, onClickClose, branchSelecte
           <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
             <Grid item xs={6}>
               <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-                วันที่ขอใช้วัตถุ ตั้งแต่ *
+              วันที่ขอใช้วัตถุดิบ ตั้งแต่ *
               </Typography>
               <DatePickerComponent
                 error={checkValue.fromDateError}
