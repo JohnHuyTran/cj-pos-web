@@ -327,7 +327,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
 
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const currentlySelected = async (params: GridCellParams) => {
-    console.log('status: ', status);
     if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT || status === 'NEW') {
       const value = params;
       let listPayload: payLoadAdd[] = [];

@@ -141,24 +141,62 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   };
   const handleOnChange = (event: any) => {
     const value = Number(event.target.value);
-    const sum = Number(sumOther);
-    setSumOther(sum + value);
     setValues({ ...values, [event.target.name]: value });
+
+    const arr = Object.entries(values);
+    let _otherSum: number = 0;
+    arr.map((element: any) => {
+      if (!isFilterFieldInExpense(element[0]) && isOtherExpenseField(element[0])) {
+        _otherSum += element[1];
+      }
+    });
+    _otherSum += value;
+    setSumOther(_otherSum);
   };
 
   useEffect(() => {
     setTestList(payload);
     setExpenseType(type);
-  }, [open, edit]);
+    setValues({});
+    if (payload && edit) {
+      let _otherSum: number = 0;
+      payload
+        .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key))
+        .map((i: payLoadAdd) => {
+          _otherSum += Number(i.value);
+        });
+      setSumOther(_otherSum);
+    } else {
+      setSumOther(0);
+    }
+  }, [open, edit, payload]);
 
   const handleChangeNew = (value: any, name: any) => {
-    const data = stringNullOrEmpty(value) ? value : Number(value);
+    const data = stringNullOrEmpty(value) ? 0 : Number(value);
     testList.forEach((element: any) => {
       if (element.key === name) {
         element.value = data;
       }
     });
 
+    setFlagEdit(true);
+  };
+  const handleChangeNewOnOtherExpense = (value: any, name: any) => {
+    let _otherSum: number = 0;
+    const data = stringNullOrEmpty(value) ? 0 : Number(value);
+    testList.forEach((element: any) => {
+      if (element.key === name) {
+        element.value = data;
+      }
+      if (!isFilterFieldInExpense(element.key) && isOtherExpenseField(element.key)) {
+        if (element.key === name) {
+          _otherSum += Number(data);
+        } else {
+          _otherSum += element.value;
+        }
+      }
+    });
+    setSumOther(_otherSum);
     setFlagEdit(true);
   };
 
@@ -231,7 +269,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   </Grid>
                   <Grid item xs={3}>
                     <TextField
-                      id='txtDocNo'
+                      id='txbSumOther'
                       name='sumOther'
                       size='small'
                       value={sumOther}
@@ -336,7 +374,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               name={i.key}
                               size='small'
                               value={i.value}
-                              onChange={(event) => handleChangeNew(event.target.value, i.key)}
+                              onChange={(event) => handleChangeNewOnOtherExpense(event.target.value, i.key)}
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
