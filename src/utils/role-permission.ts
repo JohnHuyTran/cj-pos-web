@@ -257,7 +257,7 @@ const permission = {
       submenu: [SUBMENU.SALE_SALE_LIMIT, SUBMENU.EX_EXPENSE],
     },
   },
-  accounManager: {
+  accountManager: {
     menu: {
       mainmenu: [MAINMENU.EXPENSE],
       submenu: [SUBMENU.EX_EXPENSE],

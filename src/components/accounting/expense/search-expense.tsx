@@ -8,6 +8,7 @@ import {
   Button,
   CircularProgress,
   FormHelperText,
+  Box,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useStyles } from '../../../styles/makeTheme';
@@ -33,6 +34,7 @@ import {
   featchExpensePeriodTypeAsync,
 } from '../../../store/slices/accounting/accounting-period-type-slice';
 import ModalSelectPeriod from '../expense/modal-select-period';
+import ExpenseSearchList from './expense-search-list';
 
 interface FormSelectProps {
   title: string;
@@ -108,6 +110,12 @@ export default function SearchExpense() {
   const [branchFromCode, setBranchFromCode] = useState('');
   const [isOpenLoading, setIsOpenLoading] = useState(false);
 
+  const [flagSearch, setFlagSearch] = useState(false);
+  const items = useAppSelector((state) => state.searchBranchAccounting);
+  const orderListDatas = items.branchAccountingList.data ? items.branchAccountingList.data : [];
+  const [flagBtnApproveAll, setFlagBtnApproveAll] = useState(true);
+  // console.log('==========> orderListDatas:', JSON.stringify(orderListDatas));
+
   // Lifecycle hooks
   useEffect(() => {
     if (groupBranch) {
@@ -142,8 +150,18 @@ export default function SearchExpense() {
   };
 
   const handleSearchExpense = async () => {
-    const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? false : true;
+    setFlagBtnApproveAll(true);
+    // const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? false : true;
+
+    const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? true : false;
     setIsValidate(true);
+
+    console.log('search.period:', search.period);
+    console.log('isAccountRole:', isAccountRole);
+    console.log('isAccountManagerRole:', isAccountManagerRole);
+    console.log('isPeriodValidate:', isPeriodValidate);
+    console.log('search.type:', search.type);
+
     if (search.type && isPeriodValidate) {
       setIsSearch(true);
       setIsOpenLoading(true);
@@ -153,12 +171,18 @@ export default function SearchExpense() {
         ...search,
         period: +search.period,
       };
+
+      // console.log('payload:', JSON.stringify(payload));
+
       await dispatch(featchBranchAccountingListAsync(payload)).then((res) => {
         setTimeout(() => {
           setIsValidate(false);
           setIsOpenLoading(false);
         }, 500);
       });
+
+      if (search.status === 'WAITTING_APPROVAL3') setFlagBtnApproveAll(false);
+      setFlagSearch(true);
     }
   };
 
@@ -180,12 +204,18 @@ export default function SearchExpense() {
     setOpenSelectPeriod(false);
   };
 
+  const [selectRowsList, setSelectRowsList] = useState<Array<any>>([]);
+  const handleSelectRows = async (list: any) => {
+    console.log('list:', JSON.stringify(list));
+    setSelectRowsList(list);
+  };
+
   return (
     <Fragment>
       <Grid container rowSpacing={1} columnSpacing={7}>
         <Grid item md={4} sm={4} xs={6}>
           <FormSelect
-            title="ประเภท"
+            title='ประเภท'
             dataList={expenseTypes}
             value={search.type}
             isDisabled={isOpenLoading}
@@ -194,7 +224,7 @@ export default function SearchExpense() {
           />
         </Grid>
         <Grid item md={4} sm={4} xs={6}>
-          <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+          <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
             สาขา
           </Typography>
           <BranchListDropDown
@@ -208,7 +238,7 @@ export default function SearchExpense() {
         </Grid>
         <Grid item md={4} sm={4} xs={6}>
           <FormSelect
-            title="สถานะ"
+            title='สถานะ'
             dataList={expenseStatusList}
             value={search.status}
             isValidate={isValidate}
@@ -217,7 +247,7 @@ export default function SearchExpense() {
           />
         </Grid>
         <Grid item md={4} sm={4} xs={6}>
-          <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+          <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
             เดือน
           </Typography>
           <DatePickerMonth
@@ -230,7 +260,7 @@ export default function SearchExpense() {
           (isAccountManagerRole && (
             <Grid item md={4} sm={4} xs={6}>
               <FormSelect
-                title="งวดเบิก"
+                title='งวดเบิก'
                 dataList={expensePeriodList}
                 value={search.period}
                 isValidate={isValidate}
@@ -245,44 +275,40 @@ export default function SearchExpense() {
           {isAccountManagerRole && (
             <Fragment>
               <Button
-                id="btnExport"
-                variant="contained"
-                color="primary"
+                id='btnExport'
+                variant='contained'
+                color='primary'
                 onClick={handleExport}
-                sx={{ width: '170.42px', mr: 2 }}
+                sx={{ width: 110, mr: 2 }}
                 startIcon={<Upload />}
                 className={classes.MbtnSearch}
-              >
+                disabled={true}>
                 EXPORT
               </Button>
-              {isSearch && !isValidate && (
-                <Fragment>
-                  <Button
-                    id="btnSearch"
-                    variant="contained"
-                    color="primary"
-                    onClick={handleApprove}
-                    sx={{ width: '170.42px', mr: 2 }}
-                    className={classes.MbtnSearch}
-                  >
-                    อนุมัติ
-                  </Button>
-                  <Button
-                    id="btnSearch"
-                    variant="contained"
-                    disabled={search.status !== 'WAITTING_APPROVAL3'}
-                    onClick={handleApproveAll}
-                    sx={{
-                      width: '170.42px',
-                      background: '#5468ff',
-                      ':hover': { boxShadow: 6, background: '#3e4cb8' },
-                    }}
-                    className={classes.MbtnSearch}
-                  >
-                    อนุมัติทั้งหมด
-                  </Button>
-                </Fragment>
-              )}
+              {/* {isSearch && !isValidate && ( */}
+              <Fragment>
+                <Button
+                  id='btnSearch'
+                  variant='contained'
+                  color='primary'
+                  onClick={handleApprove}
+                  sx={{ width: 110, mr: 2 }}
+                  className={classes.MbtnSearch}
+                  disabled={selectRowsList.length === 0 || orderListDatas.length === 0}>
+                  อนุมัติ
+                </Button>
+                <Button
+                  id='btnSearch'
+                  variant='contained'
+                  color='secondary'
+                  disabled={flagBtnApproveAll}
+                  onClick={handleApproveAll}
+                  sx={{ width: 110 }}
+                  className={classes.MbtnSearch}>
+                  อนุมัติทั้งหมด
+                </Button>
+              </Fragment>
+              {/* )} */}
             </Fragment>
           )}
         </Grid>
@@ -290,9 +316,9 @@ export default function SearchExpense() {
           {isBranchRole && (
             <Fragment>
               <Button
-                id="btnCoffee"
-                variant="contained"
-                color="primary"
+                id='btnCoffee'
+                variant='contained'
+                color='primary'
                 onClick={() => handleOpenSelectPeriodModal('COFFEE')}
                 startIcon={<AddCircleOutline />}
                 sx={{
@@ -301,48 +327,44 @@ export default function SearchExpense() {
                   background: '#5468ff',
                   ':hover': { boxShadow: 6, background: '#3e4cb8' },
                 }}
-                className={classes.MbtnSearch}
-              >
+                className={classes.MbtnSearch}>
                 ค่าใช้จ่ายร้านกาแฟ
               </Button>
               <Button
-                id="btnStorefront"
-                variant="contained"
-                color="warning"
+                id='btnStorefront'
+                variant='contained'
+                color='warning'
                 onClick={() => handleOpenSelectPeriodModal('STOREFRONT')}
                 sx={{ width: '170.42px', mr: 2 }}
                 startIcon={<AddCircleOutline />}
-                className={classes.MbtnSearch}
-              >
+                className={classes.MbtnSearch}>
                 ค่าใช้จ่ายหน้าร้าน
               </Button>
             </Fragment>
           )}
           <Button
-            id="btnClear"
-            variant="contained"
+            id='btnClear'
+            variant='contained'
             disabled={isOpenLoading}
             onClick={handleClearSearch}
             sx={{ width: '170.42px' }}
             className={classes.MbtnClear}
-            color="cancelColor"
-          >
+            color='cancelColor'>
             เคลียร์
           </Button>
           <LoadingButton
-            id="btnSearch"
-            variant="contained"
-            color="primary"
+            id='btnSearch'
+            variant='contained'
+            color='primary'
             onClick={handleSearchExpense}
             loading={isOpenLoading}
             loadingIndicator={
-              <Typography component="span" sx={{ fontSize: '11px' }}>
-                กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
+              <Typography component='span' sx={{ fontSize: '11px' }}>
+                กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
               </Typography>
             }
             sx={{ width: '170.42px', ml: 2 }}
-            className={classes.MbtnSearch}
-          >
+            className={classes.MbtnSearch}>
             ค้นหา
           </LoadingButton>
         </Grid>
@@ -350,6 +372,19 @@ export default function SearchExpense() {
 
       {openSelectPeriod && (
         <ModalSelectPeriod open={openSelectPeriod} onClose={handleCloseSelectPeriodModal} type={types} />
+      )}
+
+      {flagSearch && (
+        <div>
+          {orderListDatas.length > 0 && <ExpenseSearchList onSelectRows={handleSelectRows} />}
+          {orderListDatas.length === 0 && (
+            <Grid item container xs={12} justifyContent='center'>
+              <Box color='#CBD4DB'>
+                <h2>ไม่มีข้อมูล</h2>
+              </Box>
+            </Grid>
+          )}
+        </div>
       )}
     </Fragment>
   );
@@ -359,20 +394,19 @@ const FormSelect = ({ title, value, setValue, dataList, isValidate, isDisabled }
   const classes = useStyles();
   return (
     <Fragment>
-      <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+      <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
         {title}
       </Typography>
-      <FormControl id="SearchType" className={classes.Mselect} fullWidth error={value === '' && isValidate}>
+      <FormControl id='SearchType' className={classes.Mselect} fullWidth error={value === '' && isValidate}>
         <Select
-          id="type"
-          name="type"
+          id='type'
+          name='type'
           value={value}
           disabled={isDisabled}
           onChange={(e) => setValue(e)}
           displayEmpty
           renderValue={value !== '' ? undefined : () => <div style={{ color: '#CBD4DB' }}>{`กรุณาเลือก${title}`}</div>}
-          inputProps={{ 'aria-label': 'Without label' }}
-        >
+          inputProps={{ 'aria-label': 'Without label' }}>
           {dataList.map((item, index: number) => (
             <MenuItem key={index} value={item.key}>
               {item.text}

@@ -36,7 +36,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -50,7 +50,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
           {params.value}-{params.getValue(params.id, 'branchName') || ''}
         </Typography>
       </div>
@@ -101,7 +101,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
@@ -109,7 +109,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
@@ -228,8 +228,8 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
     };
   });
 
-  console.log('rows:', JSON.stringify(rows));
-  console.log('res.total:', JSON.stringify(res.total));
+  // console.log('rows:', JSON.stringify(rows));
+  // console.log('res.total:', JSON.stringify(res.total));
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -309,19 +309,19 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   };
 
   const handleSubmitRowSelect = async () => {
-    const rowSelect = apiRef.current.getSelectedRows();
+    // const rowSelect = apiRef.current.getSelectedRows();
     let rowSelectList: any = [];
-    rowSelect.forEach((data: GridRowData) => {
-      // rowSelectList.push(data.rtNo);
-      rowSelectList.push(data);
-    });
+    // rowSelect.forEach((data: GridRowData) => {
+    //   // rowSelectList.push(data.rtNo);
+    //   rowSelectList.push(data);
+    // });
 
     return onSelectRows(rowSelectList ? rowSelectList : []);
   };
 
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -334,14 +334,14 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
             rowHeight={65}
             pagination
             checkboxSelection={true}
-            isRowSelectable={(params: GridRowParams) => params.row.status === 'DRAFT'}
+            isRowSelectable={(params: GridRowParams) => params.row.status === 'WAITTING_APPROVAL3'}
             onSelectionModelChange={handleSubmitRowSelect}
             disableSelectionOnClick
           />
