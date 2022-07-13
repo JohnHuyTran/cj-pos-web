@@ -40,6 +40,7 @@ import {
   getBranchName,
   isFilterFieldInExpense,
   isFilterOutFieldInAdd,
+  numberWithCommas,
   objectNullOrEmpty,
   stringNullOrEmpty,
   stringNumberNullOrEmpty,
@@ -365,9 +366,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [showForward, setShowForward] = React.useState<boolean>(false); // show dropdown resend
   const [showReason, setShowReason] = React.useState<boolean>(false); // show comment
   const [validateReason, setValidateReason] = React.useState<boolean>(false);
-
+  const [sumWithdrawAmount, setSumWithdrawAmount] = React.useState('');
   const handleApproveBtn = () => {
     setIsApprove(true);
+    const summarys = store.getState().expenseAccountDetailSlice.summaryRows;
+    setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
     if (status === STATUS.DRAFT) {
       const isFileValidate: boolean = validateFileInfo();
       if (isFileValidate) {
@@ -387,8 +390,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   };
 
   const onCallbackFunction = (value: any) => {
-    console.log(value);
-    console.log(isApprove);
+    const summarys = store.getState().expenseAccountDetailSlice.summaryRows;
+    setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
     if (isApprove) {
       if (status === STATUS.DRAFT) {
         onApproveByBranch(value.reason);
@@ -875,7 +878,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           docNo: docNo ? docNo : '',
           type: expenseTypeName,
           period: periodLabel,
-          sumWithdrawAmount: '',
+          sumWithdrawAmount: sumWithdrawAmount,
         }}
         onCallBackFunction={onCallbackFunction}
         approve={isApprove}
