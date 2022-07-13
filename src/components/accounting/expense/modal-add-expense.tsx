@@ -1,6 +1,6 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, Grid, TextField, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
+import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -34,13 +34,15 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   const [isEdit, setisEdit] = React.useState(edit);
   const [isopen, setIsopen] = React.useState(open);
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
-  const [startDate, setStartDate] = React.useState<Date | null>(new Date());
+  const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(new Date());
   const [isErrorDate, setIsErrorDate] = React.useState(false);
-  const [isDisableSaveBtn, setIsDisableSaveBtn] = React.useState(false);
+  const [errorDate, setErrorDate] = React.useState('');
+  const [disableCalendar, setDisableCalendar] = React.useState(false);
+  const [isDisableSaveBtn, setIsDisableSaveBtn] = React.useState(true);
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
-  const itemRows = useAppSelector((state) => state.expenseAccountDetailSlice.intialRows);
-  const summaryRows = useAppSelector((state) => state.expenseAccountDetailSlice.summaryRows);
+  const items = store.getState().expenseAccountDetailSlice.itemRows;
+
   const [values, setValues] = React.useState({});
   const [sumOther, setSumOther] = React.useState(0);
   const [isLoad, setIsLoad] = React.useState(false);
@@ -50,73 +52,115 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
 
   const [flagEdit, setFlagEdit] = React.useState<boolean>(false);
   const handleStartDatePicker = (value: any) => {
+    const selectDate = moment(new Date(value)).format('DD/MM/YYYY');
+    let isError = false;
+    items.forEach((e: any) => {
+      const arr = Object.entries(e);
+      const _dateTime = arr.find((e: any) => e[0] === 'dateTime');
+      const dateTime = _dateTime ? _dateTime[1] : null;
+      let existingDate = '';
+      if (typeof dateTime === 'object') {
+        existingDate = moment(dateTime).startOf('day').format('DD/MM/YYYY');
+      } else if (typeof dateTime === 'string') {
+        existingDate = moment(new Date(dateTime)).format('DD/MM/YYYY');
+      }
+
+      if (selectDate === existingDate) {
+        isError = true;
+        return;
+      }
+    });
+
+    if (isError) {
+      setIsErrorDate(true);
+      setErrorDate('เลือกวันซ้ำ');
+    } else {
+      setIsErrorDate(false);
+      setErrorDate('');
+    }
     setStartDate(value);
   };
 
   const handleSaveBtn = async () => {
-    setOpenLoadingModal(true);
-    if (edit) {
-      let data: any;
-      let sum: number = 0;
-      let _otherSum: number = 0;
-      let _otherDetail: string = '';
-      testList.map((e: any) => {
-        data = { ...data, [e.key]: e.value };
-        if (!isFilterOutFieldInAdd(e.key)) {
-          sum += e.value;
-        }
-        if (!isFilterFieldInExpense(e.key) && isOtherExpenseField(e.key)) {
-          _otherSum += e.value;
-          if (!stringNumberNullOrEmpty(e.value)) {
-            _otherDetail += `${getOtherExpenseName(e.key)},`;
-          }
-        }
-      });
-
-      data = { ...data, total: sum, SUMOTHER: _otherSum, otherDetail: _otherDetail };
-      await dispatch(addNewItem(data));
+    let isError = false;
+    if (startDate === null) {
+      setErrorDate('กรุณาเลือกวันที่');
+      setIsErrorDate(true);
     } else {
-      let allItem = {};
-      let _otherSum: number = 0;
-      let _otherDetail: string = '';
-      const arr = Object.entries(values);
-      expenseMasterList
-        .filter((e: ExpenseInfo) => e.isActive && e.typeCode === expenseType)
-        .map((e: ExpenseInfo) => {
-          allItem = {
-            ...allItem,
-            [e.expenseNo]: Number(0),
-          };
+      setOpenLoadingModal(true);
+      if (edit) {
+        let data: any;
+        let sum: number = 0;
+        let _otherSum: number = 0;
+        let _otherDetail: string = '';
+        testList.map((e: any) => {
+          data = { ...data, [e.key]: e.value };
+          if (!isFilterOutFieldInAdd(e.key)) {
+            sum += e.value;
+          }
+          if (!isFilterFieldInExpense(e.key) && isOtherExpenseField(e.key)) {
+            _otherSum += e.value;
+            if (!stringNumberNullOrEmpty(e.value)) {
+              _otherDetail += `${getOtherExpenseName(e.key)},`;
+            }
+          }
         });
 
-      arr.map((element: any) => {
-        if (!isFilterFieldInExpense(element[0]) && isOtherExpenseField(element[0])) {
-          _otherSum += element[1];
-          if (!stringNumberNullOrEmpty(element[1])) {
-            _otherDetail += `${getOtherExpenseName(element[0])},`;
-          }
+        data = { ...data, total: sum, SUMOTHER: _otherSum, otherDetail: _otherDetail };
+        if (sum > 0) {
+          await dispatch(addNewItem(data));
+        } else {
+          isError = true;
+          setIsDisableSaveBtn(true);
         }
-      });
-      allItem = {
-        ...allItem,
-        ...values,
-      };
-      const data = {
-        ...allItem,
-        id: uuidv4(),
-        total: sum(values),
-        date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
-        dateTime: startDate,
-        SUMOTHER: _otherSum,
-        otherDetail: _otherDetail,
-      };
-      await dispatch(addNewItem(data));
-    }
-    setInit('N');
-    setTimeout(() => {
+      } else {
+        let allItem = {};
+        let _otherSum: number = 0;
+        let _otherDetail: string = '';
+        const arr = Object.entries(values);
+        expenseMasterList
+          .filter((e: ExpenseInfo) => e.isActive && e.typeCode === expenseType)
+          .map((e: ExpenseInfo) => {
+            allItem = {
+              ...allItem,
+              [e.expenseNo]: Number(0),
+            };
+          });
+
+        arr.map((element: any) => {
+          if (!isFilterFieldInExpense(element[0]) && isOtherExpenseField(element[0])) {
+            _otherSum += element[1];
+            if (!stringNumberNullOrEmpty(element[1])) {
+              _otherDetail += `${getOtherExpenseName(element[0])},`;
+            }
+          }
+        });
+        allItem = {
+          ...allItem,
+          ...values,
+        };
+        const data = {
+          ...allItem,
+          id: uuidv4(),
+          total: sum(values),
+          date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
+          dateTime: startDate,
+          SUMOTHER: _otherSum,
+          otherDetail: _otherDetail,
+        };
+        if (sum(values) > 0) {
+          await dispatch(addNewItem(data));
+        } else {
+          isError = true;
+          setIsDisableSaveBtn(true);
+        }
+      }
       setOpenLoadingModal(false);
-      onClose();
-    }, 300);
+      if (!isError) {
+        setInit('N');
+        onClose();
+      }
+    }
   };
 
   // const handleSaveBtn = async () => {
@@ -138,6 +182,17 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: Number(value) });
+    let sum: number = 0;
+    const arr = Object.entries(values);
+    arr.map((element: any) => {
+      if (!isFilterFieldInExpense(element[0])) {
+        sum += element[1];
+      }
+    });
+    sum += Number(value);
+    if (sum > 0) {
+      setIsDisableSaveBtn(false);
+    }
   };
   const handleOnChange = (event: any) => {
     const value = Number(event.target.value);
@@ -152,6 +207,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     });
     _otherSum += value;
     setSumOther(_otherSum);
+    if (_otherSum > 0) {
+      setIsDisableSaveBtn(false);
+    }
   };
 
   useEffect(() => {
@@ -165,9 +223,19 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
         .map((i: payLoadAdd) => {
           _otherSum += Number(i.value);
         });
+      const date = payload.find((i: payLoadAdd) => i.key === 'dateTime');
       setSumOther(_otherSum);
+      setIsDisableSaveBtn(false);
+      setIsErrorDate(false);
+      setStartDate(date.value);
+      setDisableCalendar(true);
     } else {
       setSumOther(0);
+      setStartDate(null);
+      setIsDisableSaveBtn(true);
+      setDisableCalendar(false);
+      setIsErrorDate(false);
+      setErrorDate('');
     }
   }, [open, edit, payload]);
 
@@ -178,7 +246,6 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
         element.value = data;
       }
     });
-
     setFlagEdit(true);
   };
   const handleChangeNewOnOtherExpense = (value: any, name: any) => {
@@ -231,7 +298,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                 minDateTo={periodProps?.startDate ? periodProps.startDate : startDate}
                 maxDate={periodProps?.endDate ? periodProps.endDate : endDate}
                 isError={isErrorDate}
-                hyperText={isErrorDate ? 'เลือกวันที่ซ้ำ กรุณาเลือกใหม่' : ''}
+                hyperText={isErrorDate ? errorDate : ''}
+                disabled={disableCalendar}
               />
             </Grid>
             {!edit && (
@@ -397,7 +465,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                 onClick={handleSaveBtn}
                 className={classes.MbtnSearch}
                 size='large'
-                disabled={isErrorDate || isDisableSaveBtn ? true : false}
+                disabled={isErrorDate || startDate === null || isDisableSaveBtn ? true : false}
                 startIcon={<AddCircleOutlineIcon />}>
                 บันทึก
               </Button>

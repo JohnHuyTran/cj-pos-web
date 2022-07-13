@@ -369,7 +369,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [sumWithdrawAmount, setSumWithdrawAmount] = React.useState('');
   const handleApproveBtn = () => {
     setIsApprove(true);
-    const summarys = store.getState().expenseAccountDetailSlice.summaryRows;
     setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
     if (status === STATUS.DRAFT) {
       const isFileValidate: boolean = validateFileInfo();
@@ -390,7 +389,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   };
 
   const onCallbackFunction = (value: any) => {
-    const summarys = store.getState().expenseAccountDetailSlice.summaryRows;
     setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
     if (isApprove) {
       if (status === STATUS.DRAFT) {
@@ -627,6 +625,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         return {
           id: uuidv4(),
           date: convertUtcToBkkDate(moment(item.expenseDate).startOf('day').toISOString()),
+          dateTime: item.expenseDate,
           total: item.totalAmount,
           SUMOTHER: _otherSum,
           otherDetail: _otherDetail,
