@@ -95,6 +95,7 @@ export enum PERMISSION_GROUP {
   DISTRICT_MANAGER = 'districtManager',
   SM = 'storeManagement',
   ACCOUNTING = 'accounting',
+  ACCOUNT_MANAGER = 'accounManager',
   PI = 'operationProcess',
   PCM = 'procurement',
   RTC = 'readyToClear',
