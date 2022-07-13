@@ -37,7 +37,7 @@ export interface ExpenseSaveRequest {
   type: string;
   month?: number;
   year?: number;
-  expensePeriod?: ExpensePeriod;
+  expensePeriod?: ExpensePeriod | null;
   status?: string;
   attachFiles?: FileType[];
   editAttachFiles?: FileType[];
@@ -135,6 +135,18 @@ export interface payLoadAdd {
   value: string;
   title: string;
 }
+export interface ExpensePeriodTypeResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: PeriodInfo | null | [];
+}
+
+export interface PeriodInfo {
+  period: number;
+  startDate: string;
+  endDate: string;
+}
 
 // Search request
 export interface ExpenseSearchRequest {
@@ -151,35 +163,35 @@ export interface ExpenseSearchRequest {
 }
 
 // Search response
-export interface ExpenseSearchResponse { 
-  timestamp: string
-  ref: string
-  code: number
-  message: string
-  data: ExpenseSearchInfo[]
-  total: number
-  page: number
-  perPage: number
-  prev: number
-  next: number
-  totalPage: number
+export interface ExpenseSearchResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: ExpenseSearchInfo[];
+  total: number;
+  page: number;
+  perPage: number;
+  prev: number;
+  next: number;
+  totalPage: number;
 }
 
 export interface ExpenseSearchInfo {
-  branchCode: string
-  branchName: string
-  docNo: string
-  type: string
-  expensePeriod: ExpensePeriod[]
-  status: string
-  sumWithdrawAmount: number
-  sumApprovalAmount: number
-  expenseDate: string
-  approvedDate: string
+  branchCode: string;
+  branchName: string;
+  docNo: string;
+  type: string;
+  expensePeriod: ExpensePeriod[];
+  status: string;
+  sumWithdrawAmount: number;
+  sumApprovalAmount: number;
+  expenseDate: string;
+  approvedDate: string;
 }
 
 export interface ExpensePeriod {
-  period: number
-  startDate: string
-  endDate: string
+  period: number;
+  startDate: string;
+  endDate: string;
 }
