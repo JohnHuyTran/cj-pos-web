@@ -25,7 +25,7 @@ function expenseSearch(): ReactElement {
   const items = useAppSelector((state) => state.searchBranchAccounting);
   const orderListDatas = items.branchAccountingList.data ? items.branchAccountingList.data : [];
   const onClickSearchBtn = async () => {
-    await dispatch(featchBranchAccountingListAsync());
+    // await dispatch(featchBranchAccountingListAsync());
     setFlagSearch(true);
   };
 
