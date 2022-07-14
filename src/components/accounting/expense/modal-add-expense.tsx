@@ -19,6 +19,7 @@ import {
 import moment from 'moment';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
+import { STATUS } from '../../../utils/enum/accounting-enum';
 
 interface Props {
   open: boolean;
@@ -42,10 +43,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   const [isDisableSaveBtn, setIsDisableSaveBtn] = React.useState(true);
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
   const items = store.getState().expenseAccountDetailSlice.itemRows;
+  const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
+  const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
+  const [enableSaveBtn, setEnableSaveBtn] = React.useState(false);
 
   const [values, setValues] = React.useState({});
   const [sumOther, setSumOther] = React.useState(0);
-  const [isLoad, setIsLoad] = React.useState(false);
   const { v4: uuidv4 } = require('uuid');
   const [testList, setTestList] = React.useState<any>(payload);
   const [expenseType, setExpenseType] = React.useState<any>(type);
@@ -73,7 +76,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
 
     if (isError) {
       setIsErrorDate(true);
-      setErrorDate('เลือกวันซ้ำ');
+      setErrorDate('เลือกวันที่ซ้ำ กรุณาเลือกใหม่');
     } else {
       setIsErrorDate(false);
       setErrorDate('');
@@ -236,6 +239,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
       setDisableCalendar(false);
       setIsErrorDate(false);
       setErrorDate('');
+    }
+    if (expenseData) {
+      setEnableSaveBtn(expenseData.status === STATUS.DRAFT || expenseData.status === STATUS.SEND_BACK_EDIT);
     }
   }, [open, edit, payload]);
 
@@ -466,7 +472,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                 className={classes.MbtnSearch}
                 size='large'
                 disabled={isErrorDate || startDate === null || isDisableSaveBtn ? true : false}
-                startIcon={<AddCircleOutlineIcon />}>
+                startIcon={<AddCircleOutlineIcon />}
+                sx={{ display: enableSaveBtn ? '' : 'none' }}>
                 บันทึก
               </Button>
             </Box>

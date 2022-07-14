@@ -68,6 +68,7 @@ import AccordionUploadSingleFile from '../../commons/ui/accordion-upload-single-
 import TextBoxComment from '../../commons/ui/textbox-comment';
 import { Day } from '@material-ui/pickers';
 import ModalConfirmExpense from './modal-confirm-expense';
+import { isGroupOC } from '../../../utils/role-permission';
 
 interface Props {
   isOpen: boolean;
@@ -372,7 +373,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
     if (status === STATUS.DRAFT) {
       const isFileValidate: boolean = validateFileInfo();
-      if (isFileValidate) {
+      const isvalidateDate = validateDateIsBeforPeriod();
+      if (isFileValidate && isvalidateDate) {
         setIsOpenModelConfirmExpense(true);
         setShowReason(true);
       }
@@ -443,6 +445,16 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     if (!isvalid && existingfileList.length <= 0) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
+      return false;
+    }
+    return true;
+  };
+
+  const validateDateIsBeforPeriod = () => {
+    const date = new Date();
+    if (date < new Date(period.endDate)) {
+      setOpenAlert(true);
+      setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
       return false;
     }
     return true;
@@ -797,7 +809,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                 docType='BA'
                 isStatus={uploadFileFlag}
                 onChangeUploadFile={handleOnChangeUploadFileOC}
-                enabledControl={status === STATUS.WAITTING_APPROVAL1}
+                enabledControl={status === STATUS.WAITTING_APPROVAL2 && isGroupOC()}
                 idControl={'AttachFileByOC'}
               />
             </Grid>

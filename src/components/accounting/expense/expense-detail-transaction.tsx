@@ -327,25 +327,25 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
 
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const currentlySelected = async (params: GridCellParams) => {
-    if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT || status === 'NEW') {
-      const value = params;
-      let listPayload: payLoadAdd[] = [];
-      const arr = Object.entries(params.row);
-      await arr.forEach((element: any, index: number) => {
-        const _title = getMasterExpenInto(element[0])?.accountNameTh || 'Field';
-        const item: payLoadAdd = {
-          id: index,
-          key: element[0],
-          value: element[1],
-          title: _title,
-        };
-        listPayload.push(item);
-      });
-      sessionStorage.setItem('ADD_NEW_ITEM', 'F');
-      await setActionEdit(true);
-      await setPayloadAdd(listPayload);
-      setOpenModalAddExpense(true);
-    }
+    // if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT || status === 'NEW') {
+    const value = params;
+    let listPayload: payLoadAdd[] = [];
+    const arr = Object.entries(params.row);
+    await arr.forEach((element: any, index: number) => {
+      const _title = getMasterExpenInto(element[0])?.accountNameTh || 'Field';
+      const item: payLoadAdd = {
+        id: index,
+        key: element[0],
+        value: element[1],
+        title: _title,
+      };
+      listPayload.push(item);
+    });
+    sessionStorage.setItem('ADD_NEW_ITEM', 'F');
+    await setActionEdit(true);
+    await setPayloadAdd(listPayload);
+    setOpenModalAddExpense(true);
+    // }
   };
   const OnCloseAddExpense = () => {
     setOpenModalAddExpense(false);

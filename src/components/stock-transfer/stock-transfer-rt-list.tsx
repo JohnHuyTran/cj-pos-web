@@ -315,7 +315,7 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
 
     handleOpenLoading('open', true);
     // await handleOpenDetailModal(params.row.rtNo, params.row.edit);
-    await dispatch(featchExpenseDetailAsync('EX22070101-000026'));
+    await dispatch(featchExpenseDetailAsync('EX22070101-000024'));
     setInit('Y');
     setOpenDetailModal(true);
     handleOpenLoading('open', false);
