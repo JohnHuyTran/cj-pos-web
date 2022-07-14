@@ -27,12 +27,13 @@ import { env } from '../../../adapters/environmentConfigs';
 
 // Call API
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
-import { ExpenseSearchRequest } from '../../../models/branch-accounting-model';
+import { ExpenseSearchRequest, ExpensePeriod } from '../../../models/branch-accounting-model';
 import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
 } from '../../../store/slices/accounting/accounting-period-type-slice';
 import ModalSelectPeriod from '../expense/modal-select-period';
+import ExpenseDetail from '../expense/expense-detail';
 
 interface FormSelectProps {
   title: string;
@@ -168,8 +169,14 @@ export default function SearchExpense() {
 
   const handleApproveAll = () => {};
 
+  const [openDetailModal, setOpenDetailModal] = useState(false);
   const [openSelectPeriod, setOpenSelectPeriod] = useState(false);
   const [types, setType] = useState('');
+  const [dataSelect, setDataSelect] = useState<ExpensePeriod>({
+    period: 0,
+    startDate: '',
+    endDate: '',
+  });
   const handleOpenSelectPeriodModal = async (type: string) => {
     setType(type);
     await dispatch(clearDataExpensePeriod());
@@ -178,6 +185,14 @@ export default function SearchExpense() {
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);
+  };
+  const handleDataSelectPeriod = (value: ExpensePeriod) => {
+    setDataSelect(value);
+    setOpenDetailModal(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setOpenDetailModal(false);
   };
 
   return (
@@ -349,7 +364,22 @@ export default function SearchExpense() {
       </Grid>
 
       {openSelectPeriod && (
-        <ModalSelectPeriod open={openSelectPeriod} onClose={handleCloseSelectPeriodModal} type={types} />
+        <ModalSelectPeriod
+          open={openSelectPeriod}
+          onClose={handleCloseSelectPeriodModal}
+          type={types}
+          onConfirm={handleDataSelectPeriod}
+        />
+      )}
+
+      {openDetailModal && (
+        <ExpenseDetail
+          isOpen={openDetailModal}
+          onClickClose={handleCloseDetailModal}
+          type={types}
+          edit={false}
+          periodProps={dataSelect}
+        />
       )}
     </Fragment>
   );
