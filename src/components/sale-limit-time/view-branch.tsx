@@ -77,13 +77,7 @@ export default function ViewBranch({ values }: Props) {
               handleOpenModal();
             }}
           >
-            {allBranches && excludeProvinces.length == 0 && excludeBranches.length == 0
-              ? 'ทุกสาขา'
-              : allBranches &&
-                excludeProvinces.length == 0 &&
-                (excludeBranches.length != 0 || excludeProvinces.length != 0)
-              ? 'หลายสาข'
-              : 'หลายสาขา'}
+            {allBranches && excludeProvinces.length == 0 && excludeBranches.length == 0 ? 'ทุกสาขา' : 'หลายสาขา'}
           </Button>
           <Dialog maxWidth="md" fullWidth open={open}>
             <Box sx={{ flex: 1, ml: 2 }}>
