@@ -115,7 +115,7 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableMainMenuProductInfo(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO));
     setDisableMainMenuPurchaseBranch(isAllowMainMenuPermission(MAINMENU.PURCHASE_BRANCH));
 
-    setDisableMainMenuExpense(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO)); //Mock Permission
+    setDisableMainMenuExpense(isAllowMainMenuPermission(MAINMENU.EXPENSE));
 
     setDisableSubMenuSaleDiscount(isAllowSubMenuPermission(SUBMENU.SALE_DISCOUNT));
     setDisableSubMenuSaleSaleLimit(isAllowSubMenuPermission(SUBMENU.SALE_SALE_LIMIT));
@@ -135,9 +135,9 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableSubMenuStockMovement(isAllowSubMenuPermission(SUBMENU.PI_STOCK_MOVEMENT));
     setDisableSubMenuProductMaster(isAllowSubMenuPermission(SUBMENU.PI_PRODUCT_MASTER));
 
-    setDisableSubMenuExpense(isAllowSubMenuPermission(SUBMENU.PI_STOCK_BALANCE)); //Mock Permission
-
     setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
+
+    setDisableSubMenuExpense(isAllowSubMenuPermission(SUBMENU.EX_EXPENSE));
   }, [navState]);
 
   const dispatch = useAppDispatch();

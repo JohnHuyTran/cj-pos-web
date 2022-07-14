@@ -21,6 +21,7 @@ import {
   KEYCLOAK_GROUP_PI,
   KEYCLOAK_GROUP_PCM,
   KEYCLOAK_GROUP_DATA,
+  KEYCLOAK_GROUP_ACCOUNTING_MANAGER,
 } from './enum/permission-enum';
 
 const _ = require('lodash');
@@ -55,6 +56,8 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.PCM;
   } else if (group === KEYCLOAK_GROUP_DATA) {
     return PERMISSION_GROUP.DATA;
+  } else if (group === KEYCLOAK_GROUP_ACCOUNTING_MANAGER) {
+    return PERMISSION_GROUP.ACCOUNT_MANAGER;
   }
 
   return '';
@@ -254,10 +257,22 @@ const permission = {
   },
   accounting: {
     menu: {
-      mainmenu: [MAINMENU.SALE],
-      submenu: [SUBMENU.SALE_SALE_LIMIT],
+      mainmenu: [MAINMENU.SALE, MAINMENU.EXPENSE],
+      submenu: [SUBMENU.SALE_SALE_LIMIT, SUBMENU.EX_EXPENSE],
     },
-    action: [ACTIONS.CAMPAIGN_TO_VIEW],
+  },
+  accountManager: {
+    menu: {
+      mainmenu: [MAINMENU.EXPENSE],
+      submenu: [SUBMENU.EX_EXPENSE],
+    },
+    action: [
+      ACTIONS.ACCOUNTING_VIEW,
+      ACTIONS.ACCOUNTING_CONFIG_VIEW,
+      ACTIONS.ACCOUNTING_MANAGE,
+      ACTIONS.ACCOUNTING_APPROVE3,
+      ACTIONS.ACCOUNTING_REJECT3,
+    ],
   },
   operationProcess: {
     menu: {

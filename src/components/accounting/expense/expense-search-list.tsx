@@ -6,6 +6,7 @@ import {
   GridCellParams,
   GridColDef,
   GridRowData,
+  GridRowParams,
   GridValueGetterParams,
   useGridApiRef,
 } from '@mui/x-data-grid';
@@ -16,8 +17,12 @@ import LoadingModal from '../../commons/ui/loading-modal';
 import { Chip, Typography } from '@mui/material';
 import { numberWithCommas } from '../../../utils/utils';
 import ExpenseDetail from './expense-detail';
-import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-detail-slice';
+import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-slice';
 import { uploadFileState } from '../../../store/slices/upload-file-slice';
+import { ExpenseSearch, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
+import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
+import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
+import { setInit } from '../../../store/sessionStore';
 
 interface loadingModalState {
   open: boolean;
@@ -35,7 +40,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -49,7 +54,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
+        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
           {params.value}-{params.getValue(params.id, 'branchName') || ''}
         </Typography>
       </div>
@@ -100,7 +105,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
@@ -108,7 +113,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
@@ -201,6 +206,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const cuurentPage = useAppSelector((state) => state.searchBranchAccounting.branchAccountingList.page);
   const limit = useAppSelector((state) => state.searchBranchAccounting.branchAccountingList.perPage);
   const res: any = items.branchAccountingList;
+  const payload = useAppSelector((state) => state.saveExpenseSearchRequest.searchExpense);
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const { apiRef, columns } = useApiRef();
@@ -227,8 +233,8 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
     };
   });
 
-  console.log('rows:', JSON.stringify(rows));
-  console.log('res.total:', JSON.stringify(res.total));
+  // console.log('rows:', JSON.stringify(rows));
+  // console.log('res.total:', JSON.stringify(res.total));
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -238,48 +244,38 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
     let page: string = (newPage + 1).toString();
+    const payloadNewpage: ExpenseSearch = {
+      limit: pageSize,
+      page: page,
+      type: payload.type,
+      status: payload.status,
+      branchCode: payload.branchCode,
+      month: payload.month,
+      year: payload.year,
+      period: payload.period,
+    };
 
-    // const payloadNewpage: StockTransferRequest = {
-    //   limit: pageSize,
-    //   page: page,
-    //   docNo: payload.docNo,
-    //   branchFrom: payload.branchFrom,
-    //   branchTo: payload.branchTo,
-    //   dateFrom: payload.dateFrom,
-    //   dateTo: payload.dateTo,
-    //   statuses: payload.statuses,
-    //   transferReason: payload.transferReason,
-    // };
-
-    // await dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
-    // await dispatch(saveSearchStockTransferRt(payloadNewpage));
-
-    alert('await Search...');
-
+    await dispatch(featchBranchAccountingListAsync(payloadNewpage));
+    await dispatch(saveExpenseSearch(payloadNewpage));
     setLoading(false);
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
-    // console.log("pageSize: ", pageSize);
     setPageSize(pageSize.toString());
     setLoading(true);
-    // const payloadNewpage: StockTransferRequest = {
-    //   limit: pageSize.toString(),
-    //   page: '1',
-    //   docNo: payload.docNo,
-    //   branchFrom: payload.branchFrom,
-    //   branchTo: payload.branchTo,
-    //   dateFrom: payload.dateFrom,
-    //   dateTo: payload.dateTo,
-    //   statuses: payload.statuses,
-    //   transferReason: payload.transferReason,
-    // };
+    const payloadNewpage: ExpenseSearch = {
+      limit: pageSize.toString(),
+      page: '1',
+      type: payload.type,
+      status: payload.status,
+      branchCode: payload.branchCode,
+      month: payload.month,
+      year: payload.year,
+      period: payload.period,
+    };
 
-    // await dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
-    // await dispatch(saveSearchStockTransferRt(payloadNewpage));
-
-    alert('await Search...');
-
+    await dispatch(featchBranchAccountingListAsync(payloadNewpage));
+    await dispatch(saveExpenseSearch(payloadNewpage));
     setLoading(false);
   };
 
@@ -289,7 +285,6 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
 
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
-
     handleOpenLoading('open', true);
     await handleOpenDetailModal(params.row.docNo);
     handleOpenLoading('open', false);
@@ -299,6 +294,8 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const handleOpenDetailModal = async (docNo: string) => {
     await dispatch(featchExpenseDetailAsync(docNo));
+    setInit('Y');
+
     setOpenDetailModal(true);
   };
 
@@ -308,18 +305,19 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   };
 
   const handleSubmitRowSelect = async () => {
-    const rowSelect = apiRef.current.getSelectedRows();
+    // const rowSelect = apiRef.current.getSelectedRows();
     let rowSelectList: any = [];
-    rowSelect.forEach((data: GridRowData) => {
-      rowSelectList.push(data);
-    });
+    // rowSelect.forEach((data: GridRowData) => {
+    //   // rowSelectList.push(data.rtNo);
+    //   rowSelectList.push(data);
+    // });
 
     return onSelectRows(rowSelectList ? rowSelectList : []);
   };
 
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -332,14 +330,14 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
             rowHeight={65}
             pagination
             checkboxSelection={true}
-            // isRowSelectable={(params: GridRowParams) => params.row.edit}
+            isRowSelectable={(params: GridRowParams) => params.row.status === 'WAITTING_APPROVAL3'}
             onSelectionModelChange={handleSubmitRowSelect}
             disableSelectionOnClick
           />
@@ -349,7 +347,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
       <LoadingModal open={openLoadingModal.open} />
 
       {openDetailModal && (
-        <ExpenseDetail isOpen={openDetailModal} onClickClose={handleCloseDetailModal} type={'COFFEE'} edit={edit} />
+        <ExpenseDetail isOpen={openDetailModal} onClickClose={handleCloseDetailModal} type={'xxxxx'} edit={true} />
       )}
     </div>
   );
