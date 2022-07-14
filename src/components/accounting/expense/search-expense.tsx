@@ -42,7 +42,6 @@ import {
 import ExpenseSearchList from './expense-search-list';
 import ModelConfirmSearch from './confirm/modal-confirm-search';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
-import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-slice';
 
 interface FormSelectProps {
   title: string;
@@ -251,13 +250,7 @@ export default function SearchExpense() {
     console.log('handleConfirm');
     console.log('periodData:', periodData);
   };
-  const testviewDetail = async () => {
-    setIsOpenLoading(true);
-    await dispatch(featchExpenseDetailAsync('EX22070101-000024'));
-    setInit('Y');
-    setOpenDetailModal(true);
-    setIsOpenLoading(false);
-  };
+
   return (
     <Fragment>
       <Grid container rowSpacing={1} columnSpacing={7}>
@@ -415,22 +408,6 @@ export default function SearchExpense() {
             className={classes.MbtnSearch}>
             ค้นหา
           </Button>
-          <Button
-            id='btnSearch'
-            variant='contained'
-            color='primary'
-            disabled={isOpenLoading}
-            onClick={testviewDetail}
-            // loading={isOpenLoading}
-            // loadingIndicator={
-            //   <Typography component="span" sx={{ fontSize: '11px' }}>
-            //     กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
-            //   </Typography>
-            // }
-            sx={{ width: '170.42px', ml: 2 }}
-            className={classes.MbtnSearch}>
-            Test
-          </Button>
         </Grid>
       </Grid>
       <LoadingModal open={isOpenLoading} />
@@ -451,7 +428,7 @@ export default function SearchExpense() {
           isOpen={openDetailModal}
           onClickClose={handleCloseDetailModal}
           type={types}
-          edit={true}
+          edit={false}
           periodProps={dataSelect}
         />
       )}
