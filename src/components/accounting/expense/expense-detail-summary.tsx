@@ -143,7 +143,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   }, [periodProps]);
 
   const currentlySelected = async (params: GridCellParams) => {
-    if (params.id === 2 && (status === STATUS.WAITTING_ACCOUNTING || status === STATUS.WAITTING_APPROVAL2)) {
+    if (params.id === 2 && (status === STATUS.WAITTING_ACCOUNTING || status === STATUS.WAITTING_APPROVAL3)) {
       let listPayload: payLoadAdd[] = [];
       const arr = Object.entries(params.row);
       await arr.forEach((element: any, index: number) => {

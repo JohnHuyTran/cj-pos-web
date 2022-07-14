@@ -742,14 +742,14 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       totalDiff = Number(totalWithDraw) - Number(totalApprove);
       totalOtherDiff = Number(totalOtherWithDraw) - Number(totalOtherApprove);
 
-      if (status === STATUS.DRAFT) {
+      if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) {
         rows = [{ ...infosWithDraw, total: totalWithDraw }];
-      } else if (status === STATUS.WAITTING_APPROVAL1) {
+      } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
         rows = [
           { ...infosWithDraw, total: totalWithDraw },
-          { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove },
+          { ...infosApprove, SUMOTHER: '', total: '' },
         ];
-      } else if (status === STATUS.WAITTING_APPROVAL2) {
+      } else {
         rows = [
           { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
           { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove, SUMOTHER: totalOtherApprove },
@@ -934,7 +934,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               /> */}
               <AccordionUploadSingleFile
                 files={attachFiles}
-                disabledControl={!(status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT)}
+                disabledControl={!((status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) && isGroupBranch)}
               />
             </Grid>
             <Grid item xs={1}>
@@ -947,7 +947,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                 docType='BA'
                 isStatus={uploadFileFlag}
                 onChangeUploadFile={handleOnChangeUploadFileEdit}
-                enabledControl={status === STATUS.WAITTING_EDIT_ATTACH_FILE}
+                enabledControl={status === STATUS.WAITTING_EDIT_ATTACH_FILE && isGroupBranch()}
                 idControl={'AttachFileEdit'}
               />
             </Grid>
