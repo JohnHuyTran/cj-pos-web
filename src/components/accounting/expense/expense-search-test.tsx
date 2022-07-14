@@ -10,6 +10,7 @@ import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
 } from '../../../store/slices/accounting/accounting-period-type-slice';
+import { ExpensePeriod } from '../../../models/branch-accounting-model';
 
 function expenseSearch(): ReactElement {
   const classes = useStyles();
@@ -52,37 +53,34 @@ function expenseSearch(): ReactElement {
           <Grid item xs={5}></Grid>
           <Grid item xs={7} sx={{ textAlign: 'end' }}>
             <Button
-              id="btnCreateStockTransferModal"
-              variant="contained"
+              id='btnCreateStockTransferModal'
+              variant='contained'
               onClick={() => handleOpenSelectPeriodModal('COFFEE')}
               sx={{ minWidth: '15%' }}
               className={classes.MbtnSearch}
               startIcon={<AddCircleOutlineOutlinedIcon />}
-              color="secondary"
-            >
+              color='secondary'>
               ค่าใช้จ่ายร้านกาแฟ
             </Button>
 
             <Button
-              id="btnCreateStockTransferModal"
-              variant="contained"
+              id='btnCreateStockTransferModal'
+              variant='contained'
               onClick={() => handleOpenSelectPeriodModal('STOREFRONT')}
               sx={{ minWidth: '15%', ml: 2 }}
               className={classes.MbtnSearch}
               startIcon={<AddCircleOutlineOutlinedIcon />}
-              color="warning"
-            >
+              color='warning'>
               ค่าใช้จ่ายหน้าร้าน
             </Button>
 
             <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
+              id='btnSearch'
+              variant='contained'
+              color='primary'
               onClick={onClickSearchBtn}
               sx={{ width: 110, ml: 2 }}
-              className={classes.MbtnSearch}
-            >
+              className={classes.MbtnSearch}>
               ค้นหา
             </Button>
           </Grid>
@@ -93,8 +91,8 @@ function expenseSearch(): ReactElement {
         <div>
           {orderListDatas.length > 0 && <ExpenseSearchList onSelectRows={handleSelectRows} />}
           {orderListDatas.length === 0 && (
-            <Grid item container xs={12} justifyContent="center">
-              <Box color="#CBD4DB">
+            <Grid item container xs={12} justifyContent='center'>
+              <Box color='#CBD4DB'>
                 <h2>ไม่มีข้อมูล</h2>
               </Box>
             </Grid>
@@ -102,7 +100,14 @@ function expenseSearch(): ReactElement {
         </div>
       )}
 
-      <ModalSelectPeriod open={openSelectPeriod} onClose={handleCloseSelectPeriodModal} type={types} />
+      <ModalSelectPeriod
+        open={openSelectPeriod}
+        onClose={handleCloseSelectPeriodModal}
+        type={types}
+        onConfirm={function (value: ExpensePeriod): void {
+          throw new Error('Function not implemented.');
+        }}
+      />
     </>
   );
 }

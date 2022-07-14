@@ -21,15 +21,14 @@ interface Props {
   open: boolean;
   onClose: () => void;
   type: string;
+  onConfirm: (value: ExpensePeriod) => void;
 }
 
-function ModalSelectPeriod({ open, onClose, type }: Props) {
+function ModalSelectPeriod({ open, onClose, type, onConfirm }: Props) {
   const classes = useStyles();
-  //   const [valuesPeriod, setValuesPeriod] = useState('Select');
   const periods = useAppSelector((state) => state.expensePeriodTypeSlice.expensePeriodList);
   const periodDate: any = periods.data ? periods.data : [];
   const [valuesPeriod, setValuesPeriod] = useState('0');
-  const [types, setTypes] = useState(type);
   const [dataSelect, setDataSelect] = useState<ExpensePeriod>({
     period: 0,
     startDate: '',
@@ -43,21 +42,12 @@ function ModalSelectPeriod({ open, onClose, type }: Props) {
     setDataSelect(periodDate[value]);
   };
 
-  const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const handleConfirm = () => {
-    console.log('handle confirm');
-    setOpenDetailModal(true);
-    setTimeout(() => {
-      // onClose();
-    }, 500);
-  };
-
-  const handleCloseDetailModal = () => {
-    setOpenDetailModal(false);
+    onConfirm(dataSelect);
+    onClose();
   };
 
   useEffect(() => {
-    setTypes(type);
     setDataSelect(periodDate[0]);
   }, [open]);
 
@@ -111,16 +101,6 @@ function ModalSelectPeriod({ open, onClose, type }: Props) {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {openDetailModal && (
-        <ExpenseDetail
-          isOpen={openDetailModal}
-          onClickClose={handleCloseDetailModal}
-          type={type}
-          edit={false}
-          // periodProps={dataSelect}
-        />
-      )}
     </div>
   );
 }
