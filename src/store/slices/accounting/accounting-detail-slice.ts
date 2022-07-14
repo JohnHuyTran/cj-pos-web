@@ -21,7 +21,7 @@ const initialState: State = {
 
 export const featchExpenseDetailAsync = createAsyncThunk('expenseDetail', async (docNo: string) => {
   try {
-    const apiRootPath = getPathExpenseDetail('EX22070101-000008', environment.branchAccounting.expense.detail.url);
+    const apiRootPath = getPathExpenseDetail(docNo, environment.branchAccounting.expense.detail.url);
     let response: ExpenseDetailResponseType = {
       ref: '',
       code: 0,

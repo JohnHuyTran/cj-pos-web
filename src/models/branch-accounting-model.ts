@@ -162,6 +162,17 @@ export interface ExpenseSearchRequest {
   period?: number;
 }
 
+export interface ExpenseSearch {
+  limit: string;
+  page: string;
+  type: string;
+  status: string;
+  branchCode: string;
+  month: number;
+  year: number;
+  period: number;
+}
+
 // Search response
 export interface ExpenseSearchResponse {
   timestamp: string;

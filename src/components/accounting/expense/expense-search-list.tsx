@@ -19,6 +19,9 @@ import { numberWithCommas } from '../../../utils/utils';
 import ExpenseDetail from './expense-detail';
 import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-detail-slice';
 import { uploadFileState } from '../../../store/slices/upload-file-slice';
+import { ExpenseSearch, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
+import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
+import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
 
 interface loadingModalState {
   open: boolean;
@@ -202,6 +205,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const cuurentPage = useAppSelector((state) => state.searchBranchAccounting.branchAccountingList.page);
   const limit = useAppSelector((state) => state.searchBranchAccounting.branchAccountingList.perPage);
   const res: any = items.branchAccountingList;
+  const payload = useAppSelector((state) => state.saveExpenseSearchRequest.searchExpense);
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const { apiRef, columns } = useApiRef();
@@ -239,48 +243,38 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const handlePageChange = async (newPage: number) => {
     setLoading(true);
     let page: string = (newPage + 1).toString();
+    const payloadNewpage: ExpenseSearch = {
+      limit: pageSize,
+      page: page,
+      type: payload.type,
+      status: payload.status,
+      branchCode: payload.branchCode,
+      month: payload.month,
+      year: payload.year,
+      period: payload.period,
+    };
 
-    // const payloadNewpage: StockTransferRequest = {
-    //   limit: pageSize,
-    //   page: page,
-    //   docNo: payload.docNo,
-    //   branchFrom: payload.branchFrom,
-    //   branchTo: payload.branchTo,
-    //   dateFrom: payload.dateFrom,
-    //   dateTo: payload.dateTo,
-    //   statuses: payload.statuses,
-    //   transferReason: payload.transferReason,
-    // };
-
-    // await dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
-    // await dispatch(saveSearchStockTransferRt(payloadNewpage));
-
-    alert('await Search...');
-
+    await dispatch(featchBranchAccountingListAsync(payloadNewpage));
+    await dispatch(saveExpenseSearch(payloadNewpage));
     setLoading(false);
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
-    // console.log("pageSize: ", pageSize);
     setPageSize(pageSize.toString());
     setLoading(true);
-    // const payloadNewpage: StockTransferRequest = {
-    //   limit: pageSize.toString(),
-    //   page: '1',
-    //   docNo: payload.docNo,
-    //   branchFrom: payload.branchFrom,
-    //   branchTo: payload.branchTo,
-    //   dateFrom: payload.dateFrom,
-    //   dateTo: payload.dateTo,
-    //   statuses: payload.statuses,
-    //   transferReason: payload.transferReason,
-    // };
+    const payloadNewpage: ExpenseSearch = {
+      limit: pageSize.toString(),
+      page: '1',
+      type: payload.type,
+      status: payload.status,
+      branchCode: payload.branchCode,
+      month: payload.month,
+      year: payload.year,
+      period: payload.period,
+    };
 
-    // await dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
-    // await dispatch(saveSearchStockTransferRt(payloadNewpage));
-
-    alert('await Search...');
-
+    await dispatch(featchBranchAccountingListAsync(payloadNewpage));
+    await dispatch(saveExpenseSearch(payloadNewpage));
     setLoading(false);
   };
 

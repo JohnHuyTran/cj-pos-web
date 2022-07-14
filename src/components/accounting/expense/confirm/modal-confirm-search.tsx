@@ -13,12 +13,20 @@ interface Props {
   onConfirm: (period: any) => void;
   startDate: string;
   endDate: string;
+  items?: any;
 }
 interface loadingModalState {
   open: boolean;
 }
 
-export default function ModelConfirmSearch({ open, onClose, onConfirm, startDate, endDate }: Props): ReactElement {
+export default function ModelConfirmSearch({
+  open,
+  onClose,
+  onConfirm,
+  startDate,
+  endDate,
+  items,
+}: Props): ReactElement {
   const classes = useStyles();
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -40,6 +48,7 @@ export default function ModelConfirmSearch({ open, onClose, onConfirm, startDate
     setPeriodData(period);
   };
 
+  // console.log('======> items:', JSON.stringify(items));
   return (
     <div>
       <Dialog
