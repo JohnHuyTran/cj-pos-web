@@ -6,17 +6,20 @@ import {
   Select,
   MenuItem,
   Button,
-  CircularProgress,
+  // CircularProgress,
   FormHelperText,
   Box,
 } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
+// import { LoadingButton } from '@mui/lab';
 import { useStyles } from '../../../styles/makeTheme';
 import { Upload, AddCircleOutline } from '@mui/icons-material';
 import { expenseTypes, expenseStatusList } from '../../../utils/enum/accounting-enum';
 import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
 import DatePickerMonth from '../../../components/commons/ui/date-picker-month';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
+import ModalSelectPeriod from '../expense/modal-select-period';
+import ExpenseDetail from '../expense/expense-detail';
+import LoadingModal from '../../commons/ui/loading-modal';
 
 // Import File ที่เกี่ยวข้องกับ Business Logic Select สาขา
 import BranchListDropDown from '../../../components/commons/ui/branch-list-dropdown';
@@ -31,15 +34,13 @@ import {
   clearDataSearchBranchAccounting,
   featchBranchAccountingListAsync,
 } from '../../../store/slices/accounting/accounting-search-slice';
-import { ExpenseSearchRequest } from '../../../models/branch-accounting-model';
+import { ExpenseSearchRequest, ExpensePeriod } from '../../../models/branch-accounting-model';
 import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
 } from '../../../store/slices/accounting/accounting-period-type-slice';
-import ModalSelectPeriod from '../expense/modal-select-period';
 import ExpenseSearchList from './expense-search-list';
 import ModelConfirmSearch from './confirm/modal-confirm-search';
-import LoadingModal from '../../commons/ui/loading-modal';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
 
 interface FormSelectProps {
@@ -160,11 +161,15 @@ export default function SearchExpense() {
   };
 
   const handleSearchExpense = async () => {
+    // let isPeriodValidate = false
+    // if (isAccountRole || isAccountManagerRole) {
+    //   isPeriodValidate = search.period === "" ? true : false
+    // }
     const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? true : false;
     setIsValidate(true);
 
     if (search.type && isPeriodValidate) {
-      setOpenLoadingModal(true);
+      // setOpenLoadingModal(true);
       setIsOpenLoading(true);
       setFlagBtnApproveAll(true);
       const payload: ExpenseSearchRequest = {
@@ -177,7 +182,7 @@ export default function SearchExpense() {
       await dispatch(featchBranchAccountingListAsync(payload)).then((res) => {
         setTimeout(() => {
           setIsValidate(false);
-          setIsOpenLoading(false);
+          // setIsOpenLoading(false);
 
           const payload: any = res.payload ? res.payload : [];
           if (search.status === 'WAITTING_APPROVAL3' && payload.data.length) setFlagBtnApproveAll(!flagBtnApproveAll);
@@ -185,7 +190,8 @@ export default function SearchExpense() {
       });
       await dispatch(saveExpenseSearch(payload));
       setIsSearch(true);
-      setOpenLoadingModal(false);
+      // setOpenLoadingModal(false);
+      setIsOpenLoading(false);
     }
   };
 
@@ -197,8 +203,14 @@ export default function SearchExpense() {
     handleOpenModelConfirm();
   };
 
+  const [openDetailModal, setOpenDetailModal] = useState(false);
   const [openSelectPeriod, setOpenSelectPeriod] = useState(false);
   const [types, setType] = useState('');
+  const [dataSelect, setDataSelect] = useState<ExpensePeriod>({
+    period: 0,
+    startDate: '',
+    endDate: '',
+  });
   const handleOpenSelectPeriodModal = async (type: string) => {
     setOpenLoadingModal(true);
     setType(type);
@@ -209,6 +221,14 @@ export default function SearchExpense() {
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);
+  };
+  const handleDataSelectPeriod = (value: ExpensePeriod) => {
+    setDataSelect(value);
+    setOpenDetailModal(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setOpenDetailModal(false);
   };
 
   const [selectRowsList, setSelectRowsList] = useState<Array<any>>([]);
@@ -372,28 +392,45 @@ export default function SearchExpense() {
             color='cancelColor'>
             เคลียร์
           </Button>
-          <LoadingButton
+          <Button
             id='btnSearch'
             variant='contained'
             color='primary'
+            disabled={isOpenLoading}
             onClick={handleSearchExpense}
             // loading={isOpenLoading}
             // loadingIndicator={
-            //   <Typography component='span' sx={{ fontSize: '11px' }}>
-            //     กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
+            //   <Typography component="span" sx={{ fontSize: '11px' }}>
+            //     กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
             //   </Typography>
             // }
-            sx={{ width: 110, ml: 2 }}
+            sx={{ width: '170.42px', ml: 2 }}
             className={classes.MbtnSearch}>
             ค้นหา
-          </LoadingButton>
+          </Button>
         </Grid>
       </Grid>
+      <LoadingModal open={isOpenLoading} />
 
-      <LoadingModal open={openLoadingModal} />
+      {/* <LoadingModal open={openLoadingModal} /> */}
 
       {openSelectPeriod && (
-        <ModalSelectPeriod open={openSelectPeriod} onClose={handleCloseSelectPeriodModal} type={types} />
+        <ModalSelectPeriod
+          open={openSelectPeriod}
+          onClose={handleCloseSelectPeriodModal}
+          type={types}
+          onConfirm={handleDataSelectPeriod}
+        />
+      )}
+
+      {openDetailModal && (
+        <ExpenseDetail
+          isOpen={openDetailModal}
+          onClickClose={handleCloseDetailModal}
+          type={types}
+          edit={false}
+          periodProps={dataSelect}
+        />
       )}
 
       {isSearch && (

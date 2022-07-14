@@ -11,6 +11,7 @@ import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
 } from '../../../store/slices/accounting/accounting-period-type-slice';
+import { ExpensePeriod } from '../../../models/branch-accounting-model';
 
 function expenseSearch(): ReactElement {
   const classes = useStyles();
@@ -149,7 +150,14 @@ function expenseSearch(): ReactElement {
         endDate='2022-06-30T23:59:59.999999999+07:00'
       />
 
-      <ModalSelectPeriod open={openSelectPeriod} onClose={handleCloseSelectPeriodModal} type={types} />
+      <ModalSelectPeriod
+        open={openSelectPeriod}
+        onClose={handleCloseSelectPeriodModal}
+        type={types}
+        onConfirm={function (value: ExpensePeriod): void {
+          throw new Error('Function not implemented.');
+        }}
+      />
     </>
   );
 }

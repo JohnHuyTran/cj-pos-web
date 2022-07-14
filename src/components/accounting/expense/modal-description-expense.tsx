@@ -22,7 +22,7 @@ function ModelDescriptionExpense({ open, onClickClose, info }: Props) {
             .map((i: ExpenseInfo, index: number) => {
               return (
                 <Typography variant='body2' key={index}>
-                  {i.accountNameTh} :{i.requiredDocument}
+                  {i.accountNameTh} :{i.requiredDocumentTh}
                 </Typography>
               );
             })}

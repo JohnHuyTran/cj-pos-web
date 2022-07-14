@@ -501,7 +501,7 @@ export const environment = {
       },
       approve: {
         branch: {
-          url: 'approve',
+          url: 'accounting/expense/submit/{docNo}',
         },
         ocArea: {
           url: '',
@@ -510,7 +510,7 @@ export const environment = {
           url: '',
         },
         accountManager: {
-          url: '',
+          url: '/expense/approve3/{docNo}',
         },
       },
       reject: {
@@ -521,7 +521,7 @@ export const environment = {
           url: '',
         },
         accountManager: {
-          url: '',
+          url: '/expense/reject3/{docNo}',
         },
       },
       periodType: {

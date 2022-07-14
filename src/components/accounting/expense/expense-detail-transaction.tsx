@@ -2,7 +2,14 @@ import { Box, TextField, Typography } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridRowData } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
 import { isNullOrUndefined } from 'util';
-import { DataItem, ExpenseInfo, payLoadAdd, SumItems, SumItemsItem } from '../../../models/branch-accounting-model';
+import {
+  DataItem,
+  ExpenseInfo,
+  ExpensePeriod,
+  payLoadAdd,
+  SumItems,
+  SumItemsItem,
+} from '../../../models/branch-accounting-model';
 import {
   initialItems,
   updateItemRows,
@@ -11,14 +18,16 @@ import {
 } from '../../../store/slices/accounting/accounting-slice';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { stringNullOrEmpty } from '../../../utils/utils';
+import { STATUS } from '../../../utils/enum/accounting-enum';
+import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
 import ModalAddExpense from './modal-add-expense';
 interface Props {
   onClickAddNewBtn?: () => void;
   type: string;
+  periodProps: ExpensePeriod;
 }
 
-function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
+function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
@@ -28,29 +37,84 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
 
   const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
   const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
-  const summary: SumItems = expenseData ? expenseData.sumItems : null;
-  const initItems: DataItem[] = expenseData ? expenseData.items : [];
+  const status = expenseData && expenseData.status ? expenseData.status : 'NEW';
 
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
   const _initialItems = useAppSelector((state) => state.expenseAccountDetailSlice.intialRows);
   const [items, setItems] = React.useState<any>(_initialItems && _initialItems.length > 0 ? _initialItems : []);
   const [actionEdit, setActionEdit] = React.useState(false);
   const payloadNewItem = useAppSelector((state) => state.expenseAccountDetailSlice.addNewItem);
+  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const [expenseType, setExpenseType] = React.useState('');
+  const [period, setPeriod] = React.useState<ExpensePeriod>();
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
-    return {
-      field: i.expenseNo,
-      headerName: i.accountNameTh,
-      minWidth: 70,
-      flex: 1,
-      headerAlign: 'center',
-      sortable: false,
-      renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
-    };
+    const master = getMasterExpenInto(i.expenseNo);
+    const hideColumn = master ? master.isOtherExpense : false;
+    if (i.expenseNo === 'date') {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        minWidth: 70,
+        flex: 0.6,
+        headerAlign: 'center',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          if (isFilterFieldInExpense(params.field)) {
+            return (
+              <Box component='div' sx={{ paddingLeft: '20px' }}>
+                {params.value}
+              </Box>
+            );
+          }
+        },
+      };
+    } else {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        // minWidth: 70,
+        flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          if (isFilterFieldInExpense(params.field)) {
+            return (
+              <Box component='div' sx={{ paddingLeft: '20px' }}>
+                {params.value}
+              </Box>
+            );
+          } else {
+            const master = getMasterExpenInto(params.field);
+
+            const value = params.value || 0;
+            const condition =
+              value > Number(master?.approvalLimit2)
+                ? 'overLimit2'
+                : value > Number(master?.approvalLimit1)
+                ? 'overLimit1'
+                : 'normal';
+            return (
+              <TextField
+                variant='outlined'
+                name={`txb${i.expenseNo}`}
+                inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+                sx={{
+                  '.MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: condition === 'overLimit1' ? 'red' : '#000',
+                    background: condition === 'overLimit2' ? 'red' : '',
+                  },
+                }}
+                value={params.value}
+                disabled={true}
+                autoComplete='off'
+              />
+            );
+          }
+        },
+      };
+    }
   });
   useEffect(() => {
     setExpenseType(type);
@@ -58,48 +122,66 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
     const headerDescription: ExpenseInfo = {
       accountNameTh: 'วันที่ค่าใช่จ่าย',
       skuCode: '',
-      approveLimit1: 0,
-      approveLimt2: 0,
+      approvalLimit1: 0,
+      approvalLimit2: 0,
       isActive: true,
-      requiredDocument: '',
+      requiredDocumentTh: '',
       expenseNo: 'date',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
+      typeNameTh: '',
+    };
+    const headerOtherSum: ExpenseInfo = {
+      accountNameTh: 'อื่นๆ',
+      skuCode: '',
+      approvalLimit1: 0,
+      approvalLimit2: 0,
+      isActive: true,
+      requiredDocumentTh: '',
+      expenseNo: 'SUMOTHER',
+      isOtherExpense: false,
+      typeCode: '',
+      accountCode: '',
+      typeNameTh: '',
     };
     const headerOtherDetail: ExpenseInfo = {
       accountNameTh: ' ',
       skuCode: '',
-      approveLimit1: 0,
-      approveLimt2: 0,
+      approvalLimit1: 0,
+      approvalLimit2: 0,
       isActive: true,
-      requiredDocument: '',
+      requiredDocumentTh: '',
       expenseNo: 'otherDetail',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
+      typeNameTh: '',
     };
 
     const headerSum: ExpenseInfo = {
       skuCode: '',
-      approveLimit1: 0,
-      approveLimt2: 0,
-      requiredDocument: '',
+      approvalLimit1: 0,
+      approvalLimit2: 0,
+      requiredDocumentTh: '',
       expenseNo: 'total',
       isOtherExpense: false,
       typeCode: '',
       accountCode: '',
       accountNameTh: 'รวม',
       isActive: false,
+      typeNameTh: '',
     };
+
     _newExpenseAllList.push(headerDescription);
 
     expenseMasterList
-      .filter((i: ExpenseInfo) => i.isActive)
+      .filter((i: ExpenseInfo) => i.isActive && i.typeCode === expenseType)
       .map((i: ExpenseInfo) => {
         _newExpenseAllList.push(i);
       });
-
+    _newExpenseAllList.push(headerOtherSum);
+    _newExpenseAllList.push(headerOtherDetail);
     _newExpenseAllList.push(headerSum);
     setNewExpenseAllList(_newExpenseAllList);
     // if (initItems && initItems.length > 0) {
@@ -121,7 +203,13 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
     //   });
     //   setItems(itemRows);
     // }
-  }, []);
+  }, [expenseType]);
+
+  React.useEffect(() => {
+    setPeriod(periodProps);
+    setExpenseType(type);
+  }, [periodProps]);
+
   const [pageSize, setPageSize] = React.useState<number>(10);
   const storeItemAddItem = async (_newItem: any) => {
     const isNewItem = sessionStorage.getItem('ADD_NEW_ITEM') === 'Y';
@@ -156,6 +244,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
     let totalWithDraw: number = 0;
     let totalApprove: number = 0;
     let rows: any[] = [];
+    let _otherSum: number = 0;
     const expenseAccountDetail = store.getState().expenseAccountDetailSlice.expenseAccountDetail;
     const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
     const summary: SumItems = expenseData ? expenseData.sumItems : null;
@@ -164,27 +253,34 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
       entries.map((entrie: SumItemsItem, i: number) => {
         infosWithDraw = {
           ...infosWithDraw,
-          id: 1,
-          description: 'ยอดเงินเบิก',
           [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
         };
-        totalWithDraw += _.sumBy(_item, entrie.expenseNo);
-        infosApprove = {
-          ...infosApprove,
-          id: 2,
-          description: 'ยอดเงินอนุมัติ',
-          [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
-        };
-        totalApprove += _.sumBy(_item, entrie.expenseNo);
+        const sum = _.sumBy(_item, entrie.expenseNo);
+        totalWithDraw += stringNullOrEmpty(sum) ? 0 : sum;
+        // infosApprove = {
+        //   ...infosApprove,
+        //   id: 2,
+        //   description: 'ยอดเงินอนุมัติ',
+        //   [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
+        // };
+        // totalApprove += _.sumBy(_item, (o: any) => {
+        //   return 1;
+        // });
+        const master = getMasterExpenInto(entrie.expenseNo);
+        const _isOtherExpense = master ? master.isOtherExpense : false;
+        if (_isOtherExpense) {
+          _otherSum += stringNullOrEmpty(sum) ? 0 : sum;
+        }
       });
       rows = [
-        { ...infosWithDraw, total: totalWithDraw },
-        { ...infosApprove, total: totalApprove },
+        { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw, SUMOTHER: _otherSum },
+        // { ...infosApprove, total: totalApprove },
       ];
       dispatch(updateSummaryRows(rows));
     } else {
       totalWithDraw = 0;
       totalApprove = 0;
+      _otherSum = 0;
       expenseMasterList
         .filter((i: ExpenseInfo) => i.isActive)
         .map((entrie: ExpenseInfo) => {
@@ -201,10 +297,17 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
             description: 'ยอดเงินอนุมัติ',
             [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
           };
+
+          const master = getMasterExpenInto(entrie.expenseNo);
+          const _isOtherExpense = master ? master.isOtherExpense : false;
+          if (_isOtherExpense) {
+            const sum = _.sumBy(_item, entrie.expenseNo);
+            _otherSum += stringNullOrEmpty(sum) ? 0 : sum;
+          }
         });
       rows = [
-        { ...infosWithDraw, total: _.sumBy(_item, 'total') },
-        { ...infosApprove, total: _.sumBy(_item, 'total') },
+        { ...infosWithDraw, total: _.sumBy(_item, 'total'), SUMOTHER: _otherSum },
+        // { ...infosApprove, total: _.sumBy(_item, 'total') },
       ];
       dispatch(updateSummaryRows(rows));
     }
@@ -217,12 +320,14 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
 
     return result;
   };
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+
   useEffect(() => {
     storeItemAddItem(payloadNewItem);
   }, [payloadNewItem]);
+
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const currentlySelected = async (params: GridCellParams) => {
+    // if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT || status === 'NEW') {
     const value = params;
     let listPayload: payLoadAdd[] = [];
     const arr = Object.entries(params.row);
@@ -240,6 +345,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
     await setActionEdit(true);
     await setPayloadAdd(listPayload);
     setOpenModalAddExpense(true);
+    // }
   };
   const OnCloseAddExpense = () => {
     setOpenModalAddExpense(false);
@@ -272,6 +378,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type }: Props) {
         edit={actionEdit}
         payload={payloadAdd}
         type={expenseType}
+        periodProps={period}
       />
     </React.Fragment>
   );

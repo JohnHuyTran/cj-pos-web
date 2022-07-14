@@ -95,6 +95,10 @@ export const isGroupBranch = () => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   return userInfo.group === PERMISSION_GROUP.BRANCH;
 };
+export const isGroupOC = () => {
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return userInfo.group === PERMISSION_GROUP.OC;
+};
 
 export const isGroupBranchParam = (group: string) => {
   return group === PERMISSION_GROUP.BRANCH;

@@ -21,15 +21,14 @@ interface Props {
   open: boolean;
   onClose: () => void;
   type: string;
+  onConfirm: (value: ExpensePeriod) => void;
 }
 
-function ModalSelectPeriod({ open, onClose, type }: Props) {
+function ModalSelectPeriod({ open, onClose, type, onConfirm }: Props) {
   const classes = useStyles();
-  //   const [valuesPeriod, setValuesPeriod] = useState('Select');
   const periods = useAppSelector((state) => state.expensePeriodTypeSlice.expensePeriodList);
   const periodDate: any = periods.data ? periods.data : [];
   const [valuesPeriod, setValuesPeriod] = useState('0');
-  const [types, setTypes] = useState(type);
   const [dataSelect, setDataSelect] = useState<ExpensePeriod>({
     period: 0,
     startDate: '',
@@ -43,37 +42,30 @@ function ModalSelectPeriod({ open, onClose, type }: Props) {
     setDataSelect(periodDate[value]);
   };
 
-  const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const handleConfirm = () => {
-    setOpenDetailModal(true);
+    onConfirm(dataSelect);
     onClose();
   };
 
-  const handleCloseDetailModal = () => {
-    setOpenDetailModal(false);
-  };
-
   useEffect(() => {
-    setTypes(type);
     setDataSelect(periodDate[0]);
   }, [open]);
 
   return (
     <div>
-      <Dialog open={open} maxWidth="xs" fullWidth={true} key="modal-select-period">
+      <Dialog open={open} maxWidth='xs' fullWidth={true} key='modal-select-period'>
         <DialogContent>
-          <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+          <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
             กรุณาเลือกงวดเบิกที่ต้องการดำเนินการ
           </Typography>
 
           <FormControl fullWidth className={classes.Mselect}>
             <Select
-              id="selPeriod"
-              name="period"
+              id='selPeriod'
+              name='period'
               value={valuesPeriod}
               onChange={handleChange}
-              inputProps={{ 'aria-label': 'Without label' }}
-            >
+              inputProps={{ 'aria-label': 'Without label' }}>
               {/* <MenuItem disabled value="Select">
                 <Typography>กรุณาเลือก</Typography>
               </MenuItem> */}
@@ -90,37 +82,25 @@ function ModalSelectPeriod({ open, onClose, type }: Props) {
 
         <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
           <Button
-            id="btnCancel"
-            variant="contained"
-            size="small"
-            color="cancelColor"
+            id='btnCancel'
+            variant='contained'
+            size='small'
+            color='cancelColor'
             sx={{ borderRadius: 2, width: 80, mr: 2 }}
-            onClick={onClose}
-          >
+            onClick={onClose}>
             ยกเลิก
           </Button>
           <Button
-            id="btnConfirm"
-            variant="contained"
-            size="small"
-            color="primary"
+            id='btnConfirm'
+            variant='contained'
+            size='small'
+            color='primary'
             sx={{ borderRadius: 2, width: 80 }}
-            onClick={handleConfirm}
-          >
+            onClick={handleConfirm}>
             ยืนยัน
           </Button>
         </DialogActions>
       </Dialog>
-
-      {openDetailModal && (
-        <ExpenseDetail
-          isOpen={openDetailModal}
-          onClickClose={handleCloseDetailModal}
-          type={type}
-          edit={false}
-          periodProps={dataSelect}
-        />
-      )}
     </div>
   );
 }

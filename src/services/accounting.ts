@@ -18,16 +18,16 @@ export async function expenseSave(payload: ExpenseSaveRequest, files: File[]) {
   return response;
 }
 
-export async function expenseApproveByBranch(payload: any, files: File[]) {
+export async function expenseApproveByBranch(payload: ExpenseSaveRequest, files: File[]) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
   files.map((file: File) => {
     return bodyFormData.append('file[]', file);
   });
-  const response = await put(
-    getPathExpense(payload.docNo, environment.branchAccounting.expense.approve.branch.url),
+  const response = await post(
+    getPathExpense(payload.docNo || '', environment.branchAccounting.expense.approve.branch.url),
     bodyFormData,
-    ContentType.JSON
+    ContentType.MULTIPART
   )
     .then((result: any) => result)
     .catch((error) => {
@@ -36,16 +36,16 @@ export async function expenseApproveByBranch(payload: any, files: File[]) {
   return response;
 }
 
-export async function expenseApproveByOC(payload: any, files: File[]) {
+export async function expenseApproveByOC(payload: ExpenseSaveRequest, files: File[]) {
   const bodyFormData = new FormData();
   bodyFormData.append('requestBody', JSON.stringify(payload));
   files.map((file: File) => {
     return bodyFormData.append('file[]', file);
   });
   const response = await put(
-    getPathExpense(payload.docNo, environment.branchAccounting.expense.approve.ocArea.url),
+    getPathExpense(payload.docNo || '', environment.branchAccounting.expense.approve.ocArea.url),
     bodyFormData,
-    ContentType.JSON
+    ContentType.MULTIPART
   )
     .then((result: any) => result)
     .catch((error) => {
@@ -54,9 +54,9 @@ export async function expenseApproveByOC(payload: any, files: File[]) {
   return response;
 }
 
-export async function expenseApproveByAccount(payload: any) {
+export async function expenseApproveByAccount(payload: ExpenseSaveRequest) {
   const response = await put(
-    getPathExpense(payload.docNo, environment.branchAccounting.expense.approve.account.url),
+    getPathExpense(payload.docNo || '', environment.branchAccounting.expense.approve.account.url),
     payload,
     ContentType.JSON
   )
@@ -67,9 +67,9 @@ export async function expenseApproveByAccount(payload: any) {
   return response;
 }
 
-export async function expenseApproveByAccountManager(payload: any) {
+export async function expenseApproveByAccountManager(payload: ExpenseSaveRequest) {
   const response = await put(
-    getPathExpense(payload.docNo, environment.branchAccounting.expense.approve.accountManager.url),
+    getPathExpense(payload.docNo || '', environment.branchAccounting.expense.approve.accountManager.url),
     payload,
     ContentType.JSON
   )
@@ -80,9 +80,9 @@ export async function expenseApproveByAccountManager(payload: any) {
   return response;
 }
 
-export async function expenseRejectByOC(payload: any) {
+export async function expenseRejectByOC(payload: ExpenseSaveRequest) {
   const response = await put(
-    getPathExpense(payload.docNo, environment.branchAccounting.expense.reject.ocArea.url),
+    getPathExpense(payload.docNo || '', environment.branchAccounting.expense.reject.ocArea.url),
     payload,
     ContentType.JSON
   )
@@ -106,9 +106,9 @@ export async function expenseRejectByAccount(payload: any) {
   return response;
 }
 
-export async function expenseRejectByAccountManager(payload: any) {
+export async function expenseRejectByAccountManager(payload: ExpenseSaveRequest) {
   const response = await put(
-    getPathExpense(payload.docNo, environment.branchAccounting.expense.reject.accountManager.url),
+    getPathExpense(payload.docNo || '', environment.branchAccounting.expense.reject.accountManager.url),
     payload,
     ContentType.JSON
   )
