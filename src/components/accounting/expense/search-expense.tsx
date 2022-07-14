@@ -6,16 +6,19 @@ import {
   Select,
   MenuItem,
   Button,
-  CircularProgress,
+  // CircularProgress,
   FormHelperText,
 } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
+// import { LoadingButton } from '@mui/lab';
 import { useStyles } from '../../../styles/makeTheme';
 import { Upload, AddCircleOutline } from '@mui/icons-material';
 import { expenseTypes, expenseStatusList } from '../../../utils/enum/accounting-enum';
 import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
 import DatePickerMonth from '../../../components/commons/ui/date-picker-month';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
+import ModalSelectPeriod from '../expense/modal-select-period';
+import ExpenseDetail from '../expense/expense-detail';
+import LoadingModal from '../../commons/ui/loading-modal';
 
 // Import File ที่เกี่ยวข้องกับ Business Logic Select สาขา
 import BranchListDropDown from '../../../components/commons/ui/branch-list-dropdown';
@@ -32,8 +35,6 @@ import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
 } from '../../../store/slices/accounting/accounting-period-type-slice';
-import ModalSelectPeriod from '../expense/modal-select-period';
-import ExpenseDetail from '../expense/expense-detail';
 
 interface FormSelectProps {
   title: string;
@@ -143,9 +144,13 @@ export default function SearchExpense() {
   };
 
   const handleSearchExpense = async () => {
-    const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? false : true;
+    let isPeriodValidate = false
+    if (isAccountRole || isAccountManagerRole) {
+      isPeriodValidate = search.period === "" ? true : false
+    }
+    
     setIsValidate(true);
-    if (search.type && isPeriodValidate) {
+    if (search.type && !isPeriodValidate) {
       setIsSearch(true);
       setIsOpenLoading(true);
       const payload: ExpenseSearchRequest = {
@@ -344,24 +349,26 @@ export default function SearchExpense() {
           >
             เคลียร์
           </Button>
-          <LoadingButton
+          <Button
             id="btnSearch"
             variant="contained"
             color="primary"
+            disabled={isOpenLoading}
             onClick={handleSearchExpense}
-            loading={isOpenLoading}
-            loadingIndicator={
-              <Typography component="span" sx={{ fontSize: '11px' }}>
-                กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
-              </Typography>
-            }
+            // loading={isOpenLoading}
+            // loadingIndicator={
+            //   <Typography component="span" sx={{ fontSize: '11px' }}>
+            //     กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
+            //   </Typography>
+            // }
             sx={{ width: '170.42px', ml: 2 }}
             className={classes.MbtnSearch}
           >
             ค้นหา
-          </LoadingButton>
+          </Button>
         </Grid>
       </Grid>
+      <LoadingModal open={isOpenLoading} />
 
       {openSelectPeriod && (
         <ModalSelectPeriod
