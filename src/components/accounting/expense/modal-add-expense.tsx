@@ -310,7 +310,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
             </Grid>
             {!edit && (
               <>
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid container spacing={2} mb={2} mt={2} ml={1}>
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && !i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
@@ -338,7 +338,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                     })}
                 </Grid>
                 <Grid container spacing={2} mt={2}>
-                  <Grid item xs={1}>
+                  <Grid item xs={1} ml={1}>
                     ค่าอื่นๆ:
                   </Grid>
                   <Grid item xs={3}>
@@ -352,11 +352,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       fullWidth
                       placeholder=''
                       autoComplete='off'
+                      disabled={true}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid container spacing={2} mb={2} mt={2} ml={1}>
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
@@ -387,7 +388,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
 
             {edit && testList && (
               <>
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid container spacing={2} mb={2} mt={2} ml={1}>
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && !isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
@@ -414,7 +415,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       );
                     })}
                 </Grid>
-                <Grid container spacing={2} mt={2}>
+                <Grid container spacing={2} mt={2} ml={1}>
                   <Grid item xs={2}>
                     ค่าอื่นๆ:
                   </Grid>
@@ -429,11 +430,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       fullWidth
                       placeholder=''
                       autoComplete='off'
+                      disabled={true}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid container spacing={2} mb={2} mt={2} ml={1}>
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {

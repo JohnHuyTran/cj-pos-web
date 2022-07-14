@@ -718,19 +718,30 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         };
 
         totalWithDraw += Number(entrie?.withdrawAmount);
-        infosApprove = {
-          ...infosApprove,
-          id: 2,
-          description: 'ยอดเงินอนุมัติ',
-          [entrie.expenseNo]: entrie?.approvedAmount,
-        };
-        totalApprove += Number(entrie?.approvedAmount);
+
+        if (status === STATUS.WAITTING_ACCOUNTING) {
+          infosApprove = {
+            ...infosApprove,
+            id: 2,
+            description: 'ยอดเงินอนุมัติ',
+            [entrie.expenseNo]: entrie?.withdrawAmount,
+          };
+          totalApprove += Number(entrie?.withdrawAmount);
+        } else {
+          infosApprove = {
+            ...infosApprove,
+            id: 2,
+            description: 'ยอดเงินอนุมัติ',
+            [entrie.expenseNo]: entrie?.approvedAmount,
+          };
+          totalApprove += Number(entrie?.approvedAmount);
+        }
 
         infoDiff = {
-          ...infosApprove,
+          ...infoDiff,
           id: 3,
           description: 'ผลต่าง',
-          [entrie.expenseNo]: entrie?.approvedAmount,
+          [entrie.expenseNo]: '',
         };
         const master = getMasterExpenInto(entrie.expenseNo);
         const _isOtherExpense = master ? master.isOtherExpense : false;
@@ -748,6 +759,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         rows = [
           { ...infosWithDraw, total: totalWithDraw },
           { ...infosApprove, SUMOTHER: '', total: '' },
+        ];
+      } else if (status === STATUS.WAITTING_ACCOUNTING) {
+        rows = [
+          { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
+          { ...infosApprove, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
+          { ...infoDiff, total: '', SUMOTHER: '' },
         ];
       } else {
         rows = [

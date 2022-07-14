@@ -204,9 +204,11 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
         const key = element[0];
         const value = Number(element[1]) || 0;
         const withDraw = entries.find((entrie: SumItemsItem, i: number) => entrie.expenseNo === key);
+        const withdrawAmount = Number(withDraw?.withdrawAmount);
+        const diff = withdrawAmount - value;
         infoDiff = {
           ...infoDiff,
-          [key]: Number(withDraw?.withdrawAmount) - Number(value),
+          [key]: diff > 0 ? `+${diff}` : diff,
         };
       });
 
