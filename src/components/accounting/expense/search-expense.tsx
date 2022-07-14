@@ -367,22 +367,6 @@ export default function SearchExpense() {
             className={classes.MbtnSearch}>
             ค้นหา
           </Button>
-          <Button
-            id='btnSearch'
-            variant='contained'
-            color='primary'
-            disabled={isOpenLoading}
-            onClick={handleTestView}
-            // loading={isOpenLoading}
-            // loadingIndicator={
-            //   <Typography component="span" sx={{ fontSize: '11px' }}>
-            //     กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
-            //   </Typography>
-            // }
-            sx={{ width: '170.42px', ml: 2 }}
-            className={classes.MbtnSearch}>
-            Test View
-          </Button>
         </Grid>
       </Grid>
       <LoadingModal open={isOpenLoading} />
@@ -401,7 +385,7 @@ export default function SearchExpense() {
           isOpen={openDetailModal}
           onClickClose={handleCloseDetailModal}
           type={types}
-          edit={true}
+          edit={false}
           periodProps={dataSelect}
         />
       )}
