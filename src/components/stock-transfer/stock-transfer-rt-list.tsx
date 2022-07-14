@@ -16,10 +16,8 @@ import { updateAddItemsState } from '../../store/slices/add-items-slice';
 import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
 import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
 import { isPreferredUsername } from '../../utils/role-permission';
-import { getUserInfo, setInit } from '../../store/sessionStore';
+import { getUserInfo } from '../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
-import { featchExpenseDetailAsync } from '../../store/slices/accounting/accounting-slice';
-import ExpenseDetail from '../accounting/expense/expense-detail';
 
 interface loadingModalState {
   open: boolean;
@@ -293,31 +291,11 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
   // const [rtNoDel, setRtNoDel] = React.useState('');
   // const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
 
-  // const currentlySelected = async (params: GridCellParams) => {
-  //   const value = params.colDef.field;
-
-  //   handleOpenLoading('open', true);
-  //   await handleOpenDetailModal(params.row.rtNo, params.row.edit);
-  //   handleOpenLoading('open', false);
-
-  //   // if (value === 'delete') {
-  //   //   setRtNoDel(params.row.rtNo);
-  //   //   setOpenModelDeleteConfirm(true);
-  //   // } else {
-  //   //   handleOpenLoading('open', true);
-  //   //   await handleOpenDetailModal(params.row.rtNo, params.row.edit);
-  //   //   handleOpenLoading('open', false);
-  //   // }
-  // };
-
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
 
     handleOpenLoading('open', true);
-    // await handleOpenDetailModal(params.row.rtNo, params.row.edit);
-    await dispatch(featchExpenseDetailAsync('EX22070101-000024'));
-    setInit('Y');
-    setOpenDetailModal(true);
+    await handleOpenDetailModal(params.row.rtNo, params.row.edit);
     handleOpenLoading('open', false);
 
     // if (value === 'delete') {
@@ -329,6 +307,31 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
     //   handleOpenLoading('open', false);
     // }
   };
+
+  // const handleModelDeleteConfirm = async (confirm: boolean) => {
+  //   if (confirm === true) {
+  //     await removeStockRequest(rtNoDel)
+  //       .then((value) => {
+  //         const payloadNewpage: StockTransferRequest = {
+  //           limit: pageSize,
+  //           page: cuurentPage.toString(),
+  //           docNo: payload.docNo,
+  //           branchFrom: payload.branchFrom,
+  //           branchTo: payload.branchTo,
+  //           dateFrom: payload.dateFrom,
+  //           dateTo: payload.dateTo,
+  //           statuses: payload.statuses,
+  //           transferReason: payload.transferReason,
+  //         };
+  //         dispatch(featchSearchStockTransferRtAsync(payloadNewpage));
+  //         dispatch(saveSearchStockTransferRt(payloadNewpage));
+  //         setOpenModelDeleteConfirm(false);
+  //       })
+  //       .catch((error) => {});
+  //   } else {
+  //     setOpenModelDeleteConfirm(false);
+  //   }
+  // };
 
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const [typeDetailModal, setTypeDetailModal] = React.useState('View');
@@ -389,17 +392,13 @@ function StockTransferRtList({ onSelectRows }: DataGridProps) {
 
       <LoadingModal open={openLoadingModal.open} />
 
-      {/* {openDetailModal && (
+      {openDetailModal && (
         <ModalDetailStockTransfer
           type={typeDetailModal}
           edit={editDetailModal}
           isOpen={openDetailModal}
           onClickClose={handleCloseDetailModal}
         />
-      )} */}
-
-      {openDetailModal && (
-        <ExpenseDetail isOpen={openDetailModal} onClickClose={handleCloseDetailModal} type={'COFFEE'} edit={true} />
       )}
 
       {/* <ModelDeleteConfirm open={openModelDeleteConfirm} onClose={handleModelDeleteConfirm} rtNo={rtNoDel} /> */}

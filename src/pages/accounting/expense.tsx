@@ -43,7 +43,7 @@ export default function Expense() {
   return (
     <Container maxWidth='xl'>
       <TitleHeader title={t('documentSearch')} />
-
+      {/* 
       <Button
         data-testid='testid-btnSendToDC'
         id='btnSendToDC'
@@ -62,7 +62,7 @@ export default function Expense() {
           edit={edit}
           periodProps={periodMockData}
         />
-      </Box>
+      </Box> */}
 
       <Box mt={3}>
         <SearchExpense />

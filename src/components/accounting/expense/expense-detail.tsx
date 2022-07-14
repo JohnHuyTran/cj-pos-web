@@ -378,57 +378,64 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setIsOpenModelConfirmExpense(true);
         setShowReason(true);
       }
-    } else {
-      if (status === STATUS.WAITTING_APPROVAL1) {
-        setShowReason(false);
+    } else if (status === STATUS.SEND_BACK_EDIT) {
+      const isFileValidate: boolean = validateFileInfo();
+      const isvalidateDate = validateDateIsBeforPeriod();
+      if (isFileValidate && isvalidateDate) {
         setIsOpenModelConfirmExpense(true);
-      } else if (status === STATUS.WAITTING_APPROVAL2) {
-        setOpenModelConfirm(true);
-      } else if (status === STATUS.WAITTING_ACCOUNTING) {
-        setOpenModelConfirm(true);
+        setShowReason(true);
       }
-    }
-  };
-
-  const onCallbackFunction = (value: any) => {
-    setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
-    if (isApprove) {
-      if (status === STATUS.DRAFT) {
-        onApproveByBranch(value.reason);
-      } else if (status === STATUS.WAITTING_APPROVAL1) {
-        onApproveByAreaMangerOC();
-      } else if (status === STATUS.WAITTING_APPROVAL2) {
-        onApproveByAccount();
-      } else if (status === STATUS.WAITTING_ACCOUNTING) {
-        onApproveByAccountManager(value.expenDate, value.approveDate);
-      }
-    } else {
-      if (status === STATUS.WAITTING_APPROVAL1) {
-        onRejectByAreaMangerOC(value.reason);
-      } else if (status === STATUS.WAITTING_APPROVAL2) {
-        //call confirm nun
-      } else if (status === STATUS.WAITTING_ACCOUNTING) {
-        //call confirm nun
-      }
+    } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
+      setShowReason(false);
+      setIsOpenModelConfirmExpense(true);
+    } else if (status === STATUS.WAITTING_ACCOUNTING) {
+      // nun
+      setOpenModelConfirm(true);
+    } else if (status === STATUS.WAITTING_APPROVAL3) {
+      //nun
+      setOpenModelConfirm(true);
     }
   };
 
   const handleRejectBtn = () => {
     setIsApprove(false);
 
-    if (status === STATUS.WAITTING_APPROVAL1) {
+    if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
       setIsOpenModelConfirmExpense(true);
       setShowReason(true);
       setValidateReason(true);
-    } else if (status === STATUS.WAITTING_APPROVAL2) {
-      setShowReason(true);
-      setValidateReason(true);
-      setShowForward(true);
-      setIsOpenModelConfirmExpense(true);
     } else if (status === STATUS.WAITTING_ACCOUNTING) {
+      setShowReason(true);
       setValidateReason(true);
       setShowForward(true);
       setIsOpenModelConfirmExpense(true);
+    } else if (status === STATUS.WAITTING_APPROVAL3) {
+      setValidateReason(true);
+      setShowForward(true);
+      setIsOpenModelConfirmExpense(true);
+    }
+  };
+
+  const onCallbackFunction = (value: any) => {
+    setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
+    if (isApprove) {
+      if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT || status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
+        onApproveByBranch(value.reason);
+      } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
+        onApproveByAreaMangerOC();
+      } else if (status === STATUS.WAITTING_ACCOUNTING) {
+        onApproveByAccount();
+      } else if (status === STATUS.WAITTING_APPROVAL3) {
+        onApproveByAccountManager(value.startDate, value.endDate);
+      }
+    } else {
+      if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
+        onRejectByAreaMangerOC(value.reason);
+      } else if (status === STATUS.WAITTING_ACCOUNTING) {
+        onRejectByAccount(value.forward, value.reason);
+      } else if (status === STATUS.WAITTING_APPROVAL3) {
+        onRejectByAccountManager(value.reason);
+      }
     }
   };
 
@@ -783,7 +790,10 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                 enabledControl={status === STATUS.DRAFT}
                 idControl={'AttachFileSave'}
               /> */}
-              <AccordionUploadSingleFile files={attachFiles} disabledControl={status !== STATUS.DRAFT} />
+              <AccordionUploadSingleFile
+                files={attachFiles}
+                disabledControl={!(status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT)}
+              />
             </Grid>
             <Grid item xs={1}>
               <Typography variant='body2'>แนบเอกสารแก้ไข:</Typography>
@@ -795,7 +805,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                 docType='BA'
                 isStatus={uploadFileFlag}
                 onChangeUploadFile={handleOnChangeUploadFileEdit}
-                enabledControl={status === STATUS.SEND_BACK_EDIT}
+                enabledControl={status === STATUS.WAITTING_EDIT_ATTACH_FILE}
                 idControl={'AttachFileEdit'}
               />
             </Grid>
