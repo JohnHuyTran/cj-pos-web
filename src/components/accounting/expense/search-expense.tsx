@@ -155,15 +155,8 @@ export default function SearchExpense() {
   };
 
   const handleSearchExpense = async () => {
-    // const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? false : true;
     const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? true : false;
     setIsValidate(true);
-
-    // console.log('search.period:', search.period);
-    // console.log('isAccountRole:', isAccountRole);
-    // console.log('isAccountManagerRole:', isAccountManagerRole);
-    // console.log('isPeriodValidate:', isPeriodValidate);
-    // console.log('search.type:', search.type);
 
     if (search.type && isPeriodValidate) {
       setIsSearch(true);
@@ -175,8 +168,6 @@ export default function SearchExpense() {
         ...search,
         period: +search.period,
       };
-
-      // console.log('payload:', JSON.stringify(payload));
 
       await dispatch(featchBranchAccountingListAsync(payload)).then((res) => {
         setTimeout(() => {
@@ -289,7 +280,6 @@ export default function SearchExpense() {
                 disabled={true}>
                 EXPORT
               </Button>
-              {/* {isSearch && !isValidate && ( */}
               <Fragment>
                 <Button
                   id='btnSearch'
@@ -312,7 +302,6 @@ export default function SearchExpense() {
                   อนุมัติทั้งหมด
                 </Button>
               </Fragment>
-              {/* )} */}
             </Fragment>
           )}
         </Grid>
