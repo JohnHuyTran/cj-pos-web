@@ -7,6 +7,7 @@ import { ExpenseInfo, payLoadAdd } from '../../../models/branch-accounting-model
 import { addSummaryItem } from '../../../store/slices/accounting/accounting-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
 import { isFilterFieldInExpense, isFilterOutFieldInAdd, stringNullOrEmpty } from '../../../utils/utils';
+import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 
 interface Props {
   open: boolean;
@@ -36,16 +37,17 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
     testList.map((e: any) => {
       data = { ...data, [e.key]: e.value };
       if (!isFilterOutFieldInAdd(e.key)) {
-        sum += e.value;
+        sum += Number(e.value) || 0;
 
         const master = getMasterExpenInto(e.key);
         const _isOtherExpense = master ? master.isOtherExpense : false;
         if (_isOtherExpense) {
-          _otherSum += stringNullOrEmpty(e.value) ? 0 : sum;
+          _otherSum += Number(e.value) || 0;
         }
       }
     });
     data = { ...data, total: sum, SUMOTHER: _otherSum };
+    console.log('data', data);
     await dispatch(addSummaryItem(data));
     setTimeout(() => {
       setOpenLoadingModal(false);
@@ -85,6 +87,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
   return (
     <div>
       <Dialog open={open} maxWidth='md' fullWidth={true} key='modal-add-expense'>
+        <BootstrapDialogTitle id='dialog-title' onClose={onClose} />
         <DialogContent>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={3}>

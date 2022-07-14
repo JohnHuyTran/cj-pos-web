@@ -42,8 +42,8 @@ export async function expenseApproveByOC(payload: ExpenseSaveRequest, files: Fil
   files.map((file: File) => {
     return bodyFormData.append('file[]', file);
   });
-  const response = await put(
-    getPathExpense(payload.docNo || '', environment.branchAccounting.expense.approve.ocArea.url),
+  const response = await post(
+    environment.branchAccounting.expense.approve.ocArea.url,
     bodyFormData,
     ContentType.MULTIPART
   )
@@ -81,7 +81,7 @@ export async function expenseApproveByAccountManager(payload: ExpenseSaveRequest
 }
 
 export async function expenseRejectByOC(payload: ExpenseSaveRequest) {
-  const response = await put(
+  const response = await post(
     getPathExpense(payload.docNo || '', environment.branchAccounting.expense.reject.ocArea.url),
     payload,
     ContentType.JSON

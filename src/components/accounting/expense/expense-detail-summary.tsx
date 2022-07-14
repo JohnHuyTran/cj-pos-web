@@ -143,7 +143,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   }, [periodProps]);
 
   const currentlySelected = async (params: GridCellParams) => {
-    if (params.id === 2 && status === STATUS.WAITTING_ACCOUNTING) {
+    if (params.id === 2 && (status === STATUS.WAITTING_ACCOUNTING || status === STATUS.WAITTING_APPROVAL2)) {
       let listPayload: payLoadAdd[] = [];
       const arr = Object.entries(params.row);
       await arr.forEach((element: any, index: number) => {
@@ -202,7 +202,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
       let totalDiff: number = 0;
       arr.map((element: any, i: number) => {
         const key = element[0];
-        const value = element[1];
+        const value = Number(element[1]) || 0;
         const withDraw = entries.find((entrie: SumItemsItem, i: number) => entrie.expenseNo === key);
         infoDiff = {
           ...infoDiff,

@@ -22,7 +22,7 @@ import LoadingModal from '../../commons/ui/loading-modal';
 
 // Import File ที่เกี่ยวข้องกับ Business Logic Select สาขา
 import BranchListDropDown from '../../../components/commons/ui/branch-list-dropdown';
-import { getUserInfo } from '../../../store/sessionStore';
+import { getUserInfo, setInit } from '../../../store/sessionStore';
 import { isGroupBranch } from '../../../utils/role-permission';
 import { getBranchName } from '../../../utils/utils';
 import { BranchListOptionType } from '../../../models/branch-model';
@@ -35,6 +35,7 @@ import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
 } from '../../../store/slices/accounting/accounting-period-type-slice';
+import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-slice';
 
 interface FormSelectProps {
   title: string;
@@ -144,11 +145,11 @@ export default function SearchExpense() {
   };
 
   const handleSearchExpense = async () => {
-    let isPeriodValidate = false
+    let isPeriodValidate = false;
     if (isAccountRole || isAccountManagerRole) {
-      isPeriodValidate = search.period === "" ? true : false
+      isPeriodValidate = search.period === '' ? true : false;
     }
-    
+
     setIsValidate(true);
     if (search.type && !isPeriodValidate) {
       setIsSearch(true);
@@ -173,6 +174,13 @@ export default function SearchExpense() {
   const handleApprove = () => {};
 
   const handleApproveAll = () => {};
+  const handleTestView = async () => {
+    setIsOpenLoading(true);
+    await dispatch(featchExpenseDetailAsync('EX22070101-000024'));
+    setInit('Y');
+    setOpenDetailModal(true);
+    setIsOpenLoading(false);
+  };
 
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [openSelectPeriod, setOpenSelectPeriod] = useState(false);
@@ -205,7 +213,7 @@ export default function SearchExpense() {
       <Grid container rowSpacing={1} columnSpacing={7}>
         <Grid item md={4} sm={4} xs={6}>
           <FormSelect
-            title="ประเภท"
+            title='ประเภท'
             dataList={expenseTypes}
             value={search.type}
             isDisabled={isOpenLoading}
@@ -214,7 +222,7 @@ export default function SearchExpense() {
           />
         </Grid>
         <Grid item md={4} sm={4} xs={6}>
-          <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+          <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
             สาขา
           </Typography>
           <BranchListDropDown
@@ -228,7 +236,7 @@ export default function SearchExpense() {
         </Grid>
         <Grid item md={4} sm={4} xs={6}>
           <FormSelect
-            title="สถานะ"
+            title='สถานะ'
             dataList={expenseStatusList}
             value={search.status}
             isValidate={isValidate}
@@ -237,7 +245,7 @@ export default function SearchExpense() {
           />
         </Grid>
         <Grid item md={4} sm={4} xs={6}>
-          <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+          <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
             เดือน
           </Typography>
           <DatePickerMonth
@@ -250,7 +258,7 @@ export default function SearchExpense() {
           (isAccountManagerRole && (
             <Grid item md={4} sm={4} xs={6}>
               <FormSelect
-                title="งวดเบิก"
+                title='งวดเบิก'
                 dataList={expensePeriodList}
                 value={search.period}
                 isValidate={isValidate}
@@ -265,31 +273,29 @@ export default function SearchExpense() {
           {isAccountManagerRole && (
             <Fragment>
               <Button
-                id="btnExport"
-                variant="contained"
-                color="primary"
+                id='btnExport'
+                variant='contained'
+                color='primary'
                 onClick={handleExport}
                 sx={{ width: '170.42px', mr: 2 }}
                 startIcon={<Upload />}
-                className={classes.MbtnSearch}
-              >
+                className={classes.MbtnSearch}>
                 EXPORT
               </Button>
               {isSearch && !isValidate && (
                 <Fragment>
                   <Button
-                    id="btnSearch"
-                    variant="contained"
-                    color="primary"
+                    id='btnSearch'
+                    variant='contained'
+                    color='primary'
                     onClick={handleApprove}
                     sx={{ width: '170.42px', mr: 2 }}
-                    className={classes.MbtnSearch}
-                  >
+                    className={classes.MbtnSearch}>
                     อนุมัติ
                   </Button>
                   <Button
-                    id="btnSearch"
-                    variant="contained"
+                    id='btnSearch'
+                    variant='contained'
                     disabled={search.status !== 'WAITTING_APPROVAL3'}
                     onClick={handleApproveAll}
                     sx={{
@@ -297,8 +303,7 @@ export default function SearchExpense() {
                       background: '#5468ff',
                       ':hover': { boxShadow: 6, background: '#3e4cb8' },
                     }}
-                    className={classes.MbtnSearch}
-                  >
+                    className={classes.MbtnSearch}>
                     อนุมัติทั้งหมด
                   </Button>
                 </Fragment>
@@ -310,9 +315,9 @@ export default function SearchExpense() {
           {isBranchRole && (
             <Fragment>
               <Button
-                id="btnCoffee"
-                variant="contained"
-                color="primary"
+                id='btnCoffee'
+                variant='contained'
+                color='primary'
                 onClick={() => handleOpenSelectPeriodModal('COFFEE')}
                 startIcon={<AddCircleOutline />}
                 sx={{
@@ -321,38 +326,35 @@ export default function SearchExpense() {
                   background: '#5468ff',
                   ':hover': { boxShadow: 6, background: '#3e4cb8' },
                 }}
-                className={classes.MbtnSearch}
-              >
+                className={classes.MbtnSearch}>
                 ค่าใช้จ่ายร้านกาแฟ
               </Button>
               <Button
-                id="btnStorefront"
-                variant="contained"
-                color="warning"
+                id='btnStorefront'
+                variant='contained'
+                color='warning'
                 onClick={() => handleOpenSelectPeriodModal('STOREFRONT')}
                 sx={{ width: '170.42px', mr: 2 }}
                 startIcon={<AddCircleOutline />}
-                className={classes.MbtnSearch}
-              >
+                className={classes.MbtnSearch}>
                 ค่าใช้จ่ายหน้าร้าน
               </Button>
             </Fragment>
           )}
           <Button
-            id="btnClear"
-            variant="contained"
+            id='btnClear'
+            variant='contained'
             disabled={isOpenLoading}
             onClick={handleClearSearch}
             sx={{ width: '170.42px' }}
             className={classes.MbtnClear}
-            color="cancelColor"
-          >
+            color='cancelColor'>
             เคลียร์
           </Button>
           <Button
-            id="btnSearch"
-            variant="contained"
-            color="primary"
+            id='btnSearch'
+            variant='contained'
+            color='primary'
             disabled={isOpenLoading}
             onClick={handleSearchExpense}
             // loading={isOpenLoading}
@@ -362,9 +364,24 @@ export default function SearchExpense() {
             //   </Typography>
             // }
             sx={{ width: '170.42px', ml: 2 }}
-            className={classes.MbtnSearch}
-          >
+            className={classes.MbtnSearch}>
             ค้นหา
+          </Button>
+          <Button
+            id='btnSearch'
+            variant='contained'
+            color='primary'
+            disabled={isOpenLoading}
+            onClick={handleTestView}
+            // loading={isOpenLoading}
+            // loadingIndicator={
+            //   <Typography component="span" sx={{ fontSize: '11px' }}>
+            //     กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
+            //   </Typography>
+            // }
+            sx={{ width: '170.42px', ml: 2 }}
+            className={classes.MbtnSearch}>
+            Test View
           </Button>
         </Grid>
       </Grid>
@@ -384,7 +401,7 @@ export default function SearchExpense() {
           isOpen={openDetailModal}
           onClickClose={handleCloseDetailModal}
           type={types}
-          edit={false}
+          edit={true}
           periodProps={dataSelect}
         />
       )}
@@ -396,20 +413,19 @@ const FormSelect = ({ title, value, setValue, dataList, isValidate, isDisabled }
   const classes = useStyles();
   return (
     <Fragment>
-      <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+      <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
         {title}
       </Typography>
-      <FormControl id="SearchType" className={classes.Mselect} fullWidth error={value === '' && isValidate}>
+      <FormControl id='SearchType' className={classes.Mselect} fullWidth error={value === '' && isValidate}>
         <Select
-          id="type"
-          name="type"
+          id='type'
+          name='type'
           value={value}
           disabled={isDisabled}
           onChange={(e) => setValue(e)}
           displayEmpty
           renderValue={value !== '' ? undefined : () => <div style={{ color: '#CBD4DB' }}>{`กรุณาเลือก${title}`}</div>}
-          inputProps={{ 'aria-label': 'Without label' }}
-        >
+          inputProps={{ 'aria-label': 'Without label' }}>
           {dataList.map((item, index: number) => (
             <MenuItem key={index} value={item.key}>
               {item.text}
