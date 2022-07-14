@@ -143,9 +143,13 @@ export default function SearchExpense() {
   };
 
   const handleSearchExpense = async () => {
-    const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? false : true;
+    let isPeriodValidate = false
+    if (isAccountRole || isAccountManagerRole) {
+      isPeriodValidate = search.period === "" ? true : false
+    }
+    
     setIsValidate(true);
-    if (search.type && isPeriodValidate) {
+    if (search.type && !isPeriodValidate) {
       setIsSearch(true);
       setIsOpenLoading(true);
       const payload: ExpenseSearchRequest = {
