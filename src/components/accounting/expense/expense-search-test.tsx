@@ -1,9 +1,10 @@
+import React, { ReactElement, useState } from 'react';
 import { Box, Button, Grid } from '@mui/material';
-import { ReactElement, useEffect, useState } from 'react';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import ExpenseSearchList from './expense-search-list';
+import ModelConfirmSearch from './confirm/modal-confirm-search';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import ModalSelectPeriod from '../expense/modal-select-period';
 import {
@@ -16,18 +17,38 @@ function expenseSearch(): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
-  const [docNo, setDocNo] = useState('');
+  const [docNo, setDocNo] = React.useState('');
 
+  const [selectRowsList, setSelectRowsList] = React.useState<Array<any>>([]);
   const handleSelectRows = async (list: any) => {
     console.log('list:', JSON.stringify(list));
+    setSelectRowsList(list);
   };
 
-  const [flagSearch, setFlagSearch] = useState(false);
+  const [flagSearch, setFlagSearch] = React.useState(false);
+  const [flagBtnApproveAll, setFlagBtnApproveAll] = React.useState(true);
   const items = useAppSelector((state) => state.searchBranchAccounting);
   const orderListDatas = items.branchAccountingList.data ? items.branchAccountingList.data : [];
+
+  if (flagSearch && orderListDatas.length > 0 && flagBtnApproveAll) setFlagBtnApproveAll(false);
+
   const onClickSearchBtn = async () => {
     // await dispatch(featchBranchAccountingListAsync());
     setFlagSearch(true);
+  };
+
+  const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  const handleOpenModelConfirm = () => {
+    setOpenModelConfirm(true);
+  };
+
+  const handleCloseModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+
+  const handleConfirm = (periodData: any) => {
+    console.log('handleConfirm');
+    console.log('periodData:', periodData);
   };
 
   const [openSelectPeriod, setOpenSelectPeriod] = useState(false);
@@ -48,9 +69,30 @@ function expenseSearch(): ReactElement {
 
   return (
     <>
-      <Box mb={6}>
+      <Box mb={2}>
         <Grid container spacing={2} mt={4} mb={2}>
-          <Grid item xs={5}></Grid>
+          <Grid item xs={5}>
+            <Button
+              id='btnSearch'
+              variant='contained'
+              color='primary'
+              onClick={handleOpenModelConfirm}
+              sx={{ width: 110 }}
+              className={classes.MbtnSearch}
+              disabled={selectRowsList.length === 0 || orderListDatas.length === 0}>
+              อนุมัติ
+            </Button>
+            <Button
+              id='btnSearch'
+              variant='contained'
+              color='secondary'
+              onClick={handleOpenModelConfirm}
+              sx={{ width: 110, ml: 2 }}
+              className={classes.MbtnSearch}
+              disabled={flagBtnApproveAll}>
+              อนุมัติทั้งหมด
+            </Button>
+          </Grid>
           <Grid item xs={7} sx={{ textAlign: 'end' }}>
             <Button
               id='btnCreateStockTransferModal'
@@ -99,6 +141,14 @@ function expenseSearch(): ReactElement {
           )}
         </div>
       )}
+
+      <ModelConfirmSearch
+        open={openModelConfirm}
+        onClose={handleCloseModelConfirm}
+        onConfirm={handleConfirm}
+        startDate='2022-06-16T00:00:00+07:00'
+        endDate='2022-06-30T23:59:59.999999999+07:00'
+      />
 
       <ModalSelectPeriod
         open={openSelectPeriod}

@@ -8,6 +8,7 @@ import {
   Button,
   // CircularProgress,
   FormHelperText,
+  Box,
 } from '@mui/material';
 // import { LoadingButton } from '@mui/lab';
 import { useStyles } from '../../../styles/makeTheme';
@@ -29,13 +30,18 @@ import { BranchListOptionType } from '../../../models/branch-model';
 import { env } from '../../../adapters/environmentConfigs';
 
 // Call API
-import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
+import {
+  clearDataSearchBranchAccounting,
+  featchBranchAccountingListAsync,
+} from '../../../store/slices/accounting/accounting-search-slice';
 import { ExpenseSearchRequest, ExpensePeriod } from '../../../models/branch-accounting-model';
 import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
 } from '../../../store/slices/accounting/accounting-period-type-slice';
-import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-slice';
+import ExpenseSearchList from './expense-search-list';
+import ModelConfirmSearch from './confirm/modal-confirm-search';
+import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
 
 interface FormSelectProps {
   title: string;
@@ -111,6 +117,11 @@ export default function SearchExpense() {
   const [branchFromCode, setBranchFromCode] = useState('');
   const [isOpenLoading, setIsOpenLoading] = useState(false);
 
+  const items = useAppSelector((state) => state.searchBranchAccounting);
+  const orderListDatas = items.branchAccountingList.data ? items.branchAccountingList.data : [];
+  const [flagBtnApproveAll, setFlagBtnApproveAll] = useState(true);
+  const [openLoadingModal, setOpenLoadingModal] = useState(false);
+
   // Lifecycle hooks
   useEffect(() => {
     if (groupBranch) {
@@ -138,34 +149,49 @@ export default function SearchExpense() {
   }, [search.type]);
 
   // Handle function
-  const handleClearSearch = () => {
+  const handleClearSearch = async () => {
+    setOpenLoadingModal(true);
     setSearch({ ...initialSearchState });
     setIsValidate(false);
     setIsSearch(false);
+
+    setFlagBtnApproveAll(true);
+    await dispatch(clearDataSearchBranchAccounting());
+    setOpenLoadingModal(false);
   };
 
   const handleSearchExpense = async () => {
-    let isPeriodValidate = false;
-    if (isAccountRole || isAccountManagerRole) {
-      isPeriodValidate = search.period === '' ? true : false;
-    }
-
+    // let isPeriodValidate = false
+    // if (isAccountRole || isAccountManagerRole) {
+    //   isPeriodValidate = search.period === "" ? true : false
+    // }
+    const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? true : false;
     setIsValidate(true);
-    if (search.type && !isPeriodValidate) {
-      setIsSearch(true);
+
+    if (search.type && isPeriodValidate) {
+      // setOpenLoadingModal(true);
       setIsOpenLoading(true);
+      setFlagBtnApproveAll(true);
       const payload: ExpenseSearchRequest = {
         limit: '10',
         page: '1',
         ...search,
         period: +search.period,
       };
+
       await dispatch(featchBranchAccountingListAsync(payload)).then((res) => {
         setTimeout(() => {
           setIsValidate(false);
-          setIsOpenLoading(false);
-        }, 500);
+          // setIsOpenLoading(false);
+
+          const payload: any = res.payload ? res.payload : [];
+          if (search.status === 'WAITTING_APPROVAL3' && payload.data.length) setFlagBtnApproveAll(!flagBtnApproveAll);
+        }, 300);
       });
+      await dispatch(saveExpenseSearch(payload));
+      setIsSearch(true);
+      // setOpenLoadingModal(false);
+      setIsOpenLoading(false);
     }
   };
 
@@ -173,13 +199,8 @@ export default function SearchExpense() {
 
   const handleApprove = () => {};
 
-  const handleApproveAll = () => {};
-  const handleTestView = async () => {
-    setIsOpenLoading(true);
-    await dispatch(featchExpenseDetailAsync('EX22070101-000024'));
-    setInit('Y');
-    setOpenDetailModal(true);
-    setIsOpenLoading(false);
+  const handleApproveAll = () => {
+    handleOpenModelConfirm();
   };
 
   const [openDetailModal, setOpenDetailModal] = useState(false);
@@ -191,10 +212,12 @@ export default function SearchExpense() {
     endDate: '',
   });
   const handleOpenSelectPeriodModal = async (type: string) => {
+    setOpenLoadingModal(true);
     setType(type);
     await dispatch(clearDataExpensePeriod());
     await dispatch(featchExpensePeriodTypeAsync(type));
     setOpenSelectPeriod(true);
+    setOpenLoadingModal(false);
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);
@@ -206,6 +229,26 @@ export default function SearchExpense() {
 
   const handleCloseDetailModal = () => {
     setOpenDetailModal(false);
+  };
+
+  const [selectRowsList, setSelectRowsList] = useState<Array<any>>([]);
+  const handleSelectRows = async (list: any) => {
+    console.log('list:', JSON.stringify(list));
+    setSelectRowsList(list);
+  };
+
+  const [openModelConfirm, setOpenModelConfirm] = useState(false);
+  const handleOpenModelConfirm = () => {
+    setOpenModelConfirm(true);
+  };
+
+  const handleCloseModelConfirm = () => {
+    setOpenModelConfirm(false);
+  };
+
+  const handleConfirm = (periodData: any) => {
+    console.log('handleConfirm');
+    console.log('periodData:', periodData);
   };
 
   return (
@@ -277,37 +320,35 @@ export default function SearchExpense() {
                 variant='contained'
                 color='primary'
                 onClick={handleExport}
-                sx={{ width: '170.42px', mr: 2 }}
+                sx={{ width: 110, mr: 2 }}
                 startIcon={<Upload />}
-                className={classes.MbtnSearch}>
+                className={classes.MbtnSearch}
+                disabled={true}>
                 EXPORT
               </Button>
-              {isSearch && !isValidate && (
-                <Fragment>
-                  <Button
-                    id='btnSearch'
-                    variant='contained'
-                    color='primary'
-                    onClick={handleApprove}
-                    sx={{ width: '170.42px', mr: 2 }}
-                    className={classes.MbtnSearch}>
-                    อนุมัติ
-                  </Button>
-                  <Button
-                    id='btnSearch'
-                    variant='contained'
-                    disabled={search.status !== 'WAITTING_APPROVAL3'}
-                    onClick={handleApproveAll}
-                    sx={{
-                      width: '170.42px',
-                      background: '#5468ff',
-                      ':hover': { boxShadow: 6, background: '#3e4cb8' },
-                    }}
-                    className={classes.MbtnSearch}>
-                    อนุมัติทั้งหมด
-                  </Button>
-                </Fragment>
-              )}
+              <Fragment>
+                <Button
+                  id='btnSearch'
+                  variant='contained'
+                  color='primary'
+                  onClick={handleApprove}
+                  sx={{ width: 110, mr: 2 }}
+                  className={classes.MbtnSearch}
+                  disabled={selectRowsList.length === 0}>
+                  อนุมัติ
+                </Button>
+                <Button
+                  id='btnSearch'
+                  variant='contained'
+                  color='secondary'
+                  // disabled={flagBtnApproveAll}
+                  // onClick={handleApproveAll}
+                  disabled={true}
+                  sx={{ width: 110 }}
+                  className={classes.MbtnSearch}>
+                  อนุมัติทั้งหมด
+                </Button>
+              </Fragment>
             </Fragment>
           )}
         </Grid>
@@ -321,7 +362,7 @@ export default function SearchExpense() {
                 onClick={() => handleOpenSelectPeriodModal('COFFEE')}
                 startIcon={<AddCircleOutline />}
                 sx={{
-                  width: '170.42px',
+                  width: 160,
                   mr: 2,
                   background: '#5468ff',
                   ':hover': { boxShadow: 6, background: '#3e4cb8' },
@@ -334,7 +375,7 @@ export default function SearchExpense() {
                 variant='contained'
                 color='warning'
                 onClick={() => handleOpenSelectPeriodModal('STOREFRONT')}
-                sx={{ width: '170.42px', mr: 2 }}
+                sx={{ width: 160, mr: 2 }}
                 startIcon={<AddCircleOutline />}
                 className={classes.MbtnSearch}>
                 ค่าใช้จ่ายหน้าร้าน
@@ -346,7 +387,7 @@ export default function SearchExpense() {
             variant='contained'
             disabled={isOpenLoading}
             onClick={handleClearSearch}
-            sx={{ width: '170.42px' }}
+            sx={{ width: 110 }}
             className={classes.MbtnClear}
             color='cancelColor'>
             เคลียร์
@@ -371,6 +412,8 @@ export default function SearchExpense() {
       </Grid>
       <LoadingModal open={isOpenLoading} />
 
+      {/* <LoadingModal open={openLoadingModal} /> */}
+
       {openSelectPeriod && (
         <ModalSelectPeriod
           open={openSelectPeriod}
@@ -389,6 +432,28 @@ export default function SearchExpense() {
           periodProps={dataSelect}
         />
       )}
+
+      {isSearch && (
+        <div>
+          {orderListDatas.length > 0 && <ExpenseSearchList onSelectRows={handleSelectRows} />}
+          {orderListDatas.length === 0 && (
+            <Grid item container xs={12} justifyContent='center'>
+              <Box color='#CBD4DB' sx={{ mt: 5 }}>
+                <h2>ไม่มีข้อมูล</h2>
+              </Box>
+            </Grid>
+          )}
+        </div>
+      )}
+
+      <ModelConfirmSearch
+        open={openModelConfirm}
+        onClose={handleCloseModelConfirm}
+        onConfirm={handleConfirm}
+        startDate='2022-06-16T00:00:00+07:00'
+        endDate='2022-06-30T23:59:59.999999999+07:00'
+        items={orderListDatas}
+      />
     </Fragment>
   );
 }

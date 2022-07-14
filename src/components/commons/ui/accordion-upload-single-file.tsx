@@ -121,6 +121,29 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
     }
   }, [fileList, !isStatus]);
 
+  function getHuaweiFileUrl(item: fileDisplayList) {
+    const keys = item.fileKey ? item.fileKey : '';
+    const branchCode = item.branchCode ? item.branchCode : '';
+    const name = item.fileName ? item.fileName : '';
+
+    if (item.status === 'old') {
+      getFileUrlHuawei(keys, branchCode)
+        .then((resp) => {
+          if (resp && resp.data) {
+            setFileUrl(resp.data);
+            setIsImage(item.mimeType === 'image/jpeg');
+            setNewFilename(name);
+            setDisplayFile(true);
+          }
+        })
+        .catch((error: ApiError) => {
+          console.log('error', error);
+          setErrorBrowseFile(true);
+          setMsgErrorBrowseFile(error.message);
+        });
+    }
+  }
+
   const mapHuaweiFile = (file: any) => {
     newFileHuawei = file.map((data: FileType, index: number) => {
       return {
@@ -210,11 +233,29 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'space-between',
+                    cursor: 'pointer',
                   }}
                 >
-                  <Typography color="secondary" sx={{ fontSize: '13px', whiteSpace: 'normal' }} noWrap>
+                  {item.status === 'old' && (
+                    <Typography
+                      color="secondary"
+                      sx={{ textDecoration: 'underline', fontSize: '13px', whiteSpace: 'normal' }}
+                      noWrap
+                      onClick={() => getHuaweiFileUrl(item)}
+                    >
+                      {item.fileName}
+                    </Typography>
+                  )}
+
+                  {item.status === 'new' && (
+                    <Typography color="secondary" sx={{ fontSize: '13px', whiteSpace: 'normal' }} noWrap>
+                      {item.fileName}
+                    </Typography>
+                  )}
+
+                  {/* <Typography color="secondary" sx={{ fontSize: '13px', whiteSpace: 'normal' }} noWrap>
                     {item.fileName}
-                  </Typography>
+                  </Typography> */}
                 </Box>
               ))}
           </Box>
@@ -232,12 +273,20 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
                 size="small"
                 component="span"
               >
-                Browse
+                แนบไฟล์
               </Button>
             </label>
           </Box>
         </Grid>
       </Grid>
+
+      <ModalShowHuaweiFile
+        open={displayFile}
+        onClose={() => setDisplayFile(false)}
+        fileName={newFilename}
+        url={fileUrl}
+        isImage={isImage}
+      />
 
       <ModalAlert open={errorBrowseFile} onClose={closeDialogConfirm} errormsg={msgErrorBrowseFile} />
     </>
