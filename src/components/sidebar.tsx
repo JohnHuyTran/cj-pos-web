@@ -15,6 +15,7 @@ import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
+import SettingsIcon from '@mui/icons-material/Settings';
 import SwapHorizontalCircleIcon from '@mui/icons-material/SwapHorizontalCircle';
 import { useAppSelector, useAppDispatch } from '../store/store';
 import { changeState } from '../store/slices/nav-slice';
@@ -77,6 +78,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [openProductInfoMenu, setOpenProductInfoMenu] = React.useState(false);
   const [openPurchaseBranchMenu, setOpenPurchaseBranchMenu] = React.useState(false);
   const [openExpenseMenu, setOpenExpenseMenu] = React.useState(false);
+  const [openSettingsMenu, setOpenSettingsMenu] = React.useState(false);
 
   const navState = useAppSelector((state) => state.navigator.state);
 
@@ -87,6 +89,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableMainMenuProductInfo, setDisableMainMenuProductInfo] = React.useState(true);
   const [disableMainMenuPurchaseBranch, setDisableMainMenuPurchaseBranch] = React.useState(true);
   const [disableMainMenuExpense, setDisableMainMenuExpense] = React.useState(true);
+  const [disableMainMenuSettings, setDisableMainMenuSettings] = React.useState(true);
 
   const [disableSubMenuOROrderReceive, setDisableSubMenuOROrderReceive] = React.useState(true);
   const [disableSubMenuORStockDiff, setDisableSubMenuORStockDiff] = React.useState(true);
@@ -99,6 +102,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuStockMovement, setDisableSubMenuStockMovement] = React.useState(true);
   const [disableSubMenuCreatePurchaseBranch, setDisableSubMenuCreatePurchaseBranch] = React.useState(true);
   const [disableSubMenuExpense, setDisableSubMenuExpense] = React.useState(true);
+  const [disableSubMenuSettings, setDisableSubMenuSettings] = React.useState(true);
 
   const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
   const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
@@ -116,6 +120,7 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableMainMenuPurchaseBranch(isAllowMainMenuPermission(MAINMENU.PURCHASE_BRANCH));
 
     setDisableMainMenuExpense(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO)); //Mock Permission
+    setDisableMainMenuSettings(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO)); //Mock Permission
 
     setDisableSubMenuSaleDiscount(isAllowSubMenuPermission(SUBMENU.SALE_DISCOUNT));
     setDisableSubMenuSaleSaleLimit(isAllowSubMenuPermission(SUBMENU.SALE_SALE_LIMIT));
@@ -136,6 +141,7 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableSubMenuProductMaster(isAllowSubMenuPermission(SUBMENU.PI_PRODUCT_MASTER));
 
     setDisableSubMenuExpense(isAllowSubMenuPermission(SUBMENU.PI_STOCK_BALANCE)); //Mock Permission
+    setDisableSubMenuSettings(isAllowSubMenuPermission(SUBMENU.PI_STOCK_BALANCE)); //Mock Permission
 
     setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
   }, [navState]);
@@ -183,6 +189,10 @@ export default function Sidebar({}: Props): ReactElement {
 
   const handleClickExpense = () => {
     setOpenExpenseMenu(!openExpenseMenu);
+  };
+  
+  const handleClickSettings = () => {
+    setOpenSettingsMenu(!openSettingsMenu);
   };
 
   return (
@@ -519,6 +529,36 @@ export default function Sidebar({}: Props): ReactElement {
                 onClick={() => handleListItemClick(15)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ค่าใช้จ่าย' />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        <ListItemButton
+          onClick={handleClickSettings}
+          id='mainMenuSettings'
+          style={{ display: disableMainMenuSettings ? 'none' : '' }}>
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary='ตั้งค่า' style={{ marginLeft: -15 }} />
+          {openSettingsMenu ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openSettingsMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
+            <Link
+              to='/reserves'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                display: disableSubMenuSettings ? 'none' : '',
+              }}
+              id='subMenuSettings'>
+              <ListItemButton
+                key='Settings'
+                selected={selectedIndex === 16}
+                onClick={() => handleListItemClick(16)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ค่าใช้จ่ายสำรอง' />
               </ListItemButton>
             </Link>
           </List>
