@@ -17,11 +17,12 @@ import LoadingModal from '../../commons/ui/loading-modal';
 import { Chip, Typography } from '@mui/material';
 import { numberWithCommas } from '../../../utils/utils';
 import ExpenseDetail from './expense-detail';
-import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-detail-slice';
+import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-slice';
 import { uploadFileState } from '../../../store/slices/upload-file-slice';
 import { ExpenseSearch, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
+import { setInit } from '../../../store/sessionStore';
 
 interface loadingModalState {
   open: boolean;
@@ -284,7 +285,6 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
 
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
-
     handleOpenLoading('open', true);
     await handleOpenDetailModal(params.row.docNo);
     handleOpenLoading('open', false);
@@ -294,6 +294,8 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const handleOpenDetailModal = async (docNo: string) => {
     await dispatch(featchExpenseDetailAsync(docNo));
+    setInit('Y');
+
     setOpenDetailModal(true);
   };
 
@@ -345,7 +347,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
       <LoadingModal open={openLoadingModal.open} />
 
       {openDetailModal && (
-        <ExpenseDetail isOpen={openDetailModal} onClickClose={handleCloseDetailModal} type={'COFFEE'} edit={edit} />
+        <ExpenseDetail isOpen={openDetailModal} onClickClose={handleCloseDetailModal} type={'xxxxx'} edit={true} />
       )}
     </div>
   );
