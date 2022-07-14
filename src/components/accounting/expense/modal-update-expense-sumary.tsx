@@ -133,9 +133,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
     const master = getMasterExpenInto(key);
     return master?.isOtherExpense;
   };
-  const getOtherExpenseName = (key: any) => {
-    return getMasterExpenInto(key)?.accountNameTh;
-  };
+
   return (
     <div>
       <Dialog open={open} maxWidth='md' fullWidth={true} key='modal-add-expense'>

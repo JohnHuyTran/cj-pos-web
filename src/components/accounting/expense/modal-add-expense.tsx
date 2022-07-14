@@ -109,7 +109,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           }
         });
 
-        data = { ...data, total: sum, SUMOTHER: _otherSum, otherDetail: _otherDetail };
+        data = {
+          ...data,
+          total: sum,
+          SUMOTHER: _otherSum,
+          otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
+        };
         if (sum > 0) {
           await dispatch(addNewItem(data));
         } else {
@@ -149,7 +154,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
           dateTime: startDate,
           SUMOTHER: _otherSum,
-          otherDetail: _otherDetail,
+          otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
         };
         if (sum(values) > 0) {
           await dispatch(addNewItem(data));

@@ -44,9 +44,14 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   const [openModalUpdatedExpenseSummary, setOpenModalUpdateExpenseSummary] = React.useState(false);
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const frontColor = (value: any) => {
+    const _value = value.toString();
+    return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
+  };
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     const master = getMasterExpenInto(i.expenseNo);
     const hideColumn = master ? master.isOtherExpense : false;
+
     return {
       field: i.expenseNo,
       headerName: i.accountNameTh,
@@ -58,7 +63,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
       renderCell: (params: GridRenderCellParams) => {
         if (isFilterFieldInExpense(params.field)) {
           return (
-            <Box component='div' sx={{ paddingLeft: '20px' }}>
+            <Box component='div' sx={{ paddingLeft: '20px', color: frontColor(params.value) }}>
               {params.value}
             </Box>
           );
@@ -70,8 +75,8 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
               inputProps={{ style: { textAlign: 'right' } }}
               sx={{
                 '.MuiInputBase-input.Mui-disabled': {
-                  WebkitTextFillColor: '#000',
-                  color: '#000',
+                  WebkitTextFillColor: frontColor(params.value),
+                  // color: color,
                 },
               }}
               value={params.value}

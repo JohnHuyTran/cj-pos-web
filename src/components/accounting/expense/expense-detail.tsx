@@ -806,7 +806,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           dateTime: item.expenseDate,
           total: item.totalAmount,
           SUMOTHER: _otherSum,
-          otherDetail: _otherDetail,
+          otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
           ...newItem,
         };
       });
