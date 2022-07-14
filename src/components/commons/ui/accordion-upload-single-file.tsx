@@ -232,7 +232,7 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
                 size="small"
                 component="span"
               >
-                Browse
+                แนบไฟล์
               </Button>
             </label>
           </Box>
