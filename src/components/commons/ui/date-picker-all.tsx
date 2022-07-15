@@ -16,6 +16,7 @@ interface StateProps {
   type?: string;
   minDateTo?: any | Date | number | string;
   disabled?: boolean;
+  error?:boolean;
 }
 
 const defaultMaterialTheme = createTheme({
@@ -52,6 +53,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         variant='inline'
         inputVariant='outlined'
         format='DD/MM/YYYY'
+        error={props.error}
         className={classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
