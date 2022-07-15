@@ -763,18 +763,21 @@ export default function ModalCreateTransferOutDestroy({
               </Grid>
             </Grid>
             {/*line 2*/}
-            <Grid item container xs={4} mb={5} mr={-3}>
+            <Grid container item xs={4} mb={5} mr={-1}>
               <Grid item xs={4}>
                 วันที่อนุมัติ :
+                </Grid>
                 {/*add control selection type in here avoid to before and after control attach many files will be pushed down row*/}
-                <Grid item xs={12} pt={8}>
-                  ประเภททำลาย <b style={{ fontSize: '18px' }}> *</b> :
+                <Grid item xs={8}>
+                {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
                 </Grid>
               </Grid>
-              <Grid item xs={8}>
-                {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
+              <Grid container item xs={4} mb={8}>
+              <Grid item xs={4}>
+                ประเภททำลาย :
+                </Grid>
                 {/*add control selection type in here avoid to before and after control attach many files will be pushed down row*/}
-                <Grid item xs={9} pt={8}>
+                <Grid item xs={8}>
                   <FormControl fullWidth className={classes.Mselect}>
                     <Select
                       id='typeDestroy'
@@ -807,13 +810,21 @@ export default function ModalCreateTransferOutDestroy({
                   </FormControl>
                 </Grid>
               </Grid>
-            </Grid>
-            <Grid item container xs={4} mb={4}>
-              <Grid item xs={4}>
-                รูปก่อนทำลาย<b style={{ fontSize: '18px' }}> *</b> :
+              <Grid container item xs={4} mb={5}>
+                <Grid item xs={4} pl={1}>
+                สต๊อก :
+                </Grid>
+                <Grid item xs={8}>
+                  {typeDestroy === 5 ? '-' : 'หลังร้าน'}
+                </Grid>
               </Grid>
-              <Grid item xs={8} pl={2}>
-                <AccordionUploadFile
+            {/*line 3*/}
+            <Grid container item xs={4} mb={8} mt={-1}>
+            <Grid item xs={4}>
+            รูปก่อนทำลาย<b style={{ fontSize: '18px' }}> *</b> :
+              </Grid>
+            <Grid item xs={8} pl={1}>
+            <AccordionUploadFile
                   files={attachFileBeforeOlds}
                   docNo={dataDetail ? dataDetail.documentNumber : ''}
                   docType='TO'
@@ -827,14 +838,14 @@ export default function ModalCreateTransferOutDestroy({
                   warningMessage={attachFileError}
                   deletePermission={TOStatus.DRAFT === status}
                 />
-              </Grid>
             </Grid>
-            <Grid item container xs={4} mb={4} pl={3}>
-              <Grid item xs={4}>
-                รูปหลังทำลาย<b style={{ fontSize: '18px' }}> *</b> :
+            </Grid>
+            <Grid container item xs={4} mb={8} mt={-1}>
+            <Grid item xs={4}>
+            รูปหลังทำลาย<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>
-              <Grid item xs={8}>
-                <AccordionUploadFile
+            <Grid item xs={8}>
+            <AccordionUploadFile
                   files={attachFileAfterOlds}
                   docNo={dataDetail ? dataDetail.documentNumber : ''}
                   docType='TO'
@@ -846,11 +857,9 @@ export default function ModalCreateTransferOutDestroy({
                   warningMessage={attachFileError}
                   deletePermission={TOStatus.DRAFT === status}
                 />
-              </Grid>
             </Grid>
-            {/*line 3*/}
-
-          </Grid>
+            </Grid>
+            </Grid>
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>
               <Box>
