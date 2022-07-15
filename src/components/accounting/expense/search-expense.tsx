@@ -120,7 +120,6 @@ export default function SearchExpense() {
   const items = useAppSelector((state) => state.searchBranchAccounting);
   const orderListDatas = items.branchAccountingList.data ? items.branchAccountingList.data : [];
   const [flagBtnApproveAll, setFlagBtnApproveAll] = useState(true);
-  const [openLoadingModal, setOpenLoadingModal] = useState(false);
 
   // Lifecycle hooks
   useEffect(() => {
@@ -150,26 +149,25 @@ export default function SearchExpense() {
 
   // Handle function
   const handleClearSearch = async () => {
-    setOpenLoadingModal(true);
+    setIsOpenLoading(true);
     setSearch({ ...initialSearchState });
     setIsValidate(false);
     setIsSearch(false);
 
     setFlagBtnApproveAll(true);
     await dispatch(clearDataSearchBranchAccounting());
-    setOpenLoadingModal(false);
+    setIsOpenLoading(false);
   };
 
   const handleSearchExpense = async () => {
-    // let isPeriodValidate = false
-    // if (isAccountRole || isAccountManagerRole) {
-    //   isPeriodValidate = search.period === "" ? true : false
-    // }
-    const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? true : false;
+    let isPeriodValidate = false
+    if (isAccountRole || isAccountManagerRole) {
+      isPeriodValidate = search.period === "" ? true : false
+    }
+    
     setIsValidate(true);
-
-    if (search.type && isPeriodValidate) {
-      // setOpenLoadingModal(true);
+    if (search.type && !isPeriodValidate) {
+      setIsSearch(true);
       setIsOpenLoading(true);
       setFlagBtnApproveAll(true);
       const payload: ExpenseSearchRequest = {
@@ -190,7 +188,6 @@ export default function SearchExpense() {
       });
       await dispatch(saveExpenseSearch(payload));
       setIsSearch(true);
-      // setOpenLoadingModal(false);
       setIsOpenLoading(false);
     }
   };
@@ -212,12 +209,12 @@ export default function SearchExpense() {
     endDate: '',
   });
   const handleOpenSelectPeriodModal = async (type: string) => {
-    setOpenLoadingModal(true);
+    setIsOpenLoading(true);
     setType(type);
     await dispatch(clearDataExpensePeriod());
     await dispatch(featchExpensePeriodTypeAsync(type));
     setOpenSelectPeriod(true);
-    setOpenLoadingModal(false);
+    setIsOpenLoading(false);
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);
@@ -297,19 +294,18 @@ export default function SearchExpense() {
             onClickDate={(value: any) => setSearch({ ...search, month: value.month.number, year: value.year - 543 })}
           />
         </Grid>
-        {isAccountRole ||
-          (isAccountManagerRole && (
-            <Grid item md={4} sm={4} xs={6}>
-              <FormSelect
-                title='งวดเบิก'
-                dataList={expensePeriodList}
-                value={search.period}
-                isValidate={isValidate}
-                isDisabled={isOpenLoading}
-                setValue={(e) => setSearch({ ...search, period: e.target.value })}
-              />
-            </Grid>
-          ))}
+        { (isAccountRole || isAccountManagerRole) &&
+          <Grid item md={4} sm={4} xs={6}>
+            <FormSelect
+              title='งวดเบิก'
+              dataList={expensePeriodList}
+              value={search.period}
+              isValidate={isValidate}
+              isDisabled={isOpenLoading}
+              setValue={(e) => setSearch({ ...search, period: e.target.value })}
+            />
+          </Grid>
+        }
       </Grid>
       <Grid container rowSpacing={1} columnSpacing={8} mt={10}>
         <Grid item md={5} sm={5} xs={12}>
@@ -411,8 +407,6 @@ export default function SearchExpense() {
         </Grid>
       </Grid>
       <LoadingModal open={isOpenLoading} />
-
-      {/* <LoadingModal open={openLoadingModal} /> */}
 
       {openSelectPeriod && (
         <ModalSelectPeriod
