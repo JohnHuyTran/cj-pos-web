@@ -13,7 +13,7 @@ import { updateSummaryRows } from '../../../store/slices/accounting/accounting-s
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { STATUS } from '../../../utils/enum/accounting-enum';
-import { isFilterFieldInExpense } from '../../../utils/utils';
+import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
 import ExpenseDetailTransaction from './expense-detail-transaction';
 import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
 
@@ -45,7 +45,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const frontColor = (value: any) => {
-    const _value = value.toString();
+    const _value = stringNullOrEmpty(value) ? '' : value.toString();
     return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
   };
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
