@@ -53,3 +53,10 @@ export enum TO_TYPE {
   TO_RAW_MATERIAL = 4,
   TO_DEFECT = 5,
 }
+
+export enum StockActionStatus {
+  DRAFT = 'DRAFT',
+  CONFIRM = 'CONFIRM',
+  COUNTING = 'COUNTING',
+  END = 'END',
+}

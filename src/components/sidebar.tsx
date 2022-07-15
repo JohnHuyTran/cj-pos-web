@@ -12,6 +12,7 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import LoyaltyOutlinedIcon from '@mui/icons-material/LoyaltyOutlined';
 import PresentToAllIcon from '@mui/icons-material/PresentToAll';
+import AllInboxIcon from '@mui/icons-material/AllInbox';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
@@ -76,6 +77,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [openWithDrawMenu, setOpenWithDrawMenu] = React.useState(false);
   const [openProductInfoMenu, setOpenProductInfoMenu] = React.useState(false);
   const [openPurchaseBranchMenu, setOpenPurchaseBranchMenu] = React.useState(false);
+  const [openCheckStockMenu, setOpenCheckStockMenu] = React.useState(false);
 
   const navState = useAppSelector((state) => state.navigator.state);
 
@@ -85,6 +87,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableMainMenuTransferOut, setDisableMainMenuTransferOut] = React.useState(true);
   const [disableMainMenuProductInfo, setDisableMainMenuProductInfo] = React.useState(true);
   const [disableMainMenuPurchaseBranch, setDisableMainMenuPurchaseBranch] = React.useState(true);
+  const [disableMainMenuCheckStock, setDisableMainMenuCheckStock] = React.useState(true)
 
   const [disableSubMenuOROrderReceive, setDisableSubMenuOROrderReceive] = React.useState(true);
   const [disableSubMenuORStockDiff, setDisableSubMenuORStockDiff] = React.useState(true);
@@ -102,6 +105,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuTODestroy, setDisableSubMenuTODestroy] = React.useState(true);
   const [disableSubMenuTOStoreUse, setDisableSubMenuTOStoreUse] = React.useState(true);
   const [disableSubMenuProductMaster, setDisableSubMenuProductMaster] = React.useState(true);
+  const [disableSubMenuAuditPlan, setDisableSubMenuAuditPlan] = React.useState(true);
 
   useEffect(() => {
     setOpen(navState);
@@ -169,6 +173,9 @@ export default function Sidebar({}: Props): ReactElement {
 
   const handleClickProductInfo = () => {
     setOpenProductInfoMenu(!openProductInfoMenu);
+  };
+  const handleClickCheckStockMenu = () => {
+    setOpenCheckStockMenu(!openCheckStockMenu);
   };
   const handleClickPurchaseBranch = () => {
     setOpenPurchaseBranchMenu(!openPurchaseBranchMenu);
@@ -478,6 +485,37 @@ export default function Sidebar({}: Props): ReactElement {
                 onClick={() => handleListItemClick(12)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ความเคลื่อนไหวของสินค้า' />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        <ListItemButton
+          onClick={handleClickCheckStockMenu}
+          id='mainMenuCheckStock'
+          // style={{ display: disableMainMenuCheckStock ? 'none' : '' }}
+        >
+          <ListItemIcon>
+            <AllInboxIcon />
+          </ListItemIcon>
+          <ListItemText primary='ตรวจนับสต๊อก' style={{ marginLeft: -15 }} />
+          {openCheckStockMenu ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openCheckStockMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
+            <Link
+              to='/audit-plan'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                // display: disableSubMenuAuditPlan ? 'none' : '',
+              }}
+              id='subMenuAuditPlan'>
+              <ListItemButton
+                key='AuditPlan'
+                selected={selectedIndex === 15}
+                onClick={() => handleListItemClick(15)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='สร้างแผนตรวจนับสต๊อก' />
               </ListItemButton>
             </Link>
           </List>

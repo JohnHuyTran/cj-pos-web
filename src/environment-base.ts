@@ -399,6 +399,13 @@ export const environment = {
       },
     },
   },
+  checkStock: {
+    auditPlan: {
+      save: {
+        url: '/stock/audit-planning',
+      },
+    },
+  },
   master: {
     branch: {
       province: {
