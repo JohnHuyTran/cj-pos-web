@@ -159,6 +159,7 @@ const permission = {
         MAINMENU.TRANSFER_OUT,
         MAINMENU.PRODUCT_INFO,
         MAINMENU.PURCHASE_BRANCH,
+        MAINMENU.EXPENSE,
       ],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
@@ -175,6 +176,7 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
+        SUBMENU.EX_EXPENSE,
       ],
     },
     action: [
