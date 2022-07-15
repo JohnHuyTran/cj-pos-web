@@ -510,18 +510,18 @@ export const environment = {
           url: 'accounting/expense/approve-by-acc/{docNo}',
         },
         accountManager: {
-          url: '/expense/approve3/{docNo}',
+          url: 'accounting/expense/approve3/{docNo}',
         },
       },
       reject: {
         ocArea: {
-          url: '/expense/reject1-2/{docNo}',
+          url: 'accounting/expense/reject1-2/{docNo}',
         },
         account: {
           url: '',
         },
         accountManager: {
-          url: '/expense/reject3/{docNo}',
+          url: 'accounting/expense/reject3/{docNo}',
         },
       },
       periodType: {

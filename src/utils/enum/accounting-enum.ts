@@ -20,15 +20,15 @@ export const expenseTypes = [
 ];
 
 export const expenseStatusList = [
-  { key: 'ALL', text: 'ทั้งหมด' },
-  { key: 'DRAFT', text: 'บันทึก' },
-  { key: 'WAITTING_APPROVAL1', text: 'รออนุมัติ1' },
-  { key: 'WAITTING_APPROVAL2', text: 'รออนุมัติ2' },
-  { key: 'WAITTING_ACCOUNTING', text: 'รอบัญชีตรวจสอบ' },
-  { key: 'WAITTING_APPROVAL3', text: 'รออนุมัติ3' },
-  { key: 'APPROVED', text: 'อนุมัติ' },
-  { key: 'SEND_BACK_EDIT', text: 'ส่งกลับแก้ไข' },
-  { key: 'WAITTING_EDIT_ATTACH_FILE', text: 'รอแก้ไขเอกสาร' },
+  { key: 'ALL', text: 'ทั้งหมด', stepperGrp: 1 },
+  { key: 'DRAFT', text: 'บันทึก', stepperGrp: 1 },
+  { key: 'SEND_BACK_EDIT', text: 'ส่งกลับแก้ไข', stepperGrp: 1 },
+  { key: 'WAITTING_EDIT_ATTACH_FILE', text: 'รอแก้ไขเอกสาร', stepperGrp: 1 },
+  { key: 'WAITTING_APPROVAL1', text: 'รออนุมัติ1', stepperGrp: 2 },
+  { key: 'WAITTING_APPROVAL2', text: 'รออนุมัติ2', stepperGrp: 2 },
+  { key: 'WAITTING_ACCOUNTING', text: 'รอบัญชีตรวจสอบ', stepperGrp: 3 },
+  { key: 'WAITTING_APPROVAL3', text: 'รออนุมัติ3', stepperGrp: 3 },
+  { key: 'APPROVED', text: 'อนุมัติ', stepperGrp: 4 },
 ];
 
 // export const getExpenseTypes = (key: string) => expenseTypes.find((item) => item.key === key)?.text;
