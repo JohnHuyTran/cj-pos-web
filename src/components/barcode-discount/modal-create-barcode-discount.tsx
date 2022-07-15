@@ -1028,6 +1028,31 @@ export default function ModalCreateBarcodeDiscount({
                 {currentBranch}
               </Grid>
             </Grid>
+            <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
+              <Grid item xs={4}>
+              สต๊อก :
+              </Grid>
+              <Grid item xs={8}>
+              หน้าร้านและหลังร้าน
+              </Grid>
+            </Grid>
+            <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
+              <Grid item xs={4}>
+                แนบรูปสินค้าขอส่วนลด<b style={{ fontSize: '18px' }}> *</b> :
+              </Grid>
+              <Grid item xs={8}>
+                <AccordionUploadFile
+                  files={attachFileOlds}
+                  docNo={dataDetail ? dataDetail.documentNumber : ''}
+                  docType='BD'
+                  isStatus={uploadFileFlag}
+                  onChangeUploadFile={handleOnChangeUploadFile}
+                  onDeleteAttachFile={onDeleteAttachFileOld}
+                  enabledControl={Number(BDStatus.DRAFT) === status}
+                  warningMessage={attachFileError}
+                />
+              </Grid>
+            </Grid>
             <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
                 ยอดลด<b style={{ fontSize: '18px' }}> *</b> :
@@ -1054,23 +1079,6 @@ export default function ModalCreateBarcodeDiscount({
                     />
                   </RadioGroup>
                 </FormControl>
-              </Grid>
-            </Grid>
-            <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
-              <Grid item xs={4}>
-                แนบรูปสินค้าขอส่วนลด<b style={{ fontSize: '18px' }}> *</b> :
-              </Grid>
-              <Grid item xs={8}>
-                <AccordionUploadFile
-                  files={attachFileOlds}
-                  docNo={dataDetail ? dataDetail.documentNumber : ''}
-                  docType='BD'
-                  isStatus={uploadFileFlag}
-                  onChangeUploadFile={handleOnChangeUploadFile}
-                  onDeleteAttachFile={onDeleteAttachFileOld}
-                  enabledControl={Number(BDStatus.DRAFT) === status}
-                  warningMessage={attachFileError}
-                />
               </Grid>
             </Grid>
           </Grid>
