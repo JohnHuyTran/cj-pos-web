@@ -6,13 +6,17 @@ import DialogContent from '@mui/material/DialogContent';
 import LoadingModal from '../../../commons/ui/loading-modal';
 import { useStyles } from '../../../../styles/makeTheme';
 import ConfirmContent from './confirm-content';
+import { ExpensePeriod } from '../../../../models/branch-accounting-model';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  onConfirm: (period: any) => void;
+  onConfirm: (comment: string) => void;
   startDate: string;
   endDate: string;
+  payload?: any;
+  periodProps?: ExpensePeriod;
+  docNo?: string;
 }
 interface loadingModalState {
   open: boolean;
@@ -31,7 +35,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, startDate, endD
 
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-    await onConfirm(periodData);
+    await onConfirm('comment');
     handleOpenLoading('open', false);
     onClose();
   };

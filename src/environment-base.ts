@@ -501,27 +501,27 @@ export const environment = {
       },
       approve: {
         branch: {
-          url: 'approve',
+          url: 'accounting/expense/submit/{docNo}',
         },
         ocArea: {
-          url: '',
+          url: 'accounting/expense/approve1-2',
         },
         account: {
-          url: '',
+          url: 'accounting/expense/approve-by-acc/{docNo}',
         },
         accountManager: {
-          url: '',
+          url: '/expense/approve3/{docNo}',
         },
       },
       reject: {
         ocArea: {
-          url: '',
+          url: '/expense/reject1-2/{docNo}',
         },
         account: {
           url: '',
         },
         accountManager: {
-          url: '',
+          url: '/expense/reject3/{docNo}',
         },
       },
       periodType: {

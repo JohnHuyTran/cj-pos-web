@@ -16,6 +16,7 @@ import { useStyles } from '../../styles/makeTheme';
 
 import SearchExpense from '../../components/accounting/expense/search-expense';
 import { useTranslation } from 'react-i18next';
+import { setInit } from '../../store/sessionStore';
 
 export default function Expense() {
   const { t } = useTranslation(['expense', 'common']);
@@ -30,30 +31,38 @@ export default function Expense() {
   const onOpenNew = async () => {
     setOpen(true);
     setEdit(false);
+    setInit('N');
     await dispatch(updateToInitialState());
-    // await dispatch(initialItems([]));
-    // await dispatch(addNewItem(null));
+    await dispatch(updateSummaryRows([]));
+    await dispatch(updateItemRows([]));
+    await dispatch(initialItems([]));
+    await dispatch(addNewItem(null));
     // await dispatch(updateSummaryRows([]));
     // await dispatch(updateItemRows([]));
   };
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth='xl'>
       <TitleHeader title={t('documentSearch')} />
-
+      {/* 
       <Button
-        data-testid="testid-btnSendToDC"
-        id="btnSendToDC"
-        variant="contained"
-        color="error"
+        data-testid='testid-btnSendToDC'
+        id='btnSendToDC'
+        variant='contained'
+        color='error'
         className={classes.MbtnSendDC}
         onClick={onOpenNew}
-        sx={{ width: 140 }}
-      >
+        sx={{ width: 140 }}>
         OpenNew
       </Button>
       <Box mt={3}>
-        <ExpenseDetail isOpen={open} onClickClose={onClose} type={''} edit={edit} periodProps={periodMockData} />
-      </Box>
+        <ExpenseDetail
+          isOpen={open}
+          onClickClose={onClose}
+          type={'STOREFRONT'}
+          edit={edit}
+          periodProps={periodMockData}
+        />
+      </Box> */}
 
       <Box mt={3}>
         <SearchExpense />

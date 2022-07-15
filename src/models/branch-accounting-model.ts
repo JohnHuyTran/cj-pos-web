@@ -3,15 +3,16 @@ import { FileType } from './common-model';
 //master Expense
 export interface ExpenseInfo {
   typeCode: string;
+  typeNameTh: string;
+  expenseNo: string;
   accountCode: string;
   accountNameTh: string;
   skuCode: string;
+  approvalLimit1: number;
+  approvalLimit2: number;
   isActive: boolean;
-  expenseNo: string;
   isOtherExpense: boolean;
-  approveLimit1: number;
-  approveLimt2: number;
-  requiredDocument: string;
+  requiredDocumentTh: string;
 }
 
 export interface ExpenseMasterResponseType {
@@ -34,7 +35,7 @@ export interface ExpenseSaveRequest {
   id?: string;
   branchCode?: string;
   docNo?: string;
-  type: string;
+  type?: string;
   month?: number;
   year?: number;
   expensePeriod?: ExpensePeriod | null;
@@ -44,7 +45,7 @@ export interface ExpenseSaveRequest {
   approvalAttachFiles?: FileType[];
   sumItems?: SumItemsItem[];
   items?: DataItem[];
-  comments?: Comment[];
+  comment?: string;
   expenseDate?: string;
   approvedDate?: string;
   nextApprover?: string;
@@ -53,6 +54,8 @@ export interface ExpenseSaveRequest {
   lastModifiedBy?: string;
   createdDate?: string;
   lastModifiedDate?: string;
+  today?: string;
+  returnTo?: string;
 }
 
 export interface AccountAccountExpenses {
@@ -105,7 +108,7 @@ export interface SumItems {
 
 export interface SumItemsItem {
   expenseNo: string;
-  withdrawAmount: number;
+  withdrawAmount?: number;
   approvedAmount?: number;
 }
 export interface Comment {
@@ -132,8 +135,9 @@ export interface AuditLog {
 export interface payLoadAdd {
   id: number;
   key: string;
-  value: string;
+  value: string | number;
   title: string;
+  isOtherExpense?: boolean;
 }
 export interface ExpensePeriodTypeResponse {
   ref: string;
@@ -160,6 +164,17 @@ export interface ExpenseSearchRequest {
   month: number;
   year: number;
   period?: number;
+}
+
+export interface ExpenseSearch {
+  limit: string;
+  page: string;
+  type: string;
+  status: string;
+  branchCode: string;
+  month: number;
+  year: number;
+  period: number;
 }
 
 // Search response

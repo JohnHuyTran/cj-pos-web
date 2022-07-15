@@ -82,7 +82,8 @@ import verifyReasonsRejectListSlice from './slices/master/verify-order-reject-re
 import masterExpenseListSlice from './slices/master/expense-list-slice';
 import expenseAccountDetailSlice from './slices/accounting/accounting-slice';
 import expenseDetailSlice from './slices/accounting/accounting-detail-slice';
-import searchBranchAccountingSlice from './slices/accounting/accounting-search-slice'; //mock
+import searchBranchAccountingSlice from './slices/accounting/accounting-search-slice';
+import saveExpenseSearchRequest from './slices/accounting/save-accounting-search-slice';
 import expensePeriodTypeSlice from './slices/accounting/accounting-period-type-slice';
 
 const store = configureStore({
@@ -169,6 +170,7 @@ const store = configureStore({
     masterExpenseListSlice: masterExpenseListSlice,
     expenseAccountDetailSlice: expenseAccountDetailSlice,
     searchBranchAccounting: searchBranchAccountingSlice,
+    saveExpenseSearchRequest: saveExpenseSearchRequest,
     expenseDetail: expenseDetailSlice,
     expensePeriodTypeSlice: expensePeriodTypeSlice,
   },
