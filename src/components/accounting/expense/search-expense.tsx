@@ -35,6 +35,9 @@ import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
 } from '../../../store/slices/accounting/accounting-period-type-slice';
+import { ApiError } from '../../../models/api-error-model';
+
+import AlertError from '../../commons/ui/alert-error';
 
 interface FormSelectProps {
   title: string;
@@ -109,6 +112,8 @@ export default function SearchExpense() {
   const [isValidate, setIsValidate] = useState(false);
   const [branchFromCode, setBranchFromCode] = useState('');
   const [isOpenLoading, setIsOpenLoading] = useState(false);
+  const [openFailAlert, setOpenFailAlert] = useState(false);
+  const [textFail, setTextFail] = useState('');
 
   // Lifecycle hooks
   useEffect(() => {
@@ -144,11 +149,11 @@ export default function SearchExpense() {
   };
 
   const handleSearchExpense = async () => {
-    let isPeriodValidate = false
+    let isPeriodValidate = false;
     if (isAccountRole || isAccountManagerRole) {
-      isPeriodValidate = search.period === "" ? true : false
+      isPeriodValidate = search.period === '' ? true : false;
     }
-    
+
     setIsValidate(true);
     if (search.type && !isPeriodValidate) {
       setIsSearch(true);
@@ -174,6 +179,12 @@ export default function SearchExpense() {
 
   const handleApproveAll = () => {};
 
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail('');
+  };
+
+  //modal select period
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [openSelectPeriod, setOpenSelectPeriod] = useState(false);
   const [types, setType] = useState('');
@@ -183,10 +194,27 @@ export default function SearchExpense() {
     endDate: '',
   });
   const handleOpenSelectPeriodModal = async (type: string) => {
+    setIsOpenLoading(true);
     setType(type);
     await dispatch(clearDataExpensePeriod());
-    await dispatch(featchExpensePeriodTypeAsync(type));
-    setOpenSelectPeriod(true);
+    await dispatch(featchExpensePeriodTypeAsync(type))
+      .then((value) => {
+        const p: any = value.payload;
+        const data = p.data;
+
+        if (data.length !== 0) {
+          setOpenSelectPeriod(true);
+        } else {
+          setOpenFailAlert(true);
+          setTextFail('ทำรายการเบิกครบแล้ว');
+        }
+
+        setIsOpenLoading(false);
+      })
+      .catch((error: ApiError) => {
+        setIsOpenLoading(false);
+        console.log(error);
+      });
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);
@@ -388,6 +416,8 @@ export default function SearchExpense() {
           periodProps={dataSelect}
         />
       )}
+
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
     </Fragment>
   );
 }
