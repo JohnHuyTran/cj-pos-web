@@ -154,8 +154,15 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'center',
     sortable: false,
+    renderCell: (params) => {
+      const status = params.getValue(params.id, 'status');
+      if (status === 'WAITTING_ACCOUNTING' || status === 'WAITTING_APPROVAL3') {
+        return params.value;
+      } else {
+        return '';
+      }
+    },
   },
-
   {
     field: 'approvedDate',
     headerName: 'วันที่อนุมัติเงินสำรอง',
@@ -163,6 +170,14 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'center',
     sortable: false,
+    renderCell: (params) => {
+      const status = params.getValue(params.id, 'status');
+      if (status === 'WAITTING_ACCOUNTING' || status === 'WAITTING_APPROVAL3') {
+        return params.value;
+      } else {
+        return '';
+      }
+    },
   },
 ];
 
@@ -187,12 +202,15 @@ function useApiRef() {
 }
 
 var calDiff = function (params: GridValueGetterParams) {
-  const diff =
-    Number(params.getValue(params.id, 'sumApprovalAmount')) - Number(params.getValue(params.id, 'sumWithdrawAmount'));
+  if (params.getValue(params.id, 'status') === 'WAITTING_APPROVAL3') {
+    const diff =
+      Number(params.getValue(params.id, 'sumApprovalAmount')) - Number(params.getValue(params.id, 'sumWithdrawAmount'));
 
-  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
-  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
-  return diff;
+    if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
+    if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+    return diff;
+  }
+  return '';
 };
 
 function ExpenseSearchList({ onSelectRows }: DataGridProps) {

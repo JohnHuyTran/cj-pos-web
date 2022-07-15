@@ -42,7 +42,6 @@ import {
 import ExpenseSearchList from './expense-search-list';
 import ModelConfirmSearch from './confirm/modal-confirm-search';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
-import { featchSummarizeByCriteriaAsync } from '../../../store/slices/accounting/accounting-summarize-by-criteria-slice';
 import { getSummarizeByCriteria, getSummarizeByNo } from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
 
