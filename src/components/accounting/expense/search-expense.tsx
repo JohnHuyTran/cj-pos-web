@@ -34,7 +34,7 @@ import {
   clearDataSearchBranchAccounting,
   featchBranchAccountingListAsync,
 } from '../../../store/slices/accounting/accounting-search-slice';
-import { ExpenseSearchRequest, ExpensePeriod } from '../../../models/branch-accounting-model';
+import { ExpenseSearchRequest, ExpensePeriod, SummarizeRequest } from '../../../models/branch-accounting-model';
 import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
@@ -42,6 +42,9 @@ import {
 import ExpenseSearchList from './expense-search-list';
 import ModelConfirmSearch from './confirm/modal-confirm-search';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
+import { featchSummarizeByCriteriaAsync } from '../../../store/slices/accounting/accounting-summarize-by-criteria-slice';
+import { getSummarizeByCriteria, getSummarizeByNo } from '../../../services/accounting';
+import { ApiError } from '../../../models/api-error-model';
 
 interface FormSelectProps {
   title: string;
@@ -120,7 +123,6 @@ export default function SearchExpense() {
   const items = useAppSelector((state) => state.searchBranchAccounting);
   const orderListDatas = items.branchAccountingList.data ? items.branchAccountingList.data : [];
   const [flagBtnApproveAll, setFlagBtnApproveAll] = useState(true);
-  const [openLoadingModal, setOpenLoadingModal] = useState(false);
 
   // Lifecycle hooks
   useEffect(() => {
@@ -150,26 +152,25 @@ export default function SearchExpense() {
 
   // Handle function
   const handleClearSearch = async () => {
-    setOpenLoadingModal(true);
+    setIsOpenLoading(true);
     setSearch({ ...initialSearchState });
     setIsValidate(false);
     setIsSearch(false);
 
     setFlagBtnApproveAll(true);
     await dispatch(clearDataSearchBranchAccounting());
-    setOpenLoadingModal(false);
+    setIsOpenLoading(false);
   };
 
   const handleSearchExpense = async () => {
-    // let isPeriodValidate = false
+    // let isPeriodValidate = false;
     // if (isAccountRole || isAccountManagerRole) {
-    //   isPeriodValidate = search.period === "" ? true : false
+    //   isPeriodValidate = search.period === '' ? true : false;
     // }
     const isPeriodValidate = search.period && (isAccountRole || isAccountManagerRole) ? true : false;
     setIsValidate(true);
 
     if (search.type && isPeriodValidate) {
-      // setOpenLoadingModal(true);
       setIsOpenLoading(true);
       setFlagBtnApproveAll(true);
       const payload: ExpenseSearchRequest = {
@@ -182,24 +183,70 @@ export default function SearchExpense() {
       await dispatch(featchBranchAccountingListAsync(payload)).then((res) => {
         setTimeout(() => {
           setIsValidate(false);
-          // setIsOpenLoading(false);
-
           const payload: any = res.payload ? res.payload : [];
-          if (search.status === 'WAITTING_APPROVAL3' && payload.data.length) setFlagBtnApproveAll(!flagBtnApproveAll);
+
+          if (search.status === 'WAITTING_APPROVAL3') {
+            summarizeByCriteria('search');
+            if (payload.data.length > 0) setFlagBtnApproveAll(!flagBtnApproveAll);
+          }
         }, 300);
       });
       await dispatch(saveExpenseSearch(payload));
       setIsSearch(true);
-      // setOpenLoadingModal(false);
       setIsOpenLoading(false);
     }
   };
 
   const handleExport = () => {};
 
-  const handleApprove = () => {};
+  const [summarizList, setSummarizList] = useState(null);
+  const [summarizTotal, setSummarizTotal] = useState(0);
+  const [summarizTitle, setSummarizTitle] = useState('');
+  const summarizeByCriteria = async (type?: string) => {
+    const payload: SummarizeRequest = {
+      type: search.type,
+      year: search.year,
+      month: search.month,
+      period: +search.period,
+    };
 
-  const handleApproveAll = () => {
+    await getSummarizeByCriteria(payload)
+      .then((value) => {
+        if (Number(value.data.total) > Number(summarizTotal)) {
+          setSummarizTitle(`${value.data.total} สาขา (จำนวนสาขาที่อนุมัติได้ล่าสุด มีการเปลี่ยนแปลง)`);
+        } else {
+          setSummarizTitle(`${value.data.total} สาขา`);
+        }
+
+        setSummarizList(value.data);
+        setSummarizTotal(value.data.total);
+      })
+      .catch((error: ApiError) => {
+        console.log('error:', error);
+      });
+  };
+  const summarizeByNo = async () => {
+    const payload: any = {
+      docNos: ['EX21070101-000001'],
+    };
+
+    await getSummarizeByNo(payload)
+      .then((value) => {
+        setSummarizTitle(`${value.data.total} สาขา`);
+        setSummarizList(value.data);
+      })
+      .catch((error: ApiError) => {
+        console.log('error:', error);
+      });
+  };
+
+  const handleApprove = () => {
+    summarizeByNo();
+    handleOpenModelConfirm();
+  };
+
+  const handleApproveAll = async () => {
+    if (search.status === 'WAITTING_APPROVAL3') await summarizeByCriteria();
     handleOpenModelConfirm();
   };
 
@@ -212,12 +259,12 @@ export default function SearchExpense() {
     endDate: '',
   });
   const handleOpenSelectPeriodModal = async (type: string) => {
-    setOpenLoadingModal(true);
+    setIsOpenLoading(true);
     setType(type);
     await dispatch(clearDataExpensePeriod());
     await dispatch(featchExpensePeriodTypeAsync(type));
     setOpenSelectPeriod(true);
-    setOpenLoadingModal(false);
+    setIsOpenLoading(false);
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);
@@ -341,9 +388,8 @@ export default function SearchExpense() {
                   id='btnSearch'
                   variant='contained'
                   color='secondary'
-                  // disabled={flagBtnApproveAll}
-                  // onClick={handleApproveAll}
-                  disabled={true}
+                  disabled={flagBtnApproveAll}
+                  onClick={handleApproveAll}
                   sx={{ width: 110 }}
                   className={classes.MbtnSearch}>
                   อนุมัติทั้งหมด
@@ -450,9 +496,9 @@ export default function SearchExpense() {
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
         onConfirm={handleConfirm}
-        startDate='2022-06-16T00:00:00+07:00'
-        endDate='2022-06-30T23:59:59.999999999+07:00'
         items={orderListDatas}
+        summarizTitle={summarizTitle}
+        summarizList={summarizList}
       />
     </Fragment>
   );

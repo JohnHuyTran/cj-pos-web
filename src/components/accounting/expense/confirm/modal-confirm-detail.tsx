@@ -49,7 +49,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, startDate, endD
         maxWidth='lg'
         PaperProps={{ sx: { minWidth: 900 } }}>
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
-          <ConfirmContent startDate={startDate} endDate={endDate} handleDate={handleDate} />
+          <ConfirmContent startDate={startDate} endDate={endDate} handleDate={handleDate} title='1 สาขา' />
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: 'center', m: 5, mr: 5, ml: 5 }}>

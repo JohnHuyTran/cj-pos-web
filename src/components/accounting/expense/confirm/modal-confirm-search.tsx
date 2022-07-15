@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -11,9 +11,9 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onConfirm: (period: any) => void;
-  startDate: string;
-  endDate: string;
   items?: any;
+  summarizTitle: string;
+  summarizList: any;
 }
 interface loadingModalState {
   open: boolean;
@@ -23,9 +23,9 @@ export default function ModelConfirmSearch({
   open,
   onClose,
   onConfirm,
-  startDate,
-  endDate,
   items,
+  summarizTitle,
+  summarizList,
 }: Props): ReactElement {
   const classes = useStyles();
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
@@ -35,6 +35,8 @@ export default function ModelConfirmSearch({
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
+  const [startDate, setStartDate] = React.useState('2022-06-16T00:00:00+07:00');
+  const [endDate, setEndDate] = React.useState('2022-06-30T23:59:59.999999999+07:00');
   const [periodData, setPeriodData] = React.useState('');
 
   const handleConfirm = async () => {
@@ -48,7 +50,11 @@ export default function ModelConfirmSearch({
     setPeriodData(period);
   };
 
-  // console.log('======> items:', JSON.stringify(items));
+  useEffect(() => {
+    console.log('======> summarizTitle:', summarizTitle);
+    console.log('======> summarizList:', JSON.stringify(summarizList));
+  }, [open]);
+
   return (
     <div>
       <Dialog
@@ -58,7 +64,7 @@ export default function ModelConfirmSearch({
         maxWidth='lg'
         PaperProps={{ sx: { minWidth: 900 } }}>
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
-          <ConfirmContent startDate={startDate} endDate={endDate} handleDate={handleDate} />
+          <ConfirmContent startDate={startDate} endDate={endDate} handleDate={handleDate} title={summarizTitle} />
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: 'center', m: 5, mr: 5, ml: 5 }}>

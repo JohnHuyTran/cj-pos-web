@@ -85,6 +85,7 @@ import expenseDetailSlice from './slices/accounting/accounting-detail-slice';
 import searchBranchAccountingSlice from './slices/accounting/accounting-search-slice';
 import saveExpenseSearchRequest from './slices/accounting/save-accounting-search-slice';
 import expensePeriodTypeSlice from './slices/accounting/accounting-period-type-slice';
+import summarizeByCriteriaSlice from './slices/accounting/accounting-summarize-by-criteria-slice';
 
 const store = configureStore({
   reducer: {
@@ -173,6 +174,7 @@ const store = configureStore({
     saveExpenseSearchRequest: saveExpenseSearchRequest,
     expenseDetail: expenseDetailSlice,
     expensePeriodTypeSlice: expensePeriodTypeSlice,
+    summarizeByCriteria: summarizeByCriteriaSlice,
   },
 });
 

@@ -10,6 +10,7 @@ import { useStyles } from '../../../../styles/makeTheme';
 interface Props {
   startDate: string;
   endDate: string;
+  title: string;
   handleDate: (period: any) => void;
 }
 interface State {
@@ -17,7 +18,7 @@ interface State {
   endDate: any;
 }
 
-export default function confirmContent({ startDate, endDate, handleDate }: Props): ReactElement {
+export default function confirmContent({ startDate, endDate, title, handleDate }: Props): ReactElement {
   const classes = useStyles();
   const [periodData, setPeriodData] = React.useState<State>({
     startDate: startDate,
@@ -129,7 +130,8 @@ export default function confirmContent({ startDate, endDate, handleDate }: Props
           ยืนยันอนุมัติค่าใช้จ่าย
         </Typography>
         <Typography variant='subtitle1' component='div'>
-          จำนวนสาขาที่อนุมัติ : 5 สาขา
+          {/* จำนวนสาขาที่อนุมัติ : 5 สาขา */}
+          จำนวนสาขาที่อนุมัติ : {title}
         </Typography>
       </DialogContentText>
 
