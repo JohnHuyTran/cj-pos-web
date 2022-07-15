@@ -108,7 +108,7 @@ export interface SumItems {
 
 export interface SumItemsItem {
   expenseNo: string;
-  withdrawAmount: number;
+  withdrawAmount?: number;
   approvedAmount?: number;
 }
 export interface Comment {
@@ -135,7 +135,7 @@ export interface AuditLog {
 export interface payLoadAdd {
   id: number;
   key: string;
-  value: string;
+  value: string | number;
   title: string;
   isOtherExpense?: boolean;
 }

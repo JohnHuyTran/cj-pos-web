@@ -6,6 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import LoadingModal from '../../../commons/ui/loading-modal';
 import { useStyles } from '../../../../styles/makeTheme';
 import ConfirmContent from './confirm-content';
+import { ExpensePeriod } from '../../../../models/branch-accounting-model';
 
 interface Props {
   open: boolean;
@@ -13,6 +14,9 @@ interface Props {
   onConfirm: (comment: string) => void;
   startDate: string;
   endDate: string;
+  payload?: any;
+  periodProps?: ExpensePeriod;
+  docNo?: string;
 }
 interface loadingModalState {
   open: boolean;

@@ -20,6 +20,7 @@ import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { STATUS } from '../../../utils/enum/accounting-enum';
 import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
+import HtmlTooltip from '../../commons/ui/html-tooltip';
 import ModalAddExpense from './modal-add-expense';
 interface Props {
   onClickAddNewBtn?: () => void;
@@ -67,6 +68,38 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
               </Box>
             );
           }
+        },
+      };
+    } else if (i.expenseNo === 'otherDetail') {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        // minWidth: 70,
+        flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          return (
+            <>
+              <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
+                <TextField
+                  variant='outlined'
+                  name={`txb${i.expenseNo}`}
+                  inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+                  sx={{
+                    '.MuiInputBase-input.Mui-disabled': {
+                      WebkitTextFillColor: '#000',
+                      background: '',
+                    },
+                  }}
+                  value={params.value}
+                  disabled={true}
+                  autoComplete='off'
+                />
+              </HtmlTooltip>
+            </>
+          );
         },
       };
     } else {
@@ -327,6 +360,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
 
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const currentlySelected = async (params: GridCellParams) => {
+    //handle inside btn
     // if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT || status === 'NEW') {
     const value = params;
     let listPayload: payLoadAdd[] = [];

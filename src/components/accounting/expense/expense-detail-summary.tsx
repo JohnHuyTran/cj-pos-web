@@ -13,7 +13,7 @@ import { updateSummaryRows } from '../../../store/slices/accounting/accounting-s
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { STATUS } from '../../../utils/enum/accounting-enum';
-import { isFilterFieldInExpense } from '../../../utils/utils';
+import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
 import ExpenseDetailTransaction from './expense-detail-transaction';
 import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
 
@@ -44,9 +44,14 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   const [openModalUpdatedExpenseSummary, setOpenModalUpdateExpenseSummary] = React.useState(false);
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
   const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const frontColor = (value: any) => {
+    const _value = stringNullOrEmpty(value) ? '' : value.toString();
+    return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
+  };
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     const master = getMasterExpenInto(i.expenseNo);
     const hideColumn = master ? master.isOtherExpense : false;
+
     return {
       field: i.expenseNo,
       headerName: i.accountNameTh,
@@ -58,7 +63,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
       renderCell: (params: GridRenderCellParams) => {
         if (isFilterFieldInExpense(params.field)) {
           return (
-            <Box component='div' sx={{ paddingLeft: '20px' }}>
+            <Box component='div' sx={{ paddingLeft: '20px', color: frontColor(params.value) }}>
               {params.value}
             </Box>
           );
@@ -70,8 +75,8 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
               inputProps={{ style: { textAlign: 'right' } }}
               sx={{
                 '.MuiInputBase-input.Mui-disabled': {
-                  WebkitTextFillColor: '#000',
-                  color: '#000',
+                  WebkitTextFillColor: frontColor(params.value),
+                  // color: color,
                 },
               }}
               value={params.value}
@@ -143,7 +148,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   }, [periodProps]);
 
   const currentlySelected = async (params: GridCellParams) => {
-    if (params.id === 2 && status === STATUS.WAITTING_ACCOUNTING) {
+    if (params.id === 2 && (status === STATUS.WAITTING_ACCOUNTING || status === STATUS.WAITTING_APPROVAL3)) {
       let listPayload: payLoadAdd[] = [];
       const arr = Object.entries(params.row);
       await arr.forEach((element: any, index: number) => {
@@ -202,11 +207,13 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
       let totalDiff: number = 0;
       arr.map((element: any, i: number) => {
         const key = element[0];
-        const value = element[1];
+        const value = Number(element[1]) || 0;
         const withDraw = entries.find((entrie: SumItemsItem, i: number) => entrie.expenseNo === key);
+        const withdrawAmount = Number(withDraw?.withdrawAmount);
+        const diff = withdrawAmount - value;
         infoDiff = {
           ...infoDiff,
-          [key]: Number(withDraw?.withdrawAmount) - Number(value),
+          [key]: diff > 0 ? `+${diff}` : diff,
         };
       });
 

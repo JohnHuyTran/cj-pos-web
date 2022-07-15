@@ -109,7 +109,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           }
         });
 
-        data = { ...data, total: sum, SUMOTHER: _otherSum, otherDetail: _otherDetail };
+        data = {
+          ...data,
+          total: sum,
+          SUMOTHER: _otherSum,
+          otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
+        };
         if (sum > 0) {
           await dispatch(addNewItem(data));
         } else {
@@ -149,7 +154,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
           dateTime: startDate,
           SUMOTHER: _otherSum,
-          otherDetail: _otherDetail,
+          otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
         };
         if (sum(values) > 0) {
           await dispatch(addNewItem(data));
@@ -242,6 +247,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     }
     if (expenseData) {
       setEnableSaveBtn(expenseData.status === STATUS.DRAFT || expenseData.status === STATUS.SEND_BACK_EDIT);
+    } else {
+      setEnableSaveBtn(true);
     }
   }, [open, edit, payload]);
 
@@ -310,7 +317,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
             </Grid>
             {!edit && (
               <>
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid container spacing={2} mb={2} mt={2} ml={1}>
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && !i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
@@ -338,7 +345,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                     })}
                 </Grid>
                 <Grid container spacing={2} mt={2}>
-                  <Grid item xs={1}>
+                  <Grid item xs={1} ml={1}>
                     ค่าอื่นๆ:
                   </Grid>
                   <Grid item xs={3}>
@@ -352,11 +359,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       fullWidth
                       placeholder=''
                       autoComplete='off'
+                      disabled={true}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid container spacing={2} mb={2} mt={2} ml={1}>
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
@@ -387,7 +395,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
 
             {edit && testList && (
               <>
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid container spacing={2} mb={2} mt={2} ml={1}>
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && !isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
@@ -414,7 +422,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       );
                     })}
                 </Grid>
-                <Grid container spacing={2} mt={2}>
+                <Grid container spacing={2} mt={2} ml={1}>
                   <Grid item xs={2}>
                     ค่าอื่นๆ:
                   </Grid>
@@ -429,11 +437,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       fullWidth
                       placeholder=''
                       autoComplete='off'
+                      disabled={true}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid container spacing={2} mb={2} mt={2} ml={1}>
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {

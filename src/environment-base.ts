@@ -504,10 +504,10 @@ export const environment = {
           url: 'accounting/expense/submit/{docNo}',
         },
         ocArea: {
-          url: '',
+          url: 'accounting/expense/approve1-2',
         },
         account: {
-          url: '',
+          url: 'accounting/expense/approve-by-acc/{docNo}',
         },
         accountManager: {
           url: '/expense/approve3/{docNo}',
@@ -515,7 +515,7 @@ export const environment = {
       },
       reject: {
         ocArea: {
-          url: '',
+          url: '/expense/reject1-2/{docNo}',
         },
         account: {
           url: '',
