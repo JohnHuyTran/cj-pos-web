@@ -123,7 +123,13 @@ const permission = {
   },
   oc: {
     menu: {
-      mainmenu: [MAINMENU.ORDER_RECEIVE, MAINMENU.STOCK_TRANSFER, MAINMENU.PRODUCT_INFO, MAINMENU.PURCHASE_BRANCH],
+      mainmenu: [
+        MAINMENU.ORDER_RECEIVE,
+        MAINMENU.STOCK_TRANSFER,
+        MAINMENU.PRODUCT_INFO,
+        MAINMENU.PURCHASE_BRANCH,
+        MAINMENU.EXPENSE,
+      ],
       submenu: [
         SUBMENU.OR_ORDER_RECEIVE,
         SUBMENU.ST_REQUEST,
@@ -131,6 +137,7 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
+        SUBMENU.EX_EXPENSE,
       ],
     },
     action: [
@@ -159,6 +166,7 @@ const permission = {
         MAINMENU.TRANSFER_OUT,
         MAINMENU.PRODUCT_INFO,
         MAINMENU.PURCHASE_BRANCH,
+        MAINMENU.EXPENSE,
       ],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
@@ -175,6 +183,7 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
+        SUBMENU.EX_EXPENSE,
       ],
     },
     action: [
@@ -200,7 +209,13 @@ const permission = {
   },
   areaManager: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.TRANSFER_OUT, MAINMENU.PRODUCT_INFO, MAINMENU.PURCHASE_BRANCH],
+      mainmenu: [
+        MAINMENU.SALE,
+        MAINMENU.TRANSFER_OUT,
+        MAINMENU.PRODUCT_INFO,
+        MAINMENU.PURCHASE_BRANCH,
+        MAINMENU.EXPENSE,
+      ],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
         SUBMENU.SALE_SALE_LIMIT,
@@ -210,6 +225,7 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
+        SUBMENU.EX_EXPENSE,
       ],
     },
     action: [
