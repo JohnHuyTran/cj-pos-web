@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import ExpenseSearchList from './expense-search-list';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import ModalSelectPeriod from '../expense/modal-select-period';
+// import ModalSelectPeriod from '../expense/modal-select-period';
 import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
@@ -102,7 +102,7 @@ function expenseSearch(): ReactElement {
         </div>
       )}
 
-      <ModalSelectPeriod open={openSelectPeriod} onClose={handleCloseSelectPeriodModal} type={types} />
+      {/* <ModalSelectPeriod open={openSelectPeriod} onClose={handleCloseSelectPeriodModal} type={types} /> */}
     </>
   );
 }
