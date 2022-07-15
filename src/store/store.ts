@@ -54,6 +54,7 @@ import transferOutRawMaterialSlice from './slices/transfer-out-raw-material-slic
 import searchProductDiscountSlice from './slices/search-product-discount';
 import addToDestroyProductSlice from './slices/add-to-destroy-product-slice';
 import stockBalanceCheckSlice from './slices/stock-balance-check-slice';
+import stockCountSlice from './slices/stock-count-slice';
 import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 import stockRequestItems from './slices/stock-request-items-slice';
@@ -135,6 +136,7 @@ const store = configureStore({
     searchProductDiscountSlice: searchProductDiscountSlice,
     addToDestroyProductSlice: addToDestroyProductSlice,
     stockBalanceCheckSlice: stockBalanceCheckSlice,
+    stockCountSlice: stockCountSlice,
     updateBTSkuSlice: updateBTSkuSlice,
     updateBTProductSlice: updateBTProductSlice,
     stockRequestItems: stockRequestItems,
