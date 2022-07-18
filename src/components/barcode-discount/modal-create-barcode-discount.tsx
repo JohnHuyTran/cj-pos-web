@@ -1031,9 +1031,35 @@ export default function ModalCreateBarcodeDiscount({
             <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
               สต๊อก :
+                <Grid item xs={4} mt={2}>
+                  ยอดลด<b style={{ fontSize: '18px' }}> *</b> :
+                </Grid>
               </Grid>
               <Grid item xs={8}>
               หน้าร้านและหลังร้าน
+                <Grid item xs={8} mt={2}>
+                  <FormControl component='fieldset' disabled={dataDetail.status > 1}>
+                    <RadioGroup
+                      aria-label='discount'
+                      value={valueRadios}
+                      defaultValue={'percent'}
+                      name='radio-buttons-group'
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+                        handleChangeRadio(event);
+                      }}>
+                      <FormControlLabel
+                        value='percent'
+                        control={<Radio disabled={status > 1}/>}
+                        label='ยอดลดเป็นเปอร์เซ็น (%)'
+                      />
+                      <FormControlLabel
+                        value='amount'
+                        control={<Radio disabled={status > 1}/>}
+                        label='ยอดลดแบบ 5-7 เดือน เป็นจำนวนเงิน(บาท)'
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Grid>
               </Grid>
             </Grid>
             <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
@@ -1051,34 +1077,6 @@ export default function ModalCreateBarcodeDiscount({
                   enabledControl={Number(BDStatus.DRAFT) === status}
                   warningMessage={attachFileError}
                 />
-              </Grid>
-            </Grid>
-            <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
-              <Grid item xs={4}>
-                ยอดลด<b style={{ fontSize: '18px' }}> *</b> :
-              </Grid>
-              <Grid item xs={8} sx={{ marginTop: '-8px' }}>
-                <FormControl component='fieldset' disabled={dataDetail.status > 1}>
-                  <RadioGroup
-                    aria-label='discount'
-                    value={valueRadios}
-                    defaultValue={'percent'}
-                    name='radio-buttons-group'
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-                      handleChangeRadio(event);
-                    }}>
-                    <FormControlLabel
-                      value='percent'
-                      control={<Radio disabled={status > 1}/>}
-                      label='ยอดลดเป็นเปอร์เซ็น (%)'
-                    />
-                    <FormControlLabel
-                      value='amount'
-                      control={<Radio disabled={status > 1}/>}
-                      label='ยอดลดแบบ 5-7 เดือน เป็นจำนวนเงิน(บาท)'
-                    />
-                  </RadioGroup>
-                </FormControl>
               </Grid>
             </Grid>
           </Grid>
