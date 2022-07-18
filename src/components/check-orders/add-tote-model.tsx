@@ -115,6 +115,7 @@ export default function AddToteModel({ open, onClose, updateToteNo }: Props): Re
                   className={classes.MbtnSearch}
                   sx={{ borderRadius: 2, width: 80, mr: 2 }}
                   onClick={handleAddTote}
+                  disabled={!values}
                 >
                   เพิ่ม
                 </Button>

@@ -445,6 +445,11 @@ export const environment = {
         },
       },
     },
+    expense: {
+      retrive: {
+        url: 'accounting/expense-config',
+      },
+    },
   },
   authority: {
     authorizedBranch: {
@@ -484,6 +489,47 @@ export const environment = {
   tote: {
     inquiryTote: {
       url: '/webtote/toteinquiry',
+    },
+  },
+  branchAccounting: {
+    expense: {
+      search: {
+        url: 'accounting/expense',
+      },
+      save: {
+        url: 'accounting/expense',
+      },
+      detail: {
+        url: 'accounting/expense/{docNo}',
+      },
+      approve: {
+        branch: {
+          url: 'accounting/expense/submit/{docNo}',
+        },
+        ocArea: {
+          url: 'accounting/expense/approve1-2',
+        },
+        account: {
+          url: 'accounting/expense/approve-by-acc/{docNo}',
+        },
+        accountManager: {
+          url: 'accounting/expense/approve3/{docNo}',
+        },
+      },
+      reject: {
+        ocArea: {
+          url: 'accounting/expense/reject1-2/{docNo}',
+        },
+        account: {
+          url: '',
+        },
+        accountManager: {
+          url: 'accounting/expense/reject3/{docNo}',
+        },
+      },
+      periodType: {
+        url: 'accounting/expense-period/{type}',
+      },
     },
   },
 };

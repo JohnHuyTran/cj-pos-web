@@ -21,6 +21,7 @@ import {
   KEYCLOAK_GROUP_PI,
   KEYCLOAK_GROUP_PCM,
   KEYCLOAK_GROUP_DATA,
+  KEYCLOAK_GROUP_ACCOUNTING_MANAGER,
 } from './enum/permission-enum';
 
 const _ = require('lodash');
@@ -55,6 +56,8 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.PCM;
   } else if (group === KEYCLOAK_GROUP_DATA) {
     return PERMISSION_GROUP.DATA;
+  } else if (group === KEYCLOAK_GROUP_ACCOUNTING_MANAGER) {
+    return PERMISSION_GROUP.ACCOUNT_MANAGER;
   }
 
   return '';
@@ -92,6 +95,10 @@ export const isGroupBranch = () => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   return userInfo.group === PERMISSION_GROUP.BRANCH;
 };
+export const isGroupOC = () => {
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return userInfo.group === PERMISSION_GROUP.OC;
+};
 
 export const isGroupBranchParam = (group: string) => {
   return group === PERMISSION_GROUP.BRANCH;
@@ -116,7 +123,13 @@ const permission = {
   },
   oc: {
     menu: {
-      mainmenu: [MAINMENU.ORDER_RECEIVE, MAINMENU.STOCK_TRANSFER, MAINMENU.PRODUCT_INFO, MAINMENU.PURCHASE_BRANCH],
+      mainmenu: [
+        MAINMENU.ORDER_RECEIVE,
+        MAINMENU.STOCK_TRANSFER,
+        MAINMENU.PRODUCT_INFO,
+        MAINMENU.PURCHASE_BRANCH,
+        MAINMENU.EXPENSE,
+      ],
       submenu: [
         SUBMENU.OR_ORDER_RECEIVE,
         SUBMENU.ST_REQUEST,
@@ -124,6 +137,7 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
+        SUBMENU.EX_EXPENSE,
       ],
     },
     action: [
@@ -152,6 +166,7 @@ const permission = {
         MAINMENU.TRANSFER_OUT,
         MAINMENU.PRODUCT_INFO,
         MAINMENU.PURCHASE_BRANCH,
+        MAINMENU.EXPENSE,
       ],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
@@ -168,6 +183,7 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
+        SUBMENU.EX_EXPENSE,
       ],
     },
     action: [
@@ -193,7 +209,13 @@ const permission = {
   },
   areaManager: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.TRANSFER_OUT, MAINMENU.PRODUCT_INFO, MAINMENU.PURCHASE_BRANCH],
+      mainmenu: [
+        MAINMENU.SALE,
+        MAINMENU.TRANSFER_OUT,
+        MAINMENU.PRODUCT_INFO,
+        MAINMENU.PURCHASE_BRANCH,
+        MAINMENU.EXPENSE,
+      ],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
         SUBMENU.SALE_SALE_LIMIT,
@@ -203,6 +225,7 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
+        SUBMENU.EX_EXPENSE,
       ],
     },
     action: [
@@ -250,10 +273,22 @@ const permission = {
   },
   accounting: {
     menu: {
-      mainmenu: [MAINMENU.SALE],
-      submenu: [SUBMENU.SALE_SALE_LIMIT],
+      mainmenu: [MAINMENU.SALE, MAINMENU.EXPENSE],
+      submenu: [SUBMENU.SALE_SALE_LIMIT, SUBMENU.EX_EXPENSE],
     },
-    action: [ACTIONS.CAMPAIGN_TO_VIEW],
+  },
+  accountManager: {
+    menu: {
+      mainmenu: [MAINMENU.EXPENSE],
+      submenu: [SUBMENU.EX_EXPENSE],
+    },
+    action: [
+      ACTIONS.ACCOUNTING_VIEW,
+      ACTIONS.ACCOUNTING_CONFIG_VIEW,
+      ACTIONS.ACCOUNTING_MANAGE,
+      ACTIONS.ACCOUNTING_APPROVE3,
+      ACTIONS.ACCOUNTING_REJECT3,
+    ],
   },
   operationProcess: {
     menu: {

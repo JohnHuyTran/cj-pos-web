@@ -79,6 +79,13 @@ import purchaseBRDetailSlice from './slices/purchase/purchase-branch-request-det
 import purchaseBranchRequestSlice from './slices/purchase-branch-request-slice';
 import saveSearchPurchaseBranchRequest from './slices/save-search-purchase-branch-request-slice';
 import verifyReasonsRejectListSlice from './slices/master/verify-order-reject-reasons-slice';
+import masterExpenseListSlice from './slices/master/expense-list-slice';
+import expenseAccountDetailSlice from './slices/accounting/accounting-slice';
+import expenseDetailSlice from './slices/accounting/accounting-detail-slice';
+import searchBranchAccountingSlice from './slices/accounting/accounting-search-slice';
+import saveExpenseSearchRequest from './slices/accounting/save-accounting-search-slice';
+import expensePeriodTypeSlice from './slices/accounting/accounting-period-type-slice';
+
 const store = configureStore({
   reducer: {
     auth: authSlice,
@@ -160,6 +167,12 @@ const store = configureStore({
     purchaseBranchRequestSlice: purchaseBranchRequestSlice,
     saveSearchPurchaseBranchRequest: saveSearchPurchaseBranchRequest,
     verifyReasonsRejectListSlice: verifyReasonsRejectListSlice,
+    masterExpenseListSlice: masterExpenseListSlice,
+    expenseAccountDetailSlice: expenseAccountDetailSlice,
+    searchBranchAccounting: searchBranchAccountingSlice,
+    saveExpenseSearchRequest: saveExpenseSearchRequest,
+    expenseDetail: expenseDetailSlice,
+    expensePeriodTypeSlice: expensePeriodTypeSlice,
   },
 });
 

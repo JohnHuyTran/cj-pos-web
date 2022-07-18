@@ -449,6 +449,13 @@ const useStyles = makeStyles({
       boxShadow: 'none !important',
     },
   },
+  MbtnBrowseSmall: {
+    '&.MuiButton-root': {
+      width: '75px',
+      borderRadius: '8px !important',
+      boxShadow: 'none !important',
+    },
+  },
   MbtnAdd: {
     '&.MuiButton-root': {
       width: '140px',
