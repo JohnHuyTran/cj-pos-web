@@ -10,12 +10,12 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
-import { TransferOut, TransferOutSearchRequest, TransferOutSearchResponse } from '../../../models/transfer-out-model';
-import { getTransferOutDetail } from '../../../store/slices/transfer-out-detail-slice';
-import { transferOutGetSearch } from '../../../store/slices/transfer-out-search-slice';
-import { saveSearchCriteriaTO } from '../../../store/slices/transfer-out-criteria-search-slice';
 import ModalCreateStockCount from "./modal-create-stock-count";
 import { convertUtcToBkkDate } from "../../../utils/date-utill";
+import { StockCount, StockCountSearchRequest, StockCountSearchResponse } from "../../../models/stock-count-model";
+import { getStockCountDetail } from "../../../store/slices/stock-count-detail-slice";
+import { getStockCountSearch } from "../../../store/slices/stock-count-search-slice";
+import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
 
 const _ = require('lodash');
 
@@ -31,7 +31,7 @@ interface StateProps {
 const StockCountList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
   const { t } = useTranslation(['barcodeDiscount']);
-  const [lstTransferOut, setLstTransferOut] = React.useState<any[]>([]);
+  const [lstStockCount, setLstStockCount] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const [popupMsg, setPopupMsg] = React.useState<string>('');
@@ -39,18 +39,18 @@ const StockCountList: React.FC<StateProps> = (props) => {
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
 
   const dispatch = useAppDispatch();
-  const transferOuttSearchSlice = useAppSelector((state) => state.transferOutSearchSlice);
-  const toSearchResponse: TransferOutSearchResponse = transferOuttSearchSlice.toSearchResponse;
-  const currentPage = useAppSelector((state) => state.transferOutSearchSlice.toSearchResponse.page);
-  const limit = useAppSelector((state) => state.transferOutSearchSlice.toSearchResponse.perPage);
+  const stockCountSearchSlice = useAppSelector((state) => state.stockCountSearchSlice);
+  const toSearchResponse: StockCountSearchResponse = stockCountSearchSlice.toSearchResponse;
+  const currentPage = useAppSelector((state) => state.stockCountSearchSlice.toSearchResponse.page);
+  const limit = useAppSelector((state) => state.stockCountSearchSlice.toSearchResponse.perPage);
   const [pageSize, setPageSize] = React.useState(limit.toString());
-  const payload = useAppSelector((state) => state.transferOutCriterSearchSlice.searchCriteria);
+  const payload = useAppSelector((state) => state.stockCountCriteriaSearchSlice.searchCriteria);
   const [userPermission, setUserPermission] = useState<any[]>([]);
 
   useEffect(() => {
-    const lstTransferOut = toSearchResponse.data;
-    if (lstTransferOut != null && lstTransferOut.length > 0) {
-      let rows = lstTransferOut.map((data: TransferOut, index: number) => {
+    const lstStockCount = toSearchResponse.data;
+    if (lstStockCount != null && lstStockCount.length > 0) {
+      let rows = lstStockCount.map((data: StockCount, index: number) => {
         return {
           id: data.id,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
@@ -67,7 +67,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
           creatorName: '',
         };
       });
-      setLstTransferOut(rows);
+      setLstStockCount(rows);
       //permission
       const userInfo: KeyCloakTokenInfo = getUserInfo();
       if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
@@ -119,7 +119,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       sortable: false,
       minWidth: 80,
-      width: 150,
+      width: 155,
     },
     {
       field: 'store',
@@ -215,7 +215,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
     setLoading(true);
     let page: string = (newPage + 1).toString();
 
-    const payloadNewPage: TransferOutSearchRequest = {
+    const payloadNewPage: StockCountSearchRequest = {
       perPage: pageSize,
       page: page,
       query: payload.query,
@@ -225,15 +225,15 @@ const StockCountList: React.FC<StateProps> = (props) => {
       endDate: payload.endDate,
     };
 
-    await dispatch(transferOutGetSearch(payloadNewPage));
-    await dispatch(saveSearchCriteriaTO(payloadNewPage));
+    await dispatch(getStockCountSearch(payloadNewPage));
+    await dispatch(saveSearchCriteriaSC(payloadNewPage));
     setLoading(false);
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
     setPageSize(pageSize.toString());
     setLoading(true);
-    const payloadNewPage: TransferOutSearchRequest = {
+    const payloadNewPage: StockCountSearchRequest = {
       perPage: pageSize.toString(),
       page: '1',
       query: payload.query,
@@ -243,19 +243,19 @@ const StockCountList: React.FC<StateProps> = (props) => {
       endDate: payload.endDate,
     };
 
-    await dispatch(transferOutGetSearch(payloadNewPage));
-    await dispatch(saveSearchCriteriaTO(payloadNewPage));
+    await dispatch(getStockCountSearch(payloadNewPage));
+    await dispatch(saveSearchCriteriaSC(payloadNewPage));
     setLoading(false);
   };
 
-  const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail);
+  const stockCountDetail = useAppSelector((state) => state.stockCountDetailSlice.stockCountDetail);
   const currentlySelected = async (params: GridCellParams) => {
     const chkPN = params.colDef.field;
     handleOpenLoading('open', true);
     if (chkPN !== 'checked') {
       try {
-        await dispatch(getTransferOutDetail(params.row.documentNumber));
-        if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
+        await dispatch(getStockCountDetail(params.row.documentNumber));
+        if (stockCountDetail.data.length > 0 || stockCountDetail.data) {
             setOpenDetail(true);
         }
       } catch (error) {
@@ -270,14 +270,14 @@ const StockCountList: React.FC<StateProps> = (props) => {
       <Box mt={2} bgcolor="background.paper">
         <div
           className={classes.MdataGridPaginationTop}
-          style={{ height: lstTransferOut.length >= 10 ? '60vh' : 'auto' }}
+          style={{ height: lstStockCount.length >= 10 ? '60vh' : 'auto' }}
         >
           <DataGrid
-            rows={lstTransferOut}
+            rows={lstStockCount}
             columns={columns}
             disableColumnMenu
             hideFooterSelectedRowCount={true}
-            autoHeight={lstTransferOut.length < 10}
+            autoHeight={lstStockCount.length < 10}
             onCellClick={currentlySelected}
             scrollbarSize={10}
             pagination

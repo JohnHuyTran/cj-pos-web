@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import TextField from '@mui/material/TextField';
 import React, { useEffect, useState } from 'react';
 import { useStyles } from '../../../styles/makeTheme';
-import { objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../../utils/utils';
+import { getBranchName, objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../../utils/utils';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -12,18 +12,18 @@ import { SearchOff } from '@mui/icons-material';
 import AlertError from '../../commons/ui/alert-error';
 import moment from 'moment';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { barcodeDiscountSearch } from '../../../store/slices/barcode-discount-search-slice';
-import { saveSearchCriteriaTO } from '../../../store/slices/transfer-out-criteria-search-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
 import { TO_TYPE, StockActionStatus } from '../../../utils/enum/common-enum';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
 import { BranchListOptionType } from '../../../models/branch-model';
-import TransferOutList from './stock-count-list';
 import { TransferOutSearchRequest } from '../../../models/transfer-out-model';
-import { transferOutGetSearch } from '../../../store/slices/transfer-out-search-slice';
-import BranchFormSearchCriteria from "../../commons/ui/branch-form-search-criteria";
+import { getStockCountSearch } from "../../../store/slices/stock-count-search-slice";
+import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
+import StockCountList from "./stock-count-list";
+import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
+import { isGroupBranch } from "../../../utils/role-permission";
 
 const _ = require('lodash');
 
@@ -47,12 +47,11 @@ const StockCountSearch = () => {
   const [textError, setTextError] = React.useState('');
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
-  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
 
   const dispatch = useAppDispatch();
   const page = '1';
-  const limit = useAppSelector((state) => state.transferOutSearchSlice.toSearchResponse.perPage);
-  const barcodeDiscountSearchSlice = useAppSelector((state) => state.transferOutSearchSlice);
+  const limit = useAppSelector((state) => state.stockCountSearchSlice.toSearchResponse.perPage);
+  const stockCountSearchSlice = useAppSelector((state) => state.stockCountSearchSlice);
   const [requestPermission, setRequestPermission] = useState<boolean>(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -61,6 +60,22 @@ const StockCountSearch = () => {
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const [ownBranch, setOwnBranch] = React.useState(
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : ''
+      : ''
+  );
+  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const branchName = getBranchName(branchList, ownBranch);
+  const branchMap: BranchListOptionType = {
+    code: ownBranch,
+    name: branchName ? branchName : '',
+  };
+  const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
+  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
     branch: 'ALL',
@@ -69,6 +84,20 @@ const StockCountSearch = () => {
     startDate: new Date(),
     endDate: new Date(),
   });
+
+  useEffect(() => {
+    if (groupBranch) {
+      setOwnBranch(getUserInfo().branch
+        ? getBranchName(branchList, getUserInfo().branch)
+          ? getUserInfo().branch
+          : ''
+        : '');
+      setBranchOptions({
+        code: ownBranch,
+        name: branchName ? branchName : '',
+      });
+    }
+  }, [branchList]);
 
   useEffect(() => {
     //permission
@@ -94,6 +123,15 @@ const StockCountSearch = () => {
       setValues({ ...values, branch: branches });
     }
   }, [listBranchSelect]);
+
+  const handleChangeBranch = (branchCode: string) => {
+    if (branchCode !== null) {
+      let codes = JSON.stringify(branchCode);
+      setValues({ ...values, branch: JSON.parse(codes) });
+    } else {
+      setValues({ ...values, branch: '' });
+    }
+  };
 
   const handleCloseAlert = () => {
     setOpenAlert(false);
@@ -125,7 +163,7 @@ const StockCountSearch = () => {
       endDate: moment(values.endDate).endOf('day').toISOString(),
       clearSearch: true
     };
-    dispatch(barcodeDiscountSearch(payload));
+    dispatch(getStockCountSearch(payload));
     if (!requestPermission) {
       setListBranchSelect([]);
     }
@@ -165,18 +203,18 @@ const StockCountSearch = () => {
     };
 
     handleOpenLoading('open', true);
-    await dispatch(transferOutGetSearch(payload));
-    await dispatch(saveSearchCriteriaTO(payload));
+    await dispatch(getStockCountSearch(payload));
+    await dispatch(saveSearchCriteriaSC(payload));
     setFlagSearch(true);
     handleOpenLoading('open', false);
   };
 
   let dataTable;
-  const res = barcodeDiscountSearchSlice.toSearchResponse;
+  const res = stockCountSearchSlice.toSearchResponse;
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      dataTable = <TransferOutList onSearch={onSearch} type={values.type}/>;
+      dataTable = <StockCountList onSearch={onSearch} type={values.type}/>;
     } else {
       dataTable = (
         <Grid item container xs={12} justifyContent='center'>
@@ -215,10 +253,13 @@ const StockCountSearch = () => {
               {t('branch')}
               <Typography sx={{ color: '#F54949', marginRight: '5px' }}> * </Typography>
             </Typography>
-            <BranchFormSearchCriteria
-              disabled={requestPermission}
-              listSelect={listBranchSelect}
-              setListSelect={setListBranchSelect}
+            <BranchListDropDown
+              valueBranch={branchOptions}
+              sourceBranchCode={ownBranch}
+              onChangeBranch={handleChangeBranch}
+              isClear={clearBranchDropDown}
+              disable={groupBranch}
+              isFilterAuthorizedBranch={true}
             />
           </Grid>
           <Grid item xs={4}>
@@ -276,7 +317,7 @@ const StockCountSearch = () => {
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnClear}
               color='cancelColor'
-              // onClick={onClear}
+              onClick={onClear}
             >
               {t('common:button.clear')}
             </Button>
@@ -286,7 +327,7 @@ const StockCountSearch = () => {
               color='primary'
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnSearch}
-              // onClick={onSearch}
+              onClick={onSearch}
             >
               {t('common:button.search')}
             </Button>
