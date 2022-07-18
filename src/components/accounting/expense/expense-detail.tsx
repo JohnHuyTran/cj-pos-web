@@ -49,7 +49,7 @@ import {
 import { convertUtcToBkkDate, convertUtcToBkkWithZ } from '../../../utils/date-utill';
 import { getInit, getUserInfo } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
-import { EXPENSE_TYPE, STATUS } from '../../../utils/enum/accounting-enum';
+import { EXPENSE_TYPE, getExpenseStatus, STATUS } from '../../../utils/enum/accounting-enum';
 import LoadingModal from '../../commons/ui/loading-modal';
 import AlertError from '../../commons/ui/alert-error';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
@@ -122,8 +122,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
-  const [isShowBtnApprove, setIsShowBtnApprove] = React.useState(true);
-  const [isShowBtnReject, setIsShowBtnReject] = React.useState(true);
+  const [isShowBtnApprove, setIsShowBtnApprove] = React.useState(false);
+  const [isShowBtnReject, setIsShowBtnReject] = React.useState(false);
   const [payloadModalConfirmDetail, setPayloadModalConfirmDetail] = React.useState<any>();
 
   const handleCloseSnackBar = () => {
@@ -879,6 +879,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         msgComment += `${e.username} ${e.statusDesc} ${convertUtcToBkkDate(e.commentDate)} \n ${e.comment}`;
       });
       setComment(msgComment);
+      const expenseStatusInfo = getExpenseStatus(expenseData.status);
+      setIsShowBtnApprove(expenseStatusInfo?.groupAllow === getUserInfo().group);
+      setIsShowBtnReject(expenseStatusInfo?.groupAllow === getUserInfo().group);
     } else {
       const ownBranch = getUserInfo().branch ? getUserInfo().branch : env.branch.code;
       setBranchCode(ownBranch);

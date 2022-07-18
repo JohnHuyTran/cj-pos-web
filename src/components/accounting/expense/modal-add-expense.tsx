@@ -204,16 +204,27 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   };
   const handleOnChange = (event: any) => {
     const value = Number(event.target.value);
+    const name = event.target.name;
     setValues({ ...values, [event.target.name]: value });
 
     const arr = Object.entries(values);
     let _otherSum: number = 0;
+    let isNewItem = true;
     arr.map((element: any) => {
       if (!isFilterFieldInExpense(element[0]) && isOtherExpenseField(element[0])) {
-        _otherSum += element[1];
+        if (name === element[0]) {
+          _otherSum += value;
+          isNewItem = false;
+        } else {
+          _otherSum += element[1];
+        }
       }
     });
-    _otherSum += value;
+    if (isNewItem) {
+      _otherSum += value;
+    }
+
+    // _otherSum += value;
     setSumOther(_otherSum);
     if (_otherSum > 0) {
       setIsDisableSaveBtn(false);
@@ -384,6 +395,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
+                              autoComplete='off'
                             />
                           </Grid>
                         </>
@@ -461,6 +473,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
+                              autoComplete='off'
                             />
                           </Grid>
                         </>
