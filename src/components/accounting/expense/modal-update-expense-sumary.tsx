@@ -192,7 +192,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                 </Grid>
               </Grid>
 
-              <Grid container spacing={2} mb={2} mt={2} ml={1}>
+              <Grid container spacing={2} mb={2} mt={2} ml={1} pr={2} pb={2} sx={{ border: 1, borderColor: '#EAEBEB' }}>
                 {testList
                   .filter((i: payLoadAdd) => i.isOtherExpense && !isFilterOutFieldInAdd(i.key))
                   .map((i: payLoadAdd) => {
