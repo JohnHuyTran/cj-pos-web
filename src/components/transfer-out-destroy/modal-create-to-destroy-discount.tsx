@@ -695,7 +695,7 @@ export default function ModalCreateToDestroyDiscount({
         <DialogContent>
           <Grid container mt={1} mb={-1}>
             {/*line 1*/}
-            <Grid item container xs={4} mb={5} mr={-3}>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 สาขา :
               </Grid>
@@ -703,7 +703,7 @@ export default function ModalCreateToDestroyDiscount({
                 {currentBranch}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5}>
+            <Grid item container xs={4} mb={5} pl={3}>
               <Grid item xs={5}>
                 เลขที่เอกสารทำลาย :
               </Grid>
@@ -720,7 +720,7 @@ export default function ModalCreateToDestroyDiscount({
               </Grid>
             </Grid>
             {/*line 2*/}
-            <Grid item container xs={4} mb={5} mr={-3}>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 วันที่อนุมัติ :
               </Grid>
@@ -728,15 +728,21 @@ export default function ModalCreateToDestroyDiscount({
                 {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5} mr={-3}>
+            <Grid item container xs={4} mb={5} pl={3}>
               <Grid item xs={4}>
-              สต๊อก :
+                สต๊อก :
               </Grid>
               <Grid item xs={8}>
                 หลังร้าน
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5} ml={6}>
+            <Grid item container xs={4} mb={5} pl={3}>
+              <Grid item xs={4}>
+              </Grid>
+              <Grid item xs={8}>
+              </Grid>
+            </Grid>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 รูปก่อนทำลาย* :
               </Grid>
@@ -757,7 +763,7 @@ export default function ModalCreateToDestroyDiscount({
                 />
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5} mr={-3} mt={-8}>
+            <Grid item container xs={4} mb={5} pl={3}>
               <Grid item xs={4}>
                 รูปหลังทำลาย* :
               </Grid>
