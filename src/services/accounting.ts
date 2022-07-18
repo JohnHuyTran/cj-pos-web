@@ -55,7 +55,7 @@ export async function expenseApproveByOC(payload: ExpenseSaveRequest, files: Fil
 }
 
 export async function expenseApproveByAccount(payload: ExpenseSaveRequest) {
-  const response = await put(
+  const response = await post(
     getPathExpense(payload.docNo || '', environment.branchAccounting.expense.approve.account.url),
     payload,
     ContentType.JSON

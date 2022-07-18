@@ -4,7 +4,7 @@ import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import AccordionUploadFile from '../../commons/ui/accordion-upload-file';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
-import Steppers from '../../commons/ui/steppers';
+
 import SaveIcon from '@mui/icons-material/Save';
 import InfoIcon from '@mui/icons-material/Info';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
@@ -71,6 +71,8 @@ import { Day } from '@material-ui/pickers';
 import ModalConfirmExpense from './modal-confirm-expense';
 import { isGroupBranch, isGroupOC } from '../../../utils/role-permission';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
+import Steppers from './steppers';
+import { stat } from 'fs';
 
 interface Props {
   isOpen: boolean;
@@ -291,7 +293,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setOpenAlert(true);
         setTextError(error.message);
       })
-      .finally(() => setOpenLoadingModal(true));
+      .finally(() => setOpenLoadingModal(false));
   };
 
   const onApproveByAccount = async () => {
@@ -400,7 +402,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setOpenAlert(true);
         setTextError(error.message);
       })
-      .finally(() => setOpenLoadingModal(true));
+      .finally(() => setOpenLoadingModal(false));
   };
 
   const onRejectByAccountManager = async (comment: string) => {
@@ -441,9 +443,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       if (isFileValidate && isvalidateDate) {
         setIsOpenModelConfirmExpense(true);
         setShowReason(true);
-      } else {
-        setOpenAlert(true);
-        setTextError('กรุณาแนบเอกสาร');
       }
     } else if (status === STATUS.SEND_BACK_EDIT) {
       const isFileValidate: boolean = validateFileInfo();
@@ -451,23 +450,28 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       if (isFileValidate && isvalidateDate) {
         setIsOpenModelConfirmExpense(true);
         setShowReason(true);
-      } else {
-        setOpenAlert(true);
-        setTextError('กรุณาแนบเอกสาร');
       }
     } else if (status === STATUS.WAITTING_APPROVAL1) {
       setShowReason(false);
       setIsOpenModelConfirmExpense(true);
     } else if (status === STATUS.WAITTING_APPROVAL2) {
-      const isFileValidate: boolean = validateFileInfo();
-      if (validateApproveLimit() && !isFileValidate) {
-        console.log('is limit error');
-        setOpenAlert(true);
-        setTextError('กรุณาแนบเอกสาร');
-      } else {
+      const isOver = validateApproveLimit();
+      if (!isOver) {
         setShowReason(false);
         setIsOpenModelConfirmExpense(true);
+      } else {
+        const isFileValidate: boolean = validateFileInfo();
+        if (isFileValidate) {
+          setShowReason(false);
+          setIsOpenModelConfirmExpense(true);
+        }
       }
+
+      // if ( && !isFileValidate) {
+      //   setOpenAlert(true);
+      //   setTextError('กรุณาแนบเอกสาร');
+      // } else {
+      // }
     } else if (status === STATUS.WAITTING_ACCOUNTING) {
       let sumApprovalAmount: number = 0;
       const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
@@ -597,6 +601,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         ? approvalAttachFiles
         : [];
     if (!isvalid && existingfileList.length <= 0) {
+      setOpenAlert(true);
+      setTextError('กรุณาแนบเอกสาร');
       return false;
     }
     return true;
@@ -604,11 +610,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
   const validateDateIsBeforPeriod = () => {
     const date = new Date();
-    if (date < new Date(period.endDate)) {
-      setOpenAlert(true);
-      setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
-      return false;
-    }
+    // if (date < new Date(period.endDate)) {
+    //   setOpenAlert(true);
+    //   setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
+    //   return false;
+    // }
     return true;
   };
 
@@ -926,7 +932,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       <Dialog open={isOpen} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={onClickClose}>
           <Typography sx={{ fontSize: 24, fontWeight: 400 }}>{expenseTypeName}</Typography>
-          <Steppers status={1} stepsList={['บันทึก', 'สาขา', 'บัญชี', 'อนุมัติ']}></Steppers>
+          <Steppers status={status} />
         </BootstrapDialogTitle>
         <DialogContent sx={{ minHeight: '70vh' }}>
           <Grid container spacing={2} mb={2} id='top-item'>
