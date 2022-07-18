@@ -15,7 +15,7 @@ import ModalAddExpense from './modal-add-expense';
 import ModelDescriptionExpense from './modal-description-expense';
 
 import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
-import { Cancel, TramOutlined, VoicemailRounded } from '@mui/icons-material';
+import { Cancel, ConstructionOutlined, TramOutlined, VoicemailRounded } from '@mui/icons-material';
 import { GridColumnHeadersItemCollection } from '@mui/x-data-grid';
 import { mockExpenseInfo001, mockExpenseInfo002 } from '../../../mockdata/branch-accounting';
 import {
@@ -73,6 +73,7 @@ import { isGroupBranch, isGroupOC } from '../../../utils/role-permission';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
 import Steppers from './steppers';
 import { stat } from 'fs';
+import { Controller } from 'react-hook-form';
 
 interface Props {
   isOpen: boolean;
@@ -299,9 +300,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const onApproveByAccount = async () => {
     setOpenLoadingModal(true);
     const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
-
     let sumItems: SumItemsItem[] = [];
-    if (_arr && _arr.length > 0) {
+    if (_arr) {
       const arr = Object.entries(_arr);
       arr
         .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
@@ -367,7 +367,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
 
     let sumItems: SumItemsItem[] = [];
-    if (_arr && _arr.length > 0) {
+    if (_arr) {
       const arr = Object.entries(_arr);
       arr
         .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
@@ -386,6 +386,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       expenseDate: moment(expenDate).startOf('day').toISOString(),
       approvedDate: moment(approveDate).startOf('day').toISOString(),
       sumItems: sumItems,
+      docNo: docNo,
     };
     await expenseApproveByAccountManager(payload)
       .then(async (value) => {
@@ -763,16 +764,16 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             ...infosApprove,
             id: 2,
             description: 'ยอดเงินอนุมัติ',
-            [entrie.expenseNo]: entrie?.approvedAmount,
+            [entrie.expenseNo]: Number(entrie?.approvedAmount) || 0,
           };
-          totalApprove += Number(entrie?.approvedAmount);
+          totalApprove += Number(entrie?.approvedAmount) || 0;
         }
 
         infoDiff = {
           ...infoDiff,
           id: 3,
           description: 'ผลต่าง',
-          [entrie.expenseNo]: '',
+          [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0),
         };
         const master = getMasterExpenInto(entrie.expenseNo);
         const _isOtherExpense = master ? master.isOtherExpense : false;
@@ -795,7 +796,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         rows = [
           { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
           { ...infosApprove, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
-          { ...infoDiff, total: '', SUMOTHER: '' },
+          { ...infoDiff, total: totalDiff, SUMOTHER: totalOtherDiff },
         ];
       } else {
         rows = [
