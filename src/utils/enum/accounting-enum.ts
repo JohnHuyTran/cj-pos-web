@@ -1,3 +1,5 @@
+import { PERMISSION_GROUP } from './permission-enum';
+
 export enum STATUS {
   DRAFT = 'DRAFT', // บันทึก
   SEND_BACK_EDIT = 'SEND_BACK_EDIT', // ส่งกลับแก้ไข
@@ -21,15 +23,17 @@ export const expenseTypes = [
 
 export const expenseStatusList = [
   { key: 'ALL', text: 'ทั้งหมด', stepperGrp: 1 },
-  { key: 'DRAFT', text: 'บันทึก', stepperGrp: 1 },
-  { key: 'SEND_BACK_EDIT', text: 'ส่งกลับแก้ไข', stepperGrp: 1 },
-  { key: 'WAITTING_EDIT_ATTACH_FILE', text: 'รอแก้ไขเอกสาร', stepperGrp: 1 },
-  { key: 'WAITTING_APPROVAL1', text: 'รออนุมัติ1', stepperGrp: 2 },
-  { key: 'WAITTING_APPROVAL2', text: 'รออนุมัติ2', stepperGrp: 2 },
-  { key: 'WAITTING_ACCOUNTING', text: 'รอบัญชีตรวจสอบ', stepperGrp: 3 },
-  { key: 'WAITTING_APPROVAL3', text: 'รออนุมัติ3', stepperGrp: 3 },
+  { key: 'DRAFT', text: 'บันทึก', stepperGrp: 1, groupAllow: PERMISSION_GROUP.BRANCH },
+  { key: 'SEND_BACK_EDIT', text: 'ส่งกลับแก้ไข', stepperGrp: 1, groupAllow: PERMISSION_GROUP.BRANCH },
+  { key: 'WAITTING_EDIT_ATTACH_FILE', text: 'รอแก้ไขเอกสาร', stepperGrp: 1, groupAllow: PERMISSION_GROUP.BRANCH },
+  { key: 'WAITTING_APPROVAL1', text: 'รออนุมัติ1', stepperGrp: 2, groupAllow: PERMISSION_GROUP.AREA_MANAGER },
+  { key: 'WAITTING_APPROVAL2', text: 'รออนุมัติ2', stepperGrp: 2, groupAllow: PERMISSION_GROUP.OC },
+  { key: 'WAITTING_ACCOUNTING', text: 'รอบัญชีตรวจสอบ', stepperGrp: 3, groupAllow: PERMISSION_GROUP.ACCOUNTING },
+  { key: 'WAITTING_APPROVAL3', text: 'รออนุมัติ3', stepperGrp: 3, groupAllow: PERMISSION_GROUP.ACCOUNT_MANAGER },
   { key: 'APPROVED', text: 'อนุมัติ', stepperGrp: 4 },
 ];
+
+export const getExpenseStatus = (key: string) => expenseStatusList.find((item) => item.key === key);
 
 // export const getExpenseTypes = (key: string) => expenseTypes.find((item) => item.key === key)?.text;
 // expenseStatusList.find((item) => item.key === key)?.text;
