@@ -94,7 +94,7 @@ export async function expenseRejectByOC(payload: ExpenseSaveRequest) {
 }
 
 export async function expenseRejectByAccount(payload: any) {
-  const response = await put(
+  const response = await post(
     getPathExpense(payload.docNo, environment.branchAccounting.expense.reject.account.url),
     payload,
     ContentType.JSON
