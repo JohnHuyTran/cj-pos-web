@@ -52,7 +52,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
     if (lstStockCount != null && lstStockCount.length > 0) {
       let rows = lstStockCount.map((data: StockCount, index: number) => {
         return {
-          id: data._id,
+          id: data.id,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
           documentNumber: data.documentNumber,
           countingTime: data.countingTime,
@@ -120,7 +120,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
       align: 'center',
       sortable: false,
       minWidth: 80,
-      width: 155,
+      width: 150,
       renderCell: (params) => (
         <Box component="div" sx={{ marginLeft: '0.2rem' }}>
           {params.value}
@@ -133,7 +133,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       sortable: false,
       minWidth: 100,
-      width: 180,
+      width: 170,
       renderCell: (params) => genStoreType(params),
     },
     {

@@ -421,6 +421,9 @@ export const environment = {
       detail: {
         url: '/stock/stock-count'
       },
+      confirm: {
+        url: '/stock-count/confirm'
+      }
     }
   },
   master: {

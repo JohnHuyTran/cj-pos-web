@@ -21,7 +21,8 @@ const initialState: ItemsState = {
     branch: '',
     storeType: '',
     countingTime: '',
-    APDocumentNumber: ''
+    APDocumentNumber: '',
+    APId: ''
   },
   errorList: [],
   checkStock: [],

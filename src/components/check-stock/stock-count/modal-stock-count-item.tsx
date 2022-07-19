@@ -20,12 +20,13 @@ import { ACTIONS } from "../../../utils/enum/permission-enum";
 export interface DataGridProps {
   action: Action | Action.INSERT;
   userPermission?: any[];
+  viewMode?: boolean;
 }
 
 const _ = require('lodash');
 
 export const ModalStockCountItem = (props: DataGridProps) => {
-  const { action, userPermission } = props;
+  const { action, userPermission, viewMode } = props;
 
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -179,7 +180,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
               onChange={(e) => {
                 handleChangeNumberOfRequested(e, params.row.index, index, params.row.barcode);
               }}
-              disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission}
+              disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission || viewMode}
             />
             {condition && <div className="title">{errorList[index]?.errorNumberOfRequested}</div>}
           </div>
