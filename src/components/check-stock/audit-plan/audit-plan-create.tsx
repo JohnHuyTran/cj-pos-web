@@ -24,11 +24,14 @@ import { BranchListOptionType } from '../../../models/branch-model';
 import { isGroupBranch } from '../../../utils/role-permission';
 import ModalAddTypeProduct from '../../commons/ui/modal-add-type-products';
 import AuditPlanCreateItem from './audit-plan-create-item';
-import ModalConfirmCouting from './modal-confirm-couting';
-import { confirmAuditPlan, coutingAuditPlan, saveDraftAuditPlan } from '../../../services/audit-plan';
+import ModalConfirmCounting from './modal-confirm-counting';
+import { confirmAuditPlan, countingAuditPlan, saveDraftAuditPlan } from '../../../services/audit-plan';
 import { updateAddTypeAndProductState } from '../../../store/slices/add-type-product-slice';
-import { PayloadCouting } from '../../../models/audit-plan';
-import { clearDataFilter } from '../../../store/slices/audit-plan-detail-slice';
+import { PayloadCounting } from '../../../models/audit-plan';
+import { clearDataFilter, getAuditPlanDetail } from '../../../store/slices/audit-plan-detail-slice';
+import { setCheckEdit } from '../../../store/slices/sale-limit-time-slice';
+import DocumentList from './modal-documents-list';
+import { env } from '../../../adapters/environmentConfigs';
 
 interface Props {
   action: Action | Action.INSERT;
@@ -38,6 +41,7 @@ interface Props {
   setPopupMsg?: any;
   onSearchMain?: () => void;
   userPermission?: any[];
+  viewMode?: boolean;
 }
 
 interface Values {
@@ -60,6 +64,7 @@ export default function ModalCreateAuditPlan({
   onSearchMain,
   userPermission,
   action,
+  viewMode,
 }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -72,14 +77,11 @@ export default function ModalCreateAuditPlan({
   const [openModalClose, setOpenModalClose] = React.useState<boolean>(false);
   const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<any>('');
-  const [errors, setErrors] = React.useState<any>([]);
-  const [openModalConfirmCouting, setOpenModalConfirmCouting] = React.useState<boolean>(false);
-
+  const [openModalConfirmCounting, setOpenModalConfirmCounting] = React.useState<boolean>(false);
   const [textErrors, setTextErrors] = React.useState({
     dateError: '',
     branchError: '',
   });
-
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [ownBranch, setOwnBranch] = React.useState(
     getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
@@ -92,7 +94,7 @@ export default function ModalCreateAuditPlan({
     name: branchName ? branchName : '',
   });
   const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
-
+  const checkEdit = useAppSelector((state) => state.saleLimitTime.checkEdit);
   const [values, setValues] = React.useState<Values>({
     id: '',
     countingDate: null,
@@ -102,25 +104,16 @@ export default function ModalCreateAuditPlan({
   });
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
-  const [checkEdit, updateCheckEdit] = React.useState(false);
   //permission
   const userInfo = getUserInfo();
   const managePermission =
     userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
       ? userInfo.acl['service.posback-stock'].includes('stock.ap.manage')
       : false;
+  const isBranchPermission = !!(env.branch.channel === 'branch');
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
-
   const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
-
-  useEffect(() => {
-    if ((payloadAddItem.length == 0 && steps.indexOf(status) < 1) || steps.indexOf(status) >= 1) {
-      updateCheckEdit(false);
-    } else {
-      updateCheckEdit(true);
-    }
-  }, [payloadAddItem, status]);
 
   useEffect(() => {
     if (steps.indexOf(status) < 1) {
@@ -135,6 +128,10 @@ export default function ModalCreateAuditPlan({
   useEffect(() => {
     if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {
       setStatus(dataDetail.status);
+      setBranchOptions({
+        code: dataDetail.branchCode,
+        name: dataDetail.branchName,
+      });
       setValues({
         id: dataDetail.id,
         branch: dataDetail.branchCode,
@@ -163,11 +160,11 @@ export default function ModalCreateAuditPlan({
     }
   };
 
-  const handleCloseModalConfirmCouting = () => {
-    setOpenModalConfirmCouting(false);
+  const handleCloseModalConfirmCounting = () => {
+    setOpenModalConfirmCounting(false);
   };
 
-  const handleCouting = async (store: number) => {
+  const handleCounting = async (store: number) => {
     try {
       const products = payloadAddTypeProduct
         .filter((el: any) => el.selectedType === 2)
@@ -179,8 +176,9 @@ export default function ModalCreateAuditPlan({
             barcode: item.barcode,
           };
         });
-      const payload: PayloadCouting = {
+      const payload: PayloadCounting = {
         auditPlanning: {
+          id: values.id,
           product: products,
           documentNumber: values.documentNumber,
           branchCode: values.branch,
@@ -188,13 +186,14 @@ export default function ModalCreateAuditPlan({
         },
         storeType: store,
       };
-      const rs = await coutingAuditPlan(payload);
+      const rs = await countingAuditPlan(payload);
       if (rs.code == 20000) {
-        updateCheckEdit(false);
+        dispatch(setCheckEdit(false));
         // setOpenPopupModal(true);
         // setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
 
         setStatus(StockActionStatus.COUNTING);
+        await dispatch(getAuditPlanDetail(values.id));
       } else {
         setOpenModalError(true);
       }
@@ -255,7 +254,7 @@ export default function ModalCreateAuditPlan({
     if (stringNullOrEmpty(values.countingDate)) {
       isValid = false;
       setTextErrors({
-        ...errors,
+        ...textErrors,
         dateError: 'กรุณาระบุรายละเอียด',
       });
     }
@@ -291,7 +290,7 @@ export default function ModalCreateAuditPlan({
             };
         const rs = await saveDraftAuditPlan(body);
         if (rs.code === 20000) {
-          updateCheckEdit(false);
+          dispatch(setCheckEdit(false));
           setOpenPopupModal(true);
           setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
           setValues({
@@ -313,12 +312,8 @@ export default function ModalCreateAuditPlan({
     if (status == StockActionStatus.DRAFT) {
       setOpenModalConfirm(true);
     } else {
-      setOpenModalConfirmCouting(true);
+      setOpenModalConfirmCounting(true);
     }
-  };
-
-  const handleOpenModalConfirm = () => {
-    setOpenModalConfirm(true);
   };
 
   const handleCloseModalConfirm = async (confirm: boolean) => {
@@ -328,9 +323,9 @@ export default function ModalCreateAuditPlan({
         const rs = await confirmAuditPlan(values.id);
         if (rs.code == 20000) {
           setStatus(StockActionStatus.CONFIRM);
-          updateCheckEdit(false);
-          setOpenPopupModal(true);
-          setTextPopup('คุณได้ทำการสร้างแผนตรวจนับสต๊อกเรียบร้อยแล้ว');
+          dispatch(setCheckEdit(false));
+          setOpenPopup(true);
+          setPopupMsg('คุณได้ทำการสร้างแผนตรวจนับสต๊อกเรียบร้อยแล้ว');
           handleClose();
           if (onSearchMain) onSearchMain();
         }
@@ -400,6 +395,7 @@ export default function ModalCreateAuditPlan({
                   minDateTo={new Date()}
                   value={values.countingDate}
                   error={!!textErrors.dateError}
+                  disabled={steps.indexOf(status) > 0}
                 />
               </Grid>
             </Grid>
@@ -422,22 +418,28 @@ export default function ModalCreateAuditPlan({
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5}>
-              <Grid item xs={4}>
-                เอกสาร SC :
-              </Grid>
-              <Grid item xs={8}></Grid>
+              {steps.indexOf(status) > 1 && (
+                <>
+                  <Grid item xs={4}>
+                    เอกสาร SC :
+                  </Grid>
+                  <Grid item xs={7}>
+                    <DocumentList />
+                  </Grid>
+                </>
+              )}
             </Grid>
             <Grid item container xs={4} mb={5} pl={2}>
-              <Grid item xs={4}>
+              {/* <Grid item xs={4}>
                 เอกสาร SA :
-              </Grid>
+              </Grid> */}
               <Grid item xs={8}></Grid>
             </Grid>
             {/*line 3*/}
             <Grid container item xs={4} mb={5} mt={-1}>
-              <Grid item xs={3}>
+              {/* <Grid item xs={3}>
                 เอกสาร SL :
-              </Grid>
+              </Grid> */}
               <Grid item xs={8}></Grid>
             </Grid>
           </Grid>
@@ -453,6 +455,9 @@ export default function ModalCreateAuditPlan({
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
                   disabled={steps.indexOf(status) > 0}
+                  style={{
+                    display: steps.indexOf(status) > 0 || !managePermission || viewMode ? 'none' : undefined,
+                  }}
                 >
                   เพิ่มสินค้า
                 </Button>
@@ -468,6 +473,9 @@ export default function ModalCreateAuditPlan({
                     (payloadAddTypeProduct && payloadAddTypeProduct.length === 0) ||
                     !managePermission
                   }
+                  style={{
+                    display: steps.indexOf(status) > 0 || !managePermission || viewMode ? 'none' : undefined,
+                  }}
                   onClick={() => handleCreateDraft()}
                   className={classes.MbtnSearch}
                 >
@@ -478,7 +486,15 @@ export default function ModalCreateAuditPlan({
                   variant="contained"
                   color="primary"
                   sx={{ margin: '0 17px' }}
-                  disabled={steps.indexOf(status) < 0 || !managePermission}
+                  disabled={
+                    steps.indexOf(status) < 0 || !managePermission || (steps.indexOf(status) > 1 && !isBranchPermission)
+                  }
+                  style={{
+                    display:
+                      (steps.indexOf(status) > 1 && !isBranchPermission) || !managePermission || viewMode
+                        ? 'none'
+                        : undefined,
+                  }}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleConfirm}
                   className={classes.MbtnSearch}
@@ -492,6 +508,9 @@ export default function ModalCreateAuditPlan({
                   disabled={steps.indexOf(status) !== 0 || !managePermission}
                   startIcon={<HighlightOffIcon />}
                   onClick={handleOpenCancel}
+                  style={{
+                    display: steps.indexOf(status) > 0 || !managePermission || viewMode ? 'none' : undefined,
+                  }}
                   className={classes.MbtnSearch}
                 >
                   ยกเลิก
@@ -499,7 +518,7 @@ export default function ModalCreateAuditPlan({
               </Box>
             </Box>
             <Box>
-              <AuditPlanCreateItem status={status} />
+              <AuditPlanCreateItem status={status} viewMode={viewMode} />
             </Box>
           </Box>
         </DialogContent>
@@ -526,10 +545,10 @@ export default function ModalCreateAuditPlan({
         isControlStockType={true}
       />
 
-      <ModalConfirmCouting
-        open={openModalConfirmCouting}
-        onClose={handleCloseModalConfirmCouting}
-        onConfirm={handleCouting}
+      <ModalConfirmCounting
+        open={openModalConfirmCounting}
+        onClose={handleCloseModalConfirmCounting}
+        onConfirm={handleCounting}
       />
 
       <ModelConfirm

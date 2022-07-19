@@ -13,9 +13,10 @@ import { StockActionStatus } from '../../../utils/enum/common-enum';
 const _ = require('lodash');
 interface Props {
   status?: string;
+  viewMode?: boolean;
 }
 
-export default function AuditPlanCreateItem({ status }: Props): ReactElement {
+export default function AuditPlanCreateItem({ status, viewMode }: Props): ReactElement {
   const classes = useStyles();
   const [dtTable, setDtTable] = React.useState<Array<STProductDetail>>([]);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
@@ -110,7 +111,7 @@ export default function AuditPlanCreateItem({ status }: Props): ReactElement {
 
         return (
           <>
-            {(status == '' || status == StockActionStatus.DRAFT) && (
+            {(status == '' || status == StockActionStatus.DRAFT) && !viewMode && (
               <Button onClick={handleOpenModalDelete}>
                 <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
               </Button>

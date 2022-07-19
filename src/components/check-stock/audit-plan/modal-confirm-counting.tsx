@@ -7,17 +7,12 @@ import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
 import { FormControl, MenuItem, Select } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
-import { onChange } from '../../../utils/utils';
 import { Box } from '@mui/system';
 
 interface Confirm {
   open: boolean;
   onClose: () => void;
   onConfirm: (store: number) => void;
-}
-
-interface loadingModalState {
-  open: boolean;
 }
 
 export interface DialogTitleProps {
@@ -27,7 +22,7 @@ export interface DialogTitleProps {
   onConfirm?: () => void;
 }
 
-export default function ModalConfirmCouting(props: Confirm) {
+export default function ModalConfirmCounting(props: Confirm) {
   const { open, onClose, onConfirm } = props;
   const classes = useStyles();
   const [value, setValue] = React.useState(0);

@@ -130,7 +130,7 @@ const AuditPlanSearch = () => {
 
   const validateSearch = () => {
     let isValid = true;
-    if (stringNullOrEmpty(values.fromDate) || stringNullOrEmpty(values.toDate) || stringNullOrEmpty(values.branch)) {
+    if (stringNullOrEmpty(values.fromDate) || stringNullOrEmpty(values.toDate) || values.branch == 'ALL') {
       isValid = false;
       setOpenAlert(true);
       setTextError('กรุณาระบุข้อมูล');

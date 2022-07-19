@@ -1,7 +1,7 @@
 import { post } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { env } from '../adapters/environmentConfigs';
-import { Payload, PayloadCouting } from '../models/audit-plan';
+import { Payload, PayloadCounting } from '../models/audit-plan';
 import { getPathUrl } from './base-service';
 
 export async function saveDraftAuditPlan(payload: Payload) {
@@ -22,7 +22,7 @@ export async function confirmAuditPlan(id: string) {
   }
 }
 
-export async function coutingAuditPlan(payload: PayloadCouting) {
+export async function countingAuditPlan(payload: PayloadCounting) {
   try {
     const response = await post(`${env.backEnd.url}${environment.checkStock.auditPlan.counting.url}`, payload);
     return response;
