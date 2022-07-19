@@ -876,7 +876,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       const _comment: Comment[] = expenseData.comments ? expenseData.comments : [];
       let msgComment = ' ';
       _comment.forEach((e: Comment) => {
-        msgComment += `${e.username} ${e.statusDesc} ${convertUtcToBkkDate(e.commentDate)} \n ${e.comment}`;
+        msgComment += `${e.username}:${e.statusDesc} ${convertUtcToBkkDate(e.commentDate)} \n ${e.comment}`;
       });
       setComment(msgComment);
       const expenseStatusInfo = getExpenseStatus(expenseData.status);
