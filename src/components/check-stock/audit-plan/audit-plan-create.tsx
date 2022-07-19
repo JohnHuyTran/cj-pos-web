@@ -115,22 +115,21 @@ export default function ModalCreateAuditPlan({
   const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
 
   useEffect(() => {
-    if (payloadAddItem.length == 0 && steps.indexOf(status) < 1) {
+    if ((payloadAddItem.length == 0 && steps.indexOf(status) < 1) || steps.indexOf(status) >= 1) {
       updateCheckEdit(false);
     } else {
-      updateCheckEdit(false);
+      updateCheckEdit(true);
     }
-  }, [payloadAddItem]);
+  }, [payloadAddItem, status]);
 
   useEffect(() => {
     if (steps.indexOf(status) < 1) {
-      if (values.branch) {
+      if (values.branch && !groupBranch) {
         setTextErrors({ ...textErrors, branchError: '' });
       }
       if (values.countingDate) {
         setTextErrors({ ...textErrors, dateError: '' });
       }
-      updateCheckEdit(true);
     }
   }, [values.branch, values.countingDate]);
   useEffect(() => {
@@ -479,7 +478,7 @@ export default function ModalCreateAuditPlan({
                   variant="contained"
                   color="primary"
                   sx={{ margin: '0 17px' }}
-                  disabled={steps.indexOf(status) < 1 || !managePermission}
+                  disabled={steps.indexOf(status) < 0 || !managePermission}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleConfirm}
                   className={classes.MbtnSearch}
