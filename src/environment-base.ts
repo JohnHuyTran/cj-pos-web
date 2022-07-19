@@ -521,7 +521,7 @@ export const environment = {
           url: 'accounting/expense/reject1-2/{docNo}',
         },
         account: {
-          url: '',
+          url: 'accounting/expense/reject-by-acc/{docNo}',
         },
         accountManager: {
           url: 'accounting/expense/reject3/{docNo}',
