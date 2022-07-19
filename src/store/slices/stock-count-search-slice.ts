@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
 import { stringNullOrEmpty } from '../../utils/utils';
+import { environment } from "../../environment-base";
 import { StockCountSearchRequest, StockCountSearchResponse } from "../../models/stock-count-model";
 
 type State = {
@@ -27,13 +27,13 @@ export const getStockCountSearch = createAsyncThunk(
   'getStockCountSearch',
   async (payload: StockCountSearchRequest) => {
     try {
-      const apiRootPath = environment.withDraw.transferOut.search.url;
-      let path = `${apiRootPath}?perPage=${payload.perPage}&page=${payload.page}`;
+      const apiRootPath = environment.checkStock.stockCount.search.url;
+      let path = `${apiRootPath}?limit=${payload.perPage}&page=${payload.page}`;
       if (!stringNullOrEmpty(payload.query)) {
-        path = path + `&query=${payload.query}`;
+        path = path + `&documentNumber=${payload.query}`;
       }
       if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
-        path = path + `&branches=${payload.branch}`;
+        path = path + `&branchCode=${payload.branch}`;
       }
       if (!stringNullOrEmpty(payload.status) && 'ALL' !== payload.status) {
         path = path + `&status=${payload.status}`;

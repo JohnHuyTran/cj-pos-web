@@ -3,7 +3,7 @@ import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mu
 import React, { useEffect, useState } from 'react';
 import { useStyles } from '../../../styles/makeTheme';
 import { useTranslation } from 'react-i18next';
-import { Action, DateFormat, StockActionStatus } from '../../../utils/enum/common-enum';
+import { Action, DateFormat, StockActionStatus, STORE_TYPE } from '../../../utils/enum/common-enum';
 import { objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
 import HtmlTooltip from '../../commons/ui/html-tooltip';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
@@ -52,19 +52,19 @@ const StockCountList: React.FC<StateProps> = (props) => {
     if (lstStockCount != null && lstStockCount.length > 0) {
       let rows = lstStockCount.map((data: StockCount, index: number) => {
         return {
-          id: data.id,
+          id: data._id,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
           documentNumber: data.documentNumber,
-          countingTimes: '',
-          store: '',
+          countingTime: data.countingTime,
+          storeType: data.storeType,
           createdDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
           status: data.status,
-          branch: stringNullOrEmpty(data.branch)
+          branch: stringNullOrEmpty(data.branchCode)
             ? stringNullOrEmpty(data.branchName)
               ? ''
               : data.branchName
-            : data.branch + ' - ' + (stringNullOrEmpty(data.branchName) ? '' : data.branchName),
-          creatorName: '',
+            : data.branchCode + ' - ' + (stringNullOrEmpty(data.branchName) ? '' : data.branchName),
+          createdBy: data.createdBy,
         };
       });
       setLstStockCount(rows);
@@ -114,20 +114,27 @@ const StockCountList: React.FC<StateProps> = (props) => {
       width: 220,
     },
     {
-      field: 'countingTimes',
+      field: 'countingTime',
       headerName: 'นับครั้งที่',
       headerAlign: 'center',
+      align: 'center',
       sortable: false,
       minWidth: 80,
       width: 155,
+      renderCell: (params) => (
+        <Box component="div" sx={{ marginLeft: '0.2rem' }}>
+          {params.value}
+        </Box>
+      ),
     },
     {
-      field: 'store',
+      field: 'storeType',
       headerName: 'คลัง',
       headerAlign: 'center',
       sortable: false,
       minWidth: 100,
       width: 180,
+      renderCell: (params) => genStoreType(params),
     },
     {
       field: 'createdDate',
@@ -167,7 +174,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
       ),
     },
     {
-      field: 'creatorName',
+      field: 'createdBy',
       headerName: 'ผู้สร้างรายการ',
       headerAlign: 'center',
       sortable: false,
@@ -180,6 +187,19 @@ const StockCountList: React.FC<StateProps> = (props) => {
       ),
     },
   ];
+
+  const genStoreType = (params: GridValueGetterParams) => {
+    let valueDisplay = '';
+    switch (params.value) {
+      case STORE_TYPE.FRONT:
+        valueDisplay = 'หน้าร้าน';
+        break;
+      case STORE_TYPE.BACK:
+        valueDisplay = 'หลังร้าน';
+        break;
+    }
+    return valueDisplay;
+  };
 
   const genRowStatus = (params: GridValueGetterParams) => {
     let statusDisplay;
@@ -254,7 +274,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
     handleOpenLoading('open', true);
     if (chkPN !== 'checked') {
       try {
-        await dispatch(getStockCountDetail(params.row.documentNumber));
+        await dispatch(getStockCountDetail(params.row.id));
         if (stockCountDetail.data.length > 0 || stockCountDetail.data) {
             setOpenDetail(true);
         }

@@ -17,10 +17,11 @@ const initialState: ItemsState = {
     documentNumber: '',
     status: '',
     createdDate: moment(new Date()).toISOString(),
+    createdBy: '',
     branch: '',
-    store: '',
+    storeType: '',
     countingTime: '',
-    apDocument: ''
+    APDocumentNumber: ''
   },
   errorList: [],
   checkStock: [],

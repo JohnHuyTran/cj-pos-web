@@ -405,6 +405,14 @@ export const environment = {
         url: '/stock/audit-planning',
       },
     },
+    stockCount: {
+      search: {
+        url: '/stock/stock-count'
+      },
+      detail: {
+        url: '/stock/stock-count'
+      },
+    }
   },
   master: {
     branch: {

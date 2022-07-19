@@ -20,7 +20,7 @@ import {
 } from '../../../store/slices/stock-count-slice';
 import AlertError from '../../commons/ui/alert-error';
 import { getBranchName, objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
-import { Action, StockActionStatus } from '../../../utils/enum/common-enum';
+import { Action, StockActionStatus, STORE_TYPE } from '../../../utils/enum/common-enum';
 import ConfirmCloseModel from '../../commons/ui/confirm-exit-model';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { ACTIONS } from "../../../utils/enum/permission-enum";
@@ -35,6 +35,7 @@ import { updateAddItemsState } from "../../../store/slices/add-items-slice";
 import StepperBar from "../../commons/ui/stepper-bar";
 import { StepItem } from "../../../models/step-item-model";
 import ModalStockCountItem from "./modal-stock-count-item";
+import { GridValueGetterParams } from "@mui/x-data-grid";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -72,14 +73,12 @@ export default function ModalCreateStockCount({
   const payloadStockCount = useAppSelector((state) => state.stockCountSlice.createDraft);
   const dataDetail = useAppSelector((state) => state.stockCountSlice.dataDetail);
   const checkEdit = useAppSelector((state) => state.stockCountSlice.checkEdit);
-  const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail.data);
+  const stockCountDetail = useAppSelector((state) => state.stockCountDetailSlice.stockCountDetail.data);
   //permission
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SC_MANAGE) : false);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
-    ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
 
   const handleOpenCancel = () => {
     setOpenModalCancel(true);
@@ -146,23 +145,25 @@ export default function ModalCreateStockCount({
 
   useEffect(() => {
     //set value detail from search
-    if (Action.UPDATE === action && !objectNullOrEmpty(transferOutDetail)) {
+    if (Action.UPDATE === action && !objectNullOrEmpty(stockCountDetail)) {
       //set value for data detail
       dispatch(
         updateDataDetail({
-          id: transferOutDetail.id,
-          documentNumber: transferOutDetail.documentNumber,
-          status: transferOutDetail.status,
-          createdDate: transferOutDetail.createdDate,
-          approvedDate: transferOutDetail.approvedDate,
-          transferOutReason: transferOutDetail.transferOutReason,
-          store: transferOutDetail.store
+          id: stockCountDetail.id,
+          documentNumber: stockCountDetail.documentNumber,
+          status: stockCountDetail.status,
+          createdDate: stockCountDetail.createdDate,
+          createdBy: stockCountDetail.createdBy,
+          countingTime: stockCountDetail.countingTime,
+          APDocumentNumber: stockCountDetail.APDocumentNumber,
+          storeType: stockCountDetail.storeType,
+          branch: stockCountDetail.branchCode + ' - ' + stockCountDetail.branchName
         })
       );
       //set value for products
-      if (transferOutDetail.products && transferOutDetail.products.length > 0) {
+      if (stockCountDetail.product && stockCountDetail.product.length > 0) {
         let lstProductDetail: any = [];
-        for (let item of transferOutDetail.products) {
+        for (let item of stockCountDetail.product) {
           lstProductDetail.push({
             barcode: item.barcode,
             barcodeName: item.productName,
@@ -170,16 +171,14 @@ export default function ModalCreateStockCount({
             unitCode: item.unitFactor,
             baseUnit: item.barFactor,
             unitPrice: item.price || 0,
-            qty: item.numberOfRequested || 0,
-            numberOfApproved: item.numberOfRequested || 0,
+            qty: item.quantity || 0,
             skuCode: item.sku,
-            remark: item.remark
           });
         }
         dispatch(updateAddItemsState(lstProductDetail));
       }
     }
-  }, [transferOutDetail]);
+  }, [stockCountDetail]);
 
   const validate = () => {
     let isValid = true;
@@ -272,6 +271,20 @@ export default function ModalCreateStockCount({
     },
   ];
 
+  const genStoreType = (value: number) => {
+    let valueDisplay = '';
+    switch (value) {
+      case STORE_TYPE.FRONT:
+        valueDisplay = '001-หน้าร้าน';
+        break;
+      case STORE_TYPE.BACK:
+        valueDisplay = '002-หลังร้าน';
+        break;
+    }
+    return valueDisplay;
+  };
+
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth>
@@ -308,7 +321,7 @@ export default function ModalCreateStockCount({
                 <Typography>รายการ :</Typography>
               </Grid>
               <Grid item xs={8}>
-                {currentBranch}
+                {dataDetail.branch}
               </Grid>
             </Grid>
             {/*line 2*/}
@@ -317,6 +330,7 @@ export default function ModalCreateStockCount({
                 คลัง :
               </Grid>
               <Grid item xs={8}>
+                {genStoreType(dataDetail.storeType)}
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5}>
@@ -324,6 +338,7 @@ export default function ModalCreateStockCount({
                 นับครั้งที่ :
               </Grid>
               <Grid item xs={8}>
+                {dataDetail.countingTime}
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5}>
@@ -331,6 +346,7 @@ export default function ModalCreateStockCount({
                 เอกสาร AP :
               </Grid>
               <Grid item xs={8}>
+                {dataDetail.APDocumentNumber}
               </Grid>
             </Grid>
           </Grid>

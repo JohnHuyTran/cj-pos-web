@@ -20,9 +20,9 @@ const initialState: State = {
 
 export const getStockCountDetail = createAsyncThunk(
   "getStockCountDetail",
-  async (docNO: string) => {
+  async (id: string) => {
     try {
-      const apiRootPath = `${environment.withDraw.transferOut.detail.url}/${docNO}`;
+      const apiRootPath = `${environment.checkStock.stockCount.detail.url}/${id}`;
       let response: StockCountDetailResponse = {
         ref: "",
         code: 0,

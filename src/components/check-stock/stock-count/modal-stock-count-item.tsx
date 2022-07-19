@@ -172,10 +172,10 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
               error={condition}
-              type="text"
+              type="number"
               inputProps={{ maxLength: 13 }}
               className={classes.MtextFieldNumber}
-              value={numberWithCommas(stringNullOrEmpty(params.value) ? '' : params.value)}
+              value={stringNullOrEmpty(params.value) ? '' : params.value}
               onChange={(e) => {
                 handleChangeNumberOfRequested(e, params.row.index, index, params.row.barcode);
               }}
@@ -200,7 +200,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
 
   return (
     <div>
-      <div style={{ width: '100%', height: dtTable.length >= 10 ? '70vh' : 'auto', marginBottom: '20px' }} className={classes.MdataGridDetail}>
+      <div style={{ width: '100%', height: dtTable.length >= 10 ? '76vh' : 'auto', marginBottom: '20px' }} className={classes.MdataGridDetail}>
         <DataGrid
           rows={dtTable}
           columns={columns}
@@ -211,7 +211,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           disableColumnMenu
           autoHeight={dtTable.length < 10}
           scrollbarSize={10}
-          rowHeight={70}
+          rowHeight={60}
           components={{
             NoRowsOverlay: () => (
               <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">

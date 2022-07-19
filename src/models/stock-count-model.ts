@@ -22,16 +22,17 @@ export interface StockCountSearchResponse {
 }
 
 export interface StockCount {
-  id: string;
-  branch: string;
+  _id: string;
+  branchCode: string;
   branchName: string;
   requester: string;
   documentNumber: string;
   status: string;
-  store: string;
+  storeType: number;
   createdDate: string;
-  countingTimes: number;
+  countingTime: number;
   documentNumberAP: string;
+  createdBy: string;
   products: StockCountProductDetail[];
 }
 
