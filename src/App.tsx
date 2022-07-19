@@ -29,6 +29,7 @@ import { featchMasterStockMovementTypeListAsync } from './store/slices/master/st
 import ProductMaster from './pages/stock/product-master';
 import TORawMasterial from './pages/transfer-out-raw-masterial/transfer-out-raw-masterial';
 import AuditPlan from './pages/check-stock/audit-plan';
+import StockCount from "./pages/check-stock/stock-count";
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -107,6 +108,7 @@ export default function App2() {
           <Route path='/create-purchase-branch' component={CreatePurchaseBranch} />
           <Route path='/product-master' component={ProductMaster} />
           <Route path='/audit-plan' component={AuditPlan} />
+          <Route path='/stock-count' component={StockCount} />
         </Switch>
       </Main>
     </Box>

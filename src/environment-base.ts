@@ -414,6 +414,17 @@ export const environment = {
         url: '/stock/stock-count',
       },
     },
+    stockCount: {
+      search: {
+        url: '/stock/stock-count'
+      },
+      detail: {
+        url: '/stock/stock-count'
+      },
+      confirm: {
+        url: '/stock-count/confirm'
+      }
+    }
   },
   master: {
     branch: {

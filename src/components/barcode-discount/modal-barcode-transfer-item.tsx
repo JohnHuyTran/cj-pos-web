@@ -22,7 +22,12 @@ import {
 } from '../../store/slices/barcode-discount-slice';
 import moment from 'moment';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
-import { numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
+import {
+  handleNumberBeforeUse,
+  numberWithCommas,
+  objectNullOrEmpty,
+  stringNullOrEmpty
+} from '../../utils/utils';
 import { Action, BDStatus } from '../../utils/enum/common-enum';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import { ACTIONS } from '../../utils/enum/permission-enum';
@@ -217,18 +222,10 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfApprove = (event: any, index: number, errorIndex: number, barcode: string) => {
-    let currentValue = event.target.value;
-    if (stringNullOrEmpty(event.target.value)
-      || stringNullOrEmpty(event.target.value.trim())
-    ) {
-      currentValue = '0';
-    }
-    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
-      return;
-    }
+    let currentValue = handleNumberBeforeUse(event.target.value);
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      data[index - 1].numberOfApproved = currentValue ? parseInt(currentValue.replace(/,/g, '')) : 0;
+      data[index - 1].numberOfApproved = currentValue;
       data[index - 1].approvedDiscount = data[index - 1].numberOfApproved * data[index - 1].cashDiscount;
       return data;
     });
@@ -249,34 +246,19 @@ export const ModalTransferItem = (props: DataGridProps) => {
   };
 
   const handleChangeNumberOfDiscount = (event: any, index: number, errorIndex: number, barcode: string) => {
-    let currentValue = event.target.value;
-    if (stringNullOrEmpty(event.target.value)
-      || stringNullOrEmpty(event.target.value.trim())
-    ) {
-      currentValue = '0';
-    }
-    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
-      return;
-    }
+    let currentValue = handleNumberBeforeUse(event.target.value);
     let currentData: any;
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       currentData = data[index - 1];
-      data[index - 1].numberOfDiscounted = currentValue
-        ? parseInt(currentValue.replace(/,/g, '')) < 10000000000
-          ? parseInt(currentValue.replace(/,/g, ''))
-          : 0
-        : 0;
+      data[index - 1].numberOfDiscounted = currentValue;
       return data;
     });
     if (Object.keys(payloadAddItem).length !== 0) {
       let updateList = _.cloneDeep(payloadAddItem);
       updateList.map((item: any) => {
         if (item.barcode === currentData.barCode) {
-          item.qty =
-            parseInt(currentValue.replace(/,/g, '')) < 10000000000
-              ? parseInt(currentValue.replace(/,/g, ''))
-              : 0;
+          item.qty = currentValue;
         }
       });
       dispatch(updateAddItemsState(updateList));
@@ -326,7 +308,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       return data;
     });
   };
-  const handleChangeRemark = (event: any, index: number, errorIndex:number) => {
+  const handleChangeRemark = (event: any, index: number, errorIndex: number) => {
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
       data[index - 1].remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
@@ -445,7 +427,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderHeader: (params) => {
-        return typeDiscount === 'percent' ? ( 
+        return typeDiscount === 'percent' ? (
           <div style={{ color: '#36C690' }}>
             <Typography variant='body2' noWrap>
               <b>{'ยอดลด * (%)'}</b>
@@ -598,7 +580,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
       disableColumnMenu: true,
       sortable: false,
       renderHeader: (params) => {
-        return ( 
+        return (
           <div style={{ color: '#36C690' }}>
             <Typography variant='body2' noWrap>
               <b>{'จำนวน'}</b>
@@ -607,7 +589,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
               <b>{'ที่ขอลด*'}</b>
             </Typography>
           </div>
-        ) 
+        )
       },
       renderCell: (params: GridRenderCellParams) => {
         const index =
@@ -622,10 +604,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
             <TextField
               error={condition}
               type='number'
-              inputProps={{ maxLength: 13 }}
+              inputProps={{ maxLength: 13, min: 0 }}
               value={stringNullOrEmpty(params.value) ? '' : params.value}
               className={classes.MtextFieldNumber}
-              // inputProps={{ min: 0 }}
               onChange={(e) => {
                 handleChangeNumberOfDiscount(e, params.row.index, index, params.row.barCode);
               }}
@@ -774,7 +755,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
             {condition && <div className="title">{errorList[index]?.errorRemark}</div>}
           </div>
         )
-      } 
+      }
     },
     {
       field: 'delete',
@@ -837,33 +818,34 @@ export const ModalTransferItem = (props: DataGridProps) => {
           },
         }}
       >
-      <div style={{ width: '100%', height: dtTable.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
-        <DataGrid
-          rows={dtTable}
-          columns={columns}
-          getRowClassName={(params) => {
-            if ((params.row.numberOfDiscounted !== params.row.numberOfApproved) && (dataDetail.status >= Number(BDStatus.APPROVED))) {
-              return `row-highlight`;
-            }
-            return '';
-          }}
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
-          pagination
-          disableColumnMenu
-          autoHeight={dtTable.length < 8}
-          scrollbarSize={10}
-          rowHeight={85}
-          components={{
-            NoRowsOverlay: () => (
-              <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
-                ไม่มีข้อมูล
-              </Typography>
-            ),
-          }}
-        />
-      </div>
+        <div style={{ width: '100%', height: dtTable.length >= 8 ? '70vh' : 'auto' }}
+             className={classes.MdataGridDetail}>
+          <DataGrid
+            rows={dtTable}
+            columns={columns}
+            getRowClassName={(params) => {
+              if ((params.row.numberOfDiscounted !== params.row.numberOfApproved) && (dataDetail.status >= Number(BDStatus.APPROVED))) {
+                return `row-highlight`;
+              }
+              return '';
+            }}
+            pageSize={pageSize}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            rowsPerPageOptions={[10, 20, 50, 100]}
+            pagination
+            disableColumnMenu
+            autoHeight={dtTable.length < 8}
+            scrollbarSize={10}
+            rowHeight={85}
+            components={{
+              NoRowsOverlay: () => (
+                <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
+                  ไม่มีข้อมูล
+                </Typography>
+              ),
+            }}
+          />
+        </div>
       </Box>
       <Box display="flex" justifyContent="space-between" paddingTop="30px">
         <Grid container spacing={2} mb={2}>

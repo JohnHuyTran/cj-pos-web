@@ -54,6 +54,11 @@ export enum TO_TYPE {
   TO_DEFECT = 5,
 }
 
+export enum STORE_TYPE {
+  FRONT = 1,
+  BACK = 2,
+}
+
 export enum StockActionStatus {
   DRAFT = 'DRAFT',
   CONFIRM = 'CONFIRM',
