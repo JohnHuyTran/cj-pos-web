@@ -20,6 +20,11 @@ import { BranchListOptionType } from '../../../models/branch-model';
 import { isGroupBranch } from '../../../utils/role-permission';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import ModalCreateAuditPlan from './audit-plan-create';
+import moment from 'moment';
+import { SearchOff } from '@mui/icons-material';
+import AuditPlanItemList from './audit-plan-search-item-list';
+import { auditPlanGetSearch } from '../../../store/slices/audit-plan-search-slice';
+import { AuditPlanSearchRequest } from '../../../models/audit-plan';
 
 const _ = require('lodash');
 
@@ -28,7 +33,7 @@ interface State {
   branch: string;
   status: string;
   fromDate: any | Date | number | string;
-  approveDate: any | Date | number | string;
+  toDate: any | Date | number | string;
 }
 
 interface loadingModalState {
@@ -55,11 +60,18 @@ const AuditPlanSearch = () => {
   const dispatch = useAppDispatch();
   const page = '1';
 
+  const auditPlanSearchSlice = useAppSelector((state) => state.auditPlanSearchSlice);
+  const limit = auditPlanSearchSlice.apSearchResponse.perPage;
+
   const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
-  const [requestPermission, setRequestPermission] = useState<boolean>(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
   });
+  const userInfo = getUserInfo();
+  const managePermission =
+    userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
+      ? userInfo.acl['service.posback-stock'].includes('stock.ap.manage')
+      : false;
   const [openModal, setOpenModal] = React.useState(false);
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -74,10 +86,10 @@ const AuditPlanSearch = () => {
   };
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
-    branch: 'ALL',
+    branch: groupBranch ? ownBranch : 'ALL',
     status: 'ALL',
     fromDate: new Date(),
-    approveDate: new Date(),
+    toDate: new Date(),
   });
 
   useEffect(() => {
@@ -87,19 +99,6 @@ const AuditPlanSearch = () => {
       );
     }
   }, [branchList]);
-  useEffect(() => {
-    //permission
-    const userInfo: KeyCloakTokenInfo = getUserInfo();
-    if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
-      let userPermission =
-        userInfo.acl['service.posback-campaign'] != null && userInfo.acl['service.posback-campaign'].length > 0
-          ? userInfo.acl['service.posback-campaign']
-          : [];
-      setRequestPermission(
-        userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.create') : false
-      );
-    }
-  }, []);
 
   const handleCloseAlert = () => {
     setOpenAlert(false);
@@ -125,23 +124,62 @@ const AuditPlanSearch = () => {
       branch: '',
       status: 'ALL',
       fromDate: new Date(),
-      approveDate: new Date(),
+      toDate: new Date(),
     });
   };
 
   const validateSearch = () => {
     let isValid = true;
-    if (values.status == 'ALL') {
-      if (stringNullOrEmpty(values.fromDate) || stringNullOrEmpty(values.approveDate)) {
-        isValid = false;
-        setOpenAlert(true);
-        setTextError('กรุณากรอกวันที่');
-      }
+    if (stringNullOrEmpty(values.fromDate) || stringNullOrEmpty(values.toDate) || stringNullOrEmpty(values.branch)) {
+      isValid = false;
+      setOpenAlert(true);
+      setTextError('กรุณาระบุข้อมูล');
     }
     return isValid;
   };
 
-  const onSearch = async () => {};
+  const onSearch = async () => {
+    if (!validateSearch()) return;
+    let limits;
+    if (limit === 0) {
+      limits = '10';
+    } else {
+      limits = limit ? limit.toString() : '10';
+    }
+    const payload: AuditPlanSearchRequest = {
+      perPage: limits,
+      page: page,
+      docNo: values.documentNumber.trim(),
+      branch: values.branch,
+      status: values.status,
+      creationDateFrom: moment(values.fromDate).startOf('day').toISOString(),
+      creationDateTo: moment(values.toDate).endOf('day').toISOString(),
+    };
+
+    handleOpenLoading('open', true);
+    await dispatch(auditPlanGetSearch(payload));
+    setFlagSearch(true);
+    handleOpenLoading('open', false);
+  };
+  let dataTable;
+  const res = auditPlanSearchSlice.apSearchResponse;
+
+  const [flagSearch, setFlagSearch] = React.useState(false);
+  if (flagSearch) {
+    if (res && res.data && res.data.length > 0) {
+      dataTable = <AuditPlanItemList values={values} onSearch={onSearch} />;
+    } else {
+      dataTable = (
+        <Grid item container xs={12} justifyContent="center">
+          <Box color="#CBD4DB">
+            <h2>
+              {'ไม่มีข้อมูล'} <SearchOff fontSize="large" />
+            </h2>
+          </Box>
+        </Grid>
+      );
+    }
+  }
 
   return (
     <>
@@ -212,27 +250,29 @@ const AuditPlanSearch = () => {
               ถึง <span style={{ color: '#F54949' }}>*</span>
             </Typography>
             <DatePickerComponent
-              onClickDate={onChangeDate.bind(this, setValues, values, 'approveDate')}
+              onClickDate={onChangeDate.bind(this, setValues, values, 'toDate')}
               type={'TO'}
               minDateTo={values.fromDate}
-              value={values.approveDate}
+              value={values.toDate}
             />
           </Grid>
           <Grid item xs={4}></Grid>
         </Grid>
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
           <Grid item xs={12} style={{ textAlign: 'right' }}>
-            <Button
-              id="btnCreate"
-              variant="contained"
-              sx={{ width: '150px', height: '40px' }}
-              className={classes.MbtnSearch}
-              color="secondary"
-              startIcon={<AddCircleOutlineOutlinedIcon />}
-              onClick={handleOpenModal}
-            >
-              สร้างเอกสารใหม่
-            </Button>
+            {managePermission && (
+              <Button
+                id="btnCreate"
+                variant="contained"
+                sx={{ width: '150px', height: '40px' }}
+                className={classes.MbtnSearch}
+                color="secondary"
+                startIcon={<AddCircleOutlineOutlinedIcon />}
+                onClick={handleOpenModal}
+              >
+                สร้างเอกสารใหม่
+              </Button>
+            )}
 
             <Button
               id="btnClear"
@@ -257,7 +297,7 @@ const AuditPlanSearch = () => {
           </Grid>
         </Grid>
       </Box>
-      {/* {dataTable} */}
+      {dataTable}
       <LoadingModal open={openLoadingModal.open} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       {openModal && (

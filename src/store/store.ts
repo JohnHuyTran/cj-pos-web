@@ -83,6 +83,8 @@ import purchaseBRDetailSlice from './slices/purchase/purchase-branch-request-det
 import purchaseBranchRequestSlice from './slices/purchase-branch-request-slice';
 import saveSearchPurchaseBranchRequest from './slices/save-search-purchase-branch-request-slice';
 import verifyReasonsRejectListSlice from './slices/master/verify-order-reject-reasons-slice';
+import auditPlanDetailSlice from './slices/audit-plan-detail-slice';
+import auditPlanSearchSlice from './slices/audit-plan-search-slice';
 const store = configureStore({
   reducer: {
     auth: authSlice,
@@ -168,6 +170,8 @@ const store = configureStore({
     purchaseBranchRequestSlice: purchaseBranchRequestSlice,
     saveSearchPurchaseBranchRequest: saveSearchPurchaseBranchRequest,
     verifyReasonsRejectListSlice: verifyReasonsRejectListSlice,
+    auditPlanDetailSlice: auditPlanDetailSlice,
+    auditPlanSearchSlice: auditPlanSearchSlice,
   },
 });
 

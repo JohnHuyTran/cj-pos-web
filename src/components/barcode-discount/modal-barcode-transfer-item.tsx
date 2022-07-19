@@ -812,6 +812,9 @@ export const ModalTransferItem = (props: DataGridProps) => {
         sx={{
           '& .row-highlight': {
             bgcolor: '#FFFFB9',
+            '&:hover': {
+              bgcolor: '#FFFFB9',
+            },
           },
         }}
       >

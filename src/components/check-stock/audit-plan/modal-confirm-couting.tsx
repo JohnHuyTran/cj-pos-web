@@ -13,7 +13,7 @@ import { Box } from '@mui/system';
 interface Confirm {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (store: number) => void;
 }
 
 interface loadingModalState {
@@ -47,7 +47,8 @@ export default function ModalConfirmCouting(props: Confirm) {
       setError(true);
       return;
     }
-    onConfirm();
+    onConfirm(value);
+    onClose();
   };
 
   return (
