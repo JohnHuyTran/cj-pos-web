@@ -189,7 +189,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   }
 
   const handleChange = (event: any) => {
-    const value = event.target.value;
+    const value = event.target.value.replace(/[^0-9]/g, '');
     setValues({ ...values, [event.target.name]: Number(value) });
     let sum: number = 0;
     const arr = Object.entries(values);
@@ -204,7 +204,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     }
   };
   const handleOnChange = (event: any) => {
-    const value = Number(event.target.value);
+    const onlyNumber = event.target.value.replace(/[^0-9]/g, '');
+    const value = Number(onlyNumber);
     const name = event.target.name;
     setValues({ ...values, [event.target.name]: value });
 
@@ -265,7 +266,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   }, [open, edit, payload]);
 
   const handleChangeNew = (value: any, name: any) => {
-    const data = stringNullOrEmpty(value) ? 0 : Number(value);
+    // e.target.value ? parseInt(e.target.value, 10) : '0';
+    const onlyNumber = value.replace(/[^0-9]/g, '');
+    const data = Number(onlyNumber);
     testList.forEach((element: any) => {
       if (element.key === name) {
         element.value = data;
@@ -274,8 +277,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     setFlagEdit(true);
   };
   const handleChangeNewOnOtherExpense = (value: any, name: any) => {
+    const onlyNumber = value.replace(/[^0-9]/g, '');
     let _otherSum: number = 0;
-    const data = stringNullOrEmpty(value) ? 0 : Number(value);
+    const data = Number(onlyNumber);
     testList.forEach((element: any) => {
       if (element.key === name) {
         element.value = data;
@@ -432,7 +436,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               id={i.key}
                               name={i.key}
                               size='small'
-                              type='number'
+                              // type='number'
                               value={i.value}
                               onChange={(event) => handleChangeNew(event.target.value, i.key)}
                               className={classes.MtextField}

@@ -81,8 +81,9 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
   }, [open, payload]);
 
   const handleChangeNew = (value: any, name: any) => {
+    const onlyNumber = value.replace(/[^0-9]/g, '');
     let sum: number = 0;
-    const data = Number(value) || 0;
+    const data = Number(onlyNumber) || 0;
     testList.forEach((element: any) => {
       if (element.key === name) {
         element.value = data;
@@ -98,9 +99,10 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
   };
 
   const handleChangeNewOnOtherExpense = (value: any, name: any) => {
+    const onlyNumber = value.replace(/[^0-9]/g, '');
     let _otherSum: number = 0;
     let sum: number = 0;
-    const data = Number(value) || 0;
+    const data = Number(onlyNumber) || 0;
     testList.forEach((element: any) => {
       if (element.key === name) {
         element.value = data;
