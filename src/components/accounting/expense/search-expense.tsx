@@ -438,11 +438,7 @@ export default function SearchExpense() {
             //     กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
             //   </Typography>
             // }
-<<<<<<< HEAD
             sx={{ width: 110, ml: 2 }}
-=======
-            sx={{ width: '170.42px', ml: 2 }}
->>>>>>> feature/sp21/1388-expense-detail
             className={classes.MbtnSearch}>
             ค้นหา
           </Button>
