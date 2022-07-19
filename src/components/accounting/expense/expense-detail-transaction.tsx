@@ -48,6 +48,8 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const [expenseType, setExpenseType] = React.useState('');
   const [period, setPeriod] = React.useState<ExpensePeriod>();
+  const [otherMaxApprove1, setOtherMaxApprove1] = React.useState(0);
+  const [otherMaxApprove2, setOtherMaxApprove2] = React.useState(0);
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     const master = getMasterExpenInto(i.expenseNo);
     const hideColumn = master ? master.isOtherExpense : false;
@@ -122,6 +124,44 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
           );
         },
       };
+    } else if (i.expenseNo === 'SUMOTHER') {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        // minWidth: 70,
+        flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          const master = getMasterExpenInto(params.field);
+
+          const value = params.value || 0;
+          const condition =
+            value > Number(otherMaxApprove2)
+              ? 'overLimit2'
+              : value > Number(otherMaxApprove1)
+              ? 'overLimit1'
+              : 'normal';
+          return (
+            <TextField
+              variant='outlined'
+              name={`txb${i.expenseNo}`}
+              inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+              sx={{
+                '.MuiInputBase-input.Mui-disabled': {
+                  WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
+                  background: condition === 'overLimit2' ? '#F54949' : '',
+                  borderRadius: 'inherit',
+                },
+              }}
+              value={params.value}
+              disabled={true}
+              autoComplete='off'
+            />
+          );
+        },
+      };
     } else {
       return {
         field: i.expenseNo,
@@ -172,6 +212,15 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   });
   useEffect(() => {
     setExpenseType(type);
+    const maxApproveLimit1Other: ExpenseInfo = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
+      return o.typeCode === type && o.isOtherExpense && o.approvalLimit1;
+    });
+
+    const maxApproveLimit2Other = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
+      return o.typeCode === type && o.isOtherExpense && o.approvalLimit2;
+    });
+    setOtherMaxApprove1(maxApproveLimit1Other.approvalLimit1);
+    setOtherMaxApprove2(maxApproveLimit2Other.approvalLimit2);
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
       accountNameTh: 'วันที่ค่าใช่จ่าย',
@@ -262,6 +311,15 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   React.useEffect(() => {
     setPeriod(periodProps);
     setExpenseType(type);
+    const maxApproveLimit1Other: ExpenseInfo = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
+      return o.typeCode === type && o.isOtherExpense && o.approvalLimit1;
+    });
+
+    const maxApproveLimit2Other = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
+      return o.typeCode === type && o.isOtherExpense && o.approvalLimit2;
+    });
+    setOtherMaxApprove1(maxApproveLimit1Other.approvalLimit1);
+    setOtherMaxApprove2(maxApproveLimit2Other.approvalLimit2);
   }, [periodProps]);
 
   const [pageSize, setPageSize] = React.useState<number>(10);

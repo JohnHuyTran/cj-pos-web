@@ -55,7 +55,7 @@ export interface ExpenseSaveRequest {
   createdDate?: string;
   lastModifiedDate?: string;
   today?: string;
-  returnTo?: string;
+  route?: string;
 }
 
 export interface AccountAccountExpenses {

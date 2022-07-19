@@ -350,6 +350,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fullWidth
                               placeholder=''
                               autoComplete='off'
+                              disabled={enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>
@@ -405,6 +406,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fullWidth
                               placeholder=''
                               autoComplete='off'
+                              disabled={enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>
@@ -437,6 +439,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fullWidth
                               placeholder=''
                               autoComplete='off'
+                              disabled={enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>
@@ -491,6 +494,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fullWidth
                               placeholder=''
                               autoComplete='off'
+                              disabled={enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>
