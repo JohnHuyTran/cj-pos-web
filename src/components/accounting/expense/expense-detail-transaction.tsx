@@ -63,7 +63,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
             return (
-              <Box component='div' sx={{ paddingLeft: '20px' }}>
+              <Box component='div' sx={{ paddingLeft: '5px' }}>
                 {params.value}
               </Box>
             );
@@ -135,8 +135,9 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
                 inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
                 sx={{
                   '.MuiInputBase-input.Mui-disabled': {
-                    WebkitTextFillColor: condition === 'overLimit1' ? 'red' : '#000',
-                    background: condition === 'overLimit2' ? 'red' : '',
+                    WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
+                    background: condition === 'overLimit2' ? '#F54949' : '',
+                    borderRadius: 'inherit',
                   },
                 }}
                 value={params.value}

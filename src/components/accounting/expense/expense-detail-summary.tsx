@@ -63,7 +63,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
       renderCell: (params: GridRenderCellParams) => {
         if (isFilterFieldInExpense(params.field)) {
           return (
-            <Box component='div' sx={{ paddingLeft: '20px', color: frontColor(params.value) }}>
+            <Box component='div' sx={{ paddingLeft: '5px', color: frontColor(params.value) }}>
               {params.value}
             </Box>
           );

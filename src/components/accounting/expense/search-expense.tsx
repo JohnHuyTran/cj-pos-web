@@ -45,6 +45,13 @@ import { saveExpenseSearch } from '../../../store/slices/accounting/save-account
 import { ApiError } from '../../../models/api-error-model';
 
 import AlertError from '../../commons/ui/alert-error';
+import {
+  addNewItem,
+  initialItems,
+  updateItemRows,
+  updateSummaryRows,
+  updateToInitialState,
+} from '../../../store/slices/accounting/accounting-slice';
 
 interface FormSelectProps {
   title: string;
@@ -241,6 +248,11 @@ export default function SearchExpense() {
         setIsOpenLoading(false);
         console.log(error);
       });
+    await dispatch(updateToInitialState());
+    await dispatch(updateSummaryRows([]));
+    await dispatch(updateItemRows([]));
+    await dispatch(initialItems([]));
+    await dispatch(addNewItem(null));
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);
@@ -279,7 +291,7 @@ export default function SearchExpense() {
       <Grid container rowSpacing={1} columnSpacing={7}>
         <Grid item md={4} sm={4} xs={6}>
           <FormSelect
-            title="ประเภท"
+            title='ประเภท'
             dataList={expenseTypes}
             value={search.type}
             isDisabled={isOpenLoading}
@@ -288,7 +300,7 @@ export default function SearchExpense() {
           />
         </Grid>
         <Grid item md={4} sm={4} xs={6}>
-          <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+          <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
             สาขา
           </Typography>
           <BranchListDropDown
@@ -302,7 +314,7 @@ export default function SearchExpense() {
         </Grid>
         <Grid item md={4} sm={4} xs={6}>
           <FormSelect
-            title="สถานะ"
+            title='สถานะ'
             dataList={expenseStatusList}
             value={search.status}
             isValidate={isValidate}
@@ -311,7 +323,7 @@ export default function SearchExpense() {
           />
         </Grid>
         <Grid item md={4} sm={4} xs={6}>
-          <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+          <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
             เดือน
           </Typography>
           <DatePickerMonth
@@ -323,7 +335,7 @@ export default function SearchExpense() {
         {(isAccountRole || isAccountManagerRole) && (
           <Grid item md={4} sm={4} xs={6}>
             <FormSelect
-              title="งวดเบิก"
+              title='งวดเบิก'
               dataList={expensePeriodList}
               value={search.period}
               isValidate={isValidate}
@@ -338,39 +350,36 @@ export default function SearchExpense() {
           {isAccountManagerRole && (
             <Fragment>
               <Button
-                id="btnExport"
-                variant="contained"
-                color="primary"
+                id='btnExport'
+                variant='contained'
+                color='primary'
                 onClick={handleExport}
                 sx={{ width: 110, mr: 2 }}
                 startIcon={<Upload />}
                 className={classes.MbtnSearch}
-                disabled={true}
-              >
+                disabled={true}>
                 EXPORT
               </Button>
               <Fragment>
                 <Button
-                  id="btnSearch"
-                  variant="contained"
-                  color="primary"
+                  id='btnSearch'
+                  variant='contained'
+                  color='primary'
                   onClick={handleApprove}
                   sx={{ width: 110, mr: 2 }}
                   className={classes.MbtnSearch}
-                  disabled={selectRowsList.length === 0}
-                >
+                  disabled={selectRowsList.length === 0}>
                   อนุมัติ
                 </Button>
                 <Button
-                  id="btnSearch"
-                  variant="contained"
-                  color="secondary"
+                  id='btnSearch'
+                  variant='contained'
+                  color='secondary'
                   // disabled={flagBtnApproveAll}
                   // onClick={handleApproveAll}
                   disabled={true}
                   sx={{ width: 110 }}
-                  className={classes.MbtnSearch}
-                >
+                  className={classes.MbtnSearch}>
                   อนุมัติทั้งหมด
                 </Button>
               </Fragment>
@@ -381,9 +390,9 @@ export default function SearchExpense() {
           {isBranchRole && (
             <Fragment>
               <Button
-                id="btnCoffee"
-                variant="contained"
-                color="primary"
+                id='btnCoffee'
+                variant='contained'
+                color='primary'
                 onClick={() => handleOpenSelectPeriodModal('COFFEE')}
                 startIcon={<AddCircleOutline />}
                 sx={{
@@ -392,38 +401,35 @@ export default function SearchExpense() {
                   background: '#5468ff',
                   ':hover': { boxShadow: 6, background: '#3e4cb8' },
                 }}
-                className={classes.MbtnSearch}
-              >
+                className={classes.MbtnSearch}>
                 ค่าใช้จ่ายร้านกาแฟ
               </Button>
               <Button
-                id="btnStorefront"
-                variant="contained"
-                color="warning"
+                id='btnStorefront'
+                variant='contained'
+                color='warning'
                 onClick={() => handleOpenSelectPeriodModal('STOREFRONT')}
                 sx={{ width: 160, mr: 2 }}
                 startIcon={<AddCircleOutline />}
-                className={classes.MbtnSearch}
-              >
+                className={classes.MbtnSearch}>
                 ค่าใช้จ่ายหน้าร้าน
               </Button>
             </Fragment>
           )}
           <Button
-            id="btnClear"
-            variant="contained"
+            id='btnClear'
+            variant='contained'
             disabled={isOpenLoading}
             onClick={handleClearSearch}
             sx={{ width: 110 }}
             className={classes.MbtnClear}
-            color="cancelColor"
-          >
+            color='cancelColor'>
             เคลียร์
           </Button>
           <Button
-            id="btnSearch"
-            variant="contained"
-            color="primary"
+            id='btnSearch'
+            variant='contained'
+            color='primary'
             disabled={isOpenLoading}
             onClick={handleSearchExpense}
             // loading={isOpenLoading}
@@ -433,8 +439,7 @@ export default function SearchExpense() {
             //   </Typography>
             // }
             sx={{ width: '170.42px', ml: 2 }}
-            className={classes.MbtnSearch}
-          >
+            className={classes.MbtnSearch}>
             ค้นหา
           </Button>
         </Grid>
@@ -464,8 +469,8 @@ export default function SearchExpense() {
         <div>
           {orderListDatas.length > 0 && <ExpenseSearchList onSelectRows={handleSelectRows} />}
           {orderListDatas.length === 0 && (
-            <Grid item container xs={12} justifyContent="center">
-              <Box color="#CBD4DB" sx={{ mt: 5 }}>
+            <Grid item container xs={12} justifyContent='center'>
+              <Box color='#CBD4DB' sx={{ mt: 5 }}>
                 <h2>ไม่มีข้อมูล</h2>
               </Box>
             </Grid>
@@ -477,8 +482,8 @@ export default function SearchExpense() {
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
         onConfirm={handleConfirm}
-        startDate="2022-06-16T00:00:00+07:00"
-        endDate="2022-06-30T23:59:59.999999999+07:00"
+        startDate='2022-06-16T00:00:00+07:00'
+        endDate='2022-06-30T23:59:59.999999999+07:00'
         items={orderListDatas}
       />
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
@@ -490,20 +495,19 @@ const FormSelect = ({ title, value, setValue, dataList, isValidate, isDisabled }
   const classes = useStyles();
   return (
     <Fragment>
-      <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+      <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
         {title}
       </Typography>
-      <FormControl id="SearchType" className={classes.Mselect} fullWidth error={value === '' && isValidate}>
+      <FormControl id='SearchType' className={classes.Mselect} fullWidth error={value === '' && isValidate}>
         <Select
-          id="type"
-          name="type"
+          id='type'
+          name='type'
           value={value}
           disabled={isDisabled}
           onChange={(e) => setValue(e)}
           displayEmpty
           renderValue={value !== '' ? undefined : () => <div style={{ color: '#CBD4DB' }}>{`กรุณาเลือก${title}`}</div>}
-          inputProps={{ 'aria-label': 'Without label' }}
-        >
+          inputProps={{ 'aria-label': 'Without label' }}>
           {dataList.map((item, index: number) => (
             <MenuItem key={index} value={item.key}>
               {item.text}
