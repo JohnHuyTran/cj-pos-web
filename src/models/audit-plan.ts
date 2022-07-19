@@ -1,8 +1,62 @@
 export interface Payload {
   id?: string;
-  branchCode: string | any,
-  branchName: string | any,
-  countingDate: string,
-  product: Object[],
-  
+  branchCode: string | any;
+  branchName: string | any;
+  countingDate: string;
+  product: Object[];
+}
+
+export interface PayloadCouting {
+  auditPlanning: {
+    product: AuditPlanProductDetail[];
+    documentNumber: string;
+    branchCode: string | any;
+    branchName: string | any;
+  };
+  storeType: number;
+}
+export interface AuditPlanSearchRequest {
+  perPage: string;
+  page: string;
+  docNo: string;
+  branch: string;
+  status: string;
+  creationDateFrom: string;
+  creationDateTo: string;
+  clearSearch?: boolean;
+}
+
+export interface AuditPlanSearchResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: AuditPlan[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPage: number;
+}
+
+export interface AuditPlan {
+  id: string;
+  branchCode: string;
+  branchName: string;
+  createdBy: string;
+  documentNumber: string;
+  status: string;
+  createdDate: string;
+  countingDate: string;
+  product: AuditPlanProductDetail[];
+}
+
+export interface AuditPlanProductDetail {
+  name: string;
+  sku: string;
+}
+
+export interface AuditPlanDetailResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: AuditPlan;
 }
