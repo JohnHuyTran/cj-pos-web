@@ -8,13 +8,14 @@ import { updateAddTypeAndProductState } from '../../../store/slices/add-type-pro
 import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { STProductDetail } from '../../../models/sale-limit-time';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { StockActionStatus } from '../../../utils/enum/common-enum';
 
 const _ = require('lodash');
 interface Props {
-  disabled?: boolean;
+  status?: string;
 }
 
-export default function AuditPlanCreateItem({ disabled }: Props): ReactElement {
+export default function AuditPlanCreateItem({ status }: Props): ReactElement {
   const classes = useStyles();
   const [dtTable, setDtTable] = React.useState<Array<STProductDetail>>([]);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
@@ -109,7 +110,7 @@ export default function AuditPlanCreateItem({ disabled }: Props): ReactElement {
 
         return (
           <>
-            {!disabled && (
+            {(status == '' || status == StockActionStatus.DRAFT) && (
               <Button onClick={handleOpenModalDelete}>
                 <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
               </Button>

@@ -404,6 +404,15 @@ export const environment = {
       save: {
         url: '/stock/audit-planning',
       },
+      detail: {
+        url: '/stock/audit-planning',
+      },
+      confirm: {
+        url: '/stock/audit-planning/confirm/{id}',
+      },
+      counting: {
+        url: '/stock/stock-count',
+      },
     },
   },
   master: {
