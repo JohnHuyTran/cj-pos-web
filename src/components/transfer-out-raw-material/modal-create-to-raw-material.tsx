@@ -415,7 +415,7 @@ export default function ModalCreateToRawMaterial({
                 สต๊อก :
               </Grid>
               <Grid item xs={8}>
-                หลังร้าน
+                หน้าร้าน
               </Grid>
             </Grid>
           </Grid>
