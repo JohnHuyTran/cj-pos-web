@@ -1,6 +1,10 @@
 import { Fragment, useState } from "react";
 import { useStyles } from '../../../styles/makeTheme';
+
+// Components
+import ModalSettingExpense from './modal-settings-expense';
 import LoadingModal from '../../commons/ui/loading-modal';
+
 import { 
   Grid,
   Typography,
@@ -30,30 +34,32 @@ export default function SearchReserves () {
   
   // Set state data
   const [search, setSearch] = useState(initialSearchState);
-  const [isDisabled, setIsDisabled] = useState(false)
+  const [isOpenModal, setIsOpenModal] = useState(false)
   const [isOpenLoading, setIsOpenLoading] = useState(false);
 
   // Handle function
   const handleClearSearch = () => {
-    setIsDisabled(false)
+    setSearch(initialSearchState)
+    // setIsDisabled(false)
   }
   
   const handleSearchExpense = () => {
-    setIsDisabled(true)
     setIsOpenLoading(true)
     setTimeout(() => {
-      setIsDisabled(false)
       setIsOpenLoading(false)
     }, 500)
   }
   
   const handleAddList = () => {
-    setIsDisabled(true)
+    setIsOpenModal(true)
   }
 
   return(
     <Fragment>
       <Grid container rowSpacing={1} columnSpacing={7}>
+        <ModalSettingExpense
+          open={isOpenModal}
+          onClose={() => setIsOpenModal(false)} />
         <Grid item md={4} sm={4} xs={6}>
           <Typography variant="subtitle1" component="div" mb={1}>
             ประเภท
@@ -63,7 +69,7 @@ export default function SearchReserves () {
               id="Type"
               name="type"
               value={search.type}
-              disabled={isDisabled}
+              disabled={isOpenLoading}
               onChange={(e) => setSearch({...search, type: e.target.value})}
               inputProps={{ 'aria-label': 'Without label' }}
             >
@@ -84,7 +90,7 @@ export default function SearchReserves () {
               id="Status"
               name="status"
               value={search.status}
-              disabled={isDisabled}
+              disabled={isOpenLoading}
               onChange={(e) => setSearch({...search, status: e.target.value})}
               inputProps={{ 'aria-label': 'Without label' }}
             >
