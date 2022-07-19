@@ -42,6 +42,9 @@ import {
 import ExpenseSearchList from './expense-search-list';
 import ModelConfirmSearch from './confirm/modal-confirm-search';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
+import { ApiError } from '../../../models/api-error-model';
+
+import AlertError from '../../commons/ui/alert-error';
 
 interface FormSelectProps {
   title: string;
@@ -116,6 +119,8 @@ export default function SearchExpense() {
   const [isValidate, setIsValidate] = useState(false);
   const [branchFromCode, setBranchFromCode] = useState('');
   const [isOpenLoading, setIsOpenLoading] = useState(false);
+  const [openFailAlert, setOpenFailAlert] = useState(false);
+  const [textFail, setTextFail] = useState('');
 
   const items = useAppSelector((state) => state.searchBranchAccounting);
   const orderListDatas = items.branchAccountingList.data ? items.branchAccountingList.data : [];
@@ -160,11 +165,11 @@ export default function SearchExpense() {
   };
 
   const handleSearchExpense = async () => {
-    let isPeriodValidate = false
+    let isPeriodValidate = false;
     if (isAccountRole || isAccountManagerRole) {
-      isPeriodValidate = search.period === "" ? true : false
+      isPeriodValidate = search.period === '' ? true : false;
     }
-    
+
     setIsValidate(true);
     if (search.type && !isPeriodValidate) {
       setIsSearch(true);
@@ -200,6 +205,12 @@ export default function SearchExpense() {
     handleOpenModelConfirm();
   };
 
+  const handleCloseFailAlert = () => {
+    setOpenFailAlert(false);
+    setTextFail('');
+  };
+
+  //modal select period
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [openSelectPeriod, setOpenSelectPeriod] = useState(false);
   const [types, setType] = useState('');
@@ -212,9 +223,24 @@ export default function SearchExpense() {
     setIsOpenLoading(true);
     setType(type);
     await dispatch(clearDataExpensePeriod());
-    await dispatch(featchExpensePeriodTypeAsync(type));
-    setOpenSelectPeriod(true);
-    setIsOpenLoading(false);
+    await dispatch(featchExpensePeriodTypeAsync(type))
+      .then((value) => {
+        const p: any = value.payload;
+        const data = p.data;
+
+        if (data.length !== 0) {
+          setOpenSelectPeriod(true);
+        } else {
+          setOpenFailAlert(true);
+          setTextFail('ทำรายการเบิกครบแล้ว');
+        }
+
+        setIsOpenLoading(false);
+      })
+      .catch((error: ApiError) => {
+        setIsOpenLoading(false);
+        console.log(error);
+      });
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);
@@ -294,7 +320,7 @@ export default function SearchExpense() {
             onClickDate={(value: any) => setSearch({ ...search, month: value.month.number, year: value.year - 543 })}
           />
         </Grid>
-        { (isAccountRole || isAccountManagerRole) &&
+        {(isAccountRole || isAccountManagerRole) && (
           <Grid item md={4} sm={4} xs={6}>
             <FormSelect
               title='งวดเบิก'
@@ -305,7 +331,7 @@ export default function SearchExpense() {
               setValue={(e) => setSearch({ ...search, period: e.target.value })}
             />
           </Grid>
-        }
+        )}
       </Grid>
       <Grid container rowSpacing={1} columnSpacing={8} mt={10}>
         <Grid item md={5} sm={5} xs={12}>
@@ -400,7 +426,7 @@ export default function SearchExpense() {
             //     กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
             //   </Typography>
             // }
-            sx={{ width: '170.42px', ml: 2 }}
+            sx={{ width: 110, ml: 2 }}
             className={classes.MbtnSearch}>
             ค้นหา
           </Button>
@@ -448,6 +474,7 @@ export default function SearchExpense() {
         endDate='2022-06-30T23:59:59.999999999+07:00'
         items={orderListDatas}
       />
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
     </Fragment>
   );
 }

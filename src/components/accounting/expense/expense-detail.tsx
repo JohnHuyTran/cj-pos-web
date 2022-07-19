@@ -4,7 +4,7 @@ import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import AccordionUploadFile from '../../commons/ui/accordion-upload-file';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
-import Steppers from '../../commons/ui/steppers';
+
 import SaveIcon from '@mui/icons-material/Save';
 import InfoIcon from '@mui/icons-material/Info';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
@@ -15,7 +15,7 @@ import ModalAddExpense from './modal-add-expense';
 import ModelDescriptionExpense from './modal-description-expense';
 
 import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
-import { Cancel, VoicemailRounded } from '@mui/icons-material';
+import { Cancel, ConstructionOutlined, TramOutlined, VoicemailRounded } from '@mui/icons-material';
 import { GridColumnHeadersItemCollection } from '@mui/x-data-grid';
 import { mockExpenseInfo001, mockExpenseInfo002 } from '../../../mockdata/branch-accounting';
 import {
@@ -49,7 +49,7 @@ import {
 import { convertUtcToBkkDate, convertUtcToBkkWithZ } from '../../../utils/date-utill';
 import { getInit, getUserInfo } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
-import { EXPENSE_TYPE, STATUS } from '../../../utils/enum/accounting-enum';
+import { EXPENSE_TYPE, getExpenseStatus, STATUS } from '../../../utils/enum/accounting-enum';
 import LoadingModal from '../../commons/ui/loading-modal';
 import AlertError from '../../commons/ui/alert-error';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
@@ -70,6 +70,10 @@ import TextBoxComment from '../../commons/ui/textbox-comment';
 import { Day } from '@material-ui/pickers';
 import ModalConfirmExpense from './modal-confirm-expense';
 import { isGroupBranch, isGroupOC } from '../../../utils/role-permission';
+import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
+import Steppers from './steppers';
+import { stat } from 'fs';
+import { Controller } from 'react-hook-form';
 
 interface Props {
   isOpen: boolean;
@@ -104,6 +108,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const [openModalAddExpense, setOpenModalAddExpense] = React.useState(false);
   const [openModalDescriptionExpense, setOpenModalDescriptionExpense] = React.useState(false);
+  const payloadSearch = useAppSelector((state) => state.saveExpenseSearchRequest.searchExpense);
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
   const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
   const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
@@ -117,8 +122,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
-  const [isShowBtnApprove, setIsShowBtnApprove] = React.useState(true);
-  const [isShowBtnReject, setIsShowBtnReject] = React.useState(true);
+  const [isShowBtnApprove, setIsShowBtnApprove] = React.useState(false);
+  const [isShowBtnReject, setIsShowBtnReject] = React.useState(false);
   const [payloadModalConfirmDetail, setPayloadModalConfirmDetail] = React.useState<any>();
 
   const handleCloseSnackBar = () => {
@@ -220,6 +225,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   };
 
   const onApproveByBranch = async (comment: string) => {
+    setOpenLoadingModal(true);
     const payload: ExpenseSaveRequest = {
       comment: comment,
       docNo: docNo,
@@ -232,6 +238,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -240,10 +247,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
 
   const onApproveByAreaMangerOC = async () => {
+    setOpenLoadingModal(true);
     const payload: ExpenseSaveRequest = {
       docNo: docNo,
     };
@@ -252,6 +261,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -260,9 +270,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
   const onRejectByAreaMangerOC = async (comment: string) => {
+    setOpenLoadingModal(true);
     const payload: ExpenseSaveRequest = {
       docNo: docNo,
       comment: comment,
@@ -272,6 +284,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -280,14 +293,15 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
 
   const onApproveByAccount = async () => {
+    setOpenLoadingModal(true);
     const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
-
     let sumItems: SumItemsItem[] = [];
-    if (_arr && _arr.length > 0) {
+    if (_arr) {
       const arr = Object.entries(_arr);
       arr
         .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
@@ -311,6 +325,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -319,9 +334,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
   const onRejectByAccount = async (returnto: string, comment: string) => {
+    setOpenLoadingModal(true);
     const payload: ExpenseSaveRequest = {
       docNo: docNo,
       comment: comment,
@@ -332,6 +349,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -340,14 +358,16 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
 
   const onApproveByAccountManager = async (expenDate: Date, approveDate: Date) => {
+    setOpenLoadingModal(true);
     const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
 
     let sumItems: SumItemsItem[] = [];
-    if (_arr && _arr.length > 0) {
+    if (_arr) {
       const arr = Object.entries(_arr);
       arr
         .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
@@ -366,12 +386,14 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       expenseDate: moment(expenDate).startOf('day').toISOString(),
       approvedDate: moment(approveDate).startOf('day').toISOString(),
       sumItems: sumItems,
+      docNo: docNo,
     };
     await expenseApproveByAccountManager(payload)
       .then(async (value) => {
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -380,10 +402,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
 
   const onRejectByAccountManager = async (comment: string) => {
+    setOpenLoadingModal(true);
     const payload: ExpenseSaveRequest = {
       comment: comment,
     };
@@ -392,6 +416,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -400,7 +425,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
   let callbackFunction: any;
   const [isOpenModelConfirmExpense, setIsOpenModelConfirmExpense] = React.useState<boolean>(false);
@@ -430,17 +456,23 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setShowReason(false);
       setIsOpenModelConfirmExpense(true);
     } else if (status === STATUS.WAITTING_APPROVAL2) {
-      const isFileValidate: boolean = validateFileInfo();
-      if (isFileValidate) {
+      const isOver = validateApproveLimit();
+      if (!isOver) {
         setShowReason(false);
         setIsOpenModelConfirmExpense(true);
-      } else if (validateApproveLimit()) {
-        setOpenAlert(true);
-        setTextError('กรุณาแนบเอกสาร');
       } else {
-        setShowReason(false);
-        setIsOpenModelConfirmExpense(true);
+        const isFileValidate: boolean = validateFileInfo();
+        if (isFileValidate) {
+          setShowReason(false);
+          setIsOpenModelConfirmExpense(true);
+        }
       }
+
+      // if ( && !isFileValidate) {
+      //   setOpenAlert(true);
+      //   setTextError('กรุณาแนบเอกสาร');
+      // } else {
+      // }
     } else if (status === STATUS.WAITTING_ACCOUNTING) {
       let sumApprovalAmount: number = 0;
       const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
@@ -562,13 +594,13 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const validateFileInfo = () => {
     const isvalid = fileUploadList.length > 0 ? true : false;
     const existingfileList =
-      status === STATUS.DRAFT
+      status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT
         ? attachFiles
-        : status === STATUS.SEND_BACK_EDIT
-        ? editAttachFiles
         : status === STATUS.WAITTING_EDIT_ATTACH_FILE
+        ? editAttachFiles
+        : status === STATUS.WAITTING_APPROVAL2
         ? approvalAttachFiles
-        : '';
+        : [];
     if (!isvalid && existingfileList.length <= 0) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
@@ -579,16 +611,16 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
   const validateDateIsBeforPeriod = () => {
     const date = new Date();
-    if (date < new Date(period.endDate)) {
-      setOpenAlert(true);
-      setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
-      return false;
-    }
+    // if (date < new Date(period.endDate)) {
+    //   setOpenAlert(true);
+    //   setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
+    //   return false;
+    // }
     return true;
   };
 
   const validateApproveLimit = () => {
-    const items = store.getState().expenseAccountDetailSlice.itemRows;
+    const items = store.getState().expenseAccountDetailSlice.intialRows;
     let isRequire = false;
     items.forEach((e: any) => {
       const arr = Object.entries(e);
@@ -732,16 +764,16 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             ...infosApprove,
             id: 2,
             description: 'ยอดเงินอนุมัติ',
-            [entrie.expenseNo]: entrie?.approvedAmount,
+            [entrie.expenseNo]: Number(entrie?.approvedAmount) || 0,
           };
-          totalApprove += Number(entrie?.approvedAmount);
+          totalApprove += Number(entrie?.approvedAmount) || 0;
         }
 
         infoDiff = {
           ...infoDiff,
           id: 3,
           description: 'ผลต่าง',
-          [entrie.expenseNo]: '',
+          [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0),
         };
         const master = getMasterExpenInto(entrie.expenseNo);
         const _isOtherExpense = master ? master.isOtherExpense : false;
@@ -764,7 +796,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         rows = [
           { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
           { ...infosApprove, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
-          { ...infoDiff, total: '', SUMOTHER: '' },
+          { ...infoDiff, total: totalDiff, SUMOTHER: totalOtherDiff },
         ];
       } else {
         rows = [
@@ -844,9 +876,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       const _comment: Comment[] = expenseData.comments ? expenseData.comments : [];
       let msgComment = ' ';
       _comment.forEach((e: Comment) => {
-        msgComment += `${e.username} ${e.statusDesc} ${convertUtcToBkkDate(e.commentDate)} \n ${e.comment}`;
+        msgComment += `${e.username}:${e.statusDesc} ${convertUtcToBkkDate(e.commentDate)} \n ${e.comment}`;
       });
       setComment(msgComment);
+      const expenseStatusInfo = getExpenseStatus(expenseData.status);
+      setIsShowBtnApprove(expenseStatusInfo?.groupAllow === getUserInfo().group);
+      setIsShowBtnReject(expenseStatusInfo?.groupAllow === getUserInfo().group);
     } else {
       const ownBranch = getUserInfo().branch ? getUserInfo().branch : env.branch.code;
       setBranchCode(ownBranch);
@@ -901,7 +936,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       <Dialog open={isOpen} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={onClickClose}>
           <Typography sx={{ fontSize: 24, fontWeight: 400 }}>{expenseTypeName}</Typography>
-          <Steppers status={1} stepsList={['บันทึก', 'สาขา', 'บัญชี', 'อนุมัติ']}></Steppers>
+          <Steppers status={status} />
         </BootstrapDialogTitle>
         <DialogContent sx={{ minHeight: '70vh' }}>
           <Grid container spacing={2} mb={2} id='top-item'>

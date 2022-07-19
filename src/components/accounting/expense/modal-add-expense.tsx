@@ -20,6 +20,7 @@ import moment from 'moment';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import { STATUS } from '../../../utils/enum/accounting-enum';
+import { border } from '@mui/system';
 
 interface Props {
   open: boolean;
@@ -204,16 +205,27 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   };
   const handleOnChange = (event: any) => {
     const value = Number(event.target.value);
+    const name = event.target.name;
     setValues({ ...values, [event.target.name]: value });
 
     const arr = Object.entries(values);
     let _otherSum: number = 0;
+    let isNewItem = true;
     arr.map((element: any) => {
       if (!isFilterFieldInExpense(element[0]) && isOtherExpenseField(element[0])) {
-        _otherSum += element[1];
+        if (name === element[0]) {
+          _otherSum += value;
+          isNewItem = false;
+        } else {
+          _otherSum += element[1];
+        }
       }
     });
-    _otherSum += value;
+    if (isNewItem) {
+      _otherSum += value;
+    }
+
+    // _otherSum += value;
     setSumOther(_otherSum);
     if (_otherSum > 0) {
       setIsDisableSaveBtn(false);
@@ -247,6 +259,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     }
     if (expenseData) {
       setEnableSaveBtn(expenseData.status === STATUS.DRAFT || expenseData.status === STATUS.SEND_BACK_EDIT);
+    } else {
+      setEnableSaveBtn(true);
     }
   }, [open, edit, payload]);
 
@@ -342,11 +356,11 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       );
                     })}
                 </Grid>
-                <Grid container spacing={2} mt={2}>
-                  <Grid item xs={1} ml={1}>
+                <Grid container spacing={2} mt={2} ml={1}>
+                  <Grid item xs={2}>
                     ค่าอื่นๆ:
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={2}>
                     <TextField
                       id='txbSumOther'
                       name='sumOther'
@@ -362,7 +376,15 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} mb={2} mt={2} ml={1}>
+                <Grid
+                  container
+                  spacing={2}
+                  mb={2}
+                  mt={2}
+                  ml={1}
+                  pr={2}
+                  pb={2}
+                  sx={{ border: 1, borderColor: '#EAEBEB' }}>
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
@@ -382,6 +404,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
+                              autoComplete='off'
                             />
                           </Grid>
                         </>
@@ -440,7 +463,15 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} mb={2} mt={2} ml={1}>
+                <Grid
+                  container
+                  spacing={2}
+                  mb={2}
+                  mt={2}
+                  ml={1}
+                  pr={2}
+                  pb={2}
+                  sx={{ border: 1, borderColor: '#EAEBEB' }}>
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
@@ -459,6 +490,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
+                              autoComplete='off'
                             />
                           </Grid>
                         </>
