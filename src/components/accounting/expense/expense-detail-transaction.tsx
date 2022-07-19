@@ -70,6 +70,26 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
           }
         },
       };
+    } else if (i.expenseNo === 'total') {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        minWidth: 70,
+        flex: 0.6,
+        headerAlign: 'center',
+        align: 'right',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          if (isFilterFieldInExpense(params.field)) {
+            return (
+              <Box component='div' sx={{ paddingRight: '5px' }}>
+                {params.value}
+              </Box>
+            );
+          }
+        },
+      };
     } else if (i.expenseNo === 'otherDetail') {
       return {
         field: i.expenseNo,

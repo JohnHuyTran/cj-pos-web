@@ -873,12 +873,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           ? expenseData.approvalAttachFiles
           : []
       );
-      const _comment: Comment[] = expenseData.comments ? expenseData.comments : [];
-      let msgComment = ' ';
-      _comment.forEach((e: Comment) => {
-        msgComment += `${e.username}:${e.statusDesc} ${convertUtcToBkkDate(e.commentDate)} \n ${e.comment}`;
-      });
-      setComment(msgComment);
       const expenseStatusInfo = getExpenseStatus(expenseData.status);
       setIsShowBtnApprove(expenseStatusInfo?.groupAllow === getUserInfo().group);
       setIsShowBtnReject(expenseStatusInfo?.groupAllow === getUserInfo().group);
@@ -1033,18 +1027,33 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             <ExpenseDetailSummary type={expenseType} periodProps={period} />
           </Box>
           <Box mt={1}>
-            <Grid container spacing={2} mb={1}>
-              <Grid item lg={3}>
-                <TextBoxComment
-                  fieldName='หมายเหตุ:'
-                  defaultValue={comment}
-                  maxLength={100}
-                  onChangeComment={() => {}}
-                  isDisable={true}
-                  rowDisplay={2}
-                />
+            <Box>
+              <Typography variant='body2'>หมายเหตุ:</Typography>
+            </Box>
+            <Grid container spacing={2} mt={1} mb={2} justifyContent='space-between'>
+              <Grid
+                item
+                xs={3}
+                mb={1}
+                mt={1}
+                ml={2}
+                pr={1}
+                pb={1}
+                sx={{ border: 1, borderColor: '#CBD4DB', borderRadius: '5px !important' }}>
+                {expenseData.comments.map((e: Comment) => {
+                  return (
+                    <>
+                      <Typography variant='body2'>
+                        <span style={{ fontWeight: 'bold' }}>{e.username} : </span>
+                        <span style={{ color: '#AEAEAE' }}>
+                          {e.statusDesc} {convertUtcToBkkDate(e.commentDate)}
+                        </span>
+                      </Typography>
+                      <Typography variant='body2'> {e.comment}</Typography>
+                    </>
+                  );
+                })}
               </Grid>
-              <Grid item xs={7}></Grid>
               <Grid item xs={2} textAlign='center'>
                 <IconButton onClick={topFunction} data-testid='testid-btnTop'>
                   <ArrowForwardIosIcon

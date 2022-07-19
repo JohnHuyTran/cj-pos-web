@@ -51,42 +51,63 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     const master = getMasterExpenInto(i.expenseNo);
     const hideColumn = master ? master.isOtherExpense : false;
-
-    return {
-      field: i.expenseNo,
-      headerName: i.accountNameTh,
-      minWidth: 70,
-      flex: 1,
-      headerAlign: 'center',
-      sortable: false,
-      hide: hideColumn,
-      renderCell: (params: GridRenderCellParams) => {
-        if (isFilterFieldInExpense(params.field)) {
-          return (
-            <Box component='div' sx={{ paddingLeft: '5px', color: frontColor(params.value) }}>
-              {params.value}
-            </Box>
-          );
-        } else {
-          return (
-            <TextField
-              variant='outlined'
-              name={`txb${i.expenseNo}`}
-              inputProps={{ style: { textAlign: 'right' } }}
-              sx={{
-                '.MuiInputBase-input.Mui-disabled': {
-                  WebkitTextFillColor: frontColor(params.value),
-                  // color: color,
-                },
-              }}
-              value={params.value}
-              disabled={true}
-              autoComplete='off'
-            />
-          );
-        }
-      },
-    };
+    if (i.expenseNo === 'total') {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        minWidth: 70,
+        flex: 0.6,
+        headerAlign: 'center',
+        align: 'right',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          if (isFilterFieldInExpense(params.field)) {
+            return (
+              <Box component='div' sx={{ paddingRight: '5px' }}>
+                {params.value}
+              </Box>
+            );
+          }
+        },
+      };
+    } else {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        minWidth: 70,
+        flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          if (isFilterFieldInExpense(params.field)) {
+            return (
+              <Box component='div' sx={{ paddingLeft: '5px', color: frontColor(params.value) }}>
+                {params.value}
+              </Box>
+            );
+          } else {
+            return (
+              <TextField
+                variant='outlined'
+                name={`txb${i.expenseNo}`}
+                inputProps={{ style: { textAlign: 'right' } }}
+                sx={{
+                  '.MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: frontColor(params.value),
+                    // color: color,
+                  },
+                }}
+                value={params.value}
+                disabled={true}
+                autoComplete='off'
+              />
+            );
+          }
+        },
+      };
+    }
   });
   useEffect(() => {
     setExpenseType(type);
