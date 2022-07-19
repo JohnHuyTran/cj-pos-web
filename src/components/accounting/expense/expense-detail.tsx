@@ -1040,19 +1040,20 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                 pr={1}
                 pb={1}
                 sx={{ border: 1, borderColor: '#CBD4DB', borderRadius: '5px !important' }}>
-                {expenseData.comments.map((e: Comment) => {
-                  return (
-                    <>
-                      <Typography variant='body2'>
-                        <span style={{ fontWeight: 'bold' }}>{e.username} : </span>
-                        <span style={{ color: '#AEAEAE' }}>
-                          {e.statusDesc} {convertUtcToBkkDate(e.commentDate)}
-                        </span>
-                      </Typography>
-                      <Typography variant='body2'> {e.comment}</Typography>
-                    </>
-                  );
-                })}
+                {expenseData &&
+                  expenseData.comments.map((e: Comment) => {
+                    return (
+                      <>
+                        <Typography variant='body2'>
+                          <span style={{ fontWeight: 'bold' }}>{e.username} : </span>
+                          <span style={{ color: '#AEAEAE' }}>
+                            {e.statusDesc} {convertUtcToBkkDate(e.commentDate)}
+                          </span>
+                        </Typography>
+                        <Typography variant='body2'> {e.comment}</Typography>
+                      </>
+                    );
+                  })}
               </Grid>
               <Grid item xs={2} textAlign='center'>
                 <IconButton onClick={topFunction} data-testid='testid-btnTop'>
@@ -1085,7 +1086,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       <ModelDescriptionExpense
         open={openModalDescriptionExpense}
         onClickClose={() => setOpenModalDescriptionExpense(false)}
-        info={[mockExpenseInfo001, mockExpenseInfo002]}
+        type={expenseType}
       />
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} payload={null} />
