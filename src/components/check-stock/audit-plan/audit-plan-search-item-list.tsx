@@ -65,6 +65,12 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
           product: data.product,
           createrName: data.createdBy,
           branch: `${data.branchCode}-${data.branchName}`,
+          relatedDocuments:
+            data.relatedDocuments && data.relatedDocuments.length
+              ? _.uniqBy(data.relatedDocuments, 'documentNumber')
+                  .map((item: any) => item.documentNumber)
+                  .join(', ')
+              : '',
         };
       });
       setLstAuditPlan(rows);
@@ -114,7 +120,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       minWidth: 180,
     },
     {
-      field: 'documentNumberSASCSL',
+      field: 'relatedDocuments',
       headerName: 'เลขที่เอกสารอ้างอิง',
       headerAlign: 'center',
       sortable: false,
@@ -214,21 +220,17 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
     setLoading(false);
   };
 
-  const transferOutDetail = useAppSelector((state) => state.transferOutDetailSlice.transferOutDetail);
+  const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail);
   const currentlySelected = async (params: GridCellParams) => {
     handleOpenLoading('open', true);
-
     try {
-      const rs = await dispatch(getAuditPlanDetail(params.row.id));
-      console.log(rs);
-
-      if (transferOutDetail.data.length > 0 || transferOutDetail.data) {
+      await dispatch(getAuditPlanDetail(params.row.id));
+      if (!objectNullOrEmpty(auditPlanDetail.data)) {
         setOpenDetail(true);
       }
     } catch (error) {
       console.log(error);
     }
-
     handleOpenLoading('open', false);
   };
 

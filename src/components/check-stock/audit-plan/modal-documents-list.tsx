@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import theme from '../../../styles/theme';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { useAppSelector } from '../../../store/store';
 
-interface Props {
-  documentList: string[];
-  type: string;
-}
-
-const AccordionHuaweiFile = ({ documentList, type }: Props) => {
-  const [accordionFile, setAccordionFile] = useState<boolean>(false);
+const DocumentList = () => {
+  const [openListDocNo, setOpenListDocNo] = useState<boolean>(false);
+  const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
+  const relatedDocuments = dataDetail.relatedDocuments;
 
   return (
     <>
@@ -20,25 +20,36 @@ const AccordionHuaweiFile = ({ documentList, type }: Props) => {
           border: `1px dashed ${theme.palette.primary.main}`,
         }}
       >
-        <Box sx={{ display: accordionFile ? 'visible' : 'none' }}>
-          {documentList &&
-            documentList.length > 0 &&
-            documentList.map((item, index) => (
+        <Box>
+          <Box
+            onClick={() => {
+              setOpenListDocNo(!openListDocNo);
+            }}
+            // fontSize={'14px'}
+            display={'flex'}
+            justifyContent={'space-between'}
+          >
+            คลิกเพื่อดูเอกสารอ้างอิง
+            {openListDocNo ? <ExpandLess color="success" /> : <ExpandMore color="success" />}
+          </Box>
+          {openListDocNo &&
+            relatedDocuments &&
+            relatedDocuments.length > 0 &&
+            relatedDocuments.map((item, index) => (
               <Box
                 key={`item-${index + 1}-${item}`}
                 component="a"
                 href={void 0}
                 sx={{
                   color: theme.palette.secondary.main,
-                  cursor: 'pointer',
                 }}
               >
                 <Typography
                   color="secondary"
-                  sx={{ textDecoration: 'underline', fontSize: '13px', whiteSpace: 'normal' }}
+                  sx={{ textDecoration: 'underline', fontSize: '14px', whiteSpace: 'normal', cursor: 'pointer' }}
                   noWrap
                 >
-                  {item}
+                  {item.documentNumber} ครั้งที่ {item.countingTime}
                 </Typography>
               </Box>
             ))}
@@ -48,4 +59,4 @@ const AccordionHuaweiFile = ({ documentList, type }: Props) => {
   );
 };
 
-export default AccordionHuaweiFile;
+export default DocumentList;

@@ -6,8 +6,9 @@ export interface Payload {
   product: Object[];
 }
 
-export interface PayloadCouting {
+export interface PayloadCounting {
   auditPlanning: {
+    id: string;
     product: AuditPlanProductDetail[];
     documentNumber: string;
     branchCode: string | any;
@@ -47,6 +48,7 @@ export interface AuditPlan {
   createdDate: string;
   countingDate: string;
   product: AuditPlanProductDetail[];
+  relatedDocuments: RelatedDocument[];
 }
 
 export interface AuditPlanProductDetail {
@@ -59,4 +61,10 @@ export interface AuditPlanDetailResponse {
   code: number;
   message: string;
   data: AuditPlan;
+}
+
+export interface RelatedDocument {
+  countingTime: number;
+  documentNumber: string;
+  id: string;
 }
