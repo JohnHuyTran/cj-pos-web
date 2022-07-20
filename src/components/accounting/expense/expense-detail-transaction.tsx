@@ -19,7 +19,7 @@ import {
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { STATUS } from '../../../utils/enum/accounting-enum';
-import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
+import { isFilterFieldInExpense, stringNullOrEmpty, isFilterOutFieldInAdd } from '../../../utils/utils';
 import HtmlTooltip from '../../commons/ui/html-tooltip';
 import ModalAddExpense from './modal-add-expense';
 interface Props {
@@ -338,31 +338,23 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
     const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
     if (entries && entries.length > 0) {
       entries.map((entrie: SumItemsItem, i: number) => {
+        console.log(entrie);
         infosWithDraw = {
           ...infosWithDraw,
           [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
         };
         const sum = _.sumBy(_item, entrie.expenseNo);
-        totalWithDraw += stringNullOrEmpty(sum) ? 0 : sum;
-        // infosApprove = {
-        //   ...infosApprove,
-        //   id: 2,
-        //   description: 'ยอดเงินอนุมัติ',
-        //   [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
-        // };
-        // totalApprove += _.sumBy(_item, (o: any) => {
-        //   return 1;
-        // });
+        if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
+          totalWithDraw += stringNullOrEmpty(sum) ? 0 : sum;
+        }
+
         const master = getMasterExpenInto(entrie.expenseNo);
         const _isOtherExpense = master ? master.isOtherExpense : false;
         if (_isOtherExpense) {
           _otherSum += stringNullOrEmpty(sum) ? 0 : sum;
         }
       });
-      rows = [
-        { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw, SUMOTHER: _otherSum },
-        // { ...infosApprove, total: totalApprove },
-      ];
+      rows = [{ ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw, SUMOTHER: _otherSum }];
       dispatch(updateSummaryRows(rows));
     } else {
       totalWithDraw = 0;

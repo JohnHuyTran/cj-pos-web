@@ -144,7 +144,7 @@ export default function SearchExpense() {
   useEffect(() => {
     // Select งวดเบิก
     if (isAccountRole || isAccountManagerRole) {
-      if (search.type === 'COFFEE') {
+      if (search.type === 'STOREFRONT') {
         // ถ้าเป็นค่าใช้จ่ายหน้าร้าน
         setSearch({ ...search, period: '1' });
         setexpensePeriodList([{ key: '1', text: 'รายเดือน' }]);
