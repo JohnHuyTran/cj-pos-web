@@ -45,6 +45,13 @@ import { saveExpenseSearch } from '../../../store/slices/accounting/save-account
 import { ApiError } from '../../../models/api-error-model';
 
 import AlertError from '../../commons/ui/alert-error';
+import {
+  addNewItem,
+  initialItems,
+  updateItemRows,
+  updateSummaryRows,
+  updateToInitialState,
+} from '../../../store/slices/accounting/accounting-slice';
 
 interface FormSelectProps {
   title: string;
@@ -137,7 +144,7 @@ export default function SearchExpense() {
   useEffect(() => {
     // Select งวดเบิก
     if (isAccountRole || isAccountManagerRole) {
-      if (search.type === 'COFFEE') {
+      if (search.type === 'STOREFRONT') {
         // ถ้าเป็นค่าใช้จ่ายหน้าร้าน
         setSearch({ ...search, period: '1' });
         setexpensePeriodList([{ key: '1', text: 'รายเดือน' }]);
@@ -241,6 +248,11 @@ export default function SearchExpense() {
         setIsOpenLoading(false);
         console.log(error);
       });
+    await dispatch(updateToInitialState());
+    await dispatch(updateSummaryRows([]));
+    await dispatch(updateItemRows([]));
+    await dispatch(initialItems([]));
+    await dispatch(addNewItem(null));
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);

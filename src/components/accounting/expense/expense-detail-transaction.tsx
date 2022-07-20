@@ -19,7 +19,7 @@ import {
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { STATUS } from '../../../utils/enum/accounting-enum';
-import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
+import { isFilterFieldInExpense, stringNullOrEmpty, isFilterOutFieldInAdd } from '../../../utils/utils';
 import HtmlTooltip from '../../commons/ui/html-tooltip';
 import ModalAddExpense from './modal-add-expense';
 interface Props {
@@ -63,7 +63,27 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
             return (
-              <Box component='div' sx={{ paddingLeft: '20px' }}>
+              <Box component='div' sx={{ paddingLeft: '5px' }}>
+                {params.value}
+              </Box>
+            );
+          }
+        },
+      };
+    } else if (i.expenseNo === 'total') {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        minWidth: 70,
+        flex: 0.6,
+        headerAlign: 'center',
+        align: 'right',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          if (isFilterFieldInExpense(params.field)) {
+            return (
+              <Box component='div' sx={{ paddingRight: '5px' }}>
                 {params.value}
               </Box>
             );
@@ -102,6 +122,39 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
           );
         },
       };
+    } else if (i.expenseNo === 'SUMOTHER') {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        // minWidth: 70,
+        flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          const otherMaxApprove1 = params.getValue(params.id, 'isOverApprovalLimit1');
+          const otherMaxApprove2 = params.getValue(params.id, 'isOverApprovalLimit2');
+          const value = params.value || 0;
+          const condition = otherMaxApprove2 ? 'overLimit2' : otherMaxApprove1 ? 'overLimit1' : 'normal';
+          return (
+            <TextField
+              variant='outlined'
+              name={`txb${i.expenseNo}`}
+              inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+              sx={{
+                '.MuiInputBase-input.Mui-disabled': {
+                  WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
+                  background: condition === 'overLimit2' ? '#F54949' : '',
+                  borderRadius: 'inherit',
+                },
+              }}
+              value={params.value}
+              disabled={true}
+              autoComplete='off'
+            />
+          );
+        },
+      };
     } else {
       return {
         field: i.expenseNo,
@@ -135,8 +188,9 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
                 inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
                 sx={{
                   '.MuiInputBase-input.Mui-disabled': {
-                    WebkitTextFillColor: condition === 'overLimit1' ? 'red' : '#000',
-                    background: condition === 'overLimit2' ? 'red' : '',
+                    WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
+                    background: condition === 'overLimit2' ? '#F54949' : '',
+                    borderRadius: 'inherit',
                   },
                 }}
                 value={params.value}
@@ -284,31 +338,23 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
     const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
     if (entries && entries.length > 0) {
       entries.map((entrie: SumItemsItem, i: number) => {
+        console.log(entrie);
         infosWithDraw = {
           ...infosWithDraw,
           [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
         };
         const sum = _.sumBy(_item, entrie.expenseNo);
-        totalWithDraw += stringNullOrEmpty(sum) ? 0 : sum;
-        // infosApprove = {
-        //   ...infosApprove,
-        //   id: 2,
-        //   description: 'ยอดเงินอนุมัติ',
-        //   [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
-        // };
-        // totalApprove += _.sumBy(_item, (o: any) => {
-        //   return 1;
-        // });
+        if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
+          totalWithDraw += stringNullOrEmpty(sum) ? 0 : sum;
+        }
+
         const master = getMasterExpenInto(entrie.expenseNo);
         const _isOtherExpense = master ? master.isOtherExpense : false;
         if (_isOtherExpense) {
           _otherSum += stringNullOrEmpty(sum) ? 0 : sum;
         }
       });
-      rows = [
-        { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw, SUMOTHER: _otherSum },
-        // { ...infosApprove, total: totalApprove },
-      ];
+      rows = [{ ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw, SUMOTHER: _otherSum }];
       dispatch(updateSummaryRows(rows));
     } else {
       totalWithDraw = 0;
@@ -344,14 +390,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
       ];
       dispatch(updateSummaryRows(rows));
     }
-  };
-
-  const sum = (item: any) => {
-    const result = item.reduce(function (s: any, o: any) {
-      return o ? s : s + o;
-    }, 0);
-
-    return result;
   };
 
   useEffect(() => {
