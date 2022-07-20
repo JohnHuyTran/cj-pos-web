@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogContent, Grid, IconButton, Typography } from '@mui/material';
+import { Box, Button, Card, Dialog, DialogContent, Grid, IconButton, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
@@ -1106,17 +1106,18 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             <Box>
               <Typography variant='body2'>หมายเหตุ:</Typography>
             </Box>
-            <Grid container spacing={2} mt={1} mb={2} justifyContent='space-between'>
+            <Grid container spacing={2} mb={2} justifyContent='space-between'>
               <Grid
                 item
-                xs={3}
-                mb={1}
-                mt={1}
-                ml={2}
-                pr={1}
-                pb={1}
-                sx={{ border: 1, borderColor: '#CBD4DB', borderRadius: '5px !important' }}>
-                {expenseData &&
+                // xs={3}
+                // mb={1}
+                // mt={1}
+                // ml={2}
+                // pr={1}
+                // pb={1}
+                // sx={{ border: 1, borderColor: '#CBD4DB', borderRadius: '5px !important' }}
+              >
+                {/* {expenseData &&
                   expenseData.comments &&
                   expenseData.comments.length > 0 &&
                   expenseData.comments.map((e: Comment) => {
@@ -1131,7 +1132,40 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                         <Typography variant='body2'> {e.comment}</Typography>
                       </>
                     );
-                  })}
+                  })} */}
+
+                <Card
+                  variant='outlined'
+                  style={{
+                    // borderWidth: '10px',
+                    height: '10vw',
+                    // border: '#ffffff',
+                    // display: 'block',
+                    // width: '20vw',
+                    paddingLeft: '10px',
+                    paddingRight: '10px',
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                    overflow: 'scroll',
+                    // boxShadow: 'none',
+                  }}>
+                  {expenseData &&
+                    expenseData.comments &&
+                    expenseData.comments.length > 0 &&
+                    expenseData.comments.map((e: Comment) => {
+                      return (
+                        <>
+                          <Typography variant='body2'>
+                            <span style={{ fontWeight: 'bold' }}>{e.username} : </span>
+                            <span style={{ color: '#AEAEAE' }}>
+                              {e.statusDesc} : {convertUtcToBkkDate(e.commentDate)}
+                            </span>
+                          </Typography>
+                          <Typography variant='body2'> {e.comment}</Typography>
+                        </>
+                      );
+                    })}
+                </Card>
               </Grid>
               <Grid item xs={2} textAlign='center'>
                 <IconButton onClick={topFunction} data-testid='testid-btnTop'>
