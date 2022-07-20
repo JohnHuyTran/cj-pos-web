@@ -9,9 +9,11 @@ interface Props {
   onSelectItem: (value: any) => void;
   isClear: boolean;
   disable: boolean;
+  onChange: (e: any) => void;
+  onKeyPress:(value: any) => void;
 }
 
-function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
+function TextBoxSearchProduct({ onSelectItem, isClear, disable, onChange, onKeyPress }: Props) {
   const classes = useStyles();
   const [value, setValue] = React.useState('');
   const [loading, setLoading] = React.useState(false);
@@ -70,20 +72,22 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
 
   const debouncedSearch = debounce(async function (event: any, value: string, reason: string) {
     if (event && event.keyCode && event.keyCode === 13) {
-      return false;
+      setValue(value);
     }
-    const keyword = value.trim();
-    if (keyword.length >= 3 && reason !== 'reset') {
-      setLoading(true);
-      setSearchItem(keyword);
-      try {
-        const rs = await searchProductItem(keyword);
-        if (rs) {
-          setItemList(rs.data);
+    else{
+      const keyword = value.trim();
+      if (keyword.length >= 3 && reason !== 'reset') {
+        setLoading(true);
+        setSearchItem(keyword);
+        try {
+          const rs = await searchProductItem(keyword);
+          if (rs) {
+            setItemList(rs.data);
+            setLoading(false);
+          }
+        } catch (error) {
           setLoading(false);
         }
-      } catch (error) {
-        setLoading(false);
       }
     }
   }, 500);
