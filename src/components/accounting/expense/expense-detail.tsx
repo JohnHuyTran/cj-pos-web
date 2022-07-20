@@ -336,7 +336,14 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           sumItems.push(item);
         });
     } else {
-      sumItems = summary.items;
+      const _summary = summary.items;
+      _summary.map((e: SumItemsItem) => {
+        const item: SumItemsItem = {
+          expenseNo: e.expenseNo,
+          approvedAmount: e.withdrawAmount,
+        };
+        sumItems.push(item);
+      });
     }
 
     const payload: ExpenseSaveRequest = {
@@ -402,7 +409,14 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           sumItems.push(item);
         });
     } else {
-      sumItems = summary.items;
+      const _summary = summary.items;
+      _summary.map((e: SumItemsItem) => {
+        const item: SumItemsItem = {
+          expenseNo: e.expenseNo,
+          approvedAmount: e.approvedAmount,
+        };
+        sumItems.push(item);
+      });
     }
 
     const payload: ExpenseSaveRequest = {
@@ -432,6 +446,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const onRejectByAccountManager = async (comment: string) => {
     setOpenLoadingModal(true);
     const payload: ExpenseSaveRequest = {
+      docNo: docNo,
       comment: comment,
     };
     await expenseRejectByAccountManager(payload)
@@ -451,7 +466,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       })
       .finally(() => setOpenLoadingModal(false));
   };
-  let callbackFunction: any;
   const [isOpenModelConfirmExpense, setIsOpenModelConfirmExpense] = React.useState<boolean>(false);
   const [isApprove, setIsApprove] = React.useState<boolean>(false);
   const [showForward, setShowForward] = React.useState<boolean>(false); // show dropdown resend
@@ -543,9 +557,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     } else if (status === STATUS.WAITTING_APPROVAL3) {
       const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
       let listPayload: payLoadAdd[] = [];
-      const arr = Object.entries(_arr);
 
       if (_arr && _arr.length > 0) {
+        const arr = Object.entries(_arr);
         arr
           .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
           .map((e: any, index: number) => {
@@ -593,7 +607,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setIsOpenModelConfirmExpense(true);
     } else if (status === STATUS.WAITTING_APPROVAL3) {
       setValidateReason(true);
-      setShowForward(true);
+      setShowReason(true);
+      // setShowForward(true);
       setIsOpenModelConfirmExpense(true);
     }
   };
@@ -1137,7 +1152,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                 <Card
                   variant='outlined'
                   style={{
-                    height: '10vw',
+                    width: '500px',
+                    height: '150px',
                     paddingLeft: '10px',
                     paddingRight: '10px',
                     paddingTop: '10px',
@@ -1153,7 +1169,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                           <Typography variant='body2'>
                             <span style={{ fontWeight: 'bold' }}>{e.username} : </span>
                             <span style={{ color: '#AEAEAE' }}>
-                              {e.statusDesc} : {convertUtcToBkkDate(e.commentDate)}
+                              {getExpenseStatus(e.status)?.text || e.status} : {convertUtcToBkkDate(e.commentDate)}
                             </span>
                           </Typography>
                           <Typography variant='body2'> {e.comment}</Typography>
@@ -1207,7 +1223,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       <ModelConfirmDetail
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
-        onConfirm={callbackFunction}
+        onConfirm={onCallbackFunction}
         startDate='2022-06-16T00:00:00+07:00'
         endDate='2022-06-30T23:59:59.999999999+07:00'
         payload={payloadModalConfirmDetail}
