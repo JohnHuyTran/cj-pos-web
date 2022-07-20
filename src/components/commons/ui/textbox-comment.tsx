@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
 interface Props {
-  fieldName: string;
+  fieldName: any;
   defaultValue: string;
   maxLength: number;
   onChangeComment: (value: string) => void;
@@ -43,7 +43,7 @@ function TextBoxComment({
 
   return (
     <>
-      <Typography variant='body2'>{fieldName}</Typography>
+      <Typography variant='body2' sx={{mb: '5px'}}>{fieldName}</Typography>
       <TextField
         data-testid='form-field-tbxComment'
         id='tbxComment'

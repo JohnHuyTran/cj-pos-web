@@ -111,9 +111,9 @@ export default function ModalConfirmExpense({
             <Details topic='ยอดเบิกทั้งหมด' detail={details?.sumWithdrawAmount} />
           </Box>
           {showForward && (
-            <Box>
-              <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-                ส่งกลับแก้ไขให้กับ
+            <Box sx={{ mt: 3 }}>
+              <Typography gutterBottom variant='subtitle1' component='div' sx={{mb: '5px'}}>
+                ส่งกลับแก้ไขให้กับ <Typography component='span' color='red'>*</Typography>
               </Typography>
               <FormControl id='SearchType' className={classes.Mselect} fullWidth error={forward === '' && isError}>
                 <Select
@@ -144,7 +144,7 @@ export default function ModalConfirmExpense({
           {showReason && (
             <Box sx={{ mt: 3 }}>
               <TextBoxComment
-                fieldName='หมายเหตุ :'
+                fieldName={<Box>หมายเหตุ : { validateReason && (<Typography component='span' color='red'>*</Typography>)}</Box>}
                 defaultValue={reason}
                 isDisable={isOpenLoading}
                 maxLength={100}
@@ -154,7 +154,7 @@ export default function ModalConfirmExpense({
                 }}
                 rowDisplay={2}
               />
-              {!reason && isError && (
+              {!reason && validateReason && isError && (
                 <Typography component='label' variant='caption' sx={{ color: '#F54949' }}>
                   กรุณาระบุหมายเหตุ
                 </Typography>
