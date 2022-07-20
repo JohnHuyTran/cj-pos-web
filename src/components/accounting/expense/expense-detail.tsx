@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogContent, Grid, IconButton, Typography } from '@mui/material';
+import { Box, Button, Card, Dialog, DialogContent, Grid, IconButton, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
@@ -227,6 +227,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setDocNo(value.docNo);
 
         await dispatch(featchExpenseDetailAsync(value.docNo));
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           // onClickClose();
@@ -240,12 +241,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
   const onApproveByBranch = async (comment: string) => {
     setOpenLoadingModal(true);
+    const approveDate = moment(new Date(period.endDate).setDate(new Date(period.endDate).getDate() + 5));
+
     let payload: ExpenseSaveRequest = {
       comment: comment,
       docNo: docNo,
-      today: moment(new Date().setDate(new Date().getDate() + 5))
-        .startOf('day')
-        .toISOString(),
+      today: moment(approveDate).startOf('day').toISOString(),
     };
 
     if (status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
@@ -336,7 +337,14 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           sumItems.push(item);
         });
     } else {
-      sumItems = summary.items;
+      const _summary = summary.items;
+      _summary.map((e: SumItemsItem) => {
+        const item: SumItemsItem = {
+          expenseNo: e.expenseNo,
+          approvedAmount: e.withdrawAmount,
+        };
+        sumItems.push(item);
+      });
     }
 
     const payload: ExpenseSaveRequest = {
@@ -402,7 +410,14 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           sumItems.push(item);
         });
     } else {
-      sumItems = summary.items;
+      const _summary = summary.items;
+      _summary.map((e: SumItemsItem) => {
+        const item: SumItemsItem = {
+          expenseNo: e.expenseNo,
+          approvedAmount: e.approvedAmount,
+        };
+        sumItems.push(item);
+      });
     }
 
     const payload: ExpenseSaveRequest = {
@@ -432,6 +447,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const onRejectByAccountManager = async (comment: string) => {
     setOpenLoadingModal(true);
     const payload: ExpenseSaveRequest = {
+      docNo: docNo,
       comment: comment,
     };
     await expenseRejectByAccountManager(payload)
@@ -451,7 +467,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       })
       .finally(() => setOpenLoadingModal(false));
   };
-  let callbackFunction: any;
   const [isOpenModelConfirmExpense, setIsOpenModelConfirmExpense] = React.useState<boolean>(false);
   const [isApprove, setIsApprove] = React.useState<boolean>(false);
   const [showForward, setShowForward] = React.useState<boolean>(false); // show dropdown resend
@@ -543,9 +558,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     } else if (status === STATUS.WAITTING_APPROVAL3) {
       const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
       let listPayload: payLoadAdd[] = [];
-      const arr = Object.entries(_arr);
 
       if (_arr && _arr.length > 0) {
+        const arr = Object.entries(_arr);
         arr
           .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
           .map((e: any, index: number) => {
@@ -593,7 +608,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setIsOpenModelConfirmExpense(true);
     } else if (status === STATUS.WAITTING_APPROVAL3) {
       setValidateReason(true);
-      setShowForward(true);
+      setShowReason(true);
+      // setShowForward(true);
       setIsOpenModelConfirmExpense(true);
     }
   };
@@ -679,6 +695,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const getOtherExpenseName = (key: any) => {
     return getMasterExpenInto(key)?.accountNameTh;
   };
+
   const componetButtonDraft = (
     <>
       <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
@@ -818,11 +835,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             [entrie.expenseNo]: Number(entrie?.approvedAmount) || 0,
           };
           totalApprove += Number(entrie?.approvedAmount) || 0;
+          const diff = (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0);
           infoDiff = {
             ...infoDiff,
             id: 3,
             description: 'ผลต่าง',
-            [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0),
+            [entrie.expenseNo]: diff > 0 ? `+${diff}` : diff,
           };
         }
 
@@ -866,20 +884,31 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     }
 
     if (_items && _items.length > 0) {
-      let _otherSum: number = 0;
-      let _otherDetail: string = '';
       const itemRows = items.map((item: DataItem, index: number) => {
         const list: ItemItem[] = item.items;
         let newItem: any;
+        let _otherSum: number = 0;
+        let _otherDetail: string = '';
+        let _isOverApprovalLimit1 = false;
+        let _isOverApprovalLimit2 = false;
         list.map((data: ItemItem) => {
           newItem = {
             ...newItem,
             [data.expenseNo]: data.amount,
           };
-          if (!isFilterFieldInExpense(data.expenseNo) && isOtherExpenseField(data.expenseNo)) {
-            _otherSum += Number(data.amount);
+          const master = getMasterExpenInto(data.expenseNo);
+          const amount = Number(data.amount) || 0;
+          if (!isFilterFieldInExpense(data.expenseNo) && master?.isOtherExpense) {
+            _otherSum += amount;
+
             if (!stringNumberNullOrEmpty(data.amount)) {
               _otherDetail += `${getOtherExpenseName(data.expenseNo)},`;
+            }
+            if (amount > master.approvalLimit1) {
+              _isOverApprovalLimit1 = true;
+            }
+            if (amount > master.approvalLimit2) {
+              _isOverApprovalLimit2 = true;
             }
           }
         });
@@ -890,6 +919,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           total: item.totalAmount,
           SUMOTHER: _otherSum,
           otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
+          isOverApprovalLimit1: _isOverApprovalLimit1,
+          isOverApprovalLimit2: _isOverApprovalLimit2,
           ...newItem,
         };
       });
@@ -1106,17 +1137,18 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             <Box>
               <Typography variant='body2'>หมายเหตุ:</Typography>
             </Box>
-            <Grid container spacing={2} mt={1} mb={2} justifyContent='space-between'>
+            <Grid container spacing={2} mb={2} justifyContent='space-between'>
               <Grid
                 item
-                xs={3}
-                mb={1}
-                mt={1}
-                ml={2}
-                pr={1}
-                pb={1}
-                sx={{ border: 1, borderColor: '#CBD4DB', borderRadius: '5px !important' }}>
-                {expenseData &&
+                // xs={3}
+                // mb={1}
+                // mt={1}
+                // ml={2}
+                // pr={1}
+                // pb={1}
+                // sx={{ border: 1, borderColor: '#CBD4DB', borderRadius: '5px !important' }}
+              >
+                {/* {expenseData &&
                   expenseData.comments &&
                   expenseData.comments.length > 0 &&
                   expenseData.comments.map((e: Comment) => {
@@ -1131,7 +1163,36 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                         <Typography variant='body2'> {e.comment}</Typography>
                       </>
                     );
-                  })}
+                  })} */}
+
+                <Card
+                  variant='outlined'
+                  style={{
+                    width: '500px',
+                    height: '150px',
+                    paddingLeft: '10px',
+                    paddingRight: '10px',
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                    overflow: 'scroll',
+                  }}>
+                  {expenseData &&
+                    expenseData.comments &&
+                    expenseData.comments.length > 0 &&
+                    expenseData.comments.map((e: Comment) => {
+                      return (
+                        <>
+                          <Typography variant='body2'>
+                            <span style={{ fontWeight: 'bold' }}>{e.username} : </span>
+                            <span style={{ color: '#AEAEAE' }}>
+                              {getExpenseStatus(e.status)?.text || e.status} : {convertUtcToBkkDate(e.commentDate)}
+                            </span>
+                          </Typography>
+                          <Typography variant='body2'> {e.comment}</Typography>
+                        </>
+                      );
+                    })}
+                </Card>
               </Grid>
               <Grid item xs={2} textAlign='center'>
                 <IconButton onClick={topFunction} data-testid='testid-btnTop'>
@@ -1178,7 +1239,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       <ModelConfirmDetail
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
-        onConfirm={callbackFunction}
+        onConfirm={onCallbackFunction}
         startDate='2022-06-16T00:00:00+07:00'
         endDate='2022-06-30T23:59:59.999999999+07:00'
         payload={payloadModalConfirmDetail}

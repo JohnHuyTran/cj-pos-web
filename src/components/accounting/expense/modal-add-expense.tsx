@@ -97,15 +97,26 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
         let sum: number = 0;
         let _otherSum: number = 0;
         let _otherDetail: string = '';
+        let _isOverApprovalLimit1 = false;
+        let _isOverApprovalLimit2 = false;
         testList.map((e: any) => {
           data = { ...data, [e.key]: e.value };
           if (!isFilterOutFieldInAdd(e.key)) {
             sum += e.value;
           }
-          if (!isFilterFieldInExpense(e.key) && isOtherExpenseField(e.key)) {
+          const master = getMasterExpenInto(e.key);
+          const amount = Number(e.value) || 0;
+          if (!isFilterFieldInExpense(e.key) && master?.isOtherExpense) {
             _otherSum += e.value;
             if (!stringNumberNullOrEmpty(e.value)) {
               _otherDetail += `${getOtherExpenseName(e.key)},`;
+            }
+
+            if (amount > master.approvalLimit1) {
+              _isOverApprovalLimit1 = true;
+            }
+            if (amount > master.approvalLimit2) {
+              _isOverApprovalLimit2 = true;
             }
           }
         });
@@ -115,6 +126,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           total: sum,
           SUMOTHER: _otherSum,
           otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
+          isOverApprovalLimit1: _isOverApprovalLimit1,
+          isOverApprovalLimit2: _isOverApprovalLimit2,
         };
         if (sum > 0) {
           await dispatch(addNewItem(data));
@@ -126,6 +139,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
         let allItem = {};
         let _otherSum: number = 0;
         let _otherDetail: string = '';
+        let _isOverApprovalLimit1 = false;
+        let _isOverApprovalLimit2 = false;
         const arr = Object.entries(values);
         expenseMasterList
           .filter((e: ExpenseInfo) => e.isActive && e.typeCode === expenseType)
@@ -137,10 +152,18 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           });
 
         arr.map((element: any) => {
-          if (!isFilterFieldInExpense(element[0]) && isOtherExpenseField(element[0])) {
+          const master = getMasterExpenInto(element[0]);
+          const amount = Number(element[1]) || 0;
+          if (!isFilterFieldInExpense(element[0]) && master?.isOtherExpense) {
             _otherSum += element[1];
             if (!stringNumberNullOrEmpty(element[1])) {
               _otherDetail += `${getOtherExpenseName(element[0])},`;
+            }
+            if (amount > master.approvalLimit1) {
+              _isOverApprovalLimit1 = true;
+            }
+            if (amount > master.approvalLimit2) {
+              _isOverApprovalLimit2 = true;
             }
           }
         });
@@ -156,6 +179,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           dateTime: startDate,
           SUMOTHER: _otherSum,
           otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
+          isOverApprovalLimit1: _isOverApprovalLimit1,
+          isOverApprovalLimit2: _isOverApprovalLimit2,
         };
         if (sum(values) > 0) {
           await dispatch(addNewItem(data));
@@ -207,7 +232,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     const onlyNumber = event.target.value.replace(/[^0-9]/g, '');
     const value = Number(onlyNumber);
     const name = event.target.name;
-    setValues({ ...values, [event.target.name]: value });
+    setValues({ ...values, [event.target.name]: Number(value) });
 
     const arr = Object.entries(values);
     let _otherSum: number = 0;
@@ -337,6 +362,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && !i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
+                      const arr = Object.entries(values);
+                      const defaul = arr.find((e: any) => e[0] === i.expenseNo);
+
                       return (
                         <>
                           <Grid item xs={2}>
@@ -347,8 +375,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               id={i.expenseNo}
                               name={i.expenseNo}
                               size='small'
-                              type='number'
-                              // value={i.}
+                              value={defaul ? defaul[1] : ''}
                               onChange={handleChange}
                               className={classes.MtextField}
                               fullWidth
@@ -371,7 +398,6 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       name='sumOther'
                       size='small'
                       value={sumOther}
-                      // onChange={handleOnChange}
                       className={classes.MtextField}
                       fullWidth
                       placeholder=''
@@ -393,6 +419,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
+                      const arr = Object.entries(values);
+                      const defaul = arr.find((e: any) => e[0] === i.expenseNo);
                       return (
                         <>
                           <Grid item xs={2}>
@@ -403,9 +431,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               id={i.expenseNo}
                               name={i.expenseNo}
                               size='small'
-                              type='number'
-                              // value=''
-                              onKeyUp={handleOnChange}
+                              value={defaul ? defaul[1] : ''}
+                              onChange={handleOnChange}
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
@@ -436,7 +463,6 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               id={i.key}
                               name={i.key}
                               size='small'
-                              // type='number'
                               value={i.value}
                               onChange={(event) => handleChangeNew(event.target.value, i.key)}
                               className={classes.MtextField}
@@ -460,7 +486,6 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       name='sumOther'
                       size='small'
                       value={sumOther}
-                      // onChange={handleOnChange}
                       className={classes.MtextField}
                       fullWidth
                       placeholder=''

@@ -11,7 +11,7 @@ import { ExpensePeriod } from '../../../../models/branch-accounting-model';
 interface Props {
   open: boolean;
   onClose: () => void;
-  onConfirm: (comment: string) => void;
+  onConfirm: (value: any) => void;
   startDate: string;
   endDate: string;
   payload?: any;
@@ -35,7 +35,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, startDate, endD
 
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-    await onConfirm('comment');
+    onConfirm({ comment: 'comment' });
     handleOpenLoading('open', false);
     onClose();
   };

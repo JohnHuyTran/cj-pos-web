@@ -172,6 +172,8 @@ export const isFilterOutFieldInAdd = (value: string) => {
     value === 'description' ||
     value === 'SUMOTHER' ||
     value === 'otherDetail' ||
-    value === 'dateTime'
+    value === 'dateTime' ||
+    value === 'isOverApprovalLimit1' ||
+    value === 'isOverApprovalLimit2'
   );
 };

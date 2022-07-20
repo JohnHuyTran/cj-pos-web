@@ -48,8 +48,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const [expenseType, setExpenseType] = React.useState('');
   const [period, setPeriod] = React.useState<ExpensePeriod>();
-  const [otherMaxApprove1, setOtherMaxApprove1] = React.useState(0);
-  const [otherMaxApprove2, setOtherMaxApprove2] = React.useState(0);
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     const master = getMasterExpenInto(i.expenseNo);
     const hideColumn = master ? master.isOtherExpense : false;
@@ -134,15 +132,10 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
         sortable: false,
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
-          const master = getMasterExpenInto(params.field);
-
+          const otherMaxApprove1 = params.getValue(params.id, 'isOverApprovalLimit1');
+          const otherMaxApprove2 = params.getValue(params.id, 'isOverApprovalLimit2');
           const value = params.value || 0;
-          const condition =
-            value > Number(otherMaxApprove2)
-              ? 'overLimit2'
-              : value > Number(otherMaxApprove1)
-              ? 'overLimit1'
-              : 'normal';
+          const condition = otherMaxApprove2 ? 'overLimit2' : otherMaxApprove1 ? 'overLimit1' : 'normal';
           return (
             <TextField
               variant='outlined'
@@ -212,15 +205,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   });
   useEffect(() => {
     setExpenseType(type);
-    const maxApproveLimit1Other: ExpenseInfo = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
-      return o.typeCode === type && o.isOtherExpense && o.approvalLimit1;
-    });
-
-    const maxApproveLimit2Other = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
-      return o.typeCode === type && o.isOtherExpense && o.approvalLimit2;
-    });
-    setOtherMaxApprove1(maxApproveLimit1Other.approvalLimit1);
-    setOtherMaxApprove2(maxApproveLimit2Other.approvalLimit2);
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
       accountNameTh: 'วันที่ค่าใช่จ่าย',
@@ -311,15 +295,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   React.useEffect(() => {
     setPeriod(periodProps);
     setExpenseType(type);
-    const maxApproveLimit1Other: ExpenseInfo = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
-      return o.typeCode === type && o.isOtherExpense && o.approvalLimit1;
-    });
-
-    const maxApproveLimit2Other = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
-      return o.typeCode === type && o.isOtherExpense && o.approvalLimit2;
-    });
-    setOtherMaxApprove1(maxApproveLimit1Other.approvalLimit1);
-    setOtherMaxApprove2(maxApproveLimit2Other.approvalLimit2);
   }, [periodProps]);
 
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -423,14 +398,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
       ];
       dispatch(updateSummaryRows(rows));
     }
-  };
-
-  const sum = (item: any) => {
-    const result = item.reduce(function (s: any, o: any) {
-      return o ? s : s + o;
-    }, 0);
-
-    return result;
   };
 
   useEffect(() => {
