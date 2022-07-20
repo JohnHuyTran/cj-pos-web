@@ -835,11 +835,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             [entrie.expenseNo]: Number(entrie?.approvedAmount) || 0,
           };
           totalApprove += Number(entrie?.approvedAmount) || 0;
+          const diff = (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0);
           infoDiff = {
             ...infoDiff,
             id: 3,
             description: 'ผลต่าง',
-            [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0),
+            [entrie.expenseNo]: diff > 0 ? `+${diff}` : diff,
           };
         }
 
