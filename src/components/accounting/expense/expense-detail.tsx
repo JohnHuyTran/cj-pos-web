@@ -241,12 +241,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
   const onApproveByBranch = async (comment: string) => {
     setOpenLoadingModal(true);
+    const approveDate = moment(new Date(period.endDate).setDate(new Date(period.endDate).getDate() + 5));
+
     let payload: ExpenseSaveRequest = {
       comment: comment,
       docNo: docNo,
-      today: moment(new Date().setDate(new Date().getDate() + 5))
-        .startOf('day')
-        .toISOString(),
+      today: moment(approveDate).startOf('day').toISOString(),
     };
 
     if (status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
