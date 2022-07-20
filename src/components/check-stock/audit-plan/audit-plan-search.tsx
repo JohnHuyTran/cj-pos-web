@@ -253,6 +253,7 @@ const AuditPlanSearch = () => {
                 <MenuItem value={StockActionStatus.CONFIRM}>ยืนยัน</MenuItem>
                 <MenuItem value={StockActionStatus.COUNTING}>เริ่มตรวจนับ</MenuItem>
                 <MenuItem value={StockActionStatus.END}>ปิดงาน</MenuItem>
+                <MenuItem value={StockActionStatus.CANCEL}>ยกเลิก</MenuItem>
               </Select>
             </FormControl>
           </Grid>

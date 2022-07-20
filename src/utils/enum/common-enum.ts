@@ -64,4 +64,5 @@ export enum StockActionStatus {
   CONFIRM = 'CONFIRM',
   COUNTING = 'COUNTING',
   END = 'END',
+  CANCEL = 'CANCEL',
 }
