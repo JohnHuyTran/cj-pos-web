@@ -177,3 +177,16 @@ export const isFilterOutFieldInAdd = (value: string) => {
     value === 'isOverApprovalLimit2'
   );
 };
+
+export const isFilterOutFieldForPayload = (value: string) => {
+  return (
+    value === 'date' ||
+    value === 'total' ||
+    value === 'id' ||
+    value === 'description' ||
+    value === 'otherDetail' ||
+    value === 'dateTime' ||
+    value === 'isOverApprovalLimit1' ||
+    value === 'isOverApprovalLimit2'
+  );
+};

@@ -40,6 +40,7 @@ import {
 import {
   getBranchName,
   isFilterFieldInExpense,
+  isFilterOutFieldForPayload,
   isFilterOutFieldInAdd,
   numberWithCommas,
   objectNullOrEmpty,
@@ -167,7 +168,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         const arr = Object.entries(e);
         let items: ItemItem[] = [];
         arr
-          .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+          .filter((e: any) => !isFilterOutFieldForPayload(e[0]))
           .map((element: any, index: number) => {
             let _isOtherExpense = getMasterExpenInto(element[0])?.isOtherExpense || false;
 
@@ -192,7 +193,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     const arr = Object.entries(summarys[0]);
     let sumItems: SumItemsItem[] = [];
     arr
-      .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+      .filter((e: any) => !isFilterOutFieldForPayload(e[0]))
       .map((e: any, index: number) => {
         const item: SumItemsItem = {
           expenseNo: e[0],
@@ -796,8 +797,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           description: 'ยอดเงินเบิก',
           [entrie.expenseNo]: entrie?.withdrawAmount,
         };
-
-        totalWithDraw += Number(entrie?.withdrawAmount);
+        if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
+          totalWithDraw += Number(entrie?.withdrawAmount);
+        }
 
         if (status === STATUS.WAITTING_ACCOUNTING) {
           infosApprove = {
@@ -855,7 +857,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       totalOtherDiff = Number(totalOtherWithDraw) - Number(totalOtherApprove);
 
       if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT || status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
-        rows = [{ ...infosWithDraw, total: totalWithDraw }];
+        rows = [{ ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw }];
       } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
         rows = [
           { ...infosWithDraw, total: totalWithDraw },
