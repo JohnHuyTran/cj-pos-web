@@ -171,7 +171,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
 
   const currentlySelected = async (params: GridCellParams) => {
     const info = getExpenseStatus(expenseData.status);
-    const isAllow = info?.groupAllow === getUserInfo().group;
+    const isAllow = info?.groupAllow === getUserInfo().group && info?.allowShowSummary;
     if (params.id === 2 && isAllow) {
       let listPayload: payLoadAdd[] = [];
       const arr = Object.entries(params.row);
