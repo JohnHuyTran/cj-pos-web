@@ -397,7 +397,7 @@ export default function ModalCreateAuditPlan({
                   sourceBranchCode={ownBranch}
                   onChangeBranch={handleChangeBranch}
                   isClear={clearBranchDropDown}
-                  disable={groupBranch}
+                  disable={groupBranch || viewMode}
                   isFilterAuthorizedBranch={true}
                 />
               </Grid>
