@@ -13,7 +13,7 @@ import AlertError from '../../commons/ui/alert-error';
 import moment from 'moment';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import LoadingModal from '../../commons/ui/loading-modal';
-import { TO_TYPE, StockActionStatus } from '../../../utils/enum/common-enum';
+import { StockActionStatus } from '../../../utils/enum/common-enum';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
@@ -199,7 +199,6 @@ const StockCountSearch = () => {
       status: values.status,
       startDate: moment(values.startDate).startOf('day').toISOString(),
       endDate: moment(values.endDate).endOf('day').toISOString(),
-      type: TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT + ',' + TO_TYPE.TO_DEFECT
     };
 
     handleOpenLoading('open', true);

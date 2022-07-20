@@ -16,7 +16,7 @@ import { StockCount, StockCountSearchRequest, StockCountSearchResponse } from ".
 import { getStockCountDetail } from "../../../store/slices/stock-count-detail-slice";
 import { getStockCountSearch } from "../../../store/slices/stock-count-search-slice";
 import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
-
+import { TransferOutSearchRequest } from "../../../models/transfer-out-model";
 const _ = require('lodash');
 
 interface loadingModalState {
@@ -268,6 +268,19 @@ const StockCountList: React.FC<StateProps> = (props) => {
     setLoading(false);
   };
 
+  const onSearchAgain = async () => {
+    const payloadNew: TransferOutSearchRequest = {
+      perPage: payload.perPage,
+      page: payload.page,
+      query: payload.query,
+      branch: payload.branch,
+      status: payload.status,
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+    };
+    await dispatch(getStockCountSearch(payloadNew));
+  };
+
   const stockCountDetail = useAppSelector((state) => state.stockCountDetailSlice.stockCountDetail);
   const currentlySelected = async (params: GridCellParams) => {
     const chkPN = params.colDef.field;
@@ -320,7 +333,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
-          onSearchMain={props.onSearch}
+          onSearchMain={onSearchAgain}
           userPermission={userPermission}
         />
       )}
