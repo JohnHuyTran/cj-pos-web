@@ -515,7 +515,7 @@ export default function ModalCreateAuditPlan({
       <ModalAddTypeProduct
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
-        title="เพิ่มรายการสินค้า*"
+        title="เพิ่มรายการสินค้า"
         showSearch={true}
         textBtn="เพิ่มสินค้า"
         requestBody={{
