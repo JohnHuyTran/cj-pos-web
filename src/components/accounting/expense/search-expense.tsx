@@ -339,7 +339,7 @@ export default function SearchExpense() {
               dataList={expensePeriodList}
               value={search.period}
               isValidate={isValidate}
-              isDisabled={isOpenLoading}
+              isDisabled={isOpenLoading || !search.type}
               setValue={(e) => setSearch({ ...search, period: e.target.value })}
             />
           </Grid>
