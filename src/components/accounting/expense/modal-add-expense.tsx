@@ -337,6 +337,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && !i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
+                      const arr = Object.entries(values);
+                      const defaul = arr.find((e: any) => e[0] === i.expenseNo);
+
                       return (
                         <>
                           <Grid item xs={2}>
@@ -347,8 +350,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               id={i.expenseNo}
                               name={i.expenseNo}
                               size='small'
-                              type='number'
-                              // value={i.}
+                              value={defaul ? defaul[1] : ''}
                               onChange={handleChange}
                               className={classes.MtextField}
                               fullWidth
@@ -393,6 +395,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
+                      const arr = Object.entries(values);
+                      const defaul = arr.find((e: any) => e[0] === i.expenseNo);
                       return (
                         <>
                           <Grid item xs={2}>
@@ -403,8 +407,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               id={i.expenseNo}
                               name={i.expenseNo}
                               size='small'
-                              type='number'
-                              // value=''
+                              value={defaul ? defaul[1] : ''}
                               onKeyUp={handleOnChange}
                               className={classes.MtextField}
                               fullWidth
@@ -436,7 +439,6 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               id={i.key}
                               name={i.key}
                               size='small'
-                              // type='number'
                               value={i.value}
                               onChange={(event) => handleChangeNew(event.target.value, i.key)}
                               className={classes.MtextField}

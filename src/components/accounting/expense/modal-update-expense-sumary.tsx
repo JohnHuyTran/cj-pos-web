@@ -161,7 +161,6 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             id={i.key}
                             name={i.key}
                             size='small'
-                            type='number'
                             value={i.value}
                             onChange={(event) => handleChangeNew(event.target.value, i.key)}
                             className={classes.MtextField}

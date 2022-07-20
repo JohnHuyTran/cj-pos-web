@@ -1137,17 +1137,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                 <Card
                   variant='outlined'
                   style={{
-                    // borderWidth: '10px',
                     height: '10vw',
-                    // border: '#ffffff',
-                    // display: 'block',
-                    // width: '20vw',
                     paddingLeft: '10px',
                     paddingRight: '10px',
                     paddingTop: '10px',
                     paddingBottom: '10px',
                     overflow: 'scroll',
-                    // boxShadow: 'none',
                   }}>
                   {expenseData &&
                     expenseData.comments &&
