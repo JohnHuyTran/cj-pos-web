@@ -76,14 +76,10 @@ export const ModalStockCountItem = (props: DataGridProps) => {
       const products = dtTable.map((item) => {
         return {
           barcode: item.barcode,
-          numberOfRequested: parseInt(String(item.numberOfRequested).replace(/,/g, '')),
-          numberOfApproved: parseInt(String(item.numberOfApproved).replace(/,/g, '')),
+          quantity: parseInt(String(item.numberOfRequested).replace(/,/g, '')),
           unitName: item.unit,
-          unitFactor: item.unitCode,
-          barFactor: item.barFactor,
           productName: item.barcodeName,
           sku: item.skuCode,
-          remark: item.remark
         };
       });
       dispatch(save({ ...payloadStockCount, products: products }));
@@ -139,7 +135,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
     },
     {
       field: 'barcodeName',
-      headerName: 'รายละเอียด',
+      headerName: 'รายละเอียดสินค้า',
       flex: 1.4,
       headerAlign: 'center',
       disableColumnMenu: false,
@@ -155,7 +151,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
     },
     {
       field: 'numberOfRequested',
-      headerName: 'จำนวนสินค้า',
+      headerName: 'จำนวนนับ',
       flex: 0.8,
       headerAlign: 'center',
       align: 'center',

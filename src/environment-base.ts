@@ -422,8 +422,11 @@ export const environment = {
         url: '/stock/stock-count'
       },
       confirm: {
-        url: '/stock-count/confirm'
-      }
+        url: '/stock/stock-count/confirm'
+      },
+      cancel: {
+        url: '/stock/stock-count/{id}'
+      },
     }
   },
   master: {

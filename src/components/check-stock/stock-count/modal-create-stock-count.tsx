@@ -44,6 +44,10 @@ interface Props {
   viewMode?: boolean;
 }
 
+interface loadingModalState {
+  open: boolean;
+}
+
 const _ = require('lodash');
 
 export default function ModalCreateStockCount({
@@ -234,15 +238,15 @@ export default function ModalCreateStockCount({
     if (!stringNullOrEmpty(status)) {
       try {
         const rs = await cancelStockCount(dataDetail.id);
-        // if (rs.status === 200) {
-        //   setOpenPopup(true);
-        //   setPopupMsg('คุณได้ยกเลิกตรวจนับสต๊อกเรียบร้อยแล้ว');
-        //   handleClose();
-        //   if (onSearchMain) onSearchMain();
-        // } else {
-        //   setOpenModalError(true);
-        //   setOpenModalCancel(false);
-        // }
+        if (rs.status === 200) {
+          setOpenPopup(true);
+          setPopupMsg('คุณได้ยกเลิกตรวจนับสต๊อกเรียบร้อยแล้ว');
+          handleClose();
+          if (onSearchMain) onSearchMain();
+        } else {
+          setOpenModalError(true);
+          setOpenModalCancel(false);
+        }
       } catch (error) {
         setOpenModalError(true);
         setOpenModalCancel(false);
@@ -279,16 +283,22 @@ export default function ModalCreateStockCount({
   };
 
   const [openDetailAP, setOpenDetailAP] = React.useState(false);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
   const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail);
   const handleOpenAP = async () => {
+    handleOpenLoading('open', true);
     try {
       await dispatch(getAuditPlanDetail(dataDetail.APId));
-      if (!objectNullOrEmpty(auditPlanDetail.data) && !stringNullOrEmpty(auditPlanDetail.data.id)) {
-        // setOpenDetailAP(true);
+      if (!objectNullOrEmpty(auditPlanDetail.data)) {
+        setOpenDetailAP(true);
       }
     } catch (error) {
       console.log(error);
     }
+    handleOpenLoading('open', false);
   };
 
   return (
@@ -352,7 +362,7 @@ export default function ModalCreateStockCount({
                 เอกสาร AP :
               </Grid>
               <Grid item xs={8}>
-                <Link component={'button'} variant={'subtitle1'} underline={'always'} onClick={handleOpenAP}>
+                <Link color={'secondary'} component={'button'} variant={'subtitle1'} underline={'always'} onClick={handleOpenAP}>
                   {dataDetail.APDocumentNumber}
                 </Link>
               </Grid>
@@ -369,9 +379,9 @@ export default function ModalCreateStockCount({
                   || (payloadStockCount.products && payloadStockCount.products.length === 0)}
                 style={{ display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) || !managePermission || viewMode) ? 'none' : undefined }}
                 startIcon={<CheckCircleOutlineIcon/>}
-                // onClick={handleOpenModalConfirm}
+                onClick={handleOpenModalConfirm}
                 className={classes.MbtnSearch}>
-                อนุมัติ
+                ยืนยัน
               </Button>
               <Button
                 id='btnCancel'
@@ -380,7 +390,7 @@ export default function ModalCreateStockCount({
                 disabled={stringNullOrEmpty(status)}
                 style={{ display: (!managePermission || viewMode) ? 'none' : undefined }}
                 startIcon={<HighlightOffIcon/>}
-                // onClick={handleOpenCancel}
+                onClick={handleOpenCancel}
                 className={classes.MbtnSearch}>
                 ยกเลิก
               </Button>
@@ -402,6 +412,7 @@ export default function ModalCreateStockCount({
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
+          viewMode={true}
         />
       )}
       <ModelConfirm

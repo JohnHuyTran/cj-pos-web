@@ -282,7 +282,7 @@ const StockCountSearch = () => {
             </FormControl>
           </Grid>
         </Grid>
-        <Typography mt={2}>วันที่ทำรายการ</Typography>
+        <Typography mt={2}>วันที่สร้างรายการ</Typography>
         <Grid container rowSpacing={3} columnSpacing={6}>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}

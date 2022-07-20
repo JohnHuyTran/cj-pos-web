@@ -138,7 +138,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
     },
     {
       field: 'createdDate',
-      headerName: 'วันที่ทำรายการ',
+      headerName: 'วันที่สร้างรายการ',
       headerAlign: 'center',
       align: 'center',
       sortable: false,

@@ -51,7 +51,7 @@ export default function ConfirmCloseModel(props: Confirm) {
         <DialogContent>
           <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }} width={350}>
             <Typography variant='body1' align='center'>
-              ข้อมูลที่แก้ไขยังไม่ได้รับการบันทึก <br /> ต้องการออกจากหน้าจอนี้หรือไม่
+              ข้อมูลที่แก้ไขยังไม่ได้รับการบันทึก <br /> ต้องการอกจากหน้าจอนี้หรือไม่
             </Typography>
           </DialogContentText>
         </DialogContent>
