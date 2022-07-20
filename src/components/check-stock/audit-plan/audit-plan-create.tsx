@@ -156,6 +156,7 @@ export default function ModalCreateAuditPlan({
   };
 
   const handleCounting = async (store: number) => {
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const products = payloadAddTypeProduct
         .filter((el: any) => el.selectedType === 2)
@@ -199,8 +200,14 @@ export default function ModalCreateAuditPlan({
     setOpenModelAddItems(false);
   };
 
-  const handleOpenCancel = () => {
-    setOpenModalCancel(true);
+  const handleOpenCancel = async () => {
+    await dispatch(getAuditPlanDetail(values.id));
+    if (dataDetail.relatedDocuments && dataDetail.relatedDocuments.length > 0) {
+      setOpenModalError(true);
+      setAlertTextError('กรุณายกเลิกเอกสารที่เกี่ยวข้องก่อนดำเนินการ');
+    } else {
+      setOpenModalCancel(true);
+    }
   };
 
   const handleCloseModalCancel = () => {
@@ -233,6 +240,7 @@ export default function ModalCreateAuditPlan({
   };
 
   const handleCreateDraft = async () => {
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const products = payloadAddTypeProduct
         .filter((el: any) => el.selectedType === 2)
@@ -286,6 +294,7 @@ export default function ModalCreateAuditPlan({
   };
 
   const handleCloseModalConfirm = async (confirm: boolean) => {
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     setOpenModalConfirm(false);
     if (confirm) {
       try {
@@ -307,12 +316,18 @@ export default function ModalCreateAuditPlan({
   };
 
   const handleDeleteDraft = async () => {
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (!stringNullOrEmpty(status)) {
       try {
         const rs = await cancelAuditPlan(values.id);
         if (rs.code === 20000) {
           setOpenPopup(true);
           setPopupMsg('คุณได้ยกเลิกสร้างแผนตรวจนับสต๊อกเรียบร้อยแล้ว');
+          if (action == Action.INSERT && !!values.branch) {
+            if (onReSearchMain) onReSearchMain(values.branch);
+          } else {
+            if (onSearchMain) onSearchMain();
+          }
 
           handleClose();
         } else {
@@ -382,7 +397,7 @@ export default function ModalCreateAuditPlan({
                   sourceBranchCode={ownBranch}
                   onChangeBranch={handleChangeBranch}
                   isClear={clearBranchDropDown}
-                  disable={groupBranch}
+                  disable={groupBranch || viewMode}
                   isFilterAuthorizedBranch={true}
                 />
               </Grid>
@@ -426,7 +441,10 @@ export default function ModalCreateAuditPlan({
                   sx={{ width: 126 }}
                   disabled={steps.indexOf(status) > 0}
                   style={{
-                    display: steps.indexOf(status) > 0 || !managePermission || viewMode ? 'none' : undefined,
+                    display:
+                      steps.indexOf(status) > 0 || !managePermission || viewMode || status == StockActionStatus.CANCEL
+                        ? 'none'
+                        : undefined,
                   }}>
                   เพิ่มสินค้า
                 </Button>
@@ -439,7 +457,10 @@ export default function ModalCreateAuditPlan({
                   startIcon={<SaveIcon />}
                   disabled={steps.indexOf(status) > 0 || (payloadAddTypeProduct && payloadAddTypeProduct.length === 0)}
                   style={{
-                    display: steps.indexOf(status) > 0 || !managePermission || viewMode ? 'none' : undefined,
+                    display:
+                      steps.indexOf(status) > 0 || !managePermission || viewMode || status == StockActionStatus.CANCEL
+                        ? 'none'
+                        : undefined,
                   }}
                   onClick={() => handleCreateDraft()}
                   className={classes.MbtnSearch}>
@@ -458,7 +479,10 @@ export default function ModalCreateAuditPlan({
                     values.countingDate == null
                   }
                   style={{
-                    display: steps.indexOf(status) >= 1 || !managePermission || viewMode ? 'none' : undefined,
+                    display:
+                      steps.indexOf(status) >= 1 || !managePermission || viewMode || status == StockActionStatus.CANCEL
+                        ? 'none'
+                        : undefined,
                   }}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleConfirm}
@@ -474,7 +498,10 @@ export default function ModalCreateAuditPlan({
                     steps.indexOf(status) < 0 || !managePermission || (steps.indexOf(status) > 1 && !isBranchPermission)
                   }
                   style={{
-                    display: steps.indexOf(status) < 1 || !countingPermission || viewMode ? 'none' : undefined,
+                    display:
+                      steps.indexOf(status) < 1 || !countingPermission || viewMode || status == StockActionStatus.CANCEL
+                        ? 'none'
+                        : undefined,
                   }}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleOpenModalCounting}
@@ -485,11 +512,17 @@ export default function ModalCreateAuditPlan({
                   id="btnCancel"
                   variant="contained"
                   color="error"
-                  disabled={steps.indexOf(status) !== 0 || !managePermission}
+                  disabled={steps.indexOf(status) < 0 || !managePermission}
                   startIcon={<HighlightOffIcon />}
                   onClick={handleOpenCancel}
                   style={{
-                    display: steps.indexOf(status) > 0 || !managePermission || viewMode ? 'none' : undefined,
+                    display:
+                      (steps.indexOf(status) > 0 && !countingPermission) ||
+                      !managePermission ||
+                      viewMode ||
+                      status == StockActionStatus.CANCEL
+                        ? 'none'
+                        : undefined,
                   }}
                   className={classes.MbtnSearch}>
                   ยกเลิก

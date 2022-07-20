@@ -16,10 +16,20 @@ const steps = [StockActionStatus.DRAFT, StockActionStatus.CONFIRM, StockActionSt
 
 export default function StepperBar({ activeStep, setActiveStep }: Props): ReactElement {
   const classes = useStyles();
+  const [cancel, setCancel] = React.useState<boolean>(false);
+  const [activeStepBar, setActiveStepBar] = React.useState(0);
+  React.useEffect(() => {
+    if (StockActionStatus.CANCEL === activeStep) {
+      setCancel(true);
+      setActiveStepBar(2);
+    } else {
+      setActiveStepBar(steps.indexOf(activeStep) + 1);
+    }
+  }, [activeStep, open]);
   return (
     <div className={classes.MStepper} style={{ paddingBottom: 5 }}>
       <Box sx={{ width: '45%', margin: 'auto', marginTop: '-1em' }}>
-        <Stepper activeStep={steps.indexOf(activeStep) + 1} alternativeLabel>
+        <Stepper activeStep={activeStepBar} alternativeLabel>
           {steps.map((status, index) => {
             const labelProps: any = {};
             let label: string = '';
@@ -36,6 +46,10 @@ export default function StepperBar({ activeStep, setActiveStep }: Props): ReactE
               case 3:
                 label = 'ปิดงาน';
                 break;
+            }
+            if (index === 1 && cancel) {
+              label = 'ยกเลิก';
+              labelProps.error = true;
             }
             return (
               <Step key={label}>

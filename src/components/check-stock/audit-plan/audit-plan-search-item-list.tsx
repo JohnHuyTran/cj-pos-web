@@ -174,6 +174,9 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       case StockActionStatus.END:
         statusDisplay = genRowStatusValue('ปิดงาน', { color: '#F54949', backgroundColor: '#FFD7D7' });
         break;
+      case StockActionStatus.CANCEL:
+        statusDisplay = genRowStatusValue('ยกเลิก', { color: '#F54949', backgroundColor: '#FFD7D7' });
+        break;
     }
     return statusDisplay;
   };
@@ -198,7 +201,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       branch: props.values.branch,
       status: props.values.status,
       creationDateFrom: moment(props.values.fromDate).startOf('day').toISOString(),
-      creationDateTo: moment(props.values.toDate).startOf('day').toISOString(),
+      creationDateTo: moment(props.values.toDate).endOf('day').toISOString(),
     };
     await dispatch(auditPlanGetSearch(payloadNewPage));
     setLoading(false);
@@ -214,7 +217,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       branch: props.values.branch,
       status: props.values.status,
       creationDateFrom: moment(props.values.fromDate).startOf('day').toISOString(),
-      creationDateTo: moment(props.values.toDate).startOf('day').toISOString(),
+      creationDateTo: moment(props.values.toDate).endOf('day').toISOString(),
     };
     await dispatch(auditPlanGetSearch(payloadNewPage));
     setLoading(false);
