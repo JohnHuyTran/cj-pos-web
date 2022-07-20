@@ -227,6 +227,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setDocNo(value.docNo);
 
         await dispatch(featchExpenseDetailAsync(value.docNo));
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           // onClickClose();
@@ -694,6 +695,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const getOtherExpenseName = (key: any) => {
     return getMasterExpenInto(key)?.accountNameTh;
   };
+
   const componetButtonDraft = (
     <>
       <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='space-between' direction='row' alignItems='flex-end'>
@@ -881,20 +883,31 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     }
 
     if (_items && _items.length > 0) {
-      let _otherSum: number = 0;
-      let _otherDetail: string = '';
       const itemRows = items.map((item: DataItem, index: number) => {
         const list: ItemItem[] = item.items;
         let newItem: any;
+        let _otherSum: number = 0;
+        let _otherDetail: string = '';
+        let _isOverApprovalLimit1 = false;
+        let _isOverApprovalLimit2 = false;
         list.map((data: ItemItem) => {
           newItem = {
             ...newItem,
             [data.expenseNo]: data.amount,
           };
-          if (!isFilterFieldInExpense(data.expenseNo) && isOtherExpenseField(data.expenseNo)) {
-            _otherSum += Number(data.amount);
+          const master = getMasterExpenInto(data.expenseNo);
+          const amount = Number(data.amount) || 0;
+          if (!isFilterFieldInExpense(data.expenseNo) && master?.isOtherExpense) {
+            _otherSum += amount;
+
             if (!stringNumberNullOrEmpty(data.amount)) {
               _otherDetail += `${getOtherExpenseName(data.expenseNo)},`;
+            }
+            if (amount > master.approvalLimit1) {
+              _isOverApprovalLimit1 = true;
+            }
+            if (amount > master.approvalLimit2) {
+              _isOverApprovalLimit2 = true;
             }
           }
         });
@@ -905,6 +918,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           total: item.totalAmount,
           SUMOTHER: _otherSum,
           otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
+          isOverApprovalLimit1: _isOverApprovalLimit1,
+          isOverApprovalLimit2: _isOverApprovalLimit2,
           ...newItem,
         };
       });
