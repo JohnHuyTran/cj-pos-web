@@ -16,7 +16,7 @@ import { StockCount, StockCountSearchRequest, StockCountSearchResponse } from ".
 import { getStockCountDetail } from "../../../store/slices/stock-count-detail-slice";
 import { getStockCountSearch } from "../../../store/slices/stock-count-search-slice";
 import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
-import { TransferOutSearchRequest } from "../../../models/transfer-out-model";
+
 const _ = require('lodash');
 
 interface loadingModalState {
@@ -269,7 +269,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
   };
 
   const onSearchAgain = async () => {
-    const payloadNew: TransferOutSearchRequest = {
+    const payloadNew: StockCountSearchRequest = {
       perPage: payload.perPage,
       page: payload.page,
       query: payload.query,
