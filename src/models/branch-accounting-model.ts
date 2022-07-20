@@ -55,7 +55,7 @@ export interface ExpenseSaveRequest {
   createdDate?: string;
   lastModifiedDate?: string;
   today?: string;
-  returnTo?: string;
+  route?: string;
 }
 
 export interface AccountAccountExpenses {
@@ -108,12 +108,12 @@ export interface SumItems {
 
 export interface SumItemsItem {
   expenseNo: string;
-  withdrawAmount: number;
+  withdrawAmount?: number;
   approvedAmount?: number;
 }
 export interface Comment {
   username: string;
-  statusDesc: string;
+  status: string;
   commentDate: string;
   comment: string;
 }
@@ -135,7 +135,7 @@ export interface AuditLog {
 export interface payLoadAdd {
   id: number;
   key: string;
-  value: string;
+  value: string | number;
   title: string;
   isOtherExpense?: boolean;
 }

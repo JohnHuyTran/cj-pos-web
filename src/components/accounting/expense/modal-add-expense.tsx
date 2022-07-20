@@ -20,6 +20,7 @@ import moment from 'moment';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import { STATUS } from '../../../utils/enum/accounting-enum';
+import { border } from '@mui/system';
 
 interface Props {
   open: boolean;
@@ -109,7 +110,12 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           }
         });
 
-        data = { ...data, total: sum, SUMOTHER: _otherSum, otherDetail: _otherDetail };
+        data = {
+          ...data,
+          total: sum,
+          SUMOTHER: _otherSum,
+          otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
+        };
         if (sum > 0) {
           await dispatch(addNewItem(data));
         } else {
@@ -149,7 +155,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
           dateTime: startDate,
           SUMOTHER: _otherSum,
-          otherDetail: _otherDetail,
+          otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
         };
         if (sum(values) > 0) {
           await dispatch(addNewItem(data));
@@ -183,7 +189,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   }
 
   const handleChange = (event: any) => {
-    const value = event.target.value;
+    const value = event.target.value.replace(/[^0-9]/g, '');
     setValues({ ...values, [event.target.name]: Number(value) });
     let sum: number = 0;
     const arr = Object.entries(values);
@@ -198,17 +204,29 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     }
   };
   const handleOnChange = (event: any) => {
-    const value = Number(event.target.value);
+    const onlyNumber = event.target.value.replace(/[^0-9]/g, '');
+    const value = Number(onlyNumber);
+    const name = event.target.name;
     setValues({ ...values, [event.target.name]: value });
 
     const arr = Object.entries(values);
     let _otherSum: number = 0;
+    let isNewItem = true;
     arr.map((element: any) => {
       if (!isFilterFieldInExpense(element[0]) && isOtherExpenseField(element[0])) {
-        _otherSum += element[1];
+        if (name === element[0]) {
+          _otherSum += value;
+          isNewItem = false;
+        } else {
+          _otherSum += element[1];
+        }
       }
     });
-    _otherSum += value;
+    if (isNewItem) {
+      _otherSum += value;
+    }
+
+    // _otherSum += value;
     setSumOther(_otherSum);
     if (_otherSum > 0) {
       setIsDisableSaveBtn(false);
@@ -242,11 +260,15 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     }
     if (expenseData) {
       setEnableSaveBtn(expenseData.status === STATUS.DRAFT || expenseData.status === STATUS.SEND_BACK_EDIT);
+    } else {
+      setEnableSaveBtn(true);
     }
   }, [open, edit, payload]);
 
   const handleChangeNew = (value: any, name: any) => {
-    const data = stringNullOrEmpty(value) ? 0 : Number(value);
+    // e.target.value ? parseInt(e.target.value, 10) : '0';
+    const onlyNumber = value.replace(/[^0-9]/g, '');
+    const data = Number(onlyNumber);
     testList.forEach((element: any) => {
       if (element.key === name) {
         element.value = data;
@@ -255,8 +277,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     setFlagEdit(true);
   };
   const handleChangeNewOnOtherExpense = (value: any, name: any) => {
+    const onlyNumber = value.replace(/[^0-9]/g, '');
     let _otherSum: number = 0;
-    const data = stringNullOrEmpty(value) ? 0 : Number(value);
+    const data = Number(onlyNumber);
     testList.forEach((element: any) => {
       if (element.key === name) {
         element.value = data;
@@ -310,10 +333,13 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
             </Grid>
             {!edit && (
               <>
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid container spacing={2} mb={2} mt={2} ml={1}>
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && !i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
+                      const arr = Object.entries(values);
+                      const defaul = arr.find((e: any) => e[0] === i.expenseNo);
+
                       return (
                         <>
                           <Grid item xs={2}>
@@ -324,24 +350,24 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               id={i.expenseNo}
                               name={i.expenseNo}
                               size='small'
-                              type='number'
-                              // value={i.}
+                              value={defaul ? defaul[1] : ''}
                               onChange={handleChange}
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
                               autoComplete='off'
+                              disabled={enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>
                       );
                     })}
                 </Grid>
-                <Grid container spacing={2} mt={2}>
-                  <Grid item xs={1}>
+                <Grid container spacing={2} mt={2} ml={1}>
+                  <Grid item xs={2}>
                     ค่าอื่นๆ:
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={2}>
                     <TextField
                       id='txbSumOther'
                       name='sumOther'
@@ -352,14 +378,25 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       fullWidth
                       placeholder=''
                       autoComplete='off'
+                      disabled={true}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid
+                  container
+                  spacing={2}
+                  mb={2}
+                  mt={2}
+                  ml={1}
+                  pr={2}
+                  pb={2}
+                  sx={{ border: 1, borderColor: '#EAEBEB' }}>
                   {expenseMasterList
                     .filter((i: ExpenseInfo) => i.isActive && i.isOtherExpense && i.typeCode === expenseType)
                     .map((i: ExpenseInfo) => {
+                      const arr = Object.entries(values);
+                      const defaul = arr.find((e: any) => e[0] === i.expenseNo);
                       return (
                         <>
                           <Grid item xs={2}>
@@ -370,12 +407,13 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               id={i.expenseNo}
                               name={i.expenseNo}
                               size='small'
-                              type='number'
-                              // value=''
+                              value={defaul ? defaul[1] : ''}
                               onKeyUp={handleOnChange}
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
+                              autoComplete='off'
+                              disabled={enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>
@@ -387,7 +425,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
 
             {edit && testList && (
               <>
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid container spacing={2} mb={2} mt={2} ml={1}>
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && !isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
@@ -401,20 +439,20 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               id={i.key}
                               name={i.key}
                               size='small'
-                              type='number'
                               value={i.value}
                               onChange={(event) => handleChangeNew(event.target.value, i.key)}
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
                               autoComplete='off'
+                              disabled={enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>
                       );
                     })}
                 </Grid>
-                <Grid container spacing={2} mt={2}>
+                <Grid container spacing={2} mt={2} ml={1}>
                   <Grid item xs={2}>
                     ค่าอื่นๆ:
                   </Grid>
@@ -429,11 +467,20 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       fullWidth
                       placeholder=''
                       autoComplete='off'
+                      disabled={true}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} mb={2} mt={2}>
+                <Grid
+                  container
+                  spacing={2}
+                  mb={2}
+                  mt={2}
+                  ml={1}
+                  pr={2}
+                  pb={2}
+                  sx={{ border: 1, borderColor: '#EAEBEB' }}>
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
@@ -452,6 +499,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               className={classes.MtextField}
                               fullWidth
                               placeholder=''
+                              autoComplete='off'
+                              disabled={enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>

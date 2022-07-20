@@ -1,10 +1,10 @@
-import { Box, Button, Dialog, DialogContent, Grid, IconButton, Typography } from '@mui/material';
+import { Box, Button, Card, Dialog, DialogContent, Grid, IconButton, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import AccordionUploadFile from '../../commons/ui/accordion-upload-file';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
-import Steppers from '../../commons/ui/steppers';
+
 import SaveIcon from '@mui/icons-material/Save';
 import InfoIcon from '@mui/icons-material/Info';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
@@ -15,7 +15,7 @@ import ModalAddExpense from './modal-add-expense';
 import ModelDescriptionExpense from './modal-description-expense';
 
 import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
-import { Cancel, VoicemailRounded } from '@mui/icons-material';
+import { Cancel, ConstructionOutlined, TramOutlined, VoicemailRounded } from '@mui/icons-material';
 import { GridColumnHeadersItemCollection } from '@mui/x-data-grid';
 import { mockExpenseInfo001, mockExpenseInfo002 } from '../../../mockdata/branch-accounting';
 import {
@@ -28,6 +28,7 @@ import {
   SumItems,
   SumItemsItem,
   Comment,
+  payLoadAdd,
 } from '../../../models/branch-accounting-model';
 import {
   addNewItem,
@@ -48,7 +49,7 @@ import {
 import { convertUtcToBkkDate, convertUtcToBkkWithZ } from '../../../utils/date-utill';
 import { getInit, getUserInfo } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
-import { EXPENSE_TYPE, STATUS } from '../../../utils/enum/accounting-enum';
+import { EXPENSE_TYPE, getExpenseStatus, STATUS } from '../../../utils/enum/accounting-enum';
 import LoadingModal from '../../commons/ui/loading-modal';
 import AlertError from '../../commons/ui/alert-error';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
@@ -57,6 +58,7 @@ import {
   expenseApproveByAccountManager,
   expenseApproveByBranch,
   expenseApproveByOC,
+  expenseRejectByAccount,
   expenseRejectByAccountManager,
   expenseRejectByOC,
   expenseSave,
@@ -68,7 +70,13 @@ import AccordionUploadSingleFile from '../../commons/ui/accordion-upload-single-
 import TextBoxComment from '../../commons/ui/textbox-comment';
 import { Day } from '@material-ui/pickers';
 import ModalConfirmExpense from './modal-confirm-expense';
-import { isGroupOC } from '../../../utils/role-permission';
+import { isGroupBranch, isGroupOC } from '../../../utils/role-permission';
+import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
+import Steppers from './steppers';
+import { stat } from 'fs';
+import { Controller } from 'react-hook-form';
+import { FileType } from '../../../models/common-model';
+import { constants } from 'buffer';
 
 interface Props {
   isOpen: boolean;
@@ -94,8 +102,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [periodLabel, setPeriodLabel] = React.useState('');
   const [status, setStatus] = React.useState(STATUS.DRAFT);
   const [attachFiles, setAttachFiles] = React.useState([]);
-  const [editAttachFiles, setEditAttachFiles] = React.useState([]);
-  const [approvalAttachFiles, setApprovalAttachFiles] = React.useState([]);
+  const [editAttachFiles, setEditAttachFiles] = React.useState<FileType[]>([]);
+  const [approvalAttachFiles, setApprovalAttachFiles] = React.useState<FileType[]>([]);
   const [comment, setComment] = React.useState('');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [branchCode, setBranchCode] = React.useState('');
@@ -103,6 +111,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [uploadFileFlag, setUploadFileFlag] = React.useState(false);
   const [openModalAddExpense, setOpenModalAddExpense] = React.useState(false);
   const [openModalDescriptionExpense, setOpenModalDescriptionExpense] = React.useState(false);
+  const payloadSearch = useAppSelector((state) => state.saveExpenseSearchRequest.searchExpense);
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
   const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
   const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
@@ -116,6 +125,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const [isShowBtnApprove, setIsShowBtnApprove] = React.useState(false);
+  const [isShowBtnReject, setIsShowBtnReject] = React.useState(false);
+  const [payloadModalConfirmDetail, setPayloadModalConfirmDetail] = React.useState<any>();
 
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -150,28 +162,32 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     const items = store.getState().expenseAccountDetailSlice.itemRows;
     const summarys = store.getState().expenseAccountDetailSlice.summaryRows;
     let dataItem: DataItem[] = [];
-    items.forEach((e: any) => {
-      const arr = Object.entries(e);
-      let items: ItemItem[] = [];
-      arr
-        .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
-        .map((element: any, index: number) => {
-          let _isOtherExpense = getMasterExpenInto(element[0])?.isOtherExpense || false;
+    if (items && items.length > 0) {
+      items.forEach((e: any) => {
+        const arr = Object.entries(e);
+        let items: ItemItem[] = [];
+        arr
+          .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+          .map((element: any, index: number) => {
+            let _isOtherExpense = getMasterExpenInto(element[0])?.isOtherExpense || false;
 
-          const item: ItemItem = {
-            expenseNo: element[0],
-            amount: element[1],
-            isOtherExpense: _isOtherExpense,
-          };
-          items.push(item);
-        });
-      const data: DataItem = {
-        expenseDate: moment(e['dateTime']).startOf('day').toISOString(),
-        // expenseDate: moment(new Date()).startOf('day').subtract(543, 'year').toISOString(),
-        items: items,
-      };
-      dataItem.push(data);
-    });
+            const item: ItemItem = {
+              expenseNo: element[0],
+              amount: element[1],
+              isOtherExpense: _isOtherExpense,
+            };
+            items.push(item);
+          });
+        const data: DataItem = {
+          expenseDate: moment(e['dateTime']).startOf('day').toISOString(),
+          // expenseDate: moment(new Date()).startOf('day').subtract(543, 'year').toISOString(),
+          items: items,
+        };
+        dataItem.push(data);
+      });
+    } else {
+      dataItem = _items;
+    }
 
     const arr = Object.entries(summarys[0]);
     let sumItems: SumItemsItem[] = [];
@@ -188,7 +204,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     const sumItem: SumItems = {
       items: sumItems,
     };
-    const payload: ExpenseSaveRequest = {
+    let payload: ExpenseSaveRequest = {
       branchCode: branchCode,
       type: expenseType,
       expensePeriod: period,
@@ -196,6 +212,13 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       items: dataItem,
       docNo: docNo,
     };
+    if (status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
+      payload = {
+        ...payload,
+        editAttachFiles: editAttachFiles,
+      };
+    }
+
     await expenseSave(payload, fileUploadList)
       .then(async (value) => {
         setShowSnackBar(true);
@@ -216,18 +239,25 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   };
 
   const onApproveByBranch = async (comment: string) => {
-    const payload: ExpenseSaveRequest = {
+    setOpenLoadingModal(true);
+    let payload: ExpenseSaveRequest = {
       comment: comment,
       docNo: docNo,
       today: moment(new Date().setDate(new Date().getDate() + 5))
         .startOf('day')
         .toISOString(),
     };
+
+    if (status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
+      payload = { ...payload, editAttachFiles: editAttachFiles };
+    }
+
     await expenseApproveByBranch(payload, fileUploadList)
       .then(async (value) => {
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -236,18 +266,25 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
 
   const onApproveByAreaMangerOC = async () => {
-    const payload: ExpenseSaveRequest = {
+    setOpenLoadingModal(true);
+    let payload: ExpenseSaveRequest = {
       docNo: docNo,
     };
+    if (status === STATUS.WAITTING_APPROVAL2) {
+      payload = { ...payload, approvalAttachFiles: approvalAttachFiles };
+    }
+
     await expenseApproveByOC(payload, fileUploadList)
       .then(async (value) => {
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -256,9 +293,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
   const onRejectByAreaMangerOC = async (comment: string) => {
+    setOpenLoadingModal(true);
     const payload: ExpenseSaveRequest = {
       docNo: docNo,
       comment: comment,
@@ -268,6 +307,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -276,19 +316,46 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
 
   const onApproveByAccount = async () => {
+    setOpenLoadingModal(true);
+    const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
+    let sumItems: SumItemsItem[] = [];
+    if (_arr) {
+      const arr = Object.entries(_arr);
+      arr
+        .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+        .map((e: any, index: number) => {
+          const item: SumItemsItem = {
+            expenseNo: e[0],
+            approvedAmount: e[1],
+          };
+          sumItems.push(item);
+        });
+    } else {
+      const _summary = summary.items;
+      _summary.map((e: SumItemsItem) => {
+        const item: SumItemsItem = {
+          expenseNo: e.expenseNo,
+          approvedAmount: e.withdrawAmount,
+        };
+        sumItems.push(item);
+      });
+    }
+
     const payload: ExpenseSaveRequest = {
       docNo: docNo,
-      comment: comment,
+      sumItems: sumItems,
     };
     await expenseApproveByAccount(payload)
       .then(async (value) => {
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -297,19 +364,22 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
   const onRejectByAccount = async (returnto: string, comment: string) => {
+    setOpenLoadingModal(true);
     const payload: ExpenseSaveRequest = {
       docNo: docNo,
       comment: comment,
-      returnTo: returnto,
+      route: returnto,
     };
-    await expenseRejectByOC(payload)
+    await expenseRejectByAccount(payload)
       .then(async (value) => {
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -318,19 +388,49 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
 
   const onApproveByAccountManager = async (expenDate: Date, approveDate: Date) => {
+    setOpenLoadingModal(true);
+    const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
+
+    let sumItems: SumItemsItem[] = [];
+    if (_arr) {
+      const arr = Object.entries(_arr);
+      arr
+        .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+        .map((e: any, index: number) => {
+          const item: SumItemsItem = {
+            expenseNo: e[0],
+            approvedAmount: e[1],
+          };
+          sumItems.push(item);
+        });
+    } else {
+      const _summary = summary.items;
+      _summary.map((e: SumItemsItem) => {
+        const item: SumItemsItem = {
+          expenseNo: e.expenseNo,
+          approvedAmount: e.approvedAmount,
+        };
+        sumItems.push(item);
+      });
+    }
+
     const payload: ExpenseSaveRequest = {
       expenseDate: moment(expenDate).startOf('day').toISOString(),
       approvedDate: moment(approveDate).startOf('day').toISOString(),
+      sumItems: sumItems,
+      docNo: docNo,
     };
     await expenseApproveByAccountManager(payload)
       .then(async (value) => {
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -339,11 +439,14 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
 
   const onRejectByAccountManager = async (comment: string) => {
+    setOpenLoadingModal(true);
     const payload: ExpenseSaveRequest = {
+      docNo: docNo,
       comment: comment,
     };
     await expenseRejectByAccountManager(payload)
@@ -351,6 +454,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
         setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
+        await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
           onClickClose();
@@ -359,9 +463,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       .catch((error: ApiError) => {
         setOpenAlert(true);
         setTextError(error.message);
-      });
+      })
+      .finally(() => setOpenLoadingModal(false));
   };
-  let callbackFunction: any;
   const [isOpenModelConfirmExpense, setIsOpenModelConfirmExpense] = React.useState<boolean>(false);
   const [isApprove, setIsApprove] = React.useState<boolean>(false);
   const [showForward, setShowForward] = React.useState<boolean>(false); // show dropdown resend
@@ -385,21 +489,113 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         setIsOpenModelConfirmExpense(true);
         setShowReason(true);
       }
-    } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
+    } else if (status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
+      const isFileValidate: boolean = validateFileInfo();
+      const isvalidateDate = validateDateIsBeforPeriod();
+      if (isFileValidate && isvalidateDate) {
+        setIsOpenModelConfirmExpense(true);
+        setShowReason(true);
+      }
+    } else if (status === STATUS.WAITTING_APPROVAL1) {
       setShowReason(false);
       setIsOpenModelConfirmExpense(true);
+    } else if (status === STATUS.WAITTING_APPROVAL2) {
+      const isOver = validateApproveLimit();
+      if (!isOver) {
+        setShowReason(false);
+        setIsOpenModelConfirmExpense(true);
+      } else {
+        const isFileValidate: boolean = validateFileInfo();
+        if (isFileValidate) {
+          setShowReason(false);
+          setIsOpenModelConfirmExpense(true);
+        }
+      }
+
+      // if ( && !isFileValidate) {
+      //   setOpenAlert(true);
+      //   setTextError('กรุณาแนบเอกสาร');
+      // } else {
+      // }
     } else if (status === STATUS.WAITTING_ACCOUNTING) {
-      // nun
+      let sumApprovalAmount: number = 0;
+      const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
+      if (_arr && _arr.length > 0) {
+        const arr = Object.entries(_arr);
+        arr
+          .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+          .map((e: any, index: number) => {
+            sumApprovalAmount += Number(e[1]);
+          });
+      } else {
+        sumApprovalAmount = summary.sumApprovalAmount || 0;
+      }
+
+      const sumWithdrawAmount = summary.sumWithdrawAmount || 0;
+      const item1: payLoadAdd = {
+        id: 1,
+        key: 'sumWithdrawAmount',
+        value: sumWithdrawAmount,
+        title: 'ยอดเบิกทั้งหมด',
+      };
+
+      const item2: payLoadAdd = {
+        id: 2,
+        key: 'sumApprovalAmount',
+        value: sumApprovalAmount || 0,
+        title: 'ยอดเงินอนุมัติ',
+      };
+      const item3: payLoadAdd = {
+        id: 3,
+        key: 'diff',
+        value: sumWithdrawAmount - sumApprovalAmount,
+        title: 'ผลต่าง',
+      };
+      let listPayload: payLoadAdd[] = [item1, item2, item3];
+      setPayloadModalConfirmDetail(listPayload);
       setOpenModelConfirm(true);
     } else if (status === STATUS.WAITTING_APPROVAL3) {
-      //nun
+      const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
+      let listPayload: payLoadAdd[] = [];
+
+      if (_arr && _arr.length > 0) {
+        const arr = Object.entries(_arr);
+        arr
+          .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+          .map((e: any, index: number) => {
+            const master = getMasterExpenInto(e[0]);
+            const item: payLoadAdd = {
+              id: index,
+              key: e[0],
+              value: e[1],
+              title: master?.accountNameTh !== undefined ? master?.accountNameTh : e[0],
+              isOtherExpense: master?.isOtherExpense,
+            };
+            listPayload.push(item);
+          });
+      } else {
+        const _sumItems = summary.items;
+        _sumItems.map((entrie: SumItemsItem, index: number) => {
+          const master = getMasterExpenInto(entrie.expenseNo);
+          const item: payLoadAdd = {
+            id: index,
+            key: entrie.expenseNo,
+            value: Number(entrie.approvedAmount) || 0,
+            title: master?.accountNameTh !== undefined ? master?.accountNameTh : entrie.expenseNo,
+            isOtherExpense: master?.isOtherExpense,
+          };
+          listPayload.push(item);
+        });
+      }
+
+      setPayloadModalConfirmDetail(listPayload);
       setOpenModelConfirm(true);
     }
   };
 
   const handleRejectBtn = () => {
     setIsApprove(false);
-
+    setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
     if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
       setIsOpenModelConfirmExpense(true);
       setShowReason(true);
@@ -411,7 +607,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setIsOpenModelConfirmExpense(true);
     } else if (status === STATUS.WAITTING_APPROVAL3) {
       setValidateReason(true);
-      setShowForward(true);
+      setShowReason(true);
+      // setShowForward(true);
       setIsOpenModelConfirmExpense(true);
     }
   };
@@ -442,13 +639,13 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const validateFileInfo = () => {
     const isvalid = fileUploadList.length > 0 ? true : false;
     const existingfileList =
-      status === STATUS.DRAFT
+      status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT
         ? attachFiles
-        : status === STATUS.SEND_BACK_EDIT
-        ? editAttachFiles
         : status === STATUS.WAITTING_EDIT_ATTACH_FILE
+        ? editAttachFiles
+        : status === STATUS.WAITTING_APPROVAL2
         ? approvalAttachFiles
-        : '';
+        : [];
     if (!isvalid && existingfileList.length <= 0) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
@@ -459,12 +656,34 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
   const validateDateIsBeforPeriod = () => {
     const date = new Date();
-    if (date < new Date(period.endDate)) {
-      setOpenAlert(true);
-      setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
-      return false;
-    }
+    // if (date < new Date(period.endDate)) {
+    //   setOpenAlert(true);
+    //   setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
+    //   return false;
+    // }
     return true;
+  };
+
+  const validateApproveLimit = () => {
+    const items = store.getState().expenseAccountDetailSlice.intialRows;
+    let isRequire = false;
+    items.forEach((e: any) => {
+      const arr = Object.entries(e);
+      arr
+        .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+        .map((element: any, index: number) => {
+          const master = getMasterExpenInto(element[0]);
+          const limit = Number(master?.approvalLimit2);
+          if (Number(element[1] > limit)) {
+            isRequire = true;
+            return;
+          }
+        });
+      if (isRequire) {
+        return;
+      }
+    });
+    return isRequire;
   };
 
   const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
@@ -500,7 +719,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             className={classes.MbtnSave}
             onClick={handleSaveBtn}
             startIcon={<SaveIcon />}
-            sx={{ width: 140 }}>
+            sx={{ width: 140 }}
+            disabled={status === STATUS.WAITTING_EDIT_ATTACH_FILE ? true : false}>
             บันทึก
           </Button>
 
@@ -534,7 +754,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             className={classes.MbtnSendDC}
             onClick={handleApproveBtn}
             startIcon={<CheckCircleOutline />}
-            sx={{ width: 140 }}>
+            sx={{ width: 140, display: isShowBtnApprove ? '' : 'none' }}>
             ขออนุมัติ
           </Button>
 
@@ -546,7 +766,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             className={classes.MbtnSendDC}
             onClick={handleRejectBtn}
             startIcon={<Cancel />}
-            sx={{ width: 140 }}>
+            sx={{ width: 140, display: isShowBtnReject ? '' : 'none' }}>
             ไม่อนุมัติ
           </Button>
         </Grid>
@@ -576,38 +796,75 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         };
 
         totalWithDraw += Number(entrie?.withdrawAmount);
-        infosApprove = {
-          ...infosApprove,
-          id: 2,
-          description: 'ยอดเงินอนุมัติ',
-          [entrie.expenseNo]: entrie?.approvedAmount,
-        };
-        totalApprove += Number(entrie?.approvedAmount);
 
-        infoDiff = {
-          ...infosApprove,
-          id: 3,
-          description: 'ผลต่าง',
-          [entrie.expenseNo]: entrie?.approvedAmount,
-        };
+        if (status === STATUS.WAITTING_ACCOUNTING) {
+          infosApprove = {
+            ...infosApprove,
+            id: 2,
+            description: 'ยอดเงินอนุมัติ',
+            [entrie.expenseNo]: entrie?.withdrawAmount,
+          };
+          totalApprove += Number(entrie?.withdrawAmount);
+          infoDiff = {
+            ...infoDiff,
+            id: 3,
+            description: 'ผลต่าง',
+            [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.withdrawAmount) || 0),
+          };
+        } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
+          infosApprove = {
+            ...infosApprove,
+            id: 2,
+            description: 'ยอดเงินอนุมัติ',
+            [entrie.expenseNo]: '',
+          };
+          totalApprove += Number(entrie?.approvedAmount) || 0;
+          infoDiff = {
+            ...infoDiff,
+            id: 3,
+            description: 'ผลต่าง',
+            [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0),
+          };
+        } else {
+          infosApprove = {
+            ...infosApprove,
+            id: 2,
+            description: 'ยอดเงินอนุมัติ',
+            [entrie.expenseNo]: Number(entrie?.approvedAmount) || 0,
+          };
+          totalApprove += Number(entrie?.approvedAmount) || 0;
+          infoDiff = {
+            ...infoDiff,
+            id: 3,
+            description: 'ผลต่าง',
+            [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0),
+          };
+        }
+
         const master = getMasterExpenInto(entrie.expenseNo);
         const _isOtherExpense = master ? master.isOtherExpense : false;
         if (_isOtherExpense) {
-          totalOtherWithDraw += stringNullOrEmpty(entrie?.withdrawAmount) ? 0 : entrie?.withdrawAmount;
+          totalOtherWithDraw += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
           totalOtherApprove += entrie?.approvedAmount === undefined ? 0 : entrie?.approvedAmount;
         }
       });
       totalDiff = Number(totalWithDraw) - Number(totalApprove);
       totalOtherDiff = Number(totalOtherWithDraw) - Number(totalOtherApprove);
 
-      if (status === STATUS.DRAFT) {
+      if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT || status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
         rows = [{ ...infosWithDraw, total: totalWithDraw }];
-      } else if (status === STATUS.WAITTING_APPROVAL1) {
+      } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
         rows = [
           { ...infosWithDraw, total: totalWithDraw },
-          { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove },
+          { ...infosApprove, SUMOTHER: '', total: '' },
         ];
-      } else if (status === STATUS.WAITTING_APPROVAL2) {
+      } else if (status === STATUS.WAITTING_ACCOUNTING) {
+        rows = [
+          { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
+          { ...infosApprove, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
+          { ...infoDiff, total: totalDiff, SUMOTHER: totalOtherDiff },
+        ];
+      } else {
         rows = [
           { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
           { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove, SUMOTHER: totalOtherApprove },
@@ -647,7 +904,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           dateTime: item.expenseDate,
           total: item.totalAmount,
           SUMOTHER: _otherSum,
-          otherDetail: _otherDetail,
+          otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
           ...newItem,
         };
       });
@@ -682,12 +939,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           ? expenseData.approvalAttachFiles
           : []
       );
-      const _comment: Comment[] = expenseData.comments ? expenseData.comments : [];
-      let msgComment = ' ';
-      _comment.forEach((e: Comment) => {
-        msgComment += `${e.username} ${e.statusDesc} ${convertUtcToBkkDate(e.commentDate)} \n ${e.comment}`;
-      });
-      setComment(msgComment);
+      const expenseStatusInfo = getExpenseStatus(expenseData.status);
+      setIsShowBtnApprove(expenseStatusInfo?.groupAllow === getUserInfo().group);
+      setIsShowBtnReject(expenseStatusInfo?.groupAllow === getUserInfo().group);
     } else {
       const ownBranch = getUserInfo().branch ? getUserInfo().branch : env.branch.code;
       setBranchCode(ownBranch);
@@ -737,12 +991,35 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       behavior: 'smooth',
     });
   };
+  const handleOnDeleteEditAttachFile = (item: any) => {
+    const fileKeyDel = item.fileKey;
+    let _files = editAttachFiles;
+    let newFiles: FileType[] = [];
+    _files.map((i: FileType) => {
+      if (i.fileKey !== fileKeyDel) {
+        newFiles.push(i);
+      }
+    });
+    setEditAttachFiles(newFiles);
+  };
+
+  const handleOnDeleteApproveAttachFile = (item: any) => {
+    const fileKeyDel = item.fileKey;
+    let _files = approvalAttachFiles;
+    let newFiles: FileType[] = [];
+    _files.map((i: FileType) => {
+      if (i.fileKey !== fileKeyDel) {
+        newFiles.push(i);
+      }
+    });
+    setApprovalAttachFiles(newFiles);
+  };
   return (
     <React.Fragment>
       <Dialog open={isOpen} maxWidth='xl' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={onClickClose}>
           <Typography sx={{ fontSize: 24, fontWeight: 400 }}>{expenseTypeName}</Typography>
-          <Steppers status={1} stepsList={['บันทึก', 'สาขา', 'บัญชี', 'อนุมัติ']}></Steppers>
+          <Steppers status={status} />
         </BootstrapDialogTitle>
         <DialogContent sx={{ minHeight: '70vh' }}>
           <Grid container spacing={2} mb={2} id='top-item'>
@@ -792,7 +1069,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               /> */}
               <AccordionUploadSingleFile
                 files={attachFiles}
-                disabledControl={!(status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT)}
+                disabledControl={!((status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) && isGroupBranch)}
               />
             </Grid>
             <Grid item xs={1}>
@@ -805,8 +1082,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                 docType='BA'
                 isStatus={uploadFileFlag}
                 onChangeUploadFile={handleOnChangeUploadFileEdit}
-                enabledControl={status === STATUS.WAITTING_EDIT_ATTACH_FILE}
+                enabledControl={status === STATUS.WAITTING_EDIT_ATTACH_FILE && isGroupBranch()}
                 idControl={'AttachFileEdit'}
+                onDeleteAttachFile={handleOnDeleteEditAttachFile}
               />
             </Grid>
             <Grid item xs={1}>
@@ -821,28 +1099,85 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                 onChangeUploadFile={handleOnChangeUploadFileOC}
                 enabledControl={status === STATUS.WAITTING_APPROVAL2 && isGroupOC()}
                 idControl={'AttachFileByOC'}
+                onDeleteAttachFile={handleOnDeleteApproveAttachFile}
               />
             </Grid>
           </Grid>
-          {status === STATUS.DRAFT && <Box>{componetButtonDraft}</Box>}
+          {isGroupBranch() &&
+            (status === STATUS.DRAFT ||
+              status === STATUS.SEND_BACK_EDIT ||
+              status === STATUS.WAITTING_EDIT_ATTACH_FILE) && <Box>{componetButtonDraft}</Box>}
 
-          {status !== STATUS.DRAFT && <Box>{componetButtonApprove}</Box>}
+          {!isGroupBranch() &&
+            !(
+              status === STATUS.DRAFT ||
+              status === STATUS.SEND_BACK_EDIT ||
+              status === STATUS.WAITTING_EDIT_ATTACH_FILE
+            ) && <Box>{componetButtonApprove}</Box>}
           <Box mb={3} mt={3}>
             <ExpenseDetailSummary type={expenseType} periodProps={period} />
           </Box>
           <Box mt={1}>
-            <Grid container spacing={2} mb={1}>
-              <Grid item lg={3}>
-                <TextBoxComment
-                  fieldName='หมายเหตุ:'
-                  defaultValue={comment}
-                  maxLength={100}
-                  onChangeComment={() => {}}
-                  isDisable={true}
-                  rowDisplay={2}
-                />
+            <Box>
+              <Typography variant='body2'>หมายเหตุ:</Typography>
+            </Box>
+            <Grid container spacing={2} mb={2} justifyContent='space-between'>
+              <Grid
+                item
+                // xs={3}
+                // mb={1}
+                // mt={1}
+                // ml={2}
+                // pr={1}
+                // pb={1}
+                // sx={{ border: 1, borderColor: '#CBD4DB', borderRadius: '5px !important' }}
+              >
+                {/* {expenseData &&
+                  expenseData.comments &&
+                  expenseData.comments.length > 0 &&
+                  expenseData.comments.map((e: Comment) => {
+                    return (
+                      <>
+                        <Typography variant='body2'>
+                          <span style={{ fontWeight: 'bold' }}>{e.username} : </span>
+                          <span style={{ color: '#AEAEAE' }}>
+                            {e.statusDesc} {convertUtcToBkkDate(e.commentDate)}
+                          </span>
+                        </Typography>
+                        <Typography variant='body2'> {e.comment}</Typography>
+                      </>
+                    );
+                  })} */}
+
+                <Card
+                  variant='outlined'
+                  style={{
+                    width: '500px',
+                    height: '150px',
+                    paddingLeft: '10px',
+                    paddingRight: '10px',
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                    overflow: 'scroll',
+                  }}>
+                  {expenseData &&
+                    expenseData.comments &&
+                    expenseData.comments.length > 0 &&
+                    expenseData.comments.map((e: Comment) => {
+                      return (
+                        <>
+                          <Typography variant='body2'>
+                            <span style={{ fontWeight: 'bold' }}>{e.username} : </span>
+                            <span style={{ color: '#AEAEAE' }}>
+                              {getExpenseStatus(e.status)?.text || e.status} : {convertUtcToBkkDate(e.commentDate)}
+                            </span>
+                          </Typography>
+                          <Typography variant='body2'> {e.comment}</Typography>
+                        </>
+                      );
+                    })}
+                </Card>
               </Grid>
-              <Grid item xs={7}></Grid>
               <Grid item xs={2} textAlign='center'>
                 <IconButton onClick={topFunction} data-testid='testid-btnTop'>
                   <ArrowForwardIosIcon
@@ -874,7 +1209,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       <ModelDescriptionExpense
         open={openModalDescriptionExpense}
         onClickClose={() => setOpenModalDescriptionExpense(false)}
-        info={[mockExpenseInfo001, mockExpenseInfo002]}
+        type={expenseType}
       />
       <LoadingModal open={openLoadingModal} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} payload={null} />
@@ -888,9 +1223,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       <ModelConfirmDetail
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
-        onConfirm={callbackFunction}
+        onConfirm={onCallbackFunction}
         startDate='2022-06-16T00:00:00+07:00'
         endDate='2022-06-30T23:59:59.999999999+07:00'
+        payload={payloadModalConfirmDetail}
+        docNo={docNo}
+        periodProps={period}
       />
 
       <ModalConfirmExpense
