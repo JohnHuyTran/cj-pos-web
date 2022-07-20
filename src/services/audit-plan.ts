@@ -31,6 +31,19 @@ export async function countingAuditPlan(payload: PayloadCounting) {
   }
 }
 
+export async function cancelAuditPlan(id: string) {
+  try {
+    const response = await post(getPathCancelAP(id));
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const getPathConfirmAP = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.checkStock.auditPlan.confirm.url}`, { id: id });
+};
+
+export const getPathCancelAP = (id: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.checkStock.auditPlan.cancel.url}`, { id: id });
 };

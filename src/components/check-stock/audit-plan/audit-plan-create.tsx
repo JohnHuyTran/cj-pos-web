@@ -25,7 +25,7 @@ import { isGroupBranch } from '../../../utils/role-permission';
 import ModalAddTypeProduct from '../../commons/ui/modal-add-type-products';
 import AuditPlanCreateItem from './audit-plan-create-item';
 import ModalConfirmCounting from './modal-confirm-counting';
-import { confirmAuditPlan, countingAuditPlan, saveDraftAuditPlan } from '../../../services/audit-plan';
+import { cancelAuditPlan, confirmAuditPlan, countingAuditPlan, saveDraftAuditPlan } from '../../../services/audit-plan';
 import { updateAddTypeAndProductState } from '../../../store/slices/add-type-product-slice';
 import { PayloadCounting } from '../../../models/audit-plan';
 import { clearDataFilter, getAuditPlanDetail } from '../../../store/slices/audit-plan-detail-slice';
@@ -40,6 +40,7 @@ interface Props {
   onClickClose: () => void;
   setPopupMsg?: any;
   onSearchMain?: () => void;
+  onReSearchMain?: (branch: string) => void;
   userPermission?: any[];
   viewMode?: boolean;
 }
@@ -62,7 +63,7 @@ export default function ModalCreateAuditPlan({
   setOpenPopup,
   setPopupMsg,
   onSearchMain,
-  userPermission,
+  onReSearchMain,
   action,
   viewMode,
 }: Props): ReactElement {
@@ -78,10 +79,6 @@ export default function ModalCreateAuditPlan({
   const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<any>('');
   const [openModalConfirmCounting, setOpenModalConfirmCounting] = React.useState<boolean>(false);
-  const [textErrors, setTextErrors] = React.useState({
-    dateError: '',
-    branchError: '',
-  });
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [ownBranch, setOwnBranch] = React.useState(
     getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
@@ -110,21 +107,15 @@ export default function ModalCreateAuditPlan({
     userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
       ? userInfo.acl['service.posback-stock'].includes('stock.ap.manage')
       : false;
+  const countingPermission =
+    userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
+      ? userInfo.acl['service.posback-stock'].includes('stock.sc.manage')
+      : false;
   const isBranchPermission = !!(env.branch.channel === 'branch');
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
   const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
 
-  useEffect(() => {
-    if (steps.indexOf(status) < 1) {
-      if (values.branch && !groupBranch) {
-        setTextErrors({ ...textErrors, branchError: '' });
-      }
-      if (values.countingDate) {
-        setTextErrors({ ...textErrors, dateError: '' });
-      }
-    }
-  }, [values.branch, values.countingDate]);
   useEffect(() => {
     if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {
       setStatus(dataDetail.status);
@@ -241,79 +232,57 @@ export default function ModalCreateAuditPlan({
     }
   };
 
-  const validate = () => {
-    let isValid = true;
-    //validate data detail
-    if (stringNullOrEmpty(values.branch)) {
-      isValid = false;
-      setTextErrors({
-        ...textErrors,
-        branchError: 'กรุณาระบุรายละเอียด',
-      });
-    }
-    if (stringNullOrEmpty(values.countingDate)) {
-      isValid = false;
-      setTextErrors({
-        ...textErrors,
-        dateError: 'กรุณาระบุรายละเอียด',
-      });
-    }
-    return isValid;
-  };
-
   const handleCreateDraft = async () => {
-    if (validate()) {
-      try {
-        const products = payloadAddTypeProduct
-          .filter((el: any) => el.selectedType === 2)
-          .map((item: any) => {
-            return {
-              name: item.barcodeName,
-              sku: item.skuCode,
-              unitName: item.unitName,
-              barcode: item.barcode,
-            };
-          });
-        const body = !!values.id
-          ? {
-              id: values.id,
-              branchCode: values.branch,
-              branchName: getBranchName(branchList, values.branch),
-              countingDate: moment(values.countingDate).toISOString(true),
-              product: products,
-            }
-          : {
-              branchCode: values.branch,
-              branchName: getBranchName(branchList, values.branch),
-              countingDate: moment(values.countingDate).toISOString(true),
-              product: products,
-            };
-        const rs = await saveDraftAuditPlan(body);
-        if (rs.code === 20000) {
-          dispatch(setCheckEdit(false));
-          setOpenPopupModal(true);
-          setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
-          setValues({
-            ...values,
-            id: rs.data.id,
-            documentNumber: rs.data.documentNumber,
-          });
-          setStatus(StockActionStatus.DRAFT);
-        } else {
-          setOpenModalError(true);
-        }
-      } catch (error) {
+    try {
+      const products = payloadAddTypeProduct
+        .filter((el: any) => el.selectedType === 2)
+        .map((item: any) => {
+          return {
+            name: item.barcodeName,
+            sku: item.skuCode,
+            unitName: item.unitName,
+            barcode: item.barcode,
+          };
+        });
+      const body = !!values.id
+        ? {
+            id: values.id,
+            branchCode: values.branch,
+            branchName: getBranchName(branchList, values.branch),
+            countingDate: moment(values.countingDate).toISOString(true),
+            product: products,
+          }
+        : {
+            branchCode: values.branch,
+            branchName: getBranchName(branchList, values.branch),
+            countingDate: moment(values.countingDate).toISOString(true),
+            product: products,
+          };
+      const rs = await saveDraftAuditPlan(body);
+      if (rs.code === 20000) {
+        dispatch(setCheckEdit(false));
+        setOpenPopupModal(true);
+        setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
+        setValues({
+          ...values,
+          id: rs.data.id,
+          documentNumber: rs.data.documentNumber,
+        });
+        setStatus(StockActionStatus.DRAFT);
+      } else {
         setOpenModalError(true);
       }
+    } catch (error) {
+      setOpenModalError(true);
     }
   };
 
-  const handleConfirm = async () => {
-    if (status == StockActionStatus.DRAFT) {
-      setOpenModalConfirm(true);
-    } else {
-      setOpenModalConfirmCounting(true);
-    }
+  const handleConfirm = () => {
+    setOpenModalConfirm(true);
+  };
+
+  const handleOpenModalCounting = () => {
+    setOpenModalConfirmCounting(true);
   };
 
   const handleCloseModalConfirm = async (confirm: boolean) => {
@@ -326,34 +295,37 @@ export default function ModalCreateAuditPlan({
           dispatch(setCheckEdit(false));
           setOpenPopup(true);
           setPopupMsg('คุณได้ทำการสร้างแผนตรวจนับสต๊อกเรียบร้อยแล้ว');
+          if (action == Action.INSERT) {
+            if (onReSearchMain) onReSearchMain(values.branch);
+          } else {
+            if (onSearchMain) onSearchMain();
+          }
           handleClose();
-          if (onSearchMain) onSearchMain();
         }
       } catch (error) {}
     }
   };
 
   const handleDeleteDraft = async () => {
-    setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     if (!stringNullOrEmpty(status)) {
-      // try {
-      //   const rs = await cancelTransferOut(values.id);
-      //   if (rs.status === 200) {
-      //     setOpenPopup(true);
-      //     setPopupMsg('คุณได้ยกเลิกเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
-      //     handleClose();
-      //     if (onSearchMain) onSearchMain();
-      //   } else {
-      //     setOpenModalError(true);
-      //     setOpenModalCancel(false);
-      //   }
-      // } catch (error) {
-      //   setOpenModalError(true);
-      //   setOpenModalCancel(false);
-      // }
+      try {
+        const rs = await cancelAuditPlan(values.id);
+        if (rs.code === 20000) {
+          setOpenPopup(true);
+          setPopupMsg('คุณได้ยกเลิกสร้างแผนตรวจนับสต๊อกเรียบร้อยแล้ว');
+
+          handleClose();
+        } else {
+          setOpenModalError(true);
+          setOpenModalCancel(false);
+        }
+      } catch (error) {
+        setOpenModalError(true);
+        setOpenModalCancel(false);
+      }
     } else {
       setOpenPopup(true);
-      setPopupMsg('คุณได้ยกเลิกเบิกใช้ในการทำกิจกรรมเรียบร้อยแล้ว');
+      setPopupMsg('คุณได้ยกเลิกสร้างแผนตรวจนับสต๊อกเรียบร้อยแล้ว');
       handleClose();
     }
   };
@@ -370,7 +342,7 @@ export default function ModalCreateAuditPlan({
             {/*line 1*/}
             <Grid item container xs={4} mb={5}>
               <Grid item xs={3}>
-                สาขา :
+                เลขที่เอกสาร :
               </Grid>
               <Grid item xs={8}>
                 {!!values.documentNumber ? values.documentNumber : '-'}
@@ -386,7 +358,7 @@ export default function ModalCreateAuditPlan({
             </Grid>
             <Grid item container xs={4} mb={5} pl={2}>
               <Grid item xs={3}>
-                วันที่กำหนด <br /> ตรวจนับ :
+                กำหนดตรวจนับ <br /> ภายในวันที่ :
               </Grid>
               <Grid item xs={8}>
                 <DatePickerAllComponent
@@ -394,7 +366,6 @@ export default function ModalCreateAuditPlan({
                   type={'TO'}
                   minDateTo={new Date()}
                   value={values.countingDate}
-                  error={!!textErrors.dateError}
                   disabled={steps.indexOf(status) > 0}
                 />
               </Grid>
@@ -413,7 +384,6 @@ export default function ModalCreateAuditPlan({
                   isClear={clearBranchDropDown}
                   disable={groupBranch}
                   isFilterAuthorizedBranch={true}
-                  error={textErrors.branchError != ''}
                 />
               </Grid>
             </Grid>
@@ -457,8 +427,7 @@ export default function ModalCreateAuditPlan({
                   disabled={steps.indexOf(status) > 0}
                   style={{
                     display: steps.indexOf(status) > 0 || !managePermission || viewMode ? 'none' : undefined,
-                  }}
-                >
+                  }}>
                   เพิ่มสินค้า
                 </Button>
               </Box>
@@ -468,17 +437,12 @@ export default function ModalCreateAuditPlan({
                   variant="contained"
                   color="warning"
                   startIcon={<SaveIcon />}
-                  disabled={
-                    steps.indexOf(status) > 0 ||
-                    (payloadAddTypeProduct && payloadAddTypeProduct.length === 0) ||
-                    !managePermission
-                  }
+                  disabled={steps.indexOf(status) > 0 || (payloadAddTypeProduct && payloadAddTypeProduct.length === 0)}
                   style={{
                     display: steps.indexOf(status) > 0 || !managePermission || viewMode ? 'none' : undefined,
                   }}
                   onClick={() => handleCreateDraft()}
-                  className={classes.MbtnSearch}
-                >
+                  className={classes.MbtnSearch}>
                   บันทึก
                 </Button>
                 <Button
@@ -487,19 +451,35 @@ export default function ModalCreateAuditPlan({
                   color="primary"
                   sx={{ margin: '0 17px' }}
                   disabled={
-                    steps.indexOf(status) < 0 || !managePermission || (steps.indexOf(status) > 1 && !isBranchPermission)
+                    steps.indexOf(status) < 0 ||
+                    !managePermission ||
+                    (steps.indexOf(status) > 1 && !isBranchPermission) ||
+                    values.branch == '' ||
+                    values.countingDate == null
                   }
                   style={{
-                    display:
-                      (steps.indexOf(status) > 1 && !isBranchPermission) || !managePermission || viewMode
-                        ? 'none'
-                        : undefined,
+                    display: steps.indexOf(status) >= 1 || !managePermission || viewMode ? 'none' : undefined,
                   }}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleConfirm}
-                  className={classes.MbtnSearch}
-                >
-                  ขออนุมัติ
+                  className={classes.MbtnSearch}>
+                  ยืนยัน
+                </Button>
+                <Button
+                  id="btnCounting"
+                  variant="contained"
+                  color="primary"
+                  sx={{ margin: '0 17px' }}
+                  disabled={
+                    steps.indexOf(status) < 0 || !managePermission || (steps.indexOf(status) > 1 && !isBranchPermission)
+                  }
+                  style={{
+                    display: steps.indexOf(status) < 1 || !countingPermission || viewMode ? 'none' : undefined,
+                  }}
+                  startIcon={<CheckCircleOutlineIcon />}
+                  onClick={handleOpenModalCounting}
+                  className={classes.MbtnSearch}>
+                  เริ่มตรวจนับ
                 </Button>
                 <Button
                   id="btnCancel"
@@ -511,8 +491,7 @@ export default function ModalCreateAuditPlan({
                   style={{
                     display: steps.indexOf(status) > 0 || !managePermission || viewMode ? 'none' : undefined,
                   }}
-                  className={classes.MbtnSearch}
-                >
+                  className={classes.MbtnSearch}>
                   ยกเลิก
                 </Button>
               </Box>

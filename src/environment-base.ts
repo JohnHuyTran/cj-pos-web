@@ -413,6 +413,9 @@ export const environment = {
       counting: {
         url: '/stock/stock-count',
       },
+      cancel: {
+        url: '/stock/audit-planning/cancel/{id}',
+      },
     },
     stockCount: {
       search: {

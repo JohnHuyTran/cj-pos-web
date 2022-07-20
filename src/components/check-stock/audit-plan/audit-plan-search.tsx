@@ -23,7 +23,7 @@ import ModalCreateAuditPlan from './audit-plan-create';
 import moment from 'moment';
 import { SearchOff } from '@mui/icons-material';
 import AuditPlanItemList from './audit-plan-search-item-list';
-import { auditPlanGetSearch } from '../../../store/slices/audit-plan-search-slice';
+import { auditPlanGetSearch, clearDataFilter } from '../../../store/slices/audit-plan-search-slice';
 import { AuditPlanSearchRequest } from '../../../models/audit-plan';
 
 const _ = require('lodash');
@@ -118,14 +118,15 @@ const AuditPlanSearch = () => {
 
   const onClear = async () => {
     setClearBranchDropDown(!clearBranchDropDown);
-    // setFlagSearch(false);
+    setFlagSearch(false);
     setValues({
       documentNumber: '',
-      branch: '',
+      branch: 'ALL',
       status: 'ALL',
       fromDate: new Date(),
       toDate: new Date(),
     });
+    dispatch(clearDataFilter());
   };
 
   const validateSearch = () => {
@@ -151,6 +152,29 @@ const AuditPlanSearch = () => {
       page: page,
       docNo: values.documentNumber.trim(),
       branch: values.branch,
+      status: values.status,
+      creationDateFrom: moment(values.fromDate).startOf('day').toISOString(),
+      creationDateTo: moment(values.toDate).endOf('day').toISOString(),
+    };
+
+    handleOpenLoading('open', true);
+    await dispatch(auditPlanGetSearch(payload));
+    setFlagSearch(true);
+    handleOpenLoading('open', false);
+  };
+
+  const onReSearch = async (branch: string) => {
+    let limits;
+    if (limit === 0) {
+      limits = '10';
+    } else {
+      limits = limit ? limit.toString() : '10';
+    }
+    const payload: AuditPlanSearchRequest = {
+      perPage: limits,
+      page: page,
+      docNo: values.documentNumber.trim(),
+      branch: branch,
       status: values.status,
       creationDateFrom: moment(values.fromDate).startOf('day').toISOString(),
       creationDateTo: moment(values.toDate).endOf('day').toISOString(),
@@ -223,8 +247,7 @@ const AuditPlanSearch = () => {
                 name="status"
                 value={values.status}
                 onChange={onChange.bind(this, setValues, values)}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
                 <MenuItem value={StockActionStatus.DRAFT}>บันทึก</MenuItem>
                 <MenuItem value={StockActionStatus.CONFIRM}>ยืนยัน</MenuItem>
@@ -268,8 +291,7 @@ const AuditPlanSearch = () => {
                 className={classes.MbtnSearch}
                 color="secondary"
                 startIcon={<AddCircleOutlineOutlinedIcon />}
-                onClick={handleOpenModal}
-              >
+                onClick={handleOpenModal}>
                 สร้างเอกสารใหม่
               </Button>
             )}
@@ -280,8 +302,7 @@ const AuditPlanSearch = () => {
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
-              onClick={onClear}
-            >
+              onClick={onClear}>
               เคลียร์
             </Button>
             <Button
@@ -290,8 +311,7 @@ const AuditPlanSearch = () => {
               color="primary"
               sx={{ width: '126px', height: '40px', ml: 2 }}
               className={classes.MbtnSearch}
-              onClick={onSearch}
-            >
+              onClick={onSearch}>
               ค้นหา
             </Button>
           </Grid>
@@ -308,6 +328,7 @@ const AuditPlanSearch = () => {
           setPopupMsg={setPopupMsg}
           action={Action.INSERT}
           onSearchMain={onSearch}
+          onReSearchMain={onReSearch}
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />

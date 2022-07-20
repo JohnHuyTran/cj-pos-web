@@ -267,7 +267,6 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           onSearchMain={props.onSearch}
-          userPermission={userPermission}
         />
       )}
 
