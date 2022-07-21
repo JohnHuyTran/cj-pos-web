@@ -553,8 +553,7 @@ export default function ModalCreateAuditPlan({
                       (steps.indexOf(status) > 0 && !countingPermission) ||
                       !managePermission ||
                       viewMode ||
-                      status == StockActionStatus.CANCEL ||
-                      !groupBranch
+                      status == StockActionStatus.CANCEL
                         ? 'none'
                         : undefined,
                   }}
