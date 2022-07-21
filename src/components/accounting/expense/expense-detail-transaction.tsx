@@ -46,7 +46,8 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   const [items, setItems] = React.useState<any>(_initialItems && _initialItems.length > 0 ? _initialItems : []);
   const [actionEdit, setActionEdit] = React.useState(false);
   const payloadNewItem = useAppSelector((state) => state.expenseAccountDetailSlice.addNewItem);
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const getMasterExpenInto = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type && e.isActive);
   const [expenseType, setExpenseType] = React.useState('');
   const [period, setPeriod] = React.useState<ExpensePeriod>();
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
@@ -363,7 +364,19 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
         setItems([_newItem]);
         _item = [..._item, _newItem];
       }
-      await dispatch(updateItemRows(_item));
+
+      const sortData = _.orderBy(
+        _item,
+        [
+          function (object: any) {
+            return new Date(object.dateTime);
+          },
+        ],
+        ['asc']
+      );
+      setItems(sortData);
+
+      await dispatch(updateItemRows(sortData));
       await dispatch(addNewItem(null));
       summaryRow(_item);
       // await dispatch(updateSummaryRows([]));
@@ -383,7 +396,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
     const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
     if (entries && entries.length > 0) {
       entries.map((entrie: SumItemsItem, i: number) => {
-        console.log(entrie);
         infosWithDraw = {
           ...infosWithDraw,
           [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),

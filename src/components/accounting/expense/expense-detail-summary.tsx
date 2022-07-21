@@ -15,7 +15,7 @@ import { updateSummaryRows } from '../../../store/slices/accounting/accounting-s
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { getExpenseStatus, STATUS } from '../../../utils/enum/accounting-enum';
-import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
+import { isFilterFieldInExpense, isFilterOutFieldInAdd, stringNullOrEmpty } from '../../../utils/utils';
 import ExpenseDetailTransaction from './expense-detail-transaction';
 import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
 
@@ -45,7 +45,8 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
   const [openModalUpdatedExpenseSummary, setOpenModalUpdateExpenseSummary] = React.useState(false);
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const getMasterExpenInto = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type && e.isActive);
   const frontColor = (value: any) => {
     const _value = stringNullOrEmpty(value) ? '' : value.toString();
     return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
@@ -242,7 +243,9 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
 
           [entrie.expenseNo]: entrie.withdrawAmount,
         };
-        totalWithDraw += Number(entrie?.withdrawAmount);
+        if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
+          totalWithDraw += Number(entrie?.withdrawAmount);
+        }
       });
       const arr = Object.entries(_item);
       await arr.forEach((element: any, index: number) => {
