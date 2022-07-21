@@ -6,6 +6,11 @@ import DialogContent from '@mui/material/DialogContent';
 import LoadingModal from '../../../commons/ui/loading-modal';
 import { useStyles } from '../../../../styles/makeTheme';
 import ConfirmContent from './confirm-content';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { ExpenseInfo } from '../../../../models/branch-accounting-model';
+import { useAppSelector } from '../../../../store/store';
+import { isFilterFieldInExpense } from '../../../../utils/utils';
+import { Box } from '@mui/material';
 
 interface Props {
   open: boolean;
@@ -35,8 +40,9 @@ export default function ModelConfirmSearch({
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  const [startDate, setStartDate] = React.useState('2022-06-16T00:00:00+07:00');
-  const [endDate, setEndDate] = React.useState('2022-06-30T23:59:59.999999999+07:00');
+  const date = new Date();
+  const [startDate, setStartDate] = React.useState(String(date));
+  const [endDate, setEndDate] = React.useState(String(date));
   const [periodData, setPeriodData] = React.useState('');
 
   const handleConfirm = async () => {
@@ -50,10 +56,62 @@ export default function ModelConfirmSearch({
     setPeriodData(period);
   };
 
+  const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
+  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const [columnsList, setColumnsList] = React.useState<GridColDef[]>([]);
+  const [rowList, setRowList] = React.useState<any[]>([]);
   useEffect(() => {
-    console.log('======> summarizTitle:', summarizTitle);
-    console.log('======> summarizList:', JSON.stringify(summarizList));
-  }, [open]);
+    if (items.length > 0) {
+      setStartDate(items[0].expensePeriod.startDate);
+      setEndDate(items[0].expensePeriod.endDate);
+    }
+
+    if (summarizList) {
+      let infosWithDraw: any;
+      summarizList.sumItems.map((item: any) => {
+        infosWithDraw = {
+          ...infosWithDraw,
+          [item.expenseNo]: item.approvedAmount,
+        };
+      });
+
+      infosWithDraw = {
+        ...infosWithDraw,
+        id: 1,
+      };
+
+      setRowList([infosWithDraw]);
+
+      const columns: GridColDef[] = summarizList.sumItems.map((i: ExpenseInfo) => {
+        const master = getMasterExpenInto(i.expenseNo);
+        const hideColumn = master ? master.isOtherExpense : false;
+        let accountNameTh = master?.accountNameTh;
+        if (i.expenseNo === 'SUMOTHER') accountNameTh = 'รวม';
+
+        return {
+          field: i.expenseNo,
+          headerName: accountNameTh,
+          minWidth: 120,
+          flex: 0.6,
+          headerAlign: 'center',
+          align: 'right',
+          sortable: false,
+          hide: hideColumn,
+          renderCell: (params: GridRenderCellParams) => {
+            if (isFilterFieldInExpense(params.field)) {
+              return (
+                <Box component='div' sx={{ paddingRight: '5px' }}>
+                  {params.value}
+                </Box>
+              );
+            }
+          },
+        };
+      });
+
+      setColumnsList(columns);
+    }
+  }, [open === true]);
 
   return (
     <div>
@@ -64,7 +122,14 @@ export default function ModelConfirmSearch({
         maxWidth='lg'
         PaperProps={{ sx: { minWidth: 900 } }}>
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
-          <ConfirmContent startDate={startDate} endDate={endDate} handleDate={handleDate} title={summarizTitle} />
+          <ConfirmContent
+            startDate={startDate}
+            endDate={endDate}
+            handleDate={handleDate}
+            title={summarizTitle}
+            columnsList={columnsList}
+            rowList={rowList}
+          />
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: 'center', m: 5, mr: 5, ml: 5 }}>

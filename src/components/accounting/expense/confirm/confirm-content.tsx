@@ -11,6 +11,8 @@ interface Props {
   startDate: string;
   endDate: string;
   title: string;
+  columnsList?: GridColDef[];
+  rowList?: any[];
   handleDate: (period: any) => void;
 }
 interface State {
@@ -18,7 +20,14 @@ interface State {
   endDate: any;
 }
 
-export default function confirmContent({ startDate, endDate, title, handleDate }: Props): ReactElement {
+export default function confirmContent({
+  startDate,
+  endDate,
+  title,
+  columnsList,
+  rowList,
+  handleDate,
+}: Props): ReactElement {
   const classes = useStyles();
   const [periodData, setPeriodData] = React.useState<State>({
     startDate: startDate,
@@ -34,94 +43,8 @@ export default function confirmContent({ startDate, endDate, title, handleDate }
     await handleDate(periodData ? periodData : null);
   };
 
-  const columns: GridColDef[] = [
-    {
-      field: 'field1',
-      headerName: 'ค่าน้ำแข็งหลอด',
-      minWidth: 130,
-      headerAlign: 'center',
-      align: 'right',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-    {
-      field: 'field2',
-      headerName: 'ค่าน้ำดื่มชงกาแฟ',
-      headerAlign: 'center',
-      align: 'right',
-      minWidth: 130,
-      sortable: false,
-    },
-    {
-      field: 'field3',
-      headerName: 'ค่าไข่ไก่',
-      minWidth: 80,
-      headerAlign: 'center',
-      align: 'right',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-
-    {
-      field: 'field4',
-      headerName: 'ค่านม',
-      minWidth: 80,
-      headerAlign: 'center',
-      align: 'right',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-    {
-      field: 'field5',
-      headerName: 'ค่าจ้างรายวัน',
-      minWidth: 115,
-      headerAlign: 'center',
-      align: 'right',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-    {
-      field: 'field6',
-      headerName: 'อื่นๆ',
-      minWidth: 80,
-      headerAlign: 'center',
-      align: 'right',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-    {
-      field: 'field7',
-      headerName: 'รวม',
-      minWidth: 80,
-      headerAlign: 'center',
-      align: 'right',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-  ];
-
-  const rows = [
-    {
-      id: 1,
-      field1: '2,350.00',
-      field2: '350.00',
-      field3: '350.00',
-      field4: '2,350.00',
-      field5: '2,350.00',
-      field6: '350.00',
-      field7: '350.00',
-    },
-    {
-      id: 2,
-      field1: '2,350.00',
-      field2: '350.00',
-      field3: '2,350.00',
-      field4: '2,350.00',
-      field5: '2,350.00',
-      field6: '350.00',
-      field7: '350.00',
-    },
-  ];
+  const columns = columnsList ? columnsList : [];
+  const rows = rowList ? rowList : [];
 
   return (
     <>
@@ -130,7 +53,6 @@ export default function confirmContent({ startDate, endDate, title, handleDate }
           ยืนยันอนุมัติค่าใช้จ่าย
         </Typography>
         <Typography variant='subtitle1' component='div'>
-          {/* จำนวนสาขาที่อนุมัติ : 5 สาขา */}
           จำนวนสาขาที่อนุมัติ : {title}
         </Typography>
       </DialogContentText>
