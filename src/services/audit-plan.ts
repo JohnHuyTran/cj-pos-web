@@ -12,6 +12,14 @@ export async function saveDraftAuditPlan(payload: Payload) {
     throw error;
   }
 }
+export async function updateAuditPlan(id: string, payload: Payload) {
+  try {
+    const response = await post(`${env.backEnd.url}${environment.checkStock.auditPlan.save.url}/${id}`, payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export async function confirmAuditPlan(id: string) {
   try {
