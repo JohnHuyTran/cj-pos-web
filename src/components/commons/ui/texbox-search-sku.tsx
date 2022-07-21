@@ -13,10 +13,11 @@ import _ from 'lodash';
 interface Props {
   skuTypes: string;
   onSelectItem: (value: any) => void;
+  disabled?: boolean;
   isClear: boolean;
 }
 
-export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear }: Props) {
+export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disabled }: Props) {
   const classes = useStyles();
 
   const [value, setValue] = React.useState('');
@@ -100,6 +101,7 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear }: Pro
             </React.Fragment>
           ),
         }}
+        disabled={disabled}
         placeholder="รหัสสินค้า"
         className={classes.MtextField}
         variant="outlined"
@@ -126,6 +128,7 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear }: Pro
       isOptionEqualToValue={(option, value) => option.skuCode === value.skuCode}
       renderInput={autocompleteRenderInput}
       size="small"
+      disabled={disabled}
       className={classes.MautocompleteAddProduct}
       noOptionsText=""
     />

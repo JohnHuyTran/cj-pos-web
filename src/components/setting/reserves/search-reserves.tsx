@@ -58,8 +58,8 @@ export default function SearchReserves () {
     <Fragment>
       <Grid container rowSpacing={1} columnSpacing={7}>
         <ModalSettingExpense
-          open={isOpenModal}
-          onClose={() => setIsOpenModal(false)} />
+          isOpen={isOpenModal}
+          onClickClose={() => setIsOpenModal(false)} />
         <Grid item md={4} sm={4} xs={6}>
           <Typography variant="subtitle1" component="div" mb={1}>
             ประเภท
