@@ -250,7 +250,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       comment: comment,
       docNo: docNo,
       today: moment(approveDate).startOf('day').toISOString(),
+      attachFiles: attachFiles,
     };
+    if ((status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) && fileUploadList && fileUploadList.length > 0) {
+      payload = { ...payload, attachFiles: [] };
+    }
 
     if (status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
       payload = { ...payload, editAttachFiles: editAttachFiles };
