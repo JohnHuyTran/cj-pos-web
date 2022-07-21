@@ -331,7 +331,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     if (_arr) {
       const arr = Object.entries(_arr);
       arr
-        .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+        .filter((e: any) => !isFilterOutFieldForPayload(e[0]))
         .map((e: any, index: number) => {
           const _isOtherExpense = getMasterExpenInto(e[0])?.isOtherExpense || false;
           const item: SumItemsItem = {
@@ -408,7 +408,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     if (_arr) {
       const arr = Object.entries(_arr);
       arr
-        .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+        .filter((e: any) => !isFilterOutFieldForPayload(e[0]))
         .map((e: any, index: number) => {
           const _isOtherExpense = getMasterExpenInto(e[0])?.isOtherExpense || false;
           const item: SumItemsItem = {
@@ -513,22 +513,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setIsOpenModelConfirmExpense(true);
     } else if (status === STATUS.WAITTING_APPROVAL2) {
       const isOver = validateApproveLimit();
-      if (!isOver) {
+      const isFileValidate: boolean = validateFileInfo();
+      if (!isOver && isFileValidate) {
         setShowReason(false);
         setIsOpenModelConfirmExpense(true);
-      } else {
-        const isFileValidate: boolean = validateFileInfo();
-        if (isFileValidate) {
-          setShowReason(false);
-          setIsOpenModelConfirmExpense(true);
-        }
       }
-
-      // if ( && !isFileValidate) {
-      //   setOpenAlert(true);
-      //   setTextError('กรุณาแนบเอกสาร');
-      // } else {
-      // }
     } else if (status === STATUS.WAITTING_ACCOUNTING) {
       let sumApprovalAmount: number = 0;
       const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
@@ -684,6 +673,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         : status === STATUS.WAITTING_APPROVAL2
         ? approvalAttachFiles
         : [];
+    console.log(isvalid);
+    console.log(existingfileList);
     if (!isvalid && existingfileList.length <= 0) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
@@ -878,6 +869,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               description: 'ผลต่าง',
               [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0),
             };
+            const master = getMasterExpenInto(entrie.expenseNo);
+            const _isOtherExpense = master ? master.isOtherExpense : false;
+            if (_isOtherExpense) {
+              totalOtherWithDraw += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
+              totalOtherApprove += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
+            }
           } else {
             infosApprove = {
               ...infosApprove,
@@ -908,7 +905,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         rows = [{ ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw }];
       } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
         rows = [
-          { ...infosWithDraw, total: totalWithDraw },
+          { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
           { ...infosApprove, SUMOTHER: '', total: '' },
         ];
       } else if (status === STATUS.WAITTING_ACCOUNTING) {

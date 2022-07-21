@@ -15,7 +15,7 @@ import { updateSummaryRows } from '../../../store/slices/accounting/accounting-s
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { getExpenseStatus, STATUS } from '../../../utils/enum/accounting-enum';
-import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
+import { isFilterFieldInExpense, isFilterOutFieldInAdd, stringNullOrEmpty } from '../../../utils/utils';
 import ExpenseDetailTransaction from './expense-detail-transaction';
 import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
 
@@ -243,7 +243,9 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
 
           [entrie.expenseNo]: entrie.withdrawAmount,
         };
-        totalWithDraw += Number(entrie?.withdrawAmount);
+        if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
+          totalWithDraw += Number(entrie?.withdrawAmount);
+        }
       });
       const arr = Object.entries(_item);
       await arr.forEach((element: any, index: number) => {
