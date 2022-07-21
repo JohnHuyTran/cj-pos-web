@@ -25,7 +25,13 @@ import { isGroupBranch } from '../../../utils/role-permission';
 import ModalAddTypeProduct from '../../commons/ui/modal-add-type-products';
 import AuditPlanCreateItem from './audit-plan-create-item';
 import ModalConfirmCounting from './modal-confirm-counting';
-import { cancelAuditPlan, confirmAuditPlan, countingAuditPlan, saveDraftAuditPlan } from '../../../services/audit-plan';
+import {
+  cancelAuditPlan,
+  confirmAuditPlan,
+  countingAuditPlan,
+  saveDraftAuditPlan,
+  updateAuditPlan,
+} from '../../../services/audit-plan';
 import { updateAddTypeAndProductState } from '../../../store/slices/add-type-product-slice';
 import { PayloadCounting } from '../../../models/audit-plan';
 import { clearDataFilter, getAuditPlanDetail } from '../../../store/slices/audit-plan-detail-slice';
@@ -90,6 +96,7 @@ export default function ModalCreateAuditPlan({
     code: ownBranch,
     name: branchName ? branchName : '',
   });
+  const [disableCounting, setDisableCounting] = React.useState<boolean>(false);
   const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
   const checkEdit = useAppSelector((state) => state.saleLimitTime.checkEdit);
   const [values, setValues] = React.useState<Values>({
@@ -142,6 +149,14 @@ export default function ModalCreateAuditPlan({
       dispatch(updateAddTypeAndProductState(products));
     }
   }, [dataDetail]);
+
+  useEffect(() => {
+    if (moment(new Date()) > moment(values.countingDate)) {
+      setDisableCounting(true);
+    } else {
+      setDisableCounting(false);
+    }
+  }, [values.countingDate]);
   const handleChangeBranch = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
@@ -252,33 +267,42 @@ export default function ModalCreateAuditPlan({
             barcode: item.barcode,
           };
         });
-      const body = !!values.id
-        ? {
-            id: values.id,
-            branchCode: values.branch,
-            branchName: getBranchName(branchList, values.branch),
-            countingDate: moment(values.countingDate).toISOString(true),
-            product: products,
-          }
-        : {
-            branchCode: values.branch,
-            branchName: getBranchName(branchList, values.branch),
-            countingDate: moment(values.countingDate).toISOString(true),
-            product: products,
-          };
-      const rs = await saveDraftAuditPlan(body);
-      if (rs.code === 20000) {
-        dispatch(setCheckEdit(false));
-        setOpenPopupModal(true);
-        setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
-        setValues({
-          ...values,
-          id: rs.data.id,
-          documentNumber: rs.data.documentNumber,
-        });
-        setStatus(StockActionStatus.DRAFT);
+      const body = {
+        branchCode: values.branch,
+        branchName: getBranchName(branchList, values.branch),
+        countingDate: moment(values.countingDate).toISOString(true),
+        product: products,
+      };
+      if (!!values.id) {
+        const rs = await updateAuditPlan(values.id, body);
+        if (rs.code === 20000) {
+          dispatch(setCheckEdit(false));
+          setOpenPopupModal(true);
+          setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
+          setValues({
+            ...values,
+            id: rs.data.id,
+            documentNumber: rs.data.documentNumber,
+          });
+          setStatus(StockActionStatus.DRAFT);
+        } else {
+          setOpenModalError(true);
+        }
       } else {
-        setOpenModalError(true);
+        const rs = await saveDraftAuditPlan(body);
+        if (rs.code === 20000) {
+          dispatch(setCheckEdit(false));
+          setOpenPopupModal(true);
+          setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
+          setValues({
+            ...values,
+            id: rs.data.id,
+            documentNumber: rs.data.documentNumber,
+          });
+          setStatus(StockActionStatus.DRAFT);
+        } else {
+          setOpenModalError(true);
+        }
       }
     } catch (error) {
       setOpenModalError(true);
@@ -381,7 +405,8 @@ export default function ModalCreateAuditPlan({
                   type={'TO'}
                   minDateTo={new Date()}
                   value={values.countingDate}
-                  disabled={steps.indexOf(status) > 0}
+                  disabled={steps.indexOf(status) > 0 && !groupBranch}
+                  placeHolder={'กรุณาเลือก'}
                 />
               </Grid>
             </Grid>
@@ -399,6 +424,7 @@ export default function ModalCreateAuditPlan({
                   isClear={clearBranchDropDown}
                   disable={groupBranch || viewMode}
                   isFilterAuthorizedBranch={true}
+                  placeHolder={'กรุณาเลือก'}
                 />
               </Grid>
             </Grid>
@@ -495,11 +521,18 @@ export default function ModalCreateAuditPlan({
                   color="primary"
                   sx={{ margin: '0 17px' }}
                   disabled={
-                    steps.indexOf(status) < 0 || !managePermission || (steps.indexOf(status) > 1 && !isBranchPermission)
+                    steps.indexOf(status) < 0 ||
+                    !managePermission ||
+                    (steps.indexOf(status) > 1 && !isBranchPermission) ||
+                    disableCounting
                   }
                   style={{
                     display:
-                      steps.indexOf(status) < 1 || !countingPermission || viewMode || status == StockActionStatus.CANCEL
+                      steps.indexOf(status) < 1 ||
+                      !countingPermission ||
+                      viewMode ||
+                      status == StockActionStatus.CANCEL ||
+                      !groupBranch
                         ? 'none'
                         : undefined,
                   }}
@@ -520,7 +553,8 @@ export default function ModalCreateAuditPlan({
                       (steps.indexOf(status) > 0 && !countingPermission) ||
                       !managePermission ||
                       viewMode ||
-                      status == StockActionStatus.CANCEL
+                      status == StockActionStatus.CANCEL ||
+                      !groupBranch
                         ? 'none'
                         : undefined,
                   }}

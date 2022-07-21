@@ -259,6 +259,7 @@ const StockCountSearch = () => {
               isClear={clearBranchDropDown}
               disable={groupBranch}
               isFilterAuthorizedBranch={true}
+              placeHolder={'กรุณาเลือก'}
             />
           </Grid>
           <Grid item xs={4}>
