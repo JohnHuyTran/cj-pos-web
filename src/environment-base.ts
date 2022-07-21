@@ -289,6 +289,9 @@ export const environment = {
         searchItem: {
           url: 'products/product/find',
         },
+        findProductSKU: {
+          url: 'products/skus',
+        },
       },
     },
   },

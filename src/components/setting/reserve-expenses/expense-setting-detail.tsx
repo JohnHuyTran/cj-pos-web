@@ -1,13 +1,17 @@
 import React from 'react';
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogContent,
   FormControl,
   FormControlLabel,
   FormHelperText,
   Grid,
+  InputLabel,
+  ListItemText,
   MenuItem,
+  OutlinedInput,
   Radio,
   RadioGroup,
   Select,
@@ -18,21 +22,73 @@ import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import { useStyles } from '../../../styles/makeTheme';
 import Save from '@mui/icons-material/Save';
 
+import { expenseTypesSetting, getExpenseTypesSetting } from '../../../utils/enum/setting-reserve-expense-enum';
+
+//component
+import TexboxSearchSku from '../../commons/ui/texbox-search-sku';
+
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
+  type: string;
 }
 
-export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
+export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Props) {
   const classes = useStyles();
 
   const [values, setValues] = React.useState<any>({
-    typeExpense: 'ALL',
+    isActive: 'true',
+    type: [],
+    typeOther: [],
+    skuCode: '',
+    accountNameTh: '',
+    accountCode: '',
+    requiredDocumentTh: '',
+    approvalLimit1: '',
+    approvalLimit2: '',
   });
+
+  const handleChange = (event: any) => {
+    const value = event.target.value;
+    setValues({ ...values, [event.target.name]: value });
+  };
+
+  const handleChangeMultiType = (event: any) => {
+    const value = event.target.value;
+    setValues({ ...values, typeOther: value === 'string' ? value.split(',') : value });
+  };
+
+  const handleAddButton = () => {
+    console.log('values: ', values);
+  };
+
+  const handleChangeProduct = (value: any) => {
+    if (value) {
+      setValues({ ...values, skuCode: value.skuCode });
+    } else {
+      setValues({ ...values, skuCode: '' });
+    }
+  };
+
+  const handleOnClose = () => {
+    onClickClose();
+    setValues({
+      isActive: 'true',
+      type: [],
+      typeOther: [],
+      skuCode: '',
+      accountNameTh: '',
+      accountCode: '',
+      requiredDocumentTh: '',
+      approvalLimit1: '',
+      approvalLimit2: '',
+    });
+  };
+
   return (
     <React.Fragment>
       <Dialog open={isOpen} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={onClickClose}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleOnClose}>
           <Typography sx={{ fontSize: 24, fontWeight: 400 }}>รายละเอียดตั้งค่ารายการค่าใช้จ่าย</Typography>
         </BootstrapDialogTitle>
         <DialogContent sx={{ minHeight: '70vh' }}>
@@ -51,9 +107,15 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
             </Grid>
             <Grid item xs={4}>
               <FormControl>
-                <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="row-radio-buttons-group">
-                  <FormControlLabel value="1" control={<Radio />} label="ใช้งาน" />
-                  <FormControlLabel value="2" control={<Radio />} label="ไม่ใช้งาน" />
+                <RadioGroup
+                  row
+                  aria-labelledby="demo-row-radio-buttons-group-label"
+                  name="isActive"
+                  value={values.isActive}
+                  onChange={handleChange}
+                >
+                  <FormControlLabel value="true" control={<Radio />} label="ใช้งาน" />
+                  <FormControlLabel value="false" control={<Radio />} label="ไม่ใช้งาน" />
                 </RadioGroup>
               </FormControl>
             </Grid>
@@ -66,18 +128,24 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
             <Grid item xs={4}>
               <FormControl fullWidth className={classes.Mselect}>
                 <Select
-                  id="selTypeExpense"
-                  name="orderType"
-                  value={values.typeExpense}
-                  // onChange={handleChange}
+                  id="selType"
+                  name="type"
+                  value={values.type}
+                  onChange={handleChange}
+                  displayEmpty
+                  renderValue={
+                    values.type.length !== 0
+                      ? undefined
+                      : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือกประเภท</div>
+                  }
                   inputProps={{ 'aria-label': 'Without label' }}
                 >
-                  <MenuItem value={'ALL'} selected={true}>
-                    กรุณาเลือก
-                  </MenuItem>
-                  <MenuItem value={'0'}>ค่าใช้จ่ายร้านกาแฟ</MenuItem>
-                  <MenuItem value={'1'}>ค่าใช้จ่ายหน้าร้าน</MenuItem>
-                  <MenuItem value={'2'}>อื่นๆ</MenuItem>
+                  {expenseTypesSetting.map((item, index: number) => (
+                    <MenuItem key={index} value={item.key}>
+                      {item.text}
+                    </MenuItem>
+                  ))}
+                  <MenuItem value={'OTHER'}>อื่นๆ</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -89,18 +157,23 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
             <Grid item xs={4}>
               <FormControl fullWidth className={classes.Mselect}>
                 <Select
-                  id="selTypeExpense"
-                  name="otherType"
-                  // value={values.orderType}
-                  // onChange={handleChange}
-                  inputProps={{ 'aria-label': 'Without label' }}
+                  id="selTypeOther"
+                  multiple
+                  value={values.typeOther}
+                  onChange={handleChangeMultiType}
+                  displayEmpty
+                  renderValue={
+                    values.typeOther.length !== 0
+                      ? (selected) => selected.map((v: any) => getExpenseTypesSetting(v)).join(', ')
+                      : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือกประเภท</div>
+                  }
                 >
-                  <MenuItem value={'ALL'} selected={true}>
-                    กรุณาเลือก
-                  </MenuItem>
-                  <MenuItem value={'0'}>ค่าใช้จ่ายร้านกาแฟ</MenuItem>
-                  <MenuItem value={'1'}>ค่าใช้จ่ายหน้าร้าน</MenuItem>
-                  <MenuItem value={'2'}>อื่นๆ</MenuItem>
+                  {expenseTypesSetting.map((item, index: number) => (
+                    <MenuItem key={index} value={item.key}>
+                      <Checkbox checked={values.typeOther.indexOf(item.key) > -1} />
+                      {item.text}
+                    </MenuItem>
+                  ))}
                 </Select>
                 <FormHelperText sx={{ textAlign: 'right' }}>เลือกได้มากกว่า 1 ประเภท</FormHelperText>
               </FormControl>
@@ -127,15 +200,17 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <TextField
+              {/* <TextField
                 //   id="txt"
-                name="status"
+                name="skuCode"
                 size="small"
-                //   value={values.orderShipment}
-                //   onChange={handleChange}
+                value={values.skuCode}
+                onChange={handleChange}
                 className={classes.MtextField}
                 fullWidth
-              />
+              /> */}
+
+              <TexboxSearchSku skuTypes="3,7" onSelectItem={handleChangeProduct} isClear={false} />
             </Grid>
             <Grid item xs={2}>
               <Typography variant="body2">
@@ -143,16 +218,18 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <TextField
-                helperText="Please enter your name"
-                name="status"
-                size="small"
-                //   value={values.orderShipment}
-                //   onChange={handleChange}
-                className={classes.MtextField}
-                fullWidth
-                inputProps={{ maxLength: 50 }}
-              />
+              <FormControl fullWidth>
+                <TextField
+                  name="accountNameTh"
+                  size="small"
+                  value={values.accountNameTh}
+                  onChange={handleChange}
+                  className={classes.MtextField}
+                  fullWidth
+                  inputProps={{ maxLength: 50 }}
+                />
+                <FormHelperText sx={{ textAlign: 'right' }}>{values.accountNameTh.length}/50</FormHelperText>
+              </FormControl>
             </Grid>
 
             <Grid item xs={2}>
@@ -163,10 +240,11 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
             <Grid item xs={4}>
               <TextField
                 //   id="txt"
-                name="status"
+                name="accountCode"
                 size="small"
-                //   value={values.orderShipment}
-                //   onChange={handleChange}
+                type="number"
+                value={values.accountCode}
+                onChange={handleChange}
                 className={classes.MtextField}
                 fullWidth
               />
@@ -175,16 +253,18 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
               <Typography variant="body2">เอกสารที่ต้องส่ง :</Typography>
             </Grid>
             <Grid item xs={4}>
-              <TextField
-                helperText="Please enter your name"
-                name="status"
-                size="small"
-                //   value={values.orderShipment}
-                //   onChange={handleChange}
-                className={classes.MtextField}
-                fullWidth
-                inputProps={{ maxLength: 50 }}
-              />
+              <FormControl fullWidth>
+                <TextField
+                  name="requiredDocumentTh"
+                  size="small"
+                  value={values.requiredDocumentTh}
+                  onChange={handleChange}
+                  className={classes.MtextField}
+                  fullWidth
+                  inputProps={{ maxLength: 50 }}
+                />
+                <FormHelperText sx={{ textAlign: 'right' }}>{values.requiredDocumentTh.length}/50</FormHelperText>
+              </FormControl>
             </Grid>
 
             <Grid item xs={2}>
@@ -195,12 +275,14 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
             <Grid item xs={4}>
               <TextField
                 //   id="txt"
-                name="status"
+                name="approvalLimit1"
                 size="small"
-                //   value={values.orderShipment}
-                //   onChange={handleChange}
+                type="number"
+                value={values.approvalLimit1}
+                onChange={handleChange}
                 className={classes.MtextField}
                 fullWidth
+                placeholder="0.00"
               />
             </Grid>
             <Grid item xs={2}>
@@ -210,12 +292,14 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
             </Grid>
             <Grid item xs={4}>
               <TextField
-                name="status"
+                name="approvalLimit2"
                 size="small"
-                //   value={values.orderShipment}
-                //   onChange={handleChange}
+                type="number"
+                value={values.approvalLimit2}
+                onChange={handleChange}
                 className={classes.MtextField}
                 fullWidth
+                placeholder="0.00"
               />
             </Grid>
           </Grid>
@@ -231,7 +315,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose }: Props) {
           >
             <Button
               variant="contained"
-              //   onClick={handleOpenOrderReceiveModal}
+              onClick={handleAddButton}
               sx={{ minWidth: '12%' }}
               className={classes.MbtnSearch}
               color="warning"
