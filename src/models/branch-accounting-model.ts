@@ -55,7 +55,7 @@ export interface ExpenseSaveRequest {
   createdDate?: string;
   lastModifiedDate?: string;
   today?: string;
-  returnTo?: string;
+  route?: string;
 }
 
 export interface AccountAccountExpenses {
@@ -113,7 +113,7 @@ export interface SumItemsItem {
 }
 export interface Comment {
   username: string;
-  statusDesc: string;
+  status: string;
   commentDate: string;
   comment: string;
 }

@@ -49,7 +49,7 @@ export default function ModalConfirmExpense({
 }: ModalConfirmExpenseProps): ReactElement {
   const classes = useStyles();
   const forwardList = [
-    { key: 'AREA', text: 'สาขา' },
+    { key: 'MANAGER', text: 'สาขา' },
     { key: 'OC', text: 'OC' },
   ];
 

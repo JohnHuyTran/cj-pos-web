@@ -1,6 +1,7 @@
 import { Box, setRef, TextField } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridRowData } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
+import NumberFormat from 'react-number-format';
 import {
   AccountAccountExpenses,
   ExpenseInfo,
@@ -9,10 +10,11 @@ import {
   SumItems,
   SumItemsItem,
 } from '../../../models/branch-accounting-model';
+import { getUserInfo } from '../../../store/sessionStore';
 import { updateSummaryRows } from '../../../store/slices/accounting/accounting-slice';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { STATUS } from '../../../utils/enum/accounting-enum';
+import { getExpenseStatus, STATUS } from '../../../utils/enum/accounting-enum';
 import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
 import ExpenseDetailTransaction from './expense-detail-transaction';
 import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
@@ -51,42 +53,90 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     const master = getMasterExpenInto(i.expenseNo);
     const hideColumn = master ? master.isOtherExpense : false;
-
-    return {
-      field: i.expenseNo,
-      headerName: i.accountNameTh,
-      minWidth: 70,
-      flex: 1,
-      headerAlign: 'center',
-      sortable: false,
-      hide: hideColumn,
-      renderCell: (params: GridRenderCellParams) => {
-        if (isFilterFieldInExpense(params.field)) {
-          return (
-            <Box component='div' sx={{ paddingLeft: '20px', color: frontColor(params.value) }}>
-              {params.value}
-            </Box>
-          );
-        } else {
-          return (
-            <TextField
-              variant='outlined'
-              name={`txb${i.expenseNo}`}
-              inputProps={{ style: { textAlign: 'right' } }}
-              sx={{
-                '.MuiInputBase-input.Mui-disabled': {
-                  WebkitTextFillColor: frontColor(params.value),
-                  // color: color,
-                },
-              }}
-              value={params.value}
-              disabled={true}
-              autoComplete='off'
-            />
-          );
-        }
-      },
-    };
+    if (i.expenseNo === 'total') {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        minWidth: 70,
+        flex: 0.6,
+        headerAlign: 'center',
+        align: 'right',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          if (isFilterFieldInExpense(params.field)) {
+            return (
+              <NumberFormat
+                value={String(params.value)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                disabled={true}
+                customInput={TextField}
+                sx={{
+                  '.MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: frontColor(params.value),
+                    // color: color,
+                  },
+                }}
+                fixedDecimalScale
+              />
+            );
+          }
+        },
+      };
+    } else {
+      return {
+        field: i.expenseNo,
+        headerName: i.accountNameTh,
+        minWidth: 70,
+        flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        hide: hideColumn,
+        renderCell: (params: GridRenderCellParams) => {
+          if (isFilterFieldInExpense(params.field)) {
+            return (
+              <Box component='div' sx={{ paddingLeft: '5px', color: frontColor(params.value) }}>
+                {params.value}
+              </Box>
+            );
+          } else {
+            return (
+              <NumberFormat
+                value={String(params.value)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                disabled={true}
+                customInput={TextField}
+                sx={{
+                  '.MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: frontColor(params.value),
+                    // color: color,
+                  },
+                }}
+                fixedDecimalScale
+              />
+              // <TextField
+              //   variant='outlined'
+              //   name={`txb${i.expenseNo}`}
+              //   inputProps={{ style: { textAlign: 'right' } }}
+              //   sx={{
+              //     '.MuiInputBase-input.Mui-disabled': {
+              //       WebkitTextFillColor: frontColor(params.value),
+              //       // color: color,
+              //     },
+              //   }}
+              //   value={params.value}
+              //   disabled={true}
+              //   autoComplete='off'
+              // />
+            );
+          }
+        },
+      };
+    }
   });
   useEffect(() => {
     setExpenseType(type);
@@ -148,7 +198,9 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   }, [periodProps]);
 
   const currentlySelected = async (params: GridCellParams) => {
-    if (params.id === 2 && (status === STATUS.WAITTING_ACCOUNTING || status === STATUS.WAITTING_APPROVAL3)) {
+    const info = getExpenseStatus(expenseData.status);
+    const isAllow = info?.groupAllow === getUserInfo().group && info?.allowShowSummary;
+    if (params.id === 2 && isAllow) {
       let listPayload: payLoadAdd[] = [];
       const arr = Object.entries(params.row);
       await arr.forEach((element: any, index: number) => {
