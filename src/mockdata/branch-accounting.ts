@@ -106,27 +106,32 @@ const summaryItem001: SumItemsItem = {
   expenseNo: '001',
   withdrawAmount: 100,
   approvedAmount: 100,
+  isOtherExpense: false,
 };
 
 const summaryItem002: SumItemsItem = {
   expenseNo: '002',
   withdrawAmount: 200,
   approvedAmount: 200,
+  isOtherExpense: false,
 };
 const summaryItem003: SumItemsItem = {
   expenseNo: '003',
   withdrawAmount: 300,
   approvedAmount: 300,
+  isOtherExpense: false,
 };
 const summaryItem004: SumItemsItem = {
   expenseNo: '004',
   withdrawAmount: 400,
   approvedAmount: 400,
+  isOtherExpense: false,
 };
 const summaryItem005: SumItemsItem = {
   expenseNo: '005',
   withdrawAmount: 500,
   approvedAmount: 500,
+  isOtherExpense: false,
 };
 
 const summary: SumItems = {

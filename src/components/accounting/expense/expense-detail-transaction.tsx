@@ -46,7 +46,8 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   const [items, setItems] = React.useState<any>(_initialItems && _initialItems.length > 0 ? _initialItems : []);
   const [actionEdit, setActionEdit] = React.useState(false);
   const payloadNewItem = useAppSelector((state) => state.expenseAccountDetailSlice.addNewItem);
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const getMasterExpenInto = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type && e.isActive);
   const [expenseType, setExpenseType] = React.useState('');
   const [period, setPeriod] = React.useState<ExpensePeriod>();
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {

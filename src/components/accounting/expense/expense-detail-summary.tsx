@@ -45,7 +45,8 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
   const [openModalUpdatedExpenseSummary, setOpenModalUpdateExpenseSummary] = React.useState(false);
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const getMasterExpenInto = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type && e.isActive);
   const frontColor = (value: any) => {
     const _value = stringNullOrEmpty(value) ? '' : value.toString();
     return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
