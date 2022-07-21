@@ -1132,7 +1132,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               /> */}
               <AccordionUploadSingleFile
                 files={attachFiles}
-                disabledControl={!((status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) && isGroupBranch)}
+                disabledControl={!((status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) && isGroupBranch())}
               />
             </Grid>
             <Grid item xs={1}>
