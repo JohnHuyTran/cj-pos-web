@@ -577,6 +577,12 @@ export default function CheckOrderDetail({
       setShowSnackBar(true);
       setContentMsg('คุณได้ทำรายการเรียบร้อยแล้ว');
       setSnackbarStatus(issuccess);
+
+      updateShipmentOrder();
+      setTimeout(() => {
+        setOpen(false);
+        onClickClose();
+      }, 1000);
     } else {
       let errorList: ErrorDetail[] = [];
       setOpenFailAlert(true);
