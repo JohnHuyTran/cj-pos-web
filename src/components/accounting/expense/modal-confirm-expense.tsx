@@ -148,6 +148,7 @@ export default function ModalConfirmExpense({
                 defaultValue={reason}
                 isDisable={isOpenLoading}
                 maxLength={100}
+                maxWidth="100%"
                 isError={!reason && validateReason ? isError : false}
                 onChangeComment={(e) => {
                   setReason(e);
