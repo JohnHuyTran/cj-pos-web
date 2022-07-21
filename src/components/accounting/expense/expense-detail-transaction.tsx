@@ -1,6 +1,7 @@
 import { Box, TextField, Typography } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridRowData } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
+import NumberFormat from 'react-number-format';
 import { isNullOrUndefined } from 'util';
 import {
   DataItem,
@@ -83,9 +84,20 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
             return (
-              <Box component='div' sx={{ paddingRight: '5px' }}>
-                {params.value}
-              </Box>
+              <NumberFormat
+                value={String(params.value)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                disabled={true}
+                customInput={TextField}
+                sx={{
+                  '.MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: '#000',
+                  },
+                }}
+                fixedDecimalScale
+              />
             );
           }
         },
@@ -97,6 +109,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
         // minWidth: 70,
         flex: 1,
         headerAlign: 'center',
+        align: 'left',
         sortable: false,
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
@@ -104,9 +117,9 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
             <>
               <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
                 <TextField
-                  variant='outlined'
+                  className={classes.MtextFieldNumber}
                   name={`txb${i.expenseNo}`}
-                  inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+                  inputProps={{ style: { textAlignLast: 'left', color: '#000000' } }}
                   sx={{
                     '.MuiInputBase-input.Mui-disabled': {
                       WebkitTextFillColor: '#000',
@@ -137,10 +150,28 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
           const value = params.value || 0;
           const condition = otherMaxApprove2 ? 'overLimit2' : otherMaxApprove1 ? 'overLimit1' : 'normal';
           return (
-            <TextField
-              variant='outlined'
-              name={`txb${i.expenseNo}`}
-              inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+            // <TextField
+            //   variant='outlined'
+            //   name={`txb${i.expenseNo}`}
+            //   inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+            //   sx={{
+            //     '.MuiInputBase-input.Mui-disabled': {
+            //       WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
+            //       background: condition === 'overLimit2' ? '#F54949' : '',
+            //       borderRadius: 'inherit',
+            //     },
+            //   }}
+            //   value={params.value}
+            //   disabled={true}
+            //   autoComplete='off'
+            // />
+            <NumberFormat
+              value={String(params.value)}
+              thousandSeparator={true}
+              decimalScale={2}
+              className={classes.MtextFieldNumber}
+              disabled={true}
+              customInput={TextField}
               sx={{
                 '.MuiInputBase-input.Mui-disabled': {
                   WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
@@ -148,9 +179,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
                   borderRadius: 'inherit',
                 },
               }}
-              value={params.value}
-              disabled={true}
-              autoComplete='off'
+              fixedDecimalScale
             />
           );
         },
@@ -182,10 +211,28 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
                 ? 'overLimit1'
                 : 'normal';
             return (
-              <TextField
-                variant='outlined'
-                name={`txb${i.expenseNo}`}
-                inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+              // <TextField
+              //   variant='outlined'
+              //   name={`txb${i.expenseNo}`}
+              //   inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+              //   sx={{
+              //     '.MuiInputBase-input.Mui-disabled': {
+              //       WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
+              //       background: condition === 'overLimit2' ? '#F54949' : '',
+              //       borderRadius: 'inherit',
+              //     },
+              //   }}
+              //   value={params.value}
+              //   disabled={true}
+              //   autoComplete='off'
+              // />
+              <NumberFormat
+                value={String(params.value)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                disabled={true}
+                customInput={TextField}
                 sx={{
                   '.MuiInputBase-input.Mui-disabled': {
                     WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
@@ -193,9 +240,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
                     borderRadius: 'inherit',
                   },
                 }}
-                value={params.value}
-                disabled={true}
-                autoComplete='off'
+                fixedDecimalScale
               />
             );
           }
