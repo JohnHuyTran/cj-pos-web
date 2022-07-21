@@ -1,6 +1,7 @@
 import { Box, setRef, TextField } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridRowData } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
+import NumberFormat from 'react-number-format';
 import {
   AccountAccountExpenses,
   ExpenseInfo,
@@ -65,9 +66,21 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
             return (
-              <Box component='div' sx={{ paddingRight: '5px' }}>
-                {params.value}
-              </Box>
+              <NumberFormat
+                value={String(params.value)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                disabled={true}
+                customInput={TextField}
+                sx={{
+                  '.MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: frontColor(params.value),
+                    // color: color,
+                  },
+                }}
+                fixedDecimalScale
+              />
             );
           }
         },
@@ -90,20 +103,35 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
             );
           } else {
             return (
-              <TextField
-                variant='outlined'
-                name={`txb${i.expenseNo}`}
-                inputProps={{ style: { textAlign: 'right' } }}
+              <NumberFormat
+                value={String(params.value)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                disabled={true}
+                customInput={TextField}
                 sx={{
                   '.MuiInputBase-input.Mui-disabled': {
                     WebkitTextFillColor: frontColor(params.value),
                     // color: color,
                   },
                 }}
-                value={params.value}
-                disabled={true}
-                autoComplete='off'
+                fixedDecimalScale
               />
+              // <TextField
+              //   variant='outlined'
+              //   name={`txb${i.expenseNo}`}
+              //   inputProps={{ style: { textAlign: 'right' } }}
+              //   sx={{
+              //     '.MuiInputBase-input.Mui-disabled': {
+              //       WebkitTextFillColor: frontColor(params.value),
+              //       // color: color,
+              //     },
+              //   }}
+              //   value={params.value}
+              //   disabled={true}
+              //   autoComplete='off'
+              // />
             );
           }
         },
