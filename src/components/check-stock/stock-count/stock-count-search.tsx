@@ -13,17 +13,17 @@ import AlertError from '../../commons/ui/alert-error';
 import moment from 'moment';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import LoadingModal from '../../commons/ui/loading-modal';
-import { TO_TYPE, StockActionStatus } from '../../../utils/enum/common-enum';
+import { StockActionStatus } from '../../../utils/enum/common-enum';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
 import { BranchListOptionType } from '../../../models/branch-model';
-import { TransferOutSearchRequest } from '../../../models/transfer-out-model';
 import { getStockCountSearch } from "../../../store/slices/stock-count-search-slice";
 import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
 import StockCountList from "./stock-count-list";
 import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
 import { isGroupBranch } from "../../../utils/role-permission";
+import { StockCountSearchRequest } from "../../../models/stock-count-model";
 
 const _ = require('lodash');
 
@@ -153,7 +153,7 @@ const StockCountSearch = () => {
       endDate: new Date(),
     });
 
-    const payload: TransferOutSearchRequest = {
+    const payload: StockCountSearchRequest = {
       perPage: (limit ? limit : 10).toString(),
       page: page,
       query: values.documentNumber,
@@ -191,7 +191,7 @@ const StockCountSearch = () => {
     } else {
       limits = limit ? limit.toString() : '10';
     }
-    const payload: TransferOutSearchRequest = {
+    const payload: StockCountSearchRequest = {
       perPage: limits,
       page: page,
       query: values.documentNumber.trim(),
@@ -199,7 +199,6 @@ const StockCountSearch = () => {
       status: values.status,
       startDate: moment(values.startDate).startOf('day').toISOString(),
       endDate: moment(values.endDate).endOf('day').toISOString(),
-      type: TO_TYPE.TO_WITHOUT_DISCOUNT + ',' + TO_TYPE.TO_WITH_DISCOUNT + ',' + TO_TYPE.TO_DEFECT
     };
 
     handleOpenLoading('open', true);

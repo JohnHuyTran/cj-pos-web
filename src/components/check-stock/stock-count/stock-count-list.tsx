@@ -268,6 +268,19 @@ const StockCountList: React.FC<StateProps> = (props) => {
     setLoading(false);
   };
 
+  const onSearchAgain = async () => {
+    const payloadNew: StockCountSearchRequest = {
+      perPage: payload.perPage,
+      page: payload.page,
+      query: payload.query,
+      branch: payload.branch,
+      status: payload.status,
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+    };
+    await dispatch(getStockCountSearch(payloadNew));
+  };
+
   const stockCountDetail = useAppSelector((state) => state.stockCountDetailSlice.stockCountDetail);
   const currentlySelected = async (params: GridCellParams) => {
     const chkPN = params.colDef.field;
@@ -320,7 +333,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
-          onSearchMain={props.onSearch}
+          onSearchMain={onSearchAgain}
           userPermission={userPermission}
         />
       )}
