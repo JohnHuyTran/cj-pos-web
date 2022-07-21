@@ -168,7 +168,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         const arr = Object.entries(e);
         let items: ItemItem[] = [];
         arr
-          .filter((e: any) => !isFilterOutFieldForPayload(e[0]))
+          .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
           .map((element: any, index: number) => {
             let _isOtherExpense = getMasterExpenInto(element[0])?.isOtherExpense || false;
 
@@ -195,9 +195,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     arr
       .filter((e: any) => !isFilterOutFieldForPayload(e[0]))
       .map((e: any, index: number) => {
+        let _isOtherExpense = getMasterExpenInto(e[0])?.isOtherExpense || false;
         const item: SumItemsItem = {
           expenseNo: e[0],
           withdrawAmount: e[1],
+          isOtherExpense: _isOtherExpense,
         };
         sumItems.push(item);
       });
@@ -248,7 +250,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       comment: comment,
       docNo: docNo,
       today: moment(approveDate).startOf('day').toISOString(),
+      attachFiles: attachFiles,
     };
+    if ((status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) && fileUploadList && fileUploadList.length > 0) {
+      payload = { ...payload, attachFiles: [] };
+    }
 
     if (status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
       payload = { ...payload, editAttachFiles: editAttachFiles };
@@ -329,20 +335,24 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     if (_arr) {
       const arr = Object.entries(_arr);
       arr
-        .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+        .filter((e: any) => !isFilterOutFieldForPayload(e[0]))
         .map((e: any, index: number) => {
+          const _isOtherExpense = getMasterExpenInto(e[0])?.isOtherExpense || false;
           const item: SumItemsItem = {
             expenseNo: e[0],
             approvedAmount: e[1],
+            isOtherExpense: _isOtherExpense,
           };
           sumItems.push(item);
         });
     } else {
       const _summary = summary.items;
       _summary.map((e: SumItemsItem) => {
+        const _isOtherExpense = getMasterExpenInto(e.expenseNo)?.isOtherExpense || false;
         const item: SumItemsItem = {
           expenseNo: e.expenseNo,
           approvedAmount: e.withdrawAmount,
+          isOtherExpense: _isOtherExpense,
         };
         sumItems.push(item);
       });
@@ -402,20 +412,24 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     if (_arr) {
       const arr = Object.entries(_arr);
       arr
-        .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
+        .filter((e: any) => !isFilterOutFieldForPayload(e[0]))
         .map((e: any, index: number) => {
+          const _isOtherExpense = getMasterExpenInto(e[0])?.isOtherExpense || false;
           const item: SumItemsItem = {
             expenseNo: e[0],
             approvedAmount: e[1],
+            isOtherExpense: _isOtherExpense,
           };
           sumItems.push(item);
         });
     } else {
       const _summary = summary.items;
       _summary.map((e: SumItemsItem) => {
+        const _isOtherExpense = getMasterExpenInto(e.expenseNo)?.isOtherExpense || false;
         const item: SumItemsItem = {
           expenseNo: e.expenseNo,
           approvedAmount: e.approvedAmount,
+          isOtherExpense: _isOtherExpense,
         };
         sumItems.push(item);
       });
@@ -503,22 +517,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setIsOpenModelConfirmExpense(true);
     } else if (status === STATUS.WAITTING_APPROVAL2) {
       const isOver = validateApproveLimit();
-      if (!isOver) {
+      const isFileValidate: boolean = validateFileInfo();
+      if (!isOver && isFileValidate) {
         setShowReason(false);
         setIsOpenModelConfirmExpense(true);
-      } else {
-        const isFileValidate: boolean = validateFileInfo();
-        if (isFileValidate) {
-          setShowReason(false);
-          setIsOpenModelConfirmExpense(true);
-        }
       }
-
-      // if ( && !isFileValidate) {
-      //   setOpenAlert(true);
-      //   setTextError('กรุณาแนบเอกสาร');
-      // } else {
-      // }
     } else if (status === STATUS.WAITTING_ACCOUNTING) {
       let sumApprovalAmount: number = 0;
       const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
@@ -561,33 +564,59 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       let listPayload: payLoadAdd[] = [];
 
       if (_arr && _arr.length > 0) {
+        let sumOther: number = 0;
         const arr = Object.entries(_arr);
         arr
           .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
           .map((e: any, index: number) => {
             const master = getMasterExpenInto(e[0]);
-            const item: payLoadAdd = {
-              id: index,
-              key: e[0],
-              value: e[1],
-              title: master?.accountNameTh !== undefined ? master?.accountNameTh : e[0],
-              isOtherExpense: master?.isOtherExpense,
-            };
-            listPayload.push(item);
+            if (!master?.isOtherExpense) {
+              const item: payLoadAdd = {
+                id: index,
+                key: e[0],
+                value: e[1],
+                title: master?.accountNameTh !== undefined ? master?.accountNameTh : e[0],
+                isOtherExpense: master?.isOtherExpense,
+              };
+              listPayload.push(item);
+            } else {
+              sumOther += e[1];
+            }
           });
+        const item: payLoadAdd = {
+          id: listPayload.length + 1,
+          key: 'SUMOTHER',
+          value: sumOther,
+          title: 'อื่นๆ',
+          isOtherExpense: false,
+        };
+        listPayload.push(item);
       } else {
+        let sumOther: number = 0;
         const _sumItems = summary.items;
         _sumItems.map((entrie: SumItemsItem, index: number) => {
           const master = getMasterExpenInto(entrie.expenseNo);
-          const item: payLoadAdd = {
-            id: index,
-            key: entrie.expenseNo,
-            value: Number(entrie.approvedAmount) || 0,
-            title: master?.accountNameTh !== undefined ? master?.accountNameTh : entrie.expenseNo,
-            isOtherExpense: master?.isOtherExpense,
-          };
-          listPayload.push(item);
+          if (!master?.isOtherExpense) {
+            const item: payLoadAdd = {
+              id: index,
+              key: entrie.expenseNo,
+              value: Number(entrie.approvedAmount) || 0,
+              title: master?.accountNameTh !== undefined ? master?.accountNameTh : entrie.expenseNo,
+              isOtherExpense: master?.isOtherExpense,
+            };
+            listPayload.push(item);
+          } else {
+            sumOther += Number(entrie.approvedAmount) || 0;
+          }
         });
+        const item: payLoadAdd = {
+          id: listPayload.length + 1,
+          key: 'SUMOTHER',
+          value: sumOther,
+          title: 'อื่นๆ',
+          isOtherExpense: false,
+        };
+        listPayload.push(item);
       }
 
       setPayloadModalConfirmDetail(listPayload);
@@ -648,6 +677,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         : status === STATUS.WAITTING_APPROVAL2
         ? approvalAttachFiles
         : [];
+    console.log(isvalid);
+    console.log(existingfileList);
     if (!isvalid && existingfileList.length <= 0) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
@@ -688,7 +719,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     return isRequire;
   };
 
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const getMasterExpenInto = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === expenseType && e.isActive);
   const isOtherExpenseField = (key: any) => {
     const master = getMasterExpenInto(key);
     return master?.isOtherExpense;
@@ -790,69 +822,86 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   let rows: any[] = [];
   if (getInit()) {
     if (entries && entries.length > 0) {
-      entries.map((entrie: SumItemsItem, i: number) => {
-        infosWithDraw = {
-          ...infosWithDraw,
-          id: 1,
-          description: 'ยอดเงินเบิก',
-          [entrie.expenseNo]: entrie?.withdrawAmount,
-        };
-        if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
-          totalWithDraw += Number(entrie?.withdrawAmount);
-        }
-
-        if (status === STATUS.WAITTING_ACCOUNTING) {
-          infosApprove = {
-            ...infosApprove,
-            id: 2,
-            description: 'ยอดเงินอนุมัติ',
+      entries
+        .filter((entrie: SumItemsItem) => !isFilterOutFieldInAdd(entrie.expenseNo))
+        .map((entrie: SumItemsItem, i: number) => {
+          infosWithDraw = {
+            ...infosWithDraw,
+            id: 1,
+            description: 'ยอดเงินเบิก',
             [entrie.expenseNo]: entrie?.withdrawAmount,
           };
-          totalApprove += Number(entrie?.withdrawAmount);
-          infoDiff = {
-            ...infoDiff,
-            id: 3,
-            description: 'ผลต่าง',
-            [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.withdrawAmount) || 0),
-          };
-        } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
-          infosApprove = {
-            ...infosApprove,
-            id: 2,
-            description: 'ยอดเงินอนุมัติ',
-            [entrie.expenseNo]: '',
-          };
-          totalApprove += Number(entrie?.approvedAmount) || 0;
-          infoDiff = {
-            ...infoDiff,
-            id: 3,
-            description: 'ผลต่าง',
-            [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0),
-          };
-        } else {
-          infosApprove = {
-            ...infosApprove,
-            id: 2,
-            description: 'ยอดเงินอนุมัติ',
-            [entrie.expenseNo]: Number(entrie?.approvedAmount) || 0,
-          };
-          totalApprove += Number(entrie?.approvedAmount) || 0;
-          const diff = (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0);
-          infoDiff = {
-            ...infoDiff,
-            id: 3,
-            description: 'ผลต่าง',
-            [entrie.expenseNo]: diff > 0 ? `+${diff}` : diff,
-          };
-        }
+          // if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
+          totalWithDraw += Number(entrie?.withdrawAmount);
+          // }
 
-        const master = getMasterExpenInto(entrie.expenseNo);
-        const _isOtherExpense = master ? master.isOtherExpense : false;
-        if (_isOtherExpense) {
-          totalOtherWithDraw += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
-          totalOtherApprove += entrie?.approvedAmount === undefined ? 0 : entrie?.approvedAmount;
-        }
-      });
+          if (status === STATUS.WAITTING_ACCOUNTING) {
+            infosApprove = {
+              ...infosApprove,
+              id: 2,
+              description: 'ยอดเงินอนุมัติ',
+              [entrie.expenseNo]: entrie?.withdrawAmount,
+            };
+            // if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
+            totalApprove += Number(entrie?.withdrawAmount);
+            // }
+            infoDiff = {
+              ...infoDiff,
+              id: 3,
+              description: 'ผลต่าง',
+              [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.withdrawAmount) || 0),
+            };
+            const master = getMasterExpenInto(entrie.expenseNo);
+            const _isOtherExpense = master ? master.isOtherExpense : false;
+            if (_isOtherExpense) {
+              totalOtherWithDraw += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
+              totalOtherApprove += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
+            }
+          } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
+            infosApprove = {
+              ...infosApprove,
+              id: 2,
+              description: 'ยอดเงินอนุมัติ',
+              [entrie.expenseNo]: '',
+            };
+            // if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
+            totalApprove += Number(entrie?.approvedAmount) || 0;
+            // }
+            infoDiff = {
+              ...infoDiff,
+              id: 3,
+              description: 'ผลต่าง',
+              [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0),
+            };
+            const master = getMasterExpenInto(entrie.expenseNo);
+            const _isOtherExpense = master ? master.isOtherExpense : false;
+            if (_isOtherExpense) {
+              totalOtherWithDraw += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
+              totalOtherApprove += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
+            }
+          } else {
+            infosApprove = {
+              ...infosApprove,
+              id: 2,
+              description: 'ยอดเงินอนุมัติ',
+              [entrie.expenseNo]: Number(entrie?.approvedAmount) || 0,
+            };
+            totalApprove += Number(entrie?.approvedAmount) || 0;
+            const diff = (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0);
+            infoDiff = {
+              ...infoDiff,
+              id: 3,
+              description: 'ผลต่าง',
+              [entrie.expenseNo]: diff > 0 ? `+${diff}` : diff,
+            };
+            const master = getMasterExpenInto(entrie.expenseNo);
+            const _isOtherExpense = master ? master.isOtherExpense : false;
+            if (_isOtherExpense) {
+              totalOtherWithDraw += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
+              totalOtherApprove += entrie?.approvedAmount === undefined ? 0 : entrie?.approvedAmount;
+            }
+          }
+        });
       totalDiff = Number(totalWithDraw) - Number(totalApprove);
       totalOtherDiff = Number(totalOtherWithDraw) - Number(totalOtherApprove);
 
@@ -860,7 +909,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         rows = [{ ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw }];
       } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
         rows = [
-          { ...infosWithDraw, total: totalWithDraw },
+          { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
           { ...infosApprove, SUMOTHER: '', total: '' },
         ];
       } else if (status === STATUS.WAITTING_ACCOUNTING) {
@@ -1087,7 +1136,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               /> */}
               <AccordionUploadSingleFile
                 files={attachFiles}
-                disabledControl={!((status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) && isGroupBranch)}
+                disabledControl={!((status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) && isGroupBranch())}
               />
             </Grid>
             <Grid item xs={1}>
