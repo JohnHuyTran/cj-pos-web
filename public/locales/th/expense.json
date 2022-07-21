@@ -13,5 +13,8 @@
     "COFFEE": "ค่าใช้จ่ายร้านกาแฟ",
     "STOREFRONT": "ค่าใช้จ่ายหน้าร้าน"
   },
-  "documentSearch": "ค่าใช้จ่าย"
+  "title": {
+    "documentSearch": "ค่าใช้จ่าย",
+    "closeSaleShift": "ปิดรหัสการขาย"
+  }
 }

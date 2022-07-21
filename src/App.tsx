@@ -31,6 +31,7 @@ import TORawMasterial from './pages/transfer-out-raw-masterial/transfer-out-raw-
 import Expense from './pages/accounting/expense';
 import { featchMasterExpenseListAsync } from './store/slices/master/expense-list-slice';
 import { featchExpenseDetailAsync } from './store/slices/accounting/accounting-slice';
+import CloseSaleShift from './pages/accounting/close-saleshift';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -110,6 +111,7 @@ export default function App2() {
           <Route path='/create-purchase-branch' component={CreatePurchaseBranch} />
           <Route path='/product-master' component={ProductMaster} />
           <Route path='/expense' component={Expense} />
+          <Route path='/close-saleshift' component={CloseSaleShift} />
         </Switch>
       </Main>
     </Box>
