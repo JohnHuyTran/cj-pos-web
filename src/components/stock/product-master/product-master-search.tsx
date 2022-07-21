@@ -13,7 +13,7 @@ import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import { isGroupBranch } from '../../../utils/role-permission';
 import TitleHeader from '../../title-header';
 import ProductListItems from './product-list-item';
-import { getProductMaster } from '../../../services/product-master';
+import { getProductMaster,searchProductItem } from '../../../services/product-master';
 import LoadingModal from '../../commons/ui/loading-modal';
 import HtmlTooltip from '../../commons/ui/html-tooltip';
 import AlertError from '../../commons/ui/alert-error';
@@ -121,7 +121,6 @@ function ProductMasterSearch() {
         setShowdData(false);
         setShowNonData(true);
       } else {
-        console.log('err: ', error);
         setTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
         setOpenAlert(true);
         setShowdData(false);
@@ -131,7 +130,7 @@ function ProductMasterSearch() {
   };
 
   const onChangeScanProduct = (e: any) => {
-    handleDebounceFn(e.target.value);
+      handleDebounceFn(e);
   };
 
   const handleDebounceFn = debounce(async (valueInput: any) => {
@@ -139,42 +138,29 @@ function ProductMasterSearch() {
       let currentValue = valueInput.trim();
       if (currentValue) {
         try {
-          let barcode = currentValue.slice(9, currentValue.length);
-          let dataTableHandle = _.cloneDeep(listBarcode);
-          let dataObj = dataTableHandle.find((it: any) => it.barcode === barcode);
           if (valueInput) {
-            setOpenLoadingModal(true);
-            const rs1 = await getProductMaster(valueInput, values.branch);
-            const rs = await getProductMaster(rs1.data.skuCode, values.branch);
-            if (!!rs && rs.code == 20000) {
-              setSkuValue(rs.data.sku);
-              setlistBarCode(rs.data.barcodes);
-              setShowdData(true);
-              setShowNonData(false);
-            } else {
-              setShowdData(false);
-              setTextError('Invalid Product Name, Product Code or SKU Product');
-              setOpenAlert(true);
+            // setOpenLoadingModal(true);
+            const rs1 = await searchProductItem(valueInput);
+            if(!!rs1 && rs1.code == 20000){
+              const rs = await getProductMaster(rs1.data[0].skuCode, values.branch);
+              if (!!rs && rs.code == 20000) {
+                setSkuValue(rs.data.sku);
+                setlistBarCode(rs.data.barcodes);
+                setShowdData(true);
+                setShowNonData(false);
+              } else {
+                setShowdData(false);
+                setTextError('Invalid Product Name, Product Code or SKU Product');
+                setOpenAlert(true);
+              }
             }
           } else {
             setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
             setOpenAlert(true);
           }
-          if (objectNullOrEmpty(dataObj)) {
-            // showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
-          } else {
-            // if (dataObj.numberOfRequested === dataObj.numberOfDiscounted) {
-            //   showModalError('จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก');
-            // } else {
-            //   dataObj.numberOfRequested = dataObj.numberOfRequested + 1;
-            //   setDataTable(dataTableHandle);
-            // }
-          }
         } catch (e) {
-          // showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
         }
       } else {
-        // showModalError('บาร์โค้ดส่วนลดไม่ถูกต้อง โปรดสแกนใหม่');
       }
     }
   }, 500);
@@ -222,7 +208,7 @@ function ProductMasterSearch() {
             isClear={isClear}
             onSelectItem={handleChangeProduct}
             onChange={onChangeScanProduct}
-            onKeyPress={onChangeScanProduct}
+            onKeyDown={onChangeScanProduct}
           />
         </Grid>
         <Grid item xs={4} mt={3} sx={{ display: 'flex' }}>

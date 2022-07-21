@@ -10,10 +10,10 @@ interface Props {
   isClear: boolean;
   disable: boolean;
   onChange: (e: any) => void;
-  onKeyPress:(value: any) => void;
+  onKeyDown: (value: any) => void;
 }
 
-function TextBoxSearchProduct({ onSelectItem, isClear, disable, onChange, onKeyPress }: Props) {
+function TextBoxSearchProduct({ onSelectItem, isClear, disable, onChange, onKeyDown }: Props) {
   const classes = useStyles();
   const [value, setValue] = React.useState('');
   const [loading, setLoading] = React.useState(false);
@@ -30,8 +30,8 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable, onChange, onKeyP
     return (
       <li {...props} key={option.barcode + option.skuCode}>
         <div>
-          <Typography variant="body2">{option.barcodeName}</Typography>
-          <Typography color="textSecondary" variant="caption">
+          <Typography variant='body2'>{option.barcodeName}</Typography>
+          <Typography color='textSecondary' variant='caption'>
             {option.barcode} / {option.skuCode}
           </Typography>
         </div>
@@ -39,26 +39,38 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable, onChange, onKeyP
     );
   };
 
-  const autocompleteRenderInput = (params: any) => {
-    return (
-      <TextField
-        {...params}
-        InputProps={{
-          ...params.InputProps,
-          endAdornment: (
-            <React.Fragment>
-              {loading ? <CircularProgress color="inherit" size={20} /> : null}
-              {params.InputProps.endAdornment}
-            </React.Fragment>
-          ),
-        }}
-        placeholder="รหัสสินค้า/ชื่อสินค้า/บาร์โค้ด"
-        className={classes.MtextField}
-        variant="outlined"
-        size="small"
-        fullWidth
-      />
-    );
+  // const autocompleteRenderInput = (params: any) => {
+  //   return (
+  //     <TextField
+  //       {...params}
+  //       InputProps={{
+  //         ...params.InputProps,
+  //         params.InputProps.onKeyPress = handleKeyPress,
+  //         endAdornment: (
+  //           <React.Fragment>
+  //             {loading ? <CircularProgress color="inherit" size={20} /> : null}
+  //             {params.InputProps.endAdornment}
+  //           </React.Fragment>
+  //         ),
+  //       }}
+  //       placeholder="รหัสสินค้า/ชื่อสินค้า/บาร์โค้ด"
+  //       className={classes.MtextField}
+  //       variant="outlined"
+  //       size="small"
+  //       fullWidth
+  //     />
+  //   );
+  // };
+
+  const handleKeyDown = (event: any) => {
+    if (event.code === 'Enter') {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.target.value.length > 0) {
+        setValue(event.target.value);
+        onKeyDown(value);
+      }
+    }
   };
 
   const handleChangeItem = async (event: any, option: any, reason: string) => {
@@ -73,8 +85,7 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable, onChange, onKeyP
   const debouncedSearch = debounce(async function (event: any, value: string, reason: string) {
     if (event && event.keyCode && event.keyCode === 13) {
       setValue(value);
-    }
-    else{
+    } else {
       const keyword = value.trim();
       if (keyword.length >= 3 && reason !== 'reset') {
         setLoading(true);
@@ -100,13 +111,13 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable, onChange, onKeyP
 
   return (
     <Autocomplete
-      id="selAddItem"
-      popupIcon={<SearchIcon color="primary" />}
+      id='selAddItem'
+      popupIcon={<SearchIcon color='primary' />}
       value={value}
       fullWidth
       // freeSolo
       disabled={disable}
-      loadingText="กำลังโหลด..."
+      loadingText='กำลังโหลด...'
       loading={loading}
       options={options}
       filterOptions={filterOptions}
@@ -115,10 +126,31 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable, onChange, onKeyP
       onInputChange={onInputChange}
       getOptionLabel={(option) => (option.barcodeName ? option.barcodeName : '')}
       isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
-      renderInput={autocompleteRenderInput}
-      size="small"
+      renderInput={(params: any) => {
+        params.inputProps.onKeyDown = handleKeyDown;
+        return (
+          <TextField
+            {...params}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <React.Fragment>
+                  {loading ? <CircularProgress color='inherit' size={20} /> : null}
+                  {params.InputProps.endAdornment}
+                </React.Fragment>
+              ),
+            }}
+            placeholder='รหัสสินค้า/ชื่อสินค้า/บาร์โค้ด'
+            className={classes.MtextField}
+            variant='outlined'
+            size='small'
+            fullWidth
+          />
+        );
+      }}
+      size='small'
       className={classes.Mautocomplete}
-      noOptionsText=""
+      noOptionsText=''
     />
   );
 }
