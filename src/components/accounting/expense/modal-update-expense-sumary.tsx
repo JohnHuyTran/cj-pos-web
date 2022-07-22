@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { ExpenseInfo, payLoadAdd } from '../../../models/branch-accounting-model';
-import { addSummaryItem } from '../../../store/slices/accounting/accounting-slice';
+import { addSummaryItem, haveUpdateData } from '../../../store/slices/accounting/accounting-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
 import { isFilterFieldInExpense, isFilterOutFieldInAdd, stringNullOrEmpty } from '../../../utils/utils';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
@@ -50,6 +50,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
     console.log('data', data);
     if (sum > 0) {
       await dispatch(addSummaryItem(data));
+      await dispatch(haveUpdateData(true));
       setTimeout(() => {
         onClose();
       }, 300);
