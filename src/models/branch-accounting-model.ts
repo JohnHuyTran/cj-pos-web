@@ -211,3 +211,41 @@ export interface ExpensePeriod {
   startDate: string;
   endDate: string;
 }
+
+// Search config request
+export interface ExpenseSearchCofigRequest {
+  limit: string;
+  page: string;
+  sortBy?: string;
+  sortDirection?: string;
+  type: string;
+  isActive?: string | boolean;
+}
+
+export interface ExpenseSearchCofigResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: ExpenseSearchConfigInfo[];
+  total: number;
+  page: number;
+  perPage: number;
+  prev: number;
+  next: number;
+  totalPage: number;
+}
+
+export interface ExpenseSearchConfigInfo {
+  typeCode: string;
+  typeNameTh: string;
+  expenseNo: string;
+  accountCode: string;
+  accountNameTh: string;
+  skuCode: string;
+  skuName: string;
+  approvalLimit1: number;
+  approvalLimit2: number;
+  isActive: boolean;
+  isOtherExpense: boolean;
+}
