@@ -557,6 +557,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         title: 'ผลต่าง',
       };
       let listPayload: payLoadAdd[] = [item1, item2, item3];
+
       setPayloadModalConfirmDetail(listPayload);
       setOpenModelConfirm(true);
     } else if (status === STATUS.WAITTING_APPROVAL3) {
@@ -594,21 +595,23 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       } else {
         let sumOther: number = 0;
         const _sumItems = summary.items;
-        _sumItems.map((entrie: SumItemsItem, index: number) => {
-          const master = getMasterExpenInto(entrie.expenseNo);
-          if (!master?.isOtherExpense) {
-            const item: payLoadAdd = {
-              id: index,
-              key: entrie.expenseNo,
-              value: Number(entrie.approvedAmount) || 0,
-              title: master?.accountNameTh !== undefined ? master?.accountNameTh : entrie.expenseNo,
-              isOtherExpense: master?.isOtherExpense,
-            };
-            listPayload.push(item);
-          } else {
-            sumOther += Number(entrie.approvedAmount) || 0;
-          }
-        });
+        _sumItems
+          .filter((entrie: SumItemsItem) => !isFilterOutFieldInAdd(entrie.expenseNo))
+          .map((entrie: SumItemsItem, index: number) => {
+            const master = getMasterExpenInto(entrie.expenseNo);
+            if (!master?.isOtherExpense) {
+              const item: payLoadAdd = {
+                id: index,
+                key: entrie.expenseNo,
+                value: Number(entrie.approvedAmount) || 0,
+                title: master?.accountNameTh !== undefined ? master?.accountNameTh : entrie.expenseNo,
+                isOtherExpense: master?.isOtherExpense,
+              };
+              listPayload.push(item);
+            } else {
+              sumOther += Number(entrie.approvedAmount) || 0;
+            }
+          });
         const item: payLoadAdd = {
           id: listPayload.length + 1,
           key: 'SUMOTHER',
@@ -618,7 +621,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         };
         listPayload.push(item);
       }
-
       setPayloadModalConfirmDetail(listPayload);
       setOpenModelConfirm(true);
     }
@@ -677,8 +679,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         : status === STATUS.WAITTING_APPROVAL2
         ? approvalAttachFiles
         : [];
-    console.log(isvalid);
-    console.log(existingfileList);
     if (!isvalid && existingfileList.length <= 0) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
