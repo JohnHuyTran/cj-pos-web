@@ -664,7 +664,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       } else if (status === STATUS.WAITTING_ACCOUNTING) {
         onApproveByAccount();
       } else if (status === STATUS.WAITTING_APPROVAL3) {
-        onApproveByAccountManager(value.startDate, value.endDate);
+        onApproveByAccountManager(value.period.startDate, value.period.endDate);
       }
     } else {
       if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {

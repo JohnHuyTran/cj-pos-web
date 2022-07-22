@@ -8,7 +8,7 @@ import { useStyles } from '../../../../styles/makeTheme';
 import { ExpenseInfo, ExpensePeriod } from '../../../../models/branch-accounting-model';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useAppSelector } from '../../../../store/store';
-import { isFilterFieldInExpense } from '../../../../utils/utils';
+import { addTwoDecimalPlaces, isFilterFieldInExpense, stringNullOrEmpty } from '../../../../utils/utils';
 import { Box, DialogContentText, TextField, Typography } from '@mui/material';
 import { convertUtcToBkkDate } from '../../../../utils/date-utill';
 import NumberFormat from 'react-number-format';
@@ -52,6 +52,10 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
 
   const columns = columnsList ? columnsList : [];
   const rows = rowList ? rowList : [];
+  const frontColor = (value: any) => {
+    const _value = stringNullOrEmpty(value) ? '' : value.toString();
+    return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
+  };
 
   useEffect(() => {
     if (payload) {
@@ -72,17 +76,44 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
 
       const columns: GridColDef[] = payload.map((i: any) => {
         const hideColumn = i.isOtherExpense ? i.isOtherExpense : false;
-        return {
-          field: i.key,
-          headerName: i.title,
-          minWidth: 120,
-          flex: 0.6,
-          headerAlign: 'center',
-          align: 'right',
-          sortable: false,
-          hide: hideColumn,
-          renderCell: (params: GridRenderCellParams) => {
-            if (isFilterFieldInExpense(params.field)) {
+
+        console.log('i.key :', i.key);
+        if (String(i.key) === 'diff') {
+          console.log('xxxxx i.key :', i.key);
+
+          return {
+            field: i.key,
+            headerName: i.title,
+            minWidth: 120,
+            flex: 0.6,
+            headerAlign: 'center',
+            align: 'right',
+            sortable: false,
+            hide: hideColumn,
+            renderCell: (params: GridRenderCellParams) => {
+              if (Number(params.value) > 0) {
+                return (
+                  <label style={{ color: '#446EF2', fontWeight: 700 }}> +{addTwoDecimalPlaces(params.value)} </label>
+                );
+              } else if (Number(params.value) < 0) {
+                return (
+                  <label style={{ color: '#F54949', fontWeight: 700 }}> {addTwoDecimalPlaces(params.value)} </label>
+                );
+              }
+              return addTwoDecimalPlaces(params.value);
+            },
+          };
+        } else {
+          return {
+            field: i.key,
+            headerName: i.title,
+            minWidth: 120,
+            flex: 0.6,
+            headerAlign: 'center',
+            align: 'right',
+            sortable: false,
+            hide: hideColumn,
+            renderCell: (params: GridRenderCellParams) => {
               return (
                 <NumberFormat
                   value={String(params.value)}
@@ -91,12 +122,24 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
                   className={classes.MtextFieldNumber}
                   disabled={true}
                   customInput={TextField}
+                  sx={{
+                    '.MuiInputBase-input.Mui-disabled': {
+                      WebkitTextFillColor: '#000',
+                    },
+                    '.MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '.MuiInputBase-input-MuiOutlinedInput-input': {
+                      textAlign: 'right',
+                    },
+                  }}
                   fixedDecimalScale
+                  type='text'
                 />
               );
-            }
-          },
-        };
+            },
+          };
+        }
       });
 
       setColumnsList(columns);
@@ -147,7 +190,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
           </div>
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', m: 5, mr: 5, ml: 5 }}>
+        <DialogActions sx={{ justifyContent: 'center', mb: 2, mr: 5, ml: 5 }}>
           <Button
             id='btnCancle'
             variant='contained'
