@@ -60,6 +60,7 @@ interface FormSelectProps {
   setValue: (value: any) => void;
   defaultValue?: string;
   isValidate?: boolean;
+  isRequest?: boolean;
   isDisabled?: boolean;
 }
 
@@ -144,7 +145,7 @@ export default function SearchExpense() {
   useEffect(() => {
     // Select งวดเบิก
     if (isAccountRole || isAccountManagerRole) {
-      if (search.type === 'COFFEE') {
+      if (search.type === 'STOREFRONT') {
         // ถ้าเป็นค่าใช้จ่ายหน้าร้าน
         setSearch({ ...search, period: '1' });
         setexpensePeriodList([{ key: '1', text: 'รายเดือน' }]);
@@ -345,6 +346,7 @@ export default function SearchExpense() {
         <Grid item md={4} sm={4} xs={6}>
           <FormSelect
             title='ประเภท'
+            isRequest
             dataList={expenseTypes}
             value={search.type}
             isDisabled={isOpenLoading}
@@ -370,7 +372,6 @@ export default function SearchExpense() {
             title='สถานะ'
             dataList={expenseStatusList}
             value={search.status}
-            isValidate={isValidate}
             isDisabled={isOpenLoading}
             setValue={(e) => setSearch({ ...search, status: e.target.value })}
           />
@@ -389,10 +390,11 @@ export default function SearchExpense() {
           <Grid item md={4} sm={4} xs={6}>
             <FormSelect
               title='งวดเบิก'
+              isRequest
               dataList={expensePeriodList}
               value={search.period}
-              isValidate={isValidate}
-              isDisabled={isOpenLoading}
+              isValidate={(isValidate && search.type !== '')}
+              isDisabled={isOpenLoading || !search.type}
               setValue={(e) => setSearch({ ...search, period: e.target.value })}
             />
           </Grid>
@@ -543,12 +545,12 @@ export default function SearchExpense() {
   );
 }
 
-const FormSelect = ({ title, value, setValue, dataList, isValidate, isDisabled }: FormSelectProps) => {
+const FormSelect = ({ title, value, setValue, dataList, isValidate, isRequest, isDisabled }: FormSelectProps) => {
   const classes = useStyles();
   return (
     <Fragment>
       <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-        {title}
+        {title} { isRequest && (<Typography component='span' color="red">*</Typography>)}
       </Typography>
       <FormControl id='SearchType' className={classes.Mselect} fullWidth error={value === '' && isValidate}>
         <Select

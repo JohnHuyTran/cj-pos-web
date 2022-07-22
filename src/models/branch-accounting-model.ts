@@ -110,6 +110,7 @@ export interface SumItemsItem {
   expenseNo: string;
   withdrawAmount?: number;
   approvedAmount?: number;
+  isOtherExpense: boolean;
 }
 export interface Comment {
   username: string;

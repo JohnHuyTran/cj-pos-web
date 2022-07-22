@@ -1,6 +1,7 @@
 import { Box, TextField, Typography } from '@mui/material';
 import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridRowData } from '@mui/x-data-grid';
 import React, { useEffect } from 'react';
+import NumberFormat from 'react-number-format';
 import { isNullOrUndefined } from 'util';
 import {
   DataItem,
@@ -19,7 +20,7 @@ import {
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { STATUS } from '../../../utils/enum/accounting-enum';
-import { isFilterFieldInExpense, stringNullOrEmpty } from '../../../utils/utils';
+import { isFilterFieldInExpense, stringNullOrEmpty, isFilterOutFieldInAdd } from '../../../utils/utils';
 import HtmlTooltip from '../../commons/ui/html-tooltip';
 import ModalAddExpense from './modal-add-expense';
 interface Props {
@@ -45,11 +46,10 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   const [items, setItems] = React.useState<any>(_initialItems && _initialItems.length > 0 ? _initialItems : []);
   const [actionEdit, setActionEdit] = React.useState(false);
   const payloadNewItem = useAppSelector((state) => state.expenseAccountDetailSlice.addNewItem);
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const getMasterExpenInto = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type && e.isActive);
   const [expenseType, setExpenseType] = React.useState('');
   const [period, setPeriod] = React.useState<ExpensePeriod>();
-  const [otherMaxApprove1, setOtherMaxApprove1] = React.useState(0);
-  const [otherMaxApprove2, setOtherMaxApprove2] = React.useState(0);
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     const master = getMasterExpenInto(i.expenseNo);
     const hideColumn = master ? master.isOtherExpense : false;
@@ -85,9 +85,20 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
             return (
-              <Box component='div' sx={{ paddingRight: '5px' }}>
-                {params.value}
-              </Box>
+              <NumberFormat
+                value={String(params.value)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                disabled={true}
+                customInput={TextField}
+                sx={{
+                  '.MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: '#000',
+                  },
+                }}
+                fixedDecimalScale
+              />
             );
           }
         },
@@ -99,6 +110,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
         // minWidth: 70,
         flex: 1,
         headerAlign: 'center',
+        align: 'left',
         sortable: false,
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
@@ -106,9 +118,9 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
             <>
               <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
                 <TextField
-                  variant='outlined'
+                  className={classes.MtextFieldNumber}
                   name={`txb${i.expenseNo}`}
-                  inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+                  inputProps={{ style: { textAlignLast: 'left', color: '#000000' } }}
                   sx={{
                     '.MuiInputBase-input.Mui-disabled': {
                       WebkitTextFillColor: '#000',
@@ -134,20 +146,33 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
         sortable: false,
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
-          const master = getMasterExpenInto(params.field);
-
+          const otherMaxApprove1 = params.getValue(params.id, 'isOverApprovalLimit1');
+          const otherMaxApprove2 = params.getValue(params.id, 'isOverApprovalLimit2');
           const value = params.value || 0;
-          const condition =
-            value > Number(otherMaxApprove2)
-              ? 'overLimit2'
-              : value > Number(otherMaxApprove1)
-              ? 'overLimit1'
-              : 'normal';
+          const condition = otherMaxApprove2 ? 'overLimit2' : otherMaxApprove1 ? 'overLimit1' : 'normal';
           return (
-            <TextField
-              variant='outlined'
-              name={`txb${i.expenseNo}`}
-              inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+            // <TextField
+            //   variant='outlined'
+            //   name={`txb${i.expenseNo}`}
+            //   inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+            //   sx={{
+            //     '.MuiInputBase-input.Mui-disabled': {
+            //       WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
+            //       background: condition === 'overLimit2' ? '#F54949' : '',
+            //       borderRadius: 'inherit',
+            //     },
+            //   }}
+            //   value={params.value}
+            //   disabled={true}
+            //   autoComplete='off'
+            // />
+            <NumberFormat
+              value={String(params.value)}
+              thousandSeparator={true}
+              decimalScale={2}
+              className={classes.MtextFieldNumber}
+              disabled={true}
+              customInput={TextField}
               sx={{
                 '.MuiInputBase-input.Mui-disabled': {
                   WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
@@ -155,9 +180,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
                   borderRadius: 'inherit',
                 },
               }}
-              value={params.value}
-              disabled={true}
-              autoComplete='off'
+              fixedDecimalScale
             />
           );
         },
@@ -189,10 +212,28 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
                 ? 'overLimit1'
                 : 'normal';
             return (
-              <TextField
-                variant='outlined'
-                name={`txb${i.expenseNo}`}
-                inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+              // <TextField
+              //   variant='outlined'
+              //   name={`txb${i.expenseNo}`}
+              //   inputProps={{ style: { textAlign: 'right', color: '#000000' } }}
+              //   sx={{
+              //     '.MuiInputBase-input.Mui-disabled': {
+              //       WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
+              //       background: condition === 'overLimit2' ? '#F54949' : '',
+              //       borderRadius: 'inherit',
+              //     },
+              //   }}
+              //   value={params.value}
+              //   disabled={true}
+              //   autoComplete='off'
+              // />
+              <NumberFormat
+                value={String(params.value)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                disabled={true}
+                customInput={TextField}
                 sx={{
                   '.MuiInputBase-input.Mui-disabled': {
                     WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
@@ -200,9 +241,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
                     borderRadius: 'inherit',
                   },
                 }}
-                value={params.value}
-                disabled={true}
-                autoComplete='off'
+                fixedDecimalScale
               />
             );
           }
@@ -212,15 +251,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   });
   useEffect(() => {
     setExpenseType(type);
-    const maxApproveLimit1Other: ExpenseInfo = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
-      return o.typeCode === type && o.isOtherExpense && o.approvalLimit1;
-    });
-
-    const maxApproveLimit2Other = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
-      return o.typeCode === type && o.isOtherExpense && o.approvalLimit2;
-    });
-    setOtherMaxApprove1(maxApproveLimit1Other.approvalLimit1);
-    setOtherMaxApprove2(maxApproveLimit2Other.approvalLimit2);
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
       accountNameTh: 'วันที่ค่าใช่จ่าย',
@@ -311,15 +341,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   React.useEffect(() => {
     setPeriod(periodProps);
     setExpenseType(type);
-    const maxApproveLimit1Other: ExpenseInfo = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
-      return o.typeCode === type && o.isOtherExpense && o.approvalLimit1;
-    });
-
-    const maxApproveLimit2Other = _.minBy(expenseMasterList, function (o: ExpenseInfo) {
-      return o.typeCode === type && o.isOtherExpense && o.approvalLimit2;
-    });
-    setOtherMaxApprove1(maxApproveLimit1Other.approvalLimit1);
-    setOtherMaxApprove2(maxApproveLimit2Other.approvalLimit2);
   }, [periodProps]);
 
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -343,7 +364,19 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
         setItems([_newItem]);
         _item = [..._item, _newItem];
       }
-      await dispatch(updateItemRows(_item));
+
+      const sortData = _.orderBy(
+        _item,
+        [
+          function (object: any) {
+            return new Date(object.dateTime);
+          },
+        ],
+        ['asc']
+      );
+      setItems(sortData);
+
+      await dispatch(updateItemRows(sortData));
       await dispatch(addNewItem(null));
       summaryRow(_item);
       // await dispatch(updateSummaryRows([]));
@@ -368,26 +401,17 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
           [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
         };
         const sum = _.sumBy(_item, entrie.expenseNo);
-        totalWithDraw += stringNullOrEmpty(sum) ? 0 : sum;
-        // infosApprove = {
-        //   ...infosApprove,
-        //   id: 2,
-        //   description: 'ยอดเงินอนุมัติ',
-        //   [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
-        // };
-        // totalApprove += _.sumBy(_item, (o: any) => {
-        //   return 1;
-        // });
+        if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
+          totalWithDraw += stringNullOrEmpty(sum) ? 0 : sum;
+        }
+
         const master = getMasterExpenInto(entrie.expenseNo);
         const _isOtherExpense = master ? master.isOtherExpense : false;
         if (_isOtherExpense) {
           _otherSum += stringNullOrEmpty(sum) ? 0 : sum;
         }
       });
-      rows = [
-        { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw, SUMOTHER: _otherSum },
-        // { ...infosApprove, total: totalApprove },
-      ];
+      rows = [{ ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw, SUMOTHER: _otherSum }];
       dispatch(updateSummaryRows(rows));
     } else {
       totalWithDraw = 0;
@@ -423,14 +447,6 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
       ];
       dispatch(updateSummaryRows(rows));
     }
-  };
-
-  const sum = (item: any) => {
-    const result = item.reduce(function (s: any, o: any) {
-      return o ? s : s + o;
-    }, 0);
-
-    return result;
   };
 
   useEffect(() => {

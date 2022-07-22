@@ -4,9 +4,10 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
 interface Props {
-  fieldName: string;
+  fieldName: any;
   defaultValue: string;
   maxLength: number;
+  maxWidth?: string | number;
   onChangeComment: (value: string) => void;
   isDisable: boolean;
   rowDisplay?: number;
@@ -17,6 +18,7 @@ function TextBoxComment({
   fieldName,
   defaultValue,
   maxLength,
+  maxWidth = 350,
   isDisable,
   onChangeComment,
   rowDisplay,
@@ -25,7 +27,7 @@ function TextBoxComment({
 }: Props): ReactElement {
   const classes = useStyles();
   const [characterCount, setCharacterCount] = React.useState(0);
-  const [comment, setComment] = React.useState(defaultValue);
+  // const [comment, setComment] = React.useState(defaultValue);
 
   useEffect(() => {
     if (defaultValue !== '' && defaultValue !== undefined) setCharacterCount(defaultValue.length);
@@ -43,7 +45,7 @@ function TextBoxComment({
 
   return (
     <>
-      <Typography variant='body2'>{fieldName}</Typography>
+      <Typography variant='body2' sx={{mb: '5px'}}>{fieldName}</Typography>
       <TextField
         data-testid='form-field-tbxComment'
         id='tbxComment'
@@ -56,7 +58,7 @@ function TextBoxComment({
         placeholder={`ความยาวไม่เกิน ${maxLength} ตัวอักษร`}
         className={classes.MtextFieldRemark}
         inputProps={{ maxLength: maxLength }}
-        sx={{ maxWidth: 350 }}
+        sx={{ maxWidth: maxWidth }}
         disabled={isDisable}
         helperText={isError === true ? hypterText : ' '}
         error={isError}
@@ -68,9 +70,10 @@ function TextBoxComment({
           fontSize: '11px',
           color: '#AEAEAE',
           width: '100%',
-          maxWidth: 350,
+          maxWidth: maxWidth,
           textAlign: 'right',
-          marginTop: '-1.5em',
+          marginTop: '-1.6em',
+          paddingRight: '5px'
         }}>
         {characterCount}/{maxLength}
       </div>

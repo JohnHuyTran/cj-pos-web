@@ -23,13 +23,49 @@ export const expenseTypes = [
 
 export const expenseStatusList = [
   { key: 'ALL', text: 'ทั้งหมด', stepperGrp: 1 },
-  { key: 'DRAFT', text: 'บันทึก', stepperGrp: 1, groupAllow: PERMISSION_GROUP.BRANCH },
-  { key: 'SEND_BACK_EDIT', text: 'ส่งกลับแก้ไข', stepperGrp: 1, groupAllow: PERMISSION_GROUP.BRANCH },
-  { key: 'WAITTING_EDIT_ATTACH_FILE', text: 'รอแก้ไขเอกสาร', stepperGrp: 1, groupAllow: PERMISSION_GROUP.BRANCH },
-  { key: 'WAITTING_APPROVAL1', text: 'รออนุมัติ1', stepperGrp: 2, groupAllow: PERMISSION_GROUP.AREA_MANAGER },
-  { key: 'WAITTING_APPROVAL2', text: 'รออนุมัติ2', stepperGrp: 2, groupAllow: PERMISSION_GROUP.OC },
-  { key: 'WAITTING_ACCOUNTING', text: 'รอบัญชีตรวจสอบ', stepperGrp: 3, groupAllow: PERMISSION_GROUP.ACCOUNTING },
-  { key: 'WAITTING_APPROVAL3', text: 'รออนุมัติ3', stepperGrp: 3, groupAllow: PERMISSION_GROUP.ACCOUNT_MANAGER },
+  { key: 'DRAFT', text: 'บันทึก', stepperGrp: 1, groupAllow: PERMISSION_GROUP.BRANCH, allowShowSummary: false },
+  {
+    key: 'SEND_BACK_EDIT',
+    text: 'ส่งกลับแก้ไข',
+    stepperGrp: 1,
+    groupAllow: PERMISSION_GROUP.BRANCH,
+    allowShowSummary: false,
+  },
+  {
+    key: 'WAITTING_EDIT_ATTACH_FILE',
+    text: 'รอแก้ไขเอกสาร',
+    stepperGrp: 1,
+    groupAllow: PERMISSION_GROUP.BRANCH,
+    allowShowSummary: false,
+  },
+  {
+    key: 'WAITTING_APPROVAL1',
+    text: 'รออนุมัติ1',
+    stepperGrp: 2,
+    groupAllow: PERMISSION_GROUP.AREA_MANAGER,
+    allowShowSummary: false,
+  },
+  {
+    key: 'WAITTING_APPROVAL2',
+    text: 'รออนุมัติ2',
+    stepperGrp: 2,
+    groupAllow: PERMISSION_GROUP.OC,
+    allowShowSummary: false,
+  },
+  {
+    key: 'WAITTING_ACCOUNTING',
+    text: 'รอบัญชีตรวจสอบ',
+    stepperGrp: 3,
+    groupAllow: PERMISSION_GROUP.ACCOUNTING,
+    allowShowSummary: true,
+  },
+  {
+    key: 'WAITTING_APPROVAL3',
+    text: 'รออนุมัติ3',
+    stepperGrp: 3,
+    groupAllow: PERMISSION_GROUP.ACCOUNT_MANAGER,
+    allowShowSummary: true,
+  },
   { key: 'APPROVED', text: 'อนุมัติ', stepperGrp: 4 },
 ];
 
