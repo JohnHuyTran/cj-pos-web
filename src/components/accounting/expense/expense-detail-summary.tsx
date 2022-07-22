@@ -15,7 +15,12 @@ import { updateSummaryRows } from '../../../store/slices/accounting/accounting-s
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { getExpenseStatus, STATUS } from '../../../utils/enum/accounting-enum';
-import { isFilterFieldInExpense, isFilterOutFieldInAdd, stringNullOrEmpty } from '../../../utils/utils';
+import {
+  isFilterFieldInExpense,
+  isFilterOutFieldInAdd,
+  stringNullOrEmpty,
+  stringNumberNullOrEmpty,
+} from '../../../utils/utils';
 import ExpenseDetailTransaction from './expense-detail-transaction';
 import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
 
@@ -66,6 +71,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
+            const _prefix = (params.value || 0) > 0 ? '+' : '';
             return (
               <NumberFormat
                 value={String(params.value)}
@@ -80,7 +86,9 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
                     // color: color,
                   },
                 }}
+                // prefix={_prefix}
                 fixedDecimalScale
+                type='text'
               />
             );
           }
@@ -265,7 +273,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
         const value = Number(element[1]) || 0;
         const withDraw = entries.find((entrie: SumItemsItem, i: number) => entrie.expenseNo === key);
         const withdrawAmount = Number(withDraw?.withdrawAmount);
-        const diff = withdrawAmount - value;
+        const diff = value - withdrawAmount;
         infoDiff = {
           ...infoDiff,
           [key]: diff > 0 ? `+${diff}` : diff,
@@ -281,7 +289,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
       rows = [
         { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw },
         { ...infosApprove, id: 2, description: 'ยอดเงินอนุมัติ', infosApprove },
-        { ...infoDiff, total: Number(totalWithDraw) - Number(totalApprove) },
+        { ...infoDiff, total: Number(totalApprove) - Number(totalWithDraw) },
       ];
       dispatch(updateSummaryRows(rows));
     }

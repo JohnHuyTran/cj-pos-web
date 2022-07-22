@@ -1,9 +1,17 @@
 import { Fragment, useState } from "react";
 import { useStyles } from '../../../styles/makeTheme';
+import { useAppSelector, useAppDispatch } from '../../../store/store';
 
 // Components
 import ModalSettingExpense from './modal-settings-expense';
 import LoadingModal from '../../commons/ui/loading-modal';
+
+// Call API
+import {
+  clearDataSearchBranchAccountingConfig,
+  featchBranchAccountingConfigListAsync,
+} from '../../../store/slices/accounting/accounting-search-config-slice';
+import { ExpenseSearchCofigRequest } from '../../../models/branch-accounting-model';
 
 import { 
   Grid,
@@ -16,6 +24,8 @@ import { AddCircleOutline } from '@mui/icons-material';
 
 export default function SearchReserves () {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
+
   const types = [
     {key: 'ALL', text: 'ทั้งหมด'},
     {key: 'COFFEE', text: 'ค่าใช้จ่ายร้านกาแฟ'},
@@ -23,13 +33,13 @@ export default function SearchReserves () {
   ]
   const statusList = [
     {key: 'ALL', text: 'ทั้งหมด'},
-    {key: 'ENABLE', text: 'ใช้งาน'},
-    {key: 'DISABLE', text: 'ไม่ได้ใช้งาน'}
+    {key: 'true', text: 'ใช้งาน'},
+    {key: 'false', text: 'ไม่ได้ใช้งาน'}
   ]
 
   const initialSearchState = {
     type: 'ALL',
-    status: 'ALL'
+    isActive: 'ALL'
   }
   
   // Set state data
@@ -38,13 +48,28 @@ export default function SearchReserves () {
   const [isOpenLoading, setIsOpenLoading] = useState(false);
 
   // Handle function
-  const handleClearSearch = () => {
+  const handleClearSearch = async () => {
     setSearch(initialSearchState)
+    await dispatch(clearDataSearchBranchAccountingConfig());
     // setIsDisabled(false)
   }
   
-  const handleSearchExpense = () => {
+  const handleSearchExpense = async () => {
     setIsOpenLoading(true)
+    // const isActive = search.status !== 'All' ? search.status : null
+    const payload: ExpenseSearchCofigRequest = {
+      limit: '10',
+      page: '1',
+      ...search
+    }
+
+    await dispatch(featchBranchAccountingConfigListAsync(payload))
+    .then((res) => {
+      setTimeout(() => {
+        setIsOpenLoading(false);
+        const payload: any = res.payload ? res.payload : []
+      }, 300);
+    });
     setTimeout(() => {
       setIsOpenLoading(false)
     }, 500)
@@ -89,9 +114,9 @@ export default function SearchReserves () {
             <Select
               id="Status"
               name="status"
-              value={search.status}
+              value={search.isActive}
               disabled={isOpenLoading}
-              onChange={(e) => setSearch({...search, status: e.target.value})}
+              onChange={(e) => setSearch({...search, isActive: e.target.value})}
               inputProps={{ 'aria-label': 'Without label' }}
             >
               {statusList.map((item, index: number) => (

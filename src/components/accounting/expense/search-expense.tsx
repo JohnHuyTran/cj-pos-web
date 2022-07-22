@@ -34,7 +34,7 @@ import {
   clearDataSearchBranchAccounting,
   featchBranchAccountingListAsync,
 } from '../../../store/slices/accounting/accounting-search-slice';
-import { ExpenseSearchRequest, ExpensePeriod } from '../../../models/branch-accounting-model';
+import { ExpenseSearchRequest, ExpensePeriod, SummarizeRequest } from '../../../models/branch-accounting-model';
 import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
@@ -42,8 +42,8 @@ import {
 import ExpenseSearchList from './expense-search-list';
 import ModelConfirmSearch from './confirm/modal-confirm-search';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
+import { getSummarizeByCriteria, getSummarizeByNo } from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
-
 import AlertError from '../../commons/ui/alert-error';
 import {
   addNewItem,
@@ -193,10 +193,12 @@ export default function SearchExpense() {
       await dispatch(featchBranchAccountingListAsync(payload)).then((res) => {
         setTimeout(() => {
           setIsValidate(false);
-          // setIsOpenLoading(false);
-
           const payload: any = res.payload ? res.payload : [];
-          if (search.status === 'WAITTING_APPROVAL3' && payload.data.length) setFlagBtnApproveAll(!flagBtnApproveAll);
+
+          if (search.status === 'WAITTING_APPROVAL3') {
+            summarizeByCriteria('search');
+            if (payload.data.length > 0) setFlagBtnApproveAll(!flagBtnApproveAll);
+          }
         }, 300);
       });
       await dispatch(saveExpenseSearch(payload));
@@ -207,9 +209,61 @@ export default function SearchExpense() {
 
   const handleExport = () => {};
 
-  const handleApprove = () => {};
+  const [summarizList, setSummarizList] = useState(null);
+  const [summarizTotal, setSummarizTotal] = useState(0);
+  const [summarizTitle, setSummarizTitle] = useState('');
+  const summarizeByCriteria = async (type?: string) => {
+    const payload: SummarizeRequest = {
+      type: search.type,
+      year: search.year,
+      month: search.month,
+      period: +search.period,
+    };
 
-  const handleApproveAll = () => {
+    await getSummarizeByCriteria(payload)
+      .then((value) => {
+        if (Number(value.data.total) > Number(summarizTotal)) {
+          setSummarizTitle(`${value.data.total} สาขา (จำนวนสาขาที่อนุมัติได้ล่าสุด มีการเปลี่ยนแปลง)`);
+        } else {
+          setSummarizTitle(`${value.data.total} สาขา`);
+        }
+
+        setSummarizList(value.data);
+        setSummarizTotal(value.data.total);
+      })
+      .catch((error: ApiError) => {
+        console.log('error:', error);
+      });
+  };
+  const summarizeByNo = async (docNos: any) => {
+    const payload: any = {
+      docNos: docNos,
+    };
+    await getSummarizeByNo(payload)
+      .then((value) => {
+        setSummarizTitle(`${value.data.total} สาขา`);
+        setSummarizList(value.data);
+        setSummarizTotal(value.data.total);
+      })
+      .catch((error: ApiError) => {
+        console.log('error:', error);
+      });
+  };
+
+  const handleApprove = () => {
+    const docNos: any[] = [];
+    selectRowsList.map((item: any) => {
+      docNos.push(item.docNo);
+    });
+
+    console.log('docNos:', docNos);
+
+    summarizeByNo(docNos);
+    handleOpenModelConfirm();
+  };
+
+  const handleApproveAll = async () => {
+    if (search.status === 'WAITTING_APPROVAL3') await summarizeByCriteria();
     handleOpenModelConfirm();
   };
 
@@ -269,7 +323,6 @@ export default function SearchExpense() {
 
   const [selectRowsList, setSelectRowsList] = useState<Array<any>>([]);
   const handleSelectRows = async (list: any) => {
-    console.log('list:', JSON.stringify(list));
     setSelectRowsList(list);
   };
 
@@ -377,9 +430,8 @@ export default function SearchExpense() {
                   id='btnSearch'
                   variant='contained'
                   color='secondary'
-                  // disabled={flagBtnApproveAll}
-                  // onClick={handleApproveAll}
-                  disabled={true}
+                  disabled={flagBtnApproveAll}
+                  onClick={handleApproveAll}
                   sx={{ width: 110 }}
                   className={classes.MbtnSearch}>
                   อนุมัติทั้งหมด
@@ -484,9 +536,9 @@ export default function SearchExpense() {
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
         onConfirm={handleConfirm}
-        startDate='2022-06-16T00:00:00+07:00'
-        endDate='2022-06-30T23:59:59.999999999+07:00'
         items={orderListDatas}
+        summarizTitle={summarizTitle}
+        summarizList={summarizList}
       />
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
     </Fragment>

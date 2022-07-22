@@ -1,4 +1,5 @@
 import { useState, useMemo, Fragment } from 'react';
+import { useAppSelector, useAppDispatch } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import {
   DataGrid,
@@ -34,7 +35,7 @@ const columns: GridColDef[] = [
     )
   },
   {
-    field: 'type',
+    field: 'typeNameTh',
     headerName: 'ประเภท',
     minWidth: 180,
     headerAlign: 'center',
@@ -50,7 +51,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <Box>
-        <Typography variant='body2'>{params.value}</Typography>
+        <Typography variant='body2'>{params.getValue(params.id, 'skuName') || ''}</Typography>
         <Typography color='textSecondary' sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
@@ -58,7 +59,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'bookName',
+    field: 'accountNameTh',
     headerName: 'ชื่อบัญชี',
     minWidth: 140,
     headerAlign: 'center',
@@ -66,7 +67,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'bookNumber',
+    field: 'accountCode',
     headerName: 'รหัสบัญชี',
     minWidth: 140,
     headerAlign: 'center',
@@ -74,7 +75,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'status',
+    field: 'isActive',
     headerName: 'สถานะ',
     minWidth: 120,
     headerAlign: 'center',
@@ -85,15 +86,15 @@ const columns: GridColDef[] = [
            sx={{ 
             margin: 'auto', 
             borderRadius: '8px',
-            color: params.value === 'ใช้งาน' ? '#20AE79' : '#ff0000b0',
-            backgroundColor: params.value === 'ใช้งาน' ? '#93fb9c42' : '#ff000038',
+            color: params.value ? '#20AE79' : '#ff0000b0',
+            backgroundColor: params.value ? '#93fb9c42' : '#ff000038',
             padding: '5px 20px'}}>
-        {params.value}
+        {params.value ? 'ใช้งาน' : 'ไม่ใช้งาน'}
       </Box>
     )
   },
   {
-    field: 'approveLimit1',
+    field: 'approvalLimit1',
     headerName: 'วงเงินอนุมัติ\nของ ผจก.ส่วน',
     minWidth: 150,
     headerAlign: 'center',
@@ -101,12 +102,12 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <Box component='div' sx={{ marginLeft: 'auto' }}>
-        {params.value}
+        {(params?.value?.toLocaleString())}
       </Box>
     )
   },
   {
-    field: 'approveLimit2',
+    field: 'approvalLimit2',
     headerName: 'วงเงินอนุมัติ\nของ ผจก.OC',
     minWidth: 150,
     headerAlign: 'center',
@@ -114,7 +115,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <Box component='div' sx={{ marginLeft: 'auto' }}>
-        {params.value}
+        {(params?.value?.toLocaleString())}
       </Box>
     )
   }
@@ -122,14 +123,15 @@ const columns: GridColDef[] = [
 
 
 export default function ReservesDetailTable () {
-  let rows: any = [
-    { id: 1, index: 1, type: 'ค่าใช้จ่ายหน้าร้าน', barcodeName: 'ค่าน้ำดื่ม',
-      bookName: 'ค่าน้ำดื่ม', bookNumber: '61120090', status: 'ใช้งาน',
-      approveLimit1: '1,000.00', approveLimit2: '5,000.00'  },
-      { id: 2, index: 2, type: 'ค่าใช้จ่ายหน้าร้าน', barcodeName: 'ค่าน้ำดื่ม',
-      bookName: 'ค่าน้ำดื่ม', bookNumber: '61120091', status: 'ไม่ใช้งาน',
-      approveLimit1: '2,000.00', approveLimit2: '6,000.00'  }
-  ];
+  const items = useAppSelector((state) => state.searchBranchAccountingConfig);
+  const res: any = items.branchAccountingConfigList;
+  const rows: any = res.data.map((data: any, indexs: number) => {
+    return {
+      id: indexs,
+      index: indexs + 1,
+      ...data
+    }
+  })
   
   // Set state data
   const classes = useStyles();
@@ -161,13 +163,6 @@ export default function ReservesDetailTable () {
           scrollbarSize={10}
           rowHeight={65}
           onCellClick={currentlySelected}
-          // sx={{
-          //   '& .MuiDataGrid-columnHeaderTitle': {
-          //       textOverflow: "clip",
-          //       whiteSpace: "break-spaces",
-          //       lineHeight: 1
-          //   }
-          // }}
           // onCellFocusOut={handleEditItems}
           // onCellOut={handleEditItems}
           // onCellKeyDown={handleEditItems}

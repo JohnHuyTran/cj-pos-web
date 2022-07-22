@@ -129,3 +129,25 @@ export const getPathExpenseDetail = (docNo: string, path: string) => {
 export const getPathExpensePeriodType = (type: string, path: string) => {
   return getPathUrl(`${path}`, { type: type });
 };
+
+export async function getSummarizeByCriteria(payload: any) {
+  try {
+    const response = await post(environment.branchAccounting.expense.summarize.byCriteria.url, payload).then(
+      (result: any) => result
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getSummarizeByNo(payload: any) {
+  try {
+    const response = await post(environment.branchAccounting.expense.summarize.byNo.url, payload).then(
+      (result: any) => result
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
