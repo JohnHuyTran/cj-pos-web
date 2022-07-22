@@ -211,3 +211,28 @@ export interface ExpensePeriod {
   startDate: string;
   endDate: string;
 }
+
+export interface SummarizeRequest {
+  type: string;
+  year: number;
+  month: number;
+  period?: number;
+}
+export interface Summarize {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: SummarizeInfo | null | [];
+}
+
+export interface SummarizeInfo {
+  total: number;
+  sumApprovedAmount: number;
+  sumItems: SummarizeSumItems;
+}
+
+export interface SummarizeSumItems {
+  expenseNo: string;
+  approvedAmount: number;
+}

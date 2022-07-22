@@ -22,7 +22,8 @@ import { uploadFileState } from '../../../store/slices/upload-file-slice';
 import { ExpenseSearch, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
-import { setInit } from '../../../store/sessionStore';
+import { getUserInfo, setInit } from '../../../store/sessionStore';
+import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
 
 interface loadingModalState {
   open: boolean;
@@ -218,8 +219,6 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
-  useEffect(() => {}, []);
-
   const items = useAppSelector((state) => state.searchBranchAccounting);
   const cuurentPage = useAppSelector((state) => state.searchBranchAccounting.branchAccountingList.page);
   const limit = useAppSelector((state) => state.searchBranchAccounting.branchAccountingList.perPage);
@@ -323,15 +322,21 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   };
 
   const handleSubmitRowSelect = async () => {
-    // const rowSelect = apiRef.current.getSelectedRows();
+    const rowSelect = apiRef.current.getSelectedRows();
     let rowSelectList: any = [];
-    // rowSelect.forEach((data: GridRowData) => {
-    //   // rowSelectList.push(data.rtNo);
-    //   rowSelectList.push(data);
-    // });
+    rowSelect.forEach((data: GridRowData) => {
+      // rowSelectList.push(data.rtNo);
+      rowSelectList.push(data);
+    });
 
     return onSelectRows(rowSelectList ? rowSelectList : []);
   };
+
+  const [groupACCM, setGroupACCM] = React.useState(false);
+  useEffect(() => {
+    const accountManager = getUserInfo().group === PERMISSION_GROUP.ACCOUNT_MANAGER;
+    setGroupACCM(accountManager);
+  }, []);
 
   return (
     <div>
@@ -354,7 +359,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
             loading={loading}
             rowHeight={65}
             pagination
-            checkboxSelection={true}
+            checkboxSelection={groupACCM ? true : false}
             isRowSelectable={(params: GridRowParams) => params.row.status === 'WAITTING_APPROVAL3'}
             onSelectionModelChange={handleSubmitRowSelect}
             disableSelectionOnClick
