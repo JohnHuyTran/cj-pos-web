@@ -11,7 +11,6 @@ import {
   Radio,
   RadioGroup,
   Select,
-  SliderValueLabelUnstyled,
   TextField,
   Typography,
   CircularProgress,
@@ -25,6 +24,7 @@ import { expenseTypesSetting, getExpenseTypesSetting } from '../../../utils/enum
 
 //Components
 import TexboxSearchSku from '../../commons/ui/texbox-search-sku';
+import AlertError from '../../commons/ui/alert-error';
 
 interface Props {
   isOpen: boolean;
@@ -35,6 +35,8 @@ interface Props {
 export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Props) {
   const classes = useStyles();
   const [isOpenLoading, setIsOpenLoading] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [textError, setTextError] = useState('');
   const [values, setValues] = useState<any>({
     isActive: 'true',
     type: [],
@@ -66,12 +68,6 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
   };
 
   const validateForm = () => {
-    console.log('values: ', values);
-
-    console.log('approvalLimit1No: ', values.approvalLimit1);
-    console.log('approvalLimit2No: ', values.approvalLimit2);
-    console.log('approvalLimit1No-no: ', Number(values.approvalLimit1));
-    console.log('approvalLimit2No-no: ', Number(values.approvalLimit2));
     if (
       values.type.length === 0 ||
       values.skuCode === '' ||
@@ -80,25 +76,33 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
       values.approvalLimit1 === '' ||
       values.approvalLimit2 === ''
     ) {
-      alert('validate 1');
+      setOpenAlert(true);
+      setTextError('กรุณากรอกข้อมูลให้ครบ');
+      return false;
     } else if (values.type === 'OTHER' && values.typeOther.length === 0) {
-      alert('กรุณาเลือกประเภทร้านที่แสดง');
+      setOpenAlert(true);
+      setTextError('กรุณาเลือกประเภทร้านที่แสดง');
+      return false;
     } else if (Number(values.approvalLimit1) >= Number(values.approvalLimit2)) {
-      alert('ต้องมีค่ามากกว่าผจก.ส่วน');
+      setOpenAlert(true);
+      setTextError('วงเงินอนุมัติ ผจก.OC ต้องมีค่ามากกว่า ผจก.ส่วน');
+      return false;
     } else {
-      alert('pass');
+      return true;
     }
   };
 
   const handleAddButton = () => {
-    setIsOpenLoading(true);
-    validateForm();
+    // setIsOpenLoading(true);
+    const isValidate: boolean = validateForm();
 
-    setTimeout(() => {
-      setIsOpenLoading(false);
-      console.log('values: ', values);
-      onClickClose();
-    }, 500);
+    if (isValidate) {
+      setTimeout(() => {
+        // setIsOpenLoading(false);
+        console.log('values: ', values);
+        // onClickClose();
+      }, 500);
+    }
   };
 
   const handleOnClose = () => {
@@ -114,6 +118,11 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
       approvalLimit1: '',
       approvalLimit2: '',
     });
+  };
+
+  //alert Errormodel
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
   };
 
   return (
@@ -197,7 +206,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                       ? (selected) => selected.map((v: any) => getExpenseTypesSetting(v)).join(', ')
                       : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือกประเภท</div>
                   }
-                  disabled={isOpenLoading && values.type !== 'OTHER'}
+                  disabled={isOpenLoading || values.type !== 'OTHER'}
                 >
                   {expenseTypesSetting.map((item, index: number) => (
                     <MenuItem key={index} value={item.key}>
@@ -230,16 +239,6 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
               </Typography>
             </Grid>
             <Grid item xs={4} mb={3}>
-              {/* <TextField
-                //   id="txt"
-                name="skuCode"
-                size="small"
-                value={values.skuCode}
-                onChange={handleChange}
-                className={classes.MtextField}
-                fullWidth
-              /> */}
-
               <TexboxSearchSku
                 skuTypes="3,7"
                 onSelectItem={handleChangeProduct}
@@ -344,7 +343,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
             </Grid>
           </Grid>
 
-          <Grid item container xs={12} sx={{ mt: 5, justifyContent: 'right' }}>
+          <Grid item container xs={12} sx={{ mt: 5, justifyContent: 'flex-end' }}>
             <LoadingButton
               id="btnSave"
               variant="contained"
@@ -364,6 +363,8 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
           </Grid>
         </DialogContent>
       </Dialog>
+
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </Fragment>
   );
 }
