@@ -518,7 +518,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     } else if (status === STATUS.WAITTING_APPROVAL2) {
       const isOver = validateApproveLimit();
       const isFileValidate: boolean = validateFileInfo();
-      if (!isOver && isFileValidate) {
+      if (isOver) {
+        if (isFileValidate) {
+          setShowReason(false);
+          setIsOpenModelConfirmExpense(true);
+        }
+      } else {
         setShowReason(false);
         setIsOpenModelConfirmExpense(true);
       }
@@ -871,7 +876,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               ...infoDiff,
               id: 3,
               description: 'ผลต่าง',
-              [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0),
+              [entrie.expenseNo]: (Number(entrie?.approvedAmount) || 0) - (Number(entrie?.withdrawAmount) || 0),
             };
             const master = getMasterExpenInto(entrie.expenseNo);
             const _isOtherExpense = master ? master.isOtherExpense : false;
@@ -887,7 +892,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               [entrie.expenseNo]: Number(entrie?.approvedAmount) || 0,
             };
             totalApprove += Number(entrie?.approvedAmount) || 0;
-            const diff = (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.approvedAmount) || 0);
+            const diff = (Number(entrie?.approvedAmount) || 0) - (Number(entrie?.withdrawAmount) || 0);
             infoDiff = {
               ...infoDiff,
               id: 3,
@@ -902,8 +907,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             }
           }
         });
-      totalDiff = Number(totalWithDraw) - Number(totalApprove);
-      totalOtherDiff = Number(totalOtherWithDraw) - Number(totalOtherApprove);
+      totalDiff = Number(totalApprove) - Number(totalWithDraw);
+      totalOtherDiff = Number(totalOtherApprove) - Number(totalOtherWithDraw);
 
       if (status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT || status === STATUS.WAITTING_EDIT_ATTACH_FILE) {
         rows = [{ ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw }];
@@ -916,13 +921,23 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         rows = [
           { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
           { ...infosApprove, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
-          { ...infoDiff, total: totalDiff, SUMOTHER: totalOtherDiff },
+          {
+            ...infoDiff,
+            total: totalDiff > 0 ? `+${totalDiff}` : totalDiff,
+            SUMOTHER: totalOtherDiff,
+            isShowDiff: true,
+          },
         ];
       } else {
         rows = [
           { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
           { ...infosApprove, total: isNaN(totalApprove) ? 0 : totalApprove, SUMOTHER: totalOtherApprove },
-          { ...infoDiff, total: isNaN(totalDiff) ? 0 : totalDiff, SUMOTHER: totalOtherDiff },
+          {
+            ...infoDiff,
+            total: totalDiff > 0 ? `+${totalDiff}` : totalDiff || 0,
+            SUMOTHER: totalOtherDiff,
+            isShowDiff: true,
+          },
         ];
       }
 
