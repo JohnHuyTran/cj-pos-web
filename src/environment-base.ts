@@ -528,5 +528,13 @@ export const environment = {
         url: 'accounting/expense-period/{type}',
       },
     },
+    closeSaleShift: {
+      search: {
+        url: '',
+      },
+      view: {
+        url: '',
+      },
+    },
   },
 };

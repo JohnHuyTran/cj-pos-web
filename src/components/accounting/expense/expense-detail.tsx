@@ -566,6 +566,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
           .map((e: any, index: number) => {
             const master = getMasterExpenInto(e[0]);
+            console.log(master);
             const item: payLoadAdd = {
               id: index,
               key: e[0],
@@ -578,7 +579,9 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       } else {
         const _sumItems = summary.items;
         _sumItems.map((entrie: SumItemsItem, index: number) => {
+          console.log(entrie.expenseNo);
           const master = getMasterExpenInto(entrie.expenseNo);
+          console.log(master);
           const item: payLoadAdd = {
             id: index,
             key: entrie.expenseNo,
@@ -688,7 +691,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     return isRequire;
   };
 
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const getMasterExpenInto = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === expenseType);
   const isOtherExpenseField = (key: any) => {
     const master = getMasterExpenInto(key);
     return master?.isOtherExpense;

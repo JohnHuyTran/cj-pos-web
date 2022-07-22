@@ -210,3 +210,38 @@ export interface ExpensePeriod {
   startDate: string;
   endDate: string;
 }
+
+export interface CloseSaleShiftRequest {
+  date: string;
+  branch: string;
+  status: string;
+  page: number;
+  limit: number;
+}
+export interface CloseSaleShiftResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: CloseSaleShiftInfo[];
+  total: number;
+  page: number;
+  perPage: number;
+  prev: number;
+  next: number;
+  totalPage: number;
+}
+
+export interface CloseSaleShiftInfo {
+  userName: string;
+  posID: string;
+  shiftCode: string;
+  status: string;
+  sellAmountSum: string;
+  billAmountSum: string;
+  sellAmountInput: string;
+  closeShiftKey: string;
+  shiftBillNoCount: string;
+  returnBillCount: string;
+  businessDate: string;
+}

@@ -13,11 +13,24 @@ import { env } from '../../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../../models/branch-model';
 import { isGroupBranch } from '../../../utils/role-permission';
 import { closeSaleShift } from '../../../utils/enum/accounting-enum';
+import CloseSaleShiftSearchList from './close-saleshift-list';
+import LoadingModal from '../../commons/ui/loading-modal';
+import AlertError from '../../commons/ui/alert-error';
+import { SearchOff } from '@mui/icons-material';
+import {
+  clearCloseSaleShiftList,
+  featchCloseSaleShiptListAsync,
+  savePayloadSearch,
+} from '../../../store/slices/accounting/close-saleshift-slice';
+import { CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
+import moment from 'moment';
 
 function CloseSaleShiftSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-
+  const page = 1;
+  const items = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift);
+  const limit = useAppSelector((state) => state.stockMovementSearchSlice.stockList.perPage);
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
@@ -46,6 +59,19 @@ function CloseSaleShiftSearch() {
   const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
     groupBranch ? branchFromMap : null
   );
+  const [flagSearch, setFlagSearch] = React.useState(false);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<{ open: boolean }>({
+    open: false,
+  });
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
@@ -55,12 +81,46 @@ function CloseSaleShiftSearch() {
       setValues({ ...values, branchFrom: '' });
     }
   };
-  const onClickValidateForm = () => {};
-  const onClickClearBtn = () => {};
+  const onClickSearch = async () => {
+    handleOpenLoading('open', true);
+    let limits: number;
+    if (limit === 0 || limit === undefined) {
+      limits = 10;
+    } else {
+      limits = limit;
+    }
+    const payload: CloseSaleShiftRequest = {
+      date: moment(startDate).startOf('day').toISOString(),
+      branch: branchFromCode,
+      status: values.status,
+      page: page,
+      limit: limits,
+    };
+
+    await dispatch(featchCloseSaleShiptListAsync(payload));
+    await dispatch(savePayloadSearch(payload));
+    setFlagSearch(true);
+    handleOpenLoading('open', false);
+  };
+  const onClickClearBtn = async () => {
+    handleOpenLoading('open', true);
+    setStartDate(null);
+    setClearBranchDropDown(!clearBranchDropDown);
+    setBranchFromCode('');
+    setValues({ status: 'ALL', branchFrom: '' });
+    dispatch(clearCloseSaleShiftList({}));
+    setTimeout(() => {
+      setFlagSearch(false);
+      handleOpenLoading('open', false);
+    }, 300);
+  };
   const handleOpenCloseSale = () => {};
   const handleOnBypass = () => {};
   const handleOnupdate = () => {};
-  const handleChange = () => {};
+  const handleChange = (event: any) => {
+    const value = event.target.value;
+    setValues({ ...values, [event.target.name]: value });
+  };
   return (
     <>
       {' '}
@@ -161,7 +221,7 @@ function CloseSaleShiftSearch() {
               id='btnSearch'
               variant='contained'
               color='primary'
-              onClick={onClickValidateForm}
+              onClick={onClickSearch}
               sx={{ width: 110, ml: 2 }}
               className={classes.MbtnSearch}>
               ค้นหา
@@ -169,6 +229,18 @@ function CloseSaleShiftSearch() {
           </Grid>
         </Grid>
       </Box>
+      {flagSearch && items.data.length > 0 && <CloseSaleShiftSearchList />}
+      {flagSearch && items.data.length === 0 && (
+        <Grid container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB' justifyContent='center'>
+            <h2>
+              ไม่มีข้อมูล <SearchOff fontSize='large' />
+            </h2>
+          </Box>
+        </Grid>
+      )}
+      <LoadingModal open={openLoadingModal.open} />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </>
   );
 }

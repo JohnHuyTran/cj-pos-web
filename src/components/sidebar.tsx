@@ -521,6 +521,22 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='ค่าใช้จ่าย' />
               </ListItemButton>
             </Link>
+            <Link
+              to='/close-saleshift'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                display: disableSubMenuExpense ? 'none' : '',
+              }}
+              id='subMenuCloseSaleShift'>
+              <ListItemButton
+                key='Expense'
+                selected={selectedIndex === 16}
+                onClick={() => handleListItemClick(16)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ปิดรหัสการขาย' />
+              </ListItemButton>
+            </Link>
           </List>
         </Collapse>
       </List>
