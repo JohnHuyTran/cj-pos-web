@@ -34,7 +34,14 @@ import {
   clearDataSearchBranchAccounting,
   featchBranchAccountingListAsync,
 } from '../../../store/slices/accounting/accounting-search-slice';
-import { ExpenseSearchRequest, ExpensePeriod, SummarizeRequest } from '../../../models/branch-accounting-model';
+import {
+  ExpenseSearchRequest,
+  ExpensePeriod,
+  SummarizeRequest,
+  ExpenseApprove3ByDocNos,
+  ExpenseApprove3All,
+  ExpenseApprove3AllCriteria,
+} from '../../../models/branch-accounting-model';
 import {
   clearDataExpensePeriod,
   featchExpensePeriodTypeAsync,
@@ -42,7 +49,12 @@ import {
 import ExpenseSearchList from './expense-search-list';
 import ModelConfirmSearch from './confirm/modal-confirm-search';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
-import { getSummarizeByCriteria, getSummarizeByNo } from '../../../services/accounting';
+import {
+  expenseApprove3All,
+  expenseApprove3ByDocNos,
+  getSummarizeByCriteria,
+  getSummarizeByNo,
+} from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
 import AlertError from '../../commons/ui/alert-error';
 import {
@@ -53,6 +65,7 @@ import {
   updateSummaryRows,
   updateToInitialState,
 } from '../../../store/slices/accounting/accounting-slice';
+import SnackbarStatus from '../../commons/ui/snackbar-status';
 
 interface FormSelectProps {
   title: string;
@@ -210,6 +223,7 @@ export default function SearchExpense() {
 
   const handleExport = () => {};
 
+  const [approveType, setApproveType] = useState('');
   const [summarizList, setSummarizList] = useState(null);
   const [summarizTotal, setSummarizTotal] = useState(0);
   const [summarizTitle, setSummarizTitle] = useState('');
@@ -252,20 +266,24 @@ export default function SearchExpense() {
   };
 
   const handleApprove = () => {
+    setIsOpenLoading(true);
+    setApproveType('byNo');
     const docNos: any[] = [];
     selectRowsList.map((item: any) => {
       docNos.push(item.docNo);
     });
 
-    console.log('docNos:', docNos);
-
     summarizeByNo(docNos);
     handleOpenModelConfirm();
+    setIsOpenLoading(false);
   };
 
   const handleApproveAll = async () => {
+    setIsOpenLoading(true);
+    setApproveType('all');
     if (search.status === 'WAITTING_APPROVAL3') await summarizeByCriteria();
     handleOpenModelConfirm();
+    setIsOpenLoading(false);
   };
 
   const handleCloseFailAlert = () => {
@@ -338,8 +356,79 @@ export default function SearchExpense() {
   };
 
   const handleConfirm = (periodData: any) => {
-    console.log('handleConfirm');
-    console.log('periodData:', periodData);
+    if (approveType === 'byNo') {
+      approveAccountExpenseManay(periodData.period.startDate, periodData.period.endDate);
+    } else if (approveType === 'all') {
+      approveAccountExpenseAll(periodData.period.startDate, periodData.period.endDate);
+    }
+  };
+
+  const payloadSearch = useAppSelector((state) => state.saveExpenseSearchRequest.searchExpense);
+  const [showSnackBar, setShowSnackBar] = useState(false);
+  const [contentMsg, setContentMsg] = useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const approveAccountExpenseManay = async (startDate: any, endDate: any) => {
+    setIsOpenLoading(true);
+    const docNos: any[] = [];
+    selectRowsList.map((item: any) => {
+      docNos.push(item.docNo);
+    });
+
+    const payload: ExpenseApprove3ByDocNos = {
+      expenseDate: startDate,
+      approvedDate: endDate,
+      docNos: docNos,
+    };
+
+    await expenseApprove3ByDocNos(payload)
+      .then((value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้อนุมัติเรียบร้อยแล้ว');
+
+        dispatch(featchBranchAccountingListAsync(payloadSearch));
+      })
+      .catch((error: ApiError) => {
+        setTextFail(error.message);
+        setOpenFailAlert(true);
+      });
+
+    setIsOpenLoading(false);
+  };
+
+  const approveAccountExpenseAll = async (startDate: any, endDate: any) => {
+    setIsOpenLoading(true);
+    const payloadCriteria: ExpenseApprove3AllCriteria = {
+      type: search.type,
+      year: search.year,
+      month: search.month,
+      period: +search.period,
+    };
+
+    const payload: ExpenseApprove3All = {
+      expenseDate: startDate,
+      approvedDate: endDate,
+      criteria: payloadCriteria,
+    };
+
+    await expenseApprove3All(payload)
+      .then((value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้อนุมัติเรียบร้อยแล้ว');
+
+        dispatch(featchBranchAccountingListAsync(payloadSearch));
+      })
+      .catch((error: ApiError) => {
+        setTextFail(error.message);
+        setOpenFailAlert(true);
+      });
+
+    setIsOpenLoading(false);
   };
 
   return (
@@ -543,6 +632,13 @@ export default function SearchExpense() {
         summarizList={summarizList}
       />
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
+
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={contentMsg}
+      />
     </Fragment>
   );
 }

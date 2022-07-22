@@ -1,6 +1,11 @@
 import { post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
-import { AccountAccountExpenses, ExpenseSaveRequest } from '../models/branch-accounting-model';
+import {
+  AccountAccountExpenses,
+  ExpenseApprove3All,
+  ExpenseApprove3ByDocNos,
+  ExpenseSaveRequest,
+} from '../models/branch-accounting-model';
 import { ContentType } from '../utils/enum/common-enum';
 import { getPathUrl } from './base-service';
 
@@ -150,4 +155,22 @@ export async function getSummarizeByNo(payload: any) {
   } catch (error) {
     throw error;
   }
+}
+
+export async function expenseApprove3ByDocNos(payload: ExpenseApprove3ByDocNos) {
+  const response = await put(environment.branchAccounting.expense.approve3.byNo.url, payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function expenseApprove3All(payload: ExpenseApprove3All) {
+  const response = await put(environment.branchAccounting.expense.approve3.byCriteria.url, payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
 }
