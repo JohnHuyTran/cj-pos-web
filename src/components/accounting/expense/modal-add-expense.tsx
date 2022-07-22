@@ -454,10 +454,11 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && !isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
+                      const master = getMasterExpenInto(i.key);
                       return (
                         <>
                           <Grid item xs={2}>
-                            <Typography variant='body2'>{i.title}: </Typography>
+                            <Typography variant='body2'>{master?.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={2}>
                             <TextField
@@ -470,7 +471,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fullWidth
                               placeholder=''
                               autoComplete='off'
-                              disabled={enableSaveBtn ? false : true}
+                              disabled={master?.isActive && enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>
@@ -508,10 +509,11 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
+                      const master = getMasterExpenInto(i.key);
                       return (
                         <>
                           <Grid item xs={2}>
-                            <Typography variant='body2'>{i.title}: </Typography>
+                            <Typography variant='body2'>{master?.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={2}>
                             <TextField
@@ -524,7 +526,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fullWidth
                               placeholder=''
                               autoComplete='off'
-                              disabled={enableSaveBtn ? false : true}
+                              disabled={master?.isActive && enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>

@@ -47,6 +47,7 @@ import { ApiError } from '../../../models/api-error-model';
 import AlertError from '../../commons/ui/alert-error';
 import {
   addNewItem,
+  addSummaryItem,
   initialItems,
   updateItemRows,
   updateSummaryRows,
@@ -308,6 +309,7 @@ export default function SearchExpense() {
     await dispatch(updateItemRows([]));
     await dispatch(initialItems([]));
     await dispatch(addNewItem(null));
+    await dispatch(addSummaryItem(null));
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);
@@ -393,7 +395,7 @@ export default function SearchExpense() {
               isRequest
               dataList={expensePeriodList}
               value={search.period}
-              isValidate={(isValidate && search.type !== '')}
+              isValidate={isValidate && search.type !== ''}
               isDisabled={isOpenLoading || !search.type}
               setValue={(e) => setSearch({ ...search, period: e.target.value })}
             />
@@ -550,7 +552,12 @@ const FormSelect = ({ title, value, setValue, dataList, isValidate, isRequest, i
   return (
     <Fragment>
       <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-        {title} { isRequest && (<Typography component='span' color="red">*</Typography>)}
+        {title}{' '}
+        {isRequest && (
+          <Typography component='span' color='red'>
+            *
+          </Typography>
+        )}
       </Typography>
       <FormControl id='SearchType' className={classes.Mselect} fullWidth error={value === '' && isValidate}>
         <Select

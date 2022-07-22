@@ -47,7 +47,6 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
       }
     });
     data = { ...data, total: sum, SUMOTHER: _otherSum };
-    console.log('data', data);
     if (sum > 0) {
       await dispatch(addSummaryItem(data));
       await dispatch(haveUpdateData(true));
@@ -152,6 +151,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                 {testList
                   .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && !i.isOtherExpense)
                   .map((i: payLoadAdd) => {
+                    const master = getMasterExpenInto(i.key);
                     return (
                       <>
                         <Grid item xs={2}>
@@ -168,6 +168,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             fullWidth
                             placeholder=''
                             autoComplete='off'
+                            disabled={!master?.isActive}
                           />
                         </Grid>
                       </>
@@ -198,6 +199,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                 {testList
                   .filter((i: payLoadAdd) => i.isOtherExpense && !isFilterOutFieldInAdd(i.key))
                   .map((i: payLoadAdd) => {
+                    const master = getMasterExpenInto(i.key);
                     return (
                       <>
                         <Grid item xs={2}>
@@ -213,6 +215,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             className={classes.MtextField}
                             fullWidth
                             placeholder=''
+                            disabled={!master?.isActive}
                           />
                         </Grid>
                       </>

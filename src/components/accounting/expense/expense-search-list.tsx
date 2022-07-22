@@ -18,7 +18,16 @@ import LoadingModal from '../../commons/ui/loading-modal';
 import { Chip, TextField, Typography } from '@mui/material';
 import { addTwoDecimalPlaces, numberWithCommas } from '../../../utils/utils';
 import ExpenseDetail from './expense-detail';
-import { featchExpenseDetailAsync, haveUpdateData } from '../../../store/slices/accounting/accounting-slice';
+import {
+  addNewItem,
+  addSummaryItem,
+  featchExpenseDetailAsync,
+  haveUpdateData,
+  initialItems,
+  updateItemRows,
+  updateSummaryRows,
+  updateToInitialState,
+} from '../../../store/slices/accounting/accounting-slice';
 import { uploadFileState } from '../../../store/slices/upload-file-slice';
 import { ExpenseSearch, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
@@ -360,10 +369,17 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const [edit, setEdit] = React.useState(false);
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const handleOpenDetailModal = async (docNo: string) => {
-    await dispatch(featchExpenseDetailAsync(docNo));
-    setInit('Y');
     await dispatch(haveUpdateData(false));
     await dispatch(uploadFileState([]));
+    await dispatch(addSummaryItem(null));
+    await dispatch(updateToInitialState());
+    await dispatch(updateSummaryRows([]));
+    await dispatch(updateItemRows([]));
+    await dispatch(initialItems([]));
+    await dispatch(addNewItem(null));
+    await dispatch(featchExpenseDetailAsync(docNo));
+    setInit('Y');
+
     setOpenDetailModal(true);
   };
 
