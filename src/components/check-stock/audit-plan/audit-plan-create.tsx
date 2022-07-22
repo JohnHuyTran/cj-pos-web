@@ -106,6 +106,7 @@ export default function ModalCreateAuditPlan({
     documentNumber: '',
     createDate: new Date(),
   });
+  const [reSave, SetReSave] = React.useState(false)
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   //permission
@@ -124,7 +125,7 @@ export default function ModalCreateAuditPlan({
   const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
 
   useEffect(() => {
-    if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {
+    if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {  
       setStatus(dataDetail.status);
       setBranchOptions({
         code: dataDetail.branchCode,
@@ -135,7 +136,7 @@ export default function ModalCreateAuditPlan({
         branch: dataDetail.branchCode,
         documentNumber: dataDetail.documentNumber,
         createDate: dataDetail.createdDate,
-        countingDate: dataDetail.countingDate,
+        countingDate: dataDetail.countingDate ? dataDetail.countingDate : null,
       });
       const products = dataDetail.product
         ? dataDetail.product.map((item: any) => {
@@ -151,12 +152,15 @@ export default function ModalCreateAuditPlan({
   }, [dataDetail]);
 
   useEffect(() => {
-    if (moment(new Date()) > moment(values.countingDate)) {
+    if (moment(dataDetail.countingDate).endOf('day').isBefore(moment(new Date()))) {
       setDisableCounting(true);
     } else {
       setDisableCounting(false);
     }
-  }, [values.countingDate]);
+  }, [dataDetail]);
+  useEffect(() => {
+    SetReSave(true)
+  }, [values.countingDate, values.branch]);
   const handleChangeBranch = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
@@ -270,7 +274,7 @@ export default function ModalCreateAuditPlan({
       const body = {
         branchCode: values.branch,
         branchName: getBranchName(branchList, values.branch),
-        countingDate: moment(values.countingDate).toISOString(true),
+        countingDate: moment(values.countingDate).endOf('day').toISOString(true),
         product: products,
       };
       if (!!values.id) {
@@ -304,6 +308,7 @@ export default function ModalCreateAuditPlan({
           setOpenModalError(true);
         }
       }
+      SetReSave(false)
     } catch (error) {
       setOpenModalError(true);
     }
@@ -322,6 +327,9 @@ export default function ModalCreateAuditPlan({
     setOpenModalConfirm(false);
     if (confirm) {
       try {
+        if (reSave || checkEdit){
+          await handleCreateDraft()
+        }
         const rs = await confirmAuditPlan(values.id);
         if (rs.code == 20000) {
           setStatus(StockActionStatus.CONFIRM);
@@ -405,8 +413,9 @@ export default function ModalCreateAuditPlan({
                   type={'TO'}
                   minDateTo={new Date()}
                   value={values.countingDate}
-                  disabled={steps.indexOf(status) > 0 && !groupBranch}
+                  disabled={steps.indexOf(status) > 0}
                   placeHolder={'กรุณาเลือก'}
+                  disableMinDateMsg={true}
                 />
               </Grid>
             </Grid>
@@ -422,14 +431,14 @@ export default function ModalCreateAuditPlan({
                   sourceBranchCode={ownBranch}
                   onChangeBranch={handleChangeBranch}
                   isClear={clearBranchDropDown}
-                  disable={groupBranch || viewMode}
+                  disable={groupBranch || viewMode || steps.indexOf(status) > 0}
                   isFilterAuthorizedBranch={true}
                   placeHolder={'กรุณาเลือก'}
                 />
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5}>
-              {steps.indexOf(status) > 1 && (
+              {steps.indexOf(status) > 1 && dataDetail.relatedDocuments && (
                 <>
                   <Grid item xs={4}>
                     เอกสาร SC :
@@ -481,7 +490,12 @@ export default function ModalCreateAuditPlan({
                   variant="contained"
                   color="warning"
                   startIcon={<SaveIcon />}
-                  disabled={steps.indexOf(status) > 0 || (payloadAddTypeProduct && payloadAddTypeProduct.length === 0)}
+                  disabled={
+                    steps.indexOf(status) > 0 ||
+                    (payloadAddTypeProduct && payloadAddTypeProduct.length === 0) ||
+                    disableCounting ||
+                    values.branch == ''
+                  }
                   style={{
                     display:
                       steps.indexOf(status) > 0 || !managePermission || viewMode || status == StockActionStatus.CANCEL
@@ -502,7 +516,8 @@ export default function ModalCreateAuditPlan({
                     !managePermission ||
                     (steps.indexOf(status) > 1 && !isBranchPermission) ||
                     values.branch == '' ||
-                    values.countingDate == null
+                    values.countingDate == null ||
+                    disableCounting
                   }
                   style={{
                     display:
@@ -550,7 +565,7 @@ export default function ModalCreateAuditPlan({
                   onClick={handleOpenCancel}
                   style={{
                     display:
-                      (steps.indexOf(status) > 0 && !countingPermission) ||
+                      (steps.indexOf(status) > 0 && !groupBranch) ||
                       !managePermission ||
                       viewMode ||
                       status == StockActionStatus.CANCEL
