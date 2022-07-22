@@ -418,7 +418,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
       totalApprove = 0;
       _otherSum = 0;
       expenseMasterList
-        .filter((i: ExpenseInfo) => i.isActive)
+        .filter((i: ExpenseInfo) => i.isActive && i.typeCode === expenseType)
         .map((entrie: ExpenseInfo) => {
           infosWithDraw = {
             ...infosWithDraw,
