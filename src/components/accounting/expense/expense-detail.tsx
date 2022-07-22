@@ -565,7 +565,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             sumApprovalAmount += Number(e[1]);
           });
       } else {
-        sumApprovalAmount = summary.sumApprovalAmount || 0;
+        sumApprovalAmount = summary.sumApprovalAmount || summary.sumWithdrawAmount || 0;
       }
 
       const sumWithdrawAmount = summary.sumWithdrawAmount || 0;
