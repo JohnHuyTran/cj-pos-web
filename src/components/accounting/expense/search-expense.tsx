@@ -234,15 +234,15 @@ export default function SearchExpense() {
         console.log('error:', error);
       });
   };
-  const summarizeByNo = async () => {
+  const summarizeByNo = async (docNos: any) => {
     const payload: any = {
-      docNos: ['EX21070101-000001'],
+      docNos: docNos,
     };
-
     await getSummarizeByNo(payload)
       .then((value) => {
         setSummarizTitle(`${value.data.total} สาขา`);
         setSummarizList(value.data);
+        setSummarizTotal(value.data.total);
       })
       .catch((error: ApiError) => {
         console.log('error:', error);
@@ -250,7 +250,14 @@ export default function SearchExpense() {
   };
 
   const handleApprove = () => {
-    summarizeByNo();
+    const docNos: any[] = [];
+    selectRowsList.map((item: any) => {
+      docNos.push(item.docNo);
+    });
+
+    console.log('docNos:', docNos);
+
+    summarizeByNo(docNos);
     handleOpenModelConfirm();
   };
 
@@ -315,7 +322,6 @@ export default function SearchExpense() {
 
   const [selectRowsList, setSelectRowsList] = useState<Array<any>>([]);
   const handleSelectRows = async (list: any) => {
-    console.log('list:', JSON.stringify(list));
     setSelectRowsList(list);
   };
 
