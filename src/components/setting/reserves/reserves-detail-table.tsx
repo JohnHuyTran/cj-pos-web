@@ -51,7 +51,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <Box>
-        <Typography variant='body2'>{params.value}</Typography>
+        <Typography variant='body2'>{params.getValue(params.id, 'skuName') || ''}</Typography>
         <Typography color='textSecondary' sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
