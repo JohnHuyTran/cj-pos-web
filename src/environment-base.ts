@@ -499,6 +499,9 @@ export const environment = {
       search: {
         url: 'accounting/expense',
       },
+      searchConfig: {
+        url: 'accounting/expense-config/search',
+      },
       save: {
         url: 'accounting/expense',
       },
@@ -519,6 +522,14 @@ export const environment = {
           url: 'accounting/expense/approve3/{docNo}',
         },
       },
+      approve3: {
+        byNo: {
+          url: '/expense/approve3-by-no',
+        },
+        byCriteria: {
+          url: '/expense/approve3-by-criteria',
+        },
+      },
       reject: {
         ocArea: {
           url: 'accounting/expense/reject1-2/{docNo}',
@@ -532,6 +543,14 @@ export const environment = {
       },
       periodType: {
         url: 'accounting/expense-period/{type}',
+      },
+      summarize: {
+        byNo: {
+          url: 'accounting/expense/summarize-by-no',
+        },
+        byCriteria: {
+          url: 'accounting/expense/summarize-by-criteria',
+        },
       },
     },
   },

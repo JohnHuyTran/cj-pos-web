@@ -211,3 +211,66 @@ export interface ExpensePeriod {
   startDate: string;
   endDate: string;
 }
+
+export interface SummarizeRequest {
+  type: string;
+  year: number;
+  month: number;
+  period?: number;
+}
+export interface Summarize {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: SummarizeInfo | null | [];
+}
+
+export interface SummarizeInfo {
+  total: number;
+  sumApprovedAmount: number;
+  sumItems: SummarizeSumItems;
+}
+
+export interface SummarizeSumItems {
+  expenseNo: string;
+  approvedAmount: number;
+}
+
+// Search config request
+export interface ExpenseSearchCofigRequest {
+  limit: string;
+  page: string;
+  sortBy?: string;
+  sortDirection?: string;
+  type: string;
+  isActive?: string | boolean;
+}
+
+export interface ExpenseSearchCofigResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: ExpenseSearchConfigInfo[];
+  total: number;
+  page: number;
+  perPage: number;
+  prev: number;
+  next: number;
+  totalPage: number;
+}
+
+export interface ExpenseSearchConfigInfo {
+  typeCode: string;
+  typeNameTh: string;
+  expenseNo: string;
+  accountCode: string;
+  accountNameTh: string;
+  skuCode: string;
+  skuName: string;
+  approvalLimit1: number;
+  approvalLimit2: number;
+  isActive: boolean;
+  isOtherExpense: boolean;
+}
