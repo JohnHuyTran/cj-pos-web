@@ -96,6 +96,8 @@ export default function ModalCreateAuditPlan({
     code: ownBranch,
     name: branchName ? branchName : '',
   });
+  // const userName = getUserInfo().preferred_username ? getUserInfo().preferred_username : ''
+  // const [currentName, setCurrentName] = React.useState<string>('')
   const [disableCounting, setDisableCounting] = React.useState<boolean>(false);
   const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
   const checkEdit = useAppSelector((state) => state.saleLimitTime.checkEdit);
@@ -127,6 +129,7 @@ export default function ModalCreateAuditPlan({
   useEffect(() => {
     if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {  
       setStatus(dataDetail.status);
+      // setCurrentName(dataDetail.createdBy)
       setBranchOptions({
         code: dataDetail.branchCode,
         name: dataDetail.branchName,
@@ -288,6 +291,7 @@ export default function ModalCreateAuditPlan({
             id: rs.data.id,
             documentNumber: rs.data.documentNumber,
           });
+          // setCurrentName(rs.data.createdBy)
           setStatus(StockActionStatus.DRAFT);
         } else {
           setOpenModalError(true);
@@ -303,6 +307,7 @@ export default function ModalCreateAuditPlan({
             id: rs.data.id,
             documentNumber: rs.data.documentNumber,
           });
+          // setCurrentName(rs.data.createdBy)
           setStatus(StockActionStatus.DRAFT);
         } else {
           setOpenModalError(true);
@@ -444,7 +449,7 @@ export default function ModalCreateAuditPlan({
                     เอกสาร SC :
                   </Grid>
                   <Grid item xs={7}>
-                    <DocumentList />
+                    <DocumentList viewMode={viewMode} />
                   </Grid>
                 </>
               )}
@@ -565,10 +570,11 @@ export default function ModalCreateAuditPlan({
                   onClick={handleOpenCancel}
                   style={{
                     display:
-                      (steps.indexOf(status) > 0 && !groupBranch) ||
+                      // (steps.indexOf(status) > 1 && !groupBranch) ||
                       !managePermission ||
                       viewMode ||
-                      status == StockActionStatus.CANCEL
+                      status == StockActionStatus.CANCEL 
+                      // (userName != currentName && steps.indexOf(status) >= 0)
                         ? 'none'
                         : undefined,
                   }}

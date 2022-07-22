@@ -10,7 +10,11 @@ import { Action } from '../../../utils/enum/common-enum';
 import { getStockCountDetail } from '../../../store/slices/stock-count-detail-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
 
-const DocumentList = () => {
+interface Props {
+  viewMode?: boolean;
+}
+
+const DocumentList = ({viewMode}:Props) => {
   const dispatch = useAppDispatch();
   const [openListDocNo, setOpenListDocNo] = useState<boolean>(false);
   const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
@@ -24,6 +28,7 @@ const DocumentList = () => {
   };
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const currentlySelected = async (item: any) => {
+    if (viewMode) return;
     setOpenLoadingModal(true);
     try {
       await dispatch(getStockCountDetail(item.id));
