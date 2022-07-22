@@ -10,7 +10,8 @@ import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { ExpenseInfo } from '../../../../models/branch-accounting-model';
 import { useAppSelector } from '../../../../store/store';
 import { isFilterFieldInExpense } from '../../../../utils/utils';
-import { Box } from '@mui/material';
+import { Box, TextField } from '@mui/material';
+import NumberFormat from 'react-number-format';
 
 interface Props {
   open: boolean;
@@ -100,9 +101,19 @@ export default function ModelConfirmSearch({
           renderCell: (params: GridRenderCellParams) => {
             if (isFilterFieldInExpense(params.field)) {
               return (
-                <Box component='div' sx={{ paddingRight: '5px' }}>
-                  {params.value}
-                </Box>
+                // <Box component='div' sx={{ paddingRight: '5px' }}>
+                //   {params.value}
+                // </Box>
+
+                <NumberFormat
+                  value={String(params.value)}
+                  thousandSeparator={true}
+                  decimalScale={2}
+                  className={classes.MtextFieldNumber}
+                  disabled={true}
+                  customInput={TextField}
+                  fixedDecimalScale
+                />
               );
             }
           },
