@@ -138,8 +138,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   function handleExitModelConfirm() {
     setConfirmModelExit(false);
     setOpen(false);
-    onClickClose();
+    onCloseModal();
   }
+  const onCloseModal = async () => {
+    await dispatch(uploadFileState([]));
+    onClickClose();
+  };
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
   };
@@ -154,7 +158,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     if (isUpdate || isUploadFile) {
       setConfirmModelExit(true);
     } else {
-      onClickClose();
+      onCloseModal();
     }
   };
   const handleOnChangeUploadFileSave = (status: boolean) => {
@@ -289,7 +293,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
-          onClickClose();
+          onCloseModal();
         }, 500);
       })
       .catch((error: ApiError) => {
@@ -316,7 +320,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
-          onClickClose();
+          onCloseModal();
         }, 500);
       })
       .catch((error: ApiError) => {
@@ -339,7 +343,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
-          onClickClose();
+          onCloseModal();
         }, 500);
       })
       .catch((error: ApiError) => {
@@ -391,7 +395,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
-          onClickClose();
+          onCloseModal();
         }, 500);
       })
       .catch((error: ApiError) => {
@@ -415,7 +419,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
-          onClickClose();
+          onCloseModal();
         }, 500);
       })
       .catch((error: ApiError) => {
@@ -470,7 +474,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
-          onClickClose();
+          onCloseModal();
         }, 500);
       })
       .catch((error: ApiError) => {
@@ -494,7 +498,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         await dispatch(featchBranchAccountingListAsync(payloadSearch));
         setTimeout(() => {
           setOpen(false);
-          onClickClose();
+          onCloseModal();
         }, 500);
       })
       .catch((error: ApiError) => {
@@ -866,26 +870,28 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           // }
 
           if (status === STATUS.WAITTING_ACCOUNTING) {
+            const _approvedAmount = entrie?.approvedAmount || entrie?.withdrawAmount || 0;
             infosApprove = {
               ...infosApprove,
               id: 2,
               description: 'ยอดเงินอนุมัติ',
-              [entrie.expenseNo]: entrie?.withdrawAmount,
+              [entrie.expenseNo]: _approvedAmount,
             };
             // if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
-            totalApprove += Number(entrie?.withdrawAmount);
+            totalApprove += Number(_approvedAmount);
             // }
+            const diff = Number(_approvedAmount) - (Number(entrie?.withdrawAmount) || 0);
             infoDiff = {
               ...infoDiff,
               id: 3,
               description: 'ผลต่าง',
-              [entrie.expenseNo]: (Number(entrie?.withdrawAmount) || 0) - (Number(entrie?.withdrawAmount) || 0),
+              [entrie.expenseNo]: diff > 0 ? `+${diff}` : diff,
             };
             const master = getMasterExpenInto(entrie.expenseNo);
             const _isOtherExpense = master ? master.isOtherExpense : false;
             if (_isOtherExpense) {
-              totalOtherWithDraw += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
-              totalOtherApprove += entrie?.withdrawAmount === undefined ? 0 : entrie?.withdrawAmount;
+              totalOtherWithDraw += entrie?.withdrawAmount || 0;
+              totalOtherApprove += _approvedAmount;
             }
           } else if (status === STATUS.WAITTING_APPROVAL1 || status === STATUS.WAITTING_APPROVAL2) {
             infosApprove = {
