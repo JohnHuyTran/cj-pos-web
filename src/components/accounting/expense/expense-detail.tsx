@@ -67,6 +67,7 @@ import {
 import { ApiError } from '../../../models/api-error-model';
 import moment from 'moment';
 import ModelConfirmDetail from './confirm/modal-confirm-detail';
+import ModelConfirmAccounting from './confirm/modal-confirm-accounting';
 import AccordionUploadSingleFile from '../../commons/ui/accordion-upload-single-file';
 import TextBoxComment from '../../commons/ui/textbox-comment';
 import { Day } from '@material-ui/pickers';
@@ -557,8 +558,10 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         title: 'ผลต่าง',
       };
       let listPayload: payLoadAdd[] = [item1, item2, item3];
+
       setPayloadModalConfirmDetail(listPayload);
-      setOpenModelConfirm(true);
+
+      setOpenModelAccountConfirm(true);
     } else if (status === STATUS.WAITTING_APPROVAL3) {
       const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
       let listPayload: payLoadAdd[] = [];
@@ -594,21 +597,23 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       } else {
         let sumOther: number = 0;
         const _sumItems = summary.items;
-        _sumItems.map((entrie: SumItemsItem, index: number) => {
-          const master = getMasterExpenInto(entrie.expenseNo);
-          if (!master?.isOtherExpense) {
-            const item: payLoadAdd = {
-              id: index,
-              key: entrie.expenseNo,
-              value: Number(entrie.approvedAmount) || 0,
-              title: master?.accountNameTh !== undefined ? master?.accountNameTh : entrie.expenseNo,
-              isOtherExpense: master?.isOtherExpense,
-            };
-            listPayload.push(item);
-          } else {
-            sumOther += Number(entrie.approvedAmount) || 0;
-          }
-        });
+        _sumItems
+          .filter((entrie: SumItemsItem) => !isFilterOutFieldInAdd(entrie.expenseNo))
+          .map((entrie: SumItemsItem, index: number) => {
+            const master = getMasterExpenInto(entrie.expenseNo);
+            if (!master?.isOtherExpense) {
+              const item: payLoadAdd = {
+                id: index,
+                key: entrie.expenseNo,
+                value: Number(entrie.approvedAmount) || 0,
+                title: master?.accountNameTh !== undefined ? master?.accountNameTh : entrie.expenseNo,
+                isOtherExpense: master?.isOtherExpense,
+              };
+              listPayload.push(item);
+            } else {
+              sumOther += Number(entrie.approvedAmount) || 0;
+            }
+          });
         const item: payLoadAdd = {
           id: listPayload.length + 1,
           key: 'SUMOTHER',
@@ -618,7 +623,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         };
         listPayload.push(item);
       }
-
       setPayloadModalConfirmDetail(listPayload);
       setOpenModelConfirm(true);
     }
@@ -677,8 +681,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         : status === STATUS.WAITTING_APPROVAL2
         ? approvalAttachFiles
         : [];
-    console.log(isvalid);
-    console.log(existingfileList);
     if (!isvalid && existingfileList.length <= 0) {
       setOpenAlert(true);
       setTextError('กรุณาแนบเอกสาร');
@@ -1038,20 +1040,16 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   }, [open]);
 
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
-  const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
-  const handleOpenModelConfirm = () => {
-    setTextHeaderConfirm('Tessssst');
-    setOpenModelConfirm(true);
-  };
+  const [openModelAccountConfirm, setOpenModelAccountConfirm] = React.useState(false);
 
   const handleCloseModelConfirm = () => {
     setOpenModelConfirm(false);
   };
 
-  const handleConfirm = (periodData: any) => {
-    console.log('handleConfirm');
-    console.log('periodData:', periodData);
+  const handleCloseModelAccountConfirm = () => {
+    setOpenModelAccountConfirm(false);
   };
+
   const topFunction = () => {
     document.getElementById('top-item')?.scrollIntoView({
       block: 'start',
@@ -1291,8 +1289,14 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
         onConfirm={onCallbackFunction}
-        startDate='2022-06-16T00:00:00+07:00'
-        endDate='2022-06-30T23:59:59.999999999+07:00'
+        payload={payloadModalConfirmDetail}
+        periodProps={period}
+      />
+
+      <ModelConfirmAccounting
+        open={openModelAccountConfirm}
+        onClose={handleCloseModelAccountConfirm}
+        onConfirm={onCallbackFunction}
         payload={payloadModalConfirmDetail}
         docNo={docNo}
         periodProps={period}
