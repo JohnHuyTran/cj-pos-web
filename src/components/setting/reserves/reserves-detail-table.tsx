@@ -85,8 +85,8 @@ const columns: GridColDef[] = [
            sx={{ 
             margin: 'auto', 
             borderRadius: '8px',
-            color: params.value === 'ใช้งาน' ? '#3fc995' : '#ff0000b0',
-            backgroundColor: params.value === 'ใช้งาน' ? '#3fc99533' : '#ff000038',
+            color: params.value === 'ใช้งาน' ? '#20AE79' : '#ff0000b0',
+            backgroundColor: params.value === 'ใช้งาน' ? '#93fb9c42' : '#ff000038',
             padding: '5px 20px'}}>
         {params.value}
       </Box>
