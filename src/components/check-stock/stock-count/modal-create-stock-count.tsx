@@ -289,6 +289,7 @@ export default function ModalCreateStockCount({
   };
   const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail);
   const handleOpenAP = async () => {
+    if (viewMode) return;
     handleOpenLoading('open', true);
     try {
       await dispatch(getAuditPlanDetail(dataDetail.APId));
