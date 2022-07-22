@@ -92,8 +92,9 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
             hide: hideColumn,
             renderCell: (params: GridRenderCellParams) => {
               if (Number(params.value) > 0) {
-                const diff = '+' + params.value;
-                return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{addTwoDecimalPlaces(diff)} </label>;
+                return (
+                  <label style={{ color: '#446EF2', fontWeight: 700 }}> +{addTwoDecimalPlaces(params.value)} </label>
+                );
               } else if (Number(params.value) < 0) {
                 return (
                   <label style={{ color: '#F54949', fontWeight: 700 }}> {addTwoDecimalPlaces(params.value)} </label>
@@ -189,7 +190,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
           </div>
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', m: 5, mr: 5, ml: 5 }}>
+        <DialogActions sx={{ justifyContent: 'center', mb: 2, mr: 5, ml: 5 }}>
           <Button
             id='btnCancle'
             variant='contained'
