@@ -349,6 +349,49 @@ const useStyles = makeStyles({
       overflow: 'unset !important',
     },
   },
+  MdataGridConfirm: {
+    '& .MuiDataGrid-columnHeaderTitle': {
+      color: '#36C690',
+      fontWeight: '600 !important',
+    },
+    '& .MuiDataGrid-root': {
+      color: '#263238',
+      fontFamily: 'Kanit',
+      borderRadius: '20px !important',
+      display: 'flex !important',
+      flexDirection: 'column-reverse',
+      '& .MuiDataGrid-main': {
+        top: -16,
+      },
+      '& .MuiDataGrid-cell': {
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        lineHeight: '120% !important',
+        maxHeight: 'none !important',
+        whiteSpace: 'unset !important',
+        overflow: 'unset !important',
+      },
+      '& .MuiDataGrid-cell--textRight': {
+        justifyContent: 'flex-end',
+      },
+      '& .MuiDataGrid-cell--textLeft': {
+        justifyContent: 'flex-start',
+      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
+        {
+          outline: 'none',
+        },
+    },
+    '& .MuiDataGrid-footerContainer': {
+      color: '#AEAEAE',
+      '& MuiDataGrid-selectedRowCount': {
+        fontFamily: 'Kanit !important',
+      },
+      minHeight: '20px !important',
+    },
+  },
+
   Mautocomplete: {
     '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
       padding: '1.5px !important',
