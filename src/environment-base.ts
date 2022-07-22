@@ -496,6 +496,9 @@ export const environment = {
       search: {
         url: 'accounting/expense',
       },
+      searchConfig: {
+        url: 'accounting/expense-config/search',
+      },
       save: {
         url: 'accounting/expense',
       },
