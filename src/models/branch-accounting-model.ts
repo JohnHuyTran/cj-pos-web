@@ -274,3 +274,21 @@ export interface ExpenseSearchConfigInfo {
   isActive: boolean;
   isOtherExpense: boolean;
 }
+
+export interface ExpenseApprove3ByDocNos {
+  expenseDate?: string;
+  approvedDate?: string;
+  docNos?: any[];
+}
+
+export interface ExpenseApprove3All {
+  expenseDate?: string;
+  approvedDate?: string;
+  criteria?: ExpenseApprove3AllCriteria;
+}
+export interface ExpenseApprove3AllCriteria {
+  type: string;
+  month: number;
+  year: number;
+  period: number;
+}

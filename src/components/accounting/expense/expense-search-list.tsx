@@ -5,6 +5,7 @@ import {
   DataGrid,
   GridCellParams,
   GridColDef,
+  GridRenderCellParams,
   GridRowData,
   GridRowParams,
   GridValueGetterParams,
@@ -14,16 +15,17 @@ import Box from '@mui/material/Box';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { useStyles } from '../../../styles/makeTheme';
 import LoadingModal from '../../commons/ui/loading-modal';
-import { Chip, Typography } from '@mui/material';
-import { numberWithCommas } from '../../../utils/utils';
+import { Chip, TextField, Typography } from '@mui/material';
+import { addTwoDecimalPlaces, numberWithCommas } from '../../../utils/utils';
 import ExpenseDetail from './expense-detail';
-import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-slice';
+import { featchExpenseDetailAsync, haveUpdateData } from '../../../store/slices/accounting/accounting-slice';
 import { uploadFileState } from '../../../store/slices/upload-file-slice';
 import { ExpenseSearch, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
 import { getUserInfo, setInit } from '../../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
+import NumberFormat from 'react-number-format';
 
 interface loadingModalState {
   open: boolean;
@@ -128,7 +130,31 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
-    renderCell: (params) => numberWithCommas(params.value),
+    // renderCell: (params) => numberWithCommas(params.value),
+    renderCell: (params: GridRenderCellParams) => {
+      return (
+        <NumberFormat
+          value={String(params.value)}
+          thousandSeparator={true}
+          decimalScale={2}
+          disabled={true}
+          customInput={TextField}
+          sx={{
+            '.MuiInputBase-input.Mui-disabled': {
+              WebkitTextFillColor: '#000',
+            },
+            '.MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '.MuiInputBase-input': {
+              textAlign: 'right',
+            },
+          }}
+          fixedDecimalScale
+          type='text'
+        />
+      );
+    },
   },
   {
     field: 'sumApprovalAmount',
@@ -137,7 +163,31 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
-    renderCell: (params) => numberWithCommas(params.value),
+    // renderCell: (params) => numberWithCommas(params.value),
+    renderCell: (params: GridRenderCellParams) => {
+      return (
+        <NumberFormat
+          value={String(params.value)}
+          thousandSeparator={true}
+          decimalScale={2}
+          disabled={true}
+          customInput={TextField}
+          sx={{
+            '.MuiInputBase-input.Mui-disabled': {
+              WebkitTextFillColor: '#000',
+            },
+            '.MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '.MuiInputBase-input': {
+              textAlign: 'right',
+            },
+          }}
+          fixedDecimalScale
+          type='text'
+        />
+      );
+    },
   },
   {
     field: 'difAmount',
@@ -207,9 +257,9 @@ var calDiff = function (params: GridValueGetterParams) {
     const diff =
       Number(params.getValue(params.id, 'sumApprovalAmount')) - Number(params.getValue(params.id, 'sumWithdrawAmount'));
 
-    if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
-    if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
-    return diff;
+    if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{addTwoDecimalPlaces(diff)} </label>;
+    if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {addTwoDecimalPlaces(diff)} </label>;
+    return addTwoDecimalPlaces(diff);
   }
   return '';
 };
@@ -312,7 +362,8 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const handleOpenDetailModal = async (docNo: string) => {
     await dispatch(featchExpenseDetailAsync(docNo));
     setInit('Y');
-
+    await dispatch(haveUpdateData(false));
+    await dispatch(uploadFileState([]));
     setOpenDetailModal(true);
   };
 
