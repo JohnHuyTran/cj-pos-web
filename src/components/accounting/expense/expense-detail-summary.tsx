@@ -72,8 +72,6 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
             const _prefix = (params.value || 0) > 0 ? '+' : '';
-            console.log(params.value);
-            console.log(String(params.value));
             return (
               <NumberFormat
                 value={String(params.value)}
