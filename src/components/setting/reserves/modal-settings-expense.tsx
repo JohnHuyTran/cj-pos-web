@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState, Fragment } from 'react';
 import {
-  Button,
   Checkbox,
   Dialog,
   DialogContent,
@@ -8,35 +7,34 @@ import {
   FormControlLabel,
   FormHelperText,
   Grid,
-  InputLabel,
-  ListItemText,
   MenuItem,
-  OutlinedInput,
   Radio,
   RadioGroup,
   Select,
   SliderValueLabelUnstyled,
   TextField,
   Typography,
+  CircularProgress,
 } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Save } from '@mui/icons-material';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import { useStyles } from '../../../styles/makeTheme';
-import Save from '@mui/icons-material/Save';
 
 import { expenseTypesSetting, getExpenseTypesSetting } from '../../../utils/enum/setting-reserve-expense-enum';
 
-//component
+//Components
 import TexboxSearchSku from '../../commons/ui/texbox-search-sku';
 
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
-  type: string;
+  type?: string;
 }
 
 export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Props) {
   const classes = useStyles();
-
+  const [isOpenLoading, setIsOpenLoading] = useState(false);
   const [values, setValues] = useState<any>({
     isActive: 'true',
     type: [],
@@ -93,7 +91,14 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
   };
 
   const handleAddButton = () => {
+    setIsOpenLoading(true);
     validateForm();
+
+    setTimeout(() => {
+      setIsOpenLoading(false);
+      console.log('values: ', values);
+      onClickClose();
+    }, 500);
   };
 
   const handleOnClose = () => {
@@ -112,18 +117,17 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
   };
 
   return (
-    <React.Fragment>
-      <Dialog open={isOpen} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleOnClose}>
-          <Typography sx={{ fontSize: 24, fontWeight: 400 }}>รายละเอียดตั้งค่ารายการค่าใช้จ่าย</Typography>
+    <Fragment>
+      <Dialog open={isOpen} maxWidth="lg" fullWidth={true}>
+        <BootstrapDialogTitle id="customized-dialog-title" disabled={isOpenLoading} onClose={handleOnClose}>
+          <Typography sx={{ ml: '15px', fontSize: 24, fontWeight: 400 }}>รายละเอียดตั้งค่ารายการค่าใช้จ่าย</Typography>
         </BootstrapDialogTitle>
-        <DialogContent sx={{ minHeight: '70vh' }}>
+        <DialogContent sx={{ p: '40px' }}>
           <Grid
             container
-            rowSpacing={5}
+            rowSpacing={1}
             columnSpacing={7}
             mb={2}
-            pr={5}
             direction="row"
             justifyContent="flex-start"
             alignItems="center"
@@ -131,8 +135,8 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
             <Grid item xs={2}>
               <Typography variant="body2">สถานะ :</Typography>
             </Grid>
-            <Grid item xs={4}>
-              <FormControl>
+            <Grid item xs={10}>
+              <FormControl disabled={isOpenLoading}>
                 <RadioGroup
                   row
                   aria-labelledby="demo-row-radio-buttons-group-label"
@@ -145,7 +149,6 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 </RadioGroup>
               </FormControl>
             </Grid>
-            <Grid item xs={6}></Grid>
             <Grid item xs={2}>
               <Typography variant="body2" mb={2}>
                 ประเภท<span style={{ color: '#F54949' }}>*</span> :
@@ -156,6 +159,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 <Select
                   id="selType"
                   name="type"
+                  disabled={isOpenLoading}
                   value={values.type}
                   onChange={handleChange}
                   displayEmpty
@@ -193,7 +197,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                       ? (selected) => selected.map((v: any) => getExpenseTypesSetting(v)).join(', ')
                       : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือกประเภท</div>
                   }
-                  disabled={values.type !== 'OTHER'}
+                  disabled={isOpenLoading && values.type !== 'OTHER'}
                 >
                   {expenseTypesSetting.map((item, index: number) => (
                     <MenuItem key={index} value={item.key}>
@@ -213,10 +217,9 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
 
           <Grid
             container
-            rowSpacing={5}
+            rowSpacing={1}
             columnSpacing={7}
             mb={2}
-            pr={5}
             direction="row"
             justifyContent="flex-start"
             alignItems="center"
@@ -237,7 +240,12 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 fullWidth
               /> */}
 
-              <TexboxSearchSku skuTypes="3,7" onSelectItem={handleChangeProduct} isClear={false} />
+              <TexboxSearchSku
+                skuTypes="3,7"
+                onSelectItem={handleChangeProduct}
+                disabled={isOpenLoading}
+                isClear={false}
+              />
             </Grid>
             <Grid item xs={2}>
               <Typography variant="body2" mb={2}>
@@ -253,6 +261,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                   onChange={handleChange}
                   className={classes.MtextField}
                   fullWidth
+                  disabled={isOpenLoading}
                   inputProps={{ maxLength: 50 }}
                 />
                 <FormHelperText sx={{ textAlign: 'right' }}>{values.accountNameTh.length}/50</FormHelperText>
@@ -274,6 +283,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 onChange={handleChange}
                 className={classes.MtextField}
                 fullWidth
+                disabled={isOpenLoading}
               />
             </Grid>
             <Grid item xs={2} mb={2}>
@@ -288,6 +298,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                   onChange={handleChange}
                   className={classes.MtextField}
                   fullWidth
+                  disabled={isOpenLoading}
                   inputProps={{ maxLength: 50 }}
                 />
                 <FormHelperText sx={{ textAlign: 'right' }}>{values.requiredDocumentTh.length}/50</FormHelperText>
@@ -296,7 +307,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
 
             <Grid item xs={2}>
               <Typography variant="body2">
-                วงเงินอนุมัติ ผจก.ส่วน<span style={{ color: '#F54949' }}>*</span> :
+                วงเงินอนุมัติ ผจก.ส่วน<span style={{ color: '#F54949' }}> * </span> :
               </Typography>
             </Grid>
             <Grid item xs={4}>
@@ -310,11 +321,12 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 className={classes.MtextField}
                 fullWidth
                 placeholder="0.00"
+                disabled={isOpenLoading}
               />
             </Grid>
             <Grid item xs={2}>
               <Typography variant="body2">
-                วงเงินอนุมัติ ผจก.OCไม่เกิน<span style={{ color: '#F54949' }}>*</span> :
+                วงเงินอนุมัติ ผจก.OCไม่เกิน<span style={{ color: '#F54949' }}> * </span> :
               </Typography>
             </Grid>
             <Grid item xs={4}>
@@ -327,32 +339,31 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 className={classes.MtextField}
                 fullWidth
                 placeholder="0.00"
+                disabled={isOpenLoading}
               />
             </Grid>
           </Grid>
 
-          <Grid
-            item
-            container
-            xs={12}
-            sx={{ mt: 5, pr: 5 }}
-            justifyContent="flex-end"
-            direction="row"
-            alignItems="flex-end"
-          >
-            <Button
+          <Grid item container xs={12} sx={{ mt: 5, justifyContent: 'right' }}>
+            <LoadingButton
+              id="btnSave"
               variant="contained"
-              onClick={handleAddButton}
-              sx={{ minWidth: '12%' }}
-              className={classes.MbtnSearch}
               color="warning"
               startIcon={<Save />}
+              loading={isOpenLoading}
+              loadingIndicator={
+                <Typography component="span" sx={{ fontSize: '11px' }}>
+                  กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
+                </Typography>
+              }
+              sx={{ borderRadius: 2, width: '12%', height: 43 }}
+              onClick={handleAddButton}
             >
               บันทึก
-            </Button>
+            </LoadingButton>
           </Grid>
         </DialogContent>
       </Dialog>
-    </React.Fragment>
+    </Fragment>
   );
 }
