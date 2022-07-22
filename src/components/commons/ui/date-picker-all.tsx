@@ -18,6 +18,7 @@ interface StateProps {
   disabled?: boolean;
   error?:boolean;
   placeHolder?: string;
+  disableMinDateMsg?: boolean;
 }
 
 const defaultMaterialTheme = createTheme({
@@ -71,7 +72,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         }}
         minDate={props.minDateTo}
         placeholder={props.placeHolder ? props.placeHolder : 'กรุณาเลือกวันที่'}
-        minDateMessage='วันที่ ต้องมากกว่าหรือเท่ากับวันที่ปัจจุบัน'
+        minDateMessage={props.disableMinDateMsg ? '' : 'วันที่ ต้องมากกว่าหรือเท่ากับวันที่ปัจจุบัน'}
         disabled={props.disabled ? props.disabled : false}
       />
     );

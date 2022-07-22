@@ -197,6 +197,7 @@ export default function AuditPlanCreateItem({ status, viewMode }: Props): ReactE
                 </Typography>
               ),
             }}
+            disableSelectionOnClick
           />
         </div>
       </Box>
