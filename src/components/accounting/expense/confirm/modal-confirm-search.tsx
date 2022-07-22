@@ -44,11 +44,14 @@ export default function ModelConfirmSearch({
   const date = new Date();
   const [startDate, setStartDate] = React.useState(String(date));
   const [endDate, setEndDate] = React.useState(String(date));
-  const [periodData, setPeriodData] = React.useState('');
+  const [periodData, setPeriodData] = React.useState({
+    startDate: startDate,
+    endDate: endDate,
+  });
 
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-    await onConfirm(periodData);
+    onConfirm({ period: periodData });
     handleOpenLoading('open', false);
     onClose();
   };
@@ -65,11 +68,26 @@ export default function ModelConfirmSearch({
     if (items.length > 0) {
       setStartDate(items[0].expensePeriod.startDate);
       setEndDate(items[0].expensePeriod.endDate);
+
+      setPeriodData({
+        startDate: String(items[0].expensePeriod.startDate),
+        endDate: String(items[0].expensePeriod.endDate),
+      });
     }
 
     if (summarizList) {
+      let _newExpenseAllList: any[] = [];
+      summarizList.sumItems.map((i: ExpenseInfo) => {
+        _newExpenseAllList.push(i);
+      });
+      const approvedAmountList = {
+        expenseNo: 'approvedAmount',
+        approvedAmount: summarizList.sumApprovedAmount,
+      };
+      _newExpenseAllList.push(approvedAmountList);
+
       let infosWithDraw: any;
-      summarizList.sumItems.map((item: any) => {
+      _newExpenseAllList.map((item: any) => {
         infosWithDraw = {
           ...infosWithDraw,
           [item.expenseNo]: item.approvedAmount,
@@ -83,11 +101,58 @@ export default function ModelConfirmSearch({
 
       setRowList([infosWithDraw]);
 
-      const columns: GridColDef[] = summarizList.sumItems.map((i: ExpenseInfo) => {
+      let columns: GridColDef[] = _newExpenseAllList.map((i: ExpenseInfo) => {
         const master = getMasterExpenInto(i.expenseNo);
+
         const hideColumn = master ? master.isOtherExpense : false;
+        // let hideColumn = false;
+        // if (master) {
+        //   console.log('master:', master);
+        //   console.log('master.isOtherExpense:', master.isOtherExpense);
+        //   if (master.isOtherExpense !== false) hideColumn = true;
+        // }
+
         let accountNameTh = master?.accountNameTh;
-        if (i.expenseNo === 'SUMOTHER') accountNameTh = 'รวม';
+        if (i.expenseNo === 'SUMOTHER') accountNameTh = 'อื่นๆ';
+        if (i.expenseNo === 'approvedAmount') {
+          accountNameTh = 'รวม';
+          return {
+            field: i.expenseNo,
+            headerName: accountNameTh,
+            minWidth: 120,
+            flex: 0.6,
+            headerAlign: 'center',
+            align: 'right',
+            sortable: false,
+            hide: hideColumn,
+            renderCell: (params: GridRenderCellParams) => {
+              return (
+                <NumberFormat
+                  value={String(params.value)}
+                  thousandSeparator={true}
+                  decimalScale={2}
+                  className={classes.MtextFieldNumber}
+                  disabled={true}
+                  customInput={TextField}
+                  sx={{
+                    '.MuiInputBase-input.Mui-disabled': {
+                      WebkitTextFillColor: '#36C690',
+                      fontWeight: '600',
+                    },
+                    '.MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '.MuiInputBase-input-MuiOutlinedInput-input': {
+                      textAlign: 'right',
+                    },
+                  }}
+                  fixedDecimalScale
+                  type='text'
+                />
+              );
+            },
+          };
+        }
 
         return {
           field: i.expenseNo,
@@ -99,23 +164,29 @@ export default function ModelConfirmSearch({
           sortable: false,
           hide: hideColumn,
           renderCell: (params: GridRenderCellParams) => {
-            if (isFilterFieldInExpense(params.field)) {
-              return (
-                // <Box component='div' sx={{ paddingRight: '5px' }}>
-                //   {params.value}
-                // </Box>
-
-                <NumberFormat
-                  value={String(params.value)}
-                  thousandSeparator={true}
-                  decimalScale={2}
-                  className={classes.MtextFieldNumber}
-                  disabled={true}
-                  customInput={TextField}
-                  fixedDecimalScale
-                />
-              );
-            }
+            return (
+              <NumberFormat
+                value={String(params.value)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                disabled={true}
+                customInput={TextField}
+                sx={{
+                  '.MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: '#000',
+                  },
+                  '.MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '.MuiInputBase-input-MuiOutlinedInput-input': {
+                    textAlign: 'right',
+                  },
+                }}
+                fixedDecimalScale
+                type='text'
+              />
+            );
           },
         };
       });
@@ -134,8 +205,8 @@ export default function ModelConfirmSearch({
         PaperProps={{ sx: { minWidth: 900 } }}>
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
           <ConfirmContent
-            startDate={startDate}
-            endDate={endDate}
+            startPeriod={startDate}
+            endPeriod={endDate}
             handleDate={handleDate}
             title={summarizTitle}
             columnsList={columnsList}
