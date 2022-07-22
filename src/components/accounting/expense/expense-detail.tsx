@@ -48,7 +48,7 @@ import {
   stringNumberNullOrEmpty,
 } from '../../../utils/utils';
 import { convertUtcToBkkDate, convertUtcToBkkWithZ } from '../../../utils/date-utill';
-import { getInit, getUserInfo } from '../../../store/sessionStore';
+import { getInit, getUserInfo, setInit } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
 import { EXPENSE_TYPE, getExpenseStatus, STATUS } from '../../../utils/enum/accounting-enum';
 import LoadingModal from '../../commons/ui/loading-modal';
@@ -490,6 +490,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [validateReason, setValidateReason] = React.useState<boolean>(false);
   const [sumWithdrawAmount, setSumWithdrawAmount] = React.useState('');
   const handleApproveBtn = () => {
+    setInit('N');
     setIsApprove(true);
     setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
     if (status === STATUS.DRAFT) {
