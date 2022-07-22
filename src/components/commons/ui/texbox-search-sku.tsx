@@ -26,7 +26,6 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear }: Pro
   let options: any = [];
   if (searchItem) options = itemsList && itemsList.length > 0 ? itemsList : [];
 
-  console.log('option: ', options);
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.skuType + option.skuCode,
   });

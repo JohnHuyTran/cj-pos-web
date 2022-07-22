@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Checkbox,
@@ -15,6 +15,7 @@ import {
   Radio,
   RadioGroup,
   Select,
+  SliderValueLabelUnstyled,
   TextField,
   Typography,
 } from '@mui/material';
@@ -36,7 +37,7 @@ interface Props {
 export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Props) {
   const classes = useStyles();
 
-  const [values, setValues] = React.useState<any>({
+  const [values, setValues] = useState<any>({
     isActive: 'true',
     type: [],
     typeOther: [],
@@ -58,16 +59,41 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
     setValues({ ...values, typeOther: value === 'string' ? value.split(',') : value });
   };
 
-  const handleAddButton = () => {
-    console.log('values: ', values);
-  };
-
   const handleChangeProduct = (value: any) => {
     if (value) {
       setValues({ ...values, skuCode: value.skuCode });
     } else {
       setValues({ ...values, skuCode: '' });
     }
+  };
+
+  const validateForm = () => {
+    console.log('values: ', values);
+
+    console.log('approvalLimit1No: ', values.approvalLimit1);
+    console.log('approvalLimit2No: ', values.approvalLimit2);
+    console.log('approvalLimit1No-no: ', Number(values.approvalLimit1));
+    console.log('approvalLimit2No-no: ', Number(values.approvalLimit2));
+    if (
+      values.type.length === 0 ||
+      values.skuCode === '' ||
+      values.accountNameTh === '' ||
+      values.accountCode === '' ||
+      values.approvalLimit1 === '' ||
+      values.approvalLimit2 === ''
+    ) {
+      alert('validate 1');
+    } else if (values.type === 'OTHER' && values.typeOther.length === 0) {
+      alert('กรุณาเลือกประเภทร้านที่แสดง');
+    } else if (Number(values.approvalLimit1) >= Number(values.approvalLimit2)) {
+      alert('ต้องมีค่ามากกว่าผจก.ส่วน');
+    } else {
+      alert('pass');
+    }
+  };
+
+  const handleAddButton = () => {
+    validateForm();
   };
 
   const handleOnClose = () => {
@@ -121,12 +147,12 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
             </Grid>
             <Grid item xs={6}></Grid>
             <Grid item xs={2}>
-              <Typography variant="body2">
+              <Typography variant="body2" mb={2}>
                 ประเภท<span style={{ color: '#F54949' }}>*</span> :
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <FormControl fullWidth className={classes.Mselect}>
+              <FormControl fullWidth className={classes.Mselect} sx={{ mb: 3 }}>
                 <Select
                   id="selType"
                   name="type"
@@ -150,7 +176,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
               </FormControl>
             </Grid>
             <Grid item xs={2}>
-              <Typography variant="body2">
+              <Typography variant="body2" mb={2}>
                 ประเภทร้านที่แสดง<span style={{ color: '#F54949' }}>*</span> :
               </Typography>
             </Grid>
@@ -167,6 +193,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                       ? (selected) => selected.map((v: any) => getExpenseTypesSetting(v)).join(', ')
                       : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือกประเภท</div>
                   }
+                  disabled={values.type !== 'OTHER'}
                 >
                   {expenseTypesSetting.map((item, index: number) => (
                     <MenuItem key={index} value={item.key}>
@@ -195,11 +222,11 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
             alignItems="center"
           >
             <Grid item xs={2}>
-              <Typography variant="body2">
+              <Typography variant="body2" mb={2}>
                 สินค้า<span style={{ color: '#F54949' }}>*</span> :
               </Typography>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={4} mb={3}>
               {/* <TextField
                 //   id="txt"
                 name="skuCode"
@@ -213,7 +240,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
               <TexboxSearchSku skuTypes="3,7" onSelectItem={handleChangeProduct} isClear={false} />
             </Grid>
             <Grid item xs={2}>
-              <Typography variant="body2">
+              <Typography variant="body2" mb={2}>
                 ชื่อบัญชี<span style={{ color: '#F54949' }}>*</span> :
               </Typography>
             </Grid>
@@ -233,11 +260,11 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
             </Grid>
 
             <Grid item xs={2}>
-              <Typography variant="body2">
+              <Typography variant="body2" mb={2}>
                 รหัสบัญชี<span style={{ color: '#F54949' }}>*</span> :
               </Typography>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={4} mb={3}>
               <TextField
                 //   id="txt"
                 name="accountCode"
@@ -249,7 +276,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 fullWidth
               />
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={2} mb={2}>
               <Typography variant="body2">เอกสารที่ต้องส่ง :</Typography>
             </Grid>
             <Grid item xs={4}>
