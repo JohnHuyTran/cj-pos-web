@@ -18,7 +18,7 @@ import LoadingModal from '../../commons/ui/loading-modal';
 import { Chip, TextField, Typography } from '@mui/material';
 import { addTwoDecimalPlaces, numberWithCommas } from '../../../utils/utils';
 import ExpenseDetail from './expense-detail';
-import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-slice';
+import { featchExpenseDetailAsync, haveUpdateData } from '../../../store/slices/accounting/accounting-slice';
 import { uploadFileState } from '../../../store/slices/upload-file-slice';
 import { ExpenseSearch, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
@@ -362,7 +362,8 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const handleOpenDetailModal = async (docNo: string) => {
     await dispatch(featchExpenseDetailAsync(docNo));
     setInit('Y');
-
+    await dispatch(haveUpdateData(false));
+    await dispatch(uploadFileState([]));
     setOpenDetailModal(true);
   };
 

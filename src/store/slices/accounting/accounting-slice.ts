@@ -14,6 +14,7 @@ type State = {
   itemRows: any;
   addNewItem: any;
   addSummaryItem: any;
+  haveUpdateData: boolean;
 };
 
 const initialState: State = {
@@ -29,6 +30,7 @@ const initialState: State = {
   itemRows: [],
   addNewItem: null,
   addSummaryItem: null,
+  haveUpdateData: false,
 };
 
 export const featchExpenseDetailAsync = createAsyncThunk('ExpenseDetail', async (docNo: string) => {
@@ -69,6 +71,9 @@ const expenseAccountDetailSlice = createSlice({
     addSummaryItem: (state, action: PayloadAction<any>) => {
       state.addSummaryItem = action.payload;
     },
+    haveUpdateData: (state, action: PayloadAction<any>) => {
+      state.haveUpdateData = action.payload;
+    },
   },
   extraReducers: (builer) => {
     builer.addCase(featchExpenseDetailAsync.pending, () => {
@@ -83,6 +88,13 @@ const expenseAccountDetailSlice = createSlice({
   },
 });
 
-export const { updateSummaryRows, updateItemRows, updateToInitialState, addNewItem, initialItems, addSummaryItem } =
-  expenseAccountDetailSlice.actions;
+export const {
+  updateSummaryRows,
+  updateItemRows,
+  updateToInitialState,
+  addNewItem,
+  initialItems,
+  addSummaryItem,
+  haveUpdateData,
+} = expenseAccountDetailSlice.actions;
 export default expenseAccountDetailSlice.reducer;
