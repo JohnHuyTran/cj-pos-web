@@ -17,13 +17,12 @@ import {
 } from '@mui/material';
 import { LoadingButton } from "@mui/lab";
 import { Save } from '@mui/icons-material';
-import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
-import { useStyles } from '../../../styles/makeTheme';
-
-import { expenseTypesSetting, getExpenseTypesSetting } from '../../../utils/enum/setting-reserve-expense-enum';
+import { useStyles } from 'styles/makeTheme';
+import { expenseTypesSetting, getExpenseTypesSetting } from 'utils/enum/setting-reserve-expense-enum';
 
 //Components
-import TexboxSearchSku from '../../commons/ui/texbox-search-sku';
+import TexboxSearchSku from 'components/commons/ui/texbox-search-sku';
+import { BootstrapDialogTitle } from 'components/commons/ui/dialog-title';
 
 interface Props {
   isOpen: boolean;

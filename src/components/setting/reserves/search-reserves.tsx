@@ -1,18 +1,5 @@
 import { Fragment, useState } from "react";
-import { useStyles } from '../../../styles/makeTheme';
-import { useAppSelector, useAppDispatch } from '../../../store/store';
-
-// Components
-import ModalSettingExpense from './modal-settings-expense';
-import LoadingModal from '../../commons/ui/loading-modal';
-
-// Call API
-import {
-  clearDataSearchBranchAccountingConfig,
-  featchBranchAccountingConfigListAsync,
-} from '../../../store/slices/accounting/accounting-search-config-slice';
-import { ExpenseSearchCofigRequest } from '../../../models/branch-accounting-model';
-
+import { useStyles } from 'styles/makeTheme';
 import { 
   Grid,
   Typography,
@@ -21,6 +8,18 @@ import {
   MenuItem,
   Button } from "@mui/material";
 import { AddCircleOutline } from '@mui/icons-material';
+import { useAppSelector, useAppDispatch } from 'store/store';
+
+// Components
+import LoadingModal from 'components/commons/ui/loading-modal';
+import ModalSettingExpense from './modal-settings-expense';
+
+// Call API
+import {
+  clearDataSearchBranchAccountingConfig,
+  featchBranchAccountingConfigListAsync,
+} from 'store/slices/accounting/accounting-search-config-slice';
+import { ExpenseSearchCofigRequest } from 'models/branch-accounting-model';
 
 export default function SearchReserves () {
   const classes = useStyles();
