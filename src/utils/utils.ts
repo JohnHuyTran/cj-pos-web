@@ -85,7 +85,7 @@ export function isOwnBranch(branch: any): boolean {
 }
 
 export const formatNumber = (value: any, decimalPoint: number = 0) => {
-  return ''+(Number.parseFloat(value).toFixed(decimalPoint)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return ''+((+value).toFixed(decimalPoint)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 // export function isBranchDC(userInfo: KeyCloakTokenInfo): boolean {
