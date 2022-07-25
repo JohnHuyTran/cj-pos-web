@@ -6,7 +6,12 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { ExpenseInfo, payLoadAdd } from '../../../models/branch-accounting-model';
 import { addSummaryItem, haveUpdateData } from '../../../store/slices/accounting/accounting-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
-import { isFilterFieldInExpense, isFilterOutFieldInAdd, stringNullOrEmpty } from '../../../utils/utils';
+import {
+  isFilterFieldInExpense,
+  isFilterOutFieldForPayload,
+  isFilterOutFieldInAdd,
+  stringNullOrEmpty,
+} from '../../../utils/utils';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import NumberFormat from 'react-number-format';
 
@@ -36,14 +41,25 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
     let sum: number = 0;
     let _otherSum: number = 0;
     testList.map((e: any) => {
-      data = { ...data, [e.key]: e.value };
+      const value = e.value;
+      let _data: any;
+      if (!isFilterOutFieldForPayload(e.key)) {
+        _data = value
+          .toString()
+          .replace(/[^0-9.]/g, '')
+          .replace(/,/g, '');
+        _data = parseFloat(_data);
+        data = { ...data, [e.key]: _data };
+      } else {
+        data = { ...data, [e.key]: e.value };
+      }
       if (!isFilterOutFieldInAdd(e.key)) {
-        sum += Number(e.value) || 0;
+        sum += _data;
 
         const master = getMasterExpenInto(e.key);
         const _isOtherExpense = master ? master.isOtherExpense : false;
         if (_isOtherExpense) {
-          _otherSum += Number(e.value) || 0;
+          _otherSum += _data;
         }
       }
     });
@@ -69,10 +85,18 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
         // .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key))
         .map((i: payLoadAdd) => {
           if (!isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key)) {
-            _otherSum += Number(i.value);
+            if (typeof i.value === 'string') {
+              _otherSum += parseFloat(i.value);
+            } else {
+              _otherSum += i.value;
+            }
           }
           if (!isFilterOutFieldInAdd(i.key)) {
-            sum += Number(i.value);
+            if (typeof i.value === 'string') {
+              sum += parseFloat(i.value);
+            } else {
+              sum += i.value;
+            }
           }
         });
       setSumOther(_otherSum);
@@ -82,7 +106,8 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
   }, [open, payload]);
 
   const handleChangeNew = (value: any, name: any) => {
-    const onlyNumber = value;
+    const _data = value.replace(/[^0-9.]/g, '').replace(/,/g, '');
+    const onlyNumber = parseFloat(_data || 0);
     let sum: number = 0;
     const data = Number(onlyNumber) || 0;
     testList.forEach((element: any) => {
@@ -100,17 +125,17 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
   };
 
   const handleChangeNewOnOtherExpense = (value: any, name: any) => {
-    const onlyNumber = value;
+    const _data = value.replace(/[^0-9.]/g, '').replace(/,/g, '');
+    const data = parseFloat(_data || 0);
     let _otherSum: number = 0;
     let sum: number = 0;
-    const data = Number(onlyNumber) || 0;
     testList.forEach((element: any) => {
       if (element.key === name) {
         element.value = data;
       }
       if (!isFilterFieldInExpense(element.key) && isOtherExpenseField(element.key)) {
         if (element.key === name) {
-          _otherSum += Number(data);
+          _otherSum += data;
         } else {
           _otherSum += element.value;
         }
@@ -144,7 +169,14 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
         <DialogContent>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={3}>
-              ยอดเงินอนุมัติ : {Number(sumExpense)}
+              ยอดเงินอนุมัติ :{' '}
+              <NumberFormat
+                value={sumExpense}
+                displayType={'text'}
+                decimalScale={2}
+                thousandSeparator={true}
+                fixedDecimalScale
+              />
             </Grid>
             <Grid item xs={4}></Grid>
             <>
@@ -182,6 +214,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             customInput={TextField}
                             fixedDecimalScale
                             autoComplete='off'
+                            thousandSeparator={true}
                           />
                         </Grid>
                       </>
@@ -217,6 +250,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                     customInput={TextField}
                     fixedDecimalScale
                     autoComplete='off'
+                    thousandSeparator={true}
                   />
                 </Grid>
               </Grid>
@@ -254,6 +288,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             customInput={TextField}
                             fixedDecimalScale
                             autoComplete='off'
+                            thousandSeparator={true}
                           />
                         </Grid>
                       </>
