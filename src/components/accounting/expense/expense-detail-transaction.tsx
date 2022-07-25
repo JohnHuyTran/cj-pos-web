@@ -22,7 +22,7 @@ import { useStyles } from '../../../styles/makeTheme';
 import { STATUS } from '../../../utils/enum/accounting-enum';
 import { isFilterFieldInExpense, stringNullOrEmpty, isFilterOutFieldInAdd } from '../../../utils/utils';
 import HtmlTooltip from '../../commons/ui/html-tooltip';
-import ModalAddExpense from './modal-add-expense';
+import ModalAddExpense from './modal-add-expense-format';
 interface Props {
   onClickAddNewBtn?: () => void;
   type: string;
@@ -210,9 +210,9 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
 
             const value = params.value || 0;
             const condition =
-              value > Number(master?.approvalLimit2)
+              value > (master?.approvalLimit2 || 0)
                 ? 'overLimit2'
-                : value > Number(master?.approvalLimit1)
+                : value > (master?.approvalLimit1 || 0)
                 ? 'overLimit1'
                 : 'normal';
             return (

@@ -160,21 +160,37 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
               ยืนยันอนุมัติค่าใช้จ่าย
             </Typography>
 
-            <Typography variant='body1' align='center'>
-              เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
-                <b>{docNo}</b>
-              </label>
-            </Typography>
+            <Box id='DetailBox' sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box id='DetailTitle' sx={{ width: '55%', textAlign: 'right' }}>
+                เลขที่เอกสาร
+              </Box>
+              <Box id='DetailLine'>
+                <Typography component='label' sx={{ color: '#AEAEAE', ml: '18px', mr: '5px' }}>
+                  |
+                </Typography>
+              </Box>
+              <Box id='DetailDescription' sx={{ width: '100%' }}>
+                <Typography component='label' sx={{ color: '#36C690', fontWeight: '700' }}>
+                  {docNo}
+                </Typography>
+              </Box>
+            </Box>
 
-            <Typography variant='body1' align='center'>
-              งวด <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
-                <b>
+            <Box id='DetailBox' sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box id='DetailTitle' sx={{ width: '55%', textAlign: 'right' }}>
+                งวด
+              </Box>
+              <Box id='DetailLine'>
+                <Typography component='label' sx={{ color: '#AEAEAE', ml: '18px', mr: '5px' }}>
+                  |
+                </Typography>
+              </Box>
+              <Box id='DetailDescription' sx={{ width: '100%' }}>
+                <Typography component='label' sx={{ color: '#36C690', fontWeight: '700' }}>
                   {convertUtcToBkkDate(startDate)} - {convertUtcToBkkDate(endDate)}
-                </b>
-              </label>
-            </Typography>
+                </Typography>
+              </Box>
+            </Box>
           </DialogContentText>
 
           <div

@@ -36,10 +36,10 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ margin: 'auto' }}>
+      <Box component="div" sx={{ margin: 'auto' }}>
         {params.value}
       </Box>
-    )
+    ),
   },
   {
     field: 'typeNameTh',
@@ -58,8 +58,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <Box>
-        <Typography variant='body2'>{params.getValue(params.id, 'skuName') || ''}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+        <Typography variant="body2">{params.getValue(params.id, 'skuName') || ''}</Typography>
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </Box>
@@ -98,7 +98,7 @@ const columns: GridColDef[] = [
             padding: '5px 20px'}}>
         {params.value ? 'ใช้งาน' : 'ไม่ใช้งาน'}
       </Box>
-    )
+    ),
   },
   {
     field: 'approvalLimit1',
@@ -111,7 +111,7 @@ const columns: GridColDef[] = [
       <Box component='div' sx={{ marginLeft: 'auto' }}>
         {formatNumber(params.value, 2)}
       </Box>
-    )
+    ),
   },
   {
     field: 'approvalLimit2',
@@ -129,7 +129,7 @@ const columns: GridColDef[] = [
 ]
 
 export default function ReservesDetailTable () {
-  const payload = useAppSelector((state) => state.saveExpenseSearchRequest.searchExpense);
+  // const payload = useAppSelector((state) => state.ExpenseSearchCofigRequest.searchExpense);
   const items = useAppSelector((state) => state.searchBranchAccountingConfig);
   const res: any = items.branchAccountingConfigList;
   // const res: any = Mock.branchAccountingConfigList;
@@ -137,20 +137,23 @@ export default function ReservesDetailTable () {
     return {
       id: indexs,
       index: indexs + 1,
-      ...data
-    }
-  })
-  
+      ...data,
+    };
+  });
+
   // Set state data
   const classes = useStyles();
-  const [pageSize, setPageSize] = useState(10)
-  const [isOpenModal, setIsOpenModal] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [pageSize, setPageSize] = useState(10);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [dataSelect, setDataSelect] = useState({});
+  const [isStatus, setIsStatus] = useState('');
+
   const currentlySelected = async (params: GridCellParams) => {
-    console.log('value', params)
-    setIsOpenModal(true)
-    // const value = params.colDef.field;
-  }
+    setIsStatus('Update');
+    setDataSelect(params.row);
+    setIsOpenModal(true);
+  };
 
   // Handle function
   const handlePageChange = async (newPage: number) => {
@@ -183,7 +186,8 @@ export default function ReservesDetailTable () {
           height: `${110 + (Math.min(pageSize, rows.length) * 65)}px`,
           maxHeight: 'calc(100vh - 360px)'
         }}
-        className={classes.MdataGridDetail}>
+        className={classes.MdataGridDetail}
+      >
         <DataGrid
           rows={rows}
           columns={columns}
@@ -206,8 +210,11 @@ export default function ReservesDetailTable () {
       </Box>
       
       <ModalSettingExpense
-          isOpen={isOpenModal}
-          onClickClose={() => setIsOpenModal(false)} />
+        isOpen={isOpenModal}
+        isStatus={isStatus}
+        dataSelect={dataSelect}
+        onClickClose={() => setIsOpenModal(false)}
+      />
     </Fragment>
-  )
+  );
 }

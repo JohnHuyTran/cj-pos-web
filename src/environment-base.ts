@@ -550,5 +550,13 @@ export const environment = {
         },
       },
     },
+    expenseConfig: {
+      createExpenseConfig: {
+        url: 'accounting/expense-config',
+      },
+      updateExpenseConfig: {
+        url: 'accounting/expense-config/{expenseNo}',
+      },
+    },
   },
 };

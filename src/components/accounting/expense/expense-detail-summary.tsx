@@ -22,7 +22,7 @@ import {
   stringNumberNullOrEmpty,
 } from '../../../utils/utils';
 import ExpenseDetailTransaction from './expense-detail-transaction';
-import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
+import ModalUpdateExpenseSummary from './modal-update-expense-sumary-format';
 
 interface Props {
   type: string;
@@ -75,7 +75,8 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
-            const _prefix = (params.value || 0) > 0 ? '+' : '';
+            const _prefix = params.getValue(params.id, 'isShowDiff') ? params.getValue(params.id, 'isShowDiff') : false;
+            const value = (params.value || 0) > 0 ? true : false;
             return (
               <NumberFormat
                 value={String(params.value)}
@@ -90,7 +91,7 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
                     // color: color,
                   },
                 }}
-                // prefix={_prefix}
+                prefix={_prefix && value ? '+' : ''}
                 fixedDecimalScale
                 type='text'
               />
@@ -115,6 +116,8 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
               </Box>
             );
           } else {
+            const _prefix = params.getValue(params.id, 'isShowDiff') ? params.getValue(params.id, 'isShowDiff') : false;
+            const value = (params.value || 0) > 0 ? true : false;
             return (
               <NumberFormat
                 value={String(params.value)}
@@ -130,6 +133,7 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
                   },
                 }}
                 fixedDecimalScale
+                prefix={_prefix && value ? '+' : ''}
               />
               // <TextField
               //   variant='outlined'
@@ -271,7 +275,7 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
           [entrie.expenseNo]: entrie.withdrawAmount,
         };
         if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
-          totalWithDraw += Number(entrie?.withdrawAmount);
+          totalWithDraw += entrie?.withdrawAmount || 0;
         }
       });
       const arr = Object.entries(_item);
@@ -286,12 +290,11 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
         };
       });
       let infoDiff: any;
-      let totalDiff: number = 0;
       arr.map((element: any, i: number) => {
         const key = element[0];
-        const value = Number(element[1]) || 0;
+        const value = element[1] || 0;
         const withDraw = entries.find((entrie: SumItemsItem, i: number) => entrie.expenseNo === key);
-        const withdrawAmount = Number(withDraw?.withdrawAmount);
+        const withdrawAmount = withDraw?.withdrawAmount || 0;
         const diff = value - withdrawAmount;
         infoDiff = {
           ...infoDiff,
@@ -304,11 +307,12 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
         id: 3,
         description: 'ผลต่าง',
       };
-
+      const _totalDiff = totalApprove - totalWithDraw;
+      const totalDiff = _totalDiff > 0 ? `+${_totalDiff}` : _totalDiff;
       rows = [
         { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw },
         { ...infosApprove, id: 2, description: 'ยอดเงินอนุมัติ', infosApprove },
-        { ...infoDiff, total: Number(totalApprove) - Number(totalWithDraw) },
+        { ...infoDiff, total: totalDiff, isShowDiff: true },
       ];
       dispatch(updateSummaryRows(rows));
     }

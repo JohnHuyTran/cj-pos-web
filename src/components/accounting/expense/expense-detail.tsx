@@ -11,7 +11,7 @@ import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import ControlPoint from '@mui/icons-material/ControlPoint';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ExpenseDetailSummary from './expense-detail-summary';
-import ModalAddExpense from './modal-add-expense';
+import ModalAddExpense from './modal-add-expense-format';
 import ModelDescriptionExpense from './modal-description-expense';
 
 import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
@@ -189,6 +189,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     if (items && items.length > 0) {
       items.forEach((e: any) => {
         const arr = Object.entries(e);
+
         let items: ItemItem[] = [];
         arr
           .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
@@ -956,7 +957,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           {
             ...infoDiff,
             total: totalDiff > 0 ? `+${totalDiff}` : totalDiff,
-            SUMOTHER: totalOtherDiff,
+            SUMOTHER: totalOtherDiff > 0 ? `+${totalOtherDiff}` : totalOtherDiff || 0,
             isShowDiff: true,
           },
         ];
@@ -967,7 +968,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           {
             ...infoDiff,
             total: totalDiff > 0 ? `+${totalDiff}` : totalDiff || 0,
-            SUMOTHER: totalOtherDiff,
+            SUMOTHER: totalOtherDiff > 0 ? `+${totalOtherDiff}` : totalOtherDiff || 0,
             isShowDiff: true,
           },
         ];
