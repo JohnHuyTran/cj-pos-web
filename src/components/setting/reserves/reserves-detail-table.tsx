@@ -11,11 +11,7 @@ import {
   GridRowId,
   useGridApiRef,
 } from '@mui/x-data-grid';
-import {
-  Box,
-  TextField,
-  Typography
-} from '@mui/material';
+import { Box, TextField, Typography } from '@mui/material';
 
 // Components
 import ModalSettingExpense from './modal-settings-expense';
@@ -29,10 +25,10 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ margin: 'auto' }}>
+      <Box component="div" sx={{ margin: 'auto' }}>
         {params.value}
       </Box>
-    )
+    ),
   },
   {
     field: 'typeNameTh',
@@ -51,8 +47,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <Box>
-        <Typography variant='body2'>{params.getValue(params.id, 'skuName') || ''}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
+        <Typography variant="body2">{params.getValue(params.id, 'skuName') || ''}</Typography>
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </Box>
@@ -82,16 +78,19 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component='div'
-           sx={{ 
-            margin: 'auto', 
-            borderRadius: '8px',
-            color: params.value ? '#20AE79' : '#ff0000b0',
-            backgroundColor: params.value ? '#93fb9c42' : '#ff000038',
-            padding: '5px 20px'}}>
+      <Box
+        component="div"
+        sx={{
+          margin: 'auto',
+          borderRadius: '8px',
+          color: params.value ? '#20AE79' : '#ff0000b0',
+          backgroundColor: params.value ? '#93fb9c42' : '#ff000038',
+          padding: '5px 20px',
+        }}
+      >
         {params.value ? 'ใช้งาน' : 'ไม่ใช้งาน'}
       </Box>
-    )
+    ),
   },
   {
     field: 'approvalLimit1',
@@ -101,10 +100,10 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ marginLeft: 'auto' }}>
-        {(params?.value?.toLocaleString())}
+      <Box component="div" sx={{ marginLeft: 'auto' }}>
+        {params?.value?.toLocaleString()}
       </Box>
-    )
+    ),
   },
   {
     field: 'approvalLimit2',
@@ -114,43 +113,46 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ marginLeft: 'auto' }}>
-        {(params?.value?.toLocaleString())}
+      <Box component="div" sx={{ marginLeft: 'auto' }}>
+        {params?.value?.toLocaleString()}
       </Box>
-    )
-  }
-]
+    ),
+  },
+];
 
-
-export default function ReservesDetailTable () {
+export default function ReservesDetailTable() {
   const items = useAppSelector((state) => state.searchBranchAccountingConfig);
   const res: any = items.branchAccountingConfigList;
   const rows: any = res.data.map((data: any, indexs: number) => {
     return {
       id: indexs,
       index: indexs + 1,
-      ...data
-    }
-  })
-  
+      ...data,
+    };
+  });
+
   // Set state data
   const classes = useStyles();
-  const [pageSize, setPageSize] = useState(10)
-  const [isOpenModal, setIsOpenModal] = useState(false)
+  const [pageSize, setPageSize] = useState(10);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [dataSelect, setDataSelect] = useState({});
+  const [isStatus, setIsStatus] = useState('');
+
   const currentlySelected = async (params: GridCellParams) => {
-    console.log('value', params.row.index)
-    setIsOpenModal(true)
-    // const value = params.colDef.field;
-  }
+    setIsStatus('Update');
+    setDataSelect(params.row);
+    setIsOpenModal(true);
+  };
 
   return (
     <Fragment>
       <div
         style={{
           width: '100%',
-          height: rows.length >= 8 ? '70vh' : 'auto'
+          height: rows.length >= 8 ? '70vh' : 'auto',
         }}
-        className={classes.MdataGridDetail}>
+        className={classes.MdataGridDetail}
+      >
         <DataGrid
           rows={rows}
           columns={columns}
@@ -168,10 +170,13 @@ export default function ReservesDetailTable () {
           // onCellKeyDown={handleEditItems}
         />
       </div>
-  
+
       <ModalSettingExpense
-          isOpen={isOpenModal}
-          onClickClose={() => setIsOpenModal(false)} />
+        isOpen={isOpenModal}
+        isStatus={isStatus}
+        dataSelect={dataSelect}
+        onClickClose={() => setIsOpenModal(false)}
+      />
     </Fragment>
-  )
+  );
 }

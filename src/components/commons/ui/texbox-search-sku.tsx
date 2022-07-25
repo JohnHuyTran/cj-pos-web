@@ -15,9 +15,11 @@ interface Props {
   onSelectItem: (value: any) => void;
   disabled?: boolean;
   isClear: boolean;
+  skuCode?: string;
+  skuName?: string;
 }
 
-export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disabled }: Props) {
+export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disabled, skuCode, skuName }: Props) {
   const classes = useStyles();
 
   const [value, setValue] = React.useState('');
@@ -27,7 +29,6 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
   let options: any = [];
   if (searchItem) options = itemsList && itemsList.length > 0 ? itemsList : [];
 
-  console.log('option: ', options);
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.skuType + option.skuCode,
   });
@@ -75,6 +76,18 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
     }
   }, [isClear]);
 
+  useEffect(() => {
+    if (skuCode || skuName) {
+      const testValue: any = {
+        productNamePrime: skuName,
+        productNameSecnd: skuName,
+        skuCode: skuCode,
+        skuType: '',
+      };
+      handleChangeItem('', testValue, '');
+    }
+  }, [skuCode]);
+
   const autocompleteRenderListItem = (props: any, option: any) => {
     return (
       <li {...props} key={option.skuCode}>
@@ -96,7 +109,7 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
           ...params.InputProps,
           endAdornment: (
             <React.Fragment>
-              {loading ? <CircularProgress color="inherit" size={20} /> : null}
+              {loading ? <CircularProgress color="inherit" size={18} /> : null}
               {params.InputProps.endAdornment}
             </React.Fragment>
           ),
@@ -124,6 +137,7 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
       renderOption={autocompleteRenderListItem}
       onChange={handleChangeItem}
       onInputChange={onInputChange}
+      //   defaultValue={skuCode}
       getOptionLabel={(option) => (option.skuCode ? option.skuCode : '')}
       isOptionEqualToValue={(option, value) => option.skuCode === value.skuCode}
       renderInput={autocompleteRenderInput}

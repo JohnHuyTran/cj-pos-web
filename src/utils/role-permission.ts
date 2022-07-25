@@ -279,8 +279,8 @@ const permission = {
   },
   accountManager: {
     menu: {
-      mainmenu: [MAINMENU.EXPENSE],
-      submenu: [SUBMENU.EX_EXPENSE],
+      mainmenu: [MAINMENU.EXPENSE, MAINMENU.EXPENSE_CONFIG],
+      submenu: [SUBMENU.EX_EXPENSE, SUBMENU.EX_CONFIG],
     },
     action: [
       ACTIONS.ACCOUNTING_VIEW,

@@ -292,3 +292,23 @@ export interface ExpenseApprove3AllCriteria {
   year: number;
   period: number;
 }
+export interface ExpenseConfigCreateRequest {
+  types: any;
+  isOtherExpense?: boolean;
+  accountCode: string;
+  accountNameTh: string;
+  skuCode: string;
+  approvalLimit1: number;
+  approvalLimit2: number;
+  isActive: boolean;
+  requiredDocumentTh?: string;
+}
+
+export interface ExpenseConfigUpdateRequest {
+  accountCode: string;
+  accountNameTh: string;
+  skuCode: string;
+  approvalLimit1: number;
+  approvalLimit2: number;
+  requiredDocumentTh: string;
+}
