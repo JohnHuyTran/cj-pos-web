@@ -8,7 +8,7 @@ import {
   MenuItem,
   Button } from "@mui/material";
 import { AddCircleOutline } from '@mui/icons-material';
-import { useAppSelector, useAppDispatch } from 'store/store';
+import { useAppDispatch } from 'store/store';
 
 // Components
 import LoadingModal from 'components/commons/ui/loading-modal';
@@ -22,7 +22,11 @@ import {
 import { ExpenseSearchCofigRequest } from 'models/branch-accounting-model';
 import { saveExpenseConfigSearch } from "store/slices/accounting/save-accounting-search-config-slice";
 
-export default function SearchReserves() {
+interface SearchReservesProps {
+  onClickSearch: (value: any) => void;
+}
+export default function SearchReserves(props: SearchReservesProps) {
+  const { onClickSearch } = props
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
@@ -52,7 +56,7 @@ export default function SearchReserves() {
   const handleClearSearch = async () => {
     setSearch(initialSearchState);
     await dispatch(clearDataSearchBranchAccountingConfig());
-    // setIsDisabled(false)
+    onClickSearch(false)
   };
 
   const handleSearchExpense = async () => {
@@ -63,17 +67,21 @@ export default function SearchReserves() {
       page: '1',
       ...search,
     };
-
-    await dispatch(featchBranchAccountingConfigListAsync(payload)).then((res) => {
+    try {
+      await dispatch(featchBranchAccountingConfigListAsync(payload)).then((res) => {
+        setTimeout(() => {
+          setIsOpenLoading(false);
+          const payload: any = res.payload ? res.payload : [];
+        }, 300);
+      });
+      await dispatch(saveExpenseConfigSearch(payload));
       setTimeout(() => {
         setIsOpenLoading(false);
-        const payload: any = res.payload ? res.payload : [];
-      }, 300);
-    });
-    await dispatch(saveExpenseConfigSearch(payload));
-    setTimeout(() => {
-      setIsOpenLoading(false);
-    }, 500);
+      }, 500);
+      onClickSearch(true)
+    } catch(errors) {
+      console.error(errors)
+    }
   };
 
   const handleAddList = () => {

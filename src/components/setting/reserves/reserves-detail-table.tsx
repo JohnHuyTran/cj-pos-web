@@ -1,4 +1,4 @@
-import { Fragment, useState, useMemo } from 'react';
+import { Fragment, useState } from 'react';
 import { useAppSelector, useAppDispatch } from 'store/store';
 import { useStyles } from 'styles/makeTheme';
 import { formatNumber } from 'utils/utils'
@@ -6,26 +6,19 @@ import {
   DataGrid,
   GridCellParams,
   GridColDef,
-  GridEditCellValueParams,
-  GridRenderCellParams,
-  GridRowData,
-  GridRowId,
-  useGridApiRef,
 } from '@mui/x-data-grid';
 import {
   Box,
+  Grid,
   Typography
 } from '@mui/material';
 
 // Components
 import ModalSettingExpense from './modal-settings-expense';
-import Mock from './mock.json'
 
 // Call API
-import {
-  featchBranchAccountingConfigListAsync,
-} from 'store/slices/accounting/accounting-search-config-slice';
-import { ExpenseSearchCofigRequest } from 'models/branch-accounting-model';
+import { featchBranchAccountingConfigListAsync } from 'store/slices/accounting/accounting-search-config-slice';
+import { saveExpenseConfigSearch } from "store/slices/accounting/save-accounting-search-config-slice";
 
 const columns: GridColDef[] = [
   {
@@ -129,25 +122,60 @@ const columns: GridColDef[] = [
 ]
 
 export default function ReservesDetailTable () {
-  // const payload = useAppSelector((state) => state.ExpenseSearchCofigRequest.searchExpense);
+  const classes = useStyles();
+  const dispatch = useAppDispatch();
+  const payload = useAppSelector((state) => state.saveExpenseConfigSearchRequest.searchExpenseConfig);
   const items = useAppSelector((state) => state.searchBranchAccountingConfig);
   const res: any = items.branchAccountingConfigList;
-  // const res: any = Mock.branchAccountingConfigList;
-  const rows: any = res.data.map((data: any, indexs: number) => {
-    return {
-      id: indexs,
-      index: indexs + 1,
-      ...data,
-    };
-  });
 
   // Set state data
-  const classes = useStyles();
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(res?.perPage);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [dataSelect, setDataSelect] = useState({});
   const [isStatus, setIsStatus] = useState('');
+
+  const rows: any = res?.data.map((data: any, index: number) => {
+    return {
+      id: index,
+      index: (res?.page - 1) * pageSize + index + 1,
+      ...data,
+    };
+  });
+
+  // Handle function
+  const getConfigListByQuery = async (payload: any) => {
+    setIsLoading(true)
+    try {
+      await dispatch(featchBranchAccountingConfigListAsync(payload))
+      await dispatch(saveExpenseConfigSearch(payload))
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 500)
+    } catch {
+      setIsLoading(false)
+    }
+  }
+
+  const handlePageChange = async (page: number) => {
+    setIsLoading(true)
+    const payloadNextPage = {
+      ...payload,
+      limit: ''+pageSize,
+      page: ''+(page + 1)
+    }
+    getConfigListByQuery(payloadNextPage)
+  }
+
+  const handlePageSizeChange = (pageSize: number) => {
+    setPageSize(pageSize);
+    const payloadRowPerPage = {
+      ...payload,
+      limit: ''+pageSize,
+      page: '1'
+    }
+    getConfigListByQuery(payloadRowPerPage)
+  }
 
   const currentlySelected = async (params: GridCellParams) => {
     setIsStatus('Update');
@@ -155,59 +183,44 @@ export default function ReservesDetailTable () {
     setIsOpenModal(true);
   };
 
-  // Handle function
-  const handlePageChange = async (newPage: number) => {
-    setIsLoading(true)
-    /* const payload: ExpenseSearchCofigRequest = {
-      limit: '10',
-      page: '1',
-      ...payload
-    }
-
-    try {
-      await featchBranchAccountingConfigListAsync(payload)
-      setTimeout(() => {
-        setIsLoading(false)
-      }, 500)
-    } catch {
-      setIsLoading(false)
-    } */
-    
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 500)
-  }
-
   return (
     <Fragment>
-      <Box
-        style={{
-          width: '100%',
-          height: `${110 + (Math.min(pageSize, rows.length) * 65)}px`,
-          maxHeight: 'calc(100vh - 360px)'
-        }}
-        className={classes.MdataGridDetail}
-      >
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={pageSize}
-          onPageChange={handlePageChange}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
-          pagination
-          disableColumnMenu
-          autoHeight={rows.length >= 10 ? false : true}
-          scrollbarSize={10}
-          rowHeight={65}
-          onCellClick={currentlySelected}
-          loading={isLoading}
-          style={{ minHeight: pageSize > 10 && rows.length > 10 ? 'calc(100vh - 355px)' : ''}}
-          // onCellFocusOut={handleEditItems}
-          // onCellOut={handleEditItems}
-          // onCellKeyDown={handleEditItems}
-        />
-      </Box>
+      { rows.length > 0 ? (
+        <Box
+          style={{
+            width: '100%',
+            height: `${110 + (Math.min(pageSize, rows.length) * 65)}px`,
+            maxHeight: 'calc(100vh - 445px)'
+          }}
+          className={classes.MdataGridDetail}
+        >
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={pageSize}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            rowsPerPageOptions={[10, 20, 50, 100]}
+            pagination
+            disableColumnMenu
+            paginationMode='server'
+            autoHeight={rows.length >= 10 ? false : true}
+            page={res?.page - 1}
+            rowCount={res?.total}
+            scrollbarSize={10}
+            rowHeight={65}
+            onCellClick={currentlySelected}
+            loading={isLoading}
+            style={{ minHeight: pageSize > 10 && rows.length > 10 ? 'calc(100vh - 440px)' : ''}}
+          />
+        </Box>
+      ) : (
+        <Grid item container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB'>
+            <h2>ไม่มีข้อมูล</h2>
+          </Box>
+        </Grid>
+      )}
       
       <ModalSettingExpense
         isOpen={isOpenModal}
