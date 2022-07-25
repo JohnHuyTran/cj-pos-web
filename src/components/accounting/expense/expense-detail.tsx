@@ -953,7 +953,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       } else if (status === STATUS.WAITTING_ACCOUNTING) {
         rows = [
           { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
-          { ...infosApprove, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
+          { ...infosApprove, total: totalApprove, SUMOTHER: totalOtherApprove },
           {
             ...infoDiff,
             total: totalDiff > 0 ? `+${totalDiff}` : totalDiff,
