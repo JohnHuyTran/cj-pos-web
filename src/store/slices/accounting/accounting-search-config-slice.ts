@@ -70,12 +70,12 @@ const searchBranchAccountingConfigSlice = createSlice({
     builer.addCase(featchBranchAccountingConfigListAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchBranchAccountingConfigListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.branchAccountingConfigList = action.payload;
-      }),
-      builer.addCase(featchBranchAccountingConfigListAsync.rejected, () => {
-        initialState;
-      });
+    builer.addCase(featchBranchAccountingConfigListAsync.fulfilled, (state, action: PayloadAction<any>) => {
+      state.branchAccountingConfigList = action.payload;
+    }),
+    builer.addCase(featchBranchAccountingConfigListAsync.rejected, () => {
+      initialState;
+    });
   },
 });
 
