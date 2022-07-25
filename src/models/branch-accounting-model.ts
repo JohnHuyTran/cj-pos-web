@@ -288,6 +288,7 @@ export interface ExpenseConfigCreateRequest {
 }
 
 export interface ExpenseConfigUpdateRequest {
+  isActive: boolean;
   accountCode: string;
   accountNameTh: string;
   skuCode: string;
