@@ -6,8 +6,8 @@ import TitleHeader from 'components/title-header';
 import { useTranslation } from 'react-i18next';
 
 // Components
-import SearchReserves from 'components/setting/reserves/search-reserves';
-import ReservesDetailTable from 'components/setting/reserves/reserves-detail-table';
+import SearchReserves from 'components/settings/reserves/search-reserves';
+import ReservesDetailTable from 'components/settings/reserves/reserves-detail-table';
 
 
 
