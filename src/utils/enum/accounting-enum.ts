@@ -78,5 +78,5 @@ export const getExpenseStatus = (key: string) => expenseStatusList.find((item) =
 export const closeSaleShift = [
   { key: 'DRAFT', text: 'บันทึก' },
   { key: 'WAIT_CHECKING', text: 'รอตรวจสอบ' },
-  { key: 'COMPLETE', text: 'ถูกต้อง' },
+  { key: 'CORRECT', text: 'ถูกต้อง' },
 ];

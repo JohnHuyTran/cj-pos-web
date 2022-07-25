@@ -7,7 +7,8 @@
     "WAITTING_APPROVAL2": "รออนุมัติ2",
     "WAITTING_ACCOUNTING": "รอบัญชีตรวจสอบ",
     "WAITTING_APPROVAL3": "รออนุมัติ3",
-    "APPROVED": "อนุมัติ"
+    "APPROVED": "อนุมัติ",
+    "CORRECT": "ถูกต้อง"
   },
   "type": {
     "COFFEE": "ค่าใช้จ่ายร้านกาแฟ",

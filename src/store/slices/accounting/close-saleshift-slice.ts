@@ -26,8 +26,8 @@ const initialState: State = {
   },
   error: '',
   payloadSearch: {
-    date: '',
-    branch: '',
+    shiftDate: '',
+    branchCode: '',
     status: '',
     page: 0,
     limit: 0,
@@ -38,14 +38,14 @@ export const featchCloseSaleShiptListAsync = createAsyncThunk(
   'closeSaleShipList',
   async (payload: CloseSaleShiftRequest) => {
     try {
-      // const apiRootPath = environment.branchAccounting.closeSaleShift.search.url;
-      // let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}&branchFrom=${payload.branch}&date=${payload.date}`;
-      // if (payload.status !== 'ALL') {
-      //   path += `&status=${payload.status}`;
-      // }
+      const apiRootPath = environment.branchAccounting.closeSaleShift.search.url;
+      let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}&branchCode=${payload.branchCode}&shiftDate=${payload.shiftDate}`;
+      if (payload.status !== 'ALL') {
+        path += `&status=${payload.status}`;
+      }
 
-      // return await get(path).then();
-      return featchCloseSaleShiftRsMockup();
+      return await get(path).then();
+      // return featchCloseSaleShiftRsMockup();
     } catch (error) {
       throw error;
     }

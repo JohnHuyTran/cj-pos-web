@@ -1,6 +1,6 @@
 import { Box, Button, FormControl, Grid, MenuItem, Select, Typography } from '@mui/material';
 import React from 'react';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
+import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { getStockTransferStatusList } from '../../../utils/enum/stock-transfer-enum';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
@@ -22,7 +22,7 @@ import {
   featchCloseSaleShiptListAsync,
   savePayloadSearch,
 } from '../../../store/slices/accounting/close-saleshift-slice';
-import { CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
+import { CloseSaleShiftInfo, CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
 import moment from 'moment';
 
 function CloseSaleShiftSearch() {
@@ -69,6 +69,7 @@ function CloseSaleShiftSearch() {
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
 
+  const [enableCloseShiftKey, setEnableCloseShiftKey] = React.useState(false);
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -82,6 +83,7 @@ function CloseSaleShiftSearch() {
     }
   };
   const onClickSearch = async () => {
+    console.log(branchFromCode);
     handleOpenLoading('open', true);
     let limits: number;
     if (limit === 0 || limit === undefined) {
@@ -90,8 +92,8 @@ function CloseSaleShiftSearch() {
       limits = limit;
     }
     const payload: CloseSaleShiftRequest = {
-      date: moment(startDate).startOf('day').toISOString(),
-      branch: branchFromCode,
+      shiftDate: moment(startDate).startOf('day').toISOString(),
+      branchCode: branchFromCode,
       status: values.status,
       page: page,
       limit: limits,
@@ -99,6 +101,14 @@ function CloseSaleShiftSearch() {
 
     await dispatch(featchCloseSaleShiptListAsync(payload));
     await dispatch(savePayloadSearch(payload));
+    const datas = store.getState().closeSaleShiftSlice.closeSaleShift.data;
+    let isAllCorrect = true;
+    datas.map((item: CloseSaleShiftInfo, index: number) => {
+      if (item.status !== 'CORRECT') {
+        isAllCorrect = false;
+      }
+    });
+    setEnableCloseShiftKey(isAllCorrect);
     setFlagSearch(true);
     handleOpenLoading('open', false);
   };
@@ -114,13 +124,24 @@ function CloseSaleShiftSearch() {
       handleOpenLoading('open', false);
     }, 300);
   };
-  const handleOpenCloseSale = () => {};
+  const handleOpenCloseSale = () => {
+    handleOpenLoading('open', true);
+    handleOpenLoading('open', false);
+  };
   const handleOnBypass = () => {};
   const handleOnupdate = () => {};
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
   };
+
+  React.useEffect(() => {
+    if (groupBranch) {
+      setBranchFromCode(ownBranch);
+      setValues({ ...values, branchFrom: ownBranch });
+    }
+  }, []);
+
   return (
     <>
       {' '}
@@ -205,7 +226,7 @@ function CloseSaleShiftSearch() {
               sx={{ width: 150 }}
               className={classes.MbtnClear}
               color='secondary'
-              disabled={true}>
+              disabled={!enableCloseShiftKey}>
               ปิดรอบยอดการขาย
             </Button>
             <Button

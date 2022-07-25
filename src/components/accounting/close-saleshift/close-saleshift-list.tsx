@@ -1,19 +1,25 @@
 import { Box, Chip, TextField, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridRowData } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRowData } from '@mui/x-data-grid';
 import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import NumberFormat from 'react-number-format';
-import { CloseSaleShiftInfo } from '../../../models/branch-accounting-model';
+import { CloseSaleShiftInfo, CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
+import {
+  featchCloseSaleShiptListAsync,
+  savePayloadSearch,
+} from '../../../store/slices/accounting/close-saleshift-slice';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
+import { STATUS } from '../../../utils/enum/accounting-enum';
 import LoadingModal from '../../commons/ui/loading-modal';
 
 function CloseSaleShiftSearchList() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useTranslation(['expense', 'common']);
+  const payloadSearch = useAppSelector((state) => state.closeSaleShiftSlice.payloadSearch);
   const items = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift);
   const cuurentPage = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift.page);
   const limit = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift.perPage);
@@ -25,6 +31,9 @@ function CloseSaleShiftSearchList() {
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
+
+  const [openPopupCloseShiftKey, setOpenPopupCloseShiftKey] = React.useState(false);
+  const [payloadCloseShiftKey, setPayloadCloseShiftKey] = React.useState<CloseSaleShiftInfo>();
   const columns: GridColDef[] = [
     {
       field: 'posUser',
@@ -88,13 +97,10 @@ function CloseSaleShiftSearchList() {
         return (
           <NumberFormat
             value={String(params.value)}
-            type='text'
+            displayType={'text'}
             fixedDecimalScale
             thousandSeparator={true}
             decimalScale={2}
-            // className={classes.MtextFieldNumber}
-            disabled={true}
-            // customInput={TextField}
           />
         );
       },
@@ -107,6 +113,17 @@ function CloseSaleShiftSearchList() {
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params) => {
+        return (
+          <NumberFormat
+            value={String(params.value)}
+            displayType={'text'}
+            fixedDecimalScale
+            thousandSeparator={true}
+            decimalScale={2}
+          />
+        );
+      },
     },
     {
       field: 'confirmAmount',
@@ -116,7 +133,22 @@ function CloseSaleShiftSearchList() {
       headerAlign: 'center',
       align: 'right',
       sortable: false,
-      renderCell: (params) => params.value,
+      renderCell: (params) => {
+        const value = Number(params.value || 0);
+        if (value > 0) {
+          return (
+            <NumberFormat
+              value={String(params.value)}
+              displayType={'text'}
+              fixedDecimalScale
+              thousandSeparator={true}
+              decimalScale={2}
+            />
+          );
+        } else {
+          return '-';
+        }
+      },
     },
     {
       field: 'shiftKey',
@@ -150,17 +182,61 @@ function CloseSaleShiftSearchList() {
   ];
 
   const handlePageChange = async (newPage: number) => {
-    setLoading(true);
-    setLoading(false);
+    handleOpenLoading('open', true);
+    let page: number = newPage + 1;
+    const payload: CloseSaleShiftRequest = {
+      shiftDate: payloadSearch.shiftDate,
+      branchCode: payloadSearch.branchCode,
+      status: payloadSearch.status,
+      page: page,
+      limit: pageSize,
+    };
+
+    await dispatch(featchCloseSaleShiptListAsync(payload));
+    await dispatch(savePayloadSearch(payload));
+    handleOpenLoading('open', false);
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
     setPageSize(pageSize);
-    setLoading(true);
+    handleOpenLoading('open', true);
+    const payload: CloseSaleShiftRequest = {
+      shiftDate: payloadSearch.shiftDate,
+      branchCode: payloadSearch.branchCode,
+      status: payloadSearch.status,
+      page: 1,
+      limit: pageSize,
+    };
 
-    setLoading(false);
+    await dispatch(featchCloseSaleShiptListAsync(payload));
+    await dispatch(savePayloadSearch(payload));
+    handleOpenLoading('open', false);
   };
-  const currentlySelected = () => {};
+  const currentlySelected = async (params: GridCellParams) => {
+    handleOpenLoading('open', true);
+    const shiftAmount = params.row.shiftAmount;
+    const billAmount = params.row.billAmount;
+    const status = params.row.status;
+    if (shiftAmount === billAmount && status === STATUS.DRAFT) {
+      const payload: CloseSaleShiftInfo = {
+        branchCode: params.row.branchCode,
+        shiftCode: params.row.shiftCode,
+        shiftKey: params.row.shiftKey,
+        shiftDate: params.row.shiftDate,
+        shiftAmount: params.row.shiftAmount,
+        billAmount: params.row.billAmount,
+        confirmAmount: params.row.confirmAmount,
+        noOfSaleBill: params.row.noOfSaleBill,
+        noOfReturnBill: params.row.noOfReturnBill,
+        status: '',
+        posCode: '',
+        posUser: '',
+      };
+      setPayloadCloseShiftKey(payload);
+      handleOpenLoading('open', false);
+      setOpenPopupCloseShiftKey(true);
+    }
+  };
   let rows: any = items.data.map((item: CloseSaleShiftInfo, index: number) => {
     return {
       id: index,
