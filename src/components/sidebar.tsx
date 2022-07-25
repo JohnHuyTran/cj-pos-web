@@ -103,6 +103,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuCreatePurchaseBranch, setDisableSubMenuCreatePurchaseBranch] = React.useState(true);
   const [disableSubMenuExpense, setDisableSubMenuExpense] = React.useState(true);
   const [disableSubMenuSettings, setDisableSubMenuSettings] = React.useState(true);
+  const [disableSubMenuCashStatement, setDisableSubMenuCashStatement] = React.useState(true);
 
   const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
   const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
@@ -142,6 +143,7 @@ export default function Sidebar({}: Props): ReactElement {
 
     setDisableSubMenuExpense(isAllowSubMenuPermission(SUBMENU.EX_EXPENSE));
     setDisableSubMenuSettings(isAllowSubMenuPermission(SUBMENU.EX_CONFIG));
+    setDisableSubMenuCashStatement(isAllowSubMenuPermission(SUBMENU.EX_EXPENSE));
 
     setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
   }, [navState]);
@@ -206,12 +208,11 @@ export default function Sidebar({}: Props): ReactElement {
           boxShadow: '10px 10px 20px rgba(0, 0, 0, 0.1)',
         },
       }}
-      variant="persistent"
-      anchor="left"
-      open={open}
-    >
+      variant='persistent'
+      anchor='left'
+      open={open}>
       <DrawerHeader>
-        <img src={imgLogo} alt="" width="50" />
+        <img src={imgLogo} alt='' width='50' />
         {/* <IconButton onClick={handleDrawerClose}>
           {theme.direction === "ltr" ? (
             <ChevronLeftIcon color="primary" />
@@ -221,23 +222,22 @@ export default function Sidebar({}: Props): ReactElement {
         </IconButton> */}
 
         <div onClick={handleDrawerClose}>
-          <ChevronLeftIcon color="primary" sx={{ marginRight: '-5px' }} />
-          <Menu color="primary" />
+          <ChevronLeftIcon color='primary' sx={{ marginRight: '-5px' }} />
+          <Menu color='primary' />
         </div>
       </DrawerHeader>
 
       <List sx={{ marginTop: 2 }}>
-        <Link to="/" style={{ textDecoration: 'none', color: '#676767' }}>
+        <Link to='/' style={{ textDecoration: 'none', color: '#676767' }}>
           <ListItemButton
-            key="HOME"
+            key='HOME'
             selected={selectedIndex === 0}
             onClick={() => handleListItemClick(0)}
-            id="mainMenuHome"
-          >
+            id='mainMenuHome'>
             <ListItemIcon>
               <HomeOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary="หน้าหลัก" style={{ marginLeft: -15 }} />
+            <ListItemText primary='หน้าหลัก' style={{ marginLeft: -15 }} />
           </ListItemButton>
         </Link>
         {/* <Link to='/notification' style={{ textDecoration: 'none', color: '#676767' }}>
@@ -254,108 +254,97 @@ export default function Sidebar({}: Props): ReactElement {
         </Link> */}
         {/*sell menu start*/}
         {/* <ListItemButton key='SELL' onClick={handleClickSell} sx={{ display: disableSellMainMenu ? 'none' : '' }}></ListItemButton> */}
-        <ListItemButton key="SELL" onClick={handleClickSell} style={{ display: disableMainMenuSell ? 'none' : '' }}>
+        <ListItemButton key='SELL' onClick={handleClickSell} style={{ display: disableMainMenuSell ? 'none' : '' }}>
           <ListItemIcon>
             <ShoppingCartSharp />
           </ListItemIcon>
-          <ListItemText primary="ขาย" style={{ marginLeft: -15 }} />
+          <ListItemText primary='ขาย' style={{ marginLeft: -15 }} />
           {openSellMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openSellMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <Link to="/sale-limit-time" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuSaleLimitTime">
+        <Collapse in={openSellMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
+            <Link to='/sale-limit-time' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuSaleLimitTime'>
               <ListItemButton
-                key="SALE LIMIT TINE"
+                key='SALE LIMIT TINE'
                 selected={selectedIndex === 2}
                 onClick={() => handleListItemClick(2)}
-                sx={{ pl: 7, display: disableSubMenuSaleSaleLimit ? 'none' : '' }}
-              >
-                <ListItemText primary="กำหนดเวลา (งด) ขายสินค้า" />
+                sx={{ pl: 7, display: disableSubMenuSaleSaleLimit ? 'none' : '' }}>
+                <ListItemText primary='กำหนดเวลา (งด) ขายสินค้า' />
               </ListItemButton>
             </Link>
           </List>
-          <List component="div" disablePadding>
+          <List component='div' disablePadding>
             <Link
-              to="/barcode-discount"
+              to='/barcode-discount'
               style={{ textDecoration: 'none', color: '#676767' }}
-              id="subMenuBarcodeDiscount"
-            >
+              id='subMenuBarcodeDiscount'>
               <ListItemButton
-                key="BARCODE DISCOUNT"
+                key='BARCODE DISCOUNT'
                 selected={selectedIndex === 3}
                 onClick={() => handleListItemClick(3)}
-                sx={{ pl: 7, display: disableSubMenuSaleDiscount ? 'none' : '' }}
-              >
-                <ListItemText primary="ส่วนลดสินค้า" />
+                sx={{ pl: 7, display: disableSubMenuSaleDiscount ? 'none' : '' }}>
+                <ListItemText primary='ส่วนลดสินค้า' />
               </ListItemButton>
             </Link>
           </List>
-          <List component="div" disablePadding>
-            <Link to="/tax-invoice" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuTaxInvoice">
+          <List component='div' disablePadding>
+            <Link to='/tax-invoice' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTaxInvoice'>
               <ListItemButton
-                key="TAX INVOICE"
+                key='TAX INVOICE'
                 selected={selectedIndex === 4}
                 onClick={() => handleListItemClick(4)}
-                sx={{ pl: 7, display: disableSubMenuTaxInvoice ? 'none' : '' }}
-              >
-                <ListItemText primary="ใบเสร็จ/ใบกำกับฉบับเต็ม" />
+                sx={{ pl: 7, display: disableSubMenuTaxInvoice ? 'none' : '' }}>
+                <ListItemText primary='ใบเสร็จ/ใบกำกับฉบับเต็ม' />
               </ListItemButton>
             </Link>
           </List>
         </Collapse>
         <ListItemButton
           onClick={handleClickPickUp}
-          id="mainMenuPickUp"
-          style={{ display: disableMainMenuOrderReceive ? 'none' : '' }}
-        >
+          id='mainMenuPickUp'
+          style={{ display: disableMainMenuOrderReceive ? 'none' : '' }}>
           <ListItemIcon>
             <LoyaltyOutlinedIcon />
           </ListItemIcon>
-          <ListItemText primary="รับสินค้า" style={{ marginLeft: -15 }} />
+          <ListItemText primary='รับสินค้า' style={{ marginLeft: -15 }} />
           {openPickUpMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openPickUpMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
+        <Collapse in={openPickUpMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
             <Link
-              to="/check-order"
+              to='/check-order'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuOROrderReceive ? 'none' : '' }}
-              id="subMenuCheckOrder"
-            >
+              id='subMenuCheckOrder'>
               <ListItemButton
-                key="SALE"
+                key='SALE'
                 selected={selectedIndex === 5}
                 onClick={() => handleListItemClick(5)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="รับสินค้า" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='รับสินค้า' />
               </ListItemButton>
             </Link>
             <Link
-              to="/dc-check-order"
+              to='/dc-check-order'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuORStockDiff ? 'none' : '' }}
-              id="subMenuDCCheckOrder"
-            >
+              id='subMenuDCCheckOrder'>
               <ListItemButton
-                key="dcConfirmOrder"
+                key='dcConfirmOrder'
                 selected={selectedIndex === 6}
                 onClick={() => handleListItemClick(6)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="ตรวจสอบผลต่างการรับสินค้า" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ตรวจสอบผลต่างการรับสินค้า' />
               </ListItemButton>
             </Link>
             <Link
-              to="/supplier-check-order"
+              to='/supplier-check-order'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuORSupplier ? 'none' : '' }}
-              id="subMenuSupplierCheckOrder"
-            >
+              id='subMenuSupplierCheckOrder'>
               <ListItemButton
-                key="supplierCheckOrder"
+                key='supplierCheckOrder'
                 selected={selectedIndex === 7}
                 onClick={() => handleListItemClick(7)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="รับสินค้า จากผู้จำหน่าย" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='รับสินค้า จากผู้จำหน่าย' />
               </ListItemButton>
             </Link>
           </List>
@@ -363,241 +352,231 @@ export default function Sidebar({}: Props): ReactElement {
 
         <ListItemButton
           onClick={handleClickTransfer}
-          id="mainMenuTransfer"
-          style={{ display: disableMainMenuStockTransfer ? 'none' : '' }}
-        >
+          id='mainMenuTransfer'
+          style={{ display: disableMainMenuStockTransfer ? 'none' : '' }}>
           <ListItemIcon>
             <SwapHorizontalCircleIcon />
           </ListItemIcon>
-          <ListItemText primary="โอนสินค้า" style={{ marginLeft: -15 }} />
+          <ListItemText primary='โอนสินค้า' style={{ marginLeft: -15 }} />
           {openTransferMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openTransferMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
+        <Collapse in={openTransferMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
             <Link
-              to="/stock-transfer-rt"
+              to='/stock-transfer-rt'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuSTStockRequest ? 'none' : '' }}
-              id="subMenuStockTransferRt"
-            >
+              id='subMenuStockTransferRt'>
               <ListItemButton
-                key="StockTransferRt"
+                key='StockTransferRt'
                 selected={selectedIndex === 8}
                 onClick={() => handleListItemClick(8)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="สร้างแผนโอนสินค้าระหว่างสาขา/คลัง" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='สร้างแผนโอนสินค้าระหว่างสาขา/คลัง' />
               </ListItemButton>
             </Link>
             <Link
-              to="/stock-transfer"
+              to='/stock-transfer'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuSTStockTransfer ? 'none' : '' }}
-              id="subMenuStockTransfer"
-            >
+              id='subMenuStockTransfer'>
               <ListItemButton
-                key="StockTransfer"
+                key='StockTransfer'
                 selected={selectedIndex === 9}
                 onClick={() => handleListItemClick(9)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="โอนสินค้าระหว่างสาขา/คลัง" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='โอนสินค้าระหว่างสาขา/คลัง' />
               </ListItemButton>
             </Link>
           </List>
         </Collapse>
         <ListItemButton
           onClick={handleClickWithDraw}
-          id="mainMenuWithDraw"
-          style={{ display: disableMainMenuTransferOut ? 'none' : '' }}
-        >
+          id='mainMenuWithDraw'
+          style={{ display: disableMainMenuTransferOut ? 'none' : '' }}>
           <ListItemIcon>
             <PresentToAllIcon />
           </ListItemIcon>
-          <ListItemText primary="เบิก" style={{ marginLeft: -15 }} />
+          <ListItemText primary='เบิก' style={{ marginLeft: -15 }} />
           {openWithDrawMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openWithDrawMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
+        <Collapse in={openWithDrawMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
             <Link
-              to="/transfer-out-destroy"
+              to='/transfer-out-destroy'
               style={{ textDecoration: 'none', color: '#676767' }}
-              id="subMenuTransferOut"
-            >
+              id='subMenuTransferOut'>
               <ListItemButton
-                key="TransferOutDestroy"
+                key='TransferOutDestroy'
                 selected={selectedIndex === 11}
                 onClick={() => handleListItemClick(11)}
-                sx={{ pl: 7, display: disableSubMenuTODestroy ? 'none' : '' }}
-              >
-                <ListItemText primary="ทำลาย" />
+                sx={{ pl: 7, display: disableSubMenuTODestroy ? 'none' : '' }}>
+                <ListItemText primary='ทำลาย' />
               </ListItemButton>
             </Link>
-            <Link to="/transfer-out" style={{ textDecoration: 'none', color: '#676767' }} id="subMenuTransferOut">
+            <Link to='/transfer-out' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTransferOut'>
               <ListItemButton
-                key="TransferOut"
+                key='TransferOut'
                 selected={selectedIndex === 10}
                 onClick={() => handleListItemClick(10)}
-                sx={{ pl: 7, display: disableSubMenuTOStoreUse ? 'none' : '' }}
-              >
-                <ListItemText primary="ใช้ในการทำกิจกรรม" />
+                sx={{ pl: 7, display: disableSubMenuTOStoreUse ? 'none' : '' }}>
+                <ListItemText primary='ใช้ในการทำกิจกรรม' />
               </ListItemButton>
             </Link>
             <Link
-              to="/transfer-out-raw-masterial"
+              to='/transfer-out-raw-masterial'
               style={{ textDecoration: 'none', color: '#676767' }}
-              id="subMenuTOMasterial"
-            >
+              id='subMenuTOMasterial'>
               <ListItemButton
-                key="subMenuTOMasterial"
+                key='subMenuTOMasterial'
                 selected={selectedIndex === 20}
                 onClick={() => handleListItemClick(20)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="ขอใช้วัตถุดิบร้านบาว" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ขอใช้วัตถุดิบร้านบาว' />
               </ListItemButton>
             </Link>
             <Link
-              to="/create-purchase-branch"
+              to='/create-purchase-branch'
               style={{
                 textDecoration: 'none',
                 color: '#676767',
                 display: disableSubMenuCreatePurchaseBranch ? 'none' : '',
               }}
-              id="subMenuCreatePurchaseBranch"
-            >
+              id='subMenuCreatePurchaseBranch'>
               <ListItemButton
-                key="CreatePurchaseBranch"
+                key='CreatePurchaseBranch'
                 selected={selectedIndex === 13}
                 onClick={() => handleListItemClick(13)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="ของใช้หน้าร้าน" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ของใช้หน้าร้าน' />
               </ListItemButton>
             </Link>
           </List>
         </Collapse>
         <ListItemButton
           onClick={handleClickProductInfo}
-          id="mainMenuProductInfo"
-          style={{ display: disableMainMenuProductInfo ? 'none' : '' }}
-        >
+          id='mainMenuProductInfo'
+          style={{ display: disableMainMenuProductInfo ? 'none' : '' }}>
           <ListItemIcon>
             <StoreMallDirectoryIcon />
           </ListItemIcon>
-          <ListItemText primary="ข้อมูลสินค้า" style={{ marginLeft: -15 }} />
+          <ListItemText primary='ข้อมูลสินค้า' style={{ marginLeft: -15 }} />
           {openProductInfoMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openProductInfoMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
+        <Collapse in={openProductInfoMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
             <Link
-              to="/product-master"
+              to='/product-master'
               style={{
                 textDecoration: 'none',
                 color: '#676767',
                 display: disableSubMenuProductMaster ? 'none' : '',
               }}
-              id="subMenuProductMaster"
-            >
+              id='subMenuProductMaster'>
               <ListItemButton
-                key="ProductMaster"
+                key='ProductMaster'
                 selected={selectedIndex === 14}
                 onClick={() => handleListItemClick(14)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="รายละเอียดสินค้า" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='รายละเอียดสินค้า' />
               </ListItemButton>
             </Link>
             <Link
-              to="/stock-balance"
+              to='/stock-balance'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuStockBalance ? 'none' : '' }}
-              id="subMenuStockBalance"
-            >
+              id='subMenuStockBalance'>
               <ListItemButton
-                key="StockBalance"
+                key='StockBalance'
                 selected={selectedIndex === 11}
                 onClick={() => handleListItemClick(11)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="สินค้าคงคลัง" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='สินค้าคงคลัง' />
               </ListItemButton>
             </Link>
             <Link
-              to="/stock-movement"
+              to='/stock-movement'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuStockMovement ? 'none' : '' }}
-              id="subMenuStockMovement"
-            >
+              id='subMenuStockMovement'>
               <ListItemButton
-                key="StockMovement"
+                key='StockMovement'
                 selected={selectedIndex === 12}
                 onClick={() => handleListItemClick(12)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="ความเคลื่อนไหวของสินค้า" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ความเคลื่อนไหวของสินค้า' />
               </ListItemButton>
             </Link>
           </List>
         </Collapse>
         <ListItemButton
           onClick={handleClickExpense}
-          id="mainMenuExpense"
-          style={{ display: disableMainMenuExpense ? 'none' : '' }}
-        >
+          id='mainMenuExpense'
+          style={{ display: disableMainMenuExpense ? 'none' : '' }}>
           <ListItemIcon>
             <StoreMallDirectoryIcon />
           </ListItemIcon>
-          <ListItemText primary="สรุปรับ-จ่าย" style={{ marginLeft: -15 }} />
+          <ListItemText primary='สรุปรับ-จ่าย' style={{ marginLeft: -15 }} />
           {openExpenseMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openExpenseMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
+        <Collapse in={openExpenseMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
             <Link
-              to="/expense"
+              to='/expense'
               style={{
                 textDecoration: 'none',
                 color: '#676767',
                 display: disableSubMenuExpense ? 'none' : '',
               }}
-              id="subMenuExpense"
-            >
+              id='subMenuExpense'>
               <ListItemButton
-                key="Expense"
+                key='Expense'
                 selected={selectedIndex === 15}
                 onClick={() => handleListItemClick(15)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="ค่าใช้จ่าย" />
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ค่าใช้จ่าย' />
+              </ListItemButton>
+            </Link>
+            <Link
+              to='/cash-statement'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                display: disableSubMenuCashStatement ? 'none' : '',
+              }}
+              id='subMenuCashStatement'>
+              <ListItemButton
+                key='CashStatement'
+                selected={selectedIndex === 16}
+                onClick={() => handleListItemClick(16)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='เงินฝากขาด - เกิน' />
               </ListItemButton>
             </Link>
           </List>
         </Collapse>
         <ListItemButton
           onClick={handleClickSettings}
-          id="mainMenuSettings"
-          style={{ display: disableMainMenuSettings ? 'none' : '' }}
-        >
+          id='mainMenuSettings'
+          style={{ display: disableMainMenuSettings ? 'none' : '' }}>
           <ListItemIcon>
             <SettingsIcon />
           </ListItemIcon>
-          <ListItemText primary="ตั้งค่า" style={{ marginLeft: -15 }} />
+          <ListItemText primary='ตั้งค่า' style={{ marginLeft: -15 }} />
           {openSettingsMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={openSettingsMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
+        <Collapse in={openSettingsMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
             <Link
-              to="/reserves"
+              to='/reserves'
               style={{
                 textDecoration: 'none',
                 color: '#676767',
                 display: disableSubMenuSettings ? 'none' : '',
               }}
-              id="subMenuSettings"
-            >
+              id='subMenuSettings'>
               <ListItemButton
-                key="Settings"
-                selected={selectedIndex === 16}
-                onClick={() => handleListItemClick(16)}
-                sx={{ pl: 7 }}
-              >
-                <ListItemText primary="ค่าใช้จ่ายสำรอง" />
+                key='Settings'
+                selected={selectedIndex === 17}
+                onClick={() => handleListItemClick(17)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ค่าใช้จ่ายสำรอง' />
               </ListItemButton>
             </Link>
           </List>
