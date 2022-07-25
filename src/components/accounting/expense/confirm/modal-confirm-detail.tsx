@@ -6,10 +6,9 @@ import DialogContent from '@mui/material/DialogContent';
 import LoadingModal from '../../../commons/ui/loading-modal';
 import { useStyles } from '../../../../styles/makeTheme';
 import ConfirmContent from './confirm-content';
-import { ExpenseInfo, ExpensePeriod } from '../../../../models/branch-accounting-model';
+import { ExpensePeriod } from '../../../../models/branch-accounting-model';
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { isFilterFieldInExpense } from '../../../../utils/utils';
-import { Box, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 import NumberFormat from 'react-number-format';
 
 interface Props {
@@ -41,16 +40,19 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
   });
 
   const handleConfirm = async () => {
-    // console.log('periodData:', periodData);
     handleOpenLoading('open', true);
     onConfirm({ period: periodData });
     handleOpenLoading('open', false);
     onClose();
   };
 
-  const handleDate = async (period: any) => {
-    // console.log('period:', period);
-    setPeriodData(period);
+  const handleDate = async (startDate: any, endDate: any) => {
+    const date = {
+      startDate: startDate,
+      endDate: endDate,
+    };
+
+    setPeriodData(date);
   };
 
   const [columnsList, setColumnsList] = React.useState<GridColDef[]>([]);
@@ -60,10 +62,10 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
       setStartDate(periodProps?.startDate);
       setEndDate(periodProps?.endDate);
 
-      // setPeriodData({
-      //   startDate: periodProps?.startDate,
-      //   endDate: periodProps?.endDate,
-      // });
+      setPeriodData({
+        startDate: periodProps?.startDate,
+        endDate: periodProps?.endDate,
+      });
     }
 
     if (payload) {

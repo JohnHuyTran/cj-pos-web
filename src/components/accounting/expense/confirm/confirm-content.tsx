@@ -13,7 +13,7 @@ interface Props {
   title: string;
   columnsList?: GridColDef[];
   rowList?: any[];
-  handleDate: (period: any) => void;
+  handleDate: (startDate: any, endDate: any) => void;
 }
 interface State {
   startDate: any;
@@ -34,11 +34,13 @@ export default function confirmContent({
 
   const handleStartDatePicker = async (value: any) => {
     setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });
-    await handleDate(periodData ? periodData : null);
+    // await handleDate(periodData ? periodData : null);
+    await handleDate(moment(value).startOf('day').toISOString(), periodData.endDate);
   };
   const handleEndDatePicker = async (value: any) => {
     setPeriodData({ ...periodData, endDate: moment(value).startOf('day').toISOString() });
-    await handleDate(periodData ? periodData : null);
+    // await handleDate(periodData ? periodData : null);
+    await handleDate(periodData.startDate, moment(value).startOf('day').toISOString());
   };
 
   const columns = columnsList ? columnsList : [];
