@@ -216,7 +216,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => {
       const status = params.getValue(params.id, 'status');
-      if (status === 'WAITTING_ACCOUNTING' || status === 'WAITTING_APPROVAL3') {
+      if (status === 'APPROVED') {
         return params.value;
       } else {
         return '';
@@ -232,7 +232,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => {
       const status = params.getValue(params.id, 'status');
-      if (status === 'WAITTING_ACCOUNTING' || status === 'WAITTING_APPROVAL3') {
+      if (status === 'APPROVED') {
         return params.value;
       } else {
         return '';
