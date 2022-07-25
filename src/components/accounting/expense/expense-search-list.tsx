@@ -262,15 +262,19 @@ function useApiRef() {
 }
 
 var calDiff = function (params: GridValueGetterParams) {
-  if (params.getValue(params.id, 'status') === 'WAITTING_APPROVAL3') {
+  if (
+    params.getValue(params.id, 'status') === 'APPROVED' ||
+    params.getValue(params.id, 'status') === 'WAITTING_APPROVAL3'
+  ) {
     const diff =
       Number(params.getValue(params.id, 'sumApprovalAmount')) - Number(params.getValue(params.id, 'sumWithdrawAmount'));
 
     if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{addTwoDecimalPlaces(diff)} </label>;
     if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {addTwoDecimalPlaces(diff)} </label>;
-    return addTwoDecimalPlaces(diff);
+
+    return <label style={{ color: '#000', fontSize: '1rem' }}> {addTwoDecimalPlaces(diff)} </label>;
   }
-  return '';
+  return <label style={{ color: '#000', fontSize: '1rem' }}> 0.00 </label>;
 };
 
 function ExpenseSearchList({ onSelectRows }: DataGridProps) {
