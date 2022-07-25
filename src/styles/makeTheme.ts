@@ -138,13 +138,13 @@ const useStyles = makeStyles({
     '& .MuiDataGrid-columnHeaderTitle': {
       color: '#36C690',
       textAlign: 'center',
-      textOverflow: "clip !important",
-      whiteSpace: "break-spaces !important",
-      lineHeight: 1,
+      textOverflow: 'clip !important',
+      whiteSpace: 'break-spaces !important',
+      // lineHeight: 1,
       fontWeight: '600 !important',
     },
     '& .MuiDataGrid-columnHeaderWrapper': {
-      marginTop: '12px'
+      marginTop: '12px',
     },
     '& .MuiDataGrid-root': {
       color: '#263238',
