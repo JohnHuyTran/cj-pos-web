@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState } from 'react';
 import { useStyles } from '../../../styles/makeTheme';
 import { useAppSelector, useAppDispatch } from '../../../store/store';
 
@@ -13,78 +13,73 @@ import {
 } from '../../../store/slices/accounting/accounting-search-config-slice';
 import { ExpenseSearchCofigRequest } from '../../../models/branch-accounting-model';
 
-import { 
-  Grid,
-  Typography,
-  FormControl,
-  Select,
-  MenuItem,
-  Button } from "@mui/material";
+import { Grid, Typography, FormControl, Select, MenuItem, Button } from '@mui/material';
 import { AddCircleOutline } from '@mui/icons-material';
+import { saveExpenseConfigSearch } from '../../../store/slices/accounting/save-accounting-search-config-slice';
 
-export default function SearchReserves () {
+export default function SearchReserves() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
   const types = [
-    {key: 'ALL', text: 'ทั้งหมด'},
-    {key: 'COFFEE', text: 'ค่าใช้จ่ายร้านกาแฟ'},
-    {key: 'STOREFRONT', text: 'ค่าใช้จ่ายหน้าร้าน'}
-  ]
+    { key: 'ALL', text: 'ทั้งหมด' },
+    { key: 'COFFEE', text: 'ค่าใช้จ่ายร้านกาแฟ' },
+    { key: 'STOREFRONT', text: 'ค่าใช้จ่ายหน้าร้าน' },
+  ];
   const statusList = [
-    {key: 'ALL', text: 'ทั้งหมด'},
-    {key: 'true', text: 'ใช้งาน'},
-    {key: 'false', text: 'ไม่ได้ใช้งาน'}
-  ]
+    { key: 'ALL', text: 'ทั้งหมด' },
+    { key: 'true', text: 'ใช้งาน' },
+    { key: 'false', text: 'ไม่ได้ใช้งาน' },
+  ];
 
   const initialSearchState = {
     type: 'ALL',
-    isActive: 'ALL'
-  }
-  
+    isActive: 'ALL',
+  };
+
   // Set state data
   const [search, setSearch] = useState(initialSearchState);
-  const [isOpenModal, setIsOpenModal] = useState(false)
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenLoading, setIsOpenLoading] = useState(false);
+  const [isStatus, setIsStatus] = useState('');
 
   // Handle function
   const handleClearSearch = async () => {
-    setSearch(initialSearchState)
+    setSearch(initialSearchState);
     await dispatch(clearDataSearchBranchAccountingConfig());
     // setIsDisabled(false)
-  }
-  
+  };
+
   const handleSearchExpense = async () => {
-    setIsOpenLoading(true)
+    setIsOpenLoading(true);
     // const isActive = search.status !== 'All' ? search.status : null
     const payload: ExpenseSearchCofigRequest = {
       limit: '10',
       page: '1',
-      ...search
-    }
+      ...search,
+    };
 
-    await dispatch(featchBranchAccountingConfigListAsync(payload))
-    .then((res) => {
+    await dispatch(featchBranchAccountingConfigListAsync(payload)).then((res) => {
       setTimeout(() => {
         setIsOpenLoading(false);
-        const payload: any = res.payload ? res.payload : []
+        const payload: any = res.payload ? res.payload : [];
       }, 300);
     });
+    await dispatch(saveExpenseConfigSearch(payload));
     setTimeout(() => {
-      setIsOpenLoading(false)
-    }, 500)
-  }
-  
-  const handleAddList = () => {
-    setIsOpenModal(true)
-  }
+      setIsOpenLoading(false);
+    }, 500);
+  };
 
-  return(
+  const handleAddList = () => {
+    setIsStatus('Create');
+    setIsOpenModal(true);
+  };
+
+  return (
     <Fragment>
       <Grid container rowSpacing={1} columnSpacing={7}>
-        <ModalSettingExpense
-          isOpen={isOpenModal}
-          onClickClose={() => setIsOpenModal(false)} />
+        <ModalSettingExpense isOpen={isOpenModal} isStatus={isStatus} onClickClose={() => setIsOpenModal(false)} />
         <Grid item md={4} sm={4} xs={6}>
           <Typography variant="subtitle1" component="div" mb={1}>
             ประเภท
@@ -95,7 +90,7 @@ export default function SearchReserves () {
               name="type"
               value={search.type}
               disabled={isOpenLoading}
-              onChange={(e) => setSearch({...search, type: e.target.value})}
+              onChange={(e) => setSearch({ ...search, type: e.target.value })}
               inputProps={{ 'aria-label': 'Without label' }}
             >
               {types.map((item, index: number) => (
@@ -116,7 +111,7 @@ export default function SearchReserves () {
               name="status"
               value={search.isActive}
               disabled={isOpenLoading}
-              onChange={(e) => setSearch({...search, isActive: e.target.value})}
+              onChange={(e) => setSearch({ ...search, isActive: e.target.value })}
               inputProps={{ 'aria-label': 'Without label' }}
             >
               {statusList.map((item, index: number) => (
@@ -143,7 +138,7 @@ export default function SearchReserves () {
             }}
             className={classes.MbtnSearch}
           >
-            ค่าใช้จ่ายร้านกาแฟ
+            เพิ่มรายการ
           </Button>
           <Button
             id="btnClear"
@@ -171,5 +166,5 @@ export default function SearchReserves () {
         <LoadingModal open={isOpenLoading} />
       </Grid>
     </Fragment>
-  )
+  );
 }

@@ -1,6 +1,11 @@
 import { post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
-import { AccountAccountExpenses, ExpenseSaveRequest } from '../models/branch-accounting-model';
+import {
+  AccountAccountExpenses,
+  ExpenseConfigCreateRequest,
+  ExpenseConfigUpdateRequest,
+  ExpenseSaveRequest,
+} from '../models/branch-accounting-model';
 import { ContentType } from '../utils/enum/common-enum';
 import { getPathUrl } from './base-service';
 
@@ -118,6 +123,30 @@ export async function expenseRejectByAccountManager(payload: ExpenseSaveRequest)
     });
   return response;
 }
+
+export async function expenseCreateConfig(payload: ExpenseConfigCreateRequest) {
+  try {
+    const apiRootPath = `${environment.branchAccounting.expenseConfig.createExpenseConfig.url}`;
+    const response = await post(apiRootPath, payload).then((result: any) => result);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function expenseUpdateConfig(expenseNo: string, payload: ExpenseConfigUpdateRequest) {
+  const response = await put(
+    getPathExpenseUpdate(expenseNo, environment.branchAccounting.expenseConfig.updateExpenseConfig.url),
+    payload,
+    ContentType.JSON
+  )
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
 export const getPathExpense = (docNo: string, path: string) => {
   return getPathUrl(`${path}`, { docNo: docNo });
 };
@@ -128,6 +157,10 @@ export const getPathExpenseDetail = (docNo: string, path: string) => {
 
 export const getPathExpensePeriodType = (type: string, path: string) => {
   return getPathUrl(`${path}`, { type: type });
+};
+
+export const getPathExpenseUpdate = (expenseNo: string, path: string) => {
+  return getPathUrl(`${path}`, { expenseNo: expenseNo });
 };
 
 export async function getSummarizeByCriteria(payload: any) {

@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect } from 'react';
 import {
   Checkbox,
   Dialog,
@@ -25,29 +25,44 @@ import { expenseTypesSetting, getExpenseTypesSetting } from '../../../utils/enum
 //Components
 import TexboxSearchSku from '../../commons/ui/texbox-search-sku';
 import AlertError from '../../commons/ui/alert-error';
+import SnackbarStatus from '../../commons/ui/snackbar-status';
+import LoadingModal from '../../commons/ui/loading-modal';
 
+//api
+import { expenseCreateConfig, expenseUpdateConfig } from '../../../services/accounting';
+import { ExpenseConfigCreateRequest, ExpenseConfigUpdateRequest } from '../../../models/branch-accounting-model';
+import { ApiError } from '../../../models/api-error-model';
+import { useAppSelector, useAppDispatch } from '../../../store/store';
+import { featchBranchAccountingConfigListAsync } from '../../../store/slices/accounting/accounting-search-config-slice';
+
+const initialStateForm: any = {
+  isActive: 'true',
+  type: [],
+  typeOther: [],
+  skuCode: '',
+  accountNameTh: '',
+  accountCode: '',
+  requiredDocumentTh: '',
+  approvalLimit1: '',
+  approvalLimit2: '',
+};
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
-  type?: string;
+  isStatus?: string;
+  dataSelect?: any;
 }
 
-export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Props) {
+export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, dataSelect }: Props) {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
+
+  const payloadSearch = useAppSelector((state) => state.saveExpenseConfigSearchRequest.searchExpenseConfig);
+
   const [isOpenLoading, setIsOpenLoading] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
   const [textError, setTextError] = useState('');
-  const [values, setValues] = useState<any>({
-    isActive: 'true',
-    type: [],
-    typeOther: [],
-    skuCode: '',
-    accountNameTh: '',
-    accountCode: '',
-    requiredDocumentTh: '',
-    approvalLimit1: '',
-    approvalLimit2: '',
-  });
+  const [values, setValues] = useState<any>(initialStateForm);
 
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -70,7 +85,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
   const validateForm = () => {
     if (
       values.type.length === 0 ||
-      values.skuCode === '' ||
+      // values.skuCode === '' ||
       values.accountNameTh === '' ||
       values.accountCode === '' ||
       values.approvalLimit1 === '' ||
@@ -92,32 +107,85 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
     }
   };
 
-  const handleAddButton = () => {
-    // setIsOpenLoading(true);
+  const handleAddButton = async () => {
+    setIsOpenLoading(true);
     const isValidate: boolean = validateForm();
 
     if (isValidate) {
-      setTimeout(() => {
-        // setIsOpenLoading(false);
-        console.log('values: ', values);
-        // onClickClose();
-      }, 500);
+      if (isStatus === 'Create') {
+        const conditionTypeOther = values.type === 'OTHER';
+
+        const payloadAdd: ExpenseConfigCreateRequest = {
+          types: conditionTypeOther ? values.typeOther : [values.type],
+          isOtherExpense: conditionTypeOther ? true : false,
+          accountCode: values.accountCode,
+          accountNameTh: values.accountNameTh,
+          skuCode: values.skuCode,
+          approvalLimit1: Number(values.approvalLimit1),
+          approvalLimit2: Number(values.approvalLimit2),
+          isActive: values.isActive === 'true' ? true : false,
+          requiredDocumentTh: values.requiredDocumentTh ? values.requiredDocumentTh : '',
+        };
+
+        await expenseCreateConfig(payloadAdd)
+          .then((value) => {
+            setShowSnackBar(true);
+            setSnackbarIsStatus(true);
+            setContentMsg('บันทึกข้อมูลเรียบร้อยแล้ว');
+
+            setTimeout(() => {
+              setShowSnackBar(false);
+              onClickClose();
+              setValues(initialStateForm);
+            }, 500);
+          })
+          .catch((error: ApiError) => {
+            setOpenAlert(true);
+            setTextError(error.message);
+          });
+
+        await dispatch(featchBranchAccountingConfigListAsync(payloadSearch));
+
+        setIsOpenLoading(false);
+      } else if (isStatus === 'Update') {
+        const payloadUpdate: ExpenseConfigUpdateRequest = {
+          accountCode: values.accountCode,
+          accountNameTh: values.accountNameTh,
+          skuCode: '000000000030000185',
+          approvalLimit1: Number(values.approvalLimit1),
+          approvalLimit2: Number(values.approvalLimit2),
+          requiredDocumentTh: values.requiredDocumentTh ? values.requiredDocumentTh : '',
+        };
+
+        await expenseUpdateConfig(dataSelect.expenseNo, payloadUpdate)
+          .then((value) => {
+            setShowSnackBar(true);
+            setSnackbarIsStatus(true);
+            setContentMsg('บันทึกข้อมูลเรียบร้อยแล้ว');
+
+            setTimeout(() => {
+              setShowSnackBar(false);
+              onClickClose();
+              setValues(initialStateForm);
+            }, 500);
+          })
+          .catch((error: ApiError) => {
+            setOpenAlert(true);
+            setTextError(error.message);
+          });
+
+        await dispatch(featchBranchAccountingConfigListAsync(payloadSearch));
+      }
     }
+
+    setTimeout(() => {
+      setIsOpenLoading(false);
+    }, 500);
   };
 
   const handleOnClose = () => {
     onClickClose();
-    setValues({
-      isActive: 'true',
-      type: [],
-      typeOther: [],
-      skuCode: '',
-      accountNameTh: '',
-      accountCode: '',
-      requiredDocumentTh: '',
-      approvalLimit1: '',
-      approvalLimit2: '',
-    });
+    setValues(initialStateForm);
   };
 
   //alert Errormodel
@@ -125,10 +193,39 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
     setOpenAlert(false);
   };
 
+  //snackbar
+  const [showSnackBar, setShowSnackBar] = useState(false);
+  const [contentMsg, setContentMsg] = useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const mapDataSelect = () => {
+    const isotherExpense = dataSelect.isOtherExpense === true;
+    setValues({
+      isActive: dataSelect.isActive.toString(),
+      type: isotherExpense ? 'OTHER' : dataSelect.typeCode,
+      typeOther: isotherExpense ? [dataSelect.typeCode] : [],
+      skuCode: '',
+      accountNameTh: dataSelect.accountNameTh,
+      accountCode: dataSelect.accountCode,
+      requiredDocumentTh: dataSelect.requiredDocumentTh,
+      approvalLimit1: dataSelect.approvalLimit1,
+      approvalLimit2: dataSelect.approvalLimit2,
+    });
+  };
+
+  useEffect(() => {
+    if (isStatus === 'Update') {
+      mapDataSelect();
+    }
+  }, [isOpen]);
+
   return (
     <Fragment>
       <Dialog open={isOpen} maxWidth="lg" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" disabled={isOpenLoading} onClose={handleOnClose}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleOnClose}>
           <Typography sx={{ ml: '15px', fontSize: 24, fontWeight: 400 }}>รายละเอียดตั้งค่ารายการค่าใช้จ่าย</Typography>
         </BootstrapDialogTitle>
         <DialogContent sx={{ p: '40px' }}>
@@ -145,7 +242,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
               <Typography variant="body2">สถานะ :</Typography>
             </Grid>
             <Grid item xs={10}>
-              <FormControl disabled={isOpenLoading}>
+              <FormControl>
                 <RadioGroup
                   row
                   aria-labelledby="demo-row-radio-buttons-group-label"
@@ -168,14 +265,12 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 <Select
                   id="selType"
                   name="type"
-                  disabled={isOpenLoading}
+                  disabled={isStatus === 'Update'}
                   value={values.type}
                   onChange={handleChange}
                   displayEmpty
                   renderValue={
-                    values.type.length !== 0
-                      ? undefined
-                      : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือกประเภท</div>
+                    values.type.length !== 0 ? undefined : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือก</div>
                   }
                   inputProps={{ 'aria-label': 'Without label' }}
                 >
@@ -204,9 +299,9 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                   renderValue={
                     values.typeOther.length !== 0
                       ? (selected) => selected.map((v: any) => getExpenseTypesSetting(v)).join(', ')
-                      : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือกประเภท</div>
+                      : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือก</div>
                   }
-                  disabled={isOpenLoading || values.type !== 'OTHER'}
+                  disabled={values.type !== 'OTHER' || isStatus === 'Update'}
                 >
                   {expenseTypesSetting.map((item, index: number) => (
                     <MenuItem key={index} value={item.key}>
@@ -241,8 +336,9 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
             <Grid item xs={4} mb={3}>
               <TexboxSearchSku
                 skuTypes="3,7"
+                skuCode={dataSelect ? dataSelect.skuCode : ''}
+                skuName={dataSelect ? dataSelect.skuName : ''}
                 onSelectItem={handleChangeProduct}
-                disabled={isOpenLoading}
                 isClear={false}
               />
             </Grid>
@@ -260,7 +356,6 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                   onChange={handleChange}
                   className={classes.MtextField}
                   fullWidth
-                  disabled={isOpenLoading}
                   inputProps={{ maxLength: 50 }}
                 />
                 <FormHelperText sx={{ textAlign: 'right' }}>{values.accountNameTh.length}/50</FormHelperText>
@@ -282,7 +377,6 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 onChange={handleChange}
                 className={classes.MtextField}
                 fullWidth
-                disabled={isOpenLoading}
               />
             </Grid>
             <Grid item xs={2} mb={2}>
@@ -297,7 +391,6 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                   onChange={handleChange}
                   className={classes.MtextField}
                   fullWidth
-                  disabled={isOpenLoading}
                   inputProps={{ maxLength: 50 }}
                 />
                 <FormHelperText sx={{ textAlign: 'right' }}>{values.requiredDocumentTh.length}/50</FormHelperText>
@@ -320,7 +413,6 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 className={classes.MtextField}
                 fullWidth
                 placeholder="0.00"
-                disabled={isOpenLoading}
               />
             </Grid>
             <Grid item xs={2}>
@@ -338,7 +430,6 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
                 className={classes.MtextField}
                 fullWidth
                 placeholder="0.00"
-                disabled={isOpenLoading}
               />
             </Grid>
           </Grid>
@@ -365,6 +456,15 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, type }: Pro
       </Dialog>
 
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={contentMsg}
+      />
+
+      <LoadingModal open={isOpenLoading} />
     </Fragment>
   );
 }
