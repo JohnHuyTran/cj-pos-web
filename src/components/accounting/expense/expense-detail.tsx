@@ -379,7 +379,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         const _isOtherExpense = getMasterExpenInto(e.expenseNo)?.isOtherExpense || false;
         const item: SumItemsItem = {
           expenseNo: e.expenseNo,
-          approvedAmount: e.withdrawAmount,
+          approvedAmount: e.approvedAmount ? e.approvedAmount : e.withdrawAmount,
           isOtherExpense: _isOtherExpense,
         };
         sumItems.push(item);
@@ -588,7 +588,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       const item3: payLoadAdd = {
         id: 3,
         key: 'diff',
-        value: sumWithdrawAmount - sumApprovalAmount,
+        value: sumApprovalAmount - sumWithdrawAmount,
         title: 'ผลต่าง',
       };
       let listPayload: payLoadAdd[] = [item1, item2, item3];
