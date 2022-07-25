@@ -12,6 +12,7 @@ import userEvent from '@testing-library/user-event';
 import { setInit } from '../../../store/sessionStore';
 import {
   isFilterFieldInExpense,
+  isFilterOutFieldForPayload,
   isFilterOutFieldInAdd,
   stringNullOrEmpty,
   stringNumberNullOrEmpty,
@@ -101,15 +102,27 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
         let _isOverApprovalLimit1 = false;
         let _isOverApprovalLimit2 = false;
         testList.map((e: any) => {
-          data = { ...data, [e.key]: e.value };
+          const value = e.value;
+          let _data: any;
+          if (!isFilterOutFieldForPayload(e.key)) {
+            _data = value
+              .toString()
+              .replace(/[^0-9.]/g, '')
+              .replace(/,/g, '');
+            _data = parseFloat(_data);
+            data = { ...data, [e.key]: _data };
+          } else {
+            data = { ...data, [e.key]: e.value };
+          }
+
           if (!isFilterOutFieldInAdd(e.key)) {
-            sum += e.value;
+            sum += _data;
           }
           const master = getMasterExpenInto(e.key);
-          const amount = Number(e.value) || 0;
+          const amount = _data;
           if (!isFilterFieldInExpense(e.key) && master?.isOtherExpense) {
-            _otherSum += e.value;
-            if (!stringNumberNullOrEmpty(e.value)) {
+            _otherSum += _data;
+            if (_data > 0) {
               _otherDetail += `${getOtherExpenseName(e.key)},`;
             }
 
@@ -130,6 +143,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           isOverApprovalLimit1: _isOverApprovalLimit1,
           isOverApprovalLimit2: _isOverApprovalLimit2,
         };
+
         if (sum > 0) {
           await dispatch(addNewItem(data));
         } else {
@@ -152,12 +166,15 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
             };
           });
 
+        let preData: any;
         arr.map((element: any) => {
           const master = getMasterExpenInto(element[0]);
-          const amount = Number(element[1]) || 0;
+          const key = element[0];
+          const _amount = (element[1] || 0).replace(/[^0-9.]/g, '').replace(/,/g, '');
+          const amount = parseFloat(_amount);
           if (!isFilterFieldInExpense(element[0]) && master?.isOtherExpense) {
-            _otherSum += element[1];
-            if (!stringNumberNullOrEmpty(element[1])) {
+            _otherSum += amount;
+            if (amount > 0) {
               _otherDetail += `${getOtherExpenseName(element[0])},`;
             }
             if (amount > master.approvalLimit1) {
@@ -167,15 +184,16 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
               _isOverApprovalLimit2 = true;
             }
           }
+          preData = { ...preData, [element[0]]: amount };
         });
         allItem = {
           ...allItem,
-          ...values,
+          ...preData,
         };
         const data = {
           ...allItem,
           id: uuidv4(),
-          total: sum(values),
+          total: sum(preData),
           date: convertUtcToBkkDate(moment(startDate).startOf('day').toISOString()),
           dateTime: startDate,
           SUMOTHER: _otherSum,
@@ -183,7 +201,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           isOverApprovalLimit1: _isOverApprovalLimit1,
           isOverApprovalLimit2: _isOverApprovalLimit2,
         };
-        if (sum(values) > 0) {
+        if (sum(preData) > 0) {
           await dispatch(addNewItem(data));
         } else {
           isError = true;
@@ -216,9 +234,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   }
 
   const handleChange = (event: any) => {
-    // const value = event.target.value.replace(/[^0-9]/g, '');
+    const data = event.target.value.replace(/[^0-9.]/g, '').replace(/,/g, '');
     const value = event.target.value;
-    setValues({ ...values, [event.target.name]: Number(value) });
+    setValues({ ...values, [event.target.name]: value });
     let sum: number = 0;
     const arr = Object.entries(values);
     arr.map((element: any) => {
@@ -226,16 +244,17 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
         sum += element[1];
       }
     });
-    sum += Number(value);
+    sum += parseFloat(data);
     if (sum > 0) {
       setIsDisableSaveBtn(false);
     }
   };
   const handleOnChange = (event: any) => {
-    const onlyNumber = event.target.value;
-    const value = Number(onlyNumber);
+    const data = event.target.value.replace(/[^0-9.]/g, '').replace(/,/g, '');
+    const _data = event.target.value;
+    const value = parseFloat(data);
     const name = event.target.name;
-    setValues({ ...values, [event.target.name]: Number(value) });
+    setValues({ ...values, [event.target.name]: _data });
 
     const arr = Object.entries(values);
     let _otherSum: number = 0;
@@ -246,7 +265,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           _otherSum += value;
           isNewItem = false;
         } else {
-          _otherSum += element[1];
+          const _element = element[1].replace(/[^0-9.]/g, '').replace(/,/g, '');
+          _otherSum += parseFloat(_element);
         }
       }
     });
@@ -294,28 +314,27 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   }, [open, edit, payload]);
 
   const handleChangeNew = (value: any, name: any) => {
-    console.log(value);
-    // e.target.value ? parseInt(e.target.value, 10) : '0';
-    const onlyNumber = value;
-    const data = Number(onlyNumber);
+    // const onlyNumber = value;
+    // const data = Number(onlyNumber);
     testList.forEach((element: any) => {
       if (element.key === name) {
-        element.value = data;
+        element.value = value;
       }
     });
     setFlagEdit(true);
   };
   const handleChangeNewOnOtherExpense = (value: any, name: any) => {
-    const onlyNumber = value;
     let _otherSum: number = 0;
-    const data = Number(onlyNumber);
+    // const data = Number(onlyNumber);
+    const _data = value.replace(/[^0-9.]/g, '').replace(/,/g, '');
+    const data = parseFloat(_data || 0);
     testList.forEach((element: any) => {
       if (element.key === name) {
         element.value = data;
       }
       if (!isFilterFieldInExpense(element.key) && isOtherExpenseField(element.key)) {
         if (element.key === name) {
-          _otherSum += Number(data);
+          _otherSum += data;
         } else {
           _otherSum += element.value;
         }
@@ -399,6 +418,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               customInput={TextField}
                               fixedDecimalScale
                               autoComplete='off'
+                              thousandSeparator={true}
                             />
                           </Grid>
                         </>
@@ -433,6 +453,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       customInput={TextField}
                       fixedDecimalScale
                       autoComplete='off'
+                      thousandSeparator={true}
                     />
                   </Grid>
                 </Grid>
@@ -481,6 +502,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               customInput={TextField}
                               fixedDecimalScale
                               autoComplete='off'
+                              thousandSeparator={true}
                             />
                           </Grid>
                         </>
@@ -527,6 +549,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               customInput={TextField}
                               fixedDecimalScale
                               autoComplete='off'
+                              thousandSeparator={true}
                             />
                           </Grid>
                         </>
@@ -560,6 +583,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       customInput={TextField}
                       fixedDecimalScale
                       autoComplete='off'
+                      thousandSeparator={true}
                     />
                   </Grid>
                 </Grid>
@@ -606,6 +630,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               customInput={TextField}
                               fixedDecimalScale
                               autoComplete='off'
+                              thousandSeparator={true}
                             />
                           </Grid>
                         </>
