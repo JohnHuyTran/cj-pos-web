@@ -155,12 +155,12 @@ export default function ModalCreateAuditPlan({
   }, [dataDetail]);
 
   useEffect(() => {
-    if (moment(dataDetail.countingDate).endOf('day').isBefore(moment(new Date()))) {
+    if (moment(values.countingDate).endOf('day').isBefore(moment(new Date()))) {
       setDisableCounting(true);
     } else {
       setDisableCounting(false);
     }
-  }, [dataDetail]);
+  }, [values.countingDate]);
   useEffect(() => {
     SetReSave(true)
   }, [values.countingDate, values.branch]);
