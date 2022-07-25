@@ -16,7 +16,7 @@ import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { useStyles } from '../../../styles/makeTheme';
 import LoadingModal from '../../commons/ui/loading-modal';
 import { Chip, TextField, Typography } from '@mui/material';
-import { addTwoDecimalPlaces, numberWithCommas } from '../../../utils/utils';
+import { numberWithCommas } from '../../../utils/utils';
 import ExpenseDetail from './expense-detail';
 import {
   addNewItem,
@@ -269,10 +269,10 @@ var calDiff = function (params: GridValueGetterParams) {
     const diff =
       Number(params.getValue(params.id, 'sumApprovalAmount')) - Number(params.getValue(params.id, 'sumWithdrawAmount'));
 
-    if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{addTwoDecimalPlaces(diff)} </label>;
-    if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {addTwoDecimalPlaces(diff)} </label>;
+    if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{numberWithCommas(diff)} </label>;
+    if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {numberWithCommas(diff)} </label>;
 
-    return <label style={{ color: '#000', fontSize: '1rem' }}> {addTwoDecimalPlaces(diff)} </label>;
+    return <label style={{ color: '#000', fontSize: '1rem' }}> {numberWithCommas(diff)} </label>;
   }
   return <label style={{ color: '#000', fontSize: '1rem' }}> 0.00 </label>;
 };
