@@ -73,6 +73,7 @@ export enum MAINMENU {
   PRODUCT_INFO = 'productInfo',
   PURCHASE_BRANCH = 'purchaseBranch',
   EXPENSE = 'expense',
+  EXPENSE_CONFIG = 'expenseConfig',
 }
 
 export enum SUBMENU {
@@ -91,6 +92,7 @@ export enum SUBMENU {
   PI_PRODUCT_MASTER = 'productInfo.productMaster',
   PR_CREATE_PURCHASE_BRANCH = 'purchasebranch.createPurchaseBranch',
   EX_EXPENSE = 'account.expense',
+  EX_CONFIG = 'account.config',
 }
 
 export enum PERMISSION_GROUP {
