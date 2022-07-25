@@ -84,7 +84,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
   const validateForm = () => {
     if (
       values.type.length === 0 ||
-      // values.skuCode === '' ||
+      values.skuCode === '' ||
       values.accountNameTh === '' ||
       values.accountCode === '' ||
       values.approvalLimit1 === '' ||
@@ -148,9 +148,10 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
         setIsOpenLoading(false);
       } else if (isStatus === 'Update') {
         const payloadUpdate: ExpenseConfigUpdateRequest = {
+          isActive: values.isActive === 'true' ? true : false,
           accountCode: values.accountCode,
           accountNameTh: values.accountNameTh,
-          skuCode: '000000000030000185',
+          skuCode: values.skuCode,
           approvalLimit1: Number(values.approvalLimit1),
           approvalLimit2: Number(values.approvalLimit2),
           requiredDocumentTh: values.requiredDocumentTh ? values.requiredDocumentTh : '',
@@ -206,7 +207,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
       isActive: dataSelect.isActive.toString(),
       type: isotherExpense ? 'OTHER' : dataSelect.typeCode,
       typeOther: isotherExpense ? [dataSelect.typeCode] : [],
-      skuCode: '',
+      skuCode: dataSelect.skuCode,
       accountNameTh: dataSelect.accountNameTh,
       accountCode: dataSelect.accountCode,
       requiredDocumentTh: dataSelect.requiredDocumentTh,
