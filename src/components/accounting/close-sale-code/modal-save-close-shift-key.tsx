@@ -189,12 +189,16 @@ const TableSaveCloseShiftKey = () => {
     <Box
       style={{
         width: '75%',
-        margin: 'auto'
+        margin: 'auto',
+        textAlign: 'center'
         // height: `${110 + (Math.min(pageSize, rows.length) * 65)}px`,
         // maxHeight: 'calc(100vh - 445px)'
       }}
       className={classes.MdataGridDetail}
     >
+      <Typography component='div' sx={{ mt:1, mb:2, fontWeight: 600 }}>
+        บันทึกรหัสปิดรอบ
+      </Typography>
       <DataGrid
         rows={row}
         columns={columns}
