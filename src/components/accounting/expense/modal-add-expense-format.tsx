@@ -23,6 +23,7 @@ import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import { STATUS } from '../../../utils/enum/accounting-enum';
 import { border } from '@mui/system';
 import NumberFormat from 'react-number-format';
+import { isGroupBranch } from 'utils/role-permission';
 
 interface Props {
   open: boolean;
@@ -306,10 +307,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
       setIsErrorDate(false);
       setErrorDate('');
     }
-    if (expenseData) {
+    if (isGroupBranch()) {
       setEnableSaveBtn(expenseData.status === STATUS.DRAFT || expenseData.status === STATUS.SEND_BACK_EDIT);
-    } else {
-      setEnableSaveBtn(true);
     }
   }, [open, edit, payload]);
 
