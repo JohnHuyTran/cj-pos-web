@@ -56,8 +56,13 @@ export default function ModelConfirmSearch({
     onClose();
   };
 
-  const handleDate = async (period: any) => {
-    setPeriodData(period);
+  const handleDate = async (startDate: any, endDate: any) => {
+    const date = {
+      startDate: startDate,
+      endDate: endDate,
+    };
+
+    setPeriodData(date);
   };
 
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);

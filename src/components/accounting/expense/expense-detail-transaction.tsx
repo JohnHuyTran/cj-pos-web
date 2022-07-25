@@ -22,14 +22,15 @@ import { useStyles } from '../../../styles/makeTheme';
 import { STATUS } from '../../../utils/enum/accounting-enum';
 import { isFilterFieldInExpense, stringNullOrEmpty, isFilterOutFieldInAdd } from '../../../utils/utils';
 import HtmlTooltip from '../../commons/ui/html-tooltip';
-import ModalAddExpense from './modal-add-expense';
+import ModalAddExpense from './modal-add-expense-format';
 interface Props {
   onClickAddNewBtn?: () => void;
   type: string;
   periodProps: ExpensePeriod;
+  edit: boolean;
 }
 
-function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props) {
+function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
@@ -46,10 +47,13 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   const [items, setItems] = React.useState<any>(_initialItems && _initialItems.length > 0 ? _initialItems : []);
   const [actionEdit, setActionEdit] = React.useState(false);
   const payloadNewItem = useAppSelector((state) => state.expenseAccountDetailSlice.addNewItem);
+  const getMasterExpenseAll = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type);
   const getMasterExpenInto = (key: any) =>
-    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type && e.isActive);
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type);
   const [expenseType, setExpenseType] = React.useState('');
   const [period, setPeriod] = React.useState<ExpensePeriod>();
+  const [editAction, setEditAction] = React.useState(edit);
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     const master = getMasterExpenInto(i.expenseNo);
     const hideColumn = master ? master.isOtherExpense : false;
@@ -251,6 +255,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   });
   useEffect(() => {
     setExpenseType(type);
+    setEditAction(edit);
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
       accountNameTh: 'วันที่ค่าใช่จ่าย',
@@ -308,11 +313,24 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
 
     _newExpenseAllList.push(headerDescription);
 
-    expenseMasterList
-      .filter((i: ExpenseInfo) => i.isActive && i.typeCode === expenseType)
-      .map((i: ExpenseInfo) => {
-        _newExpenseAllList.push(i);
-      });
+    const summary: SumItems = expenseData ? expenseData.sumItems : null;
+    const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
+    if (edit && entries.length > 0) {
+      entries
+        .filter((entrie: SumItemsItem) => !isFilterOutFieldInAdd(entrie.expenseNo))
+        .map((entrie: SumItemsItem, i: number) => {
+          const master = getMasterExpenseAll(entrie.expenseNo);
+          if (master) {
+            _newExpenseAllList.push(master);
+          }
+        });
+    } else {
+      expenseMasterList
+        .filter((i: ExpenseInfo) => i.isActive && i.typeCode === expenseType)
+        .map((i: ExpenseInfo) => {
+          _newExpenseAllList.push(i);
+        });
+    }
     _newExpenseAllList.push(headerOtherSum);
     _newExpenseAllList.push(headerOtherDetail);
     _newExpenseAllList.push(headerSum);
@@ -341,6 +359,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps }: Props
   React.useEffect(() => {
     setPeriod(periodProps);
     setExpenseType(type);
+    setEditAction(edit);
   }, [periodProps]);
 
   const [pageSize, setPageSize] = React.useState<number>(10);

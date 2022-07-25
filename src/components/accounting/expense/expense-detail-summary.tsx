@@ -27,13 +27,15 @@ import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
 interface Props {
   type: string;
   periodProps: ExpensePeriod;
+  edit: boolean;
 }
 
-function ExpenseDetailSummary({ type, periodProps }: Props) {
+function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
 
+  const [editAction, setEditAction] = React.useState(edit);
   const [expenseType, setExpenseType] = React.useState(type);
   const [period, setPeriod] = React.useState<ExpensePeriod>({
     period: 0,
@@ -50,8 +52,10 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
   const [openModalUpdatedExpenseSummary, setOpenModalUpdateExpenseSummary] = React.useState(false);
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
+  const getMasterExpenseAll = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type);
   const getMasterExpenInto = (key: any) =>
-    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type && e.isActive);
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type);
   const frontColor = (value: any) => {
     const _value = stringNullOrEmpty(value) ? '' : value.toString();
     return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
@@ -149,6 +153,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   });
   useEffect(() => {
     setExpenseType(type);
+    setEditAction(edit);
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
       accountNameTh: ' ',
@@ -190,12 +195,25 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
       typeNameTh: '',
     };
     _newExpenseAllList.push(headerDescription);
+    const summary: SumItems = expenseData ? expenseData.sumItems : null;
+    const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
+    if (edit && entries.length > 0) {
+      entries
+        .filter((entrie: SumItemsItem) => !isFilterOutFieldInAdd(entrie.expenseNo))
+        .map((entrie: SumItemsItem, i: number) => {
+          const master = getMasterExpenseAll(entrie.expenseNo);
+          if (master) {
+            _newExpenseAllList.push(master);
+          }
+        });
+    } else {
+      expenseMasterList
+        .filter((i: ExpenseInfo) => i.isActive && i.typeCode === expenseType)
+        .map((i: ExpenseInfo) => {
+          _newExpenseAllList.push(i);
+        });
+    }
 
-    expenseMasterList
-      .filter((i: ExpenseInfo) => i.isActive && i.typeCode === expenseType)
-      .map((i: ExpenseInfo) => {
-        _newExpenseAllList.push(i);
-      });
     _newExpenseAllList.push(headerOtherSum);
     _newExpenseAllList.push(headerSum);
     setNewExpenseAllList(_newExpenseAllList);
@@ -204,6 +222,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   React.useEffect(() => {
     setPeriod(periodProps);
     setExpenseType(type);
+    setEditAction(edit);
   }, [periodProps]);
 
   const currentlySelected = async (params: GridCellParams) => {
@@ -318,7 +337,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
             onCellClick={currentlySelected}
           />
         </div>
-        <ExpenseDetailTransaction type={expenseType} periodProps={period} />
+        <ExpenseDetailTransaction type={expenseType} periodProps={period} edit={editAction} />
         <ModalUpdateExpenseSummary
           open={openModalUpdatedExpenseSummary}
           onClose={() => setOpenModalUpdateExpenseSummary(false)}

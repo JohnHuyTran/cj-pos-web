@@ -59,6 +59,7 @@ import { ApiError } from '../../../models/api-error-model';
 import AlertError from '../../commons/ui/alert-error';
 import {
   addNewItem,
+  addSummaryItem,
   initialItems,
   updateItemRows,
   updateSummaryRows,
@@ -326,6 +327,7 @@ export default function SearchExpense() {
     await dispatch(updateItemRows([]));
     await dispatch(initialItems([]));
     await dispatch(addNewItem(null));
+    await dispatch(addSummaryItem(null));
   };
   const handleCloseSelectPeriodModal = async () => {
     setOpenSelectPeriod(false);

@@ -11,7 +11,7 @@ import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import ControlPoint from '@mui/icons-material/ControlPoint';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ExpenseDetailSummary from './expense-detail-summary';
-import ModalAddExpense from './modal-add-expense';
+import ModalAddExpense from './modal-add-expense-format';
 import ModelDescriptionExpense from './modal-description-expense';
 
 import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
@@ -94,6 +94,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const dispatch = useAppDispatch();
   const { v4: uuidv4 } = require('uuid');
   const [docNo, setDocNo] = React.useState();
+  const [editAction, setEditAction] = React.useState(edit);
   const [expenseTypeName, setExpenseTypeName] = React.useState('รายละเอียดเอกสาร');
   const [expenseType, setExpenseType] = React.useState('รายละเอียดเอกสาร');
   const [period, setPeriod] = React.useState<ExpensePeriod>({
@@ -253,6 +254,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
         await dispatch(featchExpenseDetailAsync(value.docNo));
         await dispatch(featchBranchAccountingListAsync(payloadSearch));
+        setAttachFiles(fileUploadList);
         await dispatch(uploadFileState([]));
         await dispatch(haveUpdateData(false));
 
@@ -557,7 +559,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     } else if (status === STATUS.WAITTING_ACCOUNTING) {
       let sumApprovalAmount: number = 0;
       const _arr = store.getState().expenseAccountDetailSlice.addSummaryItem;
-      if (_arr && _arr.length > 0) {
+      if (_arr) {
         const arr = Object.entries(_arr);
         arr
           .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
@@ -589,7 +591,6 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         title: 'ผลต่าง',
       };
       let listPayload: payLoadAdd[] = [item1, item2, item3];
-
       setPayloadModalConfirmDetail(listPayload);
 
       setOpenModelAccountConfirm(true);
@@ -754,7 +755,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   };
 
   const getMasterExpenInto = (key: any) =>
-    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === expenseType && e.isActive);
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === expenseType);
   const isOtherExpenseField = (key: any) => {
     const master = getMasterExpenInto(key);
     return master?.isOtherExpense;
@@ -1026,6 +1027,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   }
 
   useEffect(() => {
+    setEditAction(edit);
     if (edit) {
       setDocNo(expenseData.docNo);
       setBranchCode(expenseData.branchCode);
@@ -1071,6 +1073,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               endDate: '',
             }
       );
+      setEditAction(edit);
       setExpenseType(type);
       setExpenseTypeName(
         type === EXPENSE_TYPE.COFFEE
@@ -1224,7 +1227,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
               status === STATUS.WAITTING_EDIT_ATTACH_FILE
             ) && <Box>{componetButtonApprove}</Box>}
           <Box mb={3} mt={3}>
-            <ExpenseDetailSummary type={expenseType} periodProps={period} />
+            <ExpenseDetailSummary type={expenseType} periodProps={period} edit={editAction} />
           </Box>
           <Box mt={1}>
             <Box>

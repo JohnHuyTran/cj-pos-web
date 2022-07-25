@@ -18,7 +18,16 @@ import LoadingModal from '../../commons/ui/loading-modal';
 import { Chip, TextField, Typography } from '@mui/material';
 import { addTwoDecimalPlaces, numberWithCommas } from '../../../utils/utils';
 import ExpenseDetail from './expense-detail';
-import { featchExpenseDetailAsync, haveUpdateData } from '../../../store/slices/accounting/accounting-slice';
+import {
+  addNewItem,
+  addSummaryItem,
+  featchExpenseDetailAsync,
+  haveUpdateData,
+  initialItems,
+  updateItemRows,
+  updateSummaryRows,
+  updateToInitialState,
+} from '../../../store/slices/accounting/accounting-slice';
 import { uploadFileState } from '../../../store/slices/upload-file-slice';
 import { ExpenseSearch, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
@@ -207,7 +216,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => {
       const status = params.getValue(params.id, 'status');
-      if (status === 'WAITTING_ACCOUNTING' || status === 'WAITTING_APPROVAL3') {
+      if (status === 'APPROVED') {
         return params.value;
       } else {
         return '';
@@ -223,7 +232,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => {
       const status = params.getValue(params.id, 'status');
-      if (status === 'WAITTING_ACCOUNTING' || status === 'WAITTING_APPROVAL3') {
+      if (status === 'APPROVED') {
         return params.value;
       } else {
         return '';
@@ -253,15 +262,19 @@ function useApiRef() {
 }
 
 var calDiff = function (params: GridValueGetterParams) {
-  if (params.getValue(params.id, 'status') === 'WAITTING_APPROVAL3') {
+  if (
+    params.getValue(params.id, 'status') === 'APPROVED' ||
+    params.getValue(params.id, 'status') === 'WAITTING_APPROVAL3'
+  ) {
     const diff =
       Number(params.getValue(params.id, 'sumApprovalAmount')) - Number(params.getValue(params.id, 'sumWithdrawAmount'));
 
     if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{addTwoDecimalPlaces(diff)} </label>;
     if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {addTwoDecimalPlaces(diff)} </label>;
-    return addTwoDecimalPlaces(diff);
+
+    return <label style={{ color: '#000', fontSize: '1rem' }}> {addTwoDecimalPlaces(diff)} </label>;
   }
-  return '';
+  return <label style={{ color: '#000', fontSize: '1rem' }}> 0.00 </label>;
 };
 
 function ExpenseSearchList({ onSelectRows }: DataGridProps) {
@@ -360,10 +373,17 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const [edit, setEdit] = React.useState(false);
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const handleOpenDetailModal = async (docNo: string) => {
-    await dispatch(featchExpenseDetailAsync(docNo));
-    setInit('Y');
     await dispatch(haveUpdateData(false));
     await dispatch(uploadFileState([]));
+    await dispatch(addSummaryItem(null));
+    await dispatch(updateToInitialState());
+    await dispatch(updateSummaryRows([]));
+    await dispatch(updateItemRows([]));
+    await dispatch(initialItems([]));
+    await dispatch(addNewItem(null));
+    await dispatch(featchExpenseDetailAsync(docNo));
+    setInit('Y');
+
     setOpenDetailModal(true);
   };
 

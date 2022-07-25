@@ -21,6 +21,7 @@ import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import { STATUS } from '../../../utils/enum/accounting-enum';
 import { border } from '@mui/system';
+import NumberFormat from 'react-number-format';
 
 interface Props {
   open: boolean;
@@ -215,7 +216,8 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   }
 
   const handleChange = (event: any) => {
-    const value = event.target.value.replace(/[^0-9]/g, '');
+    // const value = event.target.value.replace(/[^0-9]/g, '');
+    const value = event.target.value;
     setValues({ ...values, [event.target.name]: Number(value) });
     let sum: number = 0;
     const arr = Object.entries(values);
@@ -230,7 +232,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     }
   };
   const handleOnChange = (event: any) => {
-    const onlyNumber = event.target.value.replace(/[^0-9]/g, '');
+    const onlyNumber = event.target.value;
     const value = Number(onlyNumber);
     const name = event.target.name;
     setValues({ ...values, [event.target.name]: Number(value) });
@@ -292,8 +294,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   }, [open, edit, payload]);
 
   const handleChangeNew = (value: any, name: any) => {
+    console.log(value);
     // e.target.value ? parseInt(e.target.value, 10) : '0';
-    const onlyNumber = value.replace(/[^0-9]/g, '');
+    const onlyNumber = value;
     const data = Number(onlyNumber);
     testList.forEach((element: any) => {
       if (element.key === name) {
@@ -303,7 +306,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
     setFlagEdit(true);
   };
   const handleChangeNewOnOtherExpense = (value: any, name: any) => {
-    const onlyNumber = value.replace(/[^0-9]/g, '');
+    const onlyNumber = value;
     let _otherSum: number = 0;
     const data = Number(onlyNumber);
     testList.forEach((element: any) => {
@@ -372,7 +375,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                             <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={2}>
-                            <TextField
+                            {/* <TextField
                               id={i.expenseNo}
                               name={i.expenseNo}
                               size='small'
@@ -383,6 +386,19 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               placeholder=''
                               autoComplete='off'
                               disabled={enableSaveBtn ? false : true}
+                            /> */}
+
+                            <NumberFormat
+                              id={i.expenseNo}
+                              name={i.expenseNo}
+                              value={String(defaul ? defaul[1] : '')}
+                              onChange={handleChange}
+                              decimalScale={2}
+                              className={classes.MtextFieldNumber}
+                              disabled={enableSaveBtn ? false : true}
+                              customInput={TextField}
+                              fixedDecimalScale
+                              autoComplete='off'
                             />
                           </Grid>
                         </>
@@ -394,7 +410,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                     ค่าอื่นๆ:
                   </Grid>
                   <Grid item xs={2}>
-                    <TextField
+                    {/* <TextField
                       id='txbSumOther'
                       name='sumOther'
                       size='small'
@@ -404,6 +420,19 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       placeholder=''
                       autoComplete='off'
                       disabled={true}
+                    /> */}
+
+                    <NumberFormat
+                      id='txbSumOther'
+                      name='sumOther'
+                      value={String(sumOther)}
+                      // onChange={handleOnChange}
+                      decimalScale={2}
+                      className={classes.MtextFieldNumber}
+                      disabled={true}
+                      customInput={TextField}
+                      fixedDecimalScale
+                      autoComplete='off'
                     />
                   </Grid>
                 </Grid>
@@ -428,7 +457,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                             <Typography variant='body2'>{i.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={2}>
-                            <TextField
+                            {/* <TextField
                               id={i.expenseNo}
                               name={i.expenseNo}
                               size='small'
@@ -439,6 +468,19 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               placeholder=''
                               autoComplete='off'
                               disabled={enableSaveBtn ? false : true}
+                            /> */}
+
+                            <NumberFormat
+                              id={i.expenseNo}
+                              name={i.expenseNo}
+                              value={String(defaul ? defaul[1] : '')}
+                              onChange={handleOnChange}
+                              decimalScale={2}
+                              className={classes.MtextFieldNumber}
+                              disabled={enableSaveBtn ? false : true}
+                              customInput={TextField}
+                              fixedDecimalScale
+                              autoComplete='off'
                             />
                           </Grid>
                         </>
@@ -461,7 +503,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                             <Typography variant='body2'>{master?.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={2}>
-                            <TextField
+                            {/* <TextField
                               id={i.key}
                               name={i.key}
                               size='small'
@@ -472,6 +514,19 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               placeholder=''
                               autoComplete='off'
                               disabled={master?.isActive && enableSaveBtn ? false : true}
+                            /> */}
+
+                            <NumberFormat
+                              id={i.key}
+                              name={i.key}
+                              value={i.value}
+                              onChange={(event: any) => handleChangeNew(event.target.value, i.key)}
+                              decimalScale={2}
+                              className={classes.MtextFieldNumber}
+                              disabled={master?.isActive && enableSaveBtn ? false : true}
+                              customInput={TextField}
+                              fixedDecimalScale
+                              autoComplete='off'
                             />
                           </Grid>
                         </>
@@ -483,7 +538,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                     ค่าอื่นๆ:
                   </Grid>
                   <Grid item xs={2}>
-                    <TextField
+                    {/* <TextField
                       id='txtDocNo'
                       name='sumOther'
                       size='small'
@@ -493,6 +548,18 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       placeholder=''
                       autoComplete='off'
                       disabled={true}
+                    /> */}
+                    <NumberFormat
+                      id='txtDocNo'
+                      name='sumOther'
+                      value={String(sumOther)}
+                      // onChange={handleOnChange}
+                      decimalScale={2}
+                      className={classes.MtextFieldNumber}
+                      disabled={true}
+                      customInput={TextField}
+                      fixedDecimalScale
+                      autoComplete='off'
                     />
                   </Grid>
                 </Grid>
@@ -516,7 +583,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                             <Typography variant='body2'>{master?.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={2}>
-                            <TextField
+                            {/* <TextField
                               id={i.key}
                               name={i.key}
                               size='small'
@@ -527,6 +594,18 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               placeholder=''
                               autoComplete='off'
                               disabled={master?.isActive && enableSaveBtn ? false : true}
+                            /> */}
+                            <NumberFormat
+                              id={i.key}
+                              name={i.key}
+                              value={i.value}
+                              onChange={(event: any) => handleChangeNewOnOtherExpense(event.target.value, i.key)}
+                              decimalScale={2}
+                              className={classes.MtextFieldNumber}
+                              disabled={master?.isActive && enableSaveBtn ? false : true}
+                              customInput={TextField}
+                              fixedDecimalScale
+                              autoComplete='off'
                             />
                           </Grid>
                         </>

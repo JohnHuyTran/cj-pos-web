@@ -8,6 +8,7 @@ import { addSummaryItem, haveUpdateData } from '../../../store/slices/accounting
 import LoadingModal from '../../commons/ui/loading-modal';
 import { isFilterFieldInExpense, isFilterOutFieldInAdd, stringNullOrEmpty } from '../../../utils/utils';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
+import NumberFormat from 'react-number-format';
 
 interface Props {
   open: boolean;
@@ -81,7 +82,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
   }, [open, payload]);
 
   const handleChangeNew = (value: any, name: any) => {
-    const onlyNumber = value.replace(/[^0-9]/g, '');
+    const onlyNumber = value;
     let sum: number = 0;
     const data = Number(onlyNumber) || 0;
     testList.forEach((element: any) => {
@@ -99,7 +100,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
   };
 
   const handleChangeNewOnOtherExpense = (value: any, name: any) => {
-    const onlyNumber = value.replace(/[^0-9]/g, '');
+    const onlyNumber = value;
     let _otherSum: number = 0;
     let sum: number = 0;
     const data = Number(onlyNumber) || 0;
@@ -158,7 +159,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                           <Typography variant='body2'>{i.title}: </Typography>
                         </Grid>
                         <Grid item xs={2}>
-                          <TextField
+                          {/* <TextField
                             id={i.key}
                             name={i.key}
                             size='small'
@@ -169,6 +170,18 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             placeholder=''
                             autoComplete='off'
                             disabled={!master?.isActive}
+                          /> */}
+                          <NumberFormat
+                            id={i.key}
+                            name={i.key}
+                            value={i.value}
+                            onChange={(event: any) => handleChangeNew(event.target.value, i.key)}
+                            decimalScale={2}
+                            className={classes.MtextFieldNumber}
+                            disabled={!master?.isActive}
+                            customInput={TextField}
+                            fixedDecimalScale
+                            autoComplete='off'
                           />
                         </Grid>
                       </>
@@ -180,7 +193,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                   ค่าอื่นๆ:
                 </Grid>
                 <Grid item xs={2}>
-                  <TextField
+                  {/* <TextField
                     id='txtDocNo'
                     name='sumOther'
                     size='small'
@@ -191,6 +204,19 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                     placeholder=''
                     autoComplete='off'
                     disabled={true}
+                  /> */}
+
+                  <NumberFormat
+                    id='txtDocNo'
+                    name='sumOther'
+                    value={String(sumOther)}
+                    // onChange={handleOnChange}
+                    decimalScale={2}
+                    className={classes.MtextFieldNumber}
+                    disabled={true}
+                    customInput={TextField}
+                    fixedDecimalScale
+                    autoComplete='off'
                   />
                 </Grid>
               </Grid>
@@ -206,7 +232,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                           <Typography variant='body2'>{i.title}: </Typography>
                         </Grid>
                         <Grid item xs={2}>
-                          <TextField
+                          {/* <TextField
                             id='txtDocNo'
                             name={i.key}
                             size='small'
@@ -216,6 +242,18 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             fullWidth
                             placeholder=''
                             disabled={!master?.isActive}
+                          /> */}
+                          <NumberFormat
+                            id={i.key}
+                            name={i.key}
+                            value={i.value}
+                            onChange={(event: any) => handleChangeNewOnOtherExpense(event.target.value, i.key)}
+                            decimalScale={2}
+                            className={classes.MtextFieldNumber}
+                            disabled={!master?.isActive}
+                            customInput={TextField}
+                            fixedDecimalScale
+                            autoComplete='off'
                           />
                         </Grid>
                       </>
