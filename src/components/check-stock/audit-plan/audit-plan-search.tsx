@@ -121,7 +121,7 @@ const AuditPlanSearch = () => {
     setFlagSearch(false);
     setValues({
       documentNumber: '',
-      branch: 'ALL',
+      branch: groupBranch ? ownBranch : 'ALL',
       status: 'ALL',
       fromDate: new Date(),
       toDate: new Date(),
