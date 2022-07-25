@@ -84,6 +84,10 @@ export function isOwnBranch(branch: any): boolean {
   return env.branch.code === branch;
 }
 
+export const formatNumber = (value: any, decimalPoint: number = 0) => {
+  return ''+((+value).toFixed(decimalPoint)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 // export function isBranchDC(userInfo: KeyCloakTokenInfo): boolean {
 //   const group = env.branch.default.dc.group;
 //   const location = env.branch.default.dc.location;
