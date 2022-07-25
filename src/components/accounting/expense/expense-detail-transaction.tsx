@@ -210,9 +210,9 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
 
             const value = params.value || 0;
             const condition =
-              value > Number(master?.approvalLimit2)
+              value > (master?.approvalLimit2 || 0)
                 ? 'overLimit2'
-                : value > Number(master?.approvalLimit1)
+                : value > (master?.approvalLimit1 || 0)
                 ? 'overLimit1'
                 : 'normal';
             return (
