@@ -14,12 +14,8 @@ import ExpenseDetailSummary from './expense-detail-summary';
 import ModalAddExpense from './modal-add-expense-format';
 import ModelDescriptionExpense from './modal-description-expense';
 
-import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
-import { Cancel, ConstructionOutlined, TramOutlined, VoicemailRounded } from '@mui/icons-material';
-import { GridColumnHeadersItemCollection } from '@mui/x-data-grid';
-import { mockExpenseInfo001, mockExpenseInfo002 } from '../../../mockdata/branch-accounting';
+import { Cancel } from '@mui/icons-material';
 import {
-  AccountAccountExpenses,
   DataItem,
   ExpenseInfo,
   ExpensePeriod,
@@ -35,7 +31,6 @@ import {
   featchExpenseDetailAsync,
   haveUpdateData,
   initialItems,
-  updateItemRows,
   updateSummaryRows,
 } from '../../../store/slices/accounting/accounting-slice';
 import {
@@ -44,8 +39,6 @@ import {
   isFilterOutFieldForPayload,
   isFilterOutFieldInAdd,
   numberWithCommas,
-  objectNullOrEmpty,
-  stringNullOrEmpty,
   stringNumberNullOrEmpty,
 } from '../../../utils/utils';
 import { convertUtcToBkkDate, convertUtcToBkkWithZ } from '../../../utils/date-utill';
@@ -70,8 +63,6 @@ import moment from 'moment';
 import ModelConfirmDetail from './confirm/modal-confirm-detail';
 import ModelConfirmAccounting from './confirm/modal-confirm-accounting';
 import AccordionUploadSingleFile from '../../commons/ui/accordion-upload-single-file';
-import TextBoxComment from '../../commons/ui/textbox-comment';
-import { Day } from '@material-ui/pickers';
 import ModalConfirmExpense from './modal-confirm-expense';
 import { isGroupBranch, isGroupOC } from '../../../utils/role-permission';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
@@ -519,7 +510,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const handleApproveBtn = () => {
     setInit('N');
     setIsApprove(true);
-    setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
+    setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount?.toFixed(2))} บาท`);
+    // setSumWithdrawAmount(`${<NumberFormat(summary.sumWithdrawAmount).} บาท`);
     if (status === STATUS.DRAFT) {
       const isFileValidate: boolean = validateFileInfo();
       const isvalidateDate = validateDateIsBeforPeriod();
