@@ -1,8 +1,9 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Chip, TextField, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRowData } from '@mui/x-data-grid';
 import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import NumberFormat from 'react-number-format';
 import { CloseSaleShiftInfo } from '../../../models/branch-accounting-model';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
@@ -26,7 +27,7 @@ function CloseSaleShiftSearchList() {
   };
   const columns: GridColDef[] = [
     {
-      field: 'userName',
+      field: 'posUser',
 
       headerName: 'รหัสพนักงาน',
       width: 120,
@@ -39,7 +40,7 @@ function CloseSaleShiftSearchList() {
       ),
     },
     {
-      field: 'posID',
+      field: 'posCode',
 
       headerName: 'เครื่องขาย',
       minWidth: 100,
@@ -66,19 +67,40 @@ function CloseSaleShiftSearchList() {
       sortable: false,
       align: 'center',
       renderCell: (params) => {
-        return params.value;
+        const _status = params.getValue(params.id, 'status');
+        if (_status === 'DRAFT') {
+          return <Chip label={params.value} size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
+        } else if (_status === 'CORRECT') {
+          return <Chip label={params.value} size='small' sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
+        } else if (_status === 'CANCELED') {
+          return <Chip label={params.value} size='small' sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }} />;
+        }
       },
     },
     {
-      field: 'sellAmountSum',
+      field: 'shiftAmount',
       headerName: 'ยอดขายปิดรอบ',
       width: 130,
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params) => {
+        return (
+          <NumberFormat
+            value={String(params.value)}
+            type='text'
+            fixedDecimalScale
+            thousandSeparator={true}
+            decimalScale={2}
+            // className={classes.MtextFieldNumber}
+            disabled={true}
+            // customInput={TextField}
+          />
+        );
+      },
     },
     {
-      field: 'billAmountSum',
+      field: 'billAmount',
       headerName: 'ยอดขายในบิลขาย',
       minWidth: 140,
       // flex: 0.3,
@@ -87,7 +109,7 @@ function CloseSaleShiftSearchList() {
       sortable: false,
     },
     {
-      field: 'sellAmountInput',
+      field: 'confirmAmount',
       headerName: 'ยอดขายที่สาขากรอก',
       minWidth: 160,
       // flex: 0.25,
@@ -97,7 +119,7 @@ function CloseSaleShiftSearchList() {
       renderCell: (params) => params.value,
     },
     {
-      field: 'closeShiftKey',
+      field: 'shiftKey',
       headerName: 'รหัสปิดรอบ',
       width: 100,
       headerAlign: 'center',
@@ -105,21 +127,21 @@ function CloseSaleShiftSearchList() {
       sortable: false,
     },
     {
-      field: 'shiftBillNoCount',
+      field: 'noOfSaleBill',
       headerName: 'จำนวนบิลขาย',
       width: 120,
       align: 'right',
       sortable: false,
     },
     {
-      field: 'returnBillCount',
+      field: 'noOfReturnBill',
       headerName: 'จำนวนบิลคืน',
       width: 120,
       align: 'right',
       sortable: false,
     },
     {
-      field: 'businessDate',
+      field: 'shiftDate',
       headerName: 'วันที่บันทึก',
       width: 150,
       align: 'left',
@@ -142,18 +164,18 @@ function CloseSaleShiftSearchList() {
   let rows: any = items.data.map((item: CloseSaleShiftInfo, index: number) => {
     return {
       id: index,
-      userName: item.userName,
-      posID: item.posID,
+      posUser: item.posUser,
+      posCode: item.posCode,
       shiftCode: item.shiftCode,
       status: item.status,
       statusDisplay: t(`status.${item.status}`),
-      sellAmountSum: item.sellAmountSum,
-      billAmountSum: item.billAmountSum,
-      sellAmountInput: item.sellAmountInput,
-      closeShiftKey: item.closeShiftKey,
-      shiftBillNoCount: item.shiftBillNoCount,
-      returnBillCount: item.returnBillCount,
-      businessDate: `${convertUtcToBkkDate(item.businessDate)} ${moment(item.businessDate).format('HH:mm ')}`,
+      shiftAmount: item.shiftAmount,
+      billAmount: item.billAmount,
+      confirmAmount: item.confirmAmount,
+      shiftKey: item.shiftKey,
+      noOfSaleBill: item.noOfSaleBill,
+      noOfReturnBill: item.noOfReturnBill,
+      shiftDate: `${convertUtcToBkkDate(item.shiftDate)} ${moment(item.shiftDate).format('HH:mm ')}`,
     };
   });
   return (

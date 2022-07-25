@@ -234,17 +234,18 @@ export function featchExpenseDetailAsyncMockup() {
 }
 
 const closeSaleShiftInfo: CloseSaleShiftInfo = {
-  userName: 'CJG',
-  posID: '001',
+  posUser: 'CJG',
+  posCode: '001',
   shiftCode: '20220707-006',
   status: 'DRAFT',
-  sellAmountSum: '300',
-  billAmountSum: '4000',
-  closeShiftKey: '123',
-  shiftBillNoCount: '10',
-  returnBillCount: '0',
-  businessDate: '2022-07-16T17:00:00Z',
-  sellAmountInput: '10',
+  shiftAmount: 300,
+  billAmount: 400,
+  noOfSaleBill: 10,
+  noOfReturnBill: 10,
+  shiftDate: '2022-07-16T17:00:00Z',
+  confirmAmount: 100,
+  branchCode: '0101',
+  shiftKey: 'skfjksdf',
 };
 
 const closeSaleShiftRs: CloseSaleShiftResponse = {

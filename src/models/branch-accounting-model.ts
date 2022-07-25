@@ -233,15 +233,16 @@ export interface CloseSaleShiftResponse {
 }
 
 export interface CloseSaleShiftInfo {
-  userName: string;
-  posID: string;
+  branchCode: string;
   shiftCode: string;
+  shiftKey: string;
+  shiftDate: string;
+  shiftAmount: number | null;
+  billAmount: number | null;
+  confirmAmount: number | null;
+  noOfSaleBill: number;
+  noOfReturnBill: number;
   status: string;
-  sellAmountSum: string;
-  billAmountSum: string;
-  sellAmountInput: string;
-  closeShiftKey: string;
-  shiftBillNoCount: string;
-  returnBillCount: string;
-  businessDate: string;
+  posCode: string;
+  posUser: string;
 }

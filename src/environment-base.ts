@@ -530,7 +530,7 @@ export const environment = {
     },
     closeSaleShift: {
       search: {
-        url: '',
+        url: 'sale/shift-closes',
       },
       view: {
         url: '',
