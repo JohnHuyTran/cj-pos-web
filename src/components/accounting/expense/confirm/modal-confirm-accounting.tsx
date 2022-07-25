@@ -8,7 +8,7 @@ import { useStyles } from '../../../../styles/makeTheme';
 import { ExpenseInfo, ExpensePeriod } from '../../../../models/branch-accounting-model';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useAppSelector } from '../../../../store/store';
-import { addTwoDecimalPlaces, isFilterFieldInExpense, stringNullOrEmpty } from '../../../../utils/utils';
+import { numberWithCommas, stringNullOrEmpty } from '../../../../utils/utils';
 import { Box, DialogContentText, TextField, Typography } from '@mui/material';
 import { convertUtcToBkkDate } from '../../../../utils/date-utill';
 import NumberFormat from 'react-number-format';
@@ -92,15 +92,11 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
             hide: hideColumn,
             renderCell: (params: GridRenderCellParams) => {
               if (Number(params.value) > 0) {
-                return (
-                  <label style={{ color: '#446EF2', fontWeight: 700 }}> +{addTwoDecimalPlaces(params.value)} </label>
-                );
+                return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{numberWithCommas(params.value)} </label>;
               } else if (Number(params.value) < 0) {
-                return (
-                  <label style={{ color: '#F54949', fontWeight: 700 }}> {addTwoDecimalPlaces(params.value)} </label>
-                );
+                return <label style={{ color: '#F54949', fontWeight: 700 }}> {numberWithCommas(params.value)} </label>;
               }
-              return addTwoDecimalPlaces(params.value);
+              return numberWithCommas(params.value);
             },
           };
         } else {
