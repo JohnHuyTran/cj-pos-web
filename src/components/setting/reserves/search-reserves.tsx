@@ -61,17 +61,16 @@ export default function SearchReserves () {
       page: '1',
       ...search
     }
-
-    await dispatch(featchBranchAccountingConfigListAsync(payload))
-    .then((res) => {
+    
+    try {
+      await dispatch(featchBranchAccountingConfigListAsync(payload))
       setTimeout(() => {
         setIsOpenLoading(false);
-        const payload: any = res.payload ? res.payload : []
+        // const payload: any = res.payload ? res.payload : []
       }, 300);
-    });
-    setTimeout(() => {
+    } catch {
       setIsOpenLoading(false)
-    }, 500)
+    }
   }
   
   const handleAddList = () => {

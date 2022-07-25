@@ -1,6 +1,7 @@
-import { useState, useMemo, Fragment } from 'react';
-import { useAppSelector, useAppDispatch } from '../../../store/store';
-import { useStyles } from '../../../styles/makeTheme';
+import { Fragment, useState, useMemo } from 'react';
+import { useAppSelector, useAppDispatch } from 'store/store';
+import { useStyles } from 'styles/makeTheme';
+import { formatNumber } from 'utils/utils'
 import {
   DataGrid,
   GridCellParams,
@@ -13,12 +14,18 @@ import {
 } from '@mui/x-data-grid';
 import {
   Box,
-  TextField,
   Typography
 } from '@mui/material';
 
 // Components
 import ModalSettingExpense from './modal-settings-expense';
+import Mock from './mock.json'
+
+// Call API
+import {
+  featchBranchAccountingConfigListAsync,
+} from 'store/slices/accounting/accounting-search-config-slice';
+import { ExpenseSearchCofigRequest } from 'models/branch-accounting-model';
 
 const columns: GridColDef[] = [
   {
@@ -37,7 +44,7 @@ const columns: GridColDef[] = [
   {
     field: 'typeNameTh',
     headerName: 'ประเภท',
-    minWidth: 180,
+    minWidth: 200,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -61,7 +68,7 @@ const columns: GridColDef[] = [
   {
     field: 'accountNameTh',
     headerName: 'ชื่อบัญชี',
-    minWidth: 140,
+    minWidth: 160,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -69,7 +76,7 @@ const columns: GridColDef[] = [
   {
     field: 'accountCode',
     headerName: 'รหัสบัญชี',
-    minWidth: 140,
+    minWidth: 130,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
@@ -86,8 +93,8 @@ const columns: GridColDef[] = [
            sx={{ 
             margin: 'auto', 
             borderRadius: '8px',
-            color: params.value ? '#20AE79' : '#ff0000b0',
-            backgroundColor: params.value ? '#93fb9c42' : '#ff000038',
+            color: params.value ? '#36C690' : '#F54949',
+            backgroundColor: params.value ? '#E7FFE9' : '#FFD7D7',
             padding: '5px 20px'}}>
         {params.value ? 'ใช้งาน' : 'ไม่ใช้งาน'}
       </Box>
@@ -96,35 +103,36 @@ const columns: GridColDef[] = [
   {
     field: 'approvalLimit1',
     headerName: 'วงเงินอนุมัติ\nของ ผจก.ส่วน',
-    minWidth: 150,
+    minWidth: 130,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
       <Box component='div' sx={{ marginLeft: 'auto' }}>
-        {(params?.value?.toLocaleString())}
+        {formatNumber(params.value, 2)}
       </Box>
     )
   },
   {
     field: 'approvalLimit2',
     headerName: 'วงเงินอนุมัติ\nของ ผจก.OC',
-    minWidth: 150,
+    minWidth: 130,
     headerAlign: 'center',
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
       <Box component='div' sx={{ marginLeft: 'auto' }}>
-        {(params?.value?.toLocaleString())}
+        {formatNumber(params.value, 2)}
       </Box>
     )
   }
 ]
 
-
 export default function ReservesDetailTable () {
+  const payload = useAppSelector((state) => state.saveExpenseSearchRequest.searchExpense);
   const items = useAppSelector((state) => state.searchBranchAccountingConfig);
   const res: any = items.branchAccountingConfigList;
+  // const res: any = Mock.branchAccountingConfigList;
   const rows: any = res.data.map((data: any, indexs: number) => {
     return {
       id: indexs,
@@ -137,38 +145,66 @@ export default function ReservesDetailTable () {
   const classes = useStyles();
   const [pageSize, setPageSize] = useState(10)
   const [isOpenModal, setIsOpenModal] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const currentlySelected = async (params: GridCellParams) => {
-    console.log('value', params.row.index)
+    console.log('value', params)
     setIsOpenModal(true)
     // const value = params.colDef.field;
   }
 
+  // Handle function
+  const handlePageChange = async (newPage: number) => {
+    setIsLoading(true)
+    /* const payload: ExpenseSearchCofigRequest = {
+      limit: '10',
+      page: '1',
+      ...payload
+    }
+
+    try {
+      await featchBranchAccountingConfigListAsync(payload)
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 500)
+    } catch {
+      setIsLoading(false)
+    } */
+    
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 500)
+  }
+
   return (
     <Fragment>
-      <div
+      <Box
         style={{
           width: '100%',
-          height: rows.length >= 8 ? '70vh' : 'auto'
+          height: `${110 + (Math.min(pageSize, rows.length) * 65)}px`,
+          maxHeight: 'calc(100vh - 360px)'
         }}
         className={classes.MdataGridDetail}>
         <DataGrid
           rows={rows}
           columns={columns}
           pageSize={pageSize}
+          onPageChange={handlePageChange}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           rowsPerPageOptions={[10, 20, 50, 100]}
           pagination
           disableColumnMenu
-          autoHeight={rows.length >= 8 ? false : true}
+          autoHeight={rows.length >= 10 ? false : true}
           scrollbarSize={10}
           rowHeight={65}
           onCellClick={currentlySelected}
+          loading={isLoading}
+          style={{ minHeight: pageSize > 10 && rows.length > 10 ? 'calc(100vh - 355px)' : ''}}
           // onCellFocusOut={handleEditItems}
           // onCellOut={handleEditItems}
           // onCellKeyDown={handleEditItems}
         />
-      </div>
-  
+      </Box>
+      
       <ModalSettingExpense
           isOpen={isOpenModal}
           onClickClose={() => setIsOpenModal(false)} />
