@@ -2,12 +2,12 @@ import { useState } from 'react';
 import {
   Box,
   Container } from '@mui/material';
-import TitleHeader from '../../components/title-header';
+import TitleHeader from 'components/title-header';
 import { useTranslation } from 'react-i18next';
 
 // Components
-import SearchReserves from '../../components/setting/reserves/search-reserves';
-import ReservesDetailTable from '../../components/setting/reserves/reserves-detail-table';
+import SearchReserves from 'components/setting/reserves/search-reserves';
+import ReservesDetailTable from 'components/setting/reserves/reserves-detail-table';
 
 
 
