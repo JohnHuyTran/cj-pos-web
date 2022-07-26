@@ -4,15 +4,14 @@ import CashStatementSearch from '../../components/accounting/cash-statement/cash
 import { useTranslation } from 'react-i18next';
 
 export default function EashStatement() {
-  // const { t } = useTranslation(['expense', 'common']);
+  const { t } = useTranslation(['cashStatement', 'common']);
   // const dispatch = useAppDispatch();
   // const classes = useStyles();
   // const [open, setOpen] = React.useState(false);
 
   return (
     <Container maxWidth='xl'>
-      {/* <TitleHeader title={t('documentSearch')} /> */}
-      <TitleHeader title='เงินฝากขาด-เกิน' />
+      <TitleHeader title={t('documentTitle')} />
 
       <Box mt={3}>
         <CashStatementSearch />
