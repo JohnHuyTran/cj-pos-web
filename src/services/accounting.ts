@@ -1,6 +1,6 @@
 import { post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
-import { AccountAccountExpenses, ExpenseSaveRequest } from '../models/branch-accounting-model';
+import { AccountAccountExpenses, CloseSaleShiftRequest, ExpenseSaveRequest } from '../models/branch-accounting-model';
 import { ContentType } from '../utils/enum/common-enum';
 import { getPathUrl } from './base-service';
 
@@ -118,6 +118,16 @@ export async function expenseRejectByAccountManager(payload: ExpenseSaveRequest)
     });
   return response;
 }
+
+export async function shiftClose(payload: CloseSaleShiftRequest) {
+  const response = await post(environment.branchAccounting.closeSaleShift.shiftClose.url, payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
 export const getPathExpense = (docNo: string, path: string) => {
   return getPathUrl(`${path}`, { docNo: docNo });
 };

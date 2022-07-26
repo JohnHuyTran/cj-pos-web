@@ -212,11 +212,11 @@ export interface ExpensePeriod {
 }
 
 export interface CloseSaleShiftRequest {
-  shiftDate: string;
-  branchCode: string;
-  status: string;
-  page: number;
-  limit: number;
+  shiftDate?: string;
+  branchCode?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
 }
 export interface CloseSaleShiftResponse {
   timestamp: string;

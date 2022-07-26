@@ -81,7 +81,7 @@ function CloseSaleShiftSearchList() {
           return <Chip label={params.value} size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
         } else if (_status === 'CORRECT') {
           return <Chip label={params.value} size='small' sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
-        } else if (_status === 'CANCELED') {
+        } else if (_status === 'PENDDING_REVIEW') {
           return <Chip label={params.value} size='small' sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }} />;
         }
       },

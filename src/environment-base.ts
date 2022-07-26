@@ -532,8 +532,8 @@ export const environment = {
       search: {
         url: 'sale/shift-closes',
       },
-      view: {
-        url: '',
+      shiftClose: {
+        url: 'sale/shift-closes/end',
       },
     },
   },

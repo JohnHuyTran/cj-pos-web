@@ -28,6 +28,9 @@ import {
   ExternalIncomeItemInfo,
 } from '../../../models/branch-accounting-model';
 import moment from 'moment';
+import ModalCloseSale from './modal-close-sale';
+import { shiftClose } from '../../../services/accounting';
+import { ApiError } from '../../../models/api-error-model';
 
 function CloseSaleShiftSearch() {
   const classes = useStyles();
@@ -74,8 +77,11 @@ function CloseSaleShiftSearch() {
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
 
-  const [enableCloseShiftKey, setEnableCloseShiftKey] = React.useState(false);
-  const [isAllExternalIncomeItems, setIsAllExternalIncomeItems] = React.useState(false);
+  const [disableCloseShiftKey, setDisableCloseShiftKey] = React.useState(false);
+  const [openModalCloseSale, setOpenModalCloseSale] = React.useState(false);
+  const [docNo, setDocNo] = React.useState('');
+  const [noOfShiftKey, setNoOfShiftKey] = React.useState('');
+
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -97,7 +103,8 @@ function CloseSaleShiftSearch() {
       limits = limit;
     }
     const payload: CloseSaleShiftRequest = {
-      shiftDate: moment(startDate).startOf('day').toISOString(),
+      shiftDate: moment(startDate).endOf('day').toISOString(),
+      // shiftDate: '2022-07-26',
       branchCode: branchFromCode,
       status: values.status,
       page: page,
@@ -107,13 +114,16 @@ function CloseSaleShiftSearch() {
     await dispatch(featchCloseSaleShiptListAsync(payload));
     await dispatch(savePayloadSearch(payload));
     const datas = store.getState().closeSaleShiftSlice.closeSaleShift.data;
-    let isAllCorrect = true;
-    datas.map((item: CloseSaleShiftInfo, index: number) => {
-      if (item.status !== 'CORRECT') {
-        isAllCorrect = false;
-      }
-    });
-    setEnableCloseShiftKey(isAllCorrect);
+    if (datas && datas.length > 0) {
+      let notCorrect = false;
+      datas.map((item: CloseSaleShiftInfo, index: number) => {
+        if (item.status !== 'CORRECT') {
+          notCorrect = true;
+        }
+      });
+      setDisableCloseShiftKey(notCorrect);
+    }
+
     setFlagSearch(true);
     handleOpenLoading('open', false);
   };
@@ -129,8 +139,23 @@ function CloseSaleShiftSearch() {
       handleOpenLoading('open', false);
     }, 300);
   };
-  const handleOpenCloseSale = () => {
+  const handleOpenCloseSale = async () => {
     handleOpenLoading('open', true);
+    const payload: CloseSaleShiftRequest = {
+      shiftDate: moment(new Date()).endOf('day').toISOString(),
+    };
+    await shiftClose(payload)
+      .then(async (value) => {
+        setDocNo(value.docNo);
+        setTimeout(() => {
+          setOpenModalCloseSale(true);
+        }, 500);
+      })
+      .catch((error: ApiError) => {
+        setOpenAlert(true);
+        setTextError(error.message);
+      });
+
     handleOpenLoading('open', false);
   };
   const handleOnBypass = () => {};
@@ -146,18 +171,6 @@ function CloseSaleShiftSearch() {
       setValues({ ...values, branchFrom: ownBranch });
     }
   }, []);
-
-  React.useEffect(() => {
-    let isAllow = true;
-    externalIncomeItems.map((item: ExternalIncomeItemInfo) => {
-      if (item.amount <= 0) {
-        if (item.noItem != true) {
-          isAllow = false;
-        }
-      }
-    });
-    setIsAllExternalIncomeItems(isAllow);
-  }, [externalIncomeItems]);
 
   return (
     <>
@@ -242,7 +255,7 @@ function CloseSaleShiftSearch() {
               sx={{ width: 150 }}
               className={classes.MbtnClear}
               color='secondary'
-              disabled={!enableCloseShiftKey && !isAllExternalIncomeItems}>
+              disabled={disableCloseShiftKey}>
               ปิดรอบยอดการขาย
             </Button>
             <Button
@@ -278,6 +291,12 @@ function CloseSaleShiftSearch() {
       )}
       <LoadingModal open={openLoadingModal.open} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <ModalCloseSale
+        open={openModalCloseSale}
+        onClose={() => setOpenModalCloseSale(false)}
+        noOfShiftKey={noOfShiftKey}
+        docNo={docNo}
+      />
     </>
   );
 }
