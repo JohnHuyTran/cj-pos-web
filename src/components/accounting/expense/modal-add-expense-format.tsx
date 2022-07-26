@@ -424,6 +424,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fixedDecimalScale
                               autoComplete='off'
                               thousandSeparator={true}
+                              allowNegative={false}
                             />
                           </Grid>
                         </>
@@ -508,6 +509,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fixedDecimalScale
                               autoComplete='off'
                               thousandSeparator={true}
+                              allowNegative={false}
                             />
                           </Grid>
                         </>
@@ -555,6 +557,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fixedDecimalScale
                               autoComplete='off'
                               thousandSeparator={true}
+                              allowNegative={false}
                             />
                           </Grid>
                         </>
@@ -636,6 +639,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fixedDecimalScale
                               autoComplete='off'
                               thousandSeparator={true}
+                              allowNegative={false}
                             />
                           </Grid>
                         </>

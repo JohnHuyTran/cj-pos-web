@@ -215,6 +215,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             fixedDecimalScale
                             autoComplete='off'
                             thousandSeparator={true}
+                            allowNegative={false}
                           />
                         </Grid>
                       </>
@@ -289,6 +290,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             fixedDecimalScale
                             autoComplete='off'
                             thousandSeparator={true}
+                            allowNegative={false}
                           />
                         </Grid>
                       </>
