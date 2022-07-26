@@ -4,6 +4,8 @@ import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import NumberFormat from 'react-number-format';
+import { isGroupBranch } from 'utils/role-permission';
+import { stringNullOrEmpty } from 'utils/utils';
 import { CloseSaleShiftInfo, CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
 import {
   featchCloseSaleShiptListAsync,
@@ -92,20 +94,26 @@ function CloseSaleShiftSearchList() {
       align: 'right',
       sortable: false,
       renderCell: (params) => {
-        const billAmount = params.getValue(params.id, 'billAmount');
-        const shiftAmount = params.value;
+        const billAmount = !stringNullOrEmpty(params.getValue(params.id, 'billAmount'))
+          ? params.getValue(params.id, 'billAmount')
+          : 0;
+        const shiftAmount = !stringNullOrEmpty(params.value) ? Number(params.value) : 0;
         const isDiff = shiftAmount != billAmount;
         const _status = params.getValue(params.id, 'status');
-        return (
-          <NumberFormat
-            value={String(params.value)}
-            displayType={'text'}
-            fixedDecimalScale
-            thousandSeparator={true}
-            decimalScale={2}
-            style={{ color: isDiff && _status === 'DRAFT' ? '#F54949' : '#000' }}
-          />
-        );
+        if (shiftAmount > 0) {
+          return (
+            <NumberFormat
+              value={String(params.value)}
+              displayType={'text'}
+              fixedDecimalScale
+              thousandSeparator={true}
+              decimalScale={2}
+              style={{ color: isDiff && _status === 'DRAFT' ? '#F54949' : '#000' }}
+            />
+          );
+        } else {
+          return '-';
+        }
       },
     },
     {
@@ -117,20 +125,26 @@ function CloseSaleShiftSearchList() {
       align: 'right',
       sortable: false,
       renderCell: (params) => {
-        const shiftAmount = params.getValue(params.id, 'shiftAmount');
-        const billAmount = params.value;
+        const shiftAmount = !stringNullOrEmpty(params.getValue(params.id, 'shiftAmount'))
+          ? Number(params.getValue(params.id, 'shiftAmount'))
+          : 0;
+        const billAmount = !stringNullOrEmpty(params.value) ? Number(params.value) : 0;
         const isDiff = shiftAmount != billAmount;
         const _status = params.getValue(params.id, 'status');
-        return (
-          <NumberFormat
-            value={String(params.value)}
-            displayType={'text'}
-            fixedDecimalScale
-            thousandSeparator={true}
-            decimalScale={2}
-            style={{ color: isDiff && _status === 'DRAFT' ? '#F54949' : '#000' }}
-          />
-        );
+        if (billAmount > 0) {
+          return (
+            <NumberFormat
+              value={String(params.value)}
+              displayType={'text'}
+              fixedDecimalScale
+              thousandSeparator={true}
+              decimalScale={2}
+              style={{ color: isDiff && _status === 'DRAFT' ? '#F54949' : '#000' }}
+            />
+          );
+        } else {
+          return '-';
+        }
       },
     },
     {
@@ -165,6 +179,10 @@ function CloseSaleShiftSearchList() {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
+      renderCell: (params) => {
+        const value = !stringNullOrEmpty(params.value) ? params.value : '-';
+        return value;
+      },
     },
     {
       field: 'noOfSaleBill',
@@ -173,6 +191,10 @@ function CloseSaleShiftSearchList() {
       align: 'right',
       sortable: false,
       headerAlign: 'center',
+      renderCell: (params) => {
+        const value = !stringNullOrEmpty(params.value) ? params.value : '0';
+        return value;
+      },
     },
     {
       field: 'noOfReturnBill',
@@ -181,6 +203,10 @@ function CloseSaleShiftSearchList() {
       align: 'right',
       sortable: false,
       headerAlign: 'center',
+      renderCell: (params) => {
+        const value = !stringNullOrEmpty(params.value) ? params.value : '0';
+        return value;
+      },
     },
     {
       field: 'shiftDate',
@@ -227,7 +253,7 @@ function CloseSaleShiftSearchList() {
     const shiftAmount = params.row.shiftAmount;
     const billAmount = params.row.billAmount;
     const status = params.row.status;
-    if (shiftAmount === billAmount && status === STATUS.DRAFT) {
+    if (shiftAmount === billAmount && status === STATUS.DRAFT && isGroupBranch()) {
       handleOpenLoading('open', true);
       const payload: CloseSaleShiftInfo = {
         branchCode: params.row.branchCode,
@@ -246,7 +272,6 @@ function CloseSaleShiftSearchList() {
       setPayloadCloseShiftKey(payload);
       handleOpenLoading('open', false);
       setOpenPopupCloseShiftKey(true);
-      console.log(payload);
     }
   };
   let rows: any = items.data.map((item: CloseSaleShiftInfo, index: number) => {

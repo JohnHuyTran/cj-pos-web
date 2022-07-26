@@ -2,7 +2,6 @@ import { Box, Button, FormControl, Grid, MenuItem, Select, Typography } from '@m
 import React from 'react';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
-import { getStockTransferStatusList } from '../../../utils/enum/stock-transfer-enum';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -22,11 +21,7 @@ import {
   featchCloseSaleShiptListAsync,
   savePayloadSearch,
 } from '../../../store/slices/accounting/close-saleshift-slice';
-import {
-  CloseSaleShiftInfo,
-  CloseSaleShiftRequest,
-  ExternalIncomeItemInfo,
-} from '../../../models/branch-accounting-model';
+import { CloseSaleShiftInfo, CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
 import moment from 'moment';
 import ModalCloseSale from './modal-close-sale';
 import { shiftClose } from '../../../services/accounting';
@@ -37,11 +32,12 @@ function CloseSaleShiftSearch() {
   const dispatch = useAppDispatch();
   const page = 1;
   const items = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift);
-  const limit = useAppSelector((state) => state.stockMovementSearchSlice.stockList.perPage);
-  const externalIncomeItems = useAppSelector((state) => state.closeSaleShiftSlice.externalIncomeItems);
+  const limit = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift.perPage);
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
+    setIsPickerDateError(false);
+    setPickerDateErrorMsg('');
   };
   const [values, setValues] = React.useState({
     status: 'ALL',
@@ -81,6 +77,8 @@ function CloseSaleShiftSearch() {
   const [openModalCloseSale, setOpenModalCloseSale] = React.useState(false);
   const [docNo, setDocNo] = React.useState('');
   const [noOfShiftKey, setNoOfShiftKey] = React.useState('');
+  const [isPickerDateError, setIsPickerDateError] = React.useState(false);
+  const [pickerDateErrorMsg, setPickerDateErrorMsg] = React.useState('');
 
   const handleCloseAlert = () => {
     setOpenAlert(false);
@@ -96,42 +94,56 @@ function CloseSaleShiftSearch() {
   };
   const onClickSearch = async () => {
     handleOpenLoading('open', true);
-    let limits: number;
-    if (limit === 0 || limit === undefined) {
-      limits = 10;
+
+    if (startDate !== null) {
+      let limits: number;
+      if (limit === 0 || limit === undefined) {
+        limits = 10;
+      } else {
+        limits = limit;
+      }
+      const payload: CloseSaleShiftRequest = {
+        shiftDate: moment(startDate).endOf('day').toISOString(),
+        branchCode: branchFromCode,
+        status: values.status,
+        page: page,
+        limit: limits,
+      };
+
+      await dispatch(featchCloseSaleShiptListAsync(payload));
+      await dispatch(savePayloadSearch(payload));
+      const datas = store.getState().closeSaleShiftSlice.closeSaleShift.data;
+      if (datas && datas.length > 0) {
+        let notCorrect = false;
+        datas.map((item: CloseSaleShiftInfo, index: number) => {
+          if (item.status !== 'CORRECT') {
+            notCorrect = true;
+          }
+        });
+        setDisableCloseShiftKey(notCorrect);
+      }
+
+      setFlagSearch(true);
     } else {
-      limits = limit;
-    }
-    const payload: CloseSaleShiftRequest = {
-      shiftDate: moment(startDate).endOf('day').toISOString(),
-      branchCode: branchFromCode,
-      status: values.status,
-      page: page,
-      limit: limits,
-    };
-
-    await dispatch(featchCloseSaleShiptListAsync(payload));
-    await dispatch(savePayloadSearch(payload));
-    const datas = store.getState().closeSaleShiftSlice.closeSaleShift.data;
-    if (datas && datas.length > 0) {
-      let notCorrect = false;
-      datas.map((item: CloseSaleShiftInfo, index: number) => {
-        if (item.status !== 'CORRECT') {
-          notCorrect = true;
-        }
-      });
-      setDisableCloseShiftKey(notCorrect);
+      setIsPickerDateError(true);
+      setPickerDateErrorMsg('กรุณาเลือกวันที่ยอดขาย');
     }
 
-    setFlagSearch(true);
     handleOpenLoading('open', false);
   };
   const onClickClearBtn = async () => {
     handleOpenLoading('open', true);
-    setStartDate(null);
+    if (!isGroupBranch()) {
+      setStartDate(null);
+      setBranchFromCode('');
+      setValues({ status: 'ALL', branchFrom: '' });
+    } else {
+      setValues({ ...values, status: 'ALL' });
+    }
+
     setClearBranchDropDown(!clearBranchDropDown);
-    setBranchFromCode('');
-    setValues({ status: 'ALL', branchFrom: '' });
+    setIsPickerDateError(false);
+    setPickerDateErrorMsg('');
     dispatch(clearCloseSaleShiftList({}));
     setTimeout(() => {
       setFlagSearch(false);
@@ -146,9 +158,9 @@ function CloseSaleShiftSearch() {
     await shiftClose(payload)
       .then(async (value) => {
         setDocNo(value.docNo);
-        setTimeout(() => {
-          setOpenModalCloseSale(true);
-        }, 500);
+        const payloadSearch = store.getState().closeSaleShiftSlice.payloadSearch;
+        await dispatch(featchCloseSaleShiptListAsync(payloadSearch));
+        setOpenModalCloseSale(true);
       })
       .catch((error: ApiError) => {
         setOpenAlert(true);
@@ -214,9 +226,13 @@ function CloseSaleShiftSearch() {
               วันที่ยอดขาย
             </Typography>
             <DatePickerAllComponent
+              type='TO'
               onClickDate={handleStartDatePicker}
               value={startDate}
               disabled={groupBranch ? true : false}
+              maxDate={new Date()}
+              isError={isPickerDateError}
+              hyperText={pickerDateErrorMsg}
             />
           </Grid>
         </Grid>
@@ -231,6 +247,7 @@ function CloseSaleShiftSearch() {
               startIcon={<UpdateIcon />}
               onClick={handleOnupdate}
               sx={{ minWidth: 100 }}
+              disabled={true}
               className={classes.MbtnSearch}>
               อัพเดท
             </Button>
