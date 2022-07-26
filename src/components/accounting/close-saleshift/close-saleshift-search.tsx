@@ -22,7 +22,11 @@ import {
   featchCloseSaleShiptListAsync,
   savePayloadSearch,
 } from '../../../store/slices/accounting/close-saleshift-slice';
-import { CloseSaleShiftInfo, CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
+import {
+  CloseSaleShiftInfo,
+  CloseSaleShiftRequest,
+  ExternalIncomeItemInfo,
+} from '../../../models/branch-accounting-model';
 import moment from 'moment';
 
 function CloseSaleShiftSearch() {
@@ -31,6 +35,7 @@ function CloseSaleShiftSearch() {
   const page = 1;
   const items = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift);
   const limit = useAppSelector((state) => state.stockMovementSearchSlice.stockList.perPage);
+  const externalIncomeItems = useAppSelector((state) => state.closeSaleShiftSlice.externalIncomeItems);
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
@@ -70,6 +75,7 @@ function CloseSaleShiftSearch() {
   const [textError, setTextError] = React.useState('');
 
   const [enableCloseShiftKey, setEnableCloseShiftKey] = React.useState(false);
+  const [isAllExternalIncomeItems, setIsAllExternalIncomeItems] = React.useState(false);
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -83,7 +89,6 @@ function CloseSaleShiftSearch() {
     }
   };
   const onClickSearch = async () => {
-    console.log(branchFromCode);
     handleOpenLoading('open', true);
     let limits: number;
     if (limit === 0 || limit === undefined) {
@@ -142,9 +147,20 @@ function CloseSaleShiftSearch() {
     }
   }, []);
 
+  React.useEffect(() => {
+    let isAllow = true;
+    externalIncomeItems.map((item: ExternalIncomeItemInfo) => {
+      if (item.amount <= 0) {
+        if (item.noItem != true) {
+          isAllow = false;
+        }
+      }
+    });
+    setIsAllExternalIncomeItems(isAllow);
+  }, [externalIncomeItems]);
+
   return (
     <>
-      {' '}
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
@@ -226,7 +242,7 @@ function CloseSaleShiftSearch() {
               sx={{ width: 150 }}
               className={classes.MbtnClear}
               color='secondary'
-              disabled={!enableCloseShiftKey}>
+              disabled={!enableCloseShiftKey && !isAllExternalIncomeItems}>
               ปิดรอบยอดการขาย
             </Button>
             <Button

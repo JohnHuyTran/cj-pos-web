@@ -246,3 +246,10 @@ export interface CloseSaleShiftInfo {
   posCode: string;
   posUser: string;
 }
+
+export interface ExternalIncomeItemInfo {
+  code: string;
+  name: string;
+  amount: number;
+  noItem: boolean;
+}

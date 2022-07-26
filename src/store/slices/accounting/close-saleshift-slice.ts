@@ -2,12 +2,17 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { get } from '../../../adapters/posback-adapter';
 import { environment } from '../../../environment-base';
 import { featchCloseSaleShiftRsMockup } from '../../../mockdata/branch-accounting';
-import { CloseSaleShiftRequest, CloseSaleShiftResponse } from '../../../models/branch-accounting-model';
+import {
+  CloseSaleShiftRequest,
+  CloseSaleShiftResponse,
+  ExternalIncomeItemInfo,
+} from '../../../models/branch-accounting-model';
 
 type State = {
   closeSaleShift: CloseSaleShiftResponse;
   error: '';
   payloadSearch: CloseSaleShiftRequest;
+  externalIncomeItems: ExternalIncomeItemInfo[];
 };
 
 const initialState: State = {
@@ -32,6 +37,7 @@ const initialState: State = {
     page: 0,
     limit: 0,
   },
+  externalIncomeItems: [],
 };
 
 export const featchCloseSaleShiptListAsync = createAsyncThunk(
@@ -62,6 +68,9 @@ const closeSaleShiftSlice = createSlice({
     savePayloadSearch: (state, action: PayloadAction<any>) => {
       state.payloadSearch = action.payload;
     },
+    addExternalIncomeItems: (state, action: PayloadAction<any>) => {
+      state.externalIncomeItems = action.payload;
+    },
   },
   extraReducers: (builer) => {
     builer.addCase(featchCloseSaleShiptListAsync.pending, (state, action) => {
@@ -75,5 +84,5 @@ const closeSaleShiftSlice = createSlice({
       });
   },
 });
-export const { clearCloseSaleShiftList, savePayloadSearch } = closeSaleShiftSlice.actions;
+export const { clearCloseSaleShiftList, savePayloadSearch, addExternalIncomeItems } = closeSaleShiftSlice.actions;
 export default closeSaleShiftSlice.reducer;
