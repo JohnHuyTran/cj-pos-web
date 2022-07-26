@@ -190,6 +190,7 @@ const permission = {
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
         SUBMENU.EX_EXPENSE,
+        SUBMENU.EX_CLOSE_SALE_SHIFT,
       ],
     },
     action: [

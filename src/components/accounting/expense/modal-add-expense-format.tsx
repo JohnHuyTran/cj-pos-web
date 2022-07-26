@@ -309,8 +309,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
       setIsErrorDate(false);
       setErrorDate('');
     }
-    if (expenseData && isGroupBranch()) {
-      setEnableSaveBtn(expenseData.status === STATUS.DRAFT || expenseData.status === STATUS.SEND_BACK_EDIT);
+    if (expenseData) {
+      if (isGroupBranch()) {
+        setEnableSaveBtn(expenseData.status === STATUS.DRAFT || expenseData.status === STATUS.SEND_BACK_EDIT);
+      }
     } else {
       setEnableSaveBtn(true);
     }
@@ -422,6 +424,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fixedDecimalScale
                               autoComplete='off'
                               thousandSeparator={true}
+                              allowNegative={false}
                             />
                           </Grid>
                         </>
@@ -506,6 +509,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fixedDecimalScale
                               autoComplete='off'
                               thousandSeparator={true}
+                              allowNegative={false}
                             />
                           </Grid>
                         </>
@@ -553,6 +557,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fixedDecimalScale
                               autoComplete='off'
                               thousandSeparator={true}
+                              allowNegative={false}
                             />
                           </Grid>
                         </>
@@ -634,6 +639,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fixedDecimalScale
                               autoComplete='off'
                               thousandSeparator={true}
+                              allowNegative={false}
                             />
                           </Grid>
                         </>
