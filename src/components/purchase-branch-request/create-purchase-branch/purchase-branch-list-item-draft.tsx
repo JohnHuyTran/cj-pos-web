@@ -180,6 +180,7 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         await rows.forEach((data: GridRowData) => {
+          console.log('handleEditItems data :', JSON.stringify(data));
           itemsList.push(data);
         });
 
@@ -223,7 +224,7 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
           rowHeight={65}
           onCellClick={currentlySelected}
           onCellFocusOut={handleEditItems}
-          onCellOut={handleEditItems}
+          // onCellOut={handleEditItems}
           onCellKeyDown={handleEditItems}
         />
       </div>
