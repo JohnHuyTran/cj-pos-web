@@ -7,11 +7,16 @@
     "WAITTING_APPROVAL2": "รออนุมัติ2",
     "WAITTING_ACCOUNTING": "รอบัญชีตรวจสอบ",
     "WAITTING_APPROVAL3": "รออนุมัติ3",
-    "APPROVED": "อนุมัติ"
+    "APPROVED": "อนุมัติ",
+    "CORRECT": "ถูกต้อง",
+    "PENDDING_REVIEW": "รอตรวจสอบ"
   },
   "type": {
     "COFFEE": "ค่าใช้จ่ายร้านกาแฟ",
     "STOREFRONT": "ค่าใช้จ่ายหน้าร้าน"
   },
-  "documentSearch": "ค่าใช้จ่าย"
+  "title": {
+    "documentSearch": "ค่าใช้จ่าย",
+    "closeSaleShift": "ปิดรหัสการขาย"
+  }
 }

@@ -86,7 +86,7 @@ export default function ModalCreateToRawMaterial({
   //permission
   const [approvePermission, setApprovePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.CAMPAIGN_TO_APPROVE) : false);
-  const [alertTextError, setAlertTextError] = React.useState('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+  const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
     ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
@@ -256,7 +256,7 @@ export default function ModalCreateToRawMaterial({
   }
 
   const handleCreateDraft = async (sendRequest: boolean) => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate()) {
       await dispatch(save({ ...payloadTransferOut }));
       try {
@@ -408,6 +408,14 @@ export default function ModalCreateToRawMaterial({
               </Grid>
               <Grid item xs={8}>
                 {dataDetail.transferOutReason}
+              </Grid>
+            </Grid>
+            <Grid item container xs={4} mb={5}>
+              <Grid item xs={4}>
+                สต๊อก :
+              </Grid>
+              <Grid item xs={8}>
+                หน้าร้าน
               </Grid>
             </Grid>
           </Grid>

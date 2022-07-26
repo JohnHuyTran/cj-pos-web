@@ -17,23 +17,22 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { Save } from '@mui/icons-material';
-import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
-import { useStyles } from '../../../styles/makeTheme';
-
-import { expenseTypesSetting, getExpenseTypesSetting } from '../../../utils/enum/setting-reserve-expense-enum';
+import { useStyles } from 'styles/makeTheme';
+import { expenseTypesSetting, getExpenseTypesSetting } from 'utils/enum/setting-reserve-expense-enum';
 
 //Components
-import TexboxSearchSku from '../../commons/ui/texbox-search-sku';
-import AlertError from '../../commons/ui/alert-error';
-import SnackbarStatus from '../../commons/ui/snackbar-status';
-import LoadingModal from '../../commons/ui/loading-modal';
+import TexboxSearchSku from 'components/commons/ui/texbox-search-sku';
+import { BootstrapDialogTitle } from 'components/commons/ui/dialog-title';
+import AlertError from 'components/commons/ui/alert-error';
+import SnackbarStatus from 'components/commons/ui/snackbar-status';
+import LoadingModal from 'components/commons/ui/loading-modal';
 
 //api
-import { expenseCreateConfig, expenseUpdateConfig } from '../../../services/accounting';
-import { ExpenseConfigCreateRequest, ExpenseConfigUpdateRequest } from '../../../models/branch-accounting-model';
-import { ApiError } from '../../../models/api-error-model';
-import { useAppSelector, useAppDispatch } from '../../../store/store';
-import { featchBranchAccountingConfigListAsync } from '../../../store/slices/accounting/accounting-search-config-slice';
+import { expenseCreateConfig, expenseUpdateConfig } from 'services/accounting';
+import { ExpenseConfigCreateRequest, ExpenseConfigUpdateRequest } from 'models/branch-accounting-model';
+import { ApiError } from 'models/api-error-model';
+import { useAppSelector, useAppDispatch } from 'store/store';
+import { featchBranchAccountingConfigListAsync } from 'store/slices/accounting/accounting-search-config-slice';
 
 const initialStateForm: any = {
   isActive: 'true',

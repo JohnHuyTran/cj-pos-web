@@ -68,7 +68,7 @@ export const transferOutGetSearch = createAsyncThunk(
 );
 
 const TransferOutSearchSlice = createSlice({
-  name: 'supplierCheckOrder',
+  name: 'TransferOutSearchSlice',
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,

@@ -8,7 +8,7 @@ import { useStyles } from '../../../../styles/makeTheme';
 import { ExpenseInfo, ExpensePeriod } from '../../../../models/branch-accounting-model';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useAppSelector } from '../../../../store/store';
-import { isFilterFieldInExpense } from '../../../../utils/utils';
+import { numberWithCommas, stringNullOrEmpty } from '../../../../utils/utils';
 import { Box, DialogContentText, TextField, Typography } from '@mui/material';
 import { convertUtcToBkkDate } from '../../../../utils/date-utill';
 import NumberFormat from 'react-number-format';
@@ -52,7 +52,6 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
 
   const columns = columnsList ? columnsList : [];
   const rows = rowList ? rowList : [];
-
   useEffect(() => {
     if (payload) {
       let infosWithDraw: any;
@@ -72,17 +71,32 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
 
       const columns: GridColDef[] = payload.map((i: any) => {
         const hideColumn = i.isOtherExpense ? i.isOtherExpense : false;
-        return {
-          field: i.key,
-          headerName: i.title,
-          minWidth: 120,
-          flex: 0.6,
-          headerAlign: 'center',
-          align: 'right',
-          sortable: false,
-          hide: hideColumn,
-          renderCell: (params: GridRenderCellParams) => {
-            if (isFilterFieldInExpense(params.field)) {
+
+        const frontColor = (value: any) => {
+          const _value = stringNullOrEmpty(value) ? '' : value.toString();
+          return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
+        };
+
+        if (String(i.key) === 'diff') {
+          return {
+            field: i.key,
+            headerName: i.title,
+            minWidth: 120,
+            flex: 0.6,
+            headerAlign: 'center',
+            align: 'right',
+            sortable: false,
+            hide: hideColumn,
+            // renderCell: (params: GridRenderCellParams) => {
+            //   if (Number(params.value) > 0) {
+            //     return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{numberWithCommas(params.value)} </label>;
+            //   } else if (Number(params.value) < 0) {
+            //     return <label style={{ color: '#F54949', fontWeight: 700 }}> {numberWithCommas(params.value)} </label>;
+            //   }
+            //   return numberWithCommas(params.value);
+            // },
+
+            renderCell: (params: GridRenderCellParams) => {
               return (
                 <NumberFormat
                   value={String(params.value)}
@@ -91,12 +105,61 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
                   className={classes.MtextFieldNumber}
                   disabled={true}
                   customInput={TextField}
+                  sx={{
+                    '.MuiInputBase-input.Mui-disabled': {
+                      WebkitTextFillColor: frontColor(params.value),
+                      // color: color,
+                    },
+                    '.MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '.MuiInputBase-input-MuiOutlinedInput-input': {
+                      textAlign: 'right',
+                    },
+                  }}
+                  prefix={Number(params.value) > 0 ? '+' : ''}
                   fixedDecimalScale
                 />
               );
-            }
-          },
-        };
+            },
+          };
+        } else {
+          return {
+            field: i.key,
+            headerName: i.title,
+            minWidth: 120,
+            flex: 0.6,
+            headerAlign: 'center',
+            align: 'right',
+            sortable: false,
+            hide: hideColumn,
+            renderCell: (params: GridRenderCellParams) => {
+              return (
+                <NumberFormat
+                  value={String(params.value)}
+                  thousandSeparator={true}
+                  decimalScale={2}
+                  className={classes.MtextFieldNumber}
+                  disabled={true}
+                  customInput={TextField}
+                  sx={{
+                    '.MuiInputBase-input.Mui-disabled': {
+                      WebkitTextFillColor: '#000',
+                    },
+                    '.MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '.MuiInputBase-input-MuiOutlinedInput-input': {
+                      textAlign: 'right',
+                    },
+                  }}
+                  fixedDecimalScale
+                  type='text'
+                />
+              );
+            },
+          };
+        }
       });
 
       setColumnsList(columns);
@@ -117,21 +180,37 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
               ยืนยันอนุมัติค่าใช้จ่าย
             </Typography>
 
-            <Typography variant='body1' align='center'>
-              เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
-                <b>{docNo}</b>
-              </label>
-            </Typography>
+            <Box id='DetailBox' sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box id='DetailTitle' sx={{ width: '55%', textAlign: 'right' }}>
+                เลขที่เอกสาร
+              </Box>
+              <Box id='DetailLine'>
+                <Typography component='label' sx={{ color: '#AEAEAE', ml: '18px', mr: '5px' }}>
+                  |
+                </Typography>
+              </Box>
+              <Box id='DetailDescription' sx={{ width: '100%' }}>
+                <Typography component='label' sx={{ color: '#36C690', fontWeight: '700' }}>
+                  {docNo}
+                </Typography>
+              </Box>
+            </Box>
 
-            <Typography variant='body1' align='center'>
-              งวด <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
-                <b>
+            <Box id='DetailBox' sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box id='DetailTitle' sx={{ width: '55%', textAlign: 'right' }}>
+                งวด
+              </Box>
+              <Box id='DetailLine'>
+                <Typography component='label' sx={{ color: '#AEAEAE', ml: '18px', mr: '5px' }}>
+                  |
+                </Typography>
+              </Box>
+              <Box id='DetailDescription' sx={{ width: '100%' }}>
+                <Typography component='label' sx={{ color: '#36C690', fontWeight: '700' }}>
                   {convertUtcToBkkDate(startDate)} - {convertUtcToBkkDate(endDate)}
-                </b>
-              </label>
-            </Typography>
+                </Typography>
+              </Box>
+            </Box>
           </DialogContentText>
 
           <div
@@ -147,7 +226,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
           </div>
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', m: 5, mr: 5, ml: 5 }}>
+        <DialogActions sx={{ justifyContent: 'center', mb: 2, mr: 5, ml: 5 }}>
           <Button
             id='btnCancle'
             variant='contained'

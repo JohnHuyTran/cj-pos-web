@@ -9,9 +9,11 @@ interface Props {
   onSelectItem: (value: any) => void;
   isClear: boolean;
   disable: boolean;
+  onChange: (e: any) => void;
+  onKeyDown: (value: any) => void;
 }
 
-function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
+function TextBoxSearchProduct({ onSelectItem, isClear, disable, onChange, onKeyDown }: Props) {
   const classes = useStyles();
   const [value, setValue] = React.useState('');
   const [loading, setLoading] = React.useState(false);
@@ -28,8 +30,8 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
     return (
       <li {...props} key={option.barcode + option.skuCode}>
         <div>
-          <Typography variant="body2">{option.barcodeName}</Typography>
-          <Typography color="textSecondary" variant="caption">
+          <Typography variant='body2'>{option.barcodeName}</Typography>
+          <Typography color='textSecondary' variant='caption'>
             {option.barcode} / {option.skuCode}
           </Typography>
         </div>
@@ -37,26 +39,38 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
     );
   };
 
-  const autocompleteRenderInput = (params: any) => {
-    return (
-      <TextField
-        {...params}
-        InputProps={{
-          ...params.InputProps,
-          endAdornment: (
-            <React.Fragment>
-              {loading ? <CircularProgress color="inherit" size={20} /> : null}
-              {params.InputProps.endAdornment}
-            </React.Fragment>
-          ),
-        }}
-        placeholder="รหัสสินค้า/ชื่อสินค้า/บาร์โค้ด"
-        className={classes.MtextField}
-        variant="outlined"
-        size="small"
-        fullWidth
-      />
-    );
+  // const autocompleteRenderInput = (params: any) => {
+  //   return (
+  //     <TextField
+  //       {...params}
+  //       InputProps={{
+  //         ...params.InputProps,
+  //         params.InputProps.onKeyPress = handleKeyPress,
+  //         endAdornment: (
+  //           <React.Fragment>
+  //             {loading ? <CircularProgress color="inherit" size={20} /> : null}
+  //             {params.InputProps.endAdornment}
+  //           </React.Fragment>
+  //         ),
+  //       }}
+  //       placeholder="รหัสสินค้า/ชื่อสินค้า/บาร์โค้ด"
+  //       className={classes.MtextField}
+  //       variant="outlined"
+  //       size="small"
+  //       fullWidth
+  //     />
+  //   );
+  // };
+
+  const handleKeyDown = (event: any) => {
+    if (event.code === 'Enter') {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.target.value.length > 0) {
+        setValue(event.target.value);
+        onKeyDown(value);
+      }
+    }
   };
 
   const handleChangeItem = async (event: any, option: any, reason: string) => {
@@ -70,20 +84,21 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
 
   const debouncedSearch = debounce(async function (event: any, value: string, reason: string) {
     if (event && event.keyCode && event.keyCode === 13) {
-      return false;
-    }
-    const keyword = value.trim();
-    if (keyword.length >= 3 && reason !== 'reset') {
-      setLoading(true);
-      setSearchItem(keyword);
-      try {
-        const rs = await searchProductItem(keyword);
-        if (rs) {
-          setItemList(rs.data);
+      setValue(value);
+    } else {
+      const keyword = value.trim();
+      if (keyword.length >= 3 && reason !== 'reset') {
+        setLoading(true);
+        setSearchItem(keyword);
+        try {
+          const rs = await searchProductItem(keyword);
+          if (rs) {
+            setItemList(rs.data);
+            setLoading(false);
+          }
+        } catch (error) {
           setLoading(false);
         }
-      } catch (error) {
-        setLoading(false);
       }
     }
   }, 500);
@@ -96,13 +111,13 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
 
   return (
     <Autocomplete
-      id="selAddItem"
-      popupIcon={<SearchIcon color="primary" />}
+      id='selAddItem'
+      popupIcon={<SearchIcon color='primary' />}
       value={value}
       fullWidth
       // freeSolo
       disabled={disable}
-      loadingText="กำลังโหลด..."
+      loadingText='กำลังโหลด...'
       loading={loading}
       options={options}
       filterOptions={filterOptions}
@@ -111,10 +126,31 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable }: Props) {
       onInputChange={onInputChange}
       getOptionLabel={(option) => (option.barcodeName ? option.barcodeName : '')}
       isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
-      renderInput={autocompleteRenderInput}
-      size="small"
+      renderInput={(params: any) => {
+        params.inputProps.onKeyDown = handleKeyDown;
+        return (
+          <TextField
+            {...params}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <React.Fragment>
+                  {loading ? <CircularProgress color='inherit' size={20} /> : null}
+                  {params.InputProps.endAdornment}
+                </React.Fragment>
+              ),
+            }}
+            placeholder='รหัสสินค้า/ชื่อสินค้า/บาร์โค้ด'
+            className={classes.MtextField}
+            variant='outlined'
+            size='small'
+            fullWidth
+          />
+        );
+      }}
+      size='small'
       className={classes.Mautocomplete}
-      noOptionsText=""
+      noOptionsText=''
     />
   );
 }

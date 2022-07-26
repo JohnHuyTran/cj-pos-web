@@ -6,7 +6,7 @@ import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { ExpenseInfo, ExpensePeriod, payLoadAdd } from '../../../models/branch-accounting-model';
 import { values } from 'lodash';
-import { addNewItem, updateItemRows } from '../../../store/slices/accounting/accounting-slice';
+import { addNewItem, haveUpdateData, updateItemRows } from '../../../store/slices/accounting/accounting-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
 import userEvent from '@testing-library/user-event';
 import { setInit } from '../../../store/sessionStore';
@@ -191,6 +191,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
       }
       setOpenLoadingModal(false);
       if (!isError) {
+        await dispatch(haveUpdateData(true));
         setInit('N');
         onClose();
       }
@@ -453,10 +454,11 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && !isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
+                      const master = getMasterExpenInto(i.key);
                       return (
                         <>
                           <Grid item xs={2}>
-                            <Typography variant='body2'>{i.title}: </Typography>
+                            <Typography variant='body2'>{master?.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={2}>
                             <TextField
@@ -469,7 +471,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fullWidth
                               placeholder=''
                               autoComplete='off'
-                              disabled={enableSaveBtn ? false : true}
+                              disabled={master?.isActive && enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>
@@ -507,10 +509,11 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                   {testList
                     .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key))
                     .map((i: payLoadAdd) => {
+                      const master = getMasterExpenInto(i.key);
                       return (
                         <>
                           <Grid item xs={2}>
-                            <Typography variant='body2'>{i.title}: </Typography>
+                            <Typography variant='body2'>{master?.accountNameTh}: </Typography>
                           </Grid>
                           <Grid item xs={2}>
                             <TextField
@@ -523,7 +526,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               fullWidth
                               placeholder=''
                               autoComplete='off'
-                              disabled={enableSaveBtn ? false : true}
+                              disabled={master?.isActive && enableSaveBtn ? false : true}
                             />
                           </Grid>
                         </>

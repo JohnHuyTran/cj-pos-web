@@ -5,6 +5,7 @@ import {
   DataGrid,
   GridCellParams,
   GridColDef,
+  GridRenderCellParams,
   GridRowData,
   GridRowParams,
   GridValueGetterParams,
@@ -14,16 +15,26 @@ import Box from '@mui/material/Box';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { useStyles } from '../../../styles/makeTheme';
 import LoadingModal from '../../commons/ui/loading-modal';
-import { Chip, Typography } from '@mui/material';
-import { numberWithCommas } from '../../../utils/utils';
+import { Chip, TextField, Typography } from '@mui/material';
+import { numberWithCommas, stringNullOrEmpty } from '../../../utils/utils';
 import ExpenseDetail from './expense-detail';
-import { featchExpenseDetailAsync } from '../../../store/slices/accounting/accounting-slice';
+import {
+  addNewItem,
+  addSummaryItem,
+  featchExpenseDetailAsync,
+  haveUpdateData,
+  initialItems,
+  updateItemRows,
+  updateSummaryRows,
+  updateToInitialState,
+} from '../../../store/slices/accounting/accounting-slice';
 import { uploadFileState } from '../../../store/slices/upload-file-slice';
 import { ExpenseSearch, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
 import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
 import { getUserInfo, setInit } from '../../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
+import NumberFormat from 'react-number-format';
 
 interface loadingModalState {
   open: boolean;
@@ -128,7 +139,31 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
-    renderCell: (params) => numberWithCommas(params.value),
+    // renderCell: (params) => numberWithCommas(params.value),
+    renderCell: (params: GridRenderCellParams) => {
+      return (
+        <NumberFormat
+          value={String(params.value)}
+          thousandSeparator={true}
+          decimalScale={2}
+          disabled={true}
+          customInput={TextField}
+          sx={{
+            '.MuiInputBase-input.Mui-disabled': {
+              WebkitTextFillColor: '#000',
+            },
+            '.MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '.MuiInputBase-input': {
+              textAlign: 'right',
+            },
+          }}
+          fixedDecimalScale
+          type='text'
+        />
+      );
+    },
   },
   {
     field: 'sumApprovalAmount',
@@ -137,7 +172,31 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'right',
     sortable: false,
-    renderCell: (params) => numberWithCommas(params.value),
+    // renderCell: (params) => numberWithCommas(params.value),
+    renderCell: (params: GridRenderCellParams) => {
+      return (
+        <NumberFormat
+          value={String(params.value)}
+          thousandSeparator={true}
+          decimalScale={2}
+          disabled={true}
+          customInput={TextField}
+          sx={{
+            '.MuiInputBase-input.Mui-disabled': {
+              WebkitTextFillColor: '#000',
+            },
+            '.MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '.MuiInputBase-input': {
+              textAlign: 'right',
+            },
+          }}
+          fixedDecimalScale
+          type='text'
+        />
+      );
+    },
   },
   {
     field: 'difAmount',
@@ -157,7 +216,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => {
       const status = params.getValue(params.id, 'status');
-      if (status === 'WAITTING_ACCOUNTING' || status === 'WAITTING_APPROVAL3') {
+      if (status === 'APPROVED') {
         return params.value;
       } else {
         return '';
@@ -173,7 +232,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => {
       const status = params.getValue(params.id, 'status');
-      if (status === 'WAITTING_ACCOUNTING' || status === 'WAITTING_APPROVAL3') {
+      if (status === 'APPROVED') {
         return params.value;
       } else {
         return '';
@@ -203,15 +262,46 @@ function useApiRef() {
 }
 
 var calDiff = function (params: GridValueGetterParams) {
-  if (params.getValue(params.id, 'status') === 'WAITTING_APPROVAL3') {
+  if (
+    params.getValue(params.id, 'status') === 'APPROVED' ||
+    params.getValue(params.id, 'status') === 'WAITTING_APPROVAL3'
+  ) {
     const diff =
       Number(params.getValue(params.id, 'sumApprovalAmount')) - Number(params.getValue(params.id, 'sumWithdrawAmount'));
 
-    if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
-    if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
-    return diff;
+    // if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{numberWithCommas(diff)} </label>;
+    // if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {numberWithCommas(diff)} </label>;
+    // return <label style={{ color: '#000', fontSize: '1rem' }}> {numberWithCommas(diff)} </label>;
+
+    let _diff = String(diff);
+    if (diff > 0) _diff = `+${_diff}`;
+    const frontColor = _diff.includes('+') ? '#446EF2' : _diff.includes('-') ? '#F54949' : '#000';
+
+    return (
+      <NumberFormat
+        value={String(diff)}
+        thousandSeparator={true}
+        decimalScale={2}
+        disabled={true}
+        customInput={TextField}
+        sx={{
+          '.MuiInputBase-input.Mui-disabled': {
+            WebkitTextFillColor: frontColor,
+          },
+          '.MuiOutlinedInput-notchedOutline': {
+            border: 'none',
+          },
+          '.MuiInputBase-input': {
+            textAlign: 'right',
+          },
+        }}
+        prefix={diff > 0 ? '+' : ''}
+        fixedDecimalScale
+        type='text'
+      />
+    );
   }
-  return '';
+  return <label style={{ color: '#000', fontSize: '1rem' }}> 0.00 </label>;
 };
 
 function ExpenseSearchList({ onSelectRows }: DataGridProps) {
@@ -310,6 +400,14 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   const [edit, setEdit] = React.useState(false);
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const handleOpenDetailModal = async (docNo: string) => {
+    await dispatch(haveUpdateData(false));
+    await dispatch(uploadFileState([]));
+    await dispatch(addSummaryItem(null));
+    await dispatch(updateToInitialState());
+    await dispatch(updateSummaryRows([]));
+    await dispatch(updateItemRows([]));
+    await dispatch(initialItems([]));
+    await dispatch(addNewItem(null));
     await dispatch(featchExpenseDetailAsync(docNo));
     setInit('Y');
 

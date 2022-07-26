@@ -100,7 +100,7 @@ function BranchListDropDown({
       {...defaultPropsBranchList}
       className={error ? classes.MautocompleteError : classes.Mautocomplete}
       popupIcon={<SearchIcon />}
-      noOptionsText="ไม่พอข้อมูล"
+      noOptionsText="ไม่พบข้อมูล"
       id="selBranchNo"
       value={valueBranchList}
       onChange={handleChangeBranch}

@@ -30,8 +30,12 @@ import ProductMaster from './pages/stock/product-master';
 import TORawMasterial from './pages/transfer-out-raw-masterial/transfer-out-raw-masterial';
 import Expense from './pages/accounting/expense';
 import Reserves from './pages/settings/reserves';
+import CashStatement from './pages/accounting/cash-statement';
 import { featchMasterExpenseListAsync } from './store/slices/master/expense-list-slice';
 import { featchExpenseDetailAsync } from './store/slices/accounting/accounting-slice';
+import AuditPlan from './pages/check-stock/audit-plan';
+import StockCount from './pages/check-stock/stock-count';
+import CloseSaleShift from './pages/accounting/close-saleshift';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -112,6 +116,10 @@ export default function App2() {
           <Route path='/product-master' component={ProductMaster} />
           <Route path='/expense' component={Expense} />
           <Route path='/reserves' component={Reserves} />
+          <Route path='/audit-plan' component={AuditPlan} />
+          <Route path='/stock-count' component={StockCount} />
+          <Route path='/close-saleshift' component={CloseSaleShift} />
+          <Route path='/cash-statement' component={CashStatement} />
         </Switch>
       </Main>
     </Box>

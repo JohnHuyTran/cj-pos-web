@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import moment from 'moment';
 import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
@@ -8,12 +8,12 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useStyles } from '../../../../styles/makeTheme';
 
 interface Props {
-  startDate: string;
-  endDate: string;
+  startPeriod: string;
+  endPeriod: string;
   title: string;
   columnsList?: GridColDef[];
   rowList?: any[];
-  handleDate: (period: any) => void;
+  handleDate: (startDate: any, endDate: any) => void;
 }
 interface State {
   startDate: any;
@@ -21,26 +21,26 @@ interface State {
 }
 
 export default function confirmContent({
-  startDate,
-  endDate,
+  startPeriod,
+  endPeriod,
   title,
   columnsList,
   rowList,
   handleDate,
 }: Props): ReactElement {
   const classes = useStyles();
-  const [periodData, setPeriodData] = React.useState<State>({
-    startDate: startDate,
-    endDate: endDate,
-  });
+
+  const [periodData, setPeriodData] = React.useState<State>({ startDate: startPeriod, endDate: endPeriod });
 
   const handleStartDatePicker = async (value: any) => {
     setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });
-    await handleDate(periodData ? periodData : null);
+    // await handleDate(periodData ? periodData : null);
+    await handleDate(moment(value).startOf('day').toISOString(), periodData.endDate);
   };
   const handleEndDatePicker = async (value: any) => {
     setPeriodData({ ...periodData, endDate: moment(value).startOf('day').toISOString() });
-    await handleDate(periodData ? periodData : null);
+    // await handleDate(periodData ? periodData : null);
+    await handleDate(periodData.startDate, moment(value).startOf('day').toISOString());
   };
 
   const columns = columnsList ? columnsList : [];
@@ -65,8 +65,8 @@ export default function confirmContent({
           <DatePickerComponent
             onClickDate={handleStartDatePicker}
             value={periodData.startDate}
-            type={'TO'}
-            minDateTo={periodData.startDate}
+            // type={'TO'}
+            // minDateTo={periodData.startDate}
           />
         </Grid>
         <Grid item xs={6}>
@@ -84,14 +84,11 @@ export default function confirmContent({
 
       <div
         style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto', marginTop: 25 }}
-        className={classes.MdataGridDetail}>
+        className={classes.MdataGridConfirm}>
         <DataGrid
           rows={rows}
           columns={columns}
-          // pageSize={pageSize}
-          // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          // rowsPerPageOptions={[10, 20, 50, 100]}
-          pagination
+          hideFooterPagination
           disableColumnMenu
           autoHeight={rows.length >= 8 ? false : true}
           scrollbarSize={10}

@@ -138,13 +138,11 @@ const useStyles = makeStyles({
     '& .MuiDataGrid-columnHeaderTitle': {
       color: '#36C690',
       textAlign: 'center',
-      textOverflow: "clip !important",
-      whiteSpace: "break-spaces !important",
-      lineHeight: 1,
+      overflow: 'unset !important',
+      textOverflow: 'clip !important',
+      whiteSpace: 'break-spaces !important',
+      lineHeight: 'initial',
       fontWeight: '600 !important',
-    },
-    '& .MuiDataGrid-columnHeaderWrapper': {
-      marginTop: '12px'
     },
     '& .MuiDataGrid-root': {
       color: '#263238',
@@ -155,9 +153,17 @@ const useStyles = makeStyles({
       '& .MuiDataGrid-main': {
         top: -16,
       },
+      '& .MuiDataGrid-columnsContainer': {
+        justifyContent: 'center'
+      },
+      '& .MuiDataGrid-row': {
+        maxHeight: 'none !important'
+      },
       '& .MuiDataGrid-cell': {
         cursor: 'pointer',
         display: 'flex',
+        padding: '5px',
+        overflowWrap: 'anywhere',
         alignItems: 'center',
         lineHeight: '120% !important',
         maxHeight: 'none !important',
@@ -193,21 +199,78 @@ const useStyles = makeStyles({
     },
   },
 
-  MdataGridPaginationTop: {
+  MdataGridNoPagination: {
     '& .MuiDataGrid-columnHeaderTitle': {
       color: '#36C690',
+      textAlign: 'center',
+      textOverflow: 'clip !important',
+      whiteSpace: 'break-spaces !important',
+      lineHeight: 'initial',
       fontWeight: '600 !important',
-      whiteSpace: 'unset !important',
-      // overflow: "unset !important",
     },
     '& .MuiDataGrid-root': {
       fontFamily: 'Kanit',
       borderRadius: '10px !important',
       display: 'flex !important',
       flexDirection: 'column-reverse',
+      '& .MuiDataGrid-columnsContainer': {
+        justifyContent: 'center'
+      },
       '& .MuiDataGrid-row': {
         maxHeight: 'none !important',
         '& .MuiDataGrid-cell': {
+          padding: '5px',
+          overflowWrap: 'anywhere',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          lineHeight: '120% !important',
+          maxHeight: 'none !important',
+          whiteSpace: 'unset !important',
+          overflow: 'unset !important'
+        },
+        '&:last-child': {
+          '& .MuiDataGrid-cell': {
+            borderBottom: 'none',
+          },
+          '&.Mui-selected': {
+            borderBottomLeftRadius: '8px',
+            borderBottomRightRadius: '8px'
+          }
+        }
+      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
+      {
+        outline: 'none',
+      },
+    },
+    '& .MuiCheckbox-colorPrimary.Mui-checked': {
+      color: '#36C690',
+    }
+  },
+
+  MdataGridPaginationTop: {
+    '& .MuiDataGrid-columnHeaderTitle': {
+      color: '#36C690',
+      textAlign: 'center',
+      textOverflow: 'clip !important',
+      whiteSpace: 'break-spaces !important',
+      lineHeight: 'initial',
+      fontWeight: '600 !important',
+    },
+    '& .MuiDataGrid-root': {
+      fontFamily: 'Kanit',
+      borderRadius: '10px !important',
+      display: 'flex !important',
+      flexDirection: 'column-reverse',
+      '& .MuiDataGrid-columnsContainer': {
+        justifyContent: 'center'
+      },
+      '& .MuiDataGrid-row': {
+        maxHeight: 'none !important',
+        '& .MuiDataGrid-cell': {
+          padding: '5px',
+          overflowWrap: 'anywhere',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -624,6 +687,11 @@ const useStyles = makeStyles({
     '& .MuiOutlinedInput-root': {
       borderRadius: '10px !important',
     },
+  },
+  MSelected: {
+    '& .MuiSelect-select': {
+      textAlign: 'right !important',
+    }
   },
   MtextFieldNumberNoneArrow: {
     '& .MuiInput-input': {

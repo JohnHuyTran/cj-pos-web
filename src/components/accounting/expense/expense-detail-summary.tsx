@@ -22,18 +22,20 @@ import {
   stringNumberNullOrEmpty,
 } from '../../../utils/utils';
 import ExpenseDetailTransaction from './expense-detail-transaction';
-import ModalUpdateExpenseSummary from './modal-update-expense-sumary';
+import ModalUpdateExpenseSummary from './modal-update-expense-sumary-format';
 
 interface Props {
   type: string;
   periodProps: ExpensePeriod;
+  edit: boolean;
 }
 
-function ExpenseDetailSummary({ type, periodProps }: Props) {
+function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
   const classes = useStyles();
   const _ = require('lodash');
   const dispatch = useAppDispatch();
 
+  const [editAction, setEditAction] = React.useState(edit);
   const [expenseType, setExpenseType] = React.useState(type);
   const [period, setPeriod] = React.useState<ExpensePeriod>({
     period: 0,
@@ -50,8 +52,10 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
   const [openModalUpdatedExpenseSummary, setOpenModalUpdateExpenseSummary] = React.useState(false);
   const [payloadAdd, setPayloadAdd] = React.useState<payLoadAdd[]>();
+  const getMasterExpenseAll = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type);
   const getMasterExpenInto = (key: any) =>
-    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type && e.isActive);
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type);
   const frontColor = (value: any) => {
     const _value = stringNullOrEmpty(value) ? '' : value.toString();
     return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
@@ -71,7 +75,8 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
-            const _prefix = (params.value || 0) > 0 ? '+' : '';
+            const _prefix = params.getValue(params.id, 'isShowDiff') ? params.getValue(params.id, 'isShowDiff') : false;
+            const value = (params.value || 0) > 0 ? true : false;
             return (
               <NumberFormat
                 value={String(params.value)}
@@ -86,7 +91,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
                     // color: color,
                   },
                 }}
-                // prefix={_prefix}
+                prefix={_prefix && value ? '+' : ''}
                 fixedDecimalScale
                 type='text'
               />
@@ -111,6 +116,8 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
               </Box>
             );
           } else {
+            const _prefix = params.getValue(params.id, 'isShowDiff') ? params.getValue(params.id, 'isShowDiff') : false;
+            const value = (params.value || 0) > 0 ? true : false;
             return (
               <NumberFormat
                 value={String(params.value)}
@@ -126,6 +133,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
                   },
                 }}
                 fixedDecimalScale
+                prefix={_prefix && value ? '+' : ''}
               />
               // <TextField
               //   variant='outlined'
@@ -149,6 +157,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   });
   useEffect(() => {
     setExpenseType(type);
+    setEditAction(edit);
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
       accountNameTh: ' ',
@@ -190,12 +199,25 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
       typeNameTh: '',
     };
     _newExpenseAllList.push(headerDescription);
+    const summary: SumItems = expenseData ? expenseData.sumItems : null;
+    const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
+    if (edit && entries.length > 0) {
+      entries
+        .filter((entrie: SumItemsItem) => !isFilterOutFieldInAdd(entrie.expenseNo))
+        .map((entrie: SumItemsItem, i: number) => {
+          const master = getMasterExpenseAll(entrie.expenseNo);
+          if (master) {
+            _newExpenseAllList.push(master);
+          }
+        });
+    } else {
+      expenseMasterList
+        .filter((i: ExpenseInfo) => i.isActive && i.typeCode === expenseType)
+        .map((i: ExpenseInfo) => {
+          _newExpenseAllList.push(i);
+        });
+    }
 
-    expenseMasterList
-      .filter((i: ExpenseInfo) => i.isActive && i.typeCode === expenseType)
-      .map((i: ExpenseInfo) => {
-        _newExpenseAllList.push(i);
-      });
     _newExpenseAllList.push(headerOtherSum);
     _newExpenseAllList.push(headerSum);
     setNewExpenseAllList(_newExpenseAllList);
@@ -204,6 +226,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
   React.useEffect(() => {
     setPeriod(periodProps);
     setExpenseType(type);
+    setEditAction(edit);
   }, [periodProps]);
 
   const currentlySelected = async (params: GridCellParams) => {
@@ -252,7 +275,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
           [entrie.expenseNo]: entrie.withdrawAmount,
         };
         if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
-          totalWithDraw += Number(entrie?.withdrawAmount);
+          totalWithDraw += entrie?.withdrawAmount || 0;
         }
       });
       const arr = Object.entries(_item);
@@ -267,12 +290,11 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
         };
       });
       let infoDiff: any;
-      let totalDiff: number = 0;
       arr.map((element: any, i: number) => {
         const key = element[0];
-        const value = Number(element[1]) || 0;
+        const value = element[1] || 0;
         const withDraw = entries.find((entrie: SumItemsItem, i: number) => entrie.expenseNo === key);
-        const withdrawAmount = Number(withDraw?.withdrawAmount);
+        const withdrawAmount = withDraw?.withdrawAmount || 0;
         const diff = value - withdrawAmount;
         infoDiff = {
           ...infoDiff,
@@ -285,11 +307,12 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
         id: 3,
         description: 'ผลต่าง',
       };
-
+      const _totalDiff = totalApprove - totalWithDraw;
+      const totalDiff = _totalDiff > 0 ? `+${_totalDiff}` : _totalDiff;
       rows = [
         { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw },
         { ...infosApprove, id: 2, description: 'ยอดเงินอนุมัติ', infosApprove },
-        { ...infoDiff, total: Number(totalApprove) - Number(totalWithDraw) },
+        { ...infoDiff, total: totalDiff, isShowDiff: true },
       ];
       dispatch(updateSummaryRows(rows));
     }
@@ -318,7 +341,7 @@ function ExpenseDetailSummary({ type, periodProps }: Props) {
             onCellClick={currentlySelected}
           />
         </div>
-        <ExpenseDetailTransaction type={expenseType} periodProps={period} />
+        <ExpenseDetailTransaction type={expenseType} periodProps={period} edit={editAction} />
         <ModalUpdateExpenseSummary
           open={openModalUpdatedExpenseSummary}
           onClose={() => setOpenModalUpdateExpenseSummary(false)}

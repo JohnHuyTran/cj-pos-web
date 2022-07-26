@@ -8,8 +8,7 @@ import { useStyles } from '../../../../styles/makeTheme';
 import ConfirmContent from './confirm-content';
 import { ExpensePeriod } from '../../../../models/branch-accounting-model';
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { isFilterFieldInExpense } from '../../../../utils/utils';
-import { Box, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 import NumberFormat from 'react-number-format';
 
 interface Props {
@@ -35,17 +34,25 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
   const date = new Date();
   const [startDate, setStartDate] = React.useState(String(date));
   const [endDate, setEndDate] = React.useState(String(date));
-  const [periodData, setPeriodData] = React.useState('');
+  const [periodData, setPeriodData] = React.useState({
+    startDate: startDate,
+    endDate: endDate,
+  });
 
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
-    onConfirm({ comment: 'comment' });
+    onConfirm({ period: periodData });
     handleOpenLoading('open', false);
     onClose();
   };
 
-  const handleDate = async (period: any) => {
-    setPeriodData(period);
+  const handleDate = async (startDate: any, endDate: any) => {
+    const date = {
+      startDate: startDate,
+      endDate: endDate,
+    };
+
+    setPeriodData(date);
   };
 
   const [columnsList, setColumnsList] = React.useState<GridColDef[]>([]);
@@ -54,11 +61,29 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
     if (periodProps) {
       setStartDate(periodProps?.startDate);
       setEndDate(periodProps?.endDate);
+
+      setPeriodData({
+        startDate: periodProps?.startDate,
+        endDate: periodProps?.endDate,
+      });
     }
 
     if (payload) {
+      let _newExpenseAllList: any[] = [];
+      let sumValue = 0;
+      payload.map((i: any) => {
+        sumValue += Number(i.value);
+        _newExpenseAllList.push(i);
+      });
+      const approvedAmountList = {
+        key: 'approvedAmount',
+        title: 'รวม',
+        value: sumValue,
+      };
+      _newExpenseAllList.push(approvedAmountList);
+
       let infosWithDraw: any;
-      payload.map((item: any) => {
+      _newExpenseAllList.map((item: any) => {
         infosWithDraw = {
           ...infosWithDraw,
           [item.key]: item.value,
@@ -71,8 +96,50 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
       };
       setRowList([infosWithDraw]);
 
-      const columns: GridColDef[] = payload.map((i: any) => {
-        const hideColumn = i.isOtherExpense ? i.isOtherExpense : false;
+      const columns: GridColDef[] = _newExpenseAllList.map((i: any) => {
+        let hideColumn = i.isOtherExpense;
+        if (hideColumn !== false) {
+          hideColumn = true;
+        }
+
+        if (i.key === 'approvedAmount') {
+          return {
+            field: i.key,
+            headerName: i.title,
+            minWidth: 120,
+            flex: 0.6,
+            headerAlign: 'center',
+            align: 'right',
+            sortable: false,
+            renderCell: (params: GridRenderCellParams) => {
+              return (
+                <NumberFormat
+                  value={String(params.value)}
+                  thousandSeparator={true}
+                  decimalScale={2}
+                  className={classes.MtextFieldNumber}
+                  disabled={true}
+                  customInput={TextField}
+                  sx={{
+                    '.MuiInputBase-input.Mui-disabled': {
+                      WebkitTextFillColor: '#36C690',
+                      fontWeight: '600',
+                    },
+                    '.MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '.MuiInputBase-input-MuiOutlinedInput-input': {
+                      textAlign: 'right',
+                    },
+                  }}
+                  fixedDecimalScale
+                  type='text'
+                />
+              );
+            },
+          };
+        }
+
         return {
           field: i.key,
           headerName: i.title,
@@ -83,28 +150,35 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
           sortable: false,
           hide: hideColumn,
           renderCell: (params: GridRenderCellParams) => {
-            if (isFilterFieldInExpense(params.field)) {
-              return (
-                <NumberFormat
-                  value={String(params.value)}
-                  thousandSeparator={true}
-                  decimalScale={2}
-                  className={classes.MtextFieldNumber}
-                  disabled={true}
-                  customInput={TextField}
-                  fixedDecimalScale
-                />
-              );
-            }
+            return (
+              <NumberFormat
+                value={String(params.value)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                disabled={true}
+                customInput={TextField}
+                sx={{
+                  '.MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: '#000',
+                  },
+                  '.MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '.MuiInputBase-input-MuiOutlinedInput-input': {
+                    textAlign: 'right',
+                  },
+                }}
+                fixedDecimalScale
+                type='text'
+              />
+            );
           },
         };
       });
 
       setColumnsList(columns);
     }
-
-    console.log('ColumnsList:', JSON.stringify(columnsList));
-    console.log('rowList:', JSON.stringify(rowList));
   }, [open === true]);
 
   return (
@@ -117,8 +191,8 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
         PaperProps={{ sx: { minWidth: 900 } }}>
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
           <ConfirmContent
-            startDate={startDate}
-            endDate={endDate}
+            startPeriod={startDate}
+            endPeriod={endDate}
             handleDate={handleDate}
             title='1 สาขา'
             columnsList={columnsList}

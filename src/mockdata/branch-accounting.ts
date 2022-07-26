@@ -1,5 +1,7 @@
 import {
   AccountAccountExpenses,
+  CloseSaleShiftInfo,
+  CloseSaleShiftResponse,
   DataItem,
   ExpenseInfo,
   ExpensePeriod,
@@ -233,5 +235,40 @@ export function featchMasterExpenseListAsyncMockup() {
 export function featchExpenseDetailAsyncMockup() {
   return new Promise((resolve, reject) => {
     resolve(rsExpenseDetail);
+  });
+}
+
+const closeSaleShiftInfo: CloseSaleShiftInfo = {
+  posUser: 'CJG',
+  posCode: '001',
+  shiftCode: '20220707-006',
+  status: 'CORRECT',
+  shiftAmount: 300,
+  billAmount: 300,
+  noOfSaleBill: 10,
+  noOfReturnBill: 10,
+  shiftDate: '2022-07-16T17:00:00Z',
+  confirmAmount: 100,
+  branchCode: '0101',
+  shiftKey: 'skfjksdf',
+};
+
+const closeSaleShiftRs: CloseSaleShiftResponse = {
+  timestamp: '',
+  ref: '',
+  code: 2000,
+  message: 'success',
+  data: [closeSaleShiftInfo],
+  total: 4,
+  page: 1,
+  perPage: 10,
+  totalPage: 1,
+  prev: 0,
+  next: 0,
+};
+
+export function featchCloseSaleShiftRsMockup() {
+  return new Promise((resolve, reject) => {
+    resolve(closeSaleShiftRs);
   });
 }
