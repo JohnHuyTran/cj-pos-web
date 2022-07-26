@@ -20,12 +20,13 @@ import { formatNumber } from 'utils/utils'
 
 interface ModalSaveCloseShiftKeyProps {
   open: boolean;
+  payload: any;
   onClose: () => void;
 }
 
 export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProps): ReactElement {
   // Props
-  const { open, onClose, ...other } = props;
+  const { open, payload, onClose } = props;
 
   const classes = useStyles();
   
@@ -191,10 +192,8 @@ const TableSaveCloseShiftKey = () => {
         width: '75%',
         margin: 'auto',
         textAlign: 'center'
-        // height: `${110 + (Math.min(pageSize, rows.length) * 65)}px`,
-        // maxHeight: 'calc(100vh - 445px)'
       }}
-      className={classes.MdataGridDetail}
+      className={classes.MdataGridNoPagination}
     >
       <Typography component='div' sx={{ mt:1, mb:2, fontWeight: 600 }}>
         บันทึกรหัสปิดรอบ
@@ -202,10 +201,12 @@ const TableSaveCloseShiftKey = () => {
       <DataGrid
         rows={row}
         columns={columns}
-        disableColumnMenu
         autoHeight={true}
         scrollbarSize={10}
         rowHeight={65}
+        disableColumnMenu
+        hideFooter
+
       />
     </Box>
   )

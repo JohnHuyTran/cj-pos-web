@@ -192,7 +192,7 @@ export default function ReservesDetailTable () {
             height: `${110 + (Math.min(pageSize, rows.length) * 65)}px`,
             maxHeight: 'calc(100vh - 445px)'
           }}
-          className={classes.MdataGridDetail}
+          className={classes.MdataGridPaginationTop}
         >
           <DataGrid
             rows={rows}
