@@ -8,7 +8,7 @@ import { useStyles } from '../../../../styles/makeTheme';
 import { ExpenseInfo, ExpensePeriod } from '../../../../models/branch-accounting-model';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useAppSelector } from '../../../../store/store';
-import { addTwoDecimalPlaces, isFilterFieldInExpense, stringNullOrEmpty } from '../../../../utils/utils';
+import { numberWithCommas, stringNullOrEmpty } from '../../../../utils/utils';
 import { Box, DialogContentText, TextField, Typography } from '@mui/material';
 import { convertUtcToBkkDate } from '../../../../utils/date-utill';
 import NumberFormat from 'react-number-format';
@@ -52,11 +52,6 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
 
   const columns = columnsList ? columnsList : [];
   const rows = rowList ? rowList : [];
-  const frontColor = (value: any) => {
-    const _value = stringNullOrEmpty(value) ? '' : value.toString();
-    return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
-  };
-
   useEffect(() => {
     if (payload) {
       let infosWithDraw: any;
@@ -77,10 +72,12 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
       const columns: GridColDef[] = payload.map((i: any) => {
         const hideColumn = i.isOtherExpense ? i.isOtherExpense : false;
 
-        console.log('i.key :', i.key);
-        if (String(i.key) === 'diff') {
-          console.log('xxxxx i.key :', i.key);
+        const frontColor = (value: any) => {
+          const _value = stringNullOrEmpty(value) ? '' : value.toString();
+          return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
+        };
 
+        if (String(i.key) === 'diff') {
           return {
             field: i.key,
             headerName: i.title,
@@ -90,17 +87,40 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
             align: 'right',
             sortable: false,
             hide: hideColumn,
+            // renderCell: (params: GridRenderCellParams) => {
+            //   if (Number(params.value) > 0) {
+            //     return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{numberWithCommas(params.value)} </label>;
+            //   } else if (Number(params.value) < 0) {
+            //     return <label style={{ color: '#F54949', fontWeight: 700 }}> {numberWithCommas(params.value)} </label>;
+            //   }
+            //   return numberWithCommas(params.value);
+            // },
+
             renderCell: (params: GridRenderCellParams) => {
-              if (Number(params.value) > 0) {
-                return (
-                  <label style={{ color: '#446EF2', fontWeight: 700 }}> +{addTwoDecimalPlaces(params.value)} </label>
-                );
-              } else if (Number(params.value) < 0) {
-                return (
-                  <label style={{ color: '#F54949', fontWeight: 700 }}> {addTwoDecimalPlaces(params.value)} </label>
-                );
-              }
-              return addTwoDecimalPlaces(params.value);
+              return (
+                <NumberFormat
+                  value={String(params.value)}
+                  thousandSeparator={true}
+                  decimalScale={2}
+                  className={classes.MtextFieldNumber}
+                  disabled={true}
+                  customInput={TextField}
+                  sx={{
+                    '.MuiInputBase-input.Mui-disabled': {
+                      WebkitTextFillColor: frontColor(params.value),
+                      // color: color,
+                    },
+                    '.MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '.MuiInputBase-input-MuiOutlinedInput-input': {
+                      textAlign: 'right',
+                    },
+                  }}
+                  prefix={Number(params.value) > 0 ? '+' : ''}
+                  fixedDecimalScale
+                />
+              );
             },
           };
         } else {

@@ -40,6 +40,9 @@ export enum ACTIONS {
   STOCK_BL_LOCATION = 'stock.balance.view',
   STOCK_MOVEMENT_VIEW = 'stock.movement.view',
 
+  STOCK_SC_MANAGE = 'stock.sc.manage',
+  STOCK_SC_VIEW = 'stock.sc.view',
+
   AUTHORITY_CHECK = 'authority.check',
   ORDER_RO_DRAFT = 'order.ro.draft',
   ORDER_RO_APPROVE = 'order.ro.approve',
@@ -63,6 +66,12 @@ export enum ACTIONS {
   ACCOUNTING_MANAGE = 'account.config.manage',
   ACCOUNTING_APPROVE3 = 'account.ex.approve3',
   ACCOUNTING_REJECT3 = 'account.ex.reject3',
+
+  ACCOUNTING_CS_IMPORT = 'account.cs.import',
+  ACCOUNTING_CS_APPROVE = 'account.cs.approve',
+  ACCOUNTING_CS_EXPORT = 'account.cs.export',
+  ACCOUNTING_CS_MANAGE = 'account.cs.manage',
+  ACCOUNTING_CS_VIEW = 'account.cs.view',
 }
 
 export enum MAINMENU {
@@ -93,6 +102,8 @@ export enum SUBMENU {
   PR_CREATE_PURCHASE_BRANCH = 'purchasebranch.createPurchaseBranch',
   EX_EXPENSE = 'account.expense',
   EX_CONFIG = 'account.config',
+  EX_CLOSE_SALE_SHIFT = 'account.closeSaleShift',
+  CASH_STATEMENT = 'cash.statement',
 }
 
 export enum PERMISSION_GROUP {
@@ -110,6 +121,8 @@ export enum PERMISSION_GROUP {
   PCM = 'procurement',
   RTC = 'readyToClear',
   DATA = 'data',
+  IT_SUPPORT = 'itSupport',
+  FINANCE = 'finance',
 }
 
 export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
@@ -129,3 +142,5 @@ export const KEYCLOAK_GROUP_PCM = '/service.posback/pcm';
 export const KEYCLOAK_GROUP_RTC = '/service.posback/rtc';
 export const KEYCLOAK_GROUP_DATA = '/service.posback/data';
 export const KEYCLOAK_GROUP_ACCOUNTING_MANAGER = '/service.posback/account-manager';
+export const KEYCLOAK_IT_SUPPORT = '/service.posback/it-support';
+export const KEYCLOAK_GROUP_FINANCE = '/service.posback/finance';

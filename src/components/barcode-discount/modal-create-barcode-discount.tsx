@@ -136,7 +136,7 @@ export default function ModalCreateBarcodeDiscount({
   const [attachFileError, setAttachFileError] = React.useState('');
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const [alertTextError, setAlertTextError] = React.useState(
-    'กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง'
+    'กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'
   );
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState(
@@ -172,7 +172,7 @@ export default function ModalCreateBarcodeDiscount({
         return;
       }
     } else {
-      setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+      setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
       if (!validate(true)) {
         dispatch(updateErrorList(dataAfterValidate));
         setOpenModalError(true);
@@ -335,6 +335,7 @@ export default function ModalCreateBarcodeDiscount({
                 : item.numberOfApproved || 0,
             expiryDate: item.expiredDate,
             skuCode: item.skuCode,
+            remark: item.remark,
           });
         }
         dispatch(updateAddItemsState(lstProductDetail));
@@ -429,6 +430,7 @@ export default function ModalCreateBarcodeDiscount({
           errorNumberOfDiscounted: '',
           errorNumberOfApproved: '',
           errorExpiryDate: '',
+          errorRemark: '',
         };
 
         if (checkApprove) {
@@ -442,21 +444,24 @@ export default function ModalCreateBarcodeDiscount({
             } else if (preData.numberOfApproved > preData.numberOfDiscounted) {
               isValid = false;
               item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่เกินจำนวนที่ขอลด';
+            } else if (preData.numberOfApproved < preData.numberOfDiscounted && !preData.remark) {
+              isValid = false;
+              item.errorRemark = 'กรุณาระบุเหตุผล';
             }
           }
         } else {
           if (payloadBarcodeDiscount.percentDiscount) {
             if (preData.requestedDiscount <= 0 || preData.requestedDiscount >= 100 || !preData.requestedDiscount) {
               isValid = false;
-              item.errorDiscount = 'ยอดลดต้องไม่เกิน 100%';
+              item.errorDiscount = 'ระบุยอดลด';
             }
           } else {
             if (preData.requestedDiscount <= 0 || !preData.requestedDiscount) {
               isValid = false;
-              item.errorDiscount = 'ยอดลดต้องมากกว่า 0';
+              item.errorDiscount = 'ระบุยอดลด';
             } else if (preData.requestedDiscount >= preData.price) {
               isValid = false;
-              item.errorDiscount = 'ยอดลดต้องไม่เกินราคาปกติ';
+              item.errorDiscount = 'ยอดลดต้องน้อยกว่าราคาปกติ';
             }
           }
           if (preData.numberOfDiscounted <= 0 || !preData.numberOfDiscounted) {
@@ -511,7 +516,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleCreateDraft = async (sendRequest: boolean) => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate(false)) {
       let allAttachFile = [];
       if (fileUploadList && fileUploadList.length > 0) {
@@ -614,7 +619,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleSendForApproval = async (id: string) => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     //validate attach file
     if (fileUploadList.length === 0 && attachFileOlds.length === 0) {
       setAttachFileError('กรุณาแนบไฟล์เอกสาร');
@@ -656,7 +661,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const handleApprove = async () => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const rs = await approveBarcodeDiscount(dataDetail.id, {
         products: payloadBarcodeDiscount.products,
@@ -1023,32 +1028,38 @@ export default function ModalCreateBarcodeDiscount({
                 {currentBranch}
               </Grid>
             </Grid>
-            <Grid item container xs={6} sx={{ marginBottom: '15px' }}>
+            <Grid container item xs={6} sx={{ marginBottom: '15px' }}>
               <Grid item xs={4}>
-                ยอดลด<b style={{ fontSize: '18px' }}> *</b> :
+              สต๊อก :
+                <Grid item xs={4} mt={2}>
+                  ยอดลด<b style={{ fontSize: '18px' }}> *</b> :
+                </Grid>
               </Grid>
-              <Grid item xs={8} sx={{ marginTop: '-8px' }}>
-                <FormControl component='fieldset' disabled={dataDetail.status > 1}>
-                  <RadioGroup
-                    aria-label='discount'
-                    value={valueRadios}
-                    defaultValue={'percent'}
-                    name='radio-buttons-group'
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-                      handleChangeRadio(event);
-                    }}>
-                    <FormControlLabel
-                      value='percent'
-                      control={<Radio disabled={status > 1}/>}
-                      label='ยอดลดเป็นเปอร์เซ็น (%)'
-                    />
-                    <FormControlLabel
-                      value='amount'
-                      control={<Radio disabled={status > 1}/>}
-                      label='ยอดลดแบบ 5-7 เดือน เป็นจำนวนเงิน(บาท)'
-                    />
-                  </RadioGroup>
-                </FormControl>
+              <Grid item xs={8}>
+              หน้าร้านและหลังร้าน
+                <Grid item xs={8} mt={2}>
+                  <FormControl component='fieldset' disabled={dataDetail.status > 1}>
+                    <RadioGroup
+                      aria-label='discount'
+                      value={valueRadios}
+                      defaultValue={'percent'}
+                      name='radio-buttons-group'
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+                        handleChangeRadio(event);
+                      }}>
+                      <FormControlLabel
+                        value='percent'
+                        control={<Radio disabled={status > 1}/>}
+                        label='ยอดลดเป็นเปอร์เซ็น (%)'
+                      />
+                      <FormControlLabel
+                        value='amount'
+                        control={<Radio disabled={status > 1}/>}
+                        label='ยอดลดแบบ 5-7 เดือน เป็นจำนวนเงิน(บาท)'
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Grid>
               </Grid>
             </Grid>
             <Grid container item xs={6} sx={{ marginBottom: '15px' }}>

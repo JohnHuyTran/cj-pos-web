@@ -22,6 +22,8 @@ import {
   KEYCLOAK_GROUP_PCM,
   KEYCLOAK_GROUP_DATA,
   KEYCLOAK_GROUP_ACCOUNTING_MANAGER,
+  KEYCLOAK_IT_SUPPORT,
+  KEYCLOAK_GROUP_FINANCE,
 } from './enum/permission-enum';
 
 const _ = require('lodash');
@@ -58,6 +60,10 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.DATA;
   } else if (group === KEYCLOAK_GROUP_ACCOUNTING_MANAGER) {
     return PERMISSION_GROUP.ACCOUNT_MANAGER;
+  } else if (group === KEYCLOAK_IT_SUPPORT) {
+    return PERMISSION_GROUP.IT_SUPPORT;
+  } else if (group === KEYCLOAK_GROUP_FINANCE) {
+    return PERMISSION_GROUP.FINANCE;
   }
 
   return '';
@@ -315,5 +321,25 @@ const permission = {
       submenu: [SUBMENU.SALE_SALE_LIMIT],
     },
     action: [ACTIONS.CAMPAIGN_TO_VIEW],
+  },
+  itSupport: {
+    menu: {
+      mainmenu: [MAINMENU.EXPENSE],
+      submenu: [SUBMENU.EX_CLOSE_SALE_SHIFT],
+    },
+    action: [ACTIONS.CAMPAIGN_TO_VIEW],
+  },
+  finance: {
+    menu: {
+      mainmenu: [MAINMENU.EXPENSE],
+      submenu: [SUBMENU.CASH_STATEMENT],
+    },
+    action: [
+      ACTIONS.ACCOUNTING_CS_IMPORT,
+      ACTIONS.ACCOUNTING_CS_APPROVE,
+      ACTIONS.ACCOUNTING_CS_EXPORT,
+      ACTIONS.ACCOUNTING_CS_MANAGE,
+      ACTIONS.ACCOUNTING_CS_VIEW,
+    ],
   },
 };

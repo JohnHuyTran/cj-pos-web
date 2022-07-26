@@ -305,10 +305,54 @@ export interface ExpenseConfigCreateRequest {
 }
 
 export interface ExpenseConfigUpdateRequest {
+  isActive: boolean;
   accountCode: string;
   accountNameTh: string;
   skuCode: string;
   approvalLimit1: number;
   approvalLimit2: number;
   requiredDocumentTh: string;
+}
+
+export interface CloseSaleShiftRequest {
+  shiftDate?: string;
+  branchCode?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+}
+export interface CloseSaleShiftResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: CloseSaleShiftInfo[];
+  total: number;
+  page: number;
+  perPage: number;
+  prev: number;
+  next: number;
+  totalPage: number;
+}
+
+export interface CloseSaleShiftInfo {
+  branchCode: string;
+  shiftCode: string;
+  shiftKey: string;
+  shiftDate: string;
+  shiftAmount: number | null;
+  billAmount: number | null;
+  confirmAmount: number | null;
+  noOfSaleBill: number;
+  noOfReturnBill: number;
+  status: string;
+  posCode: string;
+  posUser: string;
+}
+
+export interface ExternalIncomeItemInfo {
+  code: string;
+  name: string;
+  amount: number;
+  noItem: boolean;
 }

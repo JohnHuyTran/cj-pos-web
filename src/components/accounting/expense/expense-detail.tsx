@@ -14,12 +14,8 @@ import ExpenseDetailSummary from './expense-detail-summary';
 import ModalAddExpense from './modal-add-expense-format';
 import ModelDescriptionExpense from './modal-description-expense';
 
-import AccordionHuaweiFile from '../../commons/ui/accordion-huawei-file';
-import { Cancel, ConstructionOutlined, TramOutlined, VoicemailRounded } from '@mui/icons-material';
-import { GridColumnHeadersItemCollection } from '@mui/x-data-grid';
-import { mockExpenseInfo001, mockExpenseInfo002 } from '../../../mockdata/branch-accounting';
+import { Cancel } from '@mui/icons-material';
 import {
-  AccountAccountExpenses,
   DataItem,
   ExpenseInfo,
   ExpensePeriod,
@@ -35,7 +31,6 @@ import {
   featchExpenseDetailAsync,
   haveUpdateData,
   initialItems,
-  updateItemRows,
   updateSummaryRows,
 } from '../../../store/slices/accounting/accounting-slice';
 import {
@@ -44,8 +39,6 @@ import {
   isFilterOutFieldForPayload,
   isFilterOutFieldInAdd,
   numberWithCommas,
-  objectNullOrEmpty,
-  stringNullOrEmpty,
   stringNumberNullOrEmpty,
 } from '../../../utils/utils';
 import { convertUtcToBkkDate, convertUtcToBkkWithZ } from '../../../utils/date-utill';
@@ -70,8 +63,6 @@ import moment from 'moment';
 import ModelConfirmDetail from './confirm/modal-confirm-detail';
 import ModelConfirmAccounting from './confirm/modal-confirm-accounting';
 import AccordionUploadSingleFile from '../../commons/ui/accordion-upload-single-file';
-import TextBoxComment from '../../commons/ui/textbox-comment';
-import { Day } from '@material-ui/pickers';
 import ModalConfirmExpense from './modal-confirm-expense';
 import { isGroupBranch, isGroupOC } from '../../../utils/role-permission';
 import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
@@ -189,6 +180,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     if (items && items.length > 0) {
       items.forEach((e: any) => {
         const arr = Object.entries(e);
+
         let items: ItemItem[] = [];
         arr
           .filter((e: any) => !isFilterOutFieldInAdd(e[0]))
@@ -276,7 +268,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     let payload: ExpenseSaveRequest = {
       comment: comment,
       docNo: docNo,
-      today: moment(approveDate).startOf('day').toISOString(),
+      // today: moment(approveDate).startOf('day').toISOString(),
       attachFiles: attachFiles,
     };
     if ((status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) && fileUploadList && fileUploadList.length > 0) {
@@ -378,7 +370,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         const _isOtherExpense = getMasterExpenInto(e.expenseNo)?.isOtherExpense || false;
         const item: SumItemsItem = {
           expenseNo: e.expenseNo,
-          approvedAmount: e.withdrawAmount,
+          approvedAmount: e.approvedAmount ? e.approvedAmount : e.withdrawAmount,
           isOtherExpense: _isOtherExpense,
         };
         sumItems.push(item);
@@ -518,7 +510,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const handleApproveBtn = () => {
     setInit('N');
     setIsApprove(true);
-    setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount)} บาท`);
+    setSumWithdrawAmount(`${numberWithCommas(summary.sumWithdrawAmount?.toFixed(2))} บาท`);
+    // setSumWithdrawAmount(`${<NumberFormat(summary.sumWithdrawAmount).} บาท`);
     if (status === STATUS.DRAFT) {
       const isFileValidate: boolean = validateFileInfo();
       const isvalidateDate = validateDateIsBeforPeriod();
@@ -587,7 +580,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       const item3: payLoadAdd = {
         id: 3,
         key: 'diff',
-        value: sumWithdrawAmount - sumApprovalAmount,
+        value: sumApprovalAmount - sumWithdrawAmount,
         title: 'ผลต่าง',
       };
       let listPayload: payLoadAdd[] = [item1, item2, item3];
@@ -724,11 +717,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
   const validateDateIsBeforPeriod = () => {
     const date = new Date();
-    // if (date < new Date(period.endDate)) {
-    //   setOpenAlert(true);
-    //   setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
-    //   return false;
-    // }
+    if (date < new Date(period.endDate)) {
+      setOpenAlert(true);
+      setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
+      return false;
+    }
     return true;
   };
 
@@ -952,11 +945,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       } else if (status === STATUS.WAITTING_ACCOUNTING) {
         rows = [
           { ...infosWithDraw, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
-          { ...infosApprove, total: totalWithDraw, SUMOTHER: totalOtherWithDraw },
+          { ...infosApprove, total: totalApprove, SUMOTHER: totalOtherApprove },
           {
             ...infoDiff,
             total: totalDiff > 0 ? `+${totalDiff}` : totalDiff,
-            SUMOTHER: totalOtherDiff,
+            SUMOTHER: totalOtherDiff > 0 ? `+${totalOtherDiff}` : totalOtherDiff || 0,
             isShowDiff: true,
           },
         ];
@@ -967,7 +960,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
           {
             ...infoDiff,
             total: totalDiff > 0 ? `+${totalDiff}` : totalDiff || 0,
-            SUMOTHER: totalOtherDiff,
+            SUMOTHER: totalOtherDiff > 0 ? `+${totalOtherDiff}` : totalOtherDiff || 0,
             isShowDiff: true,
           },
         ];

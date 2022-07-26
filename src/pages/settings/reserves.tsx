@@ -1,16 +1,19 @@
-import TitleHeader from '../../components/title-header';
-import { useTranslation } from 'react-i18next';
-
-// Components
-import SearchReserves from '../../components/setting/reserves/search-reserves';
-import ReservesDetailTable from '../../components/setting/reserves/reserves-detail-table';
-
+import { useState } from 'react';
 import {
   Box,
   Container } from '@mui/material';
+import TitleHeader from 'components/title-header';
+import { useTranslation } from 'react-i18next';
+
+// Components
+import SearchReserves from 'components/settings/reserves/search-reserves';
+import ReservesDetailTable from 'components/settings/reserves/reserves-detail-table';
+
+
 
 export default function reserves() {
   const { t } = useTranslation(['reserves', 'common']);
+  const [isSearch, setIsSearch] = useState(false)
 
   return (
     <div>
@@ -18,11 +21,13 @@ export default function reserves() {
         <TitleHeader title={t('documentSearch')} />
 
         <Box mt={3}>
-          <SearchReserves />
+          <SearchReserves onClickSearch={(value) => setIsSearch(value)} />
         </Box>
-        <Box mt={3}>
-          <ReservesDetailTable />
-        </Box>
+        { isSearch && (
+          <Box mt={3}>
+            <ReservesDetailTable />
+          </Box>
+        )}
       </Container>
     </div>
   )

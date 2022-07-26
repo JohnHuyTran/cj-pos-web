@@ -42,28 +42,7 @@ export default function Expense() {
   };
   return (
     <Container maxWidth='xl'>
-      <TitleHeader title={t('documentSearch')} />
-      {/* 
-      <Button
-        data-testid='testid-btnSendToDC'
-        id='btnSendToDC'
-        variant='contained'
-        color='error'
-        className={classes.MbtnSendDC}
-        onClick={onOpenNew}
-        sx={{ width: 140 }}>
-        OpenNew
-      </Button>
-      <Box mt={3}>
-        <ExpenseDetail
-          isOpen={open}
-          onClickClose={onClose}
-          type={'STOREFRONT'}
-          edit={edit}
-          periodProps={periodMockData}
-        />
-      </Box> */}
-
+      <TitleHeader title={t('title.closeSaleShift')} />
       <Box mt={3}>
         <SearchExpense />
       </Box>

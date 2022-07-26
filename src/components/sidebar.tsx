@@ -12,6 +12,7 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import LoyaltyOutlinedIcon from '@mui/icons-material/LoyaltyOutlined';
 import PresentToAllIcon from '@mui/icons-material/PresentToAll';
+import AllInboxIcon from '@mui/icons-material/AllInbox';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
@@ -79,6 +80,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [openPurchaseBranchMenu, setOpenPurchaseBranchMenu] = React.useState(false);
   const [openExpenseMenu, setOpenExpenseMenu] = React.useState(false);
   const [openSettingsMenu, setOpenSettingsMenu] = React.useState(false);
+  const [openCheckStockMenu, setOpenCheckStockMenu] = React.useState(false);
 
   const navState = useAppSelector((state) => state.navigator.state);
 
@@ -90,6 +92,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableMainMenuPurchaseBranch, setDisableMainMenuPurchaseBranch] = React.useState(true);
   const [disableMainMenuExpense, setDisableMainMenuExpense] = React.useState(true);
   const [disableMainMenuSettings, setDisableMainMenuSettings] = React.useState(true);
+  const [disableMainMenuCheckStock, setDisableMainMenuCheckStock] = React.useState(true);
 
   const [disableSubMenuOROrderReceive, setDisableSubMenuOROrderReceive] = React.useState(true);
   const [disableSubMenuORStockDiff, setDisableSubMenuORStockDiff] = React.useState(true);
@@ -103,6 +106,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuCreatePurchaseBranch, setDisableSubMenuCreatePurchaseBranch] = React.useState(true);
   const [disableSubMenuExpense, setDisableSubMenuExpense] = React.useState(true);
   const [disableSubMenuSettings, setDisableSubMenuSettings] = React.useState(true);
+  const [disableSubMenuCloseSaleShift, setDisableSubMenuCloseSaleShift] = React.useState(true);
   const [disableSubMenuCashStatement, setDisableSubMenuCashStatement] = React.useState(true);
 
   const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
@@ -110,6 +114,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuTODestroy, setDisableSubMenuTODestroy] = React.useState(true);
   const [disableSubMenuTOStoreUse, setDisableSubMenuTOStoreUse] = React.useState(true);
   const [disableSubMenuProductMaster, setDisableSubMenuProductMaster] = React.useState(true);
+  const [disableSubMenuAuditPlan, setDisableSubMenuAuditPlan] = React.useState(true);
 
   useEffect(() => {
     setOpen(navState);
@@ -143,9 +148,10 @@ export default function Sidebar({}: Props): ReactElement {
 
     setDisableSubMenuExpense(isAllowSubMenuPermission(SUBMENU.EX_EXPENSE));
     setDisableSubMenuSettings(isAllowSubMenuPermission(SUBMENU.EX_CONFIG));
-    setDisableSubMenuCashStatement(isAllowSubMenuPermission(SUBMENU.EX_EXPENSE));
+    setDisableSubMenuCashStatement(isAllowSubMenuPermission(SUBMENU.CASH_STATEMENT));
 
     setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
+    setDisableSubMenuCloseSaleShift(isAllowSubMenuPermission(SUBMENU.EX_CLOSE_SALE_SHIFT));
   }, [navState]);
 
   const dispatch = useAppDispatch();
@@ -184,6 +190,9 @@ export default function Sidebar({}: Props): ReactElement {
 
   const handleClickProductInfo = () => {
     setOpenProductInfoMenu(!openProductInfoMenu);
+  };
+  const handleClickCheckStockMenu = () => {
+    setOpenCheckStockMenu(!openCheckStockMenu);
   };
   const handleClickPurchaseBranch = () => {
     setOpenPurchaseBranchMenu(!openPurchaseBranchMenu);
@@ -549,6 +558,22 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='เงินฝากขาด - เกิน' />
               </ListItemButton>
             </Link>
+            <Link
+              to='/close-saleshift'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                display: disableSubMenuCloseSaleShift ? 'none' : '',
+              }}
+              id='subMenuCloseSaleShift'>
+              <ListItemButton
+                key='CloseSaleShift'
+                selected={selectedIndex === 16}
+                onClick={() => handleListItemClick(16)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ปิดรหัสการขาย' />
+              </ListItemButton>
+            </Link>
           </List>
         </Collapse>
         <ListItemButton
@@ -577,6 +602,52 @@ export default function Sidebar({}: Props): ReactElement {
                 onClick={() => handleListItemClick(17)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ค่าใช้จ่ายสำรอง' />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        <ListItemButton
+          onClick={handleClickCheckStockMenu}
+          id='mainMenuCheckStock'
+          // style={{ display: disableMainMenuCheckStock ? 'none' : '' }}
+        >
+          <ListItemIcon>
+            <AllInboxIcon />
+          </ListItemIcon>
+          <ListItemText primary='ตรวจนับสต๊อก' style={{ marginLeft: -15 }} />
+          {openCheckStockMenu ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openCheckStockMenu} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
+            <Link
+              to='/audit-plan'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                // display: disableSubMenuAuditPlan ? 'none' : '',
+              }}
+              id='subMenuAuditPlan'>
+              <ListItemButton
+                key='AuditPlan'
+                selected={selectedIndex === 18}
+                onClick={() => handleListItemClick(18)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='สร้างแผนตรวจนับสต๊อก' />
+              </ListItemButton>
+            </Link>
+            <Link
+              to='/stock-count'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+              }}
+              id='subMenuStockCount'>
+              <ListItemButton
+                key='StockCount'
+                selected={selectedIndex === 19}
+                onClick={() => handleListItemClick(19)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ตรวจนับสต๊อก (SC)' />
               </ListItemButton>
             </Link>
           </List>

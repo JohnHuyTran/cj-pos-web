@@ -76,12 +76,40 @@ export const objectNullOrEmpty = (object: any) => {
   }
 };
 
+export function handleNumberBeforeUse(value: any): number {
+  let currentValue = value;
+  if (stringNullOrEmpty(value)
+    || stringNullOrEmpty(value.trim())
+  ) {
+    currentValue = 0;
+  } else {
+    if (isNaN(parseInt(currentValue.replace(/,/g, '')))) {
+      return 0;
+    } else {
+      if (parseInt(currentValue.replace(/,/g, '')) < 0) {
+        currentValue = 0;
+      } else if (parseInt(currentValue.replace(/,/g, '')) > 1000000000) {
+        currentValue = 0;
+      } else {
+        if (!(currentValue instanceof Number)) {
+          currentValue = parseInt(currentValue.replace(/,/g, ''));
+        }
+      }
+    }
+  }
+  return currentValue;
+}
+
 export const numberWithCommas = (num: any) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
 export function isOwnBranch(branch: any): boolean {
   return env.branch.code === branch;
+}
+
+export const formatNumber = (value: any, decimalPoint: number = 0) => {
+  return ''+((+value).toFixed(decimalPoint)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 // export function isBranchDC(userInfo: KeyCloakTokenInfo): boolean {

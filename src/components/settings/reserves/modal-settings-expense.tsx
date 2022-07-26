@@ -17,23 +17,22 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { Save } from '@mui/icons-material';
-import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
-import { useStyles } from '../../../styles/makeTheme';
-
-import { expenseTypesSetting, getExpenseTypesSetting } from '../../../utils/enum/setting-reserve-expense-enum';
+import { useStyles } from 'styles/makeTheme';
+import { expenseTypesSetting, getExpenseTypesSetting } from 'utils/enum/setting-reserve-expense-enum';
 
 //Components
-import TexboxSearchSku from '../../commons/ui/texbox-search-sku';
-import AlertError from '../../commons/ui/alert-error';
-import SnackbarStatus from '../../commons/ui/snackbar-status';
-import LoadingModal from '../../commons/ui/loading-modal';
+import TexboxSearchSku from 'components/commons/ui/texbox-search-sku';
+import { BootstrapDialogTitle } from 'components/commons/ui/dialog-title';
+import AlertError from 'components/commons/ui/alert-error';
+import SnackbarStatus from 'components/commons/ui/snackbar-status';
+import LoadingModal from 'components/commons/ui/loading-modal';
 
 //api
-import { expenseCreateConfig, expenseUpdateConfig } from '../../../services/accounting';
-import { ExpenseConfigCreateRequest, ExpenseConfigUpdateRequest } from '../../../models/branch-accounting-model';
-import { ApiError } from '../../../models/api-error-model';
-import { useAppSelector, useAppDispatch } from '../../../store/store';
-import { featchBranchAccountingConfigListAsync } from '../../../store/slices/accounting/accounting-search-config-slice';
+import { expenseCreateConfig, expenseUpdateConfig } from 'services/accounting';
+import { ExpenseConfigCreateRequest, ExpenseConfigUpdateRequest } from 'models/branch-accounting-model';
+import { ApiError } from 'models/api-error-model';
+import { useAppSelector, useAppDispatch } from 'store/store';
+import { featchBranchAccountingConfigListAsync } from 'store/slices/accounting/accounting-search-config-slice';
 
 const initialStateForm: any = {
   isActive: 'true',
@@ -85,7 +84,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
   const validateForm = () => {
     if (
       values.type.length === 0 ||
-      // values.skuCode === '' ||
+      values.skuCode === '' ||
       values.accountNameTh === '' ||
       values.accountCode === '' ||
       values.approvalLimit1 === '' ||
@@ -149,9 +148,10 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
         setIsOpenLoading(false);
       } else if (isStatus === 'Update') {
         const payloadUpdate: ExpenseConfigUpdateRequest = {
+          isActive: values.isActive === 'true' ? true : false,
           accountCode: values.accountCode,
           accountNameTh: values.accountNameTh,
-          skuCode: '000000000030000185',
+          skuCode: values.skuCode,
           approvalLimit1: Number(values.approvalLimit1),
           approvalLimit2: Number(values.approvalLimit2),
           requiredDocumentTh: values.requiredDocumentTh ? values.requiredDocumentTh : '',
@@ -207,7 +207,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
       isActive: dataSelect.isActive.toString(),
       type: isotherExpense ? 'OTHER' : dataSelect.typeCode,
       typeOther: isotherExpense ? [dataSelect.typeCode] : [],
-      skuCode: '',
+      skuCode: dataSelect.skuCode,
       accountNameTh: dataSelect.accountNameTh,
       accountCode: dataSelect.accountCode,
       requiredDocumentTh: dataSelect.requiredDocumentTh,

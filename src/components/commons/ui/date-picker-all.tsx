@@ -19,6 +19,9 @@ interface StateProps {
   disabled?: boolean;
   isError?: boolean;
   hyperText?: string;
+  error?: boolean;
+  placeHolder?: string;
+  disableMinDateMsg?: boolean;
 }
 
 const defaultMaterialTheme = createTheme({
@@ -55,12 +58,16 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         variant='inline'
         inputVariant='outlined'
         format='DD/MM/YYYY'
+        error={props.error}
         className={classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton size='small' onClick={() => handleDateChange(null)} data-testid='endDateIconClose'>
+            <IconButton
+              size='small'
+              onClick={() => !props.disabled && handleDateChange(null)}
+              data-testid='endDateIconClose'>
               <CloseIcon fontSize='small' />
             </IconButton>
           ),
@@ -71,8 +78,8 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         }}
         minDate={props.minDateTo}
         maxDate={props.maxDate ? props.maxDate : ''}
-        placeholder='กรุณาเลือกวันที่'
-        minDateMessage='วันที่ ต้องมากกว่าหรือเท่ากับวันที่ปัจจุบัน'
+        placeholder={props.placeHolder ? props.placeHolder : 'กรุณาเลือกวันที่'}
+        minDateMessage={props.disableMinDateMsg ? '' : 'วันที่ ต้องมากกว่าหรือเท่ากับวันที่ปัจจุบัน'}
         disabled={props.disabled ? props.disabled : false}
         helperText={props.hyperText}
         error={props.isError}
