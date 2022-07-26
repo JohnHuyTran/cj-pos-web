@@ -79,10 +79,12 @@ export const ModalTransferItem = (props: DataGridProps) => {
         let discount = !!sameItem ? sameItem.discount : 0;
         let expiryDate = !!sameItem ? sameItem.expiryDate : null;
         let numberOfDiscounted = item.qty ? item.qty : 0;
+        let remark = !!sameItem ? sameItem.remark : '';
         if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
           discount = stringNullOrEmpty(item.discount) ? 0 : item.discount;
           expiryDate = stringNullOrEmpty(item.expiryDate) ? null : item.expiryDate;
           numberOfDiscounted = stringNullOrEmpty(item.qty) ? null : item.qty;
+          remark = stringNullOrEmpty(item.remark) ? '' : item.remark;
         }
         const cashDiscount =
           typeDiscount === 'percent'
@@ -118,7 +120,7 @@ export const ModalTransferItem = (props: DataGridProps) => {
           errorNumberOfApproved: '',
           approvedDiscount: approvedDiscount,
           skuCode: item.skuCode,
-          remark: item.remark,
+          remark: remark,
         };
       });
       setDtTable(rows);
@@ -309,22 +311,11 @@ export const ModalTransferItem = (props: DataGridProps) => {
     });
   };
   const handleChangeRemark = (event: any, index: number, errorIndex: number) => {
-    let currentData: any;
     setDtTable((preData: Array<DiscountDetail>) => {
       const data = [...preData];
-      currentData = data[index - 1];
       data[index - 1].remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
       return data;
     });
-    if (Object.keys(payloadAddItem).length !== 0) {
-      let updateList = _.cloneDeep(payloadAddItem);
-      updateList.map((item: any) => {
-        if (item.barcode === currentData.barCode) {
-          item.remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
-        }
-      });
-      dispatch(updateAddItemsState(updateList));
-    }
     dispatch(
       updateErrorList(
         errorList.map((item: any, idx: number) => {
