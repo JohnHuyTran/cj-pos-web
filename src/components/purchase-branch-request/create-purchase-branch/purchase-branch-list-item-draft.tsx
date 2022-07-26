@@ -223,7 +223,7 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
           rowHeight={65}
           onCellClick={currentlySelected}
           onCellFocusOut={handleEditItems}
-          // onCellOut={handleEditItems}
+          onCellOut={handleEditItems}
           onCellKeyDown={handleEditItems}
         />
       </div>
