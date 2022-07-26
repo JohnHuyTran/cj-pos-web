@@ -143,7 +143,7 @@ export default function Sidebar({}: Props): ReactElement {
 
     setDisableSubMenuExpense(isAllowSubMenuPermission(SUBMENU.EX_EXPENSE));
     setDisableSubMenuSettings(isAllowSubMenuPermission(SUBMENU.EX_CONFIG));
-    setDisableSubMenuCashStatement(isAllowSubMenuPermission(SUBMENU.EX_EXPENSE));
+    setDisableSubMenuCashStatement(isAllowSubMenuPermission(SUBMENU.CASH_STATEMENT));
 
     setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
   }, [navState]);

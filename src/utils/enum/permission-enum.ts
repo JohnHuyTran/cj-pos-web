@@ -63,6 +63,12 @@ export enum ACTIONS {
   ACCOUNTING_MANAGE = 'account.config.manage',
   ACCOUNTING_APPROVE3 = 'account.ex.approve3',
   ACCOUNTING_REJECT3 = 'account.ex.reject3',
+
+  ACCOUNTING_CS_IMPORT = 'account.cs.import',
+  ACCOUNTING_CS_APPROVE = 'account.cs.approve',
+  ACCOUNTING_CS_EXPORT = 'account.cs.export',
+  ACCOUNTING_CS_MANAGE = 'account.cs.manage',
+  ACCOUNTING_CS_VIEW = 'account.cs.view',
 }
 
 export enum MAINMENU {
@@ -93,6 +99,7 @@ export enum SUBMENU {
   PR_CREATE_PURCHASE_BRANCH = 'purchasebranch.createPurchaseBranch',
   EX_EXPENSE = 'account.expense',
   EX_CONFIG = 'account.config',
+  CASH_STATEMENT = 'cash.statement',
 }
 
 export enum PERMISSION_GROUP {
@@ -110,6 +117,7 @@ export enum PERMISSION_GROUP {
   PCM = 'procurement',
   RTC = 'readyToClear',
   DATA = 'data',
+  FINANCE = 'finance',
 }
 
 export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
@@ -129,3 +137,4 @@ export const KEYCLOAK_GROUP_PCM = '/service.posback/pcm';
 export const KEYCLOAK_GROUP_RTC = '/service.posback/rtc';
 export const KEYCLOAK_GROUP_DATA = '/service.posback/data';
 export const KEYCLOAK_GROUP_ACCOUNTING_MANAGER = '/service.posback/account-manager';
+export const KEYCLOAK_GROUP_FINANCE = '/service.posback/finance';
