@@ -99,6 +99,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuStockMovement, setDisableSubMenuStockMovement] = React.useState(true);
   const [disableSubMenuCreatePurchaseBranch, setDisableSubMenuCreatePurchaseBranch] = React.useState(true);
   const [disableSubMenuExpense, setDisableSubMenuExpense] = React.useState(true);
+  const [disableSubMenuCloseSaleShift, setDisableSubMenuCloseSaleShift] = React.useState(true);
 
   const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
   const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
@@ -138,6 +139,7 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
 
     setDisableSubMenuExpense(isAllowSubMenuPermission(SUBMENU.EX_EXPENSE));
+    setDisableSubMenuCloseSaleShift(isAllowSubMenuPermission(SUBMENU.EX_CLOSE_SALE_SHIFT));
   }, [navState]);
 
   const dispatch = useAppDispatch();
@@ -526,11 +528,11 @@ export default function Sidebar({}: Props): ReactElement {
               style={{
                 textDecoration: 'none',
                 color: '#676767',
-                display: disableSubMenuExpense ? 'none' : '',
+                display: disableSubMenuCloseSaleShift ? 'none' : '',
               }}
               id='subMenuCloseSaleShift'>
               <ListItemButton
-                key='Expense'
+                key='CloseSaleShift'
                 selected={selectedIndex === 16}
                 onClick={() => handleListItemClick(16)}
                 sx={{ pl: 7 }}>

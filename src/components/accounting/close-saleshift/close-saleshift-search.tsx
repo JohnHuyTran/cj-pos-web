@@ -77,7 +77,7 @@ function CloseSaleShiftSearch() {
   const [openAlert, setOpenAlert] = React.useState(false);
   const [textError, setTextError] = React.useState('');
 
-  const [disableCloseShiftKey, setDisableCloseShiftKey] = React.useState(false);
+  const [disableCloseShiftKey, setDisableCloseShiftKey] = React.useState(true);
   const [openModalCloseSale, setOpenModalCloseSale] = React.useState(false);
   const [docNo, setDocNo] = React.useState('');
   const [noOfShiftKey, setNoOfShiftKey] = React.useState('');
@@ -104,7 +104,6 @@ function CloseSaleShiftSearch() {
     }
     const payload: CloseSaleShiftRequest = {
       shiftDate: moment(startDate).endOf('day').toISOString(),
-      // shiftDate: '2022-07-26',
       branchCode: branchFromCode,
       status: values.status,
       page: page,
@@ -184,7 +183,7 @@ function CloseSaleShiftSearch() {
               valueBranch={valuebranchFrom}
               onChangeBranch={handleChangeBranchFrom}
               isClear={clearBranchDropDown}
-              isFilterAuthorizedBranch={groupBranch ? false : true}
+              isFilterAuthorizedBranch={false}
               disable={groupBranch}
               sourceBranchCode={branchFromCode}
             />
@@ -255,7 +254,7 @@ function CloseSaleShiftSearch() {
               sx={{ width: 150 }}
               className={classes.MbtnClear}
               color='secondary'
-              disabled={disableCloseShiftKey}>
+              disabled={disableCloseShiftKey || !isGroupBranch()}>
               ปิดรอบยอดการขาย
             </Button>
             <Button
