@@ -40,6 +40,9 @@ export enum ACTIONS {
   STOCK_BL_LOCATION = 'stock.balance.view',
   STOCK_MOVEMENT_VIEW = 'stock.movement.view',
 
+  STOCK_SC_MANAGE = 'stock.sc.manage',
+  STOCK_SC_VIEW = 'stock.sc.view',
+
   AUTHORITY_CHECK = 'authority.check',
   ORDER_RO_DRAFT = 'order.ro.draft',
   ORDER_RO_APPROVE = 'order.ro.approve',

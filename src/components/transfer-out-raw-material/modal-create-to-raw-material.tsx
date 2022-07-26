@@ -410,6 +410,14 @@ export default function ModalCreateToRawMaterial({
                 {dataDetail.transferOutReason}
               </Grid>
             </Grid>
+            <Grid item container xs={4} mb={5}>
+              <Grid item xs={4}>
+                สต๊อก :
+              </Grid>
+              <Grid item xs={8}>
+                หน้าร้าน
+              </Grid>
+            </Grid>
           </Grid>
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>

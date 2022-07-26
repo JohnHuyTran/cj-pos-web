@@ -42,8 +42,8 @@ import {
 } from '../../services/transfer-out';
 import { updateCheckStock } from '../../store/slices/stock-balance-check-slice';
 import { checkStockBalance } from '../../services/common';
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 interface Props {
   action: Action | Action.INSERT;
@@ -101,9 +101,7 @@ export default function ModalCreateTransferOutDestroy({
   const [attachFileAfterOlds, setAttachFileAfterOlds] = React.useState<any>([]);
   const [attachFileError, setAttachFileError] = React.useState('');
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
-  const [alertTextError, setAlertTextError] = React.useState(
-    'กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'
-  );
+  const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState(
     branchList && branchList.length > 0 && getUserInfo().branch
@@ -449,17 +447,17 @@ export default function ModalCreateTransferOutDestroy({
           const allAttachFileBefore = await handleAllAttachFile(true);
           const body = !!dataDetail.id
             ? {
-              ...payloadTransferOut,
-              id: dataDetail.id,
-              documentNumber: dataDetail.documentNumber,
-              beforeAttachFiles: allAttachFileBefore,
-              type: TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy ? TO_TYPE.TO_WITHOUT_DISCOUNT : TO_TYPE.TO_DEFECT,
-            }
+                ...payloadTransferOut,
+                id: dataDetail.id,
+                documentNumber: dataDetail.documentNumber,
+                beforeAttachFiles: allAttachFileBefore,
+                type: TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy ? TO_TYPE.TO_WITHOUT_DISCOUNT : TO_TYPE.TO_DEFECT,
+              }
             : {
-              ...payloadTransferOut,
-              beforeAttachFiles: allAttachFileBefore,
-              type: TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy ? TO_TYPE.TO_WITHOUT_DISCOUNT : TO_TYPE.TO_DEFECT,
-            };
+                ...payloadTransferOut,
+                beforeAttachFiles: allAttachFileBefore,
+                type: TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy ? TO_TYPE.TO_WITHOUT_DISCOUNT : TO_TYPE.TO_DEFECT,
+              };
           const rs = await saveDraftTransferOut(body);
           if (rs.code === 201) {
             if (!sendRequest) {
@@ -621,7 +619,7 @@ export default function ModalCreateTransferOutDestroy({
       const payload = {
         branchCode: branchCodeCheckStock,
         products: products,
-        backStore: true
+        backStore: true,
       };
       const rs = await checkStockBalance(payload);
       if (rs.data && rs.data.length > 0) {
@@ -649,7 +647,7 @@ export default function ModalCreateTransferOutDestroy({
       const allAttachFileBefore = await handleAllAttachFile(true);
       const payload = {
         beforeAttachFiles: allAttachFileBefore,
-        products: payloadTransferOut.products
+        products: payloadTransferOut.products,
       };
       let res = await rejectTransferOut(dataDetail.id, payload);
       if (res && res.code === 20000) {
@@ -726,19 +724,19 @@ export default function ModalCreateTransferOutDestroy({
       }
     }
     return valueRender;
-  }
+  };
 
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCloseModalCreate}>
           <Typography sx={{ fontSize: '1em' }}>รายละเอียดเอกสารทำลาย</Typography>
-          <StepperBar activeStep={status} setActiveStep={setStatus}/>
+          <StepperBar activeStep={status} setActiveStep={setStatus} />
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container mt={1} mb={-1}>
             {/*line 1*/}
-            <Grid item container xs={4} mb={8} mr={-3}>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 สาขา :
               </Grid>
@@ -746,7 +744,7 @@ export default function ModalCreateTransferOutDestroy({
                 {currentBranch}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={8}>
+            <Grid item container xs={4} mb={5} pl={5}>
               <Grid item xs={5}>
                 เลขที่เอกสารทำลาย :
               </Grid>
@@ -754,7 +752,7 @@ export default function ModalCreateTransferOutDestroy({
                 {!!dataDetail.documentNumber ? dataDetail.documentNumber : '-'}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={8} pl={3}>
+            <Grid item container xs={4} mb={5} pl={8}>
               <Grid item xs={4}>
                 วันที่ทำรายการ :
               </Grid>
@@ -763,56 +761,69 @@ export default function ModalCreateTransferOutDestroy({
               </Grid>
             </Grid>
             {/*line 2*/}
-            <Grid item container xs={4} mb={5} mr={-3}>
+            <Grid container item xs={4} mb={5}>
               <Grid item xs={4}>
                 วันที่อนุมัติ :
-                {/*add control selection type in here avoid to before and after control attach many files will be pushed down row*/}
-                <Grid item xs={12} pt={8}>
-                  ประเภททำลาย <b style={{ fontSize: '18px' }}> *</b> :
-                </Grid>
               </Grid>
               <Grid item xs={8}>
                 {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
-                {/*add control selection type in here avoid to before and after control attach many files will be pushed down row*/}
-                <Grid item xs={9} pt={8}>
-                  <FormControl fullWidth className={classes.Mselect}>
-                    <Select
-                      id='typeDestroy'
-                      name='typeDestroy'
-                      value={typeDestroy}
-                      onChange={(e) => {
-                        setTypeDestroy(e.target.value);
-                        setErrors({
-                          ...errors,
-                          typeDestroy: '',
-                        });
-                        dispatch(updateCheckEdit(true));
-                      }}
-                      disabled={(payloadTransferOut.products && payloadTransferOut.products.length > 0)
-                        || !stringNullOrEmpty(status)}
-                      inputProps={{ 'aria-label': 'Without label' }}
-                      displayEmpty
-                      renderValue={renderValueSelectType}
-                      error={!stringNullOrEmpty(errors['typeDestroy'])}>
-                      <MenuItem value={TO_TYPE.TO_WITHOUT_DISCOUNT}>{'ทำลาย(ไม่มีส่วนลด) - TO'}</MenuItem>
-                      <MenuItem value={TO_TYPE.TO_DEFECT}>{'ทำลายวัตถุดิบร้านบาว - DF'}</MenuItem>
-                    </Select>
-                    <Typography
-                      hidden={stringNullOrEmpty(errors['typeDestroy'])}
-                      display={'flex'}
-                      justifyContent={'flex-end'}
-                      sx={{ color: '#F54949' }}>
-                      {errors['typeDestroy']}
-                    </Typography>
-                  </FormControl>
-                </Grid>
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={4}>
+            <Grid container item xs={4} mb={5} pl={5}>
+              <Grid item xs={4}>
+                ประเภททำลาย :
+              </Grid>
+              <Grid item xs={8}>
+                <FormControl fullWidth className={classes.Mselect}>
+                  <Select
+                    id='typeDestroy'
+                    name='typeDestroy'
+                    value={typeDestroy}
+                    onChange={(e) => {
+                      setTypeDestroy(e.target.value);
+                      setErrors({
+                        ...errors,
+                        typeDestroy: '',
+                      });
+                      dispatch(updateCheckEdit(true));
+                    }}
+                    disabled={
+                      (payloadTransferOut.products && payloadTransferOut.products.length > 0) ||
+                      !stringNullOrEmpty(status)
+                    }
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    displayEmpty
+                    renderValue={renderValueSelectType}
+                    error={!stringNullOrEmpty(errors['typeDestroy'])}
+                  >
+                    <MenuItem value={TO_TYPE.TO_WITHOUT_DISCOUNT}>{'ทำลาย(ไม่มีส่วนลด) - TO'}</MenuItem>
+                    <MenuItem value={TO_TYPE.TO_DEFECT}>{'ทำลายวัตถุดิบร้านบาว - DF'}</MenuItem>
+                  </Select>
+                  <Typography
+                    hidden={stringNullOrEmpty(errors['typeDestroy'])}
+                    display={'flex'}
+                    justifyContent={'flex-end'}
+                    sx={{ color: '#F54949' }}
+                  >
+                    {errors['typeDestroy']}
+                  </Typography>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Grid container item xs={4} mb={5} pl={8}>
+              <Grid item xs={4}>
+                สต๊อก :
+              </Grid>
+              <Grid item xs={8}>
+                {typeDestroy === TO_TYPE.TO_DEFECT ? '-' : 'หลังร้าน'}
+              </Grid>
+            </Grid>
+            {/*line 3*/}
+            <Grid container item xs={4} mb={8} mt={-1}>
               <Grid item xs={4}>
                 รูปก่อนทำลาย<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>
-              <Grid item xs={8} pl={2}>
+              <Grid item xs={8} pl={1}>
                 <AccordionUploadFile
                   files={attachFileBeforeOlds}
                   docNo={dataDetail ? dataDetail.documentNumber : ''}
@@ -829,7 +840,7 @@ export default function ModalCreateTransferOutDestroy({
                 />
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={4} pl={3}>
+            <Grid container item xs={4} mb={8} mt={-1} pl={5}>
               <Grid item xs={4}>
                 รูปหลังทำลาย<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>
@@ -848,8 +859,6 @@ export default function ModalCreateTransferOutDestroy({
                 />
               </Grid>
             </Grid>
-            {/*line 3*/}
-
           </Grid>
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>
@@ -859,7 +868,7 @@ export default function ModalCreateTransferOutDestroy({
                   variant='contained'
                   color='info'
                   className={classes.MbtnSearch}
-                  startIcon={<AddCircleOutlineOutlinedIcon/>}
+                  startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
                   style={{
@@ -868,7 +877,8 @@ export default function ModalCreateTransferOutDestroy({
                         ? 'none'
                         : undefined,
                   }}
-                  disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT}>
+                  disabled={!stringNullOrEmpty(status) && status != TOStatus.DRAFT}
+                >
                   เพิ่มสินค้า
                 </Button>
               </Box>
@@ -877,7 +887,7 @@ export default function ModalCreateTransferOutDestroy({
                   id='btnSaveDraft'
                   variant='contained'
                   color='warning'
-                  startIcon={<SaveIcon/>}
+                  startIcon={<SaveIcon />}
                   disabled={
                     (!stringNullOrEmpty(status) && status != TOStatus.DRAFT) ||
                     (payloadTransferOut.products && payloadTransferOut.products.length === 0)
@@ -889,7 +899,8 @@ export default function ModalCreateTransferOutDestroy({
                         : undefined,
                   }}
                   onClick={() => handleCreateDraft(false)}
-                  className={classes.MbtnSearch}>
+                  className={classes.MbtnSearch}
+                >
                   บันทึก
                 </Button>
                 <Button
@@ -907,9 +918,10 @@ export default function ModalCreateTransferOutDestroy({
                         ? 'none'
                         : undefined,
                   }}
-                  startIcon={<CheckCircleOutlineIcon/>}
+                  startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleSendRequest}
-                  className={classes.MbtnSearch}>
+                  className={classes.MbtnSearch}
+                >
                   ขออนุมัติ
                 </Button>
                 <Button
@@ -923,9 +935,10 @@ export default function ModalCreateTransferOutDestroy({
                         ? 'none'
                         : undefined,
                   }}
-                  startIcon={<HighlightOffIcon/>}
+                  startIcon={<HighlightOffIcon />}
                   onClick={handleOpenCancel}
-                  className={classes.MbtnSearch}>
+                  className={classes.MbtnSearch}
+                >
                   ยกเลิก
                 </Button>
                 <Button
@@ -934,9 +947,10 @@ export default function ModalCreateTransferOutDestroy({
                   style={{ display: status == TOStatus.WAIT_FOR_APPROVAL && approvePermission ? undefined : 'none' }}
                   variant='contained'
                   color='primary'
-                  startIcon={<CheckCircleOutlineIcon/>}
+                  startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleOpenModalConfirmApprove}
-                  className={classes.MbtnSearch}>
+                  className={classes.MbtnSearch}
+                >
                   อนุมัติ
                 </Button>
                 <Button
@@ -944,9 +958,10 @@ export default function ModalCreateTransferOutDestroy({
                   variant='contained'
                   style={{ display: status == TOStatus.WAIT_FOR_APPROVAL && approvePermission ? undefined : 'none' }}
                   color='error'
-                  startIcon={<HighlightOffIcon/>}
+                  startIcon={<HighlightOffIcon />}
                   onClick={handleOpenModalReject}
-                  className={classes.MbtnSearch}>
+                  className={classes.MbtnSearch}
+                >
                   ไม่อนุมัติ
                 </Button>
                 <Button
@@ -954,15 +969,16 @@ export default function ModalCreateTransferOutDestroy({
                   variant='contained'
                   style={{ display: status != TOStatus.APPROVED || approvePermission ? 'none' : undefined }}
                   color='info'
-                  startIcon={<CheckCircleOutlineIcon/>}
+                  startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleOpenModalConfirmEnd}
-                  className={classes.MbtnSearch}>
+                  className={classes.MbtnSearch}
+                >
                   ปิดงาน
                 </Button>
               </Box>
             </Box>
             <Box>
-              <ModalTransferOutDestroyItem id='' action={action} userPermission={userPermission}/>
+              <ModalTransferOutDestroyItem id='' action={action} userPermission={userPermission} />
             </Box>
           </Box>
         </DialogContent>
@@ -994,8 +1010,8 @@ export default function ModalCreateTransferOutDestroy({
         headerTitle={'ยืนยันยกเลิกเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
-      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
-      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError}/>
+      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
+      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError} />
       <ModalCheckStock
         open={openCheckStock}
         onClose={() => {
@@ -1003,7 +1019,7 @@ export default function ModalCreateTransferOutDestroy({
         }}
         headerTitle={'เบิกสินค้ามากกว่าที่มีในคลัง โปรดตรวจสอบ'}
       />
-      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
+      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
       <ModelConfirm
         open={openModalConfirmApprove}
         onClose={() => handleCloseModalConfirmApprove(false)}

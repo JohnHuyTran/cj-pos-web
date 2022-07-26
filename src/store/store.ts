@@ -54,6 +54,10 @@ import transferOutRawMaterialSlice from './slices/transfer-out-raw-material-slic
 import searchProductDiscountSlice from './slices/search-product-discount';
 import addToDestroyProductSlice from './slices/add-to-destroy-product-slice';
 import stockBalanceCheckSlice from './slices/stock-balance-check-slice';
+import stockCountSlice from './slices/stock-count-slice';
+import stockCountSearchSlice from './slices/stock-count-search-slice';
+import stockCountCriteriaSearchSlice from './slices/stock-count-criteria-search-slice';
+import stockCountDetailSlice from './slices/stock-count-detail-slice';
 import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 import stockRequestItems from './slices/stock-request-items-slice';
@@ -88,6 +92,8 @@ import saveExpenseSearchRequest from './slices/accounting/save-accounting-search
 import expensePeriodTypeSlice from './slices/accounting/accounting-period-type-slice';
 import saveExpenseConfigSearchRequest from './slices/accounting/save-accounting-search-config-slice';
 
+import auditPlanDetailSlice from './slices/audit-plan-detail-slice';
+import auditPlanSearchSlice from './slices/audit-plan-search-slice';
 const store = configureStore({
   reducer: {
     auth: authSlice,
@@ -144,6 +150,10 @@ const store = configureStore({
     searchProductDiscountSlice: searchProductDiscountSlice,
     addToDestroyProductSlice: addToDestroyProductSlice,
     stockBalanceCheckSlice: stockBalanceCheckSlice,
+    stockCountSlice: stockCountSlice,
+    stockCountSearchSlice: stockCountSearchSlice,
+    stockCountCriteriaSearchSlice: stockCountCriteriaSearchSlice,
+    stockCountDetailSlice: stockCountDetailSlice,
     updateBTSkuSlice: updateBTSkuSlice,
     updateBTProductSlice: updateBTProductSlice,
     stockRequestItems: stockRequestItems,
@@ -177,6 +187,8 @@ const store = configureStore({
     expenseDetail: expenseDetailSlice,
     expensePeriodTypeSlice: expensePeriodTypeSlice,
     saveExpenseConfigSearchRequest: saveExpenseConfigSearchRequest,
+    auditPlanDetailSlice: auditPlanDetailSlice,
+    auditPlanSearchSlice: auditPlanSearchSlice,
   },
 });
 

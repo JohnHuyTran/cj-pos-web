@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
 import { get } from '../../adapters/posback-adapter';
 import { stringNullOrEmpty } from '../../utils/utils';
-import { TransferOutSearchRequest, TransferOutSearchResponse } from '../../models/transfer-out-model';
+import { environment } from "../../environment-base";
+import { StockCountSearchRequest, StockCountSearchResponse } from "../../models/stock-count-model";
 
 type State = {
-  toSearchResponse: TransferOutSearchResponse;
+  toSearchResponse: StockCountSearchResponse;
   error: string;
 };
 
@@ -23,17 +23,17 @@ const initialState: State = {
   error: '',
 };
 
-export const transferOutGetSearch = createAsyncThunk(
-  'transferOutGetSearch',
-  async (payload: TransferOutSearchRequest) => {
+export const getStockCountSearch = createAsyncThunk(
+  'getStockCountSearch',
+  async (payload: StockCountSearchRequest) => {
     try {
-      const apiRootPath = environment.withDraw.transferOut.search.url;
-      let path = `${apiRootPath}?perPage=${payload.perPage}&page=${payload.page}`;
+      const apiRootPath = environment.checkStock.stockCount.search.url;
+      let path = `${apiRootPath}?limit=${payload.perPage}&page=${payload.page}`;
       if (!stringNullOrEmpty(payload.query)) {
-        path = path + `&query=${payload.query}`;
+        path = path + `&documentNumber=${payload.query}`;
       }
       if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
-        path = path + `&branches=${payload.branch}`;
+        path = path + `&branchCode=${payload.branch}`;
       }
       if (!stringNullOrEmpty(payload.status) && 'ALL' !== payload.status) {
         path = path + `&status=${payload.status}`;
@@ -44,10 +44,7 @@ export const transferOutGetSearch = createAsyncThunk(
       if (!stringNullOrEmpty(payload.endDate)) {
         path = path + `&endDate=${payload.endDate}`;
       }
-      if (!stringNullOrEmpty(payload.type)) {
-        path = path + `&type=${payload.type}`;
-      }
-      let response: TransferOutSearchResponse = {
+      let response: StockCountSearchResponse = {
         ref: '',
         code: 0,
         message: '',
@@ -67,24 +64,24 @@ export const transferOutGetSearch = createAsyncThunk(
   }
 );
 
-const TransferOutSearchSlice = createSlice({
-  name: 'TransferOutSearchSlice',
+const StockCountSearchSlice = createSlice({
+  name: 'StockCountSearchSlice',
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
   },
   extraReducers: (builer) => {
-    builer.addCase(transferOutGetSearch.pending, () => {
+    builer.addCase(getStockCountSearch.pending, () => {
       initialState;
     }),
-      builer.addCase(transferOutGetSearch.fulfilled, (state, action: PayloadAction<any>) => {
+      builer.addCase(getStockCountSearch.fulfilled, (state, action: PayloadAction<any>) => {
         state.toSearchResponse = action.payload;
       }),
-      builer.addCase(transferOutGetSearch.rejected, () => {
+      builer.addCase(getStockCountSearch.rejected, () => {
         initialState;
       });
   },
 });
 
-export const { clearDataFilter } = TransferOutSearchSlice.actions;
-export default TransferOutSearchSlice.reducer;
+export const { clearDataFilter } = StockCountSearchSlice.actions;
+export default StockCountSearchSlice.reducer;

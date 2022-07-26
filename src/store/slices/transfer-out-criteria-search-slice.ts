@@ -18,17 +18,14 @@ const initialState: State = {
 };
 
 const transferOutCriteriaSearchSlice = createSlice({
-  name: 'searchCriteriaBD',
+  name: 'transferOutCriteriaSearchSlice',
   initialState,
   reducers: {
     saveSearchCriteriaTO: (state, action: PayloadAction<any>) => {
       state.searchCriteria = action.payload;
     },
-    clearSearchCriteriaBD: () => {
-      initialState;
-    },
   },
 });
 
-export const { saveSearchCriteriaTO, clearSearchCriteriaBD } = transferOutCriteriaSearchSlice.actions;
+export const { saveSearchCriteriaTO } = transferOutCriteriaSearchSlice.actions;
 export default transferOutCriteriaSearchSlice.reducer;

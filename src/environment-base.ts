@@ -402,6 +402,39 @@ export const environment = {
       },
     },
   },
+  checkStock: {
+    auditPlan: {
+      save: {
+        url: '/stock/audit-planning',
+      },
+      detail: {
+        url: '/stock/audit-planning',
+      },
+      confirm: {
+        url: '/stock/audit-planning/confirm/{id}',
+      },
+      counting: {
+        url: '/stock/stock-count',
+      },
+      cancel: {
+        url: '/stock/audit-planning/cancel/{id}',
+      },
+    },
+    stockCount: {
+      search: {
+        url: '/stock/stock-count'
+      },
+      detail: {
+        url: '/stock/stock-count'
+      },
+      confirm: {
+        url: '/stock/stock-count/confirm'
+      },
+      cancel: {
+        url: '/stock/stock-count/{id}'
+      },
+    }
+  },
   master: {
     branch: {
       province: {
