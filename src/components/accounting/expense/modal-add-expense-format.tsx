@@ -309,8 +309,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
       setIsErrorDate(false);
       setErrorDate('');
     }
-    if (isGroupBranch()) {
+    if (expenseData && isGroupBranch()) {
       setEnableSaveBtn(expenseData.status === STATUS.DRAFT || expenseData.status === STATUS.SEND_BACK_EDIT);
+    } else {
+      setEnableSaveBtn(true);
     }
   }, [open, edit, payload]);
 
