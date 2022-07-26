@@ -204,7 +204,7 @@ export default function SelectBranch(props: Props): ReactElement {
                 {...defaultPropsBranchList}
                 className={classes.Mautocomplete}
                 popupIcon={<SearchIcon />}
-                noOptionsText='ไม่พอข้อมูล'
+                noOptionsText='ไม่พบข้อมูล'
                 id='selBranchNo'
                 value={branch}
                 onChange={handleChangeBranch}

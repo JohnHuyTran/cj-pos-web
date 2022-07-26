@@ -74,3 +74,9 @@ export const getExpenseStatus = (key: string) => expenseStatusList.find((item) =
 // export const getExpenseTypes = (key: string) => expenseTypes.find((item) => item.key === key)?.text;
 // expenseStatusList.find((item) => item.key === key)?.text;
 // return stockTransferStatus.filter((item) => item.type === type || item.type === 'ALL');
+
+export const closeSaleShift = [
+  { key: 'DRAFT', text: 'บันทึก' },
+  { key: 'WAIT_CHECKING', text: 'รอตรวจสอบ' },
+  { key: 'CORRECT', text: 'ถูกต้อง' },
+];

@@ -108,7 +108,7 @@ export default function ModalCreateToDestroyDiscount({
   const [attachFileAfterError, setAttachFileAfterError] = React.useState('');
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const fileUploadAfterList = useAppSelector((state) => state.toDestroyDiscountAttachAfterSlice.state);
-  const [alertTextError, setAlertTextError] = React.useState('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+  const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
     ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
@@ -302,13 +302,13 @@ export default function ModalCreateToDestroyDiscount({
               item.errorNumberOfApproved = 'จำนวนการทำลายต้องมากกว่าหรือเท่ากับ 0';
             } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
-              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนที่ทำลายจริง';
+              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนทำลายจริง';
             }
           }
         } else {
-          if (preData.numberOfRequested <= 0 || !preData.numberOfRequested) {
+          if (stringNullOrEmpty(preData.numberOfRequested) || preData.numberOfRequested < 0) {
             isValid = false;
-            item.errorNumberOfRequested = 'จำนวนคำขอต้องมากกว่า 0';
+            item.errorNumberOfRequested = 'ระบุจำนวนการทำลายที่แท้จริง';
           } else if (preData.numberOfRequested > preData.numberOfDiscounted) {
             isValid = false;
             item.errorNumberOfRequested = 'จำนวนทำลายจริงต้องไม่น้อยกว่าจำนวนขอส่วนลด';
@@ -395,7 +395,7 @@ export default function ModalCreateToDestroyDiscount({
   };
 
   const handleCreateDraft = async (sendRequest: boolean) => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate(false, sendRequest)) {
       const rsCheckStock = await handleCheckStock();
       if (rsCheckStock) {
@@ -488,7 +488,7 @@ export default function ModalCreateToDestroyDiscount({
   };
 
   const handleSendForApproval = async (id: string) => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const rs = await sendForApprovalTransferOut(id);
       if (rs.code === 20000) {
@@ -511,7 +511,7 @@ export default function ModalCreateToDestroyDiscount({
   };
 
   const handleOpenModalConfirmApprove = () => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     if (validate(true, false)) {
       setOpenModalConfirmApprove(true);
     } else {
@@ -521,7 +521,7 @@ export default function ModalCreateToDestroyDiscount({
   };
 
   const handleApprove = async () => {
-    setAlertTextError('กรอกข้อมูลไม่ถูกต้องหรือไม่ได้ทำการกรอกข้อมูลที่จำเป็น กรุณาตรวจสอบอีกครั้ง');
+    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
       const allAttachFile = await handleAllAttachFile(fileUploadList, attachFileBeforeOlds);
       const payload = {
@@ -581,7 +581,7 @@ export default function ModalCreateToDestroyDiscount({
       const products = payloadTransferOut.products.map((item: any) => {
         return {
           barcode: item.barcode,
-          numberOfDiscounted: item.numberOfApproved,
+          numberOfDiscounted: item.numberOfRequested,
         };
       });
       const payload = {
@@ -614,7 +614,8 @@ export default function ModalCreateToDestroyDiscount({
     try {
       const allAttachFileBefore = await handleAllAttachFile(fileUploadList, attachFileBeforeOlds);
       const payload = {
-        beforeAttachFiles: allAttachFileBefore
+        beforeAttachFiles: allAttachFileBefore,
+        products: payloadTransferOut.products
       };
       let res = await rejectTransferOut(dataDetail.id, payload);
       if (res && res.code === 20000) {
@@ -694,7 +695,7 @@ export default function ModalCreateToDestroyDiscount({
         <DialogContent>
           <Grid container mt={1} mb={-1}>
             {/*line 1*/}
-            <Grid item container xs={4} mb={5} mr={-3}>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 สาขา :
               </Grid>
@@ -702,7 +703,7 @@ export default function ModalCreateToDestroyDiscount({
                 {currentBranch}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5}>
+            <Grid item container xs={4} mb={5} pl={3}>
               <Grid item xs={5}>
                 เลขที่เอกสารทำลาย :
               </Grid>
@@ -719,7 +720,7 @@ export default function ModalCreateToDestroyDiscount({
               </Grid>
             </Grid>
             {/*line 2*/}
-            <Grid item container xs={4} mb={5} mr={-3}>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 วันที่อนุมัติ :
               </Grid>
@@ -727,11 +728,25 @@ export default function ModalCreateToDestroyDiscount({
                 {dataDetail.approvedDate ? moment(dataDetail.approvedDate).add(543, 'y').format('DD/MM/YYYY') : '-'}
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={2}>
+            <Grid item container xs={4} mb={5} pl={3}>
+              <Grid item xs={4}>
+                สต๊อก :
+              </Grid>
+              <Grid item xs={8}>
+                หลังร้าน
+              </Grid>
+            </Grid>
+            <Grid item container xs={4} mb={5} pl={3}>
+              <Grid item xs={4}>
+              </Grid>
+              <Grid item xs={8}>
+              </Grid>
+            </Grid>
+            <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
                 รูปก่อนทำลาย* :
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={8} pl={2}>
                 <AccordionUploadFile
                   files={attachFileBeforeOlds}
                   docNo={dataDetail ? dataDetail.documentNumber : ''}
@@ -748,7 +763,7 @@ export default function ModalCreateToDestroyDiscount({
                 />
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={2} pl={3}>
+            <Grid item container xs={4} mb={5} pl={3}>
               <Grid item xs={4}>
                 รูปหลังทำลาย* :
               </Grid>
@@ -895,7 +910,7 @@ export default function ModalCreateToDestroyDiscount({
         onClose={() => {
           setOpenCheckStock(false);
         }}
-        headerTitle={'จำนวนที่ขอเบิกเกินจำนวนสินค้าในสต๊อก'}
+        headerTitle={'เบิกสินค้ามากกว่าที่มีในคลัง โปรดตรวจสอบ'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm
@@ -911,7 +926,7 @@ export default function ModalCreateToDestroyDiscount({
         onClose={() => handleCloseModalConfirmApprove(false)}
         onConfirm={() => handleCloseModalConfirmApprove(true)}
         barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันอนุมัติเบิกทำลายมีส่วนลด'}
+        headerTitle={'ยืนยันอนุมัติเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <ModelConfirm

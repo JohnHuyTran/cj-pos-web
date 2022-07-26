@@ -268,7 +268,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     let payload: ExpenseSaveRequest = {
       comment: comment,
       docNo: docNo,
-      today: moment(approveDate).startOf('day').toISOString(),
+      // today: moment(approveDate).startOf('day').toISOString(),
       attachFiles: attachFiles,
     };
     if ((status === STATUS.DRAFT || status === STATUS.SEND_BACK_EDIT) && fileUploadList && fileUploadList.length > 0) {
@@ -717,11 +717,11 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
 
   const validateDateIsBeforPeriod = () => {
     const date = new Date();
-    // if (date < new Date(period.endDate)) {
-    //   setOpenAlert(true);
-    //   setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
-    //   return false;
-    // }
+    if (date < new Date(period.endDate)) {
+      setOpenAlert(true);
+      setTextError('ยังไม่ถึงรอบทำการเบิก กรุณาตรวจสอบอีกครั้ง');
+      return false;
+    }
     return true;
   };
 

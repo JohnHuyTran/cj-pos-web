@@ -47,6 +47,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   const [isDisableSaveBtn, setIsDisableSaveBtn] = React.useState(true);
   const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
   const items = store.getState().expenseAccountDetailSlice.itemRows;
+  const _initialItems = useAppSelector((state) => state.expenseAccountDetailSlice.intialRows);
   const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
   const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
   const [enableSaveBtn, setEnableSaveBtn] = React.useState(false);
@@ -60,8 +61,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   const [flagEdit, setFlagEdit] = React.useState<boolean>(false);
   const handleStartDatePicker = (value: any) => {
     const selectDate = moment(new Date(value)).format('DD/MM/YYYY');
+    const itemCheck = items && items.length > 0 ? items : _initialItems;
     let isError = false;
-    items.forEach((e: any) => {
+    itemCheck.forEach((e: any) => {
       const arr = Object.entries(e);
       const _dateTime = arr.find((e: any) => e[0] === 'dateTime');
       const dateTime = _dateTime ? _dateTime[1] : null;
@@ -307,8 +309,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
       setIsErrorDate(false);
       setErrorDate('');
     }
-    if (isGroupBranch()) {
+    if (expenseData && isGroupBranch()) {
       setEnableSaveBtn(expenseData.status === STATUS.DRAFT || expenseData.status === STATUS.SEND_BACK_EDIT);
+    } else {
+      setEnableSaveBtn(true);
     }
   }, [open, edit, payload]);
 

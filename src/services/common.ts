@@ -11,6 +11,14 @@ export async function getAllProductByType(productTypeCode: string) {
   }
 }
 
+export async function getPercentages() {
+  try {
+    return await get(`${environment.master.percentages.url}`);
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function checkStockBalance(payload: CheckStockPayload) {
   try {
     const response = await post(`${env.backEnd.url}${environment.stock.stockBalanceCheck.url}`, payload);

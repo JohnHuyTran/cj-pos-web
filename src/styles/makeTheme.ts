@@ -688,6 +688,11 @@ const useStyles = makeStyles({
       borderRadius: '10px !important',
     },
   },
+  MSelected: {
+    '& .MuiSelect-select': {
+      textAlign: 'right !important',
+    }
+  },
   MtextFieldNumberNoneArrow: {
     '& .MuiInput-input': {
       '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {

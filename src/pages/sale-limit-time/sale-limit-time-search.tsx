@@ -50,7 +50,9 @@ const SaleLimitTimeSearch = () => {
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
   let checkAdmin = env.branch.channel === 'hq';
-  const isChannelCreate = userInfo.acl['service.posback-campaign'].includes('campaign.st.create');
+  const isChannelCreate = userInfo.acl['service.posback-campaign']
+    ? userInfo.acl['service.posback-campaign'].includes('campaign.st.create')
+    : false;
   const [payloadBranchesST, setPayloadBranchesST] = React.useState<any>(null);
   const [values, setValues] = React.useState<State>({
     query: '',
