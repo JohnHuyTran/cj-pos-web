@@ -11,18 +11,17 @@ import { useStyles } from '../../../styles/makeTheme';
 //component
 import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 
+const initialStateValues: any = {
+  date: new Date(),
+  cashOver: 0,
+  cashShort: 0,
+};
 interface Props {
   open: boolean;
   onClose: () => void;
   payloadCash: any;
   payloadEdit: (value: any) => void;
 }
-
-const initialStateValues: any = {
-  date: new Date(),
-  cashOver: 0,
-  cashShort: 0,
-};
 
 function ModalEditSearchList({ open, onClose, payloadCash, payloadEdit }: Props) {
   const classes = useStyles();
@@ -54,8 +53,8 @@ function ModalEditSearchList({ open, onClose, payloadCash, payloadEdit }: Props)
   useEffect(() => {
     setValues({
       date: new Date(),
-      cashOver: payloadCash ? payloadCash.cashOver.toString() : '0',
-      cashShort: payloadCash ? payloadCash.cashShort.toString() : '0',
+      cashOver: payloadCash ? payloadCash.cash2 : '0',
+      cashShort: payloadCash ? payloadCash.cash1 : '0',
     });
     setStartDate(new Date());
   }, [open]);
