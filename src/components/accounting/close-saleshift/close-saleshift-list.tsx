@@ -92,6 +92,10 @@ function CloseSaleShiftSearchList() {
       align: 'right',
       sortable: false,
       renderCell: (params) => {
+        const billAmount = params.getValue(params.id, 'billAmount');
+        const shiftAmount = params.value;
+        const isDiff = shiftAmount != billAmount;
+        const _status = params.getValue(params.id, 'status');
         return (
           <NumberFormat
             value={String(params.value)}
@@ -99,6 +103,7 @@ function CloseSaleShiftSearchList() {
             fixedDecimalScale
             thousandSeparator={true}
             decimalScale={2}
+            style={{ color: isDiff && _status === 'DRAFT' ? '#F54949' : '#000' }}
           />
         );
       },
@@ -112,6 +117,10 @@ function CloseSaleShiftSearchList() {
       align: 'right',
       sortable: false,
       renderCell: (params) => {
+        const shiftAmount = params.getValue(params.id, 'shiftAmount');
+        const billAmount = params.value;
+        const isDiff = shiftAmount != billAmount;
+        const _status = params.getValue(params.id, 'status');
         return (
           <NumberFormat
             value={String(params.value)}
@@ -119,6 +128,7 @@ function CloseSaleShiftSearchList() {
             fixedDecimalScale
             thousandSeparator={true}
             decimalScale={2}
+            style={{ color: isDiff && _status === 'DRAFT' ? '#F54949' : '#000' }}
           />
         );
       },
