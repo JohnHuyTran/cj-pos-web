@@ -18,6 +18,8 @@ import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
 import { DeleteForever, Edit } from '@mui/icons-material';
 import NumberFormat from 'react-number-format';
 
+import ModalEditSearchList from './modal-edit-search-list';
+
 interface loadingModalState {
   open: boolean;
 }
@@ -34,7 +36,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -90,7 +92,7 @@ const columns: GridColDef[] = [
             },
           }}
           fixedDecimalScale
-          type='text'
+          type="text"
         />
       );
     },
@@ -123,7 +125,7 @@ const columns: GridColDef[] = [
             },
           }}
           fixedDecimalScale
-          type='text'
+          type="text"
         />
       );
     },
@@ -140,7 +142,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size='small'
+            size="small"
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
@@ -148,7 +150,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size='small'
+            size="small"
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
@@ -164,7 +166,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => {
       return (
         <div>
-          <Edit fontSize='medium' sx={{ color: '#AEAEAE' }} />
+          <Edit fontSize="medium" sx={{ color: '#AEAEAE' }} />
         </div>
       );
     },
@@ -178,7 +180,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => {
       return (
         <div>
-          <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
+          <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
         </div>
       );
     },
@@ -258,6 +260,11 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
     return onSelectRows(rowSelectList ? rowSelectList : []);
   };
 
+  const [openModalEdit, setOpenModalEdit] = React.useState(false);
+  const [payloadCash, setPayloadCash] = React.useState({
+    cashOver: 0,
+    cashShort: 0,
+  });
   const [selectRowsDeleteList, setSelectRowsDeleteList] = React.useState<Array<any>>([]);
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
@@ -269,7 +276,16 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   };
 
   const handleEdit = async (data: any) => {
-    console.log('handleEdit:', JSON.stringify(data));
+    setOpenModalEdit(true);
+    setPayloadCash(data);
+  };
+
+  const resPayloadEdit = (value: any) => {
+    console.log('value payload edit: ', value);
+  };
+
+  const onCloseModalEdit = () => {
+    setOpenModalEdit(false);
   };
 
   const handleDelete = async (data: any) => {
@@ -279,7 +295,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <Box className={classes.MdataGridPaginationTop} sx={{ height: '25vh' }}>
           <DataGrid
             rows={rows}
@@ -295,6 +311,13 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
           />
         </Box>
       </Box>
+
+      <ModalEditSearchList
+        open={openModalEdit}
+        onClose={onCloseModalEdit}
+        payloadCash={payloadCash}
+        payloadEdit={resPayloadEdit}
+      />
 
       <LoadingModal open={openLoadingModal.open} />
     </div>
