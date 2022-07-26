@@ -30,6 +30,7 @@ import ProductMaster from './pages/stock/product-master';
 import TORawMasterial from './pages/transfer-out-raw-masterial/transfer-out-raw-masterial';
 import Expense from './pages/accounting/expense';
 import Reserves from './pages/settings/reserves';
+import CashStatement from './pages/accounting/cash-statement';
 import { featchMasterExpenseListAsync } from './store/slices/master/expense-list-slice';
 import { featchExpenseDetailAsync } from './store/slices/accounting/accounting-slice';
 import AuditPlan from './pages/check-stock/audit-plan';
@@ -116,6 +117,7 @@ export default function App2() {
           <Route path='/reserves' component={Reserves} />
           <Route path='/audit-plan' component={AuditPlan} />
           <Route path='/stock-count' component={StockCount} />
+          <Route path='/cash-statement' component={CashStatement} />
         </Switch>
       </Main>
     </Box>
