@@ -91,6 +91,7 @@ import searchBranchAccountingConfigSlice from './slices/accounting/accounting-se
 import saveExpenseSearchRequest from './slices/accounting/save-accounting-search-slice';
 import expensePeriodTypeSlice from './slices/accounting/accounting-period-type-slice';
 import saveExpenseConfigSearchRequest from './slices/accounting/save-accounting-search-config-slice';
+import closeSaleShiftSlice from './slices/accounting/close-saleshift-slice';
 
 import auditPlanDetailSlice from './slices/audit-plan-detail-slice';
 import auditPlanSearchSlice from './slices/audit-plan-search-slice';
@@ -189,6 +190,7 @@ const store = configureStore({
     saveExpenseConfigSearchRequest: saveExpenseConfigSearchRequest,
     auditPlanDetailSlice: auditPlanDetailSlice,
     auditPlanSearchSlice: auditPlanSearchSlice,
+    closeSaleShiftSlice: closeSaleShiftSlice,
   },
 });
 

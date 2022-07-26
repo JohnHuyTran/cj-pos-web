@@ -17,34 +17,15 @@ import { useStyles } from '../../styles/makeTheme';
 import SearchExpense from '../../components/accounting/expense/search-expense';
 import { useTranslation } from 'react-i18next';
 import { setInit } from '../../store/sessionStore';
+import CloseSaleShiftSearch from '../../components/accounting/close-saleshift/close-saleshift-search';
 
-export default function Expense() {
+export default function CloseSaleShift() {
   const { t } = useTranslation(['expense', 'common']);
-  const dispatch = useAppDispatch();
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
-  const [edit, setEdit] = React.useState(false);
-  const onClose = () => {
-    setOpen(false);
-  };
-
-  const onOpenNew = async () => {
-    setOpen(true);
-    setEdit(false);
-    setInit('N');
-    await dispatch(updateToInitialState());
-    await dispatch(updateSummaryRows([]));
-    await dispatch(updateItemRows([]));
-    await dispatch(initialItems([]));
-    await dispatch(addNewItem(null));
-    // await dispatch(updateSummaryRows([]));
-    // await dispatch(updateItemRows([]));
-  };
   return (
     <Container maxWidth='xl'>
       <TitleHeader title={t('title.closeSaleShift')} />
       <Box mt={3}>
-        <SearchExpense />
+        <CloseSaleShiftSearch />
       </Box>
     </Container>
   );

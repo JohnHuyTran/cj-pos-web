@@ -2,6 +2,7 @@ import { post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import {
   AccountAccountExpenses,
+  CloseSaleShiftRequest,
   ExpenseApprove3All,
   ExpenseApprove3ByDocNos,
   ExpenseConfigCreateRequest,
@@ -198,6 +199,15 @@ export async function expenseApprove3ByDocNos(payload: ExpenseApprove3ByDocNos) 
 
 export async function expenseApprove3All(payload: ExpenseApprove3All) {
   const response = await put(environment.branchAccounting.expense.approve3.byCriteria.url, payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function shiftClose(payload: CloseSaleShiftRequest) {
+  const response = await post(environment.branchAccounting.closeSaleShift.shiftClose.url, payload, ContentType.JSON)
     .then((result: any) => result)
     .catch((error) => {
       throw error;

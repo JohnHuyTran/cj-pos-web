@@ -106,6 +106,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuCreatePurchaseBranch, setDisableSubMenuCreatePurchaseBranch] = React.useState(true);
   const [disableSubMenuExpense, setDisableSubMenuExpense] = React.useState(true);
   const [disableSubMenuSettings, setDisableSubMenuSettings] = React.useState(true);
+  const [disableSubMenuCloseSaleShift, setDisableSubMenuCloseSaleShift] = React.useState(true);
 
   const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
   const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
@@ -148,6 +149,7 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableSubMenuSettings(isAllowSubMenuPermission(SUBMENU.EX_CONFIG));
 
     setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
+    setDisableSubMenuCloseSaleShift(isAllowSubMenuPermission(SUBMENU.EX_CLOSE_SALE_SHIFT));
   }, [navState]);
 
   const dispatch = useAppDispatch();
@@ -536,6 +538,22 @@ export default function Sidebar({}: Props): ReactElement {
                 onClick={() => handleListItemClick(15)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ค่าใช้จ่าย' />
+              </ListItemButton>
+            </Link>
+            <Link
+              to='/close-saleshift'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                display: disableSubMenuCloseSaleShift ? 'none' : '',
+              }}
+              id='subMenuCloseSaleShift'>
+              <ListItemButton
+                key='CloseSaleShift'
+                selected={selectedIndex === 16}
+                onClick={() => handleListItemClick(16)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='ปิดรหัสการขาย' />
               </ListItemButton>
             </Link>
           </List>

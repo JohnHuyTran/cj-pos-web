@@ -96,6 +96,7 @@ export enum SUBMENU {
   PR_CREATE_PURCHASE_BRANCH = 'purchasebranch.createPurchaseBranch',
   EX_EXPENSE = 'account.expense',
   EX_CONFIG = 'account.config',
+  EX_CLOSE_SALE_SHIFT = 'account.closeSaleShift',
 }
 
 export enum PERMISSION_GROUP {
@@ -113,6 +114,7 @@ export enum PERMISSION_GROUP {
   PCM = 'procurement',
   RTC = 'readyToClear',
   DATA = 'data',
+  IT_SUPPORT = 'itSupport',
 }
 
 export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
@@ -132,3 +134,4 @@ export const KEYCLOAK_GROUP_PCM = '/service.posback/pcm';
 export const KEYCLOAK_GROUP_RTC = '/service.posback/rtc';
 export const KEYCLOAK_GROUP_DATA = '/service.posback/data';
 export const KEYCLOAK_GROUP_ACCOUNTING_MANAGER = '/service.posback/account-manager';
+export const KEYCLOAK_IT_SUPPORT = '/service.posback/it-support';

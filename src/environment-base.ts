@@ -594,5 +594,13 @@ export const environment = {
         url: 'accounting/expense-config/{expenseNo}',
       },
     },
+    closeSaleShift: {
+      search: {
+        url: 'sale/shift-closes',
+      },
+      shiftClose: {
+        url: 'sale/shift-closes/end',
+      },
+    },
   },
 };
