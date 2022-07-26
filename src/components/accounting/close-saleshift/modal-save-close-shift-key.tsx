@@ -18,6 +18,9 @@ import {
 } from '@mui/x-data-grid';
 import { formatNumber } from 'utils/utils'
 
+// Call API
+import { updateConfirmShiftCloses } from 'services/accounting';
+
 interface ModalSaveCloseShiftKeyProps {
   open: boolean;
   payload: any;
@@ -36,32 +39,26 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
   
   // Set state data
   const [barcode, setBarcode] = useState('')
-  const [isVerifiedBarcode, setIsVerifiedBarcode] = useState<boolean>()
   const [isValidate, setIsValidate] = useState(false)
   const [isOpenLoading, setIsOpenLoading] = useState(false)
   
-  const handleSave = () => {
-    // setIsValidate(true)
-    setIsVerifiedBarcode(false)
-    
+  const handleSave = async () => {
     if (barcode) {
       setIsOpenLoading(true)
-      setTimeout(() => {
+      try {
+        const res = await updateConfirmShiftCloses(payload?.shiftCode, barcode)
+        console.log('dispatch', res)
+        handleClose()
+      } catch {
+        setIsValidate(true)
+      } finally {
         setIsOpenLoading(false)
-        // setIsValidate(false)
-        
-        if (isVerifiedBarcode) {
-          console.log('save')
-          setBarcode('')
-          onClose()
-        }
-      }, 500)
+      }
     }
   }
 
   const handleClose = () => {
-    setIsOpenLoading(false)
-    setIsVerifiedBarcode(false)
+    setIsValidate(false)
     setBarcode('')
     onClose()
   }
@@ -93,14 +90,14 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
               <TextField
                 name="accountNameTh"
                 size="small"
-                error={isVerifiedBarcode === false}
+                error={isValidate}
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
                 className={classes.MtextField}
                 sx={{mt: 1}}
                 fullWidth
               />
-              {isVerifiedBarcode === false && (
+              {isValidate && (
                 <Typography component='div' color='error' sx={{mt: 1}}>ข้อมูลรหัสปิดรอบไม่ถูกต้อง</Typography>
               )}
             </Box>
