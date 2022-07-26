@@ -107,6 +107,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuExpense, setDisableSubMenuExpense] = React.useState(true);
   const [disableSubMenuSettings, setDisableSubMenuSettings] = React.useState(true);
   const [disableSubMenuCloseSaleShift, setDisableSubMenuCloseSaleShift] = React.useState(true);
+  const [disableSubMenuCashStatement, setDisableSubMenuCashStatement] = React.useState(true);
 
   const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
   const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
@@ -147,6 +148,7 @@ export default function Sidebar({}: Props): ReactElement {
 
     setDisableSubMenuExpense(isAllowSubMenuPermission(SUBMENU.EX_EXPENSE));
     setDisableSubMenuSettings(isAllowSubMenuPermission(SUBMENU.EX_CONFIG));
+    setDisableSubMenuCashStatement(isAllowSubMenuPermission(SUBMENU.CASH_STATEMENT));
 
     setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
     setDisableSubMenuCloseSaleShift(isAllowSubMenuPermission(SUBMENU.EX_CLOSE_SALE_SHIFT));
@@ -541,6 +543,22 @@ export default function Sidebar({}: Props): ReactElement {
               </ListItemButton>
             </Link>
             <Link
+              to='/cash-statement'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                display: disableSubMenuCashStatement ? 'none' : '',
+              }}
+              id='subMenuCashStatement'>
+              <ListItemButton
+                key='CashStatement'
+                selected={selectedIndex === 16}
+                onClick={() => handleListItemClick(16)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='เงินฝากขาด - เกิน' />
+              </ListItemButton>
+            </Link>
+            <Link
               to='/close-saleshift'
               style={{
                 textDecoration: 'none',
@@ -580,8 +598,8 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuSettings'>
               <ListItemButton
                 key='Settings'
-                selected={selectedIndex === 16}
-                onClick={() => handleListItemClick(16)}
+                selected={selectedIndex === 17}
+                onClick={() => handleListItemClick(17)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ค่าใช้จ่ายสำรอง' />
               </ListItemButton>
@@ -611,8 +629,8 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuAuditPlan'>
               <ListItemButton
                 key='AuditPlan'
-                selected={selectedIndex === 15}
-                onClick={() => handleListItemClick(15)}
+                selected={selectedIndex === 18}
+                onClick={() => handleListItemClick(18)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='สร้างแผนตรวจนับสต๊อก' />
               </ListItemButton>
@@ -626,8 +644,8 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuStockCount'>
               <ListItemButton
                 key='StockCount'
-                selected={selectedIndex === 16}
-                onClick={() => handleListItemClick(16)}
+                selected={selectedIndex === 19}
+                onClick={() => handleListItemClick(19)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ตรวจนับสต๊อก (SC)' />
               </ListItemButton>

@@ -156,9 +156,14 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   if (Object.keys(payloadAddItem).length !== 0) {
+    console.log('--> draft payloadAddItem:', JSON.stringify(payloadAddItem));
     rows = payloadAddItem.map((item: any, index: number) => {
       let qty = item.qty ? item.qty : 1;
       if (item.qty > item.stockMax) qty = item.stockMax;
+
+      console.log('--> draft item.stockMax:', item.stockMax);
+      console.log('--> draft qty:', qty);
+
       return {
         id: index,
         index: index + 1,
@@ -180,6 +185,7 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
         await rows.forEach((data: GridRowData) => {
+          console.log('--> draft handleEditItems data :', JSON.stringify(data));
           itemsList.push(data);
         });
 
@@ -223,7 +229,7 @@ function PurchaseBranchListItem({ onChangeItems }: DataGridProps) {
           rowHeight={65}
           onCellClick={currentlySelected}
           onCellFocusOut={handleEditItems}
-          onCellOut={handleEditItems}
+          // onCellOut={handleEditItems}
           onCellKeyDown={handleEditItems}
         />
       </div>
