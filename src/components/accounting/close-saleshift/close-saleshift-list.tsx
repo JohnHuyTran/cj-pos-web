@@ -60,10 +60,8 @@ function CloseSaleShiftSearchList() {
     },
     {
       field: 'shiftCode',
-
       headerName: 'เลขรหัสรอบขาย',
       minWidth: 145,
-
       headerAlign: 'center',
       sortable: false,
     },
@@ -71,7 +69,7 @@ function CloseSaleShiftSearchList() {
       field: 'statusDisplay',
 
       headerName: 'สถานะ',
-      width: 70,
+      width: 100,
       headerAlign: 'center',
       sortable: false,
       align: 'center',
@@ -153,7 +151,7 @@ function CloseSaleShiftSearchList() {
     {
       field: 'shiftKey',
       headerName: 'รหัสปิดรอบ',
-      width: 100,
+      width: 120,
       headerAlign: 'center',
       align: 'center',
       sortable: false,
@@ -164,6 +162,7 @@ function CloseSaleShiftSearchList() {
       width: 120,
       align: 'right',
       sortable: false,
+      headerAlign: 'center',
     },
     {
       field: 'noOfReturnBill',
@@ -171,13 +170,15 @@ function CloseSaleShiftSearchList() {
       width: 120,
       align: 'right',
       sortable: false,
+      headerAlign: 'center',
     },
     {
       field: 'shiftDate',
       headerName: 'วันที่บันทึก',
       width: 150,
-      align: 'left',
+      align: 'center',
       sortable: false,
+      headerAlign: 'center',
     },
   ];
 
@@ -213,11 +214,11 @@ function CloseSaleShiftSearchList() {
     handleOpenLoading('open', false);
   };
   const currentlySelected = async (params: GridCellParams) => {
-    handleOpenLoading('open', true);
     const shiftAmount = params.row.shiftAmount;
     const billAmount = params.row.billAmount;
     const status = params.row.status;
     if (shiftAmount === billAmount && status === STATUS.DRAFT) {
+      handleOpenLoading('open', true);
       const payload: CloseSaleShiftInfo = {
         branchCode: params.row.branchCode,
         shiftCode: params.row.shiftCode,
@@ -235,6 +236,7 @@ function CloseSaleShiftSearchList() {
       setPayloadCloseShiftKey(payload);
       handleOpenLoading('open', false);
       setOpenPopupCloseShiftKey(true);
+      console.log(payload);
     }
   };
   let rows: any = items.data.map((item: CloseSaleShiftInfo, index: number) => {
