@@ -69,8 +69,20 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
     setValues({ ...values, [event.target.name]: value });
   };
 
+  const handleChangType = (event: any) => {
+    const value = event.target.value;
+    if (value === 'OTHER') {
+      setValues({ ...values, type: value });
+    } else if (value !== 'OTHER') {
+      setValues({ ...values, type: value, typeOther: [] });
+    }
+  };
+
   const handleChangeMultiType = (event: any) => {
     const value = event.target.value;
+    if (values.type !== 'OTHER') {
+      alert('test');
+    }
     setValues({ ...values, typeOther: value === 'string' ? value.split(',') : value });
   };
 
@@ -268,7 +280,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   name="type"
                   disabled={isStatus === 'Update'}
                   value={values.type}
-                  onChange={handleChange}
+                  onChange={handleChangType}
                   displayEmpty
                   renderValue={
                     values.type.length !== 0 ? undefined : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือก</div>
