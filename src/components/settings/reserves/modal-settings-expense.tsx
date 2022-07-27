@@ -94,6 +94,11 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
     }
   };
 
+  const handleValidatRegEx = (e: any) => {
+    const reg = e.target.value.replace(/[^-()A-Za-z0-9_ก-๏]/g, '');
+    setValues({ ...values, accountNameTh: reg });
+  };
+
   const handleChangeApprovalLimit = (event: any) => {
     const value = event.target.value;
     const removeCommar = value.replace(/\,/g, '');
@@ -372,12 +377,15 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   name="accountNameTh"
                   size="small"
                   value={values.accountNameTh}
-                  onChange={handleChange}
+                  onChange={handleValidatRegEx}
                   className={classes.MtextField}
                   fullWidth
                   inputProps={{ maxLength: 50 }}
+                  autoComplete="off"
                 />
-                <FormHelperText sx={{ textAlign: 'right' }}>{values.accountNameTh.length}/50</FormHelperText>
+                <FormHelperText sx={{ textAlign: 'right' }}>
+                  [ก-ฮ ,A-Z,a-z,0-9,(),-,_] {values.accountNameTh.length}/50
+                </FormHelperText>
               </FormControl>
             </Grid>
 
