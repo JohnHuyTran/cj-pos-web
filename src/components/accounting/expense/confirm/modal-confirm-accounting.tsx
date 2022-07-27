@@ -72,11 +72,6 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
       const columns: GridColDef[] = payload.map((i: any) => {
         const hideColumn = i.isOtherExpense ? i.isOtherExpense : false;
 
-        const frontColor = (value: any) => {
-          const _value = stringNullOrEmpty(value) ? '' : value.toString();
-          return _value.includes('+') ? '#446EF2' : _value.includes('-') ? '#F54949' : '#000';
-        };
-
         if (String(i.key) === 'diff') {
           return {
             field: i.key,
@@ -95,8 +90,11 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
             //   }
             //   return numberWithCommas(params.value);
             // },
-
             renderCell: (params: GridRenderCellParams) => {
+              let _diff = String(params.value);
+              if (Number(params.value) > 0) _diff = `+${_diff}`;
+              const frontColor = _diff.includes('+') ? '#446EF2' : _diff.includes('-') ? '#F54949' : '#000';
+
               return (
                 <NumberFormat
                   value={String(params.value)}
@@ -107,7 +105,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
                   customInput={TextField}
                   sx={{
                     '.MuiInputBase-input.Mui-disabled': {
-                      WebkitTextFillColor: frontColor(params.value),
+                      WebkitTextFillColor: frontColor,
                       // color: color,
                     },
                     '.MuiOutlinedInput-notchedOutline': {

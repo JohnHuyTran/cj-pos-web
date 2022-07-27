@@ -18,10 +18,17 @@ import {
 } from '@mui/x-data-grid';
 import { formatNumber } from 'utils/utils'
 
+// Call API
+import { updateConfirmShiftCloses } from 'services/accounting';
+
 interface ModalSaveCloseShiftKeyProps {
   open: boolean;
   payload: any;
   onClose: () => void;
+}
+
+interface TableSaveCloseShiftKeyProps {
+  rowData: any
 }
 
 export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProps): ReactElement {
@@ -32,32 +39,26 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
   
   // Set state data
   const [barcode, setBarcode] = useState('')
-  const [isVerifiedBarcode, setIsVerifiedBarcode] = useState<boolean>()
   const [isValidate, setIsValidate] = useState(false)
   const [isOpenLoading, setIsOpenLoading] = useState(false)
   
-  const handleSave = () => {
-    // setIsValidate(true)
-    setIsVerifiedBarcode(false)
-    
+  const handleSave = async () => {
     if (barcode) {
       setIsOpenLoading(true)
-      setTimeout(() => {
+      try {
+        const res = await updateConfirmShiftCloses(payload?.shiftCode, {shiftKey: barcode})
+        console.log('dispatch', res)
+        handleClose()
+      } catch {
+        setIsValidate(true)
+      } finally {
         setIsOpenLoading(false)
-        // setIsValidate(false)
-        
-        if (isVerifiedBarcode) {
-          console.log('save')
-          setBarcode('')
-          onClose()
-        }
-      }, 500)
+      }
     }
   }
 
   const handleClose = () => {
-    setIsOpenLoading(false)
-    setIsVerifiedBarcode(false)
+    setIsValidate(false)
     setBarcode('')
     onClose()
   }
@@ -79,9 +80,9 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
             </IconButton>
           </DialogContent>
 
-          <TableSaveCloseShiftKey />
+          <TableSaveCloseShiftKey rowData={payload} />
 
-          <DialogActions sx={{ justifyContent: 'center'}}>
+          <DialogActions sx={{ justifyContent: 'center', marginTop: '15px'}}>
             <Box sx={{ textAlign: 'center',mr: '30px', maxWidth: '450px'}}>
               <Typography component='span' color='primary'>
                 กรุณาสแกน Barcode เพื่อเพิ่มรหัสปิดรอบ
@@ -89,14 +90,14 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
               <TextField
                 name="accountNameTh"
                 size="small"
-                error={isVerifiedBarcode === false}
+                error={isValidate}
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
                 className={classes.MtextField}
                 sx={{mt: 1}}
                 fullWidth
               />
-              {isVerifiedBarcode === false && (
+              {isValidate && (
                 <Typography component='div' color='error' sx={{mt: 1}}>ข้อมูลรหัสปิดรอบไม่ถูกต้อง</Typography>
               )}
             </Box>
@@ -122,11 +123,15 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
   )
 }
 
-const TableSaveCloseShiftKey = () => {
+const TableSaveCloseShiftKey = (props: TableSaveCloseShiftKeyProps) => {
+  // Props
+  const { rowData } = props
+  // Custom style
   const classes = useStyles();
+  // Variable
   const columns: GridColDef[] = [
     {
-      field: 'userName',
+      field: 'posUser',
       headerName: 'รหัสพนักงาน',
       minWidth: 120,
       headerAlign: 'center',
@@ -134,7 +139,7 @@ const TableSaveCloseShiftKey = () => {
       sortable: false,
     },
     {
-      field: 'posName',
+      field: 'posCode',
       headerName: 'เครื่องขาย',
       minWidth: 120,
       headerAlign: 'center',
@@ -150,7 +155,7 @@ const TableSaveCloseShiftKey = () => {
       sortable: false,
     },
     {
-      field: 'sellAmountSum',
+      field: 'shiftAmount',
       headerName: 'ยอดขายปิดรอบ',
       minWidth: 130,
       headerAlign: 'center',
@@ -163,7 +168,7 @@ const TableSaveCloseShiftKey = () => {
       ),
     },
     {
-      field: 'approvalLimit2',
+      field: 'billAmount',
       headerName: 'ยอดขายในบิลขาย',
       minWidth: 140,
       headerAlign: 'center',
@@ -177,36 +182,30 @@ const TableSaveCloseShiftKey = () => {
     }
   ]
 
-  const row = [{
+  const rows = [{
     id: 1,
-    userName: 'CJG2203322',
-    posName: '001',
-    shiftCode: '20220620001-001',
-    sellAmountSum: 0,
-    approvalLimit2: 0
+    posUser: rowData?.posUser || '-',
+    posCode: rowData?.posCode || '-',
+    shiftCode: rowData?.shiftCode || '-',
+    shiftAmount: rowData?.shiftAmount || 0,
+    billAmount: rowData?.billAmount|| 0
   }]
-
+  
   return(
-    <Box
-      style={{
-        width: '75%',
-        margin: 'auto',
-        textAlign: 'center'
-      }}
-      className={classes.MdataGridNoPagination}
+    <Box className={classes.MdataGridNoPagination}
+      style={{ width: '75%', margin: 'auto', textAlign: 'center' }}
     >
       <Typography component='div' sx={{ mt:1, mb:2, fontWeight: 600 }}>
         บันทึกรหัสปิดรอบ
       </Typography>
       <DataGrid
-        rows={row}
+        rows={rows}
         columns={columns}
         autoHeight={true}
         scrollbarSize={10}
         rowHeight={65}
         disableColumnMenu
         hideFooter
-
       />
     </Box>
   )

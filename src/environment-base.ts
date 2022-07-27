@@ -601,6 +601,9 @@ export const environment = {
       shiftClose: {
         url: 'sale/shift-closes/end',
       },
+      updateConfirmShiftCloses: {
+        url: 'sale/shift-closes/confirm/{shiftCode}'
+      }
     },
   },
 };
