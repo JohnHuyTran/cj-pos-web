@@ -16,6 +16,7 @@ import { useStyles } from '../../../styles/makeTheme';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { STATUS } from '../../../utils/enum/accounting-enum';
 import LoadingModal from '../../commons/ui/loading-modal';
+import ModalSaveCloseShiftKey from './modal-save-close-shift-key';
 
 function CloseSaleShiftSearchList() {
   const classes = useStyles();
@@ -272,6 +273,7 @@ function CloseSaleShiftSearchList() {
       setPayloadCloseShiftKey(payload);
       handleOpenLoading('open', false);
       setOpenPopupCloseShiftKey(true);
+      console.log(payload);
     }
   };
   let rows: any = items.data.map((item: CloseSaleShiftInfo, index: number) => {
@@ -312,6 +314,11 @@ function CloseSaleShiftSearchList() {
         rowHeight={65}
       />
       <LoadingModal open={openLoadingModal.open} />
+      <ModalSaveCloseShiftKey
+        open={openPopupCloseShiftKey}
+        payload={payloadCloseShiftKey}
+        onClose={() => setOpenPopupCloseShiftKey(false)}
+      />
     </div>
   );
 }

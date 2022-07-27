@@ -72,6 +72,8 @@ export enum ACTIONS {
   ACCOUNTING_CS_EXPORT = 'account.cs.export',
   ACCOUNTING_CS_MANAGE = 'account.cs.manage',
   ACCOUNTING_CS_VIEW = 'account.cs.view',
+  SALE_SHIFT_VIEW = 'sale.shift.view',
+  SALE_SHIFT_MANAGE = 'sale.shift.manage',
 }
 
 export enum MAINMENU {
@@ -82,7 +84,7 @@ export enum MAINMENU {
   PRODUCT_INFO = 'productInfo',
   PURCHASE_BRANCH = 'purchaseBranch',
   EXPENSE = 'expense',
-  EXPENSE_CONFIG = 'expenseConfig',
+  APP_CONFIG = 'appConfig',
 }
 
 export enum SUBMENU {

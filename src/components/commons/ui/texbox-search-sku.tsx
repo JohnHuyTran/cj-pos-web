@@ -116,10 +116,11 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
         }}
         disabled={disabled}
         placeholder="รหัสสินค้า"
-        className={classes.MtextField}
+        className={classes.MtextFieldAutoComplete}
         variant="outlined"
         size="small"
         fullWidth
+        multiline
       />
     );
   };
@@ -137,8 +138,7 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
       renderOption={autocompleteRenderListItem}
       onChange={handleChangeItem}
       onInputChange={onInputChange}
-      //   defaultValue={skuCode}
-      getOptionLabel={(option) => (option.skuCode ? option.skuCode : '')}
+      getOptionLabel={(option) => (option.skuCode ? `${option.productNamePrime}  ${option.skuCode}` : '')}
       isOptionEqualToValue={(option, value) => option.skuCode === value.skuCode}
       renderInput={autocompleteRenderInput}
       size="small"

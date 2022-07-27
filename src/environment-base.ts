@@ -422,18 +422,18 @@ export const environment = {
     },
     stockCount: {
       search: {
-        url: '/stock/stock-count'
+        url: '/stock/stock-count',
       },
       detail: {
-        url: '/stock/stock-count'
+        url: '/stock/stock-count',
       },
       confirm: {
-        url: '/stock/stock-count/confirm'
+        url: '/stock/stock-count/confirm',
       },
       cancel: {
-        url: '/stock/stock-count/{id}'
+        url: '/stock/stock-count/{id}',
       },
-    }
+    },
   },
   master: {
     branch: {
@@ -557,10 +557,10 @@ export const environment = {
       },
       approve3: {
         byNo: {
-          url: '/expense/approve3-by-no',
+          url: 'accounting/expense/approve3-by-no',
         },
         byCriteria: {
-          url: '/expense/approve3-by-criteria',
+          url: 'accounting/expense/approve3-by-criteria',
         },
       },
       reject: {
@@ -602,8 +602,8 @@ export const environment = {
         url: 'sale/shift-closes/end',
       },
       updateConfirmShiftCloses: {
-        url: 'sale/shift-closes/confirm/{shiftCode}'
-      }
+        url: 'sale/shift-closes/confirm/{shiftCode}',
+      },
     },
   },
 };
