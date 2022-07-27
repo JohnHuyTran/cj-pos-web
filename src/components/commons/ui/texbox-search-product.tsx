@@ -6,6 +6,8 @@ import { useStyles } from '../../../styles/makeTheme';
 import SearchIcon from '@mui/icons-material/Search';
 import { FindProductProps, FindProductRequest } from '../../../models/product-model';
 import _ from 'lodash';
+import { savePayloadSearchList } from 'store/slices/tax-invoice-search-list-slice';
+import { getAllProductByBarcode } from 'services/product-master';
 
 interface Props {
   // skuType?: any[];
@@ -20,10 +22,11 @@ function TextBoxSearchProduct({ onSelectItem, isClear, requestBody }: Props) {
   const [value, setValue] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [searchItem, setSearchItem] = React.useState<any | null>(null);
-  const itemsList = useAppSelector((state) => state.searchTypeAndProduct.itemList);
+  // const itemsList = useAppSelector((state) => state.searchTypeAndProduct.itemList);
+  const [itemsList, setItemList] = React.useState([]);
   const searchDebouceRef = useRef<any>();
   let options: any = [];
-  if (searchItem) options = itemsList && itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
+  if (searchItem) options = itemsList && itemsList.length > 0 ? itemsList : [];
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.barcodeName + option.barcode,
   });
@@ -89,9 +92,20 @@ function TextBoxSearchProduct({ onSelectItem, isClear, requestBody }: Props) {
           search: keyword,
           payload: requestBody,
         };
-        await dispatch(newSearchAllProductAsync(payload));
-
-        setLoading(false);
+        try {
+          const rs = await getAllProductByBarcode(payload);
+          if (rs) {
+            if (rs.data.length === 1) {
+              handleChangeItem('', rs.data[0], '');
+              setItemList([]);
+            } else {
+              setItemList(rs.data);
+            }
+          }
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
+        }
       } else {
         clearData();
       }
