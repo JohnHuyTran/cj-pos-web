@@ -68,9 +68,9 @@ function ModalEditSearchList({ open, onClose, payloadCash }: Props) {
 
   const handleSaveBtn = async () => {
     setOpenLoadingModal(true);
-    const isValidateCashXX = validateCash();
+    const isValidateCashValue = validateCash();
 
-    if (isValidateCashXX) {
+    if (isValidateCashValue) {
       setIsValidateCash(true);
 
       const payloadSave: any = {
@@ -93,17 +93,13 @@ function ModalEditSearchList({ open, onClose, payloadCash }: Props) {
         .catch((error: ApiError) => {
           setOpenAlert(true);
           setTextError(error.message);
+          setMsgError('');
         })
         .finally(() => setOpenLoadingModal(false));
     } else {
+      setOpenLoadingModal(false);
       setIsValidateCash(false);
     }
-  };
-
-  const handleOnclose = () => {
-    setMsgError('');
-    setIsValidateCash(true);
-    onClose();
   };
 
   const handleCloseSnackBar = () => {
@@ -121,12 +117,14 @@ function ModalEditSearchList({ open, onClose, payloadCash }: Props) {
       cashShort: payloadCash ? payloadCash.cash1 : '0',
     });
     setStartDate(new Date());
+    setMsgError('');
+    setIsValidateCash(true);
   }, [open]);
 
   return (
     <Fragment>
       <Dialog open={open} maxWidth="sm" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleOnclose}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={onClose}>
           <Typography variant="h6">แก้ไขข้อมูล</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
