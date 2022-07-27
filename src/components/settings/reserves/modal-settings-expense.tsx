@@ -19,6 +19,7 @@ import { LoadingButton } from '@mui/lab';
 import { Save } from '@mui/icons-material';
 import { useStyles } from 'styles/makeTheme';
 import { expenseTypesSetting, getExpenseTypesSetting } from 'utils/enum/setting-reserve-expense-enum';
+import NumberFormat from 'react-number-format';
 
 //Components
 import TexboxSearchSku from 'components/commons/ui/texbox-search-sku';
@@ -42,8 +43,8 @@ const initialStateForm: any = {
   accountNameTh: '',
   accountCode: '',
   requiredDocumentTh: '',
-  approvalLimit1: '',
-  approvalLimit2: '',
+  approvalLimit1: 0,
+  approvalLimit2: 0,
 };
 interface Props {
   isOpen: boolean;
@@ -91,6 +92,12 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
     } else {
       setValues({ ...values, skuCode: '' });
     }
+  };
+
+  const handleChangeApprovalLimit = (event: any) => {
+    const value = event.target.value;
+    const removeCommar = value.replace(/\,/g, '');
+    setValues({ ...values, [event.target.name]: removeCommar });
   };
 
   const validateForm = () => {
@@ -415,7 +422,19 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <TextField
+              <NumberFormat
+                name="approvalLimit1"
+                value={String(values.approvalLimit1)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                customInput={TextField}
+                onChange={handleChangeApprovalLimit}
+                fullWidth
+                fixedDecimalScale
+                type="text"
+              />
+              {/* <TextField
                 //   id="txt"
                 name="approvalLimit1"
                 size="small"
@@ -425,7 +444,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                 className={classes.MtextField}
                 fullWidth
                 placeholder="0.00"
-              />
+              /> */}
             </Grid>
             <Grid item xs={2}>
               <Typography variant="body2">
@@ -433,15 +452,17 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <TextField
+              <NumberFormat
                 name="approvalLimit2"
-                size="small"
-                type="number"
-                value={values.approvalLimit2}
-                onChange={handleChange}
-                className={classes.MtextField}
+                value={String(values.approvalLimit2)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                customInput={TextField}
+                onChange={handleChangeApprovalLimit}
                 fullWidth
-                placeholder="0.00"
+                fixedDecimalScale
+                type="text"
               />
             </Grid>
           </Grid>
