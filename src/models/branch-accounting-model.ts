@@ -356,3 +356,10 @@ export interface ExternalIncomeItemInfo {
   amount: number;
   noItem: boolean;
 }
+
+export interface CashStatementEditRequest {
+  id: string;
+  cashDate: string;
+  cashOver: number;
+  cashShort: number;
+}

@@ -8,8 +8,15 @@ import NumberFormat from 'react-number-format';
 //css
 import { useStyles } from '../../../styles/makeTheme';
 
+//modal
+import { ApiError } from '../../../models/api-error-model';
+
 //component
 import DatePickerAllComponent from '../../commons/ui/date-picker-all';
+import { cashStatementEdit } from '../../../services/accounting';
+import SnackbarStatus from '../../commons/ui/snackbar-status';
+import AlertError from '../../commons/ui/alert-error';
+import LoadingModal from '../../commons/ui/loading-modal';
 
 const initialStateValues: any = {
   date: new Date(),
@@ -20,15 +27,22 @@ interface Props {
   open: boolean;
   onClose: () => void;
   payloadCash: any;
-  payloadEdit: (value: any) => void;
 }
 
-function ModalEditSearchList({ open, onClose, payloadCash, payloadEdit }: Props) {
+function ModalEditSearchList({ open, onClose, payloadCash }: Props) {
   const classes = useStyles();
 
   const date = new Date();
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [values, setValues] = useState(initialStateValues);
+  const [isValidateCash, setIsValidateCash] = useState(true);
+  const [msgError, setMsgError] = useState('');
+  const [showSnackBar, setShowSnackBar] = useState(false);
+  const [snackBarMsg, setSnackBarMsg] = useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [textError, setTextError] = useState('');
+  const [openLoadingModal, setOpenLoadingModal] = useState(false);
 
   const handleDatePicker = (value: any) => {
     setStartDate(value);
@@ -40,14 +54,64 @@ function ModalEditSearchList({ open, onClose, payloadCash, payloadEdit }: Props)
     setValues({ ...values, [event.target.name]: removeCommar });
   };
 
-  const handleSaveBtn = () => {
-    const payloadSave: any = {
-      date: moment(startDate).startOf('day').toISOString(),
-      cashOver: Number(values.cashOver),
-      cashShort: Number(values.cashShort),
-    };
-    payloadEdit(payloadSave);
+  const validateCash = () => {
+    const cashOver = Number(values.cashOver);
+    const cashShort = Number(values.cashShort);
+    if (cashOver === 0 && cashShort === 0) {
+      setMsgError('กรอกจำนวนเงินไม่ถูกต้อง');
+    } else if (cashOver > 0 && cashShort > 0) {
+      setMsgError('จำนวนเงินต้องมี เงินขาดหรือเงินเกิน เท่านั้น');
+    } else {
+      return true;
+    }
+  };
+
+  const handleSaveBtn = async () => {
+    setOpenLoadingModal(true);
+    const isValidateCashXX = validateCash();
+
+    if (isValidateCashXX) {
+      setIsValidateCash(true);
+
+      const payloadSave: any = {
+        id: payloadCash.id,
+        cashDate: moment(startDate).startOf('day').toISOString(),
+        cashOver: Number(values.cashOver),
+        cashShort: Number(values.cashShort),
+      };
+
+      cashStatementEdit(payloadSave)
+        .then((value) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setSnackBarMsg('บันทึก เรียบร้อยแล้ว');
+
+          setTimeout(() => {
+            onClose();
+          }, 500);
+        })
+        .catch((error: ApiError) => {
+          setOpenAlert(true);
+          setTextError(error.message);
+        })
+        .finally(() => setOpenLoadingModal(false));
+    } else {
+      setIsValidateCash(false);
+    }
+  };
+
+  const handleOnclose = () => {
+    setMsgError('');
+    setIsValidateCash(true);
     onClose();
+  };
+
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
   };
 
   useEffect(() => {
@@ -62,7 +126,7 @@ function ModalEditSearchList({ open, onClose, payloadCash, payloadEdit }: Props)
   return (
     <Fragment>
       <Dialog open={open} maxWidth="sm" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={onClose}>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleOnclose}>
           <Typography variant="h6">แก้ไขข้อมูล</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
@@ -94,6 +158,16 @@ function ModalEditSearchList({ open, onClose, payloadCash, payloadEdit }: Props)
                 fullWidth
                 fixedDecimalScale
                 type="text"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: `${!isValidateCash ? '#F54949' : '#000000'}`,
+                    },
+                    '&:hover fieldset': {
+                      borderColor: `${!isValidateCash ? '#F54949' : '#000000'}`,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={5} textAlign="right">
@@ -111,11 +185,26 @@ function ModalEditSearchList({ open, onClose, payloadCash, payloadEdit }: Props)
                 fullWidth
                 fixedDecimalScale
                 type="text"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: `${!isValidateCash ? '#F54949' : '#000000'}`,
+                    },
+                    '&:hover fieldset': {
+                      borderColor: `${!isValidateCash ? '#F54949' : '#000000'}`,
+                    },
+                  },
+                }}
               />
+            </Grid>
+            <Grid item xs={12} textAlign="center">
+              <Typography variant="body1" color="error">
+                {msgError ? msgError : ''}
+              </Typography>
             </Grid>
           </Grid>
 
-          <DialogActions sx={{ justifyContent: 'center', mt: 4 }}>
+          <DialogActions sx={{ justifyContent: 'center', mt: 2 }}>
             <Button
               data-testid="testid-btnEdit"
               id="btnEdit"
@@ -130,6 +219,15 @@ function ModalEditSearchList({ open, onClose, payloadCash, payloadEdit }: Props)
           </DialogActions>
         </DialogContent>
       </Dialog>
+
+      <LoadingModal open={openLoadingModal} />
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={snackBarMsg}
+      />
     </Fragment>
   );
 }

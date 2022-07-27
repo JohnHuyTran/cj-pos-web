@@ -2,6 +2,7 @@ import { post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import {
   AccountAccountExpenses,
+  CashStatementEditRequest,
   CloseSaleShiftRequest,
   ExpenseApprove3All,
   ExpenseApprove3ByDocNos,
@@ -228,6 +229,15 @@ export async function updateConfirmShiftCloses(shiftCode: string, payload: any) 
     payload,
     ContentType.JSON
   )
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function cashStatementEdit(payload: CashStatementEditRequest) {
+  const response = await post(environment.branchAccounting.cashStatement.edit.url, payload, ContentType.JSON)
     .then((result: any) => result)
     .catch((error) => {
       throw error;

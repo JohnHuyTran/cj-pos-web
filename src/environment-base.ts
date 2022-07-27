@@ -605,5 +605,10 @@ export const environment = {
         url: 'sale/shift-closes/confirm/{shiftCode}',
       },
     },
+    cashStatement: {
+      edit: {
+        url: 'accounting/cash-statement/edit',
+      },
+    },
   },
 };
