@@ -12,7 +12,6 @@ type State = {
   closeSaleShift: CloseSaleShiftResponse;
   error: '';
   payloadSearch: CloseSaleShiftRequest;
-  externalIncomeItems: ExternalIncomeItemInfo[];
 };
 
 const initialState: State = {
@@ -37,7 +36,6 @@ const initialState: State = {
     page: 0,
     limit: 0,
   },
-  externalIncomeItems: [],
 };
 
 export const featchCloseSaleShiptListAsync = createAsyncThunk(
@@ -45,9 +43,12 @@ export const featchCloseSaleShiptListAsync = createAsyncThunk(
   async (payload: CloseSaleShiftRequest) => {
     try {
       const apiRootPath = environment.branchAccounting.closeSaleShift.search.url;
-      let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}&branchCode=${payload.branchCode}&shiftDate=${payload.shiftDate}`;
+      let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}&shiftDate=${payload.shiftDate}`;
       if (payload.status !== 'ALL') {
         path += `&status=${payload.status}`;
+      }
+      if (payload.branchCode != '') {
+        path += `&branchCode=${payload.branchCode}`;
       }
 
       return await get(path).then();
@@ -63,13 +64,10 @@ const closeSaleShiftSlice = createSlice({
   initialState,
   reducers: {
     clearCloseSaleShiftList: (state, action: PayloadAction<any>) => {
-      state.closeSaleShift = action.payload;
+      initialState;
     },
     savePayloadSearch: (state, action: PayloadAction<any>) => {
       state.payloadSearch = action.payload;
-    },
-    addExternalIncomeItems: (state, action: PayloadAction<any>) => {
-      state.externalIncomeItems = action.payload;
     },
   },
   extraReducers: (builer) => {
@@ -84,5 +82,5 @@ const closeSaleShiftSlice = createSlice({
       });
   },
 });
-export const { clearCloseSaleShiftList, savePayloadSearch, addExternalIncomeItems } = closeSaleShiftSlice.actions;
+export const { clearCloseSaleShiftList, savePayloadSearch } = closeSaleShiftSlice.actions;
 export default closeSaleShiftSlice.reducer;

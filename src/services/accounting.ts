@@ -214,3 +214,20 @@ export async function shiftClose(payload: CloseSaleShiftRequest) {
     });
   return response;
 }
+
+export async function updateConfirmShiftCloses(shiftCode: string, payload: any) {
+  const getPathUpdateConfirmShiftCloses = (shiftCode: string, path: string) => {
+    return getPathUrl(`${path}`, { shiftCode: shiftCode });
+  }
+  
+  const response = await put(
+      getPathUpdateConfirmShiftCloses(shiftCode, environment.branchAccounting.closeSaleShift.updateConfirmShiftCloses.url),
+      payload,
+      ContentType.JSON
+    )
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
