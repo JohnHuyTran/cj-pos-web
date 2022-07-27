@@ -216,6 +216,10 @@ export async function shiftClose(payload: CloseSaleShiftRequest) {
 }
 
 export async function updateConfirmShiftCloses(shiftCode: string, payload: any) {
+  const getPathUpdateConfirmShiftCloses = (shiftCode: string, path: string) => {
+    return getPathUrl(`${path}`, { shiftCode: shiftCode });
+  }
+  
   const response = await put(
       getPathUpdateConfirmShiftCloses(shiftCode, environment.branchAccounting.closeSaleShift.updateConfirmShiftCloses.url),
       payload,
@@ -227,8 +231,3 @@ export async function updateConfirmShiftCloses(shiftCode: string, payload: any) 
     });
   return response;
 }
-
-export const getPathUpdateConfirmShiftCloses = (shiftCode: string, path: string) => {
-  debugger
-  return getPathUrl(`${path}`, { shiftCode: shiftCode });
-};
