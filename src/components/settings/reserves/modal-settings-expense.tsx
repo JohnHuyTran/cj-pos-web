@@ -19,6 +19,7 @@ import { LoadingButton } from '@mui/lab';
 import { Save } from '@mui/icons-material';
 import { useStyles } from 'styles/makeTheme';
 import { expenseTypesSetting, getExpenseTypesSetting } from 'utils/enum/setting-reserve-expense-enum';
+import NumberFormat from 'react-number-format';
 
 //Components
 import TexboxSearchSku from 'components/commons/ui/texbox-search-sku';
@@ -42,8 +43,8 @@ const initialStateForm: any = {
   accountNameTh: '',
   accountCode: '',
   requiredDocumentTh: '',
-  approvalLimit1: '',
-  approvalLimit2: '',
+  approvalLimit1: 0,
+  approvalLimit2: 0,
 };
 interface Props {
   isOpen: boolean;
@@ -68,8 +69,20 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
     setValues({ ...values, [event.target.name]: value });
   };
 
+  const handleChangType = (event: any) => {
+    const value = event.target.value;
+    if (value === 'OTHER') {
+      setValues({ ...values, type: value });
+    } else if (value !== 'OTHER') {
+      setValues({ ...values, type: value, typeOther: [] });
+    }
+  };
+
   const handleChangeMultiType = (event: any) => {
     const value = event.target.value;
+    if (values.type !== 'OTHER') {
+      alert('test');
+    }
     setValues({ ...values, typeOther: value === 'string' ? value.split(',') : value });
   };
 
@@ -79,6 +92,12 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
     } else {
       setValues({ ...values, skuCode: '' });
     }
+  };
+
+  const handleChangeApprovalLimit = (event: any) => {
+    const value = event.target.value;
+    const removeCommar = value.replace(/\,/g, '');
+    setValues({ ...values, [event.target.name]: removeCommar });
   };
 
   const validateForm = () => {
@@ -267,7 +286,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   name="type"
                   disabled={isStatus === 'Update'}
                   value={values.type}
-                  onChange={handleChange}
+                  onChange={handleChangType}
                   displayEmpty
                   renderValue={
                     values.type.length !== 0 ? undefined : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือก</div>
@@ -403,7 +422,19 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <TextField
+              <NumberFormat
+                name="approvalLimit1"
+                value={String(values.approvalLimit1)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                customInput={TextField}
+                onChange={handleChangeApprovalLimit}
+                fullWidth
+                fixedDecimalScale
+                type="text"
+              />
+              {/* <TextField
                 //   id="txt"
                 name="approvalLimit1"
                 size="small"
@@ -413,7 +444,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                 className={classes.MtextField}
                 fullWidth
                 placeholder="0.00"
-              />
+              /> */}
             </Grid>
             <Grid item xs={2}>
               <Typography variant="body2">
@@ -421,15 +452,17 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <TextField
+              <NumberFormat
                 name="approvalLimit2"
-                size="small"
-                type="number"
-                value={values.approvalLimit2}
-                onChange={handleChange}
-                className={classes.MtextField}
+                value={String(values.approvalLimit2)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                customInput={TextField}
+                onChange={handleChangeApprovalLimit}
                 fullWidth
-                placeholder="0.00"
+                fixedDecimalScale
+                type="text"
               />
             </Grid>
           </Grid>
