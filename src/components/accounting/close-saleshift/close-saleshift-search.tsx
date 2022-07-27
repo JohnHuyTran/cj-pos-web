@@ -210,6 +210,7 @@ function CloseSaleShiftSearch() {
                 name='status'
                 value={values.status}
                 onChange={handleChange}
+                disabled={groupBranch ? true : false}
                 inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
