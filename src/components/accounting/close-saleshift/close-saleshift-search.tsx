@@ -10,7 +10,7 @@ import { getUserInfo } from '../../../store/sessionStore';
 import { getBranchName } from '../../../utils/utils';
 import { env } from '../../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../../models/branch-model';
-import { isGroupBranch } from '../../../utils/role-permission';
+import { isAllowActionPermission, isGroupBranch } from '../../../utils/role-permission';
 import { closeSaleShift } from '../../../utils/enum/accounting-enum';
 import CloseSaleShiftSearchList from './close-saleshift-list';
 import LoadingModal from '../../commons/ui/loading-modal';
@@ -26,6 +26,7 @@ import moment from 'moment';
 import ModalCloseSale from './modal-close-sale';
 import { shiftClose } from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
+import { ACTIONS } from 'utils/enum/permission-enum';
 
 function CloseSaleShiftSearch() {
   const classes = useStyles();
@@ -79,6 +80,8 @@ function CloseSaleShiftSearch() {
   const [noOfShiftKey, setNoOfShiftKey] = React.useState('');
   const [isPickerDateError, setIsPickerDateError] = React.useState(false);
   const [pickerDateErrorMsg, setPickerDateErrorMsg] = React.useState('');
+  const [disableBtnSearch, setDisableBtnSearch] = React.useState(true);
+  const [disableBtnManage, setDisableBtnManage] = React.useState(true);
 
   const handleCloseAlert = () => {
     setOpenAlert(false);
@@ -181,6 +184,8 @@ function CloseSaleShiftSearch() {
       setBranchFromCode(ownBranch);
       setValues({ ...values, branchFrom: ownBranch });
     }
+    setDisableBtnManage(isAllowActionPermission(ACTIONS.SALE_SHIFT_MANAGE));
+    setDisableBtnSearch(isAllowActionPermission(ACTIONS.SALE_SHIFT_VIEW));
   }, []);
 
   return (
@@ -247,7 +252,7 @@ function CloseSaleShiftSearch() {
               color='primary'
               startIcon={<UpdateIcon />}
               onClick={handleOnupdate}
-              sx={{ minWidth: 100 }}
+              sx={{ minWidth: 100, display: disableBtnManage ? 'none' : '' }}
               disabled={true}
               className={classes.MbtnSearch}>
               อัพเดท
@@ -257,7 +262,7 @@ function CloseSaleShiftSearch() {
               variant='contained'
               color='primary'
               onClick={handleOnBypass}
-              sx={{ ml: 2, minWidth: 100 }}
+              sx={{ ml: 2, minWidth: 100, display: disableBtnManage ? 'none' : '' }}
               className={classes.MbtnSearch}
               disabled={true}
               startIcon={<ArrowBackIcon />}>
@@ -269,7 +274,7 @@ function CloseSaleShiftSearch() {
               id='btnCreateStockTransferModal'
               variant='contained'
               onClick={handleOpenCloseSale}
-              sx={{ width: 150 }}
+              sx={{ width: 150, display: disableBtnManage ? 'none' : '' }}
               className={classes.MbtnClear}
               color='secondary'
               disabled={disableCloseShiftKey || !isGroupBranch()}>
@@ -289,7 +294,7 @@ function CloseSaleShiftSearch() {
               variant='contained'
               color='primary'
               onClick={onClickSearch}
-              sx={{ width: 110, ml: 2 }}
+              sx={{ width: 110, ml: 2, display: disableBtnSearch ? 'none' : '' }}
               className={classes.MbtnSearch}>
               ค้นหา
             </Button>
