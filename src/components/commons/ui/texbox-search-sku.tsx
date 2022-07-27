@@ -138,7 +138,7 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
       renderOption={autocompleteRenderListItem}
       onChange={handleChangeItem}
       onInputChange={onInputChange}
-      getOptionLabel={(option) => (option.skuCode ? `${option.productNamePrime}  ${option.skuCode}` : '')}
+      getOptionLabel={(option) => (option.skuCode ? `${option.productNamePrime} \n${option.skuCode}` : '')}
       isOptionEqualToValue={(option, value) => option.skuCode === value.skuCode}
       renderInput={autocompleteRenderInput}
       size="small"
