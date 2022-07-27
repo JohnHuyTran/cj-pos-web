@@ -46,7 +46,7 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
     if (barcode) {
       setIsOpenLoading(true)
       try {
-        const res = await updateConfirmShiftCloses(payload?.shiftCode, barcode)
+        const res = await updateConfirmShiftCloses(payload?.shiftCode, {shiftKey: barcode})
         console.log('dispatch', res)
         handleClose()
       } catch {
