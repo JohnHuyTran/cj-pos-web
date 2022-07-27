@@ -65,19 +65,12 @@ export default function SearchReserves(props: SearchReservesProps) {
     const payload: ExpenseSearchCofigRequest = {
       limit: '10',
       page: '1',
-      ...search,
+      ...search
     };
     try {
-      await dispatch(featchBranchAccountingConfigListAsync(payload)).then((res) => {
-        setTimeout(() => {
-          setIsOpenLoading(false);
-          const payload: any = res.payload ? res.payload : [];
-        }, 300);
-      });
-      await dispatch(saveExpenseConfigSearch(payload));
-      setTimeout(() => {
-        setIsOpenLoading(false);
-      }, 500);
+      await dispatch(featchBranchAccountingConfigListAsync(payload))
+      await dispatch(saveExpenseConfigSearch(payload))
+      setIsOpenLoading(false)
       onClickSearch(true)
     } catch(errors) {
       console.error(errors)
