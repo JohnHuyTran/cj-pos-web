@@ -34,7 +34,7 @@ export const featchBranchAccountingConfigListAsync = createAsyncThunk(
         `${apiRootPath}?limit=${payload.limit}&page=${payload.page}`;
 
       if (payload.type !== 'ALL') {
-        path = `${path}&status=${payload.type}`;
+        path = `${path}&type=${payload.type}`;
       }
       if (payload.isActive !== 'ALL' ) {
         path = `${path}&isActive=${payload.isActive}`;
