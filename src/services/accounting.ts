@@ -168,7 +168,7 @@ export const getPathExpenseUpdate = (expenseNo: string, path: string) => {
 
 export async function getSummarizeByCriteria(payload: any) {
   try {
-    const response = await post(environment.branchAccounting.expense.summarize.byCriteria.url, payload).then(
+    const response = await put(environment.branchAccounting.expense.summarize.byCriteria.url, payload).then(
       (result: any) => result
     );
     return response;
@@ -179,7 +179,7 @@ export async function getSummarizeByCriteria(payload: any) {
 
 export async function getSummarizeByNo(payload: any) {
   try {
-    const response = await post(environment.branchAccounting.expense.summarize.byNo.url, payload).then(
+    const response = await put(environment.branchAccounting.expense.summarize.byNo.url, payload).then(
       (result: any) => result
     );
     return response;
@@ -218,13 +218,16 @@ export async function shiftClose(payload: CloseSaleShiftRequest) {
 export async function updateConfirmShiftCloses(shiftCode: string, payload: any) {
   const getPathUpdateConfirmShiftCloses = (shiftCode: string, path: string) => {
     return getPathUrl(`${path}`, { shiftCode: shiftCode });
-  }
-  
+  };
+
   const response = await put(
-      getPathUpdateConfirmShiftCloses(shiftCode, environment.branchAccounting.closeSaleShift.updateConfirmShiftCloses.url),
-      payload,
-      ContentType.JSON
-    )
+    getPathUpdateConfirmShiftCloses(
+      shiftCode,
+      environment.branchAccounting.closeSaleShift.updateConfirmShiftCloses.url
+    ),
+    payload,
+    ContentType.JSON
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
