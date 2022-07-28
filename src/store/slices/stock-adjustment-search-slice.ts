@@ -27,7 +27,7 @@ export const getStockAdjustmentSearch = createAsyncThunk(
   'getStockAdjustmentSearch',
   async (payload: StockAdjustmentSearchRequest) => {
     try {
-      const apiRootPath = environment.checkStock.stockCount.search.url;
+      const apiRootPath = environment.checkStock.stockAdjustment.search.url;
       let path = `${apiRootPath}?limit=${payload.perPage}&page=${payload.page}`;
       if (!stringNullOrEmpty(payload.query)) {
         path = path + `&documentNumber=${payload.query}`;
