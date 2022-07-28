@@ -32,6 +32,7 @@ import LoadingModal from './loading-modal';
 import { featchAllItemsListAsync } from '../../../store/slices/search-all-items';
 import { FindProductProps, FindProductRequest } from '../../../models/product-model';
 import _ from 'lodash';
+import { getAllProductByBarcode } from 'services/product-master';
 
 interface StateItem {
   barcodeName: string;
@@ -61,7 +62,9 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2" sx={{wordBreak: 'break-word'}}>{params.value}</Typography>
+        <Typography variant='body2' sx={{ wordBreak: 'break-word' }}>
+          {params.value}
+        </Typography>
       </div>
     ),
   },
@@ -80,9 +83,9 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnQuantity"
-        type="number"
+        variant='outlined'
+        name='txnQuantity'
+        type='number'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
@@ -90,7 +93,7 @@ const columns: GridColDef[] = [
           if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, qty: value }]);
         }}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
@@ -102,7 +105,7 @@ const columns: GridColDef[] = [
     align: 'right',
     sortable: false,
     renderCell: () => {
-      return <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />;
+      return <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />;
     },
   },
 ];
@@ -134,7 +137,8 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [searchItem, setSearchItem] = React.useState<any | null>(null);
   const [values, setValues] = React.useState<string[]>([]);
-  const itemsList = useAppSelector((state) => state.searchAllItemsList.itemList);
+  // const itemsList = useAppSelector((state) => state.searchAllItemsList.itemList);
+  const [itemsList, setItemList] = React.useState([]);
   const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
   const searchDebouceRef = useRef<any>();
   let rows: any = [];
@@ -204,7 +208,21 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
       if (keyword.length >= 3 && reason !== 'reset') {
         setLoading(true);
         setSearchItem(keyword);
-        await dispatch(featchAllItemsListAsync(payload));
+        // await dispatch(featchAllItemsListAsync(payload));
+        try {
+          const rs = await getAllProductByBarcode(payload);
+          if (rs) {
+            if (rs.data.length === 1) {
+              handleChangeItem('', rs.data[0], 'selectOption');
+              setItemList([]);
+            } else {
+              setItemList(rs.data);
+            }
+          }
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
+        }
         setLoading(false);
       } else {
         clearData();
@@ -214,7 +232,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
   };
 
   let options: any = [];
-  if (searchItem) options = itemsList && itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
+  if (searchItem) options = itemsList && itemsList.length > 0 ? itemsList : [];
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.barcodeName + option.barcode,
   });
@@ -222,8 +240,8 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
     return (
       <li {...props} key={option.barcode}>
         <div>
-          <Typography variant="body2">{option.barcodeName}</Typography>
-          <Typography color="textSecondary" variant="caption">
+          <Typography variant='body2'>{option.barcodeName}</Typography>
+          <Typography color='textSecondary' variant='caption'>
             {option.barcode}
           </Typography>
         </div>
@@ -235,22 +253,22 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
-        data-testid="testid-tbxSearch"
+        data-testid='testid-tbxSearch'
         autoFocus={true}
         {...params}
         InputProps={{
           ...params.InputProps,
           endAdornment: (
             <React.Fragment>
-              {loading ? <CircularProgress color="inherit" size={20} /> : null}
+              {loading ? <CircularProgress color='inherit' size={20} /> : null}
               {params.InputProps.endAdornment}
             </React.Fragment>
           ),
         }}
-        placeholder="บาร์โค้ด/รายละเอียดสินค้า"
+        placeholder='บาร์โค้ด/รายละเอียดสินค้า'
         className={classes.MtextField}
-        variant="outlined"
-        size="small"
+        variant='outlined'
+        size='small'
         fullWidth
       />
     );
@@ -367,7 +385,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
 
   return (
     <div>
-      <Dialog open={open} maxWidth="sm" fullWidth={true}>
+      <Dialog open={open} maxWidth='sm' fullWidth={true}>
         <DialogContent>
           <Box sx={{ display: 'flex' }}>
             <Box pt={1.5} sx={{ flex: 2 }}>
@@ -375,12 +393,12 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
             </Box>
             <Box sx={{ flex: 7 }}>
               <Autocomplete
-                data-testid="autocomplete-search-branch-list"
-                id="selAddItem"
+                data-testid='autocomplete-search-branch-list'
+                id='selAddItem'
                 value={values}
                 fullWidth
                 // freeSolo
-                loadingText="กำลังโหลด..."
+                loadingText='กำลังโหลด...'
                 loading={loading}
                 options={options}
                 filterOptions={filterOptions}
@@ -397,17 +415,16 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
             <Box sx={{ flex: 1, ml: 2 }}>
               {handldCloseAddItemModal ? (
                 <IconButton
-                  data-testid="testid-btnClose"
-                  aria-label="close"
+                  data-testid='testid-btnClose'
+                  aria-label='close'
                   onClick={handldCloseAddItemModal}
                   sx={{
                     position: 'absolute',
                     right: 8,
                     top: 8,
                     color: (theme: any) => theme.palette.grey[400],
-                  }}
-                >
-                  <CancelOutlinedIcon fontSize="large" stroke={'white'} strokeWidth={1} />
+                  }}>
+                  <CancelOutlinedIcon fontSize='large' stroke={'white'} strokeWidth={1} />
                 </IconButton>
               ) : null}
             </Box>
@@ -435,16 +452,15 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
-              data-testid="testid-btnAdd"
-              id="btnAdd"
-              variant="contained"
-              color="secondary"
+              data-testid='testid-btnAdd'
+              id='btnAdd'
+              variant='contained'
+              color='secondary'
               onClick={handleAddItems}
               className={classes.MbtnSearch}
-              size="large"
+              size='large'
               disabled={newAddItemListArray.length === 0}
-              startIcon={<AddCircleOutlineIcon />}
-            >
+              startIcon={<AddCircleOutlineIcon />}>
               เพิ่มสินค้า
             </Button>
           </Box>
@@ -454,17 +470,16 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
 
       <Dialog
         open={openModelDeleteConfirm}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        sx={{ minWidth: 800 }}
-      >
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+        maxWidth='md'
+        sx={{ minWidth: 800 }}>
         <DialogContent sx={{ pl: 6, pr: 8 }}>
-          <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-            <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+          <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
+            <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
               ต้องการลบสินค้า
             </Typography>
-            <Typography variant="body1" align="left">
+            <Typography variant='body1' align='left'>
               สินค้า <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
               <label style={{ color: '#36C690' }}>
                 <b>{barcodeNameDel}</b>
@@ -472,7 +487,7 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
                 <label style={{ color: '#AEAEAE', fontSize: 14, marginLeft: '3.8em' }}>{skuCodeDel}</label>
               </label>
             </Typography>
-            <Typography variant="body1" align="left">
+            <Typography variant='body1' align='left'>
               บาร์โค้ด <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
               <label style={{ color: '#36C690' }}>
                 <b>{barCodeDel}</b>
@@ -483,21 +498,19 @@ export default function ModalAddItems({ open, onClose, requestBody }: Props): Re
 
         <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
           <Button
-            id="btnCancle"
-            variant="contained"
-            color="cancelColor"
+            id='btnCancle'
+            variant='contained'
+            color='cancelColor'
             sx={{ borderRadius: 2, width: 90, mr: 2 }}
-            onClick={handleModelDeleteConfirm}
-          >
+            onClick={handleModelDeleteConfirm}>
             ยกเลิก
           </Button>
           <Button
-            id="btnConfirm"
-            variant="contained"
-            color="error"
+            id='btnConfirm'
+            variant='contained'
+            color='error'
             sx={{ borderRadius: 2, width: 90 }}
-            onClick={handleDeleteItem}
-          >
+            onClick={handleDeleteItem}>
             ลบสินค้า
           </Button>
         </DialogActions>
