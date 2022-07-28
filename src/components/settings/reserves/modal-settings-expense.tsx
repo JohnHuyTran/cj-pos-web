@@ -96,7 +96,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
 
   const handleValidatRegEx = (e: any) => {
     const reg = e.target.value.replace(/[^-()A-Za-z0-9_ก-๏]/g, '');
-    setValues({ ...values, accountNameTh: reg });
+    setValues({ ...values, [e.target.name]: reg });
   };
 
   const handleChangeApprovalLimit = (event: any) => {
@@ -415,12 +415,14 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   name="requiredDocumentTh"
                   size="small"
                   value={values.requiredDocumentTh}
-                  onChange={handleChange}
+                  onChange={handleValidatRegEx}
                   className={classes.MtextField}
                   fullWidth
                   inputProps={{ maxLength: 50 }}
                 />
-                <FormHelperText sx={{ textAlign: 'right' }}>{values.requiredDocumentTh.length}/50</FormHelperText>
+                <FormHelperText sx={{ textAlign: 'right' }}>
+                  [ก-ฮ ,A-Z,a-z,0-9,(),-,_] {values.requiredDocumentTh.length}/50
+                </FormHelperText>
               </FormControl>
             </Grid>
 
@@ -442,17 +444,6 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                 fixedDecimalScale
                 type="text"
               />
-              {/* <TextField
-                //   id="txt"
-                name="approvalLimit1"
-                size="small"
-                type="number"
-                value={values.approvalLimit1}
-                onChange={handleChange}
-                className={classes.MtextField}
-                fullWidth
-                placeholder="0.00"
-              /> */}
             </Grid>
             <Grid item xs={2}>
               <Typography variant="body2">

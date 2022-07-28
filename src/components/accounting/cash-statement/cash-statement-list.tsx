@@ -280,10 +280,6 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
     setPayloadCash(data);
   };
 
-  const resPayloadEdit = (value: any) => {
-    console.log('value payload edit: ', value);
-  };
-
   const onCloseModalEdit = () => {
     setOpenModalEdit(false);
   };
@@ -312,12 +308,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
         </Box>
       </Box>
 
-      <ModalEditSearchList
-        open={openModalEdit}
-        onClose={onCloseModalEdit}
-        payloadCash={payloadCash}
-        payloadEdit={resPayloadEdit}
-      />
+      <ModalEditSearchList open={openModalEdit} onClose={onCloseModalEdit} payloadCash={payloadCash} />
 
       <LoadingModal open={openLoadingModal.open} />
     </div>

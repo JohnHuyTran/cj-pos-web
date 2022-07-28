@@ -396,7 +396,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       return (
                         <>
                           <Grid item xs={2}>
-                            <Typography variant='body2'>{i.accountNameTh}: </Typography>
+                            <Typography variant='body2' sx={{ wordWrap: 'break-word' }}>
+                              {i.accountNameTh}:{' '}
+                            </Typography>
                           </Grid>
                           <Grid item xs={2}>
                             {/* <TextField
@@ -481,7 +483,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       return (
                         <>
                           <Grid item xs={2}>
-                            <Typography variant='body2'>{i.accountNameTh}: </Typography>
+                            <Typography variant='body2' sx={{ wordWrap: 'break-word' }}>
+                              {i.accountNameTh}:{' '}
+                            </Typography>
                           </Grid>
                           <Grid item xs={2}>
                             {/* <TextField
@@ -529,7 +533,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       return (
                         <>
                           <Grid item xs={2}>
-                            <Typography variant='body2'>{master?.accountNameTh}: </Typography>
+                            <Typography variant='body2' sx={{ wordWrap: 'break-word' }}>
+                              {master?.accountNameTh}:{' '}
+                            </Typography>
                           </Grid>
                           <Grid item xs={2}>
                             {/* <TextField
@@ -612,7 +618,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       return (
                         <>
                           <Grid item xs={2}>
-                            <Typography variant='body2'>{master?.accountNameTh}: </Typography>
+                            <Typography variant='body2' sx={{ wordWrap: 'break-word' }}>
+                              {master?.accountNameTh}:{' '}
+                            </Typography>
                           </Grid>
                           <Grid item xs={2}>
                             {/* <TextField
