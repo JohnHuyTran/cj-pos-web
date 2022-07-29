@@ -103,7 +103,7 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
       return {
         field: i.expenseNo,
         headerName: i.accountNameTh,
-        minWidth: 70,
+        // minWidth: 70,
         flex: 1,
         headerAlign: 'center',
         sortable: false,
