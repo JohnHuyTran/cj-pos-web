@@ -612,6 +612,9 @@ export const environment = {
       edit: {
         url: 'accounting/cash-statement/edit',
       },
+      import: {
+        url: 'accounting/cash-statement/import',
+      },
     },
   },
 };
