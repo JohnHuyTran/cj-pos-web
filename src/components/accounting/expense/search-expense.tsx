@@ -145,7 +145,7 @@ export default function SearchExpense() {
   const [textFail, setTextFail] = useState('');
 
   const items = useAppSelector((state) => state.searchBranchAccounting);
-  const orderListDatas = items.branchAccountingList.data ? items.branchAccountingList.data : [];
+  const branchAccountingList = items.branchAccountingList.data ? items.branchAccountingList.data : [];
   const [flagBtnApproveAll, setFlagBtnApproveAll] = useState(true);
 
   // Lifecycle hooks
@@ -154,6 +154,8 @@ export default function SearchExpense() {
       setBranchFromCode(ownBranch);
       setSearch({ ...search, branchCode: ownBranch });
     }
+
+    dispatch(clearDataSearchBranchAccounting());
   }, []);
 
   useEffect(() => {
@@ -612,8 +614,8 @@ export default function SearchExpense() {
 
       {isSearch && (
         <div>
-          {orderListDatas.length > 0 && <ExpenseSearchList onSelectRows={handleSelectRows} />}
-          {orderListDatas.length === 0 && (
+          {branchAccountingList.length > 0 && <ExpenseSearchList onSelectRows={handleSelectRows} />}
+          {branchAccountingList.length === 0 && (
             <Grid item container xs={12} justifyContent='center'>
               <Box color='#CBD4DB' sx={{ mt: 5 }}>
                 <h2>ไม่มีข้อมูล</h2>
@@ -627,7 +629,7 @@ export default function SearchExpense() {
         open={openModelConfirm}
         onClose={handleCloseModelConfirm}
         onConfirm={handleConfirm}
-        items={orderListDatas}
+        items={branchAccountingList}
         summarizTitle={summarizTitle}
         summarizList={summarizList}
       />

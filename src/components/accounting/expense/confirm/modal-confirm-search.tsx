@@ -70,7 +70,7 @@ export default function ModelConfirmSearch({
   const [columnsList, setColumnsList] = React.useState<GridColDef[]>([]);
   const [rowList, setRowList] = React.useState<any[]>([]);
   useEffect(() => {
-    if (items.length > 0) {
+    if (items.length > 0 && items[0].expensePeriod) {
       setStartDate(items[0].expensePeriod.startDate);
       setEndDate(items[0].expensePeriod.endDate);
 
