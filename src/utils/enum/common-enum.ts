@@ -59,6 +59,11 @@ export enum STORE_TYPE {
   BACK = 2,
 }
 
+export enum STOCK_COUNTER_TYPE {
+  BRANCH = 1,
+  AUDIT = 2,
+}
+
 export enum StockActionStatus {
   DRAFT = 'DRAFT',
   CONFIRM = 'CONFIRM',
