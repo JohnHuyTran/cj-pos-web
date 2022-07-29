@@ -61,8 +61,8 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
       return {
         field: i.expenseNo,
         headerName: i.accountNameTh,
-        minWidth: 70,
-        flex: 0.6,
+        minWidth: 110,
+        // flex: 0.6,
         headerAlign: 'center',
         sortable: false,
         hide: hideColumn,
