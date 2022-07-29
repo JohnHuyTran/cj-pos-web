@@ -1,18 +1,21 @@
 import React, { Fragment } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Box, Button, Dialog, DialogActions, DialogContent, Typography } from '@mui/material';
 
 //css
 import { useStyles } from '../../../styles/makeTheme';
 
+//util
+import { convertUtcToBkkDate } from '../../../utils/date-utill';
+
 interface Props {
   open: boolean;
   onClose: () => void;
-  onConfirmDelete: () => void;
-  payloadDelete: any;
+  onConfirmApprove: () => void;
+  payloadApprove: any;
 }
 
-function ModalDeleteSearchList({ open, onClose, payloadDelete, onConfirmDelete }: Props) {
+function ModalApproveSearchList({ open, onClose, onConfirmApprove, payloadApprove }: Props) {
   const classes = useStyles();
 
   const columns: GridColDef[] = [
@@ -73,27 +76,26 @@ function ModalDeleteSearchList({ open, onClose, payloadDelete, onConfirmDelete }
     },
   ];
 
-  let rows: any = payloadDelete.map((item: any, index: number) => {
+  let rows: any = payloadApprove.map((item: any, index: number) => {
     return {
-      id: item.index,
+      id: index + 1,
       branch: item.branchCode,
-      cashDate: item.cashDate,
-      salesDate: item.salesDate,
+      cashDate: convertUtcToBkkDate(item.cashDate),
+      salesDate: convertUtcToBkkDate(item.salesDate),
       cashShort: item.cashShort,
       cashOver: item.cashOver,
     };
   });
-
-  //   const handleConfirmDelete = () => {
-  //     onConfirmDelete()
-  //   }
 
   return (
     <Fragment>
       <Dialog open={open} maxWidth="md" fullWidth={true}>
         <DialogContent>
           <Typography variant="h6" align="center" sx={{ marginBottom: 1 }}>
-            ยืนยันการลบรายการ
+            ยืนยันการอนุมัติรายการ
+          </Typography>
+          <Typography variant="body1" color="textSecondary" align="center" sx={{ mb: 2 }}>
+            กรุณายืนยันการอนุมัติ {payloadApprove.length} รายการ
           </Typography>
 
           <Box>
@@ -116,12 +118,12 @@ function ModalDeleteSearchList({ open, onClose, payloadDelete, onConfirmDelete }
             <Button
               id="btnDelete"
               variant="contained"
-              color="error"
+              color="primary"
               className={classes.MbtnSearch}
               sx={{ width: '20%' }}
-              onClick={() => onConfirmDelete()}
+              onClick={() => onConfirmApprove()}
             >
-              ลบรายการ
+              ยืนยัน
             </Button>
           </DialogActions>
         </DialogContent>
@@ -130,4 +132,4 @@ function ModalDeleteSearchList({ open, onClose, payloadDelete, onConfirmDelete }
   );
 }
 
-export default ModalDeleteSearchList;
+export default ModalApproveSearchList;
