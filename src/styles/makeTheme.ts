@@ -288,7 +288,7 @@ const useStyles = makeStyles({
       '& .MuiDataGrid-row': {
         maxHeight: 'none !important',
         '& .MuiDataGrid-cell': {
-          padding: '5px',
+          // padding: '5px',
           overflowWrap: 'anywhere',
           cursor: 'pointer',
           display: 'flex',
