@@ -212,6 +212,8 @@ const permission = {
       ACTIONS.STOCK_MOVEMENT_VIEW,
       ACTIONS.PURCHASE_BR_VIEW,
       ACTIONS.PURCHASE_BR_MANAGE,
+      ACTIONS.SALE_SHIFT_MANAGE,
+      ACTIONS.SALE_SHIFT_VIEW,
     ],
   },
   areaManager: {
@@ -286,7 +288,7 @@ const permission = {
   },
   accountManager: {
     menu: {
-      mainmenu: [MAINMENU.EXPENSE, MAINMENU.EXPENSE_CONFIG],
+      mainmenu: [MAINMENU.EXPENSE, MAINMENU.APP_CONFIG],
       submenu: [SUBMENU.EX_EXPENSE, SUBMENU.EX_CONFIG],
     },
     action: [
@@ -328,7 +330,7 @@ const permission = {
       mainmenu: [MAINMENU.EXPENSE],
       submenu: [SUBMENU.EX_CLOSE_SALE_SHIFT],
     },
-    action: [ACTIONS.CAMPAIGN_TO_VIEW],
+    action: [ACTIONS.SALE_SHIFT_VIEW],
   },
   finance: {
     menu: {

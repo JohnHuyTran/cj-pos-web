@@ -19,6 +19,7 @@ import { LoadingButton } from '@mui/lab';
 import { Save } from '@mui/icons-material';
 import { useStyles } from 'styles/makeTheme';
 import { expenseTypesSetting, getExpenseTypesSetting } from 'utils/enum/setting-reserve-expense-enum';
+import NumberFormat from 'react-number-format';
 
 //Components
 import TexboxSearchSku from 'components/commons/ui/texbox-search-sku';
@@ -42,8 +43,8 @@ const initialStateForm: any = {
   accountNameTh: '',
   accountCode: '',
   requiredDocumentTh: '',
-  approvalLimit1: '',
-  approvalLimit2: '',
+  approvalLimit1: 0,
+  approvalLimit2: 0,
 };
 interface Props {
   isOpen: boolean;
@@ -68,8 +69,20 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
     setValues({ ...values, [event.target.name]: value });
   };
 
+  const handleChangType = (event: any) => {
+    const value = event.target.value;
+    if (value === 'OTHER') {
+      setValues({ ...values, type: value });
+    } else if (value !== 'OTHER') {
+      setValues({ ...values, type: value, typeOther: [] });
+    }
+  };
+
   const handleChangeMultiType = (event: any) => {
     const value = event.target.value;
+    if (values.type !== 'OTHER') {
+      alert('test');
+    }
     setValues({ ...values, typeOther: value === 'string' ? value.split(',') : value });
   };
 
@@ -79,6 +92,17 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
     } else {
       setValues({ ...values, skuCode: '' });
     }
+  };
+
+  const handleValidatRegEx = (e: any) => {
+    const reg = e.target.value.replace(/[^-()A-Za-z0-9_ก-๏]/g, '');
+    setValues({ ...values, [e.target.name]: reg });
+  };
+
+  const handleChangeApprovalLimit = (event: any) => {
+    const value = event.target.value;
+    const removeCommar = value.replace(/\,/g, '');
+    setValues({ ...values, [event.target.name]: removeCommar });
   };
 
   const validateForm = () => {
@@ -267,7 +291,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   name="type"
                   disabled={isStatus === 'Update'}
                   value={values.type}
-                  onChange={handleChange}
+                  onChange={handleChangType}
                   displayEmpty
                   renderValue={
                     values.type.length !== 0 ? undefined : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือก</div>
@@ -353,12 +377,15 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   name="accountNameTh"
                   size="small"
                   value={values.accountNameTh}
-                  onChange={handleChange}
+                  onChange={handleValidatRegEx}
                   className={classes.MtextField}
                   fullWidth
                   inputProps={{ maxLength: 50 }}
+                  autoComplete="off"
                 />
-                <FormHelperText sx={{ textAlign: 'right' }}>{values.accountNameTh.length}/50</FormHelperText>
+                <FormHelperText sx={{ textAlign: 'right' }}>
+                  [ก-ฮ ,A-Z,a-z,0-9,(),-,_] {values.accountNameTh.length}/50
+                </FormHelperText>
               </FormControl>
             </Grid>
 
@@ -388,12 +415,14 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   name="requiredDocumentTh"
                   size="small"
                   value={values.requiredDocumentTh}
-                  onChange={handleChange}
+                  onChange={handleValidatRegEx}
                   className={classes.MtextField}
                   fullWidth
                   inputProps={{ maxLength: 50 }}
                 />
-                <FormHelperText sx={{ textAlign: 'right' }}>{values.requiredDocumentTh.length}/50</FormHelperText>
+                <FormHelperText sx={{ textAlign: 'right' }}>
+                  [ก-ฮ ,A-Z,a-z,0-9,(),-,_] {values.requiredDocumentTh.length}/50
+                </FormHelperText>
               </FormControl>
             </Grid>
 
@@ -403,16 +432,17 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <TextField
-                //   id="txt"
+              <NumberFormat
                 name="approvalLimit1"
-                size="small"
-                type="number"
-                value={values.approvalLimit1}
-                onChange={handleChange}
-                className={classes.MtextField}
+                value={String(values.approvalLimit1)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                customInput={TextField}
+                onChange={handleChangeApprovalLimit}
                 fullWidth
-                placeholder="0.00"
+                fixedDecimalScale
+                type="text"
               />
             </Grid>
             <Grid item xs={2}>
@@ -421,15 +451,17 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <TextField
+              <NumberFormat
                 name="approvalLimit2"
-                size="small"
-                type="number"
-                value={values.approvalLimit2}
-                onChange={handleChange}
-                className={classes.MtextField}
+                value={String(values.approvalLimit2)}
+                thousandSeparator={true}
+                decimalScale={2}
+                className={classes.MtextFieldNumber}
+                customInput={TextField}
+                onChange={handleChangeApprovalLimit}
                 fullWidth
-                placeholder="0.00"
+                fixedDecimalScale
+                type="text"
               />
             </Grid>
           </Grid>

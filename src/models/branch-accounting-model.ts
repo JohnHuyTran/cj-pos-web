@@ -356,3 +356,43 @@ export interface ExternalIncomeItemInfo {
   amount: number;
   noItem: boolean;
 }
+
+export interface CashStatementEditRequest {
+  id: string;
+  cashDate: string;
+  cashOver: number;
+  cashShort: number;
+}
+
+export interface CashStatementSearchRequest {
+  limit: string;
+  page: string;
+  status: string;
+  branchCode: string;
+  dateFrom: any;
+  dateTo: any;
+  clearSearch?: boolean;
+}
+
+export interface CashStatementSearchResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: CashStatementInfo[];
+  total: number;
+  page: number;
+  perPage: number;
+  prev: number;
+  next: number;
+  totalPage: number;
+}
+
+export interface CashStatementInfo {
+  branchCode: string;
+  id: string;
+  salesDate: any;
+  cashDate: any;
+  cashOver: any;
+  cashShort: any;
+  status: string;
+}

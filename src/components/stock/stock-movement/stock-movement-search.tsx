@@ -154,8 +154,11 @@ function StockMovementSearch() {
     handleOpenLoading('open', true);
     setStartDate(null);
     setEndDate(null);
-    setClearBranchDropDown(!clearBranchDropDown);
-    setBranchFromCode('');
+
+    if (!groupBranch) {
+      setClearBranchDropDown(!clearBranchDropDown);
+      setBranchFromCode('');
+    }
     setValues({ storeId: 0, locationId: 'ALL', skuCodes: '', branchCode: '', dateFrom: '', dateTo: '' });
     await dispatch(updateAddTypeAndProductState([]));
     dispatch(clearSearchAllProductAsync({}));
