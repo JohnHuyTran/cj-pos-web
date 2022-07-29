@@ -12,8 +12,9 @@ import {
 import { useStyles } from '../../../styles/makeTheme';
 import { Action } from '../../../utils/enum/common-enum';
 import { TransferOutDetail } from "../../../models/transfer-out";
-import { ACTIONS, KEYCLOAK_GROUP_AUDIT } from "../../../utils/enum/permission-enum";
+import { KEYCLOAK_GROUP_AUDIT } from "../../../utils/enum/permission-enum";
 import { getUserInfo } from "../../../store/sessionStore";
+import { BarcodeCalculate } from "../../../models/stock-adjustment-model";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -60,6 +61,8 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
   const dispatch = useAppDispatch();
   const [pageSize, setPageSize] = React.useState<number>(10);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  const barcodeCalculateData = useAppSelector((state) => state.stockAdjustBarcodeCalculateSlice.toSearchResponse.data);
+
   //permission
   const userInfo = getUserInfo();
   const [auditPermission, setAuditPermission] = useState<boolean>((userInfo && userInfo.groups && userInfo.groups.length > 0)
@@ -103,31 +106,31 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       setSkuTable([]);
     }
 
-    if (Object.keys(payloadAddItem).length !== 0) {
-      let rows2 = payloadAddItem.map((item: any, index: number) => {
+    if (Object.keys(barcodeCalculateData).length !== 0) {
+      let rows2: any = barcodeCalculateData.map((item: BarcodeCalculate, index: number) => {
         return {
           checked: false,
           id: `${item.barcode}-${index + 1}`,
           index: index + 1,
           barcode: item.barcode,
-          barcodeName: item.barcodeName,
-          skuCode: item.skuCode,
-          saleCounting: 0,
-          stockMovement: 0,
-          countStoreFront: 0,
-          countStoreBack: 0,
-          totalCount: 0,
-          availableStock: 0,
-          countDifference: 0,
-          stockTemp: 0,
-          unit: item.unitName,
+          productName: item.productName,
+          sku: item.sku,
+          saleCounting: item.saleCounting,
+          stockMovement: item.stockMovement,
+          storeFrontCount: item.storeFrontCount,
+          storeBackCount: item.storeBackCount,
+          totalCount: item.storeFrontCount + item.storeBackCount,
+          availableStock: item.availableStock,
+          difference: item.difference,
+          tempStock: item.tempStock,
+          unitName: item.unitName,
         };
       });
       setBarcodeTable(rows2);
     } else {
       setBarcodeTable([]);
     }
-  }, [payloadAddItem]);
+  }, [barcodeCalculateData]);
 
   const handleChangeTab = async (event: React.SyntheticEvent, newValue: number) => {
     setValueTab(newValue);
@@ -367,13 +370,13 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     {
       field: 'barcode',
       headerName: 'บาร์โค้ด',
-      flex: 1,
+      flex: 1.4,
       headerAlign: 'center',
       disableColumnMenu: false,
       sortable: false,
     },
     {
-      field: 'barcodeName',
+      field: 'productName',
       headerName: 'รายละเอียดสินค้า',
       flex: 2,
       headerAlign: 'center',
@@ -383,7 +386,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
         <div>
           <Typography variant="body2">{params.value}</Typography>
           <Typography color="textSecondary" sx={{ fontSize: 12 }}>
-            {params.getValue(params.id, 'skuCode') || ''}
+            {params.getValue(params.id, 'sku') || ''}
           </Typography>
         </div>
       ),
@@ -419,7 +422,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       sortable: false,
     },
     {
-      field: 'countStoreFront',
+      field: 'storeFrontCount',
       headerName: '',
       flex: 1,
       headerAlign: 'center',
@@ -440,7 +443,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       },
     },
     {
-      field: 'countStoreBack',
+      field: 'storeBackCount',
       headerName: '',
       flex: 1,
       headerAlign: 'center',
@@ -479,7 +482,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       sortable: false,
     },
     {
-      field: 'countDifference',
+      field: 'difference',
       headerName: 'ส่วนต่างการนับ',
       flex: 1,
       headerAlign: 'center',
@@ -488,7 +491,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       sortable: false,
     },
     {
-      field: 'stockTemp',
+      field: 'tempStock',
       headerName: 'บ้านพักสต๊อก',
       flex: 1,
       headerAlign: 'center',
@@ -497,9 +500,9 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       sortable: false,
     },
     {
-      field: 'unit',
+      field: 'unitName',
       headerName: 'หน่วย',
-      flex: 0.8,
+      flex: 0.6,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -568,6 +571,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
               rows={skuTable}
               columns={columnsSkuTable}
               pageSize={pageSize}
+              hideFooterSelectedRowCount={true}
               onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
               rowsPerPageOptions={[10, 20, 50, 100]}
               pagination
@@ -603,6 +607,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
               rows={barcodeTable}
               columns={columnsBarcodeTable}
               pageSize={pageSize}
+              hideFooterSelectedRowCount={true}
               onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
               rowsPerPageOptions={[10, 20, 50, 100]}
               pagination

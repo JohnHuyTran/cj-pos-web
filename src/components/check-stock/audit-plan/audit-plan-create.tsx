@@ -139,6 +139,10 @@ export default function ModalCreateAuditPlan({
       ? userInfo.acl['service.posback-stock']
       : []
   );
+  const manageSAPermission =
+    userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
+      ? userInfo.acl['service.posback-stock'].includes(ACTIONS.STOCK_SA_MANAGE)
+      : false;
   const isBranchPermission = !!(env.branch.channel === 'branch');
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
@@ -457,6 +461,18 @@ export default function ModalCreateAuditPlan({
       APDocumentNumber: dataDetail.documentNumber,
       branchCode: dataDetail.branchCode,
       branchName: dataDetail.branchName,
+      // id:'62e3ad548dbb8e029492eea5',
+      // documentNumber: 'SA22070101-000020',
+      // relatedSCs:[
+      //   {
+      //     documentNumber: 'SC22070101-000089',
+      //     countingTime: 1,
+      //   },
+      //   {
+      //     documentNumber: 'SC22070101-000090',
+      //     countingTime: 2,
+      //   }
+      // ]
     };
     await dispatch(updateDataDetail(dataDetailSAUpdate));
     setOpenSA(true);
@@ -593,7 +609,7 @@ export default function ModalCreateAuditPlan({
                   className={classes.MbtnSearch}
                   startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenAddItems}
-                  sx={{ width: 126 }}
+                  sx={{ width: 126, mr: '17px'}}
                   disabled={steps.indexOf(status) > 0}
                   style={{
                     display:
@@ -603,6 +619,33 @@ export default function ModalCreateAuditPlan({
                   }}>
                   เพิ่มสินค้า
                 </Button>
+                <label htmlFor="import-st-button-file">
+                  {Object.keys(payloadAddTypeProduct).length === 0 && (
+                    <Input
+                      id="import-st-button-file"
+                      type="file"
+                      onChange={handleImportFile}
+                      style={{ display: 'none' }}
+                    />
+                  )}
+                  <Button
+                    id="btnImport"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnSearch}
+                    startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
+                    sx={{ width: 126, mr: '17px' }}
+                    component="span"
+                    style={{
+                      display:
+                        steps.indexOf(status) > 0 || !managePermission || viewMode || status == StockActionStatus.CANCEL
+                          ? 'none'
+                          : undefined,
+                    }}
+                    disabled={!!Object.keys(payloadAddTypeProduct).length}>
+                    Import
+                  </Button>
+                </label>
                 <Button
                   id="btnCreateSA"
                   variant="contained"
@@ -610,13 +653,13 @@ export default function ModalCreateAuditPlan({
                   className={classes.MbtnSearch}
                   startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenSA}
-                  sx={{ width: 150 , height: '36.5px', margin: '0 17px'}}
+                  sx={{ width: 150 , height: '36.5px', mr: '17px'}}
                   disabled={
                     !(dataDetail.relatedDocuments && dataDetail.relatedDocuments.length > 0
                     && dataDetail.relatedDocuments.filter((it:any) => it.status === StockActionStatus.CONFIRM).length > 0)
                   }
                   style={{
-                    display: !managePermission || viewMode || status == StockActionStatus.CANCEL
+                    display: !manageSAPermission || viewMode || status == StockActionStatus.CANCEL
                         ? 'none'
                         : undefined,
                   }}>
@@ -626,33 +669,6 @@ export default function ModalCreateAuditPlan({
                     </Typography>
                 </Button>
               </Box>
-              <label htmlFor="import-st-button-file">
-                {Object.keys(payloadAddTypeProduct).length === 0 && (
-                  <Input
-                    id="import-st-button-file"
-                    type="file"
-                    onChange={handleImportFile}
-                    style={{ display: 'none' }}
-                  />
-                )}
-                <Button
-                  id="btnImport"
-                  variant="contained"
-                  color="primary"
-                  className={classes.MbtnSearch}
-                  startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
-                  sx={{ width: 126, ml: '19px' }}
-                  component="span"
-                  style={{
-                    display:
-                      steps.indexOf(status) > 0 || !managePermission || viewMode || status == StockActionStatus.CANCEL
-                        ? 'none'
-                        : undefined,
-                  }}
-                  disabled={!!Object.keys(payloadAddTypeProduct).length}>
-                  Import
-                </Button>
-              </label>
               <Box sx={{ marginLeft: 'auto' }}>
                 <Button
                   id="btnSaveDraft"

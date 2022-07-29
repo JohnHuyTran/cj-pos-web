@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
+import { useAppSelector } from '../../../store/store';
 import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
 import { Box } from '@material-ui/core';
 import {
@@ -8,11 +8,12 @@ import {
   Typography,
 } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
-import { StockActionStatus, STORE_TYPE } from '../../../utils/enum/common-enum';
+import { DateFormat, StockActionStatus, STORE_TYPE } from '../../../utils/enum/common-enum';
 import HtmlTooltip from "../../commons/ui/html-tooltip";
 import Button from "@mui/material/Button";
 import { BootstrapDialogTitle } from "../../commons/ui/dialog-title";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import { convertUtcToBkkDate } from "../../../utils/date-utill";
 
 export interface DataGridProps {
   open: boolean;
@@ -31,26 +32,28 @@ export const ModalAddStockCount = (props: DataGridProps) => {
   const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
 
   useEffect(() => {
-    let payloadAddItem = dataDetail.relatedDocuments;
-    if (payloadAddItem && payloadAddItem.length > 0) {
-      let rows = payloadAddItem.map((item: any, index: number) => {
-        let inSelectedSCs = selectedSCs.filter((it: any) => (it.documentNumber === item.documentNumber && it.countingTime === item.countingTime));
-        return {
-          checked: (inSelectedSCs && inSelectedSCs.length > 0),
-          id: item.id,
-          index: index + 1,
-          documentNumber: item.documentNumber,
-          countingTime: item.countingTime,
-          storeType: item.storeType,
-          createdDate: item.createdDate,
-          status: item.status,
-          createdBy: item.createdBy,
-          disabledChecked: (inSelectedSCs && inSelectedSCs.length > 0),
-        };
-      });
-      setDataTable(rows);
-    } else {
-      setDataTable([]);
+    if (dataDetail && dataDetail.relatedDocuments && dataDetail.relatedDocuments.length > 0) {
+      let lstSCConfirmed = dataDetail.relatedDocuments.filter((itF: any) => StockActionStatus.CONFIRM === itF.status);
+      if (lstSCConfirmed && lstSCConfirmed.length > 0) {
+        let rows = lstSCConfirmed.map((item: any, index: number) => {
+          let inSelectedSCs = selectedSCs.filter((it: any) => (it.documentNumber === item.documentNumber && it.countingTime === item.countingTime));
+          return {
+            checked: (inSelectedSCs && inSelectedSCs.length > 0),
+            id: item.id,
+            index: index + 1,
+            documentNumber: item.documentNumber,
+            countingTime: item.countingTime,
+            storeType: item.storeType,
+            createdDate: convertUtcToBkkDate(item.createdDate, DateFormat.DATE_FORMAT),
+            status: item.status,
+            createdBy: item.createdBy,
+            disabledChecked: (inSelectedSCs && inSelectedSCs.length > 0),
+          };
+        });
+        setDataTable(rows);
+      } else {
+        setDataTable([]);
+      }
     }
     setCheckAll(dataTable.filter((it: any) => it.disabledChecked).length === dataTable.length);
   }, [dataDetail, open]);

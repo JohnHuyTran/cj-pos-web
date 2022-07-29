@@ -40,6 +40,7 @@ import { HighlightOff, Replay } from "@mui/icons-material";
 import DialogTitle from "@mui/material/DialogTitle";
 import { ACTIONS } from "../../../utils/enum/permission-enum";
 import ModelConfirmStockAdjust from "./modal-confirm-stock-adjust";
+import { getBarcodeCalculate } from "../../../store/slices/stock-adjust-barcode-calculate-slice";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -209,7 +210,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
         dispatch(updateCheckEdit(false));
         setOpenSnackBar(true);
         setTextSnackBar('คุณได้ทำการบันทีกข้อมูลเรียบร้อยแล้ว');
-        dispatch(
+        await dispatch(
           updateDataDetail({
             ...dataDetail,
             id: rs.data.id,
@@ -217,6 +218,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
             status: StockActionStatus.DRAFT,
           })
         );
+        handleRefresh();
       } else {
         setOpenModalError(true);
       }
@@ -317,6 +319,17 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     handleCreateDraft(selectedSCs);
   };
 
+  const handleRefresh = () => {
+    handleOpenLoading('open', true);
+    dispatch(getBarcodeCalculate({
+      // id: '62e3ad548dbb8e029492eea5',
+      id: dataDetail.id,
+      perPage: 10,
+      page: 1,
+    }));
+    handleOpenLoading('open', false);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth={false} fullWidth>
@@ -324,7 +337,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
           <IconButton
             data-testid='testid-title-btnClose'
             aria-label='close'
-            // onClick={handleCloseModalCreate}
+            onClick={handleRefresh}
             sx={{
               position: 'absolute',
               right: 55,
@@ -434,9 +447,12 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   color='primary'
                   sx={{ margin: '0 17px' }}
                   disabled={stringNullOrEmpty(status) || status != StockActionStatus.DRAFT}
-                  style={{ display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) || !managePermission || viewMode) ? 'none' : undefined }}
+                  style={{
+                    display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
+                      || !managePermission || viewMode) ? 'none' : undefined
+                  }}
                   startIcon={<CheckCircleOutlineIcon/>}
-                  onClick={handleOpenModalConfirm}
+                  // onClick={handleOpenModalConfirm}
                   className={classes.MbtnSearch}>
                   ยืนยัน
                 </Button>
@@ -445,7 +461,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   variant='contained'
                   color='error'
                   disabled={stringNullOrEmpty(status)}
-                  style={{ display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) || !managePermission || viewMode) ? 'none' : undefined }}
+                  style={{
+                    display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
+                      || !managePermission || viewMode) ? 'none' : undefined
+                  }}
                   startIcon={<HighlightOffIcon/>}
                   // onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
