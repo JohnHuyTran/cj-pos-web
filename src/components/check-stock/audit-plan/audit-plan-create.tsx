@@ -514,11 +514,9 @@ export default function ModalCreateAuditPlan({
                       disabled={
                         (action == Action.INSERT && !userGroups.includes(KEYCLOAK_GROUP_AUDIT)) ||
                         steps.indexOf(status) > 0 ||
-                        !(
-                          action == Action.UPDATE &&
+                        (action == Action.UPDATE &&
                           !userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
-                          currentName == 'posaudit'
-                        )
+                          currentName == 'posaudit')
                       }
                       onChange={handleChangeStockCounter}
                       inputProps={{ 'aria-label': 'Without label' }}
@@ -661,19 +659,14 @@ export default function ModalCreateAuditPlan({
                   variant="contained"
                   color="primary"
                   sx={{ margin: '0 17px' }}
-                  disabled={
-                    steps.indexOf(status) < 0 ||
-                    !managePermission ||
-                    (steps.indexOf(status) > 1 && !isBranchPermission) ||
-                    disableCounting
-                  }
+                  disabled={steps.indexOf(status) < 0 || !managePermission || disableCounting}
                   style={{
                     display:
                       steps.indexOf(status) < 1 ||
                       !countingPermission ||
                       viewMode ||
                       status == StockActionStatus.CANCEL ||
-                      !groupBranch
+                      !(userGroups.includes(KEYCLOAK_GROUP_AUDIT) && values.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
                         ? 'none'
                         : undefined,
                   }}
