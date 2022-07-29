@@ -5,8 +5,8 @@ import DialogContent from '@mui/material/DialogContent';
 import LoadingModal from '../../commons/ui/loading-modal';
 import { useStyles } from 'styles/makeTheme';
 import { BootstrapDialogTitle } from 'components/commons/ui/dialog-title';
-import { Grid, TextField, Typography } from '@mui/material';
-import { Download } from '@mui/icons-material';
+import { Box, Grid, TextField, Typography } from '@mui/material';
+import { Download, UploadFile } from '@mui/icons-material';
 import { fetchDownloadTemplateRT } from 'services/stock-transfer';
 import moment from 'moment';
 import { ApiUploadError } from 'models/api-error-model';
@@ -87,65 +87,8 @@ export default function ModalCashStatementImport({ open, onClickClose, onConfirm
   };
 
   const handleUpLoadFile = async () => {
+    setFileName('');
     return onConfirm(file ? file : null);
-
-    // setOpenLoadingModal(true);
-
-    // if (file) {
-    // await importCashStatement(file)
-    //   .then((value) => {
-    //     // setErrorUploadFile(false);
-
-    //     alert('คุณได้Importข้อมูลเรียบร้อยแล้ว');
-
-    //     setTimeout(() => {
-    //       onClickClose();
-    //     }, 1000);
-    //   })
-    //   .catch((error: ApiUploadError) => {
-    //     setFile(undefined);
-    //     setFileName('');
-
-    //     if (errorUploadFile) setErrorUploadFile(false);
-    //     else if (!errorUploadFile) setErrorUploadFile(true);
-
-    //     // if (error.code === 40000) {
-    //     //   setOpenAlertFile(true);
-    //     //   setOpenAlert(true);
-    //     //   setTitelError('ไม่สามารถ import file ได้');
-    //     //   setTextError('รูปแบบไฟล์ต้องเป็น excel format (.xlsx)');
-    //     //   setBase64EncodeFile('');
-    //     //   setLinkFileError(false);
-    //     // } else if (error.code === 40001) {
-    //     //   setOpenAlertFile(true);
-    //     //   setOpenAlert(true);
-    //     //   setTitelError('ไม่สามารถ import file ได้');
-    //     //   setTextError(error.message);
-    //     //   setBase64EncodeFile('');
-    //     //   setLinkFileError(false);
-    //     // } else if (error.code === 40013) {
-    //     //   setOpenAlertFile(true);
-    //     //   setOpenAlert(true);
-    //     //   setTitelError('ไม่สามารถ import file ได้');
-    //     //   setTextError('');
-
-    //     //   const b64Data = error.data?.base64EncodeFile;
-    //     //   if (b64Data) {
-    //     //     setBase64EncodeFile(b64Data);
-    //     //     setLinkFileError(true);
-    //     //   }
-    //     // } else {
-    //     //   setOpenAlertFile(true);
-    //     //   setOpenAlert(true);
-    //     //   setTitelError('ไม่สามารถ import file ได้');
-    //     //   setTextError('');
-    //     //   setBase64EncodeFile('');
-    //     //   setLinkFileError(false);
-    //     // }
-    //   });
-    // }
-
-    // setOpenLoadingModal(false);
   };
 
   return (
@@ -157,10 +100,12 @@ export default function ModalCashStatementImport({ open, onClickClose, onConfirm
         maxWidth='lg'
         PaperProps={{ sx: { minWidth: 700 } }}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={onClickClose}>
-          <Typography variant='subtitle1'>นำเข้าเอกสาร</Typography>
+          <Typography variant='subtitle1' sx={{ fontWeight: 600, pl: 4 }}>
+            นำเข้าเอกสาร
+          </Typography>
         </BootstrapDialogTitle>
-        <DialogContent sx={{ mr: 3, ml: 3 }}>
-          <Grid container rowSpacing={2} columnSpacing={{ xs: 7 }}>
+        <DialogContent sx={{ mr: 4, ml: 4, mt: -3 }}>
+          <Grid container columnSpacing={{ xs: 7 }}>
             <Grid item xs={12} sx={{ textAlign: 'end' }}>
               <Button
                 id='btnImport'
@@ -175,9 +120,79 @@ export default function ModalCashStatementImport({ open, onClickClose, onConfirm
             </Grid>
           </Grid>
 
-          {/* <Grid container mt={2} rowSpacing={2} columnSpacing={{ xs: 7 }}>
-            <Grid item xs={6} sx={{ textAlign: 'start' }}>
-              xxx
+          <Grid container rowSpacing={2} columnSpacing={{ xs: 4 }} mt={1} mb={2}>
+            <Grid item xs={6}>
+              <div>
+                {errorUploadFile === true && (
+                  <>
+                    <input
+                      id='btnBrowse'
+                      type='file'
+                      accept='.xlsx'
+                      onChange={handleFileInputChange}
+                      style={{ display: 'none' }}
+                    />
+                  </>
+                )}
+
+                {errorUploadFile === false && (
+                  <>
+                    <input
+                      id='btnBrowse'
+                      type='file'
+                      accept='.xlsx'
+                      onChange={handleFileInputChange}
+                      style={{ display: 'none' }}
+                    />
+                  </>
+                )}
+
+                <label htmlFor={'btnBrowse'}>
+                  {fileName === '' && (
+                    <Box
+                      component='div'
+                      sx={{
+                        borderRadius: '5px !important',
+                        border: '2px dashed #36C690 !important',
+                        padding: '0 4px !important',
+                        width: '455px',
+                        height: 35,
+                        textAlign: 'center',
+                      }}>
+                      <UploadFile fontSize='small' sx={{ color: '#EAEBEB' }} />
+                      <label style={{ color: '#AEAEAE', fontSize: 12 }}> กรุณาเลือกไฟล์ที่ต้องการนำเข้า</label>
+                    </Box>
+                  )}
+                  {fileName !== '' && errorBrowseFile === true && (
+                    <Box
+                      component='div'
+                      sx={{
+                        borderRadius: '5px !important',
+                        border: '2px dashed #FF0000 !important',
+                        padding: '4px !important',
+                        width: '455px',
+                        height: 35,
+                      }}>
+                      {fileName}
+                    </Box>
+                  )}
+                  {fileName !== '' && errorBrowseFile === false && (
+                    <Box
+                      component='div'
+                      sx={{
+                        borderRadius: '5px !important',
+                        border: '2px dashed #36C690 !important',
+                        padding: '4px !important',
+                        width: '455px',
+                        height: 35,
+                      }}>
+                      {fileName}
+                    </Box>
+                  )}
+
+                  <label style={{ fontSize: 12, color: '#676767' }}>แนบไฟล์ .xlsx</label>
+                </label>
+              </div>
             </Grid>
             <Grid item xs={6} sx={{ textAlign: 'end' }}>
               <Button
@@ -185,15 +200,15 @@ export default function ModalCashStatementImport({ open, onClickClose, onConfirm
                 variant='contained'
                 color='primary'
                 startIcon={<Download />}
-                onClick={handleDownloadTemplate}
+                onClick={handleUpLoadFile}
                 className={classes.MbtnSearch}
-                style={{ minWidth: 150 }}>
-                Download Template
+                sx={{ minWidth: 200 }}>
+                อัพโหลดเอกสาร
               </Button>
             </Grid>
-          </Grid> */}
+          </Grid>
 
-          <Grid item xs={12} mt={2} mb={4}>
+          {/* <Grid item xs={12} mt={2} mb={4}>
             <div>
               {errorBrowseFile === true && (
                 <>
@@ -255,28 +270,11 @@ export default function ModalCashStatementImport({ open, onClickClose, onConfirm
                   style={{ marginLeft: 10, textTransform: 'none', minWidth: 200 }}>
                   แนบไฟล์
                 </Button>
-
-                {/* <TextField
-                  name='browserTxf'
-                  className={classes.MtextFieldUpload}
-                  placeholder='กรุณาเลือกไฟล์ที่ต้องการนำเข้า'
-                  helperText='แนบไฟล์ .xlsx'
-                  disabled={true}
-                /> */}
-                {/* <Button
-                  id='btnImport'
-                  variant='contained'
-                  color='primary'
-                  startIcon={<Download />}
-                  style={{ marginLeft: 10, minWidth: 200 }}
-                  className={classes.MbtnSearch}>
-                  Import
-                </Button> */}
               </label>
             </div>
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={12} mt={2} sx={{ textAlign: 'center' }}>
+          {/* <Grid item xs={12} mt={2} sx={{ textAlign: 'center' }}>
             <Button
               id='btnImport'
               variant='contained'
@@ -287,7 +285,7 @@ export default function ModalCashStatementImport({ open, onClickClose, onConfirm
               sx={{ width: '27%' }}>
               อัพโหลดเอกสาร
             </Button>
-          </Grid>
+          </Grid> */}
         </DialogContent>
       </Dialog>
 
