@@ -116,7 +116,9 @@ function CloseSaleShiftSearch() {
       await dispatch(featchCloseSaleShiptListAsync(payload));
       await dispatch(savePayloadSearch(payload));
       const datas = store.getState().closeSaleShiftSlice.closeSaleShift.data;
+      const _noOfShiftKey = store.getState().closeSaleShiftSlice.closeSaleShift.total;
       if (datas && datas.length > 0) {
+        setNoOfShiftKey(_noOfShiftKey.toString());
         let notCorrect = false;
         datas.map((item: CloseSaleShiftInfo, index: number) => {
           if (item.status !== 'CORRECT') {

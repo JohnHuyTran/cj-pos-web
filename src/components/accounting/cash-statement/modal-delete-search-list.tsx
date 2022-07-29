@@ -8,19 +8,19 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 interface Props {
   open: boolean;
   onClose: () => void;
-  payloadDelete?: any;
+  onConfirmDelete: (data: any) => void;
+  payloadDelete: any;
 }
 
-function ModalDeleteSearchList({ open, onClose, payloadDelete }: Props) {
+function ModalDeleteSearchList({ open, onClose, payloadDelete, onConfirmDelete }: Props) {
   const classes = useStyles();
-  console.log('payloadDelete: ', payloadDelete);
 
   const columns: GridColDef[] = [
     {
       field: 'id',
 
       headerName: 'ลำดับ',
-      width: 120,
+      width: 65,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -30,69 +30,75 @@ function ModalDeleteSearchList({ open, onClose, payloadDelete }: Props) {
       ),
     },
     {
-      field: 'cashShort',
-
-      headerName: 'test',
-      width: 120,
+      field: 'branch',
+      headerName: 'สาขา',
+      minWidth: 120,
+      flex: 1.2,
       headerAlign: 'center',
       sortable: false,
-      renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
+    },
+    {
+      field: 'cashDate',
+      headerName: 'วันที่เงินขาด-เกิน',
+      minWidth: 150,
+      headerAlign: 'center',
+      align: 'left',
+      sortable: false,
+    },
+    {
+      field: 'salesDate',
+      headerName: 'วันที่ยอดขาย',
+      minWidth: 120,
+      flex: 1.2,
+      headerAlign: 'center',
+      sortable: false,
     },
     {
       field: 'cashShort',
-
-      headerName: 'test',
-      width: 120,
+      headerName: 'เงินขาด',
+      minWidth: 100,
+      flex: 1.2,
       headerAlign: 'center',
+      align: 'right',
       sortable: false,
-      renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
-          {params.value}
-        </Box>
-      ),
+    },
+    {
+      field: 'cashOver',
+      headerName: 'เงินเกิน',
+      minWidth: 100,
+      flex: 1.2,
+      headerAlign: 'center',
+      align: 'right',
+      sortable: false,
     },
   ];
-  console.log('payloadDelete: ', payloadDelete);
-  let rows: any = Object.values(payloadDelete).map((item: any, index: number) => {
-    console.log('item:', item);
+
+  let rows: any = payloadDelete.map((item: any, index: number) => {
     return {
-      id: index,
-      branch: item.branch,
-      date1: item.date1,
-      date2: item.date2,
-      cashShort: item.cash1,
-      cashOver: item.cash2,
+      id: item.index,
+      branch: item.branchCode,
+      cashDate: item.cashDate,
+      salesDate: item.salesDate,
+      cashShort: item.cashShort,
+      cashOver: item.cashOver,
     };
   });
 
-  console.log('rows: ', rows);
+  //   const handleConfirmDelete = () => {
+  //     onConfirmDelete()
+  //   }
 
   return (
     <Fragment>
-      <Dialog open={open} maxWidth="sm" fullWidth={true}>
+      <Dialog open={open} maxWidth="md" fullWidth={true}>
         <DialogContent>
           <Typography variant="h6" align="center" sx={{ marginBottom: 1 }}>
             ยืนยันการลบรายการ
           </Typography>
 
           <Box>
-            <div
-              style={{ width: '100%', height: rows.length >= 5 ? '43vh' : 'auto' }}
-              className={classes.MdataGridPaginationTop}
-            >
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                disableColumnMenu
-                hideFooter
-                scrollbarSize={10}
-                // autoHeight={notPrintRows.length < 5}
-                rowHeight={70}
-              />
+            <div style={{ width: '100%', height: 'auto' }} className={classes.MdataGridPaginationTop}>
+              <DataGrid rows={rows} columns={columns} disableColumnMenu hideFooter scrollbarSize={10} autoHeight />
             </div>
           </Box>
 
@@ -113,6 +119,7 @@ function ModalDeleteSearchList({ open, onClose, payloadDelete }: Props) {
               color="error"
               className={classes.MbtnSearch}
               sx={{ width: '20%' }}
+              onClick={() => onConfirmDelete(payloadDelete)}
             >
               ลบรายการ
             </Button>

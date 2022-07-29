@@ -4,17 +4,14 @@ import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 
 import theme from '../../../styles/theme';
 import { useStyles } from '../../../styles/makeTheme';
-import CloseIcon from '@mui/icons-material/Close';
 
 import ModalAlert from '../../modal-alert';
 import { uploadFileState } from '../../../store/slices/upload-file-slice';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { FileType } from '../../../models/supplier-check-order-model';
 import { ApiError } from '../../../models/api-error-model';
-import { delFileUrlHuawei } from '../../../services/purchase';
 import { getFileUrlHuawei } from '../../../services/master-service';
 import ModalShowHuaweiFile from '../../commons/ui/modal-show-huawei-file';
-import { stringNullOrEmpty } from '../../../utils/utils';
 
 interface fileDisplayList {
   branchCode?: string;
@@ -103,11 +100,12 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
 
     let files: File = e.target.files[0];
 
-    setStatusUpload(true);
-    setStatusSaveFile(false);
-    setAccordionFile(true);
-
-    setFileList([files]);
+    if (!isCheckError) {
+      setStatusUpload(true);
+      setStatusSaveFile(false);
+      setAccordionFile(true);
+      setFileList([files]);
+    }
   };
 
   let newFileDisplayList: any = [];

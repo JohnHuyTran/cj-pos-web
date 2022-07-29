@@ -112,8 +112,8 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
   useEffect(() => {
     setValues({
       date: new Date(),
-      cashOver: payloadEdit ? payloadEdit.cash2 : '0',
-      cashShort: payloadEdit ? payloadEdit.cash1 : '0',
+      cashOver: payloadEdit ? payloadEdit.cashOver : '0',
+      cashShort: payloadEdit ? payloadEdit.cashShort : '0',
     });
     setStartDate(new Date());
     setMsgError('');

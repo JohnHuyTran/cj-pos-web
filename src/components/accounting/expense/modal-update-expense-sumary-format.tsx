@@ -188,7 +188,9 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                     return (
                       <>
                         <Grid item xs={2}>
-                          <Typography variant='body2'>{i.title}: </Typography>
+                          <Typography variant='body2' sx={{ wordWrap: 'break-word' }}>
+                            {i.title}:{' '}
+                          </Typography>
                         </Grid>
                         <Grid item xs={2}>
                           {/* <TextField
@@ -264,7 +266,9 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                     return (
                       <>
                         <Grid item xs={2}>
-                          <Typography variant='body2'>{i.title}: </Typography>
+                          <Typography variant='body2' sx={{ wordWrap: 'break-word' }}>
+                            {i.title}:{' '}
+                          </Typography>
                         </Grid>
                         <Grid item xs={2}>
                           {/* <TextField

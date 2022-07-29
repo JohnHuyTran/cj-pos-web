@@ -606,6 +606,9 @@ export const environment = {
       },
     },
     cashStatement: {
+      search: {
+        url: 'accounting/cash-statement/cash',
+      },
       edit: {
         url: 'accounting/cash-statement/edit',
       },
