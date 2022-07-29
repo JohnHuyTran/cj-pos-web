@@ -442,6 +442,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                 onChange={handleChangeApprovalLimit}
                 fullWidth
                 fixedDecimalScale
+                allowNegative={false}
                 type="text"
               />
             </Grid>
@@ -462,6 +463,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                 fullWidth
                 fixedDecimalScale
                 type="text"
+                allowNegative={false}
               />
             </Grid>
           </Grid>
