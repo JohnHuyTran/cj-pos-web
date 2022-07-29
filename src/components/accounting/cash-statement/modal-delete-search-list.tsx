@@ -8,7 +8,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 interface Props {
   open: boolean;
   onClose: () => void;
-  onConfirmDelete: (data: any) => void;
+  onConfirmDelete: () => void;
   payloadDelete: any;
 }
 
@@ -119,7 +119,7 @@ function ModalDeleteSearchList({ open, onClose, payloadDelete, onConfirmDelete }
               color="error"
               className={classes.MbtnSearch}
               sx={{ width: '20%' }}
-              onClick={() => onConfirmDelete(payloadDelete)}
+              onClick={() => onConfirmDelete()}
             >
               ลบรายการ
             </Button>

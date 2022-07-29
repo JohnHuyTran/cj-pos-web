@@ -322,8 +322,8 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
     setOpenModalDelete(true);
   };
 
-  const handleConfirmDel = (data: any) => {
-    console.log('data del:', data);
+  const handleConfirmDel = () => {
+    console.log('del confirm:');
     setOpenModalDelete(false);
   };
 
