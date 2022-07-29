@@ -48,9 +48,8 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
     if (barcode) {
       setIsOpenLoading(true)
       try {
-        updateConfirmShiftCloses(payload?.shiftCode, {shiftKey: barcode})
-        /* const res = await updateConfirmShiftCloses(payload?.shiftCode, {shiftKey: barcode})
-        console.log('dispatch', res) */
+        const res = await updateConfirmShiftCloses(payload?.shiftCode, {shiftKey: barcode})
+        // console.log('dispatch', res)
         handleClose()
       } catch (err) {
         setErrorCode(err.code || err.httpStatus)
@@ -103,7 +102,7 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
                 sx={{mt: 1}}
                 fullWidth
               />
-              {!!errorCode && (
+              {errorCode && (
                 <Typography component='div' color='error' sx={{mt: 1}}>{t(errorCode)}</Typography>
               )}
             </Box>
