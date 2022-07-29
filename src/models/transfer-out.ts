@@ -17,6 +17,7 @@ export interface TransferOutDetail {
   numberOfRequested: number;
   numberOfApproved: number;
   remark: string;
+  checked?: boolean;
 }
 
 export interface TransferOutDestroyDiscountDetail {
