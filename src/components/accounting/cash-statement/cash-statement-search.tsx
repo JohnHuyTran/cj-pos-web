@@ -1,34 +1,68 @@
 import React from 'react';
-import { Box, Button, FormControl, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  FormControl,
+  Grid,
+  Link,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useStyles } from '../../../styles/makeTheme';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import { getBranchName } from '../../../utils/utils';
 import { BranchListOptionType } from '../../../models/branch-model';
-import { useAppSelector } from '../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { getUserInfo } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
 import { isGroupBranch } from '../../../utils/role-permission';
 import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import { getCashStatementStatusInfo } from '../../../utils/enum/cash-statement-enum';
-import { Download } from '@mui/icons-material';
+import { Download, ErrorOutline } from '@mui/icons-material';
 import CashStatementList from './cash-statement-list';
+import { CashStatementSearchRequest } from 'models/branch-accounting-model';
+import moment from 'moment';
+import { featchSearchCashStatementAsync } from 'store/slices/accounting/cash-statement/cash-search-slice';
+import { saveCashStatementSearch } from 'store/slices/accounting/cash-statement/save-cash-search-slice';
+import LoadingModal from '../../commons/ui/loading-modal';
+import ModalApproveSearchList from './modal-approve-search-list';
+import ModalCashStatementImport from './modal-cash-statement-import';
+import { importCashStatement } from 'services/accounting';
+import { ApiUploadError } from 'models/api-error-model';
+import AlertError from '../../commons/ui/alert-error';
+import SnackbarStatus from '../../commons/ui/snackbar-status';
+import ModalDownloadErrorFile from './modal-download-error-file';
 
 interface State {
-  branch: string;
-  dateFrom: string;
-  dateTo: string;
-  statuses: string;
+  branchCode: string;
+  dateFrom: any;
+  dateTo: any;
+  status: string;
 }
 export default function CashStatementSearch() {
   const { t } = useTranslation(['cashStatement', 'common']);
   const classes = useStyles();
+  const dispatch = useAppDispatch();
+
+  const page = '1';
+  const items = useAppSelector((state) => state.searchCashStatement);
+  const limit = useAppSelector((state) => state.searchCashStatement.cashStatementList.perPage);
+  const [flagSearch, setFlagSearch] = React.useState(false);
+  const cashStatementList = items.cashStatementList.data ? items.cashStatementList.data : [];
+  const searchCashStatement = useAppSelector((state) => state.saveCashStatementSearchRequest.searchCashStatement);
 
   const [values, setValues] = React.useState<State>({
-    branch: '',
+    branchCode: '',
     dateFrom: '',
     dateTo: '',
-    statuses: 'ALL',
+    status: 'ALL',
   });
 
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
@@ -54,9 +88,9 @@ export default function CashStatementSearch() {
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
-      setValues({ ...values, branch: JSON.parse(codes) });
+      setValues({ ...values, branchCode: JSON.parse(codes) });
     } else {
-      setValues({ ...values, branch: '' });
+      setValues({ ...values, branchCode: '' });
     }
   };
 
@@ -75,8 +109,198 @@ export default function CashStatementSearch() {
     setValues({ ...values, [event.target.name]: value });
   };
 
+  const [selectRowsList, setSelectRowsList] = React.useState<Array<any>>([]);
   const handleSelectRows = async (list: any) => {
-    console.log('handleSelectRows: ', JSON.stringify(list));
+    setSelectRowsList(list);
+  };
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  const onClickSearchBtn = async () => {
+    let limits;
+    if (limit === 0 || limit === undefined) {
+      limits = '10';
+    } else {
+      limits = limit.toString();
+    }
+
+    const payload: CashStatementSearchRequest = {
+      limit: limits,
+      page: page,
+      branchCode: values.branchCode,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      status: values.status,
+    };
+
+    setOpenLoadingModal(true);
+    await dispatch(featchSearchCashStatementAsync(payload));
+    await dispatch(saveCashStatementSearch(payload));
+    setFlagSearch(true);
+    setOpenLoadingModal(false);
+  };
+
+  const onClickClearBtn = () => {
+    setOpenLoadingModal(true);
+    setFlagSearch(false);
+    setStartDate(null);
+    setEndDate(null);
+    setClearBranchDropDown(!clearBranchDropDown);
+    setSelectRowsList([]);
+
+    setValues({
+      branchCode: values.branchCode,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      status: 'ALL',
+    });
+
+    const payload: CashStatementSearchRequest = {
+      limit: limit ? limit.toString() : '10',
+      page: page,
+      branchCode: values.branchCode,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      status: values.status,
+      clearSearch: true,
+    };
+    dispatch(featchSearchCashStatementAsync(payload));
+
+    setTimeout(() => {
+      setOpenLoadingModal(false);
+    }, 300);
+  };
+
+  const [openModalApprove, setopenModalApprove] = React.useState(false);
+  const handleApproveMultiple = () => {
+    setopenModalApprove(true);
+  };
+
+  const handleConfirmApprove = async () => {
+    setOpenLoadingModal(true);
+    const selectRows: any = [];
+    await selectRowsList.forEach((data: any) => {
+      selectRows.push(data.id);
+    });
+
+    const payload: any = {
+      ids: selectRows,
+    };
+    console.log('payload:', payload);
+
+    // Wait API
+    // await approve(payload)
+    //   .then((value) => {
+    //     dispatch(featchSearchCashStatementAsync(searchCashStatement));
+    //     setShowSnackBar(true);
+    //     setSnackbarIsStatus(true);
+    //     setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+
+    setTimeout(() => {
+      setopenModalApprove(false);
+    }, 300);
+    // })
+    // .catch((error: any) => {
+    //   if (String(error.code) === '40014') {
+    //     const header: Header = {
+    //       field1: false,
+    //       field2: false,
+    //       field3: true,
+    //       field4: false,
+    //     };
+    //     const payload: ErrorDetailResponse = {
+    //       header: header,
+    //       error_details: error.error_details,
+    //     };
+    //     setOpenAlert(true);
+    //     // setTitleError('เลขที่เอกสาร');
+    //     setTextError(error.message);
+    //     setPayloadError(payload);
+    //   } else {
+    //     setOpenAlert(true);
+    //     setTextError(error.message);
+    //     setTitleError('');
+    //   }
+    // });
+
+    setOpenLoadingModal(false);
+  };
+
+  const onCloseModalApprove = () => {
+    setopenModalApprove(false);
+  };
+
+  const [openImportModal, setOpenImportModal] = React.useState(false);
+  const onClickImportBtn = async () => {
+    setOpenImportModal(true);
+  };
+
+  const handleCloseImport = async () => {
+    setOpenImportModal(false);
+  };
+
+  const [openAlertFile, setOpenAlertFile] = React.useState(false);
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [titelError, setTitelError] = React.useState('');
+  const [textError, setTextError] = React.useState('');
+  const [linkFileError, setLinkFileError] = React.useState(false);
+  const [base64EncodeFile, setBase64EncodeFile] = React.useState('');
+  const handleCloseAlert = () => {
+    setOpenAlertFile(false);
+    setOpenAlert(false);
+  };
+
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const handleConfirmImport = async (file: any) => {
+    setOpenLoadingModal(true);
+
+    if (file) {
+      await importCashStatement(file)
+        .then((value) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้Importข้อมูลเรียบร้อยแล้ว');
+
+          setTimeout(() => {
+            setOpenImportModal(false);
+          }, 1000);
+        })
+        .catch((error: ApiUploadError) => {
+          if (error.code === 40001) {
+            setOpenAlertFile(true);
+            setOpenAlert(true);
+            setTitelError('ไม่สามารถ import file ได้');
+            setTextError(error.message);
+            setBase64EncodeFile('');
+            setLinkFileError(false);
+          } else if (error.code === 40013) {
+            setOpenAlertFile(true);
+            setOpenAlert(true);
+            setTitelError('ไม่สามารถ import file ได้');
+            setTextError('');
+
+            const b64Data = error.data?.base64EncodeFile;
+            if (b64Data) {
+              setBase64EncodeFile(b64Data);
+              setLinkFileError(true);
+            }
+          } else {
+            setOpenAlertFile(true);
+            setOpenAlert(true);
+            setTitelError('ไม่สามารถ import file ได้');
+            setTextError('');
+            setBase64EncodeFile('');
+            setLinkFileError(false);
+          }
+        });
+    }
+
+    setOpenLoadingModal(false);
   };
 
   return (
@@ -123,7 +347,7 @@ export default function CashStatementSearch() {
               <Select
                 id='selPiType'
                 name='statuses'
-                value={values.statuses}
+                value={values.status}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
@@ -148,7 +372,7 @@ export default function CashStatementSearch() {
                 variant='contained'
                 color='primary'
                 startIcon={<Download />}
-                // onClick={handleOpenUploadFileModal}
+                onClick={onClickImportBtn}
                 // sx={{ minWidth: 100, display: `${!displayBtnImport ? 'none' : ''}` }}
                 className={classes.MbtnSearch}>
                 Import
@@ -157,12 +381,11 @@ export default function CashStatementSearch() {
                 id='btnImport'
                 variant='contained'
                 color='primary'
-                // onClick={handleApprove2Multiple}
+                onClick={handleApproveMultiple}
                 // sx={{ ml: 2, minWidth: 100, display: `${!displayBtnSubmit ? 'none' : ''}` }}
                 sx={{ ml: 2, minWidth: 110 }}
                 className={classes.MbtnSearch}
-                // disabled={selectRowsList.length === 0}
-                disabled={true}>
+                disabled={selectRowsList.length === 0}>
                 อนุมัติ
               </Button>
             </Grid>
@@ -170,7 +393,7 @@ export default function CashStatementSearch() {
               <Button
                 id='btnClear'
                 variant='contained'
-                // onClick={onClickClearBtn}
+                onClick={onClickClearBtn}
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnClear}
                 color='cancelColor'>
@@ -180,7 +403,7 @@ export default function CashStatementSearch() {
                 id='btnSearch'
                 variant='contained'
                 color='primary'
-                // onClick={onClickValidateForm}
+                onClick={onClickSearchBtn}
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnSearch}>
                 ค้นหา
@@ -189,7 +412,53 @@ export default function CashStatementSearch() {
           </Grid>
         </Box>
 
-        <CashStatementList onSelectRows={handleSelectRows} />
+        {flagSearch && (
+          <div>
+            {cashStatementList.length > 0 && <CashStatementList onSelectRows={handleSelectRows} />}
+            {cashStatementList.length === 0 && (
+              <Grid item container xs={12} justifyContent='center'>
+                <Box color='#CBD4DB'>
+                  <h2>ไม่มีข้อมูล</h2>
+                </Box>
+              </Grid>
+            )}
+          </div>
+        )}
+
+        <ModalApproveSearchList
+          open={openModalApprove}
+          onClose={onCloseModalApprove}
+          payloadApprove={selectRowsList}
+          onConfirmApprove={handleConfirmApprove}
+        />
+        <LoadingModal open={openLoadingModal} />
+
+        <ModalCashStatementImport
+          open={openImportModal}
+          onClickClose={handleCloseImport}
+          onConfirm={handleConfirmImport}
+        />
+
+        {!openAlertFile && openAlert && (
+          <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+        )}
+        {openAlertFile && openAlert && (
+          <ModalDownloadErrorFile
+            open={openAlert}
+            onClickClose={handleCloseAlert}
+            titelError={titelError}
+            textError={textError}
+            linkFileError={linkFileError}
+            base64EncodeFile={base64EncodeFile}
+          />
+        )}
+
+        <SnackbarStatus
+          open={showSnackBar}
+          onClose={handleCloseSnackBar}
+          isSuccess={snackbarIsStatus}
+          contentMsg={contentMsg}
+        />
       </Box>
     </>
   );

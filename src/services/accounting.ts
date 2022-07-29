@@ -244,3 +244,37 @@ export async function cashStatementEdit(payload: CashStatementEditRequest) {
     });
   return response;
 }
+
+export async function importCashStatement(files: File) {
+  try {
+    const bodyFormData = new FormData();
+    bodyFormData.append('file', files);
+
+    const response = await post(
+      environment.branchAccounting.cashStatement.import.url,
+      bodyFormData,
+      ContentType.MULTIPART,
+      'Upload'
+    ).then((result: any) => result);
+    return response;
+  } catch (error) {
+    console.log('error :', error);
+    throw error;
+  }
+}
+
+export const getPathCashStatementDelete = (id: string, path: string) => {
+  return getPathUrl(`${path}`, { id: id });
+};
+
+export async function cashStatementDelete(id: string) {
+  const response = await post(
+    getPathCashStatementDelete(id, environment.branchAccounting.cashStatement.delete.url),
+    ContentType.JSON
+  )
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}

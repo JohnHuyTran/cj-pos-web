@@ -68,6 +68,7 @@ export default function SearchReserves(props: SearchReservesProps) {
       ...search
     };
     try {
+      onClickSearch(false)
       await dispatch(featchBranchAccountingConfigListAsync(payload))
       await dispatch(saveExpenseConfigSearch(payload))
       setIsOpenLoading(false)
