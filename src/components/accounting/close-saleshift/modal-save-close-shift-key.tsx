@@ -17,6 +17,7 @@ import {
   GridColDef,
 } from '@mui/x-data-grid';
 import { formatNumber } from 'utils/utils'
+import { useTranslation } from 'react-i18next';
 
 // Call API
 import { updateConfirmShiftCloses } from 'services/accounting';
@@ -36,10 +37,11 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
   const { open, payload, onClose } = props;
 
   const classes = useStyles();
+  const { t } = useTranslation(['error']);
   
   // Set state data
   const [barcode, setBarcode] = useState('')
-  const [isValidate, setIsValidate] = useState(false)
+  const [errorCode, setErrorCode] = useState('')
   const [isOpenLoading, setIsOpenLoading] = useState(false)
   
   const handleSave = async () => {
@@ -47,10 +49,10 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
       setIsOpenLoading(true)
       try {
         const res = await updateConfirmShiftCloses(payload?.shiftCode, {shiftKey: barcode})
-        console.log('dispatch', res)
+        // console.log('dispatch', res)
         handleClose()
-      } catch {
-        setIsValidate(true)
+      } catch (err) {
+        setErrorCode(err.code || err.httpStatus)
       } finally {
         setIsOpenLoading(false)
       }
@@ -58,7 +60,7 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
   }
 
   const handleClose = () => {
-    setIsValidate(false)
+    setErrorCode('')
     setBarcode('')
     onClose()
   }
@@ -90,15 +92,18 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
               <TextField
                 name="accountNameTh"
                 size="small"
-                error={isValidate}
+                error={!!errorCode}
                 value={barcode}
+                onKeyPress={(e) => (
+                  (e.key === "Enter" && barcode) ? handleSave() : ''
+                )}
                 onChange={(e) => setBarcode(e.target.value)}
                 className={classes.MtextField}
                 sx={{mt: 1}}
                 fullWidth
               />
-              {isValidate && (
-                <Typography component='div' color='error' sx={{mt: 1}}>ข้อมูลรหัสปิดรอบไม่ถูกต้อง</Typography>
+              {errorCode && (
+                <Typography component='div' color='error' sx={{mt: 1}}>{t(errorCode)}</Typography>
               )}
             </Box>
             <LoadingButton
