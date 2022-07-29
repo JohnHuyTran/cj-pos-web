@@ -5,7 +5,7 @@ import { useStyles } from '../../../styles/makeTheme';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import { getBranchName } from '../../../utils/utils';
 import { BranchListOptionType } from '../../../models/branch-model';
-import { useAppSelector } from '../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { getUserInfo } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
 import { isGroupBranch } from '../../../utils/role-permission';
@@ -13,22 +13,34 @@ import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import { getCashStatementStatusInfo } from '../../../utils/enum/cash-statement-enum';
 import { Download } from '@mui/icons-material';
 import CashStatementList from './cash-statement-list';
+import { CashStatementSearchRequest } from 'models/branch-accounting-model';
+import moment from 'moment';
+import { featchSearchCashStatementAsync } from 'store/slices/accounting/cash-statement/cash-search-slice';
+import { saveCashStatementSearch } from 'store/slices/accounting/cash-statement/save-cash-search-slice';
+import LoadingModal from '../../commons/ui/loading-modal';
 
 interface State {
-  branch: string;
+  branchCode: string;
   dateFrom: string;
   dateTo: string;
-  statuses: string;
+  status: string;
 }
 export default function CashStatementSearch() {
   const { t } = useTranslation(['cashStatement', 'common']);
   const classes = useStyles();
+  const dispatch = useAppDispatch();
+
+  const page = '1';
+  const items = useAppSelector((state) => state.searchCashStatement);
+  const limit = useAppSelector((state) => state.searchCashStatement.cashStatementList.perPage);
+  const [flagSearch, setFlagSearch] = React.useState(false);
+  const cashStatementList = items.cashStatementList.data ? items.cashStatementList.data : [];
 
   const [values, setValues] = React.useState<State>({
-    branch: '',
+    branchCode: '',
     dateFrom: '',
     dateTo: '',
-    statuses: 'ALL',
+    status: 'ALL',
   });
 
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
@@ -54,9 +66,9 @@ export default function CashStatementSearch() {
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
-      setValues({ ...values, branch: JSON.parse(codes) });
+      setValues({ ...values, branchCode: JSON.parse(codes) });
     } else {
-      setValues({ ...values, branch: '' });
+      setValues({ ...values, branchCode: '' });
     }
   };
 
@@ -77,6 +89,32 @@ export default function CashStatementSearch() {
 
   const handleSelectRows = async (list: any) => {
     console.log('handleSelectRows: ', JSON.stringify(list));
+  };
+
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+
+  const onClickSearchBtn = async () => {
+    let limits;
+    if (limit === 0 || limit === undefined) {
+      limits = '10';
+    } else {
+      limits = limit.toString();
+    }
+
+    const payload: CashStatementSearchRequest = {
+      limit: limits,
+      page: page,
+      branchCode: values.branchCode,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      status: values.status,
+    };
+
+    setOpenLoadingModal(true);
+    await dispatch(featchSearchCashStatementAsync(payload));
+    await dispatch(saveCashStatementSearch(payload));
+    setFlagSearch(true);
+    setOpenLoadingModal(false);
   };
 
   return (
@@ -123,7 +161,7 @@ export default function CashStatementSearch() {
               <Select
                 id='selPiType'
                 name='statuses'
-                value={values.statuses}
+                value={values.status}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
@@ -180,7 +218,7 @@ export default function CashStatementSearch() {
                 id='btnSearch'
                 variant='contained'
                 color='primary'
-                // onClick={onClickValidateForm}
+                onClick={onClickSearchBtn}
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnSearch}>
                 ค้นหา
@@ -189,7 +227,20 @@ export default function CashStatementSearch() {
           </Grid>
         </Box>
 
-        <CashStatementList onSelectRows={handleSelectRows} />
+        {flagSearch && (
+          <div>
+            {cashStatementList.length > 0 && <CashStatementList onSelectRows={handleSelectRows} />}
+            {cashStatementList.length === 0 && (
+              <Grid item container xs={12} justifyContent='center'>
+                <Box color='#CBD4DB'>
+                  <h2>ไม่มีข้อมูล</h2>
+                </Box>
+              </Grid>
+            )}
+          </div>
+        )}
+
+        <LoadingModal open={openLoadingModal} />
       </Box>
     </>
   );

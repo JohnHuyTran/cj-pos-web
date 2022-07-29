@@ -92,9 +92,11 @@ import saveExpenseSearchRequest from './slices/accounting/save-accounting-search
 import expensePeriodTypeSlice from './slices/accounting/accounting-period-type-slice';
 import saveExpenseConfigSearchRequest from './slices/accounting/save-accounting-search-config-slice';
 import closeSaleShiftSlice from './slices/accounting/close-saleshift-slice';
-
 import auditPlanDetailSlice from './slices/audit-plan-detail-slice';
 import auditPlanSearchSlice from './slices/audit-plan-search-slice';
+import searchCashStatementSlice from './slices/accounting/cash-statement/cash-search-slice';
+import saveCashStatementSearchRequest from './slices/accounting/cash-statement/save-cash-search-slice';
+
 const store = configureStore({
   reducer: {
     auth: authSlice,
@@ -191,6 +193,8 @@ const store = configureStore({
     auditPlanDetailSlice: auditPlanDetailSlice,
     auditPlanSearchSlice: auditPlanSearchSlice,
     closeSaleShiftSlice: closeSaleShiftSlice,
+    searchCashStatement: searchCashStatementSlice,
+    saveCashStatementSearchRequest: saveCashStatementSearchRequest,
   },
 });
 
