@@ -515,14 +515,24 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
     if (status === STATUS.DRAFT) {
       const isFileValidate: boolean = validateFileInfo();
       const isvalidateDate = validateDateIsBeforPeriod();
-      if (isFileValidate && isvalidateDate) {
+      const isUpdate = store.getState().expenseAccountDetailSlice.haveUpdateData;
+      if (isUpdate) {
+        setTextError('ข้อมูลที่แก้ไขยังไม่ได้ทำการบันทึก');
+        setOpenAlert(true);
+      }
+      if (isFileValidate && isvalidateDate && !isUpdate) {
         setIsOpenModelConfirmExpense(true);
         setShowReason(true);
       }
     } else if (status === STATUS.SEND_BACK_EDIT) {
       const isFileValidate: boolean = validateFileInfo();
       const isvalidateDate = validateDateIsBeforPeriod();
-      if (isFileValidate && isvalidateDate) {
+      const isUpdate = store.getState().expenseAccountDetailSlice.haveUpdateData;
+      if (isUpdate) {
+        setTextError('ข้อมูลที่แก้ไขยังไม่ได้ทำการบันทึก');
+        setOpenAlert(true);
+      }
+      if (isFileValidate && isvalidateDate && !isUpdate) {
         setIsOpenModelConfirmExpense(true);
         setShowReason(true);
       }
