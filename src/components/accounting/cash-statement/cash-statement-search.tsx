@@ -18,6 +18,7 @@ import moment from 'moment';
 import { featchSearchCashStatementAsync } from 'store/slices/accounting/cash-statement/cash-search-slice';
 import { saveCashStatementSearch } from 'store/slices/accounting/cash-statement/save-cash-search-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
+import ModalApproveSearchList from './modal-approve-search-list';
 
 interface State {
   branchCode: string;
@@ -146,12 +147,26 @@ export default function CashStatementSearch() {
     }, 300);
   };
 
+  const [openModalApprove, setopenModalApprove] = React.useState(false);
+  const handleApproveMultiple = () => {
+    setopenModalApprove(true);
+  };
+
+  const handleConfirmApprove = () => {
+    console.log('confirm approve');
+    setopenModalApprove(false);
+  };
+
+  const onCloseModalApprove = () => {
+    setopenModalApprove(false);
+  };
+
   return (
     <>
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('documentSearchBranch')}
             </Typography>
 
@@ -164,14 +179,14 @@ export default function CashStatementSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('documentSearchStartDate')}
             </Typography>
 
             <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
+            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
               {t('documentSearchEndDate')}
             </Typography>
             <DatePickerAllComponent
@@ -183,16 +198,17 @@ export default function CashStatementSearch() {
           </Grid>
 
           <Grid item xs={4} container>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               {t('documentSearchStatus')}
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id='selPiType'
-                name='statuses'
+                id="selPiType"
+                name="statuses"
                 value={values.status}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}>
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -211,45 +227,49 @@ export default function CashStatementSearch() {
           <Grid container spacing={2} mt={4} mb={2}>
             <Grid item xs={5}>
               <Button
-                id='btnImport'
-                variant='contained'
-                color='primary'
+                id="btnImport"
+                variant="contained"
+                color="primary"
                 startIcon={<Download />}
                 // onClick={handleOpenUploadFileModal}
                 // sx={{ minWidth: 100, display: `${!displayBtnImport ? 'none' : ''}` }}
-                className={classes.MbtnSearch}>
+                className={classes.MbtnSearch}
+              >
                 Import
               </Button>
               <Button
-                id='btnImport'
-                variant='contained'
-                color='primary'
-                // onClick={handleApprove2Multiple}
+                id="btnImport"
+                variant="contained"
+                color="primary"
+                onClick={handleApproveMultiple}
                 // sx={{ ml: 2, minWidth: 100, display: `${!displayBtnSubmit ? 'none' : ''}` }}
                 sx={{ ml: 2, minWidth: 110 }}
                 className={classes.MbtnSearch}
                 // disabled={selectRowsList.length === 0}
-                disabled={true}>
+                // disabled={true}
+              >
                 อนุมัติ
               </Button>
             </Grid>
             <Grid item xs={7} sx={{ textAlign: 'end' }}>
               <Button
-                id='btnClear'
-                variant='contained'
+                id="btnClear"
+                variant="contained"
                 onClick={onClickClearBtn}
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnClear}
-                color='cancelColor'>
+                color="cancelColor"
+              >
                 เคลียร์
               </Button>
               <Button
-                id='btnSearch'
-                variant='contained'
-                color='primary'
+                id="btnSearch"
+                variant="contained"
+                color="primary"
                 onClick={onClickSearchBtn}
                 sx={{ width: 110, ml: 2 }}
-                className={classes.MbtnSearch}>
+                className={classes.MbtnSearch}
+              >
                 ค้นหา
               </Button>
             </Grid>
@@ -260,8 +280,8 @@ export default function CashStatementSearch() {
           <div>
             {cashStatementList.length > 0 && <CashStatementList onSelectRows={handleSelectRows} />}
             {cashStatementList.length === 0 && (
-              <Grid item container xs={12} justifyContent='center'>
-                <Box color='#CBD4DB'>
+              <Grid item container xs={12} justifyContent="center">
+                <Box color="#CBD4DB">
                   <h2>ไม่มีข้อมูล</h2>
                 </Box>
               </Grid>
@@ -269,6 +289,12 @@ export default function CashStatementSearch() {
           </div>
         )}
 
+        <ModalApproveSearchList
+          open={openModalApprove}
+          onClose={onCloseModalApprove}
+          payloadApprove={cashStatementList}
+          onConfirmApprove={handleConfirmApprove}
+        />
         <LoadingModal open={openLoadingModal} />
       </Box>
     </>
