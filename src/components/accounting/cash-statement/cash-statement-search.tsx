@@ -21,8 +21,8 @@ import LoadingModal from '../../commons/ui/loading-modal';
 
 interface State {
   branchCode: string;
-  dateFrom: string;
-  dateTo: string;
+  dateFrom: any;
+  dateTo: any;
   status: string;
 }
 export default function CashStatementSearch() {
@@ -92,7 +92,6 @@ export default function CashStatementSearch() {
   };
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
-
   const onClickSearchBtn = async () => {
     let limits;
     if (limit === 0 || limit === undefined) {
@@ -115,6 +114,36 @@ export default function CashStatementSearch() {
     await dispatch(saveCashStatementSearch(payload));
     setFlagSearch(true);
     setOpenLoadingModal(false);
+  };
+
+  const onClickClearBtn = () => {
+    setOpenLoadingModal(true);
+    setFlagSearch(false);
+    setStartDate(null);
+    setEndDate(null);
+    setClearBranchDropDown(!clearBranchDropDown);
+
+    setValues({
+      branchCode: values.branchCode,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      status: 'ALL',
+    });
+
+    const payload: CashStatementSearchRequest = {
+      limit: limit ? limit.toString() : '10',
+      page: page,
+      branchCode: values.branchCode,
+      dateFrom: moment(startDate).startOf('day').toISOString(),
+      dateTo: moment(endDate).endOf('day').toISOString(),
+      status: values.status,
+      clearSearch: true,
+    };
+    dispatch(featchSearchCashStatementAsync(payload));
+
+    setTimeout(() => {
+      setOpenLoadingModal(false);
+    }, 300);
   };
 
   return (
@@ -208,7 +237,7 @@ export default function CashStatementSearch() {
               <Button
                 id='btnClear'
                 variant='contained'
-                // onClick={onClickClearBtn}
+                onClick={onClickClearBtn}
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnClear}
                 color='cancelColor'>

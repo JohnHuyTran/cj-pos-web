@@ -25,11 +25,7 @@ import {
 import { convertUtcToBkkDate } from 'utils/date-utill';
 import { featchSearchCashStatementAsync } from 'store/slices/accounting/cash-statement/cash-search-slice';
 import { saveCashStatementSearch } from 'store/slices/accounting/cash-statement/save-cash-search-slice';
-import { featchSearchStockTransferRtAsync } from 'store/slices/stock-transfer-rt-slice';
-
-interface loadingModalState {
-  open: boolean;
-}
+import { getBranchName } from 'utils/utils';
 
 export interface DataGridProps {
   onSelectRows: (rowsList: Array<any>) => void;
@@ -166,11 +162,13 @@ const columns: GridColDef[] = [
     align: 'center',
     sortable: false,
     renderCell: (params) => {
-      return (
-        <div>
-          <Edit fontSize='medium' sx={{ color: '#AEAEAE' }} />
-        </div>
-      );
+      if (params.getValue(params.id, 'status') === 'DRAFT') {
+        return (
+          <div>
+            <Edit fontSize='medium' sx={{ color: '#AEAEAE' }} />
+          </div>
+        );
+      }
     },
   },
   {
@@ -238,9 +236,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
     };
   });
 
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
@@ -303,8 +299,10 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   };
 
   const handleEdit = async (data: any) => {
+    setOpenLoadingModal(true);
     setOpenModalEdit(true);
     setPayloadCash(data);
+    setOpenLoadingModal(false);
   };
 
   const onCloseModalEdit = () => {
@@ -312,34 +310,13 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   };
 
   const handleDelete = async (data: any) => {
+    setOpenLoadingModal(true);
     console.log('handleDelete:', JSON.stringify(data));
-    setSelectRowsDeleteList(data);
+    setSelectRowsDeleteList([data]);
+    setOpenLoadingModal(false);
   };
 
   return (
-    // <div>
-    //   <Box mt={2} bgcolor='background.paper'>
-    //     <Box className={classes.MdataGridPaginationTop} sx={{ height: '25vh' }}>
-    //       <DataGrid
-    //         rows={rows}
-    //         columns={columns}
-    //         disableColumnMenu
-    //         pageSize={5}
-    //         rowsPerPageOptions={[10, 20, 50, 100]}
-    //         autoHeight={rows.length >= 10 ? false : true}
-    //         checkboxSelection
-    //         disableSelectionOnClick
-    //         onSelectionModelChange={handleSubmitRowSelect}
-    //         onCellClick={currentlySelected}
-    //       />
-    //     </Box>
-    //   </Box>
-
-    //   <ModalEditSearchList open={openModalEdit} onClose={onCloseModalEdit} payloadCash={payloadCash} />
-
-    //   <LoadingModal open={openLoadingModal.open} />
-    // </div>
-
     <div>
       <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
@@ -368,7 +345,9 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
         </div>
       </Box>
 
-      <LoadingModal open={openLoadingModal.open} />
+      <ModalEditSearchList open={openModalEdit} onClose={onCloseModalEdit} payloadCash={payloadCash} />
+
+      <LoadingModal open={openLoadingModal} />
     </div>
   );
 }
