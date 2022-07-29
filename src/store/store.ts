@@ -58,6 +58,7 @@ import stockCountSlice from './slices/stock-count-slice';
 import stockCountSearchSlice from './slices/stock-count-search-slice';
 import stockCountCriteriaSearchSlice from './slices/stock-count-criteria-search-slice';
 import stockCountDetailSlice from './slices/stock-count-detail-slice';
+import stockAdjustmentSlice from './slices/stock-adjustment-slice';
 import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 import stockRequestItems from './slices/stock-request-items-slice';
@@ -145,6 +146,7 @@ const store = configureStore({
     stockCountSearchSlice: stockCountSearchSlice,
     stockCountCriteriaSearchSlice: stockCountCriteriaSearchSlice,
     stockCountDetailSlice: stockCountDetailSlice,
+    stockAdjustmentSlice: stockAdjustmentSlice,
     updateBTSkuSlice: updateBTSkuSlice,
     updateBTProductSlice: updateBTProductSlice,
     stockRequestItems: stockRequestItems,

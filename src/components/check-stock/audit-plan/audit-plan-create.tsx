@@ -38,6 +38,8 @@ import { clearDataFilter, getAuditPlanDetail } from '../../../store/slices/audit
 import { setCheckEdit } from '../../../store/slices/sale-limit-time-slice';
 import DocumentList from './modal-documents-list';
 import { env } from '../../../adapters/environmentConfigs';
+import ModalCreateStockAdjustment from "../stock-adjustment/modal-create-stock-adjustment";
+import { updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -82,6 +84,7 @@ export default function ModalCreateAuditPlan({
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const [openModalClose, setOpenModalClose] = React.useState<boolean>(false);
+  const [openSA, setOpenSA] = React.useState(false);
   const [textPopup, setTextPopup] = React.useState<string>('');
   const [status, setStatus] = React.useState<any>('');
   const [openModalConfirmCounting, setOpenModalConfirmCounting] = React.useState<boolean>(false);
@@ -121,13 +124,18 @@ export default function ModalCreateAuditPlan({
     userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
       ? userInfo.acl['service.posback-stock'].includes('stock.sc.manage')
       : false;
+  const [userPermission, setUserPermission] = useState<any[]>(
+    userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
+      ? userInfo.acl['service.posback-stock']
+      : []
+  );
   const isBranchPermission = !!(env.branch.channel === 'branch');
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
   const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
 
   useEffect(() => {
-    if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {  
+    if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {
       setStatus(dataDetail.status);
       // setCurrentName(dataDetail.createdBy)
       setBranchOptions({
@@ -382,6 +390,20 @@ export default function ModalCreateAuditPlan({
     }
   };
 
+  const dataDetailSA = useAppSelector((state) => state.stockAdjustmentSlice.dataDetail);
+  const handleOpenSA = async () =>{
+    await dispatch(getAuditPlanDetail(dataDetail.id));
+    const dataDetailSAUpdate = {
+      ...dataDetailSA,
+      APId: dataDetail.id,
+      APDocumentNumber: dataDetail.documentNumber,
+      branchCode: dataDetail.branchCode,
+      branchName: dataDetail.branchName,
+    };
+    await dispatch(updateDataDetail(dataDetailSAUpdate));
+    setOpenSA(true);
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth>
@@ -488,6 +510,28 @@ export default function ModalCreateAuditPlan({
                   }}>
                   เพิ่มสินค้า
                 </Button>
+                <Button
+                  id="btnCreateSA"
+                  variant="contained"
+                  color="info"
+                  className={classes.MbtnSearch}
+                  startIcon={<AddCircleOutlineOutlinedIcon />}
+                  onClick={handleOpenSA}
+                  sx={{ width: 150 , height: '36.5px', margin: '0 17px'}}
+                  disabled={
+                    !(dataDetail.relatedDocuments && dataDetail.relatedDocuments.length > 0
+                    && dataDetail.relatedDocuments.filter((it:any) => it.status === StockActionStatus.CONFIRM).length > 0)
+                  }
+                  style={{
+                    display: !managePermission || viewMode || status == StockActionStatus.CANCEL
+                        ? 'none'
+                        : undefined,
+                  }}>
+                    <Typography variant={'body2'} fontSize={12} pt={0.3}>
+                      สร้างรายการ
+                      ปรับสต๊อก (SA)
+                    </Typography>
+                </Button>
               </Box>
               <Box sx={{ marginLeft: 'auto' }}>
                 <Button
@@ -573,7 +617,7 @@ export default function ModalCreateAuditPlan({
                       // (steps.indexOf(status) > 1 && !groupBranch) ||
                       !managePermission ||
                       viewMode ||
-                      status == StockActionStatus.CANCEL 
+                      status == StockActionStatus.CANCEL
                       // (userName != currentName && steps.indexOf(status) >= 0)
                         ? 'none'
                         : undefined,
@@ -589,6 +633,19 @@ export default function ModalCreateAuditPlan({
           </Box>
         </DialogContent>
       </Dialog>
+
+      {openSA && (
+        <ModalCreateStockAdjustment
+          isOpen={openSA}
+          onClickClose={async () => {
+            setOpenSA(false);
+          }}
+          action={Action.INSERT}
+          setPopupMsg={setPopupMsg}
+          setOpenPopup={setOpenPopup}
+          userPermission={userPermission}
+        />
+      )}
 
       <ModelConfirm
         open={openModalConfirm}
