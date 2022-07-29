@@ -262,3 +262,19 @@ export async function importCashStatement(files: File) {
     throw error;
   }
 }
+
+export const getPathCashStatementDelete = (id: string, path: string) => {
+  return getPathUrl(`${path}`, { id: id });
+};
+
+export async function cashStatementDelete(id: string) {
+  const response = await post(
+    getPathCashStatementDelete(id, environment.branchAccounting.cashStatement.delete.url),
+    ContentType.JSON
+  )
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}

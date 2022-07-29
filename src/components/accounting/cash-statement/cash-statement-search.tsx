@@ -108,8 +108,10 @@ export default function CashStatementSearch() {
     setValues({ ...values, [event.target.name]: value });
   };
 
+  const [selectRowsList, setSelectRowsList] = React.useState<Array<any>>([]);
   const handleSelectRows = async (list: any) => {
     console.log('handleSelectRows: ', JSON.stringify(list));
+    setSelectRowsList([list]);
   };
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
@@ -343,9 +345,7 @@ export default function CashStatementSearch() {
                 // sx={{ ml: 2, minWidth: 100, display: `${!displayBtnSubmit ? 'none' : ''}` }}
                 sx={{ ml: 2, minWidth: 110 }}
                 className={classes.MbtnSearch}
-                // disabled={selectRowsList.length === 0}
-                // disabled={true}
-              >
+                disabled={selectRowsList.length === 0}>
                 อนุมัติ
               </Button>
             </Grid>
@@ -388,7 +388,7 @@ export default function CashStatementSearch() {
         <ModalApproveSearchList
           open={openModalApprove}
           onClose={onCloseModalApprove}
-          payloadApprove={cashStatementList}
+          payloadApprove={selectRowsList}
           onConfirmApprove={handleConfirmApprove}
         />
         <LoadingModal open={openLoadingModal} />

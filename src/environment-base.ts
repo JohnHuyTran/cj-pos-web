@@ -615,6 +615,9 @@ export const environment = {
       import: {
         url: 'accounting/cash-statement/import',
       },
+      delete: {
+        url: 'accounting/cash-statement/delete/{id}',
+      },
     },
   },
 };
