@@ -86,6 +86,7 @@ export default function ModalCreateAuditPlan({
   const dispatch = useAppDispatch();
   const history = useHistory();
   const [open, setOpen] = React.useState(isOpen);
+  const [openSA, setOpenSA] = React.useState<boolean>(false);
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const [openModalConfirm, setOpenModalConfirm] = React.useState<boolean>(false);
   const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
