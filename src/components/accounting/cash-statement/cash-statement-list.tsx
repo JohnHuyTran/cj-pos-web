@@ -31,6 +31,10 @@ import { convertUtcToBkkDate } from 'utils/date-utill';
 import { featchSearchCashStatementAsync } from 'store/slices/accounting/cash-statement/cash-search-slice';
 import { saveCashStatementSearch } from 'store/slices/accounting/cash-statement/save-cash-search-slice';
 import { getBranchName } from 'utils/utils';
+import { cashStatementDelete } from 'services/accounting';
+import SnackbarStatus from '../../commons/ui/snackbar-status';
+import { ApiUploadError } from 'models/api-error-model';
+import AlertError from '../../commons/ui/alert-error';
 
 export interface DataGridProps {
   onSelectRows: (rowsList: Array<any>) => void;
@@ -44,7 +48,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -98,7 +102,7 @@ const columns: GridColDef[] = [
             },
           }}
           fixedDecimalScale
-          type="text"
+          type='text'
         />
       );
     },
@@ -128,7 +132,7 @@ const columns: GridColDef[] = [
             },
           }}
           fixedDecimalScale
-          type="text"
+          type='text'
         />
       );
     },
@@ -145,7 +149,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
@@ -153,7 +157,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size="small"
+            size='small'
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
@@ -170,7 +174,7 @@ const columns: GridColDef[] = [
       if (params.getValue(params.id, 'status') === 'DRAFT') {
         return (
           <div>
-            <Edit fontSize="medium" sx={{ color: '#AEAEAE' }} />
+            <Edit fontSize='medium' sx={{ color: '#AEAEAE' }} />
           </div>
         );
       }
@@ -185,7 +189,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => {
       return (
         <div>
-          <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+          <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
         </div>
       );
     },
@@ -242,6 +246,18 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   });
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
@@ -322,9 +338,26 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
     setOpenModalDelete(true);
   };
 
-  const handleConfirmDel = () => {
-    console.log('del confirm:');
-    setOpenModalDelete(false);
+  const handleConfirmDelete = async () => {
+    setOpenLoadingModal(true);
+    const id = selectRowsDeleteList[0].id ? selectRowsDeleteList[0].id : '';
+    await cashStatementDelete(id)
+      .then((value) => {
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้ลบข้อมูลเรียบร้อยแล้ว');
+
+        setTimeout(() => {
+          dispatch(featchSearchCashStatementAsync(payload));
+          setOpenModalDelete(false);
+        }, 1000);
+      })
+      .catch((error: ApiUploadError) => {
+        setOpenAlert(true);
+        setTextError(error.message);
+      });
+
+    setOpenLoadingModal(false);
   };
 
   const onCloseModalDelete = () => {
@@ -334,7 +367,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
 
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -347,14 +380,14 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
             rowHeight={65}
             pagination
-            // checkboxSelection={groupSCM ? true : false}
-            isRowSelectable={(params: GridRowParams) => params.row.edit}
+            checkboxSelection={true}
+            isRowSelectable={(params: GridRowParams) => params.row.status === 'DRAFT'}
             onSelectionModelChange={handleSubmitRowSelect}
             disableSelectionOnClick
           />
@@ -366,10 +399,19 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
         open={openModalDelete}
         onClose={onCloseModalDelete}
         payloadDelete={selectRowsDeleteList}
-        onConfirmDelete={handleConfirmDel}
+        onConfirmDelete={handleConfirmDelete}
       />
 
       <LoadingModal open={openLoadingModal} />
+
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={snackbarIsStatus}
+        contentMsg={contentMsg}
+      />
+
+      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </div>
   );
 }

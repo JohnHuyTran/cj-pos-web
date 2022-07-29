@@ -1,5 +1,19 @@
 import React from 'react';
-import { Box, Button, FormControl, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  FormControl,
+  Grid,
+  Link,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useStyles } from '../../../styles/makeTheme';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
@@ -11,7 +25,7 @@ import { env } from '../../../adapters/environmentConfigs';
 import { isGroupBranch } from '../../../utils/role-permission';
 import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import { getCashStatementStatusInfo } from '../../../utils/enum/cash-statement-enum';
-import { Download } from '@mui/icons-material';
+import { Download, ErrorOutline } from '@mui/icons-material';
 import CashStatementList from './cash-statement-list';
 import { CashStatementSearchRequest } from 'models/branch-accounting-model';
 import moment from 'moment';
@@ -19,6 +33,12 @@ import { featchSearchCashStatementAsync } from 'store/slices/accounting/cash-sta
 import { saveCashStatementSearch } from 'store/slices/accounting/cash-statement/save-cash-search-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
 import ModalApproveSearchList from './modal-approve-search-list';
+import ModalCashStatementImport from './modal-cash-statement-import';
+import { importCashStatement } from 'services/accounting';
+import { ApiUploadError } from 'models/api-error-model';
+import AlertError from '../../commons/ui/alert-error';
+import SnackbarStatus from '../../commons/ui/snackbar-status';
+import ModalDownloadErrorFile from './modal-download-error-file';
 
 interface State {
   branchCode: string;
@@ -36,6 +56,7 @@ export default function CashStatementSearch() {
   const limit = useAppSelector((state) => state.searchCashStatement.cashStatementList.perPage);
   const [flagSearch, setFlagSearch] = React.useState(false);
   const cashStatementList = items.cashStatementList.data ? items.cashStatementList.data : [];
+  const searchCashStatement = useAppSelector((state) => state.saveCashStatementSearchRequest.searchCashStatement);
 
   const [values, setValues] = React.useState<State>({
     branchCode: '',
@@ -88,8 +109,9 @@ export default function CashStatementSearch() {
     setValues({ ...values, [event.target.name]: value });
   };
 
+  const [selectRowsList, setSelectRowsList] = React.useState<Array<any>>([]);
   const handleSelectRows = async (list: any) => {
-    console.log('handleSelectRows: ', JSON.stringify(list));
+    setSelectRowsList(list);
   };
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
@@ -123,6 +145,7 @@ export default function CashStatementSearch() {
     setStartDate(null);
     setEndDate(null);
     setClearBranchDropDown(!clearBranchDropDown);
+    setSelectRowsList([]);
 
     setValues({
       branchCode: values.branchCode,
@@ -152,13 +175,132 @@ export default function CashStatementSearch() {
     setopenModalApprove(true);
   };
 
-  const handleConfirmApprove = () => {
-    console.log('confirm approve');
-    setopenModalApprove(false);
+  const handleConfirmApprove = async () => {
+    setOpenLoadingModal(true);
+    const selectRows: any = [];
+    await selectRowsList.forEach((data: any) => {
+      selectRows.push(data.id);
+    });
+
+    const payload: any = {
+      ids: selectRows,
+    };
+    console.log('payload:', payload);
+
+    // Wait API
+    // await approve(payload)
+    //   .then((value) => {
+    //     dispatch(featchSearchCashStatementAsync(searchCashStatement));
+    //     setShowSnackBar(true);
+    //     setSnackbarIsStatus(true);
+    //     setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+
+    setTimeout(() => {
+      setopenModalApprove(false);
+    }, 300);
+    // })
+    // .catch((error: any) => {
+    //   if (String(error.code) === '40014') {
+    //     const header: Header = {
+    //       field1: false,
+    //       field2: false,
+    //       field3: true,
+    //       field4: false,
+    //     };
+    //     const payload: ErrorDetailResponse = {
+    //       header: header,
+    //       error_details: error.error_details,
+    //     };
+    //     setOpenAlert(true);
+    //     // setTitleError('เลขที่เอกสาร');
+    //     setTextError(error.message);
+    //     setPayloadError(payload);
+    //   } else {
+    //     setOpenAlert(true);
+    //     setTextError(error.message);
+    //     setTitleError('');
+    //   }
+    // });
+
+    setOpenLoadingModal(false);
   };
 
   const onCloseModalApprove = () => {
     setopenModalApprove(false);
+  };
+
+  const [openImportModal, setOpenImportModal] = React.useState(false);
+  const onClickImportBtn = async () => {
+    setOpenImportModal(true);
+  };
+
+  const handleCloseImport = async () => {
+    setOpenImportModal(false);
+  };
+
+  const [openAlertFile, setOpenAlertFile] = React.useState(false);
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [titelError, setTitelError] = React.useState('');
+  const [textError, setTextError] = React.useState('');
+  const [linkFileError, setLinkFileError] = React.useState(false);
+  const [base64EncodeFile, setBase64EncodeFile] = React.useState('');
+  const handleCloseAlert = () => {
+    setOpenAlertFile(false);
+    setOpenAlert(false);
+  };
+
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const handleConfirmImport = async (file: any) => {
+    setOpenLoadingModal(true);
+
+    if (file) {
+      await importCashStatement(file)
+        .then((value) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้Importข้อมูลเรียบร้อยแล้ว');
+
+          setTimeout(() => {
+            setOpenImportModal(false);
+          }, 1000);
+        })
+        .catch((error: ApiUploadError) => {
+          if (error.code === 40001) {
+            setOpenAlertFile(true);
+            setOpenAlert(true);
+            setTitelError('ไม่สามารถ import file ได้');
+            setTextError(error.message);
+            setBase64EncodeFile('');
+            setLinkFileError(false);
+          } else if (error.code === 40013) {
+            setOpenAlertFile(true);
+            setOpenAlert(true);
+            setTitelError('ไม่สามารถ import file ได้');
+            setTextError('');
+
+            const b64Data = error.data?.base64EncodeFile;
+            if (b64Data) {
+              setBase64EncodeFile(b64Data);
+              setLinkFileError(true);
+            }
+          } else {
+            setOpenAlertFile(true);
+            setOpenAlert(true);
+            setTitelError('ไม่สามารถ import file ได้');
+            setTextError('');
+            setBase64EncodeFile('');
+            setLinkFileError(false);
+          }
+        });
+    }
+
+    setOpenLoadingModal(false);
   };
 
   return (
@@ -166,7 +308,7 @@ export default function CashStatementSearch() {
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {t('documentSearchBranch')}
             </Typography>
 
@@ -179,14 +321,14 @@ export default function CashStatementSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {t('documentSearchStartDate')}
             </Typography>
 
             <DatePickerAllComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               {t('documentSearchEndDate')}
             </Typography>
             <DatePickerAllComponent
@@ -198,17 +340,16 @@ export default function CashStatementSearch() {
           </Grid>
 
           <Grid item xs={4} container>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               {t('documentSearchStatus')}
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selPiType"
-                name="statuses"
+                id='selPiType'
+                name='statuses'
                 value={values.status}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -227,49 +368,44 @@ export default function CashStatementSearch() {
           <Grid container spacing={2} mt={4} mb={2}>
             <Grid item xs={5}>
               <Button
-                id="btnImport"
-                variant="contained"
-                color="primary"
+                id='btnImport'
+                variant='contained'
+                color='primary'
                 startIcon={<Download />}
-                // onClick={handleOpenUploadFileModal}
+                onClick={onClickImportBtn}
                 // sx={{ minWidth: 100, display: `${!displayBtnImport ? 'none' : ''}` }}
-                className={classes.MbtnSearch}
-              >
+                className={classes.MbtnSearch}>
                 Import
               </Button>
               <Button
-                id="btnImport"
-                variant="contained"
-                color="primary"
+                id='btnImport'
+                variant='contained'
+                color='primary'
                 onClick={handleApproveMultiple}
                 // sx={{ ml: 2, minWidth: 100, display: `${!displayBtnSubmit ? 'none' : ''}` }}
                 sx={{ ml: 2, minWidth: 110 }}
                 className={classes.MbtnSearch}
-                // disabled={selectRowsList.length === 0}
-                // disabled={true}
-              >
+                disabled={selectRowsList.length === 0}>
                 อนุมัติ
               </Button>
             </Grid>
             <Grid item xs={7} sx={{ textAlign: 'end' }}>
               <Button
-                id="btnClear"
-                variant="contained"
+                id='btnClear'
+                variant='contained'
                 onClick={onClickClearBtn}
                 sx={{ width: 110, ml: 2 }}
                 className={classes.MbtnClear}
-                color="cancelColor"
-              >
+                color='cancelColor'>
                 เคลียร์
               </Button>
               <Button
-                id="btnSearch"
-                variant="contained"
-                color="primary"
+                id='btnSearch'
+                variant='contained'
+                color='primary'
                 onClick={onClickSearchBtn}
                 sx={{ width: 110, ml: 2 }}
-                className={classes.MbtnSearch}
-              >
+                className={classes.MbtnSearch}>
                 ค้นหา
               </Button>
             </Grid>
@@ -280,8 +416,8 @@ export default function CashStatementSearch() {
           <div>
             {cashStatementList.length > 0 && <CashStatementList onSelectRows={handleSelectRows} />}
             {cashStatementList.length === 0 && (
-              <Grid item container xs={12} justifyContent="center">
-                <Box color="#CBD4DB">
+              <Grid item container xs={12} justifyContent='center'>
+                <Box color='#CBD4DB'>
                   <h2>ไม่มีข้อมูล</h2>
                 </Box>
               </Grid>
@@ -292,10 +428,37 @@ export default function CashStatementSearch() {
         <ModalApproveSearchList
           open={openModalApprove}
           onClose={onCloseModalApprove}
-          payloadApprove={cashStatementList}
+          payloadApprove={selectRowsList}
           onConfirmApprove={handleConfirmApprove}
         />
         <LoadingModal open={openLoadingModal} />
+
+        <ModalCashStatementImport
+          open={openImportModal}
+          onClickClose={handleCloseImport}
+          onConfirm={handleConfirmImport}
+        />
+
+        {!openAlertFile && openAlert && (
+          <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+        )}
+        {openAlertFile && openAlert && (
+          <ModalDownloadErrorFile
+            open={openAlert}
+            onClickClose={handleCloseAlert}
+            titelError={titelError}
+            textError={textError}
+            linkFileError={linkFileError}
+            base64EncodeFile={base64EncodeFile}
+          />
+        )}
+
+        <SnackbarStatus
+          open={showSnackBar}
+          onClose={handleCloseSnackBar}
+          isSuccess={snackbarIsStatus}
+          contentMsg={contentMsg}
+        />
       </Box>
     </>
   );
