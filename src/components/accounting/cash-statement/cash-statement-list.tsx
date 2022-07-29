@@ -345,20 +345,10 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
       .then((value) => {
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
-        setContentMsg('คุณได้Importข้อมูลเรียบร้อยแล้ว');
+        setContentMsg('คุณได้ลบข้อมูลเรียบร้อยแล้ว');
 
         setTimeout(() => {
-          const payloadNewpage: CashStatementSearchRequest = {
-            limit: pageSize,
-            page: payload.page,
-            branchCode: payload.branchCode,
-            dateFrom: payload.dateFrom,
-            dateTo: payload.dateTo,
-            status: payload.status,
-          };
-
-          dispatch(featchSearchCashStatementAsync(payloadNewpage));
-          dispatch(saveCashStatementSearch(payloadNewpage));
+          dispatch(featchSearchCashStatementAsync(payload));
           setOpenModalDelete(false);
         }, 1000);
       })

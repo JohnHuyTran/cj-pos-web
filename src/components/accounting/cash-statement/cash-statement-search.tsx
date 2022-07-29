@@ -56,6 +56,7 @@ export default function CashStatementSearch() {
   const limit = useAppSelector((state) => state.searchCashStatement.cashStatementList.perPage);
   const [flagSearch, setFlagSearch] = React.useState(false);
   const cashStatementList = items.cashStatementList.data ? items.cashStatementList.data : [];
+  const searchCashStatement = useAppSelector((state) => state.saveCashStatementSearchRequest.searchCashStatement);
 
   const [values, setValues] = React.useState<State>({
     branchCode: '',
@@ -110,8 +111,7 @@ export default function CashStatementSearch() {
 
   const [selectRowsList, setSelectRowsList] = React.useState<Array<any>>([]);
   const handleSelectRows = async (list: any) => {
-    console.log('handleSelectRows: ', JSON.stringify(list));
-    setSelectRowsList([list]);
+    setSelectRowsList(list);
   };
 
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
@@ -145,6 +145,7 @@ export default function CashStatementSearch() {
     setStartDate(null);
     setEndDate(null);
     setClearBranchDropDown(!clearBranchDropDown);
+    setSelectRowsList([]);
 
     setValues({
       branchCode: values.branchCode,
@@ -174,9 +175,54 @@ export default function CashStatementSearch() {
     setopenModalApprove(true);
   };
 
-  const handleConfirmApprove = () => {
-    console.log('confirm approve');
-    setopenModalApprove(false);
+  const handleConfirmApprove = async () => {
+    setOpenLoadingModal(true);
+    const selectRows: any = [];
+    await selectRowsList.forEach((data: any) => {
+      selectRows.push(data.id);
+    });
+
+    const payload: any = {
+      ids: selectRows,
+    };
+    console.log('payload:', payload);
+
+    // Wait API
+    // await approve(payload)
+    //   .then((value) => {
+    //     dispatch(featchSearchCashStatementAsync(searchCashStatement));
+    //     setShowSnackBar(true);
+    //     setSnackbarIsStatus(true);
+    //     setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+
+    setTimeout(() => {
+      setopenModalApprove(false);
+    }, 300);
+    // })
+    // .catch((error: any) => {
+    //   if (String(error.code) === '40014') {
+    //     const header: Header = {
+    //       field1: false,
+    //       field2: false,
+    //       field3: true,
+    //       field4: false,
+    //     };
+    //     const payload: ErrorDetailResponse = {
+    //       header: header,
+    //       error_details: error.error_details,
+    //     };
+    //     setOpenAlert(true);
+    //     // setTitleError('เลขที่เอกสาร');
+    //     setTextError(error.message);
+    //     setPayloadError(payload);
+    //   } else {
+    //     setOpenAlert(true);
+    //     setTextError(error.message);
+    //     setTitleError('');
+    //   }
+    // });
+
+    setOpenLoadingModal(false);
   };
 
   const onCloseModalApprove = () => {
@@ -185,14 +231,10 @@ export default function CashStatementSearch() {
 
   const [openImportModal, setOpenImportModal] = React.useState(false);
   const onClickImportBtn = async () => {
-    console.log('handleCloseImport:', handleCloseImport);
-
     setOpenImportModal(true);
   };
 
   const handleCloseImport = async () => {
-    console.log('handleCloseImport:', handleCloseImport);
-
     setOpenImportModal(false);
   };
 
@@ -229,8 +271,6 @@ export default function CashStatementSearch() {
           }, 1000);
         })
         .catch((error: ApiUploadError) => {
-          console.log('error:', error.message);
-
           if (error.code === 40001) {
             setOpenAlertFile(true);
             setOpenAlert(true);

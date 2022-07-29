@@ -23,9 +23,7 @@ export default function ModalDownloadErrorFile({
   linkFileError,
   base64EncodeFile,
 }: Props): ReactElement {
-  useEffect(() => {
-    console.log('open:', open);
-  }, [open === true]);
+  // useEffect(() => {}, [open === true]);
 
   const handleDownloadErrorFile = () => {
     var contentType = 'application/vnd.ms-excel';
