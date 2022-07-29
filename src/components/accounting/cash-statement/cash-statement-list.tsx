@@ -17,6 +17,11 @@ import { Chip, TextField } from '@mui/material';
 import { DeleteForever, Edit } from '@mui/icons-material';
 import NumberFormat from 'react-number-format';
 import ModalEditSearchList from './modal-edit-search-list';
+import ModalDeleteSearchList from './modal-delete-search-list';
+
+interface loadingModalState {
+  open: boolean;
+}
 import {
   CashStatementInfo,
   CashStatementSearchRequest,
@@ -39,7 +44,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -93,7 +98,7 @@ const columns: GridColDef[] = [
             },
           }}
           fixedDecimalScale
-          type='text'
+          type="text"
         />
       );
     },
@@ -123,7 +128,7 @@ const columns: GridColDef[] = [
             },
           }}
           fixedDecimalScale
-          type='text'
+          type="text"
         />
       );
     },
@@ -140,7 +145,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size='small'
+            size="small"
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
@@ -148,7 +153,7 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size='small'
+            size="small"
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
@@ -165,7 +170,7 @@ const columns: GridColDef[] = [
       if (params.getValue(params.id, 'status') === 'DRAFT') {
         return (
           <div>
-            <Edit fontSize='medium' sx={{ color: '#AEAEAE' }} />
+            <Edit fontSize="medium" sx={{ color: '#AEAEAE' }} />
           </div>
         );
       }
@@ -180,7 +185,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => {
       return (
         <div>
-          <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
+          <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
         </div>
       );
     },
@@ -284,7 +289,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   };
 
   const [openModalEdit, setOpenModalEdit] = React.useState(false);
-  const [payloadCash, setPayloadCash] = React.useState({
+  const [payloadEdit, setPayloadEdit] = React.useState({
     cashOver: 0,
     cashShort: 0,
   });
@@ -301,7 +306,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   const handleEdit = async (data: any) => {
     setOpenLoadingModal(true);
     setOpenModalEdit(true);
-    setPayloadCash(data);
+    setPayloadEdit(data);
     setOpenLoadingModal(false);
   };
 
@@ -309,16 +314,27 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
     setOpenModalEdit(false);
   };
 
+  const [openModalDelete, setOpenModalDelete] = React.useState(false);
   const handleDelete = async (data: any) => {
-    setOpenLoadingModal(true);
+    // setOpenLoadingModal(true);
     console.log('handleDelete:', JSON.stringify(data));
     setSelectRowsDeleteList([data]);
+    setOpenModalDelete(true);
+  };
+
+  const handleConfirmDel = (data: any) => {
+    console.log('data del:', data);
+    setOpenModalDelete(false);
+  };
+
+  const onCloseModalDelete = () => {
+    setOpenModalDelete(false);
     setOpenLoadingModal(false);
   };
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -331,7 +347,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
@@ -345,7 +361,13 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
         </div>
       </Box>
 
-      <ModalEditSearchList open={openModalEdit} onClose={onCloseModalEdit} payloadCash={payloadCash} />
+      <ModalEditSearchList open={openModalEdit} onClose={onCloseModalEdit} payloadEdit={payloadEdit} />
+      <ModalDeleteSearchList
+        open={openModalDelete}
+        onClose={onCloseModalDelete}
+        payloadDelete={selectRowsDeleteList}
+        onConfirmDelete={handleConfirmDel}
+      />
 
       <LoadingModal open={openLoadingModal} />
     </div>
