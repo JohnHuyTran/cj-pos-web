@@ -103,7 +103,7 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
                 sx={{mt: 1}}
                 fullWidth
               />
-              {errorCode && (
+              {!!errorCode && (
                 <Typography component='div' color='error' sx={{mt: 1}}>{t(errorCode)}</Typography>
               )}
             </Box>
