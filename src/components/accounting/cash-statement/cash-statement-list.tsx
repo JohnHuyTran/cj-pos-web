@@ -19,6 +19,7 @@ import { DeleteForever, Edit } from '@mui/icons-material';
 import NumberFormat from 'react-number-format';
 
 import ModalEditSearchList from './modal-edit-search-list';
+import ModalDeleteSearchList from './modal-delete-search-list';
 
 interface loadingModalState {
   open: boolean;
@@ -261,7 +262,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   };
 
   const [openModalEdit, setOpenModalEdit] = React.useState(false);
-  const [payloadCash, setPayloadCash] = React.useState({
+  const [payloadEdit, setPayloadEdit] = React.useState({
     cashOver: 0,
     cashShort: 0,
   });
@@ -277,16 +278,22 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
 
   const handleEdit = async (data: any) => {
     setOpenModalEdit(true);
-    setPayloadCash(data);
+    setPayloadEdit(data);
   };
 
   const onCloseModalEdit = () => {
     setOpenModalEdit(false);
   };
 
+  const [openModalDelete, setOpenModalDelete] = React.useState(false);
   const handleDelete = async (data: any) => {
     console.log('handleDelete:', JSON.stringify(data));
     setSelectRowsDeleteList(data);
+    setOpenModalDelete(true);
+  };
+
+  const onCloseModalDelete = () => {
+    setOpenModalDelete(false);
   };
 
   return (
@@ -308,7 +315,8 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
         </Box>
       </Box>
 
-      <ModalEditSearchList open={openModalEdit} onClose={onCloseModalEdit} payloadCash={payloadCash} />
+      <ModalEditSearchList open={openModalEdit} onClose={onCloseModalEdit} payloadEdit={payloadEdit} />
+      <ModalDeleteSearchList open={openModalDelete} onClose={onCloseModalDelete} payloadDelete={selectRowsDeleteList} />
 
       <LoadingModal open={openLoadingModal.open} />
     </div>
