@@ -1,5 +1,19 @@
 import React from 'react';
-import { Box, Button, FormControl, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  FormControl,
+  Grid,
+  Link,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useStyles } from '../../../styles/makeTheme';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
@@ -11,13 +25,19 @@ import { env } from '../../../adapters/environmentConfigs';
 import { isGroupBranch } from '../../../utils/role-permission';
 import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import { getCashStatementStatusInfo } from '../../../utils/enum/cash-statement-enum';
-import { Download } from '@mui/icons-material';
+import { Download, ErrorOutline } from '@mui/icons-material';
 import CashStatementList from './cash-statement-list';
 import { CashStatementSearchRequest } from 'models/branch-accounting-model';
 import moment from 'moment';
 import { featchSearchCashStatementAsync } from 'store/slices/accounting/cash-statement/cash-search-slice';
 import { saveCashStatementSearch } from 'store/slices/accounting/cash-statement/save-cash-search-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
+import ModalCashStatementImport from './modal-cash-statement-import';
+import { importCashStatement } from 'services/accounting';
+import { ApiUploadError } from 'models/api-error-model';
+import AlertError from '../../commons/ui/alert-error';
+import SnackbarStatus from '../../commons/ui/snackbar-status';
+import ModalDownloadErrorFile from './modal-download-error-file';
 
 interface State {
   branchCode: string;
@@ -146,6 +166,86 @@ export default function CashStatementSearch() {
     }, 300);
   };
 
+  const [openImportModal, setOpenImportModal] = React.useState(false);
+  const onClickImportBtn = async () => {
+    console.log('handleCloseImport:', handleCloseImport);
+
+    setOpenImportModal(true);
+  };
+
+  const handleCloseImport = async () => {
+    console.log('handleCloseImport:', handleCloseImport);
+
+    setOpenImportModal(false);
+  };
+
+  const [openAlertFile, setOpenAlertFile] = React.useState(false);
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [titelError, setTitelError] = React.useState('');
+  const [textError, setTextError] = React.useState('');
+  const [linkFileError, setLinkFileError] = React.useState(false);
+  const [base64EncodeFile, setBase64EncodeFile] = React.useState('');
+  const handleCloseAlert = () => {
+    setOpenAlertFile(false);
+    setOpenAlert(false);
+  };
+
+  const [showSnackBar, setShowSnackBar] = React.useState(false);
+  const [contentMsg, setContentMsg] = React.useState('');
+  const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
+  const handleCloseSnackBar = () => {
+    setShowSnackBar(false);
+  };
+
+  const handleConfirmImport = async (file: any) => {
+    setOpenLoadingModal(true);
+
+    if (file) {
+      await importCashStatement(file)
+        .then((value) => {
+          setShowSnackBar(true);
+          setSnackbarIsStatus(true);
+          setContentMsg('คุณได้Importข้อมูลเรียบร้อยแล้ว');
+
+          setTimeout(() => {
+            setOpenImportModal(false);
+          }, 1000);
+        })
+        .catch((error: ApiUploadError) => {
+          console.log('error:', error.message);
+
+          if (error.code === 40001) {
+            setOpenAlertFile(true);
+            setOpenAlert(true);
+            setTitelError('ไม่สามารถ import file ได้');
+            setTextError(error.message);
+            setBase64EncodeFile('');
+            setLinkFileError(false);
+          } else if (error.code === 40013) {
+            setOpenAlertFile(true);
+            setOpenAlert(true);
+            setTitelError('ไม่สามารถ import file ได้');
+            setTextError('');
+
+            const b64Data = error.data?.base64EncodeFile;
+            if (b64Data) {
+              setBase64EncodeFile(b64Data);
+              setLinkFileError(true);
+            }
+          } else {
+            setOpenAlertFile(true);
+            setOpenAlert(true);
+            setTitelError('ไม่สามารถ import file ได้');
+            setTextError('');
+            setBase64EncodeFile('');
+            setLinkFileError(false);
+          }
+        });
+    }
+
+    setOpenLoadingModal(false);
+  };
+
   return (
     <>
       <Box>
@@ -215,7 +315,7 @@ export default function CashStatementSearch() {
                 variant='contained'
                 color='primary'
                 startIcon={<Download />}
-                // onClick={handleOpenUploadFileModal}
+                onClick={onClickImportBtn}
                 // sx={{ minWidth: 100, display: `${!displayBtnImport ? 'none' : ''}` }}
                 className={classes.MbtnSearch}>
                 Import
@@ -270,6 +370,33 @@ export default function CashStatementSearch() {
         )}
 
         <LoadingModal open={openLoadingModal} />
+
+        <ModalCashStatementImport
+          open={openImportModal}
+          onClickClose={handleCloseImport}
+          onConfirm={handleConfirmImport}
+        />
+
+        {!openAlertFile && openAlert && (
+          <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+        )}
+        {openAlertFile && openAlert && (
+          <ModalDownloadErrorFile
+            open={openAlert}
+            onClickClose={handleCloseAlert}
+            titelError={titelError}
+            textError={textError}
+            linkFileError={linkFileError}
+            base64EncodeFile={base64EncodeFile}
+          />
+        )}
+
+        <SnackbarStatus
+          open={showSnackBar}
+          onClose={handleCloseSnackBar}
+          isSuccess={snackbarIsStatus}
+          contentMsg={contentMsg}
+        />
       </Box>
     </>
   );

@@ -244,3 +244,21 @@ export async function cashStatementEdit(payload: CashStatementEditRequest) {
     });
   return response;
 }
+
+export async function importCashStatement(files: File) {
+  try {
+    const bodyFormData = new FormData();
+    bodyFormData.append('file', files);
+
+    const response = await post(
+      environment.branchAccounting.cashStatement.import.url,
+      bodyFormData,
+      ContentType.MULTIPART,
+      'Upload'
+    ).then((result: any) => result);
+    return response;
+  } catch (error) {
+    console.log('error :', error);
+    throw error;
+  }
+}
