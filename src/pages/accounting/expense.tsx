@@ -42,7 +42,7 @@ export default function Expense() {
   };
   return (
     <Container maxWidth='xl'>
-      <TitleHeader title={t('title.closeSaleShift')} />
+      <TitleHeader title={t('title.documentSearch')} />
       <Box mt={3}>
         <SearchExpense />
       </Box>
