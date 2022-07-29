@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, Grid, TextField, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, Grid, TextField, Typography } from '@mui/material';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import moment from 'moment';
 import NumberFormat from 'react-number-format';
 
@@ -26,10 +25,10 @@ const initialStateValues: any = {
 interface Props {
   open: boolean;
   onClose: () => void;
-  payloadCash: any;
+  payloadEdit: any;
 }
 
-function ModalEditSearchList({ open, onClose, payloadCash }: Props) {
+function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
   const classes = useStyles();
 
   const date = new Date();
@@ -74,7 +73,7 @@ function ModalEditSearchList({ open, onClose, payloadCash }: Props) {
       setIsValidateCash(true);
 
       const payloadSave: any = {
-        id: payloadCash.id,
+        id: payloadEdit.id,
         cashDate: moment(startDate).startOf('day').toISOString(),
         cashOver: Number(values.cashOver),
         cashShort: Number(values.cashShort),
@@ -113,8 +112,8 @@ function ModalEditSearchList({ open, onClose, payloadCash }: Props) {
   useEffect(() => {
     setValues({
       date: new Date(),
-      cashOver: payloadCash ? payloadCash.cash2 : '0',
-      cashShort: payloadCash ? payloadCash.cash1 : '0',
+      cashOver: payloadEdit ? payloadEdit.cashOver : '0',
+      cashShort: payloadEdit ? payloadEdit.cashShort : '0',
     });
     setStartDate(new Date());
     setMsgError('');

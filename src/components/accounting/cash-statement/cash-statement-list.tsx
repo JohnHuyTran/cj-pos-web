@@ -1,28 +1,36 @@
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector, useAppDispatch } from '../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import {
   DataGrid,
   GridCellParams,
   GridColDef,
   GridRenderCellParams,
   GridRowData,
+  GridRowParams,
   useGridApiRef,
 } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import { useStyles } from '../../../styles/makeTheme';
 import LoadingModal from '../../commons/ui/loading-modal';
 import { Chip, TextField } from '@mui/material';
-import { getUserInfo } from '../../../store/sessionStore';
-import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
 import { DeleteForever, Edit } from '@mui/icons-material';
 import NumberFormat from 'react-number-format';
-
 import ModalEditSearchList from './modal-edit-search-list';
+import ModalDeleteSearchList from './modal-delete-search-list';
 
 interface loadingModalState {
   open: boolean;
 }
+import {
+  CashStatementInfo,
+  CashStatementSearchRequest,
+  CashStatementSearchResponse,
+} from 'models/branch-accounting-model';
+import { convertUtcToBkkDate } from 'utils/date-utill';
+import { featchSearchCashStatementAsync } from 'store/slices/accounting/cash-statement/cash-search-slice';
+import { saveCashStatementSearch } from 'store/slices/accounting/cash-statement/save-cash-search-slice';
+import { getBranchName } from 'utils/utils';
 
 export interface DataGridProps {
   onSelectRows: (rowsList: Array<any>) => void;
@@ -42,7 +50,7 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'branch',
+    field: 'branchCode',
     headerName: 'สาขา',
     minWidth: 120,
     flex: 1.2,
@@ -50,7 +58,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'date1',
+    field: 'cashDate',
     headerName: 'วันที่เงินขาด-เกิน',
     minWidth: 150,
     headerAlign: 'center',
@@ -58,7 +66,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'date2',
+    field: 'salesDate',
     headerName: 'วันที่ยอดขาย',
     minWidth: 120,
     flex: 1.2,
@@ -66,7 +74,7 @@ const columns: GridColDef[] = [
     sortable: false,
   },
   {
-    field: 'cash1',
+    field: 'cashShort',
     headerName: 'เงินขาด',
     minWidth: 120,
     flex: 1.2,
@@ -83,12 +91,10 @@ const columns: GridColDef[] = [
           sx={{
             '.MuiInputBase-input.Mui-disabled': {
               WebkitTextFillColor: '#000',
+              textAlign: 'end',
             },
             '.MuiOutlinedInput-notchedOutline': {
               border: 'none',
-            },
-            '.MuiInputBase-input-MuiOutlinedInput-input': {
-              textAlign: 'right',
             },
           }}
           fixedDecimalScale
@@ -98,7 +104,7 @@ const columns: GridColDef[] = [
     },
   },
   {
-    field: 'cash2',
+    field: 'cashOver',
     headerName: 'เงินเกิน',
     minWidth: 120,
     headerAlign: 'center',
@@ -110,18 +116,15 @@ const columns: GridColDef[] = [
           value={String(params.value)}
           thousandSeparator={true}
           decimalScale={2}
-          // className={classes.MtextFieldNumber}
           disabled={true}
           customInput={TextField}
           sx={{
             '.MuiInputBase-input.Mui-disabled': {
               WebkitTextFillColor: '#000',
+              textAlign: 'end',
             },
             '.MuiOutlinedInput-notchedOutline': {
               border: 'none',
-            },
-            '.MuiInputBase-input-MuiOutlinedInput-input': {
-              textAlign: 'right',
             },
           }}
           fixedDecimalScale
@@ -164,11 +167,13 @@ const columns: GridColDef[] = [
     align: 'center',
     sortable: false,
     renderCell: (params) => {
-      return (
-        <div>
-          <Edit fontSize="medium" sx={{ color: '#AEAEAE' }} />
-        </div>
-      );
+      if (params.getValue(params.id, 'status') === 'DRAFT') {
+        return (
+          <div>
+            <Edit fontSize="medium" sx={{ color: '#AEAEAE' }} />
+          </div>
+        );
+      }
     },
   },
   {
@@ -210,50 +215,73 @@ function useApiRef() {
 function CashStatementList({ onSelectRows }: DataGridProps) {
   const { t } = useTranslation(['cashStatement', 'common']);
   const classes = useStyles();
+  const dispatch = useAppDispatch();
+
+  const items = useAppSelector((state) => state.searchCashStatement);
+  const cuurentPage = useAppSelector((state) => state.searchCashStatement.cashStatementList.page);
+  const limit = useAppSelector((state) => state.searchCashStatement.cashStatementList.perPage);
+  const res: CashStatementSearchResponse = items.cashStatementList;
+  const payload = useAppSelector((state) => state.saveCashStatementSearchRequest.searchCashStatement);
+  const [pageSize, setPageSize] = React.useState(limit.toString());
 
   useEffect(() => {}, []);
 
   const { apiRef, columns } = useApiRef();
-  const rows = [
-    {
-      id: 1,
-      index: 1,
-      branch: 'xxx',
-      date1: '26/07/2565',
-      date2: '26/07/2565',
-      cash1: 5555,
-      cash2: 0,
-      status: 'DRAFT',
-      statusText: t(`status.DRAFT`),
-      delete: '',
-    },
-    {
-      id: 2,
-      index: 2,
-      branch: 'xxx',
-      date1: '26/07/2565',
-      date2: '26/07/2565',
-      cash1: 5555,
-      cash2: 0,
-      status: 'APPROVED',
-      statusText: t(`status.APPROVED`),
-      delete: '',
-    },
-  ];
-
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
+  const rows = res.data.map((data: CashStatementInfo, indexs: number) => {
+    return {
+      id: data.id,
+      index: (cuurentPage - 1) * parseInt(pageSize) + indexs + 1,
+      branchCode: data.branchCode,
+      cashDate: convertUtcToBkkDate(data.cashDate),
+      salesDate: convertUtcToBkkDate(data.salesDate),
+      cashOver: data.cashOver,
+      cashShort: data.cashShort,
+      status: data.status,
+      statusText: t(`status.${data.status}`),
+    };
   });
 
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
+
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const handlePageChange = async (newPage: number) => {
+    setLoading(true);
+    let page: string = (newPage + 1).toString();
+    const payloadNewpage: CashStatementSearchRequest = {
+      limit: pageSize,
+      page: page,
+      branchCode: payload.branchCode,
+      dateFrom: payload.dateFrom,
+      dateTo: payload.dateTo,
+      status: payload.status,
+    };
+
+    await dispatch(featchSearchCashStatementAsync(payloadNewpage));
+    await dispatch(saveCashStatementSearch(payloadNewpage));
+    setLoading(false);
+  };
+
+  const handlePageSizeChange = async (pageSize: number) => {
+    setPageSize(pageSize.toString());
+    setLoading(true);
+
+    const payloadNewpage: CashStatementSearchRequest = {
+      limit: pageSize.toString(),
+      page: '1',
+      branchCode: payload.branchCode,
+      dateFrom: payload.dateFrom,
+      dateTo: payload.dateTo,
+      status: payload.status,
+    };
+    await dispatch(featchSearchCashStatementAsync(payloadNewpage));
+    await dispatch(saveCashStatementSearch(payloadNewpage));
+    setLoading(false);
   };
 
   const handleSubmitRowSelect = async () => {
     const rowSelect = apiRef.current.getSelectedRows();
     let rowSelectList: any = [];
     rowSelect.forEach((data: GridRowData) => {
-      // rowSelectList.push(data.rtNo);
       rowSelectList.push(data);
     });
 
@@ -261,7 +289,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   };
 
   const [openModalEdit, setOpenModalEdit] = React.useState(false);
-  const [payloadCash, setPayloadCash] = React.useState({
+  const [payloadEdit, setPayloadEdit] = React.useState({
     cashOver: 0,
     cashShort: 0,
   });
@@ -276,41 +304,72 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   };
 
   const handleEdit = async (data: any) => {
+    setOpenLoadingModal(true);
     setOpenModalEdit(true);
-    setPayloadCash(data);
+    setPayloadEdit(data);
+    setOpenLoadingModal(false);
   };
 
   const onCloseModalEdit = () => {
     setOpenModalEdit(false);
   };
 
+  const [openModalDelete, setOpenModalDelete] = React.useState(false);
   const handleDelete = async (data: any) => {
+    // setOpenLoadingModal(true);
     console.log('handleDelete:', JSON.stringify(data));
-    setSelectRowsDeleteList(data);
+    setSelectRowsDeleteList([data]);
+    setOpenModalDelete(true);
+  };
+
+  const handleConfirmDel = (data: any) => {
+    console.log('data del:', data);
+    setOpenModalDelete(false);
+  };
+
+  const onCloseModalDelete = () => {
+    setOpenModalDelete(false);
+    setOpenLoadingModal(false);
   };
 
   return (
     <div>
       <Box mt={2} bgcolor="background.paper">
-        <Box className={classes.MdataGridPaginationTop} sx={{ height: '25vh' }}>
+        <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
             columns={columns}
             disableColumnMenu
-            pageSize={5}
-            rowsPerPageOptions={[10, 20, 50, 100]}
-            autoHeight={rows.length >= 10 ? false : true}
-            checkboxSelection
-            disableSelectionOnClick
-            onSelectionModelChange={handleSubmitRowSelect}
             onCellClick={currentlySelected}
+            autoHeight={rows.length >= 10 ? false : true}
+            scrollbarSize={10}
+            page={cuurentPage - 1}
+            pageSize={parseInt(pageSize)}
+            rowsPerPageOptions={[10, 20, 50, 100]}
+            rowCount={res.total}
+            paginationMode="server"
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            loading={loading}
+            rowHeight={65}
+            pagination
+            // checkboxSelection={groupSCM ? true : false}
+            isRowSelectable={(params: GridRowParams) => params.row.edit}
+            onSelectionModelChange={handleSubmitRowSelect}
+            disableSelectionOnClick
           />
-        </Box>
+        </div>
       </Box>
 
-      <ModalEditSearchList open={openModalEdit} onClose={onCloseModalEdit} payloadCash={payloadCash} />
+      <ModalEditSearchList open={openModalEdit} onClose={onCloseModalEdit} payloadEdit={payloadEdit} />
+      <ModalDeleteSearchList
+        open={openModalDelete}
+        onClose={onCloseModalDelete}
+        payloadDelete={selectRowsDeleteList}
+        onConfirmDelete={handleConfirmDel}
+      />
 
-      <LoadingModal open={openLoadingModal.open} />
+      <LoadingModal open={openLoadingModal} />
     </div>
   );
 }
