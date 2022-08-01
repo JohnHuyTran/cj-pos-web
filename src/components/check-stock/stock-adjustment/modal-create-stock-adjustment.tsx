@@ -23,7 +23,6 @@ import { Action, StockActionStatus } from '../../../utils/enum/common-enum';
 import ConfirmCloseModel from '../../commons/ui/confirm-exit-model';
 import ModelConfirm from "../../barcode-discount/modal-confirm";
 import { updateCheckStock } from "../../../store/slices/stock-balance-check-slice";
-import { updateAddItemsState } from "../../../store/slices/add-items-slice";
 import StepperBar from "../../commons/ui/stepper-bar";
 import { StepItem } from "../../../models/step-item-model";
 import { getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
@@ -40,7 +39,7 @@ import { HighlightOff, Replay } from "@mui/icons-material";
 import DialogTitle from "@mui/material/DialogTitle";
 import { ACTIONS } from "../../../utils/enum/permission-enum";
 import ModelConfirmStockAdjust from "./modal-confirm-stock-adjust";
-import { getBarcodeCalculate } from "../../../store/slices/stock-adjust-barcode-calculate-slice";
+import { updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -85,7 +84,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
 
   const dataDetail = useAppSelector((state) => state.stockAdjustmentSlice.dataDetail);
   const checkEdit = useAppSelector((state) => state.stockAdjustmentSlice.checkEdit);
-  const stockCountDetail = useAppSelector((state) => state.stockCountDetailSlice.stockCountDetail.data);
+  const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail.data);
   const [relatedSCs, setRelatedSCs] = useState<any[]>([]);
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SA_MANAGE) : false);
@@ -162,41 +161,25 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
 
   useEffect(() => {
     //set value detail from search
-    if (Action.UPDATE === action && !objectNullOrEmpty(stockCountDetail)) {
+    if (Action.UPDATE === action && !objectNullOrEmpty(stockAdjustDetail)) {
+      setRelatedSCs(stockAdjustDetail.relatedSCs);
       //set value for data detail
       dispatch(
         updateDataDetail({
-          id: stockCountDetail.id,
-          documentNumber: stockCountDetail.documentNumber,
-          status: stockCountDetail.status,
-          createdDate: stockCountDetail.createdDate,
-          createdBy: stockCountDetail.createdBy,
-          countingTime: stockCountDetail.countingTime,
-          APDocumentNumber: stockCountDetail.APDocumentNumber,
-          APId: stockCountDetail.APId,
-          storeType: stockCountDetail.storeType,
-          branch: stockCountDetail.branchCode + ' - ' + stockCountDetail.branchName
+          id: stockAdjustDetail.id,
+          documentNumber: stockAdjustDetail.documentNumber,
+          status: stockAdjustDetail.status,
+          createdDate: stockAdjustDetail.createdDate,
+          createdBy: stockAdjustDetail.createdBy,
+          APDocumentNumber: stockAdjustDetail.APDocumentNumber,
+          APId: stockAdjustDetail.APId,
+          branchCode: stockAdjustDetail.branchCode,
+          branchName: stockAdjustDetail.branchName,
+          relatedSCs: stockAdjustDetail.relatedSCs,
         })
       );
-      //set value for products
-      if (stockCountDetail.product && stockCountDetail.product.length > 0) {
-        let lstProductDetail: any = [];
-        for (let item of stockCountDetail.product) {
-          lstProductDetail.push({
-            barcode: item.barcode,
-            barcodeName: item.productName,
-            unitName: item.unitName,
-            unitCode: item.unitFactor,
-            baseUnit: item.barFactor,
-            unitPrice: item.price || 0,
-            qty: item.quantity || 0,
-            skuCode: item.sku,
-          });
-        }
-        dispatch(updateAddItemsState(lstProductDetail));
-      }
     }
-  }, [stockCountDetail]);
+  }, [stockAdjustDetail]);
 
   const handleCreateDraft = async (relatedSCsParam: any) => {
     setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
@@ -320,14 +303,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   };
 
   const handleRefresh = () => {
-    handleOpenLoading('open', true);
-    dispatch(getBarcodeCalculate({
-      // id: '62e3ad548dbb8e029492eea5',
-      id: dataDetail.id,
-      perPage: 10,
-      page: 1,
-    }));
-    handleOpenLoading('open', false);
+    dispatch(updateRefresh(true));
   };
 
   return (
@@ -473,7 +449,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
               </Box>
             </Box>
             <Box>
-              <ModalStockAdjustmentItem action={action} userPermission={userPermission} viewMode={viewMode}/>
+              <ModalStockAdjustmentItem action={action} userPermission={userPermission} viewMode={viewMode} />
             </Box>
           </Box>
         </DialogContent>

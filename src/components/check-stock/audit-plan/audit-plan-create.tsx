@@ -44,6 +44,7 @@ import ModalValidateImport from '../../sale-limit-time/modal-validate-import';
 import { useHistory } from 'react-router-dom';
 import ModalCreateStockAdjustment from "../stock-adjustment/modal-create-stock-adjustment";
 import { updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
+import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment-detail-slice";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -455,24 +456,13 @@ export default function ModalCreateAuditPlan({
   const dataDetailSA = useAppSelector((state) => state.stockAdjustmentSlice.dataDetail);
   const handleOpenSA = async () =>{
     await dispatch(getAuditPlanDetail(dataDetail.id));
+    // await dispatch(getStockAdjustmentDetail('62e7a965852639eb91f139d1'));
     const dataDetailSAUpdate = {
       ...dataDetailSA,
       APId: dataDetail.id,
       APDocumentNumber: dataDetail.documentNumber,
       branchCode: dataDetail.branchCode,
       branchName: dataDetail.branchName,
-      // id:'62e3ad548dbb8e029492eea5',
-      // documentNumber: 'SA22070101-000020',
-      // relatedSCs:[
-      //   {
-      //     documentNumber: 'SC22070101-000089',
-      //     countingTime: 1,
-      //   },
-      //   {
-      //     documentNumber: 'SC22070101-000090',
-      //     countingTime: 2,
-      //   }
-      // ]
     };
     await dispatch(updateDataDetail(dataDetailSAUpdate));
     setOpenSA(true);
@@ -800,7 +790,7 @@ export default function ModalCreateAuditPlan({
           onClickClose={async () => {
             setOpenSA(false);
           }}
-          action={Action.INSERT}
+          action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}

@@ -11,15 +11,25 @@ import {
 } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
 import { Action } from '../../../utils/enum/common-enum';
-import { TransferOutDetail } from "../../../models/transfer-out";
 import { KEYCLOAK_GROUP_AUDIT } from "../../../utils/enum/permission-enum";
 import { getUserInfo } from "../../../store/sessionStore";
-import { BarcodeCalculate } from "../../../models/stock-adjustment-model";
+import { BarcodeCalculate, SACalculateRequest, SkuCalculate } from "../../../models/stock-adjustment-model";
+import {
+  getBarcodeCalculate, getSkuCalculate,
+  saveBarcodeCalculateCriteria, saveSkuCalculateCriteria,
+  updateRefresh
+} from "../../../store/slices/stock-adjust-calculate-slice";
+import LoadingModal from "../../commons/ui/loading-modal";
+import { stringNullOrEmpty } from "../../../utils/utils";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
   userPermission?: any[];
   viewMode?: boolean;
+}
+
+interface loadingModalState {
+  open: boolean;
 }
 
 interface TabPanelProps {
@@ -59,16 +69,21 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
 
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const [pageSize, setPageSize] = React.useState<number>(10);
-  const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  const barcodeCalculateData = useAppSelector((state) => state.stockAdjustBarcodeCalculateSlice.toSearchResponse.data);
+  const dataDetail = useAppSelector((state) => state.stockAdjustmentSlice.dataDetail);
+  const refreshCalculate = useAppSelector((state) => state.stockAdjustCalculateSlice.refresh);
+  const skuCalculateResponse = useAppSelector((state) => state.stockAdjustCalculateSlice.skuCalculateResponse);
+  const barcodeCalculateResponse = useAppSelector((state) => state.stockAdjustCalculateSlice.barcodeCalculateResponse);
+  const skuCalculateData = useAppSelector((state) => state.stockAdjustCalculateSlice.skuCalculateResponse.data);
+  const barcodeCalculateData = useAppSelector((state) => state.stockAdjustCalculateSlice.barcodeCalculateResponse.data);
+  const skuCalculateCriteria = useAppSelector((state) => state.stockAdjustCalculateSlice.skuCalculateCriteria);
+  const barcodeCalculateCriteria = useAppSelector((state) => state.stockAdjustCalculateSlice.barcodeCalculateCriteria);
 
   //permission
   const userInfo = getUserInfo();
   const [auditPermission, setAuditPermission] = useState<boolean>((userInfo && userInfo.groups && userInfo.groups.length > 0)
     ? userInfo.groups.includes(KEYCLOAK_GROUP_AUDIT) : false);
-  const [valueTab, setValueTab] = React.useState(0);
   const [values, setValues] = useState({
+    valueTab: 0,
     differenceEqual0: false,
     differenceNegative0: false,
     differencePositive0: false,
@@ -76,40 +91,49 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     differenceNegative1: false,
     differencePositive1: false,
   });
-  const [skuTable, setSkuTable] = React.useState<Array<TransferOutDetail>>([]);
-  const [barcodeTable, setBarcodeTable] = React.useState<Array<TransferOutDetail>>([]);
+  const [skuTable, setSkuTable] = React.useState<Array<SkuCalculate>>([]);
+  const [barcodeTable, setBarcodeTable] = React.useState<Array<BarcodeCalculate>>([]);
+  const [skuTableRecheck, setSkuTableRecheck] = React.useState<Array<string>>([]);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   useEffect(() => {
-    if (Object.keys(payloadAddItem).length !== 0) {
-      let rows = payloadAddItem.map((item: any, index: number) => {
+    if (skuCalculateData && skuCalculateData.length > 0) {
+      let rows: any = skuCalculateData.map((item: SkuCalculate, index: number) => {
         return {
-          checked: false,
+          checked: (skuTableRecheck.includes(item.sku)),
           id: `${item.barcode}-${index + 1}`,
           index: index + 1,
-          barcodeName: item.barcodeName,
-          skuCode: item.skuCode,
-          saleCounting: 0,
-          stockMovement: 0,
-          countStoreFront: 0,
-          countStoreBack: 0,
-          totalCount: 0,
-          availableStock: 0,
-          countDifference: 0,
-          stockTemp: 0,
-          unit: item.unitName,
+          skuName: item.skuName,
+          sku: item.sku,
+          saleCounting: item.saleCounting,
+          stockMovement: item.stockMovement,
+          storeFrontCount: item.storeFrontCount,
+          storeBackCount: item.storeBackCount,
+          totalCount: item.storeFrontCount + item.storeBackCount,
+          availableStock: item.availableStock,
+          difference: item.difference,
+          tempStock: item.tempStock,
+          unitName: item.unitName,
           adjustedPrice: 0,
           remark: '',
         };
       });
+
       setSkuTable(rows);
     } else {
       setSkuTable([]);
     }
+  }, [skuCalculateData, skuTableRecheck]);
 
-    if (Object.keys(barcodeCalculateData).length !== 0) {
+  useEffect(() => {
+    if (barcodeCalculateData && barcodeCalculateData.length > 0) {
       let rows2: any = barcodeCalculateData.map((item: BarcodeCalculate, index: number) => {
         return {
-          checked: false,
+          checked: (skuTableRecheck.includes(item.sku)),
           id: `${item.barcode}-${index + 1}`,
           index: index + 1,
           barcode: item.barcode,
@@ -130,30 +154,148 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     } else {
       setBarcodeTable([]);
     }
-  }, [barcodeCalculateData]);
+  }, [barcodeCalculateData, skuTableRecheck]);
+
+  useEffect(() => {
+    if (refreshCalculate) {
+      handleOpenLoading('open', true);
+      handleCalculate().then(() => {
+        handleOpenLoading('open', false);
+      });
+      dispatch(updateRefresh(false));
+    }
+  }, [refreshCalculate]);
+
+  const handleCalculate = async () => {
+    if (values.valueTab === 0) {
+      let filterDifference0 = '';
+      if (values.differenceEqual0) {
+        filterDifference0 += '0';
+      }
+      if (values.differenceNegative0) {
+        filterDifference0 += stringNullOrEmpty(filterDifference0) ? '-1' : ',-1';
+      }
+      if (values.differencePositive0) {
+        filterDifference0 += stringNullOrEmpty(filterDifference0) ? '1' : ',1';
+      }
+      let skuCalculateCriteriaNew = {
+        perPage: skuCalculateCriteria.perPage,
+        page: skuCalculateCriteria.page,
+        id: dataDetail.id,
+        filterDifference: filterDifference0,
+      };
+      await dispatch(saveSkuCalculateCriteria(skuCalculateCriteriaNew));
+      await dispatch(getSkuCalculate(skuCalculateCriteriaNew));
+    } else if (values.valueTab === 1) {
+      let filterDifference1 = '';
+      if (values.differenceEqual1) {
+        filterDifference1 += '0';
+      }
+      if (values.differenceNegative1) {
+        filterDifference1 += stringNullOrEmpty(filterDifference1) ? '-1' : ',-1';
+      }
+      if (values.differencePositive1) {
+        filterDifference1 += stringNullOrEmpty(filterDifference1) ? '1' : ',1';
+      }
+      let barcodeCalculateCriteriaNew = {
+        perPage: barcodeCalculateCriteria.perPage,
+        page: barcodeCalculateCriteria.page,
+        id: dataDetail.id,
+        filterDifference: filterDifference1,
+      };
+      await dispatch(saveBarcodeCalculateCriteria(barcodeCalculateCriteriaNew));
+      await dispatch(getBarcodeCalculate(barcodeCalculateCriteriaNew));
+    }
+  };
+
+  const handlePageChangeSku = async (newPage: number) => {
+    setLoading(true);
+    let page: number = newPage + 1;
+
+    const payloadNewPage: SACalculateRequest = {
+      perPage: skuCalculateCriteria.perPage,
+      page: page,
+      id: skuCalculateCriteria.id,
+      filterDifference: skuCalculateCriteria.filterDifference,
+    };
+
+    await dispatch(saveSkuCalculateCriteria(payloadNewPage));
+    await dispatch(getSkuCalculate(payloadNewPage));
+    setLoading(false);
+  };
+
+  const handlePageSizeChangeSku = async (pageSize: number) => {
+    setLoading(true);
+    const payloadNewPage: SACalculateRequest = {
+      perPage: pageSize,
+      page: 1,
+      id: skuCalculateCriteria.id,
+      filterDifference: skuCalculateCriteria.filterDifference,
+    };
+
+    await dispatch(saveSkuCalculateCriteria(payloadNewPage));
+    await dispatch(getSkuCalculate(payloadNewPage));
+    setLoading(false);
+  };
+
+  const handlePageChangeBarcode = async (newPage: number) => {
+    setLoading(true);
+    let page: number = newPage + 1;
+
+    const payloadNewPage: SACalculateRequest = {
+      perPage: barcodeCalculateCriteria.perPage,
+      page: page,
+      id: barcodeCalculateCriteria.id,
+      filterDifference: barcodeCalculateCriteria.filterDifference,
+    };
+
+    await dispatch(saveBarcodeCalculateCriteria(payloadNewPage));
+    await dispatch(getBarcodeCalculate(payloadNewPage));
+    setLoading(false);
+  };
+
+  const handlePageSizeChangeBarcode = async (pageSize: number) => {
+    setLoading(true);
+    const payloadNewPage: SACalculateRequest = {
+      perPage: pageSize,
+      page: 1,
+      id: barcodeCalculateCriteria.id,
+      filterDifference: barcodeCalculateCriteria.filterDifference,
+    };
+
+    await dispatch(saveBarcodeCalculateCriteria(payloadNewPage));
+    await dispatch(getBarcodeCalculate(payloadNewPage));
+    setLoading(false);
+  };
 
   const handleChangeTab = async (event: React.SyntheticEvent, newValue: number) => {
-    setValueTab(newValue);
+    setValues({
+      ...values,
+      valueTab: newValue,
+    });
   };
 
   const onCheckDifferenceFilter = async (e: any, fieldName: string) => {
-    await setValues({ ...values, [fieldName + valueTab]: e.target.checked });
-    handleFilterCall();
-  };
-
-  const handleFilterCall = () => {
-    console.log(values);
+    await setValues({ ...values, [fieldName + values.valueTab]: e.target.checked });
+    dispatch(updateRefresh(true));
   };
 
   const onCheckCell = async (params: GridRenderCellParams, event: any) => {
+    let skuRechecks = _.cloneDeep(skuTableRecheck);
     let skuTableHandle = _.cloneDeep(skuTable);
     for (let item of skuTableHandle) {
       if (item.id === params.row.id) {
         item.checked = event.target.checked;
+        if (event.target.checked) {
+          skuRechecks.push(item.sku);
+        } else {
+          skuRechecks = skuRechecks.filter((it: any) => it !== item.sku);
+        }
         break;
       }
     }
     setSkuTable(skuTableHandle);
+    setSkuTableRecheck(skuRechecks);
   };
 
   const columnsSkuTable: GridColDef[] = [
@@ -187,7 +329,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       ),
     },
     {
-      field: 'barcodeName',
+      field: 'skuName',
       headerName: 'รายละเอียดสินค้า',
       flex: 2,
       headerAlign: 'center',
@@ -197,7 +339,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
         <div>
           <Typography variant="body2">{params.value}</Typography>
           <Typography color="textSecondary" sx={{ fontSize: 12 }}>
-            {params.getValue(params.id, 'skuCode') || ''}
+            {params.getValue(params.id, 'sku') || ''}
           </Typography>
         </div>
       ),
@@ -233,7 +375,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       sortable: false,
     },
     {
-      field: 'countStoreFront',
+      field: 'storeFrontCount',
       headerName: '',
       flex: 1,
       headerAlign: 'center',
@@ -254,7 +396,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       },
     },
     {
-      field: 'countStoreBack',
+      field: 'storeBackCount',
       headerName: '',
       flex: 1,
       headerAlign: 'center',
@@ -293,16 +435,17 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       sortable: false,
     },
     {
-      field: 'countDifference',
+      field: 'difference',
       headerName: 'ส่วนต่างการนับ',
       flex: 1,
       headerAlign: 'center',
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => genDifferenceCount(Number(params.value)),
     },
     {
-      field: 'stockTemp',
+      field: 'tempStock',
       headerName: 'บ้านพักสต๊อก',
       flex: 1,
       headerAlign: 'center',
@@ -311,9 +454,9 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       sortable: false,
     },
     {
-      field: 'unit',
+      field: 'unitName',
       headerName: 'หน่วย',
-      flex: 0.8,
+      flex: 0.6,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -489,6 +632,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => genDifferenceCount(Number(params.value)),
     },
     {
       field: 'tempStock',
@@ -508,6 +652,16 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       sortable: false,
     },
   ];
+
+  const genDifferenceCount = (value: number) => {
+    let colorValue: string = '#263238';
+    if (value < 0) {
+      colorValue = '#F54949';
+    } else if (value > 0) {
+      colorValue = '#446EF2';
+    }
+    return <Typography variant='body2' sx={{ color: colorValue }}>{value}</Typography>;
+  };
 
   const FilterPanel = (props: FilterPanelProps) => {
     return (
@@ -548,13 +702,13 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
   return (
     <div>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={valueTab} onChange={handleChangeTab} aria-label='basic tabs example'>
+        <Tabs value={values.valueTab} onChange={handleChangeTab} aria-label='basic tabs example'>
           <Tab label={<Typography sx={{ fontWeight: 'bold' }}>ตรวจนับสินค้าตาม SKU</Typography>}/>
           <Tab label={<Typography sx={{ fontWeight: 'bold' }}>ตรวจนับตามบาร์โค้ดสินค้า</Typography>}/>
         </Tabs>
       </Box>
 
-      <TabPanel value={valueTab} index={0}>
+      <TabPanel value={values.valueTab} index={0}>
         <div>
           <FilterPanel differenceEqual={values.differenceEqual0}
                        differenceNegative={values.differenceNegative0}
@@ -570,12 +724,17 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
             <DataGrid
               rows={skuTable}
               columns={columnsSkuTable}
-              pageSize={pageSize}
-              hideFooterSelectedRowCount={true}
-              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-              rowsPerPageOptions={[10, 20, 50, 100]}
-              pagination
               disableColumnMenu
+              pageSize={skuCalculateCriteria.perPage}
+              hideFooterSelectedRowCount={true}
+              loading={loading}
+              paginationMode='server'
+              onPageChange={handlePageChangeSku}
+              onPageSizeChange={handlePageSizeChangeSku}
+              page={skuCalculateCriteria.page - 1}
+              rowsPerPageOptions={[10, 20, 50, 100]}
+              rowCount={skuCalculateResponse.total}
+              pagination
               autoHeight={skuTable.length < 10}
               scrollbarSize={10}
               rowHeight={60}
@@ -590,7 +749,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           </div>
         </div>
       </TabPanel>
-      <TabPanel value={valueTab} index={1}>
+      <TabPanel value={values.valueTab} index={1}>
         <div>
           <FilterPanel differenceEqual={values.differenceEqual1}
                        differenceNegative={values.differenceNegative1}
@@ -606,12 +765,17 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
             <DataGrid
               rows={barcodeTable}
               columns={columnsBarcodeTable}
-              pageSize={pageSize}
-              hideFooterSelectedRowCount={true}
-              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-              rowsPerPageOptions={[10, 20, 50, 100]}
-              pagination
               disableColumnMenu
+              pageSize={barcodeCalculateCriteria.perPage}
+              hideFooterSelectedRowCount={true}
+              loading={loading}
+              paginationMode='server'
+              onPageChange={handlePageChangeBarcode}
+              onPageSizeChange={handlePageSizeChangeBarcode}
+              page={barcodeCalculateCriteria.page - 1}
+              rowsPerPageOptions={[10, 20, 50, 100]}
+              rowCount={barcodeCalculateResponse.total}
+              pagination
               autoHeight={barcodeTable.length < 10}
               scrollbarSize={10}
               rowHeight={60}
@@ -626,6 +790,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           </div>
         </div>
       </TabPanel>
+      <LoadingModal open={openLoadingModal.open}/>
     </div>
   );
 };

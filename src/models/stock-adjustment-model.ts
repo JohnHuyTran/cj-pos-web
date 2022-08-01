@@ -1,7 +1,8 @@
 export interface SACalculateRequest {
-  id: string;
   perPage: number;
   page: number;
+  id: string;
+  filterDifference: any;
 }
 
 export interface SABarcodeCalculateResponse {
@@ -27,4 +28,38 @@ export interface BarcodeCalculate {
   difference: number;
   tempStock: number;
   unitName: string;
+}
+
+export interface SASkuCalculateResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: SkuCalculate[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPage: number;
+}
+
+export interface SkuCalculate {
+  barcode: string;
+  skuName: string;
+  sku: string;
+  saleCounting: number;
+  stockMovement: number;
+  storeFrontCount: number;
+  storeBackCount: number;
+  availableStock: number;
+  difference: number;
+  tempStock: number;
+  unitName: string;
+  adjustedPrice: number;
+  remark: string,
+}
+
+export interface StockAdjustmentDetailResponse {
+  ref: string;
+  code: number;
+  message: string;
+  data: any;
 }
