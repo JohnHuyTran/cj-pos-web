@@ -41,7 +41,6 @@ import DocumentList from './modal-documents-list';
 import { env } from '../../../adapters/environmentConfigs';
 import { importST } from '../../../services/sale-limit-time';
 import ModalValidateImport from '../../sale-limit-time/modal-validate-import';
-import { useHistory } from 'react-router-dom';
 
 interface Props {
   action: Action | Action.INSERT;
@@ -78,11 +77,9 @@ export default function ModalCreateAuditPlan({
   onReSearchMain,
   action,
   viewMode,
-  isRedirect,
 }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const history = useHistory();
   const [open, setOpen] = React.useState(isOpen);
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const [openModalConfirm, setOpenModalConfirm] = React.useState<boolean>(false);
@@ -159,7 +156,7 @@ export default function ModalCreateAuditPlan({
       const products = dataDetail.product
         ? dataDetail.product.map((item: any) => {
             return {
-              barcodeName: item.name,
+              skuName: item.name,
               skuCode: item.sku,
               selectedType: 2,
             };
@@ -195,16 +192,17 @@ export default function ModalCreateAuditPlan({
   const handleCounting = async (store: number) => {
     setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
-      const products = payloadAddTypeProduct
-        .filter((el: any) => el.selectedType === 2)
-        .map((item: any) => {
-          return {
-            name: item.barcodeName,
-            sku: item.skuCode,
-            unitName: item.unitName,
-            barcode: item.barcode,
-          };
-        });
+      const products = _.uniqBy(
+        payloadAddTypeProduct.filter((el: any) => el.selectedType === 2),
+        'skuName'
+      ).map((item: any) => {
+        return {
+          name: item.skuName,
+          sku: item.skuCode,
+          unitName: item.unitName,
+          barcode: item.barcode,
+        };
+      });
       const payload: PayloadCounting = {
         auditPlanning: {
           id: values.id,
@@ -270,9 +268,6 @@ export default function ModalCreateAuditPlan({
     dispatch(clearDataFilter());
     setOpen(false);
     onClickClose();
-    if (isRedirect) {
-      history.push('/audit-plan');
-    }
   };
 
   const handleCloseModalCreate = () => {
@@ -288,16 +283,40 @@ export default function ModalCreateAuditPlan({
   const handleCreateDraft = async () => {
     setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     try {
-      const products = payloadAddTypeProduct
-        .filter((el: any) => el.selectedType === 2)
-        .map((item: any) => {
-          return {
-            name: item.barcodeName,
-            sku: item.skuCode,
-            unitName: item.unitName,
-            barcode: item.barcode,
-          };
-        });
+      const products = _.uniqBy(
+        payloadAddTypeProduct.filter((el: any) => el.selectedType === 2),
+        'skuName'
+      ).map((item: any) => {
+        return {
+          name: item.skuName,
+          sku: item.skuCode,
+          unitName: item.unitName,
+          barcode: item.barcode,
+        };
+      });
+      const appliedProduct = {
+        appliedProducts: payloadAddTypeProduct
+          .filter((el: any) => el.selectedType === 2)
+          .map((item: any) => {
+            return {
+              name: item.barcodeName,
+              skuCode: item.skuCode,
+              barcode: item.barcode,
+              unitName: item.unitName,
+              categoryTypeCode: item.productTypeCode,
+            };
+          }),
+        appliedCategories: payloadAddTypeProduct
+          .filter((el: any) => el.selectedType === 1)
+          .map((item: any) => {
+            return {
+              name: item.productTypeName,
+              code: item.productTypeCode,
+            };
+          }),
+      };
+   
+      
       const body = {
         branchCode: values.branch,
         branchName: getBranchName(branchList, values.branch),
@@ -441,7 +460,13 @@ export default function ModalCreateAuditPlan({
   };
   const getDisplayCountingBtn = () => {
     let displayCounting = undefined;
-    if (steps.indexOf(status) < 1 || !countingPermission || viewMode || status == StockActionStatus.CANCEL) {
+    if (
+      steps.indexOf(status) < 1 ||
+      !countingPermission ||
+      viewMode ||
+      status == StockActionStatus.CANCEL ||
+      !groupBranch
+    ) {
       return 'none';
     } else {
       if (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.BRANCH) {
@@ -543,7 +568,10 @@ export default function ModalCreateAuditPlan({
                         steps.indexOf(status) > 0 ||
                         (action == Action.UPDATE &&
                           !userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
-                          currentName == 'posaudit')
+                          currentName == 'posaudit') ||
+                        (action == Action.UPDATE &&
+                          !userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
+                          currentName != 'posaudit')
                       }
                       onChange={handleChangeStockCounter}
                       inputProps={{ 'aria-label': 'Without label' }}
@@ -704,7 +732,6 @@ export default function ModalCreateAuditPlan({
                   onClick={handleOpenCancel}
                   style={{
                     display:
-                      // (steps.indexOf(status) > 1 && !groupBranch) ||
                       !managePermission ||
                       viewMode ||
                       status == StockActionStatus.CANCEL ||

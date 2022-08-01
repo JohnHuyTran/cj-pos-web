@@ -107,7 +107,7 @@ export default function ModalConfirmSC({ open, onClose, onConfirm }: Props): Rea
         <Button
           id="btnClose"
           variant="contained"
-          color="inherit"
+          color="cancelColor"
           sx={{ borderRadius: '5px', mb: 3, width: 126, height: 40, mr: 3 }}
           onClick={onClose}>
           ยกเลิก
