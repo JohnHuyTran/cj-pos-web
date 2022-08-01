@@ -43,8 +43,8 @@ const initialStateForm: any = {
   accountNameTh: '',
   accountCode: '',
   requiredDocumentTh: '',
-  approvalLimit1: 0,
-  approvalLimit2: 0,
+  approvalLimit1: '',
+  approvalLimit2: '',
 };
 interface Props {
   isOpen: boolean;
