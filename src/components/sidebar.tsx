@@ -533,6 +533,21 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='ตรวจนับสต๊อก (SC)' />
               </ListItemButton>
             </Link>
+            <Link
+              to='/stock-adjustment'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+              }}
+              id='subMenuStockAdjustment'>
+              <ListItemButton
+                key='StockAdjustment'
+                selected={selectedIndex === 17}
+                onClick={() => handleListItemClick(17)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='รายละเอียดตรวจนับสต๊อก (SA)' />
+              </ListItemButton>
+            </Link>
           </List>
         </Collapse>
       </List>
