@@ -433,7 +433,7 @@ export const environment = {
     },
     stockAdjustment: {
       search: {
-        url: '/stock/stock-adjustment'
+        url: '/stock/stock-adjust'
       },
     } 
   },

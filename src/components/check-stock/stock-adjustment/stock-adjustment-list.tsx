@@ -130,7 +130,7 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
         headerAlign: 'center',
         sortable: false,
         minWidth: 200,
-        width: 280,
+        width: 600,
         renderCell: (params) => (
           <Box component="div" sx={{ marginLeft: '0 auto' }}>
             {params.value}

@@ -5,7 +5,7 @@ import AuditPlanSearch from '../../components/check-stock/stock-adjustment/stock
 const StockAdjustment = () => {
   return (
     <Container maxWidth="xl">
-      <TitleHeader title={'รายละเอียดตรวจนับสต๊อก (SA)'} />
+      <TitleHeader title={'ตรวจนับสต๊อกรวม (SA)'} />
       <AuditPlanSearch />
     </Container>
   );

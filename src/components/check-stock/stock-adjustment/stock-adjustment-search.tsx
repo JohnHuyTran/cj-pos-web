@@ -18,12 +18,13 @@ import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
 import { BranchListOptionType } from '../../../models/branch-model';
-import { getStockCountSearch } from "../../../store/slices/stock-count-search-slice";
+import { getStockAdjustmentSearch } from "../../../store/slices/stock-adjustment-search-slice";
 import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
 import StockAdjustmentList from "./stock-adjustment-list";
 import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
 import { isGroupBranch } from "../../../utils/role-permission";
 import { StockCountSearchRequest } from "../../../models/stock-count-model";
+import { StockAdjustmentSearchRequest } from '../../../models/stock-adjustment-model';
 
 const _ = require('lodash');
 
@@ -153,7 +154,7 @@ const StockAdjustmentSearch = () => {
       endDate: new Date(),
     });
 
-    const payload: StockCountSearchRequest = {
+    const payload: StockAdjustmentSearchRequest = {
       perPage: (limit ? limit : 10).toString(),
       page: page,
       query: values.documentNumber,
@@ -163,7 +164,7 @@ const StockAdjustmentSearch = () => {
       endDate: moment(values.endDate).endOf('day').toISOString(),
       clearSearch: true
     };
-    dispatch(getStockCountSearch(payload));
+    dispatch(getStockAdjustmentSearch(payload));
     if (!requestPermission) {
       setListBranchSelect([]);
     }
@@ -202,7 +203,7 @@ const StockAdjustmentSearch = () => {
     };
 
     handleOpenLoading('open', true);
-    await dispatch(getStockCountSearch(payload));
+    await dispatch(getStockAdjustmentSearch(payload));
     await dispatch(saveSearchCriteriaSC(payload));
     setFlagSearch(true);
     handleOpenLoading('open', false);
