@@ -439,6 +439,33 @@ export default function ModalCreateAuditPlan({
       throw error;
     }
   };
+  const getDisplayCountingBtn = () => {
+    let displayCounting = undefined;
+    if (steps.indexOf(status) < 1 || !countingPermission || viewMode || status == StockActionStatus.CANCEL) {
+      return 'none';
+    } else {
+      if (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.BRANCH) {
+        displayCounting = undefined;
+      } else if (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.AUDIT) {
+        displayCounting = 'none';
+      } else if (
+        !groupBranch &&
+        userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
+        values.stockCounter == STOCK_COUNTER_TYPE.AUDIT
+      ) {
+        displayCounting = undefined;
+      } else if (
+        !groupBranch &&
+        userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
+        values.stockCounter == STOCK_COUNTER_TYPE.BRANCH
+      ) {
+        displayCounting = 'none';
+      } else if (!groupBranch && !userGroups.includes(KEYCLOAK_GROUP_AUDIT)) {
+        displayCounting = 'none';
+      }
+    }
+    return displayCounting;
+  };
 
   return (
     <div>
@@ -661,14 +688,7 @@ export default function ModalCreateAuditPlan({
                   sx={{ margin: '0 17px' }}
                   disabled={steps.indexOf(status) < 0 || !managePermission || disableCounting}
                   style={{
-                    display:
-                      steps.indexOf(status) < 1 ||
-                      !countingPermission ||
-                      viewMode ||
-                      status == StockActionStatus.CANCEL ||
-                      !(userGroups.includes(KEYCLOAK_GROUP_AUDIT) && values.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
-                        ? 'none'
-                        : undefined,
+                    display: getDisplayCountingBtn(),
                   }}
                   startIcon={<CheckCircleOutlineIcon />}
                   onClick={handleOpenModalCounting}
