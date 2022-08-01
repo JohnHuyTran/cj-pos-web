@@ -34,6 +34,7 @@ import ModalCreateAuditPlan from "../audit-plan/audit-plan-create";
 import { cancelStockCount, confirmStockCount } from "../../../services/stock-count";
 import ModalConfirmSC from './modal-confirm-SC';
 import { getUserInfo } from '../../../store/sessionStore';
+import { isGroupBranch } from '../../../utils/role-permission';
 
 
 interface Props {
@@ -78,6 +79,7 @@ export default function ModalCreateStockCount({
   const stockCountDetail = useAppSelector((state) => state.stockCountDetailSlice.stockCountDetail.data);
   const userName = getUserInfo().preferred_username ? getUserInfo().preferred_username : '';
   //permission
+  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SC_MANAGE) : false);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
@@ -93,7 +95,7 @@ export default function ModalCreateStockCount({
   const handleOpenModalConfirm = () => {
     if (!validate()) {
       setOpenModalError(true);
-      setAlertTextError('ไม่สามารถนับได้');
+      setAlertTextError('กรุณาระบุจำนวนนับ');
       return;
     } else {
 
@@ -235,10 +237,8 @@ export default function ModalCreateStockCount({
         );
         setOpenPopup(true);
         setPopupMsg('คุณได้ยืนยันตรวจนับสต๊อก (SC) เรียบร้อยแล้ว');
-        await dispatch(getAuditPlanDetail(dataDetail.APId));
-        if (!objectNullOrEmpty(auditPlanDetail.data)) {
-          setOpenDetailAPAdmin(true);
-        }
+        handleClose();
+        if (onSearchMain) onSearchMain();
       } else if (rs.code == 40016){
         setOpenModalError(true);
         setAlertTextError('ไม่สามารถดำเนินการได้\nเนื่องจากเอกสาร AP ถูกยกเลิก');
@@ -301,7 +301,6 @@ export default function ModalCreateStockCount({
   };
 
   const [openDetailAP, setOpenDetailAP] = React.useState(false);
-  const [openDetailAPAdmin, setOpenDetailAPAdmin] = React.useState(false)
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -433,7 +432,14 @@ export default function ModalCreateStockCount({
                 sx={{ margin: '0 17px' }}
                 disabled={(!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
                   || (payloadStockCount.products && payloadStockCount.products.length === 0)}
-                style={{ display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) || !managePermission ) ? 'none' : undefined }}
+                style={{
+                  display:
+                    (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) ||
+                    !managePermission ||
+                    !groupBranch
+                      ? 'none'
+                      : undefined,
+                }}
                 startIcon={<CheckCircleOutlineIcon/>}
                 onClick={handleOpenModalConfirm}
                 className={classes.MbtnSearch}>
@@ -444,7 +450,7 @@ export default function ModalCreateStockCount({
                 variant='contained'
                 color='error'
                 disabled={stringNullOrEmpty(status)}
-                style={{ display: (!managePermission ) ? 'none' : undefined }}
+                style={{ display: !managePermission || !groupBranch ? 'none' : undefined }}
                 startIcon={<HighlightOffIcon/>}
                 onClick={handleOpenCancel}
                 className={classes.MbtnSearch}>
@@ -470,19 +476,6 @@ export default function ModalCreateStockCount({
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
           viewMode={true}
-        />
-      )}
-      {openDetailAPAdmin && (
-        <ModalCreateAuditPlan
-          isOpen={openDetailAPAdmin}
-          onClickClose={() => {
-            setOpenDetailAPAdmin(false)
-          }}
-          action={Action.UPDATE}
-          setPopupMsg={setPopupMsg}
-          setOpenPopup={setOpenPopup}
-          userPermission={userPermission}
-          isRedirect={true}
         />
       )}
       <ModelConfirm

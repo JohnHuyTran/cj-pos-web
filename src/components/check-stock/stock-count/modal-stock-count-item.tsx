@@ -129,7 +129,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
-          disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission || viewMode}
+          disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission}
           onClick={(e) => onCheckCell(e, params.row.index, params.row.skuCode)}
         />
       ),
