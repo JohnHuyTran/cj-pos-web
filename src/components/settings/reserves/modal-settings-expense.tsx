@@ -380,11 +380,11 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   onChange={handleValidatRegEx}
                   className={classes.MtextField}
                   fullWidth
-                  inputProps={{ maxLength: 50 }}
+                  inputProps={{ maxLength: 20 }}
                   autoComplete="off"
                 />
                 <FormHelperText sx={{ textAlign: 'right' }}>
-                  [ก-ฮ ,A-Z,a-z,0-9,(),-,_] {values.accountNameTh.length}/50
+                  [ก-ฮ ,A-Z,a-z,0-9,(),-,_] {values.accountNameTh.length}/20
                 </FormHelperText>
               </FormControl>
             </Grid>
