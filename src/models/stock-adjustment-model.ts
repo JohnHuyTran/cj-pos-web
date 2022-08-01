@@ -1,11 +1,11 @@
 export interface StockAdjustmentSearchRequest {
     perPage: string;
     page: string;
-    query: string;
+    docNo: string;
     branch: string;
     status: string;
-    startDate: string;
-    endDate: string;
+    creationDateFrom: string;
+    creationDateTo: string;
     clearSearch?: boolean;
     type?: string | undefined;
   }

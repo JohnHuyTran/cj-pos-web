@@ -28,21 +28,21 @@ export const getStockAdjustmentSearch = createAsyncThunk(
   async (payload: StockAdjustmentSearchRequest) => {
     try {
       const apiRootPath = environment.checkStock.stockAdjustment.search.url;
-      let path = `${apiRootPath}?limit=${payload.perPage}&page=${payload.page}`;
-      if (!stringNullOrEmpty(payload.query)) {
-        path = path + `&documentNumber=${payload.query}`;
+      let path = `${apiRootPath}?perPage=${payload.perPage}&page=${payload.page}`;
+      if (!stringNullOrEmpty(payload.docNo)) {
+        path = path + `&docNo=${payload.docNo}`;
       }
       if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
-        path = path + `&branchCode=${payload.branch}`;
+        path = path + `&branch=${payload.branch}`;
       }
       if (!stringNullOrEmpty(payload.status) && 'ALL' !== payload.status) {
         path = path + `&status=${payload.status}`;
       }
-      if (!stringNullOrEmpty(payload.startDate)) {
-        path = path + `&startDate=${payload.startDate}`;
+      if (!stringNullOrEmpty(payload.creationDateFrom)) {
+        path = path + `&creationDateFrom=${payload.creationDateFrom}`;
       }
-      if (!stringNullOrEmpty(payload.endDate)) {
-        path = path + `&endDate=${payload.endDate}`;
+      if (!stringNullOrEmpty(payload.creationDateTo)) {
+        path = path + `&creationDateTo=${payload.creationDateTo}`;
       }
       let response: StockAdjustmentSearchResponse = {
         ref: '',

@@ -200,11 +200,11 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
     const payloadNewPage: StockAdjustmentSearchRequest = {
       perPage: pageSize,
       page: page,
-      query: payload.query,
+      docNo: payload.docNo,
       branch: payload.branch,
       status: payload.status,
-      startDate: payload.startDate,
-      endDate: payload.endDate,
+      creationDateFrom: payload.creationDateFrom,
+      creationDateTo: payload.creationDateTo,
     };
 
     await dispatch(getStockAdjustmentSearch(payloadNewPage));
@@ -218,11 +218,11 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
     const payloadNewPage: StockAdjustmentSearchRequest = {
       perPage: pageSize.toString(),
       page: '1',
-      query: payload.query,
+      docNo: payload.docNo,
       branch: payload.branch,
       status: payload.status,
-      startDate: payload.startDate,
-      endDate: payload.endDate,
+      creationDateFrom: payload.creationDateFrom,
+      creationDateTo: payload.creationDateTo,
     };
 
     await dispatch(getStockAdjustmentSearch(payloadNewPage));

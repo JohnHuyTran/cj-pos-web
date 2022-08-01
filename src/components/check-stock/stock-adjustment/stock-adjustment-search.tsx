@@ -19,7 +19,7 @@ import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
 import { BranchListOptionType } from '../../../models/branch-model';
 import { getStockAdjustmentSearch } from "../../../store/slices/stock-adjustment-search-slice";
-import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
+// import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
 import StockAdjustmentList from "./stock-adjustment-list";
 import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
 import { isGroupBranch } from "../../../utils/role-permission";
@@ -51,8 +51,8 @@ const StockAdjustmentSearch = () => {
 
   const dispatch = useAppDispatch();
   const page = '1';
-  const limit = useAppSelector((state) => state.stockCountSearchSlice.toSearchResponse.perPage);
-  const stockCountSearchSlice = useAppSelector((state) => state.stockCountSearchSlice);
+  const limit = useAppSelector((state) => state.stockAdjustmentSearchSlice.toSearchResponse.perPage);
+  const stockAdjustmentSearchSlice = useAppSelector((state) => state.stockAdjustmentSearchSlice);
   const [requestPermission, setRequestPermission] = useState<boolean>(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -79,7 +79,7 @@ const StockAdjustmentSearch = () => {
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
-    branch: 'ALL',
+    branch: groupBranch ? ownBranch : 'ALL',
     status: 'ALL',
     type: 'ALL',
     startDate: new Date(),
@@ -88,11 +88,9 @@ const StockAdjustmentSearch = () => {
 
   useEffect(() => {
     if (groupBranch) {
-      setOwnBranch(getUserInfo().branch
-        ? getBranchName(branchList, getUserInfo().branch)
-          ? getUserInfo().branch
-          : ''
-        : '');
+      setOwnBranch(
+        getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
+      );
       setBranchOptions({
         code: ownBranch,
         name: branchName ? branchName : '',
@@ -147,7 +145,7 @@ const StockAdjustmentSearch = () => {
     setFlagSearch(false);
     setValues({
       documentNumber: '',
-      branch: '',
+      branch: groupBranch ? ownBranch : 'ALL',
       status: 'ALL',
       type: 'ALL',
       startDate: new Date(),
@@ -157,11 +155,11 @@ const StockAdjustmentSearch = () => {
     const payload: StockAdjustmentSearchRequest = {
       perPage: (limit ? limit : 10).toString(),
       page: page,
-      query: values.documentNumber,
+      docNo: values.documentNumber,
       branch: values.branch,
       status: values.status,
-      startDate: moment(values.startDate).startOf('day').toISOString(),
-      endDate: moment(values.endDate).endOf('day').toISOString(),
+      creationDateFrom: moment(values.startDate).startOf('day').toISOString(),
+      creationDateTo: moment(values.endDate).endOf('day').toISOString(),
       clearSearch: true
     };
     dispatch(getStockAdjustmentSearch(payload));
@@ -192,25 +190,25 @@ const StockAdjustmentSearch = () => {
     } else {
       limits = limit ? limit.toString() : '10';
     }
-    const payload: StockCountSearchRequest = {
+    const payload: StockAdjustmentSearchRequest = {
       perPage: limits,
       page: page,
-      query: values.documentNumber.trim(),
+      docNo: values.documentNumber.trim(),
       branch: values.branch,
       status: values.status,
-      startDate: moment(values.startDate).startOf('day').toISOString(),
-      endDate: moment(values.endDate).endOf('day').toISOString(),
+      creationDateFrom: moment(values.startDate).startOf('day').toISOString(),
+      creationDateTo: moment(values.endDate).endOf('day').toISOString(),
     };
 
     handleOpenLoading('open', true);
     await dispatch(getStockAdjustmentSearch(payload));
-    await dispatch(saveSearchCriteriaSC(payload));
+    // await dispatch(saveSearchCriteriaSC(payload));
     setFlagSearch(true);
     handleOpenLoading('open', false);
   };
 
   let dataTable;
-  const res = stockCountSearchSlice.toSearchResponse;
+  const res = stockAdjustmentSearchSlice.toSearchResponse;
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {

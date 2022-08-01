@@ -9,11 +9,11 @@ const initialState: State = {
   searchCriteria: {
     perPage: '10',
     page: '1',
-    query: '',
+    docNo: '',
     branch: '',
     status: '',
-    startDate: '',
-    endDate: '',
+    creationDateFrom: '',
+    creationDateTo: '',
   },
 };
 
