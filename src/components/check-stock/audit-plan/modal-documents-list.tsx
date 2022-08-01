@@ -9,6 +9,7 @@ import { Action } from '../../../utils/enum/common-enum';
 
 import { getStockCountDetail } from '../../../store/slices/stock-count-detail-slice';
 import LoadingModal from '../../commons/ui/loading-modal';
+import { getUserInfo } from '../../../store/sessionStore';
 
 interface Props {
   viewMode?: boolean;
@@ -91,6 +92,9 @@ const DocumentList = ({viewMode}:Props) => {
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           viewMode={true}
+          userPermission={getUserInfo().acl['service.posback-stock'] != null && getUserInfo().acl['service.posback-stock'].length > 0
+          ? getUserInfo().acl['service.posback-stock']
+          : []}
         />
       )}
       <LoadingModal open={openLoadingModal} />

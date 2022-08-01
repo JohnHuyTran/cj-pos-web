@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@material-ui/core';
 import {
+  Checkbox,
   TextField,
   Typography,
 } from '@mui/material';
@@ -12,10 +13,10 @@ import {
   updateCheckEdit,
   updateErrorList,
 } from '../../../store/slices/stock-count-slice';
-import { handleNumberBeforeUse, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
+import { handleNumberBeforeUse, stringNullOrEmpty } from '../../../utils/utils';
 import { Action, TOStatus } from '../../../utils/enum/common-enum';
-import { TransferOutDetail } from "../../../models/transfer-out";
 import { ACTIONS } from "../../../utils/enum/permission-enum";
+import { StockCountDetail } from '../../../models/stock-count-model';
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -38,19 +39,14 @@ export const ModalStockCountItem = (props: DataGridProps) => {
   //permission
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SC_MANAGE) : false);
-  const [dtTable, setDtTable] = React.useState<Array<TransferOutDetail>>([]);
+  const [dtTable, setDtTable] = React.useState<Array<StockCountDetail>>([]);
   const checkStocks = useAppSelector((state) => state.stockBalanceCheckSlice.checkStock);
-
+  
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let rows = payloadAddItem.map((item: any, index: number) => {
-        let sameItem = dtTable.find((el) => el.barcode === item.barcode);
-        let numberOfRequested = item.qty ? item.qty : 0;
-        if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
-          numberOfRequested = stringNullOrEmpty(item.qty) ? null : item.qty;
-        }
-
         return {
+          checked: item.canNotCount,
           id: `${item.barcode}-${index + 1}`,
           index: index + 1,
           barcode: item.barcode,
@@ -58,10 +54,8 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           unit: item.unitName,
           unitCode: item.unitCode || '',
           barFactor: item.baseUnit || 0,
-          qty: numberOfRequested,
+          quantity: stringNullOrEmpty(item.qty) ? null : item.qty,
           errorQty: '',
-          numberOfRequested: numberOfRequested,
-          numberOfApproved: numberOfRequested,
           skuCode: item.skuCode
         };
       });
@@ -76,10 +70,11 @@ export const ModalStockCountItem = (props: DataGridProps) => {
       const products = dtTable.map((item) => {
         return {
           barcode: item.barcode,
-          quantity: parseInt(String(item.numberOfRequested).replace(/,/g, '')),
+          quantity: parseInt(String(item.quantity).replace(/,/g, '')),
           unitName: item.unit,
           productName: item.barcodeName,
           sku: item.skuCode,
+          canNotCount: item.checked
         };
       });
       dispatch(save({ ...payloadStockCount, products: products }));
@@ -88,11 +83,11 @@ export const ModalStockCountItem = (props: DataGridProps) => {
     }
   }, [dtTable]);
 
-  const handleChangeNumberOfRequested = (event: any, index: number, errorIndex: number, barcode: string) => {
+  const handleChangeQuantity = (event: any, index: number, errorIndex: number, barcode: string) => {
     let currentValue = handleNumberBeforeUse(event.target.value);
-    setDtTable((preData: Array<TransferOutDetail>) => {
+    setDtTable((preData: Array<StockCountDetail>) => {
       const data = [...preData];
-      data[index - 1].numberOfRequested = currentValue;
+      data[index - 1].quantity = currentValue; 
       return data;
     });
     dispatch(
@@ -101,7 +96,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           return idx === errorIndex
             ? {
               ...item,
-              errorNumberOfRequested: '',
+              errorQuantity: '',
             }
             : item;
         })
@@ -110,7 +105,35 @@ export const ModalStockCountItem = (props: DataGridProps) => {
     dispatch(updateCheckEdit(true));
   };
 
+  const onCheckCell =  (event: any, index: number,  skuCode: string) => {
+    setDtTable((preData: Array<StockCountDetail>) => {
+      const data = [...preData];
+      let newList = data.map((item:any) => {
+        return {
+          ...item,
+          checked: item.skuCode == skuCode ? !item.checked : item.checked
+        }
+      })
+      return newList;
+    });
+  };
+
   const columns: GridColDef[] = [
+    {
+      field: 'checked',
+      headerName: 'ไม่สามารถนับได้',
+      flex: 0.5,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      renderCell: (params) => (
+        <Checkbox
+          checked={Boolean(params.value)}
+          disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission || viewMode}
+          onClick={(e) => onCheckCell(e, params.row.index, params.row.skuCode)}
+        />
+      ),
+    },
     {
       field: 'index',
       headerName: 'ลำดับ',
@@ -150,7 +173,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
       ),
     },
     {
-      field: 'numberOfRequested',
+      field: 'quantity',
       headerName: 'จำนวนนับ',
       flex: 0.8,
       headerAlign: 'center',
@@ -164,7 +187,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           checkStocks && checkStocks.length > 0
             ? checkStocks.findIndex((item: any) => item.barcode === params.row.barcode)
             : -1;
-        const condition = (index != -1 && errorList[index].errorNumberOfRequested) || indexStock !== -1;
+        const condition = (index != -1 && errorList[index].errorQuantity) || indexStock !== -1;
         return (
           <div className={classes.MLabelTooltipWrapper}>
             <TextField
@@ -174,11 +197,11 @@ export const ModalStockCountItem = (props: DataGridProps) => {
               className={classes.MtextFieldNumber}
               value={stringNullOrEmpty(params.value) ? '' : params.value}
               onChange={(e) => {
-                handleChangeNumberOfRequested(e, params.row.index, index, params.row.barcode);
+                handleChangeQuantity(e, params.row.index, index, params.row.barcode);
               }}
-              disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission || viewMode}
+              disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission}
             />
-            {condition && <div className="title">{errorList[index]?.errorNumberOfRequested}</div>}
+            {/* {condition && <div className="title">{errorList[index]?.errorQuantity}</div>} */}
           </div>
         );
       }
@@ -206,6 +229,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           rowsPerPageOptions={[10, 20, 50, 100]}
           pagination
           disableColumnMenu
+          disableSelectionOnClick
           autoHeight={dtTable.length < 10}
           scrollbarSize={10}
           rowHeight={60}
