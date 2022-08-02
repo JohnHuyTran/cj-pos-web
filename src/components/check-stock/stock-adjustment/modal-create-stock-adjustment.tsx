@@ -85,6 +85,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   const dataDetail = useAppSelector((state) => state.stockAdjustmentSlice.dataDetail);
   const checkEdit = useAppSelector((state) => state.stockAdjustmentSlice.checkEdit);
   const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail.data);
+  const dataDetailAP = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
   const [relatedSCs, setRelatedSCs] = useState<any[]>([]);
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SA_MANAGE) : false);
@@ -175,7 +176,12 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
           APId: stockAdjustDetail.APId,
           branchCode: stockAdjustDetail.branchCode,
           branchName: stockAdjustDetail.branchName,
-          relatedSCs: stockAdjustDetail.relatedSCs,
+          relatedSCs: stockAdjustDetail.relatedSCs ? stockAdjustDetail.relatedSCs : [],
+          recheckSkus: stockAdjustDetail.recheckSkus ? stockAdjustDetail.recheckSkus : [],
+          notCountableSkus: stockAdjustDetail.notCountableSkus ? stockAdjustDetail.notCountableSkus : [],
+          skuDifferenceEqual: 0,
+          skuDifferenceNegative: 0,
+          skuDifferencePositive: 0,
         })
       );
     }
@@ -186,7 +192,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     try {
       const payload = {
         ...dataDetail,
-        relatedSCs: relatedSCsParam,
+        relatedSCs: relatedSCsParam
       };
       const rs = await saveDraftStockAdjust(payload);
       if (rs.code === 20000) {
@@ -225,7 +231,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
           })
         );
         setOpenPopup(true);
-        setPopupMsg('คุณได้ยืนยันตรวจนับสต๊อก (SC) เรียบร้อยแล้ว');
+        setPopupMsg('คุณได้ทำการยืนยันตรวจนับสต๊อกรวม (SA) \n เรียบร้อยแล้ว');
         handleClose();
         if (onSearchMain) onSearchMain();
       } else {
@@ -243,7 +249,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
         const rs = await cancelStockCount(dataDetail.id);
         if (rs.status === 200) {
           setOpenPopup(true);
-          setPopupMsg('คุณได้ยกเลิกตรวจนับสต๊อกเรียบร้อยแล้ว');
+          setPopupMsg('คุณได้ยกเลิกตรวจนับสต๊อกรวม (SA) เรียบร้อยแล้ว');
           handleClose();
           if (onSearchMain) onSearchMain();
         } else {
@@ -256,7 +262,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
       }
     } else {
       setOpenPopup(true);
-      setPopupMsg('คุณได้ยกเลิกตรวจนับสต๊อกเรียบร้อยแล้ว');
+      setPopupMsg('คุณได้ยกเลิกตรวจนับสต๊อกรวม (SA) เรียบร้อยแล้ว');
       handleClose();
     }
   };
@@ -428,7 +434,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                       || !managePermission || viewMode) ? 'none' : undefined
                   }}
                   startIcon={<CheckCircleOutlineIcon/>}
-                  // onClick={handleOpenModalConfirm}
+                  onClick={handleOpenModalConfirm}
                   className={classes.MbtnSearch}>
                   ยืนยัน
                 </Button>
@@ -436,7 +442,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   id='btnCancel'
                   variant='contained'
                   color='error'
-                  disabled={stringNullOrEmpty(status)}
+                  disabled={stringNullOrEmpty(status) || status != StockActionStatus.DRAFT}
                   style={{
                     display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
                       || !managePermission || viewMode) ? 'none' : undefined
@@ -449,7 +455,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
               </Box>
             </Box>
             <Box>
-              <ModalStockAdjustmentItem action={action} userPermission={userPermission} viewMode={viewMode} />
+              <ModalStockAdjustmentItem action={action} userPermission={userPermission} viewMode={viewMode}/>
             </Box>
           </Box>
         </DialogContent>
@@ -499,12 +505,12 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
         documentField={'เลขที่เอกสาร'}
         confirmInfo={{
           documentNumber: dataDetail.documentNumber,
-          numberOfSkuFromAP: 0,
-          numberOfDifferenceEqual: 0,
-          numberOfDifferenceNegative: 0,
-          numberOfDifferencePositive: 0,
-          numberOfSkuRecheckFromSA: 0,
-          numberOfCantCountFromSC: 0,
+          numberOfSkuFromAP: (dataDetailAP && dataDetailAP.product) ? dataDetailAP.product.length : 0,
+          numberOfDifferenceEqual: dataDetail.skuDifferenceEqual,
+          numberOfDifferenceNegative: dataDetail.skuDifferenceNegative,
+          numberOfDifferencePositive: dataDetail.skuDifferencePositive,
+          numberOfSkuRecheckFromSA: (dataDetail && dataDetail.recheckSkus) ? dataDetail.recheckSkus.length : 0,
+          numberOfCantCountFromSC: (dataDetail && dataDetail.notCountableSkus) ? dataDetail.notCountableSkus.length : 0,
         }}
       />
       <SnackbarStatus open={openSnackBar} onClose={handleCloseSnackBar} isSuccess={true} contentMsg={textSnackBar}/>

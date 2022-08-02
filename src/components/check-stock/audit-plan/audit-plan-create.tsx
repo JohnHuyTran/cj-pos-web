@@ -520,6 +520,10 @@ export default function ModalCreateAuditPlan({
     setOpenSA(true);
   };
 
+  const handleUpdateAgainDetailAP = () => {
+    dispatch(getAuditPlanDetail(dataDetail.id));
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth>
@@ -622,7 +626,7 @@ export default function ModalCreateAuditPlan({
                     เอกสาร SC :
                   </Grid>
                   <Grid item xs={8}>
-                    <DocumentList viewMode={viewMode} />
+                    <DocumentList viewMode={viewMode} handleUpdateAgain={handleUpdateAgainDetailAP}/>
                   </Grid>
                 </>
               )}

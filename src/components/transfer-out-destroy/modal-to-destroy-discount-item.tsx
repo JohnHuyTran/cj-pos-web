@@ -59,7 +59,7 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
       let rows = payloadAddItem.map((item: any, index: number) => {
         let sameItem = dtTable.find((el) => el.barcode === item.barcode);
         let numberOfDiscounted = item.numberOfDiscounted ? item.numberOfDiscounted : 0;
-        let numberOfRequested = !!sameItem ? sameItem.numberOfRequested : 0;
+        let numberOfRequested = item.numberOfRequested ? item.numberOfRequested : 0;
         let remark = !!sameItem ? sameItem.remark : '';
         if (Action.UPDATE === action && objectNullOrEmpty(sameItem)) {
           remark = stringNullOrEmpty(item.remark) ? '' : item.remark;
