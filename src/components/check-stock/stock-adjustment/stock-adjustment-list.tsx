@@ -12,9 +12,11 @@ import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
 import { convertUtcToBkkDate } from "../../../utils/date-utill";
 import { StockAdjustment, StockAdjustmentSearchRequest, StockAdjustmentSearchResponse } from "../../../models/stock-adjustment-model";
-import { getStockCountDetail } from "../../../store/slices/stock-count-detail-slice";
 import { getStockAdjustmentSearch } from "../../../store/slices/stock-adjustment-search-slice";
 import { saveSearchCriteriaSA } from "../../../store/slices/stock-adjustment-criteria-search-slice";
+import ModalCreateStockAdjustment from "./modal-create-stock-adjustment";
+import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment-detail-slice";
+import { getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
 
 const _ = require('lodash');
 
@@ -62,6 +64,8 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
               : data.branchName
             : data.branchCode + ' - ' + (stringNullOrEmpty(data.branchName) ? '' : data.branchName),
           createdBy: data.createdBy,
+          APId: data.APId,
+          APDocumentNumber: data.APDocumentNumber,
         };
       });
       setLstStockAdjustment(rows);
@@ -243,14 +247,15 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
 //     await dispatch(getStockCountSearch(payloadNew));
 //   };
 
-  const stockCountDetail = useAppSelector((state) => state.stockCountDetailSlice.stockCountDetail);
+  const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail);
   const currentlySelected = async (params: GridCellParams) => {
     const chkPN = params.colDef.field;
     handleOpenLoading('open', true);
     if (chkPN !== 'checked') {
       try {
-        await dispatch(getStockCountDetail(params.row.id));
-        if (stockCountDetail.data.length > 0 || stockCountDetail.data) {
+        await dispatch(getAuditPlanDetail(params.row.APId));
+        await dispatch(getStockAdjustmentDetail(params.row.id));
+        if (stockAdjustDetail) {
             setOpenDetail(true);
         }
       } catch (error) {
@@ -288,17 +293,16 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
           />
         </div>
       </Box>
-      {/* {openDetail && (
-        <ModalCreateStockCount
+      {openDetail && (
+        <ModalCreateStockAdjustment
           isOpen={openDetail}
           onClickClose={handleCloseDetail}
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
-          onSearchMain={onSearchAgain}
           userPermission={userPermission}
         />
-      )} */}
+      )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
     </div>
   );

@@ -824,6 +824,19 @@ export default function ModalCreateAuditPlan({
         </Box>
       </ModalValidateImport>
 
+      {openSA && (
+        <ModalCreateStockAdjustment
+          isOpen={openSA}
+          onClickClose={async () => {
+            setOpenSA(false);
+          }}
+          action={Action.INSERT}
+          setPopupMsg={setPopupMsg}
+          setOpenPopup={setOpenPopup}
+          userPermission={userPermission}
+        />
+      )}
+
       <ModelConfirm
         open={openModalConfirm}
         onClose={() => handleCloseModalConfirm(false)}

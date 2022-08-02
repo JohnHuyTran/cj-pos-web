@@ -7,6 +7,7 @@ import {
   SASkuCalculateResponse
 } from "../../models/stock-adjustment-model";
 import { stringNullOrEmpty } from "../../utils/utils";
+import { environment } from "../../environment-base";
 
 type State = {
   barcodeCalculateCriteria: SACalculateRequest;
@@ -35,8 +36,8 @@ const initialState: State = {
     message: '',
     data: [],
     total: 0,
-    page: 0,
-    perPage: 0,
+    page: 1,
+    perPage: 10,
     totalPage: 0,
   },
   skuCalculateResponse: {
@@ -45,18 +46,18 @@ const initialState: State = {
     message: '',
     data: [],
     total: 0,
-    page: 0,
-    perPage: 0,
+    page: 1,
+    perPage: 10,
     totalPage: 0,
   },
   refresh: false,
 };
 
-export const getBarcodeCalculate = createAsyncThunk(
-  'getBarcodeCalculate',
+export const getSkuCalculate = createAsyncThunk(
+  'getSkuCalculate',
   async (payload: SACalculateRequest) => {
     try {
-      const apiRootPath = 'http://192.168.110.127:8000/stock-adjust/barcodes/' + payload.id;
+      const apiRootPath = `${environment.checkStock.stockAdjustment.calculate.skuTab.url}/${payload.id}`;
       let path = `${apiRootPath}?limit=${payload.perPage}&page=${payload.page}`;
       if (!stringNullOrEmpty(payload.filterDifference)) {
         path = path + `&filterDifference=${payload.filterDifference}`;
@@ -79,11 +80,11 @@ export const getBarcodeCalculate = createAsyncThunk(
   }
 );
 
-export const getSkuCalculate = createAsyncThunk(
-  'getSkuCalculate',
+export const getBarcodeCalculate = createAsyncThunk(
+  'getBarcodeCalculate',
   async (payload: SACalculateRequest) => {
     try {
-      const apiRootPath = 'http://192.168.110.127:8000/stock-adjust/skus/' + payload.id;
+      const apiRootPath = `${environment.checkStock.stockAdjustment.calculate.barcodeTab.url}/${payload.id}`;
       let path = `${apiRootPath}?limit=${payload.perPage}&page=${payload.page}`;
       if (!stringNullOrEmpty(payload.filterDifference)) {
         path = path + `&filterDifference=${payload.filterDifference}`;

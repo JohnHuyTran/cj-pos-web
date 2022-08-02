@@ -33,6 +33,8 @@ export interface StockAdjustment {
   countingTime: number;
   documentNumberAP: string;
   createdBy: string;
+  APId: string;
+  APDocumentNumber: string;
   products: StockAdjustmentProductDetail[];
 }
 

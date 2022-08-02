@@ -22,7 +22,7 @@ export const getStockAdjustmentDetail = createAsyncThunk(
   "getStockAdjustmentDetail",
   async (id: string) => {
     try {
-      const apiRootPath = 'http://192.168.110.127:8000/stock-adjust/' + id;
+      const apiRootPath = `${environment.checkStock.stockAdjustment.detail.url}/${id}`;
       let response: StockAdjustmentDetailResponse = {
         ref: "",
         code: 0,

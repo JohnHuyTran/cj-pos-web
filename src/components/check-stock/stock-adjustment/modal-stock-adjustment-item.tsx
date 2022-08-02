@@ -99,6 +99,8 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [pageSizeSku, setPageSizeSku] = React.useState(skuCalculateResponse.perPage);
+  const [pageSizeBarcode, setPageSizeBarcode] = React.useState(barcodeCalculateResponse.perPage);
 
   useEffect(() => {
     if (skuCalculateData && skuCalculateData.length > 0) {
@@ -213,7 +215,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     let page: number = newPage + 1;
 
     const payloadNewPage: SACalculateRequest = {
-      perPage: skuCalculateCriteria.perPage,
+      perPage: pageSizeSku,
       page: page,
       id: skuCalculateCriteria.id,
       filterDifference: skuCalculateCriteria.filterDifference,
@@ -224,10 +226,11 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     setLoading(false);
   };
 
-  const handlePageSizeChangeSku = async (pageSize: number) => {
+  const handlePageSizeChangeSku = async (pageSizeNew: number) => {
+    await setPageSizeSku(pageSizeNew);
     setLoading(true);
     const payloadNewPage: SACalculateRequest = {
-      perPage: pageSize,
+      perPage: pageSizeNew,
       page: 1,
       id: skuCalculateCriteria.id,
       filterDifference: skuCalculateCriteria.filterDifference,
@@ -243,7 +246,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     let page: number = newPage + 1;
 
     const payloadNewPage: SACalculateRequest = {
-      perPage: barcodeCalculateCriteria.perPage,
+      perPage: pageSizeBarcode,
       page: page,
       id: barcodeCalculateCriteria.id,
       filterDifference: barcodeCalculateCriteria.filterDifference,
@@ -254,10 +257,11 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     setLoading(false);
   };
 
-  const handlePageSizeChangeBarcode = async (pageSize: number) => {
+  const handlePageSizeChangeBarcode = async (pageSizeNew: number) => {
+    await setPageSizeBarcode(pageSizeNew);
     setLoading(true);
     const payloadNewPage: SACalculateRequest = {
-      perPage: pageSize,
+      perPage: pageSizeNew,
       page: 1,
       id: barcodeCalculateCriteria.id,
       filterDifference: barcodeCalculateCriteria.filterDifference,
@@ -725,7 +729,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
               rows={skuTable}
               columns={columnsSkuTable}
               disableColumnMenu
-              pageSize={skuCalculateCriteria.perPage}
+              pageSize={pageSizeSku}
               hideFooterSelectedRowCount={true}
               loading={loading}
               paginationMode='server'
@@ -766,7 +770,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
               rows={barcodeTable}
               columns={columnsBarcodeTable}
               disableColumnMenu
-              pageSize={barcodeCalculateCriteria.perPage}
+              pageSize={pageSizeBarcode}
               hideFooterSelectedRowCount={true}
               loading={loading}
               paginationMode='server'

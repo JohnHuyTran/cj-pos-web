@@ -419,22 +419,36 @@ export const environment = {
     },
     stockCount: {
       search: {
-        url: '/stock/stock-count'
+        url: '/stock/stock-count',
       },
       detail: {
-        url: '/stock/stock-count'
+        url: '/stock/stock-count',
       },
       confirm: {
-        url: '/stock/stock-count/confirm'
+        url: '/stock/stock-count/confirm',
       },
       cancel: {
-        url: '/stock/stock-count/{id}'
+        url: '/stock/stock-count/{id}',
       },
     },
     stockAdjustment: {
       search: {
-        url: '/stock/stock-adjust'
+        url: '/stock/stock-adjust',
       },
+      saveDraft: {
+        url: '/stock/stock-adjust',
+      },
+      detail: {
+        url: '/stock/stock-adjust',
+      },
+      calculate:{
+        skuTab: {
+          url: '/stock/stock-adjust/skus',
+        },
+        barcodeTab: {
+          url: '/stock/stock-adjust/barcodes',
+        }
+      }
     } 
   },
   master: {
