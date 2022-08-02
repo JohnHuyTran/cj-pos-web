@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/system';
 import {
   Checkbox,
   FormControlLabel, FormGroup,
@@ -20,7 +20,8 @@ import {
   updateRefresh
 } from "../../../store/slices/stock-adjust-calculate-slice";
 import LoadingModal from "../../commons/ui/loading-modal";
-import { stringNullOrEmpty } from "../../../utils/utils";
+import { numberWithCommas, stringNullOrEmpty } from "../../../utils/utils";
+import { updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -93,7 +94,6 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
   });
   const [skuTable, setSkuTable] = React.useState<Array<SkuCalculate>>([]);
   const [barcodeTable, setBarcodeTable] = React.useState<Array<BarcodeCalculate>>([]);
-  const [skuTableRecheck, setSkuTableRecheck] = React.useState<Array<string>>([]);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -105,58 +105,67 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
   useEffect(() => {
     if (skuCalculateData && skuCalculateData.length > 0) {
       let rows: any = skuCalculateData.map((item: SkuCalculate, index: number) => {
+        let checked = false;
+        if (dataDetail.recheckSkus && dataDetail.recheckSkus.length) {
+          let skuRecheckFilter = dataDetail.recheckSkus.filter((it: any) => it.sku === item.sku);
+          checked = (skuRecheckFilter && skuRecheckFilter.length > 0);
+        }
         return {
-          checked: (skuTableRecheck.includes(item.sku)),
+          checked: checked,
           id: `${item.barcode}-${index + 1}`,
           index: index + 1,
           skuName: item.skuName,
           sku: item.sku,
-          saleCounting: item.saleCounting,
-          stockMovement: item.stockMovement,
-          storeFrontCount: item.storeFrontCount,
-          storeBackCount: item.storeBackCount,
-          totalCount: item.storeFrontCount + item.storeBackCount,
-          availableStock: item.availableStock,
-          difference: item.difference,
-          tempStock: item.tempStock,
-          unitName: item.unitName,
-          adjustedPrice: 0,
+          saleCounting: checked ? '' : item.saleCounting,
+          stockMovement: checked ? '' : item.stockMovement,
+          storeFrontCount: checked ? '' : item.storeFrontCount,
+          storeBackCount: checked ? '' : item.storeBackCount,
+          totalCount: checked ? '' : (item.storeFrontCount + item.storeBackCount),
+          availableStock: checked ? '' : item.availableStock,
+          difference: checked ? '' : item.difference,
+          tempStock: checked ? '' : item.tempStock,
+          unitName: checked ? '' : item.unitName,
+          adjustedPrice: checked ? '' : 0,
           remark: '',
         };
       });
-
       setSkuTable(rows);
     } else {
       setSkuTable([]);
     }
-  }, [skuCalculateData, skuTableRecheck]);
+  }, [skuCalculateData, dataDetail.recheckSkus]);
 
   useEffect(() => {
     if (barcodeCalculateData && barcodeCalculateData.length > 0) {
       let rows2: any = barcodeCalculateData.map((item: BarcodeCalculate, index: number) => {
+        let checked = false;
+        if (dataDetail.recheckSkus && dataDetail.recheckSkus.length) {
+          let skuRecheckFilter = dataDetail.recheckSkus.filter((it: any) => it.sku === item.sku);
+          checked = (skuRecheckFilter && skuRecheckFilter.length > 0);
+        }
         return {
-          checked: (skuTableRecheck.includes(item.sku)),
+          checked: checked,
           id: `${item.barcode}-${index + 1}`,
           index: index + 1,
           barcode: item.barcode,
           productName: item.productName,
           sku: item.sku,
-          saleCounting: item.saleCounting,
-          stockMovement: item.stockMovement,
-          storeFrontCount: item.storeFrontCount,
-          storeBackCount: item.storeBackCount,
-          totalCount: item.storeFrontCount + item.storeBackCount,
-          availableStock: item.availableStock,
-          difference: item.difference,
-          tempStock: item.tempStock,
-          unitName: item.unitName,
+          saleCounting: checked ? '' : item.saleCounting,
+          stockMovement: checked ? '' : item.stockMovement,
+          storeFrontCount: checked ? '' : item.storeFrontCount,
+          storeBackCount: checked ? '' : item.storeBackCount,
+          totalCount: checked ? '' : (item.storeFrontCount + item.storeBackCount),
+          availableStock: checked ? '' : item.availableStock,
+          difference: checked ? '' : item.difference,
+          tempStock: checked ? '' : item.tempStock,
+          unitName: checked ? '' : item.unitName,
         };
       });
       setBarcodeTable(rows2);
     } else {
       setBarcodeTable([]);
     }
-  }, [barcodeCalculateData, skuTableRecheck]);
+  }, [barcodeCalculateData, dataDetail.recheckSkus]);
 
   useEffect(() => {
     if (refreshCalculate) {
@@ -285,21 +294,27 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
   };
 
   const onCheckCell = async (params: GridRenderCellParams, event: any) => {
-    let skuRechecks = _.cloneDeep(skuTableRecheck);
+    let skuRechecks = _.cloneDeep(dataDetail.recheckSkus);
     let skuTableHandle = _.cloneDeep(skuTable);
     for (let item of skuTableHandle) {
       if (item.id === params.row.id) {
         item.checked = event.target.checked;
         if (event.target.checked) {
-          skuRechecks.push(item.sku);
+          skuRechecks.push({
+            name: item.skuName,
+            sku: item.sku
+          });
         } else {
-          skuRechecks = skuRechecks.filter((it: any) => it !== item.sku);
+          skuRechecks = skuRechecks.filter((it: any) => it.sku !== item.sku);
         }
         break;
       }
     }
     setSkuTable(skuTableHandle);
-    setSkuTableRecheck(skuRechecks);
+    await dispatch(updateDataDetail({
+      ...dataDetail,
+      recheckSkus: skuRechecks,
+    }));
   };
 
   const columnsSkuTable: GridColDef[] = [
@@ -368,6 +383,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           </div>
         );
       },
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'stockMovement',
@@ -377,6 +393,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'storeFrontCount',
@@ -398,6 +415,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           </div>
         );
       },
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'storeBackCount',
@@ -419,6 +437,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           </div>
         );
       },
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'totalCount',
@@ -428,6 +447,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'availableStock',
@@ -437,6 +457,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'difference',
@@ -446,7 +467,9 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
-      renderCell: (params) => genDifferenceCount(Number(params.value)),
+      renderCell: (params) => genDifferenceCount(
+        params.getValue(params.id, 'checked') ? Boolean(params.getValue(params.id, 'checked')) : false,
+        Number(params.value)),
     },
     {
       field: 'tempStock',
@@ -456,6 +479,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'unitName',
@@ -473,6 +497,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'remark',
@@ -558,6 +583,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           </div>
         );
       },
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'stockMovement',
@@ -567,6 +593,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'storeFrontCount',
@@ -588,6 +615,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           </div>
         );
       },
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'storeBackCount',
@@ -609,6 +637,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           </div>
         );
       },
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'totalCount',
@@ -618,6 +647,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'availableStock',
@@ -627,6 +657,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'difference',
@@ -636,7 +667,9 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
-      renderCell: (params) => genDifferenceCount(Number(params.value)),
+      renderCell: (params) => genDifferenceCount(
+        params.getValue(params.id, 'checked') ? Boolean(params.getValue(params.id, 'checked')) : false,
+        Number(params.value)),
     },
     {
       field: 'tempStock',
@@ -646,6 +679,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => numberWithCommas(params.value),
     },
     {
       field: 'unitName',
@@ -657,14 +691,14 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     },
   ];
 
-  const genDifferenceCount = (value: number) => {
+  const genDifferenceCount = (checked: boolean, value: number) => {
     let colorValue: string = '#263238';
     if (value < 0) {
       colorValue = '#F54949';
     } else if (value > 0) {
       colorValue = '#446EF2';
     }
-    return <Typography variant='body2' sx={{ color: colorValue }}>{value}</Typography>;
+    return checked ? '' : <Typography variant='body2' sx={{ color: colorValue }}>{numberWithCommas(value)}</Typography>;
   };
 
   const FilterPanel = (props: FilterPanelProps) => {
@@ -718,39 +752,56 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
                        differenceNegative={values.differenceNegative0}
                        differencePositive={values.differencePositive0}
           />
-          <div style={{
-            width: '100%',
-            height: skuTable.length >= 10 ? '76vh' : 'auto',
-            marginBottom: '10px',
-            marginTop: '10px'
-          }}
-               className={classes.MdataGridDetail}>
-            <DataGrid
-              rows={skuTable}
-              columns={columnsSkuTable}
-              disableColumnMenu
-              pageSize={pageSizeSku}
-              hideFooterSelectedRowCount={true}
-              loading={loading}
-              paginationMode='server'
-              onPageChange={handlePageChangeSku}
-              onPageSizeChange={handlePageSizeChangeSku}
-              page={skuCalculateCriteria.page - 1}
-              rowsPerPageOptions={[10, 20, 50, 100]}
-              rowCount={skuCalculateResponse.total}
-              pagination
-              autoHeight={skuTable.length < 10}
-              scrollbarSize={10}
-              rowHeight={60}
-              components={{
-                NoRowsOverlay: () => (
-                  <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
-                    ไม่มีข้อมูล
-                  </Typography>
-                ),
-              }}
-            />
-          </div>
+          <Box
+            sx={{
+              '& .row-checked': {
+                bgcolor: '#EAEBEB',
+                '&:hover': {
+                  bgcolor: '#EAEBEB',
+                },
+              },
+            }}
+          >
+            <div style={{
+              width: '100%',
+              height: skuTable.length >= 10 ? '76vh' : 'auto',
+              marginBottom: '10px',
+              marginTop: '10px'
+            }}
+                 className={classes.MdataGridDetail}>
+              <DataGrid
+                rows={skuTable}
+                columns={columnsSkuTable}
+                disableColumnMenu
+                pageSize={pageSizeSku}
+                hideFooterSelectedRowCount={true}
+                loading={loading}
+                paginationMode='server'
+                onPageChange={handlePageChangeSku}
+                onPageSizeChange={handlePageSizeChangeSku}
+                page={skuCalculateCriteria.page - 1}
+                rowsPerPageOptions={[10, 20, 50, 100]}
+                rowCount={skuCalculateResponse.total}
+                pagination
+                autoHeight={skuTable.length < 10}
+                scrollbarSize={10}
+                rowHeight={60}
+                components={{
+                  NoRowsOverlay: () => (
+                    <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
+                      ไม่มีข้อมูล
+                    </Typography>
+                  ),
+                }}
+                getRowClassName={(params) => {
+                  if (params.row.checked) {
+                    return `row-checked`;
+                  }
+                  return '';
+                }}
+              />
+            </div>
+          </Box>
         </div>
       </TabPanel>
       <TabPanel value={values.valueTab} index={1}>
@@ -759,39 +810,56 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
                        differenceNegative={values.differenceNegative1}
                        differencePositive={values.differencePositive1}
           />
-          <div style={{
-            width: '100%',
-            height: barcodeTable.length >= 10 ? '76vh' : 'auto',
-            marginBottom: '10px',
-            marginTop: '10px'
-          }}
-               className={classes.MdataGridDetail}>
-            <DataGrid
-              rows={barcodeTable}
-              columns={columnsBarcodeTable}
-              disableColumnMenu
-              pageSize={pageSizeBarcode}
-              hideFooterSelectedRowCount={true}
-              loading={loading}
-              paginationMode='server'
-              onPageChange={handlePageChangeBarcode}
-              onPageSizeChange={handlePageSizeChangeBarcode}
-              page={barcodeCalculateCriteria.page - 1}
-              rowsPerPageOptions={[10, 20, 50, 100]}
-              rowCount={barcodeCalculateResponse.total}
-              pagination
-              autoHeight={barcodeTable.length < 10}
-              scrollbarSize={10}
-              rowHeight={60}
-              components={{
-                NoRowsOverlay: () => (
-                  <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
-                    ไม่มีข้อมูล
-                  </Typography>
-                ),
-              }}
-            />
-          </div>
+          <Box
+            sx={{
+              '& .row-checked': {
+                bgcolor: '#EAEBEB',
+                '&:hover': {
+                  bgcolor: '#EAEBEB',
+                },
+              },
+            }}
+          >
+            <div style={{
+              width: '100%',
+              height: barcodeTable.length >= 10 ? '76vh' : 'auto',
+              marginBottom: '10px',
+              marginTop: '10px'
+            }}
+                 className={classes.MdataGridDetail}>
+              <DataGrid
+                rows={barcodeTable}
+                columns={columnsBarcodeTable}
+                disableColumnMenu
+                pageSize={pageSizeBarcode}
+                hideFooterSelectedRowCount={true}
+                loading={loading}
+                paginationMode='server'
+                onPageChange={handlePageChangeBarcode}
+                onPageSizeChange={handlePageSizeChangeBarcode}
+                page={barcodeCalculateCriteria.page - 1}
+                rowsPerPageOptions={[10, 20, 50, 100]}
+                rowCount={barcodeCalculateResponse.total}
+                pagination
+                autoHeight={barcodeTable.length < 10}
+                scrollbarSize={10}
+                rowHeight={60}
+                components={{
+                  NoRowsOverlay: () => (
+                    <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
+                      ไม่มีข้อมูล
+                    </Typography>
+                  ),
+                }}
+                getRowClassName={(params) => {
+                  if (params.row.checked) {
+                    return `row-checked`;
+                  }
+                  return '';
+                }}
+              />
+            </div>
+          </Box>
         </div>
       </TabPanel>
       <LoadingModal open={openLoadingModal.open}/>

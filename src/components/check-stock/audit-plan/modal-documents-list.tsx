@@ -13,9 +13,10 @@ import { getUserInfo } from '../../../store/sessionStore';
 
 interface Props {
   viewMode?: boolean;
+  handleUpdateAgain?: ()=> void;
 }
 
-const DocumentList = ({viewMode}:Props) => {
+const DocumentList = ({viewMode, handleUpdateAgain}:Props) => {
   const dispatch = useAppDispatch();
   const [openListDocNo, setOpenListDocNo] = useState<boolean>(false);
   const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
@@ -95,6 +96,7 @@ const DocumentList = ({viewMode}:Props) => {
           userPermission={getUserInfo().acl['service.posback-stock'] != null && getUserInfo().acl['service.posback-stock'].length > 0
           ? getUserInfo().acl['service.posback-stock']
           : []}
+          onSearchMain={handleUpdateAgain}
         />
       )}
       <LoadingModal open={openLoadingModal} />

@@ -18,7 +18,12 @@ const initialState: ItemsState = {
     branchName: '',
     APId: '',
     APDocumentNumber: '',
-    relatedSCs: []
+    relatedSCs: [],
+    recheckSkus: [],
+    notCountableSkus: [],
+    skuDifferenceEqual: 0,
+    skuDifferenceNegative: 0,
+    skuDifferencePositive: 0,
   },
   errorList: [],
   checkStock: [],

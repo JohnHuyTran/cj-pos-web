@@ -17,6 +17,7 @@ import { saveSearchCriteriaSA } from "../../../store/slices/stock-adjustment-cri
 import ModalCreateStockAdjustment from "./modal-create-stock-adjustment";
 import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment-detail-slice";
 import { getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
+import { updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
 
 const _ = require('lodash');
 
@@ -257,6 +258,7 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
         await dispatch(getStockAdjustmentDetail(params.row.id));
         if (stockAdjustDetail) {
             setOpenDetail(true);
+            await dispatch(updateRefresh(true));
         }
       } catch (error) {
         console.log(error);

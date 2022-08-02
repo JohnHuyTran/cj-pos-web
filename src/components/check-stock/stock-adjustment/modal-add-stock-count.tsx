@@ -29,11 +29,11 @@ export const ModalAddStockCount = (props: DataGridProps) => {
   const classes = useStyles();
   const [dataTable, setDataTable] = React.useState<any[]>([]);
   const [checkAll, setCheckAll] = React.useState<boolean>(false);
-  const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
+  const dataDetailAP = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
 
   useEffect(() => {
-    if (dataDetail && dataDetail.relatedDocuments && dataDetail.relatedDocuments.length > 0) {
-      let lstSCConfirmed = dataDetail.relatedDocuments.filter((itF: any) => StockActionStatus.CONFIRM === itF.status);
+    if (dataDetailAP && dataDetailAP.relatedDocuments && dataDetailAP.relatedDocuments.length > 0) {
+      let lstSCConfirmed = dataDetailAP.relatedDocuments.filter((itF: any) => StockActionStatus.CONFIRM === itF.status);
       if (lstSCConfirmed && lstSCConfirmed.length > 0) {
         let rows = lstSCConfirmed.map((item: any, index: number) => {
           let inSelectedSCs = selectedSCs.filter((it: any) => (it.documentNumber === item.documentNumber && it.countingTime === item.countingTime));
@@ -51,12 +51,13 @@ export const ModalAddStockCount = (props: DataGridProps) => {
           };
         });
         setDataTable(rows);
+        setCheckAll(rows.filter((it: any) => it.checked).length === dataTable.length);
       } else {
         setDataTable([]);
+        setCheckAll(false);
       }
     }
-    setCheckAll(dataTable.filter((it: any) => it.disabledChecked).length === dataTable.length);
-  }, [dataDetail, open]);
+  }, [dataDetailAP, open]);
 
   const onCheckCell = async (params: GridRenderCellParams, event: any) => {
     let dataTableHandle = _.cloneDeep(dataTable);
@@ -89,7 +90,7 @@ export const ModalAddStockCount = (props: DataGridProps) => {
       align: 'center',
       sortable: false,
       renderHeader: (params) => (
-        <FormControl component="fieldset" sx={{ marginLeft: '-20px' }}>
+        <FormControl component="fieldset" sx={{ marginLeft: '-16px' }}>
           <FormGroup aria-label="position" row>
             <FormControlLabel
               className={classes.MFormControlLabel}
@@ -111,20 +112,6 @@ export const ModalAddStockCount = (props: DataGridProps) => {
           disabled={Boolean(params.getValue(params.id, 'disabledChecked'))}
           onClick={onCheckCell.bind(this, params)}
         />
-      ),
-    },
-    {
-      field: 'index',
-      headerName: 'ลำดับ',
-      flex: 0.6,
-      headerAlign: 'center',
-      align: 'center',
-      disableColumnMenu: false,
-      sortable: false,
-      renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '10px' }}>
-          {params.value}
-        </Box>
       ),
     },
     {
