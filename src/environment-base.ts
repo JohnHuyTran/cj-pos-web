@@ -430,7 +430,12 @@ export const environment = {
       cancel: {
         url: '/stock/stock-count/{id}'
       },
-    }
+    },
+    stockAdjustment: {
+      search: {
+        url: '/stock/stock-adjust'
+      },
+    } 
   },
   master: {
     branch: {
