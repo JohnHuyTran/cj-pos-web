@@ -434,7 +434,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                       || !managePermission || viewMode) ? 'none' : undefined
                   }}
                   startIcon={<CheckCircleOutlineIcon/>}
-                  onClick={handleOpenModalConfirm}
+                  // onClick={handleOpenModalConfirm}
                   className={classes.MbtnSearch}>
                   ยืนยัน
                 </Button>
