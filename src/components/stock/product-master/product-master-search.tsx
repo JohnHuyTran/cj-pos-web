@@ -5,7 +5,7 @@ import { useStyles } from '../../../styles/makeTheme';
 import _ from 'lodash';
 
 import SearchIcon from '@mui/icons-material/Search';
-import { getBranchName,objectNullOrEmpty,stringNullOrEmpty } from '../../../utils/utils';
+import { getBranchName, objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
 import { BranchListOptionType } from '../../../models/branch-model';
 import { getUserInfo } from '../../../store/sessionStore';
 import { env } from '../../../adapters/environmentConfigs';
@@ -13,13 +13,13 @@ import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import { isGroupBranch } from '../../../utils/role-permission';
 import TitleHeader from '../../title-header';
 import ProductListItems from './product-list-item';
-import { getProductMaster,searchProductItem } from '../../../services/product-master';
+import { getProductMaster, searchProductItem } from '../../../services/product-master';
 import LoadingModal from '../../commons/ui/loading-modal';
 import HtmlTooltip from '../../commons/ui/html-tooltip';
 import AlertError from '../../commons/ui/alert-error';
 import TextBoxSearchProduct from './text-box-search-product';
 import { SearchOff } from '@mui/icons-material';
-import { debounce } from "lodash";
+import { debounce } from 'lodash';
 
 interface State {
   query: string;
@@ -130,7 +130,7 @@ function ProductMasterSearch() {
   };
 
   const onChangeScanProduct = (e: any) => {
-      handleDebounceFn(e);
+    handleDebounceFn(e);
   };
 
   const handleDebounceFn = debounce(async (valueInput: any) => {
@@ -141,7 +141,7 @@ function ProductMasterSearch() {
           if (valueInput) {
             // setOpenLoadingModal(true);
             const rs1 = await searchProductItem(valueInput);
-            if(!!rs1 && rs1.code == 20000){
+            if (!!rs1 && rs1.code == 20000) {
               const rs = await getProductMaster(rs1.data[0].skuCode, values.branch);
               if (!!rs && rs.code == 20000) {
                 setSkuValue(rs.data.sku);
@@ -158,8 +158,7 @@ function ProductMasterSearch() {
             setTextError('กรุณาระบุสินค้าที่ต้องการค้นหา');
             setOpenAlert(true);
           }
-        } catch (e) {
-        }
+        } catch (e) {}
       } else {
       }
     }
@@ -213,39 +212,37 @@ function ProductMasterSearch() {
         </Grid>
         <Grid item xs={4} mt={3} sx={{ display: 'flex' }}>
           <Button
-            id="btnClear"
-            variant="contained"
+            id='btnClear'
+            variant='contained'
             sx={{ width: '150px', ml: 2 }}
             className={classes.MbtnClear}
-            color="cancelColor"
-            onClick={onClear}
-          >
+            color='cancelColor'
+            onClick={onClear}>
             เคลียร์
           </Button>
           <Button
-            id="btnSearch"
-            variant="contained"
-            color="primary"
+            id='btnSearch'
+            variant='contained'
+            color='primary'
             sx={{ width: '150px', ml: 2 }}
             className={classes.MbtnSearch}
-            onClick={onSearch}
-          >
+            onClick={onSearch}>
             ค้นหา
           </Button>
         </Grid>
       </Grid>
       {showNonData && (
-        <Grid item container xs={12} justifyContent="center" mt={8}>
-          <Box color="#CBD4DB">
+        <Grid item container xs={12} justifyContent='center' mt={8}>
+          <Box color='#CBD4DB'>
             <h2>
-              ไม่พบข้อมูล <SearchOff fontSize="large" />
+              ไม่พบข้อมูล <SearchOff fontSize='large' />
             </h2>
           </Box>
         </Grid>
       )}
       {showData && (
         <>
-          <TitleHeader title="ผลการค้นหา" />
+          <TitleHeader title='ผลการค้นหา' />
           <Box mt={8} />
           <Grid container spacing={1} padding={2} minWidth={'1000px'}>
             <Grid item xs={5} pr={1} mt={1}>
@@ -258,17 +255,16 @@ function ProductMasterSearch() {
                 }}
                 container
                 spacing={2}
-                mb={3}
-              >
+                mb={3}>
                 <Grid item xs={5}>
                   <Typography>รหัสสินค้า</Typography> {/* skuCode */}
                 </Grid>
                 <Grid item xs={7}>
                   <HtmlTooltip title={<React.Fragment>{skuValue.skuCode}</React.Fragment>}>
                     <TextField
-                      id="sku-code"
-                      name="sku-code"
-                      size="small"
+                      id='sku-code'
+                      name='sku-code'
+                      size='small'
                       value={skuValue.skuCode}
                       style={{ backgroundColor: '#f1f1f1' }}
                       className={classes.MtextFieldAutoChangeSize}
@@ -283,9 +279,9 @@ function ProductMasterSearch() {
                 <Grid item xs={7}>
                   <HtmlTooltip title={<React.Fragment>{skuValue.productNamePrime}</React.Fragment>}>
                     <TextField
-                      id="productNamePrime"
-                      name="productNamePrime"
-                      size="small"
+                      id='productNamePrime'
+                      name='productNamePrime'
+                      size='small'
                       value={skuValue.productNamePrime}
                       style={{ backgroundColor: '#f1f1f1' }}
                       className={classes.MtextFieldAutoChangeSize}
@@ -300,9 +296,9 @@ function ProductMasterSearch() {
                 <Grid item xs={7}>
                   <HtmlTooltip title={<React.Fragment>{skuValue.productNameSecnd}</React.Fragment>}>
                     <TextField
-                      id="productNameSecnd"
-                      name="productNameSecnd"
-                      size="small"
+                      id='productNameSecnd'
+                      name='productNameSecnd'
+                      size='small'
                       value={skuValue.productNameSecnd}
                       style={{ backgroundColor: '#f1f1f1' }}
                       className={classes.MtextFieldAutoChangeSize}
@@ -317,13 +313,12 @@ function ProductMasterSearch() {
                 <Grid item xs={7}>
                   <FormControl fullWidth className={classes.Mselect}>
                     <Select
-                      id="skuStatus"
-                      name="skuStatus"
+                      id='skuStatus'
+                      name='skuStatus'
                       value={skuValue.skuStatus}
                       inputProps={{ 'aria-label': 'Without label' }}
                       disabled
-                      sx={{ fontSize: textSize }}
-                    >
+                      sx={{ fontSize: textSize }}>
                       <MenuItem value={'1'}>{'สินค้าทั่วไป'}</MenuItem>
                       <MenuItem value={'2'}>{'สินค้าชุด'}</MenuItem>
                       <MenuItem value={'3'}>{'สินค้าบริการ'}</MenuItem>
@@ -343,13 +338,12 @@ function ProductMasterSearch() {
                   padding: '0px 40px 20px 10px',
                 }}
                 container
-                spacing={2}
-              >
+                spacing={2}>
                 <Grid item xs={5} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isActive"
+                    size='small'
+                    name='isActive'
                     checked={skuValue.isActive}
                     disabled
                   />
@@ -365,8 +359,8 @@ function ProductMasterSearch() {
                 <Grid item xs={7} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isAllowCoupon"
+                    size='small'
+                    name='isAllowCoupon'
                     checked={skuValue.isAllowCoupon}
                     disabled
                   />
@@ -378,8 +372,8 @@ function ProductMasterSearch() {
                 <Grid item xs={5} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isCalVat"
+                    size='small'
+                    name='isCalVat'
                     checked={skuValue.isCalVat}
                     disabled
                   />
@@ -391,8 +385,8 @@ function ProductMasterSearch() {
                 <Grid item xs={7} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isAllowEditPrice"
+                    size='small'
+                    name='isAllowEditPrice'
                     checked={skuValue.isAllowEditPrice}
                     disabled
                   />
@@ -404,8 +398,8 @@ function ProductMasterSearch() {
                 <Grid item xs={5} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isSpecialRegulate"
+                    size='small'
+                    name='isSpecialRegulate'
                     checked={skuValue.isSpecialRegulate}
                     disabled
                   />
@@ -417,8 +411,8 @@ function ProductMasterSearch() {
                 <Grid item xs={7} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isAllowDiscount"
+                    size='small'
+                    name='isAllowDiscount'
                     checked={skuValue.isAllowDiscount}
                     disabled
                   />
@@ -430,8 +424,8 @@ function ProductMasterSearch() {
                 <Grid item xs={5} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isCtrlStock"
+                    size='small'
+                    name='isCtrlStock'
                     checked={skuValue.isCtrlStock}
                     disabled
                   />
@@ -443,8 +437,8 @@ function ProductMasterSearch() {
                 <Grid item xs={7} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isAllowTopup"
+                    size='small'
+                    name='isAllowTopup'
                     checked={skuValue.isAllowTopup}
                     disabled
                   />
@@ -456,8 +450,8 @@ function ProductMasterSearch() {
                 <Grid item xs={5} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isQuickItem"
+                    size='small'
+                    name='isQuickItem'
                     checked={skuValue.isQuickItem}
                     disabled
                   />
@@ -470,8 +464,8 @@ function ProductMasterSearch() {
                 <Grid item xs={5} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isFreshLife"
+                    size='small'
+                    name='isFreshLife'
                     checked={skuValue.isFreshLife}
                     disabled
                   />
@@ -484,8 +478,8 @@ function ProductMasterSearch() {
                 <Grid item xs={5} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isPointCal"
+                    size='small'
+                    name='isPointCal'
                     checked={skuValue.isPointCal}
                     disabled
                   />
@@ -498,8 +492,8 @@ function ProductMasterSearch() {
                 <Grid item xs={5} style={flexStyle}>
                   <Checkbox
                     style={{ marginLeft: '-10px' }}
-                    size="small"
-                    name="isAllowFreebie"
+                    size='small'
+                    name='isAllowFreebie'
                     checked={skuValue.isAllowFreebie}
                     disabled
                   />
@@ -517,22 +511,21 @@ function ProductMasterSearch() {
                 backgroundColor: '#f3fbf8',
                 border: '1px solid #BFF1C4',
                 borderRadius: '7px',
-              }}
-            >
+              }}>
               <Grid container spacing={2} mr={1} mt={'11px'}>
                 <Grid item xs={3} ml={2}>
                   <Typography>กลุ่ม</Typography> {/* productChain */}
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    id="productChainCode"
-                    name="productChainCode"
-                    size="small"
+                    id='productChainCode'
+                    name='productChainCode'
+                    size='small'
                     value={skuValue.productChainCode}
                     style={{ backgroundColor: '#f1f1f1' }}
                     className={classes.MtextFieldAutoChangeSize}
                     InputProps={{
-                      endAdornment: <SearchIcon color="disabled" sx={{ marginRight: '12px' }} />,
+                      endAdornment: <SearchIcon color='disabled' sx={{ marginRight: '12px' }} />,
                     }}
                     fullWidth
                     disabled
@@ -540,9 +533,9 @@ function ProductMasterSearch() {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    id="productChainName"
-                    name="productChainName"
-                    size="small"
+                    id='productChainName'
+                    name='productChainName'
+                    size='small'
                     value={skuValue.productChainName ? skuValue.productChainName.productChainName : ''}
                     style={{ backgroundColor: '#f1f1f1' }}
                     className={classes.MtextFieldAutoChangeSize}
@@ -555,15 +548,15 @@ function ProductMasterSearch() {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    id="productTypeCode"
-                    name="productTypeCode"
-                    size="small"
+                    id='productTypeCode'
+                    name='productTypeCode'
+                    size='small'
                     value={skuValue.productTypeCode}
                     style={{ backgroundColor: '#f1f1f1' }}
                     className={classes.MtextFieldAutoChangeSize}
                     fullWidth
                     InputProps={{
-                      endAdornment: <SearchIcon color="disabled" sx={{ marginRight: '12px' }} />,
+                      endAdornment: <SearchIcon color='disabled' sx={{ marginRight: '12px' }} />,
                       inputProps: {
                         style: { textAlignLast: 'start' },
                       },
@@ -577,12 +570,11 @@ function ProductMasterSearch() {
                       <React.Fragment>
                         {skuValue.productChainName ? skuValue.productChainName.productTypeName : ''}
                       </React.Fragment>
-                    }
-                  >
+                    }>
                     <TextField
-                      id="productTypeName"
-                      name="productTypeName"
-                      size="small"
+                      id='productTypeName'
+                      name='productTypeName'
+                      size='small'
                       value={skuValue.productChainName ? skuValue.productChainName.productTypeName : ''}
                       style={{ backgroundColor: '#f1f1f1' }}
                       className={classes.MtextFieldAutoChangeSize}
@@ -596,27 +588,26 @@ function ProductMasterSearch() {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    id="supplierCode"
-                    name="supplierCode"
-                    size="small"
+                    id='supplierCode'
+                    name='supplierCode'
+                    size='small'
                     value={skuValue.supplierCode}
                     style={{ backgroundColor: '#f1f1f1' }}
                     className={classes.MtextFieldAutoChangeSize}
                     fullWidth
                     InputProps={{
-                      endAdornment: <SearchIcon color="disabled" sx={{ marginRight: '12px' }} />,
+                      endAdornment: <SearchIcon color='disabled' sx={{ marginRight: '12px' }} />,
                     }}
                     disabled
                   />
                 </Grid>
                 <Grid item xs={4}>
                   <HtmlTooltip
-                    title={<React.Fragment>{skuValue.supplier ? skuValue.supplier.name : ''}</React.Fragment>}
-                  >
+                    title={<React.Fragment>{skuValue.supplier ? skuValue.supplier.name : ''}</React.Fragment>}>
                     <TextField
-                      id="supplierName"
-                      name="supplierName"
-                      size="small"
+                      id='supplierName'
+                      name='supplierName'
+                      size='small'
                       value={skuValue.supplier ? skuValue.supplier.name : ''}
                       style={{ backgroundColor: '#f1f1f1' }}
                       className={classes.MtextFieldAutoChangeSize}
@@ -630,9 +621,9 @@ function ProductMasterSearch() {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    id="stockMin"
-                    name="stockMin"
-                    size="small"
+                    id='stockMin'
+                    name='stockMin'
+                    size='small'
                     value={skuValue.stockMin}
                     inputProps={{ style: { textAlign: 'right' } }}
                     style={{ backgroundColor: '#f1f1f1' }}
@@ -647,9 +638,9 @@ function ProductMasterSearch() {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    id="stockMax"
-                    name="stockMax"
-                    size="small"
+                    id='stockMax'
+                    name='stockMax'
+                    size='small'
                     value={skuValue.stockMax}
                     inputProps={{ style: { textAlign: 'right' } }}
                     style={{ backgroundColor: '#f1f1f1' }}
@@ -664,10 +655,10 @@ function ProductMasterSearch() {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    id="scmStatus"
-                    name="scmStatus"
+                    id='scmStatus'
+                    name='scmStatus'
                     inputProps={{ style: { textAlign: 'right' } }}
-                    size="small"
+                    size='small'
                     value={skuValue.scmStatus}
                     style={{ backgroundColor: '#f1f1f1' }}
                     className={classes.MtextFieldAutoChangeSize}
@@ -681,9 +672,9 @@ function ProductMasterSearch() {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    id="shelfLife"
-                    name="shelfLife"
-                    size="small"
+                    id='shelfLife'
+                    name='shelfLife'
+                    size='small'
                     value={skuValue.shelfLife}
                     inputProps={{ style: { textAlign: 'right' } }}
                     style={{ backgroundColor: '#f1f1f1' }}
@@ -699,12 +690,11 @@ function ProductMasterSearch() {
                 <Grid item xs={4}>
                   <FormControl fullWidth className={classes.Mselect}>
                     <Select
-                      id="pointType"
-                      name="pointType"
+                      id='pointType'
+                      name='pointType'
                       value={skuValue.pointType}
                       inputProps={{ 'aria-label': 'Without label' }}
-                      disabled
-                    >
+                      disabled>
                       <MenuItem value={'0'}>{'แต้มร้าน'}</MenuItem>
                       <MenuItem value={'1'}>{'แต้มผู้จำหน่าย'}</MenuItem>
                       <MenuItem value={'2'}>{'ไม่กำหนด'}</MenuItem>
