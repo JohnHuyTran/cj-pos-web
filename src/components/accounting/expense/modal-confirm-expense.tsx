@@ -1,5 +1,5 @@
 import { Fragment, ReactElement, useState } from 'react';
-import TextBoxComment from '../../commons/ui/textbox-comment';
+import TextBoxComment from 'components/commons/ui/textbox-comment';
 import {
   Box,
   Button,
@@ -15,7 +15,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useStyles } from '../../../styles/makeTheme';
+import { useStyles } from 'styles/makeTheme';
 interface ModalConfirmExpenseProps {
   open: boolean;
   details: {
