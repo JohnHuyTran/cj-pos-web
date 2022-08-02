@@ -22,7 +22,7 @@ import { getStockCountSearch } from "../../../store/slices/stock-count-search-sl
 import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
 import StockCountList from "./stock-count-list";
 import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
-import { isGroupBranch } from "../../../utils/role-permission";
+import { isChannelBranch } from "../../../utils/role-permission";
 import { StockCountSearchRequest } from "../../../models/stock-count-model";
 
 const _ = require('lodash');
@@ -68,7 +68,7 @@ const StockCountSearch = () => {
         : ''
       : ''
   );
-  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [groupBranch, setGroupBranch] = React.useState(isChannelBranch);
   const branchName = getBranchName(branchList, ownBranch);
   const branchMap: BranchListOptionType = {
     code: ownBranch,
@@ -78,7 +78,7 @@ const StockCountSearch = () => {
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
-    branch: 'ALL',
+    branch: groupBranch ? ownBranch : 'ALL',
     status: 'ALL',
     type: 'ALL',
     startDate: new Date(),
@@ -146,7 +146,7 @@ const StockCountSearch = () => {
     setFlagSearch(false);
     setValues({
       documentNumber: '',
-      branch: '',
+      branch: groupBranch ? ownBranch : 'ALL',
       status: 'ALL',
       type: 'ALL',
       startDate: new Date(),
