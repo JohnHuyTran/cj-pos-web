@@ -506,6 +506,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
   const [showForward, setShowForward] = React.useState<boolean>(false); // show dropdown resend
   const [showReason, setShowReason] = React.useState<boolean>(false); // show comment
   const [validateReason, setValidateReason] = React.useState<boolean>(false);
+  const [isAllowForwardOC, setIsAllowForwardOC] = React.useState<boolean>(true);
   const [sumWithdrawAmount, setSumWithdrawAmount] = React.useState('');
   const handleApproveBtn = () => {
     setInit('N');
@@ -676,6 +677,20 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
       setValidateReason(true);
       setShowForward(true);
       setIsOpenModelConfirmExpense(true);
+      let isAllowShowOC = false;
+      if (_items && _items.length > 0) {
+        items.map((item: DataItem, index: number) => {
+          const list: ItemItem[] = item.items;
+          list.map((data: ItemItem) => {
+            const master = getMasterExpenInto(data.expenseNo);
+            const limit1 = master?.approvalLimit1 || 0;
+            if (data.amount > limit1) {
+              isAllowShowOC = true;
+            }
+          });
+        });
+      }
+      setIsAllowForwardOC(isAllowShowOC);
     } else if (status === STATUS.WAITTING_APPROVAL3) {
       setValidateReason(true);
       setShowReason(true);
@@ -1366,6 +1381,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
         showReason={showReason}
         validateReason={validateReason}
         onClose={() => setIsOpenModelConfirmExpense(false)}
+        isAllowForwardOC={isAllowForwardOC}
       />
       <ConfirmModalExit
         open={confirmModelExit}

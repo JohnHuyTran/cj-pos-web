@@ -48,7 +48,8 @@ export default function ModalConfirmExpense(props: ModalConfirmExpenseProps): Re
     showForward,
     showReason,
     validateReason,
-    isAllowForwardOC } = props
+    isAllowForwardOC,
+  } = props;
   const classes = useStyles();
   const forwardList = [
     { key: 'MANAGER', text: 'สาขา', isShowOption: true },
@@ -114,8 +115,11 @@ export default function ModalConfirmExpense(props: ModalConfirmExpenseProps): Re
           </Box>
           {showForward && (
             <Box sx={{ mt: 3 }}>
-              <Typography gutterBottom variant='subtitle1' component='div' sx={{mb: '5px'}}>
-                ส่งกลับแก้ไขให้กับ <Typography component='span' color='red'>*</Typography>
+              <Typography gutterBottom variant='subtitle1' component='div' sx={{ mb: '5px' }}>
+                ส่งกลับแก้ไขให้กับ{' '}
+                <Typography component='span' color='red'>
+                  *
+                </Typography>
               </Typography>
               <FormControl id='SearchType' className={classes.Mselect} fullWidth error={forward === '' && isError}>
                 <Select
@@ -131,13 +135,14 @@ export default function ModalConfirmExpense(props: ModalConfirmExpenseProps): Re
                       : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือกส่งกลับแก้ไขให้กับ</div>
                   }
                   inputProps={{ 'aria-label': 'Without label' }}>
-                  { forwardList.map((item, index: number) => (
+                  {forwardList.map(
+                    (item, index: number) =>
                       item.isShowOption && (
                         <MenuItem key={index} value={item.key}>
                           {item.text}
                         </MenuItem>
                       )
-                  ))}
+                  )}
                 </Select>
                 {forward === '' && isError && (
                   <FormHelperText sx={{ ml: 0 }}>กรุณาเลือกส่งกลับแก้ไขให้กับ</FormHelperText>
@@ -148,11 +153,20 @@ export default function ModalConfirmExpense(props: ModalConfirmExpenseProps): Re
           {showReason && (
             <Box sx={{ mt: 3 }}>
               <TextBoxComment
-                fieldName={<Box>หมายเหตุ : { validateReason && (<Typography component='span' color='red'>*</Typography>)}</Box>}
+                fieldName={
+                  <Box>
+                    หมายเหตุ :{' '}
+                    {validateReason && (
+                      <Typography component='span' color='red'>
+                        *
+                      </Typography>
+                    )}
+                  </Box>
+                }
                 defaultValue={reason}
                 isDisable={isOpenLoading}
                 maxLength={100}
-                maxWidth="100%"
+                maxWidth='100%'
                 isError={!reason && validateReason ? isError : false}
                 onChangeComment={(e) => {
                   setReason(e);
