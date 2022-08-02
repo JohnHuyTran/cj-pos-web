@@ -618,6 +618,9 @@ export const environment = {
       delete: {
         url: 'accounting/cash-statement/delete/{id}',
       },
+      approve: {
+        url: 'accounting/cash-statement/approve-list',
+      },
     },
   },
 };

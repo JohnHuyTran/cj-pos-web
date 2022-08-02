@@ -278,3 +278,12 @@ export async function cashStatementDelete(id: string) {
     });
   return response;
 }
+
+export async function cashStatementApprove(payload: any) {
+  const response = await post(environment.branchAccounting.cashStatement.approve.url, payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}

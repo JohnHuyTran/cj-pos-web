@@ -34,7 +34,7 @@ import { saveCashStatementSearch } from 'store/slices/accounting/cash-statement/
 import LoadingModal from '../../commons/ui/loading-modal';
 import ModalApproveSearchList from './modal-approve-search-list';
 import ModalCashStatementImport from './modal-cash-statement-import';
-import { importCashStatement } from 'services/accounting';
+import { cashStatementApprove, importCashStatement } from 'services/accounting';
 import { ApiUploadError } from 'models/api-error-model';
 import AlertError from '../../commons/ui/alert-error';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
@@ -185,42 +185,42 @@ export default function CashStatementSearch() {
     const payload: any = {
       ids: selectRows,
     };
-    console.log('payload:', payload);
 
-    // Wait API
-    // await approve(payload)
-    //   .then((value) => {
-    //     dispatch(featchSearchCashStatementAsync(searchCashStatement));
-    //     setShowSnackBar(true);
-    //     setSnackbarIsStatus(true);
-    //     setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+    await cashStatementApprove(payload)
+      .then((value) => {
+        dispatch(featchSearchCashStatementAsync(searchCashStatement));
+        setShowSnackBar(true);
+        setSnackbarIsStatus(true);
+        setContentMsg('คุณได้อนุมัติรายการเรียบร้อยแล้ว');
 
-    setTimeout(() => {
-      setopenModalApprove(false);
-    }, 300);
-    // })
-    // .catch((error: any) => {
-    //   if (String(error.code) === '40014') {
-    //     const header: Header = {
-    //       field1: false,
-    //       field2: false,
-    //       field3: true,
-    //       field4: false,
-    //     };
-    //     const payload: ErrorDetailResponse = {
-    //       header: header,
-    //       error_details: error.error_details,
-    //     };
-    //     setOpenAlert(true);
-    //     // setTitleError('เลขที่เอกสาร');
-    //     setTextError(error.message);
-    //     setPayloadError(payload);
-    //   } else {
-    //     setOpenAlert(true);
-    //     setTextError(error.message);
-    //     setTitleError('');
-    //   }
-    // });
+        setTimeout(() => {
+          setopenModalApprove(false);
+        }, 300);
+      })
+      .catch((error: any) => {
+        // if (String(error.code) === '40014') {
+        //   const header: Header = {
+        //     field1: false,
+        //     field2: false,
+        //     field3: true,
+        //     field4: false,
+        //   };
+        //   const payload: ErrorDetailResponse = {
+        //     header: header,
+        //     error_details: error.error_details,
+        //   };
+        //   setOpenAlert(true);
+        //   // setTitleError('เลขที่เอกสาร');
+        //   setTextError(error.message);
+        //   setPayloadError(payload);
+        // } else {
+        //   setOpenAlert(true);
+        //   setTextError(error.message);
+        // }
+
+        setOpenAlert(true);
+        setTextError(error.message);
+      });
 
     setOpenLoadingModal(false);
   };
