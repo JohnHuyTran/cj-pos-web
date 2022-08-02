@@ -1,7 +1,7 @@
-import React, { ReactElement, useEffect } from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import { ReactElement, useEffect, useState } from 'react';
+import { styled } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Drawer from '@mui/material/Drawer';
 import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
@@ -19,12 +19,12 @@ import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SwapHorizontalCircleIcon from '@mui/icons-material/SwapHorizontalCircle';
 import { useAppSelector, useAppDispatch } from '../store/store';
-import { changeState } from '../store/slices/nav-slice';
-import imgLogo from '../assets/images/CJlogo.jpeg';
+import { changeState } from 'store/slices/nav-slice';
+import imgLogo from 'assets/images/CJlogo.jpeg';
 import Menu from '@mui/icons-material/Menu';
-import { MoveToInbox, ShoppingCartSharp } from '@mui/icons-material';
-import { MAINMENU, SUBMENU } from '../utils/enum/permission-enum';
-import { isAllowMainMenuPermission, isAllowSubMenuPermission } from '../utils/role-permission';
+import { ShoppingCartSharp } from '@mui/icons-material';
+import { MAINMENU, SUBMENU } from 'utils/enum/permission-enum';
+import { isAllowMainMenuPermission, isAllowSubMenuPermission } from 'utils/role-permission';
 
 const drawerWidth = 240;
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -67,54 +67,87 @@ const ListItemButton = withStyles({
 interface Props {}
 
 export default function Sidebar({}: Props): ReactElement {
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(true);
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const [openSaleMenu, setOpenSaleMenu] = React.useState(false);
-  const [openProductMenu, setOpenProductMenu] = React.useState(false);
-  const [openSellMenu, setOpenSellMenu] = React.useState(false);
-  const [openPickUpMenu, setOpenPickUpMenu] = React.useState(false);
-  const [openTransferMenu, setOpenTransferMenu] = React.useState(false);
-  const [openWithDrawMenu, setOpenWithDrawMenu] = React.useState(false);
-  const [openProductInfoMenu, setOpenProductInfoMenu] = React.useState(false);
-  const [openPurchaseBranchMenu, setOpenPurchaseBranchMenu] = React.useState(false);
-  const [openExpenseMenu, setOpenExpenseMenu] = React.useState(false);
-  const [openSettingsMenu, setOpenSettingsMenu] = React.useState(false);
-  const [openCheckStockMenu, setOpenCheckStockMenu] = React.useState(false);
+  const location = useLocation();
+  const selectedByPath = (path: string) => {
+    const pathname = location.pathname.split('/')[1]
+    if (!!path && pathname.length !== 0) {
+      return pathname.includes(path)
+    } else if (!path && pathname.length === 0) {
+      return true
+    }
+  }
+  const [open, setOpen] = useState(true);
+  const [openSellMenu, setOpenSellMenu] = useState(
+    selectedByPath('sale-limit-time') ||
+    selectedByPath('barcode-discount') ||
+    selectedByPath('tax-invoice')
+  );
+  const [openPickUpMenu, setOpenPickUpMenu] = useState(
+    selectedByPath('check-order') ||
+    selectedByPath('dc-check-order') ||
+    selectedByPath('supplier-check-order')
+  );
+  const [openTransferMenu, setOpenTransferMenu] = useState(
+    selectedByPath('stock-transfer-rt') ||
+    selectedByPath('stock-transfer')
+  );
+  const [openWithDrawMenu, setOpenWithDrawMenu] = useState(
+    selectedByPath('transfer-out-destroy') ||
+    selectedByPath('transfer-out') ||
+    selectedByPath('transfer-out-raw-masterial') ||
+    selectedByPath('create-purchase-branch')
+  );
+  const [openProductInfoMenu, setOpenProductInfoMenu] = useState(
+    selectedByPath('product-master') ||
+    selectedByPath('stock-balance') ||
+    selectedByPath('stock-movement')
+  );
+  const [openExpenseMenu, setOpenExpenseMenu] = useState(
+    selectedByPath('expense') ||
+    selectedByPath('cash-statement') ||
+    selectedByPath('close-saleshift')
+  );
+  const [openSettingsMenu, setOpenSettingsMenu] = useState(
+    selectedByPath('reserves')
+  );
+  const [openCheckStockMenu, setOpenCheckStockMenu] = useState(
+    selectedByPath('audit-plan') ||
+    selectedByPath('stock-count')
+  );
 
   const navState = useAppSelector((state) => state.navigator.state);
 
-  const [disableMainMenuOrderReceive, setDisableMainMenuOrderReceive] = React.useState(true);
-  const [disableMainMenuStockTransfer, setDisableMainMenuStockTransfer] = React.useState(true);
-  const [disableMainMenuSell, setDisableMainMenuSell] = React.useState(true);
-  const [disableMainMenuTransferOut, setDisableMainMenuTransferOut] = React.useState(true);
-  const [disableMainMenuProductInfo, setDisableMainMenuProductInfo] = React.useState(true);
-  const [disableMainMenuPurchaseBranch, setDisableMainMenuPurchaseBranch] = React.useState(true);
-  const [disableMainMenuExpense, setDisableMainMenuExpense] = React.useState(true);
-  const [disableMainMenuSettings, setDisableMainMenuSettings] = React.useState(true);
-  const [disableMainMenuCheckStock, setDisableMainMenuCheckStock] = React.useState(true);
+  const [disableMainMenuOrderReceive, setDisableMainMenuOrderReceive] = useState(true);
+  const [disableMainMenuStockTransfer, setDisableMainMenuStockTransfer] = useState(true);
+  const [disableMainMenuSell, setDisableMainMenuSell] = useState(true);
+  const [disableMainMenuTransferOut, setDisableMainMenuTransferOut] = useState(true);
+  const [disableMainMenuProductInfo, setDisableMainMenuProductInfo] = useState(true);
+  // const [disableMainMenuPurchaseBranch, setDisableMainMenuPurchaseBranch] = useState(true);
+  const [disableMainMenuExpense, setDisableMainMenuExpense] = useState(true);
+  const [disableMainMenuSettings, setDisableMainMenuSettings] = useState(true);
+  // const [disableMainMenuCheckStock, setDisableMainMenuCheckStock] = useState(true);
 
-  const [disableSubMenuOROrderReceive, setDisableSubMenuOROrderReceive] = React.useState(true);
-  const [disableSubMenuORStockDiff, setDisableSubMenuORStockDiff] = React.useState(true);
-  const [disableSubMenuORSupplier, setDisableSubMenuORSupplier] = React.useState(true);
+  const [disableSubMenuOROrderReceive, setDisableSubMenuOROrderReceive] = useState(true);
+  const [disableSubMenuORStockDiff, setDisableSubMenuORStockDiff] = useState(true);
+  const [disableSubMenuORSupplier, setDisableSubMenuORSupplier] = useState(true);
 
-  const [disableSubMenuSTStockRequest, setDisableSubMenuSTStockRequest] = React.useState(true);
-  const [disableSubMenuSTStockTransfer, setDisableSubMenuSTStockTransfer] = React.useState(true);
-  const [disableSubMenuTaxInvoice, setDisableSubMenuTaxInvoice] = React.useState(true);
-  const [disableSubMenuStockBalance, setDisableSubMenuStockBalance] = React.useState(true);
-  const [disableSubMenuStockMovement, setDisableSubMenuStockMovement] = React.useState(true);
-  const [disableSubMenuCreatePurchaseBranch, setDisableSubMenuCreatePurchaseBranch] = React.useState(true);
-  const [disableSubMenuExpense, setDisableSubMenuExpense] = React.useState(true);
-  const [disableSubMenuSettings, setDisableSubMenuSettings] = React.useState(true);
-  const [disableSubMenuCloseSaleShift, setDisableSubMenuCloseSaleShift] = React.useState(true);
-  const [disableSubMenuCashStatement, setDisableSubMenuCashStatement] = React.useState(true);
+  const [disableSubMenuSTStockRequest, setDisableSubMenuSTStockRequest] = useState(true);
+  const [disableSubMenuSTStockTransfer, setDisableSubMenuSTStockTransfer] = useState(true);
+  const [disableSubMenuTaxInvoice, setDisableSubMenuTaxInvoice] = useState(true);
+  const [disableSubMenuStockBalance, setDisableSubMenuStockBalance] = useState(true);
+  const [disableSubMenuStockMovement, setDisableSubMenuStockMovement] = useState(true);
+  const [disableSubMenuCreatePurchaseBranch, setDisableSubMenuCreatePurchaseBranch] = useState(true);
+  const [disableSubMenuExpense, setDisableSubMenuExpense] = useState(true);
+  const [disableSubMenuSettings, setDisableSubMenuSettings] = useState(true);
+  const [disableSubMenuCloseSaleShift, setDisableSubMenuCloseSaleShift] = useState(true);
+  const [disableSubMenuCashStatement, setDisableSubMenuCashStatement] = useState(true);
 
-  const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = React.useState(true);
-  const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = React.useState(true);
-  const [disableSubMenuTODestroy, setDisableSubMenuTODestroy] = React.useState(true);
-  const [disableSubMenuTOStoreUse, setDisableSubMenuTOStoreUse] = React.useState(true);
-  const [disableSubMenuProductMaster, setDisableSubMenuProductMaster] = React.useState(true);
-  const [disableSubMenuAuditPlan, setDisableSubMenuAuditPlan] = React.useState(true);
+  const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = useState(true);
+  const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = useState(true);
+  const [disableSubMenuTODestroy, setDisableSubMenuTODestroy] = useState(true);
+  const [disableSubMenuTOStoreUse, setDisableSubMenuTOStoreUse] = useState(true);
+  const [disableSubMenuProductMaster, setDisableSubMenuProductMaster] = useState(true);
+  // const [disableSubMenuAuditPlan, setDisableSubMenuAuditPlan] = useState(true);
 
   useEffect(() => {
     setOpen(navState);
@@ -123,7 +156,7 @@ export default function Sidebar({}: Props): ReactElement {
     setDisableMainMenuSell(isAllowMainMenuPermission(MAINMENU.SALE));
     setDisableMainMenuTransferOut(isAllowMainMenuPermission(MAINMENU.TRANSFER_OUT));
     setDisableMainMenuProductInfo(isAllowMainMenuPermission(MAINMENU.PRODUCT_INFO));
-    setDisableMainMenuPurchaseBranch(isAllowMainMenuPermission(MAINMENU.PURCHASE_BRANCH));
+    // setDisableMainMenuPurchaseBranch(isAllowMainMenuPermission(MAINMENU.PURCHASE_BRANCH));
 
     setDisableMainMenuExpense(isAllowMainMenuPermission(MAINMENU.EXPENSE));
     setDisableMainMenuSettings(isAllowMainMenuPermission(MAINMENU.APP_CONFIG));
@@ -161,51 +194,6 @@ export default function Sidebar({}: Props): ReactElement {
     dispatch(changeState(false));
   };
 
-  const handleListItemClick = (menuId: number) => {
-    setSelectedIndex(menuId);
-  };
-
-  const handleClick = () => {
-    setOpenSaleMenu(!openSaleMenu);
-  };
-
-  const handleClickProduct = () => {
-    setOpenProductMenu(!openProductMenu);
-  };
-
-  const handleClickSell = () => {
-    setOpenSellMenu(!openSellMenu);
-  };
-
-  const handleClickPickUp = () => {
-    setOpenPickUpMenu(!openPickUpMenu);
-  };
-
-  const handleClickTransfer = () => {
-    setOpenTransferMenu(!openTransferMenu);
-  };
-  const handleClickWithDraw = () => {
-    setOpenWithDrawMenu(!openWithDrawMenu);
-  };
-
-  const handleClickProductInfo = () => {
-    setOpenProductInfoMenu(!openProductInfoMenu);
-  };
-  const handleClickCheckStockMenu = () => {
-    setOpenCheckStockMenu(!openCheckStockMenu);
-  };
-  const handleClickPurchaseBranch = () => {
-    setOpenPurchaseBranchMenu(!openPurchaseBranchMenu);
-  };
-
-  const handleClickExpense = () => {
-    setOpenExpenseMenu(!openExpenseMenu);
-  };
-
-  const handleClickSettings = () => {
-    setOpenSettingsMenu(!openSettingsMenu);
-  };
-
   return (
     <Drawer
       sx={{
@@ -222,14 +210,6 @@ export default function Sidebar({}: Props): ReactElement {
       open={open}>
       <DrawerHeader>
         <img src={imgLogo} alt='' width='50' />
-        {/* <IconButton onClick={handleDrawerClose}>
-          {theme.direction === "ltr" ? (
-            <ChevronLeftIcon color="primary" />
-          ) : (
-            <ChevronRightIcon color="primary" />
-          )}
-        </IconButton> */}
-
         <div onClick={handleDrawerClose}>
           <ChevronLeftIcon color='primary' sx={{ marginRight: '-5px' }} />
           <Menu color='primary' />
@@ -240,8 +220,7 @@ export default function Sidebar({}: Props): ReactElement {
         <Link to='/' style={{ textDecoration: 'none', color: '#676767' }}>
           <ListItemButton
             key='HOME'
-            selected={selectedIndex === 0}
-            onClick={() => handleListItemClick(0)}
+            selected={selectedByPath('')}
             id='mainMenuHome'>
             <ListItemIcon>
               <HomeOutlinedIcon />
@@ -263,7 +242,9 @@ export default function Sidebar({}: Props): ReactElement {
         </Link> */}
         {/*sell menu start*/}
         {/* <ListItemButton key='SELL' onClick={handleClickSell} sx={{ display: disableSellMainMenu ? 'none' : '' }}></ListItemButton> */}
-        <ListItemButton key='SELL' onClick={handleClickSell} style={{ display: disableMainMenuSell ? 'none' : '' }}>
+        <ListItemButton key='SELL'
+          onClick={() => setOpenSellMenu(!openSellMenu)}
+          style={{ display: disableMainMenuSell ? 'none' : '' }}>
           <ListItemIcon>
             <ShoppingCartSharp />
           </ListItemIcon>
@@ -275,8 +256,7 @@ export default function Sidebar({}: Props): ReactElement {
             <Link to='/sale-limit-time' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuSaleLimitTime'>
               <ListItemButton
                 key='SALE LIMIT TINE'
-                selected={selectedIndex === 2}
-                onClick={() => handleListItemClick(2)}
+                selected={selectedByPath('sale-limit-time')}
                 sx={{ pl: 7, display: disableSubMenuSaleSaleLimit ? 'none' : '' }}>
                 <ListItemText primary='กำหนดเวลา (งด) ขายสินค้า' />
               </ListItemButton>
@@ -289,8 +269,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuBarcodeDiscount'>
               <ListItemButton
                 key='BARCODE DISCOUNT'
-                selected={selectedIndex === 3}
-                onClick={() => handleListItemClick(3)}
+                selected={selectedByPath('barcode-discount')}
                 sx={{ pl: 7, display: disableSubMenuSaleDiscount ? 'none' : '' }}>
                 <ListItemText primary='ส่วนลดสินค้า' />
               </ListItemButton>
@@ -300,8 +279,7 @@ export default function Sidebar({}: Props): ReactElement {
             <Link to='/tax-invoice' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTaxInvoice'>
               <ListItemButton
                 key='TAX INVOICE'
-                selected={selectedIndex === 4}
-                onClick={() => handleListItemClick(4)}
+                selected={selectedByPath('tax-invoice')}
                 sx={{ pl: 7, display: disableSubMenuTaxInvoice ? 'none' : '' }}>
                 <ListItemText primary='ใบเสร็จ/ใบกำกับฉบับเต็ม' />
               </ListItemButton>
@@ -309,7 +287,7 @@ export default function Sidebar({}: Props): ReactElement {
           </List>
         </Collapse>
         <ListItemButton
-          onClick={handleClickPickUp}
+          onClick={() => setOpenPickUpMenu(!openPickUpMenu)}
           id='mainMenuPickUp'
           style={{ display: disableMainMenuOrderReceive ? 'none' : '' }}>
           <ListItemIcon>
@@ -326,8 +304,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuCheckOrder'>
               <ListItemButton
                 key='SALE'
-                selected={selectedIndex === 5}
-                onClick={() => handleListItemClick(5)}
+                selected={selectedByPath('check-order')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='รับสินค้า' />
               </ListItemButton>
@@ -338,8 +315,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuDCCheckOrder'>
               <ListItemButton
                 key='dcConfirmOrder'
-                selected={selectedIndex === 6}
-                onClick={() => handleListItemClick(6)}
+                selected={selectedByPath('dc-check-order')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ตรวจสอบผลต่างการรับสินค้า' />
               </ListItemButton>
@@ -350,8 +326,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuSupplierCheckOrder'>
               <ListItemButton
                 key='supplierCheckOrder'
-                selected={selectedIndex === 7}
-                onClick={() => handleListItemClick(7)}
+                selected={selectedByPath('supplier-check-order')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='รับสินค้า จากผู้จำหน่าย' />
               </ListItemButton>
@@ -360,7 +335,7 @@ export default function Sidebar({}: Props): ReactElement {
         </Collapse>
 
         <ListItemButton
-          onClick={handleClickTransfer}
+          onClick={() => setOpenTransferMenu(!openTransferMenu)}
           id='mainMenuTransfer'
           style={{ display: disableMainMenuStockTransfer ? 'none' : '' }}>
           <ListItemIcon>
@@ -377,8 +352,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuStockTransferRt'>
               <ListItemButton
                 key='StockTransferRt'
-                selected={selectedIndex === 8}
-                onClick={() => handleListItemClick(8)}
+                selected={selectedByPath('stock-transfer-rt')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='สร้างแผนโอนสินค้าระหว่างสาขา/คลัง' />
               </ListItemButton>
@@ -389,8 +363,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuStockTransfer'>
               <ListItemButton
                 key='StockTransfer'
-                selected={selectedIndex === 9}
-                onClick={() => handleListItemClick(9)}
+                selected={selectedByPath('stock-transfer')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='โอนสินค้าระหว่างสาขา/คลัง' />
               </ListItemButton>
@@ -398,7 +371,7 @@ export default function Sidebar({}: Props): ReactElement {
           </List>
         </Collapse>
         <ListItemButton
-          onClick={handleClickWithDraw}
+          onClick={() => setOpenWithDrawMenu(!openWithDrawMenu)}
           id='mainMenuWithDraw'
           style={{ display: disableMainMenuTransferOut ? 'none' : '' }}>
           <ListItemIcon>
@@ -415,8 +388,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuTransferOut'>
               <ListItemButton
                 key='TransferOutDestroy'
-                selected={selectedIndex === 11}
-                onClick={() => handleListItemClick(11)}
+                selected={selectedByPath('transfer-out-destroy')}
                 sx={{ pl: 7, display: disableSubMenuTODestroy ? 'none' : '' }}>
                 <ListItemText primary='ทำลาย' />
               </ListItemButton>
@@ -424,8 +396,7 @@ export default function Sidebar({}: Props): ReactElement {
             <Link to='/transfer-out' style={{ textDecoration: 'none', color: '#676767' }} id='subMenuTransferOut'>
               <ListItemButton
                 key='TransferOut'
-                selected={selectedIndex === 10}
-                onClick={() => handleListItemClick(10)}
+                selected={selectedByPath('transfer-out')}
                 sx={{ pl: 7, display: disableSubMenuTOStoreUse ? 'none' : '' }}>
                 <ListItemText primary='ใช้ในการทำกิจกรรม' />
               </ListItemButton>
@@ -436,8 +407,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuTOMasterial'>
               <ListItemButton
                 key='subMenuTOMasterial'
-                selected={selectedIndex === 20}
-                onClick={() => handleListItemClick(20)}
+                selected={selectedByPath('transfer-out-raw-masterial')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ขอใช้วัตถุดิบร้านบาว' />
               </ListItemButton>
@@ -452,8 +422,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuCreatePurchaseBranch'>
               <ListItemButton
                 key='CreatePurchaseBranch'
-                selected={selectedIndex === 13}
-                onClick={() => handleListItemClick(13)}
+                selected={selectedByPath('create-purchase-branch')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ของใช้หน้าร้าน' />
               </ListItemButton>
@@ -461,7 +430,7 @@ export default function Sidebar({}: Props): ReactElement {
           </List>
         </Collapse>
         <ListItemButton
-          onClick={handleClickProductInfo}
+          onClick={() => setOpenProductInfoMenu(!openProductInfoMenu)}
           id='mainMenuProductInfo'
           style={{ display: disableMainMenuProductInfo ? 'none' : '' }}>
           <ListItemIcon>
@@ -482,8 +451,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuProductMaster'>
               <ListItemButton
                 key='ProductMaster'
-                selected={selectedIndex === 14}
-                onClick={() => handleListItemClick(14)}
+                selected={selectedByPath('product-master')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='รายละเอียดสินค้า' />
               </ListItemButton>
@@ -494,8 +462,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuStockBalance'>
               <ListItemButton
                 key='StockBalance'
-                selected={selectedIndex === 11}
-                onClick={() => handleListItemClick(11)}
+                selected={selectedByPath('stock-balance')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='สินค้าคงคลัง' />
               </ListItemButton>
@@ -506,8 +473,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuStockMovement'>
               <ListItemButton
                 key='StockMovement'
-                selected={selectedIndex === 12}
-                onClick={() => handleListItemClick(12)}
+                selected={selectedByPath('stock-movement')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ความเคลื่อนไหวของสินค้า' />
               </ListItemButton>
@@ -515,7 +481,7 @@ export default function Sidebar({}: Props): ReactElement {
           </List>
         </Collapse>
         <ListItemButton
-          onClick={handleClickExpense}
+          onClick={() => setOpenExpenseMenu(!openExpenseMenu)}
           id='mainMenuExpense'
           style={{ display: disableMainMenuExpense ? 'none' : '' }}>
           <ListItemIcon>
@@ -536,8 +502,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuExpense'>
               <ListItemButton
                 key='Expense'
-                selected={selectedIndex === 15}
-                onClick={() => handleListItemClick(15)}
+                selected={selectedByPath('expense')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ค่าใช้จ่าย' />
               </ListItemButton>
@@ -552,8 +517,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuCashStatement'>
               <ListItemButton
                 key='CashStatement'
-                selected={selectedIndex === 16}
-                onClick={() => handleListItemClick(16)}
+                selected={selectedByPath('cash-statement')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='เงินฝากขาด - เกิน' />
               </ListItemButton>
@@ -568,8 +532,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuCloseSaleShift'>
               <ListItemButton
                 key='CloseSaleShift'
-                selected={selectedIndex === 16}
-                onClick={() => handleListItemClick(16)}
+                selected={selectedByPath('close-saleshift')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ปิดรหัสการขาย' />
               </ListItemButton>
@@ -577,7 +540,7 @@ export default function Sidebar({}: Props): ReactElement {
           </List>
         </Collapse>
         <ListItemButton
-          onClick={handleClickSettings}
+          onClick={() => setOpenSettingsMenu(!openSettingsMenu)}
           id='mainMenuSettings'
           style={{ display: disableMainMenuSettings ? 'none' : '' }}>
           <ListItemIcon>
@@ -598,8 +561,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuSettings'>
               <ListItemButton
                 key='Settings'
-                selected={selectedIndex === 17}
-                onClick={() => handleListItemClick(17)}
+                selected={selectedByPath('reserves')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ค่าใช้จ่ายสำรอง' />
               </ListItemButton>
@@ -607,7 +569,7 @@ export default function Sidebar({}: Props): ReactElement {
           </List>
         </Collapse>
         <ListItemButton
-          onClick={handleClickCheckStockMenu}
+          onClick={() => setOpenCheckStockMenu(!openCheckStockMenu)}
           id='mainMenuCheckStock'
           // style={{ display: disableMainMenuCheckStock ? 'none' : '' }}
         >
@@ -629,8 +591,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuAuditPlan'>
               <ListItemButton
                 key='AuditPlan'
-                selected={selectedIndex === 18}
-                onClick={() => handleListItemClick(18)}
+                selected={selectedByPath('audit-plan')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='สร้างแผนตรวจนับสต๊อก' />
               </ListItemButton>
@@ -644,8 +605,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuStockCount'>
               <ListItemButton
                 key='StockCount'
-                selected={selectedIndex === 19}
-                onClick={() => handleListItemClick(19)}
+                selected={selectedByPath('stock-count')}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ตรวจนับสต๊อก (SC)' />
               </ListItemButton>
