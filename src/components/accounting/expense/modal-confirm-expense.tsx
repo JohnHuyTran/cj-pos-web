@@ -30,6 +30,7 @@ interface ModalConfirmExpenseProps {
   showForward?: boolean; // show dropdown resend
   showReason?: boolean; // show comment
   validateReason?: boolean; // require  comment
+  isAllowForwardOC?: boolean;
 }
 
 interface DetailsProps {
@@ -46,6 +47,7 @@ export default function ModalConfirmExpense({
   showForward,
   showReason,
   validateReason,
+  isAllowForwardOC,
 }: ModalConfirmExpenseProps): ReactElement {
   const classes = useStyles();
   const forwardList = [
@@ -83,6 +85,7 @@ export default function ModalConfirmExpense({
 
   // Clear state when close modal.
   const onCloseModal = () => {
+    console.log('isAllowForwardOC:', isAllowForwardOC);
     onClose();
     setForward('');
     setReason('');
@@ -112,8 +115,11 @@ export default function ModalConfirmExpense({
           </Box>
           {showForward && (
             <Box sx={{ mt: 3 }}>
-              <Typography gutterBottom variant='subtitle1' component='div' sx={{mb: '5px'}}>
-                ส่งกลับแก้ไขให้กับ <Typography component='span' color='red'>*</Typography>
+              <Typography gutterBottom variant='subtitle1' component='div' sx={{ mb: '5px' }}>
+                ส่งกลับแก้ไขให้กับ{' '}
+                <Typography component='span' color='red'>
+                  *
+                </Typography>
               </Typography>
               <FormControl id='SearchType' className={classes.Mselect} fullWidth error={forward === '' && isError}>
                 <Select
@@ -144,11 +150,20 @@ export default function ModalConfirmExpense({
           {showReason && (
             <Box sx={{ mt: 3 }}>
               <TextBoxComment
-                fieldName={<Box>หมายเหตุ : { validateReason && (<Typography component='span' color='red'>*</Typography>)}</Box>}
+                fieldName={
+                  <Box>
+                    หมายเหตุ :{' '}
+                    {validateReason && (
+                      <Typography component='span' color='red'>
+                        *
+                      </Typography>
+                    )}
+                  </Box>
+                }
                 defaultValue={reason}
                 isDisable={isOpenLoading}
                 maxLength={100}
-                maxWidth="100%"
+                maxWidth='100%'
                 isError={!reason && validateReason ? isError : false}
                 onChangeComment={(e) => {
                   setReason(e);
