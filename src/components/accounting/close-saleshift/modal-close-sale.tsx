@@ -18,7 +18,7 @@ function ModalCloseSale({ open, onClose, noOfShiftKey, docNo }: Props) {
     <>
       <Dialog open={open} maxWidth='sm' fullWidth={true} key='modal-add-expense'>
         <BootstrapDialogTitle id='dialog-title' onClose={onClose}>
-          <Typography sx={{ fontSize: 20, fontWeight: 400 }}>ปิดรอบยอดการขาย</Typography>
+          <Typography sx={{ fontSize: 20, fontWeight: 400 }}>ปิดรหัสการขายสำเร็จ</Typography>
         </BootstrapDialogTitle>
         <DialogContent sx={{ justifyContent: 'center' }}>
           <Box>
@@ -28,12 +28,6 @@ function ModalCloseSale({ open, onClose, noOfShiftKey, docNo }: Props) {
               </Grid>
               <Grid item xs={7}>
                 <Typography variant='body2'>{noOfShiftKey} </Typography>
-              </Grid>
-              <Grid item xs={5}>
-                <Typography variant='body2'>เลขที่เอกสารปิดรอบ:</Typography>
-              </Grid>
-              <Grid item xs={7}>
-                <Typography variant='body2'>{docNo} </Typography>
               </Grid>
             </Grid>
           </Box>
