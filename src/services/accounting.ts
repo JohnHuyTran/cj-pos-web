@@ -1,4 +1,4 @@
-import { post, put } from '../adapters/posback-adapter';
+import { get, getFile, post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import {
   AccountAccountExpenses,
@@ -286,4 +286,20 @@ export async function cashStatementApprove(payload: any) {
       throw error;
     });
   return response;
+}
+
+export async function downloadTemplateCS() {
+  try {
+    const response = await getFile(environment.branchAccounting.cashStatement.downloadTemplate.url).then(
+      (result: any) => result
+    );
+
+    // const response = await get(environment.branchAccounting.cashStatement.downloadTemplate.url).then(
+    //   (result: any) => result
+    // );
+    return response;
+  } catch (error) {
+    console.log('error = ', error);
+    throw error;
+  }
 }
