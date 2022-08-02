@@ -17,7 +17,7 @@ import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
 import { BranchListOptionType } from '../../../models/branch-model';
-import { isGroupBranch } from '../../../utils/role-permission';
+import { isChannelBranch } from '../../../utils/role-permission';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import ModalCreateAuditPlan from './audit-plan-create';
 import moment from 'moment';
@@ -51,7 +51,7 @@ const AuditPlanSearch = () => {
     getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
   );
   const branchName = getBranchName(branchList, ownBranch);
-  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [groupBranch, setGroupBranch] = React.useState(isChannelBranch);
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [branchMap, setBranchMap] = React.useState<BranchListOptionType>({
     code: ownBranch,
