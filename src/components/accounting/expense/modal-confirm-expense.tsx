@@ -38,21 +38,22 @@ interface DetailsProps {
   detail: string;
 }
 
-export default function ModalConfirmExpense({
-  open,
-  details,
-  approve,
-  onClose,
-  onCallBackFunction,
-  showForward,
-  showReason,
-  validateReason,
-  isAllowForwardOC,
-}: ModalConfirmExpenseProps): ReactElement {
+export default function ModalConfirmExpense(props: ModalConfirmExpenseProps): ReactElement {
+  const {
+    open,
+    details,
+    approve,
+    onClose,
+    onCallBackFunction,
+    showForward,
+    showReason,
+    validateReason,
+    isAllowForwardOC,
+  } = props;
   const classes = useStyles();
   const forwardList = [
-    { key: 'MANAGER', text: 'สาขา' },
-    { key: 'OC', text: 'OC' },
+    { key: 'MANAGER', text: 'สาขา', isShowOption: true },
+    { key: 'OC', text: 'OC', isShowOption: isAllowForwardOC },
   ];
 
   // Set state data
@@ -85,7 +86,6 @@ export default function ModalConfirmExpense({
 
   // Clear state when close modal.
   const onCloseModal = () => {
-    console.log('isAllowForwardOC:', isAllowForwardOC);
     onClose();
     setForward('');
     setReason('');
@@ -135,11 +135,14 @@ export default function ModalConfirmExpense({
                       : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือกส่งกลับแก้ไขให้กับ</div>
                   }
                   inputProps={{ 'aria-label': 'Without label' }}>
-                  {forwardList.map((item, index: number) => (
-                    <MenuItem key={index} value={item.key}>
-                      {item.text}
-                    </MenuItem>
-                  ))}
+                  {forwardList.map(
+                    (item, index: number) =>
+                      item.isShowOption && (
+                        <MenuItem key={index} value={item.key}>
+                          {item.text}
+                        </MenuItem>
+                      )
+                  )}
                 </Select>
                 {forward === '' && isError && (
                   <FormHelperText sx={{ ml: 0 }}>กรุณาเลือกส่งกลับแก้ไขให้กับ</FormHelperText>
