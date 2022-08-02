@@ -40,10 +40,9 @@ export interface StockCountProductDetail {
   barcode: string;
   productName: string;
   sku: string;
-  numberOfRequested: number;
-  numberOfApproved: number;
-  remark: string;
+  quantity: number | null;
   unitName: string;
+  canNotCount?: boolean;
 }
 
 export interface StockCountDetailResponse {
@@ -51,4 +50,17 @@ export interface StockCountDetailResponse {
   code: number;
   message: string;
   data: any;
+}
+
+export interface StockCountDetail {
+  id: string;
+  index: number;
+  barcode: string;
+  barcodeName: string;
+  skuCode: string;
+  unit: string;
+  unitCode: string;
+  barFactor: number;
+  quantity: number | null;
+  checked?: boolean;
 }

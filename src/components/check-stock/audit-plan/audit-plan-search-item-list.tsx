@@ -67,7 +67,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
           branch: `${data.branchCode}-${data.branchName}`,
           relatedDocuments:
             data.relatedDocuments && data.relatedDocuments.length
-              ? _.uniqBy(data.relatedDocuments, 'documentNumber')
+              ? _.uniqBy(data.relatedDocuments.filter((el:any) => el.status == StockActionStatus.CONFIRM), 'documentNumber')
                   .map((item: any) => item.documentNumber)
                   .join(', ')
               : '',

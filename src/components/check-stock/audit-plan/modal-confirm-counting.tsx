@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import { FormControl, MenuItem, Select } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
 import { Box } from '@mui/system';
+import { STORE_TYPE } from '../../../utils/enum/common-enum';
 
 interface Confirm {
   open: boolean;
@@ -52,8 +53,7 @@ export default function ModalConfirmCounting(props: Confirm) {
         open={open}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        maxWidth="md"
-      >
+        maxWidth="md">
         <DialogContent>
           <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }} width={350}>
             <Typography variant="body1" align="center" mt={3}>
@@ -68,10 +68,9 @@ export default function ModalConfirmCounting(props: Confirm) {
                   error={error}
                   onChange={handleChangeValue}
                   inputProps={{ 'aria-label': 'Without label' }}
-                  renderValue={value !== 0 ? undefined : () => <Typography color={'#AEAEAE'}>กรุณาเลือก</Typography>}
-                >
-                  <MenuItem value={1}>หน้าร้าน</MenuItem>
-                  <MenuItem value={2}>หลังร้าน</MenuItem>
+                  renderValue={value !== 0 ? undefined : () => <Typography color={'#AEAEAE'}>กรุณาเลือก</Typography>}>
+                  <MenuItem value={STORE_TYPE.FRONT}>หน้าร้าน</MenuItem>
+                  <MenuItem value={STORE_TYPE.BACK}>หลังร้าน</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -85,8 +84,7 @@ export default function ModalConfirmCounting(props: Confirm) {
             size="small"
             color="cancelColor"
             sx={{ borderRadius: 2, width: 80, mr: 2 }}
-            onClick={handleClose}
-          >
+            onClick={handleClose}>
             ยกเลิก
           </Button>
           <Button
@@ -95,8 +93,7 @@ export default function ModalConfirmCounting(props: Confirm) {
             size="small"
             color="primary"
             sx={{ borderRadius: 2, width: 80 }}
-            onClick={confirmApproveBtn}
-          >
+            onClick={confirmApproveBtn}>
             ยืนยัน
           </Button>
         </DialogActions>
