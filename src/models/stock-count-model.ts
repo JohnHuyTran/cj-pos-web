@@ -63,4 +63,5 @@ export interface StockCountDetail {
   barFactor: number;
   quantity: number | null;
   checked?: boolean;
+  skuName: string;
 }

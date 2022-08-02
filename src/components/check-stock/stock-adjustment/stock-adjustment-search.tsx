@@ -22,7 +22,7 @@ import { getStockAdjustmentSearch } from "../../../store/slices/stock-adjustment
 // import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
 import StockAdjustmentList from "./stock-adjustment-list";
 import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
-import { isGroupBranch } from "../../../utils/role-permission";
+import { isChannelBranch } from "../../../utils/role-permission";
 import { StockCountSearchRequest } from "../../../models/stock-count-model";
 import { StockAdjustmentSearchRequest } from '../../../models/stock-adjustment-model';
 
@@ -69,7 +69,7 @@ const StockAdjustmentSearch = () => {
         : ''
       : ''
   );
-  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [groupBranch, setGroupBranch] = React.useState(isChannelBranch);
   const branchName = getBranchName(branchList, ownBranch);
   const branchMap: BranchListOptionType = {
     code: ownBranch,

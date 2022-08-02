@@ -34,7 +34,7 @@ import ModalCreateAuditPlan from "../audit-plan/audit-plan-create";
 import { cancelStockCount, confirmStockCount } from "../../../services/stock-count";
 import ModalConfirmSC from './modal-confirm-SC';
 import { getUserInfo } from '../../../store/sessionStore';
-import { isGroupBranch } from '../../../utils/role-permission';
+import { isChannelBranch } from '../../../utils/role-permission';
 
 
 interface Props {
@@ -79,7 +79,7 @@ export default function ModalCreateStockCount({
   const stockCountDetail = useAppSelector((state) => state.stockCountDetailSlice.stockCountDetail.data);
   const userName = getUserInfo().preferred_username ? getUserInfo().preferred_username : '';
   //permission
-  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [groupBranch, setGroupBranch] = React.useState(isChannelBranch);
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SC_MANAGE) : false);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
@@ -184,8 +184,9 @@ export default function ModalCreateStockCount({
             qty: item.quantity || null,
             skuCode: item.sku,
             canNotCount: item.canNotCount,
+            skuName: item.skuName
           });
-        }
+        }      
         dispatch(updateAddItemsState(lstProductDetail));
       }
     }

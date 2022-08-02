@@ -22,7 +22,7 @@ import ModelConfirm from '../../barcode-discount/modal-confirm';
 import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import { BranchListOptionType } from '../../../models/branch-model';
-import { isGroupBranch } from '../../../utils/role-permission';
+import { getUserGroup, isChannelBranch, isGroupAuditParam } from '../../../utils/role-permission';
 import ModalAddTypeProduct from '../../commons/ui/modal-add-type-products';
 import AuditPlanCreateItem from './audit-plan-create-item';
 import ModalConfirmCounting from './modal-confirm-counting';
@@ -99,7 +99,7 @@ export default function ModalCreateAuditPlan({
     getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
   );
   const branchName = getBranchName(branchList, ownBranch);
-  const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [groupBranch, setGroupBranch] = React.useState(isChannelBranch);
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [branchMap, setBranchMap] = React.useState<BranchListOptionType>({
     code: ownBranch,
@@ -107,6 +107,7 @@ export default function ModalCreateAuditPlan({
   });
   const userName = getUserInfo().preferred_username ? getUserInfo().preferred_username : '';
   const userGroups = getUserInfo().groups ? getUserInfo().groups : [];
+  const _group = getUserGroup(userGroups);
   const [currentName, setCurrentName] = React.useState<string>('');
   const [disableCounting, setDisableCounting] = React.useState<boolean>(false);
   const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
@@ -117,7 +118,7 @@ export default function ModalCreateAuditPlan({
     branch: groupBranch ? ownBranch : '',
     documentNumber: '',
     createDate: new Date(),
-    stockCounter: userName == 'posaudit' ? 0 : STOCK_COUNTER_TYPE.BRANCH,
+    stockCounter: userName == 'posaudit' && !groupBranch ? 0 : STOCK_COUNTER_TYPE.BRANCH,
   });
   const [reSave, setReSave] = React.useState(false);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
@@ -176,6 +177,7 @@ export default function ModalCreateAuditPlan({
           })
         : [];
       dispatch(updateAddTypeAndProductState(products));
+      dispatch(setCheckEdit(false));
     }
   }, [dataDetail]);
 
@@ -307,29 +309,6 @@ export default function ModalCreateAuditPlan({
           barcode: item.barcode,
         };
       });
-      const appliedProduct = {
-        appliedProducts: payloadAddTypeProduct
-          .filter((el: any) => el.selectedType === 2)
-          .map((item: any) => {
-            return {
-              name: item.barcodeName,
-              skuCode: item.skuCode,
-              barcode: item.barcode,
-              unitName: item.unitName,
-              categoryTypeCode: item.productTypeCode,
-            };
-          }),
-        appliedCategories: payloadAddTypeProduct
-          .filter((el: any) => el.selectedType === 1)
-          .map((item: any) => {
-            return {
-              name: item.productTypeName,
-              code: item.productTypeCode,
-            };
-          }),
-      };
-
-
       const body = {
         branchCode: values.branch,
         branchName: getBranchName(branchList, values.branch),
@@ -482,25 +461,14 @@ export default function ModalCreateAuditPlan({
     ) {
       return 'none';
     } else {
-      if (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.BRANCH) {
-        displayCounting = undefined;
-      } else if (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.AUDIT) {
-        displayCounting = 'none';
-      } else if (
-        !groupBranch &&
-        userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
-        values.stockCounter == STOCK_COUNTER_TYPE.AUDIT
+      if (
+        (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.BRANCH && !isGroupAuditParam(_group)) ||
+        (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.AUDIT && isGroupAuditParam(_group))
       ) {
         displayCounting = undefined;
-      } else if (
-        !groupBranch &&
-        userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
-        values.stockCounter == STOCK_COUNTER_TYPE.BRANCH
-      ) {
+      } else {
         displayCounting = 'none';
-      } else if (!groupBranch && !userGroups.includes(KEYCLOAK_GROUP_AUDIT)) {
-        displayCounting = 'none';
-      }
+      } 
     }
     return displayCounting;
   };
@@ -599,7 +567,7 @@ export default function ModalCreateAuditPlan({
                           currentName == 'posaudit') ||
                         (action == Action.UPDATE &&
                           !userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
-                          currentName != 'posaudit')
+                          currentName != 'posaudit') || groupBranch
                       }
                       onChange={handleChangeStockCounter}
                       inputProps={{ 'aria-label': 'Without label' }}
@@ -850,7 +818,7 @@ export default function ModalCreateAuditPlan({
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
         title="เพิ่มรายการสินค้า"
-        showSearch={true}
+        showSearch={false}
         textBtn="เพิ่มสินค้า"
         requestBody={{
           isControlStock: true,
@@ -869,7 +837,7 @@ export default function ModalCreateAuditPlan({
         onClose={handleCloseModalCancel}
         onConfirm={handleDeleteDraft}
         barCode={values.documentNumber}
-        headerTitle={'ยืนยันยกเลิกเบิกใช้ในการทำกิจกรรม'}
+        headerTitle={'ยืนยันยกเลิกสร้างแผนตรวจนับสต๊อก'}
         documentField={'เลขที่เอกสารเบิก'}
       />
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
