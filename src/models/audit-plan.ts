@@ -3,6 +3,7 @@ export interface Payload {
   branchCode: string | any;
   branchName: string | any;
   countingDate: string;
+  stockCounter: number;
   product: Object[];
 }
 
@@ -47,6 +48,7 @@ export interface AuditPlan {
   status: string;
   createdDate: string;
   countingDate: string;
+  stockCounter: number;
   product: AuditPlanProductDetail[];
   relatedDocuments: RelatedDocument[];
 }

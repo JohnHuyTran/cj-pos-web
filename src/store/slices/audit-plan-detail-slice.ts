@@ -24,6 +24,7 @@ const initialState: State = {
       countingDate: '',
       product: [],
       relatedDocuments: [],
+      stockCounter: 0,
     },
   },
   error: '',
@@ -47,6 +48,7 @@ export const getAuditPlanDetail = createAsyncThunk('getAuditPlanDetail', async (
         countingDate: '',
         product: [],
         relatedDocuments: [],
+        stockCounter: 0,
       },
     };
     response = await get(apiRootPath).then();

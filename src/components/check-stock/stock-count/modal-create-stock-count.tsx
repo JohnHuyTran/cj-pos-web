@@ -32,6 +32,9 @@ import ModalStockCountItem from "./modal-stock-count-item";
 import { getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
 import ModalCreateAuditPlan from "../audit-plan/audit-plan-create";
 import { cancelStockCount, confirmStockCount } from "../../../services/stock-count";
+import ModalConfirmSC from './modal-confirm-SC';
+import { getUserInfo } from '../../../store/sessionStore';
+
 
 interface Props {
   action: Action | Action.INSERT;
@@ -69,11 +72,11 @@ export default function ModalCreateStockCount({
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const [openModalClose, setOpenModalClose] = React.useState<boolean>(false);
   const [status, setStatus] = React.useState<string>('');
-
   const payloadStockCount = useAppSelector((state) => state.stockCountSlice.createDraft);
   const dataDetail = useAppSelector((state) => state.stockCountSlice.dataDetail);
   const checkEdit = useAppSelector((state) => state.stockCountSlice.checkEdit);
   const stockCountDetail = useAppSelector((state) => state.stockCountDetailSlice.stockCountDetail.data);
+  const userName = getUserInfo().preferred_username ? getUserInfo().preferred_username : '';
   //permission
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SC_MANAGE) : false);
@@ -88,7 +91,14 @@ export default function ModalCreateStockCount({
   };
 
   const handleOpenModalConfirm = () => {
-    setOpenModalConfirmConfirm(true);
+    if (!validate()) {
+      setOpenModalError(true);
+      setAlertTextError('ไม่สามารถนับได้');
+      return;
+    } else {
+
+      setOpenModalConfirmConfirm(true);
+    }
   };
 
   const handleCloseModalConfirm = (confirm: boolean) => {
@@ -169,8 +179,9 @@ export default function ModalCreateStockCount({
             unitCode: item.unitFactor,
             baseUnit: item.barFactor,
             unitPrice: item.price || 0,
-            qty: item.quantity || 0,
+            qty: item.quantity || null,
             skuCode: item.sku,
+            canNotCount: item.canNotCount,
           });
         }
         dispatch(updateAddItemsState(lstProductDetail));
@@ -187,11 +198,11 @@ export default function ModalCreateStockCount({
       for (let preData of data) {
         const item = {
           id: preData.barcode,
-          errorNumberOfRequested: '',
+          errorQuantity: '',
         };
-        if (preData.numberOfRequested <= 0 || !preData.numberOfRequested) {
+        if (!preData.quantity && !preData.canNotCount && preData.quantity != 0) {
           isValid = false;
-          item.errorNumberOfRequested = 'จำนวนคำขอต้องมากกว่า 0';
+          item.errorQuantity = 'จำนวนคำขอต้องมากกว่า 0';
         }
         if (!isValid) {
           dt.push(item);
@@ -201,13 +212,14 @@ export default function ModalCreateStockCount({
     }
     if (!isValid) {
       dispatch(updateErrorList(errorListProduct));
-      setOpenModalError(true);
+      // setOpenModalError(true);
     }
     return isValid;
   }
 
   const handleConfirm = async () => {
     setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    handleOpenLoading('open', true);
     try {
       const payload = {
         id: dataDetail.id,
@@ -223,14 +235,20 @@ export default function ModalCreateStockCount({
         );
         setOpenPopup(true);
         setPopupMsg('คุณได้ยืนยันตรวจนับสต๊อก (SC) เรียบร้อยแล้ว');
-        handleClose();
-        if (onSearchMain) onSearchMain();
+        await dispatch(getAuditPlanDetail(dataDetail.APId));
+        if (!objectNullOrEmpty(auditPlanDetail.data)) {
+          setOpenDetailAPAdmin(true);
+        }
+      } else if (rs.code == 40016){
+        setOpenModalError(true);
+        setAlertTextError('ไม่สามารถดำเนินการได้\nเนื่องจากเอกสาร AP ถูกยกเลิก');
       } else {
         setOpenModalError(true);
       }
     } catch (error) {
       setOpenModalError(true);
     }
+    handleOpenLoading('open', false);
   };
 
   const handleCancel = async () => {
@@ -283,6 +301,7 @@ export default function ModalCreateStockCount({
   };
 
   const [openDetailAP, setOpenDetailAP] = React.useState(false);
+  const [openDetailAPAdmin, setOpenDetailAPAdmin] = React.useState(false)
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -300,6 +319,27 @@ export default function ModalCreateStockCount({
       console.log(error);
     }
     handleOpenLoading('open', false);
+  };
+
+  const handleOpenAddZero = () => {
+    if (stockCountDetail.product && stockCountDetail.product.length > 0) {
+      let newList = stockCountDetail.product.map((item: any) => {
+        const sameItem = payloadStockCount.products.find((el: any) => el.barcode == item.barcode);
+        return {
+          barcode: item.barcode,
+          barcodeName: item.productName,
+          unitName: item.unitName,
+          unitCode: item.unitFactor,
+          baseUnit: item.barFactor,
+          unitPrice: item.price || 0,
+          skuCode: item.sku,
+          canNotCount: sameItem.canNotCount,
+          qty: (!sameItem.quantity && !sameItem.canNotCount) ? 0 : sameItem.quantity,
+        };
+      });
+      dispatch(updateErrorList([]));
+      dispatch(updateAddItemsState(newList));
+    }
   };
 
   return (
@@ -370,7 +410,22 @@ export default function ModalCreateStockCount({
             </Grid>
           </Grid>
           <Box>
-            <Box sx={{ display: 'flex', marginBottom: '18px', justifyContent: 'flex-end' }}>
+            <Box sx={{ display: 'flex', marginBottom: '18px' }}>
+                <Button
+                  id="btnAddZero"
+                  variant="contained"
+                  color="info"
+                  className={classes.MbtnSearch}
+                  onClick={handleOpenAddZero}
+                  sx={{ width: 172 }}
+                  style={{
+                    display:
+                      userName != 'posaudit' ? 'none' : undefined,
+                  }}>
+                  คลิกใส่ 0 สินค้าที่ไม่พบ
+                </Button>
+            
+            <Box sx={{ marginLeft: 'auto' }}>
               <Button
                 id='btnConfirm'
                 variant='contained'
@@ -378,7 +433,7 @@ export default function ModalCreateStockCount({
                 sx={{ margin: '0 17px' }}
                 disabled={(!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
                   || (payloadStockCount.products && payloadStockCount.products.length === 0)}
-                style={{ display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) || !managePermission || viewMode) ? 'none' : undefined }}
+                style={{ display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) || !managePermission ) ? 'none' : undefined }}
                 startIcon={<CheckCircleOutlineIcon/>}
                 onClick={handleOpenModalConfirm}
                 className={classes.MbtnSearch}>
@@ -389,12 +444,13 @@ export default function ModalCreateStockCount({
                 variant='contained'
                 color='error'
                 disabled={stringNullOrEmpty(status)}
-                style={{ display: (!managePermission || viewMode) ? 'none' : undefined }}
+                style={{ display: (!managePermission ) ? 'none' : undefined }}
                 startIcon={<HighlightOffIcon/>}
                 onClick={handleOpenCancel}
                 className={classes.MbtnSearch}>
                 ยกเลิก
               </Button>
+            </Box>
             </Box>
             <Box>
               <ModalStockCountItem action={action} userPermission={userPermission} viewMode={viewMode}/>
@@ -416,6 +472,19 @@ export default function ModalCreateStockCount({
           viewMode={true}
         />
       )}
+      {openDetailAPAdmin && (
+        <ModalCreateAuditPlan
+          isOpen={openDetailAPAdmin}
+          onClickClose={() => {
+            setOpenDetailAPAdmin(false)
+          }}
+          action={Action.UPDATE}
+          setPopupMsg={setPopupMsg}
+          setOpenPopup={setOpenPopup}
+          userPermission={userPermission}
+          isRedirect={true}
+        />
+      )}
       <ModelConfirm
         open={openModalCancel}
         onClose={handleCloseModalCancel}
@@ -424,20 +493,13 @@ export default function ModalCreateStockCount({
         headerTitle={'ยืนยันยกเลิกตรวจนับสต๊อก'}
         documentField={'เลขที่เอกสาร SC'}
       />
+      <ModalConfirmSC open={openModalConfirmConfirm} onClose={() => handleCloseModalConfirm(false)} onConfirm={handleConfirm} />
       <AlertError
         open={openModalError}
         onClose={handleCloseModalError}
         textError={alertTextError}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
-      <ModelConfirm
-        open={openModalConfirmConfirm}
-        onClose={() => handleCloseModalConfirm(false)}
-        onConfirm={() => handleCloseModalConfirm(true)}
-        barCode={dataDetail.documentNumber}
-        headerTitle={'ยืนยันตรวจนับสต๊อก (SC)'}
-        documentField={'เลขที่เอกสาร SC'}
-      />
     </div>
   );
 }
