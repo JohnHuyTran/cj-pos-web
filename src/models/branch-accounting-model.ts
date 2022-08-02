@@ -388,11 +388,16 @@ export interface CashStatementSearchResponse {
 }
 
 export interface CashStatementInfo {
-  branchCode: string;
+  branchCode: BranchCodeInfo | null;
   id: string;
   salesDate: any;
   cashDate: any;
   cashOver: any;
   cashShort: any;
   status: string;
+}
+
+export interface BranchCodeInfo {
+  code: string;
+  name: string;
 }
