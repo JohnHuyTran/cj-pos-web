@@ -1,29 +1,25 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useState } from 'react';
 import clsx from 'clsx';
-
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputAdornment from '@mui/material/InputAdornment';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import Button from '@mui/material/Button';
-import { useAppSelector, useAppDispatch } from '../../store/store';
-import { loginKeyCloakAsync } from '../../store/slices/authSlice';
-import { loginForm } from '../../models/user-interface';
+import logoImage from 'assets/images/CJlogo.jpeg';
 import { loginFormStyle } from './loginForm-css';
-import { env } from '../../adapters/environmentConfigs';
-import { getAccessToken, setUserInfo } from '../../store/sessionStore';
-import { getDecodedAccessToken } from '../../utils/utils';
-import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  IconButton,
+  FormControl,
+  FormHelperText,
+  OutlinedInput,
+  InputAdornment
+} from '@mui/material'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { LoadingButton } from '@mui/lab';
 import { useTranslation } from 'react-i18next';
-import { featchBranchListAsync } from '../../store/slices/search-branches-slice';
-import logoImage from '../../assets/images/CJlogo.jpeg';
-import { featchAuthorizedBranchListAsync } from '../../store/slices/authorized-branch-slice';
+
+// Call api and store
+import { useAppSelector, useAppDispatch } from 'store/store';
+import { loginKeyCloakAsync } from 'store/slices/authSlice';
+import { loginForm } from 'models/user-interface';
 
 interface State {
   userId: string;
@@ -32,17 +28,23 @@ interface State {
 }
 
 function LoginForm() {
+  // Set variable
   const classes = loginFormStyle();
+  const version = process.env.REACT_APP_POS_BACK_VERSION
+  const dispatch = useAppDispatch();
   const { t } = useTranslation(['error', 'common']);
-  const [values, setValues] = React.useState<State>({
+  const { error } = useAppSelector((state) => state.auth);
+
+  // Set state data
+  const [isOpenLoading, setIsOpenLoading] = useState(false)
+  const [isValidate, setIsValidate] = useState(false)
+  const [values, setValues] = useState<State>({
     password: '',
     userId: '',
     showPassword: false,
   });
-  // console.log(isAllowPermission('FEATURE.ADMIN.SEARCH.DATA'));
-  const dispatch = useAppDispatch();
-  const { error, isLogin } = useAppSelector((state) => state.auth);
-  const [version, setVersion] = React.useState<any>(process.env.REACT_APP_POS_BACK_VERSION);
+
+  // Handle function
   const handleChange = (prop: any) => (event: any) => {
     setValues({ ...values, [prop]: event.target.value });
   };
@@ -58,56 +60,62 @@ function LoginForm() {
     event.preventDefault();
   };
 
-  const onClickLogin = () => {
-    const form: loginForm = {
-      userId: values.userId,
-      password: values.password,
-    };
-    dispatch(loginKeyCloakAsync(form));
+  const onClickLogin = async () => {
+    setIsValidate(true)
+    if (values.userId && values.password) {
+      const form: loginForm = {
+        userId: values.userId,
+        password: values.password,
+      };
+      setIsValidate(false)
+      setIsOpenLoading(true)
+      await dispatch(loginKeyCloakAsync(form));
+      setIsOpenLoading(false)
+    }
   };
 
   return (
-    <div className={classes.wrapLogin}>
-      <div className={classes.bgLogin}>
+    <Box className={classes.wrapLogin}>
+      <Box className={classes.bgLogin}>
         <Typography variant='h5' className={classes.welcomeLabel}>
           ยินดีต้อนรับ
         </Typography>
-
         <Box className={classes.mainBox}>
-          <div id='logo' className={classes.logo}>
+          <Box id='logo' sx={{display: 'flex'}}>
             <img src={logoImage} alt='' width='50' />
-          </div>
-
-          <div id='error'> {error && <p style={{ color: 'red', fontSize: '12px' }}>{error}</p>}</div>
-          <div>
-            <FormControl sx={{ m: 5, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
-              <FormHelperText id='outlined-user-id-text' sx={{ ml: 0 }}>
+          </Box>
+          <Box sx={{mt: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+            <FormControl sx={{ m: 0 }} className={clsx(classes.textField)} variant='outlined'>
+              <FormHelperText id='OutlinedUserIdText' sx={{ ml: 0 }}>
                 รหัสผู้ใช้งาน
               </FormHelperText>
               <OutlinedInput
                 id='txtUserid'
                 value={values.userId}
+                error={!values.userId && isValidate}
+                disabled={isOpenLoading}
                 onChange={handleChange('userId')}
+                onKeyPress={(e) => ((e.key === "Enter") && onClickLogin())}
                 aria-describedby='outlined-user-id-text'
+                sx={{height: '38px'}}
                 inputProps={{
                   'aria-label': 'weight',
                 }}
               />
             </FormControl>
-          </div>
-          <div>
-            <FormControl sx={{ m: 5, mb: 0 }} className={clsx(classes.textField)} variant='outlined'>
-              <FormHelperText id='outlined-password-text' sx={{ ml: 0 }}>
+            <FormControl sx={{ m: '30px 0 0' }} className={clsx(classes.textField)} variant='outlined'>
+              <FormHelperText id='OutlinedPasswordText' sx={{ ml: 0 }}>
                 รหัสผ่าน
               </FormHelperText>
-              {/* <InputLabel htmlFor="outlined-adornment-password">
-                    กรุณป้อนรหัสผ่าน
-                  </InputLabel> */}
               <OutlinedInput
                 id='txtPassword'
                 type={values.showPassword ? 'text' : 'password'}
                 value={values.password}
+                error={!values.password && isValidate}
+                disabled={isOpenLoading}
                 onChange={handleChange('password')}
+                onKeyPress={(e) => ((e.key === "Enter") && onClickLogin())}
+                sx={{height: '38px'}}
                 endAdornment={
                   <InputAdornment position='end'>
                     <IconButton
@@ -121,37 +129,42 @@ function LoginForm() {
                 }
               />
             </FormControl>
-          </div>
-          <div>
-            <FormControl sx={{ m: 15, mb: 0 }} className={clsx(classes.textField)} variant='outlined'></FormControl>
-          </div>
-          <div>
-            <Button
-              sx={{ m: 3, mb: 0 }}
-              id='btnLogin'
+          </Box>
+          <Box id='errorMessage'
+            sx={{
+              width: '255px',  margin: '15px auto', minHeight: '30px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+            {(error || isValidate) && (
+              <Typography color="error" variant="caption" >
+                {isValidate ? 'กรุณากรอกรหัสของท่านให้ถูกต้อง' : error}
+              </Typography>
+            )}
+          </Box>
+          <Box>
+            <LoadingButton
+              id='btnConfirm'
               variant='contained'
               color='primary'
-              onClick={onClickLogin}
-              className={classes.loginBtn}>
-              <Typography variant='button' display='block' className={clsx(classes.labelLoginBtn, classes.textField)}>
-                เข้าสู่ระบบ
-              </Typography>
-            </Button>
-          </div>
-          <Box
-            sx={{
-              width: '350px',
-              minHeight: '10px',
-              marginTop: '20px',
-              display: 'flex',
-              justifyContent: 'center',
-              color: '#AEAEAE',
-            }}>
-            <Typography sx={{ fontSize: '10px', position: 'relative' }}>version: {version}</Typography>
+              loading={isOpenLoading}
+              className={classes.loginBtn}
+              loadingIndicator={
+                <Typography component='span' sx={{ fontSize: '11px' }}>
+                  กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
+                </Typography>
+              }
+              sx={{ borderRadius: 2, width: 260 }}
+              onClick={onClickLogin}>
+              เข้าสู่ระบบ
+            </LoadingButton>
+            <Box
+              sx={{ marginTop: '20px', color: '#AEAEAE' }}>
+              <Typography sx={{ fontSize: '10px', position: 'relative' }}>version: {version}</Typography>
+            </Box>
           </Box>
         </Box>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }
 
