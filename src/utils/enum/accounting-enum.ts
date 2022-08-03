@@ -80,3 +80,9 @@ export const closeSaleShift = [
   { key: 'WAIT_CHECKING', text: 'รอตรวจสอบ' },
   { key: 'CORRECT', text: 'ถูกต้อง' },
 ];
+
+export const openEndStatus = [
+  { key: 'DRAFT', text: 'บันทึก' },
+  { key: 'REQUEST_APPROVE', text: 'ขออนุมัติ' },
+  { key: 'APPROVED', text: 'อนุมัติ' },
+];

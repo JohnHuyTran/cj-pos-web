@@ -619,5 +619,10 @@ export const environment = {
         url: 'accounting/cash-statement/delete/{id}',
       },
     },
+    openEnd: {
+      search: {
+        url: 'accounting/open-end',
+      },
+    },
   },
 };

@@ -36,6 +36,7 @@ import { featchExpenseDetailAsync } from './store/slices/accounting/accounting-s
 import AuditPlan from './pages/check-stock/audit-plan';
 import StockCount from './pages/check-stock/stock-count';
 import CloseSaleShift from './pages/accounting/close-saleshift';
+import OpenEnd from './pages/accounting/open-end';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -97,29 +98,30 @@ export default function App2() {
       <Main open={open}>
         <DrawerHeader />
         <Switch>
-          <Route exact path='/' component={Home} />
-          <Route path='/notification' component={Notification} />
-          <Route path='/barcode-discount' component={BarcodeDiscount} />
-          <Route path='/tax-invoice' component={TaxInvoice} />
-          <Route path='/sale-limit-time' component={SaleLimitTime} />
-          <Route path='/check-order' component={CheckOrder} />
-          <Route path='/dc-check-order' component={DCCheckOrder} />
-          <Route path='/supplier-check-order' component={SupplierCheckOrder} />
-          <Route path='/stock-transfer' component={StockTransfer} />
-          <Route path='/stock-transfer-rt' component={StockTransferRt} />
-          <Route path='/transfer-out' component={TransferOut} />
-          <Route path='/transfer-out-destroy' component={TransferOutDestroy} />
-          <Route path='/transfer-out-raw-masterial' component={TORawMasterial} />
-          <Route path='/stock-balance' component={StockBalance} />
-          <Route path='/stock-movement' component={StockMovement} />
-          <Route path='/create-purchase-branch' component={CreatePurchaseBranch} />
-          <Route path='/product-master' component={ProductMaster} />
-          <Route path='/expense' component={Expense} />
-          <Route path='/reserves' component={Reserves} />
-          <Route path='/audit-plan' component={AuditPlan} />
-          <Route path='/stock-count' component={StockCount} />
-          <Route path='/close-saleshift' component={CloseSaleShift} />
-          <Route path='/cash-statement' component={CashStatement} />
+          <Route exact path="/" component={Home} />
+          <Route path="/notification" component={Notification} />
+          <Route path="/barcode-discount" component={BarcodeDiscount} />
+          <Route path="/tax-invoice" component={TaxInvoice} />
+          <Route path="/sale-limit-time" component={SaleLimitTime} />
+          <Route path="/check-order" component={CheckOrder} />
+          <Route path="/dc-check-order" component={DCCheckOrder} />
+          <Route path="/supplier-check-order" component={SupplierCheckOrder} />
+          <Route path="/stock-transfer" component={StockTransfer} />
+          <Route path="/stock-transfer-rt" component={StockTransferRt} />
+          <Route path="/transfer-out" component={TransferOut} />
+          <Route path="/transfer-out-destroy" component={TransferOutDestroy} />
+          <Route path="/transfer-out-raw-masterial" component={TORawMasterial} />
+          <Route path="/stock-balance" component={StockBalance} />
+          <Route path="/stock-movement" component={StockMovement} />
+          <Route path="/create-purchase-branch" component={CreatePurchaseBranch} />
+          <Route path="/product-master" component={ProductMaster} />
+          <Route path="/expense" component={Expense} />
+          <Route path="/reserves" component={Reserves} />
+          <Route path="/audit-plan" component={AuditPlan} />
+          <Route path="/stock-count" component={StockCount} />
+          <Route path="/close-saleshift" component={CloseSaleShift} />
+          <Route path="/cash-statement" component={CashStatement} />
+          <Route path="/open-end" component={OpenEnd} />
         </Switch>
       </Main>
     </Box>

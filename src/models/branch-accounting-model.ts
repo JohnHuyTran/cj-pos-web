@@ -396,3 +396,38 @@ export interface CashStatementInfo {
   cashShort: any;
   status: string;
 }
+
+export interface OpenEndSearchRequest {
+  limit: string;
+  page: string;
+  status: string;
+  branchCode: string;
+  dateFrom: any;
+  dateTo: any;
+}
+export interface OpenEndSearchResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: OpenEndSearchInfo[];
+  total: number;
+  page: number;
+  perPage: number;
+  prev: number;
+  next: number;
+  totalPage: number;
+}
+export interface OpenEndSearchInfo {
+  branchCode: string;
+  branchName: string;
+  docNo: string;
+  shiftDate: any;
+  noOfSaleBill: number;
+  dailyIncomeAmount: number;
+  depositeAmount: number;
+  diffDepositeAmount: number;
+  status: string;
+  comment: string;
+  bypass: string;
+}

@@ -106,6 +106,7 @@ export enum SUBMENU {
   EX_CONFIG = 'account.config',
   EX_CLOSE_SALE_SHIFT = 'account.closeSaleShift',
   CASH_STATEMENT = 'cash.statement',
+  EX_OPEN_END = 'account.openEnd',
 }
 
 export enum PERMISSION_GROUP {
