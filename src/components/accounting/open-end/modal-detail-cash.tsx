@@ -17,29 +17,34 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
             <Grid
               item
               xs={7}
-              pr={1}
-              mt={1}
               sx={{
-                // backgroundColor: '#f3fbf8',
-                border: '1px solid #EAEBEB',
+                backgroundColor: '#f3fbf8',
+                border: '1px solid #BFF1C4',
                 borderRadius: '7px',
-                padding: '20px 40px 20px 10px',
               }}>
-              รายการรับตามประเภทชำระ
+              <Grid container spacing={2} mr={1} mt={'11px'}></Grid>
             </Grid>
 
-            <Grid
-              item
-              xs={5}
-              pr={1}
-              mt={1}
-              sx={{
-                // backgroundColor: '#f3fbf8',
-                border: '1px solid #EAEBEB',
-                borderRadius: '7px',
-                padding: '20px 40px 20px 10px',
-              }}>
-              รายการรับตามประเภท
+            <Grid item xs={5} mt={1}>
+              <Grid
+                sx={{
+                  backgroundColor: '#f3fbf8',
+                  border: '1px solid #BFF1C4',
+                  borderRadius: '7px',
+                  padding: '20px 40px 20px 10px',
+                }}
+                container
+                spacing={2}
+                mb={3}></Grid>
+              <Grid
+                sx={{
+                  backgroundColor: '#f3fbf8',
+                  border: '1px solid #BFF1C4',
+                  borderRadius: '7px',
+                  padding: '0px 40px 20px 10px',
+                }}
+                container
+                spacing={2}></Grid>
             </Grid>
           </Grid>
         </DialogContent>
