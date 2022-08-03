@@ -118,7 +118,7 @@ export default function ModalCreateAuditPlan({
     branch: groupBranch ? ownBranch : '',
     documentNumber: '',
     createDate: new Date(),
-    stockCounter: userName == 'posaudit' && !groupBranch ? 0 : STOCK_COUNTER_TYPE.BRANCH,
+    stockCounter: isGroupAuditParam(_group) ? 0 : STOCK_COUNTER_TYPE.BRANCH,
   });
   const [reSave, setReSave] = React.useState(false);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
@@ -571,7 +571,7 @@ export default function ModalCreateAuditPlan({
                           currentName == 'posaudit') ||
                         (action == Action.UPDATE &&
                           !userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
-                          currentName != 'posaudit') || groupBranch
+                          currentName != 'posaudit')
                       }
                       onChange={handleChangeStockCounter}
                       inputProps={{ 'aria-label': 'Without label' }}
