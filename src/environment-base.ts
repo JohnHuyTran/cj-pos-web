@@ -625,5 +625,10 @@ export const environment = {
         url: 'accounting/cash-statement/approve-list',
       },
     },
+    openEnd: {
+      view: {
+        url: 'accounting/open-end/{docNo}',
+      },
+    },
   },
 };
