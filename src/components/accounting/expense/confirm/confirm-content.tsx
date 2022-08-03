@@ -3,7 +3,7 @@ import moment from 'moment';
 import DialogContentText from '@mui/material/DialogContentText';
 import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
-import DatePickerComponent from '../../../commons/ui/date-picker';
+import DatePickerComponent from '../../../commons/ui/date-picker-current-month';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useStyles } from '../../../../styles/makeTheme';
 
