@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box, Button, Dialog, DialogActions, DialogContent, Typography } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { Box, Button, Dialog, DialogActions, DialogContent, TextField, Typography } from '@mui/material';
+import NumberFormat from 'react-number-format';
 
 //css
 import { useStyles } from '../../../styles/makeTheme';
@@ -26,7 +27,7 @@ function ModalApproveSearchList({ open, onClose, onConfirmApprove, payloadApprov
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -63,6 +64,29 @@ function ModalApproveSearchList({ open, onClose, onConfirmApprove, payloadApprov
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        return (
+          <NumberFormat
+            value={String(params.value)}
+            thousandSeparator={true}
+            decimalScale={2}
+            disabled={true}
+            customInput={TextField}
+            sx={{
+              '.MuiInputBase-input.Mui-disabled': {
+                WebkitTextFillColor: '#000',
+                textAlign: 'end',
+                fontSize: '14px',
+              },
+              '.MuiOutlinedInput-notchedOutline': {
+                border: 'none',
+              },
+            }}
+            fixedDecimalScale
+            type="text"
+          />
+        );
+      },
     },
     {
       field: 'cashOver',
@@ -72,6 +96,29 @@ function ModalApproveSearchList({ open, onClose, onConfirmApprove, payloadApprov
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        return (
+          <NumberFormat
+            value={String(params.value)}
+            thousandSeparator={true}
+            decimalScale={2}
+            disabled={true}
+            customInput={TextField}
+            sx={{
+              '.MuiInputBase-input.Mui-disabled': {
+                WebkitTextFillColor: '#000',
+                textAlign: 'end',
+                fontSize: '14px',
+              },
+              '.MuiOutlinedInput-notchedOutline': {
+                border: 'none',
+              },
+            }}
+            fixedDecimalScale
+            type="text"
+          />
+        );
+      },
     },
   ];
 
@@ -88,12 +135,12 @@ function ModalApproveSearchList({ open, onClose, onConfirmApprove, payloadApprov
 
   return (
     <Fragment>
-      <Dialog open={open} maxWidth='md' fullWidth={true}>
+      <Dialog open={open} maxWidth="md" fullWidth={true}>
         <DialogContent>
-          <Typography variant='h6' align='center' sx={{ marginBottom: 1 }}>
+          <Typography variant="h6" align="center" sx={{ marginBottom: 1 }}>
             ยืนยันการอนุมัติรายการ
           </Typography>
-          <Typography variant='body1' color='textSecondary' align='center' sx={{ mb: 2 }}>
+          <Typography variant="body1" color="textSecondary" align="center" sx={{ mb: 2 }}>
             กรุณายืนยันการอนุมัติ {payloadApprove.length} รายการ
           </Typography>
 
@@ -105,21 +152,23 @@ function ModalApproveSearchList({ open, onClose, onConfirmApprove, payloadApprov
 
           <DialogActions sx={{ justifyContent: 'center', mt: 5 }}>
             <Button
-              id='btnCancle'
-              variant='contained'
-              color='cancelColor'
+              id="btnCancle"
+              variant="contained"
+              color="cancelColor"
               className={classes.MbtnSearch}
               onClick={onClose}
-              sx={{ mr: 3, width: '20%' }}>
+              sx={{ mr: 3, width: '20%' }}
+            >
               ยกเลิก
             </Button>
             <Button
-              id='btnDelete'
-              variant='contained'
-              color='primary'
+              id="btnDelete"
+              variant="contained"
+              color="primary"
               className={classes.MbtnSearch}
               sx={{ width: '20%' }}
-              onClick={() => onConfirmApprove()}>
+              onClick={() => onConfirmApprove()}
+            >
               ยืนยัน
             </Button>
           </DialogActions>
