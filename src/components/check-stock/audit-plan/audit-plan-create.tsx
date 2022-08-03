@@ -150,7 +150,7 @@ export default function ModalCreateAuditPlan({
   const [openModalValidate, setOpenModalValidate] = React.useState<boolean>(false);
   const [msgModalValidate, setMsgModalValidate] = React.useState<string>('');
   const [urlModalValidate, setUrlModalValidate] = React.useState<string>('');
-
+  
   useEffect(() => {
     if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {
       setStatus(dataDetail.status);
@@ -695,7 +695,8 @@ export default function ModalCreateAuditPlan({
                     (payloadAddTypeProduct && payloadAddTypeProduct.length === 0) ||
                     disableCounting ||
                     values.branch == '' ||
-                    values.stockCounter == 0
+                    values.stockCounter == 0 || 
+                    _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`])
                   }
                   style={{
                     display:
@@ -722,7 +723,11 @@ export default function ModalCreateAuditPlan({
                   }
                   style={{
                     display:
-                      steps.indexOf(status) >= 1 || !managePermission || viewMode || status == StockActionStatus.CANCEL
+                      steps.indexOf(status) >= 1 ||
+                      !managePermission ||
+                      viewMode ||
+                      status == StockActionStatus.CANCEL ||
+                      _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`])
                         ? 'none'
                         : undefined,
                   }}
@@ -757,7 +762,7 @@ export default function ModalCreateAuditPlan({
                       !managePermission ||
                       viewMode ||
                       status == StockActionStatus.CANCEL ||
-                      (userName != currentName && steps.indexOf(status) >= 0 && action == Action.UPDATE)
+                      (_group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]) && steps.indexOf(status) >= 0 && action == Action.UPDATE)
                         ? 'none'
                         : undefined,
                   }}
