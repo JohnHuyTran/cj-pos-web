@@ -19,6 +19,7 @@ import { openEndStatus } from '../../../utils/enum/accounting-enum';
 //component
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import DatePickerAllComponent from '../../commons/ui/date-picker-all';
+import OpenEndList from './open-end-list';
 
 //model
 import { BranchListOptionType } from 'models/branch-model';
@@ -31,6 +32,7 @@ import {
   savePayloadSearch,
   clearOpenEndSearchList,
 } from '../../../store/slices/accounting/open-end/open-end-search-slice';
+import AlertError from 'components/commons/ui/alert-error';
 
 function OpenEndSearch() {
   const { t } = useTranslation(['openEnd', 'common']);
@@ -42,6 +44,8 @@ function OpenEndSearch() {
   const limit: number = useAppSelector((state) => state.searchOpenEndSlice.openEndSearchList.perPage);
   const [openLoadingModal, setOpenLoadingModal] = useState(false);
   const [flagSearch, setFlagSearch] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [textError, setTextError] = useState('');
   const [values, setValues] = useState({
     branchCode: '',
     dateFrom: '',
@@ -52,6 +56,11 @@ function OpenEndSearch() {
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
+  };
+
+  //alert Errormodel
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
   };
 
   //config branch
@@ -97,29 +106,43 @@ function OpenEndSearch() {
     setEndDate(value);
   };
 
+  const validateCriteria = () => {
+    if (startDate === null || endDate === null) {
+      setOpenAlert(true);
+      setTextError('กรุณากรอกวันที่รับสินค้า');
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const onClickSearchBtn = async () => {
     setOpenLoadingModal(true);
-    let limits;
-    if (limit === 0 || limit === undefined) {
-      limits = '10';
-    } else {
-      limits = limit.toString();
+
+    let validate: boolean = validateCriteria();
+
+    if (validate) {
+      let limits;
+      if (limit === 0 || limit === undefined) {
+        limits = '10';
+      } else {
+        limits = limit.toString();
+      }
+
+      const payloadSearch: OpenEndSearchRequest = {
+        branchCode: values.branchCode,
+        status: values.status,
+        dateFrom: moment(startDate).startOf('day').toISOString(),
+        dateTo: moment(endDate).startOf('day').toISOString(),
+        limit: limits,
+        page: page,
+      };
+
+      await dispatch(featchSearchOpenEndAsync(payloadSearch));
+      await dispatch(savePayloadSearch(payloadSearch));
+      setFlagSearch(true);
     }
 
-    const payloadSearch: OpenEndSearchRequest = {
-      branchCode: values.branchCode,
-      status: values.status,
-      dateFrom: moment(startDate).startOf('day').toISOString(),
-      dateTo: moment(endDate).startOf('day').toISOString(),
-      limit: limits,
-      page: page,
-    };
-
-    console.log('payloadSearch: ', payloadSearch);
-
-    await dispatch(featchSearchOpenEndAsync(payloadSearch));
-    await dispatch(savePayloadSearch(payloadSearch));
-    setFlagSearch(true);
     setOpenLoadingModal(false);
   };
 
@@ -243,6 +266,7 @@ function OpenEndSearch() {
           </Grid>
         </Box>
 
+        {flagSearch && items.data.length > 0 && <OpenEndList />}
         {flagSearch && items.data.length === 0 && (
           <Grid container xs={12} justifyContent="center">
             <Box color="#CBD4DB" justifyContent="center">
@@ -254,6 +278,7 @@ function OpenEndSearch() {
         )}
 
         <LoadingModal open={openLoadingModal} />
+        <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       </Box>
     </>
   );

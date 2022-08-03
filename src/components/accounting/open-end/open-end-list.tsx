@@ -19,6 +19,7 @@ function OpenEndList() {
   const limit = useAppSelector((state) => state.searchOpenEndSlice.openEndSearchList.perPage);
   const [pageSize, setPageSize] = useState(limit.toString());
   const [openLoadingModal, setOpenLoadingModal] = useState(false);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const columns: GridColDef[] = [
     {
@@ -39,33 +40,37 @@ function OpenEndList() {
     return {
       id: indexs,
       index: (cuurentPage - 1) * parseInt(pageSize) + indexs + 1,
+      docNo: item.docNo,
     };
   });
 
+  console.log('rows: ', rows);
+
+  const currentlySelected = async (params: GridCellParams) => {
+    console.log('params: ', params.row.docNo);
+  };
+
   return (
-    <div>
-      <div>test</div>
+    <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        disableColumnMenu
+        autoHeight={rows.length >= 10 ? false : true}
+        scrollbarSize={10}
+        pagination
+        page={cuurentPage - 1}
+        pageSize={parseInt(pageSize)}
+        rowsPerPageOptions={[10, 20, 50, 100]}
+        rowCount={items.total}
+        paginationMode="server"
+        // onPageChange={handlePageChange}
+        // onPageSizeChange={handlePageSizeChange}
+        onCellClick={currentlySelected}
+        loading={loading}
+        rowHeight={65}
+      />
     </div>
-    //     <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
-    //         <DataGrid
-    //     rows={rows}
-    //     columns={columns}
-    //     disableColumnMenu
-    //     autoHeight={rows.length >= 10 ? false : true}
-    //     scrollbarSize={10}
-    //     pagination
-    //     page={cuurentPage - 1}
-    //     pageSize={pageSize}
-    //     rowsPerPageOptions={[10, 20, 50, 100]}
-    //     rowCount={items.total}
-    //     paginationMode='server'
-    //     onPageChange={handlePageChange}
-    //     onPageSizeChange={handlePageSizeChange}
-    //     onCellClick={currentlySelected}
-    //     loading={loading}
-    //     rowHeight={65}
-    //   />
-    //     </div>
   );
 }
 
