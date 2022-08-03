@@ -11,7 +11,7 @@ import { getBranchName } from '../../../utils/utils';
 import { env } from '../../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../../models/branch-model';
 import { isAllowActionPermission, isGroupBranch } from '../../../utils/role-permission';
-import { closeSaleShift } from '../../../utils/enum/accounting-enum';
+import { closeSaleShift, CLOSE_SALE_SHIFT_ENUM } from '../../../utils/enum/accounting-enum';
 import CloseSaleShiftSearchList from './close-saleshift-list';
 import LoadingModal from '../../commons/ui/loading-modal';
 import AlertError from '../../commons/ui/alert-error';
@@ -122,7 +122,7 @@ function CloseSaleShiftSearch() {
         setNoOfShiftKey(_noOfShiftKey.toString());
         let notCorrect = false;
         datas.map((item: CloseSaleShiftInfo, index: number) => {
-          if (item.status !== 'CORRECT') {
+          if (item.status !== CLOSE_SALE_SHIFT_ENUM.CORRECT) {
             notCorrect = true;
           }
         });
@@ -142,7 +142,7 @@ function CloseSaleShiftSearch() {
     if (!isGroupBranch()) {
       setStartDate(null);
       setBranchFromCode('');
-      setValues({ status: 'ALL', branchFrom: '' });
+      setValues({ status: CLOSE_SALE_SHIFT_ENUM.WAIT_CHECKING, branchFrom: '' });
     } else {
       setValues({ ...values, status: 'ALL' });
     }
@@ -188,6 +188,8 @@ function CloseSaleShiftSearch() {
     if (groupBranch) {
       setBranchFromCode(ownBranch);
       setValues({ ...values, branchFrom: ownBranch });
+    } else {
+      setValues({ ...values, status: CLOSE_SALE_SHIFT_ENUM.WAIT_CHECKING });
     }
     setDisableBtnManage(isAllowActionPermission(ACTIONS.SALE_SHIFT_MANAGE));
     setDisableBtnSearch(isAllowActionPermission(ACTIONS.SALE_SHIFT_VIEW));
@@ -220,7 +222,7 @@ function CloseSaleShiftSearch() {
                 name='status'
                 value={values.status}
                 onChange={handleChange}
-                disabled={groupBranch ? true : false}
+                disabled={true}
                 inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
